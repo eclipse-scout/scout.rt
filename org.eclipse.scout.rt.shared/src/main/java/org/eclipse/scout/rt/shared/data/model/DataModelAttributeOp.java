@@ -18,8 +18,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
   }
 
   public static IDataModelAttributeOp create(int operator, String shortText, String text) {
+    return create(operator, shortText, text, null);
+  }
+
+  public static IDataModelAttributeOp create(int operator, String shortText, String text, String explanationText) {
     for (IDataModelAttributeOperatorProvider provider : BEANS.all(IDataModelAttributeOperatorProvider.class)) {
-      IDataModelAttributeOp attributeOp = provider.createOperator(operator, shortText, text);
+      IDataModelAttributeOp attributeOp = provider.createOperator(operator, shortText, text, explanationText);
       if (attributeOp != null) {
         return attributeOp;
       }

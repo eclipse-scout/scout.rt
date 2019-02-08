@@ -223,130 +223,130 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
   }
 
   @Override
-  public IDataModelAttributeOp createOperator(int operator, String shortText, String text) {
+  public IDataModelAttributeOp createOperator(int operator, String shortText, String text, String explanationText) {
     switch (operator) {
       case OPERATOR_BETWEEN:
-        return new Between(OPERATOR_BETWEEN, (shortText == null) ? (TEXTS.get("LogicBetweenShort")) : (shortText), (text == null) ? (TEXTS.get("LogicBetween")) : text);
+        return new Between(OPERATOR_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
       case OPERATOR_DATE_BETWEEN:
-        return new Between(OPERATOR_DATE_BETWEEN, (shortText == null) ? (TEXTS.get("LogicBetweenShort")) : (shortText), (text == null) ? (TEXTS.get("LogicBetween")) : text);
+        return new Between(OPERATOR_DATE_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
       case OPERATOR_DATE_TIME_BETWEEN:
-        return new Between(OPERATOR_DATE_TIME_BETWEEN, (shortText == null) ? (TEXTS.get("LogicBetweenShort")) : (shortText), (text == null) ? (TEXTS.get("LogicBetween")) : text);
+        return new Between(OPERATOR_DATE_TIME_BETWEEN, (shortText == null) ? TEXTS.get("LogicBetweenShort") : shortText, (text == null) ? TEXTS.get("LogicBetween") : text, explanationText);
       case OPERATOR_NEQ:
-        return new NEQ(OPERATOR_NEQ, (shortText == null) ? (TEXTS.get("LogicNEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicNEQ")) : text);
+        return new NEQ(OPERATOR_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
       case OPERATOR_DATE_NEQ:
-        return new NEQ(OPERATOR_DATE_NEQ, (shortText == null) ? (TEXTS.get("LogicNEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicNEQ")) : text);
+        return new NEQ(OPERATOR_DATE_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
       case OPERATOR_DATE_TIME_NEQ:
-        return new NEQ(OPERATOR_DATE_TIME_NEQ, (shortText == null) ? (TEXTS.get("LogicNEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicNEQ")) : text);
+        return new NEQ(OPERATOR_DATE_TIME_NEQ, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
       case OPERATOR_LT:
-        return new LT(OPERATOR_LT, (shortText == null) ? (TEXTS.get("LogicLT")) : (shortText), (text == null) ? (TEXTS.get("LogicLT")) : text);
+        return new LT(OPERATOR_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
       case OPERATOR_DATE_LT:
-        return new LT(OPERATOR_DATE_LT, (shortText == null) ? (TEXTS.get("LogicLT")) : (shortText), (text == null) ? (TEXTS.get("LogicLT")) : text);
+        return new LT(OPERATOR_DATE_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
       case OPERATOR_DATE_TIME_LT:
-        return new LT(OPERATOR_DATE_TIME_LT, (shortText == null) ? (TEXTS.get("LogicLT")) : (shortText), (text == null) ? (TEXTS.get("LogicLT")) : text);
+        return new LT(OPERATOR_DATE_TIME_LT, (shortText == null) ? TEXTS.get("LogicLT") : shortText, (text == null) ? TEXTS.get("LogicLT") : text, explanationText);
       case OPERATOR_LE:
-        return new LE(OPERATOR_LE, (shortText == null) ? (TEXTS.get("LogicLE")) : (shortText), (text == null) ? (TEXTS.get("LogicLE")) : text);
+        return new LE(OPERATOR_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
       case OPERATOR_DATE_LE:
-        return new LE(OPERATOR_DATE_LE, (shortText == null) ? (TEXTS.get("LogicLE")) : (shortText), (text == null) ? (TEXTS.get("LogicLE")) : text);
+        return new LE(OPERATOR_DATE_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
       case OPERATOR_DATE_TIME_LE:
-        return new LE(OPERATOR_DATE_TIME_LE, (shortText == null) ? (TEXTS.get("LogicLE")) : (shortText), (text == null) ? (TEXTS.get("LogicLE")) : text);
+        return new LE(OPERATOR_DATE_TIME_LE, (shortText == null) ? TEXTS.get("LogicLE") : shortText, (text == null) ? TEXTS.get("LogicLE") : text, explanationText);
       case OPERATOR_EQ:
-        return new EQ(OPERATOR_EQ, (shortText == null) ? (TEXTS.get("LogicEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicEQ")) : text);
+        return new EQ(OPERATOR_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
       case OPERATOR_DATE_EQ:
-        return new EQ(OPERATOR_DATE_EQ, (shortText == null) ? (TEXTS.get("LogicEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicEQ")) : text);
+        return new EQ(OPERATOR_DATE_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
       case OPERATOR_DATE_TIME_EQ:
-        return new EQ(OPERATOR_DATE_TIME_EQ, (shortText == null) ? (TEXTS.get("LogicEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicEQ")) : text);
+        return new EQ(OPERATOR_DATE_TIME_EQ, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
       case OPERATOR_GT:
-        return new GT(OPERATOR_GT, (shortText == null) ? (TEXTS.get("LogicGT")) : (shortText), (text == null) ? (TEXTS.get("LogicGT")) : text);
+        return new GT(OPERATOR_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
       case OPERATOR_DATE_GT:
-        return new GT(OPERATOR_DATE_GT, (shortText == null) ? (TEXTS.get("LogicGT")) : (shortText), (text == null) ? (TEXTS.get("LogicGT")) : text);
+        return new GT(OPERATOR_DATE_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
       case OPERATOR_DATE_TIME_GT:
-        return new GT(OPERATOR_DATE_TIME_GT, (shortText == null) ? (TEXTS.get("LogicGT")) : (shortText), (text == null) ? (TEXTS.get("LogicGT")) : text);
+        return new GT(OPERATOR_DATE_TIME_GT, (shortText == null) ? TEXTS.get("LogicGT") : shortText, (text == null) ? TEXTS.get("LogicGT") : text, explanationText);
       case OPERATOR_GE:
-        return new GE(OPERATOR_GE, (shortText == null) ? (TEXTS.get("LogicGE")) : (shortText), (text == null) ? (TEXTS.get("LogicGE")) : text);
+        return new GE(OPERATOR_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
       case OPERATOR_DATE_GE:
-        return new GE(OPERATOR_DATE_GE, (shortText == null) ? (TEXTS.get("LogicGE")) : (shortText), (text == null) ? (TEXTS.get("LogicGE")) : text);
+        return new GE(OPERATOR_DATE_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
       case OPERATOR_DATE_TIME_GE:
-        return new GE(OPERATOR_DATE_TIME_GE, (shortText == null) ? (TEXTS.get("LogicGE")) : (shortText), (text == null) ? (TEXTS.get("LogicGE")) : text);
+        return new GE(OPERATOR_DATE_TIME_GE, (shortText == null) ? TEXTS.get("LogicGE") : shortText, (text == null) ? TEXTS.get("LogicGE") : text, explanationText);
       case OPERATOR_DATE_IS_IN_DAYS:
-        return new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS, (shortText == null) ? (TEXTS.get("LogicDateIsInDays")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInDays")) : text);
+        return new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInDays") : text, explanationText);
       case OPERATOR_DATE_IS_IN_GE_DAYS:
-        return new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS, (shortText == null) ? (TEXTS.get("LogicDateIsInGEDays")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInGEDays")) : text);
+        return new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInGEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEDays") : text, explanationText);
       case OPERATOR_DATE_IS_IN_GE_MONTHS:
-        return new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS, (shortText == null) ? (TEXTS.get("LogicDateIsInGEMonths")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInGEMonths")) : text);
+        return new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInGEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInGEMonths") : text, explanationText);
       case OPERATOR_DATE_IS_IN_LE_DAYS:
-        return new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS, (shortText == null) ? (TEXTS.get("LogicDateIsInLEDays")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInLEDays")) : text);
+        return new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLEDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEDays") : text, explanationText);
       case OPERATOR_DATE_IS_IN_LE_MONTHS:
-        return new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS, (shortText == null) ? (TEXTS.get("LogicDateIsInLEMonths")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInLEMonths")) : text);
+        return new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLEMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLEMonths") : text, explanationText);
       case OPERATOR_DATE_IS_IN_LAST_DAYS:
-        return new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS, (shortText == null) ? (TEXTS.get("LogicDateIsInLastDays")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInLastDays")) : text);
+        return new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInLastDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastDays") : text, explanationText);
       case OPERATOR_DATE_IS_IN_LAST_MONTHS:
-        return new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS, (shortText == null) ? (TEXTS.get("LogicDateIsInLastMonths")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInLastMonths")) : text);
+        return new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInLastMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInLastMonths") : text, explanationText);
       case OPERATOR_DATE_IS_IN_MONTHS:
-        return new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS, (shortText == null) ? (TEXTS.get("LogicDateIsInMonths")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInMonths")) : text);
+        return new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInMonths") : text, explanationText);
       case OPERATOR_DATE_IS_IN_NEXT_DAYS:
-        return new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS, (shortText == null) ? (TEXTS.get("LogicDateIsInNextDays")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInNextDays")) : text);
+        return new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS, (shortText == null) ? TEXTS.get("LogicDateIsInNextDays") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextDays") : text, explanationText);
       case OPERATOR_DATE_IS_IN_NEXT_MONTHS:
-        return new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS, (shortText == null) ? (TEXTS.get("LogicDateIsInNextMonths")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsInNextMonths")) : text);
+        return new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS, (shortText == null) ? TEXTS.get("LogicDateIsInNextMonths") : shortText, (text == null) ? TEXTS.get("LogicDateIsInNextMonths") : text, explanationText);
       case OPERATOR_DATE_IS_NOT_TODAY:
-        return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? (TEXTS.get("LogicDateIsNotToday")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsNotToday")) : text);
+        return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsNotToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsNotToday") : text, explanationText);
       case OPERATOR_DATE_IS_TODAY:
-        return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? (TEXTS.get("LogicDateIsToday")) : (shortText), (text == null) ? (TEXTS.get("LogicDateIsToday")) : text);
+        return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsToday") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
-        return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? (TEXTS.get("LogicDateTimeIsInGEHours")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsInGEHours")) : text);
+        return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
-        return new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES, (shortText == null) ? (TEXTS.get("LogicDateTimeIsInGEMinutes")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsInGEMinutes")) : text);
+        return new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEMinutes") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_LE_HOURS:
-        return new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS, (shortText == null) ? (TEXTS.get("LogicDateTimeIsInLEHours")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsInLEHours")) : text);
+        return new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEHours") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES:
-        return new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES, (shortText == null) ? (TEXTS.get("LogicDateTimeIsInLEMinutes")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsInLEMinutes")) : text);
+        return new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES, (shortText == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInLEMinutes") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_NOT_NOW:
-        return new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW, (shortText == null) ? (TEXTS.get("LogicDateTimeIsNotNow")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsNotNow")) : text);
+        return new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNotNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNotNow") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_NOW:
-        return new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW, (shortText == null) ? (TEXTS.get("LogicDateTimeIsNow")) : (shortText), (text == null) ? (TEXTS.get("LogicDateTimeIsNow")) : text);
+        return new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW, (shortText == null) ? TEXTS.get("LogicDateTimeIsNow") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsNow") : text, explanationText);
       case OPERATOR_ENDS_WITH:
-        return new EndsWith(OPERATOR_ENDS_WITH, (shortText == null) ? (TEXTS.get("LogicEndsWith")) : (shortText), (text == null) ? (TEXTS.get("LogicEndsWith")) : text);
+        return new EndsWith(OPERATOR_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicEndsWith") : shortText, (text == null) ? TEXTS.get("LogicEndsWith") : text, explanationText);
       case OPERATOR_NOT_ENDS_WITH:
-        return new NotEndsWith(OPERATOR_NOT_ENDS_WITH, (shortText == null) ? (TEXTS.get("LogicNotEndsWith")) : (shortText), (text == null) ? (TEXTS.get("LogicNotEndsWith")) : text);
+        return new NotEndsWith(OPERATOR_NOT_ENDS_WITH, (shortText == null) ? TEXTS.get("LogicNotEndsWith") : shortText, (text == null) ? TEXTS.get("LogicNotEndsWith") : text, explanationText);
       case OPERATOR_IN:
-        return new In(OPERATOR_IN, (shortText == null) ? (TEXTS.get("LogicIn")) : (shortText), (text == null) ? (TEXTS.get("LogicIn")) : text);
+        return new In(OPERATOR_IN, (shortText == null) ? TEXTS.get("LogicIn") : shortText, (text == null) ? TEXTS.get("LogicIn") : text, explanationText);
       case OPERATOR_CONTAINS:
-        return new Contains(OPERATOR_CONTAINS, (shortText == null) ? (TEXTS.get("LogicLike")) : (shortText), (text == null) ? (TEXTS.get("LogicLike")) : text);
+        return new Contains(OPERATOR_CONTAINS, (shortText == null) ? TEXTS.get("LogicLike") : shortText, (text == null) ? TEXTS.get("LogicLike") : text, explanationText);
       case OPERATOR_LIKE:
-        return new Like(OPERATOR_LIKE, (shortText == null) ? (TEXTS.get("LogicEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicEQ")) : text);
+        return new Like(OPERATOR_LIKE, (shortText == null) ? TEXTS.get("LogicEQ") : shortText, (text == null) ? TEXTS.get("LogicEQ") : text, explanationText);
       case OPERATOR_NOT_LIKE:
-        return new Like(OPERATOR_NOT_LIKE, (shortText == null) ? (TEXTS.get("LogicNEQ")) : (shortText), (text == null) ? (TEXTS.get("LogicNEQ")) : text);
+        return new Like(OPERATOR_NOT_LIKE, (shortText == null) ? TEXTS.get("LogicNEQ") : shortText, (text == null) ? TEXTS.get("LogicNEQ") : text, explanationText);
       case OPERATOR_NOT_IN:
-        return new NotIn(OPERATOR_NOT_IN, (shortText == null) ? (TEXTS.get("LogicNotIn")) : (shortText), (text == null) ? (TEXTS.get("LogicNotIn")) : text);
+        return new NotIn(OPERATOR_NOT_IN, (shortText == null) ? TEXTS.get("LogicNotIn") : shortText, (text == null) ? TEXTS.get("LogicNotIn") : text, explanationText);
       case OPERATOR_NOT_CONTAINS:
-        return new NotContains(OPERATOR_NOT_CONTAINS, (shortText == null) ? (TEXTS.get("LogicNotLike")) : (shortText), (text == null) ? (TEXTS.get("LogicNotLike")) : text);
+        return new NotContains(OPERATOR_NOT_CONTAINS, (shortText == null) ? TEXTS.get("LogicNotLike") : shortText, (text == null) ? TEXTS.get("LogicNotLike") : text, explanationText);
       case OPERATOR_NOT_NULL:
-        return new NotNull(OPERATOR_NOT_NULL, (shortText == null) ? (TEXTS.get("LogicNotNull")) : (shortText), (text == null) ? (TEXTS.get("LogicNotNull")) : text);
+        return new NotNull(OPERATOR_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
       case OPERATOR_NUMBER_NOT_NULL:
-        return new NumberNotNull(OPERATOR_NUMBER_NOT_NULL, (shortText == null) ? (TEXTS.get("LogicNotNull")) : (shortText), (text == null) ? (TEXTS.get("LogicNotNull")) : text);
+        return new NumberNotNull(OPERATOR_NUMBER_NOT_NULL, (shortText == null) ? TEXTS.get("LogicNotNull") : shortText, (text == null) ? TEXTS.get("LogicNotNull") : text, explanationText);
       case OPERATOR_NULL:
-        return new Null(OPERATOR_NULL, (shortText == null) ? (TEXTS.get("LogicNull")) : (shortText), (text == null) ? (TEXTS.get("LogicNull")) : text);
+        return new Null(OPERATOR_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
       case OPERATOR_NUMBER_NULL:
-        return new NumberNull(OPERATOR_NUMBER_NULL, (shortText == null) ? (TEXTS.get("LogicNull")) : (shortText), (text == null) ? (TEXTS.get("LogicNull")) : text);
+        return new NumberNull(OPERATOR_NUMBER_NULL, (shortText == null) ? TEXTS.get("LogicNull") : shortText, (text == null) ? TEXTS.get("LogicNull") : text, explanationText);
       case OPERATOR_STARTS_WITH:
-        return new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? (TEXTS.get("LogicStartsWith")) : (shortText), (text == null) ? (TEXTS.get("LogicStartsWith")) : text);
+        return new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicStartsWith") : shortText, (text == null) ? TEXTS.get("LogicStartsWith") : text, explanationText);
       case OPERATOR_NOT_STARTS_WITH:
-        return new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? (TEXTS.get("LogicNotStartsWith")) : (shortText), (text == null) ? (TEXTS.get("LogicNotStartsWith")) : text);
+        return new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? TEXTS.get("LogicNotStartsWith") : shortText, (text == null) ? TEXTS.get("LogicNotStartsWith") : text, explanationText);
       case OPERATOR_TIME_IS_IN_GE_HOURS:
-        return new TimeIsInGEHours(OPERATOR_TIME_IS_IN_GE_HOURS, (shortText == null) ? (TEXTS.get("LogicTimeIsInGEHours")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInGEHours")) : text);
+        return new TimeIsInGEHours(OPERATOR_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInGEHours") : text, explanationText);
       case OPERATOR_TIME_IS_IN_GE_MINUTES:
-        return new TimeIsInGEMinutes(OPERATOR_TIME_IS_IN_GE_MINUTES, (shortText == null) ? (TEXTS.get("LogicTimeIsInGEMinutes")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInGEMinutes")) : text);
+        return new TimeIsInGEMinutes(OPERATOR_TIME_IS_IN_GE_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInGEMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInGEMinutes") : text, explanationText);
       case OPERATOR_TIME_IS_IN_HOURS:
-        return new TimeIsInHours(OPERATOR_TIME_IS_IN_HOURS, (shortText == null) ? (TEXTS.get("LogicTimeIsInHours")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInHours")) : text);
+        return new TimeIsInHours(OPERATOR_TIME_IS_IN_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInHours") : text, explanationText);
       case OPERATOR_TIME_IS_IN_LE_HOURS:
-        return new TimeIsInLEHours(OPERATOR_TIME_IS_IN_LE_HOURS, (shortText == null) ? (TEXTS.get("LogicTimeIsInLEHours")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInLEHours")) : text);
+        return new TimeIsInLEHours(OPERATOR_TIME_IS_IN_LE_HOURS, (shortText == null) ? TEXTS.get("LogicTimeIsInLEHours") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInLEHours") : text, explanationText);
       case OPERATOR_TIME_IS_IN_LE_MINUTES:
-        return new TimeIsInLEMinutes(OPERATOR_TIME_IS_IN_LE_MINUTES, (shortText == null) ? (TEXTS.get("LogicTimeIsInLEMinutes")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInLEMinutes")) : text);
+        return new TimeIsInLEMinutes(OPERATOR_TIME_IS_IN_LE_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInLEMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInLEMinutes") : text, explanationText);
       case OPERATOR_TIME_IS_IN_MINUTES:
-        return new TimeIsInMinutes(OPERATOR_TIME_IS_IN_MINUTES, (shortText == null) ? (TEXTS.get("LogicTimeIsInMinutes")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsInMinutes")) : text);
+        return new TimeIsInMinutes(OPERATOR_TIME_IS_IN_MINUTES, (shortText == null) ? TEXTS.get("LogicTimeIsInMinutes") : shortText, (text == null) ? TEXTS.get("LogicTimeIsInMinutes") : text, explanationText);
       case OPERATOR_TIME_IS_NOW:
-        return new TimeIsNow(OPERATOR_TIME_IS_NOW, (shortText == null) ? (TEXTS.get("LogicTimeIsNow")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsNow")) : text);
+        return new TimeIsNow(OPERATOR_TIME_IS_NOW, (shortText == null) ? TEXTS.get("LogicTimeIsNow") : shortText, (text == null) ? TEXTS.get("LogicTimeIsNow") : text, explanationText);
       case OPERATOR_TIME_IS_NOT_NOW:
-        return new TimeIsNotNow(OPERATOR_TIME_IS_NOT_NOW, (shortText == null) ? (TEXTS.get("LogicTimeIsNotNow")) : (shortText), (text == null) ? (TEXTS.get("LogicTimeIsNotNow")) : text);
+        return new TimeIsNotNow(OPERATOR_TIME_IS_NOT_NOW, (shortText == null) ? TEXTS.get("LogicTimeIsNotNow") : shortText, (text == null) ? TEXTS.get("LogicTimeIsNotNow") : text, explanationText);
     }
     return null;
   }
@@ -355,14 +355,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NEQ(int operator, String shortText, String text) {
+    NEQ(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
     }
 
     @Override
@@ -378,6 +380,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -390,14 +397,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    LT(int operator, String shortText, String text) {
+    LT(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
     }
 
     @Override
@@ -413,6 +422,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -426,14 +440,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    LE(int operator, String shortText, String text) {
+    LE(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -450,6 +466,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -463,14 +484,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    EQ(int operator, String shortText, String text) {
+    EQ(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -487,6 +510,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -500,14 +528,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    GT(int operator, String shortText, String text) {
+    GT(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -524,6 +554,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -537,14 +572,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    GE(int operator, String shortText, String text) {
+    GE(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -561,6 +598,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -574,14 +616,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInDays(int operator, String shortText, String text) {
+    DateIsInDays(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -598,6 +642,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -611,14 +660,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInGEDays(int operator, String shortText, String text) {
+    DateIsInGEDays(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -635,6 +686,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -648,14 +704,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInGEMonths(int operator, String shortText, String text) {
+    DateIsInGEMonths(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -672,6 +730,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -685,14 +748,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInLEDays(int operator, String shortText, String text) {
+    DateIsInLEDays(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -709,6 +774,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -722,14 +792,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInLEMonths(int operator, String shortText, String text) {
+    DateIsInLEMonths(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -746,6 +818,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -759,14 +836,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInLastDays(int operator, String shortText, String text) {
+    DateIsInLastDays(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -783,6 +862,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -796,14 +880,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInLastMonths(int operator, String shortText, String text) {
+    DateIsInLastMonths(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -820,6 +906,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -833,14 +924,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInMonths(int operator, String shortText, String text) {
+    DateIsInMonths(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -857,6 +950,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -870,14 +968,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInNextDays(int operator, String shortText, String text) {
+    DateIsInNextDays(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -894,6 +994,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -907,14 +1012,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsInNextMonths(int operator, String shortText, String text) {
+    DateIsInNextMonths(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -931,6 +1038,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -944,14 +1056,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsNotToday(int operator, String shortText, String text) {
+    DateIsNotToday(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -968,6 +1082,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -981,14 +1100,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateIsToday(int operator, String shortText, String text) {
+    DateIsToday(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1005,6 +1126,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1018,14 +1144,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsInGEHours(int operator, String shortText, String text) {
+    DateTimeIsInGEHours(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1042,6 +1170,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1055,14 +1188,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsInGEMinutes(int operator, String shortText, String text) {
+    DateTimeIsInGEMinutes(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1079,6 +1214,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1092,14 +1232,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsInLEHours(int operator, String shortText, String text) {
+    DateTimeIsInLEHours(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1116,6 +1258,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1129,14 +1276,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsInLEMinutes(int operator, String shortText, String text) {
+    DateTimeIsInLEMinutes(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1153,6 +1302,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1166,14 +1320,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsNotNow(int operator, String shortText, String text) {
+    DateTimeIsNotNow(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1190,6 +1346,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1203,14 +1364,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    DateTimeIsNow(int operator, String shortText, String text) {
+    DateTimeIsNow(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1227,6 +1390,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1240,14 +1408,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    EndsWith(int operator, String shortText, String text) {
+    EndsWith(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1264,6 +1434,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1277,14 +1452,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NotEndsWith(int operator, String shortText, String text) {
+    NotEndsWith(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1301,6 +1478,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1314,14 +1496,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    In(int operator, String shortText, String text) {
+    In(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1338,6 +1522,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1351,14 +1540,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    Contains(int operator, String shortText, String text) {
+    Contains(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1375,6 +1566,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1388,14 +1584,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NotIn(int operator, String shortText, String text) {
+    NotIn(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1412,6 +1610,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1425,14 +1628,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NotContains(int operator, String shortText, String text) {
+    NotContains(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1452,6 +1657,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     }
 
     @Override
+    public String getExplanationText() {
+      return m_explanationText;
+    }
+
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -1462,14 +1672,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NotNull(int operator, String shortText, String text) {
+    NotNull(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1486,6 +1698,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1502,14 +1719,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NumberNotNull(int operator, String shortText, String text) {
+    NumberNotNull(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1526,6 +1745,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1539,14 +1763,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    Null(int operator, String shortText, String text) {
+    Null(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1563,6 +1789,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1579,14 +1810,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NumberNull(int operator, String shortText, String text) {
+    NumberNull(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1603,6 +1836,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1616,14 +1854,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    StartsWith(int operator, String shortText, String text) {
+    StartsWith(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1640,6 +1880,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1653,14 +1898,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    NotStartsWith(int operator, String shortText, String text) {
+    NotStartsWith(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1677,6 +1924,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1690,14 +1942,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInGEHours(int operator, String shortText, String text) {
+    TimeIsInGEHours(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1714,6 +1968,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1727,14 +1986,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInGEMinutes(int operator, String shortText, String text) {
+    TimeIsInGEMinutes(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1751,6 +2012,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1764,14 +2030,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInHours(int operator, String shortText, String text) {
+    TimeIsInHours(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1788,6 +2056,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1801,14 +2074,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInLEHours(int operator, String shortText, String text) {
+    TimeIsInLEHours(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1825,6 +2100,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1838,14 +2118,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInLEMinutes(int operator, String shortText, String text) {
+    TimeIsInLEMinutes(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1862,6 +2144,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1875,14 +2162,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsInMinutes(int operator, String shortText, String text) {
+    TimeIsInMinutes(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1902,6 +2191,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     }
 
     @Override
+    public String getExplanationText() {
+      return m_explanationText;
+    }
+
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INTEGER;
     }
@@ -1912,14 +2206,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsNow(int operator, String shortText, String text) {
+    TimeIsNow(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1936,6 +2232,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override
@@ -1949,14 +2250,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    TimeIsNotNow(int operator, String shortText, String text) {
+    TimeIsNotNow(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -1976,6 +2279,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     }
 
     @Override
+    public String getExplanationText() {
+      return m_explanationText;
+    }
+
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
     }
@@ -1985,14 +2293,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     private static final long serialVersionUID = 1L;
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    Between(int operator, String shortText, String text) {
+    Between(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
     }
 
     @Override
@@ -2019,6 +2329,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     }
 
     @Override
+    public String getExplanationText() {
+      return m_explanationText;
+    }
+
+    @Override
     public int getType() {
       return IDataModelAttribute.TYPE_INHERITED;
     }
@@ -2029,14 +2344,16 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     private final String m_shortText;
     private final String m_text;
+    private final String m_explanationText;
 
     /**
      * @param aggregationType
      */
-    Like(int operator, String shortText, String text) {
+    Like(int operator, String shortText, String text, String explanationText) {
       super(operator);
       m_shortText = shortText;
       m_text = text;
+      m_explanationText = explanationText;
 
     }
 
@@ -2053,6 +2370,11 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public String getShortText() {
       return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
     }
 
     @Override

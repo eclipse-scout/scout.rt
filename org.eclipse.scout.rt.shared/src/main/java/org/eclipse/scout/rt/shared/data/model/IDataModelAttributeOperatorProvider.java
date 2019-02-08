@@ -39,7 +39,9 @@ public interface IDataModelAttributeOperatorProvider {
    *          Short text (optional, otherwise default will be used)
    * @param text
    *          Text (optional, otherwise default will be used)
+   * @param explanationText
+   *          Text (optional)
    * @return Data model attribute operation
    */
-  IDataModelAttributeOp createOperator(int operator, String shortText, String text);
+  IDataModelAttributeOp createOperator(int operator, String shortText, String text, String explanationText);
 }

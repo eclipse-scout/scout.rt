@@ -27,6 +27,11 @@ public interface IDataModelAttributeOp {
   String getShortText();
 
   /**
+   * example: "Operator does not search for part terms use '*' to do so."
+   */
+  String getExplanationText();
+
+  /**
    * @return the field type to display to select a value for usiong this operation, use
    *         {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used see
    *         {@link IComposerAttribute}.TYPE_* values
