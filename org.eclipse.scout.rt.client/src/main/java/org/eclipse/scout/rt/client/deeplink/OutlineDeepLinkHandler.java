@@ -58,8 +58,8 @@ public class OutlineDeepLinkHandler extends AbstractDeepLinkHandler {
 
   public BrowserHistoryEntry createBrowserHistoryEntry(IOutline outline) {
     return DeepLinkUriBuilder.createRelative()
-        .parameterInfo(outline.getTitle())
         .parameterPath(toDeepLinkPath(outlineId(outline)))
+        .parameterInfo(outline.getTitle())
         .createBrowserHistoryEntry();
   }
 
