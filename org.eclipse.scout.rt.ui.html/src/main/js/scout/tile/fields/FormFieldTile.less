@@ -106,7 +106,8 @@
     }
 
     /* Override link style in inverted tiles, otherwise app-links would not be readable */
-    & .app-link {
+    & .app-link,
+    & a {
       color: @tile-default-inverted-color;
       text-decoration: underline;
 
@@ -152,7 +153,8 @@
       color: @tile-alternative-label-color;
     }
 
-    & .app-link {
+    & .app-link,
+    & a {
       color: @tile-alternative-link-color;
 
       &:hover {
@@ -174,7 +176,8 @@
       color: @tile-alternative-inverted-label-color;
     }
 
-    & .app-link {
+    & .app-link,
+    & a {
       color: @tile-alternative-inverted-color;
 
       &:hover {
