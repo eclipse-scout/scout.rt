@@ -78,5 +78,5 @@ scout.BeanColumn.prototype.cellTextForTextFilter = function(row) {
 scout.BeanColumn.prototype.compare = function(row1, row2) {
   var plainText1 = this._plainTextForRow(row1);
   var plainText2 = this._plainTextForRow(row2);
-  return this.comparator.compare(plainText1, plainText2);
+  return this.comparator.compareIgnoreCase(plainText1, plainText2);
 };

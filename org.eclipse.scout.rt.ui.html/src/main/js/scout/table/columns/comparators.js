@@ -54,6 +54,24 @@ scout.comparators = {
       // and the collator is not set. Either we forgot to call install() or we've called
       // install but the browser does not support i18n.
       return this.collator.compare(valueA, valueB);
+    },
+    compareIgnoreCase: function(valueA, valueB) {
+      if (!valueA) {
+        valueA = null;
+      }
+      if (!valueB) {
+        valueB = null;
+      }
+      if (valueA === valueB) {
+        return 0;
+      }
+      if (valueA === null) {
+        return -1;
+      }
+      if (valueB === null) {
+        return 1;
+      }
+      return this.compare(valueA.toLowerCase(), valueB.toLowerCase());
     }
   },
 
@@ -97,6 +115,12 @@ scout.comparators = {
       return !!this.collator && scout.comparators.NUMERIC.install(session);
     },
     compare: function(valueA, valueB) {
+      return this._compare(valueA, valueB, false);
+    },
+    compareIgnoreCase: function(valueA, valueB) {
+      return this._compare(valueA, valueB, true);
+    },
+    _compare: function(valueA, valueB, ignoreCase) {
       if (!valueA && !valueB) {
         return 0;
       }
@@ -121,7 +145,7 @@ scout.comparators = {
             return numericResult;
           }
         } else {
-          var textResult = scout.comparators.TEXT.compare(found1[1], found2[1]);
+          var textResult = ignoreCase ? scout.comparators.TEXT.compareIgnoreCase(found1[1], found2[1]) : scout.comparators.TEXT.compare(found1[1], found2[1]);
           if (textResult !== 0) {
             return textResult;
           }

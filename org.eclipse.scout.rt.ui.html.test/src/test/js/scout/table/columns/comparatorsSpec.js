@@ -21,6 +21,32 @@ describe("scout.comparators", function() {
     expect(comparator.compare('b', 'a')).toBe(1);
   });
 
+  it("tests 'compareIgnoreCase' method of TEXT comparator", function() {
+    var comparator = scout.comparators.TEXT;
+
+    expect(comparator.compareIgnoreCase(null, null)).toBe(0);
+    expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
+    expect(comparator.compareIgnoreCase(undefined, null)).toBe(0);
+    expect(comparator.compareIgnoreCase(undefined, '')).toBe(0);
+    expect(comparator.compareIgnoreCase('', '')).toBe(0);
+
+
+    expect(comparator.compareIgnoreCase(null, 'a')).toBe(-1);
+    expect(comparator.compareIgnoreCase('a', null)).toBe(1);
+
+    expect(comparator.compareIgnoreCase(undefined, 'a')).toBe(-1);
+    expect(comparator.compareIgnoreCase('a', undefined)).toBe(1);
+
+    expect(comparator.compareIgnoreCase('', 'a')).toBe(-1);
+    expect(comparator.compareIgnoreCase('a', '')).toBe(1);
+
+    expect(comparator.compareIgnoreCase('A', 'a')).toBe(0);
+    expect(comparator.compareIgnoreCase('a', 'a')).toBe(0);
+
+    expect(comparator.compare('a', 'B')).toBe(1);
+    expect(comparator.compare('B', 'a')).toBe(-1);
+  });
+
   it("tests 'compare' method of NUMERIC comparator", function() {
     var comparator = scout.comparators.NUMERIC;
 
@@ -50,4 +76,62 @@ describe("scout.comparators", function() {
     expect(comparator.compare('doc 9 .txt 10', 'doc 9')).toBe(1);
   });
 
+  it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator", function() {
+    var comparator = scout.comparators.ALPHANUMERIC;
+
+    expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
+    expect(comparator.compareIgnoreCase(null, null)).toBe(0);
+    expect(comparator.compareIgnoreCase('', '')).toBe(0);
+
+    expect(comparator.compareIgnoreCase('', null)).toBe(0);
+    expect(comparator.compareIgnoreCase(null, '')).toBe(0);
+
+    expect(comparator.compareIgnoreCase(null, undefined)).toBe(0);
+    expect(comparator.compareIgnoreCase('', undefined)).toBe(0);
+
+    expect(comparator.compareIgnoreCase(undefined, 'doc8')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc8', null)).toBe(1);
+    expect(comparator.compareIgnoreCase('doc8', '')).toBe(1);
+
+    expect(comparator.compareIgnoreCase('doc8', 'doc8')).toBe(0);
+    expect(comparator.compareIgnoreCase('doc8', 'DOC8')).toBe(0);
+    expect(comparator.compareIgnoreCase('doc8', 'doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('Doc8', 'doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc9', 'doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc9', 'Doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc 9 .txt 10', 'doc 9')).toBe(1);
+    expect(comparator.compareIgnoreCase('doc 9 .TXT 10', 'doc 9')).toBe(1);
+    expect(comparator.compareIgnoreCase('doc9', 'adoc10')).toBe(1);
+    expect(comparator.compareIgnoreCase('doc9', 'DOC 9')).toBe(-1);
+
+    expect(comparator.compareIgnoreCase('doc 9', 'DOC-9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC 9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC-9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC\n\n9')).toBe(-1);
+  });
+
+  it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator with session", function() {
+    var comparator = scout.comparators.ALPHANUMERIC;
+    comparator.install(createSession());
+    expect(comparator.compareIgnoreCase('doc8', 'doc8')).toBe(0);
+    expect(comparator.compareIgnoreCase('DoC8', 'dOc8')).toBe(0);
+    expect(comparator.compareIgnoreCase('doc8', 'doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('Doc9', 'doc9.txt')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc 9 .TXT 10', 'doc 9')).toBe(1);
+    expect(comparator.compareIgnoreCase('doc9', 'DOC 9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc 9', 'DOC-9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC 9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC-9')).toBe(-1);
+    expect(comparator.compareIgnoreCase('doc\n9', 'DOC\n\n9')).toBe(-1);
+  });
+
+  function createSession(userAgent) {
+    setFixtures(sandbox());
+    var session = sandboxSession({
+      'userAgent': userAgent
+    });
+    // test request only, don't test response (would require valid session, desktop etc.)
+    session._processStartupResponse = function() {};
+    return session;
+  }
 });
