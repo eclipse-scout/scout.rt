@@ -451,23 +451,18 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         flatClientSessions.addAll(m_uiSessionsByClientSession.keySet());
         flatClientSessions.addAll(m_preregisteredUiSessionsByClientSession.keySet());
 
-        Set<IUiSession> flatUiSessions = new HashSet<>();
+        Set<IUiSession> uiSessionsByClientSession = new HashSet<>();
         for (Set<IUiSession> s : m_uiSessionsByClientSession.values()) {
-          flatUiSessions.addAll(s);
+          uiSessionsByClientSession.addAll(s);
         }
 
-        Set<IUiSession> flatPreregisteredUiSessions = new HashSet<>();
+        Set<IUiSession> preregisteredUiSessionsByClientSession = new HashSet<>();
         for (Set<IUiSession> s : m_preregisteredUiSessionsByClientSession.values()) {
-          flatPreregisteredUiSessions.addAll(s);
+          preregisteredUiSessionsByClientSession.addAll(s);
         }
 
-        LOG.debug("clientSessions:{}\tclientSessionFlat:{}\tuiSessions:{}\tuiSessionsFlat:{}\tpreregisteredUiSessions:{}\tpreregisteredUiSessionsFlat:{}",
-            m_clientSessionMap.size(),
-            flatClientSessions.size(),
-            m_uiSessionMap.size(),
-            flatUiSessions.size(),
-            m_preregisteredUiSessionMap.size(),
-            flatPreregisteredUiSessions.size());
+        LOG.debug("Remaining sessions: [clientSessions: {}, clientSessionFlat: {}, uiSessions: {}, uiSessionsByClientSession: {}, preregisteredUiSessions: {}, preregisteredUiSessionsByClientSession: {}]",
+            m_clientSessionMap.size(), flatClientSessions.size(), m_uiSessionMap.size(), uiSessionsByClientSession.size(), m_preregisteredUiSessionMap.size(), preregisteredUiSessionsByClientSession.size());
       }
 
       if (m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid) {
