@@ -25,8 +25,8 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
     _table: null,
     _fillerWidth: null,
     cssSelector: '.table',
-    prepare: function($container, layout) {
-      this._table = layout._proposalChooser.model;
+    prepare: function(table) {
+      this._table = table;
     },
     /**
      * Clears the given CSS property and stores the old value as data with prefix 'backup'
@@ -64,7 +64,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
      * Modifies the table in a way that the preferred width may be read.
      * Removes explicit widths on rows, cells, fillers and sets display to inline-block.
      */
-    modifyDom: function($container) {
+    modifyDom: function() {
       this._table.$container
         .css('display', 'inline-block')
         .css('width', 'auto')
@@ -84,7 +84,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       }
     },
 
-    restoreDom: function($container) {
+    restoreDom: function() {
       this._table.$container
         .css('display', 'block')
         .css('width', '100%')
@@ -107,8 +107,8 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
   TREE: {
     _tree: null,
     cssSelector: '.tree',
-    prepare: function($container, layout) {
-      this._tree = layout._proposalChooser.model;
+    prepare: function(tree) {
+      this._tree = tree;
       var $nodes = this._tree.$data
         .children('.tree-node')
         .removeClass('first last');
@@ -117,7 +117,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       $nodes.last()
         .addClass('last');
     },
-    modifyDom: function($container) {
+    modifyDom: function() {
       this._tree.$container
         .css('display', 'inline-block')
         .css('width', 'auto')
@@ -125,7 +125,7 @@ scout.ProposalChooserLayout.TYPE_HANDLER = {
       this._tree.$data
         .css('display', 'inline-block');
     },
-    restoreDom: function($container) {
+    restoreDom: function() {
       this._tree.$container
         .css('display', 'block')
         .css('width', '100%')
@@ -189,7 +189,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     filter = this._proposalChooser.activeFilterGroup,
     $parent = $container.parent();
 
-  this._typeHandler.prepare($container, this);
+  this._typeHandler.prepare(this._proposalChooser.model);
   modelSize = this._proposalChooser.model.htmlComp.prefSize();
   prefSize = modelSize;
   scout.scrollbars.storeScrollPositions($container, this._proposalChooser.session);
@@ -199,7 +199,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   pcHeight = $container.css('height');
 
   $container.detach();
-  this._typeHandler.modifyDom($container);
+  this._typeHandler.modifyDom();
   $container
     .css('display', 'inline-block')
     .css('width', 'auto')
@@ -210,7 +210,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
   }).width;
 
   $container.detach();
-  this._typeHandler.restoreDom($container);
+  this._typeHandler.restoreDom();
   $container
     .css('display', 'block')
     .css('width', pcWidth)
