@@ -8,46 +8,57 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.tag-field > .field {
-  .input-field();
+.tag-field {
 
-  &.alternative {
-    .input-field.alternative();
+  &.focused > .field {
+    #scout.focus-border();
+
+    &.alternative {
+      #scout.alternative-focus-border();
+    }
   }
 
-  user-select: none;
-  padding: 0 0 0 @tag-field-tag-margin-right;
+  & > .field {
+    .input-field();
 
-  &:not(.multiline) {
-    white-space: nowrap;
-  }
-
-  & > .tag-bar {
-    display: inline-block;
-  }
-
-  & > input {
-    border: none;
-    padding: 0 3px;
-    height: 100%;
-    background-color: transparent;
-
-    &.fullwidth {
-      width: 100%;
-      padding: 0 0 0 @text-field-padding-x - @tag-field-tag-margin-right;
-
-      &.alternative {
-        padding-left: @text-field-alternative-padding-left;
-        padding-right: @text-field-alternative-padding-right;
-      }
+    &.alternative {
+      .input-field.alternative();
     }
 
-    &.focused, &:focus {
-      box-shadow: none;
+    user-select: none;
+    padding: 0 0 0 @tag-field-tag-margin-right;
+
+    &:not(.multiline) {
+      white-space: nowrap;
     }
 
-    &.has-error {
+    & > .tag-bar {
+      display: inline-block;
+    }
+
+    & > input {
+      border: none;
+      padding: 0 3px;
+      height: 100%;
       background-color: transparent;
+
+      &.fullwidth {
+        width: 100%;
+        padding: 0 0 0 @text-field-padding-x - @tag-field-tag-margin-right;
+
+        &.alternative {
+          padding-left: @text-field-alternative-padding-left;
+          padding-right: @text-field-alternative-padding-right;
+        }
+      }
+
+      &.focused, &:focus {
+        box-shadow: none;
+      }
+
+      &.has-error {
+        background-color: transparent;
+      }
     }
   }
 }
