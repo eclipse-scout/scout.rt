@@ -28,6 +28,9 @@ scout.WidgetTile.prototype._init = function(model) {
   if (!this.tileWidget.visible) {
     this.setVisible(false);
   }
+  if (!this.tileWidget.enabled) {
+    this.setEnabled(false);
+  }
   this.tileWidget.on('propertyChange', this._widgetPropertyChangeHandler);
 };
 
@@ -45,5 +48,7 @@ scout.WidgetTile.prototype._render = function() {
 scout.WidgetTile.prototype._onWidgetPropertyChange = function(event) {
   if (event.propertyName === 'visible') {
     this.setVisible(event.newValue);
+  } else if (event.propertyName === 'enabled') {
+    this.setEnabled(event.newValue);
   }
 };
