@@ -706,15 +706,19 @@ scout.TileGrid.prototype.setFocusedTile = function(tile) {
   if (!this.rendered || !tile || this.isFocused()) {
     return;
   }
-  var $scrollable = this.$container.scrollParent();
-  if ($scrollable.length === 0) {
+  var $scrollables = this.$container.scrollParents();
+  if ($scrollables.length === 0) {
     return;
   }
-  var oldScrollTop = $scrollable.scrollTop();
+  var oldScrollTopArr = $scrollables.map(function(i, $elem) {
+    return $elem.scrollTop();
+  }).toArray();
   // Make sure the tile grid has the focus when focusing a tile
   if (this.focus()) {
     // Restore old scroll to prevent scrolling by the browser due to the focus() call
-    $scrollable[0].scrollTop = oldScrollTop;
+    oldScrollTopArr.forEach(function(val, idx) {
+      $scrollables[idx].scrollTop(val);
+    }, this);
   }
 };
 
