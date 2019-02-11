@@ -258,6 +258,7 @@ scout.TagField.prototype._lookupByText = function(text) {
     return null;
   }
   if (scout.strings.empty(text) || text.length < 2) {
+    this.closeChooserPopup();
     return;
   }
 

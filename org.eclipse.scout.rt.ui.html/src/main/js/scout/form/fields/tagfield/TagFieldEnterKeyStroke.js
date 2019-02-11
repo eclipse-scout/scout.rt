@@ -14,6 +14,7 @@ scout.TagFieldEnterKeyStroke = function(tagField) {
   this.which = [scout.keys.ENTER];
   this.renderingHints.render = false;
   this.preventDefault = false;
+  this.stopPropagation = true;
 };
 scout.inherits(scout.TagFieldEnterKeyStroke, scout.KeyStroke);
 
