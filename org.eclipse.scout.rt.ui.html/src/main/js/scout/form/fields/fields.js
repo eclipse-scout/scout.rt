@@ -17,7 +17,7 @@ scout.fields = {
   makeTextField: function($parent, cssClass) {
     return $parent.makeElement('<input>', cssClass)
       .attr('type', 'text')
-      .attr('autocomplete', 'false') /* use false instead of off, off is currently ignored in chrome, false should work with all major browsers*/
+      .attr('autocomplete', 'NoAutocomplete') /* off and false are currently ignored in Chrome */
       .disableSpellcheck();
   },
 
