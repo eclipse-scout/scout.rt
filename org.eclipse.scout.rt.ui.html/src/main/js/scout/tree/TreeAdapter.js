@@ -169,12 +169,21 @@ scout.TreeAdapter.prototype._onNodeExpanded = function(nodeId, event) {
     options = {
       lazy: event.expandedLazy
     };
+
+  var affectedNodesMap = scout.objects.createMap();
+  affectedNodesMap[nodeId] = true;
+  if (event.recursive) {
+    scout.Tree.visitNodes(node.childNodes, function(n) {
+      affectedNodesMap[n.id] = true;
+    });
+  }
   this.addFilterForWidgetEvent(function(widgetEvent) {
     return widgetEvent.type === 'nodeExpanded' &&
-      nodeId === widgetEvent.node.id &&
+      affectedNodesMap[widgetEvent.node.id] &&
       event.expanded === widgetEvent.expanded &&
       event.expandedLazy === widgetEvent.expandedLazy;
   }.bind(this));
+
   this.widget.setNodeExpanded(node, event.expanded, options);
   if (event.recursive) {
     this.widget.setNodeExpandedRecursive(node.childNodes, event.expanded, options);
