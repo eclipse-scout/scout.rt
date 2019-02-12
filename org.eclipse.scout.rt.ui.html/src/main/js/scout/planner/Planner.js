@@ -429,6 +429,17 @@ scout.Planner.prototype._renderScale = function() {
         var rangeScaling = (24 / (lastHour - firstHour + 1));
         // re-add day component
         var dayOffset = dayDiffTBegin / dayDIffEndBegin;
+
+        if (t.getHours() < firstHour) {
+          // If t is in the morning before the first hour of day, return 00:00 of this day
+          return (rangeScaling / fullRangeMillis + dayOffset) * 100;
+        }
+        if (t.getHours() > lastHour) {
+          // If t is in the evening after the last hour of day, return 00:00 of next day
+          dayOffset = (dayDiffTBegin + 1) / dayDIffEndBegin;
+          return (rangeScaling / fullRangeMillis + dayOffset) * 100;
+        }
+
         return ((t.valueOf() - (begin.valueOf() + firstHour * 3600000) - dayComponentMillis) * rangeScaling / fullRangeMillis + dayOffset) * 100;
       };
     }(this.viewRange.from, this.viewRange.to, firstHourOfDay, lastHourOfDay, interval);
