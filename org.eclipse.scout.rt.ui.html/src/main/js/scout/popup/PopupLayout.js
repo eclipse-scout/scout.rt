@@ -19,7 +19,7 @@ scout.PopupLayout.prototype.layout = function($container) {
   if (this.popup.isOpeningAnimationRunning()) {
     this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));
     return;
-  } else if (this.popup.removalPending || this.popup.removing || !this.popup.rendered){
+  } else if (this.popup.removalPending || this.popup.removing || !this.popup.rendered) {
     return;
   }
   var htmlComp = this.popup.htmlComp;
@@ -68,6 +68,11 @@ scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) 
       width: prefSize.width,
       left: prefPosition.left,
       top: prefPosition.top
+    }, {
+      complete: function() {
+        // Ensure the arrow is at the correct position after the animation
+        this.popup.position();
+      }.bind(this)
     });
 };
 

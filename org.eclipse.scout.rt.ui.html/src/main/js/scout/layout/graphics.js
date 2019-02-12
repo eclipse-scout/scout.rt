@@ -277,6 +277,15 @@ scout.graphics = {
     });
   },
 
+  setMargins: function($comp, margins) {
+    $comp.css({
+      marginLeft: margins.left,
+      marginRight: margins.right,
+      marginTop: margins.top,
+      marginBottom: margins.bottom
+    });
+  },
+
   paddings: function($comp) {
     return scout.graphics.insets($comp, {
       includeMargin: false,

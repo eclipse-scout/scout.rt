@@ -36,15 +36,12 @@ scout.Popup = function() {
   this.verticalAlignment = scout.Popup.Alignment.BOTTOM;
 
   // If switch is enabled, the alignment will be changed if the popup overlaps a window border.
-  // Currently only switching form right to left and bottom to top is supported.
-  // Switching from leftedge to rightedge and topedge to bottomedge does not work if withArrow is true
   this.horizontalSwitch = false;
   this.verticalSwitch = true;
 
   // Hints for the layout to control whether the size should be adjusted if the popup does not fit into the window.
   // Before trimming is applied the popup will be switched, if the switch option is enabled.
-  // If neither switch nor trim is enabled, the popup will be moved from right to left until its right border is visible.
-  // This moving is currently only supported for the right window border. If it overlaps any other border it won't be moved.
+  // If neither switch nor trim is enabled, the popup will be moved until its right border is visible.
   this.trimWidth = false;
   this.trimHeight = true;
 
@@ -530,7 +527,15 @@ scout.Popup.prototype._prefLocationWithAnchor = function(verticalAlignment, hori
   var size = scout.graphics.size($container);
   var margins = scout.graphics.margins($container);
   var Alignment = scout.Popup.Alignment;
-  var arrowBounds = this.$arrow ? scout.graphics.bounds(this.$arrow) : null;
+
+  var arrowBounds = null;
+  if (this.$arrow) {
+    // Ensure the arrow has the correct class
+    this._updateArrowClass(verticalAlignment, horizontalAlignment);
+    // Remove margin added by moving logic, otherwise the bounds would not be correct
+    scout.graphics.setMargins(this.$arrow, new scout.Insets());
+    arrowBounds = scout.graphics.bounds(this.$arrow);
+  }
 
   $container.removeClass(this._alignClasses());
   $container.addClass(verticalAlignment + ' ' + horizontalAlignment);
@@ -610,20 +615,30 @@ scout.Popup.prototype.getWindowSize = function() {
   return new scout.Dimension($window.width(), $window.height());
 };
 
+/**
+ * @returns scout.Point the amount of overlap at the window borders.
+ * A positive value indicates that it is overlapping the right / bottom border, a negative value indicates that it is overlapping the left / top border.
+ * Prefers the right and bottom over the left and top border, meaning if a positive value is returned it does not mean that the left border is overlapping as well.
+ */
 scout.Popup.prototype.overlap = function(location, includeMargin) {
   var $container = this.$container;
   if (!$container || !location) {
     return;
   }
   includeMargin = scout.nvl(includeMargin, true);
-  var overlapX, overlapY,
-    height = $container.outerHeight(includeMargin),
-    width = $container.outerWidth(includeMargin),
-    left = location.x,
-    top = location.y;
+  var height = $container.outerHeight(includeMargin);
+  var width = $container.outerWidth(includeMargin);
+  var popupBounds = new scout.Rectangle(location.x, location.y, width, height);
+  var bounds = scout.graphics.offsetBounds($container.entryPoint(), true);
 
-  overlapX = left + width + this.windowPaddingX - $container.entryPoint().outerWidth(true);
-  overlapY = top + height + this.windowPaddingY - $container.entryPoint().outerHeight(true);
+  var overlapX = popupBounds.right() + this.windowPaddingX - bounds.width;
+  if (overlapX < 0) {
+    overlapX = Math.min(popupBounds.x - this.windowPaddingX - bounds.x, 0);
+  }
+  var overlapY = popupBounds.bottom() + this.windowPaddingY - bounds.height;
+  if (overlapY < 0) {
+    overlapY = Math.min(popupBounds.y - this.windowPaddingY - bounds.y, 0);
+  }
   return new scout.Point(overlapX, overlapY);
 };
 
@@ -632,19 +647,18 @@ scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
     horizontalAlignment = this.horizontalAlignment,
     overlap = this.overlap(location);
 
+  // Reset arrow style
+  if (this.$arrow) {
+    this._updateArrowClass(verticalAlignment, horizontalAlignment);
+    scout.graphics.setMargins(this.$arrow, new scout.Insets());
+  }
+
   location = location.clone();
-  if (overlap.y > 0) {
+  if (overlap.y !== 0) {
     var verticalSwitch = scout.nvl(switchIfNecessary, this.verticalSwitch);
     if (verticalSwitch) {
       // Switch vertical alignment
       verticalAlignment = scout.Popup.SwitchRule[verticalAlignment];
-
-      // Ensure arrow has correct class and margin added by moving logic is removed
-      this._updateArrowClass(verticalAlignment);
-      if (this.$arrow) {
-        this.$arrow.cssMarginTop(null);
-      }
-
       location = this.prefLocation(verticalAlignment);
     } else {
       // Move popup to the top until it gets fully visible (if switch is disabled)
@@ -653,21 +667,19 @@ scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
       // Also move arrow so that it still points to the center of the anchor
       if (this.$arrow && (this.$arrow.hasClass(scout.Popup.Alignment.LEFT) || this.$arrow.hasClass(scout.Popup.Alignment.RIGHT))) {
         this.$arrow.cssMarginTop(overlap.y);
+        if (overlap.y > 0) {
+          this.$arrow.cssMarginTop(overlap.y);
+        } else {
+          this.$arrow.cssMarginBottom(-overlap.y);
+        }
       }
     }
   }
-  if (overlap.x > 0) {
+  if (overlap.x !== 0) {
     var horizontalSwitch = scout.nvl(switchIfNecessary, this.horizontalSwitch);
     if (horizontalSwitch) {
       // Switch horizontal alignment
       horizontalAlignment = scout.Popup.SwitchRule[horizontalAlignment];
-
-      // Ensure arrow has correct class and margin added by moving logic is removed
-      this._updateArrowClass(verticalAlignment, horizontalAlignment);
-      if (this.$arrow) {
-        this.$arrow.cssMarginLeft(null);
-      }
-
       location = this.prefLocation(verticalAlignment, horizontalAlignment);
     } else {
       // Move popup to the left until it gets fully visible (if switch is disabled)
@@ -675,7 +687,11 @@ scout.Popup.prototype.adjustLocation = function(location, switchIfNecessary) {
 
       // Also move arrow so that it still points to the center of the anchor
       if (this.$arrow && (this.$arrow.hasClass(scout.Popup.Alignment.TOP) || this.$arrow.hasClass(scout.Popup.Alignment.BOTTOM))) {
-        this.$arrow.cssMarginLeft(overlap.x);
+        if (overlap.x > 0) {
+          this.$arrow.cssMarginLeft(overlap.x);
+        } else {
+          this.$arrow.cssMarginRight(-overlap.x);
+        }
       }
     }
   }
