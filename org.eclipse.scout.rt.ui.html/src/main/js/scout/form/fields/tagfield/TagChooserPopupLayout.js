@@ -29,8 +29,7 @@ scout.TagChooserPopupLayout.prototype.layout = function($container) {
  * @override AbstractLayout.js
  */
 scout.TagChooserPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var tableHandler = scout.ProposalChooserLayout.TYPE_HANDLER.TABLE;
-  tableHandler.prepare(this.popup.table);
+  var tableHandler = scout.create('TableLayoutResetter', this.popup.table);
   tableHandler.modifyDom();
   var prefSize = scout.TagChooserPopupLayout.parent.prototype.preferredLayoutSize.call(this, $container);
   tableHandler.restoreDom();
