@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -31,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
+import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardContainerForm;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -257,16 +260,36 @@ public class UnsavedFormChangesForm extends AbstractForm {
 
     @Override
     protected void execStore() {
-      for (ArrayDeque<IForm> deque : getOpenFormsField().getValue()) {
-        for (IForm f : deque) {
-          if (f instanceof IWizardContainerForm) {
-            ((IWizardContainerForm) f).getWizard().doFinish();
-          }
-          else {
-            f.doOk();
-          }
+      Set<IForm> formsToStore = getOpenFormsField().getValue().stream()
+          .flatMap(Collection::stream)
+          .collect(Collectors.toSet());
+
+      for (IForm f : formsToStore) {
+        if (isWizardContainerForm(f)) {
+          ((IWizardContainerForm) f).getWizard().doFinish();
+        }
+        else {
+          f.doOk();
         }
       }
+
+      // handle wizards which were not stored previously
+      m_forms.stream()
+          .filter(f -> !formsToStore.contains(f) && isWizardContainerForm(f))
+          .map(f -> ((IWizardContainerForm) f).getWizard())
+          .forEach(this::closeWizard);
+    }
+
+    protected boolean isWizardContainerForm(IForm form) {
+      return form instanceof IWizardContainerForm;
+    }
+
+    /**
+     * Override this method to implement custom close behavior. The default implementation suspends the wizard (@link
+     * {@link IWizard#doSuspend()}) to free eventually reserved resources or locks.
+     */
+    protected void closeWizard(IWizard wizard) {
+      wizard.doSuspend();
     }
   }
 
