@@ -459,7 +459,9 @@
   __include("scout/form/fields/smartfield/ProposalChooser.js");
   __include("scout/form/fields/smartfield/ProposalChooserLayout.js");
   __include("scout/form/fields/smartfield/TableProposalChooser.js");
+  __include("scout/form/fields/smartfield/TableLayoutResetter.js");
   __include("scout/form/fields/smartfield/TreeProposalChooser.js");
+  __include("scout/form/fields/smartfield/TreeLayoutResetter.js");
   __include("scout/form/fields/splitbox/SplitBox.js");
   __include("scout/form/fields/splitbox/SplitBoxAdapter.js");
   __include("scout/form/fields/splitbox/SplitBoxCollapseKeyStroke.js");
