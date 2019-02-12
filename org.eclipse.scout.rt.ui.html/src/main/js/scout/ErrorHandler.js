@@ -64,10 +64,10 @@ scout.ErrorHandler.prototype.handle = function() {
 
 /**
  * Returns an "errorInfo" object for the given arguments. The following cases are handled:
- * 1. Error objects
- * 2. jQuery AJAX errors
- * 3. Nothing
- * 4. Everything else
+ * 1. Error objects           (code: computed by getJsErrorCode())
+ * 2. jQuery AJAX errors      (code: 'X' + HTTP status code)
+ * 3. Nothing                 (code: 'P3')
+ * 4. Everything else         (code: 'P4')
  */
 scout.ErrorHandler.prototype.analyzeError = function(error) {
   var errorInfo = {
@@ -104,11 +104,12 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
       errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
     }
 
-  } else if ($.isJqXHR(error)) {
+  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0]))) {
     // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
-    var jqXHR = error;
-    var errorThrown = arguments[2];
-    var requestOptions = arguments[3]; // scout extension
+    var args = (Array.isArray(error) ? error : arguments);
+    var jqXHR = args[0];
+    var errorThrown = args[2];
+    var requestOptions = args[3]; // scout extension
     var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
     var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
 
@@ -131,7 +132,7 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
     var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
     errorInfo.code = 'P4';
     errorInfo.message = s || 'Unexpected error';
-    errorInfo.log = 'Unexpected error: ' + (s || error);
+    errorInfo.log = 'Unexpected error: ' + (s || JSON.stringify(error));
 
   }
 
