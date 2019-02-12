@@ -571,18 +571,37 @@ describe("Planner", function() {
       // during a day
       expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 09:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(4 * cellWidthPercent, 5);
 
       // till the end of the day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 17:00:00'))).toBeCloseTo(9 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-20 18:00:00'))).toBeCloseTo(2 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 18:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
 
       // to the next day
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+
+      // into the day
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-21 06:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+
+      // into the day from previous day
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 20:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-20 20:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+
+      // during night
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(scout.dates.create('2016-06-21 06:00:00'), scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(0, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
 
       // over two days
-      expect(planner.transformLeft(scout.dates.create('2016-06-22 08:00:00'))).toBeCloseTo(20 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
       expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(13 * cellWidthPercent, 5);
+      expect(planner.transformLeft(scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
     });
 
     it("calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)", function() {
