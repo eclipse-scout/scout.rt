@@ -50,4 +50,39 @@ public class ChartColumnParam implements IChartColumnParam {
     return m_column;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_column == null) ? 0 : m_column.hashCode());
+    result = prime * result + m_columnModifier;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ChartColumnParam other = (ChartColumnParam) obj;
+    if (m_column == null) {
+      if (other.m_column != null) {
+        return false;
+      }
+    }
+    else if (!m_column.equals(other.m_column)) {
+      return false;
+    }
+    if (m_columnModifier != other.m_columnModifier) {
+      return false;
+    }
+    return true;
+  }
+
 }

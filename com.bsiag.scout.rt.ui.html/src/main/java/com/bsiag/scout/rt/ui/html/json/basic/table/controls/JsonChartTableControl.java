@@ -120,19 +120,19 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
 
   protected void handleUiChartAggregationChange(String propertyName, JSONObject data) {
     JSONObject chartAggregation = data.getJSONObject(propertyName);
-    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGREGATION, chartAggregation);
+    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_AGGREGATION, createColumnParam(chartAggregation));
     getModel().setAggregation(createColumnParam(chartAggregation));
   }
 
   protected void handleUiChartGroup1Change(String propertyName, JSONObject data) {
     JSONObject chartGroup1 = data.optJSONObject(propertyName);
-    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, chartGroup1);
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_1, createColumnParam(chartGroup1));
     getModel().setGroup1(createColumnParam(chartGroup1));
   }
 
   protected void handleUiChartGroup2Change(String propertyName, JSONObject data) {
     JSONObject chartGroup2 = data.optJSONObject(propertyName);
-    addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, chartGroup2);
+      addPropertyEventFilterCondition(IChartTableControl.PROP_CHART_GROUP_2, createColumnParam(chartGroup2));
     getModel().setGroup2(createColumnParam(chartGroup2));
   }
 
