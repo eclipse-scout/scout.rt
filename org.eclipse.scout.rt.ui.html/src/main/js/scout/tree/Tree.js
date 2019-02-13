@@ -3090,6 +3090,10 @@ scout.Tree.prototype._onDesktopPopupOpen = function(event) {
   }
 };
 
+scout.Tree.prototype.updateScrollbars = function() {
+  scout.scrollbars.update(this.$data);
+};
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
@@ -3135,8 +3139,4 @@ scout.Tree.visitNodes = function(func, nodes, parentNode) {
       scout.Tree.visitNodes(func, node.childNodes, node);
     }
   }
-};
-
-scout.Tree.prototype.updateScrollbars = function() {
-  scout.scrollbars.update(this.$data);
 };
