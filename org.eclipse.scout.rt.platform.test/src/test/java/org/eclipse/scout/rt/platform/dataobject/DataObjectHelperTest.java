@@ -24,9 +24,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.dataobject.fixture.SimpleFixtureDo;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.testing.platform.dataobject.TestingDataObjectHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,5 +164,33 @@ public class DataObjectHelperTest {
   public void testToString() {
     assertEquals("null", m_helper.toString(null));
     assertEquals(SERIALIZED_DO_ENTITY_VALUE, m_helper.toString(BEANS.get(DoEntity.class)));
+  }
+
+  @Test
+  public void testAssertValue() {
+    SimpleFixtureDo testObj = BEANS.get(SimpleFixtureDo.class)
+        .withId(TEST_UUID)
+        .withName1("Hugo");
+
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(null));
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.createDate()));
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue(testObj.name2()));
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValue((DoValue<?>) testObj.get("doesNotExist")));
+    assertEquals(TEST_UUID, m_helper.assertValue(testObj.id()));
+    assertEquals("Hugo", m_helper.assertValue(testObj.name1()));
+  }
+
+  @Test
+  public void testAssertValueHasText() {
+    SimpleFixtureDo testObj = BEANS.get(SimpleFixtureDo.class)
+        .withId(TEST_UUID)
+        .withName1("Hugo");
+
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(null));
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(testObj.name2()));
+    @SuppressWarnings("unchecked")
+    DoValue<String> dummyDoValue = (DoValue<String>) testObj.get("doesNotExist");
+    ScoutAssert.assertThrows(AssertionException.class, () -> m_helper.assertValueHasText(dummyDoValue));
+    assertEquals("Hugo", m_helper.assertValueHasText(testObj.name1()));
   }
 }

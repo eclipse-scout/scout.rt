@@ -17,16 +17,21 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 /**
- * Helper class dealing with {@link IDoEntity} and it's attributes.
+ * Helper class dealing with {@link IDoEntity} and its attributes.
  */
 @ApplicationScoped
 public class DataObjectHelper {
 
-  private LazyValue<IDataObjectMapper> m_dataObjectMapper = new LazyValue<>(IDataObjectMapper.class);
+  protected IDataObjectMapper getDataObjectMapper() {
+    return BEANS.get(IDataObjectMapper.class);
+  }
 
   /**
    * Returns attribute {@code attributeName} converted to a {@link Integer} value.
@@ -79,7 +84,7 @@ public class DataObjectHelper {
     else if (value instanceof String) {
       return UUID.fromString((String) value);
     }
-    throw new IllegalArgumentException("Cannot convert value " + value + " to UUID");
+    throw new IllegalArgumentException("Cannot convert value '" + value + "' to UUID");
   }
 
   /**
@@ -96,7 +101,7 @@ public class DataObjectHelper {
     else if (value instanceof String) {
       return Locale.forLanguageTag(String.class.cast(value));
     }
-    throw new IllegalArgumentException("Cannot convert value " + value + " to Locale");
+    throw new IllegalArgumentException("Cannot convert value '" + value + "' to Locale");
   }
 
   /**
@@ -118,8 +123,9 @@ public class DataObjectHelper {
     }
     @SuppressWarnings("unchecked")
     Class<T> valueType = (Class<T>) value.getClass();
-    String clone = m_dataObjectMapper.get().writeValue(value);
-    return m_dataObjectMapper.get().readValue(clone, valueType);
+    IDataObjectMapper mapper = getDataObjectMapper();
+    String clone = mapper.writeValue(value);
+    return mapper.readValue(clone, valueType);
   }
 
   /**
@@ -129,6 +135,33 @@ public class DataObjectHelper {
     if (entity == null) {
       return Objects.toString(entity);
     }
-    return m_dataObjectMapper.get().writeValue(entity);
+    return getDataObjectMapper().writeValue(entity);
+  }
+
+  /**
+   * Asserts that the given {@link DoValue} exists and its value is != <code>null</code>.
+   *
+   * @return the unwrapped value (never <code>null</code>)
+   * @throws AssertionException
+   *           if the given {@link DoValue} is null, does not exist, or has no value
+   */
+  public <T> T assertValue(DoValue<T> doValue) {
+    Assertions.assertNotNull(doValue);
+    Assertions.assertTrue(doValue.exists(), "Missing mandatory attribute '{}'", doValue.getAttributeName());
+    return Assertions.assertNotNull(doValue.get(), "Value of property '{}' must not be null", doValue.getAttributeName());
+  }
+
+  /**
+   * Asserts that the given {@link DoValue} exists and its value has text (according to
+   * {@link StringUtility#hasText(CharSequence)}).
+   *
+   * @return the unwrapped value (never <code>null</code> or empty)
+   * @throws AssertionException
+   *           if the given {@link DoValue} is null, does not exist, or has no text
+   */
+  public String assertValueHasText(DoValue<String> doValue) {
+    String value = assertValue(doValue);
+    Assertions.assertTrue(StringUtility.hasText(value), "Value of property '{}' must have text", doValue.getAttributeName());
+    return value;
   }
 }
