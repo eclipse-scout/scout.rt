@@ -132,7 +132,14 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
     var s = (typeof error === 'string' || typeof error === 'number') ? String(error) : null;
     errorInfo.code = 'P4';
     errorInfo.message = s || 'Unexpected error';
-    errorInfo.log = 'Unexpected error: ' + (s || JSON.stringify(error));
+    if (!s) {
+      try {
+        s = JSON.stringify(error); // may throw "cyclic object value" error
+      } catch (err) {
+        s = String(error);
+      }
+    }
+    errorInfo.log = 'Unexpected error: ' + s;
 
   }
 
