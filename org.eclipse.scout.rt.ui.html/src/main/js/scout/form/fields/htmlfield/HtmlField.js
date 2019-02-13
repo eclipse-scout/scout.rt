@@ -69,6 +69,7 @@ scout.HtmlField.prototype._renderDisplayText = function() {
 
   // Because this method replaces the content, the scroll bars might have to be added or removed
   if (this.rendered) { // (only necessary if already rendered, otherwise it is done by renderProperties)
+    this._uninstallScrollbars();
     this._renderScrollBarEnabled();
   }
 
