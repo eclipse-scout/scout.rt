@@ -119,8 +119,8 @@ public class JettyServer {
       public void run() {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
-          while (true) {
-            String command = StringUtility.trim(br.readLine());
+          String command;
+          while ((command = StringUtility.trim(br.readLine())) != null) {
             if ("shutdown".equalsIgnoreCase(command)) {
               try { // NOSONAR
                 LOG.info("Shutting down application...");
