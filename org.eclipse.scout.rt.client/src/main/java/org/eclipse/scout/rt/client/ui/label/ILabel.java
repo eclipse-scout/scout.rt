@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 public interface ILabel extends IWidget, IExtensibleObject, IHtmlCapable, IAppLinkCapable {
 
   String PROP_VALUE = "value";
+  String PROP_SCROLLABLE = "scrollable";
 
   String getValue();
 
@@ -35,6 +36,10 @@ public interface ILabel extends IWidget, IExtensibleObject, IHtmlCapable, IAppLi
   BinaryResource getAttachment(String filename);
 
   void setAttachments(Collection<? extends BinaryResource> attachments);
+
+  boolean isScrollable();
+
+  void setScrollable(boolean scrollable);
 
   ILabelUIFacade getUIFacade();
 }

@@ -2,6 +2,7 @@ scout.Label = function() {
   scout.Label.parent.call(this);
   this.value = null;
   this.htmlEnabled = false;
+  this.scrollable = false;
 };
 scout.inherits(scout.Label, scout.Widget);
 
@@ -34,6 +35,7 @@ scout.Label.prototype._render = function() {
 scout.Label.prototype._renderProperties = function() {
   scout.Label.parent.prototype._renderProperties.call(this);
   this._renderValue();
+  this._renderScrollable();
 };
 
 scout.Label.prototype.setValue = function(value) {
@@ -55,6 +57,13 @@ scout.Label.prototype._renderValue = function() {
   } else {
     this.$container.html(scout.strings.nl2br(value));
   }
+
+  // Because this method replaces the content, the scroll bars might have to be added or removed
+  if (this.rendered) { // (only necessary if already rendered, otherwise it is done by renderProperties)
+    this._uninstallScrollbars();
+    this._renderScrollable();
+  }
+
   this.invalidateLayoutTree();
 };
 
@@ -65,6 +74,18 @@ scout.Label.prototype.setHtmlEnabled = function(htmlEnabled) {
 scout.Label.prototype._renderHtmlEnabled = function() {
   // Render the value again when html enabled changes dynamically
   this._renderValue();
+};
+
+scout.Label.prototype.setScrollable = function(scrollable) {
+  this.setProperty('scrollable', scrollable);
+};
+
+scout.Label.prototype._renderScrollable = function() {
+  if (this.scrollable) {
+    this._installScrollbars();
+  } else {
+    this._uninstallScrollbars();
+  }
 };
 
 scout.Label.prototype._onAppLinkAction = function(event) {

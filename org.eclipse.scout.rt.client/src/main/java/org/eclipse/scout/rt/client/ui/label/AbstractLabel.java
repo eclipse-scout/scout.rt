@@ -52,6 +52,7 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     super.initConfig();
     setHtmlEnabled(getConfiguredHtmlEnabled());
+    setScrollable(getConfiguredScrollable());
     setValue(getConfiguredValue());
   }
 
@@ -97,6 +98,22 @@ public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
+  @Override
+  public void setScrollable(boolean scrollable) {
+    propertySupport.setPropertyBool(PROP_SCROLLABLE, scrollable);
+  }
+
+  @Override
+  public boolean isScrollable() {
+    return propertySupport.getPropertyBool(PROP_SCROLLABLE);
+  }
+
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(30)
+  protected boolean getConfiguredScrollable() {
     return false;
   }
 

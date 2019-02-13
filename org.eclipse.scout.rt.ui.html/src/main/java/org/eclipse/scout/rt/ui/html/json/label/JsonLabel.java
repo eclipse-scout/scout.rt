@@ -49,11 +49,16 @@ public class JsonLabel<T extends ILabel> extends AbstractJsonWidget<T> implement
         return BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(JsonLabel.this, value);
       }
     });
-
     putJsonProperty(new JsonProperty<ILabel>(ILabel.PROP_HTML_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isHtmlEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ILabel>(ILabel.PROP_SCROLLABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollable();
       }
     });
   }
