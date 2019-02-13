@@ -173,9 +173,9 @@ scout.TreeAdapter.prototype._onNodeExpanded = function(nodeId, event) {
   var affectedNodesMap = scout.objects.createMap();
   affectedNodesMap[nodeId] = true;
   if (event.recursive) {
-    scout.Tree.visitNodes(node.childNodes, function(n) {
+    scout.Tree.visitNodes(function(n) {
       affectedNodesMap[n.id] = true;
-    });
+    }, node.childNodes);
   }
   this.addFilterForWidgetEvent(function(widgetEvent) {
     return widgetEvent.type === 'nodeExpanded' &&
