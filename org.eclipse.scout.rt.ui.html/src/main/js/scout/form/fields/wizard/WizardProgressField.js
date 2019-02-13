@@ -73,12 +73,6 @@ scout.WizardProgressField.prototype._renderSteps = function() {
       .addClass(step.cssClass)
       .data('wizard-step', step);
     step.$step = $step;
-    if (this.enabledComputed && step.enabled && step.actionEnabled &&  this.steps.indexOf(step) !== this.activeStepIndex) {
-      $step.addClass('action-enabled');
-      $step.on('click', this._onStepClick.bind(this));
-    } else if (!this.enabledComputed || !step.enabled) {
-      $step.addClass('disabled');
-    }
     this._updateStepClasses(step);
 
     // Inspector info
@@ -132,21 +126,25 @@ scout.WizardProgressField.prototype._setActiveStepIndex = function(activeStepInd
 };
 
 scout.WizardProgressField.prototype._renderActiveStepIndex = function() {
-  this.steps.forEach(function(step) {
-    this._updateStepClasses(step);
-  }.bind(this));
-
+  this.steps.forEach(this._updateStepClasses.bind(this));
   this.invalidateLayoutTree(false);
 };
 
 scout.WizardProgressField.prototype._updateStepClasses = function(step) {
   var $step = step.$step;
-  $step.removeClass('active before-active after-active first last');
+  $step.removeClass('active before-active after-active first last action-enabled disabled');
 
   // Important: those indices correspond to the UI's data structures (this.steps) and are not necessarily
   // consistent with the server indices (because the server does not send invisible steps).
   var stepIndex = this.steps.indexOf(step);
   var activeStepIndex = this.steps.indexOf(this.stepsMap[this.activeStepIndex]);
+
+  if (this.enabledComputed && step.enabled && step.actionEnabled &&  stepIndex !== this.activeStepIndex) {
+    $step.addClass('action-enabled');
+    $step.on('click', this._onStepClick.bind(this));
+  } else if (!this.enabledComputed || !step.enabled) {
+    $step.addClass('disabled');
+  }
 
   if (stepIndex >= 0 && activeStepIndex >= 0) {
     // Active
