@@ -131,9 +131,11 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
   if (visibilityChanged && this._lastVisibleField) {
     // if there is a new last visible field, make sure the status is shown on the previously last one
     this._lastVisibleField.suppressStatus = false;
-    this._lastVisibleField._renderErrorStatus();
-    this._lastVisibleField._renderTooltipText();
-    this._lastVisibleField._renderMenus();
+    if (this._lastVisibleField.rendered) {
+      this._lastVisibleField._renderErrorStatus();
+      this._lastVisibleField._renderTooltipText();
+      this._lastVisibleField._renderMenus();
+    }
   }
   this._lastVisibleField = this._getLastVisibleField();
   if (!this._lastVisibleField) {
@@ -150,9 +152,11 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
   this._lastVisibleField.suppressStatus = true;
   if (visibilityChanged) {
     // If the last field got invisible, make sure the new last field does not display a status anymore (now done by the seq box)
-    this._lastVisibleField._renderErrorStatus();
-    this._lastVisibleField._renderTooltipText();
-    this._lastVisibleField._renderMenus();
+    if (this._lastVisibleField.rendered) {
+      this._lastVisibleField._renderErrorStatus();
+      this._lastVisibleField._renderTooltipText();
+      this._lastVisibleField._renderMenus();
+    }
   }
 };
 
