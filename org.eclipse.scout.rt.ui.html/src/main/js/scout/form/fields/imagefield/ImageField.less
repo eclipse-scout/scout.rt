@@ -40,16 +40,18 @@
     &.has-inner-alignment {
       display: flex;
 
+      & > .font-icon {
+        display: flex;
+        align-items: inherit;
+        justify-content: inherit;
+      }
+
       &.halign-left {
         justify-content: flex-start;
       }
 
       &.halign-center {
         justify-content: center;
-      }
-
-      &.halign-center > .font-icon {
-        text-align: center;
       }
 
       &.halign-right {
@@ -62,11 +64,6 @@
 
       &.valign-middle {
         align-items: center;
-      }
-
-      &.valign-middle > .font-icon {
-        flex-direction: column;
-        justify-content: center;
       }
 
       &.valign-bottom {
