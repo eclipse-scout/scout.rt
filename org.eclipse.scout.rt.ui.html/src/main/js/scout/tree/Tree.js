@@ -2441,7 +2441,7 @@ scout.Tree.prototype.uncheckNode = function(node) {
 
 scout.Tree.prototype.uncheckNodes = function(nodes, options) {
   var opts = {
-    checked: false,
+    checked: false
   };
   $.extend(opts, options);
   this.checkNodes(nodes, opts);
