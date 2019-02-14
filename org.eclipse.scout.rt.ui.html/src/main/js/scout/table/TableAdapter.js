@@ -278,7 +278,7 @@ scout.TableAdapter.prototype._onWidgetReload = function(event) {
   this._send('reload');
 };
 
-scout.TableAdapter.prototype._onWidgetExportToClipbaord = function(event) {
+scout.TableAdapter.prototype._onWidgetExportToClipboard = function(event) {
   this._send('clipboardExport');
 };
 
@@ -306,7 +306,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else if (event.type === 'clipboardExport') {
-    this._onWidgetExportToClipbaord(event);
+    this._onWidgetExportToClipboard(event);
   } else if (event.type === 'reload') {
     this._onWidgetReload(event);
   } else if (event.type === 'filterAdded') {

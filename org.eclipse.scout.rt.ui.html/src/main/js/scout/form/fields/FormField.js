@@ -64,7 +64,7 @@ scout.FormField = function() {
 
   /**
    * Some browsers don't support copying text from disabled input fields. If such a browser is detected
-   * and this flag is true (defaul is false), an overlay DIV is rendered over disabled fields which
+   * and this flag is true (default is false), an overlay DIV is rendered over disabled fields which
    * provides a custom copy context menu that opens the ClipboardForm.
    */
   this.disabledCopyOverlay = false;
