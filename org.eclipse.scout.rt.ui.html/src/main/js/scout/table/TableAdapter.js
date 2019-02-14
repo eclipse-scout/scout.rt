@@ -259,7 +259,7 @@ scout.TableAdapter.prototype._onWidgetReload = function(event) {
   this._send('reload');
 };
 
-scout.TableAdapter.prototype._onWidgetExportToClipbaord = function(event) {
+scout.TableAdapter.prototype._onWidgetExportToClipboard = function(event) {
   this._send('exportToClipboard');
 };
 
@@ -283,7 +283,7 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else if (event.type === 'exportToClipboard') {
-    this._onWidgetExportToClipbaord(event);
+    this._onWidgetExportToClipboard(event);
   } else if (event.type === 'reload') {
     this._onWidgetReload(event);
   } else if (event.type === 'addFilter') {

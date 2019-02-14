@@ -287,7 +287,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           // in FF). It is therefore not possible to distinguish between a real file and a bitmap
           // from the clipboard. The following code measures the time between the start of the paste
           // event and the file's last modified timestamp. If it is "very small", the file is likely
-          // a bitmap from the clipbaord and not a real file. In that case, add a special "scoutName"
+          // a bitmap from the clipboard and not a real file. In that case, add a special "scoutName"
           // attribute to the file object that is then used as a filename in session.uploadFiles().
           var lastModifiedDiff = startPasteTimestamp - file.lastModified;
           if (lastModifiedDiff < 1000) {
