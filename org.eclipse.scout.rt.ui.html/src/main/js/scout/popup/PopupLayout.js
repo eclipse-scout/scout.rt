@@ -70,6 +70,9 @@ scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) 
       top: prefPosition.top
     }, {
       complete: function() {
+        if (!this.popup.rendered) {
+          return;
+        }
         // Ensure the arrow is at the correct position after the animation
         this.popup.position();
       }.bind(this)
