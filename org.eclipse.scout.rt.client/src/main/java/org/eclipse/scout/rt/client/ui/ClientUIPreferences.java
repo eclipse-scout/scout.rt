@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.shared.ISession;
@@ -111,43 +112,162 @@ public class ClientUIPreferences {
   }
 
   /**
+   * Gets the splitter position from the client preferences. If the splitter position type of the current split box does
+   * not match the splitter position type in the client preferences, the splitter position is no longer valid. The
+   * preferences will therefore be invalidated.
+   * <p>
    * Since this property depends on the user agent it is saved separately for each combination of
    * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
    * IUiDeviceType}.
    *
    * @since 3.8.0
    */
-  public int[] getSplitterPosition(ISplitBox splitBox) {
+  public Double getSplitterPosition(ISplitBox splitBox) {
+    if (m_prefs == null) {
+      return null;
+    }
+
     String baseKey = splitBox.getCacheSplitterPositionPropertyName();
     if (baseKey == null) {
       return null;
     }
 
-    String key = getUserAgentPrefix() + baseKey;
-    int[] value = getPropertyIntArray(key);
-    if (value == null) {
-      //If no value has been found try to load with the base key. Done due to backward compatibility.
-      value = getPropertyIntArray(baseKey);
+    baseKey = getUserAgentPrefix() + baseKey;
+    String splitterPositionKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION;
+    String splitterPositionTypeKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION_TYPE;
+    Double splitterPosition = getPropertyDouble(splitterPositionKey);
+    String splitterPositionType = m_prefs.get(splitterPositionTypeKey, null);
+
+    // If splitter position type does not match, clear cache since it has become invalid.
+    if (ObjectUtility.notEquals(splitterPositionType, splitBox.getSplitterPositionType())) {
+      m_prefs.remove(splitterPositionKey);
+      m_prefs.remove(splitterPositionTypeKey);
+      return null;
     }
 
-    return value;
+    return splitterPosition;
   }
 
   /**
+   * Gets the minimized state of the collapsable field.
+   * <p>
    * Since this property depends on the user agent it is saved separately for each combination of
    * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
    * IUiDeviceType}.
    *
-   * @since 3.8.0
+   * @since 9.0.0
    */
-  public void setSplitterPosition(ISplitBox splitBox, int[] weights) {
-    String key = splitBox.getCacheSplitterPositionPropertyName();
-    if (key == null) {
+  public Boolean getSplitBoxFieldMinimized(ISplitBox splitBox) {
+    if (m_prefs == null) {
+      return null;
+    }
+
+    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    if (baseKey == null) {
+      return null;
+    }
+
+    baseKey = getUserAgentPrefix() + baseKey;
+    String minimizedKey = baseKey + "#" + ISplitBox.PROP_FIELD_MINIMIZED;
+    return getPropertyBoolean(minimizedKey);
+  }
+
+  /**
+   * Gets the collapsed state of the collapsable field.
+   * <p>
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
+   *
+   * @since 9.0.0
+   */
+  public Boolean getSplitBoxFieldCollapsed(ISplitBox splitBox) {
+    if (m_prefs == null) {
+      return null;
+    }
+
+    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    if (baseKey == null) {
+      return null;
+    }
+
+    baseKey = getUserAgentPrefix() + baseKey;
+    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
+    return getPropertyBoolean(collapsedKey);
+  }
+
+  /**
+   * Sets all the split box attributes into the client preferences if {@link ISplitBox#isCacheSplitterPosition()} is set
+   * to {@code true}. If {@link ISplitBox#isCacheSplitterPosition()} is set to {@code false} the client preferences will
+   * be cleared (@see {@link #removeAllSplitBoxPreferences(ISplitBox)}).
+   * <p>
+   * Following attributes will be stored into the client preferences.
+   * <ul>
+   * <li>Splitter position
+   * <li>Splitter position type
+   * <li>Collapsable field minimized state
+   * <li>Collapsable field collapsed state
+   * </ul>
+   * <p>
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
+   *
+   * @since 9.0.0
+   */
+  public void setAllSplitBoxPreferences(ISplitBox splitBox) {
+    if (m_prefs == null) {
       return;
     }
 
-    key = getUserAgentPrefix() + key;
-    setPropertyIntArray(key, weights);
+    if (!splitBox.isCacheSplitterPosition()) {
+      removeAllSplitBoxPreferences(splitBox);
+      return;
+    }
+
+    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    if (baseKey == null) {
+      return;
+    }
+
+    baseKey = getUserAgentPrefix() + baseKey;
+    String splitterPositionKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION;
+    String splitterPositionTypeKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION_TYPE;
+    String minimizedKey = baseKey + "#" + ISplitBox.PROP_FIELD_MINIMIZED;
+    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
+
+    m_prefs.putDouble(splitterPositionKey, splitBox.getSplitterPosition());
+    m_prefs.put(splitterPositionTypeKey, splitBox.getSplitterPositionType());
+    m_prefs.putBoolean(minimizedKey, splitBox.isFieldMinimized());
+    m_prefs.putBoolean(collapsedKey, splitBox.isFieldCollapsed());
+    flush();
+  }
+
+  /**
+   * Removes all the split box attributes from the client preferences.
+   * <p>
+   * Since this property depends on the user agent it is saved separately for each combination of
+   * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
+   * IUiDeviceType}.
+   *
+   * @since 9.0.0
+   */
+  public void removeAllSplitBoxPreferences(ISplitBox splitBox) {
+    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    if (baseKey == null) {
+      return;
+    }
+
+    baseKey = getUserAgentPrefix() + baseKey;
+    String splitterPositionKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION;
+    String splitterPositionTypeKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION_TYPE;
+    String minimizedKey = baseKey + "#" + ISplitBox.PROP_FIELD_MINIMIZED;
+    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
+
+    m_prefs.remove(splitterPositionKey);
+    m_prefs.remove(splitterPositionTypeKey);
+    m_prefs.remove(minimizedKey);
+    m_prefs.remove(collapsedKey);
   }
 
   public String getTableKey(ITable t) {
@@ -786,6 +906,24 @@ public class ClientUIPreferences {
 
     m_prefs.put(propName, "" + value);
     flush();
+  }
+
+  public Boolean getPropertyBoolean(String propName) {
+    if (m_prefs == null) {
+      return null;
+    }
+
+    Boolean result = null;
+    String value = m_prefs.get(propName, null);
+    if (value != null) {
+      if ("true".equalsIgnoreCase(value)) {
+        result = true;
+      }
+      else if ("false".equalsIgnoreCase(value)) {
+        result = false;
+      }
+    }
+    return result;
   }
 
   public int[][] getDesktopColumnSplits(int rowCount, int colCount) {

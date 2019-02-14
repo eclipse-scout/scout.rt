@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.splitbox.ISplitBoxExtension;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -85,7 +86,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(355)
   protected boolean getConfiguredCacheSplitterPosition() {
-    return true;
+    return false;
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -153,20 +154,41 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     super.initConfig();
     setSplitHorizontal(getConfiguredSplitHorizontal());
     setSplitterEnabled(getConfiguredSplitterEnabled());
-    setSplitterPosition(getConfiguredSplitterPosition());
-    setMinSplitterPosition(getConfiguredMinSplitterPosition());
-    setSplitterPositionType(getConfiguredSplitterPositionType());
     setCacheSplitterPosition(getConfiguredCacheSplitterPosition());
     setCacheSplitterPositionPropertyName(getConfiguredCacheSplitterPositionPropertyName());
+    setMinSplitterPosition(getConfiguredMinSplitterPosition());
+    setSplitterPositionType(getConfiguredSplitterPositionType());
+
+    Double cachedSplitterPosition = ClientUIPreferences.getInstance().getSplitterPosition(this);
+    if (isCacheSplitterPosition() && cachedSplitterPosition != null) {
+      setSplitterPosition(cachedSplitterPosition);
+    }
+    else {
+      setSplitterPosition(getConfiguredSplitterPosition());
+    }
     if (getConfiguredCollapsibleField() != null) {
       setCollapsibleField(getFieldByClass(getConfiguredCollapsibleField()));
     }
-    setFieldCollapsed(getConfiguredFieldCollapsed());
+    Boolean cachedFieldCollapsed = ClientUIPreferences.getInstance().getSplitBoxFieldCollapsed(this);
+    if (isCacheSplitterPosition() && cachedFieldCollapsed != null) {
+      setFieldCollapsed(cachedFieldCollapsed);
+    }
+    else {
+      setFieldCollapsed(getConfiguredFieldCollapsed());
+    }
+
     // legacy mode, use deprecated configured key as fallback, this code will be removed in Scout 8.0
     setToggleCollapseKeyStroke(ObjectUtility.nvl(getConfiguredToogleCollapseKeyStroke(), getConfiguredCollapseKeyStroke()));
     setFirstCollapseKeyStroke(getConfiguredFirstCollapseKeyStroke());
     setSecondCollapseKeyStroke(getConfiguredSecondCollapseKeyStroke());
-    setFieldMinimized(getConfiguredFieldMinimized());
+
+    Boolean cachedFieldMinimized = ClientUIPreferences.getInstance().getSplitBoxFieldMinimized(this);
+    if (isCacheSplitterPosition() && cachedFieldMinimized != null) {
+      setFieldMinimized(cachedFieldMinimized);
+    }
+    else {
+      setFieldMinimized(getConfiguredFieldMinimized());
+    }
     setMinimizeEnabled(getConfiguredMinimizeEnabled());
 
     getChildren().stream()
@@ -367,6 +389,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     @Override
     public void setSplitterPositionFromUI(double splitterPosition) {
       setSplitterPosition(splitterPosition);
+      ClientUIPreferences.getInstance().setAllSplitBoxPreferences(AbstractSplitBox.this);
     }
 
     @Override
@@ -377,11 +400,13 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     @Override
     public void setFieldCollapsedFromUI(boolean collapsed) {
       setFieldCollapsed(collapsed);
+      ClientUIPreferences.getInstance().setAllSplitBoxPreferences(AbstractSplitBox.this);
     }
 
     @Override
     public void setFieldMinimizedFromUI(boolean minimized) {
       setFieldMinimized(minimized);
+      ClientUIPreferences.getInstance().setAllSplitBoxPreferences(AbstractSplitBox.this);
     }
 
     @Override
