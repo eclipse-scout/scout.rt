@@ -450,6 +450,14 @@ scout.arrays = {
     return diff;
   },
 
+  flatMap: function(arr, func) {
+    var result = [];
+    arr.forEach(function(element) {
+      scout.arrays.pushAll(result, func(element));
+    });
+    return result;
+  },
+
   //
   // Use these methods if you have an array of jquery objects.
   // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.

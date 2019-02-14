@@ -236,7 +236,7 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   $.log.warn('(keys#drawSingleKeyBoxItem) pos is undefined. $parent=' + $parent);
 
   function prependKeyBox(alignValue) {
-    return $parent.prependDiv('key-box ', text)
+    return $parent.prependDiv('key-box', text)
       .css(align, alignValue + 'px')
       .toggleClass('disabled', !this.enabledByFilter)
       .addClass(align);

@@ -671,4 +671,20 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("flatMap", function() {
+
+    it("returns flat list of all merged array elements", function() {
+      var arr = [
+        'a b c',
+        '1 2',
+        'x'
+      ];
+      var result = scout.arrays.flatMap(arr, function(text) {
+        return text.split(' ');
+      });
+      expect(['a', 'b', 'c', '1', '2', 'x']).toEqual(result);
+    });
+
+  });
+
 });

@@ -82,10 +82,11 @@ scout.TableFocusFilterFieldKeyStroke.prototype.keys = function() {
  */
 scout.TableFocusFilterFieldKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
   var $filterInput = event._$filterInput;
-
   var filterInputPosition = $filterInput.position();
   var left = filterInputPosition.left + $filterInput.cssMarginLeft() + 4;
-  $filterInput.beforeDiv('key-box char', 'a - z').cssLeft(left);
+  $filterInput.beforeDiv('key-box char', 'a - z')
+    .toggleClass('disabled', !this.enabledByFilter)
+    .cssLeft(left);
   return $filterInput.parent();
 };
 

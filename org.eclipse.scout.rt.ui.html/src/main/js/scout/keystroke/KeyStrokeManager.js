@@ -95,7 +95,6 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
       return (typeof render === 'function' ? render.call(keyStroke) : render);
     })
     .forEach(function(keyStroke) {
-
       keyStroke.enabledByFilter = this._filter(keyStroke);
       var $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
       var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
