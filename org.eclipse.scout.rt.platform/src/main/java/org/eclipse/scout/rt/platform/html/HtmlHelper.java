@@ -13,7 +13,11 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 public class HtmlHelper {
 
   @SuppressWarnings("bsiRulesDefinition:htmlInString")
-  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</table>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_PARAGRAPH_END_TAGS = Pattern.compile("<br/?></div>|</div>|<br/?>|</p>|<p/>|</tr>|</h[1-6]>|</dt>|</dd>|</dl>|</table>|</li>|</head>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_SPACE_END_TAGS = Pattern.compile("</td>|</th>", Pattern.CASE_INSENSITIVE);
+  private static final Pattern HTML_TAGS = Pattern.compile("<[^>]+>", Pattern.DOTALL);
+  private static final Pattern MULTIPLE_SPACES = Pattern.compile("[ ]+");
+  private static final Pattern SPACES_ADJACENT_LINEBREAKS = Pattern.compile("[ ]+\n[ ]?|[ ]?\n[ ]+");
 
   /**
    * Very basic HTML to plain text conversion, without parsing and building a model.
@@ -31,13 +35,24 @@ public class HtmlHelper {
    * <li><code>&lt;br/&gt;&lt;/div&gt;</code>
    * <li><code>&lt;/div&gt;</code>
    * <li><code>&lt;br&gt;</code>
-   * <li><code>&lt;br/&gt;</code>
+   * <li><code>&lt;br/&gt;</code> *
    * <li><code>&lt;/p&gt;</code>
    * <li><code>&lt;p/&gt;</code>
    * <li><code>&lt;/tr&gt;</code>
+   * <li><code>&lt;/h1&gt;</code>
+   * <li><code>&lt;/h2&gt;</code>
+   * <li><code>&lt;/h3&gt;</code>
+   * <li><code>&lt;/h4&gt;</code>
+   * <li><code>&lt;/h5&gt;</code>
+   * <li><code>&lt;/h6&gt;</code>
+   * <li><code>&lt;/dt&gt;</code>
+   * <li><code>&lt;/dd&gt;</code>
+   * <li><code>&lt;/dl&gt;</code>
    * <li><code>&lt;/table&gt;</code>
+   * <li><code>&lt;/li&gt;</code>
+   * <li><code>&lt;/head&gt;</code>
    * </ul>
-   * <li>All other tags are replaced by a space.
+   * <li>All other tags are removed.
    * <li>Multiple consecutive spaces are merged to one space.
    * <li>Leading and trailing whitespace line is removed from each line.
    * </ul>
@@ -60,12 +75,16 @@ public class HtmlHelper {
     //tabs
     s = StringUtility.replace(s, StringUtility.HTML_ENCODED_TAB, "\t");
     //remove tags
-    s = Pattern.compile("<[^>]+>", Pattern.DOTALL).matcher(s).replaceAll(" ");
+    matcher = HTML_SPACE_END_TAGS.matcher(s);
+    s = matcher.replaceAll(" ");
+    matcher = HTML_TAGS.matcher(s);
+    s = matcher.replaceAll("");
     //remove multiple spaces
-    s = s.replaceAll("[ ]+", " ");
+    matcher = MULTIPLE_SPACES.matcher(s);
+    s = matcher.replaceAll(" ");
     //remove spaces at the beginning and end of each line
-    s = s.replaceAll("[ ]+\n", "\n");
-    s = s.replaceAll("\n[ ]+", "\n");
+    matcher = SPACES_ADJACENT_LINEBREAKS.matcher(s);
+    s = matcher.replaceAll("\n");
     s = unescape(s);
 
     // space
