@@ -38,6 +38,10 @@ public class HtmlHelperTest {
     assertEquals("one\ttwo", helper.toPlainText("one" + StringUtility.HTML_ENCODED_TAB + "two"));
     assertEquals("one    two", helper.toPlainText("one&#160;&#xa0;&#Xa0;&#xA0;two")); // HTML5 spec allows for mixed case hex values.
     assertEquals("one\t\ttwo", helper.toPlainText("one&#x9;&#X9;two")); // HTML5 spec allows for mixed case hex values.
+    assertEquals("Unterraschungsfeier", helper.toPlainText("<div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div>")); // Formating tags within a single word.
+    assertEquals("Header 1\nHeader 2", helper.toPlainText("<h1>Header 1</h1><h1>Header 2</h1>")); // Headers
+    assertEquals("List 1\nList 2\nTableHeader 1 TableHeader 2\nData 1 Data 2",
+        helper.toPlainText("<ul><li>List 1</li><li>List 2</li></ul><table><tr><th>TableHeader 1</th><th>TableHeader 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>")); // List and tables
 
     // Simple documents
     assertEquals("", helper.toPlainText("<html>"));
@@ -46,8 +50,10 @@ public class HtmlHelperTest {
     assertEquals("one", helper.toPlainText("<html><head>one</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one & two</html>"));
     assertEquals("one & two", helper.toPlainText("<html><head>one &amp; two</html>"));
-    assertEquals("one & two three", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
+    assertEquals("one & two\nthree", helper.toPlainText("<html><head>one &amp; two</head><body>three</html>")); // [?] invalid <body>, has no end tag
     assertEquals("three", helper.toPlainText("<html><head>one &amp; two</head><body>three</body></html>"));
+    assertEquals("Unterraschungsfeier",
+        helper.toPlainText("<html><body><div class=\"rte-line\">Unter<u>rasch</u>u<span class=\"rte-highlight\" style=\"background-color: rgb(255, 219, 157)\">ngs</span>feier<br></div></body></html>"));
 
     // Line breaks
     assertEquals("a\nb", helper.toPlainText("a<br>b"));

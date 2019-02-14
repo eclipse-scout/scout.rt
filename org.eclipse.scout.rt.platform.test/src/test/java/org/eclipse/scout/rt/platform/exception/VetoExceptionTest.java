@@ -17,7 +17,7 @@ import org.junit.Test;
 public class VetoExceptionTest {
 
   private static final String PROCESSING_STATUS_MESSAGE = "title: body";
-  private static final String HTML_CONTENT_PLAIN_TEXT = "messages: first entry second entry";
+  private static final String HTML_CONTENT_PLAIN_TEXT = "messages:first entry\nsecond entry";
 
   private IHtmlContent m_htmlContent;
   private ProcessingStatus m_processingStatus;
