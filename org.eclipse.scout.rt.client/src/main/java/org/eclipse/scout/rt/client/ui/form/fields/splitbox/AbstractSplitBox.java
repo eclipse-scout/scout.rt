@@ -122,6 +122,12 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(400)
+  protected boolean getConfiguredMinimizeEnabled() {
+    return true;
+  }
+
   @ConfigProperty(ConfigProperty.STRING)
   @Order(410)
   protected String getConfiguredToogleCollapseKeyStroke() {
@@ -161,6 +167,7 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     setFirstCollapseKeyStroke(getConfiguredFirstCollapseKeyStroke());
     setSecondCollapseKeyStroke(getConfiguredSecondCollapseKeyStroke());
     setFieldMinimized(getConfiguredFieldMinimized());
+    setMinimizeEnabled(getConfiguredMinimizeEnabled());
 
     getChildren().stream()
         .filter(child -> child instanceof IGroupBox)
@@ -248,6 +255,16 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
   @Override
   public void setFieldMinimized(boolean minimized) {
     propertySupport.setPropertyBool(PROP_FIELD_MINIMIZED, minimized);
+  }
+
+  @Override
+  public boolean isMinimizeEnabled() {
+    return propertySupport.getPropertyBool(PROP_MINIMIZE_ENABLED);
+  }
+
+  @Override
+  public void setMinimizeEnabled(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_MINIMIZE_ENABLED, enabled);
   }
 
   @Override
@@ -365,6 +382,11 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     @Override
     public void setFieldMinimizedFromUI(boolean minimized) {
       setFieldMinimized(minimized);
+    }
+
+    @Override
+    public void setMinimizeEnabledFromUI(boolean enabled) {
+      setMinimizeEnabled(enabled);
     }
   } // end UIFacade
 

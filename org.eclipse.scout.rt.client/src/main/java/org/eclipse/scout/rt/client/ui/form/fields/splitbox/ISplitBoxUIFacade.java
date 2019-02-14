@@ -19,4 +19,6 @@ public interface ISplitBoxUIFacade {
   void setFieldCollapsedFromUI(boolean collapsed);
 
   void setFieldMinimizedFromUI(boolean minimized);
+
+  void setMinimizeEnabledFromUI(boolean enabled);
 }

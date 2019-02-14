@@ -136,6 +136,12 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
         return getModel().isFieldMinimized();
       }
     });
+    putJsonProperty(new JsonProperty<ISplitBox>(ISplitBox.PROP_MINIMIZE_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMinimizeEnabled();
+      }
+    });
   }
 
   @Override
@@ -194,6 +200,11 @@ public class JsonSplitBox<SPLIT_BOX extends ISplitBox> extends JsonFormField<SPL
       Double minSplitterPosition = JsonObjectUtility.optDouble(data, propertyName);
       addPropertyEventFilterCondition(propertyName, minSplitterPosition);
       getModel().getUIFacade().setMinSplitterPositionFromUI(minSplitterPosition);
+    }
+    else if (ISplitBox.PROP_MINIMIZE_ENABLED.equals(propertyName)) {
+      boolean minimizeEnabled = data.getBoolean(propertyName);
+      addPropertyEventFilterCondition(propertyName, minimizeEnabled);
+      getModel().getUIFacade().setMinimizeEnabledFromUI(minimizeEnabled);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);

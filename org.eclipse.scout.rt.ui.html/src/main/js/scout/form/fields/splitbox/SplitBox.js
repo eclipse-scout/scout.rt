@@ -24,6 +24,7 @@ scout.SplitBox = function() {
   this.minSplitterPosition;
   this.splitterPositionType = scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
   this.fieldMinimized = false;
+  this.minimizeEnabled = true;
 
   this._$splitArea;
   this._$splitter;
@@ -425,7 +426,7 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
   var leftVisible, rightVisible,
     collapsed = this.fieldCollapsed,
     minimized = this.fieldMinimized,
-    minimizable = !!this.minSplitterPosition,
+    minimizable = this._isMinimizable(),
     positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
     positionNotAccordingCollapsibleField = (positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField);
 
@@ -468,7 +469,7 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
 };
 
 scout.SplitBox.prototype.getEffectiveSplitterPosition = function() {
-  if (this.minSplitterPosition && this.fieldMinimized) {
+  if (this._isMinimizable() && this.fieldMinimized) {
     return this.minSplitterPosition;
   } else {
     return this.splitterPosition;
@@ -510,6 +511,26 @@ scout.SplitBox.prototype._renderFieldMinimized = function() {
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
+};
+
+scout.SplitBox.prototype.setMinimizeEnabled = function(enabled) {
+  this.setProperty('minimizeEnabled', enabled);
+  if (this._isMinimizable() && this._isSplitterPositionInMinimalRange(this.splitterPosition)) {
+    this.setFieldMinimized(true);
+  }
+
+  this._updateCollapseHandleButtons();
+};
+
+scout.SplitBox.prototype._renderMinimizeEnabled = function() {
+  // minimize enabled is considered automatically when layout is updated
+  if (this.rendered) { // don't invalidate layout on initial rendering
+    this.htmlSplitArea.invalidateLayoutTree(false);
+  }
+};
+
+scout.SplitBox.prototype._isMinimizable = function() {
+  return !!this.minSplitterPosition && this.minimizeEnabled;
 };
 
 scout.SplitBox.prototype._renderCollapsibleField = function() {
@@ -582,7 +603,7 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition, upd
   }
 
   // Ensure splitter within allowed range, toggle field minimized state if new splitter position is within minimal range
-  if (this.minSplitterPosition && this._isSplitterPositionInMinimalRange(newSplitterPosition)) {
+  if (this._isMinimizable() && this._isSplitterPositionInMinimalRange(newSplitterPosition)) {
     this.setFieldMinimized(true);
     return;
   }
@@ -608,7 +629,7 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition, upd
 };
 
 scout.SplitBox.prototype._updateFieldMinimized = function() {
-  if (this.minSplitterPosition) {
+  if (this._isMinimizable()) {
     this.setFieldMinimized(this._isSplitterPositionInMinimalRange(this.splitterPosition));
   } else {
     this.setFieldMinimized(false);
@@ -616,7 +637,7 @@ scout.SplitBox.prototype._updateFieldMinimized = function() {
 };
 
 scout.SplitBox.prototype._isSplitterPositionInMinimalRange = function(newSplitterPosition) {
-  if (!this.minSplitterPosition) {
+  if (!this._isMinimizable()) {
     return false;
   }
   return newSplitterPosition <= this.minSplitterPosition;
@@ -629,7 +650,7 @@ scout.SplitBox.prototype.toggleFieldCollapsed = function() {
 scout.SplitBox.prototype.collapseHandleButtonPressed = function(event) {
   var collapsed = this.fieldCollapsed,
     minimized = this.fieldMinimized,
-    minimizable = !!this.minSplitterPosition,
+    minimizable = this._isMinimizable(),
     positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
     increaseField = (!!event.left && !positionTypeFirstField) || (!!event.right && positionTypeFirstField);
 

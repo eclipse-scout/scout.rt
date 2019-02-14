@@ -35,6 +35,7 @@ public interface ISplitBox extends ICompositeField {
   String PROP_FIRST_COLLAPSE_KEY_STROKE = "firstCollapseKeyStroke";
   String PROP_SECOND_COLLAPSE_KEY_STROKE = "secondCollapseKeyStroke";
   String PROP_FIELD_MINIMIZED = "fieldMinimized";
+  String PROP_MINIMIZE_ENABLED = "minimizeEnabled";
 
   /**
    * The splitter position is the size of the <b>first</b> inner box relative to full size of the split box, i.e. it is
@@ -100,17 +101,29 @@ public interface ISplitBox extends ICompositeField {
 
   /**
    * @return {@code true} if collapsible field (@see {@link #getCollapsibleField()}) is reduced to its minimal splitter
-   *         position {@link #getMinSplitterPosition()}. If no minimal splitter position is configured, the minimized
-   *         field state is ignored.
+   *         position {@link #getMinSplitterPosition()}. If no minimal splitter position is configured, or
+   *         {@link #isMinimizeEnabled()} is set to {@code false}, the minimized field state is ignored.
    */
   boolean isFieldMinimized();
 
   /**
    * Sets the state of the collapsible field (@see {@link #getCollapsibleField()}). If the collapsible field is set to
    * minimized {@code true}, the splitter position is reduced to {@link #getMinSplitterPosition()}. If no minimal
-   * splitter position is configured, the minimized field state is ignored.
+   * splitter position is configured, or {@link #isMinimizeEnabled()} is set to {@code false}, the minimized field state
+   * is ignored.
    */
   void setFieldMinimized(boolean minimized);
+
+  /**
+   * @return {@code true} if the collapsible field (@see {@link #getCollapsibleField()}) has a minimized field state.
+   */
+  boolean isMinimizeEnabled();
+
+  /**
+   * Sets if the collapsible field (@see {@link #getCollapsibleField()}) has a minimized field state. If set to {@code false},
+   * only the collapsed state will be available. In this case {@link #setFieldMinimized(boolean)} will have not effect.
+   */
+  void setMinimizeEnabled(boolean enabled);
 
   /**
    * Value indicating how to interpret the value returned by {@link #getSplitterPosition()}. Should be one of the
