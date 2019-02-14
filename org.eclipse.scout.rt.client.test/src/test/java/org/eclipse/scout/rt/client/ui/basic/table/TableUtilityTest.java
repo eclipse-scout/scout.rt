@@ -408,7 +408,7 @@ public class TableUtilityTest {
     public class StringHtmlHeaderColumn extends AbstractStringColumn {
       @Override
       protected String getConfiguredHeaderText() {
-        return "<span>Header cell</span><span>with html</span>";
+        return "<span>Header cell</span><span> with html</span>";
       }
 
       @Override
