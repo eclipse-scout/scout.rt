@@ -121,7 +121,12 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
 
   @Override
   public IHtmlElement appLink(CharSequence ref) {
-    cssClass("app-link");
+    return appLink(ref, "app-link");
+  }
+
+  @Override
+  public IHtmlElement appLink(CharSequence ref, CharSequence cssClass) {
+    cssClass(cssClass);
     addAttribute("data-ref", ref);
     return this;
   }

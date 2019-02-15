@@ -52,4 +52,6 @@ public interface IHtmlElement extends IHtmlContent {
    *      attributes<a/>
    */
   IHtmlElement addBooleanAttribute(String name);
+
+  IHtmlElement appLink(CharSequence ref, CharSequence cssClass);
 }
