@@ -269,7 +269,7 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
     text: '${textKey:ui.forward}',
     cssClass: 'move move-up'
   });
-  this.forwardButton.on('action',  function() {
+  this.forwardButton.on('action', function() {
     table.moveColumn(column, pos, Math.max(pos - 1, 0));
     pos = table.visibleColumns().indexOf(column);
   });
@@ -303,17 +303,15 @@ scout.TableHeaderMenu.prototype._onColumnMoved = function() {
     column = this.column;
 
   if (this.moveGroup) {
-    var backwardEnabled = scout.arrays.find(table.visibleColumns(), function(column) {
-        return !column.fixedPosition;
-      }) !== column,
-      forwardEnabled = scout.arrays.find(table.visibleColumns().slice().reverse(), function(column) {
-        return !column.fixedPosition;
-      }) !== column;
+    var visibleColumns = table.visibleColumns();
+    var columnIndex = table.visibleColumns().indexOf(column);
+    var forwardEnabled = visibleColumns[columnIndex - 1] && !visibleColumns[columnIndex - 1].fixedPosition;
+    var backwardEnabled = visibleColumns[columnIndex + 1] && !visibleColumns[columnIndex + 1].fixedPosition;
 
-    this.toBeginButton.setEnabled(backwardEnabled);
-    this.forwardButton.setEnabled(backwardEnabled);
-    this.backwardButton.setEnabled(forwardEnabled);
-    this.toEndButton.setEnabled(forwardEnabled);
+    this.toBeginButton.setEnabled(forwardEnabled);
+    this.forwardButton.setEnabled(forwardEnabled);
+    this.backwardButton.setEnabled(backwardEnabled);
+    this.toEndButton.setEnabled(backwardEnabled);
   }
 
   this.hierarchyGroup.setVisible(this.table.isTableNodeColumn(column));

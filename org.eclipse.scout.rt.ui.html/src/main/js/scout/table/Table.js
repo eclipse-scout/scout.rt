@@ -3655,17 +3655,13 @@ scout.Table.prototype.resizeColumn = function(column, width) {
 };
 
 scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos, dragged) {
-  // translate position of 'visible columns' array to position in 'all columns' array
-  var visibleColumns = this.visibleColumns(),
-    newColumn = visibleColumns[visibleNewPos],
-    newPos = this.columns.indexOf(newColumn);
+  // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
+  visibleNewPos = this._considerFixedPositionColumns(visibleOldPos, visibleNewPos);
 
-  // Don't allow moving a column before the last column with a fixed position (checkbox col, row icon col ...)
-  this.columns.forEach(function(iteratingColumn, i) {
-    if (iteratingColumn.fixedPosition && newPos <= i) {
-      newPos = i + 1;
-    }
-  });
+  // Translate position of 'visible columns' array to position in 'all columns' array
+  var visibleColumns = this.visibleColumns();
+  var newColumn = visibleColumns[visibleNewPos];
+  var newPos = this.columns.indexOf(newColumn);
 
   scout.arrays.remove(this.columns, column);
   scout.arrays.insert(this.columns, column, newPos);
@@ -3685,6 +3681,31 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   if (this.rendered) {
     this._rerenderViewport();
   }
+};
+
+/**
+ * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
+ */
+scout.Table.prototype._considerFixedPositionColumns = function(visibleOldPos, visibleNewPos) {
+  var fixedColumnIndex = -1;
+  if (visibleNewPos > visibleOldPos) {
+    // move to right
+    fixedColumnIndex = scout.arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, function(col) {
+      return col.fixedPosition;
+    });
+    if (fixedColumnIndex > -1) {
+      visibleNewPos = Math.min(visibleNewPos, fixedColumnIndex - 1);
+    }
+  } else {
+    // move to left
+    fixedColumnIndex = scout.arrays.findIndexFromReverse(this.visibleColumns(), visibleOldPos, function(col) {
+      return col.fixedPosition;
+    });
+    if (fixedColumnIndex > -1) {
+      visibleNewPos = Math.max(visibleNewPos, fixedColumnIndex + 1);
+    }
+  }
+  return visibleNewPos;
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
