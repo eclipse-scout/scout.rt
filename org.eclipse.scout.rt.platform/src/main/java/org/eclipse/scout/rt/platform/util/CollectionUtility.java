@@ -780,16 +780,20 @@ public final class CollectionUtility {
    * @see #combine(Collection...)
    */
   @SafeVarargs
-  public static <T> List<? extends T> flatten(Collection<? extends T>... collections) {
-    if (collections == null || collections.length < 1) {
-      return CollectionUtility.emptyArrayList();
-    }
+  public static <T> List<T> flatten(Collection<? extends T>... collections) {
     List<T> result = new ArrayList<>();
+    if (collections == null) {
+      return result;
+    }
     for (Collection<? extends T> c : collections) {
-      if (c == null || c.isEmpty()) {
+      if (c == null) {
         continue;
       }
-      result.addAll(arrayListWithoutNullElements(c));
+      for (T t : c) {
+        if (t != null) {
+          result.add(t);
+        }
+      }
     }
     return result;
   }
