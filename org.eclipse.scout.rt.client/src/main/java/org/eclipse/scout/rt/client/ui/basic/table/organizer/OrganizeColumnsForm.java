@@ -49,6 +49,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupAdditionalMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.GroupMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.ModifyCustomColumnMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.MoveDownMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.MoveUpMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ColumnsGroupBox.ColumnsTableField.Table.RemoveMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.OrganizeColumnsForm.MainBox.GroupBox.ProfilesBox.ProfilesTableField;
@@ -106,7 +108,6 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
   @Override
   protected void execInitForm() {
     getOrganizedTable().addPropertyChangeListener(ITable.PROP_HIERARCHICAL_ROWS, m_organizedTablePropertyListener);
-
   }
 
   @Override
@@ -1476,6 +1477,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
     updateColumnVisibilityAndOrder();
+    enableDisableMenus();
   }
 
   public void moveDown(ITableRow row) {
@@ -1487,10 +1489,13 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       getColumnsTableField().getTable().moveRow(row.getRowIndex(), targetIndex);
     }
     updateColumnVisibilityAndOrder();
+    enableDisableMenus();
   }
 
   public void enableDisableMenus() {
-    boolean addEnabled = false,
+    boolean moveUpEnabled = false,
+        moveDownEnabled = false,
+        addEnabled = false,
         modifyEnabled = false,
         removeEnabled = false,
         removeFilterEnabled = false;
@@ -1501,6 +1506,12 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
 
     for (ITableRow row : selectedRows) {
       IColumn<?> selectedColumn = columnsTable.getKeyColumn().getValue(row);
+      if (isColumnMovableUp(selectedColumn)) {
+        moveUpEnabled = true;
+      }
+      if (isColumnMovableDown(selectedColumn)) {
+        moveDownEnabled = true;
+      }
       if (isColumnRemovable(selectedColumn)) {
         removeEnabled = true;
       }
@@ -1511,6 +1522,8 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
         removeFilterEnabled = true;
       }
     }
+    setEnabledAndVisible(columnsTable, MoveUpMenu.class, moveUpEnabled);
+    setEnabledAndVisible(columnsTable, MoveDownMenu.class, moveDownEnabled);
     setEnabledAndVisible(columnsTable, AddColumnMenu.class, addEnabled);
     setEnabledAndVisible(columnsTable, AddColumnEmptySpaceMenu.class, addEnabled && columnsTable.getSelectedRows().isEmpty());
     setEnabledAndVisible(columnsTable, ModifyCustomColumnMenu.class, modifyEnabled);
@@ -1606,6 +1619,30 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
       m_organizedTable.setTableChanging(false);
     }
     getColumnsTableField().reloadTableData();
+  }
+
+  protected boolean isColumnMovableUp(IColumn<?> column) {
+    if (column.isFixedPosition()) {
+      return false;
+    }
+    List<IColumn<?>> visibleColumns = column.getTable().getColumnSet().getVisibleColumns();
+    int index = visibleColumns.indexOf(column);
+    if (index - 1 < 0) {
+      return false;
+    }
+    return !visibleColumns.get(index - 1).isFixedPosition();
+  }
+
+  protected boolean isColumnMovableDown(IColumn<?> column) {
+    if (column.isFixedPosition()) {
+      return false;
+    }
+    List<IColumn<?>> visibleColumns = column.getTable().getColumnSet().getVisibleColumns();
+    int index = visibleColumns.indexOf(column);
+    if (index + 1 >= visibleColumns.size()) {
+      return false;
+    }
+    return !visibleColumns.get(index + 1).isFixedPosition();
   }
 
   /**

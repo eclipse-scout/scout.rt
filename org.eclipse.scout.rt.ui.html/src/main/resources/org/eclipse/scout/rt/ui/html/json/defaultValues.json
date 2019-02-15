@@ -352,6 +352,7 @@
       "editable": false,
       "enabled": true,
       "fixedWidth": false,
+      "fixedPosition": false,
       "grouped": false,
       "headerHtmlEnabled": false,
       "horizontalAlignment": -1,

@@ -84,6 +84,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
       json.put("checkable", true);
     }
     json.put(IColumn.PROP_FIXED_WIDTH, getColumn().isFixedWidth());
+    json.put(IColumn.PROP_FIXED_POSITION, getColumn().isFixedPosition());
     json.put(IColumn.PROP_AUTO_OPTIMIZE_WIDTH, getColumn().isAutoOptimizeWidth());
     json.put(IColumn.PROP_EDITABLE, getColumn().isEditable());
     json.put("mandatory", getColumn().isMandatory());

@@ -59,6 +59,10 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    */
   String PROP_FIXED_WIDTH = "fixedWidth";
   /**
+   * type boolean
+   */
+  String PROP_FIXED_POSITION = "fixedPosition";
+  /**
    * type int
    */
   String PROP_VIEW_COLUMN_INDEX_HINT = "viewColumnIndexHint";
@@ -275,6 +279,14 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   boolean isFixedWidth();
 
   void setFixedWidth(boolean fixedWidth);
+
+  /**
+   * @return <code>true</code>, if the column position is fixed, meaning that it cannot be moved by the user. Also,
+   *         other columns cannot be moved beyond a fixed column.
+   */
+  boolean isFixedPosition();
+
+  void setFixedPosition(boolean fixedPosition);
 
   int getVisibleColumnIndexHint();
 

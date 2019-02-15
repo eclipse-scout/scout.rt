@@ -324,6 +324,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures whether the column position is fixed, meaning that it cannot be moved by the user. Also, other columns
+   * cannot be moved beyond a fixed column. Defaults to <code>false</code>.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(78)
+  protected boolean getConfiguredFixedPosition() {
+    return false;
+  }
+
+  /**
    * Configures whether the column is displayable or not. A non-displayable column is always invisible for the user. A
    * displayable column may be visible for a user, depending on {@link #getConfiguredVisible()}.
    * <p>
@@ -951,6 +961,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     setMinWidth(getConfiguredMinWidth());
     setAutoOptimizeMaxWidth(getConfiguredAutoOptimizeMaxWidth());
     setFixedWidth(getConfiguredFixedWidth());
+    setFixedPosition(getConfiguredFixedPosition());
     m_flags = FLAGS_BIT_HELPER.changeBit(PRIMARY_KEY, getConfiguredPrimaryKey(), m_flags);
     m_flags2 = FLAGS2_BIT_HELPER.changeBit(PARENT_KEY, getConfiguredParentKey(), m_flags);
     m_flags = FLAGS_BIT_HELPER.changeBit(SUMMARY, getConfiguredSummary(), m_flags);
@@ -1847,6 +1858,16 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   @Override
   public void setFixedWidth(boolean fixedWidth) {
     propertySupport.setPropertyBool(PROP_FIXED_WIDTH, fixedWidth);
+  }
+
+  @Override
+  public boolean isFixedPosition() {
+    return propertySupport.getPropertyBool(PROP_FIXED_POSITION);
+  }
+
+  @Override
+  public void setFixedPosition(boolean fixedPosition) {
+    propertySupport.setPropertyBool(PROP_FIXED_POSITION, fixedPosition);
   }
 
   @Override
