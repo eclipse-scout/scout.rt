@@ -810,6 +810,38 @@ scout.Table.prototype.exportToClipboard = function() {
   this._triggerClipboardExport();
 };
 
+/**
+ * JS implementation of AbstractTable.execCopy(rows)
+ */
+scout.Table.prototype._exportToClipboard = function() {
+  scout.clipboard.copyText({
+    parent: this,
+    text: this._selectedRowsToText()
+  });
+};
+
+scout.Table.prototype._selectedRowsToText = function() {
+  var columns = this.visibleColumns();
+  return this.selectedRows.map(function(row) {
+    return columns.map(function(column) {
+      var cell = column.cell(row);
+      var text;
+      if (column instanceof scout.BooleanColumn) {
+        text = (cell.value ? 'X' : '');
+      } else if (cell.htmlEnabled) {
+        text = scout.strings.plainText(cell.text);
+      } else {
+        text = cell.text;
+      }
+      // unwrap
+      return scout.strings.nvl(text)
+        .replace(/\r/g, '')
+        .replace(/[\n\t]/g, ' ')
+        .replace(/[ ]+/g, ' ');
+    }).join('\t');
+  }).join('\n');
+};
+
 scout.Table.prototype.setMultiSelect = function(multiSelect) {
   this.setProperty('multiSelect', multiSelect);
 };
@@ -3748,7 +3780,11 @@ scout.Table.prototype._triggerReload = function(reloadReason) {
 };
 
 scout.Table.prototype._triggerClipboardExport = function() {
-  this.trigger('clipboardExport');
+  var event = new scout.Event();
+  this.trigger('clipboardExport', event);
+  if (!event.defaultPrevented) {
+    this._exportToClipboard();
+  }
 };
 
 scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {

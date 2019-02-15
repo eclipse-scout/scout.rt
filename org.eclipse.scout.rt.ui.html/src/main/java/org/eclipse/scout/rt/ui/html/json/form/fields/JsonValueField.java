@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -22,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IStatusMenuMapping;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
-import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
@@ -52,7 +49,6 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    * flag.
    */
   public static final String EVENT_ACCEPT_INPUT = "acceptInput";
-  public static final String EVENT_CLIPBOARD_EXPORT = "clipboardExport";
 
   private PropertyChangeListener m_contextMenuListener;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
@@ -86,7 +82,7 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
       protected List<IStatusMenuMapping> modelValue() {
         return getModel().getStatusMenuMappings();
       }
-    });    
+    });
   }
 
   @Override
@@ -165,9 +161,6 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
   public void handleUiEvent(JsonEvent event) {
     if (EVENT_ACCEPT_INPUT.equals(event.getType())) {
       handleUiAcceptInput(event);
-    }
-    else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
-      handleUiClipboardExport();
     }
     else {
       super.handleUiEvent(event);
@@ -252,14 +245,5 @@ public abstract class JsonValueField<VALUE_FIELD extends IValueField<?>> extends
    */
   protected void handleUiAcceptInputAfterTyping(String displayText) {
     // NOP may be implemented by sub-classes
-  }
-
-  protected void handleUiClipboardExport() {
-    try {
-      BEANS.get(IClipboardService.class).setTextContents(getModel().getDisplayText());
-    }
-    catch (RuntimeException e) {
-      BEANS.get(ExceptionHandler.class).handle(e);
-    }
   }
 }
