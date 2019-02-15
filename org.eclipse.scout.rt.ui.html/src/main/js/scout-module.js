@@ -29,6 +29,7 @@
   // Basic utilities
   __include("scout/util/arrays.js");
   __include("scout/util/Call.js");
+  __include("scout/util/clipboard.js");
   __include("scout/util/EventDelegator.js");
   __include("scout/util/dates.js");
   __include("scout/util/defaultValues.js");

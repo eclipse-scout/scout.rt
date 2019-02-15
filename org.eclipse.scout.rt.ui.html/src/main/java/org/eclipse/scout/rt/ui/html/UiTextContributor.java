@@ -121,6 +121,8 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.toEnd",
         "ui.ascending",
         "ui.Copy",
+        "ui.CopyToClipboardSuccessStatus",
+        "ui.CopyToClipboardFailedStatus",
         "ui.descending",
         "ui.ascendingAdditionally",
         "ui.descendingAdditionally",

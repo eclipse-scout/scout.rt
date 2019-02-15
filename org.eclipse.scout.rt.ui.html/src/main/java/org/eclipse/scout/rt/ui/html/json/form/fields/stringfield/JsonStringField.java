@@ -163,9 +163,6 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
     else if (EVENT_SELECTION_CHANGE.equals(event.getType())) {
       handleUiSelectionChange(event);
     }
-    else if (EVENT_CLIPBOARD_EXPORT.equals(event.getType())) {
-      handleUiClipboardExport();
-    }
     else {
       super.handleUiEvent(event);
     }

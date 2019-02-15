@@ -299,6 +299,7 @@ scout.TableAdapter.prototype._onWidgetReload = function(event) {
 
 scout.TableAdapter.prototype._onWidgetExportToClipboard = function(event) {
   this._send('clipboardExport');
+  event.preventDefault();
 };
 
 scout.TableAdapter.prototype._onWidgetEvent = function(event) {

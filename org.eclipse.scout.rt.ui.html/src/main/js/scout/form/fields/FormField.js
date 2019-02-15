@@ -1158,18 +1158,14 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     return;
   }
 
-  var field = this;
   var menu = scout.create('Menu', {
     parent: this,
     text: this.session.text('ui.Copy'),
     inheritAccessibility: false
   });
   menu.on('action', function(event) {
-    if (field instanceof scout.ValueField) {
-      // TODO [7.0] cgu offline?
-      field.trigger('clipboardExport');
-    }
-  });
+    this.exportToClipboard();
+  }.bind(this));
 
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
@@ -1260,4 +1256,24 @@ scout.FormField.prototype.clone = function(model, options) {
   var clone = scout.FormField.parent.prototype.clone.call(this, model, options);
   this._deepCloneProperties(clone, 'menus', options);
   return clone;
+};
+
+scout.FormField.prototype.exportToClipboard = function() {
+  if (!this.displayText) {
+    return;
+  }
+  var event = new scout.Event({
+    text: this.displayText
+  });
+  this.trigger('clipboardExport', event);
+  if (!event.defaultPrevented) {
+    this._exportToClipboard(event.text);
+  }
+};
+
+scout.FormField.prototype._exportToClipboard = function(text) {
+  scout.clipboard.copyText({
+    parent: this,
+    text: text
+  });
 };
