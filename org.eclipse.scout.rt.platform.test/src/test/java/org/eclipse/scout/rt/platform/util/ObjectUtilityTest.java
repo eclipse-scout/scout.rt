@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.function.BiFunction;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,12 +46,21 @@ public class ObjectUtilityTest {
 
   @Test
   public void testNvl() {
+    testNvlInternal(ObjectUtility::nvl);
+  }
+
+  @Test
+  public void testNvlOptional() {
+    testNvlInternal((o1, o2) -> ObjectUtility.nvlOptional(o1, () -> o2));
+  }
+
+  protected <T> void testNvlInternal(BiFunction<Object, Object, Object> nvlFunction) {
     Object o1 = "foo";
     Object o2 = 1234;
-    assertSame(o1, ObjectUtility.nvl(o1, o2));
-    assertSame(o2, ObjectUtility.nvl(o2, o1));
-    assertSame(o1, ObjectUtility.nvl(null, o1));
-    assertNull(ObjectUtility.nvl(null, null));
+    assertSame(o1, nvlFunction.apply(o1, o2));
+    assertSame(o2, nvlFunction.apply(o2, o1));
+    assertSame(o1, nvlFunction.apply(null, o1));
+    assertNull(nvlFunction.apply(null, null));
   }
 
   @Test
