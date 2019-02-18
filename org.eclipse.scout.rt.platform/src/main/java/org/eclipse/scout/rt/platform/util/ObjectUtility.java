@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Utility for null-safe operations on {@link Object}.
@@ -32,6 +33,17 @@ public final class ObjectUtility {
       return value;
     }
     return valueWhenNull;
+  }
+
+  /**
+   * @return {@code value} if it is not {@code null} otherwise the {@code valueSupplierWhenNull} is called to supply an
+   *         alternative which is returned.
+   */
+  public static <T> T nvlOptional(T value, Supplier<T> valueSupplierWhenNull) {
+    if (value != null) {
+      return value;
+    }
+    return valueSupplierWhenNull != null ? valueSupplierWhenNull.get() : null;
   }
 
   /**
