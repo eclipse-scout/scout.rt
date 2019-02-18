@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -226,15 +224,10 @@ public class UriBuilder {
       if (query.length() > 0) {
         query.append("&");
       }
-      try {
-        query.append(URLEncoder.encode(param.getKey(), encoding));
-        if (!StringUtility.isNullOrEmpty(param.getValue())) {
-          query.append("=");
-          query.append(URLEncoder.encode(param.getValue(), encoding));
-        }
-      }
-      catch (UnsupportedEncodingException e) {
-        throw new ProcessingException("Unsupported encoding '" + encoding + "'", e);
+      query.append(UriUtility.encode(param.getKey(), encoding));
+      if (!StringUtility.isNullOrEmpty(param.getValue())) {
+        query.append("=");
+        query.append(UriUtility.encode(param.getValue(), encoding));
       }
     }
     return query.toString();

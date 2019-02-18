@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -225,6 +226,32 @@ public final class UriUtility {
     }
     try {
       return URLDecoder.decode(uri, encoding);
+    }
+    catch (UnsupportedEncodingException e) {
+      throw new ProcessingException("unsupported encoding '" + encoding + "'", e);
+    }
+  }
+
+  /**
+   * Delegates to {@link URLDecoder#encode(String, String)} using default encoding.
+   *
+   * @return the newly encoded String
+   */
+  public static String encode(String uri) {
+    return encode(uri, DEFAULT_ENCODING);
+  }
+
+  /**
+   * Delegates to {@link URLDecoder#encode(String, String)} using the given encoding.
+   *
+   * @return the newly encoded String
+   */
+  public static String encode(String uri, String encoding) {
+    if (encoding == null) {
+      encoding = DEFAULT_ENCODING;
+    }
+    try {
+      return URLEncoder.encode(uri, encoding);
     }
     catch (UnsupportedEncodingException e) {
       throw new ProcessingException("unsupported encoding '" + encoding + "'", e);
