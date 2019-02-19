@@ -253,9 +253,7 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
 };
 
 scout.KeyStrokeManager.prototype.addFilter = function(filter) {
-  if (filter && this.filters.indexOf(filter) === -1) {
-    this.filters.push(filter);
-  }
+  scout.arrays.pushSet(this.filters, filter);
 };
 
 scout.KeyStrokeManager.prototype.removeFilter = function(filter) {

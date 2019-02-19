@@ -546,9 +546,7 @@ scout.Widget.prototype.setParent = function(parent) {
 
 scout.Widget.prototype._addChild = function(child) {
   $.log.isTraceEnabled() && $.log.trace('addChild(' + child + ') to ' + this);
-  if (this.children.indexOf(child) === -1) {
-    this.children.push(child);
-  }
+  scout.arrays.pushSet(this.children, child);
 };
 
 scout.Widget.prototype._removeChild = function(child) {

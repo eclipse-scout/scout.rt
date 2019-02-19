@@ -659,6 +659,24 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("pushSet", function() {
+
+    it("only pushes the element if it is truthy and does not already exist in the array", function() {
+      var arr = [1, 2, 3];
+      scout.arrays.pushSet(arr, 1);
+      expect(arr).toEqual([1, 2, 3]);
+
+      arr = [1, 2, 3];
+      scout.arrays.pushSet(arr, null);
+      expect(arr).toEqual([1, 2, 3]);
+
+      arr = [1, 2, 3];
+      scout.arrays.pushSet(arr, 4);
+      expect(arr).toEqual([1, 2, 3, 4]);
+    });
+
+  });
+
   describe("diff", function() {
 
     it("returns all elements of the first array which are not in the second array", function() {

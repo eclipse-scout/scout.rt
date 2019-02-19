@@ -396,6 +396,16 @@ scout.arrays = {
   },
 
   /**
+   * Pushes the given element if it does not already exist in the array and the element is truthy. Thus the array is like a Set where every element
+   * can only be added once to the collection. Note: the comparison is done with the === operator.
+   */
+  pushSet: function(arr, element) {
+    if (element && arr.indexOf(element) === -1) {
+      arr.push(element);
+    }
+  },
+
+  /**
    * @param encoded defaults to false
    */
   format: function(arr, delimiter, encodeHtml) {
