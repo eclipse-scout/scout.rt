@@ -10,7 +10,11 @@
  ******************************************************************************/
 .dropdown-field-popup, .smart-field-popup, .proposal-field-popup {
   &.animate-open {
-    #scout.transform(scaleY(0));
+    /* Changed initial transform from 0 to 0.5 because in Chrome browser v72 on zoom levels > 100%
+     * the proposal-chooser popup produced an accidental flickering animation where the proposal table
+     * jumped a few pixels to the left. With 0.5 this does not happen - only god knows why. See #241249.
+     */
+    #scout.transform(scaleY(0.5));
     #scout.animation-name(grow-y);
     #scout.animation-duration(0.125s);
 
