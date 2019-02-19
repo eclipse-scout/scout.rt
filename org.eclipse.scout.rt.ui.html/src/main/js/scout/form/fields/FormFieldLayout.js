@@ -19,7 +19,11 @@ scout.FormFieldLayout = function(formField) {
   this.formField = formField;
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this.formField.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 

@@ -17,7 +17,11 @@ scout.SmartFieldMultilineLayout = function(smartField) {
 
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this.smartField.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.SmartFieldMultilineLayout, scout.AbstractLayout);
 

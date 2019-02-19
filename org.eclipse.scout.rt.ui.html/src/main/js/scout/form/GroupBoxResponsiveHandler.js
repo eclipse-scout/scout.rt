@@ -29,8 +29,6 @@ scout.GroupBoxResponsiveHandler = function() {
   // Event handlers
   this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
   this._compositeFields = [];
-
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.GroupBoxResponsiveHandler, scout.ResponsiveHandler);
 
@@ -47,6 +45,12 @@ scout.GroupBoxResponsiveHandler.prototype._onHtmlEnvironmenPropertyChange = func
  */
 scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
   scout.GroupBoxResponsiveHandler.parent.prototype.init.call(this, model);
+
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this.widget.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 
   this.widget.visitFields(function(field) {
     if (field instanceof scout.CompositeField) {

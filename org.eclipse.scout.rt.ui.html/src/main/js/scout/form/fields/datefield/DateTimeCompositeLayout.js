@@ -20,7 +20,11 @@ scout.DateTimeCompositeLayout = function(dateField) {
 
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this._dateField.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.DateTimeCompositeLayout, scout.AbstractLayout);
 

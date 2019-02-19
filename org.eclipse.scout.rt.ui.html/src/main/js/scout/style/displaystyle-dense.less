@@ -13,7 +13,7 @@
     & > .field > .multiline-lines {
       line-height: 15px;
       padding-top: 2px; /* padding: 3px @text-field-padding-x; */
-      padding-bottom: 2px
+      padding-bottom: 2px;
     }
   }
 
@@ -100,7 +100,7 @@
     &.checkable {
       padding-top: 4px;   /* @table-row-padding-y - @checkable-cell-padding-adjustment @table-cell-padding-left 0 @table-cell-padding-left; */
       padding-bottom: 4px;
-      line-height: 0px /* somehow inline-block causes additional height when line-height is not set. (font-size would work) */
+      line-height: 0; /* somehow inline-block causes additional height when line-height is not set. (font-size would work) */
     }
 
     &.table-node {
@@ -179,16 +179,16 @@
 
   /* Button */
   .button {
-    padding-top: 0px; /*   padding: @button-padding-y @button-padding-x; */
-    padding-bottom: 0px;
+    padding-top: 0; /*   padding: @button-padding-y @button-padding-x; */
+    padding-bottom: 0;
 
     & > .button-label {
-      padding: 0px 0;
+      padding: 0 0;
     }
 
     & > .icon {
-      padding-top: 0px; /* padding-top: 2px; */
-      padding-bottom: 0px; /* padding-bottom: 2px; */
+      padding-top: 0; /* padding-top: 2px; */
+      padding-bottom: 0; /* padding-bottom: 2px; */
     }
   }
 

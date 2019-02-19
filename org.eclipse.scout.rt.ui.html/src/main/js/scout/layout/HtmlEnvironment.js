@@ -44,6 +44,10 @@ scout.HtmlEnvironment = {
 
   on: function(type, func) {
     return this.events.on(type, func);
+  },
+
+  off: function(type, func) {
+    return this.events.off(type, func);
   }
 };
 

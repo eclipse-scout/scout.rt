@@ -14,7 +14,11 @@ scout.TabBoxHeaderLayout = function(tabBoxHeader) {
 
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this.tabBoxHeader.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 };
 scout.inherits(scout.TabBoxHeaderLayout, scout.AbstractLayout);
 
