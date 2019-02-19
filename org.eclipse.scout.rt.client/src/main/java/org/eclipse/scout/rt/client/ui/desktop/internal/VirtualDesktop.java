@@ -806,6 +806,16 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public boolean cancelForms(Set<IForm> formSet, boolean alwaysShowUnsavedChangesForm) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void closeForms(Set<IForm> formSet) {
+    // NOP
+  }
+
+  @Override
   public Object getProperty(String name) {
     return null;
   }

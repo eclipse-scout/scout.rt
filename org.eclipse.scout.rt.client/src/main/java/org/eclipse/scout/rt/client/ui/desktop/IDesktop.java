@@ -940,15 +940,45 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <VALUE> VALUE getStartupRequestParam(String propertyName);
 
   /**
-   * Cancels all forms contained in the given {@link Set}. For forms with unsaved changes the user will be asked if they
-   * should be saved or not with a specific dialog (see @link UnsavedFormChangesFrom).
+   * Cancels all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file
+   * choosers related to the forms in the formSet (display parent hierarchy). For forms with unsaved changes the user
+   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesFrom}). If only
+   * one form with unsaved changes the regular confirmation message box is shown instead of the
+   * {@link UnsavedFormChangesForm}.
    *
    * @param formSet
-   *          {@link Set} of {@link IForm}s that should be closed. Can be null or empty.
+   *          {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
    * @return <code>true</code> if all forms were closed (and saved) successfully or false if the saving dialog was
    *         cancelled.
    * @since 9.0
    */
   boolean cancelForms(Set<IForm> formSet);
+
+  /**
+   * Cancels all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file
+   * choosers related to the forms in the formSet (display parent hierarchy). For forms with unsaved changes the user
+   * will be asked if they should be saved or not with a specific dialog (see {@link UnsavedFormChangesFrom}).
+   *
+   * @param formSet
+   *          {@link Set} of {@link IForm}s that should be canceled. Can be null or empty.
+   * @param alwaysShowUnsavedChangesForm
+   *          true, if the {@link UnsavedFormChangesForm} should be shown even if there is only one form to be saved,
+   *          false, if the regular confirmation message box should be shown in that case
+   * @return <code>true</code> if all forms were closed (and saved) successfully or false if the saving dialog was
+   *         cancelled.
+   * @since 9.0
+   */
+  boolean cancelForms(Set<IForm> formSet, boolean alwaysShowUnsavedChangesForm);
+
+  /**
+   * Closes all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file
+   * choosers related to the forms in the formSet (display parent hierarchy). Compared to {@link #cancelForms(Set)} the
+   * user won't be asked to save unsaved changes.
+   *
+   * @param formSet
+   *          {@link Set} of {@link IForm}s that should be closed.
+   * @since 9.0
+   */
+  void closeForms(Set<IForm> formSet);
 
 }

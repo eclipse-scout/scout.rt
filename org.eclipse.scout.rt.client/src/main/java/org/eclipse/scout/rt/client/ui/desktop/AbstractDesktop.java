@@ -2599,18 +2599,19 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   protected boolean continueClosingConsideringUnsavedForms(List<IForm> forms, boolean isStopSession) {
-    if (!forms.isEmpty()) {
-      try {
-        UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms, isStopSession);
-        f.startNew();
-        f.waitFor();
-        if (f.getCloseSystemType() == IButton.SYSTEM_TYPE_CANCEL) {
-          return false;
-        }
+    if (forms.isEmpty()) {
+      return true;
+    }
+    try {
+      UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms, isStopSession);
+      f.startNew();
+      f.waitFor();
+      if (f.getCloseSystemType() == IButton.SYSTEM_TYPE_CANCEL) {
+        return false;
       }
-      catch (RuntimeException | PlatformError e) {
-        LOG.error("Error closing forms", e);
-      }
+    }
+    catch (RuntimeException | PlatformError e) {
+      LOG.error("Error closing forms", e);
     }
     return true;
   }
@@ -2671,16 +2672,33 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public boolean cancelForms(Set<IForm> formSet) {
+  public boolean cancelForms(Set<IForm> formSet, boolean alwaysShowUnsavedChangesForm) {
     if (formSet == null || formSet.isEmpty()) {
       return true;
     }
     // if formSet contains only one element simply call doCancel on that form. Using the UnsavedFormChangesForm is not necessary in this case.
-    if (formSet.size() == 1) {
+    if (!alwaysShowUnsavedChangesForm && formSet.size() == 1) {
       CollectionUtility.firstElement(formSet).doCancel();
       return true;
     }
     return continueClosingConsideringUnsavedForms(getUnsavedForms(formSet), false) && internalCloseForms(formSet);
+  }
+
+  @Override
+  public boolean cancelForms(Set<IForm> formSet) {
+    return cancelForms(formSet, false);
+  }
+
+  @Override
+  public void closeForms(Set<IForm> formSet) {
+    if (formSet == null || formSet.isEmpty()) {
+      return;
+    }
+    // Extend the form set with all depending forms (display parent hierarchy)
+    getUnsavedForms(formSet);
+
+    // Close the given forms including the depending forms
+    internalCloseForms(formSet);
   }
 
   @Override
