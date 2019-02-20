@@ -205,6 +205,11 @@ describe('Range', function() {
       range1 = new scout.Range(10, 10);
       range2 = new scout.Range(10, 20);
       expect(range1.intersect(range2)).toEqual(new scout.Range(0, 0));
+
+      range1 = new scout.Range(11, 11);
+      range2 = new scout.Range(10, 20);
+      expect(range1.intersect(range2)).toEqual(new scout.Range(11, 11));
+      expect(range1.intersect(range2).size()).toEqual(0);
     });
   });
 });
