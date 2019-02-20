@@ -1173,7 +1173,7 @@ scout.Table.prototype._renderRowsInRange = function(range) {
 
   var maxRange = new scout.Range(0, this.rows.length);
   range = maxRange.intersect(range);
-  if (!range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
+  if (this.viewRangeRendered.size() > 0 && !range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
     throw new Error('New range must not intersect with existing.');
   }
   if (range.to <= this.viewRangeRendered.from) {
