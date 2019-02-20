@@ -272,7 +272,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
 
   @Override
   public void close() {
-    dispose();
     getPopupManager().close(this);
+    dispose();
   }
 }
