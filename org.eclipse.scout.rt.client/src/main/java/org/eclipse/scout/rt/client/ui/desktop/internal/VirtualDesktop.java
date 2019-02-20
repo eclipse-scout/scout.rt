@@ -404,7 +404,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public List<IForm> getSimilarViewForms(IForm form) {
+  public List<IForm> getSimilarForms(IForm form) {
     throw createUnsupportedOperationException();
   }
 

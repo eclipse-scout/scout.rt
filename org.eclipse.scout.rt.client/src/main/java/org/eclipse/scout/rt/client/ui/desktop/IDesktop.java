@@ -214,10 +214,10 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <T extends IViewButton> T findViewButton(Class<T> viewButtonType);
 
   /**
-   * Returns all registered Views of the same class and with the same exclusive key, except the current Search- or
+   * Returns all registered forms of the same class and with the same exclusive key, except the current Search- or
    * Detail Form.
    */
-  List<IForm> getSimilarViewForms(IForm form);
+  List<IForm> getSimilarForms(IForm form);
 
   /**
    * fires a ensure visible event for every form in viewStack

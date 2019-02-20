@@ -134,7 +134,7 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
-   * @see AbstractDesktop#getSimilarViewForms(IForm)
+   * @see AbstractDesktop#getSimilarForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
    */
   Object computeExclusiveKey();

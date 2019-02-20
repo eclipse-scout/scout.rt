@@ -960,7 +960,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
-  public List<IForm> getSimilarViewForms(final IForm form) {
+  public List<IForm> getSimilarForms(final IForm form) {
     if (form == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -982,7 +982,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     final IForm currentSearchForm = getPageSearchForm();
 
     final List<IForm> similarForms = new ArrayList<>();
-    for (final IForm candidateView : m_formStore.getViewsByKey(formKey)) {
+    for (final IForm candidateView : m_formStore.getFormsByExclusiveKey(formKey)) {
       if (candidateView == currentDetailForm) {
         continue;
       }

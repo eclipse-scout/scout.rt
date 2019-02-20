@@ -37,7 +37,7 @@ public class FormStore extends IndexedStore<IForm> {
   private final P_DisplayParentDialogIndex m_displayParentDialogIndex = registerIndex(new P_DisplayParentDialogIndex());
   private final P_DisplayHintIndex m_displayHintIndex = registerIndex(new P_DisplayHintIndex());
   private final P_ClassIndex m_clazzIndex = registerIndex(new P_ClassIndex());
-  private final P_ExclusiveKeyViewIndex m_viewKeyIndex = registerIndex(new P_ExclusiveKeyViewIndex());
+  private final P_ExclusiveKeyViewIndex m_exclusiveKeyIndex = registerIndex(new P_ExclusiveKeyViewIndex());
   private final P_ApplicationModalDialogIndex m_applicationModalDialogIndex = registerIndex(new P_ApplicationModalDialogIndex());
 
   private enum FormType {
@@ -99,11 +99,11 @@ public class FormStore extends IndexedStore<IForm> {
   }
 
   /**
-   * Returns all <code>Views</code> which compute to the given 'exclusive key'. The forms returned are ordered as
+   * Returns all <code>Forms</code> which compute to the given 'exclusive key'. The forms returned are ordered as
    * inserted.
    */
-  public List<IForm> getViewsByKey(final Object key) {
-    return m_viewKeyIndex.get(key);
+  public List<IForm> getFormsByExclusiveKey(final Object key) {
+    return m_exclusiveKeyIndex.get(key);
   }
 
   /**
@@ -195,12 +195,7 @@ public class FormStore extends IndexedStore<IForm> {
     @Override
     protected Object calculateIndexFor(final IForm form) {
       try {
-        if (form.getDisplayHint() == IForm.DISPLAY_HINT_VIEW) {
-          return form.computeExclusiveKey();
-        }
-        else {
-          return null;
-        }
+        return form.computeExclusiveKey();
       }
       catch (final ProcessingException e) {
         BEANS.get(ExceptionHandler.class).handle(e);

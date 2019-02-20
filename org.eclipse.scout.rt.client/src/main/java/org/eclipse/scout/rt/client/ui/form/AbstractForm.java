@@ -480,7 +480,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *
-   * @see AbstractDesktop#getSimilarViewForms(IForm)
+   * @see AbstractDesktop#getSimilarForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar handling.
    */
   @Override
@@ -949,7 +949,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     if (m_blockingCondition.isBlocking()) {
       throw new ProcessingException("The form " + getFormId() + " has already been started");
     }
-    for (IForm simCandidate : getDesktop().getSimilarViewForms(this)) {
+    for (IForm simCandidate : getDesktop().getSimilarForms(this)) {
       if (handler != null
           && simCandidate.getHandler() != null
           && handler.getClass().getName() == simCandidate.getHandler().getClass().getName()
