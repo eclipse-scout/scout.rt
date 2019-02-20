@@ -26,7 +26,15 @@ public abstract class AbstractHtmlTile extends AbstractTile implements IHtmlTile
   private AttachmentSupport m_attachmentSupport;
 
   public AbstractHtmlTile() {
+    this(true);
     m_attachmentSupport = BEANS.get(AttachmentSupport.class);
+  }
+
+  public AbstractHtmlTile(boolean callInitializer) {
+    super(false);
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   @Override
