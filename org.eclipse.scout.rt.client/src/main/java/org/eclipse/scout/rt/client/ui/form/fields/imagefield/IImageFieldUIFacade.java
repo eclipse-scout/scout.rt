@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.imagefield;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.shared.data.basic.AffineTransformSpec;
 
-/**
- * , Samuel Moser
- */
 public interface IImageFieldUIFacade {
 
   void setImageTransformFromUI(AffineTransformSpec t);
