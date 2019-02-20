@@ -437,7 +437,7 @@ scout.Tree.prototype._renderNodesInRange = function(range) {
 
   var maxRange = new scout.Range(0, nodes.length);
   range = maxRange.intersect(range);
-  if (!range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
+  if (this.viewRangeRendered.size() > 0 && !range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
     throw new Error('New range must not intersect with existing.');
   }
   if (range.to <= this.viewRangeRendered.from) {
