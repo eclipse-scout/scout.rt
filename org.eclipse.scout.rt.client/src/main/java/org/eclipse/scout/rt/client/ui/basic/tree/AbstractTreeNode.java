@@ -1008,10 +1008,8 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       // access control after adding the page. The add triggers the
       // page.initPage() which eventually
       // changed the visible property for the page
-      if (!node.isVisible()) {
-        if (node instanceof AbstractTreeNode) {
-          ((AbstractTreeNode) node.getParentNode()).removeChildNodesInternal(CollectionUtility.arrayList(node), false, true);
-        }
+      if (!node.isVisible() && (getTree().isRootNodeVisible() || node != getTree().getRootNode())) {
+        getTree().removeNode(node);
         return;
       }
     }

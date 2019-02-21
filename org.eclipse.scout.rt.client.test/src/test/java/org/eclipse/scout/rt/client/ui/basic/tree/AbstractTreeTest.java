@@ -207,6 +207,37 @@ public class AbstractTreeTest {
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 
+  @Test
+  public void testHandlingInvisibleChildNodes() {
+    m_tree = new P_Tree();
+    m_node1 = new P_TreeNode("node1") {
+      @Override
+      public void loadChildren() {
+        getTree().addChildNodes(this, CollectionUtility.arrayList(m_subNode1));
+      }
+    };
+
+    m_node1.setVisible(false);
+    m_node1.setExpanded(true);
+    m_tree.setTreeChanging(true);
+    m_tree.addChildNode(m_tree.getRootNode(), m_node1);
+    List<TreeEvent> events = m_tree.getEventBuffer().consumeAndCoalesceEvents();
+    m_tree.setTreeChanging(false);
+
+    assertFalse(containsEvent(events, TreeEvent.TYPE_NODES_INSERTED, m_node1));
+    assertFalse(containsEvent(events, TreeEvent.TYPE_NODES_INSERTED, m_subNode1));
+    assertFalse(containsEvent(events, TreeEvent.TYPE_NODE_EXPANDED, m_node1));
+  }
+
+  protected boolean containsEvent(List<TreeEvent> events, int eventType, ITreeNode node) {
+    for (TreeEvent event : events) {
+      if (event.getType() == eventType && event.getNode() == node) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private static void assertDisposed(ITestDisposable... disposables) {
     for (ITestDisposable disposable : disposables) {
       assertTrue("should be desposed, but is not: " + disposable.getName(), disposable.isDisposed());
