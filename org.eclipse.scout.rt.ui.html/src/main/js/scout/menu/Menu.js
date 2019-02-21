@@ -154,6 +154,17 @@ scout.Menu.prototype._removeSubMenuItems = function(parentMenu) {
 scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
   if (this.parent instanceof scout.ContextMenuPopup) {
     this.parent.renderSubMenuItems(parentMenu, menus, true);
+    var closeHandler = function(event) {
+      parentMenu.setSelected(false);
+    }.bind(this);
+    var propertyChangeHandler = function(event) {
+      if (event.propertyName === 'selected' && event.newValue === false) {
+        this.parent.off('close', closeHandler);
+        parentMenu.off('propertyChange', propertyChangeHandler);
+      }
+    }.bind(this);
+    this.parent.on('close', closeHandler);
+    parentMenu.on('propertyChange', propertyChangeHandler);
   } else if (this.parent instanceof scout.Menu) {
     this.parent._renderSubMenuItems(parentMenu, menus);
   }
