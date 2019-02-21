@@ -138,6 +138,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   String PROP_STARTUP_REQUEST_PARAMS = "startupRequestParams";
 
+  String STARTUP_REQUEST_PARAM_URL = "url";
+
   /**
    * Default style with header, navigation (tree) and bench (forms).
    * <p>
@@ -938,6 +940,11 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   PropertyMap getStartupRequestParams();
 
   <VALUE> VALUE getStartupRequestParam(String propertyName);
+
+  /**
+   * @return the URL where this Scout application runs (as seen by the browser, including all proxies, etc.).
+   */
+  String getStartupUrl();
 
   /**
    * Cancels all forms contained in the given {@link Set} including all open dialogs, views, message boxes and file

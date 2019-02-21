@@ -1539,6 +1539,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     return getStartupRequestParams().get(propertyName);
   }
 
+  @Override
+  public String getStartupUrl() {
+    return getStartupRequestParam(STARTUP_REQUEST_PARAM_URL);
+  }
+
   /**
    * While the Desktop is initialized, the UiSession class makes sure the PropertyMap contains the startup request
    * parameters. The desktop keeps a copy of these parameters which does not change until the desktop is re-attached.

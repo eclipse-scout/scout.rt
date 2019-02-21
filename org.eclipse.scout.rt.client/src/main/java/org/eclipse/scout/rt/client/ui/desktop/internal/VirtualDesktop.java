@@ -791,6 +791,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public String getStartupUrl() {
+    return null;
+  }
+
+  @Override
   public <VALUE> VALUE getStartupRequestParam(String propertyName) {
     return null;
   }
