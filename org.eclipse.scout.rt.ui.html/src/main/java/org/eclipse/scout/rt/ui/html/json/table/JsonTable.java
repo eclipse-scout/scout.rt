@@ -1608,7 +1608,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getDropMaximumSize();
   }
 

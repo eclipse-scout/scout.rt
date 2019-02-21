@@ -14,15 +14,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 
 @Bean
 public class AttachmentSupport implements IAttachmentSupport {
 
-  private Map<String, BinaryResource> m_attachments;
+  protected static final int STATE_ALL = -1;
+
+  private Map<String, Attachment> m_attachments;
 
   public AttachmentSupport() {
     m_attachments = new HashMap<>(0);
@@ -30,12 +33,24 @@ public class AttachmentSupport implements IAttachmentSupport {
 
   @Override
   public Set<BinaryResource> getAttachments() {
-    return CollectionUtility.hashSet(m_attachments.values());
+    return getAttachments(null, null);
+  }
+
+  public Set<BinaryResource> getAttachments(Boolean uploaded, Boolean referenced) {
+    return m_attachments.values().stream()
+        .filter(attachment -> (uploaded == null || BooleanUtility.nvl(uploaded) == attachment.isUploaded()) &&
+            (referenced == null || BooleanUtility.nvl(referenced) == attachment.isReferenced()))
+        .map(attachment -> attachment.getBinaryResource())
+        .collect(Collectors.toSet());
   }
 
   @Override
   public BinaryResource getAttachment(String filename) {
-    return m_attachments.get(filename);
+    Attachment attachment = m_attachments.get(filename);
+    if (attachment == null) {
+      return null;
+    }
+    return attachment.getBinaryResource();
   }
 
   @Override
@@ -44,18 +59,22 @@ public class AttachmentSupport implements IAttachmentSupport {
       m_attachments = new HashMap<>(0);
       return;
     }
-    Map<String, BinaryResource> newMap = new HashMap<>(attachments.size());
+    Map<String, Attachment> newMap = new HashMap<>(attachments.size());
     for (BinaryResource attachment : attachments) {
       if (attachment != null) {
-        newMap.put(attachment.getFilename(), attachment);
+        newMap.put(attachment.getFilename(), new Attachment(attachment));
       }
     }
     m_attachments = newMap;
   }
 
   public void addAttachment(BinaryResource attachment) {
+    addAttachment(attachment, false);
+  }
+
+  public void addAttachment(BinaryResource attachment, boolean uploaded) {
     if (attachment != null) {
-      m_attachments.put(attachment.getFilename(), attachment);
+      m_attachments.put(attachment.getFilename(), new Attachment(attachment, uploaded));
     }
   }
 
@@ -63,6 +82,51 @@ public class AttachmentSupport implements IAttachmentSupport {
     if (attachment != null) {
       m_attachments.remove(attachment.getFilename());
     }
+  }
+
+  public void setUploaded(BinaryResource attachment0, boolean uploaded) {
+    Attachment attachment = m_attachments.get(attachment0.getFilename());
+    if (attachment != null) {
+      attachment.setUploaded(uploaded);
+    }
+  }
+
+  public boolean isUploaded(BinaryResource attachment0) {
+    Attachment attachment = m_attachments.get(attachment0.getFilename());
+    if (attachment == null) {
+      return false;
+    }
+    return attachment.isUploaded();
+  }
+
+  public void setReferenced(String filename, boolean referenced) {
+    Attachment attachment = m_attachments.get(filename);
+    if (attachment != null) {
+      attachment.setReferenced(referenced);
+    }
+  }
+
+  public void setReferenced(BinaryResource attachment, boolean referenced) {
+    setReferenced(attachment.getFilename(), referenced);
+  }
+
+  public boolean isReferenced(BinaryResource attachment0) {
+    Attachment attachment = m_attachments.get(attachment0.getFilename());
+    if (attachment == null) {
+      return false;
+    }
+    return attachment.isReferenced();
+  }
+
+  /**
+   * Deletes all attachments with status !referenced.
+   */
+  public void cleanup() {
+    Set<String> toDelete = m_attachments.values().stream()
+        .filter(attachment -> !attachment.isReferenced())
+        .map(attachment -> attachment.getBinaryResource().getFilename())
+        .collect(Collectors.toSet());
+    toDelete.forEach(filename -> m_attachments.remove(filename));
   }
 
 }

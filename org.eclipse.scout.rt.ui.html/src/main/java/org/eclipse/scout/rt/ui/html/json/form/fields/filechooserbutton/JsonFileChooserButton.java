@@ -79,7 +79,7 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getMaximumUploadSize();
   }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,18 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-import java.util.List;
-import java.util.Map;
+public interface IBinaryResourceHandler {
 
-import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-
-/**
- * {@link IJsonAdapter}s can implements {@link IBinaryResourceConsumer} in order to consume files from the UI (file
- * upload).
- */
-public interface IBinaryResourceConsumer extends IBinaryResourceHandler {
-
-  void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties);
+  /**
+   * @return maximum upload size in bytes
+   */
+  long getMaximumUploadSize();
 
 }

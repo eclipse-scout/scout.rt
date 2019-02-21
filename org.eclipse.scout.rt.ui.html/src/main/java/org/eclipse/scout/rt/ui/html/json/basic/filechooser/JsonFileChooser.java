@@ -126,7 +126,7 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getMaximumUploadSize();
   }
 

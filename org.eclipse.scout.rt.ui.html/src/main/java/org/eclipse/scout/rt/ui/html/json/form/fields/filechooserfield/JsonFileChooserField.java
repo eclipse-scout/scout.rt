@@ -75,7 +75,7 @@ public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> 
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getMaximumUploadSize();
   }
 }

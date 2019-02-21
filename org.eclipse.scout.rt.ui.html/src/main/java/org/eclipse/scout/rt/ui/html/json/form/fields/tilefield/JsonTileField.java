@@ -71,7 +71,7 @@ public class JsonTileField<T extends ITileField> extends JsonFormField<T> implem
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getDropMaximumSize();
   }
 }

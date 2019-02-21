@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.ui.html.UiServlet;
 import org.eclipse.scout.rt.ui.html.UiSession;
 import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceHandler;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,9 +120,9 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     // If client sent ACK#, cleanup response history accordingly
     uiSession.confirmResponseProcessed(getAckSequenceNo(httpServletRequest));
 
-    IBinaryResourceConsumer binaryResourceConsumer = resolveJsonAdapter(uiSession, targetAdapterId);
-    if (binaryResourceConsumer == null) {
-      //Request was already processed and adapter does not exist anymore
+    IBinaryResourceHandler binaryResourceHandler = resolveJsonAdapter(uiSession, targetAdapterId);
+    if (binaryResourceHandler == null) {
+      // Request was already processed and adapter does not exist anymore
       return;
     }
     if (httpServletRequest.getParameter("legacy") != null) {
@@ -131,7 +132,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     Map<String, String> uploadProperties = new HashMap<>();
     List<BinaryResource> uploadResources = new ArrayList<>();
     try {
-      readUploadData(httpServletRequest, binaryResourceConsumer.getMaximumBinaryResourceUploadSize(), uploadProperties, uploadResources);
+      readUploadData(httpServletRequest, binaryResourceHandler.getMaximumUploadSize(), uploadProperties, uploadResources);
     }
     catch (PlatformException ex) { // NOSONAR
       writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createUnsafeUploadResponse());
@@ -146,7 +147,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
         writeJsonResponse(httpServletResponse, m_jsonRequestHelper.createSessionTimeoutResponse());
         return;
       }
-      JSONObject jsonResp = uiSession.processFileUpload(httpServletRequest, httpServletResponse, binaryResourceConsumer, uploadResources, uploadProperties);
+      JSONObject jsonResp = uiSession.processFileUpload(httpServletRequest, httpServletResponse, binaryResourceHandler, uploadResources, uploadProperties);
       if (jsonResp == null) {
         jsonResp = m_jsonRequestHelper.createEmptyResponse();
       }
@@ -222,7 +223,7 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
    * If the adapter could not be found, or the adapter is not a {@link IBinaryResourceConsumer}, a runtime exception is
    * thrown.
    */
-  protected IBinaryResourceConsumer resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
+  protected IBinaryResourceHandler resolveJsonAdapter(IUiSession uiSession, String targetAdapterId) {
     // Resolve adapter
     if (!StringUtility.hasText(targetAdapterId)) {
       throw new IllegalArgumentException("Missing target adapter ID");
@@ -231,8 +232,8 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
     if (jsonAdapter == null) {
       return null;
     }
-    if (jsonAdapter instanceof IBinaryResourceConsumer) {
-      return (IBinaryResourceConsumer) jsonAdapter;
+    if (jsonAdapter instanceof IBinaryResourceHandler) {
+      return (IBinaryResourceHandler) jsonAdapter;
     }
     throw new IllegalStateException("Invalid adapter for ID " + targetAdapterId + " (unexpected type: " + jsonAdapter.getClass().getName() + ")");
   }

@@ -68,7 +68,7 @@ public class JsonAccordionField<T extends IAccordionField> extends JsonFormField
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getDropMaximumSize();
   }
 }
