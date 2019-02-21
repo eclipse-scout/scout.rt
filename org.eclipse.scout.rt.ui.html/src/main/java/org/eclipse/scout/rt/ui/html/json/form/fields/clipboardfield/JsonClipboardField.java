@@ -92,7 +92,7 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getMaximumSize();
   }
 }

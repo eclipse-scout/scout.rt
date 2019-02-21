@@ -204,7 +204,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getDropMaximumSize();
   }
 }

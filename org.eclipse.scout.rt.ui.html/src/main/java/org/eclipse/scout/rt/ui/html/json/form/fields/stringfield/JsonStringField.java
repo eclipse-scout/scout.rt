@@ -202,7 +202,7 @@ public class JsonStringField<T extends IStringField> extends JsonBasicField<T> i
   }
 
   @Override
-  public long getMaximumBinaryResourceUploadSize() {
+  public long getMaximumUploadSize() {
     return getModel().getDropMaximumSize();
   }
 
