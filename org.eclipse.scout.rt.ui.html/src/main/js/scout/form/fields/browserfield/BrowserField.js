@@ -44,7 +44,7 @@ scout.BrowserField.prototype._init = function(model) {
 };
 
 scout.BrowserField.prototype._render = function() {
-  this.addContainer(this.$parent, 'browser-field');
+  this.addContainer(this.$parent, 'browser-field', new scout.BrowserFieldLayout(this));
   this.addLabel();
   this.addStatus();
 
@@ -53,6 +53,7 @@ scout.BrowserField.prototype._render = function() {
     this.iframe.render();
     this.addFieldContainer(this.iframe.$container);
     this.addField(this.iframe.$iframe);
+    this.$field.on('load', this._onLoad.bind(this));
   } else {
     // mode 2: separate window
     this.addField(this.$parent.makeDiv());
@@ -253,6 +254,13 @@ scout.BrowserField.prototype._onMessage = function(event) {
     data: event.data,
     origin: event.origin
   });
+};
+
+scout.BrowserField.prototype._onLoad = function(event) {
+  if (!this.rendered) { // check needed, because this is an async callback
+    return;
+  }
+  this.invalidateLayoutTree();
 };
 
 scout.BrowserField.prototype.setSandboxEnabled = function(sandboxEnabled) {

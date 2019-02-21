@@ -399,6 +399,7 @@
   __include("scout/form/fields/beanfield/BeanFieldAdapter.js");
   __include("scout/form/fields/browserfield/BrowserField.js");
   __include("scout/form/fields/browserfield/BrowserFieldAdapter.js");
+  __include("scout/form/fields/browserfield/BrowserFieldLayout.js");
   __include("scout/form/fields/button/Button.js");
   __include("scout/form/fields/button/ButtonLayout.js");
   __include("scout/form/fields/button/ButtonAdapter.js");
