@@ -1370,7 +1370,11 @@ scout.Session.prototype._processEvents = function(events) {
   // If there are still events whose target could not be resolved, throw an error
   if (events.length) {
     throw new Error('Could not resolve event targets: [' + events.map(function(event) {
-      return '"' + event.target + '"';
+      var msg = 'target: ' + event.target + ', type: ' + event.type;
+      if (event.properties) {
+        msg += ', properties: ' + Object.keys(event.properties);
+      }
+      return '"' + msg + '"';
     }, this).join(', ') + ']');
   }
 };
