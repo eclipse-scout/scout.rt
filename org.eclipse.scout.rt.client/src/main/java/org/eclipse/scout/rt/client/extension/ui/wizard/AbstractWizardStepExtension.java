@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.wizard;
 
+import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActionChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDisposeChain;
@@ -59,4 +60,8 @@ public abstract class AbstractWizardStepExtension<FORM extends IForm, OWNER exte
     chain.execFormStored(activation);
   }
 
+  @Override
+  public void execAction(WizardStepActionChain<? extends IForm> chain) {
+    chain.execAction();
+  }
 }
