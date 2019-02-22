@@ -240,6 +240,152 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
+    it('prefers the error status of the last visible field', function() {
+      var field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      field.setErrorStatus({
+        message: 'box-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+
+      field.fields[1].setErrorStatus({
+        message: 'field-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error');
+
+      field.fields[1].clearErrorStatus();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+    });
+
+    it('also remembers the new error status of the seq box if the status is currently overwritten by the field', function() {
+      var field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      field.setErrorStatus({
+        message: 'box-error-1'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error-1');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+
+      field.fields[1].setErrorStatus({
+        message: 'field-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error');
+
+      field.setErrorStatus({
+        message: 'box-error-2'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error');
+
+      field.fields[1].clearErrorStatus();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error-2');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+    });
+
+    it('also remembers the error status of the seq box if the status is overwritten by the field multiple times', function() {
+      var field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      field.setErrorStatus({
+        message: 'box-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+
+      field.fields[1].setErrorStatus({
+        message: 'field-error-1'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error-1');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error-1');
+
+      field.fields[1].setErrorStatus({
+        message: 'field-error-2'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error-2');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error-2');
+
+      field.fields[1].clearErrorStatus();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus).toBeFalsy();
+    });
+
+    it('does not change the seq box status if the last visible field is not changed', function() {
+      var field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      field.setErrorStatus({
+        message: 'box-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[0].$status.isVisible()).toBe(false);
+      expect(field.fields[0].errorStatus).toBeFalsy();
+
+      field.fields[0].setErrorStatus({
+        message: 'field-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[0].$status.isVisible()).toBe(true);
+      expect(field.fields[0].errorStatus.message).toBe('field-error');
+
+      field.fields[0].clearErrorStatus();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('box-error');
+      expect(field.fields[0].$status.isVisible()).toBe(false);
+      expect(field.fields[0].errorStatus).toBeFalsy();
+    });
+
   });
 
   describe('label', function() {

@@ -127,7 +127,6 @@ scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
  * Moves the status relevant properties from the last visible field to the sequencebox. This makes sure that the fields inside the sequencebox have the same size.
  */
 scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
-  // TODO [7.0] cgu: what if sequencebox itself has a tooltip or errorstatus? probably field has higher prio -> override status of seq box
   if (visibilityChanged && this._lastVisibleField) {
     // if there is a new last visible field, make sure the status is shown on the previously last one
     this._lastVisibleField.suppressStatus = false;
@@ -143,10 +142,33 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
   }
 
   // Update the sequencebox with the status relevant flags
-  this.setErrorStatus(this._lastVisibleField.errorStatus);
-  this.setTooltipText(this._lastVisibleField.tooltipText);
-  this.setMenus(this._lastVisibleField.menus);
-  this.setMenusVisible(this._lastVisibleField.menusVisible);
+  this._isOverwritingStatusFromField = true;
+  if (this._lastVisibleField.errorStatus) {
+    this.setErrorStatus(this._lastVisibleField.errorStatus);
+    this._isErrorStatusOverwritten = true;
+  } else {
+    this._isErrorStatusOverwritten = false;
+    this.setErrorStatus(this.boxErrorStatus);
+  }
+
+  if (this._lastVisibleField.tooltipText) {
+    this.setTooltipText(this._lastVisibleField.tooltipText);
+    this._isTooltipTextOverwritten = true;
+  } else {
+    this._isTooltipTextOverwritten = false;
+    this.setTooltipText(this.boxTooltipText);
+  }
+
+  if (this._lastVisibleField.menus) {
+    this.setMenus(this._lastVisibleField.menus);
+    this.setMenusVisible(this._lastVisibleField.menusVisible);
+    this._isMenusOverwritten = true;
+  } else {
+    this._isMenusOverwritten = false;
+    this.setMenus(this.boxMenus);
+    this.setMenusVisible(this.boxMenusVisible);
+  }
+  this._isOverwritingStatusFromField = false;
 
   // Make sure the last field won't display a status
   this._lastVisibleField.suppressStatus = true;
@@ -157,6 +179,62 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
       this._lastVisibleField._renderTooltipText();
       this._lastVisibleField._renderMenus();
     }
+  }
+};
+
+scout.SequenceBox.prototype.setErrorStatus = function(errorStatus) {
+  if (this._isOverwritingStatusFromField && !this._isErrorStatusOverwritten) {
+    // was not overwritten, will be overwritten now -> backup old value
+    this.boxErrorStatus = this.errorStatus;
+  } else if (!this._isOverwritingStatusFromField) {
+    // directly changed on seq box -> update backed-up value
+    this.boxErrorStatus = errorStatus;
+  }
+  if (this._isOverwritingStatusFromField || !this._isErrorStatusOverwritten) {
+    // prevent setting value if directly changed on seq box and is already overwritten
+    scout.SequenceBox.parent.prototype.setErrorStatus.call(this, errorStatus);
+  }
+};
+
+scout.SequenceBox.prototype.setTooltipText = function(tooltipText) {
+  if (this._isOverwritingStatusFromField && !this._isTooltipTextOverwritten) {
+    // was not overwritten, will be overwritten now -> backup old value
+    this.boxTooltipText = this.tooltipText;
+  } else if (!this._isOverwritingStatusFromField) {
+    // directly changed on seq box -> update backed-up value
+    this.boxTooltipText = tooltipText;
+  }
+  if (this._isOverwritingStatusFromField || !this._isTooltipTextOverwritten) {
+    // prevent setting value if directly changed on seq box and is already overwritten
+    scout.SequenceBox.parent.prototype.setTooltipText.call(this, tooltipText);
+  }
+};
+
+scout.SequenceBox.prototype.setMenus = function(menus) {
+  if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
+    // was not overwritten, will be overwritten now -> backup old value
+    this.boxMenus = this.menus;
+  } else if (!this._isOverwritingStatusFromField) {
+    // directly changed on seq box -> update backed-up value
+    this.boxMenus = menus;
+  }
+  if (this._isOverwritingStatusFromField || !this._isMenusOverwritten) {
+    // prevent setting value if directly changed on seq box and is already overwritten
+    scout.SequenceBox.parent.prototype.setMenus.call(this, menus);
+  }
+};
+
+scout.SequenceBox.prototype.setMenusVisible = function(menusVisible) {
+  if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
+    // was not overwritten, will be overwritten now -> backup old value
+    this.boxMenusVisible = this.menusVisible;
+  } else if (!this._isOverwritingStatusFromField) {
+    // directly changed on seq box -> update backed-up value
+    this.boxMenusVisible = menusVisible;
+  }
+  if (this._isOverwritingStatusFromField || !this._isMenusOverwritten) {
+    // prevent setting value if directly changed on seq box and is already overwritten
+    scout.SequenceBox.parent.prototype.setMenusVisible.call(this, menusVisible);
   }
 };
 
