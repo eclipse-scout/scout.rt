@@ -37,6 +37,7 @@ public class BinaryResourceUrlUtilityTest {
   public void testExtractFilenameWithFingerprint() {
     assertPairEquals("foo.txt", 0L, BinaryResourceUrlUtility.extractFilenameWithFingerprint("foo.txt"));
     assertPairEquals("foo.txt", 1234L, BinaryResourceUrlUtility.extractFilenameWithFingerprint("1234/foo.txt"));
+    assertPairEquals("20190125_072740.jpg", 0L, BinaryResourceUrlUtility.extractFilenameWithFingerprint("20190125_072740.jpg"));
   }
 
   @Test

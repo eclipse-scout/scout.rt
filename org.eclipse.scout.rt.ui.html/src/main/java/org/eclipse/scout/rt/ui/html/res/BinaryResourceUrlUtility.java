@@ -50,7 +50,7 @@ public final class BinaryResourceUrlUtility {
    */
   public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
 
-  private static final Pattern REGEX_FINGERPRINT_PATTERN = Pattern.compile("^([0-9]*)/?(.*)$");
+  private static final Pattern REGEX_FINGERPRINT_PATTERN = Pattern.compile("^(([0-9]+)\\/)?(.*)$");
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
@@ -128,8 +128,8 @@ public final class BinaryResourceUrlUtility {
     Matcher m = REGEX_FINGERPRINT_PATTERN.matcher(filenameWithFingerprint);
     m.find();
 
-    String fingerprintString = m.group(1);
-    String filename = m.group(2);
+    String fingerprintString = m.group(2);
+    String filename = m.group(3);
 
     Long fingerprint = 0L;
     if (StringUtility.hasText(fingerprintString)) {
