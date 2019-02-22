@@ -17,7 +17,8 @@ scout.icons = {
   TABLE_SORT_DESC: 'font:\u2193',
 
   /* scoutIcons: custom icons */
-  EXCLAMATION_MARK: 'font:\uE001',
+  EXCLAMATION_MARK: 'font:\uE060',
+  EXCLAMATION_MARK_CIRLCE: 'font:\uE001',
   INFO: 'font:\uE002',
   CALENDAR: 'font:\uE029',
   CALENDAR_BOLD: 'font:\uE003',

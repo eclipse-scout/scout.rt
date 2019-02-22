@@ -37,7 +37,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String TableSortDesc = "font:\u2193";
 
   /* custom icons */
-  public static final String ExclamationMark = "font:\uE001";
+  public static final String ExclamationMarkCircle = "font:\uE001";
   public static final String Info = "font:\uE002";
   public static final String Calendar = "font:\uE029";
   public static final String CalendarBold = "font:\uE003";
@@ -96,6 +96,7 @@ public abstract class AbstractIcons implements Serializable {
   public static final String ListOl = "font:\uE056";
   public static final String LightbulbOff = "font:\uE057";
   public static final String LightbulbOn = "font:\uE058";
+  public static final String ExclamationMark = "font:\uE060";
 
   /* awesome font icons */
   public static final String RotateLeftBold = "font:\uF0E2";
