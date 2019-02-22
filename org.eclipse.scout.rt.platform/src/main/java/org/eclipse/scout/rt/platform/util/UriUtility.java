@@ -87,12 +87,15 @@ public final class UriUtility {
     String[] params = getQueryString(uri).split("&");
     Map<String, String> result = new HashMap<>(params.length);
     for (String param : params) {
+      if (StringUtility.isNullOrEmpty(param)) {
+        continue;
+      }
       String[] parts = StringUtility.split(param, "=");
-      if (parts.length != 2) {
+      if (parts.length > 2) {
         throw new ProcessingException("invalid query parameter: '" + param + "'");
       }
       String key = decode(parts[0], encoding);
-      String value = decode(parts[1], encoding);
+      String value = parts.length < 2 ? "" : decode(parts[1], encoding);
       String existingMapping = result.put(key, value);
       if (existingMapping != null) {
         LOG.warn("parameter key is used multiple times [key='{}', oldValue='{}', newValue='{}'", key, existingMapping, value);

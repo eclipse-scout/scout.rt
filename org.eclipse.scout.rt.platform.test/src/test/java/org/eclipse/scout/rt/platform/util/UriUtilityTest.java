@@ -49,6 +49,8 @@ public class UriUtilityTest {
     assertEquals(Collections.singletonMap("value", "1"), UriUtility.getQueryParameters(URI.create("http://test.com/path?value=1#fragment")));
     assertEquals(Collections.singletonMap("x", "20D"), UriUtility.getQueryParameters(URI.create("http://localhost/?x=20D")));
     assertTrue(UriUtility.getQueryParameters(URI.create("scheme://test.com/path/path2")).isEmpty());
+    assertEquals(Collections.singletonMap("key", ""), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com?key").createURI()));
+    assertEquals(Collections.singletonMap("key", ""), UriUtility.getQueryParameters(new UriBuilder("http://www.example.com?key=").createURI()));
   }
 
   @Test
