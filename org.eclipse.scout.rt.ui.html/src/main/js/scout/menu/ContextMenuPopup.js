@@ -54,8 +54,9 @@ scout.ContextMenuPopup.prototype._installScrollbars = function() {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  var duration = 300;
-
+  if (!this.rendered) {
+    return;
+  }
   this.$body = parentMenu.parentMenu.$subMenuBody;
   // move new body to back
   this.$body.insertBefore(parentMenu.$subMenuBody);
@@ -78,11 +79,11 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
   this.position();
 
   parentMenu.$subMenuBody.css('display', displayBackup);
-  var position;
-  position = parentMenu.$placeHolder.position();
 
-  if (animated && this.rendered) {
+  if (animated) {
     this.bodyAnimating = true;
+    var duration = 300;
+    var position = parentMenu.$placeHolder.position();
     parentMenu.$subMenuBody.css({
       width: 'auto',
       height: 'auto'
@@ -147,6 +148,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     };
     return;
   }
+  if (!this.rendered) {
+    return;
+  }
   var actualBounds = this.htmlComp.getBounds();
   var actualSize = this.htmlComp.getSize();
 
@@ -176,15 +180,14 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   this.$body.prepend(parentMenu.$container);
   parentMenu.$container.toggleClass('expanded');
 
-  // sets this.animationBounds;
   this.revalidateLayout();
   this.position();
 
   this.updateNextToSelected();
 
-  if (animated && this.rendered) {
-    var duration = 300;
+  if (animated) {
     this.bodyAnimating = true;
+    var duration = 300;
     parentMenu.parentMenu.$subMenuBody.css({
       width: 'auto',
       height: 'auto'
