@@ -2766,6 +2766,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       displayParent = resolveDisplayParent();
     }
     displayParent = Assertions.assertNotNull(displayParent, "'displayParent' must not be null");
+    if (displayParent instanceof IForm) {
+      // an inner form of a WrappedFormField can not be the display parent. Find the root form.
+      IForm rootForm = FormUtility.findRootForm((IForm) displayParent);
+      if (rootForm.getDisplayHint() == DISPLAY_HINT_VIEW) {
+        displayParent = rootForm;
+      }
+    }
 
     if (m_displayParent.get() == displayParent) {
       m_displayParent.markAsPreferredValue();

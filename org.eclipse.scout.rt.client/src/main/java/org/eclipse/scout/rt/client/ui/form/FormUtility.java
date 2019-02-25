@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
+import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 
 public final class FormUtility {
 
@@ -83,5 +84,18 @@ public final class FormUtility {
    */
   public static void setTabBoxMarkStrategy(IForm form, int strategy) {
     form.<ITabBox> visit(box -> box.setMarkStrategy(strategy), ITabBox.class);
+  }
+
+  /**
+   * @return the form which is not a wrapped form {@link IWrappedFormField}
+   */
+  public static IForm findRootForm(IForm form) {
+    if (form == null) {
+      return null;
+    }
+    while (form.getOuterForm() != null) {
+      form = form.getOuterForm();
+    }
+    return form;
   }
 }

@@ -82,6 +82,7 @@ scout.Form.prototype._init = function(model) {
 
   this._setRootGroupBox(this.rootGroupBox);
   this._setStatus(this.status);
+  this._setModal(this.modal);
   this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
   this._installLifecycle();
 };
@@ -102,7 +103,6 @@ scout.Form.prototype._renderProperties = function() {
   this._renderSaveNeeded();
   this._renderCssClass();
   this._renderStatus();
-  this._renderModal();
 };
 
 scout.Form.prototype._postRender = function() {
@@ -131,10 +131,7 @@ scout.Form.prototype._remove = function() {
     this.messageBoxController.remove();
     this.fileChooserController.remove();
   }
-  if (this._glassPaneRenderer) {
-    this._glassPaneRenderer.removeGlassPanes();
-    this._glassPaneRenderer = null;
-  }
+
   this._uninstallFocusContext();
 
   this.$statusIcons = [];
@@ -147,6 +144,14 @@ scout.Form.prototype._remove = function() {
   this.$subTitle = null;
 
   scout.Form.parent.prototype._remove.call(this);
+};
+
+scout.Form.prototype._destroy = function() {
+  scout.Form.parent.prototype._destroy.call(this);
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+    this._glassPaneRenderer = null;
+  }
 };
 
 scout.Form.prototype._renderForm = function() {
@@ -197,16 +202,22 @@ scout.Form.prototype.setModal = function(modal) {
   this.setProperty('modal', modal);
 };
 
-scout.Form.prototype._renderModal = function() {
+scout.Form.prototype._setModal = function(modal) {
+  this._setProperty('modal', modal);
+  this._updateGlassPaneRenderer();
+};
+
+scout.Form.prototype._updateGlassPaneRenderer = function() {
   if (this.parent instanceof scout.WrappedFormField) {
     return;
   }
-  if (this.modal && !this._glassPaneRenderer) {
-    this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
-    this._glassPaneRenderer.renderGlassPanes();
-  } else if (!this.modal && this._glassPaneRenderer) {
+  if (this._glassPaneRenderer) {
     this._glassPaneRenderer.removeGlassPanes();
     this._glassPaneRenderer = null;
+  }
+  if (this.modal) {
+    this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+    this._glassPaneRenderer.renderGlassPanes();
   }
 };
 
@@ -802,10 +813,16 @@ scout.Form.prototype.setDisplayParent = function(displayParent) {
 };
 
 scout.Form.prototype._setDisplayParent = function(displayParent) {
+  var rootForm = scout.Form.findNonWrappedForm(displayParent);
+  if (rootForm && rootForm.isView()) {
+    displayParent = scout.Form.findNonWrappedForm(displayParent);
+  }
   this._setProperty('displayParent', displayParent);
+
   if (displayParent) {
     this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
+  this._updateGlassPaneRenderer();
 };
 
 /**
@@ -969,6 +986,9 @@ scout.Form.findForm = function(widget) {
  * @returns {scout.Form} the first form which is not an inner form of a wrapped form field
  */
 scout.Form.findNonWrappedForm = function(widget) {
+  if (!widget) {
+    return null;
+  }
   var form;
   widget.findParent(function(parent) {
     if (parent instanceof scout.Form) {
