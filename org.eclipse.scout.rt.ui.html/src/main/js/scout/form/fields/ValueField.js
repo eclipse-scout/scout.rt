@@ -580,6 +580,18 @@ scout.ValueField.prototype._getCurrentMenus = function() {
   return scout.ValueField.parent.prototype._getCurrentMenus.call(this);
 };
 
+scout.ValueField.prototype.markAsSaved = function() {
+  scout.ValueField.parent.prototype.markAsSaved.call(this);
+  this.initialValue = this.value;
+};
+
+/**
+ * @override
+ */
+scout.ValueField.prototype._updateEmpty = function() {
+  this.empty = this.value === null || this.value === undefined;
+};
+
 // ==== static helper methods ==== //
 
 /**
@@ -611,18 +623,9 @@ scout.ValueField.invokeValueFieldAcceptInput = function(target) {
  */
 scout.ValueField._getActiveValueField = function(target) {
   var $activeElement = $(target).activeElement(),
-    valueField = $activeElement.data('valuefield') || $activeElement.parent().data('valuefield');
-  return valueField && !(valueField.$field && valueField.$field.hasClass('disabled')) ? valueField : null;
-};
-
-scout.ValueField.prototype.markAsSaved = function() {
-  scout.ValueField.parent.prototype.markAsSaved.call(this);
-  this.initialValue = this.value;
-};
-
-/**
- * @override
- */
-scout.ValueField.prototype._updateEmpty = function() {
-  this.empty = this.value === null || this.value === undefined;
+    activeWidget = scout.widget($activeElement);
+  if (activeWidget instanceof scout.ValueField && activeWidget.enabledComputed) {
+    return activeWidget;
+  }
+  return null;
 };
