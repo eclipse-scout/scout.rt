@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  * upload). Other than IBinaryResourceConsumer it returns a link to the uploaded resource, so we can use that link
  * directly in the HTTP response to the upload request.
  */
-public interface IBinaryResourceUploader extends IBinaryResourceHandler {
+public interface IBinaryResourceUploader extends IUploadable {
 
   List<String> uploadBinaryResources(List<BinaryResource> binaryResources, Map<String, String> uploadProperties);
 

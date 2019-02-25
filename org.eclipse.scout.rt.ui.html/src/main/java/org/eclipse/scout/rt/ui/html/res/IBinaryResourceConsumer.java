@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
  * {@link IJsonAdapter}s can implements {@link IBinaryResourceConsumer} in order to consume files from the UI (file
  * upload).
  */
-public interface IBinaryResourceConsumer extends IBinaryResourceHandler {
+public interface IBinaryResourceConsumer extends IUploadable {
 
   void consumeBinaryResource(List<BinaryResource> binaryResources, Map<String, String> uploadProperties);
 

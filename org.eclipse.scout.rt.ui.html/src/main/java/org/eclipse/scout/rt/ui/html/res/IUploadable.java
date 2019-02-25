@@ -10,7 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-public interface IBinaryResourceHandler {
+/**
+ * Base interface for code that handles file uploads in a HTTP context. Currently this is only used as a common base
+ * class for <code>IBinaryResourceConsumer</code> and <code>IBinaryResourceUploader</code>.
+ *
+ * @see IBinaryResourceConsumer
+ * @see IBinaryResourceUploader
+ */
+public interface IUploadable {
 
   /**
    * @return maximum upload size in bytes
