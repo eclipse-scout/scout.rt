@@ -558,8 +558,11 @@ scout.ValueField.invokeValueFieldAcceptInput = function(target) {
  */
 scout.ValueField._getActiveValueField = function(target) {
   var $activeElement = $(target).activeElement(),
-    valueField = $activeElement.data('valuefield') || $activeElement.parent().data('valuefield');
-  return valueField && !(valueField.$field && valueField.$field.hasClass('disabled')) ? valueField : null;
+    activeWidget = scout.widget($activeElement);
+  if (activeWidget instanceof scout.ValueField && activeWidget.enabledComputed) {
+    return activeWidget;
+  }
+  return null;
 };
 
 scout.ValueField.prototype.markAsSaved = function() {
