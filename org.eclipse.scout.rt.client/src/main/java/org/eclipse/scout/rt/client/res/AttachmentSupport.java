@@ -23,8 +23,6 @@ import org.eclipse.scout.rt.platform.util.BooleanUtility;
 @Bean
 public class AttachmentSupport {
 
-  protected static final int STATE_ALL = -1;
-
   private Map<String, Attachment> m_attachments;
 
   public AttachmentSupport() {
