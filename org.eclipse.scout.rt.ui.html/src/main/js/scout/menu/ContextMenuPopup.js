@@ -65,7 +65,9 @@ scout.ContextMenuPopup.prototype._installScrollbars = function() {
 };
 
 scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
-  var duration = 300;
+  if (!this.rendered) {
+    return;
+  }
   if (this.bodyAnimating) {
     // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
     this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
@@ -86,9 +88,10 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
   this.revalidateLayout();
   this.position();
 
-  var position = parentMenu.$placeHolder.position();
-  if (animated && this.rendered) {
+  if (animated) {
     this.bodyAnimating = true;
+    var duration = 300;
+    var position = parentMenu.$placeHolder.position();
     parentMenu.$subMenuBody.css({
       width: 'auto',
       height: 'auto'
@@ -157,6 +160,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     };
     return;
   }
+  if (!this.rendered) {
+    return;
+  }
   if (this.bodyAnimating) {
     // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
     this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
@@ -192,15 +198,14 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   this.$body.prepend(parentMenu.$container);
   parentMenu.$container.toggleClass('expanded');
 
-  // sets this.animationBounds;
   this.revalidateLayout();
   this.position();
 
   this.updateNextToSelected();
 
-  if (animated && this.rendered) {
-    var duration = 300;
+  if (animated) {
     this.bodyAnimating = true;
+    var duration = 300;
     parentMenu.parentMenu.$subMenuBody.css({
       width: 'auto',
       height: 'auto'
