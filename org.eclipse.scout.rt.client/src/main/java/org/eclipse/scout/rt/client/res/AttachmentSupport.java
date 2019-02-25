@@ -21,9 +21,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 
 @Bean
-public class AttachmentSupport implements IAttachmentSupport {
-
-  protected static final int STATE_ALL = -1;
+public class AttachmentSupport {
 
   private Map<String, Attachment> m_attachments;
 
@@ -31,7 +29,6 @@ public class AttachmentSupport implements IAttachmentSupport {
     m_attachments = new HashMap<>(0);
   }
 
-  @Override
   public Set<BinaryResource> getAttachments() {
     return getAttachments(null, null);
   }
@@ -44,7 +41,6 @@ public class AttachmentSupport implements IAttachmentSupport {
         .collect(Collectors.toSet());
   }
 
-  @Override
   public BinaryResource getAttachment(String filename) {
     Attachment attachment = m_attachments.get(filename);
     if (attachment == null) {
@@ -53,7 +49,6 @@ public class AttachmentSupport implements IAttachmentSupport {
     return attachment.getBinaryResource();
   }
 
-  @Override
   public void setAttachments(Collection<? extends BinaryResource> attachments) {
     if (attachments == null) {
       m_attachments = new HashMap<>(0);

@@ -86,8 +86,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
-import org.eclipse.scout.rt.ui.html.res.IBinaryResourceHandler;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceUploader;
+import org.eclipse.scout.rt.ui.html.res.IUploadable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -824,13 +824,13 @@ public class UiSession implements IUiSession {
   }
 
   @Override
-  public JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse res, IBinaryResourceHandler resourceHandler,
+  public JSONObject processFileUpload(HttpServletRequest req, HttpServletResponse res, IUploadable uploadable,
       List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
-    if (resourceHandler instanceof IBinaryResourceConsumer) {
-      return processFileUploadWithConsumer(req, res, (IBinaryResourceConsumer) resourceHandler, uploadResources, uploadProperties);
+    if (uploadable instanceof IBinaryResourceConsumer) {
+      return processFileUploadWithConsumer(req, res, (IBinaryResourceConsumer) uploadable, uploadResources, uploadProperties);
     }
-    else if (resourceHandler instanceof IBinaryResourceUploader) {
-      return processFileUploadWithUploader(req, res, (IBinaryResourceUploader) resourceHandler, uploadResources, uploadProperties);
+    else if (uploadable instanceof IBinaryResourceUploader) {
+      return processFileUploadWithUploader(req, res, (IBinaryResourceUploader) uploadable, uploadResources, uploadProperties);
     }
     throw new IllegalStateException("resourceHandler must be either a IBinaryResourceConsumer or a IBinaryResourceUploader");
   }
@@ -880,12 +880,15 @@ public class UiSession implements IUiSession {
 
   protected JSONObject processFileUploadWithUploader(HttpServletRequest req, HttpServletResponse res, IBinaryResourceUploader resourceUploader,
       List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
-    final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
+    ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
-    List<String> links = clientRunContext.call(() -> resourceUploader.uploadBinaryResources(uploadResources, uploadProperties));
+    IFuture<List<String>> future = ModelJobs.schedule(() -> {
+      return resourceUploader.uploadBinaryResources(uploadResources, uploadProperties);
+    }, createFileUploadModelJobInput(clientRunContext));
 
+    List<String> links = future.awaitDoneAndGet();
     if (uploadResources.size() != links.size()) {
-      throw new IllegalStateException("Must return a link for each uploaded resource"); // FIXME [awe] upload: better return an error-code?
+      throw new IllegalStateException("Must return a link for each uploaded resource");
     }
 
     JSONObject json = new JSONObject();
