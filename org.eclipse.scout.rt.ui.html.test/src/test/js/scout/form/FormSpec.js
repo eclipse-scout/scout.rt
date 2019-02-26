@@ -464,6 +464,7 @@ describe('Form', function() {
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
       var form = helper.createFormWithOneField({
+        displayHint: scout.Form.DisplayHint.DIALOG,
         modal: true,
         displayParent: outline
       });

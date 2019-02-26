@@ -589,16 +589,19 @@ describe('Desktop', function() {
     it('brings non-modal dialog in front upon activation', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       // expect dialogs to be in the same order as opened
@@ -614,21 +617,24 @@ describe('Desktop', function() {
     it('keeps the order of other non-modal dialogs even when one of them is the display-parent of the dialog to activate', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.setCssClass('DIALOG0');
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false,
+        cssClass: 'DIALOG0'
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.setCssClass('DIALOG1');
-      dialog1.modal = false;
-      dialog1.parent = dialog0;
-      dialog1.displayParent = dialog0;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false,
+        cssClass: 'DIALOG1',
+        parent: dialog0,
+        displayParent: dialog0
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.setCssClass('DIALOG2');
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false,
+        cssClass: 'DIALOG2'
+      });
       desktop.showForm(dialog2);
 
       desktop.activateForm(dialog1);
@@ -642,16 +648,18 @@ describe('Desktop', function() {
       desktop.setOutline(outline1);
       var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
 
-      var dialog1 = formHelper.createFormWithOneField();
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       dialog1.setCssClass('DIALOG1');
-      dialog1.modal = false;
       dialog1.parent = outline1;
       dialog1.displayParent = outline1;
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       dialog2.setCssClass('DIALOG2');
-      dialog2.modal = false;
       dialog2.parent = dialog1;
       dialog2.displayParent = dialog1;
       desktop.showForm(dialog2);
@@ -677,16 +685,18 @@ describe('Desktop', function() {
       desktop.setOutline(outline1);
       var outline2 = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
 
-      var dialog1 = formHelper.createFormWithOneField();
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       dialog1.setCssClass('DIALOG1');
-      dialog1.modal = false;
       dialog1.parent = outline1;
       dialog1.displayParent = outline1;
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       dialog2.setCssClass('DIALOG2');
-      dialog2.modal = false;
       dialog2.parent = dialog1;
       dialog2.displayParent = dialog1;
       desktop.showForm(dialog2);
@@ -710,16 +720,19 @@ describe('Desktop', function() {
     it('does not bring non-modal dialog in front of desktop-modal dialog', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var desktopModalDialog = formHelper.createFormWithOneField();
-      desktopModalDialog.modal = true;
+      var desktopModalDialog = formHelper.createFormWithOneField({
+        modal: true
+      });
       desktop.showForm(desktopModalDialog);
 
       // expect dialogs to be in the same order as opened
@@ -733,18 +746,22 @@ describe('Desktop', function() {
     it('brings non-modal dialog in front of other non-modal dialog and it\'s modal child-dialog', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = true;
-      dialog2.parent = dialog1;
-      dialog2.displayParent = dialog1;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: true,
+        parent: dialog1,
+        displayParent: dialog1
+      });
+
       desktop.showForm(dialog2);
 
       // expect dialogs to be in the same order as opened
@@ -759,28 +776,34 @@ describe('Desktop', function() {
     it('brings complete hierarchy of a non-modal dialog with 2-levels of modal child dialogs in front', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var parentDialog = formHelper.createFormWithOneField();
-      parentDialog.modal = false;
+      var parentDialog = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(parentDialog);
 
-      var modalChildDialogLevel1 = formHelper.createFormWithOneField();
-      modalChildDialogLevel1.modal = true;
-      modalChildDialogLevel1.parent = parentDialog;
-      modalChildDialogLevel1.displayParent = parentDialog;
+      var modalChildDialogLevel1 = formHelper.createFormWithOneField({
+        modal: true,
+        parent: parentDialog,
+        displayParent: parentDialog
+      });
+
       desktop.showForm(modalChildDialogLevel1);
 
-      var modalChildDialogLevel2 = formHelper.createFormWithOneField();
-      modalChildDialogLevel2.modal = true;
-      modalChildDialogLevel2.parent = modalChildDialogLevel1;
-      modalChildDialogLevel2.displayParent = modalChildDialogLevel1;
+      var modalChildDialogLevel2 = formHelper.createFormWithOneField({
+        modal: true,
+        parent: modalChildDialogLevel1,
+        displayParent: modalChildDialogLevel1
+      });
       desktop.showForm(modalChildDialogLevel2);
 
       // expect dialogs to be in the same order as opened
@@ -826,16 +849,19 @@ describe('Desktop', function() {
     it('keeps position of dialog\'s messagebox relative to it\'s parent dialog while reordering dialogs', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       var messagebox = scout.create('MessageBox', {
@@ -871,8 +897,9 @@ describe('Desktop', function() {
     it('brings dialog with messagebox on top upon mousedown on messagebox', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
       var messagebox = scout.create('MessageBox', {
@@ -885,12 +912,14 @@ describe('Desktop', function() {
       });
       messagebox.open();
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       // expect dialogs and messagebox to be in the same order as opened
@@ -906,16 +935,19 @@ describe('Desktop', function() {
     it('keeps desktop\'s messagebox on top while reordering dialogs', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       var messagebox = scout.create('MessageBox', {
@@ -951,16 +983,19 @@ describe('Desktop', function() {
     it('keeps position of dialog\'s fileChooser relative to it\'s parent dialog while reordering dialogs', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       var fileChooser = scout.create('FileChooser', {
@@ -992,8 +1027,9 @@ describe('Desktop', function() {
     it('brings dialog with filechooser on top upon mousedown on filechooser', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
       var fileChooser = scout.create('FileChooser', {
@@ -1002,12 +1038,14 @@ describe('Desktop', function() {
       });
       fileChooser.open();
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       // expect dialogs and fileChooser to be in the same order as opened
@@ -1023,16 +1061,19 @@ describe('Desktop', function() {
     it('does not change position of desktop\'s fileChooser while reordering dialogs', function() {
       expect(desktop.activeForm).toBe(null);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog0);
 
-      var dialog1 = formHelper.createFormWithOneField();
-      dialog1.modal = false;
+      var dialog1 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog1);
 
-      var dialog2 = formHelper.createFormWithOneField();
-      dialog2.modal = false;
+      var dialog2 = formHelper.createFormWithOneField({
+        modal: false
+      });
       desktop.showForm(dialog2);
 
       var fileChooser = scout.create('FileChooser', {
@@ -1070,8 +1111,9 @@ describe('Desktop', function() {
       viewForm0.displayHint = scout.Form.DisplayHint.VIEW;
       desktop.showForm(viewForm0);
 
-      var dialog0 = formHelper.createFormWithOneField();
-      dialog0.modal = false;
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
       dialog0.parent = viewForm0;
       dialog0.displayParent = viewForm0;
       desktop.showForm(dialog0);
@@ -1757,7 +1799,6 @@ describe('Desktop', function() {
 
   });
 
-
   describe('modal form', function() {
 
     var view1, view2, view3;
@@ -1765,10 +1806,9 @@ describe('Desktop', function() {
     beforeEach(function() {
       session._renderDesktop();
 
-
       view1 = formHelper.createViewWithOneField({
         title: 'view01',
-        modal:false
+        modal: false
       });
 
       desktop.showForm(view1);
@@ -1782,9 +1822,7 @@ describe('Desktop', function() {
       view1.close();
     });
 
-
     it('of a simple form.', function() {
-
 
       var viewModal = formHelper.createViewWithOneField({
         title: 'viewModal',
@@ -1794,7 +1832,6 @@ describe('Desktop', function() {
       });
 
       desktop.showForm(viewModal);
-
 
       desktop.showForm(viewModal);
       expect(viewModal.rendered).toBe(true);
@@ -1808,16 +1845,16 @@ describe('Desktop', function() {
 
     });
 
-    it('of a wrapped form', function(){
+    it('of a wrapped form', function() {
       var form = scout.create('Form', {
         parent: session.desktop,
         id: 'outerForm',
-        displayHint : scout.Form.DisplayHint.VIEW,
+        displayHint: scout.Form.DisplayHint.VIEW,
         rootGroupBox: {
           objectType: 'GroupBox',
           fields: [{
             objectType: 'WrappedFormField',
-            id:'wrappedFormField',
+            id: 'wrappedFormField',
             innerForm: {
               id: 'innerForm',
               objectType: 'Form',
@@ -1854,7 +1891,6 @@ describe('Desktop', function() {
       expect(form.$container.children('.glasspane').length).toBe(0);
 
     });
-
 
   });
 });

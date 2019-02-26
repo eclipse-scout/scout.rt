@@ -26,14 +26,14 @@ scout.OutlineSpecHelper.prototype.createModel = function(nodes) {
   return model;
 };
 
-scout.OutlineSpecHelper.prototype.createModelNode = function (id, text) {
+scout.OutlineSpecHelper.prototype.createModelNode = function(id, text) {
   return {
     "id": id,
     "text": text
   };
 };
 
-scout.OutlineSpecHelper.prototype.createModelNodes = function (nodeCount, depth, expanded) {
+scout.OutlineSpecHelper.prototype.createModelNodes = function(nodeCount, depth, expanded) {
   return this.createModelNodesInternal(nodeCount, depth, expanded);
 };
 
@@ -84,8 +84,9 @@ scout.OutlineSpecHelper.prototype.createOutlineWithOneDetailForm = function() {
   var model = this.createModelFixture(3, 2, true);
   var outline = this.createOutline(model);
   var node = outline.nodes[0];
-  node.detailForm = new scout.FormSpecHelper(this.session).createFormWithOneField();
-  node.detailForm.modal = false;
+  node.detailForm = new scout.FormSpecHelper(this.session).createFormWithOneField({
+    modal: false
+  });
   node.detailFormVisible = true;
   return outline;
 };
