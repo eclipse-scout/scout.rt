@@ -29,11 +29,6 @@ public abstract class AbstractBeanColumn<VALUE> extends AbstractColumn<VALUE> im
     super(callInitializer);
   }
 
-  @Override
-  protected boolean getConfiguredUiSortPossible() {
-    return true;
-  }
-
   protected String getPlainText(ITableRow row) {
     return null;
   }
