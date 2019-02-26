@@ -1757,4 +1757,104 @@ describe('Desktop', function() {
 
   });
 
+
+  describe('modal form', function() {
+
+    var view1, view2, view3;
+
+    beforeEach(function() {
+      session._renderDesktop();
+
+
+      view1 = formHelper.createViewWithOneField({
+        title: 'view01',
+        modal:false
+      });
+
+      desktop.showForm(view1);
+
+      spyOn(view1, 'close').and.callThrough();
+
+      spyOn(view1, 'ok').and.callThrough();
+    });
+
+    afterEach(function() {
+      view1.close();
+    });
+
+
+    it('of a simple form.', function() {
+
+
+      var viewModal = formHelper.createViewWithOneField({
+        title: 'viewModal',
+        parent: view1,
+        displayParent: view1,
+        modal: true
+      });
+
+      desktop.showForm(viewModal);
+
+
+      desktop.showForm(viewModal);
+      expect(viewModal.rendered).toBe(true);
+
+      desktop.activateForm(view1);
+      expect(view1.rendered).toBe(true);
+      expect(view1.$container.children('.glasspane').length).toBe(1);
+
+      viewModal.close();
+      expect(view1.$container.children('.glasspane').length).toBe(0);
+
+    });
+
+    it('of a wrapped form', function(){
+      var form = scout.create('Form', {
+        parent: session.desktop,
+        id: 'outerForm',
+        displayHint : scout.Form.DisplayHint.VIEW,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'WrappedFormField',
+            id:'wrappedFormField',
+            innerForm: {
+              id: 'innerForm',
+              objectType: 'Form',
+              rootGroupBox: {
+                objectType: 'GroupBox',
+                fields: [{
+                  id: 'myButton',
+                  objectType: 'Button',
+                  keyStroke: 'ctrl-1',
+                  keyStrokeScope: 'outerForm'
+                }]
+              }
+            }
+          }]
+        }
+      });
+      desktop.showForm(form);
+      var innerForm = form.widget('wrappedFormField').innerForm;
+
+      var viewModal = formHelper.createViewWithOneField({
+        title: 'viewModal',
+        parent: innerForm,
+        displayParent: innerForm,
+        modal: true
+      });
+
+      desktop.showForm(viewModal);
+
+      desktop.activateForm(form);
+      expect(form.rendered).toBe(true);
+      expect(form.$container.children('.glasspane').length).toBe(1);
+
+      viewModal.close();
+      expect(form.$container.children('.glasspane').length).toBe(0);
+
+    });
+
+
+  });
 });
