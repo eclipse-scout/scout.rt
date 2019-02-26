@@ -814,16 +814,18 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     .not('.desktop-notifications') // exclude notification box like 'connection interrupted' to be locked
     .not('.overlay-separator'); // exclude overlay separator (marker element)
 
-  if (element && element.$container) {
-    $glassPaneTargets = $glassPaneTargets.not(element.$container);
-  }
 
-  // Exclude all child elements of the given widget
-  // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
-  $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
-    var target = scout.widget(targetElem);
-    return !element.has(target);
-  });
+  if (element) {
+    if (element.$container) {
+      $glassPaneTargets = $glassPaneTargets.not(element.$container);
+    }
+    // Exclude all child elements of the given widget
+    // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
+    $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
+      var target = scout.widget(targetElem);
+      return !element.has(target);
+    });
+  }
 
   var glassPaneTargets;
   if (element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
