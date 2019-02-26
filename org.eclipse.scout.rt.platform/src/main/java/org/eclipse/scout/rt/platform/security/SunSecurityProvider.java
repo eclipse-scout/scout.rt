@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.security;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertGreater;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertGreaterOrEqual;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +49,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
@@ -86,9 +90,9 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public EncryptionKey createEncryptionKey(char[] password, byte[] salt, int keyLen) {
-    Assertions.assertGreater(Assertions.assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
-    Assertions.assertGreater(Assertions.assertNotNull(salt, "salt must be provided.").length, 0, "empty salt is not allowed.");
-    Assertions.assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
+    assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    assertGreater(assertNotNull(salt, "salt must be provided.").length, 0, "empty salt is not allowed.");
+    assertTrue(keyLen == 128 || keyLen == 192 || keyLen == 256, "key length must be 128, 192 or 256.");
 
     try {
       SecretKeyFactory factory = SecretKeyFactory.getInstance(getSecretKeyAlgorithm(), getCipherAlgorithmProvider());
@@ -125,7 +129,7 @@ public class SunSecurityProvider implements ISecurityProvider {
   }
 
   protected void doCrypt(InputStream input, OutputStream output, EncryptionKey key, int mode) {
-    Assertions.assertNotNull(key, "key must not be null.");
+    assertNotNull(key, "key must not be null.");
     if (input == null) {
       throw new AssertionException("input must not be null.");
     }
@@ -155,16 +159,14 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public SecureRandom createSecureRandom() {
-    SecureRandom secureRandom = new SecureRandom();
-    secureRandom.nextBytes(new byte[1]); // force self-seed (required for some implementations)
-    return secureRandom;
+    return new SecureRandom();
   }
 
   @Override
   public byte[] createSecureRandomBytes(int numBytes) {
-    Assertions.assertGreater(numBytes, 0, "{} is not a valid number for random bytes.", numBytes);
+    assertGreater(numBytes, 0, "{} is not a valid number for random bytes.", numBytes);
     byte[] rnd = new byte[numBytes];
-    new SecureRandom().nextBytes(rnd); // do not use createSecureRandom() here so that we do not waste one byte.
+    createSecureRandom().nextBytes(rnd);
     return rnd;
   }
 
@@ -176,9 +178,9 @@ public class SunSecurityProvider implements ISecurityProvider {
    */
   @Override
   public byte[] createPasswordHash(char[] password, byte[] salt, int iterations) {
-    Assertions.assertGreater(Assertions.assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
-    Assertions.assertGreater(Assertions.assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
-    Assertions.assertGreaterOrEqual(iterations, MIN_PASSWORD_HASH_ITERATIONS, "iterations must be > {}", MIN_PASSWORD_HASH_ITERATIONS);
+    assertGreater(assertNotNull(password, "password must not be null.").length, 0, "empty password is not allowed.");
+    assertGreater(assertNotNull(salt, "salt must not be null.").length, 0, "empty salt is not allowed.");
+    assertGreaterOrEqual(iterations, MIN_PASSWORD_HASH_ITERATIONS, "iterations must be > {}", MIN_PASSWORD_HASH_ITERATIONS);
     // other checks are done by the PBEKeySpec constructor
 
     try {
@@ -228,7 +230,7 @@ public class SunSecurityProvider implements ISecurityProvider {
     try {
       KeyPairGenerator keyGen = KeyPairGenerator.getInstance(getKeyPairGenerationAlgorithm(), getSignatureProvider());
       ECGenParameterSpec spec = new ECGenParameterSpec(getEllipticCurveName());
-      keyGen.initialize(spec, createSecureRandom());
+      keyGen.initialize(spec, SecureRandom.getInstanceStrong()); // use strong random number generator for long living keys
       KeyPair keyPair = keyGen.generateKeyPair();
 
       X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
@@ -243,7 +245,7 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public byte[] createSignature(byte[] privateKey, InputStream data) {
-    Assertions.assertGreater(Assertions.assertNotNull(privateKey, "no private key provided").length, 0, "empty private key not allowed");
+    assertGreater(assertNotNull(privateKey, "no private key provided").length, 0, "empty private key not allowed");
     if (data == null) {
       throw new AssertionException("no data provided");
     }
@@ -273,8 +275,8 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public boolean verifySignature(byte[] publicKey, InputStream data, byte[] signatureToVerify) {
-    Assertions.assertGreater(Assertions.assertNotNull(publicKey, "no public key provided").length, 0, "empty public key not allowed");
-    Assertions.assertGreater(Assertions.assertNotNull(signatureToVerify, "no signature provided").length, 0, "empty signature not allowed");
+    assertGreater(assertNotNull(publicKey, "no public key provided").length, 0, "empty public key not allowed");
+    assertGreater(assertNotNull(signatureToVerify, "no signature provided").length, 0, "empty signature not allowed");
     if (data == null) {
       throw new AssertionException("no data provided");
     }
@@ -304,7 +306,7 @@ public class SunSecurityProvider implements ISecurityProvider {
 
   @Override
   public byte[] createMac(byte[] password, InputStream data) {
-    Assertions.assertGreater(Assertions.assertNotNull(password, "no password provided").length, 0, "empty password not allowed");
+    assertGreater(assertNotNull(password, "no password provided").length, 0, "empty password not allowed");
     if (data == null) {
       throw new AssertionException("no data provided");
     }

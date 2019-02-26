@@ -204,7 +204,7 @@ public interface ISecurityProvider {
   /**
    * Creates a new secure random instance. The returned instance has already been seeded and is ready to use.
    *
-   * @return A new self-seeded {@link SecureRandom} instance.
+   * @return A new {@link SecureRandom} instance.
    * @see #createSecureRandomBytes(int)
    */
   SecureRandom createSecureRandom();
