@@ -239,4 +239,19 @@ public interface IWidget extends IPropertyObserver, IStyleable {
   void setProperty(String name, Object value);
 
   boolean hasProperty(String name);
+
+  /**
+   * Tries to find a {@link IWidget widget} within this widget and all of its children recursively that has exactly the
+   * given class (not {@code instanceof}).
+   * <p>
+   * The first widget in the child hierarchy that has exactly the given class will be returned. The hierarchy is
+   * searched in a pre-order traversal.
+   *
+   * @param widgetClassToFind
+   *          The class of the widget. Must not be {@code null}.
+   * @return The first widget that is {@code instanceof} the given class or {@code null}.
+   * @throws AssertionException
+   *           if widgetClassToFind is {@code null}.
+   */
+  <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind);
 }

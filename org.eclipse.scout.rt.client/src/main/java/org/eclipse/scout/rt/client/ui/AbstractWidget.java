@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -79,6 +80,11 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
       return;
     }
     doInit(true);
+  }
+
+  @Override
+  public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
+    return CompositeFieldUtility.getWidgetByClass(this, widgetClassToFind);
   }
 
   private void doInit(boolean recursive) {

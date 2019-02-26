@@ -984,8 +984,8 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
  */
 
   @Override
-  public <F extends IFormField> F getFieldByClass(Class<F> c) {
-    return CompositeFieldUtility.getFieldByClass(this, c);
+  public <F extends IFormField> F getFieldByClass(Class<F> fieldToFind) {
+    return getWidgetByClass(fieldToFind);
   }
 
   @Override

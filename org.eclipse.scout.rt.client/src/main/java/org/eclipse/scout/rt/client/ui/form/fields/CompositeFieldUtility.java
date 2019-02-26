@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -94,31 +95,43 @@ public final class CompositeFieldUtility {
     movedFormFieldsByClass.put(f.getClass(), f);
   }
 
+  /**
+   * @deprecated Will be removed in Scout 10. Use {@link #getWidgetByClass(IWidget, Class)} instead.
+   */
+  @Deprecated
   public static <T extends IFormField> T getFieldByClass(ICompositeField compositeField, final Class<T> formFieldClass) {
-    // check local moved fields
-    IFormField movedField = getMovedFieldByClass(compositeField, formFieldClass);
-    if (movedField != null) {
-      return formFieldClass.cast(movedField);
-    }
-    // visit child fields
-    final Holder<T> found = new Holder<>(formFieldClass);
-    Function<IFormField, TreeVisitResult> v = field -> {
-      if (field.getClass() == formFieldClass) {
-        found.setValue(formFieldClass.cast(field));
-      }
-      else if (field instanceof ICompositeField) {
-        T movedFieldByClass = getMovedFieldByClass((ICompositeField) field, formFieldClass);
-        if (movedFieldByClass != null) {
-          found.setValue(movedFieldByClass);
-        }
-      }
-      return found.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
-    };
-    compositeField.visit(v, IFormField.class);
-    return found.getValue();
+    return getWidgetByClass(compositeField, formFieldClass);
   }
 
-  private static <T extends IFormField> T getMovedFieldByClass(ICompositeField compositeField, Class<T> formFieldClass) {
+  public static <T extends IWidget> T getWidgetByClass(final IWidget widget, final Class<T> classToFind) {
+    assertNotNull(widget);
+    assertNotNull(classToFind);
+
+    final Holder<T> result = new Holder<>(classToFind);
+    Function<IWidget, TreeVisitResult> visitor = w -> {
+      if (w.getClass() == classToFind) {
+        result.setValue(classToFind.cast(w));
+      }
+      else {
+        T movedFieldByClass = getMovedFieldByClassIfComposite(w, classToFind);
+        if (movedFieldByClass != null) {
+          result.setValue(movedFieldByClass);
+        }
+      }
+      return result.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
+    };
+    widget.visit(visitor);
+    return result.getValue();
+  }
+
+  private static <T extends IWidget> T getMovedFieldByClassIfComposite(IWidget widget, Class<T> classToFind) {
+    if (!(widget instanceof ICompositeField)) {
+      return null;
+    }
+    return getMovedFieldByClass((ICompositeField) widget, classToFind);
+  }
+
+  private static <T extends IWidget> T getMovedFieldByClass(ICompositeField compositeField, Class<T> formFieldClass) {
     Map<Class<? extends IFormField>, IFormField> movedFields = compositeField.getMovedFields();
     IFormField f = movedFields.get(formFieldClass);
     return formFieldClass.cast(f);

@@ -559,8 +559,8 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
    */
 
   @Override
-  public <F extends IFormField> F getFieldByClass(Class<F> c) {
-    return CompositeFieldUtility.getFieldByClass(this, c);
+  public <F extends IFormField> F getFieldByClass(Class<F> widgetClassToFind) {
+    return getWidgetByClass(widgetClassToFind);
   }
 
   @Override

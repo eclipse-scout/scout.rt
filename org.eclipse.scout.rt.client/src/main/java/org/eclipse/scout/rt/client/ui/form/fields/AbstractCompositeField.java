@@ -290,8 +290,13 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public <T extends IFormField> T getFieldByClass(Class<T> c) {
-    return CompositeFieldUtility.getFieldByClass(this, getReplacingFieldClass(c));
+  public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
+    return CompositeFieldUtility.getWidgetByClass(this, getReplacingFieldClass(widgetClassToFind));
+  }
+
+  @Override
+  public <T extends IFormField> T getFieldByClass(Class<T> fieldToFind) {
+    return getWidgetByClass(fieldToFind);
   }
 
   /**
@@ -320,7 +325,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * @see Replace
    * @since 3.8.2
    */
-  private <T extends IFormField> Class<? extends T> getReplacingFieldClass(Class<T> c) {
+  private <T extends IWidget> Class<? extends T> getReplacingFieldClass(Class<T> c) {
     // 1. check local replacements
     if (m_formFieldReplacements != null) {
       @SuppressWarnings("unchecked")

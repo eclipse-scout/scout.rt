@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -511,6 +512,14 @@ public class WidgetVisitorTest {
         MainBoxInWrappedForm.class,
         FormFieldMenuMenu.class,
         BigDecimalField.class);
+  }
+
+  @Test
+  public void testGetWidgetByClass() {
+    FixtureWidget root = new FixtureWidget();
+    assertNotNull(root.getWidgetByClass(ListBox.class));
+    assertNotNull(root.getWidgetByClass(FixtureWidget.class));
+    assertNotNull(root.getWidgetByClass(LongField.class));
   }
 
   private static class CollectingVisitorWrapper<T extends IWidget> extends CollectingVisitor<T> {

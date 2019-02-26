@@ -834,4 +834,9 @@ public class VirtualDesktop implements IDesktop {
   public boolean hasProperty(String name) {
     return false;
   }
+
+  @Override
+  public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
+    throw createUnsupportedOperationException();
+  }
 }

@@ -873,8 +873,8 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
  */
 
   @Override
-  public <F extends IFormField> F getFieldByClass(Class<F> c) {
-    return CompositeFieldUtility.getFieldByClass(this, c);
+  public <F extends IFormField> F getFieldByClass(Class<F> widgetClassToFind) {
+    return getWidgetByClass(widgetClassToFind);
   }
 
   @Override
