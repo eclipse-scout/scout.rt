@@ -150,9 +150,7 @@ scout.SubCloseKeyStroke.prototype._accept = function(event) {
 };
 
 scout.SubCloseKeyStroke.prototype.handle = function(event) {
-  if (event.$menuItem) {
-    event.$menuItem.data('widget').doAction();
-  }
+  event.$menuItem.data('widget').doAction();
 };
 
 /**
@@ -179,14 +177,12 @@ scout.MenuExecByNumberKeyStroke.prototype._accept = function(event) {
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
   var index = scout.codesToKeys[event.which];
   event.$menuItem = menuItems.$allVisible.eq(index - 1);
-  if (event.$menuItem) {
+  if (event.$menuItem.length > 0) {
     return true;
   }
   return false;
 };
 
 scout.MenuExecByNumberKeyStroke.prototype.handle = function(event) {
-  if (event.$menuItem) {
-    event.$menuItem.data('widget').doAction();
-  }
+  event.$menuItem.data('widget').doAction();
 };
