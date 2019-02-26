@@ -747,7 +747,7 @@ scout.Form.prototype._onMove = function(newOffset) {
 
 scout.Form.prototype.updateCacheBounds = function() {
   if (this.cacheBounds) {
-    this.storeCacheBounds(scout.graphics.offsetBounds(this.$container));
+    this.storeCacheBounds(this.htmlComp.bounds());
   }
 };
 

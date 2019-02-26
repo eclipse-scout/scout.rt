@@ -29,7 +29,7 @@ scout.DialogLayout.prototype.layout = function($container) {
   if (cacheBounds) {
     currentBounds = cacheBounds;
   } else {
-    currentBounds = htmlComp.offsetBounds(true);
+    currentBounds = htmlComp.bounds();
   }
   var dialogSize = this._calcSize($container, currentBounds, cacheBounds);
 
@@ -42,14 +42,23 @@ scout.DialogLayout.prototype.layout = function($container) {
   // This prevents 'snapping' the dialog back to the calculated size when a field changes its visibility, but the user previously enlarged the dialog.
   // This must not happen when the dialog is laid out the first time (-> when it is opened, because it has not the right size yet and may get too big)
   if (htmlComp.layouted) {
-    dialogSize.width = Math.max(dialogSize.width, currentBounds.width - dialogMargins.horizontal());
-    dialogSize.height = Math.max(dialogSize.height, currentBounds.height - dialogMargins.vertical());
+    dialogSize.width = Math.max(dialogSize.width, currentBounds.width);
+    dialogSize.height = Math.max(dialogSize.height, currentBounds.height);
   }
 
   scout.graphics.setSize($container, dialogSize);
   scout.DialogLayout.parent.prototype.layout.call(this, $container);
 };
 
+/**
+ * @param currentBounds
+ *          bounds as returned by the scout.graphics.bounds() function, i.e. position is the CSS
+ *          position (top-left of "margin box"), dimension excludes margins
+ * @param cacheBounds
+ *          optional cached bounds (same expectations as with "currentBounds")
+ * @return
+ *          adjusted size excluding margins (suitable to pass to scout.graphics.setSize())
+ */
 scout.DialogLayout.prototype._calcSize = function($container, currentBounds, cacheBounds) {
   var dialogSize,
     htmlComp = this.form.htmlComp,
@@ -84,7 +93,7 @@ scout.DialogLayout.prototype._calcSize = function($container, currentBounds, cac
  * Calculates the new container size and position. If the given containerSize is larger then the windowSize, the size will be adjusted.
  *
  * @param windowSize total size of the window
- * @param containerPosition {scout.Point} current position of the container
+ * @param containerPosition {scout.Point} current CSS position of the container (top-left of the "margin box")
  * @param containerSize {scout.Dimension} preferred size of container (excluding margins)
  * @param containerMargins {scout.Insets} margins of the container
  * @returns {scout.Dimension} the new, adjusted container size (excluding margins)
