@@ -84,6 +84,8 @@ scout.Widget = function() {
   this.trackFocus = false;
   this._$lastFocusedElement = null;
   this._storedFocusedWidget = null;
+
+  this._glassPaneContributions = [];
 };
 
 /**
@@ -1232,15 +1234,44 @@ scout.Widget.prototype.link = function(widgets) {
  * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
  */
 scout.Widget.prototype.glassPaneTargets = function(element) {
+  var resolveGlassPanes = function(element){
+    // contributions
+    var targets = scout.arrays.flatMap(this._glassPaneContributions, function(cont){
+      var $elements = cont(element);
+      if($elements){
+        return scout.arrays.ensure($elements);
+      }
+      return [];
+    }.bind(this));
+    return targets.concat(this._glassPaneTargets(element));
+
+  }.bind(this);
   if (this.rendered) {
-    return this._glassPaneTargets(element);
+    return resolveGlassPanes(element);
   }
 
-  return scout.DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this, element));
+  return scout.DeferredGlassPaneTarget.createFor(this, resolveGlassPanes.bind(this, element));
 };
 
 scout.Widget.prototype._glassPaneTargets = function(element) {
   return [this.$container];
+};
+
+scout.Widget.prototype.addGlassPaneContribution = function(contribution){
+  this._glassPaneContributions.push(contribution);
+  this.trigger('glassPaneContributionAdded', {
+    contribution: contribution
+  });
+};
+
+/**
+ * @param [contribution] a function which returns glass pane targets (jQuery elements)
+ */
+scout.Widget.prototype.removeGlassPaneContribution = function(contribution){
+  scout.arrays.remove(this._glassPaneContributions, contribution);
+  this.trigger('glassPaneContributionRemoved', {
+    contribution: contribution
+  });
 };
 
 scout.Widget.prototype.toString = function() {

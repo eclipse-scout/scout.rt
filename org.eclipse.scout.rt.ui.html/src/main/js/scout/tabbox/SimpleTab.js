@@ -36,6 +36,9 @@ scout.SimpleTab = function() {
   this._statusIconDivs = [];
 
   this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
+  this._glassPaneContribution = function(element){
+    return this.$statusContainer;
+  }.bind(this);
 };
 scout.inherits(scout.SimpleTab, scout.Widget);
 
@@ -55,6 +58,7 @@ scout.SimpleTab.prototype._init = function(model) {
 
   if (this.view) {
     this._installViewListeners();
+    this.view.addGlassPaneContribution(this._glassPaneContribution);
   }
 };
 
