@@ -125,13 +125,18 @@ scout.Form.prototype._postRender = function() {
 
 };
 
-scout.Form.prototype._remove = function() {
+scout.Form.prototype.remove = function() {
+  // the form controller remove must be called from the remove function. _remove is only called if the form is rendered
+  // which is not the case if the form is not on top of the view stack.
   if (!this._detaching) {
     this.formController.remove();
     this.messageBoxController.remove();
     this.fileChooserController.remove();
   }
+  scout.Form.parent.prototype.remove.call(this);
+};
 
+scout.Form.prototype._remove = function() {
   this._uninstallFocusContext();
 
   this.$statusIcons = [];

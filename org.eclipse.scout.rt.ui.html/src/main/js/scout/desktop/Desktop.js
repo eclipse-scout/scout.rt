@@ -993,14 +993,19 @@ scout.Desktop.prototype.cancelViews = function(forms) {
 };
 
 scout.Desktop.prototype._cancelViews = function(forms) {
+  // do not cancel forms when the form child hierarchy does not get canceled.
+  forms = forms.filter(function(form){
+    return !scout.arrays.find(form.views, function(view){
+      return view.modal;
+    });
+  });
+
   // if there's only one form simply cancel it directly
   if (forms.length === 1) {
     forms[0].cancel();
     return;
   }
-  var formFilter = function(displayChild) {
-    return displayChild instanceof scout.Form;
-  };
+
   // collect all forms in the display child hierarchy with unsaved changes.
   var unsavedForms = forms.filter(function(form) {
     var requiresSaveChildDialogs = false;
@@ -1008,7 +1013,9 @@ scout.Desktop.prototype._cancelViews = function(forms) {
       if (dialog.lifecycle.requiresSave()) {
         requiresSaveChildDialogs = true;
       }
-    }, formFilter);
+    }, function(displayChild) {
+      return displayChild instanceof scout.Form;
+    });
     return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
   });
 

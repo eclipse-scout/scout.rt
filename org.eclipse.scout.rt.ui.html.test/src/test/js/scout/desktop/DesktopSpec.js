@@ -1423,9 +1423,15 @@ describe('Desktop', function() {
 
       promises = [];
 
-      view1 = formHelper.createViewWithOneField();
-      view2 = formHelper.createViewWithOneField();
-      view3 = formHelper.createViewWithOneField();
+      view1 = formHelper.createViewWithOneField({
+        title: 'view1'
+      });
+      view2 = formHelper.createViewWithOneField({
+        title: 'view2'
+      });
+      view3 = formHelper.createViewWithOneField({
+        title: 'view3'
+      });
 
       desktop.showForm(view1);
       desktop.showForm(view2);
@@ -1447,7 +1453,7 @@ describe('Desktop', function() {
     });
 
     it('check open tabs', function() {
-      expect(desktop.bench.getViews()).toEqual([view3, view2, view1]);
+      expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
     });
 
     it('close all open tabs on desktop', function(done) {
@@ -1478,6 +1484,32 @@ describe('Desktop', function() {
           expect(view2.close).toHaveBeenCalled();
           expect(view3.close).not.toHaveBeenCalled();
           expect(desktop.bench.getViews()).toEqual([view3]);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('close others and expect to not cancel the display parent of a modal form', function(done) {
+      desktop.activateForm(view1);
+      expect(view1.rendered).toBe(true);
+      var modalView = formHelper.createViewWithOneField({
+        title: 'viewModal',
+        displayParent: view1,
+        modal: true
+      });
+      desktop.showForm(modalView);
+
+      promises.push(view2.whenClose());
+      promises.push(view3.whenClose());
+
+      desktop.bench.getViewTab(modalView)._onCloseOther();
+
+
+      $.promiseAll(promises).then(function() {
+          expect(view1.close).not.toHaveBeenCalled();
+          expect(view2.close).toHaveBeenCalled();
+          expect(view3.close).toHaveBeenCalled();
+          expect(desktop.bench.getViews()).toEqual([view1, modalView]);
         })
         .catch(fail)
         .always(done);
@@ -1525,7 +1557,7 @@ describe('Desktop', function() {
       });
 
       unsavedFormChangesForm.whenClose().then(function() {
-          expect(desktop.bench.getViews()).toEqual([view3, view2, view1]);
+          expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
         })
         .catch(fail)
         .always(done);
