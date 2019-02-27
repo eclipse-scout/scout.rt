@@ -16,19 +16,22 @@ scout.DesktopResponsiveHandler = function() {
 };
 scout.inherits(scout.DesktopResponsiveHandler, scout.ResponsiveHandler);
 
-/* --- TRANSFORMATIONS ------------------------------------------------------------- */
-/**
- * @Override
- */
-scout.DesktopResponsiveHandler.prototype._transform = function() {
-  scout.DesktopResponsiveHandler.parent.prototype._transform.call(this);
+scout.DesktopResponsiveHandler.prototype.init = function(model) {
+  scout.DesktopResponsiveHandler.parent.prototype.init.call(this, model);
 
-  if (this.state === scout.ResponsiveManager.ResponsiveState.COMPACT) {
-    this._storeFieldProperty(this.widget, 'navigationVisible', this.widget.navigationVisible);
-    this.widget.setNavigationVisible(false);
+  this._registerTransformation('navigationVisible', this._transformNavigationVisible);
+  this._enableTransformation(scout.ResponsiveManager.ResponsiveState.COMPACT, 'navigationVisible');
+};
+
+/* --- TRANSFORMATIONS ------------------------------------------------------------- */
+
+scout.DesktopResponsiveHandler.prototype._transformNavigationVisible = function(widget, apply) {
+  if (apply) {
+    this._storeFieldProperty(widget, 'navigationVisible', widget.navigationVisible);
+    widget.setNavigationVisible(false);
   } else {
-    if (this._hasFieldProperty(this.widget, 'navigationVisible')) {
-      this.widget.setNavigationVisible(this._getFieldProperty(this.widget, 'navigationVisible'));
+    if (this._hasFieldProperty(widget, 'navigationVisible')) {
+      widget.setNavigationVisible(this._getFieldProperty(widget, 'navigationVisible'));
     }
   }
 };

@@ -14,24 +14,24 @@ scout.GroupBoxResponsiveHandler = function() {
   this._initDefaults();
   this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED, scout.ResponsiveManager.ResponsiveState.COMPACT];
 
-  // transform handlers
-  this.transformHandlers = [
-    this._transformLabelPosition.bind(this),
-    this._transformLabelVisibility.bind(this),
-    this._transformStatusPosition.bind(this),
-    this._transformStatusVisibility.bind(this),
-    this._transformVerticalAlignment.bind(this),
-    this._transformGridColumnCount.bind(this),
-    this._transformHidePlaceHolderField.bind(this),
-    this._transformFieldScalable.bind(this)
-  ];
-
   // Event handlers
   this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
   this._compositeFields = [];
   this._htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
 };
 scout.inherits(scout.GroupBoxResponsiveHandler, scout.ResponsiveHandler);
+
+scout.GroupBoxResponsiveHandler.TransformationType = {
+  LABEL_POSITION_ON_FIELD: 'labelPositionOnField',
+  LABEL_POSITION_ON_TOP: 'labelPositionOnTop',
+  LABEL_VISIBILITY: 'labelVisibility',
+  STATUS_POSITION_ON_TOP: 'statusPositionOnTop',
+  STATUS_VISIBILITY: 'statusVisibility',
+  VERTICAL_ALIGNMENT: 'verticalAlignment',
+  GRID_COLUMN_COUNT: 'gridColumnCount',
+  HIDE_PLACE_HOLDER_FIELD: 'hidePlaceHolderField',
+  FIELD_SCALABLE: 'fieldScalable'
+};
 
 scout.GroupBoxResponsiveHandler.prototype._initDefaults = function() {
   this.compactThreshold = scout.HtmlEnvironment.formColumnWidth;
@@ -46,6 +46,38 @@ scout.GroupBoxResponsiveHandler.prototype._onHtmlEnvironmenPropertyChange = func
  */
 scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
   scout.GroupBoxResponsiveHandler.parent.prototype.init.call(this, model);
+
+  var transformationType = scout.GroupBoxResponsiveHandler.TransformationType;
+  var responsiveState = scout.ResponsiveManager.ResponsiveState;
+
+  this._registerTransformation(transformationType.LABEL_POSITION_ON_FIELD, this._transformLabelPositionOnField);
+  this._registerTransformation(transformationType.LABEL_POSITION_ON_TOP, this._transformLabelPositionOnTop);
+  this._registerTransformation(transformationType.LABEL_VISIBILITY, this._transformLabelVisibility);
+  this._registerTransformation(transformationType.STATUS_POSITION_ON_TOP, this._transformStatusPosition);
+  this._registerTransformation(transformationType.STATUS_VISIBILITY, this._transformStatusVisibility);
+  this._registerTransformation(transformationType.VERTICAL_ALIGNMENT, this._transformVerticalAlignment);
+  this._registerTransformation(transformationType.GRID_COLUMN_COUNT, this._transformGridColumnCount);
+  this._registerTransformation(transformationType.HIDE_PLACE_HOLDER_FIELD, this._transformHidePlaceHolderField);
+  this._registerTransformation(transformationType.FIELD_SCALABLE, this._transformFieldScalable);
+
+  this._enableTransformation(responsiveState.CONDENSED, transformationType.LABEL_POSITION_ON_TOP);
+  this._enableTransformation(responsiveState.CONDENSED, transformationType.LABEL_VISIBILITY);
+  this._enableTransformation(responsiveState.CONDENSED, transformationType.VERTICAL_ALIGNMENT);
+
+  this._enableTransformation(responsiveState.COMPACT, transformationType.LABEL_POSITION_ON_TOP);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.LABEL_VISIBILITY);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.STATUS_POSITION_ON_TOP);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.STATUS_VISIBILITY);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.VERTICAL_ALIGNMENT);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.GRID_COLUMN_COUNT);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.HIDE_PLACE_HOLDER_FIELD);
+  this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
+
+  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  this.widget.one('remove', function() {
+    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+  }.bind(this));
 
   this.widget.visitFields(function(field) {
     if (field instanceof scout.CompositeField) {
@@ -90,41 +122,65 @@ scout.GroupBoxResponsiveHandler.prototype.getCondensedThreshold = function() {
   }).width;
 };
 
+/**
+ * @Override
+ */
 scout.GroupBoxResponsiveHandler.prototype._transform = function() {
-  this.widget.visitFields(this._transformField.bind(this));
+  this.widget.visitFields(this._transformWidget.bind(this));
 };
 
-scout.GroupBoxResponsiveHandler.prototype._transformField = function(field) {
+/**
+ * @Override
+ */
+scout.GroupBoxResponsiveHandler.prototype._transformWidget = function(widget) {
   // skip group boxes with responsiveness set.
-  if (field !== this.widget && field instanceof scout.GroupBox && field.responsive !== null) {
+  if (widget !== this.widget && widget instanceof scout.GroupBox && widget.responsive !== null) {
     return scout.TreeVisitResult.SKIP_SUBTREE;
   }
 
   // skip everything that is not a form field.
-  if (!(field instanceof scout.FormField)) {
+  if (!(widget instanceof scout.FormField)) {
     return;
   }
 
   // suppress a revalidate of the layout tree, since setLabelPosition would trigger it.
-  if (field.htmlComp) {
-    field.htmlComp.suppressInvalidate = true;
+  if (widget.htmlComp) {
+    widget.htmlComp.suppressInvalidate = true;
   }
 
-  this.transformHandlers.forEach(function(transformHandler) {
-    transformHandler(field);
-  }.bind(this));
+  scout.GroupBoxResponsiveHandler.parent.prototype._transformWidget.call(this, widget);
 
-  if (field.htmlComp) {
-    field.htmlComp.suppressInvalidate = false;
+  if (widget.htmlComp) {
+    widget.htmlComp.suppressInvalidate = false;
   }
 };
 
 /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
 /**
- * Label Position
+ * Label Position -> ON_FIELD
  */
-scout.GroupBoxResponsiveHandler.prototype._transformLabelPosition = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformLabelPositionOnField = function(field, apply) {
+  if (field.parent instanceof scout.SequenceBox ||
+    field instanceof scout.CheckBoxField ||
+    field instanceof scout.LabelField) {
+    return;
+  }
+
+  if (apply) {
+    this._storeFieldProperty(field, 'labelPosition', field.labelPosition);
+    field.setLabelPosition(scout.FormField.LabelPosition.ON_FIELD);
+  } else {
+    if (this._hasFieldProperty(field, 'labelPosition')) {
+      field.setLabelPosition(this._getFieldProperty(field, 'labelPosition'));
+    }
+  }
+};
+
+/**
+ * Label Position -> ON_TOP
+ */
+scout.GroupBoxResponsiveHandler.prototype._transformLabelPositionOnTop = function(field, apply) {
   if (field.parent instanceof scout.SequenceBox ||
     field instanceof scout.CheckBoxField ||
     field instanceof scout.LabelField ||
@@ -132,12 +188,10 @@ scout.GroupBoxResponsiveHandler.prototype._transformLabelPosition = function(fie
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
-  if (this._fromNormalToOtherState()) {
+  if (apply) {
     this._storeFieldProperty(field, 'labelPosition', field.labelPosition);
     field.setLabelPosition(scout.FormField.LabelPosition.TOP);
-  } else if (this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'labelPosition')) {
       field.setLabelPosition(this._getFieldProperty(field, 'labelPosition'));
     }
@@ -147,17 +201,15 @@ scout.GroupBoxResponsiveHandler.prototype._transformLabelPosition = function(fie
 /**
  * Label visibility
  */
-scout.GroupBoxResponsiveHandler.prototype._transformLabelVisibility = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformLabelVisibility = function(field, apply) {
   if (!(field instanceof scout.CheckBoxField)) {
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
-  if (this._fromNormalToOtherState()) {
+  if (apply) {
     this._storeFieldProperty(field, 'labelVisible', field.labelVisible);
     field.setLabelVisible(false);
-  } else if (this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'labelVisible')) {
       field.setLabelVisible(this._getFieldProperty(field, 'labelVisible'));
     }
@@ -177,13 +229,11 @@ scout.GroupBoxResponsiveHandler.prototype.setGridData = function(field, gridData
 /**
  * Status position
  */
-scout.GroupBoxResponsiveHandler.prototype._transformStatusPosition = function(field) {
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
-  if (this.state === ResponsiveState.COMPACT) {
+scout.GroupBoxResponsiveHandler.prototype._transformStatusPosition = function(field, apply) {
+  if (apply) {
     this._storeFieldProperty(field, 'statusPosition', field.statusPosition);
     field.setStatusPosition(scout.FormField.StatusPosition.TOP);
-  } else if (this.state === ResponsiveState.CONDENSED || this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'statusPosition')) {
       field.setStatusPosition(this._getFieldProperty(field, 'statusPosition'));
     }
@@ -193,13 +243,13 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusPosition = function(fi
 /**
  * Status visibility
  */
-scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(field, apply) {
   var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
 
-  if (this.state === ResponsiveState.COMPACT) {
+  if (apply) {
     this._storeFieldProperty(field, 'statusVisible', field.statusVisible);
     field.setStatusVisible(false);
-  } else if (this.state === ResponsiveState.CONDENSED || this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'statusVisible')) {
       field.setStatusVisible(this._getFieldProperty(field, 'statusVisible'));
     }
@@ -209,22 +259,20 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(
 /**
  * Vertical alignment
  */
-scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function(field, apply) {
   if (!(field instanceof scout.Button && field.displayStyle === scout.Button.DisplayStyle.DEFAULT ||
       field instanceof scout.CheckBoxField) ||
     !field.gridData) {
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
   var gridData = this.getGridData(field);
-  if (this._fromNormalToOtherState()) {
+  if (apply) {
     this._storeFieldProperty(field, 'fillVertical', gridData.fillVertical);
     this._storeFieldProperty(field, 'verticalAlignment', gridData.verticalAlignment);
     gridData.fillVertical = false;
     gridData.verticalAlignment = 1;
-  } else if (this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'fillVertical')) {
       gridData.fillVertical = this._getFieldProperty(field, 'fillVertical');
     }
@@ -239,17 +287,15 @@ scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function
 /**
  * Column count
  */
-scout.GroupBoxResponsiveHandler.prototype._transformGridColumnCount = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformGridColumnCount = function(field, apply) {
   if (!(field instanceof scout.GroupBox)) {
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
-  if (this.state === ResponsiveState.COMPACT) {
+  if (apply) {
     this._storeFieldProperty(field, 'gridColumnCount', field.gridColumnCount);
     field.setGridColumnCount(1);
-  } else if (this.state === ResponsiveState.CONDENSED || this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'gridColumnCount')) {
       field.setGridColumnCount(this._getFieldProperty(field, 'gridColumnCount'));
     }
@@ -259,17 +305,15 @@ scout.GroupBoxResponsiveHandler.prototype._transformGridColumnCount = function(f
 /**
  * Hide placeholder field
  */
-scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = function(field, apply) {
   if (!(field instanceof scout.PlaceholderField)) {
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
-
-  if (this.state === ResponsiveState.COMPACT) {
+  if (apply) {
     this._storeFieldProperty(field, 'visible', field.visible);
     field.setVisible(false);
-  } else if (this.state === ResponsiveState.CONDENSED || this.state === ResponsiveState.NORMAL) {
+  } else {
     if (this._hasFieldProperty(field, 'visible')) {
       field.setVisible(this._getFieldProperty(field, 'visible'));
     }
@@ -285,17 +329,16 @@ scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = funct
  * Additionally, since we use a one column layout, setting weightX to 0 might destroy the layout because it affects
  * all the fields in the groupBox.
  */
-scout.GroupBoxResponsiveHandler.prototype._transformFieldScalable = function(field) {
+scout.GroupBoxResponsiveHandler.prototype._transformFieldScalable = function(field, apply) {
   if (field.parent instanceof scout.SequenceBox) {
     return;
   }
 
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
   var gridData = this.getGridData(field);
-  if (this.state === ResponsiveState.COMPACT && gridData.weightX === 0) {
+  if (apply && gridData.weightX === 0) {
     this._storeFieldProperty(field, 'weightX', gridData.weightX);
     gridData.weightX = 1;
-  } else if (this.state === ResponsiveState.CONDENSED || this.state === ResponsiveState.NORMAL) {
+  } else if (!apply) {
     if (this._hasFieldProperty(field, 'weightX')) {
       gridData.weightX = this._getFieldProperty(field, 'weightX');
     }
@@ -310,7 +353,7 @@ scout.GroupBoxResponsiveHandler.prototype._onFormFieldAdded = function(event) {
   if (this.state !== scout.ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
     var newFields = scout.arrays.diff(event.newValue, event.oldValue);
     newFields.forEach(function(field) {
-      field.visitFields(this._transformField.bind(this));
+      field.visitFields(this._transformWidget.bind(this));
     }.bind(this));
   }
 };
