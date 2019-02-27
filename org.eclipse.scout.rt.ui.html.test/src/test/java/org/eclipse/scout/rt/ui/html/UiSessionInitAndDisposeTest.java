@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -318,12 +319,15 @@ public class UiSessionInitAndDisposeTest {
 
     assertEquals(
         Arrays.asList(
-            "UiSession.dispose",
             "Desktop.execGuiDetached",
-            "UiSession.init",
-            "UiSession.getOrCreateClientSession",
             "Desktop.execGuiAttached"),
-        m_protocol);
+        m_protocol.stream().filter(s -> s.startsWith("Desktop.")).collect(Collectors.toList()));
+    assertEquals(
+        Arrays.asList(
+            "UiSession.dispose",
+            "UiSession.init",
+            "UiSession.getOrCreateClientSession"),
+        m_protocol.stream().filter(s -> s.startsWith("UiSession.")).collect(Collectors.toList()));
     m_protocol.clear();
     assertEquals(1, store.countClientSessions());
     assertEquals(1, store.countUiSessions());
