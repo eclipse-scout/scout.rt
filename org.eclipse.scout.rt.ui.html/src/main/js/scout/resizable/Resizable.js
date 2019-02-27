@@ -15,6 +15,7 @@
 scout.Resizable = function($container) {
   scout.assertParameter('$container', $container);
   this.$container = $container;
+  this.$window = $container.window();
   this._context = null;
 
   this._mouseDownHandler = this._onMouseDown.bind(this);
@@ -41,9 +42,20 @@ scout.Resizable.prototype._appendResizeHandles = function() {
     .on('mousedown.resizable', this._mouseDownHandler);
 };
 
-scout.Resizable.prototype.init = function(event) {
+scout.Resizable.prototype.init = function() {
   this.$container.addClass('resizable');
   this._appendResizeHandles();
+  this._installRemoveHandler();
+};
+
+scout.Resizable.prototype._installRemoveHandler = function() {
+  this.$container.on('remove', this.destroy.bind(this));
+};
+
+scout.Resizable.prototype.destroy = function() {
+  this.$window
+    .off('mouseup.resizable', this._mouseUpHandler)
+    .off('mousemove.resizable', this._mousemoveHandler);
 };
 
 scout.Resizable.prototype._onMouseDown = function(event) {
@@ -72,16 +84,20 @@ scout.Resizable.prototype._onMouseDown = function(event) {
   };
 
   $resizable.addClass('resizable-resizing');
-  $resizable.document()
+  this.$window
+    .off('mouseup.resizable', this._mouseUpHandler)
+    .off('mousemove.resizable', this._mousemoveHandler)
     .on('mouseup.resizable', this._mouseUpHandler)
     .on('mousemove.resizable', this._mousemoveHandler);
+  $('iframe').addClass('dragging-in-progress');
 };
 
 scout.Resizable.prototype._onMouseUp = function(event) {
   this.$container.removeClass('resizable-resizing');
-  this.$container.document()
+  this.$window
     .off('mouseup.resizable', this._mouseUpHandler)
     .off('mousemove.resizable', this._mousemoveHandler);
+  $('iframe').removeClass('dragging-in-progress');
   this._context = null;
 };
 
@@ -121,4 +137,3 @@ scout.Resizable.prototype._calcDistance = function(eventA, eventB) {
     distY = eventB.pageY - eventA.pageY;
   return [distX, distY];
 };
-
