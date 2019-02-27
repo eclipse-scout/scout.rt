@@ -2066,7 +2066,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
           // close potential open MessageBoxes and FileChoosers, otherwise blocking threads will remain
           internalCloseMessageBoxes(getMessageBoxes(form));
           internalCloseFileChoosers(getFileChoosers(form));
-          form.doClose();
+          try {
+            form.doClose();
+          }
+          finally {
+            form.dispose();
+          }
         }
         catch (RuntimeException | PlatformError e) {
           LOG.error("Exception while closing forms", e);
