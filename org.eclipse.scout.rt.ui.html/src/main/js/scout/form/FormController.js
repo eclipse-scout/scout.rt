@@ -39,7 +39,6 @@ scout.FormController.prototype.registerAndRender = function(form, position, sele
       this.displayParent.dialogs.push(form);
     }
     this._renderDialog(form);
-
   }
 };
 

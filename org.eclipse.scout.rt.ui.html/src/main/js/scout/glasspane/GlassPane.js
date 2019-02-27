@@ -25,6 +25,10 @@ scout.GlassPane.prototype._render = function() {
   }
 
   this.$parent.addClass('glasspane-parent');
+  var cssPosition = this.$parent.css('position');
+  if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
+    this.$parent.css('position', 'relative');
+  }
 
   // Register 'glassPaneTarget' in focus manager.
   this.session.focusManager.registerGlassPaneTarget(this.$parent);

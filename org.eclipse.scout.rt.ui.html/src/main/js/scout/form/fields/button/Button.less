@@ -59,6 +59,12 @@
     & > .icon {
       /* Reset IE hack for link buttons because it breaks ellipsis tooltip */
       pointer-events: auto;
+
+      /* Make sure button is not clickable if it is covered by a glass pane */
+      .glasspane-parent&,
+      .glasspane-parent & {
+        pointer-events: none;
+      }
     }
 
     &:hover {
