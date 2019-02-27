@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Replace;
+import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class ClientExceptionHandler extends ExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClientExceptionHandler.class);
-  private static final String SESSION_DATA_KEY = "ClientExceptionHandler#loopDetectionSemaphore";
+  private static final String LOOP_DETECTION_KEY = "ClientExceptionHandler#loopDetectionSemaphore";
 
   @Override
   protected void handlePlatformException(final PlatformException e) {
@@ -65,7 +66,7 @@ public class ClientExceptionHandler extends ExceptionHandler {
     }
 
     // Prevent loops while displaying the exception.
-    final Semaphore loopDetectionSemaphore = getLoopDetectionSemaphore(session);
+    final Semaphore loopDetectionSemaphore = getLoopDetectionSemaphore();
     if (loopDetectionSemaphore.tryAcquire()) {
       try {
         // Synchronize with the model thread if not applicable.
@@ -125,11 +126,12 @@ public class ClientExceptionHandler extends ExceptionHandler {
     BEANS.get(ErrorPopup.class).showMessageBox(t);
   }
 
-  protected Semaphore getLoopDetectionSemaphore(final IClientSession session) {
-    Semaphore semaphore = (Semaphore) session.getData(SESSION_DATA_KEY);
+  protected Semaphore getLoopDetectionSemaphore() {
+    RunContext runContext = RunContext.CURRENT.get();
+    Semaphore semaphore = (Semaphore) runContext.getProperty(LOOP_DETECTION_KEY);
     if (semaphore == null) {
       semaphore = new Semaphore(1);
-      session.setData(SESSION_DATA_KEY, semaphore);
+      runContext.withProperty(LOOP_DETECTION_KEY, semaphore);
     }
     return semaphore;
   }
