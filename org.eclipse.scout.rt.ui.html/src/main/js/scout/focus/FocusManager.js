@@ -206,9 +206,14 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Cont
  * Checks if the given element is accessible, meaning not covert by a glasspane.
  *
  * @param element a HTMLElement or a jQuery collection
+ * @param [filter] if specified, the filter is used to filter the array of glass pane targets
  */
-scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
-  if (!this._glassPaneTargets.length) {
+scout.FocusManager.prototype.isElementCovertByGlassPane = function(element, filter) {
+  var targets = this._glassPaneTargets;
+  if (filter) {
+    targets = this._glassPaneTargets.filter(filter);
+  }
+  if (!targets.length) {
     return false; // no glasspanes active.
   }
 
@@ -217,7 +222,7 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element) {
   }
   // Checks whether the element is a child of a glasspane target.
   // If so, the some-iterator returns immediately with true.
-  return this._glassPaneTargets.some(function($glassPaneTarget) {
+  return targets.some(function($glassPaneTarget) {
     return $(element).closest($glassPaneTarget).length !== 0;
   });
 };
