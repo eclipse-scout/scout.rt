@@ -284,6 +284,85 @@ describe('Session', function() {
       expect(session.areRequestsPending()).toBe(false);
     });
 
+    it('splits events into separate requests if an event requires a new request', function() {
+      var session = createSession();
+
+      var event0 = new scout.RemoteEvent(1, 'eventType0');
+      session.sendEvent(event0);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event1 = new scout.RemoteEvent(1, 'eventType1', {
+        newRequest: true
+      });
+      session.sendEvent(event1);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event2 = new scout.RemoteEvent(1, 'eventType2');
+      session.sendEvent(event2);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event3 = new scout.RemoteEvent(1, 'eventType3', {
+        newRequest: true
+      });
+      session.sendEvent(event3);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event4 = new scout.RemoteEvent(1, 'eventType4');
+      session.sendEvent(event4);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // Send first request (other requests must not be sent yet)
+      jasmine.clock().tick(0);
+      var request = jasmine.Ajax.requests.at(0);
+      expect($.parseJSON(request.params)).toContainEvents([event0]);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(true);
+
+      // Send second request
+      receiveResponseForAjaxCall(request);
+      request = jasmine.Ajax.requests.at(1);
+      expect($.parseJSON(request.params)).toContainEvents([event1, event2]);
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(true);
+
+      // Send last request
+      receiveResponseForAjaxCall(request);
+      request = jasmine.Ajax.requests.at(2);
+      expect($.parseJSON(request.params)).toContainEvents([event3, event4]);
+      expect(jasmine.Ajax.requests.count()).toBe(3);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(false);
+      receiveResponseForAjaxCall(request);
+    });
+
+    it('does not split events into separate requests if only first request requires a new request', function() {
+      var session = createSession();
+
+      var event0 = new scout.RemoteEvent(1, 'eventType0', {
+        newRequest: true
+      });
+      session.sendEvent(event0);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event1 = new scout.RemoteEvent(1, 'eventType1');
+      session.sendEvent(event1);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      var event2 = new scout.RemoteEvent(1, 'eventType2');
+      session.sendEvent(event2);
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      // Send request
+      jasmine.clock().tick(0);
+      var request = jasmine.Ajax.requests.at(0);
+      expect($.parseJSON(request.params)).toContainEvents([event0, event1, event2]);
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+      expect(session.areEventsQueued()).toBe(false);
+    });
+
     it('queues ?poll results when user requests are pending', function() {
       var session = createSession();
       session.backgroundJobPollingSupport.enabled = true;

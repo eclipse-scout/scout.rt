@@ -215,6 +215,9 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
   if (options.showBusyIndicator !== undefined) {
     event.showBusyIndicator = options.showBusyIndicator;
   }
+  if (options.newRequest !== undefined) {
+    event.newRequest = options.newRequest;
+  }
   this.session.sendEvent(event, options.delay);
 };
 

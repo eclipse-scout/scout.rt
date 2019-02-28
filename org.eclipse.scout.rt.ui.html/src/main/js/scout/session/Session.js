@@ -470,8 +470,17 @@ scout.Session.prototype._sendNow = function() {
     // Nothing to send -> return
     return;
   }
+  // If an event requires a new request, only the previous events are sent now.
+  // The next requests are send the next time _sendNow is called (-> when the response to the current request arrives)
+  var events = [];
+  this.asyncEvents.some(function(event, i) {
+    if (event.newRequest && events.length > 0) {
+      return true;
+    }
+    events.push(event);
+  });
   var request = this._newRequest({
-    events: this.asyncEvents
+    events: events
   });
   // Busy indicator required when at least one event requests it
   request.showBusyIndicator = request.events.some(function(event) {
@@ -480,7 +489,8 @@ scout.Session.prototype._sendNow = function() {
   this.responseQueue.prepareRequest(request);
   // Send request
   this._sendRequest(request);
-  this.asyncEvents = [];
+  // Remove the events which are sent now from the list, keep the ones which are sent later
+  this.asyncEvents = this.asyncEvents.slice(events.length);
 };
 
 scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
@@ -624,7 +634,7 @@ scout.Session.prototype._requestToJson = function(request) {
     // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
     var ignore =
       (this === request && key === 'showBusyIndicator') ||
-      (this instanceof scout.RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
+      (this instanceof scout.RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce', 'newRequest'));
     return (ignore ? undefined : value);
   });
 };
