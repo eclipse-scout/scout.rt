@@ -254,8 +254,10 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   /**
    * Select the first visible and selectable node in this tree. Does not expand any nodes.
+   *
+   * @return The selected node or {@code null} if no visible and selectable node could be found.
    */
-  void selectFirstNode();
+  ITreeNode selectFirstNode();
 
   /**
    * Select the last visible and selectable node in this tree. Does not expand any nodes.

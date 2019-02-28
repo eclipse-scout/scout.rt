@@ -2068,15 +2068,11 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  public void selectFirstNode() {
+  public ITreeNode selectFirstNode() {
     if (!isRootNodeVisible()) {
-      try {
-        getRootNode().ensureChildrenLoaded();
-      }
-      catch (RuntimeException e) {
-        BEANS.get(ExceptionHandler.class).handle(e);
-      }
+      getRootNode().ensureChildrenLoaded();
     }
+
     final Holder<ITreeNode> foundVisited = new Holder<>(ITreeNode.class);
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
@@ -2088,11 +2084,13 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
         return TreeVisitResult.CONTINUE;
       }
     };
-
     visitVisibleTree(v);
-    if (foundVisited.getValue() != null) {
-      selectNode(foundVisited.getValue());
+
+    ITreeNode firstNode = foundVisited.getValue();
+    if (firstNode != null) {
+      selectNode(firstNode);
     }
+    return firstNode;
   }
 
   @Override

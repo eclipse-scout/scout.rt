@@ -623,7 +623,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void resetOutline() {
-    if (getRootNode() == null) {
+    resetOutline(true);
+  }
+
+  @Override
+  public void resetOutline(boolean selectFirstNode) {
+    final ITreeNode rootNode = getRootNode();
+    if (rootNode == null) {
       return;
     }
 
@@ -632,26 +638,29 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
           setTreeChanging(true);
           try {
             selectNode(null);
-            unloadNode(getRootNode());
-            getRootNode().ensureChildrenLoaded();
+            unloadNode(rootNode);
+            rootNode.ensureChildrenLoaded();
           }
           finally {
             setTreeChanging(false);
           }
 
-          ITreeNode root = getRootNode();
-          if (root instanceof IPageWithTable) {
-            ISearchForm searchForm = ((IPageWithTable) root).getSearchFormInternal();
+          if (rootNode instanceof IPageWithTable) {
+            ISearchForm searchForm = ((IPageWithTable) rootNode).getSearchFormInternal();
             if (searchForm != null) {
               searchForm.doReset();
             }
           }
+
           if (!isRootNodeVisible()) {
-            root.setExpanded(true);
+            rootNode.setExpanded(true);
           }
-          selectFirstNode();
-          if (getSelectedNode() instanceof IPageWithTable) {
-            getSelectedNode().setExpanded(true);
+
+          if (selectFirstNode) {
+            ITreeNode selectedNode = selectFirstNode();
+            if (selectedNode instanceof IPageWithTable) {
+              selectedNode.setExpanded(true);
+            }
           }
         });
   }

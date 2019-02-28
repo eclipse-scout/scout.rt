@@ -117,9 +117,25 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   void releaseUnusedPages();
 
   /**
-   * Reset outline as it would have been started again from scratch
+   * Resets the outline.
+   * <p>
+   * This means all expanded and loaded {@link IPage pages} are discarded (disposed). This includes all detail- and
+   * search- forms. The first visible and selectable node will be selected if such a node exists.
    */
   void resetOutline();
+
+  /**
+   * Resets the outline.
+   * <p>
+   * This means all expanded and loaded {@link IPage pages} are discarded (disposed). This includes all detail- and
+   * search- forms. The first visible and selectable node will be selected if requested and such a node exists.
+   *
+   * @param selectFirstNode
+   *          Specifies if the first visible and selectable {@link IPage} should be selected after the reset. If
+   *          {@code false} no {@link IPage} will be selected and the selection of the outline will be {@code null}. In
+   *          the UI the {@link IPage} tiles will be displayed instead of a page content.
+   */
+  void resetOutline(boolean selectFirstNode);
 
   boolean isVisible();
 
@@ -222,4 +238,5 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
    * @since 7.0
    */
   ClientRunContext createDisplayParentRunContext();
+
 }
