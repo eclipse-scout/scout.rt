@@ -21,7 +21,9 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContext;
+import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
@@ -166,10 +168,8 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
   protected void notifyListenersOfCurrentSession(final T notification) {
     ISession currentSession = IClientSession.CURRENT.get();
     if (currentSession instanceof IClientSession) {
-      IClientSession[] sessions = {(IClientSession) currentSession};
-      for (IClientSession session : sessions) {
-        scheduleHandlingNotifications(notification, getListenerList(session), session);
-      }
+      IClientSession session = (IClientSession) currentSession;
+      scheduleHandlingNotifications(notification, getListenerList(session), session);
     }
   }
 
@@ -177,12 +177,13 @@ public abstract class AbstractObservableNotificationHandler<T extends Serializab
     if (listenerList == null) {
       return;
     }
-    Jobs.schedule(() -> {
-      listenerList.list().forEach(listener -> listener.handleNotification(notification));
-    }, Jobs
-        .newInput()
+
+    JobInput input = Jobs.newInput()
         .withName("Handling Client Notification")
-        .withRunContext(ClientRunContexts.empty().withSession(session, true)));
+        .withRunContext(ClientRunContexts.empty()
+            .withSession(session, true)
+            .withCorrelationId(CorrelationId.CURRENT.get()));
+    Jobs.schedule(() -> listenerList.list().forEach(listener -> listener.handleNotification(notification)), input);
   }
 
   /**
