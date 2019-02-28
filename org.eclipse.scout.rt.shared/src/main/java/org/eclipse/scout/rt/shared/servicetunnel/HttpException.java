@@ -10,6 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
+
+/**
+ * TODO [9.1] pbz: Remove class
+ *
+ * @deprecated Use {@link RemoteSystemUnavailableException} instead.
+ */
+@Deprecated
 public class HttpException extends Exception {
   private static final long serialVersionUID = 1L;
 

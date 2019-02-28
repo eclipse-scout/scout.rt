@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
-import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class RemoteServiceInvocationCallable implements Callable<ServiceTunnelRe
         // Receive the response.
         m_tunnel.interceptHttpResponse(resp, m_serviceRequest);
         if (resp.getStatusCode() != 0 && (resp.getStatusCode() < 200 || resp.getStatusCode() > 299)) {
-          return new ServiceTunnelResponse(new HttpException(resp.getStatusCode())); // request failed
+          return new ServiceTunnelResponse(new RemoteSystemUnavailableException("Service tunnel request failed with status code {}", resp.getStatusCode()));
         }
 
         try (InputStream in = resp.getContent()) {

@@ -10,9 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.IOException;
 
-import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -21,15 +29,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.api.client.http.HttpResponse;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * It is essential to call {@link HttpResponse#disconnect()} even in case of an error, otherwise connections are not
@@ -83,10 +82,9 @@ public class RemoteServiceInvocationCallableDisconnectTest {
     Throwable exception = response.getException();
 
     assertNotNull(exception);
-    assertTrue(exception instanceof HttpException);
+    assertTrue(exception instanceof RemoteSystemUnavailableException);
 
     // disconnect has been called also for status codes <> 200
     verify(m_mockResponse, times(1)).disconnect();
   }
-
 }

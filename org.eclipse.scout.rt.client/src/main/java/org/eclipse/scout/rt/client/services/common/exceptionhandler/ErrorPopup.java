@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.exception.IProcessingStatus;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.html.IHtmlContent;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
  * Popup to visualize an error.
  */
 @Bean
+@SuppressWarnings("deprecation")
 public class ErrorPopup {
 
   private final AtomicBoolean m_parsed = new AtomicBoolean();
@@ -150,9 +152,9 @@ public class ErrorPopup {
       parseVetoException((VetoException) t);
       return true;
     }
-    // HttpException is thrown by ServiceTunnel
+    // RemoteSystemUnavailableException is thrown by ServiceTunnel
     // SocketException is the parent of ConnectException (happens when server is not available) and NoRouteToHostException
-    if (t instanceof HttpException || t instanceof UnknownHostException || t instanceof SocketException) {
+    if (t instanceof HttpException || t instanceof UnknownHostException || t instanceof SocketException || t instanceof RemoteSystemUnavailableException) {
       parseNetError(t);
       return true;
     }
