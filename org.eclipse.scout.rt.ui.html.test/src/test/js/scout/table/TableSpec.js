@@ -2840,5 +2840,49 @@ describe("Table", function() {
       expect(table.rows[5].cells[0].text).toBe('B-filtered');
       expect(table.rows[6].cells[0].text).toBe('G');
     });
+
   });
+
+  describe("rowStatus", function() {
+
+    it("changes when updating the value", function() {
+      var model = helper.createModelFixture(2, 4);
+      var table = helper.createTable(model);
+
+      // Check initial status
+      expect(table.rows[0].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[2].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[3].status).toBe(scout.TableRow.Status.NON_CHANGED);
+
+      var column0 = table.columns[0];
+
+      // Update value --> should change status
+      column0.setCellValue(table.rows[0], 77);
+      expect(table.rows[0].status).toBe(scout.TableRow.Status.UPDATED);
+      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
+
+      // Call setCellValue(), but with same value --> should not change status
+      column0.setCellValue(table.rows[1], table.cellValue(column0, table.rows[1]));
+      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
+
+      // Change displayText --> should not change status
+      column0.setCellText(table.rows[2], 'ABC');
+      expect(table.rows[2].status).toBe(scout.TableRow.Status.NON_CHANGED);
+
+      // Change value via cell.setValue() --> does not update anything
+      table.rows[3].cells[0].setValue(88);
+      expect(table.rows[3].status).toBe(scout.TableRow.Status.NON_CHANGED);
+
+      // Inserted rows are "INSERTED"
+      expect(table.rows[4]).toBeUndefined();
+      table.insertRow({
+        cells: [null, null]
+      });
+      expect(table.rows[4].status).toBe(scout.TableRow.Status.INSERTED);
+      column0.setCellValue(table.rows[4], 99);
+      expect(table.rows[4].status).toBe(scout.TableRow.Status.UPDATED);
+    });
+  });
+
 });

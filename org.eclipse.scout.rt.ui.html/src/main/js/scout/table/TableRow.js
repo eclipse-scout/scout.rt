@@ -22,6 +22,13 @@ scout.TableRow = function() {
   this.parentRow;
   this.childRows = [];
   this.expanded = false;
+  this.status = scout.TableRow.Status.NON_CHANGED;
+};
+
+scout.TableRow.Status = {
+  NON_CHANGED: 'nonChanged',
+  INSERTED: 'inserted',
+  UPDATED: 'updated'
 };
 
 scout.TableRow.prototype.init = function(model) {

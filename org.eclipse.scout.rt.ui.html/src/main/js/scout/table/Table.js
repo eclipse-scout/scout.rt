@@ -2491,6 +2491,7 @@ scout.Table.prototype.insertRows = function(rows) {
   // Update model
   rows.forEach(function(row, i) {
     row = this._initRow(row);
+    row.status = scout.TableRow.Status.INSERTED;
     rows[i] = row;
     // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
     this.rows.push(row);
@@ -2688,6 +2689,14 @@ scout.Table.prototype.updateRows = function(rows) {
     }
     structureChanged = structureChanged || row._parentRowId !== parentRowId;
     row = this._initRow(row);
+    // Check if cell values have changed
+    row.cells.some(function(cell, i) {
+      var oldCell = oldRow.cells[i];
+      if (!oldCell || oldCell.value !== cell.value) {
+        row.status = scout.TableRow.Status.UPDATED;
+        return true; // break loop
+      }
+    });
     // selection
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = row;
@@ -4679,6 +4688,12 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
       }
     }.bind(this));
   }
+};
+
+scout.Table.prototype.markRowsAsNonChanged = function(rows) {
+  scout.arrays.ensure(rows || this.rows).forEach(function(row) {
+    row.status = scout.TableRow.Status.NON_CHANGED;
+  });
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

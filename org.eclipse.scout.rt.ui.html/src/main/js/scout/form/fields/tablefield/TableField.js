@@ -128,6 +128,9 @@ scout.TableField.prototype._updateInsertedRows = function (rows) {
 
 scout.TableField.prototype._updateUpdatedRows = function (rows) {
   rows.forEach(function(row) {
+    if (row.status === scout.TableRow.Status.NON_CHANGED) {
+      return;
+    }
     this._updatedRows[row.id] = row;
   }, this);
 };
@@ -152,6 +155,7 @@ scout.TableField.prototype.markAsSaved = function() {
   this._insertedRows = scout.objects.createMap();
   this._updatedRows = scout.objects.createMap();
   this._checkedRows = scout.objects.createMap();
+  this.table.markRowsAsNonChanged();
 };
 
 scout.TableField.prototype.getValidationResult = function() {
