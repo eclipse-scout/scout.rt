@@ -28,6 +28,7 @@ scout.DisableBrowserF5ReloadKeyStroke = function(desktop) {
   this.which = [scout.keys.F5];
   this.preventDefault = true;
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
+  this.renderingHints.render = false;
 };
 scout.inherits(scout.DisableBrowserF5ReloadKeyStroke, scout.KeyStroke);
 
