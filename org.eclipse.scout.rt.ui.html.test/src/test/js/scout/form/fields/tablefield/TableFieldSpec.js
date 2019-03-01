@@ -110,14 +110,20 @@ describe("TableField", function() {
     it('should require save when row has been updated', function() {
       tableField.table.updateRow(firstRow);
       tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false); // <-- no change yet (because value was not changed)
+
+      tableField.table.columns[0].setCellValue(firstRow, 77);
+      tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(true);
     });
 
     it('does not create a memory leak if same row is updated multiple times', function() {
+      tableField.table.columns[0].setCellValue(firstRow, 77);
       tableField.table.updateRow(firstRow);
       tableField.updateRequiresSave();
       expect(Object.keys(tableField._updatedRows).length).toBe(1);
 
+      tableField.table.columns[0].setCellValue(firstRow, 88);
       tableField.table.updateRow(firstRow);
       tableField.updateRequiresSave();
       expect(Object.keys(tableField._updatedRows).length).toBe(1);
@@ -194,6 +200,34 @@ describe("TableField", function() {
       tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
       jasmine.clock().tick();
       tableField.table.completeCellEdit();
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+    });
+
+    it('resets row status on markAsSaved', function(){
+      expect(firstRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(tableField.requiresSave).toBe(false);
+
+      tableField.table.columns[0].setCellValue(firstRow, 77);
+      expect(firstRow.status).toBe(scout.TableRow.Status.UPDATED);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+
+      tableField.markAsSaved();
+      expect(firstRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(false);
+
+      tableField.table.insertRow({
+        cells: [null, null]
+      });
+      var lastRow = tableField.table.rows[tableField.table.rows.length - 1];
+      expect(lastRow.status).toBe(scout.TableRow.Status.INSERTED);
+      tableField.updateRequiresSave();
+      expect(tableField.requiresSave).toBe(true);
+
+      tableField.markAsSaved();
+      expect(lastRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
     });

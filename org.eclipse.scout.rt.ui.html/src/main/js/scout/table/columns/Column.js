@@ -515,6 +515,7 @@ scout.Column.prototype.setCellValue = function(row, value) {
   }
 
   cell.setValue(value);
+  row.status = scout.TableRow.Status.UPDATED;
   this._updateCellText(row, cell);
 };
 
