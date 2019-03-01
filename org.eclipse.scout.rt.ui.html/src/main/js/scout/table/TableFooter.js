@@ -607,7 +607,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   // Auto-hide unimportant messages
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
-  if (!tableStatus.isError() && !this.table.tableStatus.uiState) {
+  if (!tableStatus.isError() && !tableStatus.isWarning() && !tableStatus.uiState) {
     // Already set status to 'auto-hidden', in case the user changes outline before timeout elapses
     this.table.tableStatus.uiState = 'auto-hidden';
     this._autoHideTableStatusTooltipTimeoutId = setTimeout(function() {
