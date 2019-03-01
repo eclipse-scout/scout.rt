@@ -38,7 +38,6 @@ scout.FormField = function() {
   this.statusVisible = true;
   this.touched = false;
   this.tooltipText = null;
-  this.tooltip = null;
 
   this.$label = null;
   /**
@@ -127,7 +126,8 @@ scout.FormField.prototype._init = function(model) {
   scout.FormField.parent.prototype._init.call(this, model);
   this.resolveConsts([{
     property: 'labelPosition',
-    constType: scout.FormField.LabelPosition}]);
+    constType: scout.FormField.LabelPosition
+  }]);
   this.resolveTextKeys(['label', 'tooltipText']);
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
@@ -411,7 +411,7 @@ scout.FormField.prototype._updateFieldStatus = function() {
     errorStatus = this._errorStatus(),
     status = null,
     statusVisible = this._computeStatusVisible(),
-    autoRemove = false;
+    autoRemove = true;
 
   this.fieldStatus.setPosition(this.statusPosition);
   this.fieldStatus.setVisible(statusVisible);
@@ -668,8 +668,8 @@ scout.FormField.prototype._$tooltipParent = function() {
 };
 
 scout.FormField.prototype._hideStatusMessage = function() {
-  if (this.tooltip) {
-    this.tooltip.destroy();
+  if (this.fieldStatus) {
+    this.fieldStatus.hideTooltip();
   }
 };
 
