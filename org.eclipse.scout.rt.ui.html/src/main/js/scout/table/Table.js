@@ -809,14 +809,15 @@ scout.Table.prototype.deselectAll = function() {
   this.selectRows([]);
 };
 
-scout.Table.prototype.checkAll = function(checked) {
-  this.checkRows(this.visibleRows, {
+scout.Table.prototype.checkAll = function(checked, options) {
+  var opts = $.extend(options, {
     checked: checked
   });
+  this.checkRows(this.visibleRows, opts);
 };
 
-scout.Table.prototype.uncheckAll = function() {
-  this.checkAll(false);
+scout.Table.prototype.uncheckAll = function(options) {
+  this.checkAll(false, options);
 };
 
 scout.Table.prototype.updateScrollbars = function() {
@@ -2338,10 +2339,11 @@ scout.Table.prototype.checkedRows = function() {
   });
 };
 
-scout.Table.prototype.checkRow = function(row, checked) {
-  this.checkRows([row], {
+scout.Table.prototype.checkRow = function(row, checked, options) {
+  var opts = $.extend(options, {
     checked: checked
   });
+  this.checkRows([row], opts);
 };
 
 scout.Table.prototype.checkRows = function(rows, options) {
@@ -2379,8 +2381,8 @@ scout.Table.prototype.checkRows = function(rows, options) {
   this._triggerRowsChecked(checkedRows);
 };
 
-scout.Table.prototype.uncheckRow = function(row) {
-  this.uncheckRows([row]);
+scout.Table.prototype.uncheckRow = function(row, options) {
+  this.uncheckRows([row], options);
 };
 
 scout.Table.prototype.uncheckRows = function(rows, options) {

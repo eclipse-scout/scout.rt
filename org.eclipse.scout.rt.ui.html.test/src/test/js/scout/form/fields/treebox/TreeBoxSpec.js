@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-describe("ListBox", function() {
+describe("TreeBox", function() {
   var session, field, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.ListBox();
+    field = new scout.TreeBox();
     helper = new scout.FormSpecHelper(session);
     jasmine.clock().install();
   });
@@ -32,15 +32,15 @@ describe("ListBox", function() {
       parent: session.desktop,
       lookupCall: lookupCallModel
     }, model);
-    return scout.create('ListBox', model);
+    return scout.create('TreeBox', model);
   }
 
-  function createListBoxWithAdapter() {
-    var model = helper.createFieldModel('ListBox');
-    var listBox = new scout.ListBox();
-    listBox.init(model);
-    linkWidgetAndAdapter(listBox, 'ListBoxAdapter');
-    return listBox;
+  function createTreeBoxWithAdapter() {
+    var model = helper.createFieldModel('TreeBox');
+    var TreeBox = new scout.TreeBox();
+    TreeBox.init(model);
+    linkWidgetAndAdapter(TreeBox, 'TreeBoxAdapter');
+    return TreeBox;
   }
 
   describe('general behavior', function() {
@@ -91,14 +91,14 @@ describe("ListBox", function() {
 
       expect(field.value).toEqual([1, 2]);
       expect(field.displayText).toBe('Foo, Bar');
-      expect(field.table.checkedRows().length).toBe(2);
+      expect(field.tree.checkedNodes.length).toBe(2);
       expect(field.getCheckedLookupRows().length).toBe(2);
 
       field.clear();
       jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.displayText).toBe('');
-      expect(field.table.checkedRows().length).toBe(0);
+      expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.getCheckedLookupRows()).toEqual([]);
     });
 
@@ -110,13 +110,13 @@ describe("ListBox", function() {
       field.setValue([1, 2, 3]);
       jasmine.clock().tick(500);
       expect(field.value).toEqual([1, 2, 3]);
-      expect(field.table.checkedRows().length).toBe(3);
+      expect(field.tree.checkedNodes.length).toBe(3);
       expect(field.displayText).toBe('Foo, Bar, Baz');
 
       field.clear();
       jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
-      expect(field.table.checkedRows().length).toBe(0);
+      expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.displayText).toBe('');
     });
   });
@@ -127,16 +127,17 @@ describe("ListBox", function() {
       jasmine.clock().tick(500);
 
       field.setEnabled(false);
-      field.table.checkAll();
+      field.tree.expandNode(field.tree.visibleNodesFlat[0]);
+      field.tree.checkNodes(field.tree.visibleNodesFlat);
       jasmine.clock().tick(500);
       expect(field.value).toEqual([]);
       expect(field.getCheckedLookupRows()).toEqual([]);
       expect(field.displayText).toBe('');
-      expect(field.table.checkedRows().length).toBe(0);
+      expect(field.tree.checkedNodes.length).toBe(0);
 
-      field.table.checkRows(field.table.rows[2]);
+      field.tree.checkNodes(field.tree.visibleNodesFlat[2]);
       expect(field.value).toEqual([]);
-      field.table.checkRows(field.table.rows[2], { checkOnlyEnabled: false });
+      field.tree.checkNodes(field.tree.visibleNodesFlat[2], { checkOnlyEnabled: false });
       expect(field.value).toEqual([3]);
 
       field.setValue([1]);
@@ -146,7 +147,7 @@ describe("ListBox", function() {
 
   describe('lookupCall', function() {
 
-    it('switching should refill table', function(){
+    it('switching should refill tree', function(){
       var field = createFieldWithLookupCall({}, {
         objectType: 'AnotherDummyLookupCall'
       });
@@ -155,8 +156,8 @@ describe("ListBox", function() {
       jasmine.clock().tick(300);
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('English, Swiss-German');
-      expect(field.table.rows.length).toBe(5);
-      expect(field.table.checkedRows().length).toBe(2);
+      expect(field.tree.visibleNodesFlat.length).toBe(5);
+      expect(field.tree.checkedNodes.length).toBe(2);
 
 
       var newLookupCall = scout.create('DummyLookupCall', {
@@ -167,8 +168,10 @@ describe("ListBox", function() {
       // dont change value when lookupCall changes
       expect(field.value).toEqual([100, 500]);
       expect(field.displayText).toBe('');
-      expect(field.table.checkedRows().length).toBe(0);
-      expect(field.table.rows.length).toBe(3);
+      expect(field.tree.checkedNodes.length).toBe(0);
+      expect(field.tree.visibleNodesFlat.length).toBe(1);
+      field.tree.expandNode(field.tree.visibleNodesFlat[0]);
+      expect(field.tree.visibleNodesFlat.length).toBe(3);
     });
 
 
@@ -203,7 +206,7 @@ describe("ListBox", function() {
       field.setValue(null);
       jasmine.clock().tick(500);
 
-      field.table.checkRows(field.table.rows[2]);
+      field.tree.checkNodes(field.tree.visibleNodesFlat[2]);
       jasmine.clock().tick(500);
 
       expect(field.value).toEqual([3]);
@@ -245,7 +248,7 @@ describe("ListBox", function() {
       var field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
-      expect(field.table.rows.length).toBe(3);
+      expect(field.tree.visibleNodesFlat.length).toBe(1);
     });
   });
 
@@ -255,23 +258,24 @@ describe("ListBox", function() {
       var field = createFieldWithLookupCall();
       jasmine.clock().tick(500);
 
-      field.table.checkAll();
+      field.tree.expandNode(field.tree.visibleNodesFlat[0]);
+      field.tree.checkNodes(field.tree.visibleNodesFlat);
       jasmine.clock().tick(300);
       expect(field.value).toEqual([1, 2, 3]);
       expect(field.displayText).toBe('Foo, Bar, Baz');
-      expect(field.table.checkedRows().length).toBe(3);
+      expect(field.tree.checkedNodes.length).toBe(3);
 
-      field.table.uncheckAll();
+      field.tree.uncheckNodes(field.tree.visibleNodesFlat);
       jasmine.clock().tick(300);
       expect(field.value).toEqual([]);
-      expect(field.table.checkedRows().length).toBe(0);
+      expect(field.tree.checkedNodes.length).toBe(0);
       expect(field.displayText).toBe('');
 
-      field.table.checkRow(field.table.rows[1]);
+      field.tree.checkNode(field.tree.visibleNodesFlat[1]);
       jasmine.clock().tick(500);
       expect(field.value).toEqual([2]);
       expect(field.displayText).toBe('Bar');
-      expect(field.table.checkedRows().length).toBe(1);
+      expect(field.tree.checkedNodes.length).toBe(1);
     });
   });
 
@@ -285,37 +289,37 @@ describe("ListBox", function() {
     });
 
     it('uses a lookup call to format the value', function() {
-      var model = helper.createFieldModel('ListBox', session.desktop, {
+      var model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var listBox = scout.create('ListBox', model);
-      expect(listBox.displayText).toBe('');
-      listBox.setValue([1]);
+      var TreeBox = scout.create('TreeBox', model);
+      expect(TreeBox.displayText).toBe('');
+      TreeBox.setValue([1]);
       jasmine.clock().tick(300);
-      expect(listBox.value).toEqual([1]);
-      expect(listBox.displayText).toBe('Foo');
-      listBox.setValue([2]);
+      expect(TreeBox.value).toEqual([1]);
+      expect(TreeBox.displayText).toBe('Foo');
+      TreeBox.setValue([2]);
       jasmine.clock().tick(300);
-      expect(listBox.value).toEqual([2]);
-      expect(listBox.displayText).toBe('Bar');
+      expect(TreeBox.value).toEqual([2]);
+      expect(TreeBox.displayText).toBe('Bar');
     });
 
     it('returns empty string if value is null or undefined', function() {
-      var model = helper.createFieldModel('ListBox', session.desktop, {
+      var model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var listBox = scout.create('ListBox', model);
-      expect(listBox.displayText).toBe('');
+      var TreeBox = scout.create('TreeBox', model);
+      expect(TreeBox.displayText).toBe('');
 
-      listBox.setValue(null);
+      TreeBox.setValue(null);
       jasmine.clock().tick(300);
-      expect(listBox.value).toEqual([]);
-      expect(listBox.displayText).toBe('');
+      expect(TreeBox.value).toEqual([]);
+      expect(TreeBox.displayText).toBe('');
 
-      listBox.setValue(undefined);
+      TreeBox.setValue(undefined);
       jasmine.clock().tick(300);
-      expect(listBox.value).toEqual([]);
-      expect(listBox.displayText).toBe('');
+      expect(TreeBox.value).toEqual([]);
+      expect(TreeBox.displayText).toBe('');
     });
 
   });
@@ -323,12 +327,12 @@ describe("ListBox", function() {
   describe('label', function() {
 
     it('is linked with the field', function() {
-      var listBox = scout.create('ListBox', {
+      var TreeBox = scout.create('TreeBox', {
         parent: session.desktop
       });
-      listBox.render();
-      expect(listBox.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(listBox.$field.attr('aria-labelledby')).toBe(listBox.$label.attr('id'));
+      TreeBox.render();
+      expect(TreeBox.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(TreeBox.$field.attr('aria-labelledby')).toBe(TreeBox.$label.attr('id'));
     });
   });
 

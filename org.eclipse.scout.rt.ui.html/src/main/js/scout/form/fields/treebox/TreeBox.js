@@ -74,8 +74,11 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
   }
 
   this._valueSyncing = true;
+  var opts = {
+    checkOnlyEnabled: false
+  };
   if (scout.arrays.empty(newValue)) {
-    this.uncheckAll();
+    this.uncheckAll(opts);
   } else {
     // if table is empty and lookup was not executed yet. do it now.
     if (scout.objects.countOwnProperties(this.tree.nodesMap) === 0) {
@@ -84,10 +87,10 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
       return;
     }
 
-    this.uncheckAll();
+    this.uncheckAll(opts);
     scout.objects.values(this.tree.nodesMap).forEach(function(node) {
       if (scout.arrays.containsAny(newValue, node.id)) {
-        this.tree.checkNode(node);
+        this.tree.checkNode(node, true, opts);
       }
     }, this);
   }
@@ -97,10 +100,10 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
 
 };
 
-scout.TreeBox.prototype.uncheckAll = function() {
+scout.TreeBox.prototype.uncheckAll = function(options) {
   for (var nodeId in this.tree.nodesMap) {
     if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
-      this.tree.uncheckNode(this.tree.nodesMap[nodeId]);
+      this.tree.uncheckNode(this.tree.nodesMap[nodeId], options);
     }
   }
 };

@@ -286,6 +286,7 @@ scout.Tree.prototype._destroy = function() {
 scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
   delete this.nodesMap[node.id];
   scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
+  scout.arrays.remove(this.checkedNodes, node); // ensure deleted node is not in checked list anymore
   this._removeFromFlatList(node, false); // ensure node is not longer in visible nodes list.
   node.destroy();
 
@@ -2370,10 +2371,11 @@ scout.Tree.prototype.updateNodeOrder = function(childNodes, parentNode) {
   });
 };
 
-scout.Tree.prototype.checkNode = function(node, checked) {
-  this.checkNodes([node], {
+scout.Tree.prototype.checkNode = function(node, checked, options) {
+  var opts = $.extend(options, {
     checked: checked
   });
+  this.checkNodes([node], opts);
 };
 
 scout.Tree.prototype.checkNodes = function(nodes, options) {
@@ -2433,10 +2435,11 @@ scout.Tree.prototype.checkNodes = function(nodes, options) {
   }
 };
 
-scout.Tree.prototype.uncheckNode = function(node) {
-  this.uncheckNodes([node], {
+scout.Tree.prototype.uncheckNode = function(node, options) {
+  var opts = $.extend({
     checkOnlyEnabled: true
-  });
+  }, options);
+  this.uncheckNodes([node], opts);
 };
 
 scout.Tree.prototype.uncheckNodes = function(nodes, options) {
