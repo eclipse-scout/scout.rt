@@ -1186,6 +1186,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void preprocessBufferedEvents() {
     List<TableEvent> bufferInternal = m_eventBuffer.getBufferInternal();
+    Map<ITableRow, Integer> rowsContainedInActualInsertEvents = new HashMap<ITableRow, Integer>();
+    for (int i = 0; i < bufferInternal.size(); i++) {
+      TableEvent event = bufferInternal.get(i);
+      if (event.getType() != TableEvent.TYPE_ROWS_INSERTED) {
+        continue;
+      }
+      for (ITableRow r : event.getRows()) {
+        rowsContainedInActualInsertEvents.put(r, i);
+      }
+    }
     for (int i = 0; i < bufferInternal.size(); i++) {
       TableEvent event = bufferInternal.get(i);
       if (event.getType() != TableEvent.TYPE_ROW_FILTER_CHANGED) {
@@ -1199,9 +1209,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       // the buffered events, the "wrong" events will be ignored and everything is fixed again.
       List<ITableRow> rowsToInsert = new ArrayList<>();
       List<ITableRow> rowsToDelete = new ArrayList<>();
+      List<ITableRow> rowsToIgnoreForOrderChanged = new ArrayList<>();
       for (ITableRow row : getModel().getRows()) {
         String existingRowId = getTableRowId(row);
         if (row.isFilterAccepted()) {
+          if (rowsContainedInActualInsertEvents.containsKey(row) && rowsContainedInActualInsertEvents.get(row) > i) {
+            // do not add an artificial insert for this row as it is contained in a following (real) insert event
+            // row must also not be added to another row order changed event if the insert event is after our event
+            // rows already inserted by previous insert events will be removed from these
+            rowsToIgnoreForOrderChanged.add(row);
+            continue;
+          }
           if (existingRowId == null) {
             // Row is not filtered but JsonTable does not know it yet --> handle as insertion event
             rowsToInsert.add(row);
@@ -1217,7 +1235,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       bufferInternal.set(i, new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, rowsToInsert));
       if (!rowsToInsert.isEmpty()) {
         // Generate an artificial "row order changed" event so that the inserted rows are at the correct position in the UI
-        bufferInternal.add(i + 1, new TableEvent(getModel(), TableEvent.TYPE_ROW_ORDER_CHANGED, getModel().getRows()));
+        ArrayList<ITableRow> rowOrderChangedRows = CollectionUtility.arrayList(getModel().getRows());
+        rowOrderChangedRows.removeAll(rowsToIgnoreForOrderChanged);
+        bufferInternal.add(i + 1, new TableEvent(getModel(), TableEvent.TYPE_ROW_ORDER_CHANGED, rowOrderChangedRows));
       }
 
       // Make sure no previous event contains the newly inserted rows

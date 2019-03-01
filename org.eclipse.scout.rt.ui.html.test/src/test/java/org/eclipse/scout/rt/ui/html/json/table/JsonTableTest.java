@@ -22,8 +22,10 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -777,6 +779,72 @@ public class JsonTableTest {
     JsonEvent jsonEvent = eventList.get(0);
     assertEquals(1, jsonEvent.getData().getJSONArray("rows").length());
     assertEquals(jsonTable.getTableRowId(row), jsonEvent.getData().getJSONArray("rows").getJSONObject(0).get("id"));
+  }
+
+  /**
+   * {@link JsonTable#preprocessBufferedEvents()} converts some {@link TableEvent#TYPE_ROW_FILTER_CHANGED} to artificial
+   * {@link TableEvent#TYPE_ROWS_INSERTED}, this conversion must not insert one row twice (e.g. if the same row is
+   * inserted afterwards by a real {@link TableEvent#TYPE_ROWS_INSERTED} event).
+   */
+  @Test
+  public void testRowFilterMustNotConvertToDuplicateInserts() throws Exception {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(1);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
+    // Filter the first row
+    ITableRowFilter filter = new ITableRowFilter() {
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() > 0; // hide first row
+      }
+    };
+    table.addRowFilter(filter);
+    assertEquals(1, table.getRowCount());
+    assertEquals(0, table.getFilteredRowCount());
+
+    // Simulate that the full table is sent to the UI
+    jsonTable.toJson();
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+    JsonTestUtility.endRequest(m_uiSession);
+
+    // Hidden row must not be sent to ui -> no row id
+    ITableRow row = table.getRow(0);
+    assertNull(jsonTable.getTableRowId(row));
+
+    // Update the hidden row
+    row.getCellForUpdate(0).setValue("Updated text");
+
+    // Remove filter -> Insert event is generated, inserted row is removed from update event in JsonTable.preprocessBufferedEvents
+    table.removeRowFilter(filter);
+    assertEquals(1, table.getFilteredRowCount());
+
+    // Create yet another event (between the filtering and the next row insert event)
+    table.updateAllRows();
+
+    // Add yet another row (not yet available at time of filtering)
+    table.fill(1, false);
+
+    // Process events
+    JsonTestUtility.processBufferedEvents(m_uiSession);
+
+    // Filtering is implemented by Only one deletion event should be emitted (no update event!)
+    assertEquals(3, m_uiSession.currentJsonResponse().getEventList().size());
+    List<JsonEvent> eventList = m_uiSession.currentJsonResponse().getEventList();
+    Set<String> insertedRowIds = new HashSet<>();
+    for (JsonEvent e : eventList) {
+      if ("rowsInserted".equals(e.getType())) {
+        JSONArray rows = e.getData().getJSONArray("rows");
+        for (int i = 0; i < rows.length(); i++) {
+          JSONObject r = rows.getJSONObject(i);
+          String id = r.getString("id");
+          assertTrue("Row " + id + " contained in more than one insert event", insertedRowIds.add(id));
+        }
+      }
+    }
+    insertedRowIds.contains(jsonTable.getTableRowId(table.getRow(0))); // converted TYPE_ROW_FILTER_CHANGED event
+    insertedRowIds.contains(jsonTable.getTableRowId(table.getRow(1))); // actual new row inserted
   }
 
   /**
