@@ -16,6 +16,7 @@ scout.ColumnOptimalWidthMeasurer = function(column) {
   this.imageCount = 0;
   this.completeImageCount = 0;
   this._imageLoadOrErrorHandler = this._onImageLoadOrError.bind(this);
+  this._columnCellContents = {};
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype.measure = function(promise) {
@@ -105,10 +106,17 @@ scout.ColumnOptimalWidthMeasurer.prototype._appendHeader = function() {
 
 scout.ColumnOptimalWidthMeasurer.prototype._appendRows = function() {
   this.table.rows.forEach(this._appendRow.bind(this));
+  this._columnCellContents = {};
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype._appendRow = function(row) {
-  this._appendToMeasurement($(this.column.buildCellForRow(row)));
+  var columnContent = this.column.buildCellForRow(row);
+  if (this._columnCellContents[columnContent]) {
+    return;
+  }
+  this._columnCellContents[columnContent] = true;
+
+  this._appendToMeasurement($(columnContent));
 };
 
 scout.ColumnOptimalWidthMeasurer.prototype._appendAggregateRows = function() {
