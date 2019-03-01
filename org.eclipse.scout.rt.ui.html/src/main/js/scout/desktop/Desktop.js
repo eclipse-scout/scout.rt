@@ -51,6 +51,7 @@ scout.Desktop = function() {
   this.inBackground = false;
   this.openUriHandler = null;
   this.theme = null;
+  this.dense = false;
 
   this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
@@ -62,8 +63,7 @@ scout.inherits(scout.Desktop, scout.Widget);
 scout.Desktop.DisplayStyle = {
   DEFAULT: 'default',
   BENCH: 'bench',
-  COMPACT: 'compact',
-  DENSE: 'dense'
+  COMPACT: 'compact'
 };
 
 scout.Desktop.UriAction = {
@@ -105,6 +105,7 @@ scout.Desktop.prototype._init = function(model) {
   this._setKeyStrokes(this.keyStrokes);
   this._setBenchLayoutData(this.benchLayoutData);
   this._setDisplayStyle(this.displayStyle);
+  this._setDense(this.dense);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
   });
@@ -165,7 +166,7 @@ scout.Desktop.prototype._render = function() {
   this._renderNavigationHandleVisible();
   this._renderNotifications();
   this._renderBrowserHistoryEntry();
-  this._renderDisplayStyle();
+  this._renderDense();
   this.addOns.forEach(function(addOn) {
     addOn.render();
   }, this);
@@ -201,9 +202,6 @@ scout.Desktop.prototype._postRender = function() {
 scout.Desktop.prototype._setDisplayStyle = function(displayStyle) {
   this._setProperty('displayStyle', displayStyle);
 
-  scout.styles.clearCache();
-  scout.HtmlEnvironment.init(this.isDenseStyleActive() ? scout.Desktop.DisplayStyle.DENSE : null);
-
   var isCompact = this.displayStyle === scout.Desktop.DisplayStyle.COMPACT;
 
   if (this.header) {
@@ -221,6 +219,21 @@ scout.Desktop.prototype._setDisplayStyle = function(displayStyle) {
     this.outline.setCompact(isCompact);
     this.outline.setEmbedDetailContent(isCompact);
   }
+};
+
+scout.Desktop.prototype.setDense = function(dense) {
+  this.setProperty('dense', dense);
+};
+
+scout.Desktop.prototype._setDense = function(dense) {
+  this._setProperty('dense', dense);
+
+  scout.styles.clearCache();
+  scout.HtmlEnvironment.init(this.dense ? 'dense' : null);
+};
+
+scout.Desktop.prototype._renderDense = function() {
+  this.$container.toggleClass('dense', this.dense);
 };
 
 scout.Desktop.prototype._createLayout = function() {
@@ -689,15 +702,6 @@ scout.Desktop.prototype._renderNotifications = function() {
   this.notifications.forEach(function(notification) {
     this._renderNotification(notification);
   }.bind(this));
-};
-
-scout.Desktop.prototype.isDenseStyleActive = function() {
-  return this.displayStyle === scout.Desktop.DisplayStyle.DENSE;
-};
-
-scout.Desktop.prototype._renderDisplayStyle = function() {
-  this.$container.toggleClass('dense', this.isDenseStyleActive());
-  this.validateLayout();
 };
 
 /**

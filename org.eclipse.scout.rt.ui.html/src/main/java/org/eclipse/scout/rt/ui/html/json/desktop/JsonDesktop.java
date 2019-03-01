@@ -365,6 +365,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
         return getModel().getDisplayStyle();
       }
     });
+    putJsonProperty(new JsonProperty<DESKTOP>(IDesktop.PROP_DENSE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isDense();
+      }
+    });
   }
 
   @Override

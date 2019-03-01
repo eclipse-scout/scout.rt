@@ -268,7 +268,8 @@
       "outline": null,
       "activeForm": null,
       "selectedViewTabs": [],
-      "notifications": []
+      "notifications": [],
+      "dense": false
     },
     "Outline": {
       "toggleBreadcrumbStyleEnabled": true,

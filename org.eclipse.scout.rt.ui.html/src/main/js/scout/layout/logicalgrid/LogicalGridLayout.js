@@ -47,7 +47,7 @@ scout.LogicalGridLayout.prototype._initDefaults = function() {
 scout.LogicalGridLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
   this.layoutConfig.applyToLayout(this);
-  this.widget.invalidateLayout();
+  this.widget.invalidateLayoutTree();
   this.widget.invalidateLogicalGrid();
 };
 

@@ -84,6 +84,7 @@ scout.Table = function() {
   this._permanentTailSortColumns = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
   this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
+  this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
 
   this.$data = null;
@@ -433,6 +434,7 @@ scout.Table.prototype._render = function() {
     this.revealSelection();
   }
   this.session.desktop.on('popupOpen', this._popupOpenHandler);
+  this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -457,6 +459,7 @@ scout.Table.prototype._setCssClass = function(cssClass) {
 };
 
 scout.Table.prototype._remove = function() {
+  this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.session.desktop.off('popupOpen', this._popupOpenHandler);
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
@@ -4725,6 +4728,13 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
         this.$container.removeClass('focused');
       }
     }.bind(this));
+  }
+};
+
+scout.Table.prototype._onDesktopPropertyChange = function(event) {
+  // The height of the menuBar changes by css when switching to or from the dense mode
+  if (event.propertyName === 'dense') {
+    this.menuBar.invalidateLayoutTree();
   }
 };
 

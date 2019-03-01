@@ -28,7 +28,7 @@ scout.TabBoxLayout.prototype._initDefaults = function() {
 
 scout.TabBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
-  this._tabBox.invalidateLayout();
+  this._tabBox.invalidateLayoutTree();
 };
 
 scout.TabBoxLayout.prototype.layout = function($container) {

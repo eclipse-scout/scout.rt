@@ -20,6 +20,7 @@ scout.Tab = function() {
   this.$subLabel = null;
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
   this._statusMouseDownHandler = this._onStatusMouseDown.bind(this);
+  this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
 };
 scout.inherits(scout.Tab, scout.Widget);
 
@@ -38,8 +39,6 @@ scout.Tab.prototype._init = function(options) {
   this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
   this.tabItem.on('propertyChange', this._tabPropertyChangeHandler);
-
-  this.session.desktop.on('propertyChange', this._onDesktopPropertyChange.bind(this));
 };
 
 scout.Tab.prototype._destroy = function() {
@@ -66,6 +65,7 @@ scout.Tab.prototype._render = function() {
   this.fieldStatus.$container.cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
 
   this.$container.on('mousedown', this._onTabMouseDown.bind(this));
+  this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
 };
 
 scout.Tab.prototype._renderProperties = function() {
@@ -192,9 +192,14 @@ scout.Tab.prototype._renderTabOverflown = function() {
   this._updateStatus();
 };
 
+scout.Tab.prototype._remove = function() {
+  this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
+  scout.Tab.parent.prototype._remove.call(this);
+};
+
 scout.Tab.prototype._onDesktopPropertyChange = function(event) {
   // switching from or to the dense mode requires clearing of the tab's htmlComponent prefSize cache.
-  if (event.propertyName === 'displayStyle' && scout.isOneOf(scout.Desktop.DisplayStyle.DENSE, event.oldValue, event.newValue)) {
+  if (event.propertyName === 'dense') {
     this.invalidateLayout();
   }
 };

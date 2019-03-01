@@ -140,6 +140,8 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
 
   String STARTUP_REQUEST_PARAM_URL = "url";
 
+  String PROP_DENSE = "dense";
+
   /**
    * Default style with header, navigation (tree) and bench (forms).
    * <p>
@@ -178,8 +180,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * </ul>
    */
   String DISPLAY_STYLE_COMPACT = "compact";
-
-  String DISPLAY_STYLE_DENSE = "dense";
 
   /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
@@ -987,5 +987,15 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * @since 9.0
    */
   void closeForms(Set<IForm> formSet);
+
+  /**
+   * @since 9.0
+   */
+  void setDense(boolean dense);
+
+  /**
+   * @since 9.0
+   */
+  boolean isDense();
 
 }

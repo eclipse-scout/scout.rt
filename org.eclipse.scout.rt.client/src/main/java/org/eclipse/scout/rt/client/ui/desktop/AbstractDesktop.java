@@ -381,6 +381,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
+   * @return the value to be assigned initially to the <i>dense</i> property. This value is ignored for
+   *         <code>displayStyle</code> = {@link IDesktop#DISPLAY_STYLE_COMPACT}.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredDense() {
+    return true;
+  }
+
+  /**
    * Called while this desktop is initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -709,7 +719,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
 
   /**
    * Applies values to the following properties, based on the given displayStyle: <i>navigationVisible</i>,
-   * <i>navigationHandleVisible</i>, <i>headerVisible</i>, <i>benchVisible</i>.
+   * <i>navigationHandleVisible</i>, <i>headerVisible</i>, <i>benchVisible</i>, <i>dense</i>.
    */
   protected void initDisplayStyle(String displayStyle) {
     if (DISPLAY_STYLE_BENCH.equals(displayStyle)) {
@@ -717,12 +727,14 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(true);
+      setDense(getConfiguredDense());
     }
     else if (DISPLAY_STYLE_COMPACT.equals(displayStyle)) {
       setNavigationVisible(true);
       setNavigationHandleVisible(false);
       setHeaderVisible(false);
       setBenchVisible(false);
+      setDense(false);
     }
     else {
       // Default
@@ -730,6 +742,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       setNavigationHandleVisible(getConfiguredNavigationHandleVisible());
       setHeaderVisible(getConfiguredHeaderVisible());
       setBenchVisible(getConfiguredBenchVisible());
+      setDense(getConfiguredDense());
     }
   }
 
@@ -2334,6 +2347,16 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public boolean isInBackground() {
     return propertySupport.getPropertyBool(PROP_IN_BACKGROUND);
+  }
+
+  @Override
+  public void setDense(boolean dense) {
+    propertySupport.setPropertyBool(PROP_DENSE, dense);
+  }
+
+  @Override
+  public boolean isDense() {
+    return propertySupport.getPropertyBool(PROP_DENSE);
   }
 
   /**

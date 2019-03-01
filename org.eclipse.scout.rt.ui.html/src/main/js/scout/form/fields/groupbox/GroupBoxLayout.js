@@ -24,7 +24,7 @@ scout.GroupBoxLayout.prototype._initDefaults = function() {
 
 scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
-  this.groupBox.invalidateLayout();
+  this.groupBox.invalidateLayoutTree();
 };
 
 scout.GroupBoxLayout.prototype.layout = function($container) {

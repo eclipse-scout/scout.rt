@@ -38,7 +38,7 @@ scout.FormFieldLayout.prototype._initDefaults = function() {
 
 scout.FormFieldLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
-  this.formField.invalidateLayout();
+  this.formField.invalidateLayoutTree();
 };
 
 scout.FormFieldLayout.prototype.layout = function($container) {

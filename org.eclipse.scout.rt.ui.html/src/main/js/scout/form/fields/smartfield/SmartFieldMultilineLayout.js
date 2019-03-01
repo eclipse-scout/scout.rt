@@ -31,7 +31,7 @@ scout.SmartFieldMultilineLayout.prototype._initDefaults = function() {
 
 scout.SmartFieldMultilineLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
-  this.smartField.invalidateLayout();
+  this.smartField.invalidateLayoutTree();
 };
 
 scout.SmartFieldMultilineLayout.prototype.layout = function($container) {

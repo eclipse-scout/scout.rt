@@ -839,4 +839,14 @@ public class VirtualDesktop implements IDesktop {
   public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public void setDense(boolean dense) {
+    // NOP
+  }
+
+  @Override
+  public boolean isDense() {
+    return false;
+  }
 }

@@ -245,4 +245,29 @@
       min-height: @logical-grid-row-height-dense;
     }
   }
+
+  /* TagBar.less */
+  .tag-element,
+  .overflow-icon {
+    height: 20px; /* @tag-field-tag-height */
+    line-height: 20px; /* @tag-field-tag-height */
+    margin-top: 0px; /* margin: @tag-field-tag-margin-y @tag-field-tag-margin-right 0 0; */
+  }
+
+  /* use default margin in the overflow popup, otherwise the tags sit on each other */
+  .tag-overflow-popup {
+    & > .tag-element {
+      margin-top: @tag-field-tag-margin-y;
+    }
+  }
+
+  /* TagField.less */
+  .tag-field {
+    & > .field {
+      & > input {
+        padding-bottom: 1px;
+      }
+    }
+  }
+
 }

@@ -34,7 +34,7 @@ scout.DateTimeCompositeLayout.prototype._initDefaults = function() {
 
 scout.DateTimeCompositeLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
   this._initDefaults();
-  this._dateField.invalidateLayout();
+  this._dateField.invalidateLayoutTree();
 };
 
 scout.DateTimeCompositeLayout.prototype.layout = function($container) {
