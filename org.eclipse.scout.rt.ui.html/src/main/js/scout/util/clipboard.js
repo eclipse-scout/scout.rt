@@ -106,26 +106,34 @@ scout.clipboard = {
   },
 
   _successStatus: function(session) {
-    return {
+    return new scout.Status({
       message: session.text('ui.CopyToClipboardSuccessStatus'),
       severity: scout.Status.Severity.INFO
-    };
+    });
   },
 
   _failedStatus: function(session) {
-    return {
+    return new scout.Status({
       message: session.text('ui.CopyToClipboardFailedStatus'),
       severity: scout.Status.Severity.WARNING
-    };
+    });
   },
 
+  /**
+   * Shows a short desktop notification. By default, it informs the user that the content
+   * has been copied to the clipboard successfully. By passing a different status, the
+   * message can be changed.
+   *
+   * @param parent
+   *          Widget that wants show the notification. Mandatory. Required for NLS texts.
+   */
   showNotification: function(parent, status) {
-    status = scout.nvl(status, this._successStatus(parent.session));
+    scout.assertParameter('parent', parent);
     var notification = scout.create('DesktopNotification', {
       parent: parent,
       closable: false,
       duration: 1234,
-      status: new scout.Status(status)
+      status: status || this._successStatus(parent.session)
     });
     notification.show();
   }
