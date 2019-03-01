@@ -58,6 +58,7 @@ scout.MessageBox.prototype._initKeyStrokeContext = function() {
   scout.MessageBox.parent.prototype._initKeyStrokeContext.call(this);
 
   this.keyStrokeContext.registerKeyStroke([
+    new scout.CopyKeyStroke(this),
     new scout.FocusAdjacentElementKeyStroke(this.session, this),
     new scout.ClickActiveElementKeyStroke(this, [
       scout.keys.SPACE, scout.keys.ENTER
@@ -74,7 +75,8 @@ scout.MessageBox.prototype._render = function() {
   this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = this.$parent.appendDiv('messagebox')
-    .on('mousedown', this._onMouseDown.bind(this));
+    .on('mousedown', this._onMouseDown.bind(this))
+    .on('copy', this._onCopy.bind(this));
 
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.draggable($handle);
@@ -83,7 +85,8 @@ scout.MessageBox.prototype._render = function() {
   this.$header = this.$content.appendDiv('messagebox-label messagebox-header');
   this.$body = this.$content.appendDiv('messagebox-label messagebox-body');
   this.$html = this.$content.appendDiv('messagebox-label messagebox-html prevent-initial-focus');
-  this.$buttons = this.$container.appendDiv('messagebox-buttons');
+  this.$buttons = this.$container.appendDiv('messagebox-buttons')
+    .on('copy', this._onCopy.bind(this));
 
   var boxButtons = new scout.BoxButtons(this.$buttons, this._onButtonClick.bind(this));
   this._$abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed
@@ -121,8 +124,6 @@ scout.MessageBox.prototype._render = function() {
   this._renderHtml();
   this._renderHiddenText();
 
-  // TODO [7.0] bsh: Somehow let the user copy the 'copyPasteText' - but how?
-
   // Prevent resizing when message-box is dragged off the viewport
   this.$container.addClass('calc-helper');
   var naturalWidth = this.$container.width();
@@ -136,6 +137,7 @@ scout.MessageBox.prototype._render = function() {
   this.htmlComp.validateLayout();
 
   this.$container.addClassForAnimation('animate-open');
+  this.$container.select();
 };
 
 scout.MessageBox.prototype.get$Scrollable = function() {
@@ -200,6 +202,52 @@ scout.MessageBox.prototype._onMouseDown = function() {
   if(parent) {
     parent.activate();
   }
+};
+
+scout.MessageBox.prototype._setCopyable = function(copyable) {
+  this.$header.toggleClass('copyable', copyable);
+  this.$body.toggleClass('copyable', copyable);
+  this.$html.toggleClass('copyable', copyable);
+};
+
+scout.MessageBox.prototype.copy = function() {
+  this._setCopyable(true);
+  var myDocument = this.$container.document(true);
+  var range = myDocument.createRange();
+  range.selectNodeContents(this.$content[0]);
+  var selection = this.$container.window(true).getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  myDocument.execCommand('copy');
+};
+
+scout.MessageBox.prototype._onCopy = function(event) {
+  var ie = scout.device.isInternetExplorer();
+  var clipboardData = ie ? this.$container.window(true).clipboardData : scout.objects.optProperty(event, 'originalEvent', 'clipboardData');
+
+  if (clipboardData) {
+    // Internet Explorer only allows plain text (which must have data-type 'Text')
+    if (!ie) {
+      var htmlText = scout.strings.join('<br/>',
+          this.$header[0].outerHTML,
+          this.$body[0].outerHTML,
+          this.$html[0].outerHTML,
+          this.hiddenText);
+      clipboardData.setData('text/html', htmlText);
+    }
+    var dataType = ie ? 'Text' : 'text/plain';
+    var plainText = scout.strings.join('\n\n',
+        this.$header.text(),
+        this.$body.text(),
+        this.$html.text(),
+        this.hiddenText);
+    clipboardData.setData(dataType, plainText);
+    this.$container.window(true).getSelection().removeAllRanges();
+    this._setCopyable(false);
+    scout.clipboard.showNotification(this);
+    event.preventDefault(); // We want to write our data to the clipboard, not data from any user selection
+  }
+  // else: do default
 };
 
 scout.MessageBox.prototype._onButtonClick = function(event, option) {

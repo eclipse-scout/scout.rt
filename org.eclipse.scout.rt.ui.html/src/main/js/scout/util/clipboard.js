@@ -96,29 +96,38 @@ scout.clipboard = {
   },
 
   _showNotification: function(options, promise) {
-    // Status for "success"
-    var status = {
-      message: options.parent.session.text('ui.CopyToClipboardSuccessStatus'),
-      severity: scout.Status.Severity.INFO
-    };
+    var status = this._successStatus(options.parent.session);
     promise
       .catch(function() {
-        // Status for "failed"
-        status = {
-          message: options.parent.session.text('ui.CopyToClipboardFailedStatus'),
-          severity: scout.Status.Severity.WARNING
-        };
+        status = this._failedStatus(options.parent.session);
       })
-      .then(function() {
-        // Show notification
-        var notification = scout.create('DesktopNotification', {
-          parent: options.parent,
-          closable: false,
-          duration: 1234,
-          status: new scout.Status(status)
-        });
-        notification.show();
-      });
+      // Show notification
+      .then(this.showNotification.bind(this, options.parent, status));
+  },
+
+  _successStatus: function(session) {
+    return {
+      message: session.text('ui.CopyToClipboardSuccessStatus'),
+      severity: scout.Status.Severity.INFO
+    };
+  },
+
+  _failedStatus: function(session) {
+    return {
+      message: session.text('ui.CopyToClipboardFailedStatus'),
+      severity: scout.Status.Severity.WARNING
+    };
+  },
+
+  showNotification: function(parent, status) {
+    status = scout.nvl(status, this._successStatus(parent.session));
+    var notification = scout.create('DesktopNotification', {
+      parent: parent,
+      closable: false,
+      duration: 1234,
+      status: new scout.Status(status)
+    });
+    notification.show();
   }
 
 };

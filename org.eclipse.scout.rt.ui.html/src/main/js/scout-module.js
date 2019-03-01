@@ -392,6 +392,7 @@
   __include("scout/messagebox/MessageBoxController.js");
   __include("scout/messagebox/MessageBoxes.js");
   __include("scout/messagebox/MessageBoxLayout.js");
+  __include("scout/messagebox/CopyKeyStroke.js");
   // Form fields (A-Z)
   __include("scout/form/fields/accordionfield/AccordionField.js");
   __include("scout/form/fields/accordionfield/AccordionFieldAdapter.js");
