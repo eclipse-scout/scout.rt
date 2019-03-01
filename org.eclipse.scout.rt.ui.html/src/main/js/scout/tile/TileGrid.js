@@ -79,7 +79,6 @@ scout.TileGrid.prototype._createVirtualScrolling = function() {
     widget: this,
     enabled: this.virtual,
     viewRangeSize: this.viewRangeSize,
-    minRowHeight: this._minRowHeight(),
     rowHeight: this._heightForRow.bind(this),
     rowCount: this.rowCount.bind(this),
     _renderViewRange: this._renderViewRange.bind(this)
@@ -445,15 +444,15 @@ scout.TileGrid.prototype._setLayoutConfig = function(layoutConfig) {
     layoutConfig = new scout.TileGridLayoutConfig();
   }
   this._setProperty('layoutConfig', scout.TileGridLayoutConfig.ensure(layoutConfig));
-  if (this.virtualScrolling) {
-    this.virtualScrolling.setMinRowHeight(this._minRowHeight());
-    this.setViewRangeSize(this.virtualScrolling.viewRangeSize, false);
-  }
 };
 
 scout.TileGrid.prototype._renderLayoutConfig = function() {
   var oldMinWidth = this.htmlComp.layout.minWidth;
   this.layoutConfig.applyToLayout(this.htmlComp.layout);
+  if (this.virtualScrolling) {
+    this.virtualScrolling.setMinRowHeight(this._minRowHeight());
+    this.setViewRangeSize(this.virtualScrolling.viewRangeSize, false);
+  }
   if (oldMinWidth !== this.htmlComp.layout.minWidth) {
     this._renderScrollable();
   }
@@ -1201,7 +1200,7 @@ scout.TileGrid.prototype._heightForRow = function(row) {
  * @returns the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
  */
 scout.TileGrid.prototype._minRowHeight = function() {
-  return scout.TileGridLayout.getTileDimensions().height + scout.TileGridLayout.getTileDimensions().y / 2;
+  return this.htmlComp.layout.rowHeight + this.htmlComp.layout.vgap / 2;
 };
 
 scout.TileGrid.prototype.rowCount = function(gridColumnCount) {

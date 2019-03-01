@@ -24,6 +24,9 @@ scout.VirtualScrolling.prototype.setMinRowHeight = function(minRowHeight) {
   if (this.minRowHeight === minRowHeight) {
     return;
   }
+  if (!scout.numbers.isNumber(minRowHeight)) {
+    throw new Error('minRowHeight is not a number: ' + minRowHeight);
+  }
   this.minRowHeight = minRowHeight;
   if (this.widget.rendered) {
     this.setViewRangeSize(this.calculateViewRangeSize());
