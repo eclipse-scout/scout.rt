@@ -40,7 +40,8 @@ scout.DateFormatPatternType = {
   AM_PM: 'am_pm',
   MINUTE: 'minute',
   SECOND: 'second',
-  MILLISECOND: 'millisecond'
+  MILLISECOND: 'millisecond',
+  TIMEZONE: 'timezone'
 };
 
 scout.DateFormat = function(locale, pattern, options) { // NOSONAR
@@ -277,8 +278,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         var startYear = (parseContext.startDate || new Date()).getFullYear();
         // Construct a new year using the startYear's century and the entered 'short year'
         var year = Number(
-            scout.strings.padZeroLeft(startYear, 4).substr(0, 2) +
-            scout.strings.padZeroLeft(match, 2));
+          scout.strings.padZeroLeft(startYear, 4).substr(0, 2) +
+          scout.strings.padZeroLeft(match, 2));
         // Ensure max. 50 years distance between 'startYear' and 'year'
         var distance = year - startYear;
         if (distance <= -50) {
@@ -774,6 +775,26 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.dateInfo.milliseconds = Number(match);
         parseContext.matchInfo.milliseconds = match;
       }
+    }),
+
+    // --- Time zone ---
+    new DateFormatPatternDefinition({
+      type: scout.DateFormatPatternType.TIMEZONE,
+      terms: ['Z'],
+      formatFunction: function(formatContext, acceptedTerm) {
+        var offset = Math.abs(formatContext.inputDate.getTimezoneOffset()),
+          isNegative = offset !== formatContext.inputDate.getTimezoneOffset();
+        return (isNegative ? '-' : '+') + scout.strings.padZeroLeft(Math.floor(offset / 60), 2) + scout.strings.padZeroLeft(offset % 60, 2);
+      },
+      parseRegExp: /^([+|-]\d{4})(.*)$/,
+      applyMatchFunction: function(parseContext, match, acceptedTerm) {
+        var offset = Number(match.substr(1, 2)) * 60 + Number(match.substr(3, 2));
+        if (match.charAt(0) === '-') {
+          offset *= -1;
+        }
+        parseContext.dateInfo.timezone = offset;
+        parseContext.matchInfo.timezone = match;
+      }
     })
   ];
 
@@ -914,14 +935,14 @@ scout.DateFormat.prototype.format = function(date, exactLength) {
  *   parts are undefined, all others are converted to numbers. Those values may be directly
  *   used in the JavaScript Date() type (month is zero-based!).
  *   Valid properties:
- *   - year, month, day, hours, minutes, seconds, milliseconds
+ *   - year, month, day, hours, minutes, seconds, milliseconds, timezone
  *
  * matchInfo:
  *   Similar to dateInfo, but the parts are defined as strings as they were parsed from the input.
  *   While dateInfo may contain the year 1995, the matchInfo may contain "95". Also note that
  *   the month is "one-based", as opposed to dateInfo.month!
  *   Valid properties:
- *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds
+ *   - year, month, week, day, weekday, hours, ampm, minutes, seconds, milliseconds, timezone
  *
  * hints:
  *   An object that contains further recognized date parts that are not needed to define the exact time.
@@ -1126,6 +1147,11 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   }
   if (!isValid(result.getMilliseconds(), dateInfo.milliseconds)) {
     return null;
+  }
+
+  // Adjust time zone
+  if (scout.numbers.isNumber(dateInfo.timezone)) {
+    result.setMinutes(result.getMinutes() - result.getTimezoneOffset() + dateInfo.timezone);
   }
 
   return result;

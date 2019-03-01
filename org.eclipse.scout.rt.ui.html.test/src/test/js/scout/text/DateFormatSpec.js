@@ -98,6 +98,26 @@ describe("DateFormat", function() {
       expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('Freitag, 21.03.14');
     });
 
+    it("considers ss SSS Z", function() {
+      var date = scout.dates.create('2014-03-21 13:01'),
+        offset = Math.abs(date.getTimezoneOffset()),
+        isNegative = offset !== date.getTimezoneOffset(),
+        timeZone = (isNegative ? '-' : '+') + scout.strings.padZeroLeft(Math.floor(offset / 60), 2) + scout.strings.padZeroLeft(offset % 60, 2);
+
+      var pattern = 'yyyy-MM-dd HH:mm:ss';
+      var dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(date)).toBe('2014-03-21 13:01:00');
+
+      pattern = 'yyyy-MM-dd HH:mm:ss.SSS';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(date)).toBe('2014-03-21 13:01:00.000');
+
+      pattern = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(date)).toBe('2014-03-21T13:01:00.000' + timeZone);
+
+    });
+
   });
 
   describe("parse", function() {
@@ -150,6 +170,28 @@ describe("DateFormat", function() {
       expect(dateFormat.parse('2017-01-01 01:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 01:00').getTime());
       expect(dateFormat.parse('2017-01-01 12:00 PM').getTime()).toBe(scout.dates.create('2017-01-01 12:00').getTime());
       expect(dateFormat.parse('2017-01-01 12:00 AM').getTime()).toBe(scout.dates.create('2017-01-01 00:00').getTime());
+    });
+
+    it("considers ss SSS Z", function() {
+      var pattern = 'yyyy-MM-dd HH:mm:ss';
+      var dateFormat = new scout.DateFormat(locale, pattern);
+
+      expect(dateFormat.parse('2017-01-01 12:00:05').getTime()).toBe(scout.dates.create('2017-01-01 12:00:05').getTime());
+      expect(dateFormat.parse('2017-01-01 13:00:05').getTime()).toBe(scout.dates.create('2017-01-01 13:00:05').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00:05').getTime()).toBe(scout.dates.create('2017-01-01 01:00:05').getTime());
+
+      pattern = 'yyyy-MM-dd HH:mm:ss.SSS';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.parse('2017-01-01 12:00:05.123').getTime()).toBe(scout.dates.create('2017-01-01 12:00:05.123').getTime());
+      expect(dateFormat.parse('2017-01-01 13:00:05.123').getTime()).toBe(scout.dates.create('2017-01-01 13:00:05.123').getTime());
+      expect(dateFormat.parse('2017-01-01 01:00:05.123').getTime()).toBe(scout.dates.create('2017-01-01 01:00:05.123').getTime());
+
+      pattern = 'yyyy-MM-ddTHH:mm:ss.SSSZ';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      var refDate = scout.dates.create('2017-01-01 12:00:05.123');
+      refDate.setMinutes(refDate.getMinutes() - refDate.getTimezoneOffset() - 6 * 60);
+      expect(dateFormat.parse('2017-01-01T12:00:05.123-0600').getTime()).toBe(refDate.getTime());
+
     });
   });
 
