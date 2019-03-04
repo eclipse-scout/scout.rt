@@ -12,17 +12,15 @@ package org.eclipse.scout.rt.ui.html.res.loader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -35,33 +33,32 @@ import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.UiLocalesProperty;
 import org.json.JSONObject;
 
 public class TextsLoader extends AbstractResourceLoader {
-  private final Map<String, Map<String, String>> m_textsByLanguageTag = new LinkedHashMap<>();
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    List<String> languageTags = getLanguageTags();
+    List<Locale> languageLocales = getLanguageLocales();
     JSONObject jsonTexts = new JSONObject();
 
     // Gather all texts and group them by language tags
+    Map<Locale, Map<String, String>> textsByLanguageTag = new LinkedHashMap<>();
     for (AbstractDynamicNlsTextProviderService textService : BEANS.all(AbstractDynamicNlsTextProviderService.class)) {
-      for (String tag : languageTags) {
-        NlsResourceBundle bundle = getResourceBundle(textService, tag);
+      for (Locale locale : languageLocales) {
+        NlsResourceBundle bundle = getResourceBundle(textService, locale);
         if (bundle == null) {
           continue;
         }
 
-        Map<String, String> map = m_textsByLanguageTag.computeIfAbsent(tag, k -> new TreeMap<>());
-        putTextsFromBundle(bundle, map);
+        Map<String, String> map = textsByLanguageTag.computeIfAbsent(locale, k -> new TreeMap<>());
+        map.putAll(bundle.getTextMap());
       }
     }
 
     // Convert the texts into json
-    for (Entry<String, Map<String, String>> entry : m_textsByLanguageTag.entrySet()) {
-      String languageTag = entry.getKey();
+    for (Entry<Locale, Map<String, String>> entry : textsByLanguageTag.entrySet()) {
+      Locale locale = entry.getKey();
+      String languageTag = (locale == null || locale == Locale.ROOT) ? "default" : locale.toLanguageTag();
+
       JSONObject jsonTextMap = textsToJson(languageTag, entry.getValue());
-      if (languageTag == null) {
-        languageTag = "default";
-      }
       jsonTexts.put(languageTag, jsonTextMap);
     }
 
@@ -76,17 +73,6 @@ public class TextsLoader extends AbstractResourceLoader {
         .build();
   }
 
-  protected Map<String, String> putTextsFromBundle(ResourceBundle bundle, Map<String, String> textMap) {
-    for (Enumeration<String> en = bundle.getKeys(); en.hasMoreElements();) {
-      String key = en.nextElement();
-      String text = bundle.getString(key);
-      if (!textMap.containsKey(key)) {
-        textMap.put(key, text);
-      }
-    }
-    return textMap;
-  }
-
   protected JSONObject textsToJson(String languageTag, Map<String, String> textMap) {
     JSONObject texts = new JSONObject();
     for (Entry<String, String> entry : textMap.entrySet()) {
@@ -95,7 +81,7 @@ public class TextsLoader extends AbstractResourceLoader {
     return texts;
   }
 
-  protected List<String> getLanguageTags() {
+  protected List<Locale> getLanguageLocales() {
     List<String> languageTags = CONFIG.getPropertyValue(UiLocalesProperty.class);
     return processLanguageTags(languageTags);
   }
@@ -114,40 +100,31 @@ public class TextsLoader extends AbstractResourceLoader {
    *
    * @return a new list of language tags including the missing tags in the same order as the original one
    */
-  protected List<String> processLanguageTags(List<String> languageTags) {
+  protected List<Locale> processLanguageTags(List<String> languageTags) {
     // Group by language and add language itself (e.g [en,de-CH] will be converted to en: [en], de: [de,de-CH]
-    Map<String, Set<String>> languages = new LinkedHashMap<>();
+    Map<String, Set<Locale>> languages = new LinkedHashMap<>();
     for (String tag : languageTags) {
       Locale locale = Locale.forLanguageTag(tag);
-      Set<String> tagsForLanguage = languages.get(locale.getLanguage());
-      if (tagsForLanguage == null) {
-        tagsForLanguage = new LinkedHashSet<>();
-        languages.put(locale.getLanguage(), tagsForLanguage);
+      Set<Locale> localesForLanguage = languages.get(locale.getLanguage());
+      if (localesForLanguage == null) {
+        localesForLanguage = new LinkedHashSet<>();
+        languages.put(locale.getLanguage(), localesForLanguage);
 
         // Always add language itself, without any country
-        tagsForLanguage.add(locale.getLanguage());
+        localesForLanguage.add(new Locale(locale.getLanguage()));
       }
-      tagsForLanguage.add(tag);
+      localesForLanguage.add(locale);
     }
 
     // Create a new list including the missing language tags
-    languageTags = new ArrayList<>();
-    for (Set<String> tags : languages.values()) {
-      languageTags.addAll(tags);
-    }
+    List<Locale> locales = languages.values().stream().flatMap(Set::stream).collect(Collectors.toList());
 
     // add default language
-    languageTags.add(0, null);
-    return languageTags;
+    locales.add(0, Locale.ROOT);
+    return locales;
   }
 
-  protected static NlsResourceBundle getResourceBundle(AbstractDynamicNlsTextProviderService textService, String languageTag) throws IOException {
-    String suffix = "";
-    if (languageTag != null) {
-      // The text property files work with '_' instead of '-' -> convert them.
-      suffix = "_" + languageTag.replace("-", "_");
-    }
-    return NlsResourceBundle.getBundle(textService.getDynamicNlsBaseName(), suffix, textService.getClass().getClassLoader());
+  protected NlsResourceBundle getResourceBundle(AbstractDynamicNlsTextProviderService textService, Locale locale) {
+    return NlsResourceBundle.getBundle(null, textService.getDynamicNlsBaseName(), locale, textService.getClass().getClassLoader());
   }
-
 }

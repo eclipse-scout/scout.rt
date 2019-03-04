@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.nls;
 
-import java.util.Enumeration;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,25 +26,10 @@ public class NlsResourceBundleCache {
 
   private final String m_resourceBundleName;
   private final Class<?> m_wrapperClass;
-  private final ConcurrentMap<Locale, ResourceBundle> m_resourceBundles;
+  private final ConcurrentMap<Locale, NlsResourceBundle> m_resourceBundles;
 
   /** constant indicating that no resource bundle exists */
-  private static final ResourceBundle NONEXISTENT_BUNDLE = new ResourceBundle() {
-    @Override
-    public Enumeration<String> getKeys() {
-      return null;
-    }
-
-    @Override
-    protected Object handleGetObject(String key) {
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return "NONEXISTENT_BUNDLE";
-    }
-  };
+  private static final NlsResourceBundle NONEXISTENT_BUNDLE = new NlsResourceBundle(null, Collections.emptyMap());
 
   public NlsResourceBundleCache(String resourceBundleName, Class wrapperClass) {
     m_resourceBundleName = resourceBundleName;
@@ -57,9 +41,9 @@ public class NlsResourceBundleCache {
     return m_wrapperClass;
   }
 
-  public ResourceBundle getResourceBundle(Locale locale) {
+  public NlsResourceBundle getResourceBundle(Locale locale) {
     Assertions.assertNotNull(locale);
-    ResourceBundle resourceBundle = m_resourceBundles.get(locale);
+    NlsResourceBundle resourceBundle = m_resourceBundles.get(locale);
     if (resourceBundle == NONEXISTENT_BUNDLE) {
       return null;
     }
@@ -74,25 +58,20 @@ public class NlsResourceBundleCache {
       m_resourceBundles.put(locale, NONEXISTENT_BUNDLE);
       return null;
     }
-    ResourceBundle r = m_resourceBundles.putIfAbsent(locale, resourceBundle);
+    NlsResourceBundle r = m_resourceBundles.putIfAbsent(locale, resourceBundle);
     // check for non existent bundle not necessary because already verified
     // by explicitly calling NlsResourceBundle.getBundle above
     // always returning same instance (thus using r if set in which case locale resource bundle is obsolete)
     return r != null ? r : resourceBundle;
   }
 
-  protected ResourceBundle loadBundle(Locale locale) {
-    NlsResourceBundle bundle = NlsResourceBundle.getBundle(m_resourceBundleName, locale, m_wrapperClass.getClassLoader());
+  protected NlsResourceBundle loadBundle(Locale locale) {
     if (Locale.ROOT.equals(locale)) {
-      return bundle;
+      return NlsResourceBundle.getBundle(null, m_resourceBundleName, locale, m_wrapperClass.getClassLoader());
     }
-    if (bundle != null) {
-      // connect new loaded resource bundle with its parent bundle
-      bundle.setParent(getResourceBundle(getParentLocale(locale)));
-      return bundle;
-    }
-    // use same as parent bundle
-    return getResourceBundle(getParentLocale(locale));
+    NlsResourceBundle parentBundle = getResourceBundle(getParentLocale(locale));
+    NlsResourceBundle bundle = NlsResourceBundle.getBundle(parentBundle, m_resourceBundleName, locale, m_wrapperClass.getClassLoader());
+    return bundle != null ? bundle : parentBundle; // use directly parent bundle if not found
   }
 
   protected Locale getParentLocale(Locale locale) {

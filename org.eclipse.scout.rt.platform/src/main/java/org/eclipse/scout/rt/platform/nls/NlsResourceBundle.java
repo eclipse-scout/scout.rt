@@ -13,42 +13,92 @@ package org.eclipse.scout.rt.platform.nls;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.function.BiConsumer;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * <h4>NlsResourceBundle</h4> Other than {@link ResourceBundle} this bundle loads bundles by their intuitive names.
- * Example: There are bundles Texts.properties (default English), Texts_de.properties and Texts_fr.properties
- * {@link ResourceBundle#getBundle("Texts",de_CH)} will yield Texts_de.properties! This cache will yield
- * Texts.properties (which basically is the correct solution)
- *
- * @author Ivan Motsch
- */
-public final class NlsResourceBundle extends PropertyResourceBundle {
+public final class NlsResourceBundle {
 
   private static final Logger LOG = LoggerFactory.getLogger(NlsResourceBundle.class);
 
-  public static final String TEXT_RESOURCE_EXTENSION = "properties";
+  private static final String TEXT_RESOURCE_EXTENSION = "properties";
 
-  public NlsResourceBundle(InputStream stream) throws IOException {
-    super(stream);
+  private final NlsResourceBundle m_parent;
+  private final Map<String, String> m_textMap;
+
+  /**
+   * @param parent
+   *          may be null
+   * @param textMap
+   *          non null map without any null keys or null values
+   */
+  public NlsResourceBundle(NlsResourceBundle parent, Map<String, String> textMap) {
+    m_parent = parent;
+    Assertions.assertFalse(textMap.containsKey(null));
+    Assertions.assertFalse(textMap.containsValue(null));
+    m_textMap = Collections.unmodifiableMap(textMap);
   }
 
-  @SuppressWarnings("squid:S1185")
-  @Override
-  protected void setParent(ResourceBundle parent) {
-    // allow access of this setter in NlsResourceBundleCache
-    super.setParent(parent);
+  /**
+   * The parent bundle of this bundle if any.
+   *
+   * @return parent bundle
+   */
+  public NlsResourceBundle getParent() {
+    return m_parent;
   }
 
-  public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl) {
+  /**
+   * Map with TextKey/TextValue mapping without any values from {@link #getParent()} resource.
+   *
+   * @return non null unmodifiable text map
+   */
+  public Map<String, String> getTextMap() {
+    return m_textMap;
+  }
+
+  /**
+   * Calls recursively the text mapping using {@link #getTextMap()} and {@link #getParent()}. Note that a mapping for
+   * the same key might be visited multiple times. Visit order depends on parent order.
+   */
+  void collectTextMapping(BiConsumer<String, String> collector) {
+    for (NlsResourceBundle rb = this; rb != null; rb = rb.m_parent) {
+      for (Entry<String, String> e : rb.m_textMap.entrySet()) {
+        collector.accept(e.getKey(), e.getValue());
+      }
+    }
+  }
+
+  /**
+   * Lookups recursively the text mapping using {@link #getTextMap()} and {@link #getParent()}.
+   *
+   * @param key
+   *          not null
+   * @return null if there is no mapping for given key else most specific mapping found
+   */
+  public String getText(String key) {
+    Assertions.assertNotNull(key);
+    for (NlsResourceBundle rb = this; rb != null; rb = rb.m_parent) {
+      String value = rb.m_textMap.get(key);
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  public static NlsResourceBundle getBundle(NlsResourceBundle parent, String baseName, Locale locale, ClassLoader cl) {
     String suffix = getLocaleSuffix(locale);
     try {
-      return NlsResourceBundle.getBundle(baseName, suffix, cl);
+      return NlsResourceBundle.getBundle(parent, baseName, suffix, cl);
     }
     catch (IOException e) {
       LOG.warn("Error loading nls resource with base name '{}' and suffix '{}'", baseName, suffix, e);
@@ -67,14 +117,24 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
    * Creates and returns a new {@link NlsResourceBundle} if there is a property file found using the given base name and
    * suffix. Otherwise it returns null.
    */
-  public static NlsResourceBundle getBundle(String baseName, String suffix, ClassLoader cl) throws IOException {
+  private static NlsResourceBundle getBundle(NlsResourceBundle parent, String baseName, String suffix, ClassLoader cl) throws IOException {
     String fileName = baseName.replace('.', '/') + suffix + '.' + TEXT_RESOURCE_EXTENSION;
     URL res = cl.getResource(fileName);
     if (res != null) {
       try (InputStream in = res.openStream()) {
-        return new NlsResourceBundle(in);
+        return new NlsResourceBundle(parent, loadTextMap(in));
       }
     }
     return null;
+  }
+
+  private static Map<String, String> loadTextMap(InputStream stream) throws IOException {
+    Properties properties = new Properties();
+    properties.load(stream);
+    Map<String, String> map = new HashMap<>();
+    for (Entry<Object, Object> entry : properties.entrySet()) {
+      map.put((String) entry.getKey(), (String) entry.getValue());
+    }
+    return map;
   }
 }

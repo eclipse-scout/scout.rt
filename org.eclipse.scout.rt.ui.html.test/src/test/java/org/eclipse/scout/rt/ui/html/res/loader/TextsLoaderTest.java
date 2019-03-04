@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,55 +21,42 @@ public class TextsLoaderTest {
 
   @Test
   public void testProcessLanguageTags_addDefault() {
-    List<String> tags = new ArrayList<>();
-    tags.add("en");
-    tags.add("de");
-    tags = new TextsLoader().processLanguageTags(tags);
+    List<Locale> locales = new TextsLoader().processLanguageTags(Arrays.asList("en", "de"));
 
-    Assert.assertEquals(3, tags.size());
-    Assert.assertEquals(null, tags.get(0));
-    Assert.assertEquals("en", tags.get(1));
-    Assert.assertEquals("de", tags.get(2));
+    Assert.assertEquals(3, locales.size());
+    Assert.assertEquals(Locale.ROOT, locales.get(0));
+    Assert.assertEquals(Locale.forLanguageTag("en"), locales.get(1));
+    Assert.assertEquals(Locale.forLanguageTag("de"), locales.get(2));
   }
 
   @Test
   public void testProcessLanguageTags_handleEmpty() {
-    List<String> tags = new ArrayList<>();
-    tags = new TextsLoader().processLanguageTags(tags);
+    List<Locale> locales = new TextsLoader().processLanguageTags(Arrays.asList());
 
-    Assert.assertEquals(1, tags.size());
-    Assert.assertEquals(null, tags.get(0));
+    Assert.assertEquals(1, locales.size());
+    Assert.assertEquals(Locale.ROOT, locales.get(0));
   }
 
   @Test
   public void testProcessLanguageTags_addMissingLanguage() {
-    List<String> tags = new ArrayList<>();
-    tags.add("en");
-    tags.add("de-CH");
-    tags = new TextsLoader().processLanguageTags(tags);
+    List<Locale> locales = new TextsLoader().processLanguageTags(Arrays.asList("en", "de-CH"));
 
-    Assert.assertEquals(4, tags.size());
-    Assert.assertEquals(null, tags.get(0));
-    Assert.assertEquals("en", tags.get(1));
-    Assert.assertEquals("de", tags.get(2));
-    Assert.assertEquals("de-CH", tags.get(3));
+    Assert.assertEquals(4, locales.size());
+    Assert.assertEquals(Locale.ROOT, locales.get(0));
+    Assert.assertEquals(Locale.forLanguageTag("en"), locales.get(1));
+    Assert.assertEquals(Locale.forLanguageTag("de"), locales.get(2));
+    Assert.assertEquals(Locale.forLanguageTag("de-CH"), locales.get(3));
   }
 
   @Test
   public void testProcessLanguageTags_removeDuplicates() {
-    List<String> tags = new ArrayList<>();
-    tags.add("en");
-    tags.add("en");
-    tags.add("de-CH");
-    tags.add("de-DE");
-    tags.add("de-CH");
-    tags = new TextsLoader().processLanguageTags(tags);
+    List<Locale> locales = new TextsLoader().processLanguageTags(Arrays.asList("en", "en", "de-CH", "de-DE", "de-CH"));
 
-    Assert.assertEquals(5, tags.size());
-    Assert.assertEquals(null, tags.get(0));
-    Assert.assertEquals("en", tags.get(1));
-    Assert.assertEquals("de", tags.get(2));
-    Assert.assertEquals("de-CH", tags.get(3));
-    Assert.assertEquals("de-DE", tags.get(4));
+    Assert.assertEquals(5, locales.size());
+    Assert.assertEquals(Locale.ROOT, locales.get(0));
+    Assert.assertEquals(Locale.forLanguageTag("en"), locales.get(1));
+    Assert.assertEquals(Locale.forLanguageTag("de"), locales.get(2));
+    Assert.assertEquals(Locale.forLanguageTag("de-CH"), locales.get(3));
+    Assert.assertEquals(Locale.forLanguageTag("de-DE"), locales.get(4));
   }
 }
