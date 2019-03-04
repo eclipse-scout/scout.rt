@@ -61,7 +61,6 @@ scout.FileChooserButton.prototype._buttonLabel = function() {
 
 scout.FileChooserButton.prototype._render = function() {
   this.addContainer(this.$parent, 'file-chooser-button has-icon');
-  this.addLabel();
 
   var $field = this.$parent.makeDiv();
   var fieldHtmlComp = scout.HtmlComponent.install($field, this.session);
