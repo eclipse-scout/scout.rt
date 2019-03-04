@@ -26,7 +26,7 @@ public class LocalesLoader extends AbstractResourceLoader {
 
     byte[] localeBytes = jsonLocales.toString(2).getBytes(StandardCharsets.UTF_8);
     return BinaryResources.create()
-        .withFilename("locales.json")
+        .withFilename(pathInfo)
         .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(localeBytes)
