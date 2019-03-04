@@ -68,7 +68,7 @@ public class TextsLoader extends AbstractResourceLoader {
     // Create a binary resource
     byte[] content = jsonTexts.toString(2).getBytes(StandardCharsets.UTF_8);
     return BinaryResources.create()
-        .withFilename("texts.json")
+        .withFilename(pathInfo)
         .withCharset(StandardCharsets.UTF_8)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(content)
