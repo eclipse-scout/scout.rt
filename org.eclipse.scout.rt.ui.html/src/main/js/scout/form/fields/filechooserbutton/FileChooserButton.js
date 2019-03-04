@@ -75,6 +75,10 @@ scout.FileChooserButton.prototype._render = function() {
   this.addStatus();
 };
 
+scout.FileChooserButton.prototype._renderLabel = function() {
+  this._renderEmptyLabel();
+};
+
 scout.FileChooserButton.prototype._onButtonClick = function(event) {
   this.fileInput.browse();
 };

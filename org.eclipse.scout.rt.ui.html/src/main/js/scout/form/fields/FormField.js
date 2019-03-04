@@ -340,6 +340,17 @@ scout.FormField.prototype._renderLabel = function() {
   }
 };
 
+/**
+ * Renders an empty label for button-like fields that don't have a regular label but which do want to support the 'labelVisible'
+ * property in order to provide some layout-flexibility. Makes sure the empty label has the same height as the other labels,
+ * which is especially important for top labels.
+ */
+scout.FormField.prototype._renderEmptyLabel = function() {
+  this.$label
+    .html('&nbsp;')
+    .toggleClass('top', this.labelPosition === scout.FormField.LabelPosition.TOP);
+};
+
 scout.FormField.prototype._renderPlaceholder = function($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {
