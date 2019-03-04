@@ -3719,6 +3719,7 @@ scout.Table.prototype._rerenderViewport = function() {
   this._removeAggregateRows();
   this._renderFiller();
   this._renderViewport();
+  this.updateScrollbars();
 };
 
 scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
