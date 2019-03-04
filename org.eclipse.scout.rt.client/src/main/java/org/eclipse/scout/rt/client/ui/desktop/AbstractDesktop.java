@@ -387,7 +387,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredDense() {
-    return true;
+    return false;
   }
 
   /**
