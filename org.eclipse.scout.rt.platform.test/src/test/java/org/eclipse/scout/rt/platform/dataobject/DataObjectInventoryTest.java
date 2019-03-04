@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,17 +19,23 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
+import org.eclipse.scout.rt.platform.dataobject.fixture.ProjectFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link DataObjectInventory}
+ * Various tests for {@link DataObjectInventory}
  */
-public class DataObjectDefinitionRegistryTest {
+@RunWith(PlatformTestRunner.class)
+public class DataObjectInventoryTest {
 
   protected DataObjectInventory m_inventory;
 
@@ -58,10 +64,10 @@ public class DataObjectDefinitionRegistryTest {
   @Before
   public void before() {
     m_inventory = new DataObjectInventory();
-    m_inventory.registerClass(EntityFixtureDo.class);
-    m_inventory.registerClass(OtherEntityFixtureDo.class);
-    m_inventory.registerClass(DateFixtureDo.class);
-    m_inventory.registerClass(TestFixtureEntityDo.class);
+    m_inventory.registerClassByTypeName(EntityFixtureDo.class);
+    m_inventory.registerClassByTypeName(OtherEntityFixtureDo.class);
+    m_inventory.registerClassByTypeName(DateFixtureDo.class);
+    m_inventory.registerClassByTypeName(TestFixtureEntityDo.class);
   }
 
   @Test
@@ -86,7 +92,7 @@ public class DataObjectDefinitionRegistryTest {
     assertNull(m_inventory.fromTypeName(null));
     assertNull(m_inventory.fromTypeName("foo"));
 
-    m_inventory.registerClass(TestBaseFixtureEntityDo.class);
+    m_inventory.registerClassByTypeName(TestBaseFixtureEntityDo.class);
     assertNull(m_inventory.fromTypeName("TestBaseFixtureEntity"));
   }
 
@@ -153,9 +159,9 @@ public class DataObjectDefinitionRegistryTest {
   }
 
   @Test(expected = AssertionException.class)
-  public void testRegisterDuplicate() {
-    m_inventory.registerClass(EntityFixtureDo.class);
-    m_inventory.registerClass(EntityFixtureDo.class);
+  public void testRegisterDuplicateTypeName() {
+    m_inventory.registerClassByTypeName(EntityFixtureDo.class);
+    m_inventory.registerClassByTypeName(EntityFixtureDo.class);
   }
 
   @Test
@@ -170,5 +176,30 @@ public class DataObjectDefinitionRegistryTest {
     assertNull(m_inventory.resolveTypeVersion(EntityFixtureDo.class));
     assertEquals("scout-8.0.0", m_inventory.resolveTypeVersion(OtherEntityFixtureDo.class));
     assertNull(m_inventory.resolveTypeVersion(Object.class));
+
+    m_inventory.registerClassByTypeVersion(ScoutFixtureDo.class);
+    assertEquals("scout-8.0.0.034", m_inventory.getTypeVersion(ScoutFixtureDo.class));
+
+    m_inventory.registerClassByTypeVersion(ProjectFixtureDo.class);
+    assertEquals("project-1.2.3.004", m_inventory.getTypeVersion(ProjectFixtureDo.class));
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testRegisterDuplicateTypeVersion() {
+    m_inventory.registerClassByTypeVersion(ScoutFixtureDo.class);
+    m_inventory.registerClassByTypeVersion(ScoutFixtureDo.class);
+  }
+
+  /**
+   * Test for {@link DataObjectInventory#init()} based on class inventory
+   */
+  @Test
+  public void testInit() {
+    DataObjectInventory inv = BEANS.get(DataObjectInventory.class);
+    assertEquals("ScoutFixture", inv.toTypeName(ScoutFixtureDo.class));
+    assertEquals("ScoutFixture", inv.toTypeName(ProjectFixtureDo.class));
+
+    assertEquals("scout-8.0.0.034", inv.getTypeVersion(ScoutFixtureDo.class));
+    assertEquals("project-1.2.3.004", inv.getTypeVersion(ProjectFixtureDo.class));
   }
 }

@@ -68,8 +68,17 @@ public class DataObjectInventory {
         .getKnownAnnotatedTypes(TypeName.class)
         .stream()
         .map(IClassInfo::resolveClass)
-        .forEach(c -> registerClass(c));
-    LOG.info("Registry initialized, found {} {} implementations with @{} annotation.", m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName());
+        .forEach(c -> registerClassByTypeName(c));
+
+    ClassInventory.get()
+        .getKnownAnnotatedTypes(TypeVersion.class)
+        .stream()
+        .map(IClassInfo::resolveClass)
+        .forEach(c -> registerClassByTypeVersion(c));
+
+    LOG.info("Registry initialized, found {} {} implementations with @{} annotation and {} implementations with @{} annotation.",
+        m_typeNameToClassMap.size(), IDoEntity.class.getSimpleName(), TypeName.class.getSimpleName(),
+        m_classToTypeVersion.size(), TypeVersion.class.getSimpleName());
   }
 
   /**
@@ -156,23 +165,37 @@ public class DataObjectInventory {
    * *************************************************************************/
 
   /**
-   * Adds {@code clazz} to registry.
+   * Adds {@code clazz} to registry based on its {@code TypeName}
    */
-  protected void registerClass(Class<?> clazz) {
+  protected void registerClassByTypeName(Class<?> clazz) {
     if (IDoEntity.class.isAssignableFrom(clazz)) {
       Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
       String name = resolveTypeName(clazz);
-      String version = resolveTypeVersion(clazz);
-      if (version != null) {
-        m_classToTypeVersion.put(entityClass, version);
-      }
       String registeredName = m_classToTypeName.put(entityClass, name);
       Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
       checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
-      LOG.debug("Registered class {} with typename '{}'", entityClass, name);
+      LOG.debug("Registered class {} with type name '{}'", entityClass, name);
     }
     else {
       LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
+    }
+  }
+
+  /**
+   * Adds {@code clazz} to registry based on its {@code TypeVersion}
+   */
+  protected void registerClassByTypeVersion(Class<?> clazz) {
+    if (IDoEntity.class.isAssignableFrom(clazz)) {
+      Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
+      String version = resolveTypeVersion(clazz);
+      if (version != null) {
+        String registeredVersion = m_classToTypeVersion.put(entityClass, version);
+        Assertions.assertNull(registeredVersion, "{} was already registered with type version {}, register each class only once.", clazz, registeredVersion, TypeVersion.class.getSimpleName());
+      }
+      LOG.debug("Registered class {} with type version '{}'", entityClass, version);
+    }
+    else {
+      LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeVersion.class.getSimpleName(), IDoEntity.class);
     }
   }
 
