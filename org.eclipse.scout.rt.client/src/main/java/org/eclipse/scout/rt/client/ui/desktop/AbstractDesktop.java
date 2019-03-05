@@ -2119,17 +2119,17 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
           BEANS.get(ExceptionHandler.class).handle(e);
         }
       }
+    }
 
-      PropertyMap params = getStartupRequestParams();
-      final String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
-      final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
-      setGeolocationServiceAvailable(geolocationServiceAvailable);
+    PropertyMap params = getStartupRequestParams();
+    final String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
+    final boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
+    setGeolocationServiceAvailable(geolocationServiceAvailable);
 
-      boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
-      if (handleDeepLink) {
-        final String deepLinkPath = params.get(DeepLinkUrlParameter.DEEP_LINK);
-        activateDefaultView(deepLinkPath);
-      }
+    boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
+    if (handleDeepLink) {
+      final String deepLinkPath = params.get(DeepLinkUrlParameter.DEEP_LINK);
+      activateDefaultView(deepLinkPath);
     }
   }
 
