@@ -56,9 +56,8 @@ if [[ "$TAG" ]]; then
 fi
 _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
-# Parallel executions of maven modules and tests.
-# Half of CPU core are used in to keep other half for OS and other programs.
-mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -f org.eclipse.scout.rt -N $_MAVEN_OPTS
+# No parallel executions of maven modules and tests.
+mvn -Prelease.setversion -Dmaster_release_milestoneVersion=$RELEASE -T1 -Dmaster_test_forkCount=1 -f org.eclipse.scout.rt -N $_MAVEN_OPTS
 processError
 
 $BASEDIR/build.sh -Dmaster_unitTest_failureIgnore=false $_MAVEN_OPTS
