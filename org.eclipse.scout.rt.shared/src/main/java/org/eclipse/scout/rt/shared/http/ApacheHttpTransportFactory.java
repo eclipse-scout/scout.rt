@@ -4,8 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import org.apache.http.ConnectionReuseStrategy;
-import org.apache.http.HttpResponse;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -13,13 +11,13 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.util.PublicSuffixMatcherLoader;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
+import org.apache.http.impl.NoConnectionReuseStrategy;
+import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
-import org.apache.http.protocol.HttpContext;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -63,25 +61,12 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    */
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
     final boolean keepAliveProp = CONFIG.getPropertyValue(ApacheHttpTransportKeepAliveProperty.class);
-    builder.setConnectionReuseStrategy(new ConnectionReuseStrategy() {
-
-      @Override
-      public boolean keepAlive(HttpResponse response, HttpContext context) {
-        return keepAliveProp;
-      }
-    });
-
-    // Connections should not be kept open forever, there are numerous reasons a connection could get invalid. Also it does not make much sense to keep a connection open forever
-    builder.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy() {
-
-      @Override
-      public long getKeepAliveDuration(HttpResponse response, HttpContext context) {
-        long headerKeepAliveDuration = super.getKeepAliveDuration(response, context);
-        return headerKeepAliveDuration < 0 ? 5000 : headerKeepAliveDuration;
-      }
-
-    });
-
+    if (keepAliveProp) {
+      builder.setConnectionReuseStrategy(DefaultClientConnectionReuseStrategy.INSTANCE);
+    }
+    else {
+      builder.setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE);
+    }
     builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
   }
 
