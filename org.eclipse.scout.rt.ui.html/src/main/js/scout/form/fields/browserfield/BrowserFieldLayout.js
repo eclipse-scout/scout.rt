@@ -17,7 +17,8 @@ scout.inherits(scout.BrowserFieldLayout, scout.FormFieldLayout);
 
 scout.BrowserFieldLayout.prototype.preferredLayoutSize = function($container, options) {
   var prefSize = scout.BrowserFieldLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
-  if (!this.browserField.sandboxEnabled || this.browserField.sandboxPermissions.includes('allow-same-origin')) {
+  var sandboxPermissions = this.browserField.sandboxPermissions;
+  if (!this.browserField.sandboxEnabled || (sandboxPermissions && sandboxPermissions.indexOf('allow-same-origin') > -1)) {
     if (this.browserField.$field.contents().attr('readyState') !== 'loading') {
       prefSize.height = this.browserField.$field.contents().height() + // get height of content
         this.browserField.iframe.htmlComp.insets().vertical() + // add insets of iframe
