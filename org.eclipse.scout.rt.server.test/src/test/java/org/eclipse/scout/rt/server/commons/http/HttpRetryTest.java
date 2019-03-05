@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.commons.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -428,48 +427,5 @@ public class HttpRetryTest {
     assertEquals(500, resp.getStatusCode());
     assertEquals(Arrays.asList("07"), servletPostLog);
     assertNull(servletPostError);
-  }
-
-  /**
-   * Expect no-retry on apache and google level since the request was completely sent and the payload has retry=false
-   */
-  @Test
-  public void testPostWithUnsupportedRetryAndThreadInterruptionInServlet() throws IOException {
-    HttpRequestFactory reqFactory = m_client.getHttpRequestFactory();
-    HttpRequest req = reqFactory.buildPostRequest(new GenericUrl(m_server.getServletUrl()), new HttpContent() {
-      @Override
-      public void writeTo(OutputStream out) throws IOException {
-        //emulate a failure in the servlet
-        out.write("bar".getBytes());
-      }
-
-      @Override
-      public boolean retrySupported() {
-        return false;
-      }
-
-      @Override
-      public String getType() {
-        return "text/plain;charset=UTF-8";
-      }
-
-      @Override
-      public long getLength() throws IOException {
-        return 3;
-      }
-    });
-    req.getHeaders().set(CORRELATION_ID, "08");
-    servletFailOnce = (hreq, hresp) -> {
-      Thread.currentThread().interrupt();
-    };
-    req.setThrowExceptionOnExecuteError(true);
-    try {
-      req.execute();
-      fail("Expected org.apache.http.NoHttpResponseException");
-    }
-    catch (Exception ex) {
-      assertEquals("org.apache.http.NoHttpResponseException", ex.getClass().getName());
-      assertTrue(ex.toString().endsWith(":33000 failed to respond"));
-    }
   }
 }
