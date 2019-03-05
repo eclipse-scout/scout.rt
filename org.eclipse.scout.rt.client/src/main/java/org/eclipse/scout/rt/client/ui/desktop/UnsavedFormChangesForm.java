@@ -165,6 +165,11 @@ public class UnsavedFormChangesForm extends AbstractForm {
           return false;
         }
 
+        @Override
+        protected boolean getConfiguredStatusVisible() {
+          return false;
+        }
+
         @ClassId("ee7f1455-7da5-402b-98c0-c9d75a221595")
         public class Tree extends DefaultListBoxTable {
           @Order(10)

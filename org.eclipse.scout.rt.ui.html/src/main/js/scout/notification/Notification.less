@@ -35,4 +35,10 @@
     background-color: @notification-error-background-color;
     border-color: @notification-error-border-color;
   }
+
+  /* When notification is a direct child of the main group-box: use different margins */
+  .root-group-box > & {
+    margin-left: 10px + @root-group-box-padding-left;
+    margin-right: @root-group-box-padding-right;
+  }
 }
