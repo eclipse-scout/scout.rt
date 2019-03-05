@@ -209,6 +209,7 @@
   &.sort-desc-add {
     & > .icon::after {
       content: @icon-plus;
+      display: inline-block /* fix for pointer-events: none in IE11 */
     }
 
     &.selected > .icon::after {
@@ -258,6 +259,7 @@
   &.group-add {
     & > .icon::after {
       content: @icon-plus;
+      display: inline-block /* fix for pointer-events: none in IE11 */
     }
 
     &.selected > .icon::after {
