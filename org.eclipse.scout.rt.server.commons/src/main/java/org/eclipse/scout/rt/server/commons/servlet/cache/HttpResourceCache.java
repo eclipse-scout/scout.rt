@@ -13,8 +13,10 @@ package org.eclipse.scout.rt.server.commons.servlet.cache;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,5 +58,13 @@ public class HttpResourceCache implements IHttpResourceCache {
   public void clear() {
     LOG.debug("Clear resource cache");
     m_cache.clear();
+  }
+
+  protected Set<HttpCacheKey> getAllKeys() {
+    return CollectionUtility.hashSet(m_cache.keySet());
+  }
+
+  protected Object getCacheLock() {
+    return m_cache;
   }
 }
