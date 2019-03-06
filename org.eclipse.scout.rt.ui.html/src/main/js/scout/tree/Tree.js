@@ -2983,14 +2983,17 @@ scout.Tree.prototype.hasNode = function(node) {
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
-  var $node = $(event.currentTarget);
-  var node = $node.data('node');
-  var expanded = !$node.hasClass('expanded');
-
   if (this.isBreadcrumbStyleActive()) {
     return;
   }
 
+  var $node = $(event.currentTarget);
+  var node = $node.data('node');
+  var expanded = !$node.hasClass('expanded');
+  this.doNodeAction(node, expanded);
+};
+
+scout.Tree.prototype.doNodeAction = function(node, expanded) {
   this.trigger('nodeAction', {
     node: node
   });
