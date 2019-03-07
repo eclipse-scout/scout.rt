@@ -2973,7 +2973,7 @@ describe("Table", function() {
       });
       expect(table.rows[4].status).toBe(scout.TableRow.Status.INSERTED);
       column0.setCellValue(table.rows[4], 99);
-      expect(table.rows[4].status).toBe(scout.TableRow.Status.UPDATED);
+      expect(table.rows[4].status).toBe(scout.TableRow.Status.INSERTED); // Still inserted
     });
   });
 
