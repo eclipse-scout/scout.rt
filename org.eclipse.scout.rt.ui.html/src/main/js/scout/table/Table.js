@@ -2690,13 +2690,15 @@ scout.Table.prototype.updateRows = function(rows) {
     structureChanged = structureChanged || row._parentRowId !== parentRowId;
     row = this._initRow(row);
     // Check if cell values have changed
-    row.cells.some(function(cell, i) {
-      var oldCell = oldRow.cells[i];
-      if (!oldCell || oldCell.value !== cell.value) {
-        row.status = scout.TableRow.Status.UPDATED;
-        return true; // break loop
-      }
-    });
+    if (row.status === scout.TableRow.Status.NON_CHANGED) {
+      row.cells.some(function(cell, i) {
+        var oldCell = oldRow.cells[i];
+        if (!oldCell || oldCell.value !== cell.value) {
+          row.status = scout.TableRow.Status.UPDATED;
+          return true; // break "some()" loop
+        }
+      });
+    }
     // selection
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = row;
