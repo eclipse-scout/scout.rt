@@ -108,6 +108,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
@@ -608,6 +609,24 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
+   * Configures whether the table shows tooltips if the cell content is truncated.
+   * <p>
+   * Subclasses can override this method. Default is {@link TriState#UNDEFINED}
+   *
+   * @return
+   *         <ul>
+   *         <li>{@link TriState#TRUE} if the tooltip should always be shown if the cell content is truncated</li>
+   *         <li>{@link TriState#FALSE} if the tooltip should never be shown</li>
+   *         <li>{@link TriState#UNDEFINED} cell tooltip is only shown if it is not possible to resize the column</li>
+   *         </ul>
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(270)
+  protected TriState getConfiguredTruncatedCellTooltipEnabled() {
+    return TriState.UNDEFINED;
+  }
+
+  /**
    * Called after a drag operation was executed on one or several table rows.
    * <p>
    * Subclasses can override this method. The default does nothing.
@@ -914,6 +933,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
+    setTruncatedCellTooltipEnabled(getConfiguredTruncatedCellTooltipEnabled());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -5118,5 +5138,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setMaxRowCount(int maxRowCount) {
     propertySupport.setPropertyInt(PROP_MAX_ROW_COUNT, maxRowCount);
+  }
+
+  @Override
+  public TriState isTruncatedCellTooltipEnabled() {
+    return (TriState) propertySupport.getProperty(PROP_TRUNCATED_CELL_TOOLTIP_ENABLED);
+  }
+
+  @Override
+  public void setTruncatedCellTooltipEnabled(TriState truncatedCellTooltipEnabled) {
+    if (truncatedCellTooltipEnabled == null) {
+      truncatedCellTooltipEnabled = TriState.UNDEFINED;
+    }
+    propertySupport.setProperty(PROP_TRUNCATED_CELL_TOOLTIP_ENABLED, truncatedCellTooltipEnabled);
   }
 }

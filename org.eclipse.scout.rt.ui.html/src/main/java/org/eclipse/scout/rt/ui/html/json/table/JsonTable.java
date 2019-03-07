@@ -392,6 +392,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return ((CheckableStyle) value).name().toLowerCase();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TRUNCATED_CELL_TOOLTIP_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTruncatedCellTooltipEnabled().getBooleanValue();
+      }
+    });
   }
 
   @Override

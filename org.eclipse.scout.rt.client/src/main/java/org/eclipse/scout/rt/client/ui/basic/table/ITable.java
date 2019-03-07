@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
@@ -232,6 +233,13 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 9.0
    */
   String PROP_MAX_ROW_COUNT = "maxRowCount";
+
+  /**
+   * type TriState
+   *
+   * @since 9.0
+   */
+  String PROP_TRUNCATED_CELL_TOOLTIP_ENABLED = "truncatedCellTooltipEnabled";
 
   /**
    * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
@@ -1260,4 +1268,14 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 9.0
    */
   void setMaxRowCount(int maxRowCount);
+
+  /**
+   * @since 9.0
+   */
+  TriState isTruncatedCellTooltipEnabled();
+
+  /**
+   * @since 9.0
+   */
+  void setTruncatedCellTooltipEnabled(TriState truncatedCellTooltipEnabled);
 }

@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
 /**
@@ -125,6 +126,12 @@ public abstract class AbstractTableFieldTile extends AbstractFormFieldTile<Table
       @Override
       protected boolean getConfiguredAutoResizeColumns() {
         return true;
+      }
+
+      @Override
+      protected TriState getConfiguredTruncatedCellTooltipEnabled() {
+        // always show toolptips
+        return TriState.TRUE;
       }
 
       @Override

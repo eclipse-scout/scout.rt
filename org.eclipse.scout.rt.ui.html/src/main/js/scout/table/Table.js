@@ -51,6 +51,7 @@ scout.Table = function() {
   this.visibleRows = [];
   this.estimatedRowCount = 0;
   this.maxRowCount = 0;
+  this.truncatedCellTooltipEnabled = null;
   this.visibleRowsMap = {}; // visible rows by id
   this.rowLevelPadding;
   this.rowsMap = {}; // rows by id
@@ -782,11 +783,19 @@ scout.Table.prototype._cellTooltipText = function($cell) {
   }
 };
 
+scout.Table.prototype.setTruncatedCellTooltipEnabled = function(truncatedCellTooltipEnabled) {
+  this.setProperty('truncatedCellTooltipEnabled', truncatedCellTooltipEnabled);
+};
+
 /**
- * Show cell tooltip only if it is not possible to resize the column
+ * Decides if a cell tooltip should be shown for a truncated cell.
  */
 scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
-  return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
+  if (this.truncatedCellTooltipEnabled === null) {
+    // Show cell tooltip only if it is not possible to resize the column.
+    return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
+  }
+  return this.truncatedCellTooltipEnabled;
 };
 
 scout.Table.prototype.reload = function(reloadReason) {
