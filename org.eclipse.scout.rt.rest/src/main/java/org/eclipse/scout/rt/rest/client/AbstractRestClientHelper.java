@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.rest.client;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
@@ -26,7 +28,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.client.proxy.RestClientProxyFactory;
@@ -96,21 +97,45 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
 
   protected void registerContextResolvers(ClientBuilder clientBuilder) {
     // Context resolver, e.g. resolver for ObjectMapper
-    for (IBean<ContextResolver> bean : BEANS.getBeanManager().getBeans(ContextResolver.class)) {
-      clientBuilder.register(bean.getBeanClazz());
+    for (ContextResolver resolver : getContextResolversToRegister()) {
+      clientBuilder.register(resolver);
     }
   }
 
   protected void registerRequestFilters(ClientBuilder clientBuilder) {
-    for (IGlobalRestRequestFilter filter : BEANS.all(IGlobalRestRequestFilter.class)) {
+    for (IGlobalRestRequestFilter filter : getRequestFiltersToRegister()) {
       clientBuilder.register(filter);
     }
   }
 
   protected void configureClientBuilder(ClientBuilder clientBuilder) {
-    for (IGlobalRestClientConfigurator configurator : BEANS.all(IGlobalRestClientConfigurator.class)) {
+    for (IGlobalRestClientConfigurator configurator : getClientConfiguratorsToRegister()) {
       configurator.configure(clientBuilder);
     }
+  }
+
+  /**
+   * @return list of context resolvers for this REST client helper. Result is modifiable and never <code>null</code>.
+   *         Can be overridden by subclasses. The default returns all {@link ContextResolver} beans.
+   */
+  protected List<ContextResolver> getContextResolversToRegister() {
+    return new ArrayList<>(BEANS.all(ContextResolver.class));
+  }
+
+  /**
+   * @return list of request filters for this REST client helper. Result is modifiable and never <code>null</code>. Can
+   *         be overridden by subclasses. The default returns all {@link IGlobalRestRequestFilter} beans.
+   */
+  protected List<IGlobalRestRequestFilter> getRequestFiltersToRegister() {
+    return new ArrayList<>(BEANS.all(IGlobalRestRequestFilter.class));
+  }
+
+  /**
+   * @return list of client configurators for this REST client helper. Result is modifiable and never <code>null</code>.
+   *         Can be overridden by subclasses. The default returns all {@link IGlobalRestClientConfigurator} beans.
+   */
+  protected List<IGlobalRestClientConfigurator> getClientConfiguratorsToRegister() {
+    return new ArrayList<>(BEANS.all(IGlobalRestClientConfigurator.class));
   }
 
   /**
