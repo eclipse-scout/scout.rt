@@ -585,6 +585,6 @@ public abstract class AbstractSeleniumTest {
    * @param expectedCssClass
    */
   public void assertCssClassNotExists(WebElement element, String expectedCssClass) {
-    waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass)));
+    waitUntil(SeleniumExpectedConditions.elementNotToHaveCssClass(element, expectedCssClass));
   }
 }

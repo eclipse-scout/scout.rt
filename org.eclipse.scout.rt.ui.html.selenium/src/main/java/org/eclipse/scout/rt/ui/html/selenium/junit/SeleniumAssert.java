@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.ui.html.selenium.util.SeleniumExpectedConditions;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public final class SeleniumAssert {
 
@@ -44,7 +43,7 @@ public final class SeleniumAssert {
    * @param expectedCssClass
    */
   public static void assertCssClassNotExists(AbstractSeleniumTest test, WebElement element, String expectedCssClass) {
-    test.waitUntil(ExpectedConditions.not(SeleniumExpectedConditions.elementToHaveCssClass(element, expectedCssClass)));
+    test.waitUntil(SeleniumExpectedConditions.elementNotToHaveCssClass(element, expectedCssClass));
   }
 
   public static void assertInputFieldValue(AbstractSeleniumTest test, WebElement inputField, String expectedValue) {

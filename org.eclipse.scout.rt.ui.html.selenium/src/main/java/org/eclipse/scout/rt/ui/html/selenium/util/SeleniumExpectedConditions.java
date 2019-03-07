@@ -203,7 +203,45 @@ public final class SeleniumExpectedConditions {
     };
   }
 
+  /**
+   * Waits until the given element doesn't have the requested CSS class.
+   */
+  public static ExpectedCondition<Boolean> elementNotToHaveCssClass(final WebElement element, final String cssClass) {
+    return new ExpectedCondition<Boolean>() {
+      private String m_actualValue = null;
+
+      @Override
+      public Boolean apply(WebDriver driver) {
+        try {
+          m_actualValue = element.getAttribute("class");
+          if (m_actualValue == null) {
+            return null;
+          }
+          return notHasCssClass(m_actualValue, cssClass);
+        }
+        catch (StaleElementReferenceException e) { // NOSONAR
+          return null;
+        }
+      }
+
+      @Override
+      public String toString() {
+        return String.format("element '%s' should not have class '%s', but has '%s'",
+            element, cssClass, m_actualValue);
+      }
+    };
+  }
+
   private static boolean hasCssClass(String cssClass, String expectedCssClass) throws AssertionError {
+    if (cssClass == null || expectedCssClass == null) {
+      return false;
+    }
+    String[] cssClasses = cssClass.split(" ");
+    String[] expectedCssClasses = expectedCssClass.split(" ");
+    return CollectionUtility.containsAll(Arrays.asList(cssClasses), expectedCssClasses);
+  }
+
+  private static boolean notHasCssClass(String cssClass, String expectedCssClass) throws AssertionError {
     if (cssClass == null || expectedCssClass == null) {
       return false;
     }
@@ -211,10 +249,10 @@ public final class SeleniumExpectedConditions {
     String[] expectedCssClasses = expectedCssClass.split(" ");
     for (String expectedCssClassPart : expectedCssClasses) {
       if (CollectionUtility.contains(Arrays.asList(cssClasses), expectedCssClassPart)) {
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   /**
