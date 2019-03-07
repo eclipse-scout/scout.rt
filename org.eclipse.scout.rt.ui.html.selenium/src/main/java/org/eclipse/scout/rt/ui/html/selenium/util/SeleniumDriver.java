@@ -115,10 +115,8 @@ public final class SeleniumDriver {
     driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);
     // Set window size roughly to the minimal supported screen size
     // (1280x1024 minus some borders for browser toolbar and windows taskbar)
-    // Add extra 50 pixel height, because of yellow bar "Chrome is being controlled..." which comes up since v 65.0.3325
-    // even tough the disable-infobars property is set - doesn't work anymore :-(
     driver.manage().window().setPosition(new Point(0, 0));
-    driver.manage().window().setSize(new Dimension(1200, 900 + 50));
+    driver.manage().window().setSize(new Dimension(1200, 900));
 
     Capabilities caps = driver.getCapabilities();
     System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
