@@ -738,6 +738,8 @@ scout.TableFooter.prototype._onTableFilterRemoved = function(event) {
   this._updateInfoFilterVisibility();
   if (event.filter.filterType === scout.TableTextUserFilter.Type) {
     this._$textFilter.val('');
+    this._updateHasFilterText();
+    this._applyFilter();
   }
 };
 
