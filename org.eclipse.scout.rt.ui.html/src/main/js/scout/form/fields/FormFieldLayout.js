@@ -184,10 +184,12 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
 
     // subtract scrollbars sizes from width and height so overlay does not block scrollbars
     // we read the size from the scrollbar from our device, because we already determined
-    // it on startup
+    // it on startup. Only do this when element is scrollable.
     var elem = $field[0];
-    var scrollHorizontal = (elem.scrollWidth - elem.clientWidth) > 0;
-    var scrollVertical = (elem.scrollHeight - elem.clientHeight) > 0;
+    var overflowX = $field.css('overflow-x');
+    var overflowY = $field.css('overflow-y');
+    var scrollHorizontal = overflowX === 'scroll' || overflowX === 'auto' && (elem.scrollWidth - elem.clientWidth) > 0;
+    var scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
     var scrollbarSize = scout.device.scrollbarWidth;
 
     $overlay
@@ -195,6 +197,7 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
       .css('left', pos.left)
       .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
       .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
+
   }
 };
 
