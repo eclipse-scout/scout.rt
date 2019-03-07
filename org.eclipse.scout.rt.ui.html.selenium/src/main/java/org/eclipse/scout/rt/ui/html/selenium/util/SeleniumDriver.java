@@ -78,8 +78,6 @@ public final class SeleniumDriver {
     System.setProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
     logProperty(ChromeDriverService.CHROME_DRIVER_VERBOSE_LOG_PROPERTY, "true");
 
-    ChromeOptions opts = new ChromeOptions();
-
     // Prepare options
     ChromeOptions options = new ChromeOptions();
     String chromeBinary = System.getProperty("chrome.binary");
@@ -87,15 +85,16 @@ public final class SeleniumDriver {
     if (StringUtility.hasText(chromeBinary)) {
       options.setBinary(chromeBinary);
     }
-    options.addArguments("--lang=en");
-    options.addArguments("--verbose");
-    options.addArguments("--disable-infobars");
-    opts.setCapability(ChromeOptions.CAPABILITY, options);
 
     // Set logging preferences (see BrowserLogRule)
     LoggingPreferences logPrefs = new LoggingPreferences();
     logPrefs.enable(LogType.BROWSER, Level.ALL);
-    opts.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+    options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+
+    // Add command line arguments
+    options.addArguments("--lang=en");
+    options.addArguments("--verbose");
+    options.addArguments("--disable-infobars");
 
     // TODO [7.0] bsh: Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
@@ -107,17 +106,15 @@ public final class SeleniumDriver {
             .usingAnyFreePort()
             .withEnvironment(env) // <--
             .build(),
-        opts);
+        options);
     //RemoteWebDriver driver = new ChromeDriver(options)
     // </WORKAROUND>
 
     driver.manage().timeouts().setScriptTimeout(10000, TimeUnit.SECONDS);
     // Set window size roughly to the minimal supported screen size
     // (1280x1024 minus some borders for browser toolbar and windows taskbar)
-    // Add extra 50 pixel height, because of yellow bar "Chrome is being controlled..." which comes up since v 65.0.3325
-    // even tough the disable-infobars property is set - doesn't work anymore :-(
     driver.manage().window().setPosition(new Point(0, 0));
-    driver.manage().window().setSize(new Dimension(1200, 900 + 50));
+    driver.manage().window().setSize(new Dimension(1200, 900));
 
     Capabilities caps = driver.getCapabilities();
     System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
