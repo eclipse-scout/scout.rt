@@ -73,7 +73,7 @@ scout.TagField.prototype._renderProperties = function() {
 };
 
 scout.TagField.prototype._renderValue = function() {
-  this.tagBar._renderTags();
+  this.tagBar.updateTags();
 };
 
 scout.TagField.prototype._setValue = function(value) {
