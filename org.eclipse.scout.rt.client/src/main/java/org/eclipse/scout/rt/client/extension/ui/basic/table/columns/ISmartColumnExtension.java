@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.basic.table.columns;
 
-import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.SmartColumnChains.SmartColumn2PrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.SmartColumnChains.SmartColumnPrepareLookupChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 public interface ISmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends IColumnExtension<VALUE, OWNER> {
 
-  void execPrepareLookup(SmartColumn2PrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row);
+  void execPrepareLookup(SmartColumnPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row);
 
 }

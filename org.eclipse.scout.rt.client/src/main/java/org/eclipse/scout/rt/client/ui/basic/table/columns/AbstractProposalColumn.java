@@ -170,17 +170,17 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractSmartC
     }
   }
 
-  protected static class LocalProposalColumn2Extension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends LocalSmartColumn2Extension<LOOKUP_TYPE, OWNER>
+  protected static class LocalProposalColumnExtension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends LocalSmartColumnExtension<LOOKUP_TYPE, OWNER>
       implements IProposalColumnExtension<LOOKUP_TYPE, OWNER> {
 
-    public LocalProposalColumn2Extension(OWNER owner) {
+    public LocalProposalColumnExtension(OWNER owner) {
       super(owner);
     }
   }
 
   @Override
   protected IProposalColumnExtension<LOOKUP_TYPE, ? extends AbstractProposalColumn<LOOKUP_TYPE>> createLocalExtension() {
-    return new LocalProposalColumn2Extension<>(this);
+    return new LocalProposalColumnExtension<>(this);
   }
 
   /**

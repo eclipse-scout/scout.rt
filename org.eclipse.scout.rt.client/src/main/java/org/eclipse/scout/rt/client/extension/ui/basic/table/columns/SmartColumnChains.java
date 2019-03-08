@@ -23,16 +23,16 @@ public final class SmartColumnChains {
   private SmartColumnChains() {
   }
 
-  protected abstract static class AbstractSmartColumn2Chain<VALUE> extends AbstractExtensionChain<ISmartColumnExtension<VALUE, ? extends AbstractSmartColumn<VALUE>>> {
+  protected abstract static class AbstractSmartColumnChain<VALUE> extends AbstractExtensionChain<ISmartColumnExtension<VALUE, ? extends AbstractSmartColumn<VALUE>>> {
 
-    public AbstractSmartColumn2Chain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
+    public AbstractSmartColumnChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
       super(extensions, ISmartColumnExtension.class);
     }
   }
 
-  public static class SmartColumn2PrepareLookupChain<VALUE> extends AbstractSmartColumn2Chain<VALUE> {
+  public static class SmartColumnPrepareLookupChain<VALUE> extends AbstractSmartColumnChain<VALUE> {
 
-    public SmartColumn2PrepareLookupChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
+    public SmartColumnPrepareLookupChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
       super(extensions);
     }
 
@@ -40,7 +40,7 @@ public final class SmartColumnChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ISmartColumnExtension<VALUE, ? extends AbstractSmartColumn<VALUE>> next) {
-          next.execPrepareLookup(SmartColumn2PrepareLookupChain.this, call, row);
+          next.execPrepareLookup(SmartColumnPrepareLookupChain.this, call, row);
         }
       };
       callChain(methodInvocation, call, row);
