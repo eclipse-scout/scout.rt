@@ -23,6 +23,10 @@ scout.TagFieldEnterKeyStroke.prototype._accept = function(event) {
   if (!accepted) {
     return false;
   }
+  // set the stopPropagation flag dynamically. While the user is typing we only want the field
+  // to apply the current displayText as tag, when the user presses ENTER. But when the displayText
+  // is empty, the ENTER key should propagate up to the form.
+  this.stopPropagation = scout.strings.hasText(this.field._readDisplayText());
   return this.field.isInputFocused();
 };
 
