@@ -79,9 +79,12 @@ scout.ListBox.prototype._syncValueToTable = function(newValue) {
   }
 
   this._valueSyncing = true;
+  var opts = {
+    checkOnlyEnabled: false
+  };
   try {
     if (scout.arrays.empty(newValue)) {
-      this.table.uncheckRows(this.table.rows);
+      this.table.uncheckRows(this.table.rows, opts);
     } else {
       // if lookup was not executed yet: do it now.
       var lookupScheduled = this._ensureLookupCallExecuted();
@@ -91,13 +94,13 @@ scout.ListBox.prototype._syncValueToTable = function(newValue) {
 
       var rowsToCheck = [];
 
-      this.table.uncheckRows(this.table.rows);
+      this.table.uncheckRows(this.table.rows, opts);
       this.table.rows.forEach(function(row) {
         if (scout.arrays.containsAny(newValue, row.lookupRow.key)) {
           rowsToCheck.push(row);
         }
       }, this);
-      this.table.checkRows(rowsToCheck);
+      this.table.checkRows(rowsToCheck, opts);
     }
 
     this._updateDisplayText();

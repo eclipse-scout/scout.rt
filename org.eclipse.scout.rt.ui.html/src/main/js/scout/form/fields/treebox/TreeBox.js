@@ -81,9 +81,12 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
   }
 
   this._valueSyncing = true;
+  var opts = {
+    checkOnlyEnabled: false
+  };
   try {
     if (scout.arrays.empty(newValue)) {
-      this.uncheckAll();
+      this.uncheckAll(opts);
     } else {
       // if lookup was not executed yet: do it now.
       var lookupScheduled = this._ensureLookupCallExecuted();
@@ -91,10 +94,10 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
         return; // was the first lookup: tree has no nodes yet. cancel sync. Will be executed again after lookup execution.
       }
 
-      this.uncheckAll();
+      this.uncheckAll(opts);
       scout.objects.values(this.tree.nodesMap).forEach(function(node) {
         if (scout.arrays.containsAny(newValue, node.id)) {
-          this.tree.checkNode(node);
+          this.tree.checkNode(node, true, opts);
         }
       }, this);
     }
@@ -105,10 +108,10 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
   }
 };
 
-scout.TreeBox.prototype.uncheckAll = function() {
+scout.TreeBox.prototype.uncheckAll = function(options) {
   for (var nodeId in this.tree.nodesMap) {
     if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
-      this.tree.uncheckNode(this.tree.nodesMap[nodeId]);
+      this.tree.uncheckNode(this.tree.nodesMap[nodeId], options);
     }
   }
 };

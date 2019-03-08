@@ -19,11 +19,11 @@ scout.inherits(scout.AnotherDummyLookupCall, scout.StaticLookupCall);
 
 scout.AnotherDummyLookupCall.prototype._data = function() {
   return [
-    [100, line.call(this, 'English'), 0],
-    [200, line.call(this, 'German'), 1],
-    [300, line.call(this, 'Italian'), 1],
-    [400, line.call(this, 'French'), 1],
-    [500, line.call(this, 'Swiss-German'), 1]
+    [100, line.call(this, 'English')],
+    [200, line.call(this, 'German')],
+    [300, line.call(this, 'Italian')],
+    [400, line.call(this, 'French')],
+    [500, line.call(this, 'Swiss-German')]
   ];
 
   function line(text) {
