@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.TargetLocator;
@@ -219,7 +220,7 @@ public abstract class AbstractSeleniumTest {
     variablePause(1);
     waitUntilDataRequestPendingDone();
 
-    inputField.clear();
+    clearInput(inputField);
     variablePause(2);
     waitUntilDataRequestPendingDone();
 
@@ -489,6 +490,33 @@ public abstract class AbstractSeleniumTest {
     return ctrlKey;
   }
 
+  /**
+   * Performs select all on the given element. Since command-key + A does not work with ChromeDriver on OSX we execute
+   * JavaScript on that platform. ChromeDriver developers don't seem to be motivated to fix that bug.
+   *
+   * @see https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
+   */
+  public void selectAll(WebElement element) {
+    if (SeleniumUtil.isMacOS()) {
+      ((JavascriptExecutor) getDriver()).executeScript("arguments[0].select();", element);
+    }
+    else {
+      element.sendKeys(getSelectAllKeys());
+    }
+  }
+
+  public CharSequence getSelectAllKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "a");
+  }
+
+  public CharSequence getCopyKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "c");
+  }
+
+  public CharSequence getPasteKeys() {
+    return Keys.chord(getOsDependentCtrlKey(), "v");
+  }
+
   public void doubleClickOnElement(WebElement element) {
     Actions actions = new Actions(getDriver());
     actions.moveToElement(element).doubleClick().perform();
@@ -550,15 +578,30 @@ public abstract class AbstractSeleniumTest {
     });
   }
 
-  /**
-   * Same as WebElement.clear, but triggers input and key up/down events (which clear does not). The methods simply
-   * calls clear, write 'a' and clears it again by sending an additional key press event for BACKSPACE. Ctrl-a delete
-   * would be more appropriate but os x seems to have problems with that (even if getOsDependentCtrlKey() is used).
-   */
   public void clearInput(WebElement input) {
-    input.clear();
-    input.sendKeys("a");
+    this.clearInput(input, false);
+  }
+
+  /**
+   * Used as a replacement for WebElement#clear. Google changed the way clear() works in ChromeDriver > 2.43 and the
+   * method now causes the field to loose focus, which triggers a lot of focus-out handlers that haven't called before
+   * version 2.43. Thus this method works with 'select all' and backspace. Additionally it also triggers key/up down
+   * events which is also a desired side-effect of this method (clear() does not trigger key events).
+   * <p>
+   * Note: you can still use WebElement#clear if focus loss doesn't matter. But for a lot of widgets, especially
+   * SmartFields it makes a difference.
+   *
+   * @param input
+   * @param withPause
+   *          whether or not a short pause should be made after the field has been cleared, this may be necessary for
+   *          some SmartFields
+   */
+  public void clearInput(WebElement input, boolean withPause) {
+    selectAll(input);
     input.sendKeys(Keys.BACK_SPACE);
+    if (withPause) {
+      SeleniumUtil.shortPause();
+    }
   }
 
   /**
