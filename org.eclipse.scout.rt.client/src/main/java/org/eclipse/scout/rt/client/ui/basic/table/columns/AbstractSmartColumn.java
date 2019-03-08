@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ISmartColumnExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.SmartColumnChains.SmartColumn2PrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.SmartColumnChains.SmartColumnPrepareLookupChain;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -68,7 +68,7 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   @Override
   protected ISmartColumnExtension<VALUE, ? extends AbstractSmartColumn<VALUE>> createLocalExtension() {
-    return new LocalSmartColumn2Extension<>(this);
+    return new LocalSmartColumnExtension<>(this);
   }
 
   @Override
@@ -480,19 +480,19 @@ public abstract class AbstractSmartColumn<VALUE> extends AbstractColumn<VALUE> i
 
   protected final void interceptPrepareLookup(ILookupCall<VALUE> call, ITableRow row) {
     List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
-    SmartColumn2PrepareLookupChain<VALUE> chain = new SmartColumn2PrepareLookupChain<>(extensions);
+    SmartColumnPrepareLookupChain<VALUE> chain = new SmartColumnPrepareLookupChain<>(extensions);
     chain.execPrepareLookup(call, row);
   }
 
-  protected static class LocalSmartColumn2Extension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends LocalColumnExtension<VALUE, OWNER>
+  protected static class LocalSmartColumnExtension<VALUE, OWNER extends AbstractSmartColumn<VALUE>> extends LocalColumnExtension<VALUE, OWNER>
       implements ISmartColumnExtension<VALUE, OWNER> {
 
-    public LocalSmartColumn2Extension(OWNER owner) {
+    public LocalSmartColumnExtension(OWNER owner) {
       super(owner);
     }
 
     @Override
-    public void execPrepareLookup(SmartColumn2PrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row) {
+    public void execPrepareLookup(SmartColumnPrepareLookupChain<VALUE> chain, ILookupCall<VALUE> call, ITableRow row) {
       getOwner().execPrepareLookup(call, row);
     }
 
