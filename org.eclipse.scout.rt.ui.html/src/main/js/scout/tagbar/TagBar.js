@@ -51,6 +51,12 @@ scout.TagBar.prototype.setTags = function(tags) {
   this.setProperty('tags', tags);
 };
 
+scout.TagBar.prototype.updateTags = function() {
+  if (this.rendered) {
+    this._renderTags();
+  }
+};
+
 /**
  * This function is also used by sub- and friend-classes like the TagOverflowPopup.
  */
