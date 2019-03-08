@@ -625,7 +625,7 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
 
     // change css of dragged header
     $header.addClass('moving');
-    that.$container.addClass('moving');
+    that.$container && that.$container.addClass('moving');
 
     // move dragged header
     $header.css('left', diff);
@@ -651,7 +651,7 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
     }
 
     // Don't show tooltips while dragging
-    that._uninstallHeaderItemTooltips();
+    that.rendered && that._uninstallHeaderItemTooltips();
   }
 
   function realWidth($div) {
@@ -671,7 +671,7 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
   }
 
   function dragEnd(event) {
-    that._$window.off('mousemove.tableheader');
+    that._$window && that._$window.off('mousemove.tableheader');
 
     // in case of no movement: return
     if (!that.dragging) {
@@ -704,10 +704,10 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
     });
 
     $header.removeClass('moving');
-    that.$container.removeClass('moving');
+    that.$container && that.$container.removeClass('moving');
 
     // Reinstall tooltips
-    that._installHeaderItemTooltips();
+    that.rendered && that._installHeaderItemTooltips();
   }
 };
 
@@ -745,10 +745,10 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
   // Install resize helpers. Those helpers make sure the header and the data element keep their
   // current width until the resizing has finished. Otherwise, make a column smaller while the
   // table has been horizontally scrolled to the right would behave very strange.
-  this.$headerColumnResizedHelper = this.$container
+  var $headerColumnResizedHelper = this.$container
     .appendDiv('table-column-resize-helper')
     .css('width', this.table.rowWidth + this.table.rowBorderWidth);
-  this.$dataColumnResizedHelper = this.table.$data
+  var $dataColumnResizedHelper = this.table.$data
     .appendDiv('table-column-resize-helper')
     .css('width', this.table.rowWidth);
 
@@ -765,7 +765,7 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
       wHeader = headerWidth + diff;
 
     wHeader = Math.max(wHeader, column.minWidth);
-    if (wHeader !== column.width) {
+    if (that.rendered && wHeader !== column.width) {
       that.table.resizeColumn(column, wHeader);
     }
   }
@@ -774,15 +774,13 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
     delete column.resizingInProgress;
 
     // Remove resize helpers
-    that.$headerColumnResizedHelper.remove();
-    that.$headerColumnResizedHelper = null;
-    that.$dataColumnResizedHelper.remove();
-    that.$dataColumnResizedHelper = null;
+    $headerColumnResizedHelper.remove();
+    $dataColumnResizedHelper.remove();
 
-    that._$window.off('mousemove.tableheader');
-    that._$body.removeClass('col-resize');
+    that._$window && that._$window.off('mousemove.tableheader');
+    that._$body && that._$body.removeClass('col-resize');
 
-    if (column.width !== headerWidth) {
+    if (that.rendered && column.width !== headerWidth) {
       that.table.resizeColumn(column, column.width);
     }
   }
