@@ -168,14 +168,14 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
   IFuture<HttpCacheObject> scheduleBuildScriptFile(HttpCacheKey key) {
     synchronized (m_pendingScriptFiles) {
       IFuture<HttpCacheObject> feature = Jobs.schedule(new RecompileLess(key), Jobs.newInput()
-          .withName("Recompile less '" + key.getResourcePath() + "'"));
+          .withName("Recompile scriptfile."));
       m_pendingScriptFiles.put(key, feature);
       return feature;
     }
   }
 
   protected void scheduleRebuildJsFiles() {
-    LOG.info("Rebuild all js files in development cache.");
+    LOG.debug("Rebuild all js files in development cache.");
     synchronized (m_rebuildJsLock) {
       if (m_rebuildJsFuture != null) {
         m_rebuildJsFuture.cancel(false);
@@ -208,7 +208,7 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
   }
 
   protected void scheduleRebuildStylesheets() {
-    LOG.info("Rebuild all stylesheets files in development cache.");
+    LOG.debug("Rebuild all stylesheets files in development cache.");
     synchronized (m_rebuildStypesheetLock) {
       if (m_rebuildStypesheetFuture != null) {
         m_rebuildStypesheetFuture.cancel(false);

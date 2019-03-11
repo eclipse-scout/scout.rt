@@ -144,7 +144,7 @@ public abstract class AbstractClasspathFileWatch {
     }
   }
 
-  protected void unregisterDirectory(WatchKey key, Path directory) throws IOException {
+  protected void unregisterDirectory(WatchKey key, Path directory) {
     try {
       m_watchKeyReadWriteLock.writeLock().lock();
       m_watchKeys.remove(key);
