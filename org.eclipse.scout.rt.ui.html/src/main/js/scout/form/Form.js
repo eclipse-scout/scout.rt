@@ -818,8 +818,7 @@ scout.Form.prototype.setDisplayParent = function(displayParent) {
 };
 
 scout.Form.prototype._setDisplayParent = function(displayParent) {
-  var rootForm = scout.Form.findNonWrappedForm(displayParent);
-  if (rootForm && rootForm.isView()) {
+  if (displayParent instanceof scout.Form && displayParent.parent instanceof scout.WrappedFormField && displayParent.isView()) {
     displayParent = scout.Form.findNonWrappedForm(displayParent);
   }
   this._setProperty('displayParent', displayParent);
