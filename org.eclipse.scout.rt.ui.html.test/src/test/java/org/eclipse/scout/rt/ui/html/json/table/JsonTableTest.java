@@ -790,7 +790,7 @@ public class JsonTableTest {
   public void testRowFilterMustNotConvertToDuplicateInserts() throws Exception {
     TableWith3Cols table = new TableWith3Cols();
     table.fill(1);
-    table.initTable();
+    table.init();
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Filter the first row
