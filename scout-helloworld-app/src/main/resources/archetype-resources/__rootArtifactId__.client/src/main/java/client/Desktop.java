@@ -70,8 +70,8 @@ public class Desktop extends AbstractDesktop {
   }
 
   protected void onThemeChanged(PropertyChangeEvent evt) {
-    IMenu darkMenu = getMenu(DarkThemeMenu.class);
-    IMenu defaultMenu = getMenu(DefaultThemeMenu.class);
+    IMenu darkMenu = getMenuByClass(DarkThemeMenu.class);
+    IMenu defaultMenu = getMenuByClass(DefaultThemeMenu.class);
     String newThemeName = (String) evt.getNewValue();
     if (DarkThemeMenu.DARK_THEME.equalsIgnoreCase(newThemeName)) {
       darkMenu.setIconId(Icons.CheckedBold);
