@@ -122,9 +122,9 @@ scout.PageWithTable.prototype.loadTableData = function() {
   this.detailTable.deleteAllRows();
   this.detailTable.setLoading(true);
   return this._loadTableData()
-    .done(this._onLoadTableDataDone.bind(this))
-    .fail(this._onLoadTableDataFail.bind(this))
-    .always(this._onLoadTableDataAlways.bind(this));
+    .then(this._onLoadTableDataDone.bind(this))
+    .catch(this._onLoadTableDataFail.bind(this))
+    .then(this._onLoadTableDataAlways.bind(this));
 };
 
 /**
