@@ -230,18 +230,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    */
   void setParentFieldInternal(ICompositeField f);
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initField();
-
-  /**
-   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
-   */
-  @Deprecated
-  void disposeField();
-
   void setView(boolean visible, boolean enabled, boolean mandatory);
 
   /**
@@ -392,12 +380,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * @return fully qualified label. This is the path in the container tree
    */
   String getFullyQualifiedLabel(String separator);
-
-  /**
-   * @deprecated will be removed with 8.0, use {@link #isInitConfigDone()} instead
-   */
-  @Deprecated
-  boolean isInitialized();
 
   boolean isMandatory();
 

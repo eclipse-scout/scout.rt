@@ -1589,16 +1589,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     interceptInitForm();
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public void initForm() {
-    init();
-  }
-
   protected void initFormInternal() {
     calculateSaveNeeded();
   }

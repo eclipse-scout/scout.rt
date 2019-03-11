@@ -242,18 +242,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_TRUNCATED_CELL_TOOLTIP_ENABLED = "truncatedCellTooltipEnabled";
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initTable();
-
-  /**
-   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
-   */
-  @Deprecated
-  void disposeTable();
-
-  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TableEvent> createEventBuffer();
@@ -646,8 +634,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   void setTableChanging(boolean b);
 
   boolean isTableChanging();
-
-  boolean isTableInitialized();
 
   void setRowState(ITableRow row, int rowState);
 

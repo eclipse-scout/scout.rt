@@ -115,16 +115,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     interceptInitAction();
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void initAction() {
-    init();
-  }
-
   /*
    * Configuration
    */

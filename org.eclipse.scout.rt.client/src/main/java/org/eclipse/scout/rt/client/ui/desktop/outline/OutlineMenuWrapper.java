@@ -198,12 +198,6 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
     // NOP
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void initAction() {
-    init();
-  }
-
   @Override
   protected void disposeInternal() {
     m_wrappedMenu.removePropertyChangeListener(m_wrappedMenuPropertyChangeListener);

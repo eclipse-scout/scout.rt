@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 /**
  * @since 1.0.9 16.07.2008
  */
-// TODO [8.0] PBZ remove PROP_COLLAPSE_KEY_STROKE and according deprecated methods
 public interface ISplitBox extends ICompositeField {
 
   String PROP_SPLITTER_ENABLED = "splitterEnabled";
@@ -27,11 +26,6 @@ public interface ISplitBox extends ICompositeField {
   String PROP_COLLAPSIBLE_FIELD = "collapsibleField";
   String PROP_FIELD_COLLAPSED = "fieldCollapsed";
   String PROP_TOGGLE_COLLAPSE_KEY_STROKE = "toggleCollapseKeyStroke";
-  /**
-   * @deprecated use {@link #PROP_TOGGLE_COLLAPSE_KEY_STROKE} instead, property will be removed with Scout 8.0.
-   */
-  @Deprecated
-  String PROP_COLLAPSE_KEY_STROKE = PROP_TOGGLE_COLLAPSE_KEY_STROKE;
   String PROP_FIRST_COLLAPSE_KEY_STROKE = "firstCollapseKeyStroke";
   String PROP_SECOND_COLLAPSE_KEY_STROKE = "secondCollapseKeyStroke";
   String PROP_FIELD_MINIMIZED = "fieldMinimized";
@@ -120,8 +114,9 @@ public interface ISplitBox extends ICompositeField {
   boolean isMinimizeEnabled();
 
   /**
-   * Sets if the collapsible field (@see {@link #getCollapsibleField()}) has a minimized field state. If set to {@code false},
-   * only the collapsed state will be available. In this case {@link #setFieldMinimized(boolean)} will have not effect.
+   * Sets if the collapsible field (@see {@link #getCollapsibleField()}) has a minimized field state. If set to
+   * {@code false}, only the collapsed state will be available. In this case {@link #setFieldMinimized(boolean)} will
+   * have not effect.
    */
   void setMinimizeEnabled(boolean enabled);
 
@@ -188,24 +183,6 @@ public interface ISplitBox extends ICompositeField {
    * @since 6.0
    */
   boolean isFieldCollapsed();
-
-  /**
-   * Sets the key-stroke used to trigger the collapse button.
-   *
-   * @since 6.0
-   * @deprecated use {@link #setToggleCollapseKeyStroke(String)} instead, code will be removed with Scout 8.0.
-   */
-  @Deprecated
-  void setCollapseKeyStroke(String keyStroke);
-
-  /**
-   * Returns the key-stroke used to trigger the collapse button.
-   *
-   * @since 6.0
-   * @deprecated use {@link #getToggleCollapseKeyStroke()} instead, code will be removed with Scout 8.0.
-   */
-  @Deprecated
-  String getCollapseKeyStroke();
 
   /**
    * Sets the key-stroke used to toggle the field collapsed mode.

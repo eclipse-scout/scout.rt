@@ -235,12 +235,6 @@ public interface ITreeNode extends IVisibleDimension, IEnabledDimension, IContex
 
   void setLazyExpandingEnabled(boolean lazyExpandingEnabled);
 
-  /**
-   * @deprecated Will be removed in Scout 8.0. use {@link #getMenuByClass(Class)} instead.
-   */
-  @Deprecated
-  <T extends IMenu> T getMenu(Class<T> menuType);
-
   void setMenus(List<? extends IMenu> a);
 
   /**

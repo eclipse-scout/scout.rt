@@ -17,7 +17,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
 import org.eclipse.scout.rt.client.ui.Coordinates;
-import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopTest.P_CheckSaveTestForm.MainBox.MessageField;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -65,7 +63,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-@SuppressWarnings("deprecation")
 @RunWith(ClientTestRunner.class)
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
@@ -384,12 +381,7 @@ public class AbstractDesktopTest {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     final HashSet<Object> resultHolder = new HashSet<>();
-    desktop.addDataChangeListener(new DataChangeListener() {
-      @Override
-      public void dataChanged(Object... dataTypes) {
-        resultHolder.addAll(Arrays.asList(dataTypes));
-      }
-    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeListener(e -> resultHolder.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
     desktop.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
@@ -423,12 +415,7 @@ public class AbstractDesktopTest {
     TestEnvironmentDesktop desktop = (TestEnvironmentDesktop) IDesktop.CURRENT.get();
 
     final HashSet<Object> resultHolder = new HashSet<>();
-    desktop.addDataChangeListener(new DataChangeListener() {
-      @Override
-      public void dataChanged(Object... dataTypes) {
-        resultHolder.addAll(Arrays.asList(dataTypes));
-      }
-    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    desktop.addDataChangeListener(e -> resultHolder.add(e.getDataType()), TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
 
     desktop.setDataChanging(true);
     desktop.dataChanged(TEST_DATA_TYPE_1);

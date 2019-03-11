@@ -59,12 +59,6 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   int KEYSTROKE_FIRE_POLICY_ALWAYS = 1;
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initAction();
-
-  /**
    * called to perform action
    */
   void doAction();

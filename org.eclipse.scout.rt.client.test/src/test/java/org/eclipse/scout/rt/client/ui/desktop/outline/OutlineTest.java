@@ -54,7 +54,7 @@ public class OutlineTest {
     o.firePageChanged(mock(IPage.class));
     o.fireAfterTableInit(mock(IPage.class)); // unbuffered
     o.setTreeChanging(false);
-    o.disposeTree(); // fires afterDispose event, is sent as buffered event but since tree isn't changing anymore no buffering is applied
+    o.dispose(); // fires afterDispose event, is sent as buffered event but since tree isn't changing anymore no buffering is applied
 
     // check number and order of unbuffered events fired during the treeChanging period
     Stack<? extends TreeEvent> firedEvents = listener.getUnbufferedEvents();
@@ -95,7 +95,7 @@ public class OutlineTest {
 
     IForm form = o.getDefaultDetailForm();
 
-    o.disposeTree();
+    o.dispose();
     assertNull("DefaultDetailForm should be null", o.getDefaultDetailForm());
     assertTrue("DefaultDetailForm should have been closed", form.isFormClosed());
   }

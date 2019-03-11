@@ -274,23 +274,6 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
 
   void setSelectionKeyStroke(String keystroke);
 
-  /**
-   * @see IGroupBox#setMinWidthInPixel(int)
-   * @deprecated will be removed with 8.0, use {@link #getBodyLayoutConfig()} instead
-   */
-  @Deprecated
-  int getMinWidthInPixel();
-
-  /**
-   * Setter for {@link AbstractGroupBox#getConfiguredMinWidthInPixel()}
-   * <p>
-   * Only changes made before the groupbox is rendered have an effect.
-   *
-   * @deprecated will be removed with 8.0, use {@link #setBodyLayoutConfig(LogicalGridLayoutConfig)} instead
-   */
-  @Deprecated
-  void setMinWidthInPixel(int minWidthInPixel);
-
   IGroupBoxUIFacade getUIFacade();
 
   /**

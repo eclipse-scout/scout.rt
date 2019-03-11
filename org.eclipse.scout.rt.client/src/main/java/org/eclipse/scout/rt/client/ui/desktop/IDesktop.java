@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -182,12 +181,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   String DISPLAY_STYLE_COMPACT = "compact";
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initDesktop();
-
-  /**
    * Returns the first {@link Form} which is of the given type or a sub type of the given type.
    */
   <T extends IForm> T findForm(Class<T> formType);
@@ -203,12 +196,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   <T extends IOutline> T findOutline(Class<T> outlineType);
 
   <T extends IAction> T findAction(Class<T> actionType);
-
-  /**
-   * @deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
-   */
-  @Deprecated
-  <T extends IMenu> T findMenu(Class<T> menuType);
 
   /**
    * Convenience alias for {@link #findAction(Class)}
@@ -462,16 +449,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
     desktopListeners().addLastCalled(listener, false, eventTypes);
   }
 
-  /**
-   * add Model Observer as last informed listener.
-   *
-   * @deprecated use {@link #addUIDesktopListener(DesktopListener, int...)}
-   */
-  @Deprecated
-  default void addDesktopListenerAtExecutionEnd(DesktopListener listener) {
-    addUIDesktopListener(listener);
-  }
-
   IDataChangeManager dataChangeListeners();
 
   IDataChangeManager dataChangeDesktopInForegroundListeners();
@@ -540,12 +517,6 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
    * Unload and release unused pages in all outlines, such as closed and non-selected nodes
    */
   void releaseUnusedPages();
-
-  /**
-   * @deprecated Will be removed with Scout 8.0. Use {@link #getMenuByClass(Class)} instead.
-   */
-  @Deprecated
-  <T extends IMenu> T getMenu(Class<? extends T> searchType);
 
   /**
    * @return all actions including keyStroke, menu, toolButton and viewButton

@@ -125,12 +125,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
   void init();
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initForm();
-
-  /**
    * This method is called to get an exclusive key of the form. The key is used to open the same form with the same
    * handler only once. Obviously this behavior can only be used for view forms.
    *

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
 import java.util.EventListener;
-import java.util.List;
 
 /**
  * @see TreeAdapter
@@ -20,19 +19,4 @@ import java.util.List;
 public interface TreeListener extends EventListener {
 
   void treeChanged(TreeEvent e);
-
-  /**
-   * batch event for fast processing of batch changes
-   *
-   * @deprecated in order for better performance the most efficient way is to only register for the events that are
-   *             really handled. see the vararg parameter to {@link ITree#addTreeListener(TreeListener, int...)}
-   *             <p>
-   *             This method will be removed in 9.x
-   */
-  @Deprecated
-  default void treeChangedBatch(List<? extends TreeEvent> events) {
-    for (TreeEvent event : events) {
-      treeChanged(event);
-    }
-  }
 }

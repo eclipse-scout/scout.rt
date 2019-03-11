@@ -723,16 +723,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal());
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void initTree() {
-    init();
-  }
-
   protected void initTreeInternal() {
   }
 
@@ -746,12 +736,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
       LOG.warn("Exception while disposing tree", e);
     }
     super.disposeInternal();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void disposeTree() {
-    dispose();
   }
 
   protected void disposeTreeInternal() {

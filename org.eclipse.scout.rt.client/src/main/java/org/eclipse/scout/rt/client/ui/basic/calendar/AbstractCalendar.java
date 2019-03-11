@@ -330,16 +330,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     updateComponentsInternal(m_providers);
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public void initCalendar() {
-    init();
-  }
-
   protected void disposeCalendarInternal() {
     for (ICalendarItemProvider p : m_providers) {
       try {
@@ -361,12 +351,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
       LOG.warn("Exception while disposing calendar", e);
     }
     super.disposeInternal();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void disposeCalendar() {
-    dispose();
   }
 
   @Override

@@ -54,12 +54,11 @@ public class PageFieldTest {
     Mockito.verify(searchFormMock, Mockito.times(0)).disposeFormInternal();
     assertEquals(0, pageDisposedCount.getValue().intValue());
 
-    pageField.disposeField();
+    pageField.dispose();
     Mockito.verify(searchFormMock, Mockito.times(1)).disposeFormInternal();
     assertEquals(1, pageDisposedCount.getValue().intValue());
   }
 
   public static class PageField extends AbstractPageField<IPage> {
   }
-
 }

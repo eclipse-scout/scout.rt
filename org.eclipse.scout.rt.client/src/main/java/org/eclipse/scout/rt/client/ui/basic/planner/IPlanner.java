@@ -84,18 +84,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   int SELECTION_MODE_SINGLE_RANGE = 1;
   int SELECTION_MODE_MULTI_RANGE = 2;
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initPlanner();
-
-  /**
-   * @deprecated will be removed with 8.0, use {@link #dispose()} instead
-   */
-  @Deprecated
-  void disposePlanner();
-
   IFastListenerList<PlannerListener> plannerListeners();
 
   default void addPlannerListener(PlannerListener listener) {
@@ -164,27 +152,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   boolean isActivitySelectable();
 
   void setActivitySelectable(boolean selectable);
-
-  /**
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @Deprecated
-  long getMinimumActivityDuration();
-
-  /**
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @Deprecated
-  void setMinimumActivityDuration(long minDuration);
-
-  /**
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @Deprecated
-  void setMinimumActivityDurationInMinutes(long min);
 
   Range<Date> getSelectionRange();
 

@@ -63,7 +63,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
 
   private FastListenerList<PlannerListener> m_listenerList;
   private IPlannerUIFacade m_activityMapUIFacade;
-  private long m_minimumActivityDuration;// millis
   private final List<Resource<RI>> m_resources;
   private List<Resource<RI>> m_selectedResources = new ArrayList<>();
   private int m_tableChanging;
@@ -146,10 +145,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
         IPlannerDisplayMode.WORK_WEEK,
         IPlannerDisplayMode.CALENDAR_WEEK,
         IPlannerDisplayMode.YEAR);
-  }
-
-  protected long getConfiguredMinimumActivityDuration() {
-    return 1800000L;
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -279,7 +274,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     setHeaderVisible(getConfiguredHeaderVisible());
     setSelectionMode(getConfiguredSelectionMode());
     setActivitySelectable(getConfiguredActivitySelectable());
-    setMinimumActivityDuration(getConfiguredMinimumActivityDuration());
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<>();
@@ -404,16 +398,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     interceptInitPlanner();
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void initPlanner() {
-    init();
-  }
-
   protected void initPlannerInternal() {
     // NOP
   }
@@ -428,12 +412,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
       LOG.warn(getClass().getName(), t);
     }
     super.disposeInternal();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void disposePlanner() {
-    dispose();
   }
 
   protected void disposePlannerInternal() {
@@ -791,40 +769,6 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
         }
       }
     }
-  }
-
-  /**
-   * @deprecated
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public long getMinimumActivityDuration() {
-    return m_minimumActivityDuration;
-  }
-
-  /**
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setMinimumActivityDuration(long minDuration) {
-    m_minimumActivityDuration = minDuration;
-  }
-
-  /**
-   * @deprecated will be removed with 8.0 because it is not used. You may use
-   *             {@link DisplayModeOptions#getMinSelectionIntervalCount} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setMinimumActivityDurationInMinutes(long min) {
-    setMinimumActivityDuration(min * 60000L);
   }
 
   @Override

@@ -82,18 +82,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   String PROP_CONTEXT_MENU = "contextMenu";
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()} or {@link #reinit()} instead
-   */
-  @Deprecated
-  void initTree();
-
-  /**
-   * @deprecated will be removed with 8.0,u se {@link #dispose()} instead
-   */
-  @Deprecated
-  void disposeTree();
-
-  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TreeEvent> createEventBuffer();

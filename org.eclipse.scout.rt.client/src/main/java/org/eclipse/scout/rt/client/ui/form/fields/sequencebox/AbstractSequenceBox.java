@@ -93,16 +93,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   }
 
   /**
-   * @deprecated This property had no effect and can be deleted. This method will be removed in Scout 9.0.
-   */
-  @Order(210)
-  @Deprecated
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  protected boolean getConfiguredEqualColumnWidths() {
-    return false;
-  }
-
-  /**
    * Configures the layout hints.
    * <p>
    * The hints are set to -1 by default which means the values will be set by the UI.
@@ -206,7 +196,6 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     m_grid = new SequenceBoxGrid();
     super.initConfig();
     setAutoCheckFromTo(getConfiguredAutoCheckFromTo());
-    setEqualColumnWidths(getConfiguredEqualColumnWidths());
     setLayoutConfig(getConfiguredLayoutConfig());
     // when range box has visible label, suppress first field's label and append
     // to own label
@@ -280,20 +269,9 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return valueFieldList;
   }
 
-/*
- * Runtime
- */
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean isEqualColumnWidths() {
-    return true;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setEqualColumnWidths(boolean b) {
-  }
+  /*
+   * Runtime
+   */
 
   @Override
   public LogicalGridLayoutConfig getLayoutConfig() {

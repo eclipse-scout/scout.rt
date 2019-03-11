@@ -1220,16 +1220,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void initTable() {
-    init();
-  }
-
   protected void initTableInternal() {
     initColumnsInternal();
     if (getUserFilterManager() == null) {
@@ -1247,12 +1237,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       LOG.error("Could not dispose table [{}]", getClass().getName(), e);
     }
     super.disposeInternal();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void disposeTable() {
-    dispose();
   }
 
   protected void disposeTableInternal() {
@@ -1696,15 +1680,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setAutoDiscardOnDelete(boolean on) {
     m_flags = FLAGS_BIT_HELPER.changeBit(AUTO_DISCARD_ON_DELETE, on, m_flags);
-  }
-
-  /**
-   * @deprecated will be removed with 8.0, use {@link #isInitDone()} instead
-   */
-  @Override
-  @Deprecated
-  public boolean isTableInitialized() {
-    return isInitDone();
   }
 
   @Override

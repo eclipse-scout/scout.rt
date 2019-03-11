@@ -901,16 +901,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #isInitConfigDone()} instead
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public boolean isInitialized() {
-    return isInitConfigDone();
-  }
-
-  /**
    * Searching the nearest field implementing the specified class by processing the enclosing field list bottom-up.
    *
    * @since 3.8.1
@@ -1006,16 +996,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return nextFormFieldCollector;
   }
 
-  /**
-   * @deprecated will be removed with 8.0, use {@link #init()} {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void initField() {
-    init();
-  }
-
   protected void initFieldInternal() {
     checkSaveNeeded();
     checkEmpty();
@@ -1040,12 +1020,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   protected void disposeFieldInternal() {
     // nop
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public final void disposeField() {
-    dispose();
   }
 
   /**

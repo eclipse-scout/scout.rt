@@ -737,12 +737,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public <T extends IMenu> T getMenu(Class<T> menuType) {
-    return getMenuByClass(menuType);
-  }
-
-  @Override
   public void setMenus(List<? extends IMenu> menus) {
     m_menus = CollectionUtility.arrayListWithoutNullElements(menus);
   }

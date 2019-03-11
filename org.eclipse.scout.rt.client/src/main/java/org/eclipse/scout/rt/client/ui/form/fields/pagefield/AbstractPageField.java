@@ -71,7 +71,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
   @Override
   protected void disposeFieldInternal() {
     if (m_outline != null) {
-      m_outline.disposeTree();
+      m_outline.dispose();
     }
     super.disposeFieldInternal();
   }
@@ -95,7 +95,7 @@ public abstract class AbstractPageField<PAGE extends IPage> extends AbstractGrou
     getTableField().setTable(null, true);
     getSearchFormField().setInnerForm(null);
     if (m_page != null) {
-      m_outline.disposeTree();
+      m_outline.dispose();
       m_outline = null;
       m_page = null;
     }

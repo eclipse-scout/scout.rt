@@ -111,7 +111,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(215)
   protected LogicalGridLayoutConfig getConfiguredBodyLayoutConfig() {
-    return new LogicalGridLayoutConfig().withMinWidth(getConfiguredMinWidthInPixel());
+    return new LogicalGridLayoutConfig();
   }
 
   /**
@@ -278,21 +278,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   protected int getConfiguredGridW() {
     return FULL_WIDTH;
-  }
-
-  /**
-   * Sets the threshold for displaying a horizontal scrollbar. When set to 0 the groupbox is not scrollable in
-   * horizontal direction.
-   * <p>
-   * Default is 0.
-   *
-   * @deprecated will be removed with 8.0, use {@link #getConfiguredBodyLayoutConfig()} instead
-   */
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(290)
-  @Deprecated
-  protected int getConfiguredMinWidthInPixel() {
-    return 0;
   }
 
   /**
@@ -650,18 +635,6 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
   @Override
   public void setBorderVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_BORDER_VISIBLE, b);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public int getMinWidthInPixel() {
-    return getBodyLayoutConfig().getMinWidth();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setMinWidthInPixel(int minWidthInPixel) {
-    setBodyLayoutConfig(getBodyLayoutConfig().copy().withMinWidth(minWidthInPixel));
   }
 
   @Override

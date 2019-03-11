@@ -343,12 +343,6 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
-  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
-    throw createUnsupportedOperationException();
-  }
-
-  @Override
   public boolean isShowing(IMessageBox messageBox) {
     throw createUnsupportedOperationException();
   }
@@ -535,12 +529,6 @@ public class VirtualDesktop implements IDesktop {
 
   @Override
   public boolean isDisposeDone() {
-    throw createUnsupportedOperationException();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void initDesktop() {
     throw createUnsupportedOperationException();
   }
 
@@ -747,12 +735,6 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public boolean isHeaderVisible() {
     return false;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T extends IMenu> T findMenu(Class<T> menuType) {
-    return null;
   }
 
   @Override

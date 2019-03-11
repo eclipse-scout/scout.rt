@@ -159,7 +159,7 @@ public class AbstractTreeTest {
 
   @Test
   public void testDisposeTree() {
-    m_tree.disposeTree();
+    m_tree.dispose();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 
@@ -169,7 +169,7 @@ public class AbstractTreeTest {
     assertNotDisposed(m_node1, m_node2, m_node1Menu1);
     assertDisposed(m_subNode1, m_subNode1Menu1, m_subNode1Menu2);
 
-    m_tree.disposeTree();
+    m_tree.dispose();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 
@@ -179,7 +179,7 @@ public class AbstractTreeTest {
     assertNotDisposed(m_node1, m_node1Menu1);
     assertDisposed(m_node2, m_subNode1, m_subNode1Menu1, m_subNode1Menu2);
 
-    m_tree.disposeTree();
+    m_tree.dispose();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 
@@ -189,7 +189,7 @@ public class AbstractTreeTest {
     m_tree.removeNode(m_node2);
     assertNotDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
 
-    m_tree.disposeTree();
+    m_tree.dispose();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 
@@ -204,7 +204,7 @@ public class AbstractTreeTest {
     assertNotDisposed(m_node1, m_node1Menu1);
     assertDisposed(m_node2, m_subNode1, m_subNode1Menu1, m_subNode1Menu2);
 
-    m_tree.disposeTree();
+    m_tree.dispose();
     assertDisposed(m_node1, m_node2, m_subNode1, m_node1Menu1, m_subNode1Menu1, m_subNode1Menu2);
   }
 

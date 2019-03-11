@@ -95,14 +95,6 @@ public final class CompositeFieldUtility {
     movedFormFieldsByClass.put(f.getClass(), f);
   }
 
-  /**
-   * @deprecated Will be removed in Scout 10. Use {@link #getWidgetByClass(IWidget, Class)} instead.
-   */
-  @Deprecated
-  public static <T extends IFormField> T getFieldByClass(ICompositeField compositeField, final Class<T> formFieldClass) {
-    return getWidgetByClass(compositeField, formFieldClass);
-  }
-
   public static <T extends IWidget> T getWidgetByClass(final IWidget widget, final Class<T> classToFind) {
     assertNotNull(widget);
     assertNotNull(classToFind);

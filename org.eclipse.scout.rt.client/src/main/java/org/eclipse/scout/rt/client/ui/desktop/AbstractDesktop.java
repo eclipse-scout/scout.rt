@@ -708,16 +708,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   /**
-   * @deprecated will be removed with 8.0, use {@link #init()}, {@link #reinit()} or {@link #initInternal()} instead
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  @Override
-  public void initDesktop() {
-    init();
-  }
-
-  /**
    * Applies values to the following properties, based on the given displayStyle: <i>navigationVisible</i>,
    * <i>navigationHandleVisible</i>, <i>headerVisible</i>, <i>benchVisible</i>, <i>dense</i>.
    */
@@ -824,12 +814,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public <T extends IAction> T findAction(Class<T> actionType) {
     return new ActionFinder().findAction(getActions(), actionType);
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T extends IMenu> T findMenu(Class<T> menuType) {
-    return findAction(menuType);
   }
 
   @Override
@@ -1384,12 +1368,6 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
       }
       setKeyStrokes(map.values());
     }
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public <T extends IMenu> T getMenu(Class<? extends T> searchType) {
-    return getMenuByClass(searchType);
   }
 
   @Override
