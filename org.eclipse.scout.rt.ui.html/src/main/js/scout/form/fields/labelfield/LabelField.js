@@ -38,6 +38,15 @@ scout.LabelField.prototype._renderProperties = function() {
   // TODO [7.0] cgu: render selectable
 };
 
+/**
+ * Since a LabelField cannot be changed by a user, acceptInput does nothing.
+ * Otherwise LabelFields could 'become' touched, because value and displayText
+ * of the LabelField don't match.
+ */
+scout.LabelField.prototype.acceptInput = function() {
+  // NOP
+};
+
 scout.LabelField.prototype.setHtmlEnabled = function(htmlEnabled) {
   this.setProperty('htmlEnabled', htmlEnabled);
 };
