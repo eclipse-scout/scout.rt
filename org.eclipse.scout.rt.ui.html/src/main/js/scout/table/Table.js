@@ -4376,6 +4376,11 @@ scout.Table.prototype._renderViewport = function() {
   if (this.visibleColumns().length === 0) {
     return;
   }
+  if (!this.$container.isEveryParentVisible()) {
+    // If the table is invisible, the height of the rows cannot be determined.
+    // In that case, the table won't be layouted either -> as soon as it will be layouted, renderViewport will be called again
+    return;
+  }
   var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
 };

@@ -2410,4 +2410,34 @@ describe("Tree", function() {
 
   });
 
+  describe("invisible", function() {
+
+    it("does not try to read node width when invisible", function() {
+      var treeField = scout.create('TreeField', {
+        parent: session.desktop,
+        visible: false
+      });
+      var model = helper.createModelFixture(3, 0, true);
+      var tree = helper.createTree(model);
+      treeField.render();
+
+      treeField.setTree(tree);
+      expect(tree.rendered).toBe(true);
+      expect(tree.nodes[0].width).toBeUndefined();
+
+      treeField.validateLayout();
+      expect(treeField.htmlComp.valid).toBe(false);
+      expect(tree.htmlComp.valid).toBe(false);
+      expect(tree.nodes[0].width).toBeUndefined();
+
+      treeField.setVisible(true);
+      expect(tree.nodes[0].width).toBeUndefined();
+
+      treeField.validateLayout();
+      expect(treeField.htmlComp.valid).toBe(true);
+      expect(tree.htmlComp.valid).toBe(true);
+      expect(tree.nodes[0].width).toBeGreaterThan(0);
+    });
+  });
+
 });

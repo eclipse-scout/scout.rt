@@ -2885,4 +2885,32 @@ describe("Table", function() {
     });
   });
 
+  describe("invisible", function() {
+    it("does not try to read row height when invisible", function() {
+      var tableField = scout.create('TableField', {
+        parent: session.desktop,
+        visible: false
+      });
+      var model = helper.createModelFixture(2, 1);
+      var table = helper.createTable(model);
+      tableField.render();
+
+      tableField.setTable(table);
+      expect(table.rendered).toBe(true);
+      expect(table.rows[0].height).toBeUndefined();
+
+      tableField.validateLayout();
+      expect(tableField.htmlComp.valid).toBe(false);
+      expect(table.htmlComp.valid).toBe(false);
+      expect(table.rows[0].height).toBeUndefined();
+
+      tableField.setVisible(true);
+      expect(table.rows[0].height).toBeUndefined();
+
+      tableField.validateLayout();
+      expect(tableField.htmlComp.valid).toBe(true);
+      expect(table.htmlComp.valid).toBe(true);
+      expect(table.rows[0].height).toBeGreaterThan(0);
+    });
+  });
 });

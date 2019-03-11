@@ -195,3 +195,10 @@ scout.TableLayout.prototype._autoResizeColumns = function() {
     }
   }.bind(this));
 };
+
+scout.TableLayout.prototype.preferredLayoutSize = function($container, options) {
+  // If table was not visible during renderViewport, the rows are not rendered yet (see _renderViewport)
+  // -> make sure rows are rendered otherwise preferred height cannot be determined
+  this.table._renderViewport();
+  return scout.TableLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+};

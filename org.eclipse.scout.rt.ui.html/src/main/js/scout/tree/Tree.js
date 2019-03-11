@@ -431,6 +431,11 @@ scout.Tree.prototype._renderViewport = function() {
     // animation pending do not render view port because finishing should rerenderViewport
     return;
   }
+  if (!this.$container.isEveryParentVisible()) {
+    // If the tree is invisible, the width and height of the nodes cannot be determined
+    // In that case, the tree won't be layouted either -> as soon as it will be layouted, renderViewport will be called again
+    return;
+  }
   var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
 };
