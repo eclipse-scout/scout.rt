@@ -32,6 +32,12 @@ describe('PageWithTable', function() {
     outline.insertNodes([page], null);
     outline.render();
     page.detailTable.render();
+
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.clock().uninstall();
   });
 
   it('updates the page on table reload', function() {
@@ -44,6 +50,23 @@ describe('PageWithTable', function() {
 
     expect(page.detailTable.hasReloadHandler).toBe(true);
     expect(counter).toBe(1);
+  });
+
+  it('should handle errors in _onLoadTableDataDone', function() {
+    page._loadTableData = function(searchFilter){
+      return $.resolvedDeferred([{
+        rowId: 1,
+        parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
+        cells: []
+      }]);
+    };
+    expect(page.detailTable.tableStatus).toBe(undefined);
+    page.detailTable.reload();
+    jasmine.clock().tick(3);
+
+    // expect error to be set as tableStatus
+    var keys = Object.keys(page.detailTable.tableStatus);
+    expect(scout.arrays.containsAll(keys, ['message', 'code', 'severity'])).toBe(true);
   });
 
 });
