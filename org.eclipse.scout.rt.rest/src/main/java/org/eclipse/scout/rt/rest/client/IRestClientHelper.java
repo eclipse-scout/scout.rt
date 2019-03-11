@@ -52,6 +52,8 @@ public interface IRestClientHelper {
 
   /**
    * @return {@link Entity} containing an empty JSON string.
+   * @deprecated Do not use this method, it will be removed in 9.0.x! Use <code>Entity.json("")</code> instead.
    */
+  @Deprecated
   Entity<String> emptyJson();
 }

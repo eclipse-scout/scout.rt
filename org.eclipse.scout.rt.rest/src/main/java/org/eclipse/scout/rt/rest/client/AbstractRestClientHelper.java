@@ -200,6 +200,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public Entity<String> emptyJson() {
     return Entity.json("");
   }
