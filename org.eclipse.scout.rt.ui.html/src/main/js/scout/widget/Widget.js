@@ -726,6 +726,21 @@ scout.Widget.prototype._renderVisible = function() {
 };
 
 /**
+ * @returns true if every parent within the hierarchy is visible.
+ */
+scout.Widget.prototype.isEveryParentVisible = function() {
+  var parent = this.parent;
+  while (parent) {
+    if (!parent.isVisible()) {
+      return false;
+    }
+    parent = parent.parent;
+  }
+
+  return true;
+};
+
+/**
  * This function does not set the focus to the field. It toggles the 'focused' class on the field container if present.
  * Objects using widget as prototype must call this function onBlur and onFocus to ensure the class gets toggled.
  *

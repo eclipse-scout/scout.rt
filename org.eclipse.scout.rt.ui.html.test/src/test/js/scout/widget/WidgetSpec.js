@@ -1014,4 +1014,71 @@ describe('Widget', function() {
     });
   });
 
+  describe('isEveryParentVisible', function() {
+
+    var parentWidget1, parentWidget2, parentWidget3, testWidget;
+
+    beforeEach(function() {
+      parentWidget1 = createWidget();
+
+      parentWidget2 = createWidget({
+        parent: parentWidget1
+      });
+
+      parentWidget3 = createWidget({
+        parent: parentWidget2
+      });
+
+      testWidget = createWidget({
+        parent: parentWidget3
+      });
+    });
+
+    it('should correctly calculate the parents visible state if all parents are visible', function() {
+      expect(testWidget.isEveryParentVisible()).toBe(true);
+    });
+
+    it('should correctly calculate the parents visible state if one parent is invisible', function() {
+      parentWidget1.setVisible(false);
+
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+
+      parentWidget1.setVisible(true);
+      parentWidget2.setVisible(false);
+
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+
+      parentWidget2.setVisible(true);
+      parentWidget3.setVisible(false);
+
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+    });
+
+    it('should correctly calculate the parents visible state if several parents are invisible', function() {
+      parentWidget1.setVisible(false);
+      parentWidget2.setVisible(false);
+
+      // parent 1 and 2 are invisible
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+
+      parentWidget2.setVisible(true);
+      parentWidget3.setVisible(false);
+
+      // parent 1 and 3 are invisible
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+
+      parentWidget1.setVisible(true);
+      parentWidget2.setVisible(false);
+
+      // parent 2 and 3 are invisible
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+    });
+
+    it('should correctly calculate the parents visible state if all parents are invisible', function() {
+      parentWidget1.setVisible(false);
+      parentWidget2.setVisible(false);
+      parentWidget3.setVisible(false);
+      expect(testWidget.isEveryParentVisible()).toBe(false);
+    });
+  });
 });
