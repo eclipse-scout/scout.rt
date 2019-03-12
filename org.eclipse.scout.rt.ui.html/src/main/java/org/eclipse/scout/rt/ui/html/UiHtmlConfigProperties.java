@@ -278,4 +278,47 @@ public final class UiHtmlConfigProperties {
       return 60; // 1 minute
     }
   }
+
+  public static class ScriptfileBuildProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.dev.scriptfile.rebuild";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies if scriptfiles should be rebuild on modification or with every request. False for rebuild on modifications. The default value is true.";
+    }
+
+    @Override
+    protected Boolean parse(String value) {
+      if (!Platform.get().inDevelopmentMode()) {
+        return true;
+      }
+      // only works in development mode
+      return super.parse(value);
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.TRUE;
+    }
+  }
+
+  public static class ScriptfileBuilderDevCacheKey extends AbstractStringConfigProperty {
+    @Override
+    public String getKey() {
+      return "scout.dev.scriptfile.persist.key";
+    }
+
+    @Override
+    public String description() {
+      return "Specifies a key to store the keys (HttpCacheKey) scripts in development cache. "
+          + "The keys of the last application start in dev mode will be stored in the user.home/.eclipse/org.eclipse.scout.dev/scriptfileCacheDev_{key}.obj. "
+          + "For the next run in dev mode the keys stored under this key are preloaded.";
+    }
+
+  }
+
 }
