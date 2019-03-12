@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.extension.ui.tile;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -76,6 +77,23 @@ public final class TileChains {
         }
       };
       callChain(methodInvocation);
+    }
+  }
+
+  public static class TileDataChangedTileChain extends AbstractTileChain {
+
+    public TileDataChangedTileChain(List<? extends ITileExtension<? extends AbstractTile>> extensions) {
+      super(extensions);
+    }
+
+    public void execDataChanged(DataChangeEvent event) {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITileExtension<? extends AbstractTile> next) {
+          next.execDataChanged(TileDataChangedTileChain.this, event);
+        }
+      };
+      callChain(methodInvocation, event);
     }
   }
 }

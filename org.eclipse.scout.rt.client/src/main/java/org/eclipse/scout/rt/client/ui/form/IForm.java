@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -50,7 +51,7 @@ import org.w3c.dom.Element;
  * <b>handler</b> is responsible for loading from data and storing data. This usually involves calling process services
  * on the server. These will in turn contact a persistence layer such as a database.
  */
-public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, IDisplayParent {
+public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, IDisplayParent, IDataChangeObserver {
 
   /**
    * The {@link IForm} which is currently associated with the current thread.

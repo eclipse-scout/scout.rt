@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -36,7 +37,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
  * {@link IPageWithTable} In the outline, it is possible to drill down the content of the node (except if the page is
  * configured as a leaf)
  */
-public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
+public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId, IDataChangeObserver {
 
   /**
    * @return The {@link ITable} of this {@link IPage} or {@code null} if it does not have a table. If this page has a

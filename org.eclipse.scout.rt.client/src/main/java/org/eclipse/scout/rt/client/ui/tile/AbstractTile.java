@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.extension.ui.tile.ITileExtension;
+import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileDataChangedTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileDisposeTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileInitTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTileChain;
@@ -121,7 +122,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   protected void disposeTileInternal() {
-    // NOP
+    unregisterDataChangeListener();
   }
 
   protected void execDisposeTile() {
@@ -319,33 +320,19 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     m_loaded = loaded;
   }
 
-  /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = event -> {
         if (isLoaded()) {
-          execDataChanged(event);
+          interceptDataChanged(event);
         }
       };
     }
     IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
-  /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
       ClientSessionProvider.currentSession().getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
@@ -580,6 +567,12 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     chain.execLoadData();
   }
 
+  protected final void interceptDataChanged(DataChangeEvent event) {
+    List<? extends ITileExtension<? extends AbstractTile>> extensions = getAllExtensions();
+    TileDataChangedTileChain chain = new TileDataChangedTileChain(extensions);
+    chain.execDataChanged(event);
+  }
+
   protected ITileExtension<? extends AbstractTile> createLocalExtension() {
     return new LocalTileExtension<>(this);
   }
@@ -609,5 +602,9 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
       getOwner().execLoadData();
     }
 
+    @Override
+    public void execDataChanged(TileDataChangedTileChain chain, DataChangeEvent event) {
+      getOwner().execDataChanged(event);
+    }
   }
 }

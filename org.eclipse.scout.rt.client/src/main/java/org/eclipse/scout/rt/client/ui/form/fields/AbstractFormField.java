@@ -1019,17 +1019,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   protected void disposeFieldInternal() {
-    // nop
+    unregisterDataChangeListener();
   }
 
-  /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = event -> interceptDataChanged(event.getDataType());
@@ -1037,14 +1030,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     IDesktop.CURRENT.get().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
-  /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
       IDesktop.CURRENT.get().removeDataChangeListener(m_internalDataChangeListener, dataTypes);

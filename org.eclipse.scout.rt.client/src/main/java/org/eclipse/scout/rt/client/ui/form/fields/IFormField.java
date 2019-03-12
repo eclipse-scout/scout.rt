@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -67,7 +68,7 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension {
+public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension, IDataChangeObserver {
   /*
    * Properties
    */

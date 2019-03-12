@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.tile;
 
+import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileDataChangedTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileDisposeTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileInitTileChain;
 import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTileChain;
+import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
@@ -23,4 +25,6 @@ public interface ITileExtension<OWNER extends AbstractTile> extends IExtension<O
   void execDisposeTile(TileDisposeTileChain chain);
 
   void execLoadData(TileLoadDataTileChain chain);
+
+  void execDataChanged(TileDataChangedTileChain chain, DataChangeEvent event);
 }

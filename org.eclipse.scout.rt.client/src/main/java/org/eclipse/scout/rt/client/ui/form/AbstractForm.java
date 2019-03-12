@@ -916,14 +916,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     return ms;
   }
 
-  /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
       m_internalDataChangeListener = event -> interceptDataChanged(event.getDataType());
@@ -931,14 +924,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     getDesktop().dataChangeListeners().add(m_internalDataChangeListener, true, dataTypes);
   }
 
-  /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
-   */
+  @Override
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
       getDesktop().removeDataChangeListener(m_internalDataChangeListener, dataTypes);
@@ -2129,7 +2115,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       // Dispose Form
       try {
         interceptDisposeForm();
-        unregisterDataChangeListener((Object[]) null);
+        unregisterDataChangeListener();
       }
       catch (Exception t) {
         LOG.warn("Failed to dispose Form {}", getClass().getName(), t);
