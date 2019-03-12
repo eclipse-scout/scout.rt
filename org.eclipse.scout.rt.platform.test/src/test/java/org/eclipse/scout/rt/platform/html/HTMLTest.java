@@ -309,7 +309,7 @@ public class HTMLTest {
 
   @Test
   public void testIconFromCustomFont() {
-    assertEquals("<span class=\"font-crmIcons\">\uE100</span>", HTML.icon("font:crmIcons \uE100").toHtml());
+    assertEquals("<span class=\"font-testIcons\">\uE100</span>", HTML.icon("font:testIcons \uE100").toHtml());
   }
 
   @Test
