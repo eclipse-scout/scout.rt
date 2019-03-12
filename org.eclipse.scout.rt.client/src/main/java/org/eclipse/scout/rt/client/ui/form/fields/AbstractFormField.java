@@ -996,15 +996,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   protected void disposeFieldInternal() {
     ActionUtility.disposeActions(getKeyStrokes());
+    unregisterDataChangeListener((Object[]) null);
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
+   * Register a {@link DataChangeListener} on the desktop for these dataTypes
    *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * @param dataTypes
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -1019,12 +1017,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes
+   * 
+   * @param dataTypes
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {

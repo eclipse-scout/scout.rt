@@ -758,12 +758,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tree != null) {
       tree.removeTreeListener(m_treeListener);
     }
-    if (m_internalDataChangeListener != null) {
-      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      if (desktop != null) {
-        desktop.removeDataChangeListener(m_internalDataChangeListener);
-      }
-    }
+    unregisterDataChangeListener((Object[]) null);
   }
 
   @Override
@@ -926,12 +921,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Register a {@link DataChangeListener} on the desktop for these dataTypes
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -965,12 +955,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Unregister the {@link DataChangeListener} from the desktop for these dataTypes
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
