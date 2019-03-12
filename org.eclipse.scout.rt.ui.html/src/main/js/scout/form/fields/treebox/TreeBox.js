@@ -82,7 +82,8 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
 
   this._valueSyncing = true;
   var opts = {
-    checkOnlyEnabled: false
+    checkOnlyEnabled: false,
+    checkChildren: false
   };
   try {
     if (scout.arrays.empty(newValue)) {

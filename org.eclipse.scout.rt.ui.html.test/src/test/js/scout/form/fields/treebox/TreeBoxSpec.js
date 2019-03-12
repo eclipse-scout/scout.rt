@@ -39,10 +39,10 @@ describe("TreeBox", function() {
 
   function createTreeBoxWithAdapter() {
     var model = helper.createFieldModel('TreeBox');
-    var TreeBox = new scout.TreeBox();
-    TreeBox.init(model);
-    linkWidgetAndAdapter(TreeBox, 'TreeBoxAdapter');
-    return TreeBox;
+    var treeBox = new scout.TreeBox();
+    treeBox.init(model);
+    linkWidgetAndAdapter(treeBox, 'TreeBoxAdapter');
+    return treeBox;
   }
 
   describe('general behavior', function() {
@@ -331,34 +331,48 @@ describe("TreeBox", function() {
       var model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var TreeBox = scout.create('TreeBox', model);
-      expect(TreeBox.displayText).toBe('');
-      TreeBox.setValue([1]);
+      var treeBox = scout.create('TreeBox', model);
+      expect(treeBox.displayText).toBe('');
+      treeBox.setValue([1]);
       jasmine.clock().tick(300);
-      expect(TreeBox.value).toEqual([1]);
-      expect(TreeBox.displayText).toBe('Foo');
-      TreeBox.setValue([2]);
+      expect(treeBox.value).toEqual([1]);
+      expect(treeBox.displayText).toBe('Foo');
+      treeBox.setValue([2]);
       jasmine.clock().tick(300);
-      expect(TreeBox.value).toEqual([2]);
-      expect(TreeBox.displayText).toBe('Bar');
+      expect(treeBox.value).toEqual([2]);
+      expect(treeBox.displayText).toBe('Bar');
     });
 
     it('returns empty string if value is null or undefined', function() {
       var model = helper.createFieldModel('TreeBox', session.desktop, {
         lookupCall: lookupCall
       });
-      var TreeBox = scout.create('TreeBox', model);
-      expect(TreeBox.displayText).toBe('');
+      var treeBox = scout.create('TreeBox', model);
+      expect(treeBox.displayText).toBe('');
 
-      TreeBox.setValue(null);
+      treeBox.setValue(null);
       jasmine.clock().tick(300);
-      expect(TreeBox.value).toEqual([]);
-      expect(TreeBox.displayText).toBe('');
+      expect(treeBox.value).toEqual([]);
+      expect(treeBox.displayText).toBe('');
 
-      TreeBox.setValue(undefined);
+      treeBox.setValue(undefined);
       jasmine.clock().tick(300);
-      expect(TreeBox.value).toEqual([]);
-      expect(TreeBox.displayText).toBe('');
+      expect(treeBox.value).toEqual([]);
+      expect(treeBox.displayText).toBe('');
+    });
+
+    it("does not auto-check child nodes if node is checked by model", function() {
+      var model = helper.createFieldModel('TreeBox', session.desktop, {
+        lookupCall: lookupCall
+      });
+      var treeBox = scout.create('TreeBox', model);
+      treeBox.tree.autoCheckChildren = true;
+
+      // Checking nodes by model should not auto-check child nodes
+      treeBox.setValue([1]);
+      jasmine.clock().tick(300);
+      expect(treeBox.value).toEqual([1]);
+      expect(treeBox.tree.checkedNodes.length).toBe(1);
     });
 
   });
@@ -366,12 +380,12 @@ describe("TreeBox", function() {
   describe('label', function() {
 
     it('is linked with the field', function() {
-      var TreeBox = scout.create('TreeBox', {
+      var treeBox = scout.create('TreeBox', {
         parent: session.desktop
       });
-      TreeBox.render();
-      expect(TreeBox.$field.attr('aria-labelledby')).toBeTruthy();
-      expect(TreeBox.$field.attr('aria-labelledby')).toBe(TreeBox.$label.attr('id'));
+      treeBox.render();
+      expect(treeBox.$field.attr('aria-labelledby')).toBeTruthy();
+      expect(treeBox.$field.attr('aria-labelledby')).toBe(treeBox.$label.attr('id'));
     });
   });
 
