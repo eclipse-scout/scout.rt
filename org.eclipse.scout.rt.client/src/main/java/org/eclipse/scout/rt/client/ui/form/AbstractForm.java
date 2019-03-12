@@ -914,12 +914,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes
    *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * @param dataTypes
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -929,12 +926,9 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   }
 
   /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes
    *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * @param dataTypes
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {

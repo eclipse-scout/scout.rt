@@ -441,7 +441,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       }
     }
     IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-    final boolean isActiveOutline = (desktop != null ? desktop.getOutline() == this.getOutline() : false);
+    final boolean isActiveOutline = desktop != null && desktop.getOutline() == this.getOutline();
     final boolean isRootNode = pathsToSelections.isEmpty() && getTree() != null && getTree().getRootNode() == this;
     if (isActiveOutline && (pathsToSelections.contains(this) || isRootNode)) {
       try {
@@ -752,12 +752,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     if (tree != null) {
       tree.removeTreeListener(m_localTreeListener);
     }
-    if (m_internalDataChangeListener != null) {
-      IDesktop desktop = ClientSessionProvider.currentSession().getDesktop();
-      if (desktop != null) {
-        desktop.removeDataChangeListener(m_internalDataChangeListener);
-      }
-    }
+    unregisterDataChangeListener((Object[]) null);
   }
 
   @Override
@@ -915,12 +910,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -943,12 +933,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {

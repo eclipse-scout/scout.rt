@@ -320,12 +320,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
-   * Register a {@link IDataChangeListener} on the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Register a {@link IDataChangeListener} on the desktop for these dataTypes
    */
   public void registerDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener == null) {
@@ -339,12 +334,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
-   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes<br>
-   * Example:
-   *
-   * <pre>
-   * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
-   * </pre>
+   * Unregister the {@link IDataChangeListener} from the desktop for these dataTypes
    */
   public void unregisterDataChangeListener(Object... dataTypes) {
     if (m_internalDataChangeListener != null) {
