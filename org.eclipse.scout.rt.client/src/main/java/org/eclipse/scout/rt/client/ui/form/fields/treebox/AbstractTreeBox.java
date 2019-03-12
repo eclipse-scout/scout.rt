@@ -908,9 +908,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
           return true;
         }
       });
+      // Checking nodes by model should not auto-check child nodes
+      boolean autoCheckChildNodes = getTree().isAutoCheckChildNodes();
+      getTree().setAutoCheckChildNodes(false);
       for (ITreeNode node : checkedNodes) {
         node.setChecked(true);
       }
+      getTree().setAutoCheckChildNodes(autoCheckChildNodes);
       if (!getTree().isCheckable()) {
         getTree().selectNodes(checkedNodes, false);
       }
