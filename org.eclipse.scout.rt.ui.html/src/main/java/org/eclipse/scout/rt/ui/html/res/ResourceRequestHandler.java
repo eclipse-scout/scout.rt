@@ -95,6 +95,8 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     // Create cache key for resource and check if resource exists in cache
     HttpCacheKey cacheKey = resourceLoader.createCacheKey(pathInfoEx);
 
+    HttpCacheObject resource = null;
+
     // When caching is disabled, always load resource
     if (!UrlHints.isCacheHint(req)) {
       LOG.debug("Requested resource with cacheKey={}. Caching is disabled by URL hint", cacheKey);
@@ -108,7 +110,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     }
 
     String cacheResultMsg;
-    HttpCacheObject resource = resourceCache.get(cacheKey);
+    resource = resourceCache.get(cacheKey);
     if (resource == null) {
       // Cache miss: resource not found in cache --> load it
       resource = resourceLoader.loadResource(cacheKey);
