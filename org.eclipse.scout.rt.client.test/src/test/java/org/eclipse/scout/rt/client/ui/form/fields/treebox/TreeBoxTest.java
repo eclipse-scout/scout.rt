@@ -94,8 +94,8 @@ public class TreeBoxTest {
   }
 
   /**
-   * Tests that a initially checked node which is removed from the tree is not contained in the set of checked nodes after
-   * removal.
+   * Tests that a initially checked node which is removed from the tree is not contained in the set of checked nodes
+   * after removal.
    */
   @Test
   public void testCheckedNodesRemovedOn() throws Exception {
@@ -191,6 +191,63 @@ public class TreeBoxTest {
     // no nodes selected
     Set<Long> values = treeBox.getValue();
     assertTrue(CollectionUtility.isEmpty(values));
+  }
+
+  @Test
+  public void testCheckKeysByModel() throws Exception {
+    SimpleTreeBox treeBox = new SimpleTreeBox();
+    treeBox.init();
+    ITree tree = treeBox.getTree();
+
+    treeBox.checkAllKeys();
+    assertEquals(14, treeBox.getCheckedKeyCount());
+
+    treeBox.uncheckAllKeys();
+    assertEquals(0, treeBox.getCheckedKeyCount());
+
+    treeBox.checkKey(9L);
+
+    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    assertEquals(1, valueSet.size());
+    assertEquals(true, valueSet.contains(9L)); // C-B
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L)), tree.getCheckedNodes()));
+
+    treeBox.checkKeys(CollectionUtility.hashSet(9L, 12L));
+
+    valueSet = new HashSet<Long>(treeBox.getValue());
+    assertEquals(2, valueSet.size());
+    assertEquals(true, valueSet.contains(9L)); // C-B
+    assertEquals(true, valueSet.contains(12L)); // C-B-B
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L, 12L)), tree.getCheckedNodes()));
+  }
+
+  @Test
+  public void testAutoCheckKeysByModel() throws Exception {
+    AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
+    treeBox.init();
+    ITree tree = treeBox.getTree();
+
+    treeBox.checkAllKeys();
+    assertEquals(14, treeBox.getCheckedKeyCount());
+
+    treeBox.uncheckAllKeys();
+    assertEquals(0, treeBox.getCheckedKeyCount());
+
+    // Checking nodes by model should not auto-check child nodes
+    treeBox.checkKey(9L);
+
+    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    assertEquals(1, valueSet.size());
+    assertEquals(true, valueSet.contains(9L)); // C-B
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L)), tree.getCheckedNodes()));
+
+    treeBox.checkKeys(CollectionUtility.hashSet(9L, 12L));
+
+    valueSet = new HashSet<Long>(treeBox.getValue());
+    assertEquals(2, valueSet.size());
+    assertEquals(true, valueSet.contains(9L)); // C-B
+    assertEquals(true, valueSet.contains(12L)); // C-B-B
+    assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L, 12L)), tree.getCheckedNodes()));
   }
 
   @Test
