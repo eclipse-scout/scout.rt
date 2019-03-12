@@ -42,10 +42,8 @@ scout.ListBox.prototype._createLayout = function() {
 
 scout.ListBox.prototype._renderStructure = function() {
   this.table.render(this.$fieldContainer);
+  this.table.htmlComp.pixelBasedSizing = true;
   this.addField(this.table.$container);
-  if (this.filterBox) {
-    this.table.htmlComp.pixelBasedSizing = true;
-  }
 };
 
 scout.ListBox.prototype._onTableRowsChecked = function(event) {

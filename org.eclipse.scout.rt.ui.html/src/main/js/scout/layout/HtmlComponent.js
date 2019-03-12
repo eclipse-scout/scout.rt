@@ -91,7 +91,7 @@ scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
  */
 scout.HtmlComponent.prototype.availableSize = function(options) {
   options = options || {};
-  var size = this.size({
+  var size = this.sizeCached || this.size({
     exact: options.exact
   });
 
@@ -116,6 +116,7 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
 scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
   this.valid = false;
   this.prefSizeCached = {};
+  this.sizeCached = null;
   if (this.layout) {
     this.layout.invalidate(htmlSource);
   }
@@ -146,9 +147,10 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     this.layout.layout(this.$comp);
     this.layouting = false;
     this.layouted = true;
-    // Save size for later use (necessary if pixelBasedSizing is set to false)
-    this.sizeCached = this.size();
     this.valid = true;
+    if (!this.sizeCached) {
+      this.sizeCached = this.size();
+    }
   }
   return true;
 };
@@ -344,6 +346,8 @@ scout.HtmlComponent.prototype.setSize = function(size) {
   }
   if (this.pixelBasedSizing) {
     scout.graphics.setSize(this.$comp, size);
+    // Save size for later use (necessary if pixelBasedSizing is set to false)
+    this.sizeCached = size;
   }
   this.validateLayout();
 };
@@ -386,6 +390,7 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     this.invalidateLayout();
   }
   scout.graphics.setBounds(this.$comp, bounds);
+  this.sizeCached = bounds.dimension();
   this.validateLayout();
 };
 

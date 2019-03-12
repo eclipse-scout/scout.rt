@@ -142,15 +142,15 @@ scout.scrollbars = {
 
     // Container with JS scrollbars must have either relative or absolute position
     // otherwise we cannot determine the correct dimension of the scrollbars
-    var cssPosition = $container.css('position');
-    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
-      $container.css('position', 'relative');
-    }
+//    var cssPosition = $container.css('position');
+//    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
+//      $container.css('position', 'relative');
+//    }
 
-    scrollbars.forEach(function(scrollbar) {
-      scrollbar.render($container);
-      scrollbar.update();
-    });
+//    scrollbars.forEach(function(scrollbar) {
+//      scrollbar.render($container);
+//      scrollbar.update();
+//    });
   },
 
   /**
@@ -213,16 +213,16 @@ scout.scrollbars = {
 
   _update: function(scrollbars) {
     // Reset the scrollbars first to make sure they don't extend the scrollSize
-    scrollbars.forEach(function(scrollbar) {
-      if (scrollbar.rendered) {
-        scrollbar.reset();
-      }
-    });
-    scrollbars.forEach(function(scrollbar) {
-      if (scrollbar.rendered) {
-        scrollbar.update();
-      }
-    });
+//    scrollbars.forEach(function(scrollbar) {
+//      if (scrollbar.rendered) {
+//        scrollbar.reset();
+//      }
+//    });
+//    scrollbars.forEach(function(scrollbar) {
+//      if (scrollbar.rendered) {
+//        scrollbar.update();
+//      }
+//    });
   },
 
   /**

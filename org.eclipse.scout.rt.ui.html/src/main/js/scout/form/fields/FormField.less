@@ -74,6 +74,7 @@
   & > .mandatory-indicator {
     position: absolute;
     visibility: hidden;
+    width: @mandatory-indicator-width;
 
     &::before {
       content: '*';
@@ -92,6 +93,7 @@
   & > .status {
     position: absolute;
     margin-left: @field-status-margin-left;
+    width: @field-status-width;
     height: @status-font-icon-size; /* Same as font-size of status icon */
 
     #scout.status();

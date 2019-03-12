@@ -6579,7 +6579,10 @@ jQuery.each( [ "height", "width" ], function( i, dimension ) {
 		set: function( elem, value, extra ) {
 			var matches,
 				styles = getStyles( elem ),
-				isBorderBox = jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				// <BSI Patch> 20.12.2018 awe: added 'extra && ' to prevent the browser from 
+				// re-calculating layout/CSS-styles which bogs down Scouts layouting performance.
+				isBorderBox = extra && jQuery.css( elem, "boxSizing", false, styles ) === "border-box",
+				// </BSI Patch>
 				subtract = extra && boxModelAdjustment(
 					elem,
 					dimension,

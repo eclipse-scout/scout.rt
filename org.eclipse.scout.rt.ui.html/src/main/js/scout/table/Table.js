@@ -1401,11 +1401,12 @@ scout.Table.prototype._buildRowDiv = function(row) {
 };
 
 scout.Table.prototype._calculateRowBorderWidth = function() {
-  var $tableRowDummy = this.$data.appendDiv('table-row');
-  this.rowBorderLeftWidth = $tableRowDummy.cssBorderLeftWidth();
-  this.rowBorderRightWidth = $tableRowDummy.cssBorderRightWidth();
-  this.rowBorderWidth = this.rowBorderLeftWidth + this.rowBorderRightWidth;
-  $tableRowDummy.remove();
+//  var $tableRowDummy = this.$data.appendDiv('table-row');
+//  this.rowBorderLeftWidth = $tableRowDummy.cssBorderLeftWidth();
+//  this.rowBorderRightWidth = $tableRowDummy.cssBorderRightWidth();
+//  this.rowBorderWidth = this.rowBorderLeftWidth + this.rowBorderRightWidth;
+//  $tableRowDummy.remove();
+  return 1;
 };
 
 scout.Table.prototype._updateRowWidth = function() {
@@ -1415,15 +1416,17 @@ scout.Table.prototype._updateRowWidth = function() {
 };
 
 scout.Table.prototype._updateRowHeight = function() {
-  var $emptyRow = this.$data.appendDiv('table-row');
-  var $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
-
-  $emptyRow.appendDiv('table-cell').html('&nbsp;');
-  $emptyAggrRow.appendDiv('table-cell').html('&nbsp;');
-  this.rowHeight = $emptyRow.outerHeight(true);
-  this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
-  $emptyRow.remove();
-  $emptyAggrRow.remove();
+//  var $emptyRow = this.$data.appendDiv('table-row');
+//  var $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
+//
+//  $emptyRow.appendDiv('table-cell').html('&nbsp;');
+//  $emptyAggrRow.appendDiv('table-cell').html('&nbsp;');
+//  this.rowHeight = $emptyRow.outerHeight(true);
+//  this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
+//  $emptyRow.remove();
+//  $emptyAggrRow.remove();
+  this.rowHeight = 30;
+  this.aggregateRowHeight = 30;
 };
 
 /**

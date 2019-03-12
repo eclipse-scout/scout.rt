@@ -53,7 +53,7 @@ scout.graphics = {
   prefSize: function($elem, options) {
     // Return 0/0 if element is not displayed (display: none).
     // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
-    if (!$elem[0] || $elem.isDisplayNone()) {
+    if (!$elem[0] || !$elem.isVisible()) {
       return new scout.Dimension(0, 0);
     }
 
@@ -179,7 +179,7 @@ scout.graphics = {
    *          of an object, the value is automatically converted to the option "includeMargin".
    */
   size: function($elem, options) {
-    if (!$elem[0] || $elem.isDisplayNone()) {
+    if (!$elem[0] || !$elem.isVisible()) {
       return new scout.Dimension(0, 0);
     }
 

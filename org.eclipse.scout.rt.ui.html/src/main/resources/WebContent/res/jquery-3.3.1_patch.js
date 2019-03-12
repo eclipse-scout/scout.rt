@@ -12,7 +12,7 @@
 // As Scout no longer supports IE9 anyway and rarely makes use of overflow:scroll, disable fix 3699 completely for the moment.
 // As soon as jQuery is updated again, this patch may be removed after good testing.
 
-//The issue can be observed in the Scout UI e.g. in the Desktop header form-menus when starting Chrome with 90% zoom.
+// The issue can be observed in the Scout UI e.g. in the Desktop header form-menus when starting Chrome with 90% zoom.
 // It is important to refresh the page after the zoom has been set to 90% because jQuery only calculates the css-fixes once and caches the results!
 $.support.scrollboxSize = function() {
   return true;

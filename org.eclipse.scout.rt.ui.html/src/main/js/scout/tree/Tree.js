@@ -530,16 +530,16 @@ scout.Tree.prototype._renderNodesInRange = function(range) {
 };
 
 scout.Tree.prototype.ensureRangeVisible = function(range) {
-  var nodes = this.visibleNodesFlat,
-    numNodesRendered = 0;
+  var nodes = this.visibleNodesFlat;
+  var nodesToInsert = [];
   for (var r = range.from; r < range.to; r++) {
     var node = nodes[r];
     if (!node.attached) {
-      this._insertNodeInDOM(node);
-      numNodesRendered++;
+      nodesToInsert.push(node);
     }
   }
-  return numNodesRendered;
+  this._insertNodesInDOM(nodesToInsert);
+  return nodesToInsert.length;
 };
 
 scout.Tree.prototype._renderFiller = function() {
@@ -724,23 +724,24 @@ scout.Tree.prototype._visibleNodesInViewRange = function() {
   return this.visibleNodesFlat.slice(this.viewRangeRendered.from, this.viewRangeRendered.to);
 };
 
-scout.Tree.prototype._updateDomNodeWidth = function($nodes) {
+scout.Tree.prototype._updateDomNodeWidth = function() {
   if (!this.isHorizontalScrollingEnabled()) {
     return;
   }
-  if (this.rendered && this.nodeWidthDirty) {
-    var nodes = this._visibleNodesInViewRange(),
-      maxNodeWidth = this.maxNodeWidth;
-    // find max-width
-    maxNodeWidth = nodes.reduce(function(aggr, node) {
-      return Math.max(node.width, aggr);
-    }, scout.nvl(maxNodeWidth, 0));
-    // set max width on all nodes
-    nodes.forEach(function(node) {
-      node.$node.cssWidth(maxNodeWidth);
-    });
-    this.nodeWidthDirty = false;
+  if (!this.rendered || !this.nodeWidthDirty) {
+    return;
   }
+  var nodes = this._visibleNodesInViewRange();
+  var maxNodeWidth = this.maxNodeWidth;
+  // find max-width
+  maxNodeWidth = nodes.reduce(function(aggr, node) {
+    return Math.max(node.width, aggr);
+  }, scout.nvl(maxNodeWidth, 0));
+  // set max width on all nodes
+  nodes.forEach(function(node) {
+    node.$node.cssWidth(maxNodeWidth);
+  });
+  this.nodeWidthDirty = false;
 };
 
 scout.Tree.prototype._cleanupNodes = function($nodes) {
@@ -840,17 +841,18 @@ scout.Tree.prototype.setViewRangeSize = function(viewRangeSize) {
 };
 
 scout.Tree.prototype._updateNodeDimensions = function() {
-  var emptyNode = this._createTreeNode();
-  var $node = this._renderNode(emptyNode).appendTo(this.$data);
-  this.nodeHeight = $node.outerHeight(true);
-  if (this.isHorizontalScrollingEnabled()) {
-    var oldNodeWidth = this.nodeWidth;
-    this.nodeWidth = $node.outerWidth(true);
-    if (oldNodeWidth !== this.nodeWidth) {
-      this.viewRangeDirty = true;
-    }
-  }
-  emptyNode.reset();
+//  var emptyNode = this._createTreeNode();
+//  var $node = this._renderNode(emptyNode).appendTo(this.$data);
+//  this.nodeHeight = $node.outerHeight(true);
+//  if (this.isHorizontalScrollingEnabled()) {
+//    var oldNodeWidth = this.nodeWidth;
+//    this.nodeWidth = $node.outerWidth(true);
+//    if (oldNodeWidth !== this.nodeWidth) {
+//      this.viewRangeDirty = true;
+//    }
+//  }
+//  emptyNode.reset();
+  this.nodeHeight = 30;
 };
 
 /**
@@ -2809,32 +2811,48 @@ scout.Tree.prototype._applyFiltersForNode = function(node) {
 /**
  * Just insert node in DOM. NO check if in viewRange
  */
-scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
+scout.Tree.prototype._insertNodesInDOM = function(nodes, indexHint) {
   if (!this.rendered && !this.rendering) {
     return;
   }
-  var index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
-  if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeRendered.size() > 0) || node.attached) {
-    //node is not visible
-    return;
-  }
-  if (!node.rendered) {
-    this._renderNode(node);
-  }
-  node._decorate();
+  nodes.forEach(function(node) {
+    var index = indexHint === undefined ? this.visibleNodesFlat.indexOf(node) : indexHint;
+    if (index === -1 || !(this.viewRangeRendered.from + this.viewRangeSize >= index && this.viewRangeRendered.from <= index && this.viewRangeRendered.size() > 0) || node.attached) {
+      //node is not visible
+      return;
+    }
+    if (!node.rendered) {
+      this._renderNode(node);
+    }
+    node._decorate();
+    this._insertNodeInDOMAtPlace(node, index);
+    if (this.prevSelectedNode === node) {
+      this._highlightPrevSelectedNode();
+    }
+    node.rendered = true;
+    node.attached = true;
+  }, this);
+  this._installNodes(nodes);
+};
 
-  this._insertNodeInDOMAtPlace(node, index);
-  if (this.prevSelectedNode === node) {
-    this._highlightPrevSelectedNode();
-  }
-
-  node.height = node.$node.outerHeight(true);
+scout.Tree.prototype._installNodes = function(nodes) {
+  // The measuring is separated into 3 blocks for performance reasons -> separates reading and setting of styles
+  // 1. Prepare style for measuring
   if (this.isHorizontalScrollingEnabled()) {
-    var widthBackup = node.width ? node.width : 0,
-      displayBackup = node.$node.css('display');
-    node.$node.css('width', 'auto');
-    node.$node.css('display', 'inline-block');
-    var newWidth = node.$node.outerWidth();
+    nodes.forEach(function(node) {
+      node.$node.css('width', 'auto');
+      node.$node.css('display', 'inline-block');
+    }, this);
+  }
+
+  // 2. Measure
+  nodes.forEach(function(node) {
+    node.height = node.$node.outerHeight(true);
+    if (!this.isHorizontalScrollingEnabled()) {
+      return;
+    }
+    var newWidth = node.$node.css('width');
+    var widthBackup = node.width ? node.width : 0;
     if (widthBackup === this.maxNodeWidth && newWidth < this.maxNodeWidth) {
       this.maxNodeWidth = 0;
       this.nodeWidthDirty = true;
@@ -2842,14 +2860,20 @@ scout.Tree.prototype._insertNodeInDOM = function(node, indexHint) {
       this.maxNodeWidth = newWidth;
       this.nodeWidthDirty = true;
     }
-    if (!this.nodeWidthDirty) {
-      node.$node.css('width', this.maxNodeWidth);
-    }
-    node.$node.css('display', displayBackup);
     node.width = newWidth;
+  }, this);
+
+  // 3. Reset style
+  if (this.isHorizontalScrollingEnabled()) {
+    nodes.forEach(function(node) {
+      if (!this.nodeWidthDirty) {
+        node.$node.css('width', this.maxNodeWidth);
+      }
+      node.$node.css('display', '');
+    }, this);
   }
-  node.rendered = true;
-  node.attached = true;
+
+  this._updateDomNodeWidth(nodes);
 };
 
 /**
@@ -2902,7 +2926,7 @@ scout.Tree.prototype.showNode = function(node, useAnimation, indexHint) {
     return;
   }
   this._ensureNodeInDOM(node.parentNode, useAnimation, indexHint - 1);
-  this._insertNodeInDOM(node, indexHint);
+  this._insertNodesInDOM([node], indexHint);
   if (!node.rendered) {
     return;
   }

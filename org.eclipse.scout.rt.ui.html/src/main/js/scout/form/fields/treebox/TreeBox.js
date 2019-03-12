@@ -45,10 +45,8 @@ scout.TreeBox.prototype._createLayout = function() {
 
 scout.TreeBox.prototype._renderStructure = function($fieldContainer) {
   this.tree.render(this.$fieldContainer);
+  this.tree.htmlComp.pixelBasedSizing = true;
   this.addField(this.tree.$container);
-  if (this.filterBox) {
-    this.tree.htmlComp.pixelBasedSizing = true;
-  }
 };
 
 scout.TreeBox.prototype._onTreeNodesChecked = function(event) {
