@@ -100,7 +100,7 @@ public final class SharedConfigProperties {
 
   /**
    * Absolute URL to the deployed http(s):// base of the web-application. The expected 'external' URL should include
-   * proxies, redirects, etc. Example: <code>https://www.bsi-software.com/bsi-crm/</code>.
+   * proxies, redirects, etc. Example: <code>https://www.bsi-software.com/myapplication/</code>.
    */
   public static class ExternalBaseUrlProperty extends AbstractStringConfigProperty {
 
