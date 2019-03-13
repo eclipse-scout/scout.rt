@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.rest.client;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 
 import org.eclipse.scout.rt.rest.client.proxy.IRestClientExceptionTransformer;
@@ -49,9 +48,4 @@ public interface IRestClientHelper {
    * Applies all specified query parameters to the specified {@code target}
    */
   WebTarget applyQueryParams(WebTarget target, Map<String, Object> queryParams);
-
-  /**
-   * @return {@link Entity} containing an empty JSON string.
-   */
-  Entity<String> emptyJson();
 }

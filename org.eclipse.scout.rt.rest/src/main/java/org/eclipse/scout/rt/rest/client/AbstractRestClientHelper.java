@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
@@ -197,10 +196,5 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    */
   protected RuntimeException transformException(RuntimeException e, Response response) {
     return e;
-  }
-
-  @Override
-  public Entity<String> emptyJson() {
-    return Entity.json("");
   }
 }
