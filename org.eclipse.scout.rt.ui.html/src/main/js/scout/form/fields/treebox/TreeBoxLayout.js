@@ -11,5 +11,4 @@
 scout.TreeBoxLayout = function(treeBox, tree, filterBox) {
   scout.TreeBoxLayout.parent.call(this, treeBox, tree, filterBox);
 };
-
 scout.inherits(scout.TreeBoxLayout, scout.LookupBoxLayout);

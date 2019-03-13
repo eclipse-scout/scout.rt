@@ -22,7 +22,7 @@ scout.LookupBoxLayout.prototype.layout = function($container) {
     height = size.height,
     filterBoxHeight;
 
-  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered) {
     filterBoxHeight = scout.HtmlComponent.get(this.filterBox.$container).prefSize().height;
     height -= filterBoxHeight;
   }
@@ -31,7 +31,7 @@ scout.LookupBoxLayout.prototype.layout = function($container) {
   var htmlStructure = scout.HtmlComponent.get(this.structure.$container);
   htmlStructure.setSize(new scout.Dimension(size.width, height));
 
-  if (this.filterBox && this.filterBox.rendered && this.filterBox.$container.isVisible()) {
+  if (this.filterBox && this.filterBox.rendered) {
     var htmlFilterBox = scout.HtmlComponent.get(this.filterBox.$container);
     htmlFilterBox.setSize(new scout.Dimension(size.width, filterBoxHeight));
   }
