@@ -241,6 +241,7 @@ public class OrganizeColumnsForm extends AbstractForm implements IOrganizeColumn
               m_organizedTable.setTableChanging(true);
               //
               m_organizedTable.resetColumns();
+              ClientUIPreferences.getInstance().setAllTableColumnPreferences(m_organizedTable);
               TableUserFilterManager m = m_organizedTable.getUserFilterManager();
               if (m != null) {
                 m.reset();
