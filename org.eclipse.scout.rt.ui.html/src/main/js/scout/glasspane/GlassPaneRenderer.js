@@ -163,6 +163,12 @@ scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
 scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   var $animationTarget = null;
 
+  // notify the display parent to handle the mouse down on the glass pane.
+  var displayParent = this._resolveDisplayParent();
+  if (displayParent._onGlassPaneMouseDown) {
+    displayParent._onGlassPaneMouseDown($(event.target));
+  }
+
   if (this._widget instanceof scout.Form && this._widget.isView()) {
     // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,
     // highlight the view tab (or the overflow item, if the view tab is not visible).

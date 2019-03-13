@@ -1032,6 +1032,15 @@ scout.Outline.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) 
   return $glassPanes;
 };
 
+scout.Outline.prototype._onGlassPaneMouseDown = function($glassPane) {
+  var desktop = this.session.desktop;
+  if (desktop.navigation) {
+    if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
+      desktop.bringOutlineToFront();
+    }
+  }
+};
+
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
