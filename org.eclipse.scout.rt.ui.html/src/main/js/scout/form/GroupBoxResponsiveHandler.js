@@ -144,14 +144,22 @@ scout.GroupBoxResponsiveHandler.prototype._transformWidget = function(widget) {
   }
 
   // suppress a revalidate of the layout tree, since setLabelPosition would trigger it.
+  var htmlParent;
   if (widget.htmlComp) {
     widget.htmlComp.suppressInvalidate = true;
+    htmlParent = widget.htmlComp.getParent();
+    if (htmlParent) {
+      htmlParent.suppressInvalidate = true;
+    }
   }
 
   scout.GroupBoxResponsiveHandler.parent.prototype._transformWidget.call(this, widget);
 
   if (widget.htmlComp) {
     widget.htmlComp.suppressInvalidate = false;
+  }
+  if (htmlParent) {
+    htmlParent.suppressInvalidate = false;
   }
 };
 
