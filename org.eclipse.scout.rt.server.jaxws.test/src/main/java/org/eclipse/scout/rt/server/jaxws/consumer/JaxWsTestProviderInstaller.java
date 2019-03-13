@@ -64,7 +64,13 @@ public class JaxWsTestProviderInstaller {
   }
 
   public void uninstall() {
-    m_consumerEndpoint.stop();
-    m_pingEndpoint.stop();
+    if (m_consumerEndpoint != null) {
+      // may be null if there is an error in install()
+      m_consumerEndpoint.stop();
+    }
+    if (m_pingEndpoint != null) {
+      // may be null if there is an error in install()
+      m_pingEndpoint.stop();
+    }
   }
 }
