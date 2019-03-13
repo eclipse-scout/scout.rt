@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -41,11 +42,13 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Credentials are loaded from property {@link CredentialsProperty}. Multiple credentials are separated with the
  * semicolon, username and password with the colon. If using hashed passwords (by default), the password's salt and hash
- * are separated with the dot.
- * <p/>
- * Example of hashed passwords: <code>scott:SALT.PASSWORD-HASH;jack:SALT.PASSWORD-HASH;john:SALT.PASSWORD-HASH</code>
- * <br/>
- * Example of plain-text passwords: <code>scott:*****;jack:*****;john:*****</code>
+ * are separated with the dot. Usernames are case-insensitive, plain text password are case-sensitive.
+ * <p>
+ * Example of hashed passwords:<br>
+ * <code>scott:SALT.PASSWORD-HASH;jack:SALT.PASSWORD-HASH;john:SALT.PASSWORD-HASH</code>
+ * <p>
+ * Example of plain-text passwords:<br>
+ * <code>scott:*****;jack:*****;john:*****</code>
  */
 @Bean
 public class ConfigFileCredentialVerifier implements ICredentialVerifier {
@@ -96,7 +99,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
           continue;
         }
 
-        m_credentials.put(username, createPassword(password));
+        m_credentials.put(normalizeUsername(username), createPassword(password));
       }
       else {
         LOG.warn("Username and password must be separated with the 'colon' sign.  [example={}]", credentialSample);
@@ -110,12 +113,19 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
       return AUTH_CREDENTIALS_REQUIRED;
     }
 
-    final IPassword password = m_credentials.get(username.toLowerCase());
+    final IPassword password = m_credentials.get(normalizeUsername(username));
     if (password == null || !password.isEqual(passwordPlainText)) {
       return AUTH_FORBIDDEN;
     }
 
     return AUTH_OK;
+  }
+
+  protected String normalizeUsername(final String username) {
+    if (username == null) {
+      return null;
+    }
+    return username.trim().toLowerCase(Locale.US);
   }
 
   /**
@@ -135,8 +145,9 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
   /**
    * Represents credentials to be loaded into {@link ConfigFileCredentialVerifier}.
    * <p>
-   * Multiple credentials are separated with a semicolon, username and password with the 'colon' sign.
-   * <p/>
+   * Multiple credentials are separated with a semicolon, username and password with the 'colon' sign. Usernames are
+   * case-insensitive and it is recommended that they should only consist of ASCII characters.
+   * <p>
    * Example: <code>scott:*****;jack:*****;john:*****</code>
    */
   public static class CredentialsProperty extends AbstractStringConfigProperty {
@@ -149,7 +160,7 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
 
   /**
    * Indicates whether plain-text or hashed passwords are stored in 'config.properties'. By default, this verifier
-   * expects hashed passwords.
+   * expects hashed passwords. Passwords are case-sensitive.
    */
   public static class CredentialPlainTextProperty extends AbstractBooleanConfigProperty {
 
