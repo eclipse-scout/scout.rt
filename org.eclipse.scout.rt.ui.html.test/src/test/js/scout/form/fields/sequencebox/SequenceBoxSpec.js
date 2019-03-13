@@ -386,6 +386,46 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus).toBeFalsy();
     });
 
+    it('removes the error status from the sequenceBox after all fields are valid', function() {
+      var field = createField({
+        statusVisible: false
+      });
+      field.render();
+
+      field.fields[1].setErrorStatus({
+        message: 'field-error-2'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error-2');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error-2');
+
+      field.fields[0].setErrorStatus({
+        message: 'field-error'
+      });
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('field-error-2');
+      expect(field.fields[0].$status.isVisible()).toBe(true);
+      expect(field.fields[0].errorStatus.message).toBe('field-error');
+      expect(field.fields[1].$status.isVisible()).toBe(false);
+      expect(field.fields[1].errorStatus.message).toBe('field-error-2');
+
+      field.fields[1].clearErrorStatus();
+
+      expect(field.$status.isVisible()).toBe(false);
+      expect(field.errorStatus).toBeFalsy();
+      expect(field.fields[0].$status.isVisible()).toBe(true);
+      expect(field.fields[0].errorStatus.message).toBe('field-error');
+
+      field.fields[0].clearErrorStatus();
+
+      expect(field.fields[0].$status.isVisible()).toBe(false);
+      expect(field.fields[0].errorStatus).toBeFalsy();
+      expect(field.$status.isVisible()).toBe(false);
+      expect(field.errorStatus).toBeFalsy();
+    });
   });
 
   describe('label', function() {

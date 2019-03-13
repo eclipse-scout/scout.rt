@@ -147,16 +147,16 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
     this.setErrorStatus(this._lastVisibleField.errorStatus);
     this._isErrorStatusOverwritten = true;
   } else {
-    this._isErrorStatusOverwritten = false;
     this.setErrorStatus(this.boxErrorStatus);
+    this._isErrorStatusOverwritten = false;
   }
 
   if (this._lastVisibleField.tooltipText) {
     this.setTooltipText(this._lastVisibleField.tooltipText);
     this._isTooltipTextOverwritten = true;
   } else {
-    this._isTooltipTextOverwritten = false;
     this.setTooltipText(this.boxTooltipText);
+    this._isTooltipTextOverwritten = false;
   }
 
   if (this._lastVisibleField.menus) {
@@ -164,9 +164,9 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
     this.setMenusVisible(this._lastVisibleField.menusVisible);
     this._isMenusOverwritten = true;
   } else {
-    this._isMenusOverwritten = false;
     this.setMenus(this.boxMenus);
     this.setMenusVisible(this.boxMenusVisible);
+    this._isMenusOverwritten = false;
   }
   this._isOverwritingStatusFromField = false;
 
@@ -248,7 +248,6 @@ scout.SequenceBox.prototype._getLastVisibleField = function() {
 
   return visibleFields[visibleFields.length - 1];
 };
-
 
 scout.SequenceBox.prototype._onFieldValueChange = function(event) {
   if (event.source instanceof scout.DateField) {
