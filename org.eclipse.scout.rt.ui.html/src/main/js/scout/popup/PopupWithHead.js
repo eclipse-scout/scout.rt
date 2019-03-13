@@ -79,15 +79,7 @@ scout.PopupWithHead.prototype._renderHead = function() {
     .append(this.$deco);
   if (this.$headBlueprint) {
     this.$head.html(this.$headBlueprint.html());
-    this._modifyHeadChildren();
   }
-};
-
-/**
- * Sets CSS classes or CSS-properties on the copied children in the head.
- */
-scout.PopupWithHead.prototype._modifyHeadChildren = function() {
-  // NOP
 };
 
 /**

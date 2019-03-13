@@ -100,13 +100,6 @@ scout.ViewMenuPopup.prototype._modifyBody = function() {
   this.$body.addClass('view-menu-popup-body');
 };
 
-/**
- * @override PopupWithHead.js
- */
-scout.ViewMenuPopup.prototype._modifyHeadChildren = function() {
-  this.$head.find('.arrow-icon').addClass('menu-open');
-};
-
 scout.ViewMenuPopup.prototype.position = function() {
   var pos = this.$tab.offset(),
     headSize = scout.graphics.size(this.$tab, true),
