@@ -35,6 +35,7 @@ scout.LookupBox.prototype._init = function(model) {
   if (this.filterBox) {
     this.filterBox.enabledComputed = true; // filter is always enabled
     this.filterBox.recomputeEnabled(true);
+    this.filterBox.on('propertyChange', this._onFilterBoxPropertyChange.bind(this));
   }
 };
 
@@ -60,12 +61,13 @@ scout.LookupBox.prototype._render = function() {
   this._renderStructure();
   this.$field.addDeviceClass();
   this.$field.addClass('structure');
-  if (this.filterBox) {
-    this._renderFilterBox();
-  }
+  this._renderFilterBox();
 };
 
 scout.LookupBox.prototype._renderFilterBox = function() {
+  if (!this.filterBox || !this.filterBox.visible) {
+    return;
+  }
   this.filterBox.render(this.$fieldContainer);
 };
 
@@ -229,4 +231,17 @@ scout.LookupBox.prototype._readDisplayText = function() {
 
 scout.LookupBox.prototype._clear = function() {
   this.setValue(null);
+};
+
+scout.LookupBox.prototype._onFilterBoxPropertyChange = function(event) {
+  if (event.propertyName === 'visible') {
+    if (!this.rendered) {
+      return;
+    }
+    if (this.filterBox.visible) {
+      this._renderFilterBox();
+    } else {
+      this.filterBox.remove();
+    }
+  }
 };
