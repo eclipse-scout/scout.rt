@@ -121,6 +121,9 @@ scout.Form.prototype._postRender = function() {
     this.formController.render();
     this.messageBoxController.render();
     this.fileChooserController.render();
+    if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.renderGlassPanes();
+    }
   }
 
 };
@@ -132,6 +135,9 @@ scout.Form.prototype.remove = function() {
     this.formController.remove();
     this.messageBoxController.remove();
     this.fileChooserController.remove();
+    if (this._glassPaneRenderer) {
+      this._glassPaneRenderer.removeGlassPanes();
+    }
   }
   scout.Form.parent.prototype.remove.call(this);
 };
@@ -153,10 +159,10 @@ scout.Form.prototype._remove = function() {
 
 scout.Form.prototype._destroy = function() {
   scout.Form.parent.prototype._destroy.call(this);
-  if (this._glassPaneRenderer) {
-    this._glassPaneRenderer.removeGlassPanes();
-    this._glassPaneRenderer = null;
-  }
+//  if (this._glassPaneRenderer) {
+//    this._glassPaneRenderer.removeGlassPanes();
+//    this._glassPaneRenderer = null;
+//  }
 };
 
 scout.Form.prototype._renderForm = function() {
