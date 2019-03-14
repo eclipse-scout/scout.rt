@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.ser.Serializers;
  * a JSON name (i.e. always typed string), whereas the latter writes a JSON value (i.e. any JSON type, including objects
  * and arrays).
  * <p>
- * TODO [8.x] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600) (and LocaleMapKeySerializer is the
- * only key serializer)
+ * TODO [9.1] pbz: [JSON] Remove this class when Jackson is upgraded to 3.0 (issue 1600) (and LocaleMapKeySerializer is
+ * the only key serializer)
  */
 @Bean
 public class DataObjectMapKeySerializers extends Serializers.Base {

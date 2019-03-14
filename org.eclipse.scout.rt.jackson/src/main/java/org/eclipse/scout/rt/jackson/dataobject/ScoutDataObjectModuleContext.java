@@ -76,7 +76,7 @@ public class ScoutDataObjectModuleContext {
   }
 
   /**
-   * TODO [9.1] pbz: remove method
+   * TODO [9.1] pbz: [JSON] Remove method
    *
    * @deprecated Use {@link #withTypeAttributeName(String)} instead.
    */

@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonTypeName("TestComplexEntity")
 public class TestComplexEntityPojo {
 
-  // TODO [8.x] pbz: Remove this class when Jackson issue 1600 is fixed
+  // TODO [9.1] pbz: [JSON] Remove this class when Jackson is upgraded to 3.0 (issue 1600)
   static class P_CustomLocaleSerializer extends JsonSerializer<Locale> {
     @Override
     public void serialize(Locale value, JsonGenerator gen, SerializerProvider serializers) throws IOException {

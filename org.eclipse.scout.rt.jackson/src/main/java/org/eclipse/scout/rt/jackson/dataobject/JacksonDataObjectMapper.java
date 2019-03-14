@@ -125,7 +125,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   }
 
   /**
-   * TODO [9.1] pbz: [JSON] remove this method
+   * TODO [9.1] pbz: [JSON] Remove this method
    *
    * @deprecated Use {@link #createObjectMapperInstance(boolean)} instead.
    */
@@ -140,7 +140,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
     ObjectMapper om = new ObjectMapper();
     om.registerModule(BEANS.get(ScoutDataObjectModule.class).withIgnoreTypeAttribute(ignoreTypeAttribute));
-    om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // FIXME [9.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
+    om.setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)); // TODO [9.1] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
     return om;
   }
 }

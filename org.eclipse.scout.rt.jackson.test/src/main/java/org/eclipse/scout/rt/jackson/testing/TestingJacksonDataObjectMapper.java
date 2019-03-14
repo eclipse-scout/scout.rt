@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * {@link IDataObjectMapper} implementation based on jackson {@link ObjectMapper} with output indentation enabled (e.g.
  * pretty formatted JSON output).
  *
- * @deprecated Use {@link IPrettyPrintDataObjectMapper} instance instead // TODO [9.1] pbz: Remove this class
+ * @deprecated Use {@link IPrettyPrintDataObjectMapper} instance instead // TODO [9.1] pbz: [JSON] Remove this class
  */
 @IgnoreBean
 @Deprecated
