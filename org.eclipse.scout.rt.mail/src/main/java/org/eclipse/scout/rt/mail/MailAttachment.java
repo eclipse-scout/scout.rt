@@ -55,15 +55,6 @@ public class MailAttachment {
     m_content = binaryResource.getContent();
   }
 
-  // TODO sme [9.0] remove constructor and getContentInternal()
-  protected MailAttachment(DataSource dataSource, String contentType, String name, String contentId, byte[] content) {
-    m_dataSource = dataSource;
-    m_contentType = contentType;
-    m_name = name;
-    m_contentId = contentId;
-    m_content = content;
-  }
-
   public DataSource getDataSource() {
     return m_dataSource;
   }
@@ -78,10 +69,6 @@ public class MailAttachment {
       }
     }
     return Arrays.copyOf(m_content, m_content.length);
-  }
-
-  public byte[] getContentInternal() {
-    return m_content;
   }
 
   /**

@@ -24,8 +24,6 @@ import org.eclipse.scout.rt.platform.Bean;
 @Bean
 public class MailMessage {
 
-  // TODO sme [9.0] remove ? extends for collection operations
-
   private final List<MailParticipant> m_toRecipients = new ArrayList<>();
   private final List<MailParticipant> m_ccRecipients = new ArrayList<>();
   private final List<MailParticipant> m_bccRecipients = new ArrayList<>();
@@ -43,7 +41,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of TO recipients.
    */
-  public List<? extends MailParticipant> getToRecipients() {
+  public List<MailParticipant> getToRecipients() {
     return Collections.unmodifiableList(m_toRecipients);
   }
 
@@ -64,7 +62,7 @@ public class MailMessage {
    * @param toRecipients
    *          TO recipients to add
    */
-  public MailMessage addToRecipients(Collection<? extends MailParticipant> toRecipients) {
+  public MailMessage addToRecipients(Collection<MailParticipant> toRecipients) {
     if (toRecipients != null) {
       m_toRecipients.addAll(toRecipients);
     }
@@ -82,7 +80,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of CC recipients.
    */
-  public List<? extends MailParticipant> getCcRecipients() {
+  public List<MailParticipant> getCcRecipients() {
     return Collections.unmodifiableList(m_ccRecipients);
   }
 
@@ -103,7 +101,7 @@ public class MailMessage {
    * @param ccRecipients
    *          CC recipients to add
    */
-  public MailMessage addCcRecipients(Collection<? extends MailParticipant> ccRecipients) {
+  public MailMessage addCcRecipients(Collection<MailParticipant> ccRecipients) {
     if (ccRecipients != null) {
       m_ccRecipients.addAll(ccRecipients);
     }
@@ -121,7 +119,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of BCC recipients.
    */
-  public List<? extends MailParticipant> getBccRecipients() {
+  public List<MailParticipant> getBccRecipients() {
     return Collections.unmodifiableList(m_bccRecipients);
   }
 
@@ -142,7 +140,7 @@ public class MailMessage {
    * @param bccRecipients
    *          BCC recipients to add
    */
-  public MailMessage addBccRecipients(Collection<? extends MailParticipant> bccRecipients) {
+  public MailMessage addBccRecipients(Collection<MailParticipant> bccRecipients) {
     if (bccRecipients != null) {
       m_bccRecipients.addAll(bccRecipients);
     }
@@ -178,7 +176,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of reply TO's.
    */
-  public List<? extends MailParticipant> getReplyTos() {
+  public List<MailParticipant> getReplyTos() {
     return Collections.unmodifiableList(m_replyTos);
   }
 
@@ -199,7 +197,7 @@ public class MailMessage {
    * @param replyTos
    *          reply TO recipients to add
    */
-  public MailMessage addReplyTos(Collection<? extends MailParticipant> replyTos) {
+  public MailMessage addReplyTos(Collection<MailParticipant> replyTos) {
     if (replyTos != null) {
       m_replyTos.addAll(replyTos);
     }
@@ -244,7 +242,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of attachments.
    */
-  public List<? extends MailAttachment> getAttachments() {
+  public List<MailAttachment> getAttachments() {
     return Collections.unmodifiableList(m_attachments);
   }
 
@@ -263,7 +261,7 @@ public class MailMessage {
    *
    * @param attachments
    */
-  public MailMessage withAttachments(Collection<? extends MailAttachment> attachments) {
+  public MailMessage withAttachments(Collection<MailAttachment> attachments) {
     m_attachments.addAll(attachments);
     return this;
   }
@@ -279,7 +277,7 @@ public class MailMessage {
   /**
    * @return an unmodifiable list of inline attachments.
    */
-  public List<? extends MailAttachment> getInlineAttachments() {
+  public List<MailAttachment> getInlineAttachments() {
     return Collections.unmodifiableList(m_inlineAttachments);
   }
 
@@ -298,7 +296,7 @@ public class MailMessage {
    *
    * @param inlineAttachments
    */
-  public MailMessage withInlineAttachments(Collection<? extends MailAttachment> inlineAttachments) {
+  public MailMessage withInlineAttachments(Collection<MailAttachment> inlineAttachments) {
     m_inlineAttachments.addAll(inlineAttachments);
     return this;
   }
