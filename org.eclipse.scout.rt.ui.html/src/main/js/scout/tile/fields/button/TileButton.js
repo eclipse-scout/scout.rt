@@ -63,3 +63,15 @@ scout.TileButton.prototype._renderIconId = function() {
   // Invalidate layout because button may now be longer or shorter
   this.htmlComp.invalidateLayoutTree();
 };
+
+scout.TileButton.prototype._renderTooltipText = function() {
+  // Because tile buttons don't have a visible status, display the tooltip text as normal "hover" tooltip
+  if (scout.strings.hasText(this.tooltipText)) {
+    scout.tooltips.install(this.$container, {
+      parent: this,
+      text: this.tooltipText
+    });
+  } else {
+    scout.tooltips.uninstall(this.$container);
+  }
+};
