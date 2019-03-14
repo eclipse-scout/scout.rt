@@ -64,51 +64,51 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label).width;
+        labelWidth = 32;//scout.graphics.prefSize(formField.$label).width;
       }
     }
     if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
-      scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
-      left += labelWidth + formField.$label.cssMarginX();
+//      scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
+      left += labelWidth;// + formField.$label.cssMarginX();
     } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
-      var labelHeight = scout.graphics.prefSize(formField.$label).height;
+      var labelHeight = 32;//scout.graphics.prefSize(formField.$label).height;
       // prefSize rounds the value -> ensure label height is set to that value to prevent gaps between container and label.
       // In addition, this also ensures that the correct height is set when changing the label position from left to top
-      formField.$label.cssHeight(labelHeight);
-      top += labelHeight + formField.$label.cssMarginY();
+//      formField.$label.cssHeight(labelHeight);
+      top += labelHeight;// + formField.$label.cssMarginY();
       labelHasFieldWidth = true;
     }
   }
   if (formField.$mandatory && formField.$mandatory.isVisible()) {
-    formField.$mandatory
-      .cssTop(top)
-      .cssLeft(left);
-    left += this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
+//    formField.$mandatory
+//      .cssTop(top)
+//      .cssLeft(left);
+    left += this.mandatoryIndicatorWidth;// + formField.$mandatory.cssMarginX();//formField.$mandatory.outerWidth(true);
   }
   if (this._isStatusVisible()) {
     // If both status and label position is "top", pull status up (without margin on the right side)
     if (formField.statusPosition === scout.FormField.StatusPosition.TOP && labelHasFieldWidth) {
-      var statusHeight = scout.graphics.prefSize(formField.$status, {
-        useCssSize: true
-      }).height;
+      var statusHeight = 32;//scout.graphics.prefSize(formField.$status, {
+//        useCssSize: true
+//      }).height;
       // Vertically center status with label
       var statusTop = containerPadding.top + formField.$label.cssPaddingTop() + (formField.$label.height() / 2) - (statusHeight / 2);
-      formField.$status
-        .cssTop(statusTop)
-        .cssRight(right + formField.$label.cssMarginRight())
-        .cssHeight(statusHeight)
-        .cssLineHeight(null);
+//      formField.$status
+//        .cssTop(statusTop)
+//        .cssRight(right + formField.$label.cssMarginRight())
+//        .cssHeight(statusHeight)
+//        .cssLineHeight(null);
       // Add padding to label to prevent overlay of text and status icon
       var w = scout.graphics.size(formField.$status, true).width;
-      formField.$label.cssPaddingRight(w);
+//      formField.$label.cssPaddingRight(w);
     } else {
       // Default status position
-      formField.$status
-        .cssTop(top)
-        .cssRight(right)
-        .cssHeight(this.rowHeight)
-        .cssLineHeight(this.rowHeight);
-      right += statusWidth + formField.$status.cssMarginX();
+//      formField.$status
+//        .cssTop(top)
+//        .cssRight(right)
+//        .cssHeight(this.rowHeight)
+//        .cssLineHeight(this.rowHeight);
+      right += statusWidth;// + formField.$status.cssMarginX();
     }
   }
 
@@ -132,21 +132,22 @@ scout.FormFieldLayout.prototype.layout = function($container) {
       fieldBounds.x = 0;
       fieldBounds.y = 0;
     }
+//    htmlField = formField.htmlFieldContainer || scout.HtmlComponent.optGet(formField.$fieldContainer);
     htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
     } else {
       scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
     }
-    formField.$field.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
-    formField.$container.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
+//    formField.$field.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
+//    formField.$container.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
-      var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
+      var fieldWidth = fieldSize.add(fieldMargins).width;// - formField.$label.cssMarginX();
       if (formField.$mandatory && formField.$mandatory.isVisible()) {
         fieldWidth += formField.$mandatory.outerWidth(true);
       }
-      formField.$label.cssWidth(fieldWidth);
+//      formField.$label.cssWidth(fieldWidth);
     }
   }
 
@@ -205,11 +206,12 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
     var scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
     var scrollbarSize = scout.device.scrollbarWidth;
 
-    $overlay
-      .css('top', pos.top)
-      .css('left', pos.left)
-      .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
-      .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
+//    $overlay
+//      .css('top', pos.top)
+//      .css('left', pos.left)
+//      .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
+//      .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
+
   }
 };
 

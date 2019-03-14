@@ -136,6 +136,8 @@ scout.FormField.prototype._init = function(model) {
   this._setGridData(this.gridData);
   this._updateEmpty();
   this.htmlComp = new scout.HtmlComponent(null, this.session);
+  this.htmlField = new scout.HtmlComponent(null, this.session);
+  this.htmlFieldContainer = new scout.HtmlComponent(null, this.session);
 };
 
 scout.FormField.prototype._initProperty = function(propertyName, value) {
@@ -211,6 +213,8 @@ scout.FormField.prototype._remove = function() {
   this.removeMandatoryIndicator();
   this._removeDisabledCopyOverlay();
   this._uninstallDragAndDropHandler();
+  this.htmlField.invalidateLayout(null, false);
+  this.htmlFieldContainer.invalidateLayout(null, false);
 };
 
 scout.FormField.prototype.setFieldStyle = function(fieldStyle) {
@@ -848,6 +852,7 @@ scout.FormField.prototype.addField = function($field) {
     this.addFieldContainer($field);
   }
   this.$field = $field;
+  this.htmlField.bind($field);
   this._linkWithLabel($field);
   this.$field.on('blur', this._onFieldBlur.bind(this))
     .on('focus', this._onFieldFocus.bind(this));
@@ -860,6 +865,7 @@ scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
   this.$fieldContainer = $fieldContainer
     .addClass('field')
     .appendTo(this.$container);
+  this.htmlFieldContainer.bind(this.$fieldContainer);
 };
 
 /**
