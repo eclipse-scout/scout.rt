@@ -233,6 +233,11 @@ describe('DateField', function() {
       expect(field.value).toBe(null);
       expect(field.errorStatus instanceof scout.Status).toBe(true);
 
+      field.setValue('2019-03-14');
+      expect(field.value).toBe(null);
+      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.displayText).toBe('14.03.2019\n00:00');
+
       field.setValidator(function(value) {
         return value;
       });

@@ -343,12 +343,13 @@ scout.ValueField.prototype._ensureValue = function(value) {
 scout.ValueField.prototype._setValue = function(value) {
   var oldValue = this.value;
   this._updateErrorStatus(null);
-
+  var typedValue = null;
   try {
-    var typedValue = this._ensureValue(value);
+    typedValue = this._ensureValue(value);
     this.value = this.validateValue(typedValue);
   } catch (error) {
-    this._validationFailed(value, error);
+    typedValue = typedValue || value;
+    this._validationFailed(typedValue, error);
     return;
   }
 
