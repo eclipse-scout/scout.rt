@@ -914,7 +914,7 @@ $.fn.placeholder = function(placeholder) {
 };
 
 $.fn.isVisible = function() {
-  return elemVisible(this[0]);
+  return !this.hasClass('hidden');
 };
 
 $.fn.isEveryParentVisible = function() {

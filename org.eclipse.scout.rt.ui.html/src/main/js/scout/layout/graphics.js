@@ -51,9 +51,8 @@ scout.graphics = {
    *          of an object, the value is automatically converted to the option "includeMargin".
    */
   prefSize: function($elem, options) {
-    // Return 0/0 if element is not displayed (display: none).
-    // We don't use isVisible by purpose because isVisible returns false for elements with visibility: hidden which is wrong here (we would like to be able to measure hidden elements)
-    if (!$elem[0] || $elem.isDisplayNone()) {
+    // Return 0/0 if element is not visible
+    if (!$elem[0] || !($elem.isVisible() && $elem.isEveryParentVisible())) {
       return new scout.Dimension(0, 0);
     }
 
@@ -78,6 +77,7 @@ scout.graphics = {
       return this.prefSizeWithoutAnimation($elem, options);
     }
 
+//    var oldStyle = null;
     var oldStyle = $elem.attr('style');
     var oldScrollLeft = $elem.scrollLeft();
     var oldScrollTop = $elem.scrollTop();
@@ -85,6 +85,23 @@ scout.graphics = {
     if (options.restoreScrollPositions) {
       scout.scrollbars.storeScrollPositions($elem);
     }
+
+//    if (!options.useCssSize) {
+//      $elem.addClass('measure-width-height');
+//    } else {
+//      oldStyle = $elem.attr('style');
+//
+//      // UseCssSize is necessary if the css rules have a fix height or width set.
+//      // Otherwise setting the width/height to auto could result in a different size
+//      var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
+//      var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
+//
+//      // modify properties which prevent reading the preferred size
+//      $elem.css({
+//        'width': newWidth,
+//        'height': newHeight
+//      });
+//    }
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
@@ -105,7 +122,12 @@ scout.graphics = {
       prefSize.height += $elem.cssMarginY();
     }
 
-    // reset the modified style attribute
+//    // reset the modified style attribute
+//    if (!options.useCssSize) {
+//      $elem.removeClass('measure-width-height');
+//    } else {
+//      $elem.attrOrRemove('style', oldStyle);
+//    }
     $elem.attrOrRemove('style', oldStyle);
     $elem.scrollLeft(oldScrollLeft);
     $elem.scrollTop(oldScrollTop);
@@ -179,7 +201,7 @@ scout.graphics = {
    *          of an object, the value is automatically converted to the option "includeMargin".
    */
   size: function($elem, options) {
-    if (!$elem[0] || $elem.isDisplayNone()) {
+    if (!$elem[0] || !($elem.isVisible() && $elem.isEveryParentVisible())) {
       return new scout.Dimension(0, 0);
     }
 

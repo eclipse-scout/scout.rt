@@ -31,6 +31,7 @@ scout.TabArea.prototype._init = function(options) {
     cssClass: 'overflow-tab-item unfocusable',
     iconId: null
   });
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -53,7 +54,8 @@ scout.TabArea.prototype._initKeyStrokeContext = function() {
 
 scout.TabArea.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tab-area');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.TabAreaLayout(this));
 
   this.ellipsis.render(this.$container);

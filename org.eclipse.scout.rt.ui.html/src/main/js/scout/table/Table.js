@@ -198,6 +198,7 @@ scout.Table.prototype._init = function(model) {
   this._setTableStatus(this.tableStatus);
   this._calculateValuesForBackgroundEffect();
   this._group();
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -396,7 +397,8 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
 
 scout.Table.prototype._render = function() {
   this.$container = this.$parent.appendDiv('table');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 

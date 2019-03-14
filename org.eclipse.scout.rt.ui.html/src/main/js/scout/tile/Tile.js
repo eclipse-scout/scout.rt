@@ -46,11 +46,13 @@ scout.Tile.prototype._init = function(model) {
   this._setGridDataHints(this.gridDataHints);
   this._setColorScheme(this.colorScheme);
   this._setSelectable(this.selectable);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.Tile.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tile');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.SingleLayout());
 };
 

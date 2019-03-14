@@ -99,7 +99,7 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   if (view === this.currentView) {
     return;
   }
-
+  console.time('remove')
   if (this.currentView) {
     if (this.currentView.tabDeactivated) {
       this.currentView.tabDeactivated();
@@ -111,18 +111,26 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
     });
     this.currentView = null;
   }
+  console.timeEnd('remove')
+
   // ensure rendered
   if (this.rendered) {
+    console.time('render')
     this._renderView(view);
+    console.timeEnd('render')
   }
 
   this.currentView = view;
 
+  console.time('event')
   this.trigger('viewActivate', {
     view: view
   });
+  console.timeEnd('event')
 
+  console.time('layout')
   this.revalidateLayout();
+  console.timeEnd('layout')
 };
 
 scout.SimpleTabBox.prototype.setLayoutData = function(layoutData) {

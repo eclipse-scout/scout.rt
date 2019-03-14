@@ -128,6 +128,7 @@ scout.Tree.prototype._init = function(model) {
   this._setDisplayStyle(this.displayStyle);
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -322,7 +323,8 @@ scout.Tree.prototype._render = function() {
   }
 
   var layout = new scout.TreeLayout(this);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 

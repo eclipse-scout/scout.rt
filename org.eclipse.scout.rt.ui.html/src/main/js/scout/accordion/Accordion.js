@@ -27,6 +27,7 @@ scout.Accordion.prototype._init = function(model) {
   scout.Accordion.parent.prototype._init.call(this, model);
   this._initGroups(this.groups);
   this._setExclusiveExpand(this.exclusiveExpand);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -40,7 +41,7 @@ scout.Accordion.prototype._createLoadingSupport = function() {
 
 scout.Accordion.prototype._render = function() {
   this.$container = this.$parent.appendDiv('accordion');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(this._createLayout());
 };
 

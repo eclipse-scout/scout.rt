@@ -50,6 +50,12 @@ scout.HtmlComponent = function($comp, session) {
   this.session = session;
 };
 
+scout.HtmlComponent.prototype.bind = function($comp) {
+  this.$comp = $comp;
+  // link DOM element with the new instance
+  this.$comp.data('htmlComponent', this);
+};
+
 /**
  * Returns the parent or $comp or null when $comp has no parent.
  * Creates a new instance of HtmlComponent if the parent DOM element has no linked instance yet.
@@ -113,9 +119,15 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
  * @param {scout.HtmlComponent} htmlSource The component the invalidation originated from.
  *        Is always set if the invalidation is triggered by using invalidateLayoutTree, may be undefined otherwise.
  */
-scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
+scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource, invalidateCache) {
   this.valid = false;
-  this.prefSizeCached = {};
+  if (invalidateCache) {
+    this.prefSizeCached = {};
+    this.sizeCached = null;
+    this.offsetBoundsCached = null;
+    this.marginsCached = null;
+    this.insetsCached = null;
+  }
   if (this.layout) {
     this.layout.invalidate(htmlSource);
   }
@@ -314,11 +326,19 @@ scout.HtmlComponent.prototype._adjustPrefSizeWithMinMaxSize = function(prefSize)
  * Returns the inset-dimensions of the component (padding and border, no margin).
  */
 scout.HtmlComponent.prototype.insets = function(options) {
-  return scout.graphics.insets(this.$comp, options);
+  if (this.insetsCached) {
+    return this.insetsCached;
+  }
+  this.insetsCached = scout.graphics.insets(this.$comp, options);
+  return this.insetsCached;
 };
 
 scout.HtmlComponent.prototype.margins = function() {
-  return scout.graphics.margins(this.$comp);
+  if (this.marginsCached) {
+    return this.marginsCached;
+  }
+  this.marginsCached = scout.graphics.margins(this.$comp);
+  return this.marginsCached;
 };
 
 /**
@@ -326,7 +346,11 @@ scout.HtmlComponent.prototype.margins = function() {
  * @param options, see {@link scout.graphics#size} for details.
  */
 scout.HtmlComponent.prototype.size = function(options) {
-  return scout.graphics.size(this.$comp, options);
+  if (this.sizeCached) {
+    return this.sizeCached;
+  }
+  this.sizeCached = scout.graphics.size(this.$comp, options);
+  return this.sizeCached;
 };
 
 /**
@@ -345,6 +369,7 @@ scout.HtmlComponent.prototype.setSize = function(size) {
   if (this.pixelBasedSizing) {
     scout.graphics.setSize(this.$comp, size);
   }
+  this.sizeCached = size;
   this.validateLayout();
 };
 
@@ -357,7 +382,11 @@ scout.HtmlComponent.prototype.position = function() {
 };
 
 scout.HtmlComponent.prototype.offsetBounds = function(options) {
-  return scout.graphics.offsetBounds(this.$comp, options);
+  if (this.offsetBoundsCached) {
+    return this.offsetBoundsCached;
+  }
+  this.offsetBoundsCached = scout.graphics.offsetBounds(this.$comp, options);
+  return this.offsetBoundsCached;
 };
 
 scout.HtmlComponent.prototype.offset = function() {
@@ -381,11 +410,12 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
-  var oldBounds = this.offsetBounds();
-  if (!oldBounds.dimension().equals(bounds.dimension())) {
+  var oldSize = this.sizeCached;
+  if (!bounds.dimension().equals(oldSize)) {
     this.invalidateLayout();
   }
   scout.graphics.setBounds(this.$comp, bounds);
+  this.sizeCached = bounds.dimension();
   this.validateLayout();
 };
 

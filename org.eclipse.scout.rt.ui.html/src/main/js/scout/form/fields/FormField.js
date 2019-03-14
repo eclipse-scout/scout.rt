@@ -135,6 +135,7 @@ scout.FormField.prototype._init = function(model) {
   this._setGridDataHints(this.gridDataHints);
   this._setGridData(this.gridData);
   this._updateEmpty();
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.FormField.prototype._initProperty = function(propertyName, value) {
@@ -955,9 +956,8 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
   if (cssClass) {
     this.$container.addClass(cssClass);
   }
-  var htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
-  this.htmlComp = htmlComp;
+  this.htmlComp.bind(this.$container);
+  this.htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
 };
 
 /**

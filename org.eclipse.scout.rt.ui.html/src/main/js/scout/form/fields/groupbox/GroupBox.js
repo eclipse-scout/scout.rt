@@ -74,6 +74,8 @@ scout.GroupBox.prototype._init = function(model) {
   }));
 
   this._setResponsive(this.responsive);
+  this.htmlTitle = new scout.HtmlComponent(null, this.session);
+  this.htmlBody = new scout.HtmlComponent(null, this.session);
 };
 
 scout.GroupBox.prototype._destroy = function() {
@@ -187,16 +189,20 @@ scout.GroupBox.prototype._render = function() {
   this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
 
   this.$title = this.$container.appendDiv('group-box-title');
+  this.htmlTitle.bind(this.$title);
   this.addLabel();
   this.addSubLabel();
   this.addStatus();
   this.$body = this.$container.appendDiv('group-box-body');
-  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  this.htmlBody.bind(this.$body);
+//  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
   this.htmlBody.setLayout(this._createBodyLayout());
 };
 
 scout.GroupBox.prototype._remove = function() {
   this._removeSubLabel();
+  this.htmlTitle.invalidateLayout(null, false);
+  this.htmlBody.invalidateLayout(null, false);
   scout.GroupBox.parent.prototype._remove.call(this);
 };
 
@@ -638,8 +644,10 @@ scout.GroupBox.prototype.setGridColumnCount = function(gridColumnCount) {
  */
 scout.GroupBox.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   scout.GroupBox.parent.prototype.invalidateLogicalGrid.call(this, false);
-  if (scout.nvl(invalidateLayout, true) && this.rendered) {
-    this.htmlBody.invalidateLayoutTree();
+  if (scout.nvl(invalidateLayout, true)) {
+    if (this.rendered) {
+      this.htmlBody.invalidateLayoutTree();
+    }
   }
 };
 

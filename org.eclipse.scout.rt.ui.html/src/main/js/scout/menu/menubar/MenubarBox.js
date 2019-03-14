@@ -18,6 +18,7 @@ scout.inherits(scout.MenubarBox, scout.Widget);
 
 scout.MenubarBox.prototype._init = function(options) {
   scout.MenubarBox.parent.prototype._init.call(this, options);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.MenubarBox.prototype._destroy = function() {
@@ -28,7 +29,8 @@ scout.MenubarBox.prototype._destroy = function() {
 scout.MenubarBox.prototype._render = function() {
   this.$container = this.$parent.appendDiv('menubox');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.MenubarBoxLayout(this));
 };
 

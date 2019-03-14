@@ -40,12 +40,14 @@ scout.TabBoxHeader.prototype._init = function(options) {
   this.tabBox.on('propertyChange', this._tabBoxPropertyChangeHandler);
 
   this.menuBar.setMenuItems(this.tabBox.menus);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.TabBoxHeader.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tab-box-header');
   this.$borderBottom = this.$container.appendDiv('tab-box-header-bottom-border');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.TabBoxHeaderLayout(this));
   this.tabArea.render(this.$container);
   this.menuBar.render(this.$container);

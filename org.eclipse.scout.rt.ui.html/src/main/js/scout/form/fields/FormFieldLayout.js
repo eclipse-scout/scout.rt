@@ -82,13 +82,10 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.$mandatory && formField.$mandatory.isVisible()) {
     formField.$mandatory
       .cssTop(top)
-      .cssLeft(left)
-      .cssWidth(this.mandatoryIndicatorWidth);
-    left += formField.$mandatory.outerWidth(true);
+      .cssLeft(left);
+    left += this.mandatoryIndicatorWidth + formField.$mandatory.cssMarginX();
   }
   if (this._isStatusVisible()) {
-    formField.$status
-      .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
     if (formField.statusPosition === scout.FormField.StatusPosition.TOP && labelHasFieldWidth) {
       var statusHeight = scout.graphics.prefSize(formField.$status, {
@@ -213,7 +210,6 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
       .css('left', pos.left)
       .width($field.width() + padding.horizontal() - (scrollVertical ? scrollbarSize : 0))
       .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
-
   }
 };
 

@@ -61,6 +61,7 @@ scout.TileGrid.prototype._init = function(model) {
   this._applyFilters(this.tiles);
   this._updateFilteredTiles();
   this._setMenus(this.menus);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -129,7 +130,8 @@ scout.TileGrid.prototype._initTile = function(tile) {
 
 scout.TileGrid.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tile-grid');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(this._createLayout());
   this.$container
     .on('mousedown', '.tile', this._onTileMouseDown.bind(this))

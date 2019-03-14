@@ -49,6 +49,7 @@ scout.Group.prototype._init = function(model) {
   this.resolveIconIds(['iconId']);
   this._setBody(this.body);
   this._setHeader(this.header);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -75,7 +76,8 @@ scout.Group.prototype._initKeyStrokeContext = function() {
 
 scout.Group.prototype._render = function() {
   this.$container = this.$parent.appendDiv('group');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.GroupLayout(this));
 
   this._renderHeader();

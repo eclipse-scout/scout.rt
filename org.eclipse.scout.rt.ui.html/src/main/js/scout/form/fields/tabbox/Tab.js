@@ -39,6 +39,7 @@ scout.Tab.prototype._init = function(options) {
   this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
   this.tabItem.on('propertyChange', this._tabPropertyChangeHandler);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.Tab.prototype._destroy = function() {
@@ -49,7 +50,8 @@ scout.Tab.prototype._destroy = function() {
 
 scout.Tab.prototype._render = function() {
   this.$container = this.$parent.appendDiv('tab-item');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.$title = this.$container.appendDiv('title');
   this.$label = this.$title.appendDiv('label');
   scout.tooltips.installForEllipsis(this.$label, {

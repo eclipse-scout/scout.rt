@@ -22,6 +22,7 @@ scout.MenuBox.prototype._init = function(options) {
   this.uiMenuCssClass = options.uiMenuCssClass || '';
   this.uiMenuCssClass += ' ' + 'menu-box-item';
   this._initMenus(this.menus);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.MenuBox.prototype._initMenus = function(menus) {
@@ -38,7 +39,8 @@ scout.MenuBox.prototype._initMenu = function(menu) {
 scout.MenuBox.prototype._render = function() {
   this.$container = this.$parent.appendDiv('menu-box');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.MenuBoxLayout(this));
 };
 

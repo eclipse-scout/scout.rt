@@ -174,7 +174,8 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this.groupBox.$title, true).height;
+  return this.groupBox.htmlTitle.prefSize(true).height;
+//  return scout.graphics.prefSize(this.groupBox.$title, true).height;
 };
 
 scout.GroupBoxLayout.prototype._notificationHeight = function(options) {

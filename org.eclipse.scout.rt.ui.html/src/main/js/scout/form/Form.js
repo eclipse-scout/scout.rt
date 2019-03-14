@@ -85,6 +85,7 @@ scout.Form.prototype._init = function(model) {
   this._setModal(this.modal);
   this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
   this._installLifecycle();
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.Form.prototype._render = function() {
@@ -170,7 +171,7 @@ scout.Form.prototype._renderForm = function() {
     this.$container.addClass(this.uiCssClass);
   }
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);

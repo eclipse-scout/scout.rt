@@ -51,6 +51,7 @@ scout.Menu.MenuStyle = {
 
 scout.Menu.prototype._init = function(options) {
   scout.Menu.parent.prototype._init.call(this, options);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 /**
@@ -69,7 +70,7 @@ scout.Menu.prototype._render = function() {
     this._renderItem();
   }
   this.$container.unfocusable();
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
 };
 
 scout.Menu.prototype._renderProperties = function() {

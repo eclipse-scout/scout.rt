@@ -19,10 +19,16 @@ scout.FieldStatus = function() {
 };
 scout.inherits(scout.FieldStatus, scout.Widget);
 
+scout.FieldStatus.prototype._init = function(model) {
+  scout.FieldStatus.parent.prototype._init.call(this, model);
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
+};
+
 scout.FieldStatus.prototype._render = function() {
   this.$container = this.$parent.appendSpan('status')
     .on('mousedown', this._onStatusMouseDown.bind(this));
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+//  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
 };
 
 scout.FieldStatus.prototype._remove = function() {

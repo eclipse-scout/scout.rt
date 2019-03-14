@@ -403,6 +403,10 @@ scout.Widget.prototype._removeInternal = function() {
   this._cleanup();
   this._remove();
   this.$parent = null;
+  if (this.htmlComp) {
+    // Make sure it will be layouted again the next time is rendered.
+    this.htmlComp.invalidateLayout(null, false);
+  }
   this.rendered = false;
   this.removing = false;
   this.trigger('remove');

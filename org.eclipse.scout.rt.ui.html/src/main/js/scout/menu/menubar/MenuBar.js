@@ -63,6 +63,7 @@ scout.MenuBar.prototype._init = function(options) {
 
   this._setMenuItems(scout.arrays.ensure(this.menuItems));
   this.updateVisibility();
+  this.htmlComp = new scout.HtmlComponent(null, this.session);
 };
 
 scout.MenuBar.prototype._destroy = function() {
@@ -96,7 +97,7 @@ scout.MenuBar.prototype._render = function() {
   this.$container = this.$parent.makeDiv('menubar')
     .toggleClass('main-menubar', this.size === 'large');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.bind(this.$container);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
 
   if (this.position === 'top') {
