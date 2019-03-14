@@ -34,7 +34,12 @@ scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windo
     if (!this.preserveOpener) {
       popup.opener = null;
     }
-    popup.window.location.href = uri;
+    try {
+      popup.window.location.href = uri;
+    } catch (err) {
+      this._handleInvalidUri(uri, popup, err);
+      return;
+    }
     if (onWindowOpened) {
       onWindowOpened(popup);
     }
@@ -69,4 +74,19 @@ scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
     notification.on('linkClick', vararg);
   }
   notification.show();
+};
+
+scout.PopupBlockerHandler.prototype._handleInvalidUri = function(uri, popup, err) {
+  // Log
+  $.log.warn('Invalid URI: ' + uri);
+
+  // Close popup
+  popup.close();
+
+  // Show message
+  scout.MessageBoxes.createOk(this.session.desktop)
+    .withHeader(this.session.text('ui.UnexpectedProblem'))
+    .withBody(this.session.text('ui.InvalidUriMsg'))
+    .withSeverity(scout.Status.Severity.ERROR)
+    .buildAndOpen();
 };

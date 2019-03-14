@@ -129,6 +129,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.UiInconsistentMsg",
         "ui.UnexpectedProblem",
         "ui.InternalProcessingErrorMsg",
+        "ui.InvalidUriMsg",
         "ui.PleaseWait_",
         "ui.ShowAllNodes",
         "ui.CW",
