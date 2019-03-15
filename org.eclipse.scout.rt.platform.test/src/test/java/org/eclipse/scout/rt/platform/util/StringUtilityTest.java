@@ -56,6 +56,32 @@ public class StringUtilityTest {
   }
 
   @Test
+  public void testLtrim() {
+    assertEquals("bcdefg", StringUtility.ltrim("aaabcdefg", 'a'));
+    assertEquals("bcdefg", StringUtility.ltrim("abcdefg", 'a'));
+    assertEquals("", StringUtility.ltrim("aa", 'a'));
+    assertEquals("", StringUtility.ltrim("a", 'a'));
+    assertEquals("b", StringUtility.ltrim("b", 'a'));
+    assertEquals("abc", StringUtility.ltrim("abc", 'd'));
+    assertEquals("abc", StringUtility.ltrim("abc", null));
+    assertNull(StringUtility.ltrim(null, null));
+    assertNull(StringUtility.ltrim(null, 'a'));
+  }
+
+  @Test
+  public void testRtrim() {
+    assertEquals("abcdef", StringUtility.rtrim("abcdefggggg", 'g'));
+    assertEquals("abcdef", StringUtility.rtrim("abcdefg", 'g'));
+    assertEquals("", StringUtility.rtrim("aa", 'a'));
+    assertEquals("", StringUtility.rtrim("a", 'a'));
+    assertEquals("b", StringUtility.rtrim("b", 'a'));
+    assertEquals("abc", StringUtility.rtrim("abc", 'd'));
+    assertEquals("abc", StringUtility.rtrim("abc", null));
+    assertNull(StringUtility.rtrim(null, null));
+    assertNull(StringUtility.rtrim(null, 'a'));
+  }
+
+  @Test
   public void testReplace() {
     assertEquals("ba", StringUtility.replace("aaa", "aa", "b"));
     assertNull(StringUtility.replace(null, "aa", "b"));

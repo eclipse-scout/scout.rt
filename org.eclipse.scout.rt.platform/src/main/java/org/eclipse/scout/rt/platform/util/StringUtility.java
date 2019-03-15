@@ -1241,6 +1241,9 @@ public final class StringUtility {
     return buf.substring(0, len);
   }
 
+  /**
+   * Removes all leading characters from s that matches c.
+   */
   public static String ltrim(String s, Character c) {
     if (s == null) {
       return null;
@@ -1250,13 +1253,15 @@ public final class StringUtility {
     }
     int len = s.length();
     int st = 0;
-    char[] val = s.toCharArray();
-    while ((st < len) && (val[st] == c)) {
+    while (st < len && s.charAt(st) == c) {
       st++;
     }
-    return ((st > 0) || (len < s.length())) ? s.substring(st, len) : s;
+    return st > 0 ? s.substring(st, len) : s;
   }
 
+  /**
+   * Removes all trailing characters from s that matches c.
+   */
   public static String rtrim(String s, Character c) {
     if (s == null) {
       return null;
@@ -1265,12 +1270,10 @@ public final class StringUtility {
       return s;
     }
     int len = s.length();
-    int st = 0;
-    char[] val = s.toCharArray();
-    while ((st < len) && (val[len - 1] == c)) {
+    while (len > 0 && s.charAt(len - 1) == c) {
       len--;
     }
-    return ((st > 0) || (len < s.length())) ? s.substring(st, len) : s;
+    return len < s.length() ? s.substring(0, len) : s;
   }
 
   /**
