@@ -49,7 +49,9 @@ public class TextsLoader extends AbstractResourceLoader {
         }
 
         Map<String, String> map = textsByLanguageTag.computeIfAbsent(locale, k -> new TreeMap<>());
-        map.putAll(bundle.getTextMap());
+        for (Entry<String, String> entry : bundle.getTextMap().entrySet()) {
+          map.putIfAbsent(entry.getKey(), entry.getValue());
+        }
       }
     }
 
