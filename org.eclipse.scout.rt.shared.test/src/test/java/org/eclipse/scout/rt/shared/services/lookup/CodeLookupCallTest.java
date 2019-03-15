@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.lookup;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -135,6 +136,18 @@ public class CodeLookupCallTest {
     List<ILookupRow<Integer>> newRows = newLc.getDataByRec();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
+  }
+
+  @Test
+  public void testGetDataByAllWithMaxRowCount() {
+    int numSkippedRows = 3;
+    P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
+    List<ILookupRow<Integer>> allRows = newLc.getDataByAll();
+    assertTrue(allRows.size() > numSkippedRows);
+
+    newLc.setMaxRowCount(allRows.size() - numSkippedRows);
+    List<ILookupRow<Integer>> firstRows = newLc.getDataByAll();
+    assertEquals(allRows.size() - numSkippedRows + 1 /* if max row count=3, actually return 4 rows so that the UI recognizes that there are more rows */, firstRows.size());
   }
 
   @Test

@@ -194,28 +194,16 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
     final Pattern pat = createSearchPattern(getText());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
-      public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
-          return true;
+      protected ILookupRow<CODE_ID> toLookupRow(ICode<CODE_ID> code) {
+        ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
+        if (row != null && row.getText() != null && (pat.matcher(row.getText().toLowerCase()).matches() || (isHierarchicalLookup() && isParentInResultList(m_list, row)))) {
+          return row;
         }
-        if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
-          if (row != null && row.getText() != null && (pat.matcher(row.getText().toLowerCase()).matches() || (isHierarchicalLookup() && isParentInResultList(getLookupRows(), row)))) {
-            add(row);
-          }
-        }
-        return true;
+        return null;
       }
     };
     resolveCodes(v);
-    List<ILookupRow<CODE_ID>> result = v.getLookupRows();
-    if (result.size() > 1) {
-      Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
-      if (comparator != null) {
-        result.sort(comparator);
-      }
-    }
-    return result;
+    return v.getLookupRows();
   }
 
   /**
@@ -226,28 +214,16 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
     final Pattern pat = createSearchPattern(getAll());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
-      public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
-          return true;
+      protected ILookupRow<CODE_ID> toLookupRow(ICode<CODE_ID> code) {
+        ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
+        if (row != null && row.getText() != null && pat.matcher(row.getText().toLowerCase()).matches()) {
+          return row;
         }
-        if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
-          if (row != null && row.getText() != null && pat.matcher(row.getText().toLowerCase()).matches()) {
-            add(row);
-          }
-        }
-        return true;
+        return null;
       }
     };
     resolveCodes(v);
-    List<ILookupRow<CODE_ID>> result = v.getLookupRows();
-    if (result.size() > 1) {
-      Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
-      if (comparator != null) {
-        result.sort(comparator);
-      }
-    }
-    return result;
+    return v.getLookupRows();
   }
 
   /**
@@ -256,37 +232,22 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
   @Override
   public List<ILookupRow<CODE_ID>> getDataByRec() {
     Object recValue = getRec();
-    if ((recValue instanceof Number) && ((Number) recValue).longValue() == 0) {
+    if (recValue instanceof Number && ((Number) recValue).longValue() == 0) {
       recValue = null;
     }
     final Object key = recValue;
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
-      public boolean visit(ICode<CODE_ID> code, int treeLevel) {
-        if (m_filter != null && !m_filter.visit(CodeLookupCall.this, code, treeLevel)) {
-          return true;
-        }
+      protected ILookupRow<CODE_ID> toLookupRow(ICode<CODE_ID> code) {
         ICode parentCode = code.getParentCode();
-        if (getActive().isUndefined() || getActive().getBooleanValue() == code.isActive()) {
-          if (((parentCode == null && key == null) || (parentCode != null && parentCode.getId() != null && parentCode.getId().equals(key)))) { // NOSONAR
-            ILookupRow<CODE_ID> row = execCreateLookupRowFromCode(code);
-            if (row != null) {
-              add(row);
-            }
-          }
+        if ((parentCode == null && key == null) || (parentCode != null && parentCode.getId() != null && parentCode.getId().equals(key))) {
+          return execCreateLookupRowFromCode(code);
         }
-        return true;
+        return null;
       }
     };
     resolveCodes(v);
-    List<ILookupRow<CODE_ID>> result = v.getLookupRows();
-    if (result.size() > 1) {
-      Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
-      if (comparator != null) {
-        result.sort(comparator);
-      }
-    }
-    return result;
+    return v.getLookupRows();
   }
 
   /**
@@ -319,20 +280,54 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> {
     }
   }
 
-  private abstract class AbstractLookupRowCollector implements ICodeVisitor<ICode<CODE_ID>> {
+  protected abstract class AbstractLookupRowCollector implements ICodeVisitor<ICode<CODE_ID>> {
 
-    private final List<ILookupRow<CODE_ID>> m_list = new ArrayList<>();
+    protected final List<ILookupRow<CODE_ID>> m_list = new ArrayList<>();
 
-    public AbstractLookupRowCollector() {
+    @Override
+    public boolean visit(ICode<CODE_ID> code, int treeLevel) {
+      if (!acceptedByRowCount()) {
+        return false;
+      }
+      if (!acceptedByFilter(code, treeLevel)) {
+        return true;
+      }
+      if (acceptedByActive(code, treeLevel)) {
+        ILookupRow<CODE_ID> row = toLookupRow(code);
+        if (row != null) {
+          m_list.add(row);
+        }
+      }
+      return true;
     }
 
-    public void add(ILookupRow<CODE_ID> row) {
-      m_list.add(row);
+    protected boolean acceptedByActive(ICode<CODE_ID> code, int treeLevel) {
+      return getActive().isUndefined() || getActive().getBooleanValue() == code.isActive();
     }
 
+    protected boolean acceptedByRowCount() {
+      // if max row count=n, actually return n+1 rows so that the UI recognizes that there are more rows
+      return getMaxRowCount() < 1 || m_list.size() <= getMaxRowCount();
+    }
+
+    protected boolean acceptedByFilter(ICode<CODE_ID> code, int treeLevel) {
+      return m_filter == null || m_filter.visit(CodeLookupCall.this, code, treeLevel);
+    }
+
+    protected abstract ILookupRow<CODE_ID> toLookupRow(ICode<CODE_ID> code);
+
+    /**
+     * @return A live list holding all {@link ILookupRow LookupRows} that fulfill all filters sorted by
+     *         {@link CodeLookupCall#getSortComparator()}.
+     */
     public List<ILookupRow<CODE_ID>> getLookupRows() {
+      if (m_list.size() > 1) {
+        Comparator<ILookupRow<CODE_ID>> comparator = getSortComparator();
+        if (comparator != null) {
+          m_list.sort(comparator);
+        }
+      }
       return m_list;
     }
   }
-
 }
