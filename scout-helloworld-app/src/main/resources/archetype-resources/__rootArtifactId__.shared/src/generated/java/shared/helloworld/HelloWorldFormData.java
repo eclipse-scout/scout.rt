@@ -1,7 +1,6 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-
 package ${package}.shared.helloworld;
 
 import javax.annotation.Generated;
@@ -19,9 +18,6 @@ public class HelloWorldFormData extends AbstractFormData {
 
   private static final long serialVersionUID = 1L;
 
-  public HelloWorldFormData() {
-  }
-
   public Message getMessage() {
     return getFieldByClass(Message.class);
   }
@@ -29,8 +25,5 @@ public class HelloWorldFormData extends AbstractFormData {
   public static class Message extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;
-
-    public Message() {
-    }
   }
 }
