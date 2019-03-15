@@ -23,7 +23,7 @@ scout.LogicalGridLayout = function(widget, layoutConfig) {
   this.info = null;
 
   this._initDefaults();
-  this.layoutConfig = scout.LogicalGridLayoutConfig.ensure(layoutConfig);
+  this.layoutConfig = scout.LogicalGridLayoutConfig.ensure(layoutConfig || {});
   this.layoutConfig.applyToLayout(this);
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
