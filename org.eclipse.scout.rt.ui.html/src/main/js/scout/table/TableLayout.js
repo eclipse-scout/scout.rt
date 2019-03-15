@@ -88,14 +88,18 @@ scout.TableLayout.prototype.layout = function($container) {
   this.table.updateScrollbars();
 };
 
-scout.TableLayout.prototype._layoutColumns = function() {
+scout.TableLayout.prototype._layoutColumns = function(widthHint) {
   this._autoOptimizeColumnsWidths();
 
   var htmlContainer = this.table.htmlComp;
-  var columnLayoutDirty = this.table.columnLayoutDirty || !htmlContainer.sizeCached || htmlContainer.sizeCached.width !== htmlContainer.size().width;
+  var columnLayoutDirty = this.table.columnLayoutDirty || !htmlContainer.sizeCached;
+  if (!columnLayoutDirty) {
+    var width = widthHint || htmlContainer.size().width;
+    columnLayoutDirty = htmlContainer.sizeCached.width !== width;
+  }
   // Auto resize only if table width or column structure has changed
   if (this.table.autoResizeColumns && columnLayoutDirty) {
-    this._autoResizeColumns();
+    this._autoResizeColumns(widthHint);
     this.table.columnLayoutDirty = false;
   }
 };
@@ -114,12 +118,13 @@ scout.TableLayout.prototype._autoOptimizeColumnsWidths = function() {
 /**
  * Resizes the visible columns to make them use all the available space.
  */
-scout.TableLayout.prototype._autoResizeColumns = function() {
+scout.TableLayout.prototype._autoResizeColumns = function(widthHint) {
   var newWidth, weight,
     relevantColumns = [],
     currentWidth = 0,
     totalInitialWidth = 0,
-    availableWidth = Math.floor(this.table.$data.width() - this.table.rowBorderWidth);
+    tableWidth = widthHint || this.table.$data.width(),
+    availableWidth = Math.floor(tableWidth - this.table.rowBorderWidth);
 
   // Don't resize fixed and auto optimize width columns
   this.table.visibleColumns().forEach(function(column) {
@@ -197,6 +202,9 @@ scout.TableLayout.prototype._autoResizeColumns = function() {
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($container, options) {
+  // If autoResizeColumns and text wrap is enabled, the height of the table depends on the width
+  this._layoutColumns(options.widthHint);
+
   // If table was not visible during renderViewport, the rows are not rendered yet (see _renderViewport)
   // -> make sure rows are rendered otherwise preferred height cannot be determined
   this.table._renderViewport();

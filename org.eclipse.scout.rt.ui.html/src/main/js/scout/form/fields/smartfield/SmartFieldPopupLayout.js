@@ -77,13 +77,13 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
 /**
  * @override AbstractLayout.js
  */
-scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container) {
+scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container, options) {
   var prefSize,
     htmlProposalChooser = this._htmlProposalChooser(),
     fieldBounds = scout.graphics.offsetBounds(this.popup.smartField.$field);
 
   if (htmlProposalChooser) {
-    prefSize = htmlProposalChooser.prefSize();
+    prefSize = htmlProposalChooser.prefSize(options);
     prefSize = prefSize.add(this.popup.htmlComp.insets());
   } else {
     prefSize = new scout.Dimension(

@@ -60,7 +60,7 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
  * in a way the DIV does not limit the size of the table/tree. Thus we can read the preferred
  * size of the table/tree. After that the original width and height is restored.
  */
-scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container) {
+scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container, options) {
   var oldDisplay, prefSize, modelSize, statusSize, filterPrefSize,
     pcWidth, pcHeight,
     htmlComp = this._proposalChooser.htmlComp,
@@ -68,7 +68,7 @@ scout.ProposalChooserLayout.prototype.preferredLayoutSize = function($container)
     filter = this._proposalChooser.activeFilterGroup,
     $parent = $container.parent();
 
-  modelSize = this._proposalChooser.model.htmlComp.prefSize();
+  modelSize = this._proposalChooser.model.htmlComp.prefSize(options);
   prefSize = modelSize;
   scout.scrollbars.storeScrollPositions($container, this._proposalChooser.session);
 
