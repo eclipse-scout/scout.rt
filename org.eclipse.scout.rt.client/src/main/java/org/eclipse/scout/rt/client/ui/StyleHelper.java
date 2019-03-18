@@ -10,48 +10,37 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.util.regex.Pattern;
+import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 
 /**
  * Helper class providing functionality to modify the set of CSS classes.
  *
+ * @deprecated Code was moved to platform, use {@link org.eclipse.scout.rt.platform.html.StyleHelper} instead or methods
+ *             on {@link IStyleable}. This class will be removed in 10.0.x.
  * @since 5.2
  */
 @ApplicationScoped
+@Deprecated
 public class StyleHelper {
 
   /**
    * Adds a class to a given class string if not contained yet.
+   *
+   * @param cssClass
+   *          one or more CSS classes separated by space
    */
   public String addCssClass(String cssClasses, String cssClass) {
-    boolean hasCssClasses = StringUtility.hasText(cssClasses);
-    boolean hasCssClass = StringUtility.hasText(cssClass);
-    if (hasCssClasses
-        && hasCssClass
-        && !cssClasses.matches("(.* |^)" + Pattern.quote(cssClass) + "( .*|$)")) {
-      return cssClasses + " " + cssClass;
-    }
-    if (!hasCssClasses && hasCssClass) {
-      return cssClass;
-    }
-    return cssClasses;
+    return BEANS.get(org.eclipse.scout.rt.platform.html.StyleHelper.class).addCssClass(cssClasses, cssClass);
   }
 
   /**
    * Removes a class (all occurrences) from a given class string.
    */
   public String removeCssClass(String cssClasses, String cssClass) {
-    String[] classes = StringUtility.split(cssClasses, " ");
-    for (int i = 0; i < classes.length; i++) {
-      if (ObjectUtility.equals(classes[i], cssClass)) {
-        classes[i] = null;
-      }
-    }
-    return StringUtility.join(" ", classes);
+    return BEANS.get(org.eclipse.scout.rt.platform.html.StyleHelper.class).removeCssClass(cssClasses, cssClass);
   }
 
   /**
@@ -60,8 +49,8 @@ public class StyleHelper {
    * Class is added for <code>add==true</code>. </br>
    * Otherwise the class is removed.
    */
-  public String toggleCssClass(String cssClasses, String cssClass, boolean add) {
-    return add ? addCssClass(cssClasses, cssClass) : removeCssClass(cssClasses, cssClass);
+  public String toggleCssClass(String cssClasses, String cssClass, boolean condition) {
+    return BEANS.get(org.eclipse.scout.rt.platform.html.StyleHelper.class).toggleCssClass(cssClasses, cssClass, condition);
   }
 
   /**
@@ -88,12 +77,23 @@ public class StyleHelper {
    * Class is added for <code>add==true</code>. </br>
    * Otherwise the class is removed.
    */
-  public void toggleCssClass(IStyleable stylable, String cssClass, boolean add) {
-    if (add) {
+  public void toggleCssClass(IStyleable stylable, String cssClass, boolean condition) {
+    if (condition) {
       addCssClass(stylable, cssClass);
     }
     else {
       removeCssClass(stylable, cssClass);
     }
+  }
+
+  public boolean hasCssClass(String cssClasses, String cssClass) {
+    return BEANS.get(org.eclipse.scout.rt.platform.html.StyleHelper.class).hasCssClass(cssClasses, cssClass);
+  }
+
+  /**
+   * Converts the space separated CSS class string to a list.
+   */
+  public List<String> cssClassesAsList(String cssClass) {
+    return BEANS.get(org.eclipse.scout.rt.platform.html.StyleHelper.class).cssClassesAsList(cssClass);
   }
 }

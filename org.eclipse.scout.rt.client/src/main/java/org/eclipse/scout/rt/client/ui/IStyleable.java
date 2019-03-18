@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.html.StyleHelper;
 
 /**
  * @since 5.1
  */
 public interface IStyleable {
+
   String PROP_CSS_CLASS = "cssClass";
 
   String getCssClass();
@@ -31,15 +31,7 @@ public interface IStyleable {
    *          one or more CSS classes separated by space
    */
   default void addCssClass(String cssClass) {
-    List<String> cssClasses = cssClassesAsList(cssClass);
-    List<String> existingCssClasses = cssClassesAsList(getCssClass());
-    for (String cssClassStr : cssClasses) {
-      if (existingCssClasses.indexOf(cssClassStr) >= 0) {
-        continue;
-      }
-      existingCssClasses.add(cssClassStr);
-    }
-    setCssClass(CollectionUtility.format(existingCssClasses, " "));
+    setCssClass(BEANS.get(StyleHelper.class).addCssClass(getCssClass(), cssClass));
   }
 
   /**
@@ -47,33 +39,20 @@ public interface IStyleable {
    *          one or more CSS classes separated by space
    */
   default void removeCssClass(String cssClass) {
-    List<String> cssClasses = cssClassesAsList(cssClass);
-    List<String> existingCssClasses = cssClassesAsList(getCssClass());
-    if (existingCssClasses.removeAll(cssClasses)) {
-      setCssClass(CollectionUtility.format(existingCssClasses, " "));
-    }
+    setCssClass(BEANS.get(StyleHelper.class).removeCssClass(getCssClass(), cssClass));
   }
 
   default void toggleCssClass(String cssClass, boolean condition) {
-    if (condition) {
-      addCssClass(cssClass);
-    }
-    else {
-      removeCssClass(cssClass);
-    }
+    setCssClass(BEANS.get(StyleHelper.class).toggleCssClass(getCssClass(), cssClass, condition));
   }
 
   /**
    * Converts the space separated CSS class string to a list.
+   *
+   * @deprecated will be removed in 10.0.x, use {@link StyleHelper#cssClassesAsList(String)} instead.
    */
+  @Deprecated
   static List<String> cssClassesAsList(String cssClass) {
-    List<String> cssClasses = new ArrayList<>();
-    String cssClassesStr = ObjectUtility.nvl(cssClass, "");
-
-    cssClassesStr = cssClassesStr.trim();
-    if (cssClassesStr.length() > 0) {
-      cssClasses = CollectionUtility.arrayList(cssClassesStr.split(" "));
-    }
-    return cssClasses;
+    return BEANS.get(StyleHelper.class).cssClassesAsList(cssClass);
   }
 }
