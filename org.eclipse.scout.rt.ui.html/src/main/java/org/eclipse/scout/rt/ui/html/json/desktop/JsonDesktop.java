@@ -189,14 +189,22 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   }
 
   protected void handleUiGeolocationDetermined(JsonEvent event) {
-    String errorCode = event.getData().optString("errorCode");
-    String errorMessage = event.getData().optString("errorMessage");
+    JSONObject data = event.getData();
+    String errorCode = data.optString("errorCode");
+    String errorMessage = data.optString("errorMessage");
     if (StringUtility.hasText(errorCode)) {
       getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
       return;
     }
-    String latitude = event.getData().getString("latitude");
-    String longitude = event.getData().getString("longitude");
+
+    String latitude = data.optString("latitude");
+    String longitude = data.optString("longitude");
+    // some browsers do not provide an errorCode but still deliver no location data
+    if (!StringUtility.hasText(latitude) || !StringUtility.hasText(longitude)) {
+      getModel().getUIFacade().fireGeolocationFailed(errorCode, errorMessage);
+      return;
+    }
+
     getModel().getUIFacade().fireGeolocationDetermined(latitude, longitude);
   }
 
