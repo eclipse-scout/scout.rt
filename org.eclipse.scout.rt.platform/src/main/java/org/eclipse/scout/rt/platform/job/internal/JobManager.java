@@ -302,7 +302,9 @@ public class JobManager implements IJobManager {
   protected void shutdownExecutor(final ExecutorService executor) {
     executor.shutdownNow();
     try {
-      executor.awaitTermination(1, TimeUnit.MINUTES);
+      LOG.info("Shutdown ExecutorService, await termination...");
+      boolean terminated = executor.awaitTermination(1, TimeUnit.MINUTES);
+      LOG.info("Shutdown ExecutorService, await termination returned terminated={}", terminated);
     }
     catch (final InterruptedException e) {
       // NOOP
