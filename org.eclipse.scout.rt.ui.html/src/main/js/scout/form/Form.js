@@ -358,9 +358,10 @@ scout.Form.prototype.whenSave = function() {
 
 scout.Form.prototype._onLifecycleSave = function() {
   var data = this.exportData();
-  return this._save(data).then(function() {
+  return this._save(data).then(function(status) {
     this.setData(data);
     this.trigger('save');
+    return status;
   }.bind(this));
 };
 
@@ -379,6 +380,12 @@ scout.Form.prototype._validate = function() {
   return scout.Status.ok();
 };
 
+/**
+ * This function is called by the lifecycle, when the 'save' function is called.<p>
+ * The data given to this function is the result of 'exportData' which was called in advance.
+ *
+ * @returns {Promise} promise which may contain a scout.Status specifying if the save operation was successful. The promise may be empty which means the save operation was successful.
+ */
 scout.Form.prototype._save = function(data) {
   return $.resolvedPromise();
 };
