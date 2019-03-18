@@ -39,6 +39,16 @@ describe('TabBox', function() {
 
   });
 
+  describe('remove', function() {
+
+    it('does not fail if there was no selected tab', function() {
+      var tabBox = scout.create('TabBox', {parent: session.desktop});
+      tabBox.render();
+      tabBox.remove();
+    });
+
+  });
+
   describe('selection', function() {
 
     it('should select tabs by ID', function() {

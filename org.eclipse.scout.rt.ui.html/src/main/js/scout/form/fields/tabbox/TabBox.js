@@ -172,7 +172,9 @@ scout.TabBox.prototype._renderSelectedTab = function() {
 };
 
 scout.TabBox.prototype._removeSelectedTab = function() {
-  this.selectedTab.remove();
+  if (this.selectedTab) {
+    this.selectedTab.remove();
+  }
 };
 
 /**
