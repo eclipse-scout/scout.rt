@@ -86,6 +86,9 @@ scout.FormTableControl.prototype._adaptForm = function(form) {
 };
 
 scout.FormTableControl.prototype.onControlContainerOpened = function() {
+  if (!this.form.rendered) {
+    return;
+  }
   this.form.renderInitialFocus();
 };
 

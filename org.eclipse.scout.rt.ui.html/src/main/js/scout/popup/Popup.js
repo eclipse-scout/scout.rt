@@ -67,6 +67,8 @@ scout.Popup = function() {
   // Defines whether the popup should be closed whenever another popup opens.
   this.closeOnOtherPopupOpen = true;
 
+  this._openLater = false;
+
   this.$arrow = null;
   this._windowResizeHandler = this._onWindowResize.bind(this);
   this._addWidgetProperties(['anchor']);
@@ -151,6 +153,9 @@ scout.Popup.prototype.open = function($parent) {
   this._triggerPopupOpenEvent();
 
   this._open($parent);
+  if (this._openLater) {
+    return;
+  }
 
   // Focus the popup
   // It is important that this happens after layouting and positioning, otherwise we'd focus an element
@@ -166,13 +171,29 @@ scout.Popup.prototype.open = function($parent) {
 
 scout.Popup.prototype._open = function($parent) {
   this.render($parent);
+  if (this._openLater) {
+    return;
+  }
   this.revalidateLayout();
   this.position();
 };
 
 scout.Popup.prototype.render = function($parent) {
   var $popupParent = $parent || this.entryPoint();
+  // when the parent is detached it is not possible to render the popup -> do it later
+  if (!$popupParent || !$popupParent.length || !$popupParent.isAttached()) {
+    this._openLater = true;
+    return;
+  }
   scout.Popup.parent.prototype.render.call(this, $popupParent);
+};
+
+scout.Popup.prototype._onAttach = function() {
+  scout.Popup.parent.prototype._onAttach.call(this);
+  if (this._openLater && !this.rendered) {
+    this._openLater = false;
+    this.open();
+  }
 };
 
 scout.Popup.prototype._render = function() {

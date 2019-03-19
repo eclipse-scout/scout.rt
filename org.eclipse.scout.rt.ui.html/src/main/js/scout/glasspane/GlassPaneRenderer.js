@@ -163,15 +163,11 @@ scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
 scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   var $animationTarget = null;
 
-  if (this._widget instanceof scout.Form ){
-    this.session.desktop.activateForm(this._widget);
+  // notify the display parent to handle the mouse down on the glass pane.
+  var displayParent = this._resolveDisplayParent();
+  if (displayParent._onGlassPaneMouseDown) {
+    displayParent._onGlassPaneMouseDown(this._widget, $(event.target));
   }
-
-//  // notify the display parent to handle the mouse down on the glass pane.
-//  var displayParent = this._resolveDisplayParent();
-//  if (displayParent._onGlassPaneMouseDown) {
-//    displayParent._onGlassPaneMouseDown($(event.target));
-//  }
 
   if (this._widget instanceof scout.Form && this._widget.isView()) {
     // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,

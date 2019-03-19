@@ -30,3 +30,20 @@ scout.OutlineOverview.prototype._render = function() {
   this.$content.appendDiv('outline-overview-title').text(this.outline.title);
 };
 
+/**
+ * @override Widget.js
+ */
+scout.OutlineOverview.prototype._attach = function() {
+  this.$parent.append(this.$container);
+  var htmlParent = this.htmlComp.getParent();
+  this.htmlComp.setSize(htmlParent.size());
+  scout.OutlineOverview.parent.prototype._attach.call(this);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.OutlineOverview.prototype._detach = function() {
+  this.$container.detach();
+  scout.OutlineOverview.parent.prototype._detach.call(this);
+};

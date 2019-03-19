@@ -25,6 +25,14 @@ scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
 /**
  * @override KeyStroke.js
  */
+scout.ButtonKeyStroke.prototype._accept = function(event) {
+  var accepted = scout.ButtonKeyStroke.parent.prototype._accept.call(this, event);
+  return accepted && this.field.$field.isAttached();
+};
+
+/**
+ * @override KeyStroke.js
+ */
 scout.ButtonKeyStroke.prototype.handle = function(event) {
   this.field.doAction();
 };

@@ -618,20 +618,20 @@ scout.Outline.prototype.sendToBack = function() {
   this.inBackground = true;
   this._renderInBackground();
 
-  // Remove child dialogs, message boxes and file choosers, not views.
-  this.formController.removeDialogs();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
+  // Detach child dialogs, message boxes and file choosers, not views.
+  this.formController.detachDialogs();
+  this.messageBoxController.detach();
+  this.fileChooserController.detach();
 };
 
 scout.Outline.prototype.bringToFront = function() {
   this.inBackground = false;
   this._renderInBackground();
 
-  // Render child dialogs, message boxes and file choosers.
-  this.formController.renderDialogs();
-  this.messageBoxController.render();
-  this.fileChooserController.render();
+  // Attach child dialogs, message boxes and file choosers.
+  this.formController.attachDialogs();
+  this.messageBoxController.attach();
+  this.fileChooserController.attach();
 };
 
 scout.Outline.prototype._renderInBackground = function() {
@@ -1036,11 +1036,15 @@ scout.Outline.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) 
   return $glassPanes;
 };
 
-scout.Outline.prototype._onGlassPaneMouseDown = function($glassPane) {
+scout.Outline.prototype._onGlassPaneMouseDown = function(glassPaneOwner, $glassPane) {
   var desktop = this.session.desktop;
-  if (desktop.navigation) {
-    if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
-      desktop.bringOutlineToFront();
+  if (glassPaneOwner instanceof scout.Form && glassPaneOwner.isDialog()) {
+    desktop.activateForm(glassPaneOwner);
+  } else {
+    if (desktop.navigation) {
+      if ($glassPane.parent()[0] === desktop.navigation.$body[0]) {
+        desktop.bringOutlineToFront();
+      }
     }
   }
 };

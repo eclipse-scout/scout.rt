@@ -36,7 +36,8 @@ scout.SimpleTab = function() {
   this._statusIconDivs = [];
 
   this._viewPropertyChangeListener = this._onViewPropertyChange.bind(this);
-  this._glassPaneContribution = function(element){
+  this._viewRemoveListener = this._onViewRemove.bind(this);
+  this._glassPaneContribution = function(element) {
     return this.$statusContainer;
   }.bind(this);
 };
@@ -376,10 +377,12 @@ scout.SimpleTab.prototype.getMenuText = function() {
 
 scout.SimpleTab.prototype._installViewListeners = function() {
   this.view.on('propertyChange', this._viewPropertyChangeListener);
+  this.view.on('remove', this._viewRemoveListener);
 };
 
 scout.SimpleTab.prototype._uninstallViewListeners = function() {
   this.view.off('propertyChange', this._viewPropertyChangeListener);
+  this.view.off('remove', this._viewRemoveListener);
 };
 
 scout.SimpleTab.prototype._onViewPropertyChange = function(event) {
@@ -399,5 +402,19 @@ scout.SimpleTab.prototype._onViewPropertyChange = function(event) {
     this.setClosable(event.newValue);
   } else if (event.propertyName === 'status') {
     this.setStatus(event.newValue);
+  }
+};
+
+/**
+ * We cannot not bind the 'remove' event of the view to the remove function
+ * of the this tab, because in bench-mode the tab is never rendered
+ * and thus the _remove function is never called.
+ */
+scout.SimpleTab.prototype._onViewRemove = function() {
+  this._uninstallViewListeners();
+  if (this.rendered) {
+    this.remove();
+  } else {
+    this.trigger('remove');
   }
 };

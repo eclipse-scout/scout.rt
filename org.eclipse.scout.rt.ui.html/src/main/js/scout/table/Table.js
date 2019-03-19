@@ -85,6 +85,8 @@ scout.Table = function() {
   this._permanentTailSortColumns = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
   this._popupOpenHandler = this._onDesktopPopupOpen.bind(this);
+  this._rerenderViewPortAfterAttach = false;
+  this._renderViewPortAfterAttach = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
 
@@ -628,7 +630,7 @@ scout.Table.prototype.showContextMenu = function(options) {
 
 scout.Table.prototype._showContextMenu = function(options) {
   options = options || {};
-  if (!this.rendered) { // check needed because function is called asynchronously
+  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
     return;
   }
   if (this.selectedRows.length === 0) {
@@ -1717,6 +1719,7 @@ scout.Table.prototype._removeRows = function(rows) {
     return;
   }
 
+  var tableAttached = this.isAttachedAndRendered();
   rows = scout.arrays.ensure(rows);
   rows.forEach(function(row) {
     var rowIndex = this.visibleRows.indexOf(row);
@@ -1727,10 +1730,10 @@ scout.Table.prototype._removeRows = function(rows) {
     var rowRendered = !!row.$row;
     var rowInViewRange = this.viewRangeRendered.contains(rowIndex);
 
-    // Note: these checks can only be done, when table is rendered. When the table is detached it can
+    // Note: these checks can only be done, when table is rendered _and_ attached. When the table is detached it can
     // still add rows, but these new rows are not rendered while the table is detached. Thus this check would fail,
     // when a row that has been added in detached state is removed again while table is still detached.
-    if (this.rendered) {
+    if (tableAttached) {
       // if row is not rendered but its row-index is inside the view range -> inconsistency
       if (!rowRendered && rowInViewRange) {
         throw new Error('Inconsistency found while removing row. Row is undefined but inside rendered view range. RowIndex: ' + rowIndex);
@@ -2890,7 +2893,7 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype.startCellEdit = function(column, row, field) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
     return;
   }
@@ -2912,7 +2915,7 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
  *    value is updated by an updateRow event instead.
  */
 scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
     return;
   }
@@ -4476,6 +4479,11 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
 scout.Table.prototype._renderViewport = function() {
+  if (!this.isAttachedAndRendered()) {
+    // if table is not attached the correct viewPort can not be evaluated. Mark for render after attach.
+    this._renderViewPortAfterAttach = true;
+    return;
+  }
   if (this._renderViewportBlocked) {
     return;
   }
@@ -4492,6 +4500,11 @@ scout.Table.prototype._renderViewport = function() {
 };
 
 scout.Table.prototype._rerenderViewport = function() {
+  if (!this.isAttachedAndRendered()) {
+    // if table is not attached the correct viewPort can not be evaluated. Mark for rerender after attach.
+    this._rerenderViewPortAfterAttach = true;
+    return;
+  }
   this._removeRows();
   this._removeAggregateRows();
   this._renderFiller();
@@ -4705,7 +4718,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
 };
 
 scout.Table.prototype.focusCell = function(column, row) {
-  if (!this.rendered) {
+  if (!this.rendered || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.focusCell.bind(this, column, row));
     return;
   }
@@ -4714,6 +4727,52 @@ scout.Table.prototype.focusCell = function(column, row) {
   if (this.enabled && row.enabled && cell.editable) {
     this.prepareCellEdit(column, row, false);
   }
+};
+
+scout.Table.prototype._attach = function() {
+  this.$parent.append(this.$container);
+  scout.Table.parent.prototype._attach.call(this);
+};
+/**
+ * Method invoked when this is a 'detailTable' and the outline content is displayed.
+ * @override Widget.js
+ */
+scout.Table.prototype._postAttach = function() {
+  var htmlParent = this.htmlComp.getParent();
+  this.htmlComp.setSize(htmlParent.size());
+  scout.Table.parent.prototype._postAttach.call(this);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Table.prototype._renderOnAttach = function() {
+  scout.Table.parent.prototype._renderOnAttach.call(this);
+  // this is an "if... else if..." to avoid rendering the viewport multiple
+  // times in case all ...afterAttach flags are set to true.
+  if (this._rerenderViewPortAfterAttach) {
+    this._rerenderViewport();
+    this._rerenderViewPortAfterAttach = false;
+  } else if (this._renderViewPortAfterAttach) {
+    this._renderViewport();
+    this._renderViewPortAfterAttach = false;
+  }
+};
+
+/**
+ * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
+ * @override Widget.js
+ */
+scout.Table.prototype._detach = function() {
+  this.$container.detach();
+  // Detach helper stores the current scroll pos and restores in attach.
+  // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
+  scout.Table.parent.prototype._detach.call(this);
+};
+
+scout.Table.prototype._onDetach = function() {
+  scout.Table.parent.prototype._onDetach.call(this);
+  this._destroyCellEditorPopup();
 };
 
 scout.Table.prototype._destroyCellEditorPopup = function() {

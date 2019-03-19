@@ -335,3 +335,21 @@ scout.FileChooser.prototype._onMouseDown = function(event, option) {
     parent.activate();
   }
 };
+
+/**
+ * @override Widget.js
+ */
+scout.FileChooser.prototype._attach = function() {
+  this.$parent.append(this.$container);
+  scout.FileChooser.parent.prototype._attach.call(this);
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.FileChooser.prototype._detach = function() {
+  this.session.focusManager.uninstallFocusContext(this.$container);
+  this.$container.detach();
+  scout.FileChooser.parent.prototype._detach.call(this);
+};

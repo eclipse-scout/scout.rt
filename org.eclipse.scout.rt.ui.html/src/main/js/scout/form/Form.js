@@ -40,9 +40,6 @@ scout.Form = function() {
   this.messageBoxController = null;
   this.fileChooserController = null;
   this._glassPaneRenderer = null;
-  this._attaching = false;
-  this._detaching = false;
-  this._tabDeactivated = false;
   /**
    * Whether this form should render its initial focus
    */
@@ -82,7 +79,6 @@ scout.Form.prototype._init = function(model) {
 
   this._setRootGroupBox(this.rootGroupBox);
   this._setStatus(this.status);
-  this._setModal(this.modal);
   this.cacheBoundsKey = scout.nvl(model.cacheBoundsKey, this.objectType);
   this._installLifecycle();
 };
@@ -103,46 +99,43 @@ scout.Form.prototype._renderProperties = function() {
   this._renderSaveNeeded();
   this._renderCssClass();
   this._renderStatus();
-};
-
-scout.Form.prototype._postRender = function() {
-  scout.Form.parent.prototype._postRender.call(this);
+  this._renderModal();
 
   this._installFocusContext();
   if (this.renderInitialFocusEnabled) {
     this.renderInitialFocus();
   }
+};
 
-  // restore focus
-  this.restoreFocus();
+scout.Form.prototype._postRender = function() {
+  scout.Form.parent.prototype._postRender.call(this);
 
-  if (!this._attaching) {
-    // Render attached forms, message boxes and file choosers.
-    this.formController.render();
-    this.messageBoxController.render();
-    this.fileChooserController.render();
-    if (this._glassPaneRenderer) {
+  // Render attached forms, message boxes and file choosers.
+  this.formController.render();
+  this.messageBoxController.render();
+  this.fileChooserController.render();
+
+  if (this._glassPaneRenderer) {
     this._glassPaneRenderer.renderGlassPanes();
-    }
   }
 
 };
 
-scout.Form.prototype.remove = function() {
-  // the form controller remove must be called from the remove function. _remove is only called if the form is rendered
-  // which is not the case if the form is not on top of the view stack.
-  if (!this._detaching) {
-    this.formController.remove();
-    this.messageBoxController.remove();
-    this.fileChooserController.remove();
-    if (this._glassPaneRenderer) {
-      this._glassPaneRenderer.removeGlassPanes();
-    }
+scout.Form.prototype._destroy = function() {
+  scout.Form.parent.prototype._destroy.call(this);
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer = null;
   }
-  scout.Form.parent.prototype.remove.call(this);
 };
 
 scout.Form.prototype._remove = function() {
+  this.formController.remove();
+  this.messageBoxController.remove();
+  this.fileChooserController.remove();
+  if (this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+  }
+
   this._uninstallFocusContext();
 
   this.$statusIcons = [];
@@ -155,14 +148,6 @@ scout.Form.prototype._remove = function() {
   this.$subTitle = null;
 
   scout.Form.parent.prototype._remove.call(this);
-};
-
-scout.Form.prototype._destroy = function() {
-  scout.Form.parent.prototype._destroy.call(this);
-//  if (this._glassPaneRenderer) {
-//    this._glassPaneRenderer.removeGlassPanes();
-//    this._glassPaneRenderer = null;
-//  }
 };
 
 scout.Form.prototype._renderForm = function() {
@@ -213,22 +198,16 @@ scout.Form.prototype.setModal = function(modal) {
   this.setProperty('modal', modal);
 };
 
-scout.Form.prototype._setModal = function(modal) {
-  this._setProperty('modal', modal);
-  this._updateGlassPaneRenderer();
-};
-
-scout.Form.prototype._updateGlassPaneRenderer = function() {
+scout.Form.prototype._renderModal = function() {
   if (this.parent instanceof scout.WrappedFormField) {
     return;
   }
-  if (this._glassPaneRenderer) {
-    this._glassPaneRenderer.removeGlassPanes();
-    this._glassPaneRenderer = null;
-  }
-  if (this.modal) {
+  if (this.modal && !this._glassPaneRenderer) {
     this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
     this._glassPaneRenderer.renderGlassPanes();
+  } else if (!this.modal && this._glassPaneRenderer) {
+    this._glassPaneRenderer.removeGlassPanes();
+    this._glassPaneRenderer = null;
   }
 };
 
@@ -839,53 +818,62 @@ scout.Form.prototype._setDisplayParent = function(displayParent) {
   if (displayParent) {
     this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
-  this._updateGlassPaneRenderer();
+};
+
+scout.Form.prototype._attach = function() {
+  this.$parent.append(this.$container);
+
+  // If the parent was resized while this view was detached, the view has a wrong size.
+  if (this.isView()) {
+    this.invalidateLayoutTree(false);
+  }
+
+  // form is attached even if children are not yet
+  if ((this.isView() || this.isDialog()) && !this.detailForm) {
+    //notify model this form is active
+    this.session.desktop._setFormActivated(this);
+  }
+  this._installFocusContext();
+  scout.Form.parent.prototype._attach.call(this);
 };
 
 /**
- * This method is invoked when:
- *  - A view tab is selected to render the form.
+ * Method invoked when:
+ *  - this is a 'detailForm' and the outline content is displayed;
+ *  - this is a 'view' and the view tab is selected;
+ *  - this is a child 'dialog' or 'view' and its 'displayParent' is attached;
+ * @override Widget.js
  */
-scout.Form.prototype.tabActivated = function($parent) {
-  if (this._tabDeactivated) {
-    this._attaching = true;
-    this.render($parent);
+scout.Form.prototype._postAttach = function() {
 
-    if ((this.isView() || this.isDialog()) && !this.detailForm) {
-      //notify model this form is active
-      this.session.desktop._setFormActivated(this);
-    }
-    // Render child dialogs, message boxes and file choosers.
-    this.formController.renderDialogs();
-    this.messageBoxController.render();
-    this.fileChooserController.render();
+  // Attach child dialogs, message boxes and file choosers.
+  this.formController.attachDialogs();
+  this.messageBoxController.attach();
+  this.fileChooserController.attach();
 
-    this._attaching = false;
-    this._tabDeactivated = false;
-  } else {
-    this.render($parent);
-  }
+  scout.Form.parent.prototype._attach.call(this);
 };
 
-scout.Form.prototype.tabDeactivated = function() {
-  if (this._tabDeactivated) {
-    return;
-  }
-  this._detaching = true;
+/**
+ * Method invoked when:
+ *  - this is a 'detailForm' and the outline content is hidden;
+ *  - this is a 'view' and the view tab is deselected;
+ *  - this is a child 'dialog' or 'view' and its 'displayParent' is detached;
+ * @override Widget.js
+ */
+scout.Form.prototype._detach = function() {
   // Detach child dialogs, message boxes and file choosers, not views.
-  this.formController.removeDialogs();
-  this.messageBoxController.remove();
-  this.fileChooserController.remove();
-  this.remove();
-  this._detaching = false;
-  this._tabDeactivated = true;
+  this.formController.detachDialogs();
+  this.messageBoxController.detach();
+  this.fileChooserController.detach();
+
+  this._uninstallFocusContext();
+
+  this.$container.detach();
+  scout.Form.parent.prototype._detach.call(this);
 };
 
 scout.Form.prototype.renderInitialFocus = function() {
-  if (!this.rendered) {
-    return;
-  }
-
   if (this.initialFocus) {
     this.initialFocus.focus();
   } else {
@@ -934,7 +922,7 @@ scout.Form.prototype.touch = function() {
  * @return 'true' if this Form is currently accessible to the user
  */
 scout.Form.prototype.inFront = function() {
-  return this.rendered;
+  return this.rendered && this.attached;
 };
 
 /**

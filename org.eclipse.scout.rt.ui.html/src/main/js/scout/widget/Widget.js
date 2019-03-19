@@ -39,6 +39,7 @@ scout.Widget = function() {
    * The 'rendered' flag is set the true when initial rendering of the widget is completed.
    */
   this.rendered = false;
+  this.attached = false;
   this.destroyed = false;
   this.destroying = false;
 
@@ -296,9 +297,10 @@ scout.Widget.prototype.render = function($parent) {
   this.session.keyStrokeManager.installKeyStrokeContext(this.keyStrokeContext);
   this.rendering = false;
   this.rendered = true;
+  this.attached = true;
   this.trigger('render');
-  this._postRender();
   this.restoreFocus();
+  this._postRender();
 };
 
 /**
@@ -389,6 +391,9 @@ scout.Widget.prototype._removeInternal = function() {
   this.removalPending = false;
   this.trigger('removing');
   // transform last focused element into a scout widget
+  if (this.$container) {
+    this.$container.off('focusin', this._focusInListener);
+  }
   if (this._$lastFocusedElement) {
     this._storedFocusedWidget = scout.widget(this._$lastFocusedElement);
     this._$lastFocusedElement = null;
@@ -404,6 +409,7 @@ scout.Widget.prototype._removeInternal = function() {
   this._remove();
   this.$parent = null;
   this.rendered = false;
+  this.attached = false;
   this.removing = false;
   this.trigger('remove');
 };
@@ -481,7 +487,6 @@ scout.Widget.prototype._cleanup = function() {
   }
   this._uninstallScrollbars();
   if (this.$container) {
-    this.$container.off('focusin', this._focusInListener);
     this.session.layoutValidator.cleanupInvalidComponents(this.$container);
   }
 };
@@ -1055,6 +1060,124 @@ scout.Widget.prototype.document = function(domElement) {
 };
 
 /**
+ * This method attaches the detached $container to the DOM.
+ */
+scout.Widget.prototype.attach = function() {
+  if (this.attached || !this.rendered) {
+    return;
+  }
+  this._attach();
+  this.restoreFocus();
+  this.attached = true;
+  this._postAttach();
+  this._onAttach();
+  this._triggerChildrenOnAttach(this);
+};
+
+/**
+ * Override this method to do something when Widget is attached again. Typically
+ * you will append this.$container to this.$parent. The default implementation
+ * sets this.attached to true.
+ *
+ * @param the event.target property is used to decide if a Widget must attach
+ *   its $container. When the parent of the Widget already attaches, the Widget
+ *   itself must _not_ attach its own $container. That's why we should only
+ *   attach when event.target is === this.
+ */
+scout.Widget.prototype._attach = function() {};
+
+/**
+ * Override this method to do something after this widget is attached.
+ * This function is not called on any child of the attached widget.
+ */
+scout.Widget.prototype._postAttach = function() {
+
+};
+
+scout.Widget.prototype._triggerChildrenOnAttach = function(parent) {
+  this.children.forEach(function(child) {
+    child._onAttach();
+    child._triggerChildrenOnAttach(parent);
+  });
+};
+
+/**
+ * Override this method to do something after this widget or any parent of it is attached.
+ * This function is called whether or not the widget is rendered.
+ */
+scout.Widget.prototype._onAttach = function() {
+  if (this.rendered) {
+    this._renderOnAttach();
+  }
+};
+
+/**
+ * Override this method to do something after this widget or any parent of it is attached.
+ * This function is only called when this widget is rendered.
+ */
+scout.Widget.prototype._renderOnAttach = function() {
+  this._renderScrollTop();
+  this._renderScrollLeft();
+};
+
+/**
+ * This method calls detach() on all child-widgets. It is used to store some data
+ * before a DOM element is detached and propagate the detach "event" to all child-
+ * widgets, because when a DOM element is detached - child elements are not notified
+ */
+scout.Widget.prototype.detach = function() {
+  if (this.rendering) {
+    // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
+    this._postRenderActions.push(this.detach.bind(this));
+  }
+  if (!this.attached || !this.rendered || this._isRemovalPending()) {
+    return;
+  }
+
+  this._beforeDetach();
+  this._onDetach();
+  this._triggerChildrenOnDetach(this);
+  this._detach();
+  this.attached = false;
+};
+
+/**
+ * This function is called before a widget gets detached. The function is only called on the detached widget and NOT on
+ * any of its children.
+ */
+scout.Widget.prototype._beforeDetach = function(parent) {
+  // NOP
+};
+
+scout.Widget.prototype._triggerChildrenOnDetach = function() {
+  this.children.forEach(function(child) {
+    child._onDetach();
+    child._triggerChildrenOnDetach(parent);
+  });
+};
+
+/**
+ * This function is called before a widget or any of its parent getting detached.
+ * This function is thought to be overridden.
+ */
+scout.Widget.prototype._onDetach = function() {
+  if (this.rendered) {
+    this._renderOnDetach();
+  }
+};
+
+scout.Widget.prototype._renderOnDetach = function() {
+  // NOP
+};
+
+/**
+ * Override this method to do something when Widget is detached. Typically you
+ * will call this.$container.detach(). The default
+ * implementation sets this.attached to false.
+ */
+scout.Widget.prototype._detach = function() {};
+
+/**
  * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default scout.KeyStrokeContext.
  */
 scout.Widget.prototype._createKeyStrokeContext = function() {
@@ -1234,11 +1357,11 @@ scout.Widget.prototype.link = function(widgets) {
  * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
  */
 scout.Widget.prototype.glassPaneTargets = function(element) {
-  var resolveGlassPanes = function(element){
+  var resolveGlassPanes = function(element) {
     // contributions
-    var targets = scout.arrays.flatMap(this._glassPaneContributions, function(cont){
+    var targets = scout.arrays.flatMap(this._glassPaneContributions, function(cont) {
       var $elements = cont(element);
-      if($elements){
+      if ($elements) {
         return scout.arrays.ensure($elements);
       }
       return [];
@@ -1257,7 +1380,7 @@ scout.Widget.prototype._glassPaneTargets = function(element) {
   return [this.$container];
 };
 
-scout.Widget.prototype.addGlassPaneContribution = function(contribution){
+scout.Widget.prototype.addGlassPaneContribution = function(contribution) {
   this._glassPaneContributions.push(contribution);
   this.trigger('glassPaneContributionAdded', {
     contribution: contribution
@@ -1267,7 +1390,7 @@ scout.Widget.prototype.addGlassPaneContribution = function(contribution){
 /**
  * @param [contribution] a function which returns glass pane targets (jQuery elements)
  */
-scout.Widget.prototype.removeGlassPaneContribution = function(contribution){
+scout.Widget.prototype.removeGlassPaneContribution = function(contribution) {
   scout.arrays.remove(this._glassPaneContributions, contribution);
   this.trigger('glassPaneContributionRemoved', {
     contribution: contribution
@@ -1656,13 +1779,13 @@ scout.Widget.prototype._renderTrackFocus = function() {
     this.$container.on('focusin', this._focusInListener);
   } else {
     this.$container.off('focusin', this._focusInListener);
-    this._$lastFocusedElement = null;
-    this._storedFocusedWidget = null;
   }
 };
 
 scout.Widget.prototype.restoreFocus = function() {
-  if (this._storedFocusedWidget) {
+  if (this._$lastFocusedElement) {
+    this.session.focusManager.requestFocus(this._$lastFocusedElement);
+  } else if (this._storedFocusedWidget) {
     this._storedFocusedWidget.focus();
     this._storedFocusedWidget = null;
   }
@@ -1917,7 +2040,7 @@ scout.Widget.prototype.reveal = function() {
  * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
  */
 scout.Widget.prototype.visitChildren = function(visitor) {
-  for (var i = 0; i < this.children.length; i++){
+  for (var i = 0; i < this.children.length; i++) {
     var child = this.children[i];
     if (child.parent === this) {
       var treeVisitResult = visitor(child);
@@ -1932,6 +2055,13 @@ scout.Widget.prototype.visitChildren = function(visitor) {
       }
     }
   }
+};
+
+/**
+ * @returns {boolean} Whether or not the widget is rendered (or rendering) and the DOM $container isAttached()
+ */
+scout.Widget.prototype.isAttachedAndRendered = function() {
+  return (this.rendered || this.rendering) && this.$container.isAttached();
 };
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */

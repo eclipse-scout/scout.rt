@@ -199,7 +199,7 @@ scout.MessageBox.prototype._onMouseDown = function() {
   var parent = this.findParent(function(p) {
     return p instanceof scout.Form && p.isDialog();
   });
-  if(parent) {
+  if (parent) {
     parent.activate();
   }
 };
@@ -229,18 +229,18 @@ scout.MessageBox.prototype._onCopy = function(event) {
     // Internet Explorer only allows plain text (which must have data-type 'Text')
     if (!ie) {
       var htmlText = scout.strings.join('<br/>',
-          this.$header[0].outerHTML,
-          this.$body[0].outerHTML,
-          this.$html[0].outerHTML,
-          this.hiddenText);
+        this.$header[0].outerHTML,
+        this.$body[0].outerHTML,
+        this.$html[0].outerHTML,
+        this.hiddenText);
       clipboardData.setData('text/html', htmlText);
     }
     var dataType = ie ? 'Text' : 'text/plain';
     var plainText = scout.strings.join('\n\n',
-        this.$header.text(),
-        this.$body.text(),
-        this.$html.text(),
-        this.hiddenText);
+      this.$header.text(),
+      this.$body.text(),
+      this.$html.text(),
+      this.hiddenText);
     clipboardData.setData(dataType, plainText);
     this.$container.window(true).getSelection().removeAllRanges();
     this._setCopyable(false);
@@ -292,4 +292,22 @@ scout.MessageBox.prototype.abort = function() {
   if (this._$abortButton && this.session.focusManager.requestFocus(this._$abortButton)) {
     this._$abortButton.click();
   }
+};
+
+/**
+ * @override Widget.js
+ */
+scout.MessageBox.prototype._attach = function() {
+  this.$parent.append(this.$container);
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  scout.MessageBox.parent.prototype._attach.call(this);
+};
+
+/**
+ * @override Widget.js
+ */
+scout.MessageBox.prototype._detach = function() {
+  this.session.focusManager.uninstallFocusContext(this.$container);
+  this.$container.detach();
+  scout.MessageBox.parent.prototype._detach.call(this);
 };
