@@ -259,8 +259,9 @@ public class HttpRetryTest {
     //emulate a socket close before data is received
     AtomicInteger count = new AtomicInteger(1);
     m_server.withChannelInterceptor((channel, superCall) -> {
-      if (count.getAndIncrement() < 2) {
-        channel.getHttpTransport().abort(new SocketException("TEST:cannot write"));
+      //2 failures in a row, the first would have been retried by the CustomHttpRequestRetryHandler
+      if (count.getAndIncrement() < 3) {
+        channel.getHttpTransport().abort(new IOException("TEST:cannot write"));
         return;
       }
       superCall.call();

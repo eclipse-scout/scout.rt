@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,10 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
+import org.eclipse.scout.rt.shared.http.retry.CustomHttpRequestRetryHandler;
 import org.eclipse.scout.rt.shared.http.transport.ApacheHttpTransport;
 import org.eclipse.scout.rt.shared.servicetunnel.http.MultiSessionCookieStore;
 
@@ -70,6 +73,14 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
    * @param builder
    */
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
+    addConnectionKeepAliveSettings(builder);
+    addRetrySettings(builder);
+  }
+
+  /**
+   * @param builder
+   */
+  protected void addConnectionKeepAliveSettings(HttpClientBuilder builder) {
     final boolean keepAliveProp = CONFIG.getPropertyValue(ApacheHttpTransportKeepAliveProperty.class);
     if (keepAliveProp) {
       builder.setConnectionReuseStrategy(DefaultClientConnectionReuseStrategy.INSTANCE);
@@ -77,7 +88,29 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     else {
       builder.setConnectionReuseStrategy(NoConnectionReuseStrategy.INSTANCE);
     }
-    builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
+  }
+
+  /**
+   * @param builder
+   */
+  protected void addRetrySettings(HttpClientBuilder builder) {
+    final boolean retryOnNoHttpResponseException = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty.class);
+    final boolean retryOnSocketExceptionByConnectionReset = CONFIG.getPropertyValue(ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty.class);
+    if (retryOnNoHttpResponseException || retryOnSocketExceptionByConnectionReset) {
+      builder.setRetryHandler(new CustomHttpRequestRetryHandler(1, false, retryOnNoHttpResponseException, retryOnSocketExceptionByConnectionReset));
+    }
+    else {
+      builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
+    }
+  }
+
+  /**
+   * @deprecated use {@link #createHttpClientConnectionManager()}
+   * @return
+   */
+  @Deprecated
+  protected HttpClientConnectionManager getConfiguredConnectionManager() {
+    return createHttpClientConnectionManager();
   }
 
   /**

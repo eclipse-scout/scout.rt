@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.http;
 
+import java.net.SocketException;
+
+import org.apache.http.NoHttpResponseException;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 
@@ -27,7 +30,7 @@ public final class HttpConfigurationProperties {
 
     @Override
     public String description() {
-      return "Specifies the maximum life time in milliseconds for kept alive connections of the Apache HTTP client. The defautl value is 1 hour.";
+      return "Specifies the maximum life time in milliseconds for kept alive connections of the Apache HTTP client. The default value is 1 hour.";
     }
 
     @Override
@@ -92,6 +95,69 @@ public final class HttpConfigurationProperties {
     @Override
     public String getKey() {
       return "scout.http.keepAlive";
+    }
+  }
+
+  /**
+   * Enable retry of request (includes non-idempotent requests) on {@link NoHttpResponseException}
+   * <p>
+   * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+   * <p>
+   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
+   *
+   * @since 7.0
+   */
+  public static class ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return "Enable retry of request (includes non-idempotent requests) on NoHttpResponseException\n"
+          + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
+          + "For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659\n"
+          + "The default value is true";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.retryOnNoHttpResponseException";
+    }
+  }
+
+  /**
+   * Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message "Connection
+   * reset"
+   * <p>
+   * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+   * <p>
+   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
+   *
+   * @since 7.0
+   */
+  public static class ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return "Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message 'Connection reset'\n"
+          + "Assuming that the cause of the exception was most probably a stale socket channel on the server side.\n"
+          + "For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659\n"
+          + "The default value is true";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.retryOnSocketExceptionByConnectionReset";
     }
   }
 }
