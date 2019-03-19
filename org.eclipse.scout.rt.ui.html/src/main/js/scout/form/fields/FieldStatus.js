@@ -142,11 +142,13 @@ scout.FieldStatus.prototype._updatePopup = function(showStatus) {
   } else if (showStatus === false) {
     this.hideTooltip();
   }
-
 };
 
 scout.FieldStatus.prototype.showTooltip = function() {
   if (!this.status) {
+    return;
+  }
+  if(scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {
     return;
   }
   var event = new scout.Event();
