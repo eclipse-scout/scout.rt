@@ -39,9 +39,7 @@ scout.FieldStatus.prototype._remove = function() {
 
 scout.FieldStatus.prototype._renderOnAttach = function() {
   scout.FieldStatus.parent.prototype._renderOnAttach.call(this);
-  if (this.tooltip) {
-    this.tooltip.render();
-  }
+  this._renderTooltip();
 };
 
 scout.FieldStatus.prototype._onDetach = function() {
@@ -62,9 +60,7 @@ scout.FieldStatus.prototype.update = function(status, menus, autoRemove, showSta
   this.setMenus(menus);
   this.setAutoRemove(autoRemove);
   this.updating = false;
-  if (this.isAttachedAndRendered()) {
-    this._updatePopup(showStatus);
-  }
+  this._updatePopup(showStatus);
 };
 
 scout.FieldStatus.prototype.clearStatus = function() {
@@ -164,7 +160,7 @@ scout.FieldStatus.prototype.showTooltip = function() {
   if (!this.status) {
     return;
   }
-  if(scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {
+  if (scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {
     return;
   }
   var event = new scout.Event();
@@ -195,6 +191,14 @@ scout.FieldStatus.prototype.showTooltip = function() {
     this.tooltip.one('destroy', function() {
       this.hideTooltip();
     }.bind(this));
+    if (this.isAttachedAndRendered()) {
+      this._renderTooltip();
+    }
+  }
+};
+
+scout.FieldStatus.prototype._renderTooltip = function() {
+  if (this.tooltip) {
     this.tooltip.render();
   }
 };
