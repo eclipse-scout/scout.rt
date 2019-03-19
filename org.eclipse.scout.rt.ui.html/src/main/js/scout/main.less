@@ -411,6 +411,10 @@ textarea {
   /* Override default overflow value 'scroll' in IE */
   overflow: auto;
 
+  /* IE/Edge: show scrollbars on textarea if the content is too big to fit */
+  /* overflow:auto alone is not sufficient because -ms-overflow-style could be set on a parent element and textarea inherits this property */
+  -ms-overflow-style: auto;
+
   /* remove platform specific styling, mainly used to remove shadow on ios safari */
   -webkit-appearance: none;
   -moz-appearance: none;
