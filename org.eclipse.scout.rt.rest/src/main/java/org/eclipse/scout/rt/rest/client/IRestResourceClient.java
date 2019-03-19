@@ -20,10 +20,10 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  *     return BEANS.get(MyRestClientHelper.class);
  *   }
  *
- *   public ExampleDo loadExample(ExampleId exampleId) {
+ *   public ExampleDo loadExample(String id) {
  *     WebTarget target = helper().target(RESOURCE_PATH)
  *         .path("{id}/current")
- *         .resolveTemplate("id", exampleId.unwrap());
+ *         .resolveTemplate("id", id);
  *
  *     return target.request()
  *         .accept(MediaType.APPLICATION_JSON)
@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  * <b>Usage:</b>
  *
  * <pre>
- * ExampleDo result = BEANS.get(ExampleResourceClient.class).loadExample(input);
+ * ExampleDo result = BEANS.get(ExampleResourceClient.class).loadExample(id);
  * </pre>
  */
 @ApplicationScoped
