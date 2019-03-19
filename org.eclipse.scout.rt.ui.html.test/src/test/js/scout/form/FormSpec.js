@@ -11,6 +11,12 @@
 describe('Form', function() {
   var session, helper, outlineHelper;
 
+  function closeMessageBox() {
+    if (session && session.$entryPoint) {
+      session.$entryPoint.find('.messagebox .box-button').click();
+    }
+  }
+
   beforeEach(function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
@@ -174,6 +180,43 @@ describe('Form', function() {
         })
         .catch(fail)
         .always(done);
+    });
+
+    it('is marked saved after save', function(done) {
+      var form = helper.createFormWithOneField();
+      var field = form.rootGroupBox.fields[0];
+
+      field.setValue('whatever');
+      form.save()
+        .then(function() {
+          // it should be marked saved as the save was successful
+          expect(field.touched).toBe(false);
+        })
+        .catch(fail)
+        .always(done);
+    });
+
+    it('is not marked saved on error', function(done) {
+      jasmine.clock().install();
+      var form = helper.createFormWithOneField();
+      var field = form.rootGroupBox.fields[0];
+
+      form._save = function(data) {
+        return $.resolvedPromise(scout.Status.error());
+      };
+
+      field.setValue('whatever');
+      form.save()
+        .then(function() {
+          // it should not be marked saved because the save returned an error
+          expect(field.touched).toBe(true);
+        })
+        .catch(fail)
+        .always(done);
+      jasmine.clock().tick(1000);
+      closeMessageBox();
+      jasmine.clock().tick(1000);
+      jasmine.clock().uninstall();
     });
 
     it('does not call save if save is not required', function(done) {
