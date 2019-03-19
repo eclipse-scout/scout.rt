@@ -1,5 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.shared.http;
 
+import java.net.SocketException;
+
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
@@ -130,4 +143,48 @@ public final class HttpConfigurationProperties {
 
   }
 
+  /**
+   * Enable retry of request (includes non-idempotent requests) on {@link NoHttpResponseException}
+   * <p>
+   * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+   * <p>
+   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
+   *
+   * @since 7.0
+   */
+  public static class ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.apache_retry_on_NoHttpResponseException";
+    }
+  }
+
+  /**
+   * Enable retry of request (includes non-idempotent requests) on {@link SocketException} with message "Connection
+   * reset"
+   * <p>
+   * Assuming that the cause of the exception was most probably a stale socket channel on the server side.
+   * <p>
+   * For apache tomcat see http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e659
+   *
+   * @since 7.0
+   */
+  public static class ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    protected Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.apache_retry_on_SocketException_by_connection_reset";
+    }
+  }
 }
