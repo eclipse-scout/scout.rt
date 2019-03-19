@@ -255,7 +255,8 @@ scout.SmartField.prototype._clearPendingLookup = function() {
  * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
 scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
-  if (this._notUnique) {
+  // Don't show the not-unique error when the search-text becomes empty while typing (see ticket #229775)
+  if (this._notUnique && !searchTextEmpty) {
     this._setNotUniqueError(searchText);
   }
 
@@ -263,7 +264,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
   if (!selectedLookupRow && this.lookupRow) {
     var lookupRowText = scout.strings.nvl(this.lookupRow.text);
     if (lookupRowText === searchText) {
-      $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is equals. Close popup');
+      $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is equals. Close popup');
       this._clearLookupStatus();
       this._inputAccepted(false);
       return;
@@ -274,7 +275,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
   // trigger event when search text has changed. This is required for the case where
   // a field is cleared, and the remote model must be updated (value=null)
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
-    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) unchanged: text is empty. Close popup');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is empty. Close popup');
     this._clearLookupStatus();
     if (this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
       // clear the error status from previous search which did not find any results. This error status is no longer valid as we accept the null content here.
@@ -287,7 +288,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
   // 1.) when search text is empty and no lookup-row is selected, simply set the value to null
   // Note: here we assume that a current lookup row is set.
   if (!selectedLookupRow && searchTextEmpty) {
-    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) empty. Set lookup-row to null, close popup');
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) empty. Set lookup-row to null, close popup');
     this._clearLookupStatus();
     this.setLookupRow(null);
     this._inputAccepted();
@@ -296,7 +297,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
 
   // 2.) proposal chooser is open -> use the selected row as value
   if (selectedLookupRow) {
-    $.log.isDebugEnabled() && $.log.debug('(SmartField#acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
+    $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) lookup-row selected. Set lookup-row, close popup lookupRow=', selectedLookupRow.toString());
     this._clearLookupStatus();
     this.setLookupRow(selectedLookupRow);
     this._inputAccepted();
@@ -1134,6 +1135,18 @@ scout.SmartField.prototype._isFunctionKey = function(event) {
 };
 
 scout.SmartField.prototype._onLookupRowSelected = function(event) {
+  // When a row has been selected in the proposal chooser, cancel all
+  // pending and running lookup-calls. This avoids situations where the
+  // lookup-call returns with results after the user has pressed the
+  // enter key in order to select a result (see ticket #229775).
+  this._clearPendingLookup();
+
+  if (this._currentLookupCall) {
+    this._currentLookupCall.abort();
+    this._currentLookupCall = null;
+    this.setLoading(false);
+  }
+
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
   this.closePopup();
