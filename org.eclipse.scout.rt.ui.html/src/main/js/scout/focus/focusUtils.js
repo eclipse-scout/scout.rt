@@ -68,14 +68,15 @@ scout.focusUtils = {
     if ($element.is('input[disabled][type=text], textarea[disabled]')) {
       return true;
     }
-    var text = $element
-      .clone()
-      .children()
-      .remove()
-      .end()
-      .text()
-      .trim();
-    return (text.length > 0);
+    // When element or its children have text, it should be selectable.
+    // The old implementation only looked at the text of the element itself
+    // but not at the text of its children. With the old approach it was not
+    // possible to select something inside of a TD, for instance:
+    //   <td><span>Foo</span></td>
+    // Because TD itself has no text at all.
+    // When an element has no text we return false, because if we could select
+    // empty elements, we'd loose focus more often.
+    return $element.text().trim().length > 0;
   },
 
 
