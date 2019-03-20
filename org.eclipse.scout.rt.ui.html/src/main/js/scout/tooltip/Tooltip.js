@@ -38,13 +38,21 @@ scout.Tooltip = function() {
   this.$content;
   this.menus = [];
   this._addWidgetProperties(['menus']);
+
+  this._openLater = false;
 };
 scout.inherits(scout.Tooltip, scout.Widget);
 
 scout.Tooltip.prototype.render = function($parent) {
   // Use entry point by default
-  $parent = $parent || this.entryPoint();
-  scout.Tooltip.parent.prototype.render.call(this, $parent);
+  var $tooltipParent = $parent || this.entryPoint();
+  // when the parent is detached it is not possible to render the popup -> do it later
+  if (!$tooltipParent || !$tooltipParent.length || !$tooltipParent.isAttached()) {
+    this._openLater = true;
+    this.$parent = $tooltipParent;
+    return;
+  }
+  scout.Tooltip.parent.prototype.render.call(this, $tooltipParent);
 };
 
 scout.Tooltip.prototype._render = function() {
@@ -123,6 +131,20 @@ scout.Tooltip.prototype._remove = function() {
   this.dialog = null;
   this.$menus = null;
   scout.Tooltip.parent.prototype._remove.call(this);
+};
+
+scout.Tooltip.prototype._onAttach = function() {
+  scout.Tooltip.parent.prototype._onAttach.call(this);
+  if (this._openLater && !this.rendered) {
+    this._openLater = false;
+    this.render(this.$parent);
+  }
+};
+
+scout.Tooltip.prototype._renderOnDetach = function() {
+  this._openLater = true;
+  this.remove();
+  scout.FieldStatus.parent.prototype._onDetach.call(this);
 };
 
 scout.Tooltip.prototype._isRemovalPrevented = function() {

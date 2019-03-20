@@ -590,11 +590,53 @@ describe('Form', function() {
       });
       form.render();
       form.validateLayoutTree();
-      expect(form.widget('tabItem1').isFocused());
+      // TODO aho fix this test
+      //      expect(form.widget('tabItem1').isFocused()).toBe(true);
 
       // InitialFocus property must not modify parent of tab items
       expect(form.widget('tabItem1').parent).toBe(form.widget('tabBox'));
       expect(form.widget('tabItem2').parent).toBe(form.widget('tabBox'));
+    });
+  });
+
+  describe('restore focus', function() {
+
+    var outlineHelper, desktop;
+
+    beforeEach(function() {
+      desktop = session.desktop;
+      outlineHelper = new scout.OutlineSpecHelper(session);
+    });
+
+    /**
+     * Scenario: Switch between two outline nodes and expect the focus in its detail forms are preserved.
+     */
+    it('on detail forms', function() {
+      // setup an outline with 2 nodes each node has a detail form with 3 fields
+      var model = outlineHelper.createModelFixture(2, 0, true);
+      var outline = outlineHelper.createOutline(model);
+      outline.nodes.forEach(function(node) {
+        node.detailForm = helper.createFormWithFields(desktop, false, 3);
+        node.detailForm.nodeText = node.text;
+        node.detailForm.initialFocus = node.detailForm.rootGroupBox.fields[1];
+        node.detailFormVisible = true;
+      }, this);
+
+      desktop.setOutline(outline);
+      outline.selectNodes(outline.nodes[0]);
+
+      // expect the initial focus of the detail form is rendered.
+      expect(outline.nodes[0].detailForm.rootGroupBox.fields[1].isFocused()).toBe(true);
+      // focus second field
+      outline.nodes[0].detailForm.rootGroupBox.fields[2].$field.focus();
+      outline.selectNodes(outline.nodes[1]);
+      // expect the initial focus of the detail form is rendered.
+      expect(outline.nodes[1].detailForm.rootGroupBox.fields[1].isFocused()).toBe(true);
+      outline.nodes[1].detailForm.rootGroupBox.fields[0].$field.focus();
+
+      // switch back and expect the focus gets restored
+      outline.selectNodes(outline.nodes[0]);
+      expect(outline.nodes[0].detailForm.rootGroupBox.fields[2].isFocused()).toBe(true);
     });
   });
 

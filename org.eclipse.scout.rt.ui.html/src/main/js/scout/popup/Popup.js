@@ -119,6 +119,7 @@ scout.Popup.prototype._init = function(options) {
   if (this.withGlassPane) {
     this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
   }
+  this._setAnchor(this.anchor);
 };
 
 /**
@@ -188,14 +189,6 @@ scout.Popup.prototype.render = function($parent) {
   scout.Popup.parent.prototype.render.call(this, $popupParent);
 };
 
-scout.Popup.prototype._onAttach = function() {
-  scout.Popup.parent.prototype._onAttach.call(this);
-  if (this._openLater && !this.rendered) {
-    this._openLater = false;
-    this.open();
-  }
-};
-
 scout.Popup.prototype._render = function() {
   this.$container = this.$parent.appendDiv('popup');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -218,6 +211,20 @@ scout.Popup.prototype._postRender = function() {
   this.size();
   this._attachCloseHandlers();
   this._attachAnchorHandlers();
+};
+
+scout.Popup.prototype._onAttach = function() {
+  scout.Popup.parent.prototype._onAttach.call(this);
+  if (this._openLater && !this.rendered) {
+    this._openLater = false;
+    this.open();
+  }
+};
+
+scout.Popup.prototype._renderOnDetach = function() {
+  this._openLater = true;
+  this.remove();
+  scout.FieldStatus.parent.prototype._onDetach.call(this);
 };
 
 scout.Popup.prototype._remove = function() {
@@ -815,6 +822,13 @@ scout.Popup.prototype.ensureOpen = function() {
 };
 
 scout.Popup.prototype.setAnchor = function(anchor) {
+  this.setProperty('anchor', anchor);
+};
+
+scout.Popup.prototype._setAnchor = function(anchor) {
+  if (anchor) {
+    this.setParent(anchor);
+  }
   this.setProperty('anchor', anchor);
 };
 

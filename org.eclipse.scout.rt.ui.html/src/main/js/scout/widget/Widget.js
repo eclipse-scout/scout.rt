@@ -1810,6 +1810,10 @@ scout.Widget.prototype.restoreFocus = function() {
  * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
  */
 scout.Widget.prototype._onFocusIn = function(event) {
+  // do not track focus events during rendering to avoid initial focus to be restored.
+  if (this.rendering) {
+    return;
+  }
   var $target = $(event.target);
   if (this.$container.has($target)) {
     this._$lastFocusedElement = $target;

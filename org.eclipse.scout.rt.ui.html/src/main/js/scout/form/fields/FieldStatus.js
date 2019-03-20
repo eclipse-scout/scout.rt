@@ -37,18 +37,6 @@ scout.FieldStatus.prototype._remove = function() {
   }
 };
 
-scout.FieldStatus.prototype._renderOnAttach = function() {
-  scout.FieldStatus.parent.prototype._renderOnAttach.call(this);
-  this._renderTooltip();
-};
-
-scout.FieldStatus.prototype._onDetach = function() {
-  scout.FieldStatus.parent.prototype._onDetach.call(this);
-  if (this.tooltip) {
-    this.tooltip.remove();
-  }
-};
-
 scout.FieldStatus.prototype._renderProperties = function() {
   scout.FieldStatus.parent.prototype._renderProperties.call(this);
   this._renderPosition();
@@ -191,14 +179,6 @@ scout.FieldStatus.prototype.showTooltip = function() {
     this.tooltip.one('destroy', function() {
       this.hideTooltip();
     }.bind(this));
-    if (this.isAttachedAndRendered()) {
-      this._renderTooltip();
-    }
-  }
-};
-
-scout.FieldStatus.prototype._renderTooltip = function() {
-  if (this.tooltip) {
     this.tooltip.render();
   }
 };

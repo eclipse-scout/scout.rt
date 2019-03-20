@@ -35,7 +35,7 @@ scout.PopupManager.prototype._setPopups = function(popups) {
 
 scout.PopupManager.prototype._openPopups = function(popups) {
   popups.forEach(function(popup) {
-    popup.open(popup.session.$entryPoint);
+    popup.open(popup.$anchor ? popup.$anchor : popup.session.$entryPoint);
   });
 };
 
