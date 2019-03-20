@@ -48,6 +48,11 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractContextM
     handleOwnerEnabledChanged();
   }
 
+  @Override
+  protected boolean getConfiguredInheritAccessibility() {
+    return false;
+  }
+
   protected void handleOwnerEnabledChanged() {
     if (getContainer() == null) {
       return;
