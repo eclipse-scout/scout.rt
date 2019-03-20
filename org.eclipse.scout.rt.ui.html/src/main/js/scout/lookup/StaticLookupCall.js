@@ -52,11 +52,15 @@ scout.StaticLookupCall.prototype._getAll = function() {
 };
 
 scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
-  var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
   deferred.resolve({
     queryBy: scout.QueryBy.ALL,
-    lookupRows: datas.map(this._dataToLookupRow, this)
+    lookupRows: this._lookupRowsByAll()
   });
+};
+
+scout.StaticLookupCall.prototype._lookupRowsByAll = function() {
+  var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
+  return datas.map(this._dataToLookupRow, this);
 };
 
 scout.StaticLookupCall.prototype._getByText = function(text) {
@@ -66,10 +70,7 @@ scout.StaticLookupCall.prototype._getByText = function(text) {
 };
 
 scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
-  var datas = this.data.filter(function(data) {
-    return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
-  });
-  var lookupRows = datas.map(this._dataToLookupRow, this);
+  var lookupRows = this._lookupRowsByText(text);
 
   // resolve non-hierarchical results immediately
   if (!this.hierarchical) {
@@ -106,6 +107,13 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
     });
 };
 
+scout.StaticLookupCall.prototype._lookupRowsByText = function(text) {
+  var datas = this.data.filter(function(data) {
+    return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
+  });
+  return datas.map(this._dataToLookupRow, this);
+};
+
 scout.StaticLookupCall.prototype._getByKey = function(key) {
   var deferred = $.Deferred();
   setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
@@ -113,17 +121,25 @@ scout.StaticLookupCall.prototype._getByKey = function(key) {
 };
 
 scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
-  var data = scout.arrays.find(this.data, function(data) {
-    return data[0] === key;
-  });
-  if (data) {
+  var lookupRow = this._lookupRowByKey(key);
+  if (lookupRow) {
     deferred.resolve({
       queryBy: scout.QueryBy.KEY,
-      lookupRows: [this._dataToLookupRow(data)]
+      lookupRows: [lookupRow]
     });
   } else {
     deferred.reject();
   }
+};
+
+scout.StaticLookupCall.prototype._lookupRowByKey = function(key) {
+  var data = scout.arrays.find(this.data, function(data) {
+    return data[0] === key;
+  });
+  if (!data) {
+    return null;
+  }
+  return this._dataToLookupRow(data);
 };
 
 scout.StaticLookupCall.prototype._getByRec = function(rec) {
@@ -133,17 +149,20 @@ scout.StaticLookupCall.prototype._getByRec = function(rec) {
 };
 
 scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
-  var lookupRows = this.data.reduce(function(aggr, data) {
+  deferred.resolve({
+    queryBy: scout.QueryBy.REC,
+    rec: rec,
+    lookupRows: this._lookupRowsByRec(rec)
+  });
+};
+
+scout.StaticLookupCall.prototype._lookupRowsByRec = function(rec) {
+  return this.data.reduce(function(aggr, data) {
     if (data[2] === rec) {
       aggr.push(this._dataToLookupRow(data));
     }
     return aggr;
   }.bind(this), []);
-  deferred.resolve({
-    queryBy: scout.QueryBy.REC,
-    rec: rec,
-    lookupRows: lookupRows
-  });
 };
 
 scout.StaticLookupCall.prototype.setDelay = function(delay) {

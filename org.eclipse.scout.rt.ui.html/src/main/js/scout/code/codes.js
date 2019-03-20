@@ -51,9 +51,21 @@ scout.codes = {
     }, this);
   },
 
-  remove: function(codeTypeId) {
-    delete this.registry[codeTypeId];
-    // TODO [7.0] awe: also clean up texts?
+  /**
+   * @param codeTypes code types or code type ids to remove
+   */
+  remove: function(codeTypes) {
+    codeTypes = scout.arrays.ensure(codeTypes);
+    codeTypes.forEach(function(codeType) {
+      var id;
+      if (typeof codeType === 'string') {
+        id = codeType;
+      } else {
+        id =  codeType.id;
+      }
+      delete this.registry[id];
+      // TODO [7.0] awe: also clean up texts?
+    }, this);
   },
 
   /**
