@@ -161,7 +161,7 @@ public final class HttpConfigurationProperties {
 
     @Override
     public String getKey() {
-      return "scout.http.apache_retry_on_NoHttpResponseException";
+      return "scout.http.retryOnNoHttpResponseException";
     }
   }
 
@@ -184,7 +184,7 @@ public final class HttpConfigurationProperties {
 
     @Override
     public String getKey() {
-      return "scout.http.apache_retry_on_SocketException_by_connection_reset";
+      return "scout.http.retryOnSocketExceptionByConnectionReset";
     }
   }
 }
