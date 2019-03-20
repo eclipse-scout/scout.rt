@@ -1190,6 +1190,25 @@ describe('Desktop', function() {
         .always(done);
     });
 
+    it('will send the outline to back', function() {
+      var outline = outlineHelper.createOutline(outlineHelper.createModelFixture(3, 2));
+      desktop.setOutline(outline);
+
+      var view = formHelper.createFormWithOneField({
+        displayHint: scout.Form.DisplayHint.VIEW
+      });
+
+      desktop.showForm(view);
+      outline.selectNode(outline.nodes[0]);
+      desktop.bringOutlineToFront();
+
+      desktop.activateForm(view);
+      outline.deselectAll();
+
+      expect(desktop.activeForm).toBe(view);
+      expect(view.attached).toBe(true);
+    });
+
     it('will be set to currentView if dialog closes and there is no display parent form', function(done) {
       var view = formHelper.createFormWithOneField({
         displayHint: 'view'

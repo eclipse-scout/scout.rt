@@ -243,7 +243,6 @@ scout.DesktopBench.prototype.setChanging = function(changing) {
     this.htmlComp.validateLayoutTree();
     this.changed = false;
   }
-  this.chaningCounter = Math.max(this.changingCounter - 1, 0);
 };
 
 scout.DesktopBench.prototype.updateLayoutData = function(layoutData) {
@@ -589,7 +588,7 @@ scout.DesktopBench.prototype._onViewRemove = function(event) {
 scout.DesktopBench.prototype._onViewActivate = function(event) {
   var view = event.view;
   if (this.outlineContent === view) {
-    this.desktop.bringOutlineToFront(this.desktop.outline);
+    this.desktop.bringOutlineToFront();
   }
   this.trigger('viewActivate', {
     view: view

@@ -818,7 +818,6 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     .not('.desktop-notifications') // exclude notification box like 'connection interrupted' to be locked
     .not('.overlay-separator'); // exclude overlay separator (marker element)
 
-
   if (element) {
     if (element.$container) {
       $glassPaneTargets = $glassPaneTargets.not(element.$container);
@@ -980,6 +979,14 @@ scout.Desktop.prototype._setFormActivated = function(form) {
 
   this.activeForm = form;
 
+  if (!form) {
+    // no form is activated -> show outline
+    this.bringOutlineToFront();
+  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
+    // view form was activated. send the outline to back to ensure the form is attached
+    this.sendOutlineToBack();
+  }
+
   this.triggerFormActivate(form);
 };
 
@@ -1000,8 +1007,8 @@ scout.Desktop.prototype.cancelViews = function(forms) {
 
 scout.Desktop.prototype._cancelViews = function(forms) {
   // do not cancel forms when the form child hierarchy does not get canceled.
-  forms = forms.filter(function(form){
-    return !scout.arrays.find(form.views, function(view){
+  forms = forms.filter(function(form) {
+    return !scout.arrays.find(form.views, function(view) {
       return view.modal;
     });
   });
