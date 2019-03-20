@@ -120,6 +120,12 @@ public class HtmlNodeBuilder extends HtmlContentBuilder implements IHtmlElement 
   }
 
   @Override
+  public IHtmlElement id(CharSequence id) {
+    addAttribute("id", id);
+    return this;
+  }
+
+  @Override
   public IHtmlElement appLink(CharSequence ref) {
     return appLink(ref, "app-link");
   }

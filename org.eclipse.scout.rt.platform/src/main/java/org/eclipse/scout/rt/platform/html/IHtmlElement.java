@@ -11,30 +11,44 @@
 package org.eclipse.scout.rt.platform.html;
 
 /**
- * A html element
+ * A HTML element.
  */
 public interface IHtmlElement extends IHtmlContent {
 
   /**
-   * Add a css class
+   * Sets the 'class' attribute (CSS).
    */
   IHtmlElement cssClass(CharSequence cssClass);
 
   /**
-   * Add a css style
+   * Sets the 'style' attribute (CSS).
    */
   IHtmlElement style(CharSequence style);
 
   /**
-   * Add an application local link
-   *
-   * @param path
-   *          path to identify what is the link referring to.
+   * Sets the 'id' attribute.
    */
-  IHtmlElement appLink(CharSequence path);
+  IHtmlElement id(CharSequence id);
 
   /**
-   * Add a html attribute to the element.
+   * Add an application local link.
+   *
+   * @param ref
+   *          Reference to identify what the link is referring to
+   */
+  IHtmlElement appLink(CharSequence ref);
+
+  /**
+   * Add an application local link.
+   *
+   * @param ref
+   *          Reference to identify what the link is referring to
+   * @param cssClass
+   */
+  IHtmlElement appLink(CharSequence ref, CharSequence cssClass);
+
+  /**
+   * Add a HTML attribute to the element.
    *
    * @param name
    *          of the attribute
@@ -44,7 +58,7 @@ public interface IHtmlElement extends IHtmlContent {
   IHtmlElement addAttribute(String name, CharSequence value);
 
   /**
-   * Add a boolean html attribute to the element.
+   * Add a boolean HTML attribute to the element.
    *
    * @param name
    *          of the attribute
@@ -53,5 +67,4 @@ public interface IHtmlElement extends IHtmlContent {
    */
   IHtmlElement addBooleanAttribute(String name);
 
-  IHtmlElement appLink(CharSequence ref, CharSequence cssClass);
 }
