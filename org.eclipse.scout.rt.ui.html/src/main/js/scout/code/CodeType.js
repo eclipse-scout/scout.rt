@@ -81,8 +81,35 @@ scout.CodeType.prototype.getCodes = function(rootOnly) {
       }
     }
     return rootCodes;
-  } else {
-    return this.codes;
+  }
+  return this.codes;
+};
+
+/**
+ * Visits all codes and theirs children.
+ * <p>
+ * In order to abort visiting, the visitor can return true or scout.TreeVisitResult.TERMINATE.
+ * To only abort the visiting of a sub tree, the visitor can return SKIP_SUBTREE.
+ * </p>
+ * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
+ */
+scout.CodeType.prototype.visit = function(visitor) {
+  var codes =  this.codes.filter(function(code) {
+    // Only consider root codes
+    return !code.parent;
+  });
+  for (var i = 0; i < codes.length; i++) {
+    var code = this.codes[i];
+    var visitResult = visitor(code);
+    if (visitResult === true || visitResult === scout.TreeVisitResult.TERMINATE) {
+      return scout.TreeVisitResult.TERMINATE;
+    }
+    if (visitResult !== scout.TreeVisitResult.SKIP_SUBTREE) {
+      visitResult = code.visitChildren(visitor);
+      if (visitResult === true || visitResult === scout.TreeVisitResult.TERMINATE) {
+        return scout.TreeVisitResult.TERMINATE;
+      }
+    }
   }
 };
 

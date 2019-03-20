@@ -46,3 +46,19 @@ scout.Code.prototype.text = function(vararg) {
   }
   return scout.texts.resolveText(this._text, languageTag);
 };
+
+scout.Code.prototype.visitChildren = function(visitor) {
+  for (var i = 0; i < this.children.length; i++) {
+    var child = this.children[i];
+    var visitResult = visitor(child);
+    if (visitResult === true || visitResult === scout.TreeVisitResult.TERMINATE) {
+      return scout.TreeVisitResult.TERMINATE;
+    }
+    if (visitResult !== scout.TreeVisitResult.SKIP_SUBTREE) {
+      visitResult = child.visitChildren(visitor);
+      if (visitResult === true || visitResult === scout.TreeVisitResult.TERMINATE) {
+        return scout.TreeVisitResult.TERMINATE;
+      }
+    }
+  }
+};
