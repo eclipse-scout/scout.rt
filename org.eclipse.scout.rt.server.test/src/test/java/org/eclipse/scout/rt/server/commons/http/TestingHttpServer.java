@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.commons.http;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.server.commons.servlet.AbstractHttpServlet;
 
 /**
@@ -166,11 +168,23 @@ public class TestingHttpServer {
   }
 
   public void start() {
-    try {
-      m_server.start();
-    }
-    catch (Exception e) {
-      throw new ProcessingException("start", e);
+    //since multiple test runs can occur at the same time in a ci environment, try until the port is available
+    long timeout = System.currentTimeMillis() + 60000L;
+    while (true) {
+      try {
+        m_server.start();
+        //ok, got the port
+        return;
+      }
+      catch (Exception e) {
+        if (System.currentTimeMillis() > timeout) {
+          throw new ProcessingException("start", e);
+        }
+        else {
+          System.out.println("waiting for " + m_servletUrl + " to become available");
+          SleepUtil.sleepElseThrow(1, TimeUnit.SECONDS);
+        }
+      }
     }
   }
 
