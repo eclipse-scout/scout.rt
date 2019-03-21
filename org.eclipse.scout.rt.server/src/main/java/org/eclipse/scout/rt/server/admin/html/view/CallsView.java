@@ -236,15 +236,6 @@ public class CallsView extends DefaultView {
         p.spacingRow(2);
         //
         p.startTableRow();
-        p.tableCell("Out&nbsp;variables");
-        p.startTableCell();
-        renderValueTable(p, info.getOutVariables());
-        p.endTableCell();
-        p.endTableRow();
-        //
-        p.spacingRow(2);
-        //
-        p.startTableRow();
         p.tableCell("Return&nbsp;data");
         p.startTableCell();
         renderValueTable(p, new Object[]{info.getReturnData()});

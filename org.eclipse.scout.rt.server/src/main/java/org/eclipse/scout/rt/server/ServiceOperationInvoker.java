@@ -95,8 +95,7 @@ public class ServiceOperationInvoker {
       Object service = getValidatedServiceAccess(serviceInterfaceClass, serviceOp, args);
 
       Object data = serviceUtility.invoke(service, serviceOp, args);
-      Object[] outParameters = serviceUtility.extractHolderArguments(args);
-      serviceRes = new ServiceTunnelResponse(data, outParameters);
+      serviceRes = new ServiceTunnelResponse(data);
       return serviceRes;
     }
     finally {

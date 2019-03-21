@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.shared.servicetunnel;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
@@ -21,7 +20,6 @@ public class ServiceTunnelResponse implements Serializable {
   private static final long serialVersionUID = 0L;
 
   private final Object m_data;
-  private final Object[] m_outVars;
   private final Throwable m_exception;
   // added in 3.1.17
   private volatile Long m_processingDuration;
@@ -29,25 +27,20 @@ public class ServiceTunnelResponse implements Serializable {
   private List<ClientNotificationMessage> m_notifications;
 
   public ServiceTunnelResponse(Throwable t) {
-    this(null, null, t);
+    this(null, t);
   }
 
-  public ServiceTunnelResponse(Object data, Object[] outVars) {
-    this(data, outVars, null);
+  public ServiceTunnelResponse(Object data) {
+    this(data, null);
   }
 
-  public ServiceTunnelResponse(Object data, Object[] outVars, Throwable t) {
+  public ServiceTunnelResponse(Object data, Throwable t) {
     m_data = data;
-    m_outVars = outVars;
     m_exception = t;
   }
 
   public Object getData() {
     return m_data;
-  }
-
-  public Object[] getOutVars() {
-    return m_outVars;
   }
 
   public Throwable getException() {
@@ -80,7 +73,6 @@ public class ServiceTunnelResponse implements Serializable {
   public String toString() {
     ToStringBuilder tsb = new ToStringBuilder(this);
     tsb.ref("data", getData());
-    tsb.attr("vars", Arrays.asList(getOutVars()));
     tsb.attr("exception", getException());
     tsb.attr("notifications", getNotifications());
     return tsb.toString();

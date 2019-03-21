@@ -56,7 +56,7 @@ public class HttpServiceTunnelTest {
   public void testTunnel() throws IOException {
     when(mockUrl.getValue()).thenReturn("http://localhost");
 
-    final MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData", new Object[]{})));
+    final MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData")));
 
     HttpServiceTunnel tunnel = new HttpServiceTunnel() {
 

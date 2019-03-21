@@ -15,9 +15,6 @@ import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelServ
 
 public class MockServerProcessingCancelService implements IRunMonitorCancelService {
 
-  public MockServerProcessingCancelService() {
-  }
-
   @Override
   public boolean cancel(long requestSequence) {
     Thread t = BEANS.get(MockServiceTunnel.class).getThreadByRequestSequence(requestSequence);

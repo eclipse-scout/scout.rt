@@ -21,7 +21,6 @@ public class CallInfo {
   private long m_endTime;
   private Object m_returnData;
   private Throwable m_returnException;
-  private Object[] m_outVariables;
 
   public String getService() {
     return m_service;
@@ -98,13 +97,5 @@ public class CallInfo {
 
   public void setReturnData(Object o) {
     m_returnData = o;
-  }
-
-  public Object[] getOutVariables() {
-    return m_outVariables;
-  }
-
-  public void setOutVariables(Object[] a) {
-    m_outVariables = a;
   }
 }

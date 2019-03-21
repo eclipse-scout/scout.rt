@@ -16,11 +16,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.holders.HolderUtility;
-import org.eclipse.scout.rt.platform.holders.IHolder;
-import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.shared.servicetunnel.internal.AbstractHolderArgumentVisitor;
 
 @ApplicationScoped
 public class ServiceUtility {
@@ -46,7 +42,7 @@ public class ServiceUtility {
    *           if the service invocation failed. Hence, runtime exceptions are propagated, any other exception is
    *           translated into {@link PlatformException}.
    */
-  @SuppressWarnings("squid:S1181")
+  @SuppressWarnings("squid:S1181") // Throwable and Error should not be caught
   public Object invoke(final Object service, final Method operation, final Object[] args) {
     Assertions.assertNotNull(service, "service is null");
     Assertions.assertNotNull(operation, "operation is null");
@@ -56,75 +52,6 @@ public class ServiceUtility {
     }
     catch (final Throwable t) {
       throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(t);
-    }
-  }
-
-  /**
-   * Holders and nvpairs need to be copied as value clones. A smartfield for example is a holder and must not go to
-   * backend. NVPairs with holder values ae replaced by NVPair with serializable holder arguments
-   */
-  public Object[] filterHolderArguments(Object[] callerArgs) {
-    Object[] serializableArgs = new Object[callerArgs.length];
-    new AbstractHolderArgumentVisitor() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public void visitHolder(IHolder input, IHolder output) {
-        if (!HolderUtility.containEqualValues(output, input)) {
-          output.setValue(input.getValue());
-        }
-      }
-
-      @Override
-      public void visitOther(Object[] input, Object[] output, int index) {
-        output[index] = input[index];
-      }
-    }.startVisiting(callerArgs, serializableArgs, 1, true);
-    return serializableArgs;
-  }
-
-  /**
-   * Extract holders and nvpairs in callerArgs (and eventually in sub-arrays)
-   */
-  public Object[] extractHolderArguments(Object[] callerArgs) {
-    Object[] holderArgs = new Object[callerArgs.length];
-    new AbstractHolderArgumentVisitor() {
-      @Override
-      public void visitHolder(IHolder input, IHolder output) {
-        // do nothing
-      }
-
-      @Override
-      public void visitOther(Object[] input, Object[] output, int index) {
-        // do nothing
-      }
-    }.startVisiting(callerArgs, holderArgs, 1, true);
-    return holderArgs;
-  }
-
-  /**
-   * Apply changed holder and {@link NVPair} values from updatedArgs to callerArgs
-   *
-   * @param clearNonOutArgs
-   *          if true deletes calerArgs that aren't out parameters
-   */
-  @SuppressWarnings("unchecked")
-  public void updateHolderArguments(Object[] callerArgs, Object[] updatedArgs, final boolean clearNonOutArgs) {
-    if (updatedArgs != null) {
-      new AbstractHolderArgumentVisitor() {
-        @Override
-        public void visitHolder(IHolder input, IHolder output) {
-          if (!HolderUtility.containEqualValues(output, input)) {
-            output.setValue(input.getValue());
-          }
-        }
-
-        @Override
-        public void visitOther(Object[] input, Object[] output, int index) {
-          if (clearNonOutArgs) {
-            output[index] = null;
-          }
-        }
-      }.startVisiting(updatedArgs, callerArgs, 1, false);
     }
   }
 }

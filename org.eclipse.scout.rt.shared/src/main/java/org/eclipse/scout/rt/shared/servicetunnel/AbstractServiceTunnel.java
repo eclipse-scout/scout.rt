@@ -68,7 +68,6 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
       serviceException.setStackTrace(both);
       throw serviceException;
     }
-    BEANS.get(ServiceUtility.class).updateHolderArguments(request.getArgs(), response.getOutVars(), false);
     return response.getData();
   }
 
@@ -76,8 +75,7 @@ public abstract class AbstractServiceTunnel implements IServiceTunnel {
     if (args == null) {
       args = new Object[0];
     }
-    Object[] serializableArgs = BEANS.get(ServiceUtility.class).filterHolderArguments(args);
-    return new ServiceTunnelRequest(interfaceClass.getName(), operation.getName(), operation.getParameterTypes(), serializableArgs);
+    return new ServiceTunnelRequest(interfaceClass.getName(), operation.getName(), operation.getParameterTypes(), args);
   }
 
   protected void interceptRequest(ServiceTunnelRequest request) {

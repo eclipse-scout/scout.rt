@@ -53,12 +53,6 @@ public class CallInspector {
     if (res != null) {
       m_info.setReturnData(res.getData());
       m_info.setReturnException(res.getException());
-      Object[] args = res.getOutVars();
-      Object[] newArgs = new Object[(args != null ? args.length : 0)];
-      if (newArgs.length > 0) {
-        System.arraycopy(args, 0, newArgs, 0, newArgs.length);
-      }
-      m_info.setOutVariables(newArgs);
     }
   }
 

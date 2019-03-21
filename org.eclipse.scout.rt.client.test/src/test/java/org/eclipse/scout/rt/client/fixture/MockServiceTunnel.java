@@ -67,10 +67,10 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
         break;
       }
       Object result = serviceUtility.invoke(service, serviceOperation, req.getArgs());
-      return new ServiceTunnelResponse(result, null, null);
+      return new ServiceTunnelResponse(result, null);
     }
     catch (Throwable t) {
-      return new ServiceTunnelResponse(null, null, t);
+      return new ServiceTunnelResponse(null, t);
     }
   }
 
@@ -78,39 +78,4 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   protected HttpResponse executeRequest(ServiceTunnelRequest call, byte[] callData) throws IOException {
     return null;
   }
-
-//  @Override
-//  protected URLConnection createURLConnection(final ServiceTunnelRequest call, byte[] callData) throws IOException {
-//    URLConnection urlConn = new MockHttpURLConnection(getServerUrl()) {
-//      @Override
-//      protected void mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
-//        ServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
-//        try {
-//          m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
-//          //
-//          ServiceTunnelResponse res = MockServiceTunnel.this.mockServiceCall(req);
-//          if (res.getException() != null) {
-//            throw new Exception(res.getException());
-//          }
-//          getContentHandler().writeResponse(servletOut, res);
-//        }
-//        finally {
-//          m_runningMap.remove(call.getRequestSequence());
-//        }
-//      }
-//    };
-//    //
-//    String contentType = "text/xml";
-//    urlConn.setRequestProperty("Content-type", contentType);
-//    urlConn.setDoOutput(true);
-//    urlConn.setDoInput(true);
-//    urlConn.setDefaultUseCaches(false);
-//    urlConn.setUseCaches(false);
-//    //
-//    OutputStream httpOut = urlConn.getOutputStream();
-//    httpOut.write(callData);
-//    httpOut.close();
-//    httpOut = null;
-//    return urlConn;
-//  }
 }
