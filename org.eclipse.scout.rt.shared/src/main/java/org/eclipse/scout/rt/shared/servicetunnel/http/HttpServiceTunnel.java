@@ -112,7 +112,7 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     HttpRequest request = requestFactory.buildPostRequest(getGenericUrl(), new ByteArrayContentEx(null, callData, false));
     HttpHeaders headers = request.getHeaders();
     headers.setCacheControl("no-cache");
-    headers.setContentType("text/xml");
+    headers.setContentType(getContentHandler().getContentType());
     headers.put("Pragma", "no-cache");
     addCustomHeaders(request, call, callData);
     return request.execute();
