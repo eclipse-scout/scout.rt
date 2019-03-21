@@ -67,10 +67,12 @@ scout.Popup = function() {
   // Defines whether the popup should be closed whenever another popup opens.
   this.closeOnOtherPopupOpen = true;
 
+
   this._openLater = false;
 
   this.$arrow = null;
   this._windowResizeHandler = this._onWindowResize.bind(this);
+  this._anchorRenderHandler = this._onAnchorRender.bind(this);
   this._addWidgetProperties(['anchor']);
   this._addPreserveOnPropertyChangeProperties(['anchor']);
 };
@@ -227,6 +229,7 @@ scout.Popup.prototype._renderOnDetach = function() {
   scout.Popup.parent.prototype._renderOnDetach.call(this);
 };
 
+
 scout.Popup.prototype._remove = function() {
   this.$container.window().off('resize', this._windowResizeHandler);
   if (this._glassPaneRenderer) {
@@ -239,10 +242,23 @@ scout.Popup.prototype._remove = function() {
     this.$arrow.remove();
     this.$arrow = null;
   }
+
+  if (this.anchor) {
+    // reopen when the anchor gets rendered again
+    this.anchor.one('render', this._anchorRenderHandler);
+  }
+
   // remove all clean-up handlers
   this._detachAnchorHandlers();
   this._detachCloseHandlers();
   scout.Popup.parent.prototype._remove.call(this);
+};
+
+scout.Popup.prototype._destroy = function() {
+  if(this.anchor){
+    this.anchor.off('render', this._anchorRenderHandler);
+  }
+  scout.Popup.parent.prototype._destroy.call(this);
 };
 
 scout.Popup.prototype._renderWithFocusContext = function() {
@@ -830,6 +846,12 @@ scout.Popup.prototype._setAnchor = function(anchor) {
     this.setParent(anchor);
   }
   this.setProperty('anchor', anchor);
+};
+
+scout.Popup.prototype._onAnchorRender = function() {
+  if (!this.rendered) {
+    this.session.layoutValidator.schedulePostValidateFunction(this.open.bind(this));
+  }
 };
 
 scout.Popup.prototype._renderAnchor = function() {
