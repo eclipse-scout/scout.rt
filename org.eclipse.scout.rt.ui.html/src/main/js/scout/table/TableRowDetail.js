@@ -110,7 +110,10 @@ scout.TableRowDetail.prototype._onTableRowsInserted = function(event) {
     return;
   }
 
-  this.row = this.page.row;
+  if (event.source.rows.indexOf(this.page.row) < 0) {
+    return;
+  }
 
+  this.row = this.page.row;
   this._refreshRow();
 };
