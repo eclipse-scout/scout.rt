@@ -454,12 +454,13 @@ scout.RadioButtonGroup.prototype._clearPendingLookup = function() {
  * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
  */
 scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExisting) {
-  this._lookupInProgress = true;
-  this.setLoading(true);
-
   if (abortExisting && this._currentLookupCall) {
     this._currentLookupCall.abort();
   }
+
+  this._lookupInProgress = true;
+  this.setLoading(true);
+
   this._currentLookupCall = lookupCall;
   this.trigger('prepareLookupCall', {
     lookupCall: lookupCall
