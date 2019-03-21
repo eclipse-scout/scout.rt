@@ -41,7 +41,8 @@
   border: 1px solid @tile-border-color;
   padding: @tile-padding-y @tile-padding-x;
 
-  &.selectable:active:not(.selected) {
+  &.selectable:active:not(.selected),
+  &.selectable.active:not(.selected) {
     background-color: @tile-active-background-color;
   }
 

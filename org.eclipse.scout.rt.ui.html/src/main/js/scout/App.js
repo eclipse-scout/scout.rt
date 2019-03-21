@@ -170,6 +170,7 @@ scout.App.prototype._init = function(options) {
   this._prepareDOM();
   this._installErrorHandler();
   this._installGlobalMouseDownInterceptor();
+  this._installSyntheticActiveStateHandler();
   this._ajaxSetup();
   this._installExtensions();
   this._loadSessions(options.session);
@@ -213,6 +214,10 @@ scout.App.prototype._prepareDOM = function() {
 
 scout.App.prototype._installGlobalMouseDownInterceptor = function() {
   scout.installGlobalMouseDownInterceptor(document);
+};
+
+scout.App.prototype._installSyntheticActiveStateHandler = function() {
+  scout.installSyntheticActiveStateHandler(document);
 };
 
 /**

@@ -343,7 +343,8 @@ button {
     }
   }
 
-  &:not(.disabled):active {
+  &:not(.disabled):active,
+  &:not(.disabled).active {
     color: @button-active-color;
     background-color: @button-active-background-color;
 
@@ -366,7 +367,7 @@ button {
       background-color: @default-button-hover-background-color;
     }
 
-    &:active {
+    &:active, &.active {
       background-color: @default-button-active-background-color;
       border-color: @default-button-active-background-color;
     }
@@ -487,7 +488,7 @@ button::-moz-focus-inner {
     content: @icon-remove-bold;
   }
 
-  &:active {
+  &:active, &.active {
     color: @active-color;
   }
 
@@ -579,7 +580,7 @@ a,
     color: @link-hover-color;
   }
 
-  &:active {
+  &:active, &.active {
     color: @link-active-color;
   }
 

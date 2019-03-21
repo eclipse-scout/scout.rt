@@ -130,7 +130,7 @@
     border-color: @hover-color;
   }
 
-  &:active {
+  &:active, &.active {
     color: @button-active-color;
     background-color: @button-active-background-color;
     border-color: @table-header-menu-cmd-active-border-color;
@@ -168,7 +168,8 @@
       }
     }
 
-    &:active:not(.disabled) {
+    &:active:not(.disabled),
+    &.active:not(.disabled) {
       background-color: darken(@table-header-menu-cmd-selected-background-color, 10%);
       border-color: darken(@table-header-menu-cmd-selected-border-color, 10%);
     }

@@ -22,7 +22,8 @@
     }
   }
 
-  &:not(.disabled):active {
+  &:not(.disabled):active,
+  &:not(.disabled).active {
     background-color: @tile-button-default-active-background-color;
   }
 
@@ -75,7 +76,8 @@
       }
     }
 
-    &:not(.disabled):active {
+    &:not(.disabled):active,
+    &:not(.disabled).active {
       background-color: @tile-button-default-inverted-active-background-color;
       border-color: @tile-button-default-inverted-active-background-color;
     }
@@ -95,7 +97,8 @@
       }
     }
 
-    &:not(.disabled):active {
+    &:not(.disabled):active,
+    &:not(.disabled).active {
       background-color: @tile-button-alternative-active-background-color;
     }
   }
@@ -111,7 +114,8 @@
       }
     }
 
-    &:not(.disabled):active {
+    &:not(.disabled):active,
+    &:not(.disabled).active {
       background-color: @tile-button-alternative-inverted-active-background-color;
       border-color: @tile-button-alternative-inverted-active-background-color;
     }

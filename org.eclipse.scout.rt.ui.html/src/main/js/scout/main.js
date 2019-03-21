@@ -14,6 +14,7 @@
 
 scout.sessions = [];
 scout.appListeners = [];
+scout.$activeElements = null;
 
 /**
  * Adds a listener to the app. If the app is not created yet it remembers the listener and adds it as soon the app is started.
@@ -157,6 +158,35 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
   myDocument.addEventListener('mousedown', function(event) {
     scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
+};
+
+/**
+ * Because Firefox does not set the active state of a DOM element when the mousedown event
+ * for that element is prevented, we set an 'active' CSS class instead. This means in the
+ * CSS we must deal with :active and with .active, where we need same behavior for the
+ * active state across all browsers.
+ * <p>
+ * Typically you'd write something like this in your CSS:
+ *   button:active, button.active { ... }
+ */
+scout.installSyntheticActiveStateHandler = function(myDocument) {
+  if (scout.device.requiresSyntheticActiveState()) {
+    scout.$activeElements = [];
+    $(myDocument)
+      .on('mousedown', function(event) {
+        var $element = $(event.target);
+        while ($element.length) {
+          scout.$activeElements.push($element.addClass('active'));
+          $element = $element.parent();
+        }
+      })
+      .on('mouseup', function() {
+        scout.$activeElements.forEach(function($element) {
+          $element.removeClass('active');
+        });
+        scout.$activeElements = [];
+      });
+  }
 };
 
 /**

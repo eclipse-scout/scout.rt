@@ -211,6 +211,8 @@ scout.Device.prototype.isStandalone = function() {
   return !!window.navigator.standalone;
 };
 
+// TODO [awe] Scout 10.0 - remove functions required for IE 9 support, also check FocusManager#_handleIEEvent
+
 /**
  * This method returns false for very old browsers. Basically we check for the first version
  * that supports ECMAScript 5. This methods excludes all browsers that are known to be
@@ -459,18 +461,29 @@ scout.Device.prototype.supportsGeolocation = function() {
   return false;
 };
 
+/**
+ * When we call .preventDefault() on a mousedown event Firefox doesn't apply the :active state.
+ * Since W3C does not specify an expected behavior, we need this workaround for consistent behavior in
+ * our UI. The issue has been reported to Mozilla but it doesn't look like there will be a bugfix soon:
+ *
+ * https://bugzilla.mozilla.org/show_bug.cgi?id=771241#c7
+ */
+scout.Device.prototype.requiresSyntheticActiveState = function() {
+  return this.isFirefox();
+};
+
 scout.Device.prototype.supportsPassiveEventListener = function() {
   return this.supportsFeature('_passiveEventListener', function check(property) {
     // Code from MDN https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
     var passiveSupported = false;
     try {
-      var options = Object.defineProperty({}, "passive", {
+      var options = Object.defineProperty({}, 'passive', {
         get: function() {
           passiveSupported = true;
         }
       });
-      window.addEventListener("test", options, options);
-      window.removeEventListener("test", options, options);
+      window.addEventListener('test', options, options);
+      window.removeEventListener('test', options, options);
     } catch(err) {
       passiveSupported = false;
     }
