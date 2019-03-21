@@ -561,7 +561,7 @@ scout.TileGrid.prototype._onScroll = function() {
 
 scout.TileGrid.prototype._onScrollParentScroll = function(event) {
   this.scrolling = true;
-  this.revalidateLayout();
+  this.revalidateLayoutTree(false);
   this.scrolling = false;
 };
 

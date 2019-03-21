@@ -229,6 +229,14 @@ scout.Popup.prototype._renderOnDetach = function() {
   scout.Popup.parent.prototype._renderOnDetach.call(this);
 };
 
+scout.Popup.prototype.remove = function() {
+  var currentAnimateRemoval = this.animateRemoval;
+  if (!this._isInView()) {
+    this.animateRemoval = false;
+  }
+  scout.Popup.parent.prototype.remove.call(this);
+  this.animateRemoval = currentAnimateRemoval;
+};
 
 scout.Popup.prototype._remove = function() {
   this.$container.window().off('resize', this._windowResizeHandler);
@@ -255,7 +263,7 @@ scout.Popup.prototype._remove = function() {
 };
 
 scout.Popup.prototype._destroy = function() {
-  if(this.anchor){
+  if (this.anchor) {
     this.anchor.off('render', this._anchorRenderHandler);
   }
   scout.Popup.parent.prototype._destroy.call(this);
@@ -783,10 +791,16 @@ scout.Popup.prototype._validateVisibility = function() {
     return;
   }
   var inView = this._isInView();
-  var needsLayouting = this.$container.isVisible() !== inView && inView;
+  var needsLayouting = this.$container.hasClass('invisible') === inView && inView;
   this.$container.toggleClass('invisible', !inView); // Use visibility: hidden to not break layouting / size measurement
   if (needsLayouting) {
+    var currentAnimateResize = this.animateResize;
+    this.animateResize = false;
     this.revalidateLayout();
+    this.animateResize = currentAnimateResize;
+    if (this.withFocusContext) {
+      this.session.focusManager.validateFocus();
+    }
   }
 };
 
