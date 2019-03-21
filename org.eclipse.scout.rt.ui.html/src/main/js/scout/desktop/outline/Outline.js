@@ -456,6 +456,9 @@ scout.Outline.prototype.setDefaultDetailForm = function(defaultDetailForm) {
 
 scout.Outline.prototype._setDefaultDetailForm = function(defaultDetailForm) {
   this._setProperty('defaultDetailForm', defaultDetailForm);
+  if (defaultDetailForm) {
+    defaultDetailForm.detailForm = true;
+  }
 };
 
 scout.Outline.prototype.setOutlineOverviewVisible = function(outlineOverviewVisible) {
