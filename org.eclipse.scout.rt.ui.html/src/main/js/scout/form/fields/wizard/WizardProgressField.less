@@ -99,11 +99,11 @@
   }
 
   /* Step types */
-  &.active {
+  &.active-step {
     & > .wizard-step-content > .wizard-step-content-icon-container {
       padding: @wizard-progress-icon-container-padding - @wizard-progress-icon-container-border-width;
-      border: @wizard-progress-icon-container-border-width solid @wizard-step-active-border-color;
-      #scout.glow(@wizard-step-active-border-color, 3px);
+      border: @wizard-progress-icon-container-border-width solid @wizard-step-active-step-border-color;
+      #scout.glow(@wizard-step-active-step-border-color, 3px);
     }
   }
   &.disabled {
@@ -116,26 +116,26 @@
     }
   }
   &:not(.disabled) {
-    &.active {
-      #scout.wizard-step-color(@wizard-step-active-text-color);
+    &.active-step {
+      #scout.wizard-step-color(@wizard-step-active-step-text-color);
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-active-background-color;
-        color: @wizard-step-active-color;
-        border-color: @wizard-step-active-border-color;
+        background-color: @wizard-step-active-step-background-color;
+        color: @wizard-step-active-step-color;
+        border-color: @wizard-step-active-step-border-color;
       }
     }
     &.before-active {
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-before-active-background-color;
-        color: @wizard-step-before-active-color;
-        border-color: @wizard-step-before-active-border-color;
+        background-color: @wizard-step-before-active-step-background-color;
+        color: @wizard-step-before-active-step-color;
+        border-color: @wizard-step-before-active-step-border-color;
       }
     }
     &.after-active {
       & > .wizard-step-content > .wizard-step-content-icon-container > .wizard-step-content-icon {
-        background-color: @wizard-step-after-active-background-color;
-        color: @wizard-step-after-active-color;
-        border-color: @wizard-step-after-active-border-color;
+        background-color: @wizard-step-after-active-step-background-color;
+        color: @wizard-step-after-active-step-color;
+        border-color: @wizard-step-after-active-step-border-color;
       }
     }
   }
