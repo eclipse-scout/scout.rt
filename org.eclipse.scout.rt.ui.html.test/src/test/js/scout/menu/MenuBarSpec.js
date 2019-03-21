@@ -15,6 +15,12 @@ describe("MenuBar", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.MenuSpecHelper(session);
+    $('<style>' +
+        '.menubar { overflow: hidden; background-color: red; padding: 5px; }' +
+        '.menubar > .menubox { display: inline-block; height: 100% }' +
+        '.menubar > .menubox.right { float:right }' +
+        '.menu-item { min-width: 110px; max-width: 110px; padding: 5px; display: inline-block; background-color: orange;}' +
+        '</style>').appendTo($('#sandbox'));
   });
 
   function createModel(text, iconId, menuTypes) {
@@ -154,6 +160,34 @@ describe("MenuBar", function() {
 
       menuBar.destroy();
       expect(menu.events.count()).toBe(1);
+    });
+  });
+
+  describe('setVisible', function() {
+    it('does not throw an error if called on menus moved to the ellipsis menu', function(){
+      var menu1 = helper.createMenu(createModel('foo')),
+      menu2 = helper.createMenu(createModel('bar')),
+      menuBar = createMenuBar();
+
+      var menu3model = createModel('boo');
+      menu3model.visible = false;
+      var menu3 = helper.createMenu(menu3model);
+
+      var menu4model = createModel('far');
+      menu4model.horizontalAlignment = 1;
+      var menu4 = helper.createMenu(menu4model);
+
+      var menus = [menu1, menu2, menu3, menu4];
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+      menuBar.htmlComp.setSize(new scout.Dimension(100, 50));
+
+      menu3.setVisible(true);
+      menuBar.validateLayout();
+      
+      // no error is thrown.
+	  expect(true).toBe(true);
     });
   });
 

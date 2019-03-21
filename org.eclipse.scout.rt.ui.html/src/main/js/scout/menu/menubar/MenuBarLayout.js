@@ -40,7 +40,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   }
   this._visibleMenuItems.forEach(function(menuItem) {
     menuItem._setOverflown(false);
-    menuItem.setParent(this._menuBar);
   }, this);
 
   this._overflowMenuItems.forEach(function(menuItem) {
@@ -57,11 +56,6 @@ scout.MenuBarLayout.prototype.layout = function($container) {
   // set childActions to empty array to prevent the menuItems from calling remove.
   if (ellipsis) {
     ellipsis._closePopup();
-    /* workaround to ensure current child action will not be removed when setting the new ones.
-     * This workaround and also the setParent on all visible menu items (see above) can be removed
-     * with the context menu clean up planned in the UI team.
-     */
-    ellipsis.childActions = [];
     ellipsis.setChildActions(this._overflowMenuItems);
   }
 

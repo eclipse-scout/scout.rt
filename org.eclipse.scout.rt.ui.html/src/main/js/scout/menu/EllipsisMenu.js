@@ -18,6 +18,7 @@ scout.EllipsisMenu = function() {
   this.inheritAccessibility = false;
   this.tabbable = false;
   this.rightAligned = false;
+  this._addPreserveOnPropertyChangeProperties(['childActions']);
 };
 scout.inherits(scout.EllipsisMenu, scout.Menu);
 
