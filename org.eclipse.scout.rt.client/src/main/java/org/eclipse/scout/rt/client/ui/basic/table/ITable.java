@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.status.IStatus;
+import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -673,6 +674,10 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   ITableRow getSelectedRow();
 
   List<ITableRow> getSelectedRows();
+
+  List<CompositeObject> getSelectedKeys();
+
+  void restoreSelection(List<CompositeObject> selectedKeys);
 
   boolean isSelectedRow(ITableRow row);
 

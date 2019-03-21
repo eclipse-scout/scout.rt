@@ -2052,7 +2052,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
-  private List<CompositeObject> getSelectedKeys() {
+  @Override
+  public List<CompositeObject> getSelectedKeys() {
     List<CompositeObject> selectedKeys = new ArrayList<>();
     for (ITableRow r : getSelectedRows()) {
       selectedKeys.add(new CompositeObject(getRowKeys(r)));
@@ -2060,7 +2061,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return selectedKeys;
   }
 
-  private void restoreSelection(List<CompositeObject> selectedKeys) {
+  @Override
+  public void restoreSelection(List<CompositeObject> selectedKeys) {
     List<ITableRow> selectedRows = new ArrayList<>();
     if (!selectedKeys.isEmpty()) {
       for (ITableRow r : m_rows) {
