@@ -713,15 +713,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
     @Override
     public void fireActionFromUI() {
-      boolean actionAllowed;
-      if (isInheritAccessibility()) {
-        actionAllowed = isEnabledIncludingParents() && isVisibleIncludingParents();
-      }
-      else {
-        actionAllowed = isEnabled() && isVisible();
-      }
-
-      if (actionAllowed) {
+      if (isEnabledIncludingParents() && isVisibleIncludingParents()) {
         doAction();
       }
     }
