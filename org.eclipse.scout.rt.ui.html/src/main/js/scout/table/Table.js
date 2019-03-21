@@ -418,7 +418,9 @@ scout.Table.prototype._render = function() {
   });
   this._installImageListeners();
   this._installCellTooltipSupport();
-  this.menuBar.render();
+  if (this.menuBar) {
+    this.menuBar.render();
+  }
 
   // layout bugfix for IE9 (and maybe other browsers)
   if (scout.device.tableAdditionalDivRequired) {
@@ -3978,10 +3980,12 @@ scout.Table.prototype._setMenus = function(menus, oldMenus) {
 };
 
 scout.Table.prototype._updateMenuBar = function() {
-  var notAllowedTypes = ['Header'];
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
-  menuItems = this.staticMenus.concat(menuItems);
-  this.menuBar.setMenuItems(menuItems);
+  if (this.menuBar) {
+    var notAllowedTypes = ['Header'];
+    var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
+    menuItems = this.staticMenus.concat(menuItems);
+    this.menuBar.setMenuItems(menuItems);
+  }
   if (this.contextMenu) {
     var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
     this.contextMenu.updateMenuItems(contextMenuItems);
@@ -4819,7 +4823,7 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
 
 scout.Table.prototype._onDesktopPropertyChange = function(event) {
   // The height of the menuBar changes by css when switching to or from the dense mode
-  if (event.propertyName === 'dense') {
+  if (event.propertyName === 'dense' && this.menuBar) {
     this.menuBar.invalidateLayoutTree();
   }
 };

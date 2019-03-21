@@ -22,6 +22,11 @@ scout.TableRowDetail.prototype._init = function(model) {
   scout.TableRowDetail.parent.prototype._init.call(this, model);
   this.row = this.page.row;
 
+  if (this.table && this.table.menuBar) {
+    this.table.menuBar.destroy();
+    this.table.menuBar = null;
+  }
+
   this.table.on('rowsUpdated', this._tableRowsUpdatedHandler);
   this.table.on('rowsInserted', this._tableRowsInsertedHandler);
 };
