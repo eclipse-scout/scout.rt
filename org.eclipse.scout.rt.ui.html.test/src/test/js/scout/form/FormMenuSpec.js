@@ -91,6 +91,23 @@ describe('FormMenu', function() {
 
   });
 
+  describe('detach', function() {
+    it('does not fail if a parent is detached', function() {
+      var menuBar = scout.create('MenuBar', {parent: session.desktop});
+      var menu = createMenu();
+      // Link menu with the menu bar
+      menuBar.setMenuItems([menu]);
+      menuBar.render();
+      menu.setSelected(true);
+      expect(menu.popup.rendered).toBe(true);
+
+      // scout.Popup#_renderOnDetach will remove the popup and eventually the form.
+      // As soon as the form is removed, the FormMenu will unselected the menu which closes the popup (FormMenu#_onFormRemove).
+      menuBar.detach();
+      expect(menu.popup).toBe(null);
+    });
+  });
+
   describe('onModelPropertyChange', function() {
 
     describe('selected', function() {

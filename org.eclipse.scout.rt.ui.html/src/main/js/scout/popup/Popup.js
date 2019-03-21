@@ -67,7 +67,6 @@ scout.Popup = function() {
   // Defines whether the popup should be closed whenever another popup opens.
   this.closeOnOtherPopupOpen = true;
 
-
   this._openLater = false;
 
   this.$arrow = null;

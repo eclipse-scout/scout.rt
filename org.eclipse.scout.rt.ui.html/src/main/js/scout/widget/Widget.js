@@ -405,6 +405,12 @@ scout.Widget.prototype._removeInternal = function() {
       child.remove();
     }
   }, this);
+
+  if (!this.rendered) {
+    // The widget may have been removed already by one of the above remove() calls (e.g. by a remove listener)
+    // -> don't try to do it again, it might fail
+    return;
+  }
   this._cleanup();
   this._remove();
   this.$parent = null;
