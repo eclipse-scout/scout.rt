@@ -78,7 +78,9 @@ scout.TableLayout.prototype.layout = function($container) {
 
   // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
   this.table.tooltips.forEach(function(tooltip) {
-    tooltip.position();
+    if (tooltip.rendered) {
+      tooltip.position();
+    }
   }.bind(this));
   if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
     this.table.cellEditorPopup.position();

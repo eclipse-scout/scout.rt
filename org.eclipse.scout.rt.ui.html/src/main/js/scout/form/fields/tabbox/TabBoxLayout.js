@@ -72,7 +72,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   htmlTabContent.setSize(tabContentSize);
 
   // Make sure tooltip is at correct position after layouting, if there is one
-  if (tooltip) {
+  if (tooltip && tooltip.rendered) {
     tooltip.position();
   }
 };

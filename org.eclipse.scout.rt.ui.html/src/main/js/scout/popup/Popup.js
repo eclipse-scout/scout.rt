@@ -224,7 +224,7 @@ scout.Popup.prototype._onAttach = function() {
 scout.Popup.prototype._renderOnDetach = function() {
   this._openLater = true;
   this.remove();
-  scout.FieldStatus.parent.prototype._onDetach.call(this);
+  scout.Popup.parent.prototype._renderOnDetach.call(this);
 };
 
 scout.Popup.prototype._remove = function() {

@@ -176,7 +176,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   }
 
   // Make sure tooltip is at correct position after layouting, if there is one
-  if (tooltip && formField.rendered) {
+  if (tooltip && tooltip.rendered) {
     tooltip.position();
   }
 
