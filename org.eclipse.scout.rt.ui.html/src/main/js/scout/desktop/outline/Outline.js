@@ -455,9 +455,12 @@ scout.Outline.prototype.setDefaultDetailForm = function(defaultDetailForm) {
 };
 
 scout.Outline.prototype._setDefaultDetailForm = function(defaultDetailForm) {
+  if (this.defaultDetailForm) {
+    this.defaultDetailForm.detailForm = false;
+  }
   this._setProperty('defaultDetailForm', defaultDetailForm);
-  if (defaultDetailForm) {
-    defaultDetailForm.detailForm = true;
+  if (this.defaultDetailForm) {
+    this.defaultDetailForm.detailForm = true;
   }
 };
 

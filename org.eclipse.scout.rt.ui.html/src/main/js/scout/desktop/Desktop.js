@@ -982,8 +982,9 @@ scout.Desktop.prototype._setFormActivated = function(form) {
   if (!form) {
     // no form is activated -> show outline
     this.bringOutlineToFront();
-  } else if (form.displayHint === scout.Form.DisplayHint.VIEW) {
+  } else if (form.displayHint === scout.Form.DisplayHint.VIEW && !form.detailForm) {
     // view form was activated. send the outline to back to ensure the form is attached
+    // exclude detail forms even though detail forms usually are not activated
     this.sendOutlineToBack();
   }
 
