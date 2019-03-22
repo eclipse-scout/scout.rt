@@ -104,6 +104,15 @@ describe('ProposalField2', function() {
       expect(field.displayText).toBe('Foo');
       expect(field.$field.val()).toBe('Foo');
     });
+
+    it('should set error status when result has an exception', function() {
+      field._lookupByTextOrAllDone({
+        lookupRows: [],
+        exception: 'proposal lookup failed'
+      });
+      expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
+      expect(field.errorStatus.message).toBe('proposal lookup failed');
+    });
   });
 
 });

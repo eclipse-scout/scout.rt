@@ -41,6 +41,9 @@ scout.ProposalField2.prototype._handleEnterKey = function(event) {
 };
 
 scout.ProposalField2.prototype._lookupByTextOrAllDone = function(result) {
+  if (scout.ProposalField2.parent.prototype._handleException.call(this, result)) {
+    return;
+  }
   if (result.lookupRows.length === 0) {
     this.setLoading(false);
     this._handleEmptyResult();

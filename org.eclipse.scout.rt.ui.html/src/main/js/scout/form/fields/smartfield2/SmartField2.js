@@ -685,12 +685,7 @@ scout.SmartField2.prototype._lookupByTextOrAllDone = function(result) {
   this._extendResult(result);
   this._notUnique = !result.browse && result.numLookupRows > 1;
 
-  // Oops! Something went wrong while the lookup has been processed.
-  if (result.exception) {
-    this.setErrorStatus(scout.Status.error({
-      message: result.exception
-    }));
-    this.closePopup();
+  if (this._handleException(result)) {
     return;
   }
 
@@ -755,6 +750,18 @@ scout.SmartField2.prototype._ensurePopup = function(result, status) {
   } else {
     this._renderPopup(result, status);
   }
+};
+
+scout.SmartField2.prototype._handleException = function(result) {
+  // Oops! Something went wrong while the lookup has been processed.
+  if (result.exception) {
+    this.setErrorStatus(scout.Status.error({
+      message: result.exception
+    }));
+    this.closePopup();
+    return true;
+  }
+  return false;
 };
 
 scout.SmartField2.prototype._handleEmptyResult = function() {
