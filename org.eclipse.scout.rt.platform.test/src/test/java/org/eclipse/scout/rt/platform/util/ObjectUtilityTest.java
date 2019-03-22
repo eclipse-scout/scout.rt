@@ -17,6 +17,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Date;
 import java.util.function.BiFunction;
 
@@ -71,6 +72,8 @@ public class ObjectUtilityTest {
     assertFalse(ObjectUtility.isOneOf(TEST_STRING, FOO_STRING, TEST_NUMBER));
     assertFalse(ObjectUtility.isOneOf(null, FOO_STRING, TEST_NUMBER));
     assertFalse(ObjectUtility.isOneOf(null, (Object[]) null));
+    assertFalse(ObjectUtility.isOneOf(TEST_STRING, Collections.emptyList()));
+    assertTrue(ObjectUtility.isOneOf(null, Collections.singletonList(null)));
     assertTrue(ObjectUtility.isOneOf(TEST_STRING, TEST_STRING, TEST_NUMBER));
     assertTrue(ObjectUtility.isOneOf(null, TEST_STRING, TEST_NUMBER, null));
     assertTrue(ObjectUtility.isOneOf(null, (Object) null));

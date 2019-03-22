@@ -170,19 +170,30 @@ public final class ObjectUtility {
   }
 
   /**
-   * @return Returns <code>true</code> if the given object is in the list of the given elements. The objects are
-   *         compared using {@link #equals}.
+   * @return {@code true} if the given object is equal to an element in the given array. The objects are compared using
+   *         {@link #equals}.
    */
-  public static boolean isOneOf(Object o, Object... elements) {
-    if (elements == null) {
+  public static boolean isOneOf(Object o, Object[] elements) {
+    if (elements == null || elements.length < 1) {
       return false;
     }
     return isOneOf(o, Arrays.asList(elements));
   }
 
   /**
-   * @return Returns <code>true</code> if the given object is in the list of the given elements. The objects are
-   *         compared using {@link ObjectUtility#equals}.
+   * @return {@code true} if the given object is equal to the first element or an element in the given varargs array.
+   *         The objects are compared using {@link #equals}.
+   */
+  public static boolean isOneOf(Object o, Object first, Object... elements) {
+    if (equals(o, first)) {
+      return true;
+    }
+    return isOneOf(o, elements);
+  }
+
+  /**
+   * @return {@code true} if the given object is equal to an element in the given {@link Collection}. The objects are
+   *         compared using {@link #equals}.
    */
   public static boolean isOneOf(Object o, Collection<?> elements) {
     if (CollectionUtility.isEmpty(elements)) {
