@@ -140,13 +140,21 @@ scout.FileChooser.prototype._renderProperties = function() {
 
 scout.FileChooser.prototype._postRender = function() {
   scout.FileChooser.parent.prototype._postRender.call(this);
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  this._installFocusContext();
 };
 
 scout.FileChooser.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.session.focusManager.uninstallFocusContext(this.$container);
+  this._uninstallFocusContext();
   scout.FileChooser.parent.prototype._remove.call(this);
+};
+
+scout.FileChooser.prototype._installFocusContext = function() {
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+};
+
+scout.FileChooser.prototype._uninstallFocusContext = function() {
+  this.session.focusManager.uninstallFocusContext(this.$container);
 };
 
 /**
@@ -342,14 +350,12 @@ scout.FileChooser.prototype._onMouseDown = function(event, option) {
 scout.FileChooser.prototype._attach = function() {
   this.$parent.append(this.$container);
   scout.FileChooser.parent.prototype._attach.call(this);
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
 };
 
 /**
  * @override Widget.js
  */
 scout.FileChooser.prototype._detach = function() {
-  this.session.focusManager.uninstallFocusContext(this.$container);
   this.$container.detach();
   scout.FileChooser.parent.prototype._detach.call(this);
 };

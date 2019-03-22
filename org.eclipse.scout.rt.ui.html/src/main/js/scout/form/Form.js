@@ -833,7 +833,6 @@ scout.Form.prototype._attach = function() {
     //notify model this form is active
     this.session.desktop._setFormActivated(this);
   }
-  this._installFocusContext();
   scout.Form.parent.prototype._attach.call(this);
 };
 
@@ -866,8 +865,6 @@ scout.Form.prototype._detach = function() {
   this.formController.detachDialogs();
   this.messageBoxController.detach();
   this.fileChooserController.detach();
-
-  this._uninstallFocusContext();
 
   this.$container.detach();
   scout.Form.parent.prototype._detach.call(this);

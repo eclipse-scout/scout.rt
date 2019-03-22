@@ -1088,6 +1088,7 @@ scout.Widget.prototype.attach = function() {
     return;
   }
   this._attach();
+  this._installFocusContext();
   this.restoreFocus();
   this.attached = true;
   this._postAttach();
@@ -1097,22 +1098,23 @@ scout.Widget.prototype.attach = function() {
 
 /**
  * Override this method to do something when Widget is attached again. Typically
- * you will append this.$container to this.$parent. The default implementation
- * sets this.attached to true.
+ * you will append this.$container to this.$parent.
  *
  * @param the event.target property is used to decide if a Widget must attach
  *   its $container. When the parent of the Widget already attaches, the Widget
  *   itself must _not_ attach its own $container. That's why we should only
  *   attach when event.target is === this.
  */
-scout.Widget.prototype._attach = function() {};
+scout.Widget.prototype._attach = function() {
+  // NOP
+};
 
 /**
  * Override this method to do something after this widget is attached.
  * This function is not called on any child of the attached widget.
  */
 scout.Widget.prototype._postAttach = function() {
-
+  // NOP
 };
 
 scout.Widget.prototype._triggerChildrenOnAttach = function(parent) {
@@ -1167,8 +1169,22 @@ scout.Widget.prototype.detach = function() {
  * any of its children.
  */
 scout.Widget.prototype._beforeDetach = function(parent) {
-  // NOP
+  if (!this.$container) {
+    return;
+  }
+
+  var activeElement = this.$container.document(true).activeElement;
+  var isFocused = this.$container.isOrHas(activeElement);
+  var focusManager = this.session.focusManager;
+
+  if (focusManager.isFocusContextInstalled(this.$container)) {
+    this._uninstallFocusContext();
+  } else if (isFocused) {
+    // exclude the container or any of its child elements to gain focus
+    focusManager.validateFocus(scout.filters.outsideFilter(this.$container));
+  }
 };
+
 
 scout.Widget.prototype._triggerChildrenOnDetach = function() {
   this.children.forEach(function(child) {
@@ -1197,6 +1213,15 @@ scout.Widget.prototype._renderOnDetach = function() {
  * implementation sets this.attached to false.
  */
 scout.Widget.prototype._detach = function() {};
+
+
+scout.Widget.prototype._uninstallFocusContext = function(){
+  // NOP
+};
+
+scout.Widget.prototype._installFocusContext = function(){
+  // NOP
+};
 
 /**
  * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default scout.KeyStrokeContext.

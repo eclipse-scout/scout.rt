@@ -146,13 +146,21 @@ scout.MessageBox.prototype.get$Scrollable = function() {
 
 scout.MessageBox.prototype._postRender = function() {
   scout.MessageBox.parent.prototype._postRender.call(this);
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  this._installFocusContext();
 };
 
 scout.MessageBox.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
-  this.session.focusManager.uninstallFocusContext(this.$container);
+  this._uninstallFocusContext();
   scout.MessageBox.parent.prototype._remove.call(this);
+};
+
+scout.MessageBox.prototype._installFocusContext = function() {
+  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+};
+
+scout.MessageBox.prototype._uninstallFocusContext = function() {
+  this.session.focusManager.uninstallFocusContext(this.$container);
 };
 
 scout.MessageBox.prototype._renderIconId = function() {
@@ -299,7 +307,6 @@ scout.MessageBox.prototype.abort = function() {
  */
 scout.MessageBox.prototype._attach = function() {
   this.$parent.append(this.$container);
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
   scout.MessageBox.parent.prototype._attach.call(this);
 };
 
@@ -307,7 +314,7 @@ scout.MessageBox.prototype._attach = function() {
  * @override Widget.js
  */
 scout.MessageBox.prototype._detach = function() {
-  this.session.focusManager.uninstallFocusContext(this.$container);
   this.$container.detach();
   scout.MessageBox.parent.prototype._detach.call(this);
 };
+
