@@ -184,7 +184,7 @@ scout.CellEditorPopup.prototype._onKeyStroke = function(event) {
   if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
     return;
   }
-  if (this.$container.isOrHas(event.keyStrokeContext.$scopeTarget())) {
+  if (this.$container.isOrHas(event.keyStrokeContext.$getScopeTarget())) {
     // Don't interfere with key strokes of the popup or children of the popup (otherwise pressing enter would close both the popup and the form at once)
     return;
   }
