@@ -862,9 +862,14 @@ scout.Popup.prototype._setAnchor = function(anchor) {
 };
 
 scout.Popup.prototype._onAnchorRender = function() {
-  if (!this.rendered) {
-    this.session.layoutValidator.schedulePostValidateFunction(this.open.bind(this));
-  }
+  this.session.layoutValidator.schedulePostValidateFunction(function() {
+    if (!this.rendered) {
+      var currentAnimateOpening = this.animateOpening;
+      this.animateOpening = false;
+      this.open();
+      this.animateOpening = currentAnimateOpening;
+    }
+  }.bind(this));
 };
 
 scout.Popup.prototype._renderAnchor = function() {
