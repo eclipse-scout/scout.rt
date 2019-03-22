@@ -76,14 +76,14 @@ public final class CompositeFieldUtility {
     if (form.getHandler() == null) {
       return;
     }
-    if (form.isShowing()) {
+    if (form.isShowing() && form.isFormStarted()) {
       throw new IllegalStateException("field '" + f + "' is already showing on desktop. Structural changes are not allowed anymore.");
     }
   }
 
   /**
    * Applies the given {@link IFormFieldVisitor} to the given {@link IFormField}s.
-   * 
+   *
    * @param visitor
    *          The visitor
    * @param fieldToVisit
