@@ -821,6 +821,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
       detailTable = selectedPage.detailTable;
       menuItems = scout.menus.filter(detailTable.menus, ['Table.EmptySpace'], false, true);
       tableControls = detailTable.tableControls;
+      detailTable.setMenuBarVisible(false);
       this._attachDetailMenusListener(detailTable);
     }
     // get single selection menus from parent detail table
@@ -828,6 +829,7 @@ scout.Outline.prototype.updateDetailMenus = function() {
     if (parentPage && parentPage.detailTable) {
       detailTable = parentPage.detailTable;
       menuItems = menuItems.concat(scout.menus.filter(detailTable.menus, ['Table.SingleSelection'], false, true));
+      detailTable.setMenuBarVisible(false);
       this._attachDetailMenusListener(detailTable);
     }
   }

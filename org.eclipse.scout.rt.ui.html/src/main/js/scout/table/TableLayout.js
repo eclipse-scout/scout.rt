@@ -29,14 +29,14 @@ scout.TableLayout.prototype.layout = function($container) {
     header = this.table.header,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
-    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     htmlContainer = this.table.htmlComp,
     containerSize = htmlContainer.availableSize({
       exact: true
-    }).subtract(htmlContainer.insets()),
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    }).subtract(htmlContainer.insets());
 
-  if (menuBar.visible) {
+  if (this.table.menuBarVisible && menuBar.visible) {
+    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container);
+    var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     menuBarHeight = menuBarSize.height;
   }

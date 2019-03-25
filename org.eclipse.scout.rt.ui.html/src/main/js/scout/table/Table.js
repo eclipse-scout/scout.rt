@@ -33,6 +33,7 @@ scout.Table = function() {
   this.keyboardNavigation = true;
   this.menus = [];
   this.menuBar = null;
+  this.menuBarVisible = true;
   this.contextMenu = null;
   this.multiCheck = true;
   this.multiSelect = true;
@@ -185,11 +186,7 @@ scout.Table.prototype._init = function(model) {
     updateTree: true
   });
 
-  this.menuBar = scout.create('MenuBar', {
-    parent: this,
-    menuOrder: new scout.MenuItemsOrder(this.session, 'Table'),
-    menuFilter: this._filterMenusHandler
-  });
+  this.menuBar = this._createMenuBar();
   this.menuBar.bottom();
 
   this._setSelectedRows(this.selectedRows);
@@ -418,9 +415,6 @@ scout.Table.prototype._render = function() {
   });
   this._installImageListeners();
   this._installCellTooltipSupport();
-  if (this.menuBar) {
-    this.menuBar.render();
-  }
 
   // layout bugfix for IE9 (and maybe other browsers)
   if (scout.device.tableAdditionalDivRequired) {
@@ -445,6 +439,7 @@ scout.Table.prototype._render = function() {
 scout.Table.prototype._renderProperties = function() {
   scout.Table.parent.prototype._renderProperties.call(this);
   this._renderTableHeader();
+  this._renderMenuBarVisible();
   this._renderFooterVisible();
   this._renderDropType();
   this._renderCheckableStyle();
@@ -3979,8 +3974,37 @@ scout.Table.prototype._setMenus = function(menus, oldMenus) {
   }
 };
 
+scout.Table.prototype.setMenuBarVisible = function(visible) {
+  this.setProperty('menuBarVisible', visible);
+};
+
+scout.Table.prototype._setMenuBarVisible = function(visible) {
+  this._setProperty('menuBarVisible', visible);
+  this._updateMenuBar();
+};
+
+scout.Table.prototype._renderMenuBarVisible = function() {
+  if (this.menuBarVisible) {
+    this.menuBar.render();
+  } else {
+    this.menuBar.remove();
+  }
+  this._updateMenuBar();
+  this.invalidateLayoutTree();
+};
+
+scout.Table.prototype._createMenuBar = function() {
+  return scout.create('MenuBar', {
+    parent: this,
+    menuOrder: new scout.MenuItemsOrder(this.session, 'Table'),
+    menuFilter: this._filterMenusHandler
+  });
+};
+
 scout.Table.prototype._updateMenuBar = function() {
-  if (this.menuBar) {
+  if (this.menuBarVisible) {
+    // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
+    // -> this makes sure the parent is not accidentally set to the table, the other widget should remain responsible
     var notAllowedTypes = ['Header'];
     var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
     menuItems = this.staticMenus.concat(menuItems);
@@ -4823,7 +4847,7 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
 
 scout.Table.prototype._onDesktopPropertyChange = function(event) {
   // The height of the menuBar changes by css when switching to or from the dense mode
-  if (event.propertyName === 'dense' && this.menuBar) {
+  if (event.propertyName === 'dense') {
     this.menuBar.invalidateLayoutTree();
   }
 };

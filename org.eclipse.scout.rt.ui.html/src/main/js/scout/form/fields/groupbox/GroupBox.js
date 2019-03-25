@@ -490,13 +490,17 @@ scout.GroupBox.prototype._renderBorderDecoration = function() {
 scout.GroupBox.prototype._getCurrentMenus = function() {
   if (this.menuBarVisible) {
     return [];
-  } else {
-    return scout.GroupBox.parent.prototype._getCurrentMenus.call(this);
   }
+  return scout.GroupBox.parent.prototype._getCurrentMenus.call(this);
 };
 
 scout.GroupBox.prototype.setMenuBarVisible = function(visible) {
   this.setProperty('menuBarVisible', visible);
+};
+
+scout.GroupBox.prototype._setMenuBarVisible = function(visible) {
+  this._setProperty('menuBarVisible', visible);
+  this._updateMenuBar();
 };
 
 scout.GroupBox.prototype._renderMenuBarVisible = function() {
@@ -685,6 +689,11 @@ scout.GroupBox.prototype._setMenus = function(menus) {
 };
 
 scout.GroupBox.prototype._updateMenuBar = function() {
+  if (!this.menuBarVisible) {
+    // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
+    // -> this makes sure the parent is not accidentally set to the group box, the other widget should remain responsible
+    return;
+  }
   var menus = this.staticMenus
     .concat(this.processMenus)
     .concat(this.menus);

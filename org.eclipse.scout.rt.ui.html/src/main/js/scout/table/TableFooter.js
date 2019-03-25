@@ -547,7 +547,6 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     dataMargins = scout.graphics.margins(table.$data),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = table.menuBar,
-    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
     footer = table.footer,
     htmlContainer = table.htmlComp,
     containerSize = htmlContainer.availableSize()
@@ -557,7 +556,8 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     return;
   }
 
-  if (menuBar.visible) {
+  if (table.menuBarVisible && menuBar.visible) {
+    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container);
     menuBarHeight = scout.MenuBarLayout.size(htmlMenuBar, containerSize).height;
   }
   // Layout table footer and add size of footer (including the control content) to 'height'

@@ -277,6 +277,70 @@ describe("Outline", function() {
       outline.nodes[0].detailTable.destroy();
       expect(node0.detailTable.events._eventListeners.length).toBe(0); // every listener should be removed now
     });
+
+    it("makes sure table does not update the menu parent for empty space menus", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      outline.setCompact(true);
+      outline.setEmbedDetailContent(true);
+      outline.render();
+      var node0 = outline.nodes[0];
+      var emptySpaceMenu = menuHelper.createMenu({
+        menuTypes: ['Table.EmptySpace']
+      });
+      var emptySpaceMenu2 = menuHelper.createMenu({
+        menuTypes: ['Table.EmptySpace']
+      });
+      node0.detailTable.menus = [emptySpaceMenu];
+
+      // Select node -> empty space menus are active
+      outline.selectNodes(node0);
+      expect(outline.detailMenuBar.menuItems.length).toBe(1);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+      expect(outline.detailMenuBar.menuItems[0].parent).toBe(outline.detailMenuBar.menuboxLeft);
+
+      node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
+      expect(outline.detailMenuBar.menuItems.length).toBe(2);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+      expect(outline.detailMenuBar.menuItems[0].parent).toBe(outline.detailMenuBar.menuboxLeft);
+      expect(outline.detailMenuBar.menuItems[1]).toBe(node0.detailTable.menus[1]);
+      expect(outline.detailMenuBar.menuItems[1].parent).toBe(outline.detailMenuBar.menuboxLeft);
+
+      // MenuBarLayout would throw an exception if parent is table, because table is not rendered and therefore the menu item is not rendered as well
+      outline.validateLayout();
+    });
+
+    it("makes sure table does not update the menu parent for single selection menus", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      outline.setCompact(true);
+      outline.setEmbedDetailContent(true);
+      outline.render();
+      var node0 = outline.nodes[0];
+      // Select child node -> single selection menus are active
+      // A row is necessary to make sure single selection menus are not filtered out
+      node0.detailTable.insertRow({
+        cells: [null, null]
+      });
+      node0.detailTable.selectRow(node0.detailTable.rows[0]);
+      outline.selectNodes(node0.childNodes[0]);
+      expect(outline.detailMenuBar.menuItems.length).toBe(0);
+
+      var singleSelectionMenu = menuHelper.createMenu({
+        menuTypes: ['Table.SingleSelection']
+      });
+      var singleSelectionMenu2 = menuHelper.createMenu({
+        menuTypes: ['Table.SingleSelection']
+      });
+      node0.detailTable.setMenus([singleSelectionMenu, singleSelectionMenu2]);
+      expect(outline.detailMenuBar.menuItems.length).toBe(2);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+      expect(outline.detailMenuBar.menuItems[0].parent).toBe(outline.detailMenuBar.menuboxLeft);
+      expect(outline.detailMenuBar.menuItems[1]).toBe(node0.detailTable.menus[1]);
+      expect(outline.detailMenuBar.menuItems[1].parent).toBe(outline.detailMenuBar.menuboxLeft);
+
+      // MenuBarLayout would throw an exception if parent is table, because table is not rendered and therefore the menu items are not rendered as well
+      outline.validateLayout();
+    });
+
   });
 
   describe("click on a node inside the detail content", function() {
