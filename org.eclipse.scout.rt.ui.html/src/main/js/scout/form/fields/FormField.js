@@ -274,9 +274,7 @@ scout.FormField.prototype._renderErrorStatus = function() {
     statusClass = hasStatus ? 'has-' + status.cssClass() : '';
 
   this._updateErrorStatusClasses(statusClass, hasStatus);
-
   this._updateFieldStatus();
-
 };
 
 scout.FormField.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
@@ -883,7 +881,10 @@ scout.FormField.prototype.addStatus = function() {
     return;
   }
   this.fieldStatus = scout.create('FieldStatus', {
-    parent: this
+    parent: this,
+    position: this.statusPosition,
+    // This will be done by _updateFieldStatus again, but doing it here prevents unnecessary layout invalidations later on
+    visible: this._computeStatusVisible()
   });
   this.fieldStatus.render();
   this.$status = this.fieldStatus.$container;

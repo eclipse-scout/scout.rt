@@ -29,7 +29,8 @@ scout.TabArea.prototype._init = function(options) {
   this.ellipsis = scout.create('EllipsisMenu', {
     parent: this,
     cssClass: 'overflow-tab-item unfocusable',
-    iconId: null
+    iconId: null,
+    text: '0' // Initialize with the normal value to prevent unnecessary layout invalidation by the TabAreaLayout if ellipsis menus is not visible
   });
 };
 
