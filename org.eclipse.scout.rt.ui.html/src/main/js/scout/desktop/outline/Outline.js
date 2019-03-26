@@ -912,6 +912,11 @@ scout.Outline.prototype._attachDetailMenusListener = function(menuContainer) {
 };
 
 scout.Outline.prototype.setDetailMenus = function(detailMenus) {
+  // Make sure detailMenus are rendered again even if they are the same as before
+  // Reason: the menus could have been removed from the DOM in the meantime.
+  // This happens if table#setMenus() is called while table is not rendered, which is always the case in compact mode.
+  // In that case the parent is temporarily set to the table which will remove the menu.
+  this.detailMenuBar.setMenuItems([]);
   this.detailMenuBar.setMenuItems(detailMenus);
   this.setDetailMenuBarVisible(this.detailMenuBar.menuItems.length > 0);
 };
@@ -956,6 +961,8 @@ scout.Outline.prototype.setDetailMenuBarVisible = function(visible) {
 };
 
 scout.Outline.prototype.setNodeMenus = function(nodeMenus) {
+  // See setDetailMenus for the reason of the following code
+  this.nodeMenuBar.setMenuItems([]);
   this.nodeMenuBar.setMenuItems(nodeMenus);
   this.setNodeMenuBarVisible(this.nodeMenuBar.menuItems.length > 0);
 };

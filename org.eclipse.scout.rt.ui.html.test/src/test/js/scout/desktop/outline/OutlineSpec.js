@@ -341,33 +341,39 @@ describe("Outline", function() {
       outline.validateLayout();
     });
 
-  });
-
-  describe("click on a node inside the detail content", function() {
-
-    it("does not modify the outline", function() {
-      var outline = helper.createOutline(helper.createModelFixture(3, 2));
+    it("does not fail if same menus are set again", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
       outline.setEmbedDetailContent(true);
-      var node0 = outline.nodes[0];
       outline.render();
-      outline.selectNodes(outline.nodes[1]);
+      var node0 = outline.nodes[0];
+      var emptySpaceMenu = menuHelper.createMenu({
+        menuTypes: ['Table.EmptySpace']
+      });
+      var emptySpaceMenu2 = menuHelper.createMenu({
+        menuTypes: ['Table.EmptySpace']
+      });
+      node0.detailTable.menus = [emptySpaceMenu, emptySpaceMenu2];
 
-      // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
-      var treeHelper = new scout.TreeSpecHelper(session);
-      var treeModel = treeHelper.createModelFixture(3, 3);
-      treeModel.nodes[0].id = scout.objectFactory.createUniqueId(); // tree helper doesn't use unique ids -> do it here
-      var tree = treeHelper.createTree(treeModel);
-      outline.setDetailContent(tree);
+      // Select node -> empty space menus are active
+      outline.selectNodes(node0);
+      expect(outline.detailMenuBar.menuItems.length).toBe(2);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+      expect(outline.detailMenuBar.menuItems[0].parent).toBe(outline.detailMenuBar.menuboxLeft);
+      expect(outline.detailMenuBar.menuItems[1]).toBe(node0.detailTable.menus[1]);
+      expect(outline.detailMenuBar.menuItems[1].parent).toBe(outline.detailMenuBar.menuboxLeft);
 
-      spyOn(outline, 'selectNodes');
-      spyOn(tree, 'selectNodes');
+      // Set same menus again. Table is temporarily used as parent which means that menu will be removed because table is not rendered
+      // Setting the same menus again would normally not trigger a rerendering, but in this case it has to
+      node0.detailTable.setMenus([emptySpaceMenu, emptySpaceMenu2]);
+      expect(outline.detailMenuBar.menuItems.length).toBe(2);
+      expect(outline.detailMenuBar.menuItems[0]).toBe(node0.detailTable.menus[0]);
+      expect(outline.detailMenuBar.menuItems[0].parent).toBe(outline.detailMenuBar.menuboxLeft);
+      expect(outline.detailMenuBar.menuItems[1]).toBe(node0.detailTable.menus[1]);
+      expect(outline.detailMenuBar.menuItems[1].parent).toBe(outline.detailMenuBar.menuboxLeft);
 
-      tree.nodes[0].$node.triggerMouseDown();
-
-      // Outline must not react to clicks on tree nodes of the detail content tree
-      expect(outline.selectNodes).not.toHaveBeenCalled();
-      expect(tree.selectNodes).toHaveBeenCalledWith(tree.nodes[0]);
+      // Ensure no exception is thrown
+      outline.validateLayout();
     });
 
   });
