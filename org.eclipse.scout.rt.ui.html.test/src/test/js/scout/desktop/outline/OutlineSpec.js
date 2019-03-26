@@ -310,20 +310,6 @@ describe("Outline", function() {
 
   describe("detailContent", function() {
 
-    beforeEach(function() {
-      $('<style>' +
-          '.tree > .tree-data > .tree-node,' +
-          '.tree > .tree-data > .animation-wrapper > .tree-node {' +
-          '  display: none;' +
-          '}' +
-          '.tree > .tree-data > .tree-node.ancestor-of-selected,' +
-          '.tree > .tree-data > .tree-node.child-of-selected,' +
-          '.tree > .tree-data > .tree-node.selected {' +
-          '  display: block;' +
-          '}' +
-          '</style>').appendTo($('#sandbox'));
-    });
-
     it("is shown when a node is selected", function() {
       var outline = helper.createOutlineWithOneDetailTable();
       outline.setCompact(true);
@@ -338,7 +324,6 @@ describe("Outline", function() {
       outline.selectNodes(node0.childNodes[0]);
       expect(outline.detailContent).toBe(node0.childNodes[0].detailForm);
       expect(outline.detailContent.rendered).toBe(true);
-      expect(outline.detailContent.htmlComp.layouted).toBe(true);
 
       outline.selectNodes(node0);
       expect(outline.detailContent).toBe(null);
@@ -346,7 +331,6 @@ describe("Outline", function() {
       outline.selectNodes(node0.childNodes[0]);
       expect(outline.detailContent).toBe(node0.childNodes[0].detailForm);
       expect(outline.detailContent.rendered).toBe(true);
-      expect(outline.detailContent.htmlComp.layouted).toBe(true);
     });
 
     describe("click on a node inside the detail content", function() {
