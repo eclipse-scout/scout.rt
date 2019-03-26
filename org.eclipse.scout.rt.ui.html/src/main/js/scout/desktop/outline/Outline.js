@@ -424,7 +424,7 @@ scout.Outline.prototype.selectNodes = function(nodes, debounceSend) {
  */
 scout.Outline.prototype._setSelectedNodes = function(nodes, debounceSend) {
   scout.Outline.parent.prototype._setSelectedNodes.call(this, nodes, debounceSend);
-  // Needs to be done here so that tree.selectedNodes can restore scroll position correctly after the content has been updated
+  // Needs to be done here so that tree.selectNodes() can restore scroll position correctly after the content has been updated
   this.updateDetailContent();
 };
 
@@ -742,23 +742,31 @@ scout.Outline.prototype.updateDetailContent = function() {
   this.setNodeMenuBarVisible(false);
   this.setDetailContent(this._computeDetailContent());
   this.updateDetailMenus();
+};
 
-  if (this.rendered) {
-    // Layout immediate to prevent 'laggy' form visualization,
-    // but not initially while desktop gets rendered because it will be done at the end anyway
-    this.validateLayoutTree();
+/**
+ * @override
+ */
+scout.Outline.prototype._updateScrollTopAfterSelection = function() {
+  scout.Outline.parent.prototype._updateScrollTopAfterSelection.call(this);
+  if (!this.embedDetailContent) {
+    return;
+  }
+  // Layout immediate to prevent 'laggy' detail form visualization,
+  // but not initially while desktop gets rendered because it will be done at the end anyway
+  // It is important that this is done after _renderSelection, because node could be invisible due to the missing .selected class which means it won't be layouted
+  this.validateLayoutTree();
 
-    // Scroll to the parent node to hide ancestor nodes and give as much room as possible for the content
-    if (this.selectedNodes[0] && this.selectedNodes[0].parentNode) {
-      if (this.prevSelectedNode && this.prevSelectedNode.isChildOf(this.selectedNodes[0])) {
-        // But don't do it on upwards navigation, in that case the tree will scroll to the optimal position by itself, see _updateScrollTopAfterSelection
-        return;
-      }
-      this.scrollTo(this.selectedNodes[0].parentNode, {
-        align: 'top',
-        animate: true
-      });
+  // Scroll to the parent node to hide ancestor nodes and give as much room as possible for the content
+  if (this.selectedNodes[0] && this.selectedNodes[0].parentNode) {
+    if (this.prevSelectedNode && this.prevSelectedNode.isChildOf(this.selectedNodes[0])) {
+      // But don't do it on upwards navigation, in that case the tree will scroll to the optimal position by itself, see _updateScrollTopAfterSelection
+      return;
     }
+    this.scrollTo(this.selectedNodes[0].parentNode, {
+      align: 'top',
+      animate: true
+    });
   }
 };
 

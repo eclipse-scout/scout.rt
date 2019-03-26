@@ -378,6 +378,77 @@ describe("Outline", function() {
 
   });
 
+  describe("detailContent", function() {
+
+    beforeEach(function() {
+      $('<style>' +
+          '.tree > .tree-data > .tree-node,' +
+          '.tree > .tree-data > .animation-wrapper > .tree-node {' +
+          '  display: none;' +
+          '}' +
+          '.tree > .tree-data > .tree-node.ancestor-of-selected,' +
+          '.tree > .tree-data > .tree-node.child-of-selected,' +
+          '.tree > .tree-data > .tree-node.selected {' +
+          '  display: block;' +
+          '}' +
+          '</style>').appendTo($('#sandbox'));
+    });
+
+    it("is shown when a node is selected", function() {
+      var outline = helper.createOutlineWithOneDetailTable();
+      outline.setCompact(true);
+      outline.setEmbedDetailContent(true);
+      outline.render();
+      var node0 = outline.nodes[0];
+      node0.childNodes[0].detailForm = new scout.FormSpecHelper(session).createFormWithOneField({
+        modal: false
+      });
+      expect(outline.detailContent).toBe(null);
+
+      outline.selectNodes(node0.childNodes[0]);
+      expect(outline.detailContent).toBe(node0.childNodes[0].detailForm);
+      expect(outline.detailContent.rendered).toBe(true);
+      expect(outline.detailContent.htmlComp.layouted).toBe(true);
+
+      outline.selectNodes(node0);
+      expect(outline.detailContent).toBe(null);
+
+      outline.selectNodes(node0.childNodes[0]);
+      expect(outline.detailContent).toBe(node0.childNodes[0].detailForm);
+      expect(outline.detailContent.rendered).toBe(true);
+      expect(outline.detailContent.htmlComp.layouted).toBe(true);
+    });
+
+    describe("click on a node inside the detail content", function() {
+
+      it("does not modify the outline", function() {
+        var outline = helper.createOutline(helper.createModelFixture(3, 2));
+        outline.setCompact(true);
+        outline.setEmbedDetailContent(true);
+        var node0 = outline.nodes[0];
+        outline.render();
+        outline.selectNodes(outline.nodes[1]);
+
+        // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
+        var treeHelper = new scout.TreeSpecHelper(session);
+        var treeModel = treeHelper.createModelFixture(3, 3);
+        treeModel.nodes[0].id = scout.objectFactory.createUniqueId(); // tree helper doesn't use unique ids -> do it here
+        var tree = treeHelper.createTree(treeModel);
+        outline.setDetailContent(tree);
+
+        spyOn(outline, 'selectNodes');
+        spyOn(tree, 'selectNodes');
+
+        tree.nodes[0].$node.triggerMouseDown();
+
+        // Outline must not react to clicks on tree nodes of the detail content tree
+        expect(outline.selectNodes).not.toHaveBeenCalled();
+        expect(tree.selectNodes).toHaveBeenCalledWith(tree.nodes[0]);
+      });
+
+    });
+  });
+
   describe("outlineOverview", function() {
 
     beforeEach(function() {
