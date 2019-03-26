@@ -86,10 +86,7 @@ scout.FieldStatus.prototype.setPosition = function(position) {
 
 scout.FieldStatus.prototype._renderPosition = function() {
   this.$container.toggleClass('top', this.position === scout.FormField.StatusPosition.TOP);
-  // avoid invalidating during rendering
-  if (this.rendered) {
-    this.invalidateLayoutTree();
-  }
+  this.invalidateLayoutTree();
 };
 
 scout.FieldStatus.prototype._renderVisible = function() {

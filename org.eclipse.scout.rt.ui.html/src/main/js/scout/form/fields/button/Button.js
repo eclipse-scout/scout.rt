@@ -287,7 +287,7 @@ scout.Button.prototype._renderLabel = function() {
   this._updateLabelAndIconStyle();
 
   // Invalidate layout because button may now be longer or shorter
-  this.htmlComp.invalidateLayoutTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Button.prototype.setIconId = function(iconId) {
@@ -320,14 +320,14 @@ scout.Button.prototype._renderIconId = function() {
 
   this._updateLabelAndIconStyle();
   // Invalidate layout because button may now be longer or shorter
-  this.htmlComp.invalidateLayoutTree();
+  this.invalidateLayoutTree();
 
   // ----- Helper functions -----
 
   function updateButtonLayoutAfterImageLoaded(success) {
     $icon.removeClass('loading');
     $icon.toggleClass('broken', !success);
-    this.htmlComp.invalidateLayoutTree();
+    this.invalidateLayoutTree();
   }
 };
 
