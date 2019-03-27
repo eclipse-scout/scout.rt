@@ -237,9 +237,13 @@ scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
   // check if search text has changed since the last search, when it has changed
   // we cannot use the currently selected lookup row, because these proposals are
   // out-dated.
+  return !this._searchTextEquals(searchText, this._lastSearchText);
+};
+
+scout.SmartField.prototype._searchTextEquals = function(searchText, lastSearchText) {
   var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
-  var b = scout.strings.nullIfEmpty(this._lastSearchText);
-  return !scout.strings.equalsIgnoreCase(a, b);
+  var b = scout.strings.nullIfEmpty(lastSearchText);
+  return scout.strings.equalsIgnoreCase(a, b);
 };
 
 scout.SmartField.prototype._clearPendingLookup = function() {
@@ -662,6 +666,21 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
     browse = true;
   }
 
+  // this avoids unnecessary lookup-calls when a keyboard event has triggered
+  // the lookupByTextOrAll function but the search-text has not changed #226643.
+  if (!browse) {
+    var lastSearchText = null;
+    if (this._lastSearchText) {
+      lastSearchText = this._lastSearchText;
+    } else {
+      lastSearchText = this._getLastSearchText();
+    }
+    if (this._searchTextEquals(searchText, lastSearchText)) {
+      this._pendingOpenPopup = false;
+      return;
+    }
+  }
+
   this._clearPendingLookup();
 
   var deferred = $.Deferred();
@@ -698,6 +717,13 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   }
 
   return deferred.promise();
+};
+
+/**
+ * Returns the text used to store the 'last search-text'. The implementation differs between SmartField and ProposalField.
+ */
+scout.SmartField.prototype._getLastSearchText = function() {
+  return scout.objects.optProperty(this.lookupRow, 'text');
 };
 
 scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {

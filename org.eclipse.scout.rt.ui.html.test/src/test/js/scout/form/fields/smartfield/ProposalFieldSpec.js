@@ -144,4 +144,9 @@ describe('ProposalField', function() {
     expect(field.$field.val()).toBe('Foo');
   });
 
+  it('should return value for last search-text', function() {
+    field.setValue('Bar');
+    expect(field._getLastSearchText()).toBe('Bar');
+  });
+
 });
