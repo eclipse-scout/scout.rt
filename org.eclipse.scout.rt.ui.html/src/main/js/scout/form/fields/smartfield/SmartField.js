@@ -403,7 +403,10 @@ scout.SmartField.prototype._focusNextTabbable = function() {
       nextIndex = 0;
     }
     $.log.isDebugEnabled() && $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
-    $tabElements.eq(nextIndex).focus();
+    var $nextElement = $tabElements.eq(nextIndex).focus();
+    if (scout.objects.isFunction($nextElement[0].select)) {
+      $nextElement[0].select();
+    }
     this._tabPrevented = null;
   }
 };
