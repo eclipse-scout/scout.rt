@@ -49,11 +49,21 @@ public interface IDeviceTransformer {
 
   void notifyFormDisposed(IForm form);
 
+  void notifyFieldDisposed(IFormField formField);
+
   void notifyDesktopClosing();
 
   void notifyPageSearchFormInit(IPageWithTable<ITable> page);
 
+  void excludeForm(IForm form);
+
+  void excludeFormTransformation(IForm form, IDeviceTransformation transformation);
+
   boolean isFormExcluded(IForm form);
+
+  void excludeField(IFormField formField);
+
+  void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation);
 
   boolean isFormFieldExcluded(IFormField formField);
 

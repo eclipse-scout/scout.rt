@@ -110,6 +110,10 @@ public class DeviceTransformationConfig {
     return false;
   }
 
+  public void removeFormExclusion(IForm form) {
+    m_excludedForms.remove(form);
+  }
+
   public void excludeField(IFormField formField) {
     ExclusionInfo exclusionInfo = m_excludedFields.computeIfAbsent(formField, k -> new ExclusionInfo());
 
@@ -150,6 +154,10 @@ public class DeviceTransformationConfig {
     }
 
     return false;
+  }
+
+  public void removeFieldExclusion(IFormField formField) {
+    m_excludedFields.remove(formField);
   }
 
   private class ExclusionInfo {

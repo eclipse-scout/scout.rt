@@ -81,6 +81,11 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void notifyFieldDisposed(IFormField formField) {
+    // NOP
+  }
+
+  @Override
   public void notifyDesktopClosing() {
     // NOP
   }
@@ -91,8 +96,28 @@ public class NullDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
+  public void excludeForm(IForm form) {
+    // NOP
+  }
+
+  @Override
+  public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
+    // NOP
+  }
+
+  @Override
   public boolean isFormExcluded(IForm form) {
     return false;
+  }
+
+  @Override
+  public void excludeField(IFormField formField) {
+    // NOP
+  }
+
+  @Override
+  public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
+    // NOP
   }
 
   @Override

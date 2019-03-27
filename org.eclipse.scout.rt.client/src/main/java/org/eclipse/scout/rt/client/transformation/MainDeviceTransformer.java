@@ -47,9 +47,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void dispose() {
-    if (!isActive()) {
-      return;
-    }
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.dispose();
     }
@@ -64,10 +61,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformDesktop() {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformDesktop();
     }
@@ -75,7 +68,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformForm(IForm form) {
-    if (!isActive() || isFormExcluded(form)) {
+    if (isFormExcluded(form)) {
       return;
     }
 
@@ -86,15 +79,34 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyFormDisposed(IForm form) {
-    // NOP
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.notifyFormDisposed(form);
+    }
+  }
+
+  @Override
+  public void notifyFieldDisposed(IFormField formField) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.notifyFieldDisposed(formField);
+    }
+  }
+
+  @Override
+  public void excludeForm(IForm form) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.excludeForm(form);
+    }
+  }
+
+  @Override
+  public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.excludeFormTransformation(form, transformation);
+    }
   }
 
   @Override
   public boolean isFormExcluded(IForm form) {
-    if (!isActive()) {
-      return false;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       if (transformer.isFormExcluded(form)) {
         return true;
@@ -104,11 +116,21 @@ public class MainDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public boolean isFormFieldExcluded(IFormField formField) {
-    if (!isActive()) {
-      return false;
+  public void excludeField(IFormField formField) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.excludeField(formField);
     }
+  }
 
+  @Override
+  public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
+    for (IDeviceTransformer transformer : getTransformers()) {
+      transformer.excludeFieldTransformation(formField, transformation);
+    }
+  }
+
+  @Override
+  public boolean isFormFieldExcluded(IFormField formField) {
     for (IDeviceTransformer transformer : getTransformers()) {
       if (transformer.isFormFieldExcluded(formField)) {
         return true;
@@ -119,7 +141,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformFormField(IFormField field) {
-    if (!isActive() || isFormExcluded(field.getForm()) || isFormFieldExcluded(field)) {
+    if (isFormExcluded(field.getForm()) || isFormFieldExcluded(field)) {
       return;
     }
 
@@ -130,10 +152,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformOutline(IOutline outline) {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformOutline(outline);
     }
@@ -141,10 +159,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPage(IPage<?> page) {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformPage(page);
     }
@@ -152,10 +166,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void transformPageTable(ITable table, IPage<?> page) {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.transformPageTable(table, page);
     }
@@ -163,7 +173,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyPageDetailFormChanged(IForm form) {
-    if (!isActive() || form == null || isFormExcluded(form)) {
+    if (form == null || isFormExcluded(form)) {
       return;
     }
 
@@ -174,7 +184,7 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyPageDetailTableChanged(ITable table) {
-    if (!isActive() || table == null) {
+    if (table == null) {
       return;
     }
 
@@ -185,10 +195,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyDesktopClosing() {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.notifyDesktopClosing();
     }
@@ -196,10 +202,6 @@ public class MainDeviceTransformer implements IDeviceTransformer {
 
   @Override
   public void notifyPageSearchFormInit(IPageWithTable<ITable> page) {
-    if (!isActive()) {
-      return;
-    }
-
     for (IDeviceTransformer transformer : getTransformers()) {
       transformer.notifyPageSearchFormInit(page);
     }

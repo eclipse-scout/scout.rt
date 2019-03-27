@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.transformation;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractFormFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldDisposeFieldChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldInitFieldChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -25,6 +26,12 @@ public class FormFieldExtension extends AbstractFormFieldExtension<AbstractFormF
   public void execInitField(FormFieldInitFieldChain chain) {
     super.execInitField(chain);
     BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().transformFormField(getOwner());
+  }
+
+  @Override
+  public void execDisposeField(FormFieldDisposeFieldChain chain) {
+    super.execDisposeField(chain);
+    BEANS.get(IDeviceTransformationService.class).getDeviceTransformer().notifyFieldDisposed(getOwner());
   }
 
 }
