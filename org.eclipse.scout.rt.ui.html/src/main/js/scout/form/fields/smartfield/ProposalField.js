@@ -28,6 +28,10 @@ scout.ProposalField.prototype._getValueFromLookupRow = function(lookupRow) {
   return lookupRow.text;
 };
 
+scout.ProposalField.prototype._getLastSearchText = function() {
+  return this.value;
+};
+
 scout.ProposalField.prototype.cssClassName = function() {
   return 'proposal-field';
 };
