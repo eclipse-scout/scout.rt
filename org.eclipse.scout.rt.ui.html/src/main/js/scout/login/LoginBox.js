@@ -52,7 +52,7 @@ scout.LoginBox.prototype.render = function($parent) {
   if (this.messageKey) {
     this.$message = $('<div>')
       .attr('id', 'message-box')
-      .text(this.texts.get(this.messageKey))
+      .html(scout.strings.nl2br(this.texts.get(this.messageKey)))
       .appendTo(this.$form);
   }
   this.$user = $('<input>')
