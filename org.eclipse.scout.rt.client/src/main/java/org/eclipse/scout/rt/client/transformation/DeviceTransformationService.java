@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.client.transformation;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.shared.session.ISessionListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
@@ -87,6 +89,26 @@ public class DeviceTransformationService implements IDeviceTransformationService
       return null;
     }
     return (IDeviceTransformer) data;
+  }
+
+  @Override
+  public void excludeForm(IForm form) {
+    getDeviceTransformer().excludeForm(form);
+  }
+
+  @Override
+  public void excludeFormTransformation(IForm form, IDeviceTransformation transformation) {
+    getDeviceTransformer().excludeFormTransformation(form, transformation);
+  }
+
+  @Override
+  public void excludeField(IFormField formField) {
+    getDeviceTransformer().excludeField(formField);
+  }
+
+  @Override
+  public void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation) {
+    getDeviceTransformer().excludeFieldTransformation(formField, transformation);
   }
 
   private class P_SessionListener implements ISessionListener {

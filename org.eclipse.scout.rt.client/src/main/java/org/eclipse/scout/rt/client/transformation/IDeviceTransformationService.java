@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.transformation;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.service.IService;
 
 /**
@@ -23,4 +25,12 @@ public interface IDeviceTransformationService extends IService {
   void uninstall();
 
   IDeviceTransformer getDeviceTransformer();
+
+  void excludeForm(IForm form);
+
+  void excludeFormTransformation(IForm form, IDeviceTransformation transformation);
+
+  void excludeField(IFormField formField);
+
+  void excludeFieldTransformation(IFormField formField, IDeviceTransformation transformation);
 }
