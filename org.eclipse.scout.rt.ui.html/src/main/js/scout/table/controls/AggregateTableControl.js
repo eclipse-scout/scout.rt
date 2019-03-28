@@ -54,8 +54,7 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.$data.on('scroll', this._tableDataScrollHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
-  this.table.on('rowsSelected rowsInserted rowsDeleted filter group allRowsDeleted',
-    this._tableChangedHandler);
+  this.table.on('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._removeContent = function() {
@@ -64,8 +63,7 @@ scout.AggregateTableControl.prototype._removeContent = function() {
   this.table.$data.off('scroll', this._tableDataScrollHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
-  this.table.off('rowsSelected rowsInserted rowsDeleted filter group allRowsDeleted',
-    this._tableChangedHandler);
+  this.table.off('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
 };
 
 scout.AggregateTableControl.prototype._renderAggregate = function() {

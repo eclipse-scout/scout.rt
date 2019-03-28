@@ -207,6 +207,63 @@ describe("AggregateTableControl", function() {
       expect($aggrCell.text()).toBe('.03');
     });
 
+    it("updates aggregation if a row is inserted", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      table.render();
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('6');
+
+      table.insertRow({cells: ['new row', 5, null]});
+      $aggrRow = $aggregateRow(tableControl);
+      $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('11');
+    });
+
+    it("updates aggregation if a row is updated", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      table.render();
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('6');
+
+      table.columns[1].setCellValue(table.rows[0], 3);
+      $aggrRow = $aggregateRow(tableControl);
+      $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('8');
+    });
+
+    it("updates aggregation if a row is deleted", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      table.render();
+
+      var $aggrRow = $aggregateRow(tableControl);
+      var $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('6');
+
+      table.deleteRow(table.rows[0]);
+      $aggrRow = $aggregateRow(tableControl);
+      $aggrCells = $aggrRow.children('.table-cell');
+      $aggrCells.children('.table-cell-icon').remove();
+      expect($aggrCells.eq(1).text()).toBe('5');
+    });
+
   });
 
   describe("eanbled state", function() {
