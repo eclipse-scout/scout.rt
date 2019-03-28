@@ -898,18 +898,20 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
 
 scout.SmartField.prototype._onFieldMouseDown = function(event) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldMouseDown)');
-  this.activate();
+  this.activate(true);
 };
 
-scout.SmartField.prototype.activate = function() {
+scout.SmartField.prototype.activate = function(onField) {
   if (!this.enabledComputed || !this.rendered) {
     return;
   }
   if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
     return;
   }
-  if (scout.device.supportsTouch()) {
-    this.$field.focus(); // required for touch case where field is a DIV
+  // Don't focus on desktop devices when click is on field #217192
+  // Also required for touch case where field is a DIV and not an INPUT field
+  if (!onField || scout.device.supportsTouch()) {
+    this.$field.focus();
   }
   this.togglePopup();
 };
