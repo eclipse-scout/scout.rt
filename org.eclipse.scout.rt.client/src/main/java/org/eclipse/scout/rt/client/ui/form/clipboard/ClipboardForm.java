@@ -21,10 +21,9 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.CancelButton;
-import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardBox.ClipboardField;
+import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardField;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.ClipboardLabel;
 import org.eclipse.scout.rt.client.ui.form.clipboard.ClipboardForm.MainBox.OkButton;
-import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.clipboardfield.AbstractClipboardField;
@@ -109,18 +108,23 @@ public class ClipboardForm extends AbstractForm {
       return 1;
     }
 
+    @Override
+    protected String getConfiguredBorderDecoration() {
+      return BORDER_DECORATION_EMPTY;
+    }
+
     @Order(10)
     @ClassId("7f2f4401-7bc8-45aa-9cf5-e23129aafd44")
     public class ClipboardLabel extends AbstractLabelField {
 
       @Override
-      protected double getConfiguredGridWeightX() {
-        return 1;
+      protected String getConfiguredCssClass() {
+        return "clipboard-form-label";
       }
 
       @Override
-      protected int getConfiguredHeightInPixel() {
-        return 40;
+      protected boolean getConfiguredGridUseUiHeight() {
+        return true;
       }
 
       @Override
@@ -140,12 +144,12 @@ public class ClipboardForm extends AbstractForm {
     }
 
     @Order(20)
-    @ClassId("7248dcf2-e2de-4aa6-8c35-5144a6e02c00")
-    public class ClipboardBox extends AbstractGroupBox {
+    @ClassId("5c81521d-f16d-411a-85f1-c349d8b71a28")
+    public class ClipboardField extends AbstractClipboardField {
 
       @Override
       protected int getConfiguredHeightInPixel() {
-        return 220;
+        return 190;
       }
 
       @Override
@@ -153,41 +157,35 @@ public class ClipboardForm extends AbstractForm {
         return 705;
       }
 
-      @Order(10)
-      @ClassId("5c81521d-f16d-411a-85f1-c349d8b71a28")
-      public class ClipboardField extends AbstractClipboardField {
-
-        @Override
-        protected double getConfiguredGridWeightX() {
-          return 1;
-        }
-
-        @Override
-        protected double getConfiguredGridWeightY() {
-          return 1;
-        }
-
-        @Override
-        protected boolean getConfiguredLabelVisible() {
-          return false;
-        }
-
-        @Override
-        protected boolean getConfiguredStatusVisible() {
-          return false;
-        }
-
-        @Override
-        protected String getConfiguredFieldStyle() {
-          return FIELD_STYLE_CLASSIC;
-        }
-
-        @Override
-        protected void execChangedValue() {
-          checkOkButtonEnabled();
-        }
+      @Override
+      protected double getConfiguredGridWeightX() {
+        return 1;
       }
 
+      @Override
+      protected double getConfiguredGridWeightY() {
+        return 1;
+      }
+
+      @Override
+      protected boolean getConfiguredLabelVisible() {
+        return false;
+      }
+
+      @Override
+      protected boolean getConfiguredStatusVisible() {
+        return false;
+      }
+
+      @Override
+      protected String getConfiguredFieldStyle() {
+        return FIELD_STYLE_CLASSIC;
+      }
+
+      @Override
+      protected void execChangedValue() {
+        checkOkButtonEnabled();
+      }
     }
 
     @Order(30)
@@ -227,9 +225,6 @@ public class ClipboardForm extends AbstractForm {
     protected void execLoad() {
       // use setVisibleGranted here because we don't want to send the cancel-button (incl. ESC keyStroke) to the UI
       super.execLoad();
-      GridData gd = getClipboardLabel().getGridDataHints();
-      gd.heightInPixel = 40;
-      getClipboardLabel().setGridDataInternal(gd);
       getClipboardLabel().setValue(TEXTS.get("CopyToClipboardFromFieldBelow"));
       getCancelButton().setVisibleGranted(false);
       checkOkButtonEnabled();
@@ -243,9 +238,6 @@ public class ClipboardForm extends AbstractForm {
     @Override
     protected void execLoad() {
       super.execLoad();
-      GridData gd = getClipboardLabel().getGridDataHints();
-      gd.heightInPixel = 60;
-      getClipboardLabel().setGridDataInternal(gd);
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       checkOkButtonEnabled();
       getClipboardField().requestFocus();
