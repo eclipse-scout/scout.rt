@@ -114,13 +114,8 @@ public class ClipboardForm extends AbstractForm {
     public class ClipboardLabel extends AbstractLabelField {
 
       @Override
-      protected double getConfiguredGridWeightX() {
-        return 1;
-      }
-
-      @Override
-      protected int getConfiguredHeightInPixel() {
-        return 40;
+      protected boolean getConfiguredGridUseUiHeight() {
+        return true;
       }
 
       @Override
