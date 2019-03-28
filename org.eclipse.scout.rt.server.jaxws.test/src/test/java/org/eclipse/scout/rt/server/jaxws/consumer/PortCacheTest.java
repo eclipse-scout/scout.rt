@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-@SuppressWarnings("deprecation")
 public class PortCacheTest {
 
   private IPortProvider<Object> m_portProvider;

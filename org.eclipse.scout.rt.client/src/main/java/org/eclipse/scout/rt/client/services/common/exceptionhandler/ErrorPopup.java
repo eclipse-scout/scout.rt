@@ -35,13 +35,11 @@ import org.eclipse.scout.rt.platform.status.Status;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
-import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 
 /**
  * Popup to visualize an error.
  */
 @Bean
-@SuppressWarnings("deprecation")
 public class ErrorPopup {
 
   private final AtomicBoolean m_parsed = new AtomicBoolean();
@@ -154,7 +152,7 @@ public class ErrorPopup {
     }
     // RemoteSystemUnavailableException is thrown by ServiceTunnel
     // SocketException is the parent of ConnectException (happens when server is not available) and NoRouteToHostException
-    if (t instanceof HttpException || t instanceof UnknownHostException || t instanceof SocketException || t instanceof RemoteSystemUnavailableException) {
+    if (t instanceof UnknownHostException || t instanceof SocketException || t instanceof RemoteSystemUnavailableException) {
       parseNetError(t);
       return true;
     }

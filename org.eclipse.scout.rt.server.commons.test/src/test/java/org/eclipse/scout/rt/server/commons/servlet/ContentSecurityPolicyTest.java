@@ -45,12 +45,6 @@ public class ContentSecurityPolicyTest {
     testDirective(ContentSecurityPolicy.DIRECTIVE_SCRIPT_SRC, m_csp::appendScriptSrc, m_csp::withScriptSrc);
   }
 
-  @SuppressWarnings("deprecation")
-  @Test
-  public void testFrameSrc() {
-    testDirective(ContentSecurityPolicy.DIRECTIVE_FRAME_SRC, m_csp::appendFrameSrc, m_csp::withFrameSrc);
-  }
-
   @Test
   public void testChildSrc() {
     testDirective(ContentSecurityPolicy.DIRECTIVE_CHILD_SRC, m_csp::appendChildSrc, m_csp::withChildSrc);

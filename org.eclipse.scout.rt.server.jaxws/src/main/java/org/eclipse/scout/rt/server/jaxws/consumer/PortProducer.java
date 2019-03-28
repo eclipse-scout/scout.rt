@@ -34,16 +34,12 @@ import org.eclipse.scout.rt.platform.context.RunWithRunContext;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
 
 /**
  * Factory for new Port objects to interact with a webservice endpoint.
  *
  * @since 5.1
- * @deprecated This IPortProvider strategy is replaced by {@link PooledPortProvider}. This class will be removed in the
- *             P-release.
  */
-@Deprecated
 public class PortProducer<SERVICE extends Service, PORT> implements IPortProvider<PORT> {
 
   protected static final Set<Method> PROXIED_HANDLER_METHODS = CollectionUtility.hashSet(Handler.class.getDeclaredMethods()); // only methods declared directly on the handler are proxied.

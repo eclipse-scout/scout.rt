@@ -105,15 +105,6 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   }
 
   /**
-   * @deprecated use {@link #createHttpClientConnectionManager()}
-   * @return
-   */
-  @Deprecated
-  protected HttpClientConnectionManager getConfiguredConnectionManager() {
-    return createHttpClientConnectionManager();
-  }
-
-  /**
    * Return the {@link HttpClientConnectionManager}. Return <code>null</code> to create it using the
    * {@link HttpClientBuilder}. Caution: Returning a custom connection manager overrides several properties of the
    * {@link HttpClientBuilder}.

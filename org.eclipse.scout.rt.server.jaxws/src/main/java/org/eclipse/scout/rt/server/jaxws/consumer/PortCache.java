@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.ToStringBuilder;
-import org.eclipse.scout.rt.server.jaxws.consumer.pool.PooledPortProvider;
 import org.quartz.SimpleScheduleBuilder;
 
 /**
@@ -31,10 +30,7 @@ import org.quartz.SimpleScheduleBuilder;
  * This class is thread-safe.
  *
  * @since 5.1
- * @deprecated This IPortProvider strategy is replaced by {@link PooledPortProvider}. This class will be removed in the
- *             P-release.
  */
-@Deprecated
 public class PortCache<PORT> implements IPortProvider<PORT> {
 
   protected final Deque<PortCacheEntry<PORT>> m_queue;

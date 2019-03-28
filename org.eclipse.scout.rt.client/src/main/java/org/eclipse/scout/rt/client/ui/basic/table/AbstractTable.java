@@ -3399,12 +3399,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return CollectionUtility.emptyArrayList();
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public ITableRow findRowByKey(List<?> keys) {
-    return getRowByKey(keys);
-  }
-
   @Override
   public ITableRow getRowByKey(List<?> keys) {
     if (!CollectionUtility.hasElements(keys)) {

@@ -96,11 +96,6 @@ public class ContentSecurityPolicy {
   public static final String DIRECTIVE_REPORT_URI = "report-uri";
   public static final String DIRECTIVE_SANDBOX = "sandbox";
   public static final String DIRECTIVE_SCRIPT_SRC = "script-src";
-  /**
-   * @deprecated use <code>child-src</code> instead
-   */
-  @Deprecated
-  public static final String DIRECTIVE_FRAME_SRC = "frame-src";
 
   private final Map<String, String> m_directives = new LinkedHashMap<>();
 
@@ -139,7 +134,6 @@ public class ContentSecurityPolicy {
     withReportUri(getConfiguredDefault(DIRECTIVE_REPORT_URI, HttpServletControl.CSP_REPORT_URL)); // see also ContentSecurityPolicyReportHandler
     withSandbox(getConfiguredDefault(DIRECTIVE_SANDBOX, null));
     withScriptSrc(getConfiguredDefault(DIRECTIVE_SCRIPT_SRC, "'self'"));
-    withFrameSrc(getConfiguredDefault(DIRECTIVE_FRAME_SRC, "*"));
   }
 
   protected String getConfiguredDefault(String directiveKey, String fallbackValue) {
@@ -306,27 +300,6 @@ public class ContentSecurityPolicy {
    */
   public ContentSecurityPolicy appendFrameAncestors(String frameAncestors) {
     return addOrAppend(DIRECTIVE_FRAME_ANCESTORS, frameAncestors);
-  }
-
-  /**
-   * @deprecated use <code>child-src</code> instead
-   * @see <a href="https://www.w3.org/TR/CSP2/#directive-frame-srcc">https://www.w3.org/TR/CSP2/#directive-frame-src</a>
-   */
-  @Deprecated
-  public ContentSecurityPolicy withFrameSrc(String frameSrc) {
-    putOrRemove(DIRECTIVE_FRAME_SRC, frameSrc);
-    return this;
-  }
-
-  /**
-   * Appends {@code frameSrc} to existing frame source directive or creates new directive if it not already exists.
-   *
-   * @deprecated use <code>child-src</code> instead
-   * @see <a href="https://www.w3.org/TR/CSP2/#directive-frame-srcc">https://www.w3.org/TR/CSP2/#directive-frame-src</a>
-   */
-  @Deprecated
-  public ContentSecurityPolicy appendFrameSrc(String frameSrc) {
-    return addOrAppend(DIRECTIVE_FRAME_SRC, frameSrc);
   }
 
   /**

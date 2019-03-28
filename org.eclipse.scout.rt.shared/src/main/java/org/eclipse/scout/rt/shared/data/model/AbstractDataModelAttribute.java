@@ -560,12 +560,9 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     m_parentEntity = parent;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public boolean isMultiValued() {
     switch (getType()) {
-      case DataModelConstants.TYPE_CODE_LIST:
-      case DataModelConstants.TYPE_CODE_TREE:
       case DataModelConstants.TYPE_LIST:
       case DataModelConstants.TYPE_TREE:
         return true;
@@ -574,7 +571,6 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     }
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public String formatValue(Object rawValue) {
     if (rawValue == null) {
@@ -582,8 +578,6 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
     }
 
     switch (getType()) {
-      case IDataModelAttribute.TYPE_CODE_LIST:
-      case IDataModelAttribute.TYPE_CODE_TREE:
       case IDataModelAttribute.TYPE_LIST:
       case IDataModelAttribute.TYPE_TREE:
       case IDataModelAttribute.TYPE_SMART:

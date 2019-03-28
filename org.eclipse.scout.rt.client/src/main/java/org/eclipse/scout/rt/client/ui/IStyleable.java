@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
-import java.util.List;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.html.StyleHelper;
 
@@ -44,15 +42,5 @@ public interface IStyleable {
 
   default void toggleCssClass(String cssClass, boolean condition) {
     setCssClass(BEANS.get(StyleHelper.class).toggleCssClass(getCssClass(), cssClass, condition));
-  }
-
-  /**
-   * Converts the space separated CSS class string to a list.
-   *
-   * @deprecated will be removed in 10.0.x, use {@link StyleHelper#cssClassesAsList(String)} instead.
-   */
-  @Deprecated
-  static List<String> cssClassesAsList(String cssClass) {
-    return BEANS.get(StyleHelper.class).cssClassesAsList(cssClass);
   }
 }

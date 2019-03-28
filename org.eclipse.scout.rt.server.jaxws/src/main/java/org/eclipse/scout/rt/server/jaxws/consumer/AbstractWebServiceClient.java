@@ -407,18 +407,15 @@ public abstract class AbstractWebServiceClient<SERVICE extends Service, PORT> {
   /**
    * Overwrite to work with another {@link IPortProvider} to create new port objects.
    */
-  @SuppressWarnings("deprecation")
-  protected IPortProvider<PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation, final String targetNamespace, final String serviceName,
-      final IPortInitializer portInitializer) {
+  protected IPortProvider<PORT> getConfiguredPortProvider(final Class<SERVICE> serviceClazz, final Class<PORT> portTypeClazz, final URL wsdlLocation,
+      final String targetNamespace, final String serviceName, final IPortInitializer portInitializer) {
 
     if (BooleanUtility.nvl(CONFIG.getPropertyValue(getConfiguredPortPoolEnabledProperty()))) {
-      if (!BEANS.get(JaxWsImplementorSpecifics.class).isPoolingSupported()) {
-        LOG.warn("The current runtime environment does not support pooling of web services. Check your configuration (i.e. either disable '{}' or use a JAX-WS implementor that supports pooling like 'JAX-WS Metro')",
-            BEANS.get(getConfiguredPortPoolEnabledProperty()).getKey());
-      }
-      else {
+      if (BEANS.get(JaxWsImplementorSpecifics.class).isPoolingSupported()) {
         return new PooledPortProvider<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);
       }
+      LOG.warn("The current runtime environment does not support pooling of web services. Check your configuration (i.e. either disable '{}' or use a JAX-WS implementor that supports pooling like 'JAX-WS Metro')",
+          BEANS.get(getConfiguredPortPoolEnabledProperty()).getKey());
     }
 
     PortProducer<SERVICE, PORT> portProducer = new PortProducer<>(serviceClazz, portTypeClazz, serviceName, wsdlLocation, targetNamespace, portInitializer);

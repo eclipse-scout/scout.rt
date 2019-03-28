@@ -409,12 +409,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   ITableRow getRowByKey(List<?> keys);
 
-  /**
-   * @deprecated use {@link ITable#getRowByKey(List)} instead. This method will be removed in Scout 9.0.
-   */
-  @Deprecated
-  ITableRow findRowByKey(List<?> keys);
-
   List<Object> getParentRowKeys(int rowIndex);
 
   List<Object> getParentRowKeys(ITableRow row);

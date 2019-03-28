@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ApplicationScoped
 public class JacksonDataObjectMapper implements IDataObjectMapper {
 
-  private final LazyValue<ObjectMapper> m_objectMapper = new LazyValue<>(() -> createObjectMapperInstance());
+  private final LazyValue<ObjectMapper> m_objectMapper = new LazyValue<>(() -> createObjectMapperInstance(false));
   private final LazyValue<ObjectMapper> m_rawObjectMapper = new LazyValue<>(() -> createObjectMapperInstance(true));
 
   @Override
@@ -122,16 +122,6 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
   @Deprecated
   public ObjectMapper getObjectMapper() {
     return m_objectMapper.get();
-  }
-
-  /**
-   * TODO [9.1] pbz: [JSON] remove this method
-   *
-   * @deprecated Use {@link #createObjectMapperInstance(boolean)} instead.
-   */
-  @Deprecated
-  protected ObjectMapper createObjectMapperInstance() {
-    return createObjectMapperInstance(false);
   }
 
   /**

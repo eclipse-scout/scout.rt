@@ -74,14 +74,4 @@ public class ScoutDataObjectModuleContext {
     put(IGNORE_TYPE_ATTRIBUTE_KEY, ignoreTypeAttribute);
     return this;
   }
-
-  /**
-   * TODO [9.1] pbz: remove method
-   *
-   * @deprecated Use {@link #withTypeAttributeName(String)} instead.
-   */
-  @Deprecated
-  public void setTypeAttributeName(String typeAttributeName) {
-    withTypeAttributeName(typeAttributeName);
-  }
 }

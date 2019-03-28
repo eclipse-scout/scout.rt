@@ -25,34 +25,6 @@ public interface DataModelConstants {
   int TYPE_NONE = 0;
 
   /**
-   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_LIST} instead <br/>
-   *             TODO [10.x] imo delete this field
-   */
-  @Deprecated
-  int TYPE_CODE_LIST = 1;
-
-  /**
-   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_TREE} instead <br/>
-   *             TODO [10.x] imo delete this field
-   */
-  @Deprecated
-  int TYPE_CODE_TREE = 2;
-
-  /**
-   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_LIST} instead <br/>
-   *             TODO [10.x] imo delete this field
-   */
-  @Deprecated
-  int TYPE_NUMBER_LIST = 3;
-
-  /**
-   * @deprecated since 9.x, will be deleted in 10.x, use {@link #TYPE_TREE} instead <br/>
-   *             TODO [10.x] imo delete this field
-   */
-  @Deprecated
-  int TYPE_NUMBER_TREE = 4;
-
-  /**
    * This is the {@link IDataModelAttribute#getType()} of list or {@link LookupCall} style attributes. The pre 9.x
    * distinction between {@link ICodeType} based and number based attributes was dropped in 9.x and summarized in this
    * new type
