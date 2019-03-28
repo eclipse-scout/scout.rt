@@ -14,6 +14,7 @@ scout.Button = function() {
   this.defaultButton = false;
   this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
   this.gridDataHints.fillHorizontal = false;
+  this.htmlEnabled = false;
   this.iconId = null;
   this.keyStroke = null;
   this.processButton = true;
@@ -279,11 +280,24 @@ scout.Button.prototype._renderSelected = function() {
   }
 };
 
+scout.Button.prototype.setHtmlEnabled = function(htmlEnabled) {
+  this.setProperty('htmlEnabled', htmlEnabled);
+};
+
+scout.Button.prototype._renderHtmlEnabled = function() {
+  // Render the label again when html enabled changes dynamically
+  this._renderLabel();
+};
+
 /**
  * @override
  */
 scout.Button.prototype._renderLabel = function() {
-  this.$buttonLabel.textOrNbsp(this.label, 'empty');
+  if (this.htmlEnabled) {
+    this.$buttonLabel.html(this.label || '');
+  } else {
+    this.$buttonLabel.textOrNbsp(this.label, 'empty');
+  }
   this._updateLabelAndIconStyle();
 
   // Invalidate layout because button may now be longer or shorter
