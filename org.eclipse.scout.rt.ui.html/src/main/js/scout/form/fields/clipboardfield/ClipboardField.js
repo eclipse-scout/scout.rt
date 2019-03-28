@@ -79,10 +79,6 @@ scout.ClipboardField.prototype._render = function() {
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
     .on('cut', this._onCopy.bind(this));
-
-  this.$parent.on('click', function(event) {
-    this.focus();
-  }.bind(this));
 };
 
 scout.ClipboardField.prototype._renderProperties = function() {
