@@ -229,7 +229,6 @@ public class ClipboardForm extends AbstractForm {
       getCancelButton().setVisibleGranted(false);
       checkOkButtonEnabled();
       getClipboardField().setReadOnly(true);
-      getClipboardField().requestFocus();
     }
   }
 
@@ -240,7 +239,6 @@ public class ClipboardForm extends AbstractForm {
       super.execLoad();
       getClipboardLabel().setValue(TEXTS.get("PasteClipboardContentsInFieldBelow"));
       checkOkButtonEnabled();
-      getClipboardField().requestFocus();
     }
   }
 
