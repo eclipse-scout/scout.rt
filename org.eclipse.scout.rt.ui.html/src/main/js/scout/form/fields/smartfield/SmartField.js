@@ -908,7 +908,9 @@ scout.SmartField.prototype.activate = function() {
   if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
     return;
   }
-  this.$field.focus(); // required for touch case where field is a DIV
+  if (scout.device.supportsTouch()) {
+    this.$field.focus(); // required for touch case where field is a DIV
+  }
   this.togglePopup();
 };
 
