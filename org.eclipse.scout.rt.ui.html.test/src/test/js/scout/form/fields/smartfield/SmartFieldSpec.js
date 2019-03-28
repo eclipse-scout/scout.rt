@@ -765,14 +765,27 @@ describe('SmartField', function() {
       expect(field.lookupRow.text).toBe('Foo');
 
       // case 1: text from lookup-row is the same as the search-text
+      field._pendingOpenPopup = true;
       expect(field._lookupByTextOrAll(false, 'Foo')).toBe(undefined);
+      expect(field._pendingOpenPopup).toBe(false);
 
       // case 2: last search-text is the same as the search-text
       field._lastSearchText = 'Homer';
+      field._pendingOpenPopup = true;
       expect(field._lookupByTextOrAll(false, 'Homer')).toBe(undefined);
+      expect(field._pendingOpenPopup).toBe(false);
 
       // every other case should return a promise
+      field._pendingOpenPopup = true;
       expect(field._lookupByTextOrAll(false, 'Marge')).not.toBe(undefined);
+      expect(field._pendingOpenPopup).toBe(true);
+    });
+
+    it('should return text from lookup-row for last search-text', function() {
+      field.setLookupRow(scout.create('LookupRow', {
+        text: 'Foo'
+      }));
+      expect(field._getLastSearchText()).toBe('Foo');
     });
 
   });

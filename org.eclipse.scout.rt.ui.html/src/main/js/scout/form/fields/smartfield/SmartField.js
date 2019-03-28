@@ -678,10 +678,11 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
     var lastSearchText = null;
     if (this._lastSearchText) {
       lastSearchText = this._lastSearchText;
-    } else if (this.lookupRow) {
-      lastSearchText = this.lookupRow.text;
+    } else {
+      lastSearchText = this._getLastSearchText();
     }
     if (this._searchTextEquals(searchText, lastSearchText)) {
+      this._pendingOpenPopup = false;
       return;
     }
   }
@@ -724,6 +725,13 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
   }
 
   return deferred.promise();
+};
+
+/**
+ * Returns the text used to store the 'last search-text'. The implementation differs between SmartField and ProposalField.
+ */
+scout.SmartField.prototype._getLastSearchText = function() {
+  return scout.objects.optProperty(this.lookupRow, 'text');
 };
 
 scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
