@@ -165,25 +165,25 @@ scout.fonts = {
       // Create DIV with default fonts
       // (Because preloader functionality should not depend on a CSS style sheet we set the required properties programmatically.)
       var $div = $('body').appendDiv('font-preloader')
-          .text(font.testString)
-          .css('display', 'block')
-          .css('visibility', 'hidden')
-          .css('position', 'absolute')
-          .css('top', 0)
-          .css('left', 0)
-          .css('width', 'auto')
-          .css('height', 'auto')
-          .css('margin', 0)
-          .css('padding', 0)
-          .css('white-space', 'nowrap')
-          .css('line-height', 'normal')
-          .css('font-variant', 'normal')
-          .css('font-size', '20em')
-          .css('font-family', testFonts);
+        .text(font.testString)
+        .css('display', 'block')
+        .css('visibility', 'hidden')
+        .css('position', 'absolute')
+        .css('top', 0)
+        .css('left', 0)
+        .css('width', 'auto')
+        .css('height', 'auto')
+        .css('margin', 0)
+        .css('padding', 0)
+        .css('white-space', 'nowrap')
+        .css('line-height', 'normal')
+        .css('font-variant', 'normal')
+        .css('font-size', '20em')
+        .css('font-family', testFonts);
 
       // Remember size, set new font, and then measure again
-      var originalWidth = $div.outerWidth();
-      $div.data('original-width', originalWidth);
+      var originalSize = this.measureSize($div);
+      $div.data('original-size', originalSize);
       $div.data('font-family', font.family);
       $div.css('font-family', '\'' + font.family + '\',' + testFonts);
       if (font.style) {
@@ -192,7 +192,7 @@ scout.fonts = {
         $div.attr('style', style + sep + font.style);
       }
 
-      if ($div.outerWidth() !== originalWidth) {
+      if (this.measureSize($div) !== originalSize) {
         // Font already loaded, nothing to do
         $div.remove();
       } else {
@@ -231,7 +231,7 @@ scout.fonts = {
       var i = divs.length;
       while (i--) {
         var $div = divs[i];
-        if ($div.outerWidth() !== $div.data('original-width')) {
+        if (scout.fonts.measureSize($div) !== $div.data('original-size')) {
           divs.splice(i, 1);
           $div.remove();
         }
@@ -257,6 +257,11 @@ scout.fonts = {
         return $div.data('font-family');
       }));
     }
+  },
+
+  measureSize: function($div) {
+    var size = scout.graphics.size($div, {exact: true});
+    return size.width + 'x' + size.height;
   },
 
   /**
@@ -319,5 +324,4 @@ scout.fonts = {
     }
     return fonts;
   }
-
 };
