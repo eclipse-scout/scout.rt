@@ -440,10 +440,12 @@ public class UiSession implements IUiSession {
   }
 
   protected void startDesktop(Map<String, String> sessionStartupParams) {
+    BEANS.get(UiThreadInterruption.class).detectAndClear(this, "startDesktop");
     final IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
 
       @Override
       public void run() throws Exception {
+        BEANS.get(UiThreadInterruption.class).detectAndClear(this, "startDesktop run begin");
         IDesktop desktop = m_clientSession.getDesktop();
         IDesktopUIFacade uiFacade = desktop.getUIFacade();
         boolean desktopOpen = desktop.isOpened();
@@ -454,6 +456,7 @@ public class UiSession implements IUiSession {
         // in that case the client state shall be recovered rather than following the deep link
         PropertyMap.CURRENT.get().put(DeepLinkUrlParameter.HANDLE_DEEP_LINK, !isPersistent() || !desktopOpen);
         uiFacade.fireGuiAttached();
+        BEANS.get(UiThreadInterruption.class).detectAndClear(this, "startDesktop run end");
         m_attachedToDesktop = true;
       }
     }, ModelJobs.newInput(
@@ -961,6 +964,8 @@ public class UiSession implements IUiSession {
   @Override
   public void logout() {
     LOG.info("Logging out from UI session with ID {} [clientSessionId={}, processingJsonRequest={}]", m_uiSessionId, getClientSessionId(), isProcessingJsonRequest());
+
+    BEANS.get(UiThreadInterruption.class).detectAndClear(this, "logout");
 
     // Redirect client to "you are now logged out" screen
     if (isProcessingJsonRequest()) {

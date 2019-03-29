@@ -146,6 +146,7 @@ public class UiServlet extends AbstractHttpServlet {
 
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    BEANS.get(UiThreadInterruption.class).detectAndClear(this, "doPost");
     m_httpServletControl.doDefaults(this, req, resp);
     try {
       createServletRunContext(req, resp).run(new IRunnable() {
