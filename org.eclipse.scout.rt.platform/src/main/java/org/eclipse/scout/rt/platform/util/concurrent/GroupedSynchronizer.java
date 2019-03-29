@@ -25,6 +25,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class implementing a dynamic list of synchronizer groups.
  * <p>
@@ -42,6 +45,7 @@ import java.util.stream.Stream;
 public final class GroupedSynchronizer<K, V> {
 
   public static final int DEFAULT_ROOT_LOCKS = 32;
+  private static final Logger LOG = LoggerFactory.getLogger(GroupedSynchronizer.class);
 
   private final ConcurrentMap<K, V> m_locks;
   private final ReentrantReadWriteLock[] m_rootLocks;
@@ -259,11 +263,25 @@ public final class GroupedSynchronizer<K, V> {
     }
 
     synchronized (lockGroup) {
-      if (shouldRemove == null || shouldRemove.test(lockGroup)) {
+      if (accept(lockGroup, shouldRemove)) {
         return m_locks.remove(groupKey);
       }
     }
     return null;
+  }
+
+  boolean accept(V element, Predicate<? super V> predicate) {
+    if (predicate == null) {
+      return true;
+    }
+
+    try {
+      return predicate.test(element);
+    }
+    catch (RuntimeException e) {
+      LOG.warn("Error evaluating lock predicate", e);
+      return true; // to ensure there are no leaks in the map
+    }
   }
 
   /**

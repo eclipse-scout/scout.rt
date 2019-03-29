@@ -278,7 +278,7 @@ public class ServerSessionCacheTest {
     assertEquals(scoutSessionId, createdSession1.getId());
 
     // asynchronously stop the first session (waits until second one is created)
-    IFuture<Void> sessionStopTask = Jobs.schedule(() -> cache.removeHttpSession(createdSession1.getId(), httpSession1), Jobs.newInput());
+    IFuture<Void> sessionStopTask = Jobs.schedule(() -> cache.removeHttpSession(createdSession1.getId(), httpSession1.getId()), Jobs.newInput());
 
     firstSessionIsDestroying.await(1, TimeUnit.MINUTES);
     HttpSession httpSession2 = new TestHttpSession("testHttpSessionId2");

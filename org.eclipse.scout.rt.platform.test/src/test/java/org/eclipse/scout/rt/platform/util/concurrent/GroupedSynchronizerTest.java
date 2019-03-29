@@ -196,7 +196,7 @@ public class GroupedSynchronizerTest {
 
     // lock is available again:
     assertEquals(0, lck.numLockedRootLocks());
-    assertEquals(1, lck.size());
+    assertEquals(0, lck.size()); // remove is done (event there was an exception)
   }
 
   @Test
