@@ -2589,7 +2589,8 @@ scout.Table.prototype.insertRows = function(rows) {
     applyFilters: false,
     visibleRows: true
   });
-  if (filterAcceptedRows.length > 0) {
+  // Notify changed filter if there are user filters and at least one of the new rows is accepted by them
+  if (this._filterCount() > 0 && filterAcceptedRows.length > 0) {
     this._triggerFilter();
   }
 
