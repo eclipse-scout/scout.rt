@@ -226,10 +226,10 @@ public class HttpServiceTunnel extends AbstractServiceTunnel {
     }
     catch (ThreadInterruptedError e) { // NOSONAR
       future.cancel(true); // Ensure the monitor to be cancelled once this thread is interrupted to cancel the remote call.
-      return new ServiceTunnelResponse(new ThreadInterruptedError(TEXTS.get("UserInterrupted"))); // Interruption has precedence over computation result or computation error.
+      return new ServiceTunnelResponse(new ThreadInterruptedError("UserInterrupted")); // Interruption has precedence over computation result or computation error.
     }
     catch (FutureCancelledError e) { // NOSONAR
-      return new ServiceTunnelResponse(new FutureCancelledError(TEXTS.get("UserInterrupted"))); // Cancellation has precedence over computation result or computation error.
+      return new ServiceTunnelResponse(new FutureCancelledError("UserInterrupted")); // Cancellation has precedence over computation result or computation error.
     }
   }
 
