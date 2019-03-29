@@ -214,6 +214,7 @@ public class UiServlet extends AbstractHttpServlet {
    * @return <code>true</code> if request was handled, <code>false</code> otherwise.
    */
   protected boolean handleRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    BEANS.get(UiThreadInterruption.class).detectAndClear(this, "handleRequest");
     m_httpServletControl.doDefaults(this, req, resp);
     try {
       return createServletRunContext(req, resp).call(() -> handleRequestInternal(req, resp), DefaultExceptionTranslator.class);
