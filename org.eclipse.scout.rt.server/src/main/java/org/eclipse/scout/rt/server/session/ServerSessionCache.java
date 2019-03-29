@@ -88,13 +88,13 @@ public class ServerSessionCache {
    * @param httpSession
    *          May not be {@code null}.
    */
-  public void removeHttpSession(String scoutSessionId, HttpSession httpSession) {
-    final ServerSessionEntry removedEntry = m_lockBySessionId.remove(scoutSessionId, entry -> removeEntry(entry, httpSession));
+  public void removeHttpSession(String scoutSessionId, String httpSessionId) {
+    final ServerSessionEntry removedEntry = m_lockBySessionId.remove(scoutSessionId, entry -> removeEntry(entry, httpSessionId));
     if (removedEntry == null) {
-      LOG.warn("Unknown sessionContext [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSession.getId());
+      LOG.warn("Unknown sessionContext [scoutSessionId={}, httpSessionId={}]", scoutSessionId, httpSessionId);
     }
     else {
-      LOG.debug("Removed Scout server session from cache [scoutSessionId={}, httpSessionId={}].", scoutSessionId, httpSession.getId());
+      LOG.debug("Removed Scout server session from cache [scoutSessionId={}, httpSessionId={}].", scoutSessionId, httpSessionId);
       // destroy entry that was removed from the cache.
       // execute it outside the lock so that new sessions may be created again while the old one is still stopping.
       // no try necessary. Throw any exceptions while stopping up to the caller. The caches are in sync already anyway.
@@ -102,11 +102,8 @@ public class ServerSessionCache {
     }
   }
 
-  protected boolean removeEntry(ServerSessionEntry scoutSessionContext, HttpSession httpSession) {
-    httpSession.removeAttribute(SERVER_SESSION_KEY);
-    LOG.debug("Removed Scout server session from HttpSession [scoutSessionId={}, httpSessionId={}]", scoutSessionContext.getServerSessionLifecycleHandler().getId(), httpSession.getId());
-
-    scoutSessionContext.removeHttpSessionId(httpSession.getId());
+  protected boolean removeEntry(ServerSessionEntry scoutSessionContext, String httpSessionId) {
+    scoutSessionContext.removeHttpSessionId(httpSessionId);
     return scoutSessionContext.httpSessionCount() < 1;
   }
 

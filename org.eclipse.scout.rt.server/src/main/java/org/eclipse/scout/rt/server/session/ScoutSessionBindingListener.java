@@ -40,7 +40,7 @@ public class ScoutSessionBindingListener implements HttpSessionBindingListener, 
   @Override
   public void valueUnbound(final HttpSessionBindingEvent event) {
     try {
-      BEANS.get(ServerSessionCache.class).removeHttpSession(m_scoutSessionId, event.getSession());
+      BEANS.get(ServerSessionCache.class).removeHttpSession(m_scoutSessionId, event.getSession().getId() /* do not pass the session here as it is invalid already and should not be used anymore */);
     }
     catch (RuntimeException e) {
       // catch exceptions so that the container is not affected. Otherwise the unbound for other values may not be called (container dependent).
