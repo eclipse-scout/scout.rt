@@ -307,6 +307,7 @@ public final class UiHtmlConfigProperties {
   }
 
   public static class ScriptfileBuilderDevCacheKey extends AbstractStringConfigProperty {
+
     @Override
     public String getKey() {
       return "scout.dev.scriptfile.persist.key";
@@ -315,10 +316,8 @@ public final class UiHtmlConfigProperties {
     @Override
     public String description() {
       return "Specifies a key to store the keys (HttpCacheKey) scripts in development cache. "
-          + "The keys of the last application start in dev mode will be stored in the user.home/.eclipse/org.eclipse.scout.dev/scriptfileCacheDev_{key}.obj. "
+          + "The keys of the last application start in dev mode will be stored in the user.home/.eclipse/org.eclipse.scout.dev/scriptfile_cache_{key}.obj. "
           + "For the next run in dev mode the keys stored under this key are preloaded.";
     }
-
   }
-
 }

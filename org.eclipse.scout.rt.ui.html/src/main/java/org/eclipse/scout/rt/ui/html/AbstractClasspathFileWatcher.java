@@ -38,14 +38,14 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractClasspathFileWatch {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractClasspathFileWatch.class);
+public abstract class AbstractClasspathFileWatcher {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractClasspathFileWatcher.class);
 
   private final WatchService m_watcher;
-  private Map<WatchKey, Path> m_watchKeys = new HashMap<>();
-  final ReentrantReadWriteLock m_watchKeyReadWriteLock = new ReentrantReadWriteLock();
+  private final Map<WatchKey, Path> m_watchKeys = new HashMap<>();
+  private final ReentrantReadWriteLock m_watchKeyReadWriteLock = new ReentrantReadWriteLock();
 
-  public AbstractClasspathFileWatch() throws IOException {
+  public AbstractClasspathFileWatcher() throws IOException {
     m_watcher = FileSystems.getDefault().newWatchService();
     init();
     start();
@@ -154,5 +154,4 @@ public abstract class AbstractClasspathFileWatch {
     }
     key.cancel();
   }
-
 }
