@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
-import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatch;
+import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
 import org.eclipse.scout.rt.ui.html.res.loader.ScriptFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
@@ -49,16 +49,16 @@ import org.slf4j.LoggerFactory;
 public class DevelopmentScriptfileCache extends HttpResourceCache {
   private static final Logger LOG = LoggerFactory.getLogger(DevelopmentScriptfileCache.class);
 
-  private PathMatcher m_cssMatcher = FileSystems.getDefault().getPathMatcher("glob:**.css");
-  private PathMatcher m_jsMatcher = FileSystems.getDefault().getPathMatcher("glob:**.js");
+  private final PathMatcher m_cssMatcher = FileSystems.getDefault().getPathMatcher("glob:**.css");
+  private final PathMatcher m_jsMatcher = FileSystems.getDefault().getPathMatcher("glob:**.js");
+  private final Map<HttpCacheKey, IFuture<HttpCacheObject>> m_pendingScriptFiles = new HashMap<>();
+  private final Object m_rebuildJsLock = new Object();
+  private final Object m_rebuildStylesheetLock = new Object();
 
-  private ScriptFileWatcher m_scriptFileWatcher;
   private boolean m_active;
-  private Map<HttpCacheKey, IFuture<HttpCacheObject>> m_pendingScriptFiles = new HashMap<>();
-  private Object m_rebuildJsLock = new Object();
+  private AbstractClasspathFileWatcher m_scriptFileWatcher;
   private IFuture<Void> m_rebuildJsFuture;
-  private Object m_rebuildStypesheetLock = new Object();
-  private IFuture<Void> m_rebuildStypesheetFuture;
+  private IFuture<Void> m_rebuildStylesheetFuture;
 
   @PostConstruct
   public void init() {
@@ -67,7 +67,7 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
       return;
     }
     try {
-      m_scriptFileWatcher = new ScriptFileWatcher();
+      m_scriptFileWatcher = createScriptFileWatcher();
     }
     catch (IOException e) { //NOSONAR
       m_scriptFileWatcher = null;
@@ -165,9 +165,9 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     }
   }
 
-  IFuture<HttpCacheObject> scheduleBuildScriptFile(HttpCacheKey key) {
+  protected IFuture<HttpCacheObject> scheduleBuildScriptFile(HttpCacheKey key) {
     synchronized (m_pendingScriptFiles) {
-      IFuture<HttpCacheObject> feature = Jobs.schedule(new RecompileLess(key), Jobs.newInput()
+      IFuture<HttpCacheObject> feature = Jobs.schedule(createRecompileScriptJob(key), Jobs.newInput()
           .withName("Recompile scriptfile."));
       m_pendingScriptFiles.put(key, feature);
       return feature;
@@ -209,16 +209,16 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
 
   protected void scheduleRebuildStylesheets() {
     LOG.debug("Rebuild all stylesheets files in development cache.");
-    synchronized (m_rebuildStypesheetLock) {
-      if (m_rebuildStypesheetFuture != null) {
-        m_rebuildStypesheetFuture.cancel(false);
-        m_rebuildStypesheetFuture = null;
+    synchronized (m_rebuildStylesheetLock) {
+      if (m_rebuildStylesheetFuture != null) {
+        m_rebuildStylesheetFuture.cancel(false);
+        m_rebuildStylesheetFuture = null;
       }
-      m_rebuildStypesheetFuture = Jobs.schedule(new IRunnable() {
+      m_rebuildStylesheetFuture = Jobs.schedule(new IRunnable() {
         @Override
         public void run() throws Exception {
           try {
-            synchronized (m_rebuildStypesheetLock) {
+            synchronized (m_rebuildStylesheetLock) {
               if (IFuture.CURRENT.get().isCancelled()) {
                 return;
               }
@@ -226,9 +226,9 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
             rebuildScripts(m_cssMatcher);
           }
           finally {
-            synchronized (m_rebuildStypesheetLock) {
-              if (IFuture.CURRENT.get() == m_rebuildStypesheetFuture) {
-                m_rebuildStypesheetFuture = null;
+            synchronized (m_rebuildStylesheetLock) {
+              if (IFuture.CURRENT.get() == m_rebuildStylesheetFuture) {
+                m_rebuildStylesheetFuture = null;
               }
             }
           }
@@ -240,7 +240,16 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     }
   }
 
-  private class ScriptFileWatcher extends AbstractClasspathFileWatch {
+  protected AbstractClasspathFileWatcher createScriptFileWatcher() throws IOException {
+    return new ScriptFileWatcher();
+  }
+
+  protected Callable<HttpCacheObject> createRecompileScriptJob(HttpCacheKey key) {
+    return new RecompileScriptJob(key);
+  }
+
+  private class ScriptFileWatcher extends AbstractClasspathFileWatcher {
+
     private final PathMatcher m_lessMatcher = FileSystems.getDefault().getPathMatcher("glob:**.less");
 
     public ScriptFileWatcher() throws IOException {
@@ -259,10 +268,11 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     }
   }
 
-  private class RecompileLess implements Callable<HttpCacheObject> {
-    private HttpCacheKey m_key;
+  private class RecompileScriptJob implements Callable<HttpCacheObject> {
 
-    public RecompileLess(HttpCacheKey key) {
+    private final HttpCacheKey m_key;
+
+    public RecompileScriptJob(HttpCacheKey key) {
       m_key = key;
     }
 

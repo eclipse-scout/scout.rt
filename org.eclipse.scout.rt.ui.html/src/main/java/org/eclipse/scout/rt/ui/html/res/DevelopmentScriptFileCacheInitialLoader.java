@@ -70,7 +70,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
       }
       try {
         DevelopmentScriptfileCache cache = BEANS.get(DevelopmentScriptfileCache.class);
-        m_cachedKeys = laodCachedKeys();
+        m_cachedKeys = loadCachedKeys();
         m_cachedKeys.forEach(key -> cache.scheduleBuildScriptFile(key));
       }
       catch (ClassNotFoundException | IOException e) {
@@ -89,8 +89,7 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
       LOG.warn("Could not resolve user.home directory '{}'.", System.getProperty("user.home"));
       return null;
     }
-    //.eclipse/org.eclipse.scout.dev/scriptfileCacheDev_{key}.obj
-    Path file = userHome.resolve(Paths.get(".eclipse", "org.eclipse.scout.dev", "scriptfileCacheDev_" + persistKey + ".obj"));
+    Path file = userHome.resolve(Paths.get(".eclipse", "org.eclipse.scout.dev", "scriptfilecache_" + persistKey + ".obj"));
     if (!Files.exists(file)) {
       Files.createDirectories(file.getParent());
       Files.createFile(file);
@@ -98,11 +97,11 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
     return file;
   }
 
-  @SuppressWarnings("unchecked")
-  protected synchronized Set<HttpCacheKey> laodCachedKeys() throws IOException, ClassNotFoundException {
+  protected synchronized Set<HttpCacheKey> loadCachedKeys() throws IOException, ClassNotFoundException {
     ObjectInputStream objectinputstream = null;
     try {
       objectinputstream = new ObjectInputStream(Files.newInputStream(m_cacheFile));
+      @SuppressWarnings("unchecked")
       Set<HttpCacheKey> loadedFiles = (Set<HttpCacheKey>) objectinputstream.readObject();
       if (LOG.isInfoEnabled()) {
         LOG.info("Load keys from persist cache in user.home '{}'.", loadedFiles
