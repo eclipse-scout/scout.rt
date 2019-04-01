@@ -285,10 +285,10 @@ public final class UiHtmlConfigProperties {
    * the next run in dev mode the keys stored under this key are preloaded.
    */
   public static class ScriptfileBuilderDevCacheKey extends AbstractStringConfigProperty {
+
     @Override
     public String getKey() {
       return "scout.dev.scriptfile.persist.key";
     }
-
   }
 }
