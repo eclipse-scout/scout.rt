@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.platform.config.PropertiesHelper;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty.TrustedCertificatesProperty;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.TrustedCertificatesProperty;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.slf4j.Logger;

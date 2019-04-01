@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty.CspDirectiveProperty;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspDirectiveProperty;
 
 /**
  * This bean holds a modifiable set of Content Security Policy Level 2 (CSP) directives. The default rules are defined

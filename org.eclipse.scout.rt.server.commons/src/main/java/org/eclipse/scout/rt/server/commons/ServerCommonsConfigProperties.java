@@ -97,36 +97,36 @@ public final class ServerCommonsConfigProperties {
     public String getKey() {
       return "scout.cspEnabled";
     }
+  }
 
-    public static class CspDirectiveProperty extends AbstractMapConfigProperty {
+  public static class CspDirectiveProperty extends AbstractMapConfigProperty {
 
-      @Override
-      public String getKey() {
-        return "scout.cspDirective";
-      }
-
-      @Override
-      @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
-      public String description() {
-        return String.format("Configures individual Content Security Policy (CSP) directives.\n"
-            + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"
-            + "The value must be provided as a Map.\n"
-            + "Example: scout.cspDirective[img-src]='self' data: https: http://localhost:8086",
-            ContentSecurityPolicy.class.getName());
-      }
+    @Override
+    public String getKey() {
+      return "scout.cspDirective";
     }
 
-    public static class TrustedCertificatesProperty extends AbstractStringListConfigProperty {
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return String.format("Configures individual Content Security Policy (CSP) directives.\n"
+          + "See https://www.w3.org/TR/CSP2/ and the Bean '%s' for more details.\n"
+          + "The value must be provided as a Map.\n"
+          + "Example: scout.cspDirective[img-src]='self' data: https: http://localhost:8086",
+          ContentSecurityPolicy.class.getName());
+    }
+  }
 
-      @Override
-      public String getKey() {
-        return "scout.trustedCertificates";
-      }
+  public static class TrustedCertificatesProperty extends AbstractStringListConfigProperty {
 
-      @Override
-      public String description() {
-        return "URIs to DER (Base64) encoded certificate files that should be trusted. The URI may refer to a local file or a resource on the classpath (use classpath: prefix). The default value is an empty list.";
-      }
+    @Override
+    public String getKey() {
+      return "scout.trustedCertificates";
+    }
+
+    @Override
+    public String description() {
+      return "URIs to DER (Base64) encoded certificate files that should be trusted. The URI may refer to a local file or a resource on the classpath (use classpath: prefix). The default value is an empty list.";
     }
   }
 }
