@@ -21,7 +21,8 @@ scout.TableMatrix.DateGroup = {
   NONE: 0,
   YEAR: 256,
   MONTH: 257,
-  WEEKDAY: 258
+  WEEKDAY: 258,
+  DATE: 259
 };
 
 scout.TableMatrix.NumberGroup = {
@@ -219,6 +220,21 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return emptyCell;
         } else {
           return locale.dateFormatSymbols.weekdaysOrdered[n];
+        }
+      };
+    } else if (axisGroup === scout.TableMatrix.DateGroup.DATE) {
+      keyAxis.norm = function(f) {
+        if (f === null || f === '') {
+          return null;
+        } else {
+          return scout.dates.trunc(f).getTime();
+        }
+      };
+      keyAxis.format = function(n) {
+        if (n === null) {
+          return emptyCell;
+        } else {
+          return scout.dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
         }
       };
     }
