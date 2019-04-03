@@ -1,0 +1,20 @@
+{
+  "name": "org.eclipse.scout.rt.ui.web",
+  "version": "10.0.0",
+  "description": "Scout RT Web",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+		"build": "webpack"
+  },
+  "author": "BSI Business Systems Integration AG",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine-core": "^3.3.0",
+    "karma": "^4.0.1",
+    "karma-jasmine": "^2.0.1",
+    "karma-webpack": "^3.0.5",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
+  }
+}
