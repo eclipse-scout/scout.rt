@@ -1,4 +1,4 @@
-import Ocean from '../../../src/scout/Ocean.js';
+import Ocean from '../../src/scout/Ocean.js';
 
 describe('Ocean', () => {
 
