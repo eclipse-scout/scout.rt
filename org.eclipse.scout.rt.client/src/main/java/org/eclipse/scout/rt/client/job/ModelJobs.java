@@ -120,6 +120,12 @@ public final class ModelJobs {
   public static final String EXECUTION_HINT_UI_INTERACTION_REQUIRED = "ui.interaction.required";
 
   /**
+   * Execution hint to mark jobs that cannot be cancelled by the user. Nevertheless, these jobs can still be cancelled
+   * programmatically.
+   */
+  public static final String EXECUTION_HINT_NOT_CANCELLABLE_BY_USER = "not.cancellable.by.user";
+
+  /**
    * Runnable which does nothing.
    */
   private static final IRunnable NULL_RUNNABLE = () -> {
