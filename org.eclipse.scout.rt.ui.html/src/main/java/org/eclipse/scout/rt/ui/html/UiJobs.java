@@ -111,6 +111,7 @@ public class UiJobs {
         .andMatchNotExecutionHint(EXECUTION_HINT_RESPONSE_TO_JSON)
         .andMatchNotExecutionHint(EXECUTION_HINT_POLL_REQUEST)
         .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_UI_INTERACTION_REQUIRED)
+        .andMatchNotExecutionHint(ModelJobs.EXECUTION_HINT_NOT_CANCELLABLE_BY_USER)
         .toFilter(), true);
   }
 
