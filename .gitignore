@@ -18,7 +18,6 @@ bin
 classes
 
 # IDEA #
-*.iml
 /.idea
 
 # Maven #
