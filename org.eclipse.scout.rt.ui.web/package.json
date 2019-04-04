@@ -10,10 +10,17 @@
   "author": "BSI Business Systems Integration AG",
   "license": "ISC",
   "devDependencies": {
+    "css-loader": "^2.1.1",
+    "extract-loader": "^3.1.0",
     "jasmine-core": "^3.3.0",
     "karma": "^4.0.1",
     "karma-jasmine": "^2.0.1",
     "karma-webpack": "^3.0.5",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
+    "mini-css-extract-plugin": "^0.5.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "style-loader": "^0.23.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
