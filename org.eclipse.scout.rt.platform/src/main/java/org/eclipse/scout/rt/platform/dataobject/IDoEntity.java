@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Bean;
@@ -215,5 +216,40 @@ public interface IDoEntity extends IDataObject {
    */
   default List<String> getStringList(String attributeName) {
     return getList(attributeName, item -> Assertions.assertType(item, String.class));
+  }
+
+  /**
+   * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
+   * <p>
+   * Example:
+   *
+   * <pre>
+   * dataObject.remove(dataObject::attributeName);
+   * </pre>
+   */
+  default void remove(Supplier<? extends DoNode<?>> nodeAccessor) {
+    remove(nodeAccessor.get());
+  }
+
+  /**
+   * Removes {@link DoValue} or {@link DoList} attribute node from attributes map.
+   * <p>
+   * Example:
+   *
+   * <pre>
+   * dataObject.remove(dataObject:attributeName());
+   * </pre>
+   */
+  default void remove(DoNode<?> node) {
+    remove(node.getAttributeName());
+  }
+
+  /**
+   * Returns {@code true} if this entity contains no attributes.
+   *
+   * @return {@code true} if this entity contains no attributes.
+   */
+  default boolean isEmpty() {
+    return allNodes().isEmpty();
   }
 }

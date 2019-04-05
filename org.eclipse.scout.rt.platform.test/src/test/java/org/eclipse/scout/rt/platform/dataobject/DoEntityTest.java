@@ -33,6 +33,7 @@ import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
+import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -180,6 +181,50 @@ public class DoEntityTest {
   }
 
   @Test
+  public void testRemoveByNodeSupplier() {
+    EntityFixtureDo entity = BEANS.get(EntityFixtureDo.class)
+        .withId("foo")
+        .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other"));
+
+    assertTrue(entity.id().exists());
+    entity.remove(entity::id);
+    assertFalse(entity.has("id"));
+    assertFalse(entity.id().exists());
+
+    assertTrue(entity.otherEntities().exists());
+    entity.remove(entity::otherEntities);
+    assertFalse(entity.has("otherEntities"));
+    assertFalse(entity.otherEntities().exists());
+
+    // repeat call -> void
+    entity.remove(entity::otherEntities);
+
+    assertTrue(entity.isEmpty());
+  }
+
+  @Test
+  public void testRemoveByNode() {
+    EntityFixtureDo entity = BEANS.get(EntityFixtureDo.class)
+        .withId("foo")
+        .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other"));
+
+    assertTrue(entity.id().exists());
+    entity.remove(entity.id());
+    assertFalse(entity.has("id"));
+    assertFalse(entity.id().exists());
+
+    assertTrue(entity.otherEntities().exists());
+    entity.remove(entity.otherEntities());
+    assertFalse(entity.has("otherEntities"));
+    assertFalse(entity.otherEntities().exists());
+
+    // repeat call -> void
+    entity.remove(entity.otherEntities());
+
+    assertTrue(entity.isEmpty());
+  }
+
+  @Test
   public void testRemoveIf() {
     DoEntity entity = new DoEntity();
     entity.putList("foo", Arrays.asList("value1"));
@@ -194,6 +239,18 @@ public class DoEntityTest {
     assertEquals(CollectionUtility.hashSet("foo"), entity.allNodes().keySet());
     entity.removeIf(n -> n.getAttributeName().equals("foo"));
     assertEquals(Collections.emptySet(), entity.allNodes().keySet());
+  }
+
+  @Test
+  public void testIsEmpty() {
+    DoEntity entity = new DoEntity();
+    assertTrue(entity.isEmpty());
+
+    entity.put("foo", "value2");
+    assertFalse(entity.isEmpty());
+
+    entity.remove("foo");
+    assertTrue(entity.isEmpty());
   }
 
   @Test(expected = UnsupportedOperationException.class)
