@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestGenericDoEntityMapDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItem3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemExDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemPojo2;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestMapDo;
@@ -415,6 +416,15 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     TestRenamedAttributeDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestRenamedAttributeDo.class);
+    s_testHelper.assertDoEntityEquals(testDo, testDoMarshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_TestItemExDo() throws Exception {
+    TestItemExDo testDo = BEANS.get(TestItemExDo.class).withId("foo");
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+    TestItemExDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestItemExDo.class);
     s_testHelper.assertDoEntityEquals(testDo, testDoMarshalled);
   }
 
