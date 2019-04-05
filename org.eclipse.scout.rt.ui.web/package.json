@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "karma start",
-    "build": "webpack"
+    "build-dev": "webpack --mode development",
+    "build": "webpack --mode production"
   },
   "author": "BSI Business Systems Integration AG",
   "license": "ISC",
