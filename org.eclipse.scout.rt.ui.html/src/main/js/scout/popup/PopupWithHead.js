@@ -79,6 +79,7 @@ scout.PopupWithHead.prototype._renderHead = function() {
     .append(this.$deco);
   if (this.$headBlueprint) {
     this.$head.html(this.$headBlueprint.html());
+    this._copyStyleToHeadChildren();
   }
 };
 
@@ -102,6 +103,15 @@ scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
   if (this.$headBlueprint && this.$headBlueprint.hasClass(className)) {
     this.$head.addClass(className);
   }
+};
+
+scout.PopupWithHead.prototype._copyStyleToHeadChildren = function() {
+  var $blueprintChildren = this.$headBlueprint.children();
+  this.$head.children().each(function(i) {
+    var $headChild = $(this);
+    var $blueprintChild = $blueprintChildren.eq(i);
+    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
+  });
 };
 
 scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
@@ -203,12 +213,7 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
   this.$head.height(this.$headBlueprint.height());
   this.$head.width(this.$headBlueprint.width());
 
-  $blueprintChildren = this.$headBlueprint.children();
-  this.$head.children().each(function(i) {
-    var $headChild = $(this);
-    var $blueprintChild = $blueprintChildren.eq(i);
-    $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
-  });
+  this._copyStyleToHeadChildren();
 
   headSize = scout.graphics.size(this.$head, true);
   bodySize = scout.graphics.size(this.$body, true);
