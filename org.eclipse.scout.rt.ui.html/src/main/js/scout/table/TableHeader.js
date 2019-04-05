@@ -311,14 +311,7 @@ scout.TableHeader.prototype.openHeaderMenu = function(column) {
     this.closeHeaderMenu();
   }
 
-  var $header = column.$header;
-  this.tableHeaderMenu = scout.create('TableHeaderMenu', {
-    parent: this,
-    column: $header.data('column'),
-    tableHeader: this,
-    $anchor: $header,
-    focusableContainer: true
-  });
+  this.tableHeaderMenu = column.createTableHeaderMenu(this);
   this.tableHeaderMenu.open();
 
   // Trigger events on column to make it possible to react to the opening of the menu
