@@ -377,11 +377,20 @@ scout.Desktop.prototype._renderHeader = function() {
   }
   this.header = scout.create('DesktopHeader', {
     parent: this,
+    logoUrl: this.logoUrl,
     animateRemoval: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
     toolBoxVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
   });
   this.header.render();
-  this.header.$container.insertBefore(this.$overlaySeparator);
+  if (this.navigation && this.navigation.rendered) {
+    this.header.$container.insertAfter(this.navigation.$container);
+  } else {
+    this.header.$container.insertBefore(this.$overlaySeparator);
+  }
+  // register header tab area
+  if (this.bench) {
+    this.bench._setTabArea(this.header.tabArea);
+  }
   this.invalidateLayoutTree();
 };
 
