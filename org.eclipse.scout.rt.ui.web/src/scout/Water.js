@@ -1,23 +1,23 @@
 export default class Water {
 
   constructor() {
-	this.salinityLevel = 0;
+    this.salinityLevel = 0;
   }
 
   flow() {
-    console.log('flowing...');
+    return 'Flowing...';
   }
 
   freeze() {
-	console.log('freezing...');
+    return 'Freezing...';
   }
 
   vaporize() {
-	console.log('vaporizing...');
+    return 'Vaporizing...';
   }
 
   tasteSalinityLevel() {
-	console.log('tastes like salinity-level ', this.salinityLevel);
+    return 'Tastes like salinity-level ' + this.salinityLevel;
   }
 
 }

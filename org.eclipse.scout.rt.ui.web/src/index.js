@@ -1,9 +1,8 @@
 import Ocean from './scout/Ocean.js';
 
-import './scout/Ocean.less';
-
 function main() {
-  new Ocean().flow();
+  var output = document.getElementById('output');
+  output.innerHTML = new Ocean().flow();
 }
 
 main();
