@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -110,7 +111,9 @@ module.exports = (env, args) => {
       // https://www.npmjs.com/package/copy-webpack-plugin
       new CopyPlugin([
         { from: 'res', to: '.' }
-      ])
+      ]),
+      // Shows progress information in the console
+      new webpack.ProgressPlugin()
     ]
   };
 }
