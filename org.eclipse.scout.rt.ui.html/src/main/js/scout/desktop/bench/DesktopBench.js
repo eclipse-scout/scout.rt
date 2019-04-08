@@ -71,6 +71,21 @@ scout.DesktopBench.prototype._init = function(model) {
   this.updateNavigationHandleVisibility();
 };
 
+scout.DesktopBench.prototype._setTabArea = function(headerTabArea) {
+  this.headerTabArea = headerTabArea;
+  if (this.headerTabAreaController) {
+    this.headerTabAreaController.install(this, this.headerTabArea);
+    // for all views
+    this.getTabBox('C').viewStack.slice().reverse().forEach(function(view) {
+      this.headerTabAreaController._onViewAdd({
+        view: view
+      });
+    }, this);
+    // ensure the correct view tab area is visible (header or center part)
+    this.headerTabAreaController._onViewsChanged();
+  }
+};
+
 scout.DesktopBench.prototype._createColumns = function() {
   var layoutData = this.getLayoutData(),
     columnLayoutData = [];
