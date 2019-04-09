@@ -16,11 +16,11 @@ describe("MenuBar", function() {
     session = sandboxSession();
     helper = new scout.MenuSpecHelper(session);
     $('<style>' +
-        '.menubar { overflow: hidden; background-color: red; padding: 5px; }' +
-        '.menubar > .menubox { display: inline-block; height: 100% }' +
-        '.menubar > .menubox.right { float:right }' +
-        '.menu-item { min-width: 110px; max-width: 110px; padding: 5px; display: inline-block; background-color: orange;}' +
-        '</style>').appendTo($('#sandbox'));
+      '.menubar { overflow: hidden; background-color: red; padding: 5px; }' +
+      '.menubar > .menubox { display: inline-block; height: 100% }' +
+      '.menubar > .menubox.right { float:right }' +
+      '.menu-item { min-width: 110px; max-width: 110px; padding: 5px; display: inline-block; background-color: orange;}' +
+      '</style>').appendTo($('#sandbox'));
   });
 
   function createModel(text, iconId, menuTypes) {
@@ -164,10 +164,10 @@ describe("MenuBar", function() {
   });
 
   describe('setVisible', function() {
-    it('does not throw an error if called on menus moved to the ellipsis menu', function(){
+    it('does not throw an error if called on menus moved to the ellipsis menu', function() {
       var menu1 = helper.createMenu(createModel('foo')),
-      menu2 = helper.createMenu(createModel('bar')),
-      menuBar = createMenuBar();
+        menu2 = helper.createMenu(createModel('bar')),
+        menuBar = createMenuBar();
 
       var menu3model = createModel('boo');
       menu3model.visible = false;
@@ -185,9 +185,9 @@ describe("MenuBar", function() {
 
       menu3.setVisible(true);
       menuBar.validateLayout();
-      
+
       // no error is thrown.
-	  expect(true).toBe(true);
+      expect(true).toBe(true);
     });
   });
 
@@ -238,9 +238,16 @@ describe("MenuBar", function() {
 
     it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', function() {
       var button = new scout.Button();
-      button.init({id:'123', parent: session.desktop});
+      button.init({
+        id: '123',
+        parent: session.desktop
+      });
       var adapterMenu = new scout.ButtonAdapterMenu();
-      adapterMenu.init({id:'234', button:button, parent: session.desktop});
+      adapterMenu.init({
+        id: '234',
+        button: button,
+        parent: session.desktop
+      });
 
       button.setProperty('defaultButton', false);
       button.setProperty('keyStroke', 'enter');
@@ -389,7 +396,6 @@ describe("MenuBar", function() {
       expect(menu2.$container).not.toHaveClass('default-menu');
     });
 
-
     it('considers rendered state of default menu', function() {
       var modelMenu1 = createModel('foo');
       var modelMenu2 = createModel('bar');
@@ -512,6 +518,54 @@ describe("MenuBar", function() {
       expect(menuBar.orderedMenuItems.right[0]).toBe(menuBar._ellipsis);
       expect(menuBar.orderedMenuItems.right[1]).toBe(rightMenu1);
       expect(menuBar.orderedMenuItems.right[2]).toBe(rightMenu2);
+    });
+  });
+
+  describe('reorderMenus', function() {
+    it('updates left-of-button correctly', function() {
+      var button1 = scout.create('Menu', {
+          parent: session.desktop,
+          actionStyle: scout.Action.ActionStyle.BUTTON
+        }),
+        button2 = scout.create('Menu', {
+          parent: session.desktop,
+          actionStyle: scout.Action.ActionStyle.BUTTON
+        }),
+        menuBar = createMenuBar(),
+        menus = [button1, button2];
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+      expect(button1.$container).toHaveClass('left-of-button');
+      expect(button2.$container).not.toHaveClass('left-of-button');
+
+      menuBar.reorderMenus();
+      expect(button1.$container).toHaveClass('left-of-button');
+      expect(button2.$container).not.toHaveClass('left-of-button');
+    });
+
+    it('updates last correctly', function() {
+      var button1 = scout.create('Menu', {
+          parent: session.desktop,
+          actionStyle: scout.Action.ActionStyle.BUTTON
+        }),
+        button2 = scout.create('Menu', {
+          parent: session.desktop,
+          actionStyle: scout.Action.ActionStyle.BUTTON
+        }),
+        menuBar = createMenuBar(),
+        menus = [button1, button2];
+
+      menuBar.setMenuItems(menus);
+      menuBar.render();
+      menuBar.validateLayout();
+      expect(button1.$container).not.toHaveClass('last');
+      expect(button2.$container).toHaveClass('last');
+
+      menuBar.reorderMenus();
+      menuBar.validateLayout();
+      expect(button1.$container).not.toHaveClass('last');
+      expect(button2.$container).toHaveClass('last');
     });
   });
 });

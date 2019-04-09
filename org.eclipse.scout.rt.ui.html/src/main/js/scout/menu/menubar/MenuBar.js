@@ -454,4 +454,7 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
 scout.MenuBar.prototype.reorderMenus = function(rightFirst) {
   var menuItems = this.menuItems;
   this._setMenuItems(menuItems, rightFirst);
+  if (this.rendered) {
+    this.updateLeftOfButtonMarker();
+  }
 };
