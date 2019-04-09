@@ -144,10 +144,6 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
     r1 = cellBounds[data.gridy][data.gridx];
     r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
     r = r1.union(r2);
-    if (data.topInset > 0) {
-      r.y += data.topInset;
-      r.height -= data.topInset;
-    }
     margins = htmlComp.margins();
     r.width -= margins.horizontal();
     r.height -= margins.vertical();
