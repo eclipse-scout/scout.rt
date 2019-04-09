@@ -205,7 +205,7 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 @Order(5500)
 public class JsonObjectFactory extends AbstractJsonObjectFactory {
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "squid:S138"})
   @Override
   public IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent) {
     // --- form fields ----

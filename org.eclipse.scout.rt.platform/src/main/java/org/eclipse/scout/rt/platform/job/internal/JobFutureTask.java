@@ -135,7 +135,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     m_calendar = (input.getExecutionTrigger() == null ? null : input.getExecutionTrigger().getCalendar());
     m_firstFireTime = computeFirstFireTime(m_trigger);
     m_singleExecution = computeSingleExecuting(m_trigger, m_firstFireTime);
-    m_delayedExecution = (input.getExecutionTrigger() == null ? false : computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow()));
+    m_delayedExecution = (input.getExecutionTrigger() != null && computeDelayedExecuting(m_firstFireTime, m_input.getExecutionTrigger().getNow()));
 
     // register this instance with the JobManager before it is registered with the RunMonitor, so that already cancelled RunMonitors are handled correctly.
     m_jobManager.registerFuture(this);
@@ -313,7 +313,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * Returns <code>true</code> if expired and this job should not commence execution, or else <code>false</code>.
    */
   protected boolean isExpired() {
-    return (m_expirationDate == null ? false : System.currentTimeMillis() > m_expirationDate);
+    return m_expirationDate != null && System.currentTimeMillis() > m_expirationDate;
   }
 
   @Override
