@@ -55,12 +55,7 @@ scout.Icon.prototype._renderIconDesc = function() {
   this._removeFontIcon();
   this._removeImageIcon();
 
-  if (!this.iconDesc) {
-    this._renderFontIcon(null);
-    return;
-  }
-
-  if (this.iconDesc.isFontIcon()) {
+  if (!this.iconDesc || this.iconDesc.isFontIcon()) {
     this._renderFontIcon();
   } else {
     this._renderImageIcon();
