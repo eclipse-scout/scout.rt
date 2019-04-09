@@ -615,7 +615,8 @@ $.fn.appendTextNode = function(text) {
  */
 $.fn.appendIcon = function(iconId, cssClass) {
   if (!iconId) {
-    return this.appendImg(null, cssClass);
+    return this.appendSpan(cssClass)
+      .addClass('icon');
   }
   var icon;
   if (iconId instanceof scout.IconDesc) {

@@ -71,6 +71,10 @@ scout.ImageField.prototype._setImageUrl = function(imageUrl) {
   this.image.setImageUrl(imageUrl);
 };
 
+scout.ImageField.prototype._renderImageUrl = function() {
+  scout.scrollbars.update(this.$fieldContainer);
+};
+
 scout.ImageField.prototype.setAutoFit = function(autoFit) {
   this.setProperty('autoFit', autoFit);
 };
