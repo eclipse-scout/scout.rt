@@ -195,7 +195,7 @@ scout.PopupWithHead.prototype._position = function(switchIfNecessary) {
 };
 
 scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, verticalAlignment) {
-  var pos, headSize, bodySize, bodyWidth, widthDiff, $blueprintChildren, left, top, headInsets, menuInsets,
+  var pos, headSize, bodySize, bodyWidth, widthDiff, left, top, headInsets, menuInsets,
     bodyTop = 0,
     headTop = 0,
     decoTop = 0;
