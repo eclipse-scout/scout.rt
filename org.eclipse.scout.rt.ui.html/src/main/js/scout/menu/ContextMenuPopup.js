@@ -420,7 +420,6 @@ scout.ContextMenuPopup.prototype.$visibleMenuItems = function() {
 scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
   var $firstMenuItem, $lastMenuItem;
 
-  // TODO [7.0] cgu: after refactoring of menu-item to context-menu-item we can use last/first instead of a fully qualified name. We also could move this function to jquery-scout to make it reusable.
   this.$body.children('.menu-item').each(function() {
     var $menuItem = $(this);
     $menuItem.removeClass('context-menu-item-first context-menu-item-last');
