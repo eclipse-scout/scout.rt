@@ -578,23 +578,6 @@ scout.Outline.prototype.selectedRow = function() {
   return node.detailTable.selectedRow();
 };
 
-scout.Outline.prototype._applyUpdatedNodeProperties = function(oldNode, updatedNode) {
-  var propertiesChanged = scout.Outline.parent.prototype._applyUpdatedNodeProperties.call(this, oldNode, updatedNode);
-  if (oldNode.modelClass !== updatedNode.modelClass) {
-    oldNode.modelClass = updatedNode.modelClass;
-    propertiesChanged = true;
-  }
-  if (oldNode.classId !== updatedNode.classId) {
-    oldNode.classId = updatedNode.classId;
-    propertiesChanged = true;
-  }
-  if (oldNode.nodeType !== updatedNode.nodeType) {
-    oldNode.nodeType = updatedNode.nodeType;
-    propertiesChanged = true;
-  }
-  return propertiesChanged;
-};
-
 /**
  * Called by updateItemPath.
  *
