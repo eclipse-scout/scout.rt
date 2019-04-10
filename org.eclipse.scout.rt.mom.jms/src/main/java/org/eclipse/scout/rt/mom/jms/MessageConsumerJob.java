@@ -13,7 +13,7 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
   protected final IMessageListener<DTO> m_listener;
 
-  public MessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
+  public MessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
     super(mom, sessionProvider, destination, input);
     m_listener = listener;
   }

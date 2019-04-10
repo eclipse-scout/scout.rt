@@ -1,5 +1,5 @@
 /*
- * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+ * Copyright (c) 2019 BSI Business Systems Integration AG. All rights reserved.
  * http://www.bsiag.com/
  */
 package org.eclipse.scout.rt.mom.api;
@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
+import org.eclipse.scout.rt.platform.config.AbstractIntegerConfigProperty;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -249,6 +250,101 @@ public interface IMom {
     @Override
     protected IDestinationType getType() {
       return DestinationType.TOPIC;
+    }
+  }
+
+  /**
+   * Property to enable or disable connection failover in the scout mom wrapper. The default retry count is
+   * <code>15</code> times. A value of 0 disables scout level connection failover.
+   * <p>
+   * If the property is not set, the value of {@link ConnectionRetryCountProperty} is used. <b>Value type:</b>
+   * {@link Integer} or {@link String}
+   * <p>
+   * Assume the connection dropped. A call to a method of the scout mom wrapper is then blocked until a reconnect
+   * succeeded or all retry attempts failed. The maximum blocking time is
+   * <code>connectionRetryCount*connectionRetryInterval + sessionRetryInterval + connectionRetryCount*connectionRetryInterval</code>.
+   * After connectionRetryCount unsuccessful connection retries the caller code in the session wrapper gets an error
+   * back and does one retry after {@link SessionRetryIntervalMillisProperty}. This results in a second set of
+   * connectionRetryCount attempts to restore the connection. If also this second phase of retries fails, the call
+   * results in an exception thrown.
+   * <p>
+   * Scout mom subscriber listeners however support failover even when such retry phases fail. The consumer loop is not
+   * terminated when an exception occurs. It continues looping and tries again and again to get the next message until
+   * the connection is restored or the subscription is closed.
+   * <p>
+   * Setting this property to a large value increases the time a caller of jms code is potentially blocked until the jms
+   * connection is restored.
+   * <p>
+   *
+   * @since 6.1
+   */
+  class ConnectionRetryCountProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.mom.failover.connectionRetryCount";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 15;
+    }
+  }
+
+  /**
+   * If {@link #CONNECTION_RETRY_COUNT} is set then this property sets the interval in milliseconds between connection
+   * attempts. The default retry interval is <code>2</code> seconds.
+   * <p>
+   * If the property is not set, the value of {@link ConnectionRetryIntervalMillisProperty} is used. <b>Value type:</b>
+   * {@link Integer} or {@link String}
+   *
+   * @since 6.1
+   */
+  class ConnectionRetryIntervalMillisProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.mom.failover.connectionRetryIntervalMillis";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 2000;
+    }
+  }
+
+  /**
+   * If {@link #CONNECTION_RETRY_COUNT} is set then every call to a method in {@link IJmsSessionProvider} is tried a
+   * second time after an Exception. This is the interval to wait inbetween these two attempts.
+   * <p>
+   * The default interval is <code>5</code> seconds.
+   * <p>
+   * If the property is not set, the value of {@link SessionRetryIntervalMillisProperty} is used. <b>Value type:</b>
+   * {@link Integer} or {@link String}
+   * <p>
+   * Choosing the right value for this property depends on the jms driver. When the jms driver detects a connection
+   * loss, it calls the handler set by Connection.setExceptionListener(). The latency between the detection and that
+   * call to the listener is relevant in defining the value for this property. A good value is double the expected
+   * latency time.
+   * <p>
+   * Example: A subscriber calls Consumer.recevice. The connection has just dropped. This leads to an exception in the
+   * driver code. The driver code throws an exception to the scout jms wrapper code and <em>after some latency time</em>
+   * informs the listener set by Connection.setExceptionListener(). Therefore the scout jms wrapper code should wait
+   * before its second attempt to get a new connection until the old connection in the connection wrapper was marked
+   * invalid. This is the wait time set in {@link SessionRetryIntervalMillisProperty}.
+   *
+   * @since 6.1
+   */
+  class SessionRetryIntervalMillisProperty extends AbstractIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.mom.failover.sessionRetryIntervalMillis";
+    }
+
+    @Override
+    protected Integer getDefaultValue() {
+      return 5000;
     }
   }
 }

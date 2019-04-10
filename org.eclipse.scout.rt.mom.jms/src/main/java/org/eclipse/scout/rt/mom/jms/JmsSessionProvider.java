@@ -1,9 +1,20 @@
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
@@ -11,16 +22,20 @@ import javax.jms.TemporaryQueue;
 import javax.jms.Topic;
 
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
+import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProviderEx;
+import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
+import org.eclipse.scout.rt.mom.jms.internal.JmsSubscriptionStats;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 
-public class JmsSessionProvider implements IJmsSessionProvider {
+public class JmsSessionProvider implements IJmsSessionProviderEx {
 
   private final Session m_session;
   private final Destination m_destination; // may be null
+  private final JmsSubscriptionStats m_stats;
   private MessageProducer m_producer;
   private MessageConsumer m_consumer;
 
@@ -31,6 +46,7 @@ public class JmsSessionProvider implements IJmsSessionProvider {
   public JmsSessionProvider(Session session, Destination destination) {
     m_session = assertNotNull(session);
     m_destination = destination;
+    m_stats = new JmsSubscriptionStats();
   }
 
   @Override
@@ -78,8 +94,36 @@ public class JmsSessionProvider implements IJmsSessionProvider {
   public void deleteTemporaryQueue() throws JMSException {
     Assertions.assertTrue(m_closing, "deleteTemporaryQueue can only be called on a closing session provider.");
     if (m_temporaryQueue != null) {
-      m_temporaryQueue.delete();
+      try {
+        m_temporaryQueue.delete();
+      }
+      finally {
+        m_temporaryQueue = null;
+      }
     }
+  }
+
+  @Override
+  public Message receive(SubscribeInput input) throws JMSException {
+    try {
+      MessageConsumer consumer = getConsumer(input);
+      m_stats.notifyBeforeReceive();
+      Message m = consumer.receive();
+      m_stats.notifyReceiveMessage(m);
+      return m;
+    }
+    catch (JMSException e) {
+      m_stats.notifyReceiveError(e);
+      throw e;
+    }
+    finally {
+      m_stats.notifyAfterReceive();
+    }
+  }
+
+  @Override
+  public ISubscriptionStats getStats() {
+    return m_stats;
   }
 
   @Override

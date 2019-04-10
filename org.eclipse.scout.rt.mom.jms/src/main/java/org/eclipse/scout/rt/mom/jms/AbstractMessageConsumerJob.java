@@ -1,15 +1,25 @@
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
 import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
+import org.eclipse.scout.rt.mom.jms.internal.JmsSessionProviderMigration;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -27,15 +37,13 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   protected final IJmsSessionProvider m_sessionProvider;
   protected final IDestination<DTO> m_destination;
   protected final SubscribeInput m_subscribeInput;
-  protected final MessageConsumer m_consumer;
   protected final IMarshaller m_marshaller;
 
-  public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input) throws JMSException {
+  public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input) {
     m_mom = mom;
     m_sessionProvider = sessionProvider;
     m_destination = destination;
     m_subscribeInput = input;
-    m_consumer = sessionProvider.getConsumer(input);
     m_marshaller = mom.resolveMarshaller(destination);
   }
 
@@ -50,25 +58,31 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   @Override
   public void run() throws Exception {
     while (true) {
-      if (m_sessionProvider.isClosing() || IFuture.CURRENT.get().isCancelled()) {
+      if (IFuture.CURRENT.get().isCancelled() || m_sessionProvider.isClosing()) {
         LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
         break;
       }
-      Message message = m_consumer.receive();
-      if (message == null) {
-        // consumer closed
-        break;
-      }
 
-      LOG.debug("Receiving JMS message [message={}]", message);
       try {
+        Message message = JmsSessionProviderMigration.receive(m_sessionProvider, m_subscribeInput);
+        if (message == null) {
+          // consumer closed or connection failure, go to start of while loop
+          continue;
+        }
+
+        LOG.debug("Receiving JMS message [message={}]", message);
         onJmsMessage(message);
       }
       catch (Exception e) {
-        BEANS.get(MomExceptionHandler.class).handle(e);
+        if (IFuture.CURRENT.get().isCancelled() || m_sessionProvider.isClosing()) {
+          LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
+          break;
+        }
+        else {
+          BEANS.get(MomExceptionHandler.class).handle(e);
+        }
       }
     }
-
     LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
   }
 
