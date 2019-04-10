@@ -1,19 +1,32 @@
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
 import java.util.UUID;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageConsumer;
+import javax.jms.Session;
 
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
+import org.eclipse.scout.rt.mom.jms.internal.JmsSessionProviderMigration;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
@@ -27,16 +40,34 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   protected final IJmsSessionProvider m_sessionProvider;
   protected final IDestination<DTO> m_destination;
   protected final SubscribeInput m_subscribeInput;
-  protected final MessageConsumer m_consumer;
   protected final IMarshaller m_marshaller;
+  protected final long m_receiveTimeoutMillis;
 
-  public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input) throws JMSException {
+  /**
+   * @param mom
+   * @param sessionProvider
+   * @param destination
+   * @param input
+   */
+  public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input) {
+    this(mom, sessionProvider, destination, input, 0L);
+  }
+
+  /**
+   * @param mom
+   * @param sessionProvider
+   * @param destination
+   * @param input
+   * @param receiveTimeoutMillis
+   *          in milliseconds, 0 for no timeout
+   */
+  public AbstractMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input, long receiveTimeoutMillis) {
     m_mom = mom;
     m_sessionProvider = sessionProvider;
     m_destination = destination;
     m_subscribeInput = input;
-    m_consumer = sessionProvider.getConsumer(input);
     m_marshaller = mom.resolveMarshaller(destination);
+    m_receiveTimeoutMillis = receiveTimeoutMillis;
   }
 
   protected boolean isSingleThreaded() {
@@ -50,26 +81,57 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
   @Override
   public void run() throws Exception {
     while (true) {
-      if (m_sessionProvider.isClosing() || IFuture.CURRENT.get().isCancelled()) {
+      if (IFuture.CURRENT.get().isCancelled() || m_sessionProvider.isClosing()) {
         LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
         break;
       }
-      Message message = m_consumer.receive();
-      if (message == null) {
-        // consumer closed
-        break;
+
+      final Session transactedSession;
+      final Message message;
+      try {
+        transactedSession = m_sessionProvider.getSession();
+        message = JmsSessionProviderMigration.receive(m_sessionProvider, m_subscribeInput, m_receiveTimeoutMillis);
+        if (message == null) {
+          // consumer closed or connection failure, go to start of while loop
+          continue;
+        }
+      }
+      catch (Exception e) {
+        if (IFuture.CURRENT.get().isCancelled() || m_sessionProvider.isClosing()) {
+          LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
+          break;
+        }
+        LOG.warn("JMS MessageConsumer for {} is still idle after several retry attempts", m_destination, e);
+        continue;
       }
 
-      LOG.debug("Receiving JMS message [message={}]", message);
       try {
+        LOG.debug("Receiving JMS message [message={}]", message);
         onJmsMessage(message);
       }
       catch (Exception e) {
+        if (isRollbackNecessary(e)) {
+          try {
+            transactedSession.rollback();
+          }
+          catch (final JMSException ex) {
+            LOG.error("Failed to rollback transacted session [session={}]", transactedSession, ex);
+          }
+        }
         BEANS.get(MomExceptionHandler.class).handle(e);
       }
     }
-
     LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
+  }
+
+  /**
+   * Make sure that a scout JMS-Transaction-Member that is being initialized and not yet attached to the
+   * {@link ITransaction} is rollbacked in case of error.
+   * <p>
+   * Once the scout JMS-Transaction-Member is registered it will safely be rollbacked on errors.
+   */
+  protected boolean isRollbackNecessary(Exception e) {
+    return isTransacted() && !(e instanceof PlatformException);
   }
 
   protected RunContext createRunContext() throws JMSException {

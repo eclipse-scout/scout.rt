@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
@@ -20,7 +30,6 @@ import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
-import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -48,6 +57,8 @@ import org.eclipse.scout.rt.mom.api.PublishInput;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
+import org.eclipse.scout.rt.mom.jms.internal.JmsConnectionWrapper;
+import org.eclipse.scout.rt.mom.jms.internal.JmsSessionProviderWrapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.CONFIG;
@@ -70,6 +81,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -96,6 +108,21 @@ public class JmsMomImplementor implements IMomImplementor {
    */
   public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
 
+  /**
+   * Key to set {@link #m_messageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.messageConsumerJobReceiveTimeout";
+
+  /**
+   * Key to set {@link #m_replyMessageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.replyMessageConsumerJobReceiveTimeout";
+
+  /**
+   * Key to set {@link #m_requestCancellationMessageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.requestCancellationMessageConsumerJobReceiveTimeout";
+
   protected final String m_momUid = UUID.randomUUID().toString();
 
   // init -> thread-safety: only set in init method
@@ -104,16 +131,28 @@ public class JmsMomImplementor implements IMomImplementor {
   protected Hashtable<Object, Object> m_contextEnvironment;
   protected ConnectionFactory m_connectionFactory;
   protected String m_clientId;
+
+  /**
+   * @deprecated do NOT use this connection directly, use {@link #getConnection()}
+   */
+  @Deprecated
   protected Connection m_connection;
+
+  protected JmsConnectionWrapper m_connectionWrapper;
   protected boolean m_requestReplyEnabled;
   protected IDestination<?> m_requestReplyCancellationTopic;
   protected IMarshaller m_defaultMarshaller;
   // end init
 
   protected ISubscription m_requestCancellationSubscription;
+  protected int m_subscriptionAwaitStartedSeconds = 30;
 
   protected final Map<IDestination, Destination> m_jmsDestinations = new ConcurrentHashMap<>();
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
+
+  protected long m_messageConsumerJobReceiveTimeout = 0L;
+  protected long m_replyMessageConsumerJobReceiveTimeout = 0L;
+  protected long m_requestCancellationMessageConsumerJobReceiveTimeout = 0L;
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
@@ -122,16 +161,19 @@ public class JmsMomImplementor implements IMomImplementor {
       LOG.info("{} configuration: {}", m_symbolicName, properties);
     }
     try {
+      m_messageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_replyMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_requestCancellationMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_contextEnvironment = createContextEnvironment(properties);
       m_connectionFactory = createConnectionFactory(properties);
       m_clientId = computeClientId(properties);
-      m_connection = createConnection();
+      m_connectionWrapper = createConnectionWrapper(properties);
 
       m_defaultMarshaller = createDefaultMarshaller(properties);
 
       initRequestReply(properties);
 
-      LOG.info("{} initialized: {}", m_symbolicName, m_connection);
+      LOG.info("{} initialized: {}", m_symbolicName, m_connectionWrapper);
     }
     catch (Exception e) {
       try {
@@ -144,7 +186,20 @@ public class JmsMomImplementor implements IMomImplementor {
     }
   }
 
-  protected void initRequestReply(final Map<Object, Object> properties) throws JMSException {
+  protected JmsConnectionWrapper createConnectionWrapper(final Map<Object, Object> properties) {
+    return new JmsConnectionWrapper(properties)
+        .withConnectionFunction(
+            new ICreateJmsConnection() {
+              @Override
+              public Connection create() throws JMSException {
+                Connection c = createConnection();
+                m_connection = c;
+                return c;
+              }
+            });
+  }
+
+  protected void initRequestReply(final Map<Object, Object> properties) throws JMSException {//NOSONAR
     m_requestReplyEnabled = BooleanUtility.nvl(
         TypeCastUtility.castValue(properties.get(REQUEST_REPLY_ENABLED), Boolean.class),
         CONFIG.getPropertyValue(RequestReplyEnabledProperty.class));
@@ -204,9 +259,24 @@ public class JmsMomImplementor implements IMomImplementor {
     return createSessionProvider(null, false);
   }
 
-  public IJmsSessionProvider createSessionProvider(IDestination<?> destination, boolean transacted) throws JMSException {
-    Session session = transacted ? m_connection.createSession(true, Session.SESSION_TRANSACTED) : m_connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-    return new JmsSessionProvider(session, resolveJmsDestination(destination, session));
+  public IJmsSessionProvider createSessionProvider(final IDestination<?> destination, boolean transacted) throws JMSException {//NOSONAR
+    ICreateJmsSessionProvider providerFunction = new ICreateJmsSessionProvider() {
+      @Override
+      public IJmsSessionProvider create(Session session) throws JMSException {
+        return new JmsSessionProvider(session, resolveJmsDestination(destination, session));
+      }
+    };
+    return createSessionProviderWrapper(transacted, providerFunction);
+  }
+
+  protected JmsSessionProviderWrapper createSessionProviderWrapper(boolean transacted, ICreateJmsSessionProvider providerFunction) {
+    return new JmsSessionProviderWrapper(m_connectionWrapper, transacted, providerFunction);
+  }
+
+  protected JmsSubscription createJmsSubscription(IDestination<?> destination, SubscribeInput input, IJmsSessionProvider sessionProvider, IFuture<?> worker) {
+    JmsSubscription subscription = new JmsSubscription(destination, input, sessionProvider, worker);
+    subscription.awaitStarted(m_subscriptionAwaitStartedSeconds, TimeUnit.SECONDS);
+    return subscription;
   }
 
   @Override
@@ -276,18 +346,12 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected <DTO> ISubscription subscribeImpl(IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, SubscribeInput.ACKNOWLEDGE_TRANSACTED == input.getAcknowledgementMode());
-    try {
-      IFuture<Void> jobMonitor = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
-      return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
-    }
-    catch (JMSException | RuntimeException e) {
-      sessionProvider.close();
-      throw e;
-    }
+    IFuture<?> worker = Jobs.schedule(createMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
+    return createJmsSubscription(destination, input, sessionProvider, worker);
   }
 
-  protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) throws JMSException {
-    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input);
+  protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
+    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input, m_messageConsumerJobReceiveTimeout);
   }
 
   @Override
@@ -433,18 +497,12 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected <REQUEST, REPLY> ISubscription replyImpl(final IBiDestination<REQUEST, REPLY> destination, final IRequestListener<REQUEST, REPLY> listener, final SubscribeInput input) throws JMSException {
     IJmsSessionProvider sessionProvider = createSessionProvider(destination, false);
-    try {
-      IFuture<Void> jobMonitor = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
-      return new JmsSubscription(destination, input, sessionProvider, jobMonitor);
-    }
-    catch (JMSException | RuntimeException e) {
-      sessionProvider.close();
-      throw e;
-    }
+    IFuture<?> worker = Jobs.schedule(createReplyMessageConsumerJob(sessionProvider, destination, listener, input), newJobInput().withName("JMS subscriber"));
+    return createJmsSubscription(destination, input, sessionProvider, worker);
   }
 
-  protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) throws JMSException {
-    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input);
+  protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
+    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input, m_replyMessageConsumerJobReceiveTimeout);
   }
 
   protected synchronized void ensureRequestCancellationSubscription() throws JMSException {
@@ -454,24 +512,14 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> ISubscription subscribeRequestCancellation(IDestination<DTO> cancellationTopic) throws JMSException {
+    SubscribeInput input = MOM.newSubscribeInput();
     IJmsSessionProvider sessionProvider = createSessionProvider(cancellationTopic, false);
-    try {
-      SubscribeInput input = MOM.newSubscribeInput();
-      IFuture<Void> jobMonitor = Jobs.schedule(new AbstractMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input) {
+    final IFuture<?> worker = Jobs.schedule(createRequestCancellationMessageConsumerJob(sessionProvider, cancellationTopic, input), newJobInput().withName("JMS reply cancel message listener"));
+    return createJmsSubscription(cancellationTopic, input, sessionProvider, worker);
+  }
 
-        @Override
-        protected void onJmsMessage(Message jmsMessage) throws JMSException {
-          Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-              .andMatchExecutionHint(jmsMessage.getStringProperty(JMS_PROP_REPLY_ID))
-              .toFilter(), true);
-        }
-      }, newJobInput().withName("JMS reply cancel message listener"));
-      return new JmsSubscription(cancellationTopic, input, sessionProvider, jobMonitor);
-    }
-    catch (JMSException | RuntimeException e) {
-      sessionProvider.close();
-      throw e;
-    }
+  protected <DTO> IRunnable createRequestCancellationMessageConsumerJob(IJmsSessionProvider sessionProvider, final IDestination<DTO> cancellationTopic, final SubscribeInput input) {
+    return new RequestCancellationMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input, m_requestCancellationMessageConsumerJobReceiveTimeout);
   }
 
   @Override
@@ -508,13 +556,18 @@ public class JmsMomImplementor implements IMomImplementor {
       }
 
       // close connection
-      if (m_connection != null) {
-        m_connection.close();
+      if (m_connectionWrapper != null) {
+        try {
+          m_connectionWrapper.close();
+        }
+        finally {
+          m_connectionWrapper = null;
+        }
       }
 
       // wait for jobs to finish
       if (!futures.isEmpty()) {
-        try {
+        try {//NOSONAR
           Jobs.getJobManager().awaitDone(momJobsFilter, 10, TimeUnit.SECONDS);
           LOG.debug("All mom jobs have finished.");
         }
@@ -523,7 +576,7 @@ public class JmsMomImplementor implements IMomImplementor {
         }
       }
     }
-    catch (JMSException e) {
+    catch (Exception e) {
       LOG.error("Failed to destroy MOM", e);
     }
   }
@@ -548,10 +601,26 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   /**
-   * @return a shared {@link Connection} to JMS broker.
+   * @return true if jms is currently connected. Does not block.
+   */
+  public boolean isConnected() {
+    return m_connectionWrapper.isConnected();
+  }
+
+  /**
+   * @return a shared {@link Connection} to JMS broker. This method may block until a connection is available.
+   *         <p>
+   *         Do not keep references to this value, it may change after reconnect attempts.
+   *         <p>
+   *         see {@link #isConnected()} which is not blocking
    */
   public Connection getConnection() {
-    return m_connection;
+    try {
+      return m_connectionWrapper.getConnection();
+    }
+    catch (JMSException e) {
+      throw new ProcessingException("Cannot open connection", e);
+    }
   }
 
   public <DTO> void send(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, DTO transferObject, PublishInput input) throws JMSException {
@@ -587,7 +656,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   @SuppressWarnings("squid:S1149")
-  protected Hashtable<Object, Object> createContextEnvironment(final Map<Object, Object> properties) throws NamingException {
+  protected Hashtable<Object, Object> createContextEnvironment(final Map<Object, Object> properties) throws NamingException {//NOSONAR
     Hashtable<Object, Object> env = new Hashtable<>();
     if (properties != null) {
       for (Entry<Object, Object> entry : properties.entrySet()) {
@@ -628,12 +697,6 @@ public class JmsMomImplementor implements IMomImplementor {
 
   protected void postCreateConnection(Connection connection) throws JMSException {
     connection.setClientID(m_clientId);
-    connection.setExceptionListener(new ExceptionListener() {
-      @Override
-      public void onException(final JMSException exception) {
-        BEANS.get(MomExceptionHandler.class).handle(exception);
-      }
-    });
     // we directly start the shared connection
     connection.start();
   }

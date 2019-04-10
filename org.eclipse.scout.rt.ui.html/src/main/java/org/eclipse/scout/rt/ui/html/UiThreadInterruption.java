@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility used to handle unexpected interruptions on poolead threads.
  *
- * @since 9.0
+ * @since 6.1
  */
 @ApplicationScoped
 public class UiThreadInterruption {
