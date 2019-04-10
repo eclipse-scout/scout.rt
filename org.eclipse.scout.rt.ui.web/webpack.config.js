@@ -32,7 +32,7 @@ module.exports = (env, args) => {
       // points für alle Themes definieren.
       // Evtl. hilft das ManifestPlugin beim aufräumen, check:
       // https://webpack.js.org/guides/output-management#cleaning-up-the-dist-folder
-      scout: './src/index.js',
+      scout: './src/module.js',
       'theme-default': './src/theme-default.less',
       'theme-dark': './src/theme-dark.less'
     },

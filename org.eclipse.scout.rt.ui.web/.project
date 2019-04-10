@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.scout.rt.ui.web</name>
+	<name>eclipse-scout</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -16,7 +16,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1554283339942</id>
+			<id>0</id>
 			<name></name>
 			<type>10</type>
 			<matcher>

@@ -1,5 +1,5 @@
 {
-  "name": "org.eclipse.scout.rt.ui.web",
+  "name": "eclipse-scout",
   "version": "10.0.0",
   "description": "Scout RT Web",
   "private": true,
