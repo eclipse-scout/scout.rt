@@ -1,4 +1,8 @@
 <!doctype html>
+<!--
+  We don't use Webpack's html-loader to process .html files, since it cannot
+  resolve .js or .less dependencies but only image resources.
+ -->
 <html>
   <head>
     <meta charset="UTF-8">
@@ -7,6 +11,7 @@
   </head>
   <body>
     <h1 class="ocean">Hello Ocean</h1>
+    <img src="img/eclipse-scout-logo.png">
     <div id="output"></div>
     <script src="scout.js"></script>
   </body>
