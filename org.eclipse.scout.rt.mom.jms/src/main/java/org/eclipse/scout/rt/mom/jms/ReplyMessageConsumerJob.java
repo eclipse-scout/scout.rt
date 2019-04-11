@@ -35,8 +35,12 @@ import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestore
 public class ReplyMessageConsumerJob<REQUEST, REPLY> extends AbstractMessageConsumerJob<REQUEST> {
   protected final IRequestListener<REQUEST, REPLY> m_listener;
 
-  public ReplyMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) throws JMSException {
-    super(mom, sessionProvider, destination, input);
+  public ReplyMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
+    this(mom, sessionProvider, destination, listener, input, 0L);
+  }
+
+  public ReplyMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input, long receiveTimeout) {
+    super(mom, sessionProvider, destination, input, receiveTimeout);
     m_listener = listener;
   }
 
