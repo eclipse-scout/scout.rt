@@ -36,7 +36,7 @@ public interface ICodeService extends IService {
 
   Map<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>> getCodeTypeMap(Collection<Class<? extends ICodeType<?, ?>>> types);
 
-  <CODE extends ICode<?>> CODE getCode(Class<CODE> type);
+  <T, CODE extends ICode<T>> CODE getCode(Class<CODE> type);
 
   /**
    * reload code type
