@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
+import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.naming.Context;
@@ -66,6 +67,7 @@ import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.JsonMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
 import org.eclipse.scout.rt.mom.api.marshaller.TextMarshaller;
+import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
@@ -101,6 +103,7 @@ import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameteriz
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.ParameterizedPlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -119,8 +122,9 @@ public class JmsMomImplementorTest {
   @ClassRule
   public static final ArtemisJmsBrokerTestRule ARTEMIS_RULE = new ArtemisJmsBrokerTestRule();
 
-  private IBean<? extends JmsTestMom> m_momBean;
-  private List<IDisposable> m_disposables;
+  private JmsTestMom m_mom;
+  private final List<IBean<?>> m_beans = new ArrayList<>();
+  private final List<IDisposable> m_disposables = new ArrayList<>();
 
   private String m_testJobExecutionHint;
 
@@ -223,19 +227,24 @@ public class JmsMomImplementorTest {
   }
 
   protected void installTestMom(Class<? extends JmsTestMom> transportType) {
-    if (m_momBean != null) {
+    if (m_mom != null) {
       uninstallTestMom();
     }
 
+    m_beans.add(BEANS.getBeanManager().registerBean(new BeanMetaData(FixtureJmsJobInput.class)));
+
     JmsTestMom transport = BeanUtility.createInstance(transportType, m_parameter);
-    m_momBean = BEANS.getBeanManager().registerBean(new BeanMetaData(transportType, transport));
+    m_beans.add(BEANS.getBeanManager().registerBean(new BeanMetaData(transportType, transport)));
+    m_mom = BEANS.get(transportType);
   }
 
   protected void uninstallTestMom() {
-    m_momBean.getInstance().destroy();
-
-    BEANS.getBeanManager().unregisterBean(m_momBean);
-    m_momBean = null;
+    m_mom.destroy();
+    m_mom = null;
+    for (IBean<?> bean : m_beans) {
+      BEANS.getBeanManager().unregisterBean(bean);
+    }
+    m_beans.clear();
   }
 
   @Before
@@ -246,7 +255,6 @@ public class JmsMomImplementorTest {
     LOG.info("<{}>", m_testName.getMethodName());
     m_t0 = System.nanoTime();
     m_testJobExecutionHint = UUID.randomUUID().toString();
-    m_disposables = new ArrayList<>();
   }
 
   @After
@@ -254,24 +262,44 @@ public class JmsMomImplementorTest {
     // Dispose resources
     dispose(m_disposables);
 
-    // Cancel jobs
+    // Cancel regular jobs
     Predicate<IFuture<?>> testJobsFilter = Jobs.newFutureFilterBuilder()
         .andMatchExecutionHint(m_testJobExecutionHint)
         .toFilter();
     Set<IFuture<?>> futures = Jobs.getJobManager().getFutures(testJobsFilter);
     if (futures.size() > 0) {
-      LOG.info("Cancelling {} jobs: {}", futures.size(), futures);
+      LOG.info("Cancelling {} regular jobs: {}", futures.size(), futures);
       Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
           .andMatchFuture(futures)
           .andMatchNotState(JobState.DONE)
           .toFilter(), true);
       long t0 = System.nanoTime();
       try {
-        Jobs.getJobManager().awaitDone(testJobsFilter, 10, TimeUnit.SECONDS);
-        LOG.info("All jobs have finished after {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
+        Jobs.getJobManager().awaitDone(testJobsFilter, 30, TimeUnit.SECONDS);
+        LOG.info("All regular jobs have finished after {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
       }
       catch (TimedOutError e) {
-        LOG.warn("Some cancelled jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
+        LOG.warn("Some cancelled regular jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
+      }
+    }
+    // Cancel jms subscriber jobs
+    Predicate<IFuture<?>> jmsJobsFilter = Jobs.newFutureFilterBuilder()
+        .andMatchExecutionHint(FixtureJmsJobInput.HINT)
+        .toFilter();
+    futures = Jobs.getJobManager().getFutures(jmsJobsFilter);
+    if (futures.size() > 0) {
+      LOG.info("Cancelling {} subscriber jobs: {}", futures.size(), futures);
+      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
+          .andMatchFuture(futures)
+          .andMatchNotState(JobState.DONE)
+          .toFilter(), false);
+      long t0 = System.nanoTime();
+      try {
+        Jobs.getJobManager().awaitDone(testJobsFilter, 30, TimeUnit.SECONDS);
+        LOG.info("All subscriber jobs have finished after {} ms", StringUtility.formatNanos(System.nanoTime() - t0));
+      }
+      catch (TimedOutError e) {
+        LOG.warn("Some cancelled subscriber jobs are still running after {} ms! Please check their implementation.", StringUtility.formatNanos(System.nanoTime() - t0));
       }
     }
 
@@ -411,7 +439,7 @@ public class JmsMomImplementorTest {
    * In case of single threaded subscription, {@link ISubscription#dispose()} waits for any ongoing processing of this
    * subscription to finish.
    */
-  private void testSubscriptionDisposeSynchronized(SubscribeInput subscribeInput) throws InterruptedException {
+  protected void testSubscriptionDisposeSynchronized(SubscribeInput subscribeInput) throws InterruptedException {
     final Capturer<String> capturer = new Capturer<>();
     final CountDownLatch latch = new CountDownLatch(1);
 
@@ -448,7 +476,7 @@ public class JmsMomImplementorTest {
 
     // Verify
     try {
-      disposeFuture.awaitDoneAndGet(200, TimeUnit.MILLISECONDS);
+      disposeFuture.awaitDoneAndGet(1, TimeUnit.SECONDS);
       assertEquals(SubscribeInput.ACKNOWLEDGE_AUTO, subscribeInput.getAcknowledgementMode());
     }
     catch (TimedOutError e) {
@@ -600,7 +628,7 @@ public class JmsMomImplementorTest {
     MOM.publish(JmsTestMom.class, topic, "hello world");
 
     // Verify
-    assertTrue(latch.await(5, TimeUnit.SECONDS));
+    assertTrue(latch.await(30, TimeUnit.SECONDS));
   }
 
   @Test
@@ -611,7 +639,7 @@ public class JmsMomImplementorTest {
     // Publish a message
     MOM.publish(JmsTestMom.class, topic, "hello world");
 
-    // Subscribe for the destination
+    // Subscribe too late for the destination
     final CountDownLatch latch = new CountDownLatch(1);
     m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
@@ -703,7 +731,7 @@ public class JmsMomImplementorTest {
     }));
 
     // Verify
-    assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
+    assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
   }
 
   @Test
@@ -960,6 +988,21 @@ public class JmsMomImplementorTest {
   public void testRequestReplyWithBlockingCondition() throws InterruptedException {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testRequestReplyWithBlockingCondition", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
+    //prepare the reply
+    final CountDownLatch replyLatch = new CountDownLatch(1);
+    m_disposables.add(MOM.reply(JmsTestMom.class, queue, new IRequestListener<String, String>() {
+      @Override
+      public String onRequest(IMessage<String> request) {
+        try {
+          replyLatch.await();
+        }
+        catch (InterruptedException e) {
+          throw new ThreadInterruptedError("Interrupted", e);
+        }
+        return "TheReply";
+      }
+    }));
+
     // semaphore for jobs
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
@@ -968,7 +1011,9 @@ public class JmsMomImplementorTest {
 
       @Override
       public String call() throws Exception {
-        return MOM.request(JmsTestMom.class, queue, "hello world");
+        String reply = MOM.request(JmsTestMom.class, queue, "hello world");
+        System.out.println("Reply: " + reply);
+        return reply;
       }
     }, Jobs.newInput()
         .withName("requester (T)")
@@ -990,11 +1035,17 @@ public class JmsMomImplementorTest {
 
     // Verify
     try {
-      otherFuture.awaitDone(2000, TimeUnit.MILLISECONDS);
+      otherFuture.awaitDone(10, TimeUnit.SECONDS);
       assertSame(JobState.WAITING_FOR_BLOCKING_CONDITION, requestFuture.getState());
+      //now send reply
+      replyLatch.countDown();
+      requestFuture.awaitDone(10, TimeUnit.SECONDS);
     }
     catch (TimedOutError e) {
       fail();
+    }
+    finally {
+      replyLatch.countDown();
     }
   }
 
@@ -1100,10 +1151,10 @@ public class JmsMomImplementorTest {
 
       @Override
       public String onRequest(IMessage<String> request) {
+        /*
+         * MARKER
+         */
         try {
-          /*
-           * MARKER
-           */
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
@@ -1684,7 +1735,7 @@ public class JmsMomImplementorTest {
         allCapturer.set(message.getTransferObject());
       }
     }));
-    // register subscriber with selector '"user = 'john''
+    // register subscriber with selector user = 'john'
     m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
@@ -1693,7 +1744,7 @@ public class JmsMomImplementorTest {
       }
     }, MOM.newSubscribeInput().withSelector("user = 'john'")));
 
-    // register subscriber with selector 'user = 'anna''
+    // register subscriber with selector user = 'anna'
     m_disposables.add(MOM.subscribe(JmsTestMom.class, topic, new IMessageListener<String>() {
 
       @Override
@@ -1714,8 +1765,8 @@ public class JmsMomImplementorTest {
       // NOOP
     }
 
-    assertEquals("message-for-anna", allCapturer.get(2, TimeUnit.SECONDS));
-    assertEquals("message-for-anna", annaCapturer.get(2, TimeUnit.SECONDS));
+    assertEquals("message-for-anna", allCapturer.get(5, TimeUnit.SECONDS));
+    assertEquals("message-for-anna", annaCapturer.get(5, TimeUnit.SECONDS));
   }
 
   private Object testPublishAndConsumeInternal(Object transferObject, IMarshaller marshaller) throws InterruptedException {
@@ -1780,15 +1831,14 @@ public class JmsMomImplementorTest {
       for (IDisposable disposable : disposables) {
         disposable.dispose();
       }
+      disposables.clear();
     }
   }
 
   @Test
   public void testTopicDurableSubscription() throws InterruptedException {
-    if (m_parameter.getImplementor() == J2eeJmsMomImplementor.class) {
-      // J2EE implementor does not set any client id; therefore no durable subscription is possible
-      return;
-    }
+    // J2EE implementor does not set any client id; therefore no durable subscription is possible
+    Assume.assumeFalse(J2eeJmsMomImplementor.class.isAssignableFrom(m_parameter.getImplementor()));
 
     final IDestination<String> topic = MOM.newDestination("test/mom/testTopicPublishSubscribe", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
     final String durableSubscriptionName = "Durable-Test-Subscription";
@@ -1962,6 +2012,52 @@ public class JmsMomImplementorTest {
     assertNotNull(capturer.get(1, TimeUnit.SECONDS));
   }
 
+  @Test
+  public void testSubscribeFailover() throws InterruptedException {
+    Assume.assumeFalse(J2eeJmsMomImplementor.class.isAssignableFrom(m_mom.getConfiguredImplementor()));
+
+    //retryCount=3, retryInterval=1s, sesionRetryInterval=2s
+    installTestMom(JmsTestMomWithConnectionFailover.class);
+    JmsTestMomWithConnectionFailover mom = (JmsTestMomWithConnectionFailover) m_mom;
+
+    IDestination<String> queue = MOM.newDestination("test/mom/testSubscribeFailover", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
+    m_disposables.add(MOM.registerMarshaller(JmsTestMom.class, queue, BEANS.get(ObjectMarshaller.class)));
+
+    final CountDownLatch message1CountDown = new CountDownLatch(1);
+    final CountDownLatch message2CountDown = new CountDownLatch(2);
+
+    // Register transactional subscriber
+    ISubscription subs;
+    m_disposables.add(subs = MOM.subscribe(JmsTestMom.class, queue,
+        new IMessageListener<String>() {
+          @Override
+          public void onMessage(IMessage<String> message) {
+            message1CountDown.countDown();
+            message2CountDown.countDown();
+          }
+        },
+        MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO)));
+
+    // Publish first message
+    MOM.publish(JmsTestMom.class, queue, "message-1", MOM.newPublishInput());
+    message1CountDown.await();
+
+    //3*2+1 failures triggers one error log message after 3*2 retries but continues trying
+    CountDownLatch failureCount = new CountDownLatch(3 * 2 + 1);
+    mom.simulateConnectionDown(failureCount);
+    failureCount.await();
+
+    // Publish second message after connection failover
+    MOM.publish(JmsTestMom.class, queue, "message-2", MOM.newPublishInput());
+    message2CountDown.await();
+
+    //the stats reflect events after reconnect
+    ISubscriptionStats stats = ((JmsSubscription) subs).getStats();
+    assertEquals(0, stats.receivedErrors());
+    assertEquals(1, stats.receivedMessages());
+    assertEquals(1, stats.receivedNonNullMessages());
+  }
+
   private static class SomethingWrongException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
@@ -2099,4 +2195,50 @@ public class JmsMomImplementorTest {
       return env;
     }
   }
+
+  @IgnoreBean
+  @Replace
+  public static class JmsTestMomWithConnectionFailover extends JmsTestMom {
+    private ICreateJmsConnection m_oldCF;
+
+    public JmsTestMomWithConnectionFailover(AbstractJmsEnvironmentTestParameter parameter) {
+      super(parameter);
+    }
+
+    @Override
+    protected IMomImplementor initDelegate() throws Exception {
+      IMomImplementor impl = super.initDelegate();
+      m_oldCF = ((JmsMomImplementor) impl).m_connectionWrapper.getConnectionFunction();
+      return impl;
+    }
+
+    @Override
+    protected Map<Object, Object> lookupEnvironment() {
+      Map<Object, Object> env = super.lookupEnvironment();
+      env.put(IMomImplementor.CONNECTION_RETRY_COUNT, 5);
+      env.put(IMomImplementor.CONNECTION_RETRY_INTERVAL_MILLIS, 1000);
+      env.put(IMomImplementor.SESSION_RETRY_INTERVAL_MILLIS, 2000);
+      return env;
+    }
+
+    public void simulateConnectionDown(final CountDownLatch failingCount) {
+      System.out.println("simulateConnectionDown");
+      final JmsMomImplementor impl = (JmsMomImplementor) getImplementor();
+      impl.m_connectionWrapper.withConnectionFunction(new ICreateJmsConnection() {
+        @Override
+        public Connection create() throws JMSException {
+          failingCount.countDown();
+          if (failingCount.getCount() > 0) {
+            throw new JMSException("JUnit fixture: no connection");
+          }
+          if (failingCount.getCount() == 0) {
+            System.out.println("simulateConnectionUp");
+          }
+          return m_oldCF.create();
+        }
+      });
+      impl.m_connectionWrapper.invalidate(new JMSException("JUnit fixture: connection failed"));
+    }
+  }
+
 }

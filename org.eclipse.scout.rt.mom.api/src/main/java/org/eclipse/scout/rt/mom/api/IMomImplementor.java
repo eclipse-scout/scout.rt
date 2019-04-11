@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,6 +68,30 @@ public interface IMomImplementor extends IMom {
    * <b>Value type:</b> {@link IDestination} or {@link String} (parseable by {@link DestinationConfigPropertyParser})
    */
   String REQUEST_REPLY_CANCELLATION_TOPIC = "scout.mom.requestreply.cancellationTopic";
+
+  /**
+   * Property to enable or disable connection failover in the scout mom wrapper.
+   *
+   * @see IMom.ConnectionRetryCountProperty
+   * @since 6.1
+   */
+  String CONNECTION_RETRY_COUNT = "scout.mom.failover.connectionRetryCount";
+
+  /**
+   * Property sets the interval in milliseconds between connection attempts.
+   *
+   * @see IMom.ConnectionRetryIntervalMillisProperty
+   * @since 6.1
+   */
+  String CONNECTION_RETRY_INTERVAL_MILLIS = "scout.mom.failover.connectionRetryIntervalMillis";
+
+  /**
+   * Property sets the interval to wait after a failed session call.
+   *
+   * @see IMom.SessionRetryIntervalMillisProperty
+   * @since 6.1
+   */
+  String SESSION_RETRY_INTERVAL_MILLIS = "scout.mom.failover.sessionRetryIntervalMillis";
 
   /**
    * Initializes this implementor, e.g. to connect to the environment as specified by the given properties.
