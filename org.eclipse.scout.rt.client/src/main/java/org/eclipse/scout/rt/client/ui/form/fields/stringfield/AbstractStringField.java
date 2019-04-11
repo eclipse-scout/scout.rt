@@ -266,6 +266,9 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
       }
       if (validValue.length() > getMaxLength()) {
         validValue = validValue.substring(0, getMaxLength());
+        if (isTrimText()) { // trim again
+          validValue = validValue.trim();
+        }
       }
       if (isFormatUpper()) {
         validValue = validValue.toUpperCase();
@@ -338,7 +341,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   public void setTrimText(boolean b) {
-    propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, b);
+    boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, b);
+    if (b & changed && isInitConfigDone()) {
+      setValue(getValue());
+    }
   }
 
   @Override
@@ -348,7 +354,10 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   @Override
   public void setMultilineText(boolean b) {
-    propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    boolean changed = propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    if (!b & changed && isInitConfigDone()) {
+      setValue(getValue());
+    }
   }
 
   @Override

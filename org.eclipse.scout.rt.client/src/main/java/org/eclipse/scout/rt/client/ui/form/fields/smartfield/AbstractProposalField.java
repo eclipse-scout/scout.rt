@@ -95,7 +95,7 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
   @Override
   public void setTrimText(boolean trimText) {
     boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
-    if (changed && isInitConfigDone()) {
+    if (trimText && changed && isInitConfigDone()) {
       setValue(getValue());
     }
   }
@@ -127,6 +127,15 @@ public abstract class AbstractProposalField<VALUE> extends AbstractSmartField<VA
       }
       if (stringValue.length() > getMaxLength()) {
         stringValue = stringValue.substring(0, getMaxLength());
+        if (isTrimText()) { // trim again
+          stringValue = stringValue.trim();
+        }
+      }
+      if (!isMultilineText()) {
+        // omit leading and trailing newlines
+        stringValue = StringUtility.trimNewLines(stringValue);
+        // replace newlines by spaces
+        stringValue = stringValue.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
       }
       validValue = (VALUE) StringUtility.nullIfEmpty(stringValue);
     }
