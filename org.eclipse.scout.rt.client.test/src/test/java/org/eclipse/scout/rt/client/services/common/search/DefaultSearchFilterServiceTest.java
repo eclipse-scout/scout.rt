@@ -59,9 +59,11 @@ import org.junit.runner.RunWith;
 @RunWithSubject("default")
 @RunWithClientSession(TestEnvironmentClientSession.class)
 public class DefaultSearchFilterServiceTest {
+
+  private static final String LABEL = "Label";
+
   private DefaultSearchFilterService m_searchFilterService;
   private SearchFilter m_searchFilter;
-  private static String LABEL = "Label";
 
   @Before
   public void setUp() {
@@ -142,6 +144,43 @@ public class DefaultSearchFilterServiceTest {
   }
 
   @Test
+  public void testUncheckedBooleanField() {
+    AbstractBooleanField booleanField = new MyBooleanField();
+    booleanField.init();
+    runBasicAsserts(booleanField);
+    booleanField.setChecked(true);
+
+    AbstractStringField stringField = new MyStringField();
+    stringField.init();
+    runBasicAsserts(stringField);
+    stringField.setValue("value");
+
+    AbstractStringField stringField2 = new MyStringField();
+    stringField2.init();
+    runBasicAsserts(stringField2);
+    stringField2.setValue("value2");
+
+    // Checked
+    m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
+    m_searchFilterService.applySearchDelegate(booleanField, m_searchFilter, false);
+    m_searchFilterService.applySearchDelegate(stringField2, m_searchFilter, false);
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText() + "\n" +
+        LABEL + "\n" + // <--
+        LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
+        m_searchFilter.getDisplayTextsPlain());
+
+    // Unchecked --> not contained in output
+    booleanField.setChecked(false);
+    m_searchFilter.clear();
+    m_searchFilterService.applySearchDelegate(stringField, m_searchFilter, false);
+    m_searchFilterService.applySearchDelegate(booleanField, m_searchFilter, false);
+    m_searchFilterService.applySearchDelegate(stringField2, m_searchFilter, false);
+    Assert.assertEquals(LABEL + " " + TEXTS.get("LogicLike") + " " + stringField.getDisplayText() + "\n" +
+        LABEL + " " + TEXTS.get("LogicLike") + " " + stringField2.getDisplayText(),
+        m_searchFilter.getDisplayTextsPlain());
+  }
+
+  @Test
   public void testRadioButtonGroup() {
     MyRadioButtonGroup radioButtonGroup = new MyRadioButtonGroup();
     radioButtonGroup.init();
@@ -149,6 +188,25 @@ public class DefaultSearchFilterServiceTest {
     radioButtonGroup.setValue(1L);
     m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
     Assert.assertEquals(LABEL + " = " + radioButtonGroup.getRadioButton1().getLabel(), m_searchFilter.getDisplayTextsPlain());
+
+    // Without radio button group label
+    m_searchFilter.clear();
+    radioButtonGroup.setLabel(null);
+    m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
+    Assert.assertEquals(radioButtonGroup.getRadioButton1().getLabel(), m_searchFilter.getDisplayTextsPlain());
+    radioButtonGroup.setLabel(LABEL);
+
+    // Without radio button label
+    m_searchFilter.clear();
+    radioButtonGroup.getRadioButton1().setLabel(null);
+    m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
+    Assert.assertEquals(LABEL, m_searchFilter.getDisplayTextsPlain());
+
+    // Without radio button group label and without radio button label
+    m_searchFilter.clear();
+    radioButtonGroup.setLabel(null);
+    m_searchFilterService.applySearchDelegate(radioButtonGroup, m_searchFilter, false);
+    Assert.assertEquals("", m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
@@ -159,6 +217,12 @@ public class DefaultSearchFilterServiceTest {
     field.setValue(1L);
     m_searchFilterService.applySearchDelegate(field, m_searchFilter, false);
     Assert.assertEquals(LABEL + " " + TEXTS.get("LogicEQ") + " " + field.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
+
+    // Without label
+    m_searchFilter.clear();
+    field.setLabel(null);
+    m_searchFilterService.applySearchDelegate(field, m_searchFilter, false);
+    Assert.assertEquals(field.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
 
   @Test
