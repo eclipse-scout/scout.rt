@@ -104,5 +104,57 @@ public class AbstractStringFieldTest extends AbstractStringField {
     setMaxLength(9);
     setValue("the clown has a red nose");
     assertEquals("the clown", getValue());
+    setMaxLength(4);
+    assertEquals("the", getValue());
+  }
+
+  @Test
+  public void testTrimText() {
+    setMultilineText(true);
+
+    setTrimText(true);
+    setValue("  a  b  ");
+    assertEquals("a  b", getValue());
+    setValue("\n  a \n b  \n");
+    assertEquals("a \n b", getValue());
+    setValue(null);
+    assertEquals(null, getValue());
+
+    setTrimText(false);
+    setValue("  a  b  ");
+    assertEquals("  a  b  ", getValue());
+    setValue("\n  a \n b  \n");
+    assertEquals("\n  a \n b  \n", getValue());
+    setValue(null);
+    assertEquals(null, getValue());
+
+    // set value
+    setValue("  a  b  ");
+    assertEquals("  a  b  ", getValue());
+    setTrimText(true);
+    assertEquals("a  b", getValue());
+  }
+
+  @Test
+  public void testMultilineText() {
+    setMultilineText(false);
+
+    setValue("a\n\nb");
+    assertEquals("a  b", getValue());
+    setValue(null);
+    assertEquals(null, getValue());
+
+    setMultilineText(true);
+    setValue("a\n\nb");
+    assertEquals("a\n\nb", getValue());
+    setValue(null);
+    assertEquals(null, getValue());
+
+    // set value
+    setMultilineText(true);
+    setValue("a\nb");
+    assertEquals("a\nb", getValue());
+    setMultilineText(false);
+    assertEquals("a b", getValue());
   }
 }
