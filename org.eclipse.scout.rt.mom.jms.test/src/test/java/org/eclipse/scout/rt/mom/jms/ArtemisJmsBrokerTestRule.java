@@ -8,6 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
 import java.io.IOException;
@@ -111,6 +121,7 @@ public class ArtemisJmsBrokerTestRule extends ExternalResource {
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testConcurrentMessageConsumption"));
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testPublishAndConsumeInternal"));
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testSubscribeTransactional"));
+    config.addQueueConfiguration(createQueue("jms.queue.test/mom/testSubscribeFailover"));
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testQueuePublishFirst"));
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testPublishJsonData"));
     config.addQueueConfiguration(createQueue("jms.queue.test/mom/testPublishJsonDataSecure"));
