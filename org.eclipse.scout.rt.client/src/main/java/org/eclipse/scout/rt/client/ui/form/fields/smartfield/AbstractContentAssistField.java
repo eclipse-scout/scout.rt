@@ -598,7 +598,10 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
 
   @Override
   public void setMultilineText(boolean b) {
-    propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    boolean changed = propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    if (!b & changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override
