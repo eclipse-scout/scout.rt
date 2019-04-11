@@ -18,7 +18,7 @@
 .year-panel-title {
   position: relative;
   margin-left: 10px;
-  width: calc(~'100%' - 40px);
+  width: calc(~'100% - 40px');
   height: @calendar-title-height;
   white-space: nowrap;
 
@@ -55,7 +55,7 @@
   position: relative;
   width: 180px;
   margin-left: 10px;
-  height: calc(~'100%' -  @calendar-title-height);
+  height: calc(~'100% - ' @calendar-title-height);
   overflow: hidden;
 
   & > .year-month {
@@ -112,7 +112,7 @@
     position: absolute;
     bottom: 0;
     right: 19px;
-    height: calc(~'100%' -  20px);
+    height: calc(~'100% - 20px');
     width: 26%;
     content: '';
     background-color: @year-panel-weekend-background-color;

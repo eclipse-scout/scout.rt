@@ -52,7 +52,7 @@
 }
 
 .group-box-title {
-  width: calc(~'100%' - @mandatory-indicator-width);
+  width: calc(~'100% - ' @mandatory-indicator-width);
   margin-top: @group-box-title-margin-top;
   margin-left: @mandatory-indicator-width;
   border-bottom: @group-box-title-border-width solid @group-box-title-border-color;
@@ -107,7 +107,7 @@
     font-weight: bold;
     color: @title-color;
     #scout.overflow-ellipsis();
-    max-width: calc(~'100%' - @group-box-control-width);
+    max-width: calc(~'100% - ' @group-box-control-width);
   }
 
   & > .sub-label {

@@ -200,7 +200,7 @@
   padding-left: 4px;
   #scout.overflow-ellipsis();
   min-height: 20px;
-  width: calc(~'100%' - @calendar-component-margin-left);
+  width: calc(~'100% - ' @calendar-component-margin-left);
   border-left: 4px solid;
   text-align: left;
   color: @calendar-component-color;
@@ -277,7 +277,7 @@
   & > .calendar-component {
     cursor: pointer;
     height: auto;
-    width: calc(~'100%' - 10px);
+    width: calc(~'100% - 10px');
     background-color: transparent !important; /* NOSONAR (required to override original component background color) */
     margin-top: 12px;
     color: @text-color;
@@ -286,7 +286,7 @@
 
 .calendar-list-title {
   position: relative;
-  width: calc(~'100%' - 10px);
+  width: calc(~'100% - 10px');
   height: @calendar-title-height;
   line-height: @calendar-title-height;
   font-weight: bold;
@@ -323,7 +323,7 @@
 
 .calendar-week {
   position: relative;
-  height: calc(~'(100%' - @calendar-title-height ~') / 6');
+  height: calc(~'(100% - ' @calendar-title-height ~') / 6');
 }
 
 .calendar-week-name {
@@ -425,7 +425,7 @@
         content: '';
         width: 16px;
         height: 16px;
-        left: calc(~'50%' - 8px);
+        left: calc(~'50% - 8px');
         top: -8px;
         transform: rotate(45deg);
         background-color: @background-color;
@@ -441,7 +441,7 @@
         content: '';
         width: 16px;
         height: 16px;
-        left: calc(~'50%' - 8px);
+        left: calc(~'50% - 8px');
         bottom: -8px;
         transform: rotate(45deg);
         background-color: inherit;
@@ -500,7 +500,7 @@
 .calendar-week-axis {
   position: absolute;
   left: @calendar-week-name-width - 6px;
-  width: calc(~'100%' - 8px);
+  width: calc(~'100% - 8px');
 }
 
 .calendar-week-axis::after {
