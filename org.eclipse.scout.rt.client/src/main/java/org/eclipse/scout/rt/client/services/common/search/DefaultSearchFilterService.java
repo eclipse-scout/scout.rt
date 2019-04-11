@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.internal.ComposerDisplayTextBuilder;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
@@ -48,7 +48,8 @@ public class DefaultSearchFilterService implements ISearchFilterService {
         label = range.getInitialLabel() + (StringUtility.isNullOrEmpty(label) ? "" : " " + label);
       }
     }
-    //
+    label = StringUtility.nullIfEmpty(label);
+
     //composer
     if (field instanceof AbstractComposerField) {
       AbstractComposerField composerField = (AbstractComposerField) field;
@@ -67,7 +68,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractListBox<?>) {
       AbstractListBox<?> valueField = (AbstractListBox<?>) field;
       if (!valueField.getValue().isEmpty()) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
+        search.addDisplayText(StringUtility.box("", label, " " + ScoutTexts.get("LogicIn") + " ") + valueField.getDisplayText());
       }
       return;
     }
@@ -75,7 +76,7 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractTreeBox<?>) {
       AbstractTreeBox<?> valueField = (AbstractTreeBox<?>) field;
       if (!valueField.getValue().isEmpty()) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicIn") + " " + valueField.getDisplayText());
+        search.addDisplayText(StringUtility.box("", label, " " + ScoutTexts.get("LogicIn") + " ") + valueField.getDisplayText());
       }
       return;
     }
@@ -83,14 +84,14 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractStringField || field instanceof AbstractHtmlField || field instanceof AbstractLabelField) {
       AbstractValueField<?> valueField = (AbstractValueField<?>) field;
       if (valueField.getValue() != null) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicLike") + " " + valueField.getDisplayText());
+        search.addDisplayText(StringUtility.box("", label, " " + ScoutTexts.get("LogicLike") + " ") + valueField.getDisplayText());
       }
       return;
     }
     //boolean field
     if (field instanceof AbstractBooleanField) {
       AbstractBooleanField valueField = (AbstractBooleanField) field;
-      if (valueField.getValue() != null && valueField.getValue()) {
+      if (valueField.getValue() != null && valueField.getValue() && label != null) {
         search.addDisplayText(label);
       }
       return;
@@ -99,8 +100,16 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractRadioButtonGroup<?>) {
       AbstractRadioButtonGroup<?> valueField = (AbstractRadioButtonGroup<?>) field;
       if (valueField.getValue() != null) {
-        IButton selectedButton = valueField.getSelectedButton();
-        search.addDisplayText(label + " = " + (selectedButton != null ? selectedButton.getLabel() : ""));
+        IRadioButton<?> selectedButton = valueField.getSelectedButton();
+        String valueLabel = (selectedButton != null ? selectedButton.getLabel() : null);
+        if (valueLabel == null) {
+          if (label != null) {
+            search.addDisplayText(label);
+          }
+        }
+        else {
+          search.addDisplayText(StringUtility.box("", label, " = ") + valueLabel);
+        }
       }
       return;
     }
@@ -108,10 +117,11 @@ public class DefaultSearchFilterService implements ISearchFilterService {
     if (field instanceof AbstractValueField<?>) {
       AbstractValueField<?> valueField = (AbstractValueField<?>) field;
       if (valueField.getValue() != null) {
-        search.addDisplayText(label + " " + ScoutTexts.get("LogicEQ") + " " + valueField.getDisplayText());
+        search.addDisplayText(StringUtility.box("", label, " " + ScoutTexts.get("LogicEQ") + " ") + valueField.getDisplayText());
       }
       return;
     }
+
     if (includeChildren) {
       applySearchDelegateForChildren(field, search);
     }
@@ -124,5 +134,4 @@ public class DefaultSearchFilterService implements ISearchFilterService {
       }
     }
   }
-
 }
