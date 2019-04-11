@@ -243,6 +243,77 @@ public class ProposalFieldTest {
     assertEquals(null, m_proposalField.getValueAsLookupKey());
   }
 
+  @Test
+  public void testMaxLength() {
+    int initialMaxLength = m_proposalField.getMaxLength();
+    assertEquals(m_proposalField.getConfiguredMaxLength(), initialMaxLength);
+    m_proposalField.setMaxLength(1234);
+    assertEquals(1234, m_proposalField.getMaxLength());
+    m_proposalField.setMaxLength(0);
+    assertEquals(0, m_proposalField.getMaxLength());
+    m_proposalField.setMaxLength(-2);
+    assertEquals(0, m_proposalField.getMaxLength());
+
+    // set value
+    m_proposalField.setValue("the clown has a red nose");
+    assertEquals(null, m_proposalField.getValue());
+    m_proposalField.setMaxLength(9);
+    m_proposalField.setValue("the clown has a red nose");
+    assertEquals("the clown", m_proposalField.getValue());
+    m_proposalField.setMaxLength(4);
+    assertEquals("the", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testTrimText() {
+    m_proposalField.setMultilineText(true);
+
+    m_proposalField.setTrimText(true);
+    m_proposalField.setValue("  a  b  ");
+    assertEquals("a  b", m_proposalField.getValue());
+    m_proposalField.setValue("\n  a \n b  \n");
+    assertEquals("a \n b", m_proposalField.getValue());
+    m_proposalField.setValue(null);
+    assertEquals(null, m_proposalField.getValue());
+
+    m_proposalField.setTrimText(false);
+    m_proposalField.setValue("  a  b  ");
+    assertEquals("  a  b  ", m_proposalField.getValue());
+    m_proposalField.setValue("\n  a \n b  \n");
+    assertEquals("\n  a \n b  \n", m_proposalField.getValue());
+    m_proposalField.setValue(null);
+    assertEquals(null, m_proposalField.getValue());
+
+    // set value
+    m_proposalField.setValue("  a  b  ");
+    assertEquals("  a  b  ", m_proposalField.getValue());
+    m_proposalField.setTrimText(true);
+    assertEquals("a  b", m_proposalField.getValue());
+  }
+
+  @Test
+  public void testMultilineText() {
+    m_proposalField.setMultilineText(false);
+
+    m_proposalField.setValue("a\n\nb");
+    assertEquals("a  b", m_proposalField.getValue());
+    m_proposalField.setValue(null);
+    assertEquals(null, m_proposalField.getValue());
+
+    m_proposalField.setMultilineText(true);
+    m_proposalField.setValue("a\n\nb");
+    assertEquals("a\n\nb", m_proposalField.getValue());
+    m_proposalField.setValue(null);
+    assertEquals(null, m_proposalField.getValue());
+
+    // set value
+    m_proposalField.setMultilineText(true);
+    m_proposalField.setValue("a\nb");
+    assertEquals("a\nb", m_proposalField.getValue());
+    m_proposalField.setMultilineText(false);
+    assertEquals("a b", m_proposalField.getValue());
+  }
+
   int getProposalTableRowCount() {
     return ((ITable) m_proposalField.getProposalChooser().getModel()).getRowCount();
   }

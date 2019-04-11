@@ -464,7 +464,10 @@ public abstract class AbstractSmartField2<VALUE> extends AbstractValueField<VALU
 
   @Override
   public void setMultilineText(boolean b) {
-    propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    boolean changed = propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+    if (!b & changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override

@@ -82,7 +82,10 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
 
   @Override
   public void setMaxLength(int maxLength) {
-    propertySupport.setPropertyInt(PROP_MAX_LENGTH, maxLength);
+    boolean changed = propertySupport.setPropertyInt(PROP_MAX_LENGTH, Math.max(0, maxLength));
+    if (changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override
@@ -92,7 +95,10 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
 
   @Override
   public void setTrimText(boolean trimText) {
-    propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
+    boolean changed = propertySupport.setPropertyBool(PROP_TRIM_TEXT_ON_VALIDATE, trimText);
+    if (trimText && changed && isInitialized()) {
+      setValue(getValue());
+    }
   }
 
   @Override
@@ -127,6 +133,15 @@ public abstract class AbstractProposalField2<VALUE> extends AbstractSmartField2<
       }
       if (stringValue.length() > getMaxLength()) {
         stringValue = stringValue.substring(0, getMaxLength());
+        if (isTrimText()) { // trim again
+          stringValue = stringValue.trim();
+        }
+      }
+      if (!isMultilineText()) {
+        // omit leading and trailing newlines
+        stringValue = StringUtility.trimNewLines(stringValue);
+        // replace newlines by spaces
+        stringValue = stringValue.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
       }
       validValue = (VALUE) StringUtility.nullIfEmpty(stringValue);
     }

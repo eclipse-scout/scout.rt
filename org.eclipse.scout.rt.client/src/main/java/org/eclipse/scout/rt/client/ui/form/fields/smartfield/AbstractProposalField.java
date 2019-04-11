@@ -164,6 +164,15 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
       }
       if (validValue.length() > getMaxLength()) {
         validValue = validValue.substring(0, getMaxLength());
+        if (isTrimText()) { // trim again
+          validValue = validValue.trim();
+        }
+      }
+      if (validValue != null && !isMultilineText()) {
+        // omit leading and trailing newlines
+        validValue = StringUtility.trimNewLines(validValue);
+        // replace newlines by spaces
+        validValue = validValue.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
       }
     }
     return StringUtility.nullIfEmpty(validValue);
