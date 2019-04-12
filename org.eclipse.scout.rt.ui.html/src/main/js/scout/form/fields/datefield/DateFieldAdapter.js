@@ -46,9 +46,9 @@ scout.DateFieldAdapter.prototype._attachWidget = function() {
  */
 scout.DateFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
   var data = {
-      displayText: this.widget.displayText,
-      errorStatus: this.widget.errorStatus
-    };
+    displayText: this.widget.displayText,
+    errorStatus: this.widget.errorStatus
+  };
   // In case of an error, the value is still the old, valid value -> don't send it
   if (!this.widget.errorStatus) {
     data.value = scout.dates.toJsonDate(this.widget.value);

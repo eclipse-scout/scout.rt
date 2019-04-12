@@ -1185,7 +1185,6 @@ scout.Widget.prototype._beforeDetach = function(parent) {
   }
 };
 
-
 scout.Widget.prototype._triggerChildrenOnDetach = function() {
   this.children.forEach(function(child) {
     child._onDetach();
@@ -1214,12 +1213,11 @@ scout.Widget.prototype._renderOnDetach = function() {
  */
 scout.Widget.prototype._detach = function() {};
 
-
-scout.Widget.prototype._uninstallFocusContext = function(){
+scout.Widget.prototype._uninstallFocusContext = function() {
   // NOP
 };
 
-scout.Widget.prototype._installFocusContext = function(){
+scout.Widget.prototype._installFocusContext = function() {
   // NOP
 };
 

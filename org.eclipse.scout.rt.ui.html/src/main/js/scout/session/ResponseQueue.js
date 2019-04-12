@@ -132,15 +132,14 @@ scout.ResponseQueue.prototype._checkTimeout = function() {
         }
         s += ']';
         this.session.sendLogRequest('Expected response #' + this.nextExpectedSequenceNo + ' still missing after ' +
-            scout.ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + s);
+          scout.ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + s);
       } catch (error) {
         // nop
       }
       this.force = true;
       try {
         this.process();
-      }
-      finally {
+      } finally {
         this.force = false;
         this.forceTimeoutId = null;
       }

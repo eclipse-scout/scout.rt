@@ -57,8 +57,8 @@ scout.TableRow.prototype._initCells = function() {
 
 scout.TableRow.prototype.animateExpansion = function() {
   var $row = this.$row,
-  $rowControl;
-  if(!$row){
+    $rowControl;
+  if (!$row) {
     return;
   }
   $rowControl = $row.find('.table-row-control');

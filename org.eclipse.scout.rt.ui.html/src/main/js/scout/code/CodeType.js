@@ -94,7 +94,7 @@ scout.CodeType.prototype.getCodes = function(rootOnly) {
  * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
  */
 scout.CodeType.prototype.visit = function(visitor) {
-  var codes =  this.codes.filter(function(code) {
+  var codes = this.codes.filter(function(code) {
     // Only consider root codes
     return !code.parent;
   });

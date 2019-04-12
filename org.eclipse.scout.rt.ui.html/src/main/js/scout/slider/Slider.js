@@ -97,4 +97,3 @@ scout.Slider.prototype._onValueChange = function(event) {
 scout.Slider.prototype.setValue = function(value) {
   this.setProperty('value', value);
 };
-

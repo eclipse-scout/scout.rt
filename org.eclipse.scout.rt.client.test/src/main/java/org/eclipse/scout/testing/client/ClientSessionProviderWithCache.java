@@ -88,8 +88,8 @@ public class ClientSessionProviderWithCache extends ClientSessionProvider {
    *
    * @param sessionId
    *          unique session ID to identify the cached session. If <code>null</code>, the context's {@link Subject} is
-   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a random
-   *          UUID if <code>null</code>.
+   *          used for identification. On cache miss, this <em>sessionId</em> is used to create a new session, or a
+   *          random UUID if <code>null</code>.
    * @param clientRunContext
    *          applied during session start, and to get the session's {@link Subject}.
    * @return session found in cache, or a new session on cache miss.

@@ -79,7 +79,6 @@ scout.focusUtils = {
     return $element.text().trim().length > 0;
   },
 
-
   /**
    * Returns true if the given HTML element is the active element in its own document, false otherwise
    * @param element

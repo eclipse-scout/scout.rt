@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 scout.BenchRowLayoutData = function(model) {
-  this.rows = [null,null,null];
+  this.rows = [null, null, null];
   scout.BenchRowLayoutData.parent.call(this, model);
 
   this._ensureRows();
@@ -17,21 +17,19 @@ scout.BenchRowLayoutData = function(model) {
 
 scout.inherits(scout.BenchRowLayoutData, scout.FlexboxLayoutData);
 
-scout.BenchRowLayoutData.prototype.getRows = function(){
+scout.BenchRowLayoutData.prototype.getRows = function() {
   return this.rows;
 };
 
 scout.BenchRowLayoutData.prototype._ensureRows = function() {
-  this.rows = this.rows.map(function(row,i){
-    return new scout.FlexboxLayoutData(row).withOrder(i*2);
+  this.rows = this.rows.map(function(row, i) {
+    return new scout.FlexboxLayoutData(row).withOrder(i * 2);
   });
 };
 
-
 scout.BenchRowLayoutData.prototype.updateVisibilities = function(rows) {
-  rows.forEach(function(row, index){
+  rows.forEach(function(row, index) {
     this.rows[index].visible = row.rendered;
 
   }.bind(this));
 };
-

@@ -124,4 +124,3 @@ scout.CompactTree.prototype._renderExpansion = function(node) {
 scout.CompactTree.prototype._updateItemPath = function() {
   // nop (not supported by CompactTree)
 };
-

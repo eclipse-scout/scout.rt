@@ -164,19 +164,19 @@ scout.RadioButtonGroup.prototype.getFields = function() {
  */
 scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
   var treeVisitResult = scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
-  if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+  if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
     return scout.TreeVisitResult.TERMINATE;
   }
 
-  if(treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE){
+  if (treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE) {
     return;
   }
 
   var fields = this.getFields();
-  for(var i = 0; i < fields.length; i++){
+  for (var i = 0; i < fields.length; i++) {
     var field = fields[i];
     treeVisitResult = field.visitFields(visitor);
-    if(treeVisitResult === scout.TreeVisitResult.TERMINATE){
+    if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
       return scout.TreeVisitResult.TERMINATE;
     }
   }

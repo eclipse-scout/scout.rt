@@ -202,7 +202,7 @@ scout.ViewMenuTab.prototype.sendToBack = function() {
 };
 
 scout.ViewMenuTab.prototype.bringToFront = function() {
- // NOP
+  // NOP
 };
 
 scout.ViewMenuTab.prototype.onViewButtonSelected = function() {

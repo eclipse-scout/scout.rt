@@ -139,7 +139,7 @@ scout.WizardProgressField.prototype._updateStepClasses = function(step) {
   var stepIndex = this.steps.indexOf(step);
   var activeStepIndex = this.steps.indexOf(this.stepsMap[this.activeStepIndex]);
 
-  if (this.enabledComputed && step.enabled && step.actionEnabled &&  stepIndex !== this.activeStepIndex) {
+  if (this.enabledComputed && step.enabled && step.actionEnabled && stepIndex !== this.activeStepIndex) {
     $step.addClass('action-enabled');
     $step.on('click', this._onStepClick.bind(this));
   } else if (!this.enabledComputed || !step.enabled) {

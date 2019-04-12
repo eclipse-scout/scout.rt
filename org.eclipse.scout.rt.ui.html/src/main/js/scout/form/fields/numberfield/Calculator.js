@@ -113,4 +113,3 @@ scout.Calculator.prototype._group = function() {
   }
   return undefined;
 };
-

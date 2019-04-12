@@ -639,8 +639,8 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   /**
-   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call any
-   * further chain elements.
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
    */
   protected static class LocalCodeTypeWithGenericExtension<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>, OWNER extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>> extends AbstractSerializableExtension<OWNER>
       implements ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, OWNER> {

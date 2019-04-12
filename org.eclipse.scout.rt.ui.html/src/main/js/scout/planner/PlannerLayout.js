@@ -140,18 +140,24 @@ scout.PlannerLayout.prototype._minWidth = function() {
     numScaleItemsLarge = $scaleItemsLarge.length,
     numScaleItemsSmall = $scaleItemsSmall.length,
     displayMode = scout.Planner.DisplayMode,
-    cellInsets = scout.graphics.insets($scaleItemsSmall, {includeBorder: false}),
-    minWidth = numScaleItemsSmall*cellInsets.horizontal(); //no matter what, this width must never be deceeded
+    cellInsets = scout.graphics.insets($scaleItemsSmall, {
+      includeBorder: false
+    }),
+    minWidth = numScaleItemsSmall * cellInsets.horizontal(); //no matter what, this width must never be deceeded
 
   if (this.planner.displayMode === displayMode.DAY) {
     return Math.max(minWidth, numScaleItemsLarge * 52);
-  } if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
+  }
+  if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
     return Math.max(minWidth, numScaleItemsLarge * 160);
-  } if (this.planner.displayMode === displayMode.MONTH) {
+  }
+  if (this.planner.displayMode === displayMode.MONTH) {
     return Math.max(minWidth, numScaleItemsSmall * 23);
-  } if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
+  }
+  if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
     return Math.max(minWidth, numScaleItemsSmall * 23);
-  } if (this.planner.displayMode === displayMode.YEAR) {
+  }
+  if (this.planner.displayMode === displayMode.YEAR) {
     return Math.max(minWidth, numScaleItemsSmall * 90);
   }
 };

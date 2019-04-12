@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Abstract default implementation of a JAX-RS REST {@link ExceptionMapper}.
  * <p>
- * <b>NOTE:</b> Use {@link #notifyTransaction(Exception)} method to notify the Scout transaction before the exception
- * is mapped into a {@link Response} object and discarded as exception. If the Scout transaction is not notified about
- * the failure, the transaction will be committed afterwards.
+ * <b>NOTE:</b> Use {@link #notifyTransaction(Exception)} method to notify the Scout transaction before the exception is
+ * mapped into a {@link Response} object and discarded as exception. If the Scout transaction is not notified about the
+ * failure, the transaction will be committed afterwards.
  */
 @Bean
 public abstract class AbstractExceptionMapper<E extends Throwable> implements ExceptionMapper<E> {
@@ -46,8 +46,8 @@ public abstract class AbstractExceptionMapper<E extends Throwable> implements Ex
   /**
    * Maps an exception to a {@link Response}.
    * <p>
-   * <b>NOTE:</b> The returned {@link Response} instance should contain a {@link ErrorResponse} entity providing
-   * further error information. Otherwise, clients relying on the entity would fail.
+   * <b>NOTE:</b> The returned {@link Response} instance should contain a {@link ErrorResponse} entity providing further
+   * error information. Otherwise, clients relying on the entity would fail.
    *
    * @param exception
    *          the exception to map to a response.

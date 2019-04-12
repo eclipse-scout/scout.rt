@@ -484,7 +484,7 @@ scout.Device.prototype.supportsPassiveEventListener = function() {
       });
       window.addEventListener('test', options, options);
       window.removeEventListener('test', options, options);
-    } catch(err) {
+    } catch (err) {
       passiveSupported = false;
     }
     return passiveSupported;

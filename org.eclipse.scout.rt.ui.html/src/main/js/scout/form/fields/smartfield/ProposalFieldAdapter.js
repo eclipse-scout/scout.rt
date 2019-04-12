@@ -14,5 +14,3 @@ scout.ProposalFieldAdapter = function() {
   this._addRemoteProperties(['lookupRows']);
 };
 scout.inherits(scout.ProposalFieldAdapter, scout.SmartFieldAdapter);
-
-

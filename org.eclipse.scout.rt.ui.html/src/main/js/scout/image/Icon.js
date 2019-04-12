@@ -100,7 +100,7 @@ scout.Icon.prototype._renderImageIcon = function() {
     this.trigger(event.type, event);
   }.bind(this));
   this.$container = this.image.$container;
-  this.htmlComp =  this.image.htmlComp;
+  this.htmlComp = this.image.htmlComp;
 };
 
 scout.Icon.prototype._removeImageIcon = function() {

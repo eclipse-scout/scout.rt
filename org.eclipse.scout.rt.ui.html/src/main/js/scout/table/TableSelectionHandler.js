@@ -195,7 +195,8 @@ scout.TableSelectionHandler.prototype.getMinMaxSelectionIndizes = function() {
     return [-1, -1];
   }
 
-  var min = -1, max = -1;
+  var min = -1,
+    max = -1;
   selectedRows.forEach(function(row) {
     var index = allRows.indexOf(row);
     if (min === -1 || index < min) {

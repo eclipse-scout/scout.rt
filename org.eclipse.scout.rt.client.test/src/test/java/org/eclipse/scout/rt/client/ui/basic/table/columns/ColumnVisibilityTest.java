@@ -50,8 +50,8 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
-   * of {@link AbstractTable}.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
+   * execInitTable of {@link AbstractTable}.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue() throws Exception {
@@ -78,8 +78,8 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
-   * of {@link AbstractTable}. In addition the column's preferences are set to invisible.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
+   * execInitTable of {@link AbstractTable}. In addition the column's preferences are set to invisible.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleFalse() throws Exception {
@@ -116,9 +116,9 @@ public class ColumnVisibilityTest {
   }
 
   /**
-   * Column that is configured displayable and that is set to not-displayable and back to displayable in the execInitTable
-   * of {@link AbstractTable}. In addition the column's preferences are set to visible but visible granted is set to
-   * false.
+   * Column that is configured displayable and that is set to not-displayable and back to displayable in the
+   * execInitTable of {@link AbstractTable}. In addition the column's preferences are set to visible but visible granted
+   * is set to false.
    */
   @Test
   public void test_displayable_configuredTrue_initFalseTrue_uiPrefsVisibleTrueVisibleGrantedFalse() throws Exception {

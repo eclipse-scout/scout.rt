@@ -57,7 +57,7 @@ scout.styles = {
       scout.styles.element = elem;
     }
     elem.className = cssClass;
-    if(additionalClass) {
+    if (additionalClass) {
       elem.className += ' ' + additionalClass;
     }
     var computedStyle = window.getComputedStyle(elem);
@@ -259,7 +259,6 @@ scout.styles = {
     style += this.legacyFont(obj, $element, propertyPrefix);
     return style;
   },
-
 
   legacyForegroundColor: function(obj, $element, propertyPrefix) {
     propertyPrefix = propertyPrefix || '';

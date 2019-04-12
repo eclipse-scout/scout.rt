@@ -317,4 +317,3 @@ scout.MessageBox.prototype._detach = function() {
   this.$container.detach();
   scout.MessageBox.parent.prototype._detach.call(this);
 };
-

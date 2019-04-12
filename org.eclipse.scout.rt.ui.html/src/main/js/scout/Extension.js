@@ -34,8 +34,7 @@
  *
  *   extended: is the extended or original object.
  */
-scout.Extension = function() {
-};
+scout.Extension = function() {};
 
 scout.Extension.prototype.extend = function(extended, funcName) {
   var origFunc = extended[funcName];
@@ -59,4 +58,3 @@ scout.Extension.install = function(extensions) {
     scout.create(ext);
   });
 };
-

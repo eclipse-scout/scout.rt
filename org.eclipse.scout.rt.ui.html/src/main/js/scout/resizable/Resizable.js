@@ -108,12 +108,12 @@ scout.Resizable.prototype._onMousemove = function(event) {
 
   if (ctx.axis.indexOf('x') > -1) {
     newSize[0] = Math.max(ctx.minSize[0],
-        Math.min(ctx.maxSize[0], ctx.initialSize[0] + distance[0]));
+      Math.min(ctx.maxSize[0], ctx.initialSize[0] + distance[0]));
 
   }
   if (ctx.axis.indexOf('y') > -1) {
     newSize[1] = Math.max(ctx.minSize[1],
-        Math.min(ctx.maxSize[1], ctx.initialSize[1] + distance[1]));
+      Math.min(ctx.maxSize[1], ctx.initialSize[1] + distance[1]));
   }
   $.throttle(this._resizeHandler, scout.Resizable.FPS)(newSize);
 };

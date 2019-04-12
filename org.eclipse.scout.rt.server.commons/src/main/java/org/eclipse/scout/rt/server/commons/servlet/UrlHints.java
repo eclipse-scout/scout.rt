@@ -268,7 +268,8 @@ public class UrlHints implements Serializable {
   }
 
   /**
-   * Static convenience method delegating to {@link UrlHintsHelper#updateHints(HttpServletRequest, HttpServletResponse)}.
+   * Static convenience method delegating to
+   * {@link UrlHintsHelper#updateHints(HttpServletRequest, HttpServletResponse)}.
    */
   public static void updateHints(HttpServletRequest req, HttpServletResponse resp) {
     URL_HINTS_HELPER.get().updateHints(req, resp);

@@ -121,7 +121,7 @@ scout.events = {
       }, 50);
     }
 
-    function removeHandlers () {
+    function removeHandlers() {
       $elem.off('scroll', scrollHandler);
       $elem.document().off('touchend touchcancel', touchEndHandler);
     }

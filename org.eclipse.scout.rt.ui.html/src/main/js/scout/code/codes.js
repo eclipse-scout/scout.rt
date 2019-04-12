@@ -61,7 +61,7 @@ scout.codes = {
       if (typeof codeType === 'string') {
         id = codeType;
       } else {
-        id =  codeType.id;
+        id = codeType.id;
       }
       delete this.registry[id];
       // TODO [7.0] awe: also clean up texts?

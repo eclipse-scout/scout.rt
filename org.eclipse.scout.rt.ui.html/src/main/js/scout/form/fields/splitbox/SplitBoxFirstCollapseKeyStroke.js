@@ -16,7 +16,9 @@ scout.SplitBoxFirstCollapseKeyStroke = function(splitBox, keyStroke) {
 scout.inherits(scout.SplitBoxFirstCollapseKeyStroke, scout.KeyStroke);
 
 scout.SplitBoxFirstCollapseKeyStroke.prototype.handle = function(event) {
-  this.field.collapseHandleButtonPressed({left: true});
+  this.field.collapseHandleButtonPressed({
+    left: true
+  });
 };
 
 scout.SplitBoxFirstCollapseKeyStroke.prototype._postRenderKeyBox = function($drawingArea, $keyBox) {

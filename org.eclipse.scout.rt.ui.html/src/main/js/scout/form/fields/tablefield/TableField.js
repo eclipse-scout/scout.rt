@@ -89,9 +89,9 @@ scout.TableField.prototype._removeTable = function() {
 
 scout.TableField.prototype.computeRequiresSave = function() {
   return Object.keys(this._deletedRows).length > 0 ||
-      Object.keys(this._insertedRows).length > 0 ||
-      Object.keys(this._updatedRows).length > 0 ||
-      Object.keys(this._checkedRows).length > 0;
+    Object.keys(this._insertedRows).length > 0 ||
+    Object.keys(this._updatedRows).length > 0 ||
+    Object.keys(this._checkedRows).length > 0;
 };
 
 scout.TableField.prototype._onTableChanged = function(event) {
@@ -106,7 +106,7 @@ scout.TableField.prototype._onTableChanged = function(event) {
   }
 };
 
-scout.TableField.prototype._updateDeletedRows = function (rows) {
+scout.TableField.prototype._updateDeletedRows = function(rows) {
   rows.forEach(function(row) {
     if (row.id in this._insertedRows) {
       // If a row is contained in _insertedRows an inserted row has been deleted again.
@@ -120,13 +120,13 @@ scout.TableField.prototype._updateDeletedRows = function (rows) {
   }, this);
 };
 
-scout.TableField.prototype._updateInsertedRows = function (rows) {
+scout.TableField.prototype._updateInsertedRows = function(rows) {
   rows.forEach(function(row) {
     this._insertedRows[row.id] = row;
   }, this);
 };
 
-scout.TableField.prototype._updateUpdatedRows = function (rows) {
+scout.TableField.prototype._updateUpdatedRows = function(rows) {
   rows.forEach(function(row) {
     if (row.status === scout.TableRow.Status.NON_CHANGED) {
       return;
@@ -139,7 +139,7 @@ scout.TableField.prototype._updateUpdatedRows = function (rows) {
  * If a row already exists in the _checkedRows array, remove it (row was checked/unchecked again, which
  * means it is no longer changed). Add it to the array otherwise.
  */
-scout.TableField.prototype._updateCheckedRows = function (rows) {
+scout.TableField.prototype._updateCheckedRows = function(rows) {
   rows.forEach(function(row) {
     if (row.id in this._checkedRows) {
       delete this._checkedRows[row.id];

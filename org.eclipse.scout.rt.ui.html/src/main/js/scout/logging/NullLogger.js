@@ -13,37 +13,31 @@ scout.NullLogger = function() {
 };
 
 scout.NullLogger.prototype = {
-  trace: function () {
-  },
-  debug: function () {
-  },
-  info: function () {
-  },
-  warn: function () {
-  },
-  error: function () {
-  },
-  fatal: function () {
-  },
-  isEnabledFor: function () {
+  trace: function() {},
+  debug: function() {},
+  info: function() {},
+  warn: function() {},
+  error: function() {},
+  fatal: function() {},
+  isEnabledFor: function() {
     return false;
   },
-  isTraceEnabled: function () {
+  isTraceEnabled: function() {
     return false;
   },
-  isDebugEnabled: function () {
+  isDebugEnabled: function() {
     return false;
   },
-  isInfoEnabled: function () {
+  isInfoEnabled: function() {
     return false;
   },
-  isWarnEnabled: function () {
+  isWarnEnabled: function() {
     return false;
   },
-  isErrorEnabled: function () {
+  isErrorEnabled: function() {
     return false;
   },
-  isFatalEnabled: function () {
+  isFatalEnabled: function() {
     return false;
   }
 };

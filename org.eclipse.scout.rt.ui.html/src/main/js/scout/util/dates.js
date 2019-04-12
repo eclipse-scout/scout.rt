@@ -572,14 +572,13 @@ scout.dates = {
 
       date.setSeconds(0, 0); // clear seconds and millis
 
-
       m = (parseInt((date.getMinutes() + mResulution) / mResulution) * mResulution);
       h = date.getHours();
-      if(m >= 60){
+      if (m >= 60) {
         h++;
         m = 0;
       }
-      if(h > 23){
+      if (h > 23) {
         h = 0;
         date.setDate(date.getDate() + 1);
       }

@@ -52,7 +52,7 @@ scout.LoadingSupport.prototype.renderLoading = function() {
     // add loading indicator
     if (this.loadingIndicatorDelay && !this.widget.rendering) {
       this._loadingIndicatorTimeoutId = setTimeout(
-          this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
+        this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
     } else {
       this._renderLoadingIndicator();
     }

@@ -100,7 +100,6 @@ scout.CalendarComponent.prototype._render = function() {
     this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
 
-
     if (this.parent._isMonth()) {
       $part.addClass('component-month')
         .toggleClass('compact', $day.width() < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);

@@ -74,7 +74,7 @@ scout.VirtualScrolling.prototype.calculateCurrentViewRange = function() {
   var widgetBounds = this.widget.$container[0].getBoundingClientRect();
   var scrollableBounds = this.$scrollable[0].getBoundingClientRect();
   if (widgetBounds.bottom < scrollableBounds.top ||
-      widgetBounds.top > scrollableBounds.bottom) {
+    widgetBounds.top > scrollableBounds.bottom) {
     // If widget is not in the view port, no need to draw any row
     return new scout.Range(0, 0);
   }

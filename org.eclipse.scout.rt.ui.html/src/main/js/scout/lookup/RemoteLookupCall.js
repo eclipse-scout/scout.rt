@@ -47,7 +47,7 @@ scout.RemoteLookupCall.prototype._getByRec = function(rec) {
 scout.RemoteLookupCall.prototype.resolveLookup = function(lookupResult) {
   if (!this._belongsToLatestRequest(lookupResult)) {
     $.log.isTraceEnabled() && $.log.trace('(RemoteLookupCall#resolveLookup) ignore lookupResult. Does not belong to latest request',
-        scout.objects.optProperty(this.deferred, 'requestParameter'));
+      scout.objects.optProperty(this.deferred, 'requestParameter'));
     return;
   }
 
@@ -85,4 +85,3 @@ scout.RemoteLookupCall.prototype._newDeferred = function(requestParameter) {
   this.deferred = $.Deferred();
   this.deferred.requestParameter = requestParameter;
 };
-

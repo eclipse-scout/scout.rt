@@ -26,7 +26,8 @@ public final class TypeFactoryUtility {
   }
 
   /**
-   * @return Jackson {@link JavaType} representing the declared {@link ParameterizedType} of {@link DoValue} or {@link DoList} type.
+   * @return Jackson {@link JavaType} representing the declared {@link ParameterizedType} of {@link DoValue} or
+   *         {@link DoList} type.
    */
   public static JavaType toJavaType(ParameterizedType parametrizedType) {
     if (DoList.class == parametrizedType.getRawType()) {

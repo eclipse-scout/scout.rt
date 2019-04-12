@@ -283,7 +283,7 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
 };
 
 scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
-  return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1')+'wOnly'+scout.nvl(options.widthOnly, '-1');
+  return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1') + 'wOnly' + scout.nvl(options.widthOnly, '-1');
 };
 
 scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options) {

@@ -278,11 +278,11 @@ scout.KeyStroke.parseKeyStroke = function(keyStrokeName) {
   }
 
   var keyStrokeObj = {
-      alt: false,
-      ctrl: false,
-      shift: false,
-      which: []
-    };
+    alt: false,
+    ctrl: false,
+    shift: false,
+    which: []
+  };
 
   keyStrokeName.split('-').forEach(function(part) {
     if (part === 'alternate' || part === 'alt') {

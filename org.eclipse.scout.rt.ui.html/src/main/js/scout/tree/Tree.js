@@ -2851,7 +2851,7 @@ scout.Tree.prototype._installNodes = function(nodes) {
     if (!this.isHorizontalScrollingEnabled()) {
       return;
     }
-    var newWidth =  node.$node.outerWidth();
+    var newWidth = node.$node.outerWidth();
     var oldWidth = node.width ? node.width : 0;
     if (oldWidth === this.maxNodeWidth && newWidth < this.maxNodeWidth) {
       this.maxNodeWidth = 0;

@@ -40,8 +40,8 @@ import org.junit.runners.model.Statement;
  * 
  *   private final MathTestParameter m_testParameter;
  * 
- *   public SampleParameterizedServerTest(MathTestParameter testParameter) {
- *     m_testParameter = testParameter;
+ *   public SampleParameterizedServerTest(MathTestParameter testParameter){
+ *   m_testParameter=testParameter;
  *   }
  * 
  *   &#064;Test

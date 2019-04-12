@@ -18,7 +18,7 @@ scout.BenchColumnLayoutData = function(model) {
 
 scout.BenchColumnLayoutData.prototype._ensureColumns = function() {
   this.columns = this.columns.map(function(col, i) {
-    return new scout.BenchRowLayoutData(col).withOrder(i*2);
+    return new scout.BenchRowLayoutData(col).withOrder(i * 2);
   });
 };
 

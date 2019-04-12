@@ -64,8 +64,8 @@ scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPage
   return childPages.map(function(childPage) {
     var row = scout.create('TableRow', {
       parent: this.detailTable,
-      cells: [childPage.text]}
-    );
+      cells: [childPage.text]
+    });
     childPage.linkWithRow(row);
     return row;
   }, this);
@@ -92,4 +92,3 @@ scout.PageWithNodes.prototype.loadChildren = function() {
 scout.PageWithNodes.prototype._createChildPages = function() {
   return $.resolvedDeferred(this.childNodes);
 };
-

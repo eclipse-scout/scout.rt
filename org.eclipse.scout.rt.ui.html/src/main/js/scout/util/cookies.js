@@ -35,7 +35,7 @@ scout.cookies = {
     var cookie = name + '=' + value;
     if (maxAge > -1) {
       var expires = new Date();
-      expires.setTime(expires.getTime() + maxAge*1000);
+      expires.setTime(expires.getTime() + maxAge * 1000);
       cookie += ';max-age=' + maxAge + ';expires=' + expires;
     }
     if (path) {

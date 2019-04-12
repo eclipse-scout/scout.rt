@@ -156,7 +156,7 @@ scout.ProposalChooser.prototype._updateStatus = function() {
   if (scout.objects.optProperty(this.status, 'severity') === scout.Status.Severity.OK) {
     // compute statusVisible 250 ms later (status can change in the meantime)
     this._updateStatusTimeout = setTimeout(
-        this._updateStatusImpl.bind(this), 250);
+      this._updateStatusImpl.bind(this), 250);
   } else {
     this._updateStatusImpl();
   }
@@ -173,7 +173,7 @@ scout.ProposalChooser.prototype._updateStatusImpl = function() {
     visible = this._computeStatusVisible();
 
   if (oldVisible === visible &&
-      oldMessage === scout.objects.optProperty(this.status, 'message')) {
+    oldMessage === scout.objects.optProperty(this.status, 'message')) {
     return;
   }
 
@@ -196,15 +196,15 @@ scout.ProposalChooser.prototype._setStatusMessage = function(message) {
 
 scout.ProposalChooser.prototype._insertActiveFilterButton = function(value, index) {
   var radio = scout.create('RadioButton', {
-      parent: this.activeFilterGroup,
-      label: this._activeFilterLabel(index),
-      radioValue: scout.SmartField.ACTIVE_FILTER_VALUES[index],
-      selected: this.smartField.activeFilter === value,
-      focusWhenSelected: false,
-      gridDataHints: {
-        useUiWidth: true
-      }
-    });
+    parent: this.activeFilterGroup,
+    label: this._activeFilterLabel(index),
+    radioValue: scout.SmartField.ACTIVE_FILTER_VALUES[index],
+    selected: this.smartField.activeFilter === value,
+    focusWhenSelected: false,
+    gridDataHints: {
+      useUiWidth: true
+    }
+  });
 
   radio.on('propertyChange', function(event) {
     if (event.propertyName === 'selected' && event.newValue === true) {

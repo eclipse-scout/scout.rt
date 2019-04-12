@@ -131,7 +131,7 @@ scout.YearPanel.prototype._colorYear = function() {
     $day = $(this);
     date = $day.data('date');
     if (that.displayMode !== scout.Calendar.DisplayMode.DAY &&
-        date >= that.viewRange.from && date < that.viewRange.to) {
+      date >= that.viewRange.from && date < that.viewRange.to) {
       $day.addClass('year-range');
     }
     if (scout.dates.isSameDay(date, that.selectedDate)) {
@@ -199,8 +199,8 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
 
 scout.YearPanel.prototype._onYearClick = function(event) {
   var
-    // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
-    // because YearPanel must work for calendar and planner.
+  // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
+  // because YearPanel must work for calendar and planner.
     displayMode = scout.Planner.DisplayMode,
     diff = $(event.target).data('year-diff'),
     year = this.selectedDate.getFullYear(),

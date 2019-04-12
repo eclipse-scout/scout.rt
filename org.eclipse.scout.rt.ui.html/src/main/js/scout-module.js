@@ -642,4 +642,4 @@
   __include("scout/resizable/Resizable.js");
   __include("scout/desktop/unsavedchanges/UnsavedFormChangesForm.js");
   __include("scout/desktop/unsavedchanges/UnsavedFormsLookupCall.js");
-} (window.scout = window.scout || {}, jQuery)); //NOSONAR
+}(window.scout = window.scout || {}, jQuery)); //NOSONAR

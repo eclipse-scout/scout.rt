@@ -118,7 +118,7 @@ public abstract class AbstractDeviceTransformer implements IDeviceTransformer {
   @Override
   public void notifyPageDetailTableChanged(ITable table) {
   }
-  
+
   @Override
   public void notifyFormDisposed(IForm form) {
     getDeviceTransformationConfig().removeFormExclusion(form);

@@ -61,4 +61,3 @@ scout.FormAdapter.prototype._onRequestFocus = function(event) {
 scout.FormAdapter.prototype._onRequestInput = function(event) {
   this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
 };
-

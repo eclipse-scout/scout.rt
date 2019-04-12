@@ -35,7 +35,9 @@ scout.TagBarLayout.prototype.layout = function($container) {
     // use a for loop, because don't want to loop all elements when we already know the rest is in overflow
     for (i = numTagElements - 1; i >= 0; i--) {
       $te = $($tagElements[i]);
-      teSizes[i] = scout.graphics.size($te, {includeMargin: true});
+      teSizes[i] = scout.graphics.size($te, {
+        includeMargin: true
+      });
       overflow = (prefTagsWidth + teSizes[i].width) > maxTagsWidth;
       if (overflow) {
         break;
@@ -47,7 +49,9 @@ scout.TagBarLayout.prototype.layout = function($container) {
     this.tagBar.setOverflowVisible(overflow);
 
     if (overflow) {
-      prefTagsWidth = scout.graphics.size(this.tagBar.$overflowIcon, {includeMargin: true}).width;
+      prefTagsWidth = scout.graphics.size(this.tagBar.$overflowIcon, {
+        includeMargin: true
+      }).width;
       for (i = numTagElements - 1; i >= 0; i--) {
         $te = $($tagElements[i]);
 
@@ -83,8 +87,9 @@ scout.TagBarLayout.prototype.preferredLayoutSize = function($container, options)
   var $tagElements = $container.find('.tag-element');
   $tagElements.removeClass('hidden');
   $tagElements.each(function() {
-    prefTagsWidth += scout.graphics.size($(this), {includeMargin: true}).width;
+    prefTagsWidth += scout.graphics.size($(this), {
+      includeMargin: true
+    }).width;
   });
   return new scout.Dimension(prefTagsWidth, availableSize.height);
 };
-

@@ -113,8 +113,3 @@ scout.TypeDescriptor.parse = function(typeDescriptor) {
     return createInfo(descriptorPart, namespaces);
   }
 };
-
-
-
-
-

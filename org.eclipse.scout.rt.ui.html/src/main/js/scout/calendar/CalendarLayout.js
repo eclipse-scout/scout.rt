@@ -17,7 +17,8 @@ scout.CalendarLayout = function(calendar) {
 scout.inherits(scout.CalendarLayout, scout.AbstractLayout);
 
 scout.CalendarLayout.prototype.layout = function($container) {
-  var height = 0, headerHeight = 0,
+  var height = 0,
+    headerHeight = 0,
     $yearContainer = this.calendar._yearPanel.$container,
     $grid = this.calendar.$grid,
     $header = this.calendar.$header;

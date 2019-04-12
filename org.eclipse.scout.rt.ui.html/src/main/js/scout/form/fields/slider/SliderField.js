@@ -16,7 +16,9 @@ scout.inherits(scout.SliderField, scout.ValueField);
 
 scout.SliderField.prototype._init = function(model) {
   scout.SliderField.parent.prototype._init.call(this, model);
-  var sliderOptions = $.extend({parent: this}, model);
+  var sliderOptions = $.extend({
+    parent: this
+  }, model);
   this.slider = scout.create('Slider', sliderOptions);
 };
 

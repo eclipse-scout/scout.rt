@@ -228,20 +228,20 @@ scout.Lifecycle.prototype._whenInvalid = function(func) {
       return this._showStatusMessageBox(errorToStatus(error));
     }.bind(this));
 
-    // See ValueField#_createInvalidValueStatus, has similar code to transfor error to status
-    function errorToStatus(error) {
-      if (error instanceof scout.Status) {
-        return error;
-      }
-      if (typeof error === 'string') {
-        return scout.Status.error({
-          message: error
-        });
-      }
+  // See ValueField#_createInvalidValueStatus, has similar code to transfor error to status
+  function errorToStatus(error) {
+    if (error instanceof scout.Status) {
+      return error;
+    }
+    if (typeof error === 'string') {
       return scout.Status.error({
-        message: error.message
+        message: error
       });
     }
+    return scout.Status.error({
+      message: error.message
+    });
+  }
 };
 
 scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {

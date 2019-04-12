@@ -37,7 +37,7 @@ scout.TableNavigationDownKeyStroke.prototype.handle = function(event) {
   if (rows.length > 1 && (selectedRows.length > 0 || lastActionRowIndex > -1)) {
     // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
     if (lastActionRowIndex < 0) {
-      if (rows.length === selectedRows.length){
+      if (rows.length === selectedRows.length) {
         lastActionRow = scout.arrays.first(rows);
       } else {
         lastActionRow = scout.arrays.last(selectedRows);

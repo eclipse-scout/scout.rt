@@ -8,11 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.OutlineMediator = function() {
-};
+scout.OutlineMediator = function() {};
 
-scout.OutlineMediator.prototype.init = function(model) {
-};
+scout.OutlineMediator.prototype.init = function(model) {};
 
 scout.OutlineMediator.prototype._skipEvent = function(page) {
   return page === null || page.getOutline() === null || page.leaf;
@@ -69,4 +67,3 @@ scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWit
 scout.OutlineMediator.prototype.onTableFilter = function(event, page) {
   page.getOutline().filter();
 };
-

@@ -186,11 +186,11 @@ scout.strings = {
     text = text.replace(/^[ ]+/gm, '');
     text = text.replace(/[ ]+$/gm, '');
 
-    if (options.compact){
+    if (options.compact) {
       // Compact consecutive empty lines. One is enough
       text = text.replace(/\n{3,}/gm, '\n\n');
     }
-    if (options.trim){
+    if (options.trim) {
       text = text.trim();
     }
 

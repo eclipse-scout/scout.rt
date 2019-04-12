@@ -87,7 +87,7 @@ scout.Button.prototype._initKeyStrokeContext = function() {
  */
 scout.Button.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
   return scout.Button.parent.prototype._computeEnabled.call(this,
-      inheritAccessibility && !this._isIgnoreAccessibilityFlags(), parentEnabled);
+    inheritAccessibility && !this._isIgnoreAccessibilityFlags(), parentEnabled);
 };
 
 scout.Button.prototype._isIgnoreAccessibilityFlags = function() {

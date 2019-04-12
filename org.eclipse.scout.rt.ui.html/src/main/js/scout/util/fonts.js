@@ -260,7 +260,9 @@ scout.fonts = {
   },
 
   measureSize: function($div) {
-    var size = scout.graphics.size($div, {exact: true});
+    var size = scout.graphics.size($div, {
+      exact: true
+    });
     return size.width + 'x' + size.height;
   },
 

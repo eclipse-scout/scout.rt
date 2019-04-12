@@ -26,7 +26,7 @@ scout.TagFieldAdapter.prototype._postCreateWidget = function() {
 };
 
 scout.TagFieldAdapter.prototype._syncResult = function(result) {
-  if(this.widget._currentLookupCall) {
+  if (this.widget._currentLookupCall) {
     this.widget._currentLookupCall.resolveLookup(result);
   }
 };

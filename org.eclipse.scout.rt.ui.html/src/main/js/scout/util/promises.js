@@ -177,8 +177,7 @@ scout.PromiseCreator.prototype._createPromise = function() {
 scout.PromiseCreator.prototype._addResults = function(index, result) {
   if (result.length === 0) {
     result = undefined;
-  }
-  else if (result.length === 1) {
+  } else if (result.length === 1) {
     result = result[0];
   }
   this.results[index] = result;

@@ -239,7 +239,6 @@ scout.TableControl.prototype.getTable = function() {
   return null;
 };
 
-
 /**
  * TableControlActionKeyStroke
  */

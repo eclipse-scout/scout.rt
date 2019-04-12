@@ -167,7 +167,7 @@ scout.TimePicker.prototype.shiftViewDate = function(years, months, days) {
 scout.TimePicker.prototype.shiftSelectedTime = function(hourUnits, minuteUnits, secondUnits) {
   var time = this.preselectedTime;
   if (this.selectedTime) {
-      time = scout.dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
+    time = scout.dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
   }
   if (!time) {
     return; // do nothing when no date was found
@@ -175,15 +175,14 @@ scout.TimePicker.prototype.shiftSelectedTime = function(hourUnits, minuteUnits, 
   this.selectTime(this._snapToTimeGrid(time));
 };
 
-scout.TimePicker.prototype._snapToTimeGrid = function(time){
-  if(!time){
+scout.TimePicker.prototype._snapToTimeGrid = function(time) {
+  if (!time) {
     return time;
   }
   var min = time.getMinutes();
-  min = (parseInt(min  / this.resolution) * this.resolution);
+  min = (parseInt(min / this.resolution) * this.resolution);
   time.setMinutes(min);
   return time;
-
 
 };
 

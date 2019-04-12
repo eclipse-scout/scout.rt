@@ -48,4 +48,3 @@ scout.LoginApp.prototype._init = function(options) {
   var loginBox = scout.create('LoginBox', options);
   loginBox.render($('body'));
 };
-

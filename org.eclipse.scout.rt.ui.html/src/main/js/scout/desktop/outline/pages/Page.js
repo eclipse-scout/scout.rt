@@ -134,8 +134,7 @@ scout.Page.prototype.activate = function() {
 };
 
 // see Java: AbstractPage#pageDeactivatedNotify
-scout.Page.prototype.deactivate = function() {
-};
+scout.Page.prototype.deactivate = function() {};
 
 /**
  * @returns {scout.Outline} the tree / outline / parent instance. it's all the same,
@@ -232,7 +231,7 @@ scout.Page.prototype._pageParam = function(paramProperties) {
   return param;
 };
 
-scout.Page.prototype.reloadPage = function () {
+scout.Page.prototype.reloadPage = function() {
   var outline = this.getOutline();
   if (outline) {
     this.loadChildren();

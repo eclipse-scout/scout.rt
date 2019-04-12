@@ -13,7 +13,7 @@ scout.TreeBreadcrumbFilter = function(tree) {
 };
 
 scout.TreeBreadcrumbFilter.prototype.accept = function(node) {
-  if(this.tree.selectedNodes.length === 0 ){
+  if (this.tree.selectedNodes.length === 0) {
     return node.parentNode === undefined;
   }
   return this.tree.isNodeInBreadcrumbVisible(node);

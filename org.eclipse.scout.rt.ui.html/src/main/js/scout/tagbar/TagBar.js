@@ -75,7 +75,9 @@ scout.TagBar.prototype._onTagClick = function(event) {
 };
 
 scout.TagBar.prototype._triggerTagClick = function(tag) {
-  this.trigger('tagClick', {tag: tag});
+  this.trigger('tagClick', {
+    tag: tag
+  });
 };
 
 scout.TagBar.prototype._onTagRemoveClick = function(event) {
@@ -291,4 +293,3 @@ scout.TagBar.renderTag = function($parent, tagText, enabled, clickHandler, remov
   }
   return $element;
 };
-

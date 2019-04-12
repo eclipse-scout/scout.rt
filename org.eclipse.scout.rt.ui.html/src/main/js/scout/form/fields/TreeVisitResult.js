@@ -12,18 +12,18 @@
  * Controls how the tree visiting should continue.
  */
 scout.TreeVisitResult = {
-    /**
-     * Normally continue visiting. Nothing will be skipped.
-     */
-    CONTINUE: 'continue',
+  /**
+   * Normally continue visiting. Nothing will be skipped.
+   */
+  CONTINUE: 'continue',
 
-    /**
-     * Abort the whole visiting. May be used if the visitor finishes the operation before all elements have been visited.
-     */
-    TERMINATE: 'terminate',
+  /**
+   * Abort the whole visiting. May be used if the visitor finishes the operation before all elements have been visited.
+   */
+  TERMINATE: 'terminate',
 
-    /**
-     * Continue without visiting the child elements of the current element.
-     */
-    SKIP_SUBTREE: 'skip_subtree'
+  /**
+   * Continue without visiting the child elements of the current element.
+   */
+  SKIP_SUBTREE: 'skip_subtree'
 };
