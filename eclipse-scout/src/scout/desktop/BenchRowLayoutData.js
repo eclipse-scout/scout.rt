@@ -1,4 +1,4 @@
-import FlexboxLayoutData from '../Layout/FlexboxLayoutData';
+import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 
 export default class BenchRowLayoutData extends FlexboxLayoutData {
 

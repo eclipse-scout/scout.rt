@@ -1,10 +1,10 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
 import SimpleTabBoxLayout from './SimpleTabBoxLayout';
 import SimpleTabViewContentLayout from './SimpleTabViewContentLayout';
 import Scout from '../Scout';
 import SimpleTabBoxController from './SimpleTabBoxController';
-import Arrays from '../Utils/Arrays';
+import Arrays from '../utils/Arrays';
 import SimpleTabArea from './SimpleTabArea';
 
 export default class SimpleTabBox extends Widget {

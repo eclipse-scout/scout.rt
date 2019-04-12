@@ -1,8 +1,8 @@
-import Models from './Utils/Models';
+import Models from './utils/Models';
 import Scout from './Scout';
-import ViewButton from './Desktop/ViewButton';
-import OutlineViewButton from './Outline/OutlineViewButton';
+import ViewButton from './desktop/ViewButton';
+import OutlineViewButton from './outline/OutlineViewButton';
 import App from './App';
-import Desktop from './Desktop/Desktop';
+import Desktop from './desktop/Desktop';
 
 export { Models, Scout, ViewButton, OutlineViewButton, App, Desktop };

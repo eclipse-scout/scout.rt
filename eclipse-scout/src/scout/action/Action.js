@@ -1,6 +1,6 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
-import NullLayout from '../Layout/NullLayout';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
+import NullLayout from '../layout/NullLayout';
 
 export const ActionStyle = Object.freeze({
   DEFAULT: 0,

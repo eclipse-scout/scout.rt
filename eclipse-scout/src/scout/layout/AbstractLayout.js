@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import HtmlComponent from './HtmlComponent';
-import Graphics from '../Utils/Graphics';
+import Graphics from '../utils/Graphics';
 
 export default class AbstractLayout {
 

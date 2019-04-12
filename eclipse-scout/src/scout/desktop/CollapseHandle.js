@@ -1,4 +1,4 @@
-import Widget from '../Widget/Widget';
+import Widget from '../widget/Widget';
 
 export default class CollapseHandle extends Widget {
 

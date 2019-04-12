@@ -1,5 +1,5 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
 import Scout from '../Scout';
 
 export default class ViewMenuTab extends Widget {

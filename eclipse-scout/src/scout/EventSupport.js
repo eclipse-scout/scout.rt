@@ -1,4 +1,4 @@
-import Arrays from './Utils/Arrays';
+import Arrays from './utils/Arrays';
 
 export default class EventSupport {
 

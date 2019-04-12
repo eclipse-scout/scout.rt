@@ -1,6 +1,6 @@
-import AbstractLayout from '../Layout/AbstractLayout';
-import HtmlComponent from '../Layout/HtmlComponent';
-import Dimension from '../Utils/Dimension';
+import AbstractLayout from '../layout/AbstractLayout';
+import HtmlComponent from '../layout/HtmlComponent';
+import Dimension from '../utils/Dimension';
 
 export default class SimpleTabBoxLayout extends AbstractLayout {
 

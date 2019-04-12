@@ -1,6 +1,6 @@
 import Scout from '../Scout';
-import DateFormat from '../Text/DateFormat';
-import DecimalFormat from '../Text/DecimalFormat';
+import DateFormat from '../text/DateFormat';
+import DecimalFormat from '../text/DecimalFormat';
 
 export default class Locale {
 

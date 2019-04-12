@@ -1,9 +1,6 @@
 import * as $ from 'jquery';
-import Arrays from './Utils/Arrays';
+import Arrays from './utils/Arrays';
 import ObjectFactory from './ObjectFactory';
-import Strings from './Utils/Strings';
-
-// FIXME [awe] add style folder again
 
 export default class Scout { // FIXME [awe] check if we should use a Singleton? upper/lowercase
 

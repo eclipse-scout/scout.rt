@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
-import Widget from './../Widget/Widget';
+import Widget from './../widget/Widget';
 import Scout from '../Scout';
-import Arrays from '../Utils/Arrays';
+import Arrays from '../utils/Arrays';
 import BenchColumnLayoutData from './BenchColumnLayoutData';
-import HtmlComponent from '../Layout/HtmlComponent';
+import HtmlComponent from '../layout/HtmlComponent';
 import DesktopLayout from './DesktopLayout';
 import DesktopNavigation, { BREADCRUMB_STYLE_WIDTH } from './DesktopNavigation';
 import DesktopHeader from './DesktopHeader';

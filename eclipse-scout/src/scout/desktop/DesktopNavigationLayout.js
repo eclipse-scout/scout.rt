@@ -1,5 +1,5 @@
-import AbstractLayout from '../Layout/AbstractLayout';
-import Dimension from '../Utils/Dimension';
+import AbstractLayout from '../layout/AbstractLayout';
+import Dimension from '../utils/Dimension';
 
 export default class DesktopNavigationLayout extends AbstractLayout {
 

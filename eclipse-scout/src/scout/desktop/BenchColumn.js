@@ -1,11 +1,11 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
-import {Direction} from '../Layout/FlexboxLayout';
-import FlexboxLayout from '../Layout/FlexboxLayout';
-import FlexboxLayoutData from '../Layout/FlexboxLayoutData';
-import Arrays from '../Utils/Arrays';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
+import {Direction} from '../layout/FlexboxLayout';
+import FlexboxLayout from '../layout/FlexboxLayout';
+import FlexboxLayoutData from '../layout/FlexboxLayoutData';
+import Arrays from '../utils/Arrays';
 import Scout from '../Scout';
-import SimpleTabBox from '../TabBox/SimpleTabBox';
+import SimpleTabBox from '../tabbox/SimpleTabBox';
 import DesktopTabBoxController from './DesktopTabBoxController';
 
 export const TAB_BOX_INDEX = Object.freeze({

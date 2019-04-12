@@ -3,12 +3,12 @@ import Scout from './Scout';
 import ErrorHandler from './ErrorHandler';
 import EventSupport from './EventSupport';
 import ObjectFactory from './ObjectFactory';
-import Locale from './Session/Locale';
-import Session from './Session/Session';
-import NullWidget from './Widget/NullWidget';
-import Desktop from './Desktop/Desktop';
-import Models from './Utils/Models';
-import JQueryUtils from './Utils/JQueryUtils';
+import Locale from './session/Locale';
+import Session from './session/Session';
+import NullWidget from './widget/NullWidget';
+import Desktop from './desktop/Desktop';
+import Models from './utils/Models';
+import JQueryUtils from './utils/JQueryUtils';
 
 var scout_sessions = [];
 var scout_appListeners = [];

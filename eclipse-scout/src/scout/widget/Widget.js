@@ -1,9 +1,9 @@
 import * as $ from 'jquery';
-import Arrays from '../Utils/Arrays';
+import Arrays from '../utils/Arrays';
 import Scout from '../Scout';
 import EventSupport from './../EventSupport';
-import Strings from '../Utils/Strings';
-import Event from '../Utils/Event';
+import * as strings from '../utils/strings2';
+import Event from '../utils/Event';
 
 export default class Widget {
 
@@ -1157,7 +1157,7 @@ export default class Widget {
     if (!widgets) {
       return;
     }
-    var removeFuncName = '_remove' + Strings.toUpperCaseFirstLetter(propertyName);
+    var removeFuncName = '_remove' + strings.uppercaseFirstLetter(propertyName);
     if (this[removeFuncName]) {
       this[removeFuncName]();
     } else {
@@ -1176,7 +1176,7 @@ export default class Widget {
   };
 
   _callSetProperty(propertyName, value) {
-    var setFuncName = '_set' + Strings.toUpperCaseFirstLetter(propertyName);
+    var setFuncName = '_set' + strings.uppercaseFirstLetter(propertyName);
     if (this[setFuncName]) {
       this[setFuncName](value);
     } else {
@@ -1185,7 +1185,7 @@ export default class Widget {
   };
 
   _callRenderProperty(propertyName) {
-    var renderFuncName = '_render' + Strings.toUpperCaseFirstLetter(propertyName);
+    var renderFuncName = '_render' + strings.uppercaseFirstLetter(propertyName);
     if (!this[renderFuncName]) {
       return;
     }
@@ -1527,7 +1527,7 @@ export default class Widget {
   };
 
   callSetter(propertyName, value) {
-    var setterFuncName = 'set' + Strings.toUpperCaseFirstLetter(propertyName);
+    var setterFuncName = 'set' + strings.uppercaseFirstLetter(propertyName);
     if (this[setterFuncName]) {
       this[setterFuncName](value);
     } else {

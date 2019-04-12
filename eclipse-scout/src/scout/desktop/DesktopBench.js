@@ -1,11 +1,11 @@
-import Widget from '../Widget/Widget';
+import Widget from '../widget/Widget';
 import Scout from '../Scout';
-import HtmlComponent from '../Layout/HtmlComponent';
-import FlexboxLayout, {Direction} from '../Layout/FlexboxLayout';
-import FlexboxLayoutData from '../Layout/FlexboxLayoutData';
+import HtmlComponent from '../layout/HtmlComponent';
+import FlexboxLayout, {Direction} from '../layout/FlexboxLayout';
+import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 import BenchColumn from './BenchColumn';
 import HeaderTabBoxController from './HeaderTabBoxController';
-import Arrays from '../Utils/Arrays';
+import Arrays from '../utils/Arrays';
 
 export const VIEW_MIN_HEIGHT = 50;
 export const VIEW_MIN_WIDTH = 50;

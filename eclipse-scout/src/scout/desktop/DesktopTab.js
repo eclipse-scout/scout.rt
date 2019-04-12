@@ -1,4 +1,4 @@
-import SimpleTab from '../TabBox/SimpleTab';
+import SimpleTab from '../tabbox/SimpleTab';
 
 export default class DesktopTab extends SimpleTab {
 

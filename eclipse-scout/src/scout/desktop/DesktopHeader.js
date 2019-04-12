@@ -1,9 +1,9 @@
-import Widget from '../Widget/Widget';
+import Widget from '../widget/Widget';
 import Scout from '../Scout';
 import {DisplayStyle} from './Desktop';
 import DesktopHeaderLayout from './DesktopHeaderLayout';
-import HtmlComponent from '../Layout/HtmlComponent';
-import SimpleTabArea from '../TabBox/SimpleTabArea';
+import HtmlComponent from '../layout/HtmlComponent';
+import SimpleTabArea from '../tabbox/SimpleTabArea';
 import DesktopToolBox from './DesktopToolBox';
 import ViewButtonBox from './ViewButtonBox';
 

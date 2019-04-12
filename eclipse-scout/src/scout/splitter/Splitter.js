@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
-import Graphics from '../Utils/Graphics';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
+import Graphics from '../utils/Graphics';
 
 export default class Splitter extends Widget {
 

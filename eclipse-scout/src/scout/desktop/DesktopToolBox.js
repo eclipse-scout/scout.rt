@@ -1,5 +1,5 @@
-import MenuBox from '../Menu/MenuBox';
-import Strings from '../Utils/Strings';
+import MenuBox from '../menu/MenuBox';
+import * as strings from '../utils/strings2';
 
 export default class DesktopToolBox extends MenuBox {
   constructor(menuBar) {
@@ -7,7 +7,7 @@ export default class DesktopToolBox extends MenuBox {
   }
 
   _init(options) {
-    options.uiMenuCssClass = Strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
+    options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
     super._init(options);
   };
 

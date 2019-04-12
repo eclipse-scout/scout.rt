@@ -1,4 +1,4 @@
-import Action from '../Action/Action';
+import Action from '../action/Action';
 
 export default class ViewButton extends Action {
 

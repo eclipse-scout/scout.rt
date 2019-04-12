@@ -1,4 +1,4 @@
-import SimpleTabBoxController from '../TabBox/SimpleTabBoxController';
+import SimpleTabBoxController from '../tabbox/SimpleTabBoxController';
 import DesktopTab from './DesktopTab';
 import Scout from '../Scout';
 

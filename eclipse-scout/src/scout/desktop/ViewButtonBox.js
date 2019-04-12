@@ -1,9 +1,9 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
 import ViewMenuTab from './ViewMenuTab';
 import ViewButtonBoxLayout from './ViewButtonBoxLayout';
 import Scout from '../Scout';
-import OutlineViewButton from '../Outline/OutlineViewButton';
+import OutlineViewButton from '../outline/OutlineViewButton';
 
 export default class ViewButtonBox extends Widget {
 

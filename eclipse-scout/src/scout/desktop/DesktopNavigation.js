@@ -1,10 +1,10 @@
-import Widget from '../Widget/Widget';
-import HtmlComponent from '../Layout/HtmlComponent';
+import Widget from '../widget/Widget';
+import HtmlComponent from '../layout/HtmlComponent';
 import Scout from '../Scout';
 import ViewButtonBox from './ViewButtonBox';
 import { DisplayStyle } from './Desktop';
 import DesktopNavigationLayout from './DesktopNavigationLayout';
-import SingleLayout from '../Layout/SingleLayout';
+import SingleLayout from '../layout/SingleLayout';
 import { HorizontalAlignment } from './CollapseHandle';
 import DesktopNavigationHandle from './DesktopNavigationHandle';
 

@@ -3,9 +3,9 @@ import Scout from '../Scout';
 import Locale from './Locale';
 import EventSupport from '../EventSupport';
 import TypeDescriptor from '../TypeDescriptor';
-import LayoutValidator from '../Layout/LayoutValidator';
-import NullWidget from '../Widget/NullWidget';
-import DetachHelper from '../Utils/DetachHelper';
+import LayoutValidator from '../layout/LayoutValidator';
+import NullWidget from '../widget/NullWidget';
+import DetachHelper from '../utils/DetachHelper';
 
 export default class Session {
 

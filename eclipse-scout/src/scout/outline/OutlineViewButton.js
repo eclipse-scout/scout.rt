@@ -1,4 +1,4 @@
-import ViewButton from '../Desktop/ViewButton';
+import ViewButton from '../desktop/ViewButton';
 
 export default class OutlineViewButton extends ViewButton {
 

@@ -1,7 +1,7 @@
 import AbstractLayout from './AbstractLayout';
 import HtmlComponent from './HtmlComponent';
-import Dimension from '../Utils/Dimension';
-import Rectangle from '../Utils/Rectangle';
+import Dimension from '../utils/Dimension';
+import Rectangle from '../utils/Rectangle';
 
 export default class FlexboxLayout extends AbstractLayout {
 

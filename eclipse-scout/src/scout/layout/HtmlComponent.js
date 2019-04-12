@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
 import NullLayout from './NullLayout';
 import Scout from '../Scout';
-import Graphics from '../Utils/Graphics';
+import Graphics from '../utils/Graphics';
 
 export default class HtmlComponent {
 

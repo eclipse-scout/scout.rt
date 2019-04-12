@@ -1,47 +1,48 @@
 export default class Insets {
-    constructor(vararg, right, bottom, left){
-        if (vararg instanceof Insets) {
-            this.top = vararg.top;
-            this.right = vararg.right;
-            this.bottom = vararg.bottom;
-            this.left = vararg.left;
-        } else {
-            this.top = vararg || 0;
-            this.right = right || 0;
-            this.bottom = bottom || 0;
-            this.left = left || 0;
-        }
+
+  constructor(vararg, right, bottom, left) {
+    if (vararg instanceof Insets) {
+      this.top = vararg.top;
+      this.right = vararg.right;
+      this.bottom = vararg.bottom;
+      this.left = vararg.left;
+    } else {
+      this.top = vararg || 0;
+      this.right = right || 0;
+      this.bottom = bottom || 0;
+      this.left = left || 0;
     }
+  }
 
-    toString() {
-        return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
-    };
+  toString() {
+    return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
+  };
 
-    equals(o) {
-        return this.top === o.top &&
-            this.right === o.right &&
-            this.bottom === o.bottom &&
-            this.left === o.left;
-    };
+  equals(o) {
+    return this.top === o.top &&
+      this.right === o.right &&
+      this.bottom === o.bottom &&
+      this.left === o.left;
+  };
 
-    clone() {
-        return new Insets(this.top, this.right, this.bottom, this.left);
-    };
+  clone() {
+    return new Insets(this.top, this.right, this.bottom, this.left);
+  };
 
-    horizontal() {
-        return this.right + this.left;
-    };
+  horizontal() {
+    return this.right + this.left;
+  };
 
-    vertical() {
-        return this.top + this.bottom;
-    };
+  vertical() {
+    return this.top + this.bottom;
+  };
 
-    floor() {
-        return new Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
-    };
+  floor() {
+    return new Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
+  };
 
-    ceil() {
-        return new Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
-    };
+  ceil() {
+    return new Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
+  };
 
 }

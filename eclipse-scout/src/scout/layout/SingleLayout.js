@@ -1,7 +1,7 @@
 import AbstractLayout from './AbstractLayout';
 import HtmlComponent from './HtmlComponent';
-import Dimension from '../Utils/Dimension';
-import Graphics from '../Utils/Graphics';
+import Dimension from '../utils/Dimension';
+import Graphics from '../utils/Graphics';
 
 export default class SingleLayout extends AbstractLayout {
 

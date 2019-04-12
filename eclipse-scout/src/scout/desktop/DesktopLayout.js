@@ -1,5 +1,5 @@
-import AbstractLayout from '../Layout/AbstractLayout';
-import Dimension from '../Utils/Dimension';
+import AbstractLayout from '../layout/AbstractLayout';
+import Dimension from '../utils/Dimension';
 import DesktopNavigation, { BREADCRUMB_STYLE_WIDTH, DEFAULT_STYLE_WIDTH, MIN_WIDTH } from './DesktopNavigation';
 
 export default class DesktopLayout extends AbstractLayout {
