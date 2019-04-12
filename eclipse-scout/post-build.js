@@ -1,8 +1,8 @@
 const fs = require('fs');
 const errno = require('errno');
 
-deleteFile('./dist/theme-default.js');
-deleteFile('./dist/theme-dark.js');
+deleteFile('./dist/scout-theme.js');
+deleteFile('./dist/scout-theme-dark.js');
 
 function deleteFile(filename) {
   fs.unlink(filename, (err) => {

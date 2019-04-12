@@ -6,21 +6,17 @@ export default class WidgetsApp extends App {
 
   _createDesktop(parent) {
     let desktop = Scout.create(Desktop, Models.getModel(desktopModel, parent));
-    let button1Model = {
+    let dataButton = Scout.create(OutlineViewButton, {
       parent: desktop,
       text: 'Data',
       displayStyle: 'TAB'
-    };
-    let button1 = Scout.create(OutlineViewButton, button1Model);
-
-    let button2Model = {
+    });
+    let searchButton = Scout.create(OutlineViewButton, {
       parent: desktop,
-      text: 'Data2',
+      text: 'Search',
       displayStyle: 'TAB'
-    };
-    let button2 = Scout.create(OutlineViewButton, button2Model);
-
-    desktop._setViewButtons([button1, button2]);
+    });
+    desktop._setViewButtons([dataButton, searchButton]);
     return desktop;
   }
 

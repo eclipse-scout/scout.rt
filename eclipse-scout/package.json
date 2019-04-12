@@ -10,15 +10,23 @@
   "scripts": {
     "build-dev": "webpack --display-error-details --display-reasons --debug",
     "build": "webpack --display-error-details --display-reasons --debug",
-    "prepare": "npm run build",
     "test": "karma start"
   },
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
   "license": "EPL-1.0",
   "devDependencies": {
+    "clean-webpack-plugin": "^2.0.1",
+    "copy-webpack-plugin": "^5.0.2",
+    "css-loader": "^2.1.1",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
+    "mini-css-extract-plugin": "^0.5.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "style-loader": "^0.23.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
+    "webpack-shell-plugin": "^0.5.0",
     "jquery": "^3.4.0"
   }
 }

@@ -2,6 +2,9 @@
   "name": "eclipse-scout-widgets-app",
   "version": "10.0.0",
   "description": "Eclipse Scout: Widgets App",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "license": "EPL-1.0",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -9,9 +12,6 @@
     "build-dev": "webpack --display-error-details --display-reasons --debug",
     "test": "karma start"
   },
-  "author": "BSI Business Systems Integration AG",
-  "homepage": "https://www.eclipse.org/scout",
-  "license": "EPL-1.0",
   "devDependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
@@ -20,7 +20,9 @@
     "@babel/preset-env": "^7.1.0",
     "babel-loader": "^8.0.4",
     "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^3.3.0",
+    "clean-webpack-plugin": "^2.0.1",
+    "copy-webpack-plugin": "^5.0.2"
   },
   "dependencies": {
     "eclipse-scout": "file:../eclipse-scout",
