@@ -1,0 +1,67 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.desktop-navigation-handle.collapse-handle {
+  position: absolute;
+
+  &:active > .collapse-handle-body {
+    background-color: @desktop-navigation-handle-active-background-color;
+  }
+
+  & > .collapse-handle-body {
+    background-color: @desktop-navigation-handle-background-color;
+    border-color: fade(@desktop-navigation-handle-border-color, 75%);
+    color: fade(@desktop-navigation-handle-color, 75%);
+  }
+
+  &.navigation-closed > .collapse-handle-body {
+    /* increase border radius a little, otherwise it is barely visible */
+    border-radius: 4px;
+  }
+
+  &.right-aligned {
+    &.both-visible {
+      right: 5px;
+    }
+
+    &:not(.both-visible) > .collapse-handle-body {
+      border-right: 0;
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
+  &.left-aligned {
+    &.both-visible {
+      right: 5px;
+    }
+
+    &:not(.both-visible) > .collapse-handle-body {
+      border-left: 0;
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+    }
+  }
+
+}
+
+.navigation-handle-key-box {
+  margin-top: -6px;
+
+  &.left {
+    margin-right: -4px;
+  }
+
+  &.right {
+    margin-left: -4px;
+  }
+}

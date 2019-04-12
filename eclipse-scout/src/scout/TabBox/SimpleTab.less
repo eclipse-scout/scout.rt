@@ -1,0 +1,121 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.simple-tab {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  /* 1px smaller than the header because of the bottom border (see .selected rule below) */
+  height: calc(~'100% - 1px');
+  padding: 5px;
+  background-color: @simple-tab-background-color;
+  color: @text-color;
+  border-right: 1px solid @border-color;
+
+  &.last {
+    border-right-width: 0;
+  }
+
+  &:not(.no-hover) {
+    cursor: pointer;
+  }
+
+  &:not(.no-hover):hover > .title {
+    color: @hover-color;
+  }
+
+  &.small {
+    width: 130px;
+  }
+
+  &:active > .title {
+    color: @active-color;
+  }
+
+  &.disabled {
+    color: @disabled-color;
+    cursor: default;
+  }
+
+  &.selected {
+    cursor: default;
+    background-color: @simple-tab-active-background-color;
+    /* full size of header to draw over the border-bottom */
+    height: 100%;
+
+    & > .title {
+      color: @simple-tab-active-color;
+    }
+  }
+
+  &.animate-modality-highlight {
+    #scout.animation-flash-gray();
+  }
+
+  & > .title,
+  & > .sub-title {
+    #scout.overflow-ellipsis-nowrap();
+  }
+
+  & > .sub-title {
+    padding-top: 2px;
+  }
+
+  & > .icon {
+    float: right;
+    margin-left: 5px;
+  }
+
+  & > .status-container {
+   float: right;
+
+   & > .status {
+     vertical-align: middle;
+     display: inline-block;
+     margin-left: 5px;
+
+     &.closer {
+       margin-left: 7px;
+     }
+   }
+  }
+
+  & > .icon-container {
+    float: left;
+
+    & > .icon {
+      margin-right: 5px;
+      vertical-align: middle;
+
+      &.font-icon {
+        font-size: 14px;
+      }
+    }
+  }
+
+  &.closable .closer {
+    display: none;
+  }
+  &.closable.selected .closer {
+    display: inline-block;
+  }
+}
+
+/* key boxes */
+
+.simple-tab .key-box {
+  bottom: 4px;
+
+  &.disabled {
+    background-color: @disabled-color;
+  }
+}

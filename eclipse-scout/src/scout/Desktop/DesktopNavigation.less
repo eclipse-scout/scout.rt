@@ -1,0 +1,102 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.desktop-navigation {
+  position: absolute;
+  height: 100%;
+  width: @desktop-navigation-width;
+  min-width: @desktop-navigation-min-width;
+  background-color: @navigation-background-color;
+  color: @navigation-color;
+
+  &.single-view-button {
+
+    & > .navigation-body {
+      & > .outline > .outline-title {
+        height: @single-view-button-outline-title-height;
+        margin-left: 35px;
+        margin-bottom: @single-view-button-outline-title-margin-bottom;
+        border-bottom: none;
+        padding-left: 20px;
+
+        & > .outline-title-text {
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        & > .menubar {
+          height: @single-view-button-outline-title-height; /* 100% not possible because outline-title must not be position relative due to menu item focus border */
+          top: 0;
+        }
+      }
+
+      & > .outline.breadcrumb > .outline-title > .outline-title-text {
+        padding-left: 0;
+      }
+
+      & > .outline.breadcrumb:not(.search-outline) {
+        & > .outline-title {
+          margin-bottom: 0;
+        }
+
+        & > .tree-data {
+          margin-top: @single-view-button-outline-title-margin-bottom;
+          border-top: 1px solid @outline-breadcrumb-border-color;
+        }
+      }
+
+      & > .search-outline {
+        & > .outline-title {
+          margin-bottom: 0;
+        }
+
+        & > .search-outline-panel {
+          padding-top: @single-view-button-search-outline-panel-padding-top;
+          padding-bottom: @single-view-button-search-outline-panel-padding-bottom;
+
+          &.has-status {
+            padding-bottom: @search-outline-panel-padding-bottom;
+          }
+
+          & > .search-outline-field {
+            height: @single-view-button-search-outline-field-height;
+          }
+
+          & > .clear-icon {
+            top: @single-view-button-search-outline-panel-padding-top;
+            height: @single-view-button-search-outline-field-height;
+          }
+        }
+      }
+    }
+
+    & > .view-button-box {
+      & .view-button-tab {
+        padding-left: 20px;
+        text-align: initial;
+      }
+    }
+  }
+}
+
+.desktop-navigation-breadcrumb {
+  width: @desktop-navigation-breadcrumb-width;
+}
+
+.navigation-body {
+  position: absolute;
+}
+
+.desktop-navigation > .desktop-tool-box {
+  background-color: @desktop-toolbox-in-navigation-background-color;
+  text-align: right;
+}

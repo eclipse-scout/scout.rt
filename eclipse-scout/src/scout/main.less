@@ -1,0 +1,667 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url(mixins);
+@import url(animations);
+@import url(colors);
+@import url(fonts);
+@import url(icons);
+@import url(sizes);
+@import url(mixins);
+
+body {
+  background-color: @body-background-color;
+  #scout.font-text-normal();
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow: hidden;
+  cursor: default;
+  color: @text-color;
+  #scout.user-select(none);
+  -moz-user-select: -moz-none;
+  /* Prevent mobile safari from adjusting text, due to our dynamic layouting it will be always wrong */
+  -webkit-text-size-adjust: none;
+  /* Disable highlight color. May be enabled for specific elements if required */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+
+  &.ios {
+    /* Body can be moved on ios even if it isn't scrollable. Prevent it by using position: fixed.
+    Drawback: it seems something invisible happens nevertheless, actions like a button click won't be executed if the user tried to scroll right before.
+    He has to wait until the invisible scrolling has finished before he can try to click the button.
+    Another drawback: there is a flickering effect of labels on certain screens (e.g. beamer) with chrome when a popup (e.g. smart field popup) is shown and position is set to fixed.
+    Hence it is important to only activate it on ios. */
+    position: fixed;
+  }
+}
+
+/* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
+::-moz-selection {
+  #scout.text-selection();
+}
+::selection {
+  #scout.text-selection();
+}
+
+::-webkit-input-placeholder {
+  #scout.placeholder();
+}
+:-moz-placeholder { /* older versions of firefox */
+  #scout.placeholder();
+}
+::-moz-placeholder {
+  #scout.placeholder();
+}
+:-ms-input-placeholder {
+  #scout.placeholder();
+}
+
+/* Hide IE decorations for text input fields: */
+/* - Clear button ("X"): https://msdn.microsoft.com/en-us/library/windows/apps/hh465740.aspx */
+/* - Password reveal button: https://msdn.microsoft.com/en-us/library/windows/apps/hh465773.aspx */
+/* Note: Set width/height to 0 instead of "display: none", because of http://stackoverflow.com/a/17986002 */
+::-ms-clear {
+  width: 0;
+  height: 0;
+}
+::-ms-reveal {
+  width: 0;
+  height: 0;
+}
+
+.disabled {
+  &::-moz-selection {
+    #scout.text-selection-disabled();
+  }
+  &::selection {
+    #scout.text-selection-disabled();
+  }
+
+  &::-webkit-input-placeholder {
+    #scout.placeholder-disabled();
+    /* Fill color is inherited, make sure it is ignored and the current color is used instead. Needed for iOS, see usage of -webkit-text-fill-color below*/
+    -webkit-text-fill-color: currentcolor;
+  }
+  &:-moz-placeholder { /* older versions of firefox */
+    #scout.placeholder-disabled();
+  }
+  &::-moz-placeholder {
+    #scout.placeholder-disabled();
+  }
+  &:-ms-input-placeholder {
+    #scout.placeholder-disabled();
+  }
+}
+
+/* Add this class to temporary remove an element from the document flow. */
+/* !important is used to override any specific "display" values (because this */
+/* call would in most cases be less specific than the element's rules). */
+.hidden {
+  display: none !important; /* NOSONAR (!important is okay here) */
+}
+
+/* Add this class to temporary hide (but not remove from flow) an element. Similar to "hidden". */
+.invisible {
+  visibility: hidden !important; /* NOSONAR (!important is okay here) */
+}
+
+*, *::before, *::after { /* NOSONAR (universal selector is okay here) */
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
+/* use -moz-none to allow child element to set -moz-user-select: text */
+/* See also: focusUtil.js, isSelectableText() */
+.table-cell,
+.table-header-item,
+.tree-node,
+.table-footer,
+.table-control,
+.table-info-item,
+.table-header-menu-group-text {
+  -moz-user-select: -moz-none;
+}
+
+input,
+textarea,
+button {
+  #scout.font-text-normal();
+}
+
+input,
+textarea,
+.input-field {
+  background-color: @control-background-color;
+  color: @control-color;
+  border: 1px solid @border-color;
+  border-radius: @control-border-radius;
+
+  &.disabled {
+    background-color: @control-disabled-background-color;
+    color: @control-disabled-color;
+  }
+
+  &:focus,
+  &.focused {
+    #scout.focus-border();
+  }
+
+  &.has-error {
+    border-color: @error-border-color;
+    background-color: @error-background-color;
+  }
+
+  &.has-error:focus,
+  &.has-error.focused {
+    #scout.glow(@error-glow-color);
+  }
+
+  &.read-only {
+    #scout.read-only();
+  }
+}
+
+input[type="text"].alternative,
+input[type="password"].alternative {
+  /* Add 1px padding to prevent the text from moving a little when field is focused due to the 2px focus border */
+  padding-bottom: 1px;
+
+  /* Compensate padding-bottom to align input text with label on the left */
+  /* It won't be perfect (especially when zoomed) but should be good enough */
+  padding-top: @text-field-padding-top-compensation;
+}
+
+input.alternative,
+.input-field.alternative {
+  background-color: @text-field-alternative-background-color;
+  border-color: transparent;
+  border-bottom-color: @border-color;
+  border-radius: @control-alternative-border-radius;
+  border-left-width: 0;
+  border-right-width: 0;
+  padding-left: @text-field-alternative-padding-left;
+  padding-right: @text-field-alternative-padding-right;
+
+  &.disabled {
+    color: @disabled-color;
+    border-bottom-style: dashed;
+    border-bottom-color: @text-field-alternative-disabled-border-color;
+  }
+
+  &:focus,
+  &.focused {
+    color: @focus-color;
+    #scout.alternative-focus-border();
+  }
+
+  &.has-error {
+    color: @error-color;
+    border-bottom-color: @error-border-color;
+  }
+
+  &.has-error:focus,
+  &.has-error.focused {
+    border-bottom-color: @error-border-color;
+    border-bottom-width: 2px;
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
+  &.read-only {
+    color: @text-color;
+  }
+}
+
+input {
+  padding: 0 @text-field-padding-x;
+
+  /* remove platform specific styling, mainly used to remove shadow on iOS Safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  /* text inputs on Safari have 2px top and bottom margin -> remove*/
+  margin: 0;
+
+  &.disabled {
+    /* Only setting the color has no effect for input elements on iOS Safari -> set fill color, too */
+    /* It is activated for input elements only since the rule would be inherited by sub elements and therefore would change theirs colors as well */
+    -webkit-text-fill-color: currentcolor;
+    opacity: 1;
+  }
+}
+
+textarea.alternative {
+  background-color: @text-field-alternative-background-color;
+
+  &.disabled:not(.read-only) {
+    background-color: transparent;
+    border: 1px dashed @border-color;
+    color: @disabled-color;
+  }
+}
+
+input[type="text"],
+textarea {
+  /* Explicitly set 'user-select' to something other than 'none', otherwise the focus manager */
+  /* might prevent text selection (scout.focusUtils.isSelectableText()). Some browsers already */
+  /* provide such a rule in the user style sheet, but some do not (e.g. Chrome 62). */
+  #scout.user-select(text);
+}
+
+input[type="radio"] {
+  /* radiobutton in active filter (smartfield) should be displayed as radiobutton */
+  -webkit-appearance: radio;
+  -moz-appearance: radio;
+  appearance: radio;
+  margin: 1px;
+}
+
+.input-field {
+  padding: @text-field-padding-y @text-field-padding-x;
+  #scout.overflow-ellipsis-nowrap();
+  #scout.user-select(text);
+}
+
+button {
+  padding: @button-padding-y @button-padding-x;
+  margin: 0; /* reset user agent style, e.g. on safari */
+}
+
+.button {
+  position: relative;
+  color: @button-color;
+  background-color: @button-background-color;
+  border: 1px solid @button-border-color;
+  border-radius: @button-border-radius;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: @button-padding-y @button-padding-x;
+  /* Note: no vertical align helper here! this is very dependent on the content of the button */
+  /* (only text or other DOM nodes), therefore it has to be added manually when desired. */
+
+  & > .button-label,
+  & > .submenu-icon,
+  & > .icon {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  & > .button-label {
+    margin-top: 1px; /* SUPER HACK */
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  & > .icon {
+    /* Padding only relevant for icons larger than the container */
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    &.with-label {
+      margin-right: 8px;
+    }
+
+    &.loading,
+    &.broken {
+      .hidden();
+    }
+
+    &.font-icon {
+      color: @button-font-icon-color;
+      font-size: @button-font-icon-size;
+    }
+
+    &.image-icon {
+      max-height: 100%;
+    }
+  }
+
+  & > .submenu-icon {
+    #scout.submenu-icon();
+    padding-left: 8px;
+  }
+
+  & > .button-label,
+  & > .icon,
+  & > .submenu-icon {
+    opacity: 1;
+    transition: opacity @loading-fade-duration;
+  }
+
+  &:hover {
+    color: @button-hover-color;
+  }
+
+  &:focus {
+    outline: none;
+    overflow: visible; /* without this, IE would cut off the focus glow */
+
+    &::before {
+      #scout.button-focus();
+    }
+  }
+
+  &:not(.disabled):active {
+    color: @button-active-color;
+    background-color: @button-active-background-color;
+
+    & > .font-icon {
+      color: @button-active-color;
+    }
+  }
+
+  &.default:not(.disabled) {
+    background-color: @default-button-background-color;
+    /* border is necessary to align the text with text from buttons with a real border */
+    border-color: @default-button-background-color;
+    color: @default-button-color;
+
+    &:focus {
+      color: @default-button-color;
+    }
+
+    &:hover {
+      background-color: @default-button-hover-background-color;
+    }
+
+    &:active {
+      background-color: @default-button-active-background-color;
+      border-color: @default-button-active-background-color;
+    }
+
+    & > .font-icon {
+      font-weight: normal;
+      color: @icon-inverted-color;
+    }
+  }
+
+  &:disabled {
+    background-color: @button-disabled-background-color;
+    border-color: @button-disabled-border-color;
+    color: @button-disabled-color;
+    cursor: default;
+
+    & > .font-icon {
+      color: @button-font-icon-disabled-color;
+    }
+  }
+
+  &.loading {
+    & > .button-label,
+    & > .icon,
+    & > .submenu-icon {
+      opacity: 0;
+      transition: opacity @loading-fade-duration;
+    }
+
+    & > .loading-indicator {
+      #scout.loading-indicator(20px);
+    }
+  }
+}
+
+textarea {
+  /* these two properties are required for FF, otherwise the editable textarea is 2px too large, */
+  /* and the DOM inspector does not include these 2 pixels. */
+  margin: 0 auto;
+  padding: @text-field-padding-y @text-field-padding-x;
+  resize: none;
+  /* Override default overflow value 'scroll' in IE */
+  overflow: auto;
+
+  /* remove platform specific styling, mainly used to remove shadow on ios safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  &.alternative {
+    border-radius: @control-alternative-border-radius;
+  }
+}
+
+/* cursor handling */
+
+/* The following classes are added dynamically while dragging. !important is necessary to override */
+/* any cursor an underlying component defines while moving the mouse. */
+
+.col-resize,
+.col-resize * { /* NOSONAR (universal selector is okay here) */
+  cursor: col-resize !important; /* NOSONAR (!important is okay here) */
+}
+.row-resize,
+.row-resize * { /* NOSONAR (universal selector is okay here) */
+  cursor: row-resize !important; /* NOSONAR (!important is okay here) */
+}
+
+/* Used to temporarily disable pointer events on iframes while dragging elements */
+.dragging-in-progress {
+  pointer-events: none;
+}
+
+/* remove the dotted border in firefox */
+button::-moz-focus-inner {
+  border: 0;
+}
+
+.font-preloader {
+  position: absolute;
+  top: -999px;
+  left: -999px;
+  visibility: hidden;
+  display: block;
+  width: auto;
+  height: auto;
+  white-space: nowrap;
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+  font-variant: normal;
+  font-size: 20em;
+}
+
+.drag-handle {
+  content: '';
+  width: 100%;
+  height: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-top: -5px;
+  cursor: move;
+  z-index: 10;
+}
+
+.closer {
+  #scout.font-icon();
+  font-size: 17px;
+  cursor: pointer;
+  color: @closer-color;
+
+  &::before {
+    content: @icon-remove-bold;
+  }
+
+  &:active {
+    color: @active-color;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+}
+
+.save-needer {
+  #scout.font-icon();
+  font-size: 12px;
+  color: @save-needer-color;
+
+  &::before {
+    content: @icon-pencil-solid;
+  }
+}
+
+/* Used to display errors from server when desktop is not available */
+.fatal-error {
+  margin: 10px;
+  #scout.user-select(text)
+}
+
+.application-loading-root {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: @application-loading-background-color;
+  pointer-events: none;
+}
+
+.application-loading-root-fadeout {
+  #scout.animation(fade-out @loading-fade-duration linear 1);
+}
+
+.application-loading01 {
+  height: @application-loading01-size;
+  width: @application-loading01-size;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 3px @application-loading01-color;
+    #scout.animation(pulsate 2s ease-out infinite);
+  }
+}
+
+.application-loading02 {
+  height: @application-loading02-size;
+  width: @application-loading02-size;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: inset 0 0 4px 2px @application-loading02-color;
+    #scout.animation(pulsate 2.84s ease-out infinite);
+  }
+}
+
+
+a,
+.link,
+.app-link {
+  color: @link-color;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: @link-hover-color;
+  }
+
+  &:active {
+    color: @link-active-color;
+  }
+
+  &:focus {
+    outline-color: @link-color;
+  }
+}
+
+.font-icon {
+  #scout.font-icon();
+}
+
+.white-space-nowrap {
+  #scout.white-space-nowrap();
+}
+
+.startup-error {
+  #scout.user-select(text);
+  #scout.drop-shadow();
+  margin: 100px 50px;
+  padding: 20px;
+  border: 1px solid @error-border-color;
+  background-color: @error-background-color;
+}
+
+.startup-error-title {
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+/* --- z-index --- */
+/* Rule: All child elements of .scout get the same z-index 0 assigned. This spawns a new stacking context for each */
+/* of these elements (iff they are "positioned"). To bring a new element to the top, add it to the end of the list. */
+/* https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Understanding_z_index/The_stacking_context */
+.scout > .desktop-navigation,
+.scout > .desktop-header,
+.scout > .desktop-bench,
+.scout > .desktop-bench,
+.scout > .splitter,
+.scout > .glasspane,
+.scout > .busyindicator,
+.scout > .dialog,
+.scout > .form,
+.scout > .messagebox,
+.scout > .file-chooser,
+.scout > .tooltip,
+.scout > .popup,
+.scout > .touch-popup,
+.scout > .form-menu-popup,
+.scout > .smart-field-popup,
+.scout > .proposal-field-popup,
+.scout > .date-picker-popup,
+.scout > .time-picker-popup,
+.scout > .table-header-menu,
+.scout > .tag-chooser-popup,
+.scout > .tag-overflow-popup,
+.scout > .notifications {
+  z-index: 0;
+}
+
+noscript {
+  display: block;
+
+  & > .wrapper > .box-content > h1 {
+    #scout.font-text-normal(bold);
+  }
+}
+
+/* Internet explorer applies the -ms-user-select setting: none (inherited from body) also to iframe contents.
+ * Other browsers do not, websites within an iframe should decide on their own if they are selectable (or not).
+ * Reset to default.
+ */
+iframe {
+  -ms-user-select: element;
+}
+
+.error-popup-correlation-id {
+  #scout.user-select(text);
+  #scout.font-text-small();
+  color: @palette-gray-6;
+}

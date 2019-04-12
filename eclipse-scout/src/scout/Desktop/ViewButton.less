@@ -1,0 +1,127 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.view-tab {
+  display: inline-block;
+  position: relative;
+  height: @view-button-box-height;
+
+  & > .key-box {
+    bottom: 4px;
+  }
+}
+
+.view-button-tab {
+  white-space: nowrap;
+  border-right: solid 1px @border-color;
+  text-align: center;
+  #scout.vertical-align-helper-before();
+  min-width: 50px;
+  background-color: @view-button-tab-background-color;
+  color: @view-button-tab-color;
+
+  &:hover {
+    cursor: pointer;
+
+    &:not(.selected) > .font-icon {
+      color: @hover-color;
+    }
+  }
+
+  &:active {
+    &:not(.selected) > .font-icon {
+      color: @active-color;
+    }
+  }
+
+  &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+
+    &.last {
+      border-right-color: transparent;
+    }
+  }
+
+  &.disabled {
+    color: @text-disabled-color;
+
+    &:hover {
+      cursor: default;
+      color: @text-disabled-color;
+
+      &:not(.selected) > .font-icon {
+        color: @text-disabled-color;
+      }
+    }
+  }
+
+  &.view-menu-popup-head {
+    position: absolute;
+    background-color: @active-inverted-color;
+    color: @active-color;
+  }
+
+  & > .icon {
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    font-size: 20px;
+  }
+
+  & > .arrow-icon {
+    /* Set size to zero, so we can position the element relative to the parent element while NOT taking up space. */
+    /* Otherwise, the icon would "jump" when toggling the visibility. */
+    display: inline-block;
+    width: 0;
+    height: 0;
+    position: relative;
+    top: 10px;
+    left: -6px;
+    opacity: 1;
+    transition: opacity 150ms;
+
+    &.hidden {
+      /* override "display: none" */
+      display: inline-block !important; /* NOSONAR (!important is okay here) */
+      opacity: 0;
+    }
+
+    & > .arrow-icon-svg {
+      width: 11px;
+      height: 11px;
+
+      & > .circle {
+        fill: @view-button-tab-active-color;
+      }
+
+      & > .arrow {
+        fill: @view-button-tab-active-background-color;
+      }
+    }
+
+    &.menu-open > .arrow-icon-svg {
+      transform:
+        /* For some reason, the icon is positioned 1px too high in the menu popup -> fix it */
+        translateY(1px)
+        /* Rotate the arrow */
+        rotate(180deg);
+
+      & > .circle {
+        fill: @active-color;
+      }
+      & > .arrow {
+        fill: @palette-white;
+      }
+    }
+  }
+}

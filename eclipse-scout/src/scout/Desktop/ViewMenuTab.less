@@ -1,0 +1,66 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.view-tab {
+
+  & > .menu-item {
+    height: @view-button-box-height;
+    display: inline-block;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: solid 1px @border-color;
+
+    & > .icon {
+      top: 0;
+    }
+  }
+
+  & > .view-button-tab {
+    display: inline-block;
+    height: @view-button-box-height;
+  }
+
+  & > .submenu-icon {
+    #scout.submenu-icon();
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    line-height: normal;
+    height: auto;
+
+    /* Make IE trigger the :active state if the text or icon is pressed */
+    pointer-events: none;
+  }
+}
+
+.view-menu {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-right: solid 1px @border-color;
+  background-color: @view-button-tab-background-color;
+  color: @view-button-tab-color;
+
+  &.view-menu-popup-head {
+    position: absolute;
+    background-color: @view-menu-popup-background-color;
+    color: @active-color;
+  }
+
+  &.selected {
+    background-color: @view-button-tab-active-background-color;
+    color: @view-button-tab-active-color;
+
+    &.last {
+      border-right-color: transparent;
+    }
+  }
+}

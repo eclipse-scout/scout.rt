@@ -1,32 +1,24 @@
 {
   "name": "eclipse-scout",
   "version": "10.0.0",
-  "description": "Scout RT Web",
+  "description": "Eclipse Scout",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "license": "EPL-1.0",
   "private": true,
+  "main": "index.js",
   "scripts": {
-    "test": "karma start",
-    "build-dev": "webpack --mode development",
-    "build": "webpack --mode production"
+    "build-dev": "webpack --display-error-details --display-reasons --debug",
+    "build": "webpack --display-error-details --display-reasons --debug",
+    "prepare": "npm run build",
+    "test": "karma start"
   },
   "author": "BSI Business Systems Integration AG",
-  "license": "ISC",
+  "homepage": "https://www.eclipse.org/scout",
+  "license": "EPL-1.0",
   "devDependencies": {
-    "clean-webpack-plugin": "^2.0.1",
-    "copy-webpack-plugin": "^5.0.2",
-    "css-loader": "^2.1.1",
-    "extract-loader": "^3.1.0",
-    "jasmine-core": "^3.3.0",
-    "karma": "^4.0.1",
-    "karma-jasmine": "^2.0.1",
-    "karma-webpack": "^3.0.5",
-    "less": "^3.9.0",
-    "less-loader": "^4.1.0",
-    "mini-css-extract-plugin": "^0.5.0",
-    "optimize-css-assets-webpack-plugin": "^5.0.1",
-    "style-loader": "^0.23.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.2.1",
-    "webpack-shell-plugin": "^0.5.0"
+    "jquery": "^3.4.0"
   }
 }

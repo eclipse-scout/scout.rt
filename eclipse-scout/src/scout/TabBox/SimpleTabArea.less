@@ -1,0 +1,38 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+@import url('../main');
+
+.simple-tab-area {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+
+  & > .simple-overflow-tab-item {
+    border-right: 1px solid @border-color;
+    display: inline-block;
+    height: 100%;
+    width: 30px;
+    padding-top: @simple-overflow-tab-item-padding-top;
+    text-align: center;
+    cursor: pointer;
+    vertical-align: top;
+
+    &::after {
+      #scout.font-icon();
+      color: @icon-color;
+      content: @icon-angle-down;
+    }
+
+    &.animate-modality-highlight {
+      #scout.animation-flash-gray();
+    }
+  }
+}
