@@ -11,6 +11,8 @@ module.exports = (env, args) => {
   let devMode = args.mode !== 'production';
   let cssFilename = devMode ? '[name].css' : '[name]-[contenthash].min.css';
 
+  // FIXME [awe] separate file for eclipse-scout.js
+
   return {
     target: 'web',
     mode: 'none',

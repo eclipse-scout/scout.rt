@@ -3,53 +3,51 @@ import Scout from '../Scout';
 import Graphics from '../Utils/Graphics';
 
 export default class ViewButtonBoxLayout extends AbstractLayout {
-    constructor(viewButtonBox) {
-        super();
-        this.viewButtonBox = viewButtonBox;
+
+  constructor(viewButtonBox) {
+    super();
+    this.viewButtonBox = viewButtonBox;
+  }
+
+  layout($container) {
+    var tabs = this.viewButtonBox.tabButtons.filter(function(tab) {
+        return tab.visible;
+      }),
+      viewMenuTab = this.viewButtonBox.viewMenuTab,
+      htmlComp = this.viewButtonBox.htmlComp,
+      containerWidth = htmlComp.size().width,
+      tabWidth = containerWidth / tabs.length;
+
+    if (viewMenuTab.visible && viewMenuTab.selectedButton.rendered) {
+      if (viewMenuTab.selectedButton) {
+        tabWidth = (containerWidth - Graphics.size(viewMenuTab.dropdown.$container, {
+          exact: true
+        }).width) / (tabs.length + 1);
+        viewMenuTab.selectedButton.$container.cssPxValue('width', tabWidth);
+      }
+
+      containerWidth -= Graphics.size(viewMenuTab.$container, {
+        exact: true
+      }).width;
     }
 
-    layout($container) {
-        var tabs = this.viewButtonBox.tabButtons.filter(function(tab) {
-                return tab.visible;
-            }),
-            viewMenuTab = this.viewButtonBox.viewMenuTab,
-            htmlComp = this.viewButtonBox.htmlComp,
-            containerWidth = htmlComp.size().width,
-            tabWidth = containerWidth / tabs.length;
+    tabs.forEach(function(tab, index) {
+      if (tabs.length - 1 === index) {
+        // to avoid pixel fault due to rounding issues calculate the rest for the last tab.
+        // Round up to the second digit otherwise at least Chrome may still show the background of the view button box (at least in compact mode)
+        tab.$container.cssWidth(Math.ceil(containerWidth * 100) / 100);
+      } else {
+        tab.$container.cssWidth(tabWidth);
+        containerWidth -= tab.$container.cssWidth();
+      }
+    }, this);
+  };
 
-        if (viewMenuTab.visible && viewMenuTab.selectedButton.rendered) {
-            if (viewMenuTab.selectedButton) {
-                tabWidth = (containerWidth - Graphics.size(viewMenuTab.dropdown.$container, {
-                    exact: true
-                }).width) / (tabs.length + 1);
-                viewMenuTab.selectedButton.$container.cssPxValue('width', tabWidth);
-            }
-
-            containerWidth -= Graphics.size(viewMenuTab.$container, {
-                exact: true
-            }).width;
-        }
-
-        tabs.forEach(function(tab, index) {
-            if (tabs.length - 1 === index) {
-                // to avoid pixel fault due to rounding issues calculate the rest for the last tab.
-                // Round up to the second digit otherwise at least Chrome may still show the background of the view button box (at least in compact mode)
-                tab.$container.cssWidth(Math.ceil(containerWidth * 100) / 100);
-            } else {
-                tab.$container.cssWidth(tabWidth);
-                containerWidth -= tab.$container.cssWidth();
-            }
-        }, this);
-    };
-
-    preferredLayoutSize($container) {
-        // View buttons have an absolute css height set -> useCssSize = true
-        return Graphics.prefSize($container, {
-            useCssSize: true
-        });
-    };
+  preferredLayoutSize($container) {
+    // View buttons have an absolute css height set -> useCssSize = true
+    return Graphics.prefSize($container, {
+      useCssSize: true
+    });
+  };
 
 }
-
-
-

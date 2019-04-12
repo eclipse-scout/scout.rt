@@ -1,72 +1,70 @@
 import Action from '../Action/Action';
 
-//require('./ViewButton.less');
-
 export default class ViewButton extends Action {
 
-    constructor(){
-        super();
-        this.showTooltipWhenSelected = false;
-        this.displayStyle = 'TAB';
-        this._renderedAsMenu = false;
+  constructor() {
+    super();
+    this.showTooltipWhenSelected = false;
+    this.displayStyle = 'TAB';
+    this._renderedAsMenu = false;
+  }
+
+  renderAsMenuItem($parent) {
+    this._renderedAsMenu = true;
+    super.render($parent);
+  };
+  renderAsTab($parent) {
+    this._renderedAsMenu = false;
+    super.render($parent);
+  };
+
+  _render() {
+    if (this._renderedAsMenu) {
+      this._renderAsMenuItem();
+    } else {
+      this._renderAsTab();
     }
+  };
 
-    renderAsMenuItem($parent) {
-        this._renderedAsMenu = true;
-        super.render($parent);
-    };
-    renderAsTab($parent) {
-        this._renderedAsMenu = false;
-        super.render($parent);
-    };
+  _renderAsMenuItem() {
+    this.$container = this.$parent.appendDiv('view-menu-item')
+      .on('click', this._onMouseEvent.bind(this));
+  };
 
-    _render() {
-        if (this._renderedAsMenu) {
-            this._renderAsMenuItem();
-        } else {
-            this._renderAsTab();
-        }
-    };
+  _renderAsTab() {
+    this.$container = this.$parent.appendDiv('view-button-tab')
+      .on('mousedown', this._onMouseEvent.bind(this));
+  };
 
-    _renderAsMenuItem() {
-        this.$container = this.$parent.appendDiv('view-menu-item')
-            .on('click', this._onMouseEvent.bind(this));
-    };
+  /**
+   * @override Action.js
+   */
+  _renderText() {
+    /*if (this._renderedAsMenu) {*/
+    super._renderText();
+    //}
+  };
 
-    _renderAsTab() {
-        this.$container = this.$parent.appendDiv('view-button-tab')
-            .on('mousedown', this._onMouseEvent.bind(this));
-    };
+  setDisplayStyle(displayStyle) {
+    this.setProperty('displayStyle', displayStyle);
+  };
 
-    /**
-     * @override Action.js
-     */
-    _renderText() {
-        /*if (this._renderedAsMenu) {*/
-            super._renderText();
-        //}
-    };
+  last() {
+    this.$container.addClass('last');
+  };
 
-    setDisplayStyle(displayStyle) {
-        this.setProperty('displayStyle', displayStyle);
-    };
+  tab() {
+    this.$container.addClass('view-tab');
+  };
 
-    last() {
-        this.$container.addClass('last');
-    };
+  _onMouseEvent(event) {
+    this.doAction();
+  };
 
-    tab() {
-        this.$container.addClass('view-tab');
-    };
-
-    _onMouseEvent(event) {
-        this.doAction();
-    };
-
-    /**
-     * @override Action.js
-     */
-    /*_createActionKeyStroke() {
+  /**
+   * @override Action.js
+   */
+  /*_createActionKeyStroke() {
         return new scout.ViewButtonActionKeyStroke(this);
     };
 

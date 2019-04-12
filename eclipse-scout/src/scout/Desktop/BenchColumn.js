@@ -8,362 +8,360 @@ import Scout from '../Scout';
 import SimpleTabBox from '../TabBox/SimpleTabBox';
 import DesktopTabBoxController from './DesktopTabBoxController';
 
-//require('./BenchColumn.less');
-
 export const TAB_BOX_INDEX = Object.freeze({
-    TOP: 0,
-    CENTER: 1,
-    BOTTOM: 2
+  TOP: 0,
+  CENTER: 1,
+  BOTTOM: 2
 });
 
 export const TAB_BOX_CLASSES = Object.freeze([
-    'north',
-    'center',
-    'south'
+  'north',
+  'center',
+  'south'
 ]);
 
 export default class BenchColumn extends Widget {
 
-    constructor(){
-        super();
-        this.htmlComp;
-        this.tabBoxes = [];
-        this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
-        this.components;
-        this._removeViewInProgress = 0;
-        this.layoutData;
+  constructor() {
+    super();
+    this.htmlComp;
+    this.tabBoxes = [];
+    this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
+    this.components;
+    this._removeViewInProgress = 0;
+    this.layoutData;
 
-        // event listener functions
-        this._viewAddHandler = this._onViewAdd.bind(this);
-        this._viewRemoveHandler = this._onViewRemove.bind(this);
-        this._viewActivateHandler = this._onViewActivate.bind(this);
-        this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
+    // event listener functions
+    this._viewAddHandler = this._onViewAdd.bind(this);
+    this._viewRemoveHandler = this._onViewRemove.bind(this);
+    this._viewActivateHandler = this._onViewActivate.bind(this);
+    this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
+  }
+
+  _init(model) {
+    super._init(model);
+    this.layoutData = model.layoutData;
+    this.layoutCacheKey = model.cacheKey;
+    this.cssClass = model.cssClass;
+    this._createTabBoxes();
+  };
+
+  /**
+   * Returns a $container used as a bind target for the key-stroke context of the group-box.
+   * By default this function returns the container of the form, or when group-box is has no
+   * form as a parent the container of the group-box.
+   */
+  _keyStrokeBindTarget() {
+    return this.$container;
+  };
+
+  _render() {
+    this.$container = this.$parent.appendDiv('bench-column');
+    if (this.cssClass) {
+      this.$container.addClass(this.cssClass);
     }
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(this._createLayout());
 
-    _init(model) {
-        super._init(model);
-        this.layoutData = model.layoutData;
-        this.layoutCacheKey = model.cacheKey;
-        this.cssClass = model.cssClass;
-        this._createTabBoxes();
-    };
+    this.htmlComp.layoutData = this.getLayoutData();
+  };
 
-    /**
-     * Returns a $container used as a bind target for the key-stroke context of the group-box.
-     * By default this function returns the container of the form, or when group-box is has no
-     * form as a parent the container of the group-box.
-     */
-    _keyStrokeBindTarget() {
-        return this.$container;
-    };
+  _renderProperties() {
+    super._renderProperties();
+    this._renderTabBoxes();
+    this._revalidateSplitters();
+  };
 
-    _render() {
-        this.$container = this.$parent.appendDiv('bench-column');
-        if (this.cssClass) {
-            this.$container.addClass(this.cssClass);
+  _renderTabBoxes() {
+    this.visibleTabBoxes().forEach(function(tabBox) {
+      this._renderTabBox(tabBox);
+    }.bind(this));
+    this.updateFirstLastMarker();
+  };
+
+  _renderTabBox(tabBox) {
+    if (!tabBox.rendered) {
+      tabBox.render();
+    }
+  };
+
+  postRender() {
+    this.tabBoxes.forEach(function(tabBox) {
+      tabBox.postRender();
+    });
+  };
+
+  _createLayout() {
+    return new FlexboxLayout(Direction.COLUMN, this.layoutCacheKey);
+  };
+
+  updateLayoutData(layoutData, cacheKey) {
+    if (this.getLayoutData() === layoutData) {
+      return;
+    }
+    this.layoutCacheKey = cacheKey;
+    this.setLayoutData(layoutData);
+
+    // update columns
+    var rowDatas = this.layoutData.getRows();
+    this.tabBoxes.forEach(function(tb, i) {
+      tb.setLayoutData(rowDatas[i]);
+    });
+    this._updateSplitterMovable();
+    if (this.rendered) {
+      this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
+      this.htmlComp.layout.reset();
+      this.htmlComp.invalidateLayoutTree();
+    }
+  };
+
+  setLayoutData(layoutData) {
+    super.setLayoutData(layoutData);
+    this.layoutData = layoutData;
+  };
+
+  getLayoutData() {
+    return this.layoutData;
+  };
+
+  _onViewAdd(event) {
+    this.trigger('viewAdd', {
+      view: event.view
+    });
+  };
+
+  _onViewRemove(event) {
+    this.trigger('viewRemove', {
+      view: event.view
+    });
+  };
+
+  _onViewActivate(event) {
+    this.trigger('viewActivate', {
+      view: event.view
+    });
+  };
+
+  _onViewDeactivate(event) {
+    this.trigger('viewDeactivate', {
+      view: event.view
+    });
+  };
+
+  activateView(view) {
+    var tabBox = this.getTabBox(view.displayViewId);
+    tabBox.activateView(view);
+  };
+
+  _createTabBoxes() {
+    var rowLayoutDatas = [];
+    if (this.layoutData) {
+      rowLayoutDatas = this.layoutData.getRows();
+    }
+    for (var i = 0; i < 3; i++) {
+      var tabBox = Scout.create(SimpleTabBox, {
+        parent: this,
+        cssClass: TAB_BOX_CLASSES[i],
+        controller: Scout.create(DesktopTabBoxController)
+      });
+      tabBox.setLayoutData(rowLayoutDatas[i]);
+      tabBox.on('viewAdd', this._viewAddHandler);
+      tabBox.on('viewRemove', this._viewRemoveHandler);
+      tabBox.on('viewActivate', this._viewActivateHandler);
+      tabBox.on('viewDeactivate', this._viewDeactivateHandler);
+      this.tabBoxes.push(tabBox);
+    }
+  };
+
+  _revalidateSplitters(clearPosition) {
+    // remove old splitters
+    if (this.components) {
+      this.components.forEach(function(comp) {
+        if (comp instanceof Splitter) {
+          comp.destroy();
         }
-        this.htmlComp = HtmlComponent.install(this.$container, this.session);
-        this.htmlComp.setLayout(this._createLayout());
+      });
+    }
+    this.components = this.visibleTabBoxes()
+      .reduce(function(arr, col) {
+        if (arr.length > 0) {
+          // add sep
+          var splitter = Scout.create('Splitter', {
+            parent: this,
+            $anchor: arr[arr.length - 1].$container,
+            $root: this.$container,
+            splitHorizontal: false,
+            maxRatio: 1
+          });
+          splitter.render();
+          splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
+          splitter.$container.addClass('line');
+          arr.push(splitter);
+        }
+        arr.push(col);
+        return arr;
+      }.bind(this), []);
+    // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
+    this.components.filter(function(comp) {
+        return comp instanceof SimpleTabBox;
+      })
+      .reduce(function(c1, c2, index) {
+        if (index > 0) {
+          c2.$container.insertAfter(c1.$container);
+        }
+        return c2;
+      }, undefined);
+    this._updateSplitterMovable();
+  };
 
-        this.htmlComp.layoutData = this.getLayoutData();
-    };
+  _updateSplitterMovable() {
+    if (!this.components) {
+      return;
+    }
+    this.components.forEach(function(c, i) {
+      if (c instanceof Splitter) {
+        var componentsBefore = this.components.slice(0, i).reverse();
+        var componentsAfter = this.components.slice(i + 1);
+        // shrink
+        if (
+          componentsBefore.filter(function(c) {
+            return c.getLayoutData().shrink > 0;
+          }).length > 0 &&
+          componentsAfter.filter(function(c) {
+            return c.getLayoutData().grow > 0;
+          }).length > 0
+        ) {
+          c.setEnabled(true);
+          c.on('move', this._onSplitterMove.bind(this));
+          return;
+        }
+        // grow
+        if (
+          componentsBefore.filter(function(c) {
+            return c.getLayoutData().grow > 0;
+          }).length > 0 &&
+          componentsAfter.filter(function(c) {
+            return c.getLayoutData().shrink > 0;
+          }).length > 0
+        ) {
+          c.setEnabled(true);
+          c.on('move', this._onSplitterMove.bind(this));
+          return;
+        }
+        c.setEnabled(false);
 
-    _renderProperties() {
-        super._renderProperties();
-        this._renderTabBoxes();
-        this._revalidateSplitters();
-    };
+      }
+    }.bind(this));
+  };
 
-    _renderTabBoxes() {
-        this.visibleTabBoxes().forEach(function(tabBox) {
-            this._renderTabBox(tabBox);
-        }.bind(this));
+  _onSplitterMove(event) {
+    var splitter = event.source;
+    var diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
+    splitter.getLayoutData().diff = diff;
+    this.revalidateLayout();
+    splitter.getLayoutData().diff = null;
+    event.preventDefault();
+  };
+
+  addView(view, bringToFront) {
+    var tabBox = this.getTabBox(view.displayViewId);
+    this._widgetToTabBox[view.id] = tabBox;
+
+    tabBox.addView(view, bringToFront);
+
+    if (this.rendered && tabBox.viewCount() === 1) {
+      if (!tabBox.rendered) {
+        // lazy render if the first view is added.
+        tabBox.render();
+      }
+      this._revalidateSplitters(true);
+      this.updateFirstLastMarker();
+      this.htmlComp.layout.reset();
+      this.htmlComp.invalidateLayoutTree();
+      // Layout immediate to prevent 'laggy' form visualization,
+      // but not initially while desktop gets rendered because it will be done at the end anyway
+      this.htmlComp.validateLayoutTree();
+    }
+  };
+
+  getTabBox(displayViewId) {
+    var tabBox;
+    switch (displayViewId) {
+      case 'NW':
+      case 'N':
+      case 'NE':
+        tabBox = this.tabBoxes[TAB_BOX_INDEX.TOP];
+        break;
+      case 'SW':
+      case 'S':
+      case 'SE':
+        tabBox = this.tabBoxes[TAB_BOX_INDEX.BOTTOM];
+        break;
+      default:
+        tabBox = this.tabBoxes[TAB_BOX_INDEX.CENTER];
+        break;
+    }
+    return tabBox;
+  };
+
+  removeView(view, showSiblingView) {
+    var tabBox = this._widgetToTabBox[view.id];
+    if (tabBox) {
+      this._removeViewInProgress++;
+      tabBox.removeView(view, showSiblingView);
+      this._removeViewInProgress--;
+      delete this._widgetToTabBox[view.id];
+      if (this.rendered && tabBox.viewCount() === 0 && this._removeViewInProgress === 0) {
+        // remove view area if no view is left.
+        tabBox.remove();
+        this._revalidateSplitters(true);
         this.updateFirstLastMarker();
-    };
+        this.htmlComp.layout.reset();
+        this.htmlComp.invalidateLayoutTree();
+        // Layout immediate to prevent 'laggy' form visualization,
+        // but not initially while desktop gets rendered because it will be done at the end anyway
+        this.htmlComp.validateLayoutTree();
+      }
+    }
+  };
 
-    _renderTabBox(tabBox) {
-        if (!tabBox.rendered) {
-            tabBox.render();
-        }
-    };
+  viewCount() {
+    return this.tabBoxes.map(function(tabBox) {
+      return tabBox.viewCount();
+    }).reduce(function(c1, c2) {
+      return c1 + c2;
+    }, 0);
+  };
 
-    postRender() {
-        this.tabBoxes.forEach(function(tabBox) {
-            tabBox.postRender();
-        });
-    };
+  hasView(view) {
+    return this.tabBoxes.filter(function(tabBox) {
+      return tabBox.hasView(view);
+    }).length > 0;
+  };
 
-    _createLayout() {
-        return new FlexboxLayout(Direction.COLUMN, this.layoutCacheKey);
-    };
+  hasViews() {
+    return this.viewCount() > 0;
+  };
 
-    updateLayoutData(layoutData, cacheKey) {
-        if (this.getLayoutData() === layoutData) {
-            return;
-        }
-        this.layoutCacheKey = cacheKey;
-        this.setLayoutData(layoutData);
+  getViews(displayViewId) {
+    return this.tabBoxes.reduce(function(arr, tabBox) {
+      Arrays.pushAll(arr, tabBox.getViews(displayViewId));
+      return arr;
+    }, []);
+  };
 
-        // update columns
-        var rowDatas = this.layoutData.getRows();
-        this.tabBoxes.forEach(function(tb, i) {
-            tb.setLayoutData(rowDatas[i]);
-        });
-        this._updateSplitterMovable();
-        if (this.rendered) {
-            this.htmlComp.layout.setCacheKey(this.layoutCacheKey);
-            this.htmlComp.layout.reset();
-            this.htmlComp.invalidateLayoutTree();
-        }
-    };
+  getComponents() {
+    return this.components;
+  };
 
-    setLayoutData(layoutData) {
-        super.setLayoutData(layoutData);
-        this.layoutData = layoutData;
-    };
+  visibleTabBoxes() {
+    return this.tabBoxes.filter(function(tabBox) {
+      return tabBox.hasViews();
+    });
+  };
 
-    getLayoutData() {
-        return this.layoutData;
-    };
-
-    _onViewAdd(event) {
-        this.trigger('viewAdd', {
-            view: event.view
-        });
-    };
-
-    _onViewRemove(event) {
-        this.trigger('viewRemove', {
-            view: event.view
-        });
-    };
-
-    _onViewActivate(event) {
-        this.trigger('viewActivate', {
-            view: event.view
-        });
-    };
-
-    _onViewDeactivate(event) {
-        this.trigger('viewDeactivate', {
-            view: event.view
-        });
-    };
-
-    activateView(view) {
-        var tabBox = this.getTabBox(view.displayViewId);
-        tabBox.activateView(view);
-    };
-
-    _createTabBoxes() {
-        var rowLayoutDatas = [];
-        if (this.layoutData) {
-            rowLayoutDatas = this.layoutData.getRows();
-        }
-        for (var i = 0; i < 3; i++) {
-            var tabBox = Scout.create(SimpleTabBox, {
-                parent: this,
-                cssClass: TAB_BOX_CLASSES[i],
-                controller: Scout.create(DesktopTabBoxController)
-            });
-            tabBox.setLayoutData(rowLayoutDatas[i]);
-            tabBox.on('viewAdd', this._viewAddHandler);
-            tabBox.on('viewRemove', this._viewRemoveHandler);
-            tabBox.on('viewActivate', this._viewActivateHandler);
-            tabBox.on('viewDeactivate', this._viewDeactivateHandler);
-            this.tabBoxes.push(tabBox);
-        }
-    };
-
-    _revalidateSplitters(clearPosition) {
-        // remove old splitters
-        if (this.components) {
-            this.components.forEach(function(comp) {
-                if (comp instanceof Splitter) {
-                    comp.destroy();
-                }
-            });
-        }
-        this.components = this.visibleTabBoxes()
-            .reduce(function(arr, col) {
-                if (arr.length > 0) {
-                    // add sep
-                    var splitter = Scout.create('Splitter', {
-                        parent: this,
-                        $anchor: arr[arr.length - 1].$container,
-                        $root: this.$container,
-                        splitHorizontal: false,
-                        maxRatio: 1
-                    });
-                    splitter.render();
-                    splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
-                    splitter.$container.addClass('line');
-                    arr.push(splitter);
-                }
-                arr.push(col);
-                return arr;
-            }.bind(this), []);
-        // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
-        this.components.filter(function(comp) {
-            return comp instanceof SimpleTabBox;
-        })
-            .reduce(function(c1, c2, index) {
-                if (index > 0) {
-                    c2.$container.insertAfter(c1.$container);
-                }
-                return c2;
-            }, undefined);
-        this._updateSplitterMovable();
-    };
-
-    _updateSplitterMovable() {
-        if (!this.components) {
-            return;
-        }
-        this.components.forEach(function(c, i) {
-            if (c instanceof Splitter) {
-                var componentsBefore = this.components.slice(0, i).reverse();
-                var componentsAfter = this.components.slice(i + 1);
-                // shrink
-                if (
-                    componentsBefore.filter(function(c) {
-                        return c.getLayoutData().shrink > 0;
-                    }).length > 0 &&
-                    componentsAfter.filter(function(c) {
-                        return c.getLayoutData().grow > 0;
-                    }).length > 0
-                ) {
-                    c.setEnabled(true);
-                    c.on('move', this._onSplitterMove.bind(this));
-                    return;
-                }
-                // grow
-                if (
-                    componentsBefore.filter(function(c) {
-                        return c.getLayoutData().grow > 0;
-                    }).length > 0 &&
-                    componentsAfter.filter(function(c) {
-                        return c.getLayoutData().shrink > 0;
-                    }).length > 0
-                ) {
-                    c.setEnabled(true);
-                    c.on('move', this._onSplitterMove.bind(this));
-                    return;
-                }
-                c.setEnabled(false);
-
-            }
-        }.bind(this));
-    };
-
-    _onSplitterMove(event) {
-        var splitter = event.source;
-        var diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
-        splitter.getLayoutData().diff = diff;
-        this.revalidateLayout();
-        splitter.getLayoutData().diff = null;
-        event.preventDefault();
-    };
-
-    addView(view, bringToFront) {
-        var tabBox = this.getTabBox(view.displayViewId);
-        this._widgetToTabBox[view.id] = tabBox;
-
-        tabBox.addView(view, bringToFront);
-
-        if (this.rendered && tabBox.viewCount() === 1) {
-            if (!tabBox.rendered) {
-                // lazy render if the first view is added.
-                tabBox.render();
-            }
-            this._revalidateSplitters(true);
-            this.updateFirstLastMarker();
-            this.htmlComp.layout.reset();
-            this.htmlComp.invalidateLayoutTree();
-            // Layout immediate to prevent 'laggy' form visualization,
-            // but not initially while desktop gets rendered because it will be done at the end anyway
-            this.htmlComp.validateLayoutTree();
-        }
-    };
-
-    getTabBox(displayViewId) {
-        var tabBox;
-        switch (displayViewId) {
-            case 'NW':
-            case 'N':
-            case 'NE':
-                tabBox = this.tabBoxes[TAB_BOX_INDEX.TOP];
-                break;
-            case 'SW':
-            case 'S':
-            case 'SE':
-                tabBox = this.tabBoxes[TAB_BOX_INDEX.BOTTOM];
-                break;
-            default:
-                tabBox = this.tabBoxes[TAB_BOX_INDEX.CENTER];
-                break;
-        }
-        return tabBox;
-    };
-
-    removeView(view, showSiblingView) {
-        var tabBox = this._widgetToTabBox[view.id];
-        if (tabBox) {
-            this._removeViewInProgress++;
-            tabBox.removeView(view, showSiblingView);
-            this._removeViewInProgress--;
-            delete this._widgetToTabBox[view.id];
-            if (this.rendered && tabBox.viewCount() === 0 && this._removeViewInProgress === 0) {
-                // remove view area if no view is left.
-                tabBox.remove();
-                this._revalidateSplitters(true);
-                this.updateFirstLastMarker();
-                this.htmlComp.layout.reset();
-                this.htmlComp.invalidateLayoutTree();
-                // Layout immediate to prevent 'laggy' form visualization,
-                // but not initially while desktop gets rendered because it will be done at the end anyway
-                this.htmlComp.validateLayoutTree();
-            }
-        }
-    };
-
-    viewCount() {
-        return this.tabBoxes.map(function(tabBox) {
-            return tabBox.viewCount();
-        }).reduce(function(c1, c2) {
-            return c1 + c2;
-        }, 0);
-    };
-
-    hasView(view) {
-        return this.tabBoxes.filter(function(tabBox) {
-            return tabBox.hasView(view);
-        }).length > 0;
-    };
-
-    hasViews() {
-        return this.viewCount() > 0;
-    };
-
-    getViews(displayViewId) {
-        return this.tabBoxes.reduce(function(arr, tabBox) {
-            Arrays.pushAll(arr, tabBox.getViews(displayViewId));
-            return arr;
-        }, []);
-    };
-
-    getComponents() {
-        return this.components;
-    };
-
-    visibleTabBoxes() {
-        return this.tabBoxes.filter(function(tabBox) {
-            return tabBox.hasViews();
-        });
-    };
-
-    updateFirstLastMarker() {
-        Widget.updateFirstLastMarker(this.visibleTabBoxes());
-    };
+  updateFirstLastMarker() {
+    Widget.updateFirstLastMarker(this.visibleTabBoxes());
+  };
 
 }
