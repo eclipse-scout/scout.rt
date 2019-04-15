@@ -17,7 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +38,6 @@ import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
-import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
 import org.eclipse.scout.rt.ui.html.res.loader.ScriptFileLoader;
@@ -46,18 +47,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class DevelopmentScriptfileCache extends HttpResourceCache {
+public class DevelopmentScriptfileCache {
   private static final Logger LOG = LoggerFactory.getLogger(DevelopmentScriptfileCache.class);
 
   private final PathMatcher m_cssMatcher = FileSystems.getDefault().getPathMatcher("glob:**.css");
   private final PathMatcher m_jsMatcher = FileSystems.getDefault().getPathMatcher("glob:**.js");
-  private final Map<HttpCacheKey, IFuture<HttpCacheObject>> m_pendingScriptFiles = new HashMap<>();
-  private final Object m_rebuildJsLock = new Object();
-  private final Object m_rebuildStylesheetLock = new Object();
 
+  // initialized once in #init() / thread-safe [effective immutable]
   private boolean m_active;
   private AbstractClasspathFileWatcher m_scriptFileWatcher;
+
+  // thread-safe through m_scriptLock
+  private final Object m_scriptLock = new Object();
+  private final Map<HttpCacheKey, HttpCacheObject> m_scriptCache = new HashMap<>();
+  private final Map<HttpCacheKey, IFuture<HttpCacheObject>> m_pendingScriptFiles = new HashMap<>();
   private IFuture<Void> m_rebuildJsFuture;
+
+  // thread-safe through m_rebuildStylesheetLock
+  private final Object m_rebuildStylesheetLock = new Object();
   private IFuture<Void> m_rebuildStylesheetFuture;
 
   @PostConstruct
@@ -91,7 +98,6 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     return m_active;
   }
 
-  @Override
   public HttpCacheObject get(HttpCacheKey cacheKey) {
     if (!isActive()) {
       return null;
@@ -101,10 +107,10 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     }
     HttpCacheObject result = null;
     IFuture<HttpCacheObject> future = null;
-    synchronized (getCacheLock()) {
+    synchronized (m_scriptLock) {
       future = m_pendingScriptFiles.get(cacheKey);
       if (future == null) {
-        result = super.get(cacheKey);
+        result = m_scriptCache.get(cacheKey);
         if (result != null) {
           return result;
         }
@@ -125,29 +131,24 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
     return m_cssMatcher.matches(path) || m_jsMatcher.matches(path);
   }
 
-  @Override
-  public boolean put(HttpCacheObject obj) {
-    boolean inserted = super.put(obj);
-    if (inserted) {
+  protected void put(HttpCacheObject obj) {
+    if (obj.isCachingAllowed()) {
+      synchronized (m_scriptLock) {
+        LOG.debug("put {} to cache.", obj.getCacheKey());
+        m_scriptCache.put(obj.getCacheKey(), obj);
+      }
       handleCacheChanged();
     }
-    return inserted;
-  }
-
-  @Override
-  public HttpCacheObject remove(HttpCacheKey cacheKey) {
-    HttpCacheObject removed = super.remove(cacheKey);
-    if (removed != null) {
-
-      handleCacheChanged();
-    }
-    return removed;
   }
 
   protected void handleCacheChanged() {
     Jobs.schedule(() -> {
       try {
-        BEANS.get(DevelopmentScriptFileCacheInitialLoader.class).storeInitialScriptfiles(getAllKeys());
+          Set<HttpCacheKey> keys;
+          synchronized (m_scriptLock) {
+            keys = new HashSet<HttpCacheKey>(m_scriptCache.keySet());
+          }
+          BEANS.get(DevelopmentScriptFileCacheInitialLoader.class).storeInitialScriptfiles(keys);
       }
       catch (Exception e) {
         LOG.warn("Could not store cached scriptfiles in dev mode.", e);
@@ -156,17 +157,17 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
   }
 
   public void rebuildScripts(PathMatcher matcher) {
-    synchronized (getCacheLock()) {
+    synchronized (m_scriptLock) {
       m_pendingScriptFiles.forEach((ikey, future) -> future.cancel(true));
       m_pendingScriptFiles.clear();
-      getAllKeys().stream()
+      m_scriptCache.keySet().stream()
           .filter(key -> matcher.matches(Paths.get(key.getResourcePath())))
           .forEach(key -> scheduleBuildScriptFile(key));
     }
   }
 
   protected IFuture<HttpCacheObject> scheduleBuildScriptFile(HttpCacheKey key) {
-    synchronized (m_pendingScriptFiles) {
+    synchronized (m_scriptLock) {
       IFuture<HttpCacheObject> feature = Jobs.schedule(createRecompileScriptJob(key), Jobs.newInput()
           .withName("Recompile scriptfile."));
       m_pendingScriptFiles.put(key, feature);
@@ -176,7 +177,7 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
 
   protected void scheduleRebuildJsFiles() {
     LOG.debug("Rebuild all js files in development cache.");
-    synchronized (m_rebuildJsLock) {
+    synchronized (m_scriptLock) {
       if (m_rebuildJsFuture != null) {
         m_rebuildJsFuture.cancel(false);
         m_rebuildJsFuture = null;
@@ -185,7 +186,7 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
         @Override
         public void run() throws Exception {
           try {
-            synchronized (m_rebuildJsLock) {
+            synchronized (m_scriptLock) {
               if (IFuture.CURRENT.get().isCancelled()) {
                 return;
               }
@@ -193,7 +194,7 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
             rebuildScripts(m_jsMatcher);
           }
           finally {
-            synchronized (m_rebuildJsLock) {
+            synchronized (m_scriptLock) {
               if (IFuture.CURRENT.get() == m_rebuildJsFuture) {
                 m_rebuildJsFuture = null;
               }
@@ -297,15 +298,12 @@ public class DevelopmentScriptfileCache extends HttpResourceCache {
                 .withCacheMaxAge(HttpCacheControl.MAX_AGE_ONE_YEAR)
                 .build());
         if (!IFuture.CURRENT.get().isCancelled()) {
-          synchronized (getCacheLock()) {
-            LOG.debug("put {} to cache.", m_key);
-            put(cacheObject);
-          }
+          put(cacheObject);
         }
         return cacheObject;
       }
       finally {
-        synchronized (getCacheLock()) {
+        synchronized (m_scriptLock) {
           m_pendingScriptFiles.remove(m_key);
         }
       }
