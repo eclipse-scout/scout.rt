@@ -178,8 +178,8 @@ public class CodeService implements ICodeService {
   }
 
   @Override
-  public <T, CODE extends ICode<T>> CODE getCode(Class<CODE> type) {
-    Class<? extends ICode<T>> typeClass = type;
+  public <CODE extends ICode<?>> CODE getCode(Class<CODE> type) {
+    Class<? extends ICode<?>> typeClass = type;
     Class<? extends ICodeType<?, ?>> declaringCodeTypeClass = getDeclaringCodeTypeClass(typeClass);
     ICodeType<?, ?> codeType = getCodeType(declaringCodeTypeClass);
     return findCode(type, codeType);
