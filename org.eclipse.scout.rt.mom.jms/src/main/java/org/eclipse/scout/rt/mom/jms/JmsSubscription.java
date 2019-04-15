@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProviderEx;
+import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProvider2;
 import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 import org.eclipse.scout.rt.platform.job.IFuture;
 
@@ -59,11 +59,13 @@ public class JmsSubscription implements ISubscription {
   }
 
   /**
+   * @return the stats of this subscription since the real jms session was started. Returns null if the jms connection
+   *         is currently down.
    * @since 6.1
    */
   public ISubscriptionStats getStats() {
-    if (m_sessionProvider instanceof IJmsSessionProviderEx) {
-      return ((IJmsSessionProviderEx) m_sessionProvider).getStats();
+    if (m_sessionProvider instanceof IJmsSessionProvider2) {
+      return ((IJmsSessionProvider2) m_sessionProvider).getStats();
     }
     return null;
   }
@@ -80,7 +82,7 @@ public class JmsSubscription implements ISubscription {
    * @since 6.1
    */
   public boolean awaitStarted(int time, TimeUnit unit) {
-    if (!(m_sessionProvider instanceof IJmsSessionProviderEx)) {
+    if (!(m_sessionProvider instanceof IJmsSessionProvider2)) {
       return false;
     }
     long timeoutNanos = System.nanoTime() + unit.toNanos(time);

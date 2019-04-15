@@ -22,7 +22,7 @@ import javax.jms.TemporaryQueue;
 import javax.jms.Topic;
 
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProviderEx;
+import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProvider2;
 import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 import org.eclipse.scout.rt.mom.jms.internal.JmsSubscriptionStats;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 
-public class JmsSessionProvider implements IJmsSessionProviderEx {
+public class JmsSessionProvider implements IJmsSessionProvider2 {
 
   private final Session m_session;
   private final Destination m_destination; // may be null
@@ -104,11 +104,11 @@ public class JmsSessionProvider implements IJmsSessionProviderEx {
   }
 
   @Override
-  public Message receive(SubscribeInput input) throws JMSException {
+  public Message receive(SubscribeInput input, long receiveTimeoutMillis) throws JMSException {
     try {
       MessageConsumer consumer = getConsumer(input);
       m_stats.notifyBeforeReceive();
-      Message m = consumer.receive();
+      Message m = receiveTimeoutMillis == 0L ? consumer.receive() : consumer.receive(receiveTimeoutMillis);
       m_stats.notifyReceiveMessage(m);
       return m;
     }

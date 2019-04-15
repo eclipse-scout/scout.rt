@@ -22,7 +22,11 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 public class RequestCancellationMessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
 
   public RequestCancellationMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input) {
-    super(mom, sessionProvider, destination, input);
+    this(mom, sessionProvider, destination, input, 0L);
+  }
+
+  public RequestCancellationMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, SubscribeInput input, long receiveTimeout) {
+    super(mom, sessionProvider, destination, input, receiveTimeout);
   }
 
   @Override

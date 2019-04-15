@@ -14,7 +14,11 @@ public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
   protected final IMessageListener<DTO> m_listener;
 
   public MessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
-    super(mom, sessionProvider, destination, input);
+    this(mom, sessionProvider, destination, listener, input, 0L);
+  }
+
+  public MessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input, long receiveTimeout) {
+    super(mom, sessionProvider, destination, input, receiveTimeout);
     m_listener = listener;
   }
 

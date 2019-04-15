@@ -22,15 +22,17 @@ import org.eclipse.scout.rt.mom.jms.JmsSubscription;
  *
  * @since 6.1
  */
-public interface IJmsSessionProviderEx extends IJmsSessionProvider {
+public interface IJmsSessionProvider2 extends IJmsSessionProvider {
   /**
    * @param subscribeInput
+   * @param receiveTimeoutMillis
+   *          0 for no timeout
    * @return the next message or null if the consumer has no more messages
    * @throws JMSException
    *           if the jms connection was closed and failover was not possible
    * @since 6.1
    */
-  Message receive(SubscribeInput subscribeInput) throws JMSException;
+  Message receive(SubscribeInput subscribeInput, long receiveTimeoutMillis) throws JMSException;
 
   /**
    * @return subscription statistics since the last (re-)connect

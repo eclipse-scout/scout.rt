@@ -26,7 +26,11 @@ public class ReplyMessageConsumerJob<REQUEST, REPLY> extends AbstractMessageCons
   protected final IRequestListener<REQUEST, REPLY> m_listener;
 
   public ReplyMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
-    super(mom, sessionProvider, destination, input);
+    this(mom, sessionProvider, destination, listener, input, 0L);
+  }
+
+  public ReplyMessageConsumerJob(JmsMomImplementor mom, IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input, long receiveTimeout) {
+    super(mom, sessionProvider, destination, input, receiveTimeout);
     m_listener = listener;
   }
 

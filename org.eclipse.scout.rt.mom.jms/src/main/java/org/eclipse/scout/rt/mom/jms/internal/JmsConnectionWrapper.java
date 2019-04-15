@@ -112,6 +112,10 @@ public class JmsConnectionWrapper {
     return this;
   }
 
+  public boolean isConnected() {
+    return !m_closing && m_impl != null;
+  }
+
   public void close() {
     m_closing = true;
     synchronized (m_connectionFunction) {

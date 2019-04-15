@@ -134,6 +134,10 @@ public class JmsMomImplementor implements IMomImplementor {
   protected final Map<IDestination, Destination> m_jmsDestinations = new ConcurrentHashMap<>();
   protected final Map<IDestination, IMarshaller> m_marshallers = new ConcurrentHashMap<>();
 
+  protected long m_messageConsumerJobReceiveTimeout = 0L;
+  protected long m_replyMessageConsumerJobReceiveTimeout = 0L;
+  protected long m_requestCancellationMessageConsumerJobReceiveTimeout = 0L;
+
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
     m_symbolicName = Objects.toString(properties.get(SYMBOLIC_NAME), StringUtility.join(" ", CONFIG.getPropertyValue(ApplicationNameProperty.class), "MOM"));
@@ -328,7 +332,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
-    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input);
+    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input, m_messageConsumerJobReceiveTimeout);
   }
 
   @Override
@@ -479,7 +483,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
-    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input);
+    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input, m_replyMessageConsumerJobReceiveTimeout);
   }
 
   protected synchronized void ensureRequestCancellationSubscription() throws JMSException {
@@ -496,7 +500,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> IRunnable createRequestCancellationMessageConsumerJob(IJmsSessionProvider sessionProvider, final IDestination<DTO> cancellationTopic, final SubscribeInput input) {
-    return new RequestCancellationMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input);
+    return new RequestCancellationMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input, m_requestCancellationMessageConsumerJobReceiveTimeout);
   }
 
   @Override
@@ -578,9 +582,18 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   /**
+   * @return true if jms is currently connected. Does not block.
+   */
+  public boolean isConnected() {
+    return m_connectionWrapper.isConnected();
+  }
+
+  /**
    * @return a shared {@link Connection} to JMS broker. This method may block until a connection is available.
    *         <p>
    *         Do not keep references to this value, it may change after reconnect attempts.
+   *         <p>
+   *         see {@link #isConnected()} which is not blocking
    */
   public Connection getConnection() {
     try {
