@@ -8,8 +8,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build-dev": "webpack --display-error-details --display-reasons --debug",
-    "build": "webpack --display-error-details --display-reasons --debug",
+    "build-dev": "webpack --mode=development --display-error-details",
+    "build": "webpack --mode=production --display-error-details",
     "test": "karma start"
   },
   "devDependencies": {
@@ -28,6 +28,7 @@
     "mini-css-extract-plugin": "^0.5.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "style-loader": "^0.23.1",
+    "terser-webpack-plugin": "^1.2.3",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-shell-plugin": "^0.5.0"

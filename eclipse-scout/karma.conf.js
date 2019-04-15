@@ -1,6 +1,6 @@
 let path = require('path');
 
-var specIndex = path.resolve(__dirname, 'test/index.js');
+var specIndex = path.resolve(__dirname, 'test/test-index.js');
 var preprocessorObj = {};
 preprocessorObj[specIndex] = ['webpack'];
 

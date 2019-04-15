@@ -55,7 +55,8 @@ export default class ObjectFactory {
     }
     options = options || {};
 
-    var createFunc = this._registry[objectType];
+    // FIXME [awe] toolstack: does the objectType always have the "name" property? Check IE, Safari
+    var createFunc = this._registry[objectType.name];
     if (createFunc) {
       // 1. - Use factory function registered for the given objectType
       var scoutObject = createFunc(options.model);
@@ -165,11 +166,11 @@ export default class ObjectFactory {
    * That's why we call this method in the scout._init method.
    */
   init() {
-    /*for (var objectType in objectFactories) {
-        if (scout.objectFactories.hasOwnProperty(objectType)) {
-            this.register(objectType, scout.objectFactories[objectType]);
-        }
-    }*/
+    for (var objectType in Scout.objectFactories) {
+      if (Scout.objectFactories.hasOwnProperty(objectType)) {
+        this.register(objectType, Scout.objectFactories[objectType]);
+      }
+    }
   };
 
   static getInstance() {

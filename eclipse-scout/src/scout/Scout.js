@@ -4,6 +4,10 @@ import ObjectFactory from './ObjectFactory';
 
 export default class Scout { // FIXME [awe] check if we should use a Singleton? upper/lowercase
 
+  constructor() {
+    this.objectFactories = {};
+  }
+
   static create(objectType, model = null, options = null) {
     return ObjectFactory.getInstance().create(objectType, model, options);
   }

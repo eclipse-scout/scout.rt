@@ -6,24 +6,47 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = (env, args) => {
   let devMode = args.mode !== 'production';
+  console.log('Webpack mode:', args.mode);
+
+  // FIXME [awe] output separate file for eclipse-scout.js
 
   return {
+    target: 'web',
     mode: 'none',
+    devtool: undefined,
+    /* ------------------------------------------------------
+     * + Entry                                              +
+     * ------------------------------------------------------ */
     entry: {
       index: './index.js'
     },
+    /* ------------------------------------------------------
+     * + Output                                             +
+     * ------------------------------------------------------ */
     output: {
       filename: 'widgets-app.js',
       path: path.join(__dirname, 'dist'),
       chunkFilename: '[name].js'
     },
+    /* ------------------------------------------------------
+     * + Optimization                                       +
+     * ------------------------------------------------------ */
     optimization: {
+      // # Split Chunks
+      // Note: we don't define jQuery and Eclipse Scout as 'externals', since we want to bundle
+      // them with our code and also provide minify, content-hash etc. for these libraries
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
+          // # jQuery
           jquery: {
-            test: /.*jquery/,
-            name: 'jquery'
+            name: 'jquery',
+            test: /.*jquery/
+          },
+          // # Eclipse Scout
+          'eclipse-scout': {
+            name: 'eclipse-scout',
+            test: /eclipse\-scout[\/|\\]/
           }
         }
       }

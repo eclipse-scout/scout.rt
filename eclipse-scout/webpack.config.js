@@ -6,12 +6,13 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (env, args) => {
   let devMode = args.mode !== 'production';
   let cssFilename = devMode ? '[name].css' : '[name]-[contenthash].min.css';
-
-  // FIXME [awe] separate file for eclipse-scout.js
+  let jsFilename = devMode ? '[name].js' : '[name]-[contenthash].min.js';
+  console.log('Webpack mode:', args.mode);
 
   return {
     target: 'web',
@@ -28,19 +29,26 @@ module.exports = (env, args) => {
      * + Output                                             +
      * ------------------------------------------------------ */
     output: {
-      filename: '[name].js',
+      filename: jsFilename, //'[name].js',
       path: path.join(__dirname, 'dist')
     },
     /* ------------------------------------------------------
      * + Optimization                                       +
      * ------------------------------------------------------ */
     optimization: {
-      // # Minify CSS
       minimizer: [
+        // # Minify CSS
         // Used to minify CSS assets (by default, run when mode is 'production')
         // see: https://github.com/NMFR/optimize-css-assets-webpack-plugin
         new OptimizeCssAssetsPlugin({
           assetNameRegExp: /\.min\.css$/g
+        }),
+        // # Minify JS
+        new TerserPlugin({
+          test: /\.js(\?.*)?$/i,
+          sourceMap: true,
+          cache: true,
+          parallel: true
         })
       ]
     },
@@ -83,7 +91,7 @@ module.exports = (env, args) => {
      * ------------------------------------------------------ */
     // This option controls if and how source maps are generated.
     // see: https://webpack.js.org/configuration/devtool/
-    devtool: 'inline-source-map',
+    devtool: devMode ? 'source-map' : undefined,
     /* ------------------------------------------------------
      * + Externals                                          +
      * ------------------------------------------------------ */

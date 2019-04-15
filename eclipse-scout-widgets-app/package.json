@@ -8,8 +8,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build": "webpack --display-error-details --display-reasons --debug",
-    "build-dev": "webpack --display-error-details --display-reasons --debug",
+    "build-dev": "webpack --mode=development --display-error-details",
+    "build": "webpack --mode=production --display-error-details",
     "test": "karma start"
   },
   "devDependencies": {
