@@ -475,7 +475,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public void check(Object o) {
     FormDataStatementBuilderCheck c = createCheckInstance();
     c.check(o);
-    System.out.println(c.toString());
   }
 
   public String build(AbstractFormData formData) {
