@@ -15,6 +15,7 @@ export { default as Scout } from './Scout';
 export { default as ViewButton } from './desktop/ViewButton';
 export { default as Desktop } from './desktop/Desktop';
 export { default as OutlineViewButton } from './outline/OutlineViewButton';
+export { default as Session } from './session/Session';
 export { default as Models } from './utils/Models';
 
 
