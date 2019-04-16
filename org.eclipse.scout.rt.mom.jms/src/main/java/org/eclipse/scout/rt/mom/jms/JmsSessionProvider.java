@@ -46,7 +46,11 @@ public class JmsSessionProvider implements IJmsSessionProvider2 {
   public JmsSessionProvider(Session session, Destination destination) {
     m_session = assertNotNull(session);
     m_destination = destination;
-    m_stats = new JmsSubscriptionStats();
+    m_stats = createJmsSubscriptionStats();
+  }
+
+  protected JmsSubscriptionStats createJmsSubscriptionStats() {
+    return new JmsSubscriptionStats();
   }
 
   @Override

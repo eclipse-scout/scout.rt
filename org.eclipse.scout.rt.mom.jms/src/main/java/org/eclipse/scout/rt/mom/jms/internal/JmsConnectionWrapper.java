@@ -197,7 +197,7 @@ public class JmsConnectionWrapper {
         @Override
         public void onException(JMSException e1) {
           if (m_connectionRetryCount > 0) {
-            LOG.info("JMS connection dropped with '{}'; starting failover", e1);
+            LOG.info("JMS connection dropped with '{}'; starting failover", e1.getMessage());
             invalidate(e1);
           }
           else {

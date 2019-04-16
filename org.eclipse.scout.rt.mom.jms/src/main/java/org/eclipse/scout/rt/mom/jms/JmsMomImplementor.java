@@ -81,6 +81,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
@@ -106,6 +107,21 @@ public class JmsMomImplementor implements IMomImplementor {
    * Key to explicitly set the JMS client ID. If omitted, the client ID is computed automatically.
    */
   public static final String JMS_CLIENT_ID = "scout.mom.jms.clientId";
+
+  /**
+   * Key to set {@link #m_messageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.messageConsumerJobReceiveTimeout";
+
+  /**
+   * Key to set {@link #m_replyMessageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.replyMessageConsumerJobReceiveTimeout";
+
+  /**
+   * Key to set {@link #m_requestCancellationMessageConsumerJobReceiveTimeout}
+   */
+  public static final String JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.requestCancellationMessageConsumerJobReceiveTimeout";
 
   protected final String m_momUid = UUID.randomUUID().toString();
 
@@ -145,6 +161,9 @@ public class JmsMomImplementor implements IMomImplementor {
       LOG.info("{} configuration: {}", m_symbolicName, properties);
     }
     try {
+      m_messageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_replyMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_requestCancellationMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_contextEnvironment = createContextEnvironment(properties);
       m_connectionFactory = createConnectionFactory(properties);
       m_clientId = computeClientId(properties);

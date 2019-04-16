@@ -86,8 +86,10 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
         break;
       }
 
-      Message message;
+      final Session transactedSession;
+      final Message message;
       try {
+        transactedSession = m_sessionProvider.getSession();
         message = JmsSessionProviderMigration.receive(m_sessionProvider, m_subscribeInput, m_receiveTimeoutMillis);
         if (message == null) {
           // consumer closed or connection failure, go to start of while loop
@@ -99,7 +101,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
           LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
           break;
         }
-        BEANS.get(MomExceptionHandler.class).handle(e);
+        LOG.warn("JMS MessageConsumer for {} is still idle after several retry attempts", m_destination, e);
         continue;
       }
 
@@ -109,9 +111,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
       }
       catch (Exception e) {
         if (isRollbackNecessary(e)) {
-          Session transactedSession = null;
           try {
-            transactedSession = m_sessionProvider.getSession();
             transactedSession.rollback();
           }
           catch (final JMSException ex) {
