@@ -235,8 +235,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * @return true to consume child contributions by this entity. Default returns true. If the entity is a 1:1 or 1:0
-   *         relation to its base and its sql contribution is just a join clause or similar, this method must return false
-   *         to let the parent entity colelct all parts. Use <code>return
+   *         relation to its base and its sql contribution is just a join clause or similar, this method must return
+   *         false to let the parent entity colelct all parts. Use <code>return
    *         {@link IDataModelEntity#isOneToMany()}</code> when such behaviour is implemented.
    */
   protected boolean isConsumeChildContributions(EntityPath ePath) {
@@ -441,8 +441,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * )
    * </pre></code> It is not allowed, that the selectClause contains a <i>UNION</i> because this part is needed for
    * aggregation too.<br>
-   * The <i>selectParts</i> tag is replaced with all attributes which are selected. If there are more than one attributes,
-   * they are separated by a comma "<i>attribute1</i> <i>,</i> <i>attribute2</i>".<br>
+   * The <i>selectParts</i> tag is replaced with all attributes which are selected. If there are more than one
+   * attributes, they are separated by a comma "<i>attribute1</i> <i>,</i> <i>attribute2</i>".<br>
    * The <i>whereParts</i> tag is replaced with all attributes contained in the entity that have no aggregation type.
    * Every attribute contributes a "AND <i>attribute</i> <i>op</i> <i>value</i>" line.<br>
    * The <i>groupBy</i> tag is only used when there are attributes in the entity that have an aggregation type.<br>
@@ -475,7 +475,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
   public void check(Object o) {
     FormDataStatementBuilderCheck c = createCheckInstance();
     c.check(o);
-    System.out.println(c.toString());
   }
 
   public String build(AbstractFormData formData) {
@@ -514,8 +513,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * {@link #getWhereConstraints()} are added as well.
    *
    * @param stm
-   *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt; or
-   *          &lt;havingParts/&gt; place holders.
+   *          base statement with &lt;selectParts/&gt;, &lt;fromParts/&gt;, &lt;whereParts/&gt;, &lt;groupByParts/&gt;
+   *          or &lt;havingParts/&gt; place holders.
    * @param contributions
    *          entity contributions that are used to replace markers in the given base statement.
    * @return Returns given base statement having all place holders replaced by the given entity contributions.
@@ -662,8 +661,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   }
 
   /**
-   * Replace bind name by unique bind name so that it is not conflicting with other parts that use the same statement part
-   * and bind name. For example S is replaces by __S123.
+   * Replace bind name by unique bind name so that it is not conflicting with other parts that use the same statement
+   * part and bind name. For example S is replaces by __S123.
    */
   public String localizeBindName(String bindName, String prefix) {
     if (bindName != null) {
@@ -1138,22 +1137,23 @@ public class FormDataStatementBuilder implements DataModelConstants {
 
   /**
    * Evaluates the collecting tags in the entity statement and fills in the values of the {@link EntityContribution}. If
-   * the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery} and
-   * as 'where' on {@link EntityStrategy#BuildConstraints}
+   * the contributing tags are missing, the complete part is treated as 'select' on {@link EntityStrategy#BuildQuery}
+   * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
    * Default calls
    * {@link EntityContributionUtility#mergeContributions(EntityStrategy, String, EntityContribution, boolean)}
    *
    * @param entityStrategy
    * @param entityPartWithTags
-   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts <br/>
+   *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts
+   *          <br/>
    *          as well as the contributing selectPart, fromPart, wherePart, groupByPart, havingPart for the outer calling
    *          part.
    * @param childContributions
    *          is the set of tags collected by all children
    * @param consumeChildContributions
-   *          true: consume the child tags inside the entity statement. The returned entity contributions will not contain
-   *          any of these tags
+   *          true: consume the child tags inside the entity statement. The returned entity contributions will not
+   *          contain any of these tags
    *          <p>
    *          false: don't consume the child tags inside the entity statement. The returned entity contribution contains
    *          its onw plus all of these child tags (proxy)
@@ -1447,8 +1447,8 @@ public class FormDataStatementBuilder implements DataModelConstants {
   /**
    * Create sql text, makes bind names unique, and adds all binds to the bind map
    * <p>
-   * To use no operator use {@link DataModelConstants#OPERATOR_NONE} and null for binds and values, stm will be decorated
-   * and is the result itself
+   * To use no operator use {@link DataModelConstants#OPERATOR_NONE} and null for binds and values, stm will be
+   * decorated and is the result itself
    * <p>
    * To use no aggregation use {@link DataModelConstants#AGGREGATION_NONE}
    */
