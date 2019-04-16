@@ -1,12 +1,22 @@
-let path = require('path');
-let webpack = require('webpack');
-
+/*******************************************************************************
+ * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+
+let path = require('path');
+let webpack = require('webpack');
 
 module.exports = (env, args) => {
   let devMode = args.mode !== 'production';
@@ -29,7 +39,7 @@ module.exports = (env, args) => {
      * + Output                                             +
      * ------------------------------------------------------ */
     output: {
-      filename: jsFilename, //'[name].js',
+      filename: jsFilename,
       path: path.join(__dirname, 'dist')
     },
     /* ------------------------------------------------------

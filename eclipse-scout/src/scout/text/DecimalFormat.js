@@ -1,7 +1,7 @@
 import Scout from '../Scout';
 import { RoundingMode } from '../utils/Numbers';
 import * as strings from '../utils/strings2';
-import Numbers from '../utils/Numbers'; // FIXME [awe] kann man auch absolute importe machen oder via eine $basePath variable? IDE support
+import Numbers from '../utils/Numbers'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
 
 export default class DecimalFormat {
 

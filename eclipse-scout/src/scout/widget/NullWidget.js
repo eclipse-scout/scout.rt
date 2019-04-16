@@ -1,6 +1,7 @@
 import Widget from './Widget';
 
 export default class NullWidget extends Widget {
+
   constructor() {
     super();
     this._addWidgetProperties(['childWidget']);
@@ -9,4 +10,5 @@ export default class NullWidget extends Widget {
   setChildWidget(childWidget) {
     this.setProperty('childWidget', childWidget);
   };
+
 }

@@ -2,7 +2,7 @@ import Scout from '../Scout';
 
 let _encodeElement = null;
 
-const encode = function(string) {
+function encode(string) {
   if (!string) {
     return string;
   }
@@ -16,7 +16,7 @@ const encode = function(string) {
   return elem.innerHTML;
 };
 
-const asString = function(input) {
+function asString(input) {
   if (input === undefined || input === null) {
     return input;
   }
@@ -26,7 +26,7 @@ const asString = function(input) {
   return String(input);
 };
 
-const hasText = function(text) {
+function hasText(text) {
   if (text === undefined || text === null) {
     return false;
   }
@@ -41,11 +41,11 @@ const hasText = function(text) {
  * Inverse operation of hasText(string). Used because empty(s) is more readable than !hasText(s).
  * @returns true if the given string is not set or contains only white-space characters.
  */
-const empty = function(text) {
+function empty(text) {
   return !hasText(text);
 };
 
-const box = function(prefix, string, suffix) {
+function box(prefix, string, suffix) {
   prefix = asString(prefix);
   string = asString(string);
   suffix = asString(suffix);
@@ -62,7 +62,7 @@ const box = function(prefix, string, suffix) {
   return s;
 };
 
-const startsWith = function(fullString, startString) {
+function startsWith(fullString, startString) {
   if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
     return false;
   }
@@ -77,7 +77,7 @@ const startsWith = function(fullString, startString) {
   return (fullString.substr(0, startString.length) === startString);
 };
 
-const quote = function(string) {
+function quote(string) {
   if (string === undefined || string === null) {
     return string;
   }
@@ -86,7 +86,7 @@ const quote = function(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& = last match
 };
 
-const count = function(string, separator) {
+function count(string, separator) {
   if (!string || separator === undefined || separator === null) {
     return 0;
   }
@@ -95,7 +95,7 @@ const count = function(string, separator) {
   return string.split(separator).length - 1;
 };
 
-const repeat = function(pattern, count) {
+function repeat(pattern, count) {
   if (pattern === undefined || pattern === null) {
     return pattern;
   }
@@ -109,7 +109,7 @@ const repeat = function(pattern, count) {
   return result;
 };
 
-const padZeroLeft = function(string, padding) {
+function padZeroLeft(string, padding) {
   string = asString(string);
   if (string === undefined || string === null || typeof padding !== 'number' || padding < 1 || (string + '').length >= padding) {
     return string;
@@ -118,7 +118,7 @@ const padZeroLeft = function(string, padding) {
   return z.slice(-padding);
 };
 
-const join = function(separator, vararg) {
+function join(separator, vararg) {
   var stringsToJoin;
   if (vararg && Array.isArray(vararg)) {
     stringsToJoin = vararg;
@@ -139,7 +139,7 @@ const join = function(separator, vararg) {
   return s;
 };
 
-const contains = function(string, searchFor) {
+function contains(string, searchFor) {
   if (!string) {
     return false;
   }
@@ -147,7 +147,7 @@ const contains = function(string, searchFor) {
 };
 
 // not exported!
-const _changeFirstLetter = function(string, funcName) {
+function _changeFirstLetter(string, funcName) {
   if (string === undefined || string === null) {
     return string;
   }
@@ -159,7 +159,7 @@ const _changeFirstLetter = function(string, funcName) {
   return s;
 };
 
-const uppercaseFirstLetter = function(string) {
+function uppercaseFirstLetter(string) {
   return _changeFirstLetter(string, 'toUpperCase');
 };
 

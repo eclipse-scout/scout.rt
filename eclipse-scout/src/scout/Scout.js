@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 import Arrays from './utils/Arrays';
 import ObjectFactory from './ObjectFactory';
 
-export default class Scout { // FIXME [awe] check if we should use a Singleton? upper/lowercase
+export default class Scout { // FIXME [awe] ES6: check if we should use a Singleton or a module? upper/lowercase
 
   constructor() {
     this.objectFactories = {};

@@ -55,7 +55,11 @@ export default class ObjectFactory {
     }
     options = options || {};
 
-    // FIXME [awe] toolstack: does the objectType always have the "name" property? Check IE, Safari
+    // FIXME [awe] ES6: The 'name' property is not standard and does not exist in Internet Explorer, thus we cannot use it!
+    // additionally TerserPlugin changes class-names in minify-process, thus we cannot rely on name-magic when we instantiate
+    // a class by string (which happens in Scout classic case). Proposal: assign a static property 'name' to every Scout class
+    // and use this string for lookups when we come from Scout.create(string). The create function should also accept a Function
+    // argument, so we can pass a function-reference in Scout JS applications (which is better for IDE support).
     var createFunc = this._registry[objectType.name];
     if (createFunc) {
       // 1. - Use factory function registered for the given objectType

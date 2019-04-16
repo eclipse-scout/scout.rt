@@ -1,14 +1,27 @@
+/*******************************************************************************
+ * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+
 let path = require('path');
 let webpack = require('webpack');
 
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
-
 module.exports = (env, args) => {
   let devMode = args.mode !== 'production';
+  let jsFilename = devMode ? '[name].js' : '[name]-[contenthash].min.js';
   console.log('Webpack mode:', args.mode);
 
-  // FIXME [awe] output separate file for eclipse-scout.js
+  // FIXME [awe] toolstack: fix bug with double "eclipse-scout.js" files in output (one of them seems to contain jQuery)
+  // FIXME [awe] toolstack: create "web.properties" with filenames from dist/, required for resource-loading in Java
 
   return {
     target: 'web',
@@ -18,15 +31,15 @@ module.exports = (env, args) => {
      * + Entry                                              +
      * ------------------------------------------------------ */
     entry: {
-      index: './index.js'
+      'widgets-app': './index.js'
     },
     /* ------------------------------------------------------
      * + Output                                             +
      * ------------------------------------------------------ */
     output: {
-      filename: 'widgets-app.js',
+      filename: jsFilename,
       path: path.join(__dirname, 'dist'),
-      chunkFilename: '[name].js'
+      chunkFilename: jsFilename
     },
     /* ------------------------------------------------------
      * + Optimization                                       +
@@ -49,7 +62,16 @@ module.exports = (env, args) => {
             test: /eclipse\-scout[\/|\\]/
           }
         }
-      }
+      },
+      minimizer: [
+        // # Minify JS
+        new TerserPlugin({
+          test: /\.js(\?.*)?$/i,
+          sourceMap: true,
+          cache: true,
+          parallel: true
+        })
+      ]
     },
     /* ------------------------------------------------------
      * + Module                                             +

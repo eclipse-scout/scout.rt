@@ -22,7 +22,13 @@
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "clean-webpack-plugin": "^2.0.1",
-    "copy-webpack-plugin": "^5.0.2"
+    "copy-webpack-plugin": "^5.0.2",
+    "jasmine-core": "^3.3.0",
+    "karma": "^4.0.1",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.0",
+    "karma-webpack": "^3.0.5"
   },
   "dependencies": {
     "eclipse-scout": "file:../eclipse-scout",
