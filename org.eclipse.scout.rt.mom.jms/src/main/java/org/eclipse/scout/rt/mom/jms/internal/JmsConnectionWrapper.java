@@ -207,6 +207,7 @@ public class JmsConnectionWrapper {
       });
     }
     m_impl = c;
+    LOG.info("JMS connection established: {}", m_impl);
     return m_impl;
   }
 
