@@ -15,6 +15,18 @@ import desktopModel from './Desktop.json'; // FIXME [awe] ES6: check if JSON-ext
 export default class WidgetsApp extends App {
 
   _createDesktop(parent) {
+    // FIXME [awe] ES6: check the Plugin proposed by "Izhaki", this would allow to re-define the properties exported by Webpack.
+    // Without the configurable: true property, the code below cannot work.
+    /*
+    var origFunc = scout.isFunction;
+    Object.defineProperty(scout, 'isFunction', {
+      value: (obj) => {
+        console.log('You\'ve been p0wnd!');
+        return origFunc(obj);
+      }
+    });
+    */
+
     let desktop = scout.create(Desktop, models.getModel(desktopModel, parent));
     let dataButton = scout.create(OutlineViewButton, {
       parent: desktop,
