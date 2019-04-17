@@ -24,7 +24,11 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
     // Reporter for "Jasmine Spec Runner" results in browser
     // https://www.npmjs.com/package/karma-jasmine-html-reporter
-    reporters: ['kjhtml'],
+    reporters: ['kjhtml', 'junit'],
+    junitReporter: {
+      outputDir: './test-results/',
+      outputFile: 'test-results.xml'
+    },
     client: {
       // Leave "Jasmine Spec Runner" output visible in browser
       clearContext: false
