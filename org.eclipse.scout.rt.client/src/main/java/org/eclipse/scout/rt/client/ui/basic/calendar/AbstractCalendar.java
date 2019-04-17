@@ -146,12 +146,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     return 6;
   }
 
-  @ConfigProperty(ConfigProperty.INTEGER)
-  @Order(510)
-  protected int getConfiguredEndHour() {
-    return 19;
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(520)
   protected boolean getConfiguredUseOverflowCells() {
@@ -161,18 +155,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(530)
   protected boolean getConfiguredShowDisplayModeSelection() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(540)
-  protected boolean getConfiguredMarkNoonHour() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(550)
-  protected boolean getConfiguredMarkOutOfMonthDays() {
     return true;
   }
 
@@ -228,11 +210,8 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
     setTitle(getConfiguredTitle());
     setSelectedDate(new Date());
     setStartHour(getConfiguredStartHour());
-    setEndHour(getConfiguredEndHour());
     setUseOverflowCells(getConfiguredUseOverflowCells());
     setShowDisplayModeSelection(getConfiguredShowDisplayModeSelection());
-    setMarkNoonHour(getConfiguredMarkNoonHour());
-    setMarkOutOfMonthDays(getConfiguredMarkOutOfMonthDays());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -364,16 +343,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   }
 
   @Override
-  public int getEndHour() {
-    return (Integer) propertySupport.getProperty(PROP_END_HOUR);
-  }
-
-  @Override
-  public void setEndHour(int hour) {
-    propertySupport.setProperty(PROP_END_HOUR, hour);
-  }
-
-  @Override
   public int getStartHour() {
     return (Integer) propertySupport.getProperty(PROP_START_HOUR);
   }
@@ -401,26 +370,6 @@ public abstract class AbstractCalendar extends AbstractWidget implements ICalend
   @Override
   public void setShowDisplayModeSelection(boolean showDisplayModeSelection) {
     propertySupport.setProperty(PROP_SHOW_DISPLAY_MODE_SELECTION, showDisplayModeSelection);
-  }
-
-  @Override
-  public boolean getMarkNoonHour() {
-    return (Boolean) propertySupport.getProperty(PROP_MARK_NOON_HOUR);
-  }
-
-  @Override
-  public void setMarkNoonHour(boolean markNoonHour) {
-    propertySupport.setProperty(PROP_MARK_NOON_HOUR, markNoonHour);
-  }
-
-  @Override
-  public boolean getMarkOutOfMonthDays() {
-    return (Boolean) propertySupport.getProperty(PROP_MARK_OUT_OF_MONTH_DAYS);
-  }
-
-  @Override
-  public void setMarkOutOfMonthDays(boolean markOutOfMonthDays) {
-    propertySupport.setProperty(PROP_MARK_OUT_OF_MONTH_DAYS, markOutOfMonthDays);
   }
 
   @Override

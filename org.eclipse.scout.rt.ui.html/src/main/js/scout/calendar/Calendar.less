@@ -30,9 +30,14 @@
   height: 100%;
 }
 
+.calendar-week-scrollable {
+  overflow: visible;
+}
+
+
 .calendar-scrollable-components-week {
-  top: 85%;
-  height: 15%;
+  top: calc(@calendar-day-selected-circle-size ~'+ 5px');
+  height: calc(~'15% - (' @calendar-day-selected-circle-size ~' + 5px)');
 }
 
 .calendar-header {
@@ -197,57 +202,94 @@
   float: left;
   line-height: 24px;
   height: 24px;
-  padding-left: 4px;
   #scout.overflow-ellipsis();
   min-height: 20px;
   width: calc(~'100% - ' @calendar-component-margin-left);
-  border-left: 4px solid;
+  border-bottom: 1px solid @form-background-color;
   text-align: left;
   color: @calendar-component-color;
 
+  & > .calendar-component-leftcolorborder {
+    position: relative;
+    float: left;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 4px;
+    margin-right: 4px;
+    background-color: @palette-blue-1; /* Default colors used when component has no specific class */
+  }
+
+  &:hover > .calendar-component-leftcolorborder {
+    background-color: @palette-blue-2;
+  }
+
+  &.comp-selected > .calendar-component-leftcolorborder {
+    background-color: @palette-blue-6;
+  }
+
   /* Default colors used when component has no specific class */
   background-color: @palette-blue-0;
-  border-left-color: @palette-blue-1;
 
   &:hover {
     background-color: @palette-blue-1;
-    border-left-color: @palette-blue-2;
   }
 
   &.comp-selected {
     background-color: @palette-blue-2;
-    border-left-color: @palette-blue-6;
   }
 
   /* Colors for type Appointment */
   &.calendar-appointment {
     background-color: @palette-orange-0;
-    border-left-color: @palette-orange-2;
+
+    & > .calendar-component-leftcolorborder {
+      background-color: @palette-orange-2;
+    }
 
     &:hover {
       background-color: @palette-orange-2;
-      border-left-color: @palette-orange-3;
+    }
+
+    &:hover > .calendar-component-leftcolorborder {
+      background-color: @palette-orange-3;
+    }
+
+    &:hover .comp-selected > .calendar-component-leftcolorborder  {
+      background-color: @palette-orange-4;
     }
 
     &.comp-selected {
       background-color: @palette-orange-3;
-      border-left-color: @palette-orange-4;
+    }
+
+    &.comp-selected > .calendar-component-leftcolorborder  {
+      background-color: @palette-orange-4;
     }
   }
 
   /* Colors for type Task */
   &.calendar-task {
     background-color: @palette-cyan-0;
-    border-left-color: @palette-cyan-2;
+
+    & > .calendar-component-leftcolorborder {
+      background-color: @palette-cyan-2;
+    }
 
     &:hover {
       background-color: @palette-cyan-2;
-      border-left-color: @palette-cyan-3;
+    }
+
+    &:hover > .calendar-component-leftcolorborder {
+      background-color: @palette-cyan-3;
     }
 
     &.comp-selected {
       background-color: @palette-cyan-3;
-      border-left-color: @palette-cyan-4;
+    }
+
+    &.comp-selected > .calendar-component-leftcolorborder  {
+      background-color: @palette-cyan-4;
     }
   }
 }
@@ -303,11 +345,32 @@
   }
 }
 
-.calendar-grid {
+.calendar-grids {
   display: inline-block;
   vertical-align: top;
-  width: 60%;
   overflow: hidden;
+}
+
+.calendar-grid {
+  display: block;
+  vertical-align: top;
+  height: calc(~'100% - 25px');
+}
+
+.calendar-grid.calendar-grid-short {
+  height: calc(~'100% - 105px');
+}
+
+.calendar-top-grid {
+  display: block;
+  vertical-align: top;
+  overflow: hidden;
+  border-bottom: 1px solid @palette-gray-3;
+  height: 105px;
+}
+
+.calendar-top-grid.calendar-top-grid-short {
+  height: 25px;
 }
 
 .calendar-week-header,
@@ -317,13 +380,17 @@
   white-space: nowrap;
 }
 
+.calendar-week-allday-container{
+  height: 80px;
+}
+
 .calendar-week-header {
   height: @calendar-title-height;
 }
 
 .calendar-week {
   position: relative;
-  height: calc(~'(100% - ' @calendar-title-height ~') / 6');
+  height: 1920px; /* FIXME pbn Fixed value: 24*4*20 +40 px offset */
 }
 
 .calendar-week-name {
@@ -342,6 +409,15 @@
 
 .calendar-day {
   padding: 0;
+
+  &:not(.calendar-no-label)::before {
+  position: absolute;
+  content: attr(data-day-name);
+  color: @calendar-day-color;
+  left: 7px;
+  top: 7px;
+  z-index: 1; /* draw over calendar items */
+  }
 
   &.out {
     background-color: @calendar-out-background-color;
@@ -364,28 +440,6 @@
   &.now::before {
     color: @highlight-color;
     font-weight: bold;
-  }
-
-  &.selected.now::before{
-    left: 4px;
-    top: 3px;
-    font-weight: normal;
-    border: solid 4px @highlight-inverted-background-color;
-    border-radius: 50%;
-    background-color: @highlight-inverted-background-color;
-    color: @palette-white;
-  }
-
-  &.selected::before {
-    text-align: center;
-    left: 4px;
-    top: 3px;
-    width: @calendar-day-selected-circle-size;
-    height: @calendar-day-selected-circle-size;
-    border: solid 4px @calendar-day-selected-background-color;
-    border-radius: 50%;
-    background-color: @calendar-day-selected-background-color;
-    color: @calendar-day-selected-color;
   }
 
   /* helps to center days between 10 and 19 nicer */
@@ -419,6 +473,12 @@
       overflow: visible;
       padding-top: 10px;
 
+      /* Compensate for open top padding */
+      & > .calendar-component-leftcolorborder {
+        height: calc( 100% ~'+' 10px );
+        top:-10px;
+      }
+
       &::before {
         position: absolute;
         display: block;
@@ -434,6 +494,7 @@
 
     &.component-open-bottom {
       overflow: visible;
+      border-bottom: none; /* Compensate for calendar-component border */
 
       &::after {
         position: absolute;
@@ -450,6 +511,30 @@
   }
 }
 
+  .calendar-day.selected.now::before {
+    left: 4px;
+    top: 3px;
+    font-weight: normal;
+    border: solid 4px @highlight-inverted-background-color;
+    border-radius: 50%;
+    background-color: @highlight-inverted-background-color;
+    color: @palette-white;
+  }
+
+  .calendar-day.selected::before {
+    text-align: center;
+    left: 4px;
+    top: 3px;
+    width: @calendar-day-selected-circle-size;
+    height: @calendar-day-selected-circle-size;
+    border: solid 4px @calendar-day-selected-background-color;
+    border-radius: 50%;
+    background-color: @calendar-day-selected-background-color;
+    color: @calendar-day-selected-color;
+  }
+
+
+
 .calendar-week-name {
   font-size: 11px;
   color: @calendar-week-axis-color;
@@ -458,7 +543,7 @@
 }
 
 .calendar-day::after,
-.calendar-day-name::after{
+.calendar-day-name::after {
   position: absolute;
   width: 1px;
   height: 100%;
@@ -468,7 +553,7 @@
   background-color: @border-color;
 }
 
-.calendar-week::after {
+.calendar-week:not(.calendar-week-noborder)::after {
   position: absolute;
   height: 1px;
   width: 100%;
@@ -488,15 +573,6 @@
   line-height: @calendar-title-height;
 }
 
-.calendar-day::before {
-  position: absolute;
-  content: attr(data-day-name);
-  color: @calendar-day-color;
-  left: 7px;
-  top: 7px;
-  z-index: 1; /* draw over calendar items */
-}
-
 .calendar-week-axis {
   position: absolute;
   left: @calendar-week-name-width - 6px;
@@ -513,21 +589,20 @@
 
 .calendar-week-axis::before {
   position: absolute;
-  font-size: 11px;
-  top: -5px;
+  font-size: 13px;
   left: -30px;
   color: @calendar-week-axis-color;
   content: attr(data-axis-name);
 }
 
 .calendar-week-task {
-  position: absolute;
+  position: relative;
   left: 0;
   width: 100%;
 }
 
 .calendar-week-task::after {
-  position: absolute;
+  position: relative;
   height: 1px;
   width: 100%;
   content: '';
@@ -537,8 +612,8 @@
 .calendar-week-task::before {
   position: absolute;
   font-size: 11px;
-  top: 5px;
-  left: 9px;
+  top: 28px;
+  left: 7px;
   color: @calendar-week-axis-color;
   content: attr(data-axis-name);
 }

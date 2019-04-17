@@ -83,20 +83,30 @@ scout.CalendarComponent.prototype._render = function() {
       // break condition, partDay is now out of range.
       break;
     }
-    $day = this._findDayInGrid(partDay);
-    if ($day === undefined) {
+
+    if (this.fullDay && !this.parent._isMonth()) {
+      $day = this._findDayInTopGrid(partDay);
+    } else {
+      $day = this._findDayInGrid(partDay);
+    }
+    if (!$day) {
       // next day, partDay not found in grid
       continue;
     }
+    $part = $day.appendDiv('calendar-component');
 
-    $part = $day
-      .appendDiv('calendar-component', this.item.subject)
+    $part
       .addClass(this.item.cssClass)
       .data('component', this)
       .data('partDay', partDay)
       .data('tooltipText', this._description.bind(this))
       .mousedown(this._onMouseDown.bind(this))
       .on('contextmenu', this._onContextMenu.bind(this));
+    $part
+      .appendDiv('calendar-component-leftcolorborder');
+    $part
+      .appendDiv('content', this.item.subject);
+
     this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
 
@@ -105,8 +115,11 @@ scout.CalendarComponent.prototype._render = function() {
         .toggleClass('compact', $day.width() < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
     } else {
       if (this.fullDay) {
-        var count = $('.component-task', $day).length;
-        this._arrangeTask(1 + 26 * count);
+        // Full day tasks are rendered in the topGrid
+        var alreadyExistingTasks = $('.component-task', $day).length;
+        // Offset of initial task: 30px for the day-of-month number
+        // Offset of following tasks: 26px * preceding number of tasks. 26px: Task 23px high, 1px border. Spaced by 2px
+        this._arrangeTask(30 + 26 * alreadyExistingTasks);
         $part.addClass('component-task');
       } else {
         var
@@ -120,13 +133,15 @@ scout.CalendarComponent.prototype._render = function() {
         if (scout.dates.isSameDay(scout.dates.trunc(this.coveredDaysRange.from), scout.dates.trunc(this.coveredDaysRange.to))) {
           this._partPosition($part, partFrom, partTo);
         } else if (scout.dates.isSameDay(partDay, fromDate)) {
-          this._partPosition($part, partFrom, 24)
+          this._partPosition($part, partFrom, 25) // 25: indicate that it takes longer than that day
             .addClass('component-open-bottom');
         } else if (scout.dates.isSameDay(partDay, toDate)) {
+          // Start at zero: No need to indicate that it starts earlier since indicator needs no extra space
           this._partPosition($part, 0, partTo)
             .addClass('component-open-top');
         } else {
-          this._partPosition($part, 1, 24)
+
+          this._partPosition($part, 0, 25) // 25: indicate that it takes longer than that day
             .addClass('component-open-top')
             .addClass('component-open-bottom');
         }
@@ -141,15 +156,17 @@ scout.CalendarComponent.prototype._getHours = function(date) {
 };
 
 scout.CalendarComponent.prototype._findDayInGrid = function(date) {
-  var $day;
-  $('.calendar-day', this.parent.$grid)
-    .each(function() {
-      if (scout.dates.isSameDay($(this).data('date'), date)) {
-        $day = $(this);
-        return;
-      }
-    });
-  return $day;
+  return this.parent.$grid.find('.calendar-day').filter(
+    function(i, elem) {
+      return scout.dates.isSameDay($(this).data('date'), date);
+    }).eq(0);
+};
+
+scout.CalendarComponent.prototype._findDayInTopGrid = function(date) {
+  return this.parent.$topGrid.find('.calendar-day').filter(
+    function() {
+      return scout.dates.isSameDay($(this).data('date'), date);
+    }).eq(0);
 };
 
 scout.CalendarComponent.prototype._isTask = function() {
@@ -185,8 +202,10 @@ scout.CalendarComponent.prototype.getPartDayPosition = function(day) {
 };
 
 scout.CalendarComponent.prototype._getDisplayDayPosition = function(range) {
-  var preferredRange = new scout.Range(this.parent._dayPosition(range.from), this.parent._dayPosition(range.to));
-  var minRangeSize = 2.5;
+  // Doesn't support minutes yet...
+  var preferredRange = new scout.Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
+  // Fixed number of divisions...
+  var minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
   if (preferredRange.size() < minRangeSize) {
     return new scout.Range(preferredRange.from, preferredRange.from + minRangeSize);
   }
@@ -194,12 +213,19 @@ scout.CalendarComponent.prototype._getDisplayDayPosition = function(range) {
 };
 
 scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
+  // Compensate open bottom (height: square of 16px, rotated 45°, approx. 23px = sqrt(16^2 + 16^2)
+  var compensateBottom = y2 === 25 ? 23 : 0;
+  y2 = Math.min(24, y2);
+
   var range = new scout.Range(y1, y2);
   var r = this._getDisplayDayPosition(range);
 
+  // Convert to %, rounded to two decimal places
+  compensateBottom = Math.round(100 * (100 / 1920 * compensateBottom)) / 100;
+
   return $part
     .css('top', r.from + '%')
-    .css('height', r.to - r.from + '%');
+    .css('height', r.to - r.from - compensateBottom + '%');
 };
 
 scout.CalendarComponent.prototype._renderProperties = function() {

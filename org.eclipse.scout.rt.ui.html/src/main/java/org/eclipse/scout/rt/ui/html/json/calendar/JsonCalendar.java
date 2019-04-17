@@ -179,12 +179,6 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
         return getModel().getStartHour();
       }
     });
-    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_END_HOUR, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getEndHour();
-      }
-    });
     putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_USE_OVERFLOW_CELLS, model) {
       @Override
       protected Boolean modelValue() {
@@ -195,18 +189,6 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
       @Override
       protected Boolean modelValue() {
         return getModel().getShowDisplayModeSelection();
-      }
-    });
-    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_MARK_NOON_HOUR, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().getMarkNoonHour();
-      }
-    });
-    putJsonProperty(new JsonProperty<CALENDAR>(ICalendar.PROP_MARK_OUT_OF_MONTH_DAYS, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().getMarkOutOfMonthDays();
       }
     });
   }

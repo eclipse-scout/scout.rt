@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,29 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
+
 scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
+  this.monthViewNumberOfWeeks = 6;
+  this.numberOfHourDivisions = 4;
+  this.heightPerDivision = 20;
+  this.startHour = 6;
+  this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
   this.components = [];
   this.displayMode;
   this.displayCondensed;
   this.loadInProgress;
-  this.markNoonHour = true;
-  this.markOutOfMonthDays = true;
   this.selectedDate;
   this.showDisplayModeSelection = true;
-  this.startHour = 6;
-  this.endHour = 19;
   this.title;
   this.useOverflowCells = true;
   this.viewRange;
+  this.needsScrollToStartHour = true;
 
   // main elements
   this.$container;
   this.$header;
   this.$range;
   this.$commands;
+  this.$grids;
   this.$grid;
+  this.$topGrid;
   this.$list;
   this.$progress;
 
@@ -169,6 +174,7 @@ scout.Calendar.prototype._renderDisplayMode = function(oldDisplayMode) {
   // only render if components have another layout
   if (oldDisplayMode === scout.Calendar.DisplayMode.MONTH || this.displayMode === scout.Calendar.DisplayMode.MONTH) {
     this._renderComponents();
+    this.needsScrollToStartHour = true;
   }
 };
 
@@ -195,7 +201,10 @@ scout.Calendar.prototype._render = function() {
   this.$headerRow2 = this.$header.appendDiv('calendar-header-row last');
   this._yearPanel.render();
 
-  this.$grid = this.$container.appendDiv('calendar-grid');
+  this.$grids = this.$container.appendDiv('calendar-grids');
+  this.$topGrid = this.$grids.appendDiv('calendar-top-grid');
+  this.$grid = this.$grids.appendDiv('calendar-grid');
+
   this.$list = this.$container.appendDiv('calendar-list-container').appendDiv('calendar-list');
   this.$listTitle = this.$list.appendDiv('calendar-list-title');
 
@@ -220,34 +229,44 @@ scout.Calendar.prototype._render = function() {
   this.$commands.appendDiv('calendar-toggle-year').click(this._onYearClick.bind(this));
   this.$commands.appendDiv('calendar-toggle-list').click(this._onListClick.bind(this));
 
-  // append the main grid
-  for (var w = 0; w < 7; w++) {
-    var $w = this.$grid.appendDiv();
-    if (w === 0) {
-      $w.addClass('calendar-week-header');
-    } else {
-      $w.addClass('calendar-week');
-    }
+  // Append the top grid (day/week views)
+  var $weekHeader = this.$topGrid.appendDiv('calendar-week-header');
+  $weekHeader.appendDiv('calendar-week-name');
+  for (var dayTop = 0; dayTop < 7; dayTop++) {
+    $weekHeader.appendDiv('calendar-day-name')
+      .data('day', dayTop);
+  }
 
+  this.$topGrid.appendDiv('calendar-week-task').attr('data-axis-name', this.session.text('ui.CalendarDay'));
+  var $weekTopGridDays = this.$topGrid.appendDiv('calendar-week-allday-container');
+  $weekTopGridDays.appendDiv('calendar-week-name');
+
+  var dayContextMenuCallback = this._onDayContextMenu.bind(this);
+  for (var dayBottom = 0; dayBottom < 7; dayBottom++) {
+    $weekTopGridDays.appendDiv('calendar-day')
+      .data('day', dayBottom)
+      .on('contextmenu', dayContextMenuCallback);
+  }
+
+  for (var w = 1; w < 7; w++) {
+    var $w = this.$grid.appendDiv('calendar-week');
     for (var d = 0; d < 8; d++) {
       var $d = $w.appendDiv();
-      if (w === 0 && d === 0) {
-        $d.addClass('calendar-week-name');
-      } else if (w === 0 && d > 0) {
-        $d.addClass('calendar-day-name');
-      } else if (w > 0 && d === 0) {
+      if (w > 0 && d === 0) {
         $d.addClass('calendar-week-name');
       } else if (w > 0 && d > 0) {
         $d.addClass('calendar-day')
           .data('day', d)
           .data('week', w)
-          .on('contextmenu', this._onDayContextMenu.bind(this));
+          .on('contextmenu', dayContextMenuCallback);
       }
     }
   }
 
   // click event on all day and children elements
-  $('.calendar-day', this.$grid).mousedown(this._onDayMouseDown.bind(this));
+  var mousedownCallback = this._onDayMouseDown.bind(this);
+  this.$grids.find('.calendar-day').on('mousedown', mousedownCallback);
+
   this._updateScreen(false);
 };
 
@@ -278,6 +297,28 @@ scout.Calendar.prototype._renderSelectedComponent = function() {
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
   this.$progress.setVisible(this.loadInProgress);
+};
+
+scout.Calendar.prototype.scrollToInitialTime = function() {
+  if (!this.rendered) {
+    // Execute delayed because table may be not layouted yet
+    this.session.layoutValidator.schedulePostValidateFunction(this._scrollToInitialTime.bind(this));
+  } else {
+    this._scrollToInitialTime();
+  }
+};
+
+scout.Calendar.prototype._scrollToInitialTime = function() {
+  this.needsScrollToStartHour = false;
+  if (!this._isMonth()) {
+    var $scrollables = this.$grid;
+    var scrollTargetTop = this.numberOfHourDivisions * this.heightPerDivision * this.startHour;
+
+    for (var k = 0; k < $scrollables.length; k++) {
+      var $scrollable = $scrollables.eq(k);
+      scout.scrollbars.scrollTop($scrollable, scrollTargetTop);
+    }
+  }
 };
 
 /* -- basics, events -------------------------------------------- */
@@ -489,8 +530,17 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   // reset animation sizes
   $('div', this.$container).removeData(['new-width', 'new-height']);
 
-  // init vars
+  if (this._isMonth()) {
+    this.$topGrid.addClass("calendar-top-grid-short");
+    this.$grid.removeClass("calendar-grid-short");
+  } else {
+    this.$topGrid.removeClass("calendar-top-grid-short");
+    this.$grid.addClass("calendar-grid-short");
+  }
+
+  // init vars (Selected: Day)
   var $selected = $('.selected', this.$grid),
+    $topSelected = $('.selected', this.$topGrid),
     headerH = this.$header.height(),
     gridH = this.$grid.height(),
     gridW = this.$container.width();
@@ -514,30 +564,55 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   }
 
   // basic grid width
-  this.$grid.data('new-width', gridW);
+  this.$grids.data('new-width', gridW);
 
+  var $weeksToHide = $(); // Empty
+  var $allWeeks = $('.calendar-week', this.$grid);
   // layout week
+
   if (this._isDay() || this._isWeek() || this._isWorkWeek()) {
-    $('.calendar-week', this.$grid).data('new-height', 0);
-    $selected.parent().data('new-height', gridH - headerH);
+    $('.calendar-week', this.$grid).removeClass('calendar-week-noborder');
+    // Parent of selected (Day) is a week
+    var selectedWeek = $selected.parent();
+    $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
+    $weeksToHide.data('new-height', 0);
+    $weeksToHide.removeClass('invisible');
+    selectedWeek.data('new-height', 24 * this.numberOfHourDivisions * this.heightPerDivision);
+    selectedWeek.addClass('calendar-week-noborder');
+    selectedWeek.removeClass('hidden invisible'); // Current week must be shown
+    // Hide the week-number in the lower grid
+    $('.calendar-week-name', this.$grid).addClass('invisible'); // Keep the reserved space
+    $('.calendar-week-allday-container', this.$topGrid).removeClass('hidden');
+    $('.calendar-week-task', this.$topGrid).removeClass('hidden');
   } else {
-    $('.calendar-week', this.$grid).data('new-height', parseInt((gridH - headerH) / 6, 10));
+    // Month
+    $allWeeks.removeClass('calendar-week-noborder invisible');
+    $allWeeks.eq(0).addClass('calendar-week-noborder');
+    $allWeeks.data('new-height', parseInt((gridH - headerH) / this.monthViewNumberOfWeeks, 10));
+    $('.calendar-week-name', this.$grid).removeClass('hidden invisible');
+    $('.calendar-week-allday-container', this.$topGrid).addClass('hidden');
+    $('.calendar-week-task', this.$topGrid).addClass('hidden');
   }
 
   // layout days
   if (this._isDay()) {
-    $('.calendar-day-name, .calendar-day', this.$grid)
-      .data('new-width', 0);
-    $('.calendar-day-name:nth-child(' + ($selected.index() + 1) + '), .calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid)
+    $('.calendar-day-name, .calendar-day', this.$topGrid).data('new-width', 0);
+    $('.calendar-day', this.$grid).data('new-width', 0);
+    $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
       .data('new-width', gridW - headerH);
+    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid).data('new-width', gridW - headerH);
+    $('.calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid).data('new-width', gridW - headerH);
   } else if (this._isWorkWeek()) {
-    $('.calendar-day-name, .calendar-day', this.$grid)
-      .data('new-width', 0);
-    $('.calendar-day-name:nth-child(-n+6), .calendar-day:nth-child(-n+6)', this.$grid)
-      .data('new-width', parseInt((gridW - headerH) / 5, 10));
+    this.$topGrid.find('.calendar-day-name').data('new-width', 0);
+    this.$grids.find('.calendar-day').data('new-width', 0);
+    $('.calendar-day-name:nth-child(-n+6), ' +
+        '.calendar-day:nth-child(-n+6)', this.$topGrid)
+      .data('new-width', parseInt((gridW - headerH) / this.workDayIndices.length, 10));
+    $('.calendar-day:nth-child(-n+6)', this.$grid)
+      .data('new-width', parseInt((gridW - headerH) / this.workDayIndices.length, 10));
   } else if (this._isMonth() || this._isWeek()) {
-    $('.calendar-day-name, .calendar-day', this.$grid)
-      .data('new-width', parseInt((gridW - headerH) / 7, 10));
+    this.$grids.find('.calendar-day').data('new-width', parseInt((gridW - headerH) / 7, 10));
+    this.$topGrid.find('.calendar-day-name').data('new-width', parseInt((gridW - headerH) / 7, 10));
   }
 
   // layout components
@@ -556,7 +631,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   if (this._isDay()) {
     width /= 1;
   } else if (this._isWorkWeek()) {
-    width /= 5;
+    width /= this.workDayIndices.length;
   } else if (this._isWeek()) {
     width /= 7;
   } else if (this._isMonth()) {
@@ -569,7 +644,7 @@ scout.Calendar.prototype.layoutSize = function(animate) {
     weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
   }
 
-  $('.calendar-day-name', this.$grid).each(function(index) {
+  $('.calendar-day-name', this.$topGrid).each(function(index) {
     $(this).attr('data-day-name', weekdays[index]);
   });
 
@@ -590,10 +665,21 @@ scout.Calendar.prototype.layoutSize = function(animate) {
       }
     }
     if (h !== undefined && h !== $e.outerHeight()) {
+      if (h > 0) {
+        $e.removeClass('hidden');
+      }
       if (animate) {
-        $e.animateAVCSD('height', h, updateScrollbarCallback.bind($e));
+        $e.animateAVCSD('height', h, function() {
+          if (h === 0) {
+            $e.addClass('hidden');
+          }
+          updateScrollbarCallback($e);
+        });
       } else {
         $e.css('height', h);
+        if (h === 0) {
+          $e.addClass('hidden');
+        }
         updateScrollbarCallback($e);
       }
     }
@@ -607,6 +693,9 @@ scout.Calendar.prototype._updateScrollbars = function($parent) {
     var $scrollable = $scrollables.eq(k);
     scout.scrollbars.update($scrollable, true);
   }
+  if (this.needsScrollToStartHour) {
+    this.scrollToInitialTime();
+  }
 };
 
 scout.Calendar.prototype.layoutYearPanel = function() {
@@ -617,7 +706,7 @@ scout.Calendar.prototype.layoutYearPanel = function() {
 };
 
 scout.Calendar.prototype.layoutLabel = function() {
-  var text, $dates,
+  var text, $dates, $topGridDates,
     exFrom = this._exactRange.from,
     exTo = this._exactRange.to;
 
@@ -646,11 +735,52 @@ scout.Calendar.prototype.layoutLabel = function() {
     currentMonth = this._exactRange.from.getMonth(),
     date = new Date(this.viewRange.from.valueOf());
 
-  // loop all days and set value and class
-  for (w = 0; w < 6; w++) {
+  // Main grid: loop all days and set value and class
+  for (w = 0; w < this.monthViewNumberOfWeeks; w++) {
     for (d = 0; d < 7; d++) {
       cssClass = '';
-      if ((date.getDay() === 6) || (date.getDay() === 0)) {
+      if (this.workDayIndices.indexOf(date.getDay()) === -1) {
+        cssClass = date.getMonth() !== currentMonth ? ' weekend-out' : ' weekend';
+      } else {
+        cssClass = date.getMonth() !== currentMonth ? ' out' : '';
+      }
+      if (scout.dates.isSameDay(date, new Date())) {
+        cssClass += ' now';
+      }
+      if (scout.dates.isSameDay(date, this.selectedDate)) {
+        cssClass += ' selected';
+      }
+      if (!this._isMonth()) {
+        cssClass += ' calendar-no-label'; // If we're not in the month view, number is shown on top
+      }
+
+      // adjust position for days between 10 and 19 (because "1" is narrower than "0" or "2")
+      if (date.getDate() > 9 && date.getDate() < 20) {
+        cssClass += ' center-nice';
+      }
+
+      text = this._format(date, 'dd');
+      $dates.eq(w * 7 + d)
+        .removeClass('weekend-out weekend out selected now calendar-no-label')
+        .addClass(cssClass)
+        .attr('data-day-name', text)
+        .data('date', new Date(date.valueOf()));
+      date.setDate(date.getDate() + 1);
+    }
+  }
+
+  // Top grid: loop days of one calendar week and set value and class
+  if (!this._isMonth()) {
+    $topGridDates = $('.calendar-day', this.$topGrid);
+    // From the view range, find the week we are in
+    var exactDate = new Date(this._exactRange.from.valueOf());
+
+    // Find first day of week.
+    date = scout.dates.firstDayOfWeek(exactDate, 1);
+
+    for (d = 0; d < 7; d++) {
+      cssClass = '';
+      if (this.workDayIndices.indexOf(date.getDay()) === -1) {
         cssClass = date.getMonth() !== currentMonth ? ' weekend-out' : ' weekend';
       } else {
         cssClass = date.getMonth() !== currentMonth ? ' out' : '';
@@ -662,30 +792,28 @@ scout.Calendar.prototype.layoutLabel = function() {
         cssClass += ' selected';
       }
 
-      // adjust position for days between 10 and 19 (because "1" is narrower than "0" or "2")
-      if (date.getDate() > 9 && date.getDate() < 20) {
-        cssClass += ' center-nice';
-      }
-
       text = this._format(date, 'dd');
-      $dates.eq(w * 7 + d)
+      $topGridDates.eq(d)
         .removeClass('weekend-out weekend out selected now')
         .addClass(cssClass)
         .attr('data-day-name', text)
         .data('date', new Date(date.valueOf()));
+
       date.setDate(date.getDate() + 1);
     }
   }
+
 };
 
 scout.Calendar.prototype.layoutAxis = function() {
-  var $e, $selected = $('.selected', this.$grid);
+  var $e;
 
   // remove old axis
   $('.calendar-week-axis, .calendar-week-task', this.$grid).remove();
 
   // set weekname
   var session = this.session;
+
   $('.calendar-week-name', this.$container).each(function(index) {
     if (index > 0) {
       $e = $(this);
@@ -695,12 +823,22 @@ scout.Calendar.prototype.layoutAxis = function() {
 
   // day schedule
   if (!this._isMonth()) {
-    var $parent = $selected.parent();
-    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8) + '%');
-    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12) + '%');
-    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13) + '%');
-    $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17) + '%');
-    $parent.appendDiv('calendar-week-task').attr('data-axis-name', session.text('ui.CalendarDay')).css('top', this._dayPosition(-1) + '%');
+    // Parent of selected day: Week
+    //    var $parent = $selected.parent();
+    var $parent = $('.calendar-week', this.$grid);
+    var divisionEachXMin = 15; // At this interval, additional lines are added.
+    var divisonsPerHour = 60 / divisionEachXMin;
+
+    for (var h = 0; h < 24; h++) { // Render lines for each hour
+      var paddedHour = ('00' + h).slice(-2);
+      var topPos = h * divisonsPerHour * this.heightPerDivision;
+      $parent.appendDiv('calendar-week-axis').attr('data-axis-name', paddedHour).css('top', topPos + 'px');
+
+      for (var m = 1; m < divisonsPerHour; m++) { // First one rendered above. Start at the next
+        topPos += this.heightPerDivision;
+        $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '').css('top', topPos + 'px');
+      }
+    }
   }
 };
 
@@ -814,30 +952,27 @@ scout.Calendar.prototype._showContextMenu = function(event, allowedType) {
 /* -- components, arrangement------------------------------------ */
 
 scout.Calendar.prototype._arrangeComponents = function() {
-  var k, $day, $allChildren, $children, $scrollableContainer, dayComponents, day,
-    $days = $('.calendar-day', this.$grid);
+  var k, j, $day, $allChildren, $children, $scrollableContainer, dayComponents, day;
 
+  var $days = $('.calendar-day', this.$grid);
+  // Main (Bottom) grid: Iterate over days
   for (k = 0; k < $days.length; k++) {
     $day = $days.eq(k);
     $children = $day.children('.calendar-component:not(.component-task)');
     $allChildren = $day.children('.calendar-component');
     day = $day.data('date');
 
+    // Remove old element containers
     $scrollableContainer = $day.children('.calendar-scrollable-components');
-
     if ($scrollableContainer.length > 0) {
       scout.scrollbars.uninstall($scrollableContainer, this.session);
       $scrollableContainer.remove();
     }
 
-    if ($allChildren.length > 0) {
+    if (this._isMonth() && $allChildren.length > 0) {
       $scrollableContainer = $day.appendDiv('calendar-scrollable-components');
 
-      if (!this._isMonth()) {
-        $scrollableContainer.addClass('calendar-scrollable-components-week');
-      }
-
-      for (var j = 0; j < $allChildren.length; j++) {
+      for (j = 0; j < $allChildren.length; j++) {
         var $child = $allChildren.eq(j);
         // non-tasks (communications) are distributed manually
         // within the parent container in all views except the monthly view.
@@ -865,6 +1000,20 @@ scout.Calendar.prototype._arrangeComponents = function() {
       this._arrangeComponentSetPlacement($children, day);
     }
   }
+
+  // If we're in the non-month views, the time can scroll. Add scrollbars
+  if (this._isMonth()) {
+    scout.scrollbars.uninstall(this.$grid, this.session);
+    this.$grid.removeClass('calendar-scrollable-components');
+  } else {
+    this.$grid.addClass('calendar-scrollable-components');
+    scout.scrollbars.install(this.$grid, {
+      parent: this,
+      session: this.session,
+      axis: 'y'
+    });
+  }
+
 };
 
 scout.Calendar.prototype._getComponents = function($children) {
@@ -886,7 +1035,7 @@ scout.Calendar.prototype._sort = function(components) {
  * */
 scout.Calendar.prototype._arrange = function(components, day) {
   var i, j, c, r, k,
-    rows = [];
+    columns = [];
 
   //ordered by from, to
   this._sort(components);
@@ -902,46 +1051,46 @@ scout.Calendar.prototype._arrange = function(components, day) {
 
   for (i = 0; i < components.length; i++) {
     c = components[i];
-    r = c.getPartDayPosition(day);
+    r = c.getPartDayPosition(day); // Range [from,to]
 
-    //reduce number of rows, if all components end before this one
-    if (rows.length > 0 && this._allEndBefore(rows, r.from, day)) {
-      rows = [];
+    //reduce number of columns, if all components end before this one
+    if (columns.length > 0 && this._allEndBefore(columns, r.from, day)) {
+      columns = [];
     }
 
     //replace an component that ends before and can be replaced
-    k = this._findReplacableRow(rows, r.from, day);
+    k = this._findReplacableColumn(columns, r.from, day);
 
     //insert
     if (k >= 0) {
-      rows[k] = c;
+      columns[k] = c;
       c.stack[day].x = k;
     } else {
-      rows.push(c);
-      c.stack[day].x = rows.length - 1;
+      columns.push(c);
+      c.stack[day].x = columns.length - 1;
     }
 
     //update stackW
-    for (j = 0; j < rows.length; j++) {
-      rows[j].stack[day].w = rows.length;
+    for (j = 0; j < columns.length; j++) {
+      columns[j].stack[day].w = columns.length;
     }
   }
 };
 
-scout.Calendar.prototype._allEndBefore = function(rows, pos, day) {
+scout.Calendar.prototype._allEndBefore = function(columns, pos, day) {
   var i;
-  for (i = 0; i < rows.length; i++) {
-    if (!this._endsBefore(rows[i], pos, day)) {
+  for (i = 0; i < columns.length; i++) {
+    if (!this._endsBefore(columns[i], pos, day)) {
       return false;
     }
   }
   return true;
 };
 
-scout.Calendar.prototype._findReplacableRow = function(rows, pos, day) {
+scout.Calendar.prototype._findReplacableColumn = function(columns, pos, day) {
   var j;
-  for (j = 0; j < rows.length; j++) {
-    if (this._endsBefore(rows[j], pos, day)) {
+  for (j = 0; j < columns.length; j++) {
+    if (this._endsBefore(columns[j], pos, day)) {
       return j;
     }
   }
@@ -969,20 +1118,14 @@ scout.Calendar.prototype._arrangeComponentSetPlacement = function($children, day
 
 /* -- helper ---------------------------------------------------- */
 
-scout.Calendar.prototype._dayPosition = function(hour) {
+scout.Calendar.prototype._dayPosition = function(hour, minutes) {
+  // Height position in percent of total calendar
+
   var pos;
   if (hour < 0) {
-    pos = 85;
-  } else if (hour < 8) {
-    pos = hour / 8 * 10 + 5;
-  } else if (hour < 12) {
-    pos = (hour - 8) / 4 * 25 + 15;
-  } else if (hour < 13) {
-    pos = (hour - 12) / 1 * 5 + 40;
-  } else if (hour < 17) {
-    pos = (hour - 13) / 4 * 25 + 45;
-  } else if (hour <= 24) {
-    pos = (hour - 17) / 7 * 10 + 70;
+    pos = 0; // All day event
+  } else {
+    pos = 100 / (24 * 60) * (hour * 60 + minutes);
   }
   return Math.round(pos * 100) / 100;
 };

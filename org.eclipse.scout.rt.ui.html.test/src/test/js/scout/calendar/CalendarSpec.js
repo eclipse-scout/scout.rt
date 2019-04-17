@@ -41,16 +41,17 @@ describe("Calendar", function() {
     it("calculates the day position", function() {
       var cal = helper.createCalendar(helper.createSimpleModel());
       //fix total size: 80
-      expect(cal._dayPosition(0)).toBe(5);
-      expect(cal._dayPosition(4)).toBe(10);
-      expect(cal._dayPosition(8)).toBe(15);
-      expect(cal._dayPosition(10)).toBe(27.5);
-      expect(cal._dayPosition(12)).toBe(40);
-      expect(cal._dayPosition(12.5)).toBe(42.5);
-      expect(cal._dayPosition(13)).toBe(45);
-      expect(cal._dayPosition(17)).toBe(70);
-      expect(cal._dayPosition(24)).toBe(80);
-      expect(cal._dayPosition(-1)).toBe(85);
+      // All day event. Not relevant since in top grid
+      expect(cal._dayPosition(-1, 0)).toBe(0);
+      expect(cal._dayPosition(0, 0)).toBe(0);
+      expect(cal._dayPosition(4, 0)).toBe(16.67); // one sixth
+      expect(cal._dayPosition(8, 0)).toBe(33.33); // one third
+      expect(cal._dayPosition(10, 0)).toBe(41.67);
+      expect(cal._dayPosition(12, 0)).toBe(50);
+      expect(cal._dayPosition(12.5, 0)).toBe(52.08);
+      expect(cal._dayPosition(13, 0)).toBe(54.17);
+      expect(cal._dayPosition(17, 0)).toBe(70.83);
+      expect(cal._dayPosition(24, 0)).toBe(100);
     });
 
   });
@@ -105,24 +106,16 @@ describe("Calendar", function() {
     describe("part day position", function() {
 
       it("calculates the part day position", function() {
-        var posRange = c1.getPartDayPosition(day);
-        expect(posRange.from).toBe(40);
-        expect(posRange.to).toBe(42.5);
+        var posRange = c4.getPartDayPosition(day);
+        expect(posRange.from).toBe(56.25);
+        expect(posRange.to).toBe(62.5);
       });
 
       it("calculates the part day position for a range smaller than the minimum", function() {
         var posRange = c7.getPartDayPosition(day);
-        var minRange = 2.5;
-        expect(posRange.from).toBe(39.9);
-        expect(posRange.to).toBe(39.9 + minRange);
-      });
-
-
-      it("calculates the part day position for components larger than a day", function() {
-        var posRange = c7.getPartDayPosition(day);
-        var minRange = 2.5;
-        expect(posRange.from).toBe(39.9);
-        expect(posRange.to).toBe(39.9 + minRange);
+        var minRange = 1.04; // Rounded to two digits: 15min (default division in calendar)
+        expect(posRange.from).toBe(49.93);
+        expect(posRange.to).toBe(49.93 + minRange);
       });
 
     });
@@ -151,17 +144,6 @@ describe("Calendar", function() {
         expect(components[0]).toEqual(c1);
         expect(c1.stack[day].x).toEqual(0);
         expect(c1.stack[day].w).toEqual(1);
-      });
-
-      it("arranges non intersecting components", function() {
-        var components = [c1, c2];
-        cal._arrange(components, day);
-        expect(components[0]).toEqual(c1);
-        expect(components[1]).toEqual(c2);
-        expect(c1.stack[day].x).toEqual(0);
-        expect(c1.stack[day].w).toEqual(1);
-        expect(c2.stack[day].x).toEqual(0);
-        expect(c2.stack[day].w).toEqual(1);
       });
 
       it("arranges intersecting components", function() {
@@ -195,18 +177,19 @@ describe("Calendar", function() {
         expect(components[3]).toEqual(c2);
         expect(components[4]).toEqual(c3);
         expect(components[5]).toEqual(c4);
-        expect(c1.stack[day].w).toEqual(3);
-        expect(c2.stack[day].w).toEqual(3);
+        expect(c1.stack[day].w).toEqual(2);
+        expect(c2.stack[day].w).toEqual(2);
         expect(c3.stack[day].w).toEqual(3);
         expect(c4.stack[day].w).toEqual(3);
         expect(c5.stack[day].w).toEqual(3);
-        expect(c6.stack[day].w).toEqual(3);
+        expect(c6.stack[day].w).toEqual(2);
 
         expect(c6.stack[day].x).toEqual(0);
         expect(c1.stack[day].x).toEqual(1);
-        expect(c5.stack[day].x).toEqual(2);
-        expect(c2.stack[day].x).toEqual(0);
-        expect(c3.stack[day].x).toEqual(0);
+        expect(c5.stack[day].x).toEqual(0);
+        expect(c2.stack[day].x).toEqual(1);
+        expect(c3.stack[day].x).toEqual(1);
+        expect(c4.stack[day].x).toEqual(2);
       });
 
       it("reduces rows when arranging components", function() {

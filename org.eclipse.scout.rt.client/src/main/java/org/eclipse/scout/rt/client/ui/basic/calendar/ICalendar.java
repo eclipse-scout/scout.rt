@@ -64,10 +64,6 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    */
   String PROP_START_HOUR = "startHour";
   /**
-   * type int
-   */
-  String PROP_END_HOUR = "endHour";
-  /**
    * type {@link Boolean}
    */
   String PROP_USE_OVERFLOW_CELLS = "useOverflowCells";
@@ -75,16 +71,6 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * type {@link Boolean}
    */
   String PROP_SHOW_DISPLAY_MODE_SELECTION = "showDisplayModeSelection";
-
-  /**
-   * type {@link Boolean}
-   */
-  String PROP_MARK_NOON_HOUR = "markNoonHour";
-
-  /**
-   * type {@link Boolean}
-   */
-  String PROP_MARK_OUT_OF_MONTH_DAYS = "markOutOfMonthDays";
 
   /**
    * {@link Object}
@@ -184,29 +170,15 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   /**
    * Configures the starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode.
-   * Together with getEndHour and getOverflowCells is defines the timeline of a day.
+   * Together with getOverflowCells is defines the timeline of a day.
    * <p>
    * Default {@code 6}.
    *
-   * @see getEndHour
    * @see getUseOverflowCells
    */
   int getStartHour();
 
   void setStartHour(int hour);
-
-  /**
-   * The starting hour of the calendar. Only visible when the calendar is in day, week or work-week mode. Together with
-   * getStartHour and getUseOverflowCells is defines the timeline of a day.
-   * <p>
-   * Default {@code 19}.
-   *
-   * @see getStartHour
-   * @see getUseOverflowCells
-   */
-  int getEndHour();
-
-  void setEndHour(int hour);
 
   /**
    * Defines the label of the first and last cell of the calendar. Only visible when the calendar is in day, week or
@@ -217,7 +189,6 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * <p>
    * Default {@code true}.
    *
-   * @see getEndHour
    * @see getStartHour
    */
   boolean getUseOverflowCells();
@@ -233,21 +204,6 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
   boolean getShowDisplayModeSelection();
 
   void setShowDisplayModeSelection(boolean showDisplayModeSelection);
-
-  /**
-   * Defines whether or not the noon hour is painted with a darker color. The actually implementation is UI rendering
-   * specific.
-   */
-  boolean getMarkNoonHour();
-
-  void setMarkNoonHour(boolean markNoonHour);
-
-  /**
-   * Defines whether or not days that are outside the current month are painted with a darker background color.
-   */
-  boolean getMarkOutOfMonthDays();
-
-  void setMarkOutOfMonthDays(boolean markOutOfMonthDays);
 
   /*
    * UI interface

@@ -228,7 +228,7 @@ scout.dates = {
     var jan4 = new Date(thursday.getFullYear(), 0, 4);
 
     // If the date is before the beginning of the year, it belongs to the year before
-    var startJan4 = this._firstDayOfWeek(jan4, firstDayOfWeek);
+    var startJan4 = this.firstDayOfWeek(jan4, firstDayOfWeek);
     if (date.getTime() < startJan4.getTime()) {
       jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
     }
@@ -257,7 +257,7 @@ scout.dates = {
     return thursday;
   },
 
-  _firstDayOfWeek: function(date, firstDayOfWeek) {
+  firstDayOfWeek: function(date, firstDayOfWeek) {
     if (!date || typeof firstDayOfWeek !== 'number') {
       return undefined;
     }
