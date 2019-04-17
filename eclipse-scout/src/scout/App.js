@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Scout from './Scout';
+import * as scout from './scout';
 import ErrorHandler from './ErrorHandler';
 import EventSupport from './EventSupport';
 import ObjectFactory from './ObjectFactory';
@@ -9,28 +9,32 @@ import NullWidget from './widget/NullWidget';
 import Desktop from './desktop/Desktop';
 import Models from './utils/Models';
 import JQueryUtils from './utils/JQueryUtils';
+import { JsonResponseError } from './constants';
 
-var scout_sessions = [];
-var scout_appListeners = [];
-var scout_app = null;
-var scout_errorHandler = null;
+let scout_appListeners = [];
+let scout_errorHandler = null;
+
+// FIXME [awe] ES6: talk about this pattern, see: https://k94n.com/es6-modules-single-instance-pattern
+// Let used in global scope makes sure 'instance' is not reused.
+export let instance = null;
 
 export default class App {
+
   constructor() {
     this.events = this._createEventSupport();
+    this.sessions = [];
 
     /// register the listeners which were added to scout before the app is created
     scout_appListeners.forEach(function(listener) {
       this.addListener(listener);
     }, this);
     scout_appListeners = [];
-
-    scout_app = this;
+    instance = this;
     scout_errorHandler = this._createErrorHandler();
   }
 
-  static getSessions() {
-    return scout_sessions;
+  getSessions() { // FIXME [awe] ES6: discuss where to put the sessions
+    return this.sessions;
   }
 
   /**
@@ -136,17 +140,17 @@ export default class App {
         this._handleBootstrapTimeoutError(vararg, url);
         return;
       }
-    } else if (Scout.isPlainObject(vararg) && vararg.error) {
+    } else if (scout.isPlainObject(vararg) && vararg.error) {
       // Json based error
       // Json errors (normally processed by Session.js) are returned with http status 200
-      if (vararg.error.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
+      if (vararg.error.code === JsonResponseError.SESSION_TIMEOUT) {
         this._handleBootstrapTimeoutError(vararg.error, vararg.url);
         return;
       }
     }
 
     // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
-    var args = Scout.argumentsToArray(arguments).slice(1);
+    var args = scout.argumentsToArray(arguments).slice(1);
     return $.rejectedPromise.apply($, args);
   };
 
@@ -163,7 +167,7 @@ export default class App {
         scout.webstorage.setItem(sessionStorage, 'scout:timeoutPageReload', true);
 */
     // See comment in _bootstrapFail for the reasons why to reload here
-    Scout.reloadPage();
+    scout.reloadPage();
   };
 
   /**
@@ -210,18 +214,18 @@ export default class App {
   };
 
   _initVersion(options) {
-    this.version = Scout.nvl(
+    this.version = scout.nvl(
       this.version,
       options.version,
       $('scout-version').data('value'));
   };
 
   _prepareDOM() {
-    Scout.prepareDOM(document);
+    scout.prepareDOM(document);
   };
 
   _installGlobalMouseDownInterceptor() {
-    Scout.installGlobalMouseDownInterceptor(document);
+    scout.installGlobalMouseDownInterceptor(document);
   };
 
   /**
@@ -240,7 +244,7 @@ export default class App {
   };
 
   _createErrorHandler() {
-    return Scout.create(ErrorHandler);
+    return scout.create(ErrorHandler);
   };
 
   _ajaxSetup() {
@@ -277,7 +281,7 @@ export default class App {
       var $entryPoint = $(elem);
       options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
       var session = this._loadSession($entryPoint, options);
-      App.getSessions().push(session);
+      this.getSessions().push(session);
     }.bind(this));
   };
 
@@ -306,13 +310,13 @@ export default class App {
   };
 
   _createSession(options) {
-    return Scout.create(Session, options, {
+    return scout.create(Session, options, {
       ensureUniqueId: false
     });
   };
 
   _createDesktop(parent) {
-    return Scout.create(Desktop, {
+    return scout.create(Desktop, {
       parent: parent
     });
   };
@@ -335,7 +339,7 @@ export default class App {
     var $error = $('body').appendDiv('startup-error', null);
     $error.appendDiv('startup-error-title', 'The application could not be started');
 
-    var args = Scout.argumentsToArray(arguments).slice(1);
+    var args = scout.argumentsToArray(arguments).slice(1);
     var errorInfo = scout_errorHandler.handle(args);
     if (errorInfo.message) {
       $error.appendDiv('startup-error-message', errorInfo.message);
@@ -388,3 +392,4 @@ export default class App {
   };
 
 }
+

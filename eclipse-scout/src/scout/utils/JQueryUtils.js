@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import Arrays from './Arrays';
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 export default class JQueryUtils extends $ {
 
@@ -120,7 +120,7 @@ export default class JQueryUtils extends $ {
   };
 
   static promiseAll(promises, asArray) {
-    asArray = Scout.nvl(asArray, false);
+    asArray = scout.nvl(asArray, false);
     promises = Arrays.ensure(promises);
     var deferred = $.Deferred();
     $.when.apply($, promises).done(function() {
@@ -197,7 +197,7 @@ export default class JQueryUtils extends $ {
     }).catch(function() {
       // Reject the promise with usual arguments (jqXHR, textStatus, errorThrown), but add the request
       // options as additional argument (e.g. to make the URL available to the error handler)
-      var args = Scout.argumentsToArray(arguments);
+      var args = scout.argumentsToArray(arguments);
       args.push(this);
       return this.rejectedPromise.apply($, args);
     });

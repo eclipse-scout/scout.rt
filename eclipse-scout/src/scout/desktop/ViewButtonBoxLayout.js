@@ -1,5 +1,5 @@
 import AbstractLayout from '../layout/AbstractLayout';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import Graphics from '../utils/Graphics';
 
 export default class ViewButtonBoxLayout extends AbstractLayout {

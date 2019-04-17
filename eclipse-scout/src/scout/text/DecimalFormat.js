@@ -1,6 +1,6 @@
-import Scout from '../Scout';
+import * as scout from '../scout';
 import { RoundingMode } from '../utils/Numbers';
-import * as strings from '../utils/strings2';
+import * as strings from '../utils/strings';
 import Numbers from '../utils/Numbers'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
 
 export default class DecimalFormat {
@@ -115,7 +115,7 @@ export default class DecimalFormat {
   };
 
   format(number, applyMultiplier) {
-    applyMultiplier = Scout.nvl(applyMultiplier, true);
+    applyMultiplier = scout.nvl(applyMultiplier, true);
     if (number === null || number === undefined) {
       return null;
     }
@@ -173,7 +173,7 @@ export default class DecimalFormat {
    * Rounds a number according to the properties of the DecimalFormat.
    */
   round(number, applyMultiplier) {
-    applyMultiplier = Scout.nvl(applyMultiplier, true);
+    applyMultiplier = scout.nvl(applyMultiplier, true);
     if (number === null || number === undefined) {
       return null;
     }

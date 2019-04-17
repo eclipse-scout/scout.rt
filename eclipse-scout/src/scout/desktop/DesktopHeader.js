@@ -1,11 +1,12 @@
 import Widget from '../widget/Widget';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import {DisplayStyle} from './Desktop';
 import DesktopHeaderLayout from './DesktopHeaderLayout';
 import HtmlComponent from '../layout/HtmlComponent';
 import SimpleTabArea from '../tabbox/SimpleTabArea';
 import DesktopToolBox from './DesktopToolBox';
 import ViewButtonBox from './ViewButtonBox';
+import Form from '../form/Form';
 
 export default class DesktopHeader extends Widget {
 
@@ -21,11 +22,11 @@ export default class DesktopHeader extends Widget {
   _init(model) {
     super._init(model);
     this.desktop = this.session.desktop;
-    this.toolBoxVisible = Scout.nvl(model.toolBoxVisible, true);
-    this.viewButtonBoxVisible = Scout.nvl(model.viewButtonBoxVisible, false);
+    this.toolBoxVisible = scout.nvl(model.toolBoxVisible, true);
+    this.viewButtonBoxVisible = scout.nvl(model.viewButtonBoxVisible, false);
     this.updateViewButtonBoxVisibility();
     // create view tab box
-    this.tabArea = Scout.create(SimpleTabArea, {
+    this.tabArea = scout.create(SimpleTabArea, {
       parent: this
     });
   };
@@ -63,7 +64,7 @@ export default class DesktopHeader extends Widget {
     if (this.toolBox) {
       return;
     }
-    this.toolBox = Scout.create(DesktopToolBox, {
+    this.toolBox = scout.create(DesktopToolBox, {
       parent: this,
       menus: this.desktop.menus
     });
@@ -120,7 +121,7 @@ export default class DesktopHeader extends Widget {
     if (this.viewButtonBox) {
       return;
     }
-    this.viewButtonBox = Scout.create(ViewButtonBox, {
+    this.viewButtonBox = scout.create(ViewButtonBox, {
       parent: this,
       viewButtons: this.desktop.viewButtons
     });
@@ -219,7 +220,7 @@ export default class DesktopHeader extends Widget {
   };
 
   _outlineContentMenuBar(outlineContent) {
-    if (outlineContent instanceof scout.Form) {
+    if (outlineContent instanceof Form) {
       return outlineContent.rootGroupBox.menuBar;
     }
     return outlineContent.menuBar;
@@ -235,7 +236,7 @@ export default class DesktopHeader extends Widget {
       return;
     }
     var hasMenuBar = false;
-    if (outlineContent instanceof scout.Form && outlineContent.detailForm) {
+    if (outlineContent instanceof Form && outlineContent.detailForm) {
       var rootGroupBox = outlineContent.rootGroupBox;
       hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
     } else {

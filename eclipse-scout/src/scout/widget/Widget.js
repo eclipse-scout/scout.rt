@@ -1,9 +1,11 @@
 import * as $ from 'jquery';
 import Arrays from '../utils/Arrays';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import EventSupport from './../EventSupport';
-import * as strings from '../utils/strings2';
+import * as strings from '../utils/strings';
 import Event from '../utils/Event';
+import DeferredGlassPaneTarget from '../glasspane/DeferredGlassPaneTarget';
+import EventDelegator from '../utils/EventDelegator';
 
 export default class Widget {
 
@@ -167,7 +169,7 @@ export default class Widget {
       return existingWidget;
     }
     model.parent = this;
-    return Scout.create(model);
+    return scout.create(model);
   };
 
   _initKeyStrokeContext() {
@@ -422,7 +424,7 @@ export default class Widget {
   };
 
   setOwner(owner) {
-    Scout.assertParameter('owner', owner);
+    scout.assertParameter('owner', owner);
     if (owner === this.owner) {
       return;
     }
@@ -436,7 +438,7 @@ export default class Widget {
   };
 
   setParent(parent) {
-    Scout.assertParameter('parent', parent);
+    scout.assertParameter('parent', parent);
     if (parent === this.parent) {
       return;
     }
@@ -868,7 +870,7 @@ export default class Widget {
       return;
     }
     this.logicalGrid.setDirty(true);
-    if (Scout.nvl(invalidateLayout, true)) {
+    if (scout.nvl(invalidateLayout, true)) {
       this.invalidateLayoutTree();
     }
   };
@@ -882,7 +884,7 @@ export default class Widget {
       return;
     }
     this.parent.invalidateLogicalGrid(false);
-    if (Scout.nvl(invalidateLayout, true)) {
+    if (scout.nvl(invalidateLayout, true)) {
       var htmlCompParent = this.htmlComp.getParent();
       if (htmlCompParent) {
         htmlCompParent.invalidateLayoutTree();
@@ -901,7 +903,7 @@ export default class Widget {
 
   _setLogicalGrid(logicalGrid) {
     if (typeof logicalGrid === 'string') {
-      logicalGrid = Scout.create(logicalGrid);
+      logicalGrid = scout.create(logicalGrid);
     }
     this._setProperty('logicalGrid', logicalGrid);
     this.invalidateLogicalGrid();
@@ -952,7 +954,7 @@ export default class Widget {
    * for popup-window this function will return the body of the document in the popup window.
    */
   entryPoint($element) {
-    $element = Scout.nvl($element, this.parent.$container);
+    $element = scout.nvl($element, this.parent.$container);
     if (!$element.length) {
       throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
     }
@@ -1061,7 +1063,7 @@ export default class Widget {
    * old and new value are the same.
    */
   triggerPropertyChange(propertyName, oldValue, newValue) {
-    Scout.assertParameter('propertyName', propertyName);
+    scout.assertParameter('propertyName', propertyName);
     var event = new Event({
       propertyName: propertyName,
       oldValue: oldValue,
@@ -1075,9 +1077,9 @@ export default class Widget {
    * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
    */
   _setProperty(propertyName, newValue) {
-    Scout.assertParameter('propertyName', propertyName);
+    scout.assertParameter('propertyName', propertyName);
     var oldValue = this[propertyName];
-    if (Scout.equals(oldValue, newValue)) {
+    if (scout.equals(oldValue, newValue)) {
       return;
     }
     this[propertyName] = newValue;
@@ -1099,7 +1101,7 @@ export default class Widget {
    * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
    */
   setProperty(propertyName, value) {
-    if (Scout.equals(this[propertyName], value)) {
+    if (scout.equals(this[propertyName], value)) {
       return;
     }
 
@@ -1220,7 +1222,7 @@ export default class Widget {
       return this._glassPaneTargets(element);
     }
 
-    return scout.DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this, element));
+    return DeferredGlassPaneTarget.createFor(this, this._glassPaneTargets.bind(this, element));
   };
 
   _glassPaneTargets() {
@@ -1246,7 +1248,7 @@ export default class Widget {
     var str = '',
       ancestors = this.ancestors();
 
-    count = Scout.nvl(count, -1);
+    count = scout.nvl(count, -1);
     ancestors.some(function(ancestor, i) {
       if (count > -1 && i >= count) {
         return true;
@@ -1399,8 +1401,8 @@ export default class Widget {
     model = model || {};
     options = options || {};
 
-    cloneModel = Scout.extractProperties(this, model, this._cloneProperties);
-    clone = Scout.create(this.objectType, cloneModel);
+    cloneModel = scout.extractProperties(this, model, this._cloneProperties);
+    clone = scout.create(this.objectType, cloneModel);
     clone.cloneOf = this;
     this._mirror(clone, options);
 
@@ -1476,11 +1478,11 @@ export default class Widget {
     options = options || {};
     eventDelegator = {
       clone: clone,
-      originalToClone: scout.EventDelegator.create(this, clone, {
+      originalToClone: EventDelegator.create(this, clone, {
         delegateProperties: options.delegatePropertiesToClone,
         delegateAllProperties: options.delegateAllPropertiesToClone
       }),
-      cloneToOriginal: scout.EventDelegator.create(clone, this, {
+      cloneToOriginal: EventDelegator.create(clone, this, {
         delegateProperties: options.delegatePropertiesToOriginal,
         delegateAllProperties: options.delegateAllPropertiesToOriginal,
         excludeProperties: options.excludePropertiesToOriginal,
@@ -1606,7 +1608,7 @@ export default class Widget {
    * @returns whether the widget is the currently active element
    */
   isFocused() {
-    return this.rendered && Scout.isActiveElement(this.getFocusableElement());
+    return this.rendered && scout.isActiveElement(this.getFocusableElement());
   };
 
   /**

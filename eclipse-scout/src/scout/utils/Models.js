@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 var modelMap = {};
 

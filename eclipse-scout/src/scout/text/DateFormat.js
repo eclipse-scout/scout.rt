@@ -1,7 +1,7 @@
-import DateFormatPatternDefinition from './DateFormatPatternDefinition';
-import Scout from '../Scout';
+import * as scout from '../scout';
+import * as strings from '../utils/strings';
 import Dates from '../utils/Dates';
-import * as strings from '../utils/strings2';
+import DateFormatPatternDefinition from './DateFormatPatternDefinition';
 
 export default class DateFormat {
 
@@ -10,9 +10,9 @@ export default class DateFormat {
 
     /*jshint sub:true*/
     this.locale = locale;
-    Scout.assertParameter('locale', this.locale);
+    scout.assertParameter('locale', this.locale);
     this.pattern = pattern || locale.dateFormatPatternDefault;
-    Scout.assertParameter('pattern', this.pattern);
+    scout.assertParameter('pattern', this.pattern);
 
     this.symbols = locale.dateFormatSymbols;
     this.symbols.firstDayOfWeek = 1; // monday
@@ -24,7 +24,7 @@ export default class DateFormat {
     // Relevant during analyze(). When this is true (default), terms of the same 'pattern type' (e.g. 'd' and 'dd') will
     // also be considered. Otherwise, analyze() behaves like parse(), i.g. the pattern must match exactly.
     // Example: '2.10' will match the pattern 'dd.MM.yyy' when lenient=true. If lenient is false, it won't match.
-    this.lenient = Scout.nvl(options.lenient, true);
+    this.lenient = scout.nvl(options.lenient, true);
 
     // List of terms, e.g. split up parts of this.pattern. The length of this array is equal
     // to the length of this._formatFunctions, this._parseFunctions and this._analyzeFunctions.
@@ -83,7 +83,7 @@ export default class DateFormat {
             return year.slice(-length);
           }
           // Return max. 2 digits with zero padding
-          return Scout.padZeroLeft(year, length).slice(-length);
+          return strings.padZeroLeft(year, length).slice(-length);
         },
         parseRegExp: /^(\d{1,3})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -94,7 +94,7 @@ export default class DateFormat {
           }
           var startYear = (parseContext.startDate || new Date()).getFullYear();
           // Construct a new year using the startYear's century and the entered 'short year'
-          var year = Number(Scout.padZeroLeft(startYear, 4).substr(0, 2) + Scout.padZeroLeft(match, 2));
+          var year = Number(strings.padZeroLeft(startYear, 4).substr(0, 2) + strings.padZeroLeft(match, 2));
           // Ensure max. 50 years distance between 'startYear' and 'year'
           var distance = year - startYear;
           if (distance <= -50) {
@@ -120,7 +120,7 @@ export default class DateFormat {
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + Scout.quote(symbol) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
             m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.dateInfo.month = i;
@@ -133,7 +133,7 @@ export default class DateFormat {
           if (parseContext.analyze) {
             for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
               symbol = this.dateFormat.symbols.months[i];
-              re = new RegExp('^(' + Scout.quote(parseContext.inputString) + ')(.*)$', 'i');
+              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
               m = re.exec(symbol);
               if (m) { // match found
                 parseContext.dateInfo.month = i;
@@ -159,7 +159,7 @@ export default class DateFormat {
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + Scout.quote(symbol) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
             m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.dateInfo.month = i;
@@ -172,7 +172,7 @@ export default class DateFormat {
           if (parseContext.analyze) {
             for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
               symbol = this.dateFormat.symbols.monthsShort[i];
-              re = new RegExp('^(' + Scout.quote(parseContext.inputString) + ')(.*)$', 'i');
+              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
               m = re.exec(symbol);
               if (m) { // match found
                 parseContext.dateInfo.month = i;
@@ -189,7 +189,7 @@ export default class DateFormat {
         type: DateFormatPatternType.MONTH,
         terms: ['MM'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
+          return strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -217,7 +217,7 @@ export default class DateFormat {
                 }
               }
               parseContext.dateInfo.month = month;
-              parseContext.matchInfo.month = Scout.padZeroLeft(String(month + 1), 2);
+              parseContext.matchInfo.month = strings.padZeroLeft(String(month + 1), 2);
               parseContext.inputString = '';
               return '0';
             }
@@ -243,7 +243,7 @@ export default class DateFormat {
         type: DateFormatPatternType.WEEK_IN_YEAR,
         terms: ['ww'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(Dates.weekInYear(formatContext.inputDate), 2);
+          return strings.padZeroLeft(Dates.weekInYear(formatContext.inputDate), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -268,7 +268,7 @@ export default class DateFormat {
         type: DateFormatPatternType.DAY_IN_MONTH,
         terms: ['dd'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getDate(), 2);
+          return strings.padZeroLeft(formatContext.inputDate.getDate(), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -315,7 +315,7 @@ export default class DateFormat {
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + Scout.quote(symbol) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
             m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.matchInfo.weekday = m[1];
@@ -328,7 +328,7 @@ export default class DateFormat {
           if (parseContext.analyze) {
             for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
               symbol = this.dateFormat.symbols.weekdays[i];
-              re = new RegExp('^(' + Scout.quote(parseContext.inputString) + ')(.*)$', 'i');
+              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
               m = re.exec(symbol);
               if (m) { // match found
                 parseContext.matchInfo.weekday = symbol;
@@ -354,7 +354,7 @@ export default class DateFormat {
             if (!symbol) {
               continue; // Ignore empty symbols (otherwise, pattern would match everything)
             }
-            re = new RegExp('^(' + Scout.quote(symbol) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
             m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.matchInfo.weekday = m[1];
@@ -367,7 +367,7 @@ export default class DateFormat {
           if (parseContext.analyze) {
             for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
               symbol = this.dateFormat.symbols.weekdaysShort[i];
-              re = new RegExp('^(' + Scout.quote(parseContext.inputString) + ')(.*)$', 'i');
+              re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
               m = re.exec(symbol);
               if (m) { // match found
                 parseContext.matchInfo.weekday = symbol;
@@ -385,7 +385,7 @@ export default class DateFormat {
         type: DateFormatPatternType.HOUR_24,
         terms: ['HH'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getHours(), 2);
+          return strings.padZeroLeft(formatContext.inputDate.getHours(), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -413,7 +413,7 @@ export default class DateFormat {
           if (formatContext.inputDate.getHours() % 12 === 0) {
             return '12'; // there is no hour '0' in 12-hour format
           }
-          return Scout.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
+          return strings.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
         },
         parseRegExp: /^(10|11|12|0[1-9])(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -459,7 +459,7 @@ export default class DateFormat {
           return this.dateFormat.symbols.pm;
         },
         parseFunction: function(parseContext, acceptedTerm) {
-          var re = new RegExp('^(' + Scout.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
+          var re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
           var m = re.exec(parseContext.inputString);
           parseContext.matchInfo.ampm = null;
           if (m) { // match found
@@ -469,7 +469,7 @@ export default class DateFormat {
             parseContext.dateInfo.hours = parseContext.dateInfo.hours % 12;
             return m[1];
           } else {
-            re = new RegExp('^(' + Scout.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
             m = re.exec(parseContext.inputString);
             if (m) { // match found
               parseContext.matchInfo.ampm = m[1];
@@ -481,7 +481,7 @@ export default class DateFormat {
           }
           // No match found so far. In analyze mode, check prefixes.
           if (parseContext.analyze) {
-            re = new RegExp('^(' + Scout.quote(parseContext.inputString) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
             m = re.exec(this.dateFormat.symbols.am);
             if (m) {
               parseContext.matchInfo.ampm = this.dateFormat.symbols.am;
@@ -507,7 +507,7 @@ export default class DateFormat {
         type: DateFormatPatternType.MINUTE,
         terms: ['mm'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
+          return strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -518,7 +518,7 @@ export default class DateFormat {
           // Special case! When regexp did not match, check if input + '0' would make a
           // valid minutes value. If yes, predict this value.
           if (parseContext.analyze) {
-            if (Scout.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
+            if (scout.isOneOf(parseContext.inputString, '0', '1', '2', '3', '4', '5')) {
               var tenMinutes = parseContext.inputString + '0';
               parseContext.dateInfo.minutes = Number(tenMinutes);
               parseContext.matchInfo.minutes = tenMinutes;
@@ -546,7 +546,7 @@ export default class DateFormat {
         type: DateFormatPatternType.SECOND,
         terms: ['ss'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
+          return strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -571,7 +571,7 @@ export default class DateFormat {
         type: DateFormatPatternType.MILLISECOND,
         terms: ['SSS'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return Scout.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
+          return strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
         },
         parseRegExp: /^(\d{3})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -693,7 +693,7 @@ export default class DateFormat {
     }
 
     var formatContext = this._createFormatContext(date);
-    formatContext.exactLength = Scout.nvl(exactLength, false);
+    formatContext.exactLength = scout.nvl(exactLength, false);
     // Apply all formatter functions for this DateFormat to the pattern to replace the
     // different terms with the corresponding value from the given date.
     for (var i = 0; i < this._formatFunctions.length; i++) {
@@ -866,15 +866,15 @@ export default class DateFormat {
     // 2015 does not have 29 days and is 'corrected' to March.)
     var result = new Date(1970, 0, 1);
 
-    var validDay = Scout.nvl(dateInfo.day, startDate.getDate());
-    var validMonth = Scout.nvl(dateInfo.month, startDate.getMonth());
-    var validYear = Scout.nvl(dateInfo.year, startDate.getFullYear());
+    var validDay = scout.nvl(dateInfo.day, startDate.getDate());
+    var validMonth = scout.nvl(dateInfo.month, startDate.getMonth());
+    var validYear = scout.nvl(dateInfo.year, startDate.getFullYear());
     // When user entered the day but not (yet) the month, adjust month if possible to propose a valid date
     if (dateInfo.day && !dateInfo.month) {
       // If day '31' does not exist in the proposed month, use the next month
       if (dateInfo.day === 31) {
         var monthsWithThirthyOneDays = [0, 2, 4, 6, 7, 9, 11];
-        if (!Scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
+        if (!scout.isOneOf(validMonth, monthsWithThirthyOneDays)) {
           validMonth = validMonth + 1;
         }
       }
@@ -899,10 +899,10 @@ export default class DateFormat {
     );
 
     result.setHours(
-      Scout.nvl(dateInfo.hours, startDate.getHours()),
-      Scout.nvl(dateInfo.minutes, startDate.getMinutes()),
-      Scout.nvl(dateInfo.seconds, startDate.getSeconds()),
-      Scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
+      scout.nvl(dateInfo.hours, startDate.getHours()),
+      scout.nvl(dateInfo.minutes, startDate.getMinutes()),
+      scout.nvl(dateInfo.seconds, startDate.getSeconds()),
+      scout.nvl(dateInfo.milliseconds, startDate.getMilliseconds())
     );
 
     // Validate. A date is considered valid if the value from the dateInfo did

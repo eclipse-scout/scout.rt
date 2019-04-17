@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import Dimension from './Dimension';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import Rectangle from './Rectangle';
 import Insets from './Insets';
 import Arrays from './Arrays';
@@ -23,13 +23,13 @@ export default class Graphics {
 
     var bcr = $elem[0].getBoundingClientRect();
     var size = new Dimension(bcr.width, bcr.height);
-    var includeMargin = Scout.nvl(options.includeMargin, false);
+    var includeMargin = scout.nvl(options.includeMargin, false);
     if (includeMargin) {
       size.width += $elem.cssMarginX();
       size.height += $elem.cssMarginY();
     }
     // see comments in prefSize()
-    var exact = Scout.nvl(options.exact, false);
+    var exact = scout.nvl(options.exact, false);
     if (!exact) {
       size.width = Math.ceil(size.width);
       size.height = Math.ceil(size.height);
@@ -75,8 +75,8 @@ export default class Graphics {
 
     // UseCssSize is necessary if the css rules have a fix height or width set.
     // Otherwise setting the width/height to auto could result in a different size
-    var newWidth = (options.useCssSize ? '' : Scout.nvl(options.widthHint, 'auto'));
-    var newHeight = (options.useCssSize ? '' : Scout.nvl(options.heightHint, 'auto'));
+    var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
+    var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
 
     // modify properties which prevent reading the preferred size
     $elem.css({
@@ -111,7 +111,7 @@ export default class Graphics {
     // - Results:
     //     IE                   <div id='elem' style='height: 345.23px'>     [Fractional part cut off after two digits]
     //     Firefox & Chrome     <div id='elem' style='height: 345.24px'>     [Fractional part rounded to three digits]
-    var exact = Scout.nvl(options.exact, false);
+    var exact = scout.nvl(options.exact, false);
     if (!exact) {
       prefSize.width = Math.ceil(prefSize.width);
       prefSize.height = Math.ceil(prefSize.height);
@@ -193,9 +193,9 @@ export default class Graphics {
     var i,
       directions = ['top', 'right', 'bottom', 'left'],
       insets = [0, 0, 0, 0],
-      includeMargin = Scout.nvl(options.includeMargin, false),
-      includePadding = Scout.nvl(options.includePadding, true),
-      includeBorder = Scout.nvl(options.includeBorder, true);
+      includeMargin = scout.nvl(options.includeMargin, false),
+      includePadding = scout.nvl(options.includePadding, true),
+      includeBorder = scout.nvl(options.includeBorder, true);
 
     for (i = 0; i < directions.length; i++) {
       if (includeMargin) {

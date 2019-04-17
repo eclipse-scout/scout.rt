@@ -1,11 +1,11 @@
-import Scout from '../Scout';
+import * as scout from '../scout';
 import DateFormat from '../text/DateFormat';
 import DecimalFormat from '../text/DecimalFormat';
 
 export default class Locale {
 
   constructor(model) {
-    model = Scout.nvl(model, DEFAULT_LOCALE_MODEL);
+    model = scout.nvl(model, DEFAULT_LOCALE_MODEL);
 
     this.languageTag = model.languageTag;
     var tags = Locale.splitLanguageTag(this.languageTag);

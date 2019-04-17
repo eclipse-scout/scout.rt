@@ -1,6 +1,6 @@
 import SimpleTabBoxController from '../tabbox/SimpleTabBoxController';
 import DesktopTab from './DesktopTab';
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 export default class DesktopTabBoxController extends SimpleTabBoxController {
 
@@ -9,7 +9,7 @@ export default class DesktopTabBoxController extends SimpleTabBoxController {
   }
 
   _createTab(view) {
-    return Scout.create(DesktopTab, {
+    return scout.create(DesktopTab, {
       parent: this.tabArea,
       view: view
     });

@@ -2,7 +2,7 @@ import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 import ViewMenuTab from './ViewMenuTab';
 import ViewButtonBoxLayout from './ViewButtonBoxLayout';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import OutlineViewButton from '../outline/OutlineViewButton';
 
 export default class ViewButtonBox extends Widget {
@@ -21,7 +21,7 @@ export default class ViewButtonBox extends Widget {
   _init(model) {
     super._init(model);
     this.desktop = this.session.desktop;
-    this.viewMenuTab = Scout.create(ViewMenuTab, {
+    this.viewMenuTab = scout.create(ViewMenuTab, {
       parent: this
     });
     this._setViewButtons(this.viewButtons);

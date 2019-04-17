@@ -1,6 +1,6 @@
 import AbstractLayout from '../layout/AbstractLayout';
 import Dimension from '../utils/Dimension';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import Graphics from '../utils/Graphics';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
@@ -113,7 +113,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
 
     this._overflowTabsIndizes.forEach(function(i) {
       tab = this.tabArea.getTabs()[i];
-      menu = Scout.create('Menu', {
+      menu = scout.create('Menu', {
         parent: this.tabArea,
         text: tab.getMenuText(),
         tab: tab
@@ -124,7 +124,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
       overflowMenus.push(menu);
     }, this);
 
-    popup = Scout.create('ContextMenuPopup', {
+    popup = scout.create('ContextMenuPopup', {
       parent: this.tabArea,
       menuItems: overflowMenus,
       cloneMenuItems: false,

@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
-import * as strings from './utils/strings2';
-import Scout from './Scout';
+import * as strings from './utils/strings';
+import { instance as app } from './App';
 
 export default class ErrorHandler {
 
@@ -8,7 +8,6 @@ export default class ErrorHandler {
     this.logError = true;
     this.displayError = true;
     this.sendError = false;
-
     this.windowErrorHandler = this._onWindowError.bind(this);
   }
 
@@ -152,8 +151,8 @@ export default class ErrorHandler {
     // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    if (App.getSessions().length > 0) {
-      var session = App.scout_sessions[0];
+    if (app.getSessions().length > 0) {
+      var session = app.getSessions()[0];
       if (this.displayError) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }
@@ -203,7 +202,7 @@ export default class ErrorHandler {
         session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
         session.optText('ui.UiInconsistentMsg', '')),
       yesButtonText: session.optText('ui.Reload', 'Reload'),
-      yesButtonAction: Scout.reloadPage,
+      yesButtonAction: scout.reloadPage,
       noButtonText: session.optText('ui.Ignore', 'Ignore'),
       hiddenText: logMessage
     };

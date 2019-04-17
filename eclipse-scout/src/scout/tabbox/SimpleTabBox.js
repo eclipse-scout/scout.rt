@@ -2,7 +2,7 @@ import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 import SimpleTabBoxLayout from './SimpleTabBoxLayout';
 import SimpleTabViewContentLayout from './SimpleTabViewContentLayout';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import SimpleTabBoxController from './SimpleTabBoxController';
 import Arrays from '../utils/Arrays';
 import SimpleTabArea from './SimpleTabArea';
@@ -27,13 +27,13 @@ export default class SimpleTabBox extends Widget {
 
     if (!this.tabArea) {
       // default tab area
-      this.tabArea = Scout.create(SimpleTabArea, {
+      this.tabArea = scout.create(SimpleTabArea, {
         parent: this
       });
     }
     if (!this.controller) {
       // default controller
-      this.controller = Scout.create(SimpleTabBoxController);
+      this.controller = scout.create(SimpleTabBoxController);
     }
     // link
     this.controller.install(this, this.tabArea);
@@ -150,7 +150,7 @@ export default class SimpleTabBox extends Widget {
    * @param bringToTop whether the view should be placed on top of the view stack. the view tab will be selected.
    */
   addView(view, bringToTop) {
-    var activate = Scout.nvl(bringToTop, true);
+    var activate = scout.nvl(bringToTop, true);
     // add to view stack
     var siblingView = this._addToViewStack(view, activate);
     view.setParent(this);
@@ -218,7 +218,7 @@ export default class SimpleTabBox extends Widget {
     if (!view) {
       return;
     }
-    showSiblingView = Scout.nvl(showSiblingView, true);
+    showSiblingView = scout.nvl(showSiblingView, true);
     var index = this.viewStack.indexOf(view);
     var viewToActivate;
     // if current view is the view to remove reset current view

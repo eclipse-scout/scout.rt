@@ -1,4 +1,4 @@
-import Scout from './Scout';
+import * as scout from './scout';
 
 export default class ObjectFactory {
 
@@ -50,7 +50,7 @@ export default class ObjectFactory {
    *                                 without variant (see description above).
    */
   _createObjectByType(objectType, options) {
-    if (!Scout.isFunction(objectType)) {
+    if (!scout.isFunction(objectType)) {
       throw new Error('missing or invalid object type');
     }
     options = options || {};
@@ -58,7 +58,7 @@ export default class ObjectFactory {
     // FIXME [awe] ES6: The 'name' property is not standard and does not exist in Internet Explorer, thus we cannot use it!
     // additionally TerserPlugin changes class-names in minify-process, thus we cannot rely on name-magic when we instantiate
     // a class by string (which happens in Scout classic case). Proposal: assign a static property 'name' to every Scout class
-    // and use this string for lookups when we come from Scout.create(string). The create function should also accept a Function
+    // and use this string for lookups when we come from scout.create(string). The create function should also accept a Function
     // argument, so we can pass a function-reference in Scout JS applications (which is better for IDE support).
     var createFunc = this._registry[objectType.name];
     if (createFunc) {
@@ -109,7 +109,7 @@ export default class ObjectFactory {
     // Normalize arguments
     if (typeof objectType === 'function') {
       options = options || {};
-    } else if (Scout.isPlainObject(objectType)) {
+    } else if (scout.isPlainObject(objectType)) {
       options = model || {};
       model = objectType;
       if (!model.objectType) {
@@ -123,9 +123,9 @@ export default class ObjectFactory {
 
     // Create object
     var scoutObject = this._createObjectByType(objectType, options);
-    if (Scout.isFunction(scoutObject.init)) {
+    if (scout.isFunction(scoutObject.init)) {
       if (model) {
-        if (model.id === undefined && Scout.nvl(options.ensureUniqueId, true)) {
+        if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
           model.id = this.createUniqueId();
         }
         model.objectType = objectType;
@@ -134,7 +134,7 @@ export default class ObjectFactory {
       scoutObject.init(model);
     }
 
-    if (scoutObject.id === undefined && Scout.nvl(options.ensureUniqueId, true)) {
+    if (scoutObject.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
       scoutObject.id = this.createUniqueId();
     }
     if (scoutObject.objectType === undefined) {
@@ -170,9 +170,9 @@ export default class ObjectFactory {
    * That's why we call this method in the scout._init method.
    */
   init() {
-    for (var objectType in Scout.objectFactories) {
-      if (Scout.objectFactories.hasOwnProperty(objectType)) {
-        this.register(objectType, Scout.objectFactories[objectType]);
+    for (var objectType in scout.objectFactories) {
+      if (scout.objectFactories.hasOwnProperty(objectType)) {
+        this.register(objectType, scout.objectFactories[objectType]);
       }
     }
   };

@@ -1,11 +1,13 @@
 import Widget from '../widget/Widget';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import HtmlComponent from '../layout/HtmlComponent';
 import FlexboxLayout, {Direction} from '../layout/FlexboxLayout';
 import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 import BenchColumn from './BenchColumn';
 import HeaderTabBoxController from './HeaderTabBoxController';
 import Arrays from '../utils/Arrays';
+import Splitter from '../splitter/Splitter';
+import Table from '../table/Table';
 
 export const VIEW_MIN_HEIGHT = 50;
 export const VIEW_MIN_WIDTH = 50;
@@ -60,10 +62,10 @@ export default class DesktopBench extends Widget {
     this.headerTabArea = model.headerTabArea;
     // controller for headerTabArea
     if (this.headerTabArea) {
-      this.headerTabAreaController = Scout.create(HeaderTabBoxController);
+      this.headerTabAreaController = scout.create(HeaderTabBoxController);
       this.headerTabAreaController.install(this, this.headerTabArea);
     }
-    this.outlineContentVisible = Scout.nvl(model.outlineContentVisible, true);
+    this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
     this.setOutline(this.desktop.outline);
     this.updateNavigationHandleVisibility();
   };
@@ -80,7 +82,7 @@ export default class DesktopBench extends Widget {
       if (cacheKey.length > 0) {
         cacheKey.push('column' + i);
       }
-      var column = Scout.create(BenchColumn, {
+      var column = scout.create(BenchColumn, {
         parent: this,
         layoutData: columnLayoutData[i],
         cacheKey: cacheKey,
@@ -186,7 +188,7 @@ export default class DesktopBench extends Widget {
   };
 
   _createNavigationHandle() {
-    return Scout.create('DesktopNavigationHandle', {
+    return scout.create('DesktopNavigationHandle', {
       parent: this,
       leftVisible: false
     });
@@ -393,7 +395,7 @@ export default class DesktopBench extends Widget {
       }
     }
     if (content) {
-      if (content instanceof scout.Table) {
+      if (content instanceof Table) {
         content.menuBar.top();
         content.menuBar.large();
       }
@@ -440,7 +442,7 @@ export default class DesktopBench extends Widget {
   };
 
   _onOutlinePropertyChange(event) {
-    if (Scout.isOneOf(event.propertyName, ['defaultDetailForm', 'outlineOverview'])) {
+    if (scout.isOneOf(event.propertyName, ['defaultDetailForm', 'outlineOverview'])) {
       this.updateOutlineContent();
     }
   };
@@ -485,7 +487,7 @@ export default class DesktopBench extends Widget {
     // remove old splitters
     if (this.components) {
       this.components.forEach(function(comp) {
-        if (comp instanceof scout.Splitter) {
+        if (comp instanceof Splitter) {
           comp.destroy();
         }
       });
@@ -494,7 +496,7 @@ export default class DesktopBench extends Widget {
       .reduce(function(arr, col) {
         if (arr.length > 0) {
           // add sep
-          var splitter = Scout.create('Splitter', {
+          var splitter = scout.create('Splitter', {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,
@@ -511,7 +513,7 @@ export default class DesktopBench extends Widget {
       }.bind(this), []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
     this.components.filter(function(comp) {
-        return comp instanceof scout.BenchColumn;
+        return comp instanceof BenchColumn;
       })
       .reduce(function(c1, c2, index) {
         if (index > 0) {
@@ -527,7 +529,7 @@ export default class DesktopBench extends Widget {
       return;
     }
     this.components.forEach(function(c, i) {
-      if (c instanceof scout.Splitter) {
+      if (c instanceof Splitter) {
         var componentsBefore = this.components.slice(0, i).reverse();
         var componentsAfter = this.components.slice(i + 1);
         // shrink

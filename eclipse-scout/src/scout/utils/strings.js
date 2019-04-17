@@ -1,4 +1,4 @@
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 let _encodeElement = null;
 
@@ -123,7 +123,7 @@ function join(separator, vararg) {
   if (vararg && Array.isArray(vararg)) {
     stringsToJoin = vararg;
   } else {
-    stringsToJoin = Scout.argumentsToArray(arguments).slice(1);
+    stringsToJoin = scout.argumentsToArray(arguments).slice(1);
   }
   separator = asString(separator);
   var s = '';

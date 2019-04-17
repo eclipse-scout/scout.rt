@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import SimpleTab from './SimpleTab';
 
 export default class SimpleTabBoxController {
@@ -20,8 +20,8 @@ export default class SimpleTabBoxController {
   };
 
   install(tabBox, tabArea) {
-    this.tabBox = Scout.assertParameter('tabBox', tabBox);
-    this.tabArea = Scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
+    this.tabBox = scout.assertParameter('tabBox', tabBox);
+    this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
 
     this._installListeners();
   };
@@ -98,7 +98,7 @@ export default class SimpleTabBoxController {
   };
 
   _createTab(view) {
-    return Scout.create(SimpleTab, {
+    return scout.create(SimpleTab, {
       parent: this.tabArea,
       view: view
     });
@@ -126,7 +126,7 @@ export default class SimpleTabBoxController {
   /* ----- static functions ----- */
 
   static hasViewTab(view) {
-    return Scout.someProperties(view, ['title', 'subTitle', 'iconId']);
+    return scout.someProperties(view, ['title', 'subTitle', 'iconId']);
   };
 
 }

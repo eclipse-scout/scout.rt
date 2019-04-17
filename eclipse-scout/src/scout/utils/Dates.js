@@ -1,4 +1,4 @@
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 export default class Dates {
 
@@ -59,7 +59,7 @@ export default class Dates {
 
   static trunc(date, createCopy) {
     if (date) {
-      if (Scout.nvl(createCopy, true)) {
+      if (scout.nvl(createCopy, true)) {
         date = new Date(date.getTime());
       }
       date.setHours(0, 0, 0, 0); // clear time

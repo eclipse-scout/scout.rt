@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
+import * as scout from '../scout';
 import Widget from './../widget/Widget';
-import Scout from '../Scout';
 import Arrays from '../utils/Arrays';
 import BenchColumnLayoutData from './BenchColumnLayoutData';
 import HtmlComponent from '../layout/HtmlComponent';
@@ -8,7 +8,13 @@ import DesktopLayout from './DesktopLayout';
 import DesktopNavigation, { BREADCRUMB_STYLE_WIDTH } from './DesktopNavigation';
 import DesktopHeader from './DesktopHeader';
 import DesktopBench from './DesktopBench';
-import Splitter from '../Splitter/Splitter';
+import Splitter from '../splitter/Splitter';
+import DeferredGlassPaneTarget from '../glasspane/DeferredGlassPaneTarget';
+import { DisplayHint } from '../form/Form';
+import Outline from '../outline/Outline';
+import Table from '../table/Table';
+import Tree, { DisplayStyle as TreeDisplayStyle } from '../tree/Tree';
+import * as cookies from '../utils/cookies';
 
 export default class Desktop extends Widget {
 
@@ -51,7 +57,7 @@ export default class Desktop extends Widget {
     super._init(model);
 
     this._initTheme();
-    /*this.formController = Scout.create('DesktopFormController', {
+    /*this.formController = scout.create('DesktopFormController', {
         displayParent: this,
         session: this.session
     });*/
@@ -67,7 +73,7 @@ export default class Desktop extends Widget {
     this._setKeyStrokes(this.keyStrokes);
     this._setBenchLayoutData(this.benchLayoutData);
     this._setDisplayStyle(this.displayStyle);
-    /*this.openUriHandler = Scout.create('OpenUriHandler', {
+    /*this.openUriHandler = scout.create('OpenUriHandler', {
         session: this.session
     });*/
 
@@ -223,7 +229,7 @@ export default class Desktop extends Widget {
     // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
     // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
     var parent = displayParent;
-    if (displayParent instanceof scout.Outline) {
+    if (displayParent instanceof Outline) {
       parent = this;
     }
     return parent;
@@ -248,7 +254,7 @@ export default class Desktop extends Widget {
     if (this.bench) {
       return;
     }
-    this.bench = Scout.create(DesktopBench, {
+    this.bench = scout.create(DesktopBench, {
       parent: this,
       animateRemoval: true,
       headerTabArea: this.header ? this.header.tabArea : undefined,
@@ -286,7 +292,7 @@ export default class Desktop extends Widget {
     if (this.navigation) {
       return;
     }
-    this.navigation = Scout.create(DesktopNavigation, {
+    this.navigation = scout.create(DesktopNavigation, {
       parent: this,
       outline: this.outline,
       toolBoxVisible: this.displayStyle === DisplayStyle.COMPACT,
@@ -326,7 +332,7 @@ export default class Desktop extends Widget {
     if (this.header) {
       return;
     }
-    this.header = Scout.create(DesktopHeader, {
+    this.header = scout.create(DesktopHeader, {
       parent: this,
       animateRemoval: this.displayStyle === DisplayStyle.COMPACT,
       toolBoxVisible: this.displayStyle !== DisplayStyle.COMPACT
@@ -373,7 +379,7 @@ export default class Desktop extends Widget {
     if (this.splitter || !this.navigation) {
       return;
     }
-    this.splitter = Scout.create(Splitter, {
+    this.splitter = scout.create(Splitter, {
       parent: this,
       $anchor: this.navigation.$container,
       $root: this.$container
@@ -561,16 +567,16 @@ export default class Desktop extends Widget {
 
   shrinkNavigation() {
     if (this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
-      this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
-      this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+      this.outlineDisplayStyle() === TreeDisplayStyle.DEFAULT) {
+      this.outline.setDisplayStyle(TreeDisplayStyle.BREADCRUMB);
     } else {
       this.setNavigationVisible(false);
     }
   };
 
   enlargeNavigation() {
-    if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB) {
-      this.outline.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
+    if (this.navigationVisible && this.outlineDisplayStyle() === TreeDisplayStyle.BREADCRUMB) {
+      this.outline.setDisplayStyle(TreeDisplayStyle.DEFAULT);
     } else {
       this.setNavigationVisible(true);
       // Layout immediately to have view tabs positioned correctly before animation starts
@@ -602,7 +608,7 @@ export default class Desktop extends Widget {
     }
     this.offline = true;
     this._removeOfflineNotification();
-    this._offlineNotification = Scout.create('DesktopNotification:Offline', {
+    this._offlineNotification = scout.create('DesktopNotification:Offline', {
       parent: this
     });
     this._offlineNotification.show();
@@ -777,7 +783,7 @@ export default class Desktop extends Widget {
     });
 
     var glassPaneTargets;
-    if (element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
+    if (element instanceof Form && element.displayHint === DisplayHint.VIEW) {
       $glassPaneTargets = $glassPaneTargets
         .not('.desktop-bench')
         .not('.desktop-header');
@@ -806,7 +812,7 @@ export default class Desktop extends Widget {
    * pane.
    */
   _deferredGlassPaneTarget(popupWindow) {
-    var deferred = new scout.DeferredGlassPaneTarget();
+    var deferred = new DeferredGlassPaneTarget();
     popupWindow.one('init', function() {
       deferred.ready([popupWindow.$container]);
     });
@@ -1089,12 +1095,12 @@ export default class Desktop extends Widget {
 
   _switchTheme(theme) {
     // Add a persistent cookie which expires in 30 days
-    scout.cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
+    cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
 
     // Reload page in order to download the CSS files for the new theme
     // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
     $('body').setVisible(false);
-    Scout.reloadPage({
+    scout.reloadPage({
       clearBody: false
     });
   };

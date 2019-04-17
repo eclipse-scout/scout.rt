@@ -1,11 +1,16 @@
 import * as $ from 'jquery';
-import Scout from '../Scout';
+import * as scout from '../scout';
+import * as strings from '../utils/strings';
 import Locale from './Locale';
 import EventSupport from '../EventSupport';
 import TypeDescriptor from '../TypeDescriptor';
 import LayoutValidator from '../layout/LayoutValidator';
 import NullWidget from '../widget/NullWidget';
 import DetachHelper from '../utils/DetachHelper';
+import { Severity, FileInput, BackgroundJobPollingStatus, JsonResponseError } from '../constants';
+import RemoteEvent from './RemoteEvent';
+import URL from '../utils/URL';
+import { instance as app } from '../App';
 
 export default class Session {
 
@@ -125,15 +130,15 @@ export default class Session {
       throw new Error('$entryPoint is not defined');
     }
     this.$entryPoint = options.$entryPoint;
-    this.partId = Scout.nvl(options.portletPartId, this.partId);
-    this.forceNewClientSession = false; //Scout.nvl(this.url.getParameter('forceNewClientSession'), options.forceNewClientSession);
+    this.partId = scout.nvl(options.portletPartId, this.partId);
+    this.forceNewClientSession = false; //scout.nvl(this.url.getParameter('forceNewClientSession'), options.forceNewClientSession);
     if (this.forceNewClientSession) {
       this.clientSessionId = null;
     } else {
-      this.clientSessionId = Scout.nvl(options.clientSessionId, this.clientSessionId);
+      this.clientSessionId = scout.nvl(options.clientSessionId, this.clientSessionId);
     }
-    this.userAgent = Scout.nvl(options.userAgent, this.userAgent);
-    this.suppressErrors = Scout.nvl(options.suppressErrors, this.suppressErrors);
+    this.userAgent = scout.nvl(options.userAgent, this.userAgent);
+    this.suppressErrors = scout.nvl(options.suppressErrors, this.suppressErrors);
     if (options.locale) {
       this.locale = Locale.ensure(options.locale);
       //this.textMap = scout.texts.get(this.locale.languageTag);
@@ -161,7 +166,7 @@ export default class Session {
     });
     this.keyStrokeManager = new scout.KeyStrokeManager(this);*/
 
-    this.showTreeIcons = Scout.nvl(options.showTreeIcons, true);
+    this.showTreeIcons = scout.nvl(options.showTreeIcons, true);
   };
 
   _throwError(message) {
@@ -236,7 +241,7 @@ export default class Session {
       id: adapterData.id,
       session: this
     };
-    return Scout.create(objectType, adapterModel, createOpts);
+    return scout.create(objectType, adapterModel, createOpts);
   };
 
   /**
@@ -252,7 +257,7 @@ export default class Session {
     this.asyncEvents.push(event);
     // Use the specified delay, except another event is already scheduled. In that case, use the minimal delay.
     // This ensures that an event with a long delay doesn't hold back another event with a short delay.
-    this._asyncDelay = Math.min(delay, Scout.nvl(this._asyncDelay, delay));
+    this._asyncDelay = Math.min(delay, scout.nvl(this._asyncDelay, delay));
 
     clearTimeout(this._sendTimeoutId);
     this._sendTimeoutId = setTimeout(function() {
@@ -277,8 +282,8 @@ export default class Session {
     if (this.clientSessionId) {
       request.clientSessionId = this.clientSessionId;
     }
-    if (scout.app.version) {
-      request.version = scout.app.version;
+    if (app.version) {
+      request.version = app.version;
     }
     request.userAgent = this.userAgent;
     request.sessionStartupParams = this._createSessionStartupParams();
@@ -356,7 +361,7 @@ export default class Session {
 
     // Special case: Page must be reloaded on startup (e.g. theme changed)
     if (data.startupData.reloadPage) {
-      Scout.reloadPage();
+      scout.reloadPage();
       return;
     }
 
@@ -460,7 +465,7 @@ export default class Session {
     });
     // Busy indicator required when at least one event requests it
     request.showBusyIndicator = request.events.some(function(event) {
-      return Scout.nvl(event.showBusyIndicator, true);
+      return scout.nvl(event.showBusyIndicator, true);
     });
     //this.responseQueue.prepareRequest(request);
     // Send request
@@ -502,7 +507,7 @@ export default class Session {
 
     var ajaxOptions = this.defaultAjaxOptions(request);
 
-    var busyHandling = Scout.nvl(request.showBusyIndicator, true);
+    var busyHandling = scout.nvl(request.showBusyIndicator, true);
     if (request.unload) {
       ajaxOptions.async = false;
     }
@@ -609,7 +614,7 @@ export default class Session {
       // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
       var ignore =
         (this === request && key === 'showBusyIndicator') ||
-        (this instanceof scout.RemoteEvent && Scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
+        (this instanceof RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce'));
       return (ignore ? undefined : value);
     });
   };
@@ -618,7 +623,7 @@ export default class Session {
     var defaultOptions = {
       retryIntervals: [100, 500, 500, 500]
     };
-    var ajaxCall = Scout.create('AjaxCall', $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
+    var ajaxCall = scout.create('AjaxCall', $.extend(defaultOptions, callOptions, this.ajaxCallOptions), {
       ensureUniqueId: false
     });
     this.registerAjaxCall(ajaxCall);
@@ -743,7 +748,7 @@ export default class Session {
    * In the latter case, polling is resumed when a user-initiated request has been successful.
    */
   _resumeBackgroundJobPolling() {
-    if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== scout.BackgroundJobPollingStatus.RUNNING) {
+    if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== BackgroundJobPollingStatus.RUNNING) {
       this._pollForBackgroundJobs();
     }
   };
@@ -880,10 +885,10 @@ export default class Session {
     // Show error message
     var boxOptions = {
       header: this.optText('ui.NetworkError', 'Network error'),
-      body: scout.strings.join(' ', (jqXHR.status || ''), errorThrown),
+      body: strings.join(' ', (jqXHR.status || ''), errorThrown),
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: function() {
-        Scout.reloadPage();
+        scout.reloadPage();
       },
       noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
     };
@@ -891,12 +896,12 @@ export default class Session {
   };
 
   _processErrorJsonResponse(jsonError) {
-    if (jsonError.code === scout.Session.JsonResponseError.VERSION_MISMATCH) {
+    if (jsonError.code === JsonResponseError.VERSION_MISMATCH) {
       /*var loopDetection = scout.webstorage.getItem(sessionStorage, 'scout:versionMismatch');
       if (!loopDetection) {
           scout.webstorage.setItem(sessionStorage, 'scout:versionMismatch', 'yes');
           // Reload page -> everything should then be up to date
-          Scout.reloadPage();
+          scout.reloadPage();
           return;
       }
       scout.webstorage.removeItem(sessionStorage, 'scout:versionMismatch');*/
@@ -908,26 +913,26 @@ export default class Session {
       body: jsonError.message,
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: function() {
-        Scout.reloadPage();
+        scout.reloadPage();
       }
     };
 
     // Customize for specific error codes
-    if (jsonError.code === scout.Session.JsonResponseError.STARTUP_FAILED) {
+    if (jsonError.code === JsonResponseError.STARTUP_FAILED) {
       // there are no texts yet if session startup failed
       boxOptions.header = jsonError.message;
       boxOptions.body = null;
       boxOptions.yesButtonText = 'Retry';
-    } else if (jsonError.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
+    } else if (jsonError.code === JsonResponseError.SESSION_TIMEOUT) {
       boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
       boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
-    } else if (jsonError.code === scout.Session.JsonResponseError.UI_PROCESSING) {
+    } else if (jsonError.code === JsonResponseError.UI_PROCESSING) {
       boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
-      boxOptions.body = scout.strings.join('\n\n',
+      boxOptions.body = strings.join('\n\n',
         this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
         this.optText('ui.UiInconsistentMsg', ''));
       boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
-    } else if (jsonError.code === scout.Session.JsonResponseError.UNSAFE_UPLOAD) {
+    } else if (jsonError.code === JsonResponseError.UNSAFE_UPLOAD) {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
@@ -975,7 +980,7 @@ export default class Session {
         session: this,
         parent: this.desktop || new NullWidget(),
         iconId: options.iconId,
-        severity: Scout.nvl(options.severity, scout.Status.Severity.ERROR),
+        severity: scout.nvl(options.severity, Severity.ERROR),
         header: options.header,
         body: options.body,
         hiddenText: options.hiddenText,
@@ -983,7 +988,7 @@ export default class Session {
         noButtonText: options.noButtonText,
         cancelButtonText: options.cancelButtonText
       },
-      messageBox = Scout.create('MessageBox', model),
+      messageBox = scout.create('MessageBox', model),
       $entryPoint = options.entryPoint || this.$entryPoint;
 
     messageBox.on('action', function(event) {
@@ -1012,15 +1017,15 @@ export default class Session {
     }
 
     $.each(files, function(index, value) {
-      if (!allowedTypes || allowedTypes.length === 0 || Scout.isOneOf(value.type, allowedTypes)) {
+      if (!allowedTypes || allowedTypes.length === 0 || scout.isOneOf(value.type, allowedTypes)) {
         totalSize += value.size;
-        var filename = Scout.nvl(value.scoutName, value.name, ''); // see ClipboardField for comments on 'scoutName'
+        var filename = scout.nvl(value.scoutName, value.name, ''); // see ClipboardField for comments on 'scoutName'
         formData.append('files', value, filename);
       }
     }.bind(this));
 
     // 50 MB as default maximum size
-    maxTotalSize = Scout.nvl(maxTotalSize, scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
+    maxTotalSize = scout.nvl(maxTotalSize, FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
 
     // very large files must not be sent to server otherwise the whole system might crash (for all users).
     if (totalSize > maxTotalSize) {
@@ -1138,7 +1143,7 @@ export default class Session {
 
   areBusyIndicatedEventsQueued() {
     return this.asyncEvents.some(function(event) {
-      return Scout.nvl(event.showBusyIndicator, true);
+      return scout.nvl(event.showBusyIndicator, true);
     });
   };
 
@@ -1193,7 +1198,7 @@ export default class Session {
       if (!this.desktop || !this.desktop.rendered) {
         return; // No busy indicator without desktop (e.g. during shutdown)
       }
-      this._busyIndicator = Scout.create('BusyIndicator', {
+      this._busyIndicator = scout.create('BusyIndicator', {
         parent: this.desktop
       });
       this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
@@ -1369,7 +1374,7 @@ export default class Session {
   };
 
   switchLocale(locale, textMap) {
-    Scout.assertParameter('locale', locale, Locale);
+    scout.assertParameter('locale', locale, Locale);
     /*if (!textMap) {
         textMap = scout.texts.get(locale.languageTag);
     }*/
@@ -1397,13 +1402,13 @@ export default class Session {
       this.desktop.$container.window(true).close();
     } else {
       // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
-      var url = new scout.URL();
+      var url = new URL();
       url.removeParameter('dl'); //deeplink
       url.removeParameter('i'); //deeplink info
       //scout.webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
       // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
       setTimeout(function() {
-        Scout.reloadPage({
+        scout.reloadPage({
           redirectUrl: logoutUrl
         });
       }.bind(this));
@@ -1421,7 +1426,7 @@ export default class Session {
   _onReloadPage(event) {
     // Don't clear the body, because other events might be processed before the reload and
     // it could cause errors when all DOM elements are already removed.
-    Scout.reloadPage({
+    scout.reloadPage({
       clearBody: false
     });
   };
@@ -1479,7 +1484,7 @@ export default class Session {
   };
 
   optText(textKey, defaultValue) {
-    return Scout.nvl(textKey, defaultValue); //scout.TextMap.prototype.optGet.apply(this.textMap, arguments);
+    return scout.nvl(textKey, defaultValue); //scout.TextMap.prototype.optGet.apply(this.textMap, arguments);
   };
 
   textExists(textKey) {
@@ -1518,12 +1523,3 @@ export default class Session {
   };
 
 }
-
-// Corresponds to constants in JsonResponse
-const JsonResponseError = Object.freeze({
-  STARTUP_FAILED: 5,
-  SESSION_TIMEOUT: 10,
-  UI_PROCESSING: 20,
-  UNSAFE_UPLOAD: 30,
-  VERSION_MISMATCH: 40
-});

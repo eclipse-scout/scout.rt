@@ -1,6 +1,5 @@
-import Scout from './Scout';
 import Arrays from './utils/Arrays';
-import * as strings from './utils/strings2';
+import * as strings from './utils/strings';
 
 export const NAMESPACE_SEPARATOR = '.';
 export const MODEL_VARIANT_SEPARATOR = ':';
@@ -88,7 +87,7 @@ export default class TypeDescriptor {
     function createInfo(name, namespaces) {
       return {
         name: name,
-        namespaces: Scout.nvl(namespaces, []),
+        namespaces: scout.nvl(namespaces, []),
         toString: function() {
           var parts = namespaces.slice();
           parts.push(name);

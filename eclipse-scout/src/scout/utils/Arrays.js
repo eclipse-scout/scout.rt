@@ -1,4 +1,4 @@
-import * as strings from './strings2';
+import * as strings from './strings';
 
 export default class Arrays {
 

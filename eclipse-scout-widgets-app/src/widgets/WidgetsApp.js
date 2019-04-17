@@ -8,20 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-import { Scout, App, Desktop, Models, OutlineViewButton } from 'eclipse-scout';
+import { scout, App, Desktop, Models, OutlineViewButton } from 'eclipse-scout';
 
 import desktopModel from './Desktop.json'; // FIXME [awe] ES6: check if JSON-extensibility still works with this approach, remove request for JSON models.
 
 export default class WidgetsApp extends App {
 
   _createDesktop(parent) {
-    let desktop = Scout.create(Desktop, Models.getModel(desktopModel, parent));
-    let dataButton = Scout.create(OutlineViewButton, {
+    let desktop = scout.create(Desktop, Models.getModel(desktopModel, parent));
+    let dataButton = scout.create(OutlineViewButton, {
       parent: desktop,
       text: 'Data',
       displayStyle: 'TAB'
     });
-    let searchButton = Scout.create(OutlineViewButton, {
+    let searchButton = scout.create(OutlineViewButton, {
       parent: desktop,
       text: 'Search',
       displayStyle: 'TAB'

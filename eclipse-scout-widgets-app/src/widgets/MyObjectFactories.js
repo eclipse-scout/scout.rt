@@ -8,14 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-import { Scout, OutlineViewButton } from 'eclipse-scout';
 import * as $ from 'jquery';
+import { scout } from 'eclipse-scout';
 import MyOutlineViewButton from './outline/MyOutlineViewButton';
 
-
-// FIXME [awe] ES6: better use an API function from Scout, instead of plain jQuery/object
-Scout.objectFactories = $.extend(Scout.objectFactories, {
-  OutlineViewButton: function() {
-    return new MyOutlineViewButton();
-  }
+scout.addObjectFactories({
+  OutlineViewButton: () => new MyOutlineViewButton()
 });

@@ -1,5 +1,5 @@
 import DesktopTabBoxController from './DesktopTabBoxController';
-import Scout from '../Scout';
+import * as scout from '../scout';
 
 export default class HeaderTabBoxController extends DesktopTabBoxController {
 
@@ -13,7 +13,7 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
   }
 
   install(bench, tabArea) {
-    this.bench = Scout.assertParameter('bench', bench);
+    this.bench = scout.assertParameter('bench', bench);
 
     var tabBoxCenter = this.bench.getTabBox('C');
     this.tabAreaCenter = tabBoxCenter.tabArea;

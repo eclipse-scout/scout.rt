@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-// Scout module, re-exports
+// Eclipse Scout module: re-exports
+// The modules exported here will be available when someone imports from 'eclipse-scout'
+import * as scout from './scout';
+
+export { scout };
 export { default as NullWidget } from './widget/NullWidget';
 export { default as App } from './App';
-export { default as Scout } from './Scout';
 export { default as ViewButton } from './desktop/ViewButton';
 export { default as Desktop } from './desktop/Desktop';
 export { default as OutlineViewButton } from './outline/OutlineViewButton';

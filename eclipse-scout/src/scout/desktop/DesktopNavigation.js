@@ -1,12 +1,13 @@
 import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import ViewButtonBox from './ViewButtonBox';
 import { DisplayStyle } from './Desktop';
 import DesktopNavigationLayout from './DesktopNavigationLayout';
 import SingleLayout from '../layout/SingleLayout';
 import { HorizontalAlignment } from './CollapseHandle';
 import DesktopNavigationHandle from './DesktopNavigationHandle';
+import { DisplayStyle as TreeDisplayStyle } from '../tree/Tree';
 
 export var DEFAULT_STYLE_WIDTH; // Configured in sizes.css
 export var BREADCRUMB_STYLE_WIDTH; // Configured in sizes.css
@@ -31,10 +32,10 @@ export default class DesktopNavigation extends Widget {
     BREADCRUMB_STYLE_WIDTH = 240; //scout.styles.getSize('desktop-navigation-breadcrumb', 'width', 'width', 240);
     this.desktop = this.parent;
     this.layoutData = model.layoutData || {};
-    this.toolBoxVisible = Scout.nvl(model.toolBoxVisible, false);
+    this.toolBoxVisible = scout.nvl(model.toolBoxVisible, false);
     this.updateHandleVisibility();
     this._setOutline(model.outline);
-    this.viewButtonBox = Scout.create(ViewButtonBox, {
+    this.viewButtonBox = scout.create(ViewButtonBox, {
       parent: this,
       viewButtons: this.desktop.viewButtons,
       singleViewButton: this.singleViewButton
@@ -185,7 +186,7 @@ export default class DesktopNavigation extends Widget {
   _updateHandle() {
     if (this.handle) {
       this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled &&
-        this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
+        this.desktop.outlineDisplayStyle() === TreeDisplayStyle.BREADCRUMB);
     }
   };
 
@@ -206,7 +207,7 @@ export default class DesktopNavigation extends Widget {
     if (this.toolBox) {
       return;
     }
-    this.toolBox = Scout.create('DesktopToolBox', {
+    this.toolBox = scout.create('DesktopToolBox', {
       parent: this,
       menus: this.desktop.menus
     });
@@ -230,7 +231,7 @@ export default class DesktopNavigation extends Widget {
   };
 
   _createHandle() {
-    return Scout.create(DesktopNavigationHandle, {
+    return scout.create(DesktopNavigationHandle, {
       parent: this,
       rightVisible: false,
       horizontalAlignment: HorizontalAlignment.RIGHT

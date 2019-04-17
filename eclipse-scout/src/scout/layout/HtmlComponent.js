@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import NullLayout from './NullLayout';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import Graphics from '../utils/Graphics';
 
 export default class HtmlComponent {
@@ -161,7 +161,7 @@ export default class HtmlComponent {
         if (this.suppressInvalidate) {
             return;
         }
-        if (Scout.nvl(invalidateParents, true)) {
+        if (scout.nvl(invalidateParents, true)) {
             this.session.layoutValidator.invalidateTree(this); // will call invalidateLayout(), which sets this.valid = false
         } else {
             this.valid = false;
@@ -237,7 +237,7 @@ export default class HtmlComponent {
             // Create a copy to not modify the original options
             options = $.extend({}, options);
         }
-        var includeMargin = Scout.nvl(options.includeMargin, false);
+        var includeMargin = scout.nvl(options.includeMargin, false);
         options.includeMargin = null;
         if (!this.layout) {
             throw new Error('Called prefSize() but component has no layout');
@@ -245,7 +245,7 @@ export default class HtmlComponent {
 
         var prefSizeCacheKey = this.computePrefSizeKey(options);
         var prefSizeCached = this.prefSizeCached[prefSizeCacheKey];
-        if (this.valid && !Scout.isNullOrUndefined(prefSizeCached)) {
+        if (this.valid && !scout.isNullOrUndefined(prefSizeCached)) {
             if (includeMargin) {
                 prefSizeCached.add(this.margins());
             }
@@ -267,12 +267,12 @@ export default class HtmlComponent {
     };
 
     computePrefSizeKey(options) {
-        return 'wHint' + Scout.nvl(options.widthHint, '-1') + 'hHint' + Scout.nvl(options.heightHint, '-1');
+        return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1');
     };
 
     _adjustSizeHintsForPrefSize(options) {
         // Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it
-        var removeMargin = Scout.nvl(options.removeMarginFromHints, true);
+        var removeMargin = scout.nvl(options.removeMarginFromHints, true);
         options.removeMarginFromHints = null;
         if (options.widthHint) {
             options.widthHint -= this.insets(removeMargin).horizontal();

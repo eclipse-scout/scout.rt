@@ -4,7 +4,7 @@ import {Direction} from '../layout/FlexboxLayout';
 import FlexboxLayout from '../layout/FlexboxLayout';
 import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 import Arrays from '../utils/Arrays';
-import Scout from '../Scout';
+import * as scout from '../scout';
 import SimpleTabBox from '../tabbox/SimpleTabBox';
 import DesktopTabBoxController from './DesktopTabBoxController';
 
@@ -159,10 +159,10 @@ export default class BenchColumn extends Widget {
       rowLayoutDatas = this.layoutData.getRows();
     }
     for (var i = 0; i < 3; i++) {
-      var tabBox = Scout.create(SimpleTabBox, {
+      var tabBox = scout.create(SimpleTabBox, {
         parent: this,
         cssClass: TAB_BOX_CLASSES[i],
-        controller: Scout.create(DesktopTabBoxController)
+        controller: scout.create(DesktopTabBoxController)
       });
       tabBox.setLayoutData(rowLayoutDatas[i]);
       tabBox.on('viewAdd', this._viewAddHandler);
@@ -186,7 +186,7 @@ export default class BenchColumn extends Widget {
       .reduce(function(arr, col) {
         if (arr.length > 0) {
           // add sep
-          var splitter = Scout.create('Splitter', {
+          var splitter = scout.create('Splitter', {
             parent: this,
             $anchor: arr[arr.length - 1].$container,
             $root: this.$container,
