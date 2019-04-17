@@ -1,7 +1,7 @@
 import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 import * as scout from '../scout';
-import * as graphics from '../utils/graphics';
+import * as graphics from '../util/graphics';
 
 export default class ViewMenuTab extends Widget {
 

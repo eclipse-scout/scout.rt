@@ -1,4 +1,4 @@
-import * as arrays from '../utils/arrays';
+import * as arrays from '../util/arrays';
 
 export default class LayoutValidator {
 

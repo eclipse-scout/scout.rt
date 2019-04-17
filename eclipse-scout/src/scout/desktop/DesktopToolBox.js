@@ -1,5 +1,5 @@
 import MenuBox from '../menu/MenuBox';
-import * as strings from '../utils/strings';
+import * as strings from '../util/strings';
 
 export default class DesktopToolBox extends MenuBox {
   constructor(menuBar) {

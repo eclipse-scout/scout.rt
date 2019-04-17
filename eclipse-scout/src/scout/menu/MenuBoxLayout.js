@@ -1,5 +1,5 @@
 import AbstractLayout from '../layout/AbstractLayout';
-import * as graphics from '../utils/graphics';
+import * as graphics from '../util/graphics';
 
 export default class MenuBoxLayout extends AbstractLayout {
 

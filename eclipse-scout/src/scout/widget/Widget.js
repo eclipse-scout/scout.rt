@@ -1,11 +1,11 @@
 import * as $ from 'jquery';
-import * as arrays from '../utils/arrays';
+import * as arrays from '../util/arrays';
 import * as scout from '../scout';
 import EventSupport from './../EventSupport';
-import * as strings from '../utils/strings';
-import Event from '../utils/Event';
+import * as strings from '../util/strings';
+import Event from '../util/Event';
 import DeferredGlassPaneTarget from '../glasspane/DeferredGlassPaneTarget';
-import EventDelegator from '../utils/EventDelegator';
+import EventDelegator from '../util/EventDelegator';
 
 export default class Widget {
 

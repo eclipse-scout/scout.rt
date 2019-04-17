@@ -1,6 +1,6 @@
 import * as scout from '../scout';
-import * as strings from '../utils/strings';
-import * as dates from '../utils/dates';
+import * as strings from '../util/strings';
+import * as dates from '../util/dates';
 import DateFormatPatternDefinition from './DateFormatPatternDefinition';
 
 export default class DateFormat {

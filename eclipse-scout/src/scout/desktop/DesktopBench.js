@@ -5,7 +5,7 @@ import FlexboxLayout, {Direction} from '../layout/FlexboxLayout';
 import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 import BenchColumn from './BenchColumn';
 import HeaderTabBoxController from './HeaderTabBoxController';
-import * as arrays from '../utils/arrays';
+import * as arrays from '../util/arrays';
 import Splitter from '../splitter/Splitter';
 import Table from '../table/Table';
 

@@ -1,15 +1,15 @@
 import * as $ from 'jquery';
 import * as scout from '../scout';
-import * as strings from '../utils/strings';
+import * as strings from '../util/strings';
 import Locale from './Locale';
 import EventSupport from '../EventSupport';
 import TypeDescriptor from '../TypeDescriptor';
 import LayoutValidator from '../layout/LayoutValidator';
 import NullWidget from '../widget/NullWidget';
-import DetachHelper from '../utils/DetachHelper';
+import DetachHelper from '../util/DetachHelper';
 import { Severity, FileInput, BackgroundJobPollingStatus, JsonResponseError } from '../constants';
 import RemoteEvent from './RemoteEvent';
-import URL from '../utils/URL';
+import URL from '../util/URL';
 import { instance as app } from '../App';
 
 export default class Session {

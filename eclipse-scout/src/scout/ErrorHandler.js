@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import * as strings from './utils/strings';
+import * as strings from './util/strings';
 import { instance as app } from './App';
 
 export default class ErrorHandler {

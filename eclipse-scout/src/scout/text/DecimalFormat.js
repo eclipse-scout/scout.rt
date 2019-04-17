@@ -1,6 +1,6 @@
 import * as scout from '../scout'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
-import * as numbers from '../utils/numbers';
-import * as strings from '../utils/strings';
+import * as numbers from '../util/numbers';
+import * as strings from '../util/strings';
 
 /**
  * Literal (not localized!) pattern symbols as defined in http://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html

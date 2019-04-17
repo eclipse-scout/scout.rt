@@ -4,7 +4,7 @@ import SimpleTabBoxLayout from './SimpleTabBoxLayout';
 import SimpleTabViewContentLayout from './SimpleTabViewContentLayout';
 import * as scout from '../scout';
 import SimpleTabBoxController from './SimpleTabBoxController';
-import * as arrays from '../utils/arrays';
+import * as arrays from '../util/arrays';
 import SimpleTabArea from './SimpleTabArea';
 
 export default class SimpleTabBox extends Widget {

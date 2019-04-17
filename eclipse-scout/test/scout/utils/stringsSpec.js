@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-import * as strings from '../../../src/scout/utils/strings';
+import * as strings from '../../../src/scout/util/strings';
 
 describe('strings', () => {
 

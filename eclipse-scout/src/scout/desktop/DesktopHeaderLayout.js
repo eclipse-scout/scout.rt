@@ -1,6 +1,6 @@
 import AbstractLayout from '../layout/AbstractLayout';
-import Dimension from '../utils/Dimension';
-import * as graphics from '../utils/graphics';
+import Dimension from '../util/Dimension';
+import * as graphics from '../util/graphics';
 
 export default class DesktopHeaderLayout extends AbstractLayout {
 

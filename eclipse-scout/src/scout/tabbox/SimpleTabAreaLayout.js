@@ -1,7 +1,7 @@
 import AbstractLayout from '../layout/AbstractLayout';
-import Dimension from '../utils/Dimension';
+import Dimension from '../util/Dimension';
 import * as scout from '../scout';
-import * as graphics from '../utils/graphics';
+import * as graphics from '../util/graphics';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
 

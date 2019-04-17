@@ -1,5 +1,5 @@
-import * as arrays from './utils/arrays';
-import * as strings from './utils/strings';
+import * as arrays from './util/arrays';
+import * as strings from './util/strings';
 
 export const NAMESPACE_SEPARATOR = '.';
 export const MODEL_VARIANT_SEPARATOR = ':';

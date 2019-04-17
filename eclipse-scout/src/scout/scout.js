@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import * as arrays from './utils/arrays';
+import * as arrays from './util/arrays';
 import ObjectFactory from './ObjectFactory';
 
 export let objectFactories = {};

@@ -3,7 +3,7 @@ import HtmlComponent from '../layout/HtmlComponent';
 import {Direction} from '../layout/FlexboxLayout';
 import FlexboxLayout from '../layout/FlexboxLayout';
 import FlexboxLayoutData from '../layout/FlexboxLayoutData';
-import * as arrays from '../utils/arrays';
+import * as arrays from '../util/arrays';
 import * as scout from '../scout';
 import SimpleTabBox from '../tabbox/SimpleTabBox';
 import DesktopTabBoxController from './DesktopTabBoxController';

@@ -7,8 +7,8 @@ import Locale from './session/Locale';
 import Session from './session/Session';
 import NullWidget from './widget/NullWidget';
 import Desktop from './desktop/Desktop';
-import * as models from './utils/models';
-import JQueryUtils from './utils/JQueryUtils';
+import * as models from './util/models';
+import JQueryUtils from './util/JQueryUtils';
 import { JsonResponseError } from './constants';
 
 let scout_appListeners = [];

@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import * as graphics from '../utils/graphics';
+import * as graphics from '../util/graphics';
 import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 
