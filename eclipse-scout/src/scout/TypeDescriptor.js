@@ -1,4 +1,4 @@
-import Arrays from './utils/Arrays';
+import * as arrays from './utils/arrays';
 import * as strings from './utils/strings';
 
 export const NAMESPACE_SEPARATOR = '.';
@@ -75,7 +75,7 @@ export default class TypeDescriptor {
       variantPart = parseDescriptorPart(tmp[1]);
 
       // when type has namespaces but the variant has not, use type namespaces for variant too
-      if (Arrays.empty(variantPart.namespaces) && !Arrays.empty(typePart.namespaces)) {
+      if (arrays.empty(variantPart.namespaces) && !arrays.empty(typePart.namespaces)) {
         variantPart.namespaces = typePart.namespaces;
       }
     } else {
@@ -102,7 +102,7 @@ export default class TypeDescriptor {
       if (strings.contains(descriptorPart, NAMESPACE_SEPARATOR)) {
         var namespaceParts = descriptorPart.split(NAMESPACE_SEPARATOR);
         namespaces = namespaceParts.slice(0, namespaceParts.length - 1);
-        descriptorPart = Arrays.last(namespaceParts);
+        descriptorPart = arrays.last(namespaceParts);
       }
 
       return createInfo(descriptorPart, namespaces);

@@ -7,7 +7,7 @@ import Locale from './session/Locale';
 import Session from './session/Session';
 import NullWidget from './widget/NullWidget';
 import Desktop from './desktop/Desktop';
-import Models from './utils/Models';
+import * as models from './utils/models';
 import JQueryUtils from './utils/JQueryUtils';
 import { JsonResponseError } from './constants';
 
@@ -109,7 +109,7 @@ export default class App {
       JQueryUtils.bootstrap(),
       //scout.device.bootstrap(),
       //scout.fonts.bootstrap(options.fonts),
-      Models.bootstrap(options.modelsUrl)
+      models.bootstrap(options.modelsUrl)
       //scout.locales.bootstrap(options.localesUrl),
       //scout.texts.bootstrap(options.textsUrl),
       //scout.codes.bootstrap(options.codesUrl)

@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Arrays from './Arrays';
+import * as arrays from './arrays';
 import * as scout from '../scout';
 
 export default class JQueryUtils extends $ {
@@ -121,7 +121,7 @@ export default class JQueryUtils extends $ {
 
   static promiseAll(promises, asArray) {
     asArray = scout.nvl(asArray, false);
-    promises = Arrays.ensure(promises);
+    promises = arrays.ensure(promises);
     var deferred = $.Deferred();
     $.when.apply($, promises).done(function() {
       if (asArray) {

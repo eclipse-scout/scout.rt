@@ -1,4 +1,4 @@
-import Arrays from '../utils/Arrays';
+import * as arrays from '../utils/arrays';
 
 export default class LayoutValidator {
 
@@ -51,7 +51,7 @@ export default class LayoutValidator {
         }, this);
 
         // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
-        Arrays.insert(this._invalidComponents, htmlComp, position);
+        arrays.insert(this._invalidComponents, htmlComp, position);
 
         this._scheduleValidation();
     };
@@ -72,12 +72,12 @@ export default class LayoutValidator {
         this._validateTimeoutId = null;
         this._invalidComponents.slice().forEach(function(comp) {
             if (comp.validateLayout()) {
-                Arrays.remove(this._invalidComponents, comp);
+                arrays.remove(this._invalidComponents, comp);
             }
         }, this);
         this._postValidateFunctions.slice().forEach(function(func) {
             func();
-            Arrays.remove(this._postValidateFunctions, func);
+            arrays.remove(this._postValidateFunctions, func);
         }, this);
     };
 
@@ -88,7 +88,7 @@ export default class LayoutValidator {
     cleanupInvalidComponents($parentContainer){
         this._invalidComponents.slice().forEach(function(comp){
             if (comp.$comp.closest($parentContainer).length > 0){
-                Arrays.remove(this._invalidComponents, comp);
+                arrays.remove(this._invalidComponents, comp);
             }
         }, this);
     };

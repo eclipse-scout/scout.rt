@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Arrays from './utils/Arrays';
+import * as arrays from './utils/arrays';
 import ObjectFactory from './ObjectFactory';
 
 export let objectFactories = {};
@@ -118,7 +118,7 @@ export function isOneOf(value) {
 };
 
 export function someProperties(obj, properties) {
-  var propArr = Arrays.ensure(properties);
+  var propArr = arrays.ensure(properties);
   return propArr.some(function(prop) {
     return prop in obj;
   });

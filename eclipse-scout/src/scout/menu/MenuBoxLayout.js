@@ -1,5 +1,5 @@
 import AbstractLayout from '../layout/AbstractLayout';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class MenuBoxLayout extends AbstractLayout {
 
@@ -216,13 +216,13 @@ export default class MenuBoxLayout extends AbstractLayout {
    */
   _moveOverflowMenusIntoEllipsis(containerSize, menusWidth) {
     var collapsedMenus = [this._ellipsis];
-    var ellipsisSize = Graphics.size(this._ellipsis.$container, true);
+    var ellipsisSize = graphics.size(this._ellipsis.$container, true);
     menusWidth += ellipsisSize.width;
     this.visibleMenus().slice().reverse().forEach(function(menu) {
       var menuSize;
       if (menusWidth > containerSize.width) {
         // Menu does not fit -> move to ellipsis menu
-        menuSize = Graphics.size(menu.$container, true);
+        menuSize = graphics.size(menu.$container, true);
         menusWidth -= menuSize.width;
         scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
       } else {
@@ -244,7 +244,7 @@ export default class MenuBoxLayout extends AbstractLayout {
 
     menus = menus || this.visibleMenus();
     menusWidth = this._menusWidth(menus);
-    prefSize = Graphics.prefSize(this.menuBox.$container, {
+    prefSize = graphics.prefSize(this.menuBox.$container, {
       includeMargin: true,
       useCssSize: true
     });

@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
 import * as scout from '../scout';
 import Widget from './../widget/Widget';
-import Arrays from '../utils/Arrays';
+import * as arrays from '../utils/arrays';
 import BenchColumnLayoutData from './BenchColumnLayoutData';
 import HtmlComponent from '../layout/HtmlComponent';
 import DesktopLayout from './DesktopLayout';
@@ -664,7 +664,7 @@ export default class Desktop extends Widget {
   removeNotification(notification) {
     if (typeof notification === 'string') {
       var notificationId = notification;
-      notification = Arrays.find(this.notifications, function(n) {
+      notification = arrays.find(this.notifications, function(n) {
         return notificationId === n.id;
       });
     }
@@ -674,7 +674,7 @@ export default class Desktop extends Widget {
     if (notification.removeTimeout) {
       clearTimeout(notification.removeTimeout);
     }
-    Arrays.remove(this.notifications, notification);
+    arrays.remove(this.notifications, notification);
     if (!this.rendered) {
       return;
     }
@@ -793,7 +793,7 @@ export default class Desktop extends Widget {
       }
 
       glassPaneTargets = $.makeArray($glassPaneTargets);
-      Arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
+      arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
     } else {
       glassPaneTargets = $.makeArray($glassPaneTargets);
     }
@@ -886,7 +886,7 @@ export default class Desktop extends Widget {
 
     if (this.displayStyle === DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
       var openViews = this.bench.getViews().slice();
-      Arrays.remove(openViews, form);
+      arrays.remove(openViews, form);
       if (openViews.length === 0) {
         // Hide bench and show navigation if this is the last view to be hidden
         this.switchToNavigation();

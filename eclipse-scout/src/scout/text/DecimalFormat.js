@@ -1,7 +1,18 @@
-import * as scout from '../scout';
-import { RoundingMode } from '../utils/Numbers';
+import * as scout from '../scout'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
+import * as numbers from '../utils/numbers';
 import * as strings from '../utils/strings';
-import Numbers from '../utils/Numbers'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
+
+/**
+ * Literal (not localized!) pattern symbols as defined in http://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
+ */
+const PATTERN_SYMBOLS = Object.freeze({
+  digit: '#',
+  zeroDigit: '0',
+  decimalSeparator: '.',
+  groupingSeparator: ',',
+  minusSign: '-',
+  patternSeparator: ';'
+});
 
 export default class DecimalFormat {
 
@@ -24,7 +35,7 @@ export default class DecimalFormat {
     options = options || {};
     this.pattern = this.pattern || options.pattern || locale.decimalFormatPatternDefault;
     this.multiplier = options.multiplier || 1;
-    this.roundingMode = options.roundingMode || RoundingMode.HALF_UP;
+    this.roundingMode = options.roundingMode || numbers.RoundingMode.HALF_UP;
 
     // Check if there are separate subpatterns for positive and negative numbers ('PositivePattern;NegativePattern')
     var split = this.pattern.split(PATTERN_SYMBOLS.patternSeparator);
@@ -183,7 +194,7 @@ export default class DecimalFormat {
       number *= this.multiplier;
     }
     // round
-    number = Numbers.round(number, this.roundingMode, this.allAfter);
+    number = numbers.round(number, this.roundingMode, this.allAfter);
     // un-apply multiplier
     if (applyMultiplier && this.multiplier !== 1) {
       number /= this.multiplier;
@@ -214,17 +225,3 @@ export default class DecimalFormat {
     return new DecimalFormat(locale, format);
   };
 }
-
-/* --- STATIC HELPERS ------------------------------------------------------------- */
-
-/**
- * Literal (not localized!) pattern symbols as defined in http://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
- */
-const PATTERN_SYMBOLS = Object.freeze({
-  digit: '#',
-  zeroDigit: '0',
-  decimalSeparator: '.',
-  groupingSeparator: ',',
-  minusSign: '-',
-  patternSeparator: ';'
-});

@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
 import NullLayout from './NullLayout';
 import * as scout from '../scout';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class HtmlComponent {
 
@@ -298,15 +298,15 @@ export default class HtmlComponent {
      * Returns the inset-dimensions of the component (padding and border, no margin).
      */
     insets(options) {
-        return Graphics.insets(this.$comp, options);
+        return graphics.insets(this.$comp, options);
     };
 
     margins() {
-        return Graphics.margins(this.$comp);
+        return graphics.margins(this.$comp);
     };
 
     size(options) {
-        return Graphics.size(this.$comp, options);
+        return graphics.size(this.$comp, options);
     };
 
     /**
@@ -323,25 +323,25 @@ export default class HtmlComponent {
             this.invalidateLayout();
         }
         if (this.pixelBasedSizing) {
-            Graphics.setSize(this.$comp, size);
+            graphics.setSize(this.$comp, size);
         }
         this.validateLayout();
     };
 
     bounds(options) {
-        return Graphics.bounds(this.$comp, options);
+        return graphics.bounds(this.$comp, options);
     };
 
     position() {
-        return Graphics.position(this.$comp);
+        return graphics.position(this.$comp);
     };
 
     offsetBounds(options) {
-        return Graphics.offsetBounds(this.$comp, options);
+        return graphics.offsetBounds(this.$comp, options);
     };
 
     offset() {
-        return Graphics.offset(this.$comp);
+        return graphics.offset(this.$comp);
     };
 
     /**
@@ -349,11 +349,11 @@ export default class HtmlComponent {
      * @param location scout.Point
      */
     setLocation(location) {
-        Graphics.setLocation(this.$comp, location);
+        graphics.setLocation(this.$comp, location);
     };
 
     location() {
-        return Graphics.location(this.$comp);
+        return graphics.location(this.$comp);
     };
 
     setBounds(bounds) {
@@ -365,7 +365,7 @@ export default class HtmlComponent {
         if (!oldBounds.dimension().equals(bounds.dimension())) {
             this.invalidateLayout();
         }
-        Graphics.setBounds(this.$comp, bounds);
+        graphics.setBounds(this.$comp, bounds);
         this.validateLayout();
     };
 

@@ -5,7 +5,7 @@ import FlexboxLayout, {Direction} from '../layout/FlexboxLayout';
 import FlexboxLayoutData from '../layout/FlexboxLayoutData';
 import BenchColumn from './BenchColumn';
 import HeaderTabBoxController from './HeaderTabBoxController';
-import Arrays from '../utils/Arrays';
+import * as arrays from '../utils/arrays';
 import Splitter from '../splitter/Splitter';
 import Table from '../table/Table';
 
@@ -715,7 +715,7 @@ export default class DesktopBench extends Widget {
 
   visibleTabBoxes() {
     return this.visibleColumns().reduce(function(arr, column) {
-      Arrays.pushAll(arr, column.visibleTabBoxes());
+      arrays.pushAll(arr, column.visibleTabBoxes());
       return arr;
     }, []);
   };
@@ -728,7 +728,7 @@ export default class DesktopBench extends Widget {
 
   getViews(displayViewId) {
     return this.columns.reduce(function(arr, column) {
-      Arrays.pushAll(arr, column.getViews(displayViewId));
+      arrays.pushAll(arr, column.getViews(displayViewId));
       return arr;
     }, []);
   };

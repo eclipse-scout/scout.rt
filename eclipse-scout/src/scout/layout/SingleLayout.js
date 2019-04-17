@@ -1,7 +1,7 @@
 import AbstractLayout from './AbstractLayout';
 import HtmlComponent from './HtmlComponent';
 import Dimension from '../utils/Dimension';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class SingleLayout extends AbstractLayout {
 
@@ -30,7 +30,7 @@ export default class SingleLayout extends AbstractLayout {
             htmlChild = this._getHtmlSingleChild($container);
         }
         if (htmlChild) {
-            return htmlChild.prefSize(options).add(Graphics.insets($container));
+            return htmlChild.prefSize(options).add(graphics.insets($container));
         } else {
             return new Dimension(1, 1);
         }

@@ -1,7 +1,7 @@
 import AbstractLayout from '../layout/AbstractLayout';
 import Dimension from '../utils/Dimension';
 import * as scout from '../scout';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class SimpleTabAreaLayout extends AbstractLayout {
 
@@ -100,7 +100,7 @@ export default class SimpleTabAreaLayout extends AbstractLayout {
 
   preferredLayoutSize($container) {
     var numTabs = this.tabArea.getTabs().length;
-    return new Dimension(numTabs * TAB_WIDTH_LARGE, Graphics.prefSize(this.tabArea.htmlComp.$comp, {
+    return new Dimension(numTabs * TAB_WIDTH_LARGE, graphics.prefSize(this.tabArea.htmlComp.$comp, {
       includeMargin: true,
       useCssSize: true
     }).height);

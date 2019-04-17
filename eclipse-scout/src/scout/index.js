@@ -11,14 +11,14 @@
 // Eclipse Scout module: re-exports
 // The modules exported here will be available when someone imports from 'eclipse-scout'
 import * as scout from './scout';
+import * as models from './utils/models';
 
-export { scout };
-export { default as NullWidget } from './widget/NullWidget';
+export { scout, models };
 export { default as App } from './App';
-export { default as ViewButton } from './desktop/ViewButton';
-export { default as Desktop } from './desktop/Desktop';
-export { default as OutlineViewButton } from './outline/OutlineViewButton';
 export { default as Session } from './session/Session';
-export { default as Models } from './utils/Models';
+export { default as Desktop } from './desktop/Desktop';
+export { default as NullWidget } from './widget/NullWidget';
+export { default as ViewButton } from './desktop/ViewButton';
+export { default as OutlineViewButton } from './outline/OutlineViewButton';
 
 

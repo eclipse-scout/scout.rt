@@ -1,6 +1,6 @@
 import * as scout from '../scout';
 import * as strings from '../utils/strings';
-import Dates from '../utils/Dates';
+import * as dates from '../utils/dates';
 import DateFormatPatternDefinition from './DateFormatPatternDefinition';
 
 export default class DateFormat {
@@ -16,8 +16,8 @@ export default class DateFormat {
 
     this.symbols = locale.dateFormatSymbols;
     this.symbols.firstDayOfWeek = 1; // monday
-    this.symbols.weekdaysOrdered = Dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
-    this.symbols.weekdaysShortOrdered = Dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
+    this.symbols.weekdaysOrdered = dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
+    this.symbols.weekdaysShortOrdered = dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
     this.symbols.monthsToNumber;
     this.symbols.monthsShortToNumber;
 
@@ -243,7 +243,7 @@ export default class DateFormat {
         type: DateFormatPatternType.WEEK_IN_YEAR,
         terms: ['ww'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return strings.padZeroLeft(Dates.weekInYear(formatContext.inputDate), 2);
+          return strings.padZeroLeft(dates.weekInYear(formatContext.inputDate), 2);
         },
         parseRegExp: /^(\d{2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -255,7 +255,7 @@ export default class DateFormat {
         type: DateFormatPatternType.WEEK_IN_YEAR,
         terms: ['w'],
         formatFunction: function(formatContext, acceptedTerm) {
-          return String(Dates.weekInYear(formatContext.inputDate));
+          return String(dates.weekInYear(formatContext.inputDate));
         },
         parseRegExp: /^(\d{1,2})(.*)$/,
         applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -792,7 +792,7 @@ export default class DateFormat {
     // Try to generate a valid predicted date with the information retrieved so far
     startDate = this._prepareStartDate(startDate);
     if (parseContext.hints.weekday !== undefined) {
-      startDate = Dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
+      startDate = dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
     }
     var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate);
 
@@ -880,7 +880,7 @@ export default class DateFormat {
       }
       // If day is '29' or '30' and month is february, use next month (except day is '29' and the year is a leap year)
       else if (dateInfo.day >= 29 && validMonth === 1) {
-        if (dateInfo.day > 29 || !Dates.isLeapYear(validYear)) {
+        if (dateInfo.day > 29 || !dates.isLeapYear(validYear)) {
           validMonth = validMonth + 1;
         }
       }
@@ -888,7 +888,7 @@ export default class DateFormat {
 
     // ensure valid day for selected month for dateInfo without day
     if (!dateInfo.day && dateInfo.month) {
-      var lastOfMonth = Dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
+      var lastOfMonth = dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
       validDay = Math.min(lastOfMonth.getDate(), startDate.getDate());
     }
 
@@ -948,7 +948,7 @@ export default class DateFormat {
       // It is important that we don't alter the argument 'startDate', but create an independent copy!
       return new Date(startDate.getTime());
     }
-    return Dates.trunc(new Date()); // clear time
+    return dates.trunc(new Date()); // clear time
   };
 
   /**

@@ -1,4 +1,4 @@
-import Arrays from './utils/Arrays';
+import * as arrays from './utils/arrays';
 
 export default class EventSupport {
 
@@ -87,7 +87,7 @@ export default class EventSupport {
     };
 
     removeListener(listener) {
-        Arrays.remove(this._eventListeners, listener);
+        arrays.remove(this._eventListeners, listener);
     };
 
     count(type, func) {

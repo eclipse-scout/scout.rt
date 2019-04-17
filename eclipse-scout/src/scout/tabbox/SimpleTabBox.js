@@ -4,7 +4,7 @@ import SimpleTabBoxLayout from './SimpleTabBoxLayout';
 import SimpleTabViewContentLayout from './SimpleTabViewContentLayout';
 import * as scout from '../scout';
 import SimpleTabBoxController from './SimpleTabBoxController';
-import Arrays from '../utils/Arrays';
+import * as arrays from '../utils/arrays';
 import SimpleTabArea from './SimpleTabArea';
 
 export default class SimpleTabBox extends Widget {
@@ -205,7 +205,7 @@ export default class SimpleTabBox extends Widget {
 
   _onViewDestroyed(event) {
     var view = event.source;
-    Arrays.remove(this.viewStack, view);
+    arrays.remove(this.viewStack, view);
     if (this.currentView === view) {
       if (this.rendered) {
         view.remove();

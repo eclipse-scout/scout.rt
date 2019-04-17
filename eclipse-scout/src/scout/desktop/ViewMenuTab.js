@@ -1,6 +1,7 @@
 import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 import * as scout from '../scout';
+import * as graphics from '../utils/graphics';
 
 export default class ViewMenuTab extends Widget {
 
@@ -164,7 +165,7 @@ export default class ViewMenuTab extends Widget {
       // already open
       return;
     }
-    var naviBounds = Graphics.bounds(this.$container.parent(), true);
+    var naviBounds = graphics.bounds(this.$container.parent(), true);
     this.popup = scout.create('ViewMenuPopup', {
       parent: this,
       $tab: this.dropdown.$container,

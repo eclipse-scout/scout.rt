@@ -724,7 +724,7 @@ export default class Session {
   };
 
   unregisterAjaxCall(ajaxCall) {
-    Arrays.remove(this.ajaxCalls, ajaxCall);
+    arrays.remove(this.ajaxCalls, ajaxCall);
   };
 
   interruptAllAjaxCalls() {

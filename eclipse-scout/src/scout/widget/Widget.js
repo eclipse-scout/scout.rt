@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Arrays from '../utils/Arrays';
+import * as arrays from '../utils/arrays';
 import * as scout from '../scout';
 import EventSupport from './../EventSupport';
 import * as strings from '../utils/strings';
@@ -233,7 +233,7 @@ export default class Widget {
       return;
     }
 
-    widgets = Arrays.ensure(widgets);
+    widgets = arrays.ensure(widgets);
     widgets.forEach(function(widget) {
       this._destroyChild(widget);
     }, this);
@@ -479,7 +479,7 @@ export default class Widget {
   };
 
   _removeChild(child) {
-    Arrays.remove(this.children, child);
+    arrays.remove(this.children, child);
   };
 
   /**
@@ -709,14 +709,14 @@ export default class Widget {
       }
       cssClasses.push(newCssClass);
     }, this);
-    this.setProperty('cssClass', Arrays.format(cssClasses, ' '));
+    this.setProperty('cssClass', arrays.format(cssClasses, ' '));
   };
 
   removeCssClass(cssClass) {
     var cssClasses = this.cssClassAsArray();
     var cssClassesToRemove = Widget.cssClassAsArray(cssClass);
-    if (Arrays.removeAll(cssClasses, cssClassesToRemove)) {
-      this.setProperty('cssClass', Arrays.format(cssClasses, ' '));
+    if (arrays.removeAll(cssClasses, cssClassesToRemove)) {
+      this.setProperty('cssClass', arrays.format(cssClasses, ' '));
     }
   };
 
@@ -1130,7 +1130,7 @@ export default class Widget {
     if (oldWidgets && Array.isArray(widgets)) {
       // If new value is an array, old value has to be one as well
       // Only destroy those which are not in the new array
-      oldWidgets = Arrays.diff(oldWidgets, widgets);
+      oldWidgets = arrays.diff(oldWidgets, widgets);
     }
 
     // Destroy old child widget(s)
@@ -1171,7 +1171,7 @@ export default class Widget {
    * Removes the given widgets
    */
   _internalRemoveWidgets(widgets) {
-    widgets = Arrays.ensure(widgets);
+    widgets = arrays.ensure(widgets);
     widgets.forEach(function(widget) {
       widget.remove();
     });
@@ -1204,7 +1204,7 @@ export default class Widget {
       return;
     }
 
-    widgets = Arrays.ensure(widgets);
+    widgets = arrays.ensure(widgets);
     widgets.forEach(function(child) {
       child.setParent(this);
     }, this);
@@ -1306,7 +1306,7 @@ export default class Widget {
   };
 
   _addProperties(propertyName, properties) {
-    properties = Arrays.ensure(properties);
+    properties = arrays.ensure(properties);
     properties.forEach(function(property) {
       if (this[propertyName].indexOf(property) > -1) {
         throw new Error(propertyName + ' already contains the property ' + property);
@@ -1341,9 +1341,9 @@ export default class Widget {
 
   _removeWidgetProperties(properties) {
     if (Array.isArray(properties)) {
-      Arrays.removeAll(this._widgetProperties, properties);
+      arrays.removeAll(this._widgetProperties, properties);
     } else {
-      Arrays.remove(this._widgetProperties, properties);
+      arrays.remove(this._widgetProperties, properties);
     }
   };
 
@@ -1422,7 +1422,7 @@ export default class Widget {
     if (!properties) {
       return clone;
     }
-    properties = Arrays.ensure(properties);
+    properties = arrays.ensure(properties);
     properties.forEach(function(property) {
       var propertyValue = this[property],
         clonedProperty = null;
@@ -1469,7 +1469,7 @@ export default class Widget {
   };
 
   _mirror(clone, options) {
-    var eventDelegator = Arrays.find(this.eventDelegators, function(eventDelegator) {
+    var eventDelegator = arrays.find(this.eventDelegators, function(eventDelegator) {
       return eventDelegator.clone === clone;
     });
     if (eventDelegator) {
@@ -1504,7 +1504,7 @@ export default class Widget {
   };
 
   _unmirror(target) {
-    var eventDelegatorIndex = Arrays.findIndex(this.eventDelegators, function(eventDelegator) {
+    var eventDelegatorIndex = arrays.findIndex(this.eventDelegators, function(eventDelegator) {
         return eventDelegator.clone === target;
       }),
       eventDelegator = (eventDelegatorIndex > -1) ? (this.eventDelegators.splice(eventDelegatorIndex, 1)[0]) : null;

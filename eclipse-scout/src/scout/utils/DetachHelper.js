@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import Arrays from './Arrays';
+import * as arrays from './arrays';
 
 export default class DetachHelper {
   constructor(session) {
@@ -59,7 +59,7 @@ export default class DetachHelper {
 
     tooltipDestroyHandler = function(event) {
       // If tooltip will be destroyed, remove it from the list so that restore won't try to render it
-      Arrays.remove(tooltips, event.source);
+      arrays.remove(tooltips, event.source);
       event.source.off('render', tooltipRenderHandler);
     };
     tooltipRenderHandler = function(event) {

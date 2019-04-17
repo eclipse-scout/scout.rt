@@ -1,6 +1,6 @@
 import AbstractLayout from '../layout/AbstractLayout';
 import * as scout from '../scout';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class ViewButtonBoxLayout extends AbstractLayout {
 
@@ -20,13 +20,13 @@ export default class ViewButtonBoxLayout extends AbstractLayout {
 
     if (viewMenuTab.visible && viewMenuTab.selectedButton.rendered) {
       if (viewMenuTab.selectedButton) {
-        tabWidth = (containerWidth - Graphics.size(viewMenuTab.dropdown.$container, {
+        tabWidth = (containerWidth - graphics.size(viewMenuTab.dropdown.$container, {
           exact: true
         }).width) / (tabs.length + 1);
         viewMenuTab.selectedButton.$container.cssPxValue('width', tabWidth);
       }
 
-      containerWidth -= Graphics.size(viewMenuTab.$container, {
+      containerWidth -= graphics.size(viewMenuTab.$container, {
         exact: true
       }).width;
     }
@@ -45,7 +45,7 @@ export default class ViewButtonBoxLayout extends AbstractLayout {
 
   preferredLayoutSize($container) {
     // View buttons have an absolute css height set -> useCssSize = true
-    return Graphics.prefSize($container, {
+    return graphics.prefSize($container, {
       useCssSize: true
     });
   };

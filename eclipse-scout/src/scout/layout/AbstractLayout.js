@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import HtmlComponent from './HtmlComponent';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class AbstractLayout {
 
@@ -49,7 +49,7 @@ export default class AbstractLayout {
         // Insets have been removed automatically by the html component with the assumption that the layout will pass it to its child elements.
         // Since this is not the case in this generic layout the insets have to be added again, otherwise the sizes used to measure would too small.
         this._revertSizeHintsAdjustments($container, options);
-        return Graphics.prefSize($container, options);
+        return graphics.prefSize($container, options);
     };
 
 }

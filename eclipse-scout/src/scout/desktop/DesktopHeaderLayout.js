@@ -1,6 +1,6 @@
 import AbstractLayout from '../layout/AbstractLayout';
 import Dimension from '../utils/Dimension';
-import Graphics from '../utils/Graphics';
+import * as graphics from '../utils/graphics';
 
 export default class DesktopHeaderLayout extends AbstractLayout {
 
@@ -30,7 +30,7 @@ export default class DesktopHeaderLayout extends AbstractLayout {
     containerSize = containerSize.subtract(htmlContainer.insets());
 
     if (this.header.logo) {
-      logoWidth = Graphics.size(this.header.logo.$container, true).width;
+      logoWidth = graphics.size(this.header.logo.$container, true).width;
     }
 
     if (viewButtonBox) {

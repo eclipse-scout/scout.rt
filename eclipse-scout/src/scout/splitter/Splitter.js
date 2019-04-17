@@ -1,7 +1,7 @@
 import * as $ from 'jquery';
+import * as graphics from '../utils/graphics';
 import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
-import Graphics from '../utils/Graphics';
 
 export default class Splitter extends Widget {
 
@@ -77,7 +77,7 @@ export default class Splitter extends Widget {
     if (!this.$anchor) {
       return null;
     }
-    var anchorBounds = Graphics.offsetBounds(this.$anchor, {
+    var anchorBounds = graphics.offsetBounds(this.$anchor, {
       exact: true
     });
     if (this.splitHorizontal) {
@@ -109,7 +109,7 @@ export default class Splitter extends Widget {
       return;
     }
 
-    var splitterSize = Graphics.size(this.$container, true);
+    var splitterSize = graphics.size(this.$container, true);
     if (this.splitHorizontal) {
       var x = this.position - (splitterSize.width / 2);
       if (this.orientation === 'right') {
@@ -131,8 +131,8 @@ export default class Splitter extends Widget {
     // The calculation of the offset bounds looks a bit complicated, because we cannot
     // use 'scout.graphics.offsetBounds($el, true)' here. This method would only consider
     // any margins in the size, not the position.
-    var splitterMargins = Graphics.margins(this.$container);
-    var splitterOffsetBounds = Graphics.offsetBounds(this.$container);
+    var splitterMargins = graphics.margins(this.$container);
+    var splitterOffsetBounds = graphics.offsetBounds(this.$container);
     splitterOffsetBounds.x -= splitterMargins.left;
     splitterOffsetBounds.y -= splitterMargins.top;
     splitterOffsetBounds.width += splitterMargins.horizontal();
@@ -158,7 +158,7 @@ export default class Splitter extends Widget {
   };
 
   _getSplitterPosition(event) {
-    var rootBounds = Graphics.offsetBounds(this.$root);
+    var rootBounds = graphics.offsetBounds(this.$root);
     if (this.splitHorizontal) {
       var x = event.pageX + this._cursorOffset.left - rootBounds.x;
       return (this.orientation === 'right' ? rootBounds.width - x : x);
