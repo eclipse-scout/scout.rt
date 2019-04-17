@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 import * as $ from 'jquery';
-import { scout } from 'eclipse-scout';
+import scout from 'eclipse-scout';
 import MyOutlineViewButton from './outline/MyOutlineViewButton';
 
 scout.addObjectFactories({

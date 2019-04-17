@@ -13,7 +13,8 @@
 import * as scout from './scout';
 import * as models from './util/models';
 
-export { scout, models };
+export { scout as default };
+export { models };
 export { default as App } from './App';
 export { default as Session } from './session/Session';
 export { default as Desktop } from './desktop/Desktop';

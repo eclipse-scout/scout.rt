@@ -94,6 +94,16 @@ module.exports = (env, args) => {
             sourceMap: true
           }
         }]
+      }, {
+        // # Babel
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
       }]
     },
     /* ------------------------------------------------------
@@ -105,9 +115,13 @@ module.exports = (env, args) => {
     /* ------------------------------------------------------
      * + Externals                                          +
      * ------------------------------------------------------ */
+    // The value of this property (jQuery) is the name of the global variable (window scope)
+    // where the declared external library will be available in the browser. This is required
+    // for the ES5-client case, where a developer will add eclipse-scout.js and jquery.js from
+    // a CDN source and develops a Scout app without a build stack.
     // see: https://webpack.js.org/configuration/externals/
     externals: {
-      jquery: 'jquery'
+      jquery: 'jQuery'
     },
     /* ------------------------------------------------------
      * + Plugins                                            +
