@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -55,7 +56,7 @@ public class UiJobsTest {
   }
 
   @Test
-  public void testCancelOrdinaryModelJob() {
+  public void testCancelOrdinaryModelJob() throws InterruptedException {
     final CountDownLatch jobStarted = new CountDownLatch(1);
     final CountDownLatch jobsCancelled = new CountDownLatch(1);
     IFuture<String> future = ModelJobs.schedule(new Callable<String>() {
@@ -72,11 +73,13 @@ public class UiJobsTest {
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession(), true)));
 
+    jobStarted.await();
     BEANS.get(UiJobs.class).cancelModelJobs(clientSession());
     assertTrue(future.isCancelled());
+
     jobsCancelled.countDown();
     try {
-      future.awaitDoneAndGet(200, TimeUnit.MILLISECONDS);
+      future.awaitDoneAndGet();
       fail("Expecting a " + FutureCancelledError.class);
     }
     catch (FutureCancelledError expected) {
@@ -85,7 +88,7 @@ public class UiJobsTest {
   }
 
   @Test
-  public void testCancelNotCancellableByUserModelJob() {
+  public void testCancelNotCancellableByUserModelJob() throws InterruptedException {
     final CountDownLatch jobStarted = new CountDownLatch(1);
     final CountDownLatch jobsCancelled = new CountDownLatch(1);
     IFuture<String> future = ModelJobs.schedule(new Callable<String>() {
@@ -93,14 +96,17 @@ public class UiJobsTest {
       public String call() throws Exception {
         jobStarted.countDown();
         jobsCancelled.await();
+        SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
         return "completed";
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession(), true))
         .withExecutionHint(ModelJobs.EXECUTION_HINT_NOT_CANCELLABLE_BY_USER));
 
+    jobStarted.await();
     BEANS.get(UiJobs.class).cancelModelJobs(clientSession());
     assertFalse(future.isCancelled());
+
     jobsCancelled.countDown();
-    assertEquals("completed", future.awaitDoneAndGet(200, TimeUnit.MILLISECONDS));
+    assertEquals("completed", future.awaitDoneAndGet());
   }
 }
