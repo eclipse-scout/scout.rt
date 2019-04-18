@@ -10,76 +10,91 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.ParamConverterProvider;
 
+import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.rest.container.IRestContainerRequestFilter;
+import org.eclipse.scout.rt.platform.util.StreamUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JAX-RS REST application registering all {@link IRestResource}, {@link ExceptionMapper} and {@link ContextResolver} to
- * the JAX-RS context.
+ * JAX-RS REST application registering all provided classes, singletons and properties to the JAX-RS context.
+ *
+ * @see IRestApplicationClassesContributor
+ * @see IRestApplicationSingletonsContributor
+ * @see IRestApplicationPropertiesContributor
  */
 public class RestApplication extends Application {
 
   private static final Logger LOG = LoggerFactory.getLogger(RestApplication.class);
 
-  private Set<Class<?>> m_classes = new HashSet<>();
+  private final Set<Class<?>> m_classes;
+  private final Set<Object> m_singletons;
+  private final Map<String, Object> m_properties;
 
   public RestApplication() {
     m_classes = initClasses();
+    m_singletons = initSingletons();
+    m_properties = initProperties();
   }
 
   protected Set<Class<?>> initClasses() {
-    Set<Class<?>> classes = new HashSet<>();
-    registerContextResolvers(classes);
-    registerExceptionMappers(classes);
-    registerParamConverterProviders(classes);
-    registerRestResources(classes);
-    registerContainerRequestFilters(classes);
-    return classes;
+    return BEANS.all(IRestApplicationClassesContributor.class).stream().flatMap(contributor -> {
+      Set<Class<?>> classes = contributor.contribute();
+      LOG.info("Contributed {} classes by {}", classes.size(), contributor.getClass());
+      return classes.stream();
+    }).collect(Collectors.toSet());
   }
 
-  protected void registerContainerRequestFilters(Set<Class<?>> classes) {
-    registerClasses(classes, IRestContainerRequestFilter.class);
+  protected Set<Object> initSingletons() {
+    return BEANS.all(IRestApplicationSingletonsContributor.class).stream().flatMap(contributor -> {
+      Set<Object> singletons = contributor.contribute();
+      LOG.info("Contributed {} singletons by {}", singletons.size(), contributor.getClass());
+      return singletons.stream();
+    }).collect(Collectors.toSet());
   }
 
-  protected void registerContextResolvers(Set<Class<?>> classes) {
-    registerClasses(classes, ContextResolver.class);
-  }
-
-  protected void registerExceptionMappers(Set<Class<?>> classes) {
-    registerClasses(classes, ExceptionMapper.class);
-  }
-
-  protected void registerRestResources(Set<Class<?>> classes) {
-    registerClasses(classes, IRestResource.class);
-  }
-
-  protected void registerParamConverterProviders(Set<Class<?>> classes) {
-    registerClasses(classes, ParamConverterProvider.class);
-  }
-
-  protected <T> void registerClasses(Set<Class<?>> classes, Class<T> lookupBeanClazz) {
-    List<IBean<T>> beans = BEANS.getBeanManager().getBeans(lookupBeanClazz);
-    for (IBean<?> bean : beans) {
-      classes.add(bean.getBeanClazz());
-      LOG.debug("{} registered as REST {}", bean.getBeanClazz(), lookupBeanClazz.getSimpleName());
-    }
-    LOG.info("Registered {} classes as REST {}", beans.size(), lookupBeanClazz.getSimpleName());
+  protected Map<String, Object> initProperties() {
+    return BEANS.all(IRestApplicationPropertiesContributor.class).stream().flatMap(contributor -> {
+      Map<String, Object> properties = contributor.contribute();
+      LOG.info("Contributed {} properties by {}", properties.size(), contributor.getClass());
+      return properties.entrySet().stream();
+    }).collect(StreamUtility.toMap(Entry::getKey, Entry::getValue, StreamUtility.ignoringMerger())); // use first provided property value for multiple properties with the same key
   }
 
   @Override
   public Set<Class<?>> getClasses() {
     return m_classes;
+  }
+
+  @Override
+  public Set<Object> getSingletons() {
+    return m_singletons;
+  }
+
+  @Override
+  public Map<String, Object> getProperties() {
+    return m_properties;
+  }
+
+  @ApplicationScoped
+  public static interface IRestApplicationClassesContributor {
+    Set<Class<?>> contribute();
+  }
+
+  @ApplicationScoped
+  public static interface IRestApplicationSingletonsContributor {
+    Set<Object> contribute();
+  }
+
+  @ApplicationScoped
+  public static interface IRestApplicationPropertiesContributor {
+    Map<String, Object> contribute();
   }
 }
