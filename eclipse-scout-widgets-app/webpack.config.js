@@ -84,7 +84,17 @@ module.exports = (env, args) => {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
+            plugins: ['@babel/plugin-transform-object-assign'],
+            presets: [
+              ['@babel/preset-env', {
+                debug: true,
+                targets: {
+                  firefox: '35',
+                  chrome: '40',
+                  ie: '11'
+                }
+              }]
+            ]
           }
         }
       }]

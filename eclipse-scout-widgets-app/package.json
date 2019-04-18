@@ -4,6 +4,10 @@
   "description": "Eclipse Scout: Widgets App",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
+  },
   "license": "EPL-1.0",
   "//": "private: true",
   "publishConfig": {
@@ -20,10 +24,9 @@
     "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
     "@babel/preset-env": "^7.1.0",
     "babel-loader": "^8.0.4",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0",
     "clean-webpack-plugin": "^2.0.1",
     "copy-webpack-plugin": "^5.0.2",
     "jasmine-core": "^3.3.0",
@@ -31,7 +34,9 @@
     "karma-chrome-launcher": "~2.2.0",
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
-    "karma-webpack": "^3.0.5"
+    "karma-webpack": "^3.0.5",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
   },
   "dependencies": {
     "eclipse-scout": "file:../eclipse-scout",

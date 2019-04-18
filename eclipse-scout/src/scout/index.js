@@ -21,14 +21,3 @@ export { default as Desktop } from './desktop/Desktop';
 export { default as NullWidget } from './widget/NullWidget';
 export { default as ViewButton } from './desktop/ViewButton';
 export { default as OutlineViewButton } from './outline/OutlineViewButton';
-
-// FIXME [awe] ES6: its important to think about how we want to organize the eclipse-scout module
-// as this decides how a Scout developer will import stuff from Eclipse Scout.
-// take a look at WidgetsApp.js
-// Idea: instead of exporting a single module, it could be more appropriate to define an "alias"
-// in Webpack that accesses the /src/ directory of Eclipse Scout. So instead of doing
-//   import { models } from 'eclipse-scout';
-// The developer would write:
-//   import * as models from 'eclipse-scout/util/models';
-// Don't know if that will work, but this way we don't have to deal with building a namespace
-// structure for the eclipse-scout module.
