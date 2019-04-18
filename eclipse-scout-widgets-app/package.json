@@ -1,11 +1,14 @@
 {
   "name": "eclipse-scout-widgets-app",
-  "version": "10.0.0",
+  "version": "10.0.0-SNAPSHOT.1",
   "description": "Eclipse Scout: Widgets App",
   "author": "BSI Business Systems Integration AG",
   "homepage": "https://www.eclipse.org/scout",
   "license": "EPL-1.0",
-  "private": true,
+  "//": "private: true",
+  "publishConfig": {
+    "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
+  },
   "main": "index.js",
   "scripts": {
     "build-dev": "webpack --mode=development --display-error-details",

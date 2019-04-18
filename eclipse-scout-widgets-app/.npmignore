@@ -1,0 +1,4 @@
+node_modules
+.settings
+.project
+eclipse-scout-widgets-app.iml
