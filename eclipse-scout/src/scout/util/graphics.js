@@ -60,7 +60,7 @@ export function prefSize($elem, options) {
   options = $.extend({}, defaults, options);
 
   if (options.animateClasses && options.animateClasses.length > 0) {
-    return this.prefSizeWithoutAnimation($elem, options);
+    return prefSizeWithoutAnimation($elem, options);
   }
 
   var oldStyle = $elem.attr('style');
@@ -126,16 +126,16 @@ export function prefSizeWithoutAnimation($elem, options) {
   options.animateClasses = null;
 
   if (!animateClass) {
-    return this.prefSize($elem, options);
+    return prefSize($elem, options);
   }
 
   var $clone = $elem
     .clone()
     .removeClass(animateClass)
     .appendTo($elem.parent());
-  var prefSize = prefSize($clone, options);
+  var prefSize0 = prefSize($clone, options);
   $clone.remove();
-  return prefSize;
+  return prefSize0;
 }
 
 export function offsetBounds($elem, options) {
@@ -224,7 +224,7 @@ export function insets($comp, options) {
 };
 
 export function margins($comp) {
-  return this.insets($comp, {
+  return insets($comp, {
     includeMargin: true,
     includePadding: false,
     includeBorder: false
@@ -232,7 +232,7 @@ export function margins($comp) {
 }
 
 export function paddings($comp) {
-  return this.insets($comp, {
+  return insets($comp, {
     includeMargin: false,
     includePadding: true,
     includeBorder: false
@@ -240,7 +240,7 @@ export function paddings($comp) {
 };
 
 export function borders($comp) {
-  return this.insets($comp, {
+  return insets($comp, {
     includeMargin: false,
     includePadding: false,
     includeBorder: true
