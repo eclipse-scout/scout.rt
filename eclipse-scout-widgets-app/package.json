@@ -1,5 +1,5 @@
 {
-  "name": "eclipse-scout-widgets-app",
+  "name": "@eclipse-scout/eclipse-scout-widgets-app",
   "version": "10.0.0-SNAPSHOT.1",
   "description": "Eclipse Scout: Widgets App",
   "author": "BSI Business Systems Integration AG",
