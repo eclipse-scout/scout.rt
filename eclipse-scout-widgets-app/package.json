@@ -15,10 +15,11 @@
   },
   "main": "index.js",
   "scripts": {
-    "build-dev": "webpack --mode=development --display-error-details",
+    "build:dev": "webpack --mode=development --display-error-details",
     "build": "webpack --mode=production --display-error-details",
+    "start:dev": "webpack-dev-server",
     "test": "karma start --browsers ChromeHeadless --single-run",
-    "test-dev": "karma start"
+    "test:dev": "karma start"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -38,7 +39,8 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-webpack": "^3.0.5",
     "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0"
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.3.1"
   },
   "dependencies": {
     "eclipse-scout": "file:../eclipse-scout",

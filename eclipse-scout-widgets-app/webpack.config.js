@@ -49,17 +49,18 @@ module.exports = (env, args) => {
       // Note: we don't define jQuery and Eclipse Scout as 'externals', since we want to bundle
       // them with our code and also provide minify, content-hash etc. for these libraries
       splitChunks: {
-        chunks: 'all',
         cacheGroups: {
           // # jQuery
           jquery: {
             name: 'jquery',
-            test: /.*jquery/
+            test: /.*jquery/,
+            chunks: 'all'
           },
           // # Eclipse Scout
           'eclipse-scout': {
             name: 'eclipse-scout',
-            test: /eclipse\-scout[\/|\\]/
+            test: /eclipse\-scout[\/|\\]/,
+            chunks: 'all'
           }
         }
       },
