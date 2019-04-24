@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
+import org.eclipse.scout.rt.client.ui.action.menu.form.fields.AbstractFormFieldMenu;
+
 /**
  * CSS classes that can be used by the model to give the UI some hint about the rendering or behavior of a specific
  * component.
@@ -22,4 +24,9 @@ public interface CssClasses {
    * Class that applies the same vertical padding to the .field as to the label (useful e.g. for HTML fields)
    */
   String BORDERLESS_FIELD_PADDING_Y = "borderless-field-padding-y";
+
+  /**
+   * Class that hides the mandatory indicator (useful e.g. inside a {@link AbstractFormFieldMenu})
+   */
+  String NO_MANDATORY_INDICATOR = "no-mandatory-indicator";
 }
