@@ -89,6 +89,11 @@
     color: @disabled-color;
   }
 
+  /* Convenience class to add to a field when the mandatory indicator should not be displayed (e.g. inside a FormFieldMenu) */
+  &.no-mandatory-indicator > .mandatory-indicator {
+    display: none;
+  }
+
   & > .status {
     position: absolute;
     margin-left: @field-status-margin-left;
