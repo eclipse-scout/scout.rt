@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.internal;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,34 +19,28 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default strategy for creating bean instances. Objects returned by {@link #produce(IBean)} are completely initialized
- * (i.e. the constructor invocation as well as the invocation of every {@link PostConstruct} method have been
- * completed). Further, beans annotated with {@link ApplicationScoped} are instantiated at most once (a bean that throws
- * an exception during its instantiation is not considered instantiated).
+ * This producers creates a new instance for the given bean or returns the already created instance. It is used as
+ * default producer for {@link ApplicationScoped} beans. Further, it does not only return always the same instance but
+ * ensures also that at most one instance is created and initialized (a bean that throws an exception during its
+ * instantiation is not considered instantiated).
  * <p>
- * The strategy keeps track of beans being created by the current thread so that circular dependencies are detected and
- * reported by throwing a {@link BeanCreationException}.
+ * Behavior of {@link NonSingeltonBeanInstanceProducer} applies also on this producer (initialization, circular
+ * dependencies check, ...)
  * <p>
- * This class is thread safe. Concurrent invocations of {@link #produce(IBean)} create multiple instances for
- * non-application-scoped beans. In case of an application-scoped bean, only one thread creates the bean. Any other
- * thread requesting the application-scoped instance is suspended until the creator thread completes or after waiting at
- * most 90 seconds. Potential deadlocks are reported in the log and a {@link BeanCreationException} is thrown. Potential
- * dead locks are logged after 5 seconds on level <code>WARN</code>, if the class' log level is <code>DEBUG</code>
- * (speeds up identifying potential deadlocks during development) and another one is logged after waiting 90 seconds if
- * the log level is <code>WARN</code>.
+ * This class is thread safe. In case of concurrent invocations of {@link #produce(IBean)} at most one thread creates
+ * the bean. Any other thread requesting the application-scoped instance is suspended until the creator thread completes
+ * or after waiting at most 90 seconds. Potential deadlocks are reported in the log and a {@link BeanCreationException}
+ * is thrown. Potential dead locks are logged after 5 seconds on level <code>WARN</code>, if the class' log level is
+ * <code>DEBUG</code> (speeds up identifying potential deadlocks during development) and another one is logged after
+ * waiting 90 seconds if the log level is <code>WARN</code>.
  * <p>
- * <b>Important 1:</b> Beans are discarded without any clean-up operations if the creation process throws any exception.
- * The implementer of a bean's constructor and its {@link PostConstruct}-annotated methods is responsible for proper
- * disposal of already bound resources.
- * <p>
- * <b>Important 2:</b> If the bean's initialization depends on (external) resources which might not be available at the
+ * <b>Important:</b> If the bean's initialization depends on (external) resources which might not be available at the
  * time of construction and the initialization process waits until they are available, they should not be initialized in
  * the constructor or in a {@link PostConstruct} annotated method. Other threads requesting the same bean would run into
  * the potential deadlock detection and a {@link BeanCreationException} would be thrown. These resources should be
@@ -81,10 +71,12 @@ import org.slf4j.LoggerFactory;
  *   }
  * }
  * </pre>
+ *
+ * @see NonSingeltonBeanInstanceProducer
  */
-public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
+public class SingeltonBeanInstanceProducer<T> implements IBeanInstanceProducer<T> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultBeanInstanceProducer.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SingeltonBeanInstanceProducer.class);
 
   /**
    * Default max wait time in seconds another thread will wait on the creator thread which is instantiating an
@@ -95,47 +87,16 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   /** Time in seconds another thread will wait before a log entry is created with level DEBUG. */
   private static final int DEADLOCK_DETECTION_DEBUG_WAIT_TIME_SECONDS = 5;
 
-  /** Stack to keep track of beans being created to avoid circular dependencies */
-  private static final ThreadLocal<Deque<String>> INSTANTIATION_STACK = new ThreadLocal<>();
-
-  private final FinalValue<T> m_applicationScopedInstance = new FinalValue<>();
+  private final FinalValue<T> m_instance = new FinalValue<>();
   private final AtomicReference<Thread> m_creatorThread = new AtomicReference<>();
 
-  /**
-   * Creates a new instance for the given bean or returns the already created instance, if the bean is
-   * application-scoped.
-   *
-   * @return Returns an instance for the bean, never <code>null</code>.
-   */
   @Override
   public T produce(IBean<T> bean) {
-    checkInstanciationInProgress(bean);
-
-    if (BeanManagerImplementor.isApplicationScoped(bean)) {
-      return getApplicationScopedInstance(bean);
-    }
-
-    return safeCreateInstance(bean.getBeanClazz());
+    return BeanInstanceUtil.createAndAssertNoCircularDependency(() -> getOrCreateInstance(bean), bean.getBeanClazz());
   }
 
-  /**
-   * Checks instantiation of this bean is already in progress, possibly due to circular dependencies.
-   *
-   * @param bean
-   *          bean to be checked
-   * @throws BeanCreationException
-   *           if the bean is already bean instantiation is already in progress
-   */
-  private void checkInstanciationInProgress(IBean<T> bean) {
-    Deque<String> stack = INSTANTIATION_STACK.get();
-    String beanName = bean.getBeanClazz().getName();
-    if (stack != null && stack.contains(beanName)) {
-      throw new BeanCreationException("The requested bean is currently being created. Creation path: [{}]", stack);
-    }
-  }
-
-  private T getApplicationScopedInstance(final IBean<T> bean) {
-    T instance = m_applicationScopedInstance.get();
+  protected T getOrCreateInstance(final IBean<T> bean) {
+    T instance = m_instance.get();
     if (instance != null) {
       return instance;
     }
@@ -143,13 +104,13 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     if (m_creatorThread.compareAndSet(null, Thread.currentThread())) {
       try {
         // check again to avoid race conditions
-        instance = m_applicationScopedInstance.get();
+        instance = m_instance.get();
         if (instance != null) {
           return instance;
         }
         // current thread has to create instance
-        instance = safeCreateInstance(bean.getBeanClazz());
-        m_applicationScopedInstance.set(instance);
+        instance = createInstance(bean);
+        m_instance.set(instance);
         return instance;
       }
       finally {
@@ -196,7 +157,7 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
     while (System.currentTimeMillis() < maxWaitEndTimeMillis); // try as long as the other thread is still creating the bean and the max wait time has not been elapsed
 
     // check if bean has been created in the meantime
-    instance = m_applicationScopedInstance.get();
+    instance = m_instance.get();
     if (instance != null) {
       return instance;
     }
@@ -256,38 +217,6 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
   }
 
   /**
-   * Creates and initializes a new instance while keeping track of the classes instantiated during this process and
-   * ensuring that there are no circular dependencies.
-   *
-   * @return a new instance of the bean. Never <code>null</code>.
-   */
-  private T safeCreateInstance(Class<? extends T> beanClass) {
-    Deque<String> stack = INSTANTIATION_STACK.get();
-    boolean removeStack = false;
-    if (stack == null) {
-      stack = new LinkedList<>();
-      INSTANTIATION_STACK.set(stack);
-      //remove later, if this is the first instance on the stack
-      removeStack = true;
-    }
-
-    try {
-      stack.addLast(beanClass.getName());
-      T instance = Assertions.assertNotNull(createInstance(beanClass));
-      initializeBean(instance);
-      return instance;
-    }
-    finally {
-      if (removeStack) {
-        INSTANTIATION_STACK.remove();
-      }
-      else {
-        stack.removeLast();
-      }
-    }
-  }
-
-  /**
    * Max wait time in seconds another thread will wait on the creator thread which is instantiating an
    * application-scoped bean. This default implementation returns 90s.
    *
@@ -302,27 +231,9 @@ public class DefaultBeanInstanceProducer<T> implements IBeanInstanceProducer<T> 
    *
    * @return new instance. Never <code>null</code>.
    */
-  protected T createInstance(Class<? extends T> beanClass) {
-    @SuppressWarnings("unchecked")
-    Constructor<T> injectCons = (Constructor<T>) BeanInstanceUtil.getInjectionConstructor(beanClass);
-    if (injectCons != null) {
-      try {
-        injectCons.setAccessible(true);
-        return injectCons.newInstance(BeanInstanceUtil.getInjectionArguments(injectCons.getParameterTypes()));
-      }
-      catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        throw new BeanCreationException(beanClass.getName(), e);
-      }
-    }
-    else {
-      return BeanInstanceUtil.createBean(beanClass);
-    }
-  }
-
-  /**
-   * Initializes the new bean instance. Guaranteed to be called only once per instance.
-   */
-  protected void initializeBean(T beanInstance) {
-    BeanInstanceUtil.initializeBeanInstance(beanInstance);
+  protected T createInstance(IBean<T> bean) {
+    T instance = BeanInstanceUtil.createBean(bean.getBeanClazz());
+    BeanInstanceUtil.initializeBeanInstance(instance);
+    return instance;
   }
 }

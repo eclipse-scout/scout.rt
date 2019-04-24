@@ -31,7 +31,14 @@ public class BeanImplementor<T> implements IBean<T> {
    * Creates a {@link BeanImplementor} with {@link DefaultBeanInstanceProducer} to produce beans upon bean lookup.
    */
   public BeanImplementor(BeanMetaData beanData) {
-    this(beanData, new DefaultBeanInstanceProducer<>());
+    this(beanData, getDefaultBeanInstanceProducer(beanData));
+  }
+
+  private static <T> IBeanInstanceProducer<T> getDefaultBeanInstanceProducer(BeanMetaData beanData) {
+    if (beanData.getBeanAnnotation(ApplicationScoped.class) != null) {
+      return new SingeltonBeanInstanceProducer<>();
+    }
+    return new NonSingeltonBeanInstanceProducer<>();
   }
 
   @SuppressWarnings("unchecked")

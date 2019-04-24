@@ -17,7 +17,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.internal.SingeltonBeanInstanceProducer;
 
 /**
  * A class annotated with this annotation represents a Bean which is application scoped, meaning that that Bean only
@@ -29,9 +29,9 @@ import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
  * be used within the application (all other instances are discarded after construction and never used within the
  * application). For initialization code that needs to be run exactly once, create a method annotated
  * with @PostConstruct. Details are documented on the {@link IBeanInstanceProducer} used when the bean is registered, by
- * default {@link DefaultBeanInstanceProducer}.
+ * default {@link SingeltonBeanInstanceProducer}.
  *
- * @see DefaultBeanInstanceProducer
+ * @see SingeltonBeanInstanceProducer
  */
 @Bean
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})

@@ -13,15 +13,13 @@ package org.eclipse.scout.rt.platform;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
-import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Tests for {@link DefaultBeanInstanceProducer} to make sure errors are thrown, if there are circular dependencies
- * (regardless of the circular dependency is created by constructor or {@link PostConstruct} annotated method
- * invocations).
+ * Tests for default bean producers to make sure errors are thrown, if there are circular dependencies (regardless of
+ * the circular dependency is created by constructor or {@link PostConstruct} annotated method invocations).
  */
 @RunWith(PlatformTestRunner.class)
 public class BeansWithCircularDependenciesTest {

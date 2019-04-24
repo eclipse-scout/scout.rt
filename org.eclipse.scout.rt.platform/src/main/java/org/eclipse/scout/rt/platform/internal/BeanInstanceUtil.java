@@ -11,15 +11,22 @@
 package org.eclipse.scout.rt.platform.internal;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -28,13 +35,15 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.InjectBean;
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.exception.IExceptionTranslator;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class BeanInstanceUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(BeanInstanceUtil.class);
+
+  /** Stack to keep track of beans being created to avoid circular dependencies */
+  private static final ThreadLocal<Deque<Class<?>>> INSTANTIATION_STACK = ThreadLocal.withInitial(ArrayDeque::new);
 
   private BeanInstanceUtil() {
   }
@@ -43,44 +52,20 @@ public final class BeanInstanceUtil {
    * Creates a new bean instance.
    *
    * @param beanClazz
+   *          not null
    * @return the newly created instance
    */
   public static <T> T createBean(Class<T> beanClazz) {
-    Assertions.assertNotNull(beanClazz);
+    return createBean(getBeanConstructor(beanClazz));
+  }
+
+  static <T> T createBean(Constructor<T> ctor) {
     try {
-      Constructor<T> cons = beanClazz.getDeclaredConstructor();
-      cons.setAccessible(true);
-      return cons.newInstance();
+      return ctor.getParameterCount() == 0 ? ctor.newInstance() : ctor.newInstance(getInjectionArguments(ctor.getParameterTypes()));
     }
     catch (Exception e) {
-      throw translateException("Could not create bean [{}]", beanClazz, e);
+      throw translateException("Could not create bean [{}]", ctor.getDeclaringClass(), e);
     }
-  }
-
-  /**
-   * @return Constructor with {@link InjectBean} annotation
-   * @throws BeanCreationException
-   *           in case of multiple {@link InjectBean} annotated constructors
-   */
-  public static Constructor<?> getInjectionConstructor(Class<?> clazz) {
-    Constructor<?> result = null;
-    for (Constructor<?> cons : clazz.getDeclaredConstructors()) {
-      if (cons.getAnnotation(InjectBean.class) != null) {
-        if (result != null) {
-          throw new BeanCreationException("Found multiple @InjectBean constructors in {}", clazz);
-        }
-        result = cons;
-      }
-    }
-    return result;
-  }
-
-  public static Object[] getInjectionArguments(Class<?>[] argTypes) {
-    Object[] args = new Object[argTypes.length];
-    for (int i = 0; i < argTypes.length; i++) {
-      args[i] = BEANS.get(argTypes[i]);
-    }
-    return args;
   }
 
   /**
@@ -88,11 +73,14 @@ public final class BeanInstanceUtil {
    * of the given instance.
    */
   public static void initializeBeanInstance(Object instance) {
-    Collection<Field> fields = collectInjectedFields(instance.getClass());
-    for (Field field : fields) {
+    Class<?> clazz = instance.getClass();
+    initializeBeanInstance(instance, collectInjectedFields(clazz), collectInjectedMethods(clazz), collectPostConstructMethods(clazz));
+  }
+
+  static void initializeBeanInstance(Object instance, Collection<Field> injectedFields, Collection<Method> injectedMethods, Collection<Method> postConstructMethods) {
+    for (Field field : injectedFields) {
       LOG.debug("injecting field {}", field);
       try {
-        field.setAccessible(true);
         Object value = BEANS.get(field.getType());
         field.set(instance, value);
       }
@@ -100,27 +88,68 @@ public final class BeanInstanceUtil {
         throw translateException("Exception while injecting field {}", field, e);
       }
     }
-    Collection<Method> initMethods = collectInjectedMethods(instance.getClass());
-    for (Method method : initMethods) {
+    for (Method method : injectedMethods) {
       LOG.debug("invoking injected method {}", method);
       try {
-        method.setAccessible(true);
         method.invoke(instance, getInjectionArguments(method.getParameterTypes()));
       }
       catch (Exception e) {
         throw translateException("Exception while invoking @InjectBean method {}", method, e);
       }
     }
-    Collection<Method> postConstructMethods = collectPostConstructMethods(instance.getClass());
     for (Method method : postConstructMethods) {
       LOG.debug("invoking post-construct method {}", method);
       try {
-        method.setAccessible(true);
         method.invoke(instance);
       }
       catch (Exception e) {
         throw translateException("Exception while invoking @PostConstruct method {}", method, e);
       }
+    }
+  }
+
+  /**
+   * Returns a new supplier which can be used multiple times to create a new initialized instance for given bean class.
+   *
+   * @param beanClazz
+   *          type of beans to create
+   * @return new supplier to create bean instances
+   */
+  public static <T> Supplier<T> beanInstanceCreator(Class<T> beanClazz) {
+    Constructor<T> ctor = getBeanConstructor(beanClazz);
+    Collection<Field> injectedFields = collectInjectedFields(beanClazz);
+    Collection<Method> injectedMethods = collectInjectedMethods(beanClazz);
+    Collection<Method> postConstructMethods = collectPostConstructMethods(beanClazz);
+    return () -> {
+      T instance = createBean(ctor);
+      initializeBeanInstance(instance, injectedFields, injectedMethods, postConstructMethods);
+      return instance;
+    };
+  }
+
+  /**
+   * Creates a new instance with given instance creator and asserts that no other instantiation of this bean is in
+   * current thread already in progress (possibly due to circular dependencies).
+   *
+   * @param instanceCreator
+   *          instance creator which will be called
+   * @param beanClazz
+   *          beanClazz to be checked
+   * @throws BeanCreationException
+   *           if the bean is already bean instantiation is already in progress
+   */
+  public static <T> T createAndAssertNoCircularDependency(Supplier<T> instanceCreator, Class<?> beanClazz) {
+    Deque<Class<?>> stack = INSTANTIATION_STACK.get();
+    if (stack.contains(beanClazz)) {
+      String path = stack.stream().map(Class::getName).collect(Collectors.joining("/"));
+      throw new BeanCreationException("The requested bean is currently being created. Creation path: [{}]", path);
+    }
+    stack.addLast(beanClazz);
+    try {
+      return instanceCreator.get();
+    }
+    finally {
+      stack.removeLast();
     }
   }
 
@@ -142,6 +171,57 @@ public final class BeanInstanceUtil {
     return new BeanCreationException(message, arg, t);
   }
 
+  /**
+   * @return <em>accessible</em> bean constructor, never {@code null}
+   */
+  static <T> Constructor<T> getBeanConstructor(Class<T> clazz) {
+    Constructor<T> injectionConstructor = findInjectionConstructor(clazz);
+    if (injectionConstructor == null) {
+      injectionConstructor = getDefaultConstructor(clazz);
+    }
+    injectionConstructor.setAccessible(true);
+    return injectionConstructor;
+  }
+
+  /**
+   * @return Constructor with {@link InjectBean} annotation
+   * @throws BeanCreationException
+   *           in case of multiple {@link InjectBean} annotated constructors
+   */
+  @SuppressWarnings("unchecked")
+  private static <T> Constructor<T> findInjectionConstructor(Class<T> clazz) {
+    Constructor<T> result = null;
+    for (Constructor<?> cons : clazz.getDeclaredConstructors()) {
+      if (cons.getAnnotation(InjectBean.class) != null) {
+        if (result != null) {
+          throw new BeanCreationException("Found multiple @InjectBean constructors in {}", clazz);
+        }
+        result = (Constructor<T>) cons;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @return default Constructor as defined in {@link Class#getDeclaredConstructor()}
+   */
+  private static <T> Constructor<T> getDefaultConstructor(Class<T> clazz) {
+    try {
+      return clazz.getDeclaredConstructor();
+    }
+    catch (Exception e) {
+      throw translateException("No default bean constructor defined [{}]", clazz, e);
+    }
+  }
+
+  static Object[] getInjectionArguments(Class<?>[] argTypes) {
+    Object[] args = new Object[argTypes.length];
+    for (int i = 0; i < argTypes.length; i++) {
+      args[i] = BEANS.get(argTypes[i]);
+    }
+    return args;
+  }
+
   static Collection<Method> collectInjectedMethods(Class<?> clazz) {
     return collectNonStaticMethodsWithAnnotation(clazz, InjectBean.class, true, true);
   }
@@ -157,7 +237,7 @@ public final class BeanInstanceUtil {
    *
    * @param clazz
    *          The class {@link PostConstruct}-annotated methods are searched in.
-   * @return Returns a collection of {@link PostConstruct} methods.
+   * @return Returns a collection of <em>accessible</em> {@link PostConstruct} methods.
    * @throws BeanCreationException
    *           If unsupported methods are annotated with {@link PostConstruct} (i.e. those with parameters)
    */
@@ -202,7 +282,7 @@ public final class BeanInstanceUtil {
       }
       currentClass = currentClass.getSuperclass();
     }
-    return collector.values();
+    return collectAsAccessible(collector);
   }
 
   static Collection<Field> collectInjectedFields(Class<?> clazz) {
@@ -237,7 +317,19 @@ public final class BeanInstanceUtil {
       }
       currentClass = currentClass.getSuperclass();
     }
-    return collector.values();
+    return collectAsAccessible(collector);
+  }
+
+  private static <T extends AccessibleObject> Collection<T> collectAsAccessible(Map<?, T> collector) {
+    if (collector.isEmpty()) {
+      return Collections.emptyList();
+    }
+    Collection<T> list = new ArrayList<>();
+    for (T o : collector.values()) {
+      o.setAccessible(true);
+      list.add(o);
+    }
+    return list;
   }
 
   private static void handleError(boolean throwOnError, String msg, Object... args) {
