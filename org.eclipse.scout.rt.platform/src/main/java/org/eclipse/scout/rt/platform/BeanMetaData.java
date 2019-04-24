@@ -16,7 +16,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.internal.NonSingeltonBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.internal.SingeltonBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
@@ -138,7 +139,8 @@ public class BeanMetaData {
   }
 
   /**
-   * set the instance producer if a special handling is needed. Default is {@link DefaultBeanInstanceProducer}
+   * set the instance producer if a special handling is needed. Default is {@link NonSingeltonBeanInstanceProducer} or
+   * in case of {@link ApplicationScoped} beans {@link SingeltonBeanInstanceProducer}
    *
    * @return this supporting the fluent api
    */

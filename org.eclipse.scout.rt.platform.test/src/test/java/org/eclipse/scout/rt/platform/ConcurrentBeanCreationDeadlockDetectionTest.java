@@ -28,7 +28,7 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.rt.platform.exception.BeanCreationException;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.internal.SingeltonBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -67,7 +67,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
     return Platform.get().getBeanManager().registerBean(
         new BeanMetaData(beanClass)
             .withApplicationScoped(true)
-            .withProducer(new DefaultBeanInstanceProducer<T>() {
+            .withProducer(new SingeltonBeanInstanceProducer<T>() {
               @Override
               protected int getDeadlockDetectionMaxWaitTimeSeconds() {
                 return 1;
