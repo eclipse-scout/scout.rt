@@ -1015,6 +1015,8 @@ scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) 
       var vAlign = gridData.verticalAlignment;
       $field.addClass(vAlign < 0 ? 'valign-top' : (vAlign > 0 ? 'valign-bottom' : 'valign-middle'));
     }
+    // Alignment might have affected inner elements (e.g. clear icon)
+    this.invalidateLayout();
   }
 };
 
