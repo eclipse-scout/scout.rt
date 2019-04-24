@@ -15,10 +15,10 @@
   },
   "main": "index.js",
   "scripts": {
-    "build-dev": "webpack --mode=development --display-error-details",
+    "build:dev": "webpack --mode=development --display-error-details",
     "build": "webpack --mode=production --display-error-details",
     "test": "karma start --browsers ChromeHeadless --single-run",
-    "test-dev": "karma start"
+    "test:dev": "karma start"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
