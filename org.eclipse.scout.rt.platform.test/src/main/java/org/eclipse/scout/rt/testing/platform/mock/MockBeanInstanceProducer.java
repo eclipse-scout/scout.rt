@@ -10,17 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.platform.mock;
 
-import org.eclipse.scout.rt.platform.internal.DefaultBeanInstanceProducer;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
+import org.eclipse.scout.rt.platform.internal.SingeltonBeanInstanceProducer;
 import org.mockito.Mockito;
 
 /**
  * Uses {@link Mockito#mock(Class)} to create a new instance for a bean.
  */
-public class MockBeanInstanceProducer<T> extends DefaultBeanInstanceProducer<T> {
+public class MockBeanInstanceProducer<T> extends SingeltonBeanInstanceProducer<T> {
 
   @Override
-  protected T createInstance(Class<? extends T> beanClass) {
-    return Mockito.mock(beanClass);
+  public T produce(IBean<T> bean) {
+    if (BeanManagerImplementor.isApplicationScoped(bean)) {
+      return super.produce(bean);
+    }
+    else {
+      return BeanInstanceUtil.createAndAssertNoCircularDependency(() -> createInstance(bean), bean.getBeanClazz());
+    }
   }
 
+  @Override
+  protected T createInstance(IBean<T> bean) {
+    T mock = Mockito.mock(bean.getBeanClazz());
+    BeanInstanceUtil.initializeBeanInstance(mock);
+    return mock;
+  }
 }
