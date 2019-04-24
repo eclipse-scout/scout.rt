@@ -342,11 +342,13 @@ scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBoun
   if (formField instanceof scout.BasicField && formField.gridData.horizontalAlignment > 0) {
     formField.$clearIcon
       .cssLeft(fieldBounds.x)
+      .cssRight('')
       .cssTop(fieldBounds.y)
       .cssHeight(height)
       .cssLineHeight(height);
   } else {
     formField.$clearIcon
+      .cssLeft('')
       .cssRight(right)
       .cssTop(fieldBounds.y)
       .cssHeight(height)
