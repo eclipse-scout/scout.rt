@@ -305,7 +305,14 @@ scout.FormController.prototype._activateDialog = function(dialog) {
     }.bind(this));
 
   // Activate the focus context of the form (will restore the previously focused field)
-  this.session.focusManager.activateFocusContext(dialog.$container);
+  // This must not be done when the currently focused element is part of this dialog's DOM
+  // subtree, even if it has a separate focus context. Otherwise, the dialog would be
+  // (unnecessarily) activated, causing the current focus context to lose the focus.
+  // Example: editable table with a cell editor popup --> editor should keep the focus
+  // when the user clicks the clear icon ("x") inside the editor field.
+  if (!dialog.$container.isOrHas(dialog.$container.activeElement())) {
+    this.session.focusManager.activateFocusContext(dialog.$container);
+  }
 };
 
 /**
