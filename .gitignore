@@ -17,8 +17,13 @@
 bin
 classes
 
-# IDEA #
-/.idea
+# IntelliJ IDEA #
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/sonarlint
 
 # Maven #
 target/
