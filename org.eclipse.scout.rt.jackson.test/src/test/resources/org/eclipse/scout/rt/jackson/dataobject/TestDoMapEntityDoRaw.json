@@ -1,0 +1,19 @@
+{
+  "count" : 42,
+  "mapAttribute1" : {
+    "id" : "id-1",
+    "stringAttribute" : "value-1"
+  },
+  "mapAttribute2" : {
+    "id" : "id-2",
+    "stringAttribute" : "value-2"
+  },
+  "namedItem" : {
+    "id" : "namedItem",
+    "stringAttribute" : "value-named"
+  },
+  "namedItem3" : {
+    "bigDecimalAttribute" : 42,
+    "id" : "namedItem3"
+  }
+}

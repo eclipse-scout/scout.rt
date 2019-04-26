@@ -1,0 +1,22 @@
+{
+  "_type" : "TestDoMapListEntity",
+  "count" : 42,
+  "mapAttribute1" : [ {
+    "_type" : "TestItem",
+    "id" : "id-1a",
+    "stringAttribute" : "value-1a"
+  }, {
+    "_type" : "TestItem",
+    "id" : "id-1b",
+    "stringAttribute" : "value-1b"
+  } ],
+  "mapAttribute2" : [ {
+    "_type" : "TestItem",
+    "id" : "id-2a",
+    "stringAttribute" : "value-2a"
+  }, {
+    "_type" : "TestItem",
+    "id" : "id-2b",
+    "stringAttribute" : "value-2b"
+  } ]
+}
