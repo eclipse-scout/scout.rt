@@ -77,6 +77,19 @@ scout.Page.prototype._init = function(model) {
   this._internalInitDetailForm();
 };
 
+/**
+ * @override TreeNode.js
+ */
+scout.Page.prototype._destroy = function() {
+  scout.Page.parent.prototype._destroy.call(this);
+  if (this.detailTable) {
+    this.detailTable.destroy();
+  }
+  if (this.detailForm) {
+    this.detailForm.destroy();
+  }
+};
+
 scout.Page.prototype._internalInitTable = function() {
   var table = this.detailTable;
   if (table) {

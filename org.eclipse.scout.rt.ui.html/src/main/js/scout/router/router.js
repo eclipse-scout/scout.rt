@@ -37,16 +37,7 @@ scout.router = {
   },
 
   activate: function(location) {
-    if (!location) {
-      var regexp = new RegExp('[^/]*$'); // match everything after last slash
-      var matches = regexp.exec(document.location.href);
-      location = matches[0];
-    }
-
-    // no route is set in the URL
-    if (scout.strings.empty(location) || '/' === location) {
-      location = this.defaultLocation;
-    }
+    location = location || (window.location.hash || '') || this.defaultLocation;
 
     var i, route = null;
     for (i = 0; i < this.routes.length; i++) {
@@ -100,6 +91,6 @@ scout.router = {
 };
 
 window.addEventListener('popstate', function(event) {
-  scout.router.activate(null);
+  scout.router.activate();
   return false;
 });

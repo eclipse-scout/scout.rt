@@ -36,5 +36,4 @@ scout.Route.prototype.activate = function(location) {
  * to perform clean-up operations.
  */
 scout.Route.prototype.deactivate = function() {
-
 };
