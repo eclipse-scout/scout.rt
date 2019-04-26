@@ -28,12 +28,18 @@ module.exports = (env, args) => {
     target: 'web',
     mode: 'none',
     /* ------------------------------------------------------
+     * + Devtool                                            +
+     * ------------------------------------------------------ */
+    // This option controls if and how source maps are generated.
+    // see: https://webpack.js.org/configuration/devtool/
+    devtool: devMode ? 'inline-module-source-map' : undefined,
+    /* ------------------------------------------------------
      * + Entry                                              +
      * ------------------------------------------------------ */
     entry: {
       'eclipse-scout': './index.js',
-      'scout-theme': './src/scout/scout-theme.less' /*,
-      'theme-dark': './src/theme-dark.less'*/
+      'scout-theme': './src/scout/scout-theme.less' ,
+      'scout-theme-dark': './src/scout/scout-theme-dark.less'
     },
     /* ------------------------------------------------------
      * + Output                                             +
@@ -41,6 +47,9 @@ module.exports = (env, args) => {
     output: {
       filename: jsFilename,
       path: path.join(__dirname, 'dist')
+    },
+    performance: {
+      hints: false
     },
     /* ------------------------------------------------------
      * + Optimization                                       +
@@ -51,12 +60,15 @@ module.exports = (env, args) => {
         // Used to minify CSS assets (by default, run when mode is 'production')
         // see: https://github.com/NMFR/optimize-css-assets-webpack-plugin
         new OptimizeCssAssetsPlugin({
-          assetNameRegExp: /\.min\.css$/g
+          assetNameRegExp: /\.min\.css$/g,
+          cssProcessorPluginOptions: {
+            preset: ['default', { discardComments: { removeAll: true } }],
+          },
         }),
         // # Minify JS
         new TerserPlugin({
           test: /\.js(\?.*)?$/i,
-          sourceMap: true,
+          sourceMap: devMode,
           cache: true,
           parallel: true
         })
@@ -83,7 +95,7 @@ module.exports = (env, args) => {
           // Interprets @import and url() like import/require() and will resolve them.
           // see: https://webpack.js.org/loaders/css-loader/
           loader: 'css-loader', options: {
-            sourceMap: true,
+            sourceMap: devMode,
             modules: false, // We don't want to work with CSS modules
             url: false      // Don't resolve URLs in LESS, because relative path does not match /res/fonts
           }
@@ -91,7 +103,7 @@ module.exports = (env, args) => {
           // Compiles Less to CSS.
           // see: https://webpack.js.org/loaders/less-loader/
           loader: 'less-loader', options: {
-            sourceMap: true
+            sourceMap: devMode
           }
         }]
       }, {
@@ -101,7 +113,9 @@ module.exports = (env, args) => {
         use: {
           loader: 'babel-loader',
           options: {
-            plugins: ['@babel/plugin-transform-object-assign'],
+            compact: false,
+            sourceMaps: devMode ? 'inline' : undefined,
+            plugins: ['@babel/plugin-transform-object-assign', '@babel/proposal-class-properties', '@babel/proposal-object-rest-spread'],
             presets: [
               ['@babel/preset-env', {
                 debug: true,
@@ -116,12 +130,6 @@ module.exports = (env, args) => {
         }
       }]
     },
-    /* ------------------------------------------------------
-     * + Devtool                                            +
-     * ------------------------------------------------------ */
-    // This option controls if and how source maps are generated.
-    // see: https://webpack.js.org/configuration/devtool/
-    devtool: devMode ? 'source-map' : undefined,
     /* ------------------------------------------------------
      * + Externals                                          +
      * ------------------------------------------------------ */

@@ -10,16 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -32,6 +22,16 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
+import org.eclipse.scout.rt.ui.html.res.WebResourceHelpers;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * This class loads and parses HTML files from WebContent/ folder.
@@ -92,15 +92,20 @@ public class HtmlFileLoader extends AbstractResourceLoader {
 
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
-    HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(pathInfo);
-    URL url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
-    if (url == null) {
-      // not handled here
-      return null;
+    URL url;
+    if (ResourceLoaders.isNewMode()) {
+      url = WebResourceHelpers.create().getWebResource(pathInfo).orElse(null);
     }
-    byte[] document = IOUtility.readFromUrl(url);
+    else {
+      url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);
+    }
+    if (url == null) {
+      return null; // not handled here
+    }
+
+    HtmlDocumentParserParameters params = createHtmlDocumentParserParameters(pathInfo);
     HtmlDocumentParser parser = createHtmlDocumentParser(params);
-    byte[] parsedDocument = parser.parseDocument(document);
+    byte[] parsedDocument = parser.parseDocument(IOUtility.readFromUrl(url));
     return BinaryResources.create()
         .withFilename(pathInfo)
         .withCharset(StandardCharsets.UTF_8)

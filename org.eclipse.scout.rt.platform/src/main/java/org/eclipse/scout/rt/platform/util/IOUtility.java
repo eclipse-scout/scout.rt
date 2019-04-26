@@ -55,6 +55,9 @@ import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 @SuppressWarnings("findbugs:RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
 public final class IOUtility {
   private static final Logger LOG = LoggerFactory.getLogger(IOUtility.class);
@@ -65,7 +68,7 @@ public final class IOUtility {
   }
 
   public static byte[] getContent(String filename) {
-    return getContent(Assertions.assertNotNull(toFile(filename)));
+    return getContent(assertNotNull(toFile(filename)));
   }
 
   public static byte[] getContent(File file) {
@@ -319,6 +322,19 @@ public final class IOUtility {
     int len = uc.getContentLength();
     try (BufferedInputStream in = new BufferedInputStream(uc.getInputStream())) {
       return readBytes(in, len);
+    }
+  }
+
+  /**
+   * Reads all text lines from the {@link URL} specified.
+   * @param url The {@link URL} to read from. Must not be {@code null}.
+   * @param charset The {@link Charset} used to read the url content. Must not be {@code null}.
+   * @return A {@link List} with all lines
+   * @throws IOException
+   */
+  public static List<String> readAllLinesFromUrl(URL url, Charset charset) throws IOException {
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(assertNotNull(url).openConnection().getInputStream(), charset))) {
+      return in.lines().collect(toList());
     }
   }
 

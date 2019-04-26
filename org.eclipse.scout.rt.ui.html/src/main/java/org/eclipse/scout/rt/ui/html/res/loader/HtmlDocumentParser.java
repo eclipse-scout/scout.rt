@@ -10,14 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -33,9 +25,18 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
+import org.eclipse.scout.rt.ui.html.res.WebResourceHelpers;
 import org.eclipse.scout.rt.ui.html.script.ScriptRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
@@ -104,35 +105,40 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    String[] filenameParts = FileUtility.getFilenameParts(internalPath);
-    Pair<HttpCacheObject, String> scriptAndFingerprint = null;
-
-    // When caching is enabled we must calculate the fingerprint for the script file
-    if (m_params.isCacheEnabled()) {
-      scriptAndFingerprint = getScriptAndFingerprint(internalPath);
+    if (ResourceLoaders.isNewMode()) {
+      return ScriptResourceIndexes.getExternalForm(internalPath, m_params.isMinify());
     }
+    else {
+      String[] filenameParts = FileUtility.getFilenameParts(internalPath);
+      Pair<HttpCacheObject, String> scriptAndFingerprint = null;
 
-    String extension = getScriptFileExtension(filenameParts[1]);
-    String pathAndBaseName = getScriptFileName(filenameParts[0]);
-    String externalPath = ScriptRequest.toFullPath(null, pathAndBaseName, scriptAndFingerprint == null ? null : scriptAndFingerprint.getRight(), m_params.isMinify(), extension);
+      // When caching is enabled we must calculate the fingerprint for the script file
+      if (m_params.isCacheEnabled()) {
+        scriptAndFingerprint = getScriptAndFingerprint(internalPath);
+      }
 
-    // we must put the same resource into the cache with two different cache keys:
-    // 1. the 'internal' cache key is the path as it is used when the HTML file is parsed by the HtmlDocumenParser. Example: '/res/scout-all-macro.js'
-    // 2. the 'external' cache key is the path as it is used in the browser. Example: '/res/scout-all-0ac567fe1.min.js'
-    // We have kind of a chicken/egg problem here: in order to get the fingerprint we must first read and parse the file. So when the parser builds
-    // a HTML file it cannot now the fingerprint in advance. That's why we put the 'internal' path into the cache. Later, when the browser requests
-    // the script with the 'external' URL, we want to access the already built and cached file. That's why we must also store the external form of
-    // the path. Additionally the same script may be used in another HTML file, which is also processed by the HtmlDocumentParser, then again we need
-    // want to access the cached file by its internal path.
-    if (scriptAndFingerprint != null) {
-      HttpCacheObject internalCacheObject = scriptAndFingerprint.getLeft();
-      HttpCacheKey externalCacheKey = createScriptFileLoader().createCacheKey("/" + externalPath);
-      HttpCacheObject externalCacheObject = new HttpCacheObject(externalCacheKey, internalCacheObject.getResource());
-      m_cache.put(internalCacheObject);
-      m_cache.put(externalCacheObject);
+      String extension = getScriptFileExtension(filenameParts[1]);
+      String pathAndBaseName = getScriptFileName(filenameParts[0]);
+      String externalPath = ScriptRequest.toFullPath(null, pathAndBaseName, scriptAndFingerprint == null ? null : scriptAndFingerprint.getRight(), m_params.isMinify(), extension);
+
+      // we must put the same resource into the cache with two different cache keys:
+      // 1. the 'internal' cache key is the path as it is used when the HTML file is parsed by the HtmlDocumenParser. Example: '/res/scout-all-macro.js'
+      // 2. the 'external' cache key is the path as it is used in the browser. Example: '/res/scout-all-0ac567fe1.min.js'
+      // We have kind of a chicken/egg problem here: in order to get the fingerprint we must first read and parse the file. So when the parser builds
+      // a HTML file it cannot now the fingerprint in advance. That's why we put the 'internal' path into the cache. Later, when the browser requests
+      // the script with the 'external' URL, we want to access the already built and cached file. That's why we must also store the external form of
+      // the path. Additionally the same script may be used in another HTML file, which is also processed by the HtmlDocumentParser, then again we need
+      // want to access the cached file by its internal path.
+      if (scriptAndFingerprint != null) {
+        HttpCacheObject internalCacheObject = scriptAndFingerprint.getLeft();
+        HttpCacheKey externalCacheKey = createScriptFileLoader().createCacheKey("/" + externalPath);
+        HttpCacheObject externalCacheObject = new HttpCacheObject(externalCacheKey, internalCacheObject.getResource());
+        m_cache.put(internalCacheObject);
+        m_cache.put(externalCacheObject);
+      }
+
+      return externalPath;
     }
-
-    return externalPath;
   }
 
   protected ScriptFileLoader createScriptFileLoader() {
@@ -223,7 +229,14 @@ public class HtmlDocumentParser {
     StringBuffer sb = new StringBuffer();
     while (m.find()) {
       String includeName = m.group(1);
-      URL includeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
+      URL includeUrl;
+      if (ResourceLoaders.isNewMode()) {
+        includeUrl = WebResourceHelpers.create().getWebResource(includeName).orElse(null);
+      }
+      else {
+        includeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);
+      }
+
       if (includeUrl == null) {
         throw new IOException("Could not resolve include '" + includeName + "'");
       }

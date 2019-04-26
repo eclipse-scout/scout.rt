@@ -13,6 +13,10 @@
   "publishConfig": {
     "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
   },
+  "engines": {
+    "node": ">=12.1.0",
+    "npm": ">=6.9.0"
+  },
   "main": "index.js",
   "scripts": {
     "build:dev": "webpack --mode=development --display-error-details",
@@ -22,32 +26,33 @@
     "snapshot": "node scripts/snapshot"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.2",
-    "@babel/core": "^7.1.2",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
     "@babel/plugin-transform-object-assign": "^7.2.0",
-    "@babel/preset-env": "^7.1.0",
-    "babel-loader": "^8.0.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^2.0.1",
-    "copy-webpack-plugin": "^5.0.2",
-    "css-loader": "^2.1.1",
-    "jasmine-core": "^3.3.0",
-    "jquery": "^3.4.0",
-    "karma": "^4.0.1",
+    "copy-webpack-plugin": "^5.0.3",
+    "jasmine-core": "^3.4.0",
+    "karma": "^4.1.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-jasmine": "^2.0.1",
-    "karma-jasmine-html-reporter": "^1.4.0",
+    "karma-jasmine-html-reporter": "^1.4.2",
     "karma-junit-reporter": "^1.2.0",
     "karma-webpack": "^3.0.5",
+    "css-loader": "^2.1.1",
     "less": "^3.9.0",
-    "less-loader": "^4.1.0",
-    "mini-css-extract-plugin": "^0.5.0",
+    "less-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^0.6.0",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
-    "style-loader": "^0.23.1",
     "terser-webpack-plugin": "^1.2.3",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
     "webpack-shell-plugin": "^0.5.0"
+  },
+  "dependencies": {
+    "jquery": "^3.4.0"
   }
 }

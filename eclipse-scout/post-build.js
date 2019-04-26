@@ -10,9 +10,11 @@
  ******************************************************************************/
 const fs = require('fs');
 const errno = require('errno');
+const outDir = './dist/';
 
-deleteFile('./dist/scout-theme.js');
-deleteFile('./dist/scout-theme-dark.js');
+fs.readdirSync(outDir)
+  .filter(f => /.*theme.*\.js/.test(f))
+  .forEach(f => deleteFile(outDir + f))
 
 function deleteFile(filename) {
   fs.unlink(filename, (err) => {
