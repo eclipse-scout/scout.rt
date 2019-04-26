@@ -1,0 +1,17 @@
+{
+  "count" : 42,
+  "mapAttribute1" : [ {
+    "id" : "id-1a",
+    "stringAttribute" : "value-1a"
+  }, {
+    "id" : "id-1b",
+    "stringAttribute" : "value-1b"
+  } ],
+  "mapAttribute2" : [ {
+    "id" : "id-2a",
+    "stringAttribute" : "value-2a"
+  }, {
+    "id" : "id-2b",
+    "stringAttribute" : "value-2b"
+  } ]
+}
