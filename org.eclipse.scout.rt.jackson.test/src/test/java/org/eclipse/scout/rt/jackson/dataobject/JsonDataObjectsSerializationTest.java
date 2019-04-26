@@ -49,6 +49,7 @@ import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCoreExample3Do;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDateDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapEntityDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoMapListEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDoValuePojo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestDuplicatedAttributeDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestElectronicAddressDo;
@@ -1339,6 +1340,8 @@ public class JsonDataObjectsSerializationTest {
     assertTrue(marshalled.getStringSetAttribute().contains("bar"));
   }
 
+  // ------------------------------------ DoMapEntity test cases ------------------------------------
+
   @Test
   public void testSerializeDeserialize_DoMapEntity() throws Exception {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
@@ -1374,11 +1377,69 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertDoEntityEquals(mapDo.get("mapAttribute2", IDoEntity.class), marshalled.get("mapAttribute2"));
   }
 
+  @Test
+  public void testSerializeDeserialize_DoMapEntityRaw2() throws Exception {
+    String json = readResourceAsString("TestDoMapEntityDoRaw.json");
+    TestDoMapEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapEntityDo.class);
+
+    assertEquals("value-1", marshalled.get("mapAttribute1").getStringAttribute());
+    assertEquals("value-2", marshalled.get("mapAttribute2").getStringAttribute());
+    assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
+    assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
   @Test(expected = ClassCastException.class)
   public void testSerializeDeserialize_DoMapEntity_illegalAccess() {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
     mapDo.put("namedItem3", createTestItemDo("id-1", "value-1"));
     mapDo.getNamedItem3(); // access item with type TestItem3 which was filled with a wrong TestItemDo value
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapListEntity() throws Exception {
+    TestDoMapListEntityDo mapDo = BEANS.get(TestDoMapListEntityDo.class);
+    mapDo.put("mapAttribute1", CollectionUtility.arrayList(createTestItemDo("id-1a", "value-1a"), createTestItemDo("id-1b", "value-1b")));
+    mapDo.put("mapAttribute2", CollectionUtility.arrayList(createTestItemDo("id-2a", "value-2a"), createTestItemDo("id-2b", "value-2b")));
+    mapDo.withCount(42);
+
+    String json = s_dataObjectMapper.writeValueAsString(mapDo);
+    assertJsonEquals("TestDoMapListEntityDo.json", json);
+
+    TestDoMapListEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapListEntityDo.class);
+    s_testHelper.assertDoEntityEquals(mapDo, marshalled);
+
+    assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
+    assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapListEntityRaw() throws Exception {
+    DoEntity mapDo = BEANS.get(DoEntity.class);
+    mapDo.put("mapAttribute1", CollectionUtility.arrayList(createTestItemDo("id-1a", "value-1a"), createTestItemDo("id-1b", "value-1b")));
+    mapDo.put("mapAttribute2", CollectionUtility.arrayList(createTestItemDo("id-2a", "value-2a"), createTestItemDo("id-2b", "value-2b")));
+    String json = s_dataObjectMapper.writeValueAsString(mapDo); // write TestDoMapEntityDo as DoEntity to exclude writing the _type property
+
+    // read object as raw Map<String, String> object
+    TypeReference<Map<String, List<TestItemDo>>> typeRef = new TypeReference<Map<String, List<TestItemDo>>>() {
+    };
+    Map<String, List<TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, typeRef);
+    assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
+    assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
+
+    s_testHelper.assertDoEntityEquals((IDoEntity) mapDo.get("mapAttribute1", List.class).get(0), marshalled.get("mapAttribute1").get(0));
+    s_testHelper.assertDoEntityEquals((IDoEntity) mapDo.get("mapAttribute2", List.class).get(1), marshalled.get("mapAttribute2").get(1));
+  }
+
+  @Test
+  public void testSerializeDeserialize_DoMapListEntityRaw2() throws Exception {
+    String json = readResourceAsString("TestDoMapListEntityDoRaw.json");
+    TestDoMapListEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapListEntityDo.class);
+
+    assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
+    assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
+    assertEquals(Integer.valueOf(42), marshalled.getCount());
   }
 
   // ------------------------------------ polymorphic test cases ------------------------------------
@@ -2047,6 +2108,16 @@ public class JsonDataObjectsSerializationTest {
     DoEntity marshalled = mapper.readValue(json, DoEntity.class);
     assertEquals(TestVersionedDo.class, marshalled.getClass());
     assertEquals("foo", ((TestVersionedDo) marshalled).getName());
+  }
+
+  @Test
+  public void testSerializeDeserialize_VersionedDoRaw() throws Exception {
+    DoEntity entity = BEANS.get(DoEntity.class);
+    entity.put(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME, "123");
+    String json = s_dataObjectMapper.writeValueAsString(entity);
+
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    assertEquals("123", marshalled.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
   }
 
   // ------------------------------------ common test helper methods ------------------------------------

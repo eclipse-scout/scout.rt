@@ -195,16 +195,13 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected JavaType findResolvedFallbackAttributeType(boolean isObject, boolean isArray) {
-    // fallback to default handling, if no attribute definition could be found
-    if (isObject) {
+    if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // DoMapEntity<T> structure is deserialized as typed Map<String, T>
-      if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
-        return findResolvedDoMapEntityType();
-      }
-      else {
-        // object-like JSON structure is deserialized as raw DoEntity
-        return TypeFactory.defaultInstance().constructType(DoEntity.class);
-      }
+      return findResolvedDoMapEntityType();
+    }
+    else if (isObject) {
+      // fallback to default handling, if no attribute definition could be found
+      return TypeFactory.defaultInstance().constructType(DoEntity.class);
     }
     else if (isArray) {
       // array-like JSON structure is deserialized as raw DoList
