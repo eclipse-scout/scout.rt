@@ -550,6 +550,13 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   }
 };
 
+scout.Column.prototype.setCellErrorStatus = function(row, errorStatus, cell) {
+  if (!cell) {
+    cell = this.cell(row);
+  }
+  cell.setErrorStatus(errorStatus);
+};
+
 scout.Column.prototype.setHorizontalAlignment = function(hAlign) {
   if (this.horizontalAlignment === hAlign) {
     return;

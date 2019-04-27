@@ -2932,7 +2932,15 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
     // because in updateRows we check if the popup is still there and start cell editing mode again.
     saveEditorValue = scout.nvl(saveEditorValue, false);
     if (saveEditorValue) {
-      this.setCellValue(context.column, context.row, field.value);
+      var column = context.column;
+      var row = context.row;
+      this.setCellErrorStatus(column, row, field.errorStatus); //always get the errorStatus from the editor
+      if (field.errorStatus) {
+        //if there is an error from the editor, the displayText of the cell has to be updated
+        this.setCellText(column, row, field.displayText);
+      } else {
+        this.setCellValue(column, row, field.value);
+      }
     }
   }
 
@@ -4820,6 +4828,14 @@ scout.Table.prototype.setVirtual = function(virtual) {
 
 scout.Table.prototype.setCellValue = function(column, row, value) {
   column.setCellValue(row, value);
+};
+
+scout.Table.prototype.setCellText = function(column, row, displayText) {
+  column.setCellText(row, displayText);
+};
+
+scout.Table.prototype.setCellErrorStatus = function(column, row, errorStatus) {
+  column.setCellErrorStatus(row, errorStatus);
 };
 
 scout.Table.prototype.visibleColumns = function(includeGuiColumns) {

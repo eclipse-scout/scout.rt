@@ -55,6 +55,10 @@ scout.Cell.prototype.setValue = function(value) {
   this.value = value;
 };
 
+scout.Cell.prototype.setErrorStatus = function(errorStatus) {
+  this.errorStatus = errorStatus;
+};
+
 scout.Cell.prototype.setText = function(text) {
   var oldText = this.text;
   this.text = text;

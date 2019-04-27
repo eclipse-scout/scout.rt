@@ -327,4 +327,37 @@ describe('NumberColumn', function() {
       expect(column0.cell(table.rows[0]).value).toBe(0.05);
     });
   });
+
+  describe('errorStatus on cell', function() {
+    it('gets errorStatus from editor', function() {
+      var model = helper.createModelSingleColumnByValues([3], 'NumberColumn');
+      var table = helper.createTable(model);
+      table.columns[0].setEditable(true);
+      var column0 = table.columns[0];
+      //just values between 2 and 4 are valid
+      column0.minValue = 2;
+      column0.maxValue = 4;
+      table.render();
+      expect(column0.cell(table.rows[0]).text).toBe('3');
+      expect(column0.cell(table.rows[0]).value).toBe(3);
+      expect(table.rows[0].cells[0].errorStatus).toBe(null);
+
+      //set an invalid value
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.cellEditorPopup.cell.field.setValue(5);
+      table.completeCellEdit();
+      expect(table.rows[0].cells[0].errorStatus instanceof scout.Status).toBe(true);
+      expect(column0.cell(table.rows[0]).text).toBe('5');
+
+      //set a valid value
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.cellEditorPopup.cell.field.setValue(2);
+      table.completeCellEdit();
+      expect(column0.cell(table.rows[0]).text).toBe('2');
+      expect(column0.cell(table.rows[0]).value).toBe(2);
+      expect(table.rows[0].cells[0].errorStatus).toBe(null);
+    });
+  });
 });
