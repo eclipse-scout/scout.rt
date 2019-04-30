@@ -283,7 +283,7 @@ scout.Tree.prototype._destroy = function() {
   this.nodes = []; // finally, clear array with root tree-nodes
 };
 
-scout.Tree.prototype._destroyTreeNode = function(node, parentNode) {
+scout.Tree.prototype._destroyTreeNode = function(node) {
   delete this.nodesMap[node.id];
   scout.arrays.remove(this.selectedNodes, node); // ensure deleted node is not in selection list anymore (in case the model does not update the selection)
   scout.arrays.remove(this.checkedNodes, node); // ensure deleted node is not in checked list anymore
@@ -854,7 +854,10 @@ scout.Tree.prototype.removeAllNodes = function() {
 };
 
 /**
- * @param parentNode optional. If provided, this node's state will be updated (e.g. it will be collapsed)
+ * @param parentNode
+ *          Optional. If provided, this node's state will be updated (e.g. it will be collapsed
+ *          if it does no longer have child nodes). Can also be an array, in which case all of
+ *          those nodes are updated.
  */
 scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
   if (nodes.length === 0) {
@@ -876,14 +879,11 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
   //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
-  var $parentNode = (parentNode ? parentNode.$node : undefined);
-  if ($parentNode) {
-    var childNodesOfParent = parentNode.childNodes;
-    if (!childNodesOfParent || childNodesOfParent.length === 0) {
-      $parentNode.removeClass('expanded');
-      $parentNode.removeClass('lazy');
+  scout.arrays.ensure(parentNode).forEach(function(p) {
+    if (p && p.$node && p.childNodes.length === 0) {
+      p.$node.removeClass('expanded lazy');
     }
-  }
+  });
   if (this.rendered) {
     this.viewRangeDirty = true;
     this.invalidateLayoutTree();
@@ -2112,6 +2112,9 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
 };
 
 scout.Tree.prototype._updateChildNodeIndex = function(nodes, startIndex) {
+  if (!nodes || !nodes.length) {
+    return;
+  }
   for (var i = scout.nvl(startIndex, 0); i < nodes.length; i++) {
     nodes[i].childNodeIndex = i;
   }
@@ -2266,18 +2269,25 @@ scout.Tree.prototype.deleteAllNodes = function() {
 
 scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
   var deletedNodes = [];
+  var parentNodesToReindex = [];
+  var topLevelNodesToReindex = [];
 
   nodes = scout.arrays.ensure(nodes).slice(); // copy
   nodes.forEach(function(node) {
-    if (parentNode) {
-      if (node.parentNode !== parentNode) {
+    var p = parentNode || node.parentNode;
+    if (p) {
+      if (node.parentNode !== p) {
         throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
       }
-      scout.arrays.remove(parentNode.childNodes, node);
+      scout.arrays.remove(p.childNodes, node);
+      if (parentNodesToReindex.indexOf(p) === -1) {
+        parentNodesToReindex.push(p);
+      }
     } else {
       scout.arrays.remove(this.nodes, node);
+      topLevelNodesToReindex = this.nodes;
     }
-    this._destroyTreeNode(node, node.parentNode);
+    this._destroyTreeNode(node);
     deletedNodes.push(node);
     this._updateMarkChildrenChecked(node, false, false);
 
@@ -2288,15 +2298,14 @@ scout.Tree.prototype.deleteNodes = function(nodes, parentNode) {
   this.deselectNodes(deletedNodes);
 
   // update child node indices
-  if (parentNode) {
-    this._updateChildNodeIndex(parentNode.childNodes);
-  } else {
-    this._updateChildNodeIndex(this.nodes);
-  }
+  parentNodesToReindex.forEach(function(p) {
+    this._updateChildNodeIndex(p.childNodes);
+  }, this);
+  this._updateChildNodeIndex(topLevelNodesToReindex);
 
   // remove node from html document
   if (this.rendered) {
-    this._removeNodes(deletedNodes, parentNode);
+    this._removeNodes(deletedNodes, parentNode || parentNodesToReindex);
   }
 
   this.trigger('nodesDeleted', {
@@ -2336,8 +2345,8 @@ scout.Tree.prototype.deleteAllChildNodes = function(parentNode) {
   // --- Helper functions ---
 
   // Update model and nodemap
-  function updateNodeMap(node, parentNode) {
-    this._destroyTreeNode(node, parentNode);
+  function updateNodeMap(node) {
+    this._destroyTreeNode(node);
     this._updateMarkChildrenChecked(node, false, false);
   }
 };

@@ -739,6 +739,29 @@ describe("Tree", function() {
       });
     });
 
+    describe("deleting child nodes without commentParentNode", function() {
+
+      it("updates model", function() {
+        var node1Child2 = node1.childNodes[2];
+        var node2Child0 = node2.childNodes[0];
+        var node2Child1 = node2.childNodes[1];
+        var node2Child2 = node2.childNodes[2];
+        expect(tree.nodes.length).toBe(3);
+        expect(tree.nodes[0]).toBe(node0);
+        expect(Object.keys(tree.nodesMap).length).toBe(39); // 3 + 9 + 27
+
+        tree.deleteNodes([node1Child2, node2Child0, node2Child1, node0]); // <-- no second argument (common parent node)
+        expect(tree.nodes.length).toBe(2);
+        expect(tree.nodes[0]).toBe(node1);
+        expect(tree.nodes[1]).toBe(node2);
+        expect(tree.nodes[0].childNodes.length).toBe(2);
+        expect(tree.nodes[1].childNodes.length).toBe(1);
+        expect(tree.nodes[1].childNodes[0]).toBe(node2Child2);
+        expect(Object.keys(tree.nodesMap).length).toBe(14); // 39 - (1 + 3 + 9) - 3*(1 + 3) = 39 - 13 - 12
+      });
+
+    });
+
   });
 
   describe("deleteAllChildNodes", function() {
