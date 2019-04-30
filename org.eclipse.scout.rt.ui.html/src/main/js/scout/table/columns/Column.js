@@ -38,6 +38,7 @@ scout.Column = function() {
   this.showSeparator = true;
   this.table = null;
   this.tableNodeColumn = false;
+  this.maxLength = 4000;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
@@ -680,6 +681,7 @@ scout.Column.prototype.createEditor = function(row) {
 scout.Column.prototype._createEditor = function() {
   return scout.create('StringField', {
     parent: this.table,
+    maxLength: this.maxLength,
     multilineText: this.table.multilineText,
     wrapText: this.textWrap
   });
@@ -757,6 +759,10 @@ scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
     this.table.columnLayoutDirty = true;
     this.table.invalidateLayoutTree();
   }
+};
+
+scout.Column.prototype.setMaxLength = function(maxLength) {
+  this.maxLength = maxLength;
 };
 
 scout.Column.prototype.setTextWrap = function(textWrap) {
