@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -333,9 +334,9 @@ public class UnsavedFormChangesForm extends AbstractForm {
     @Override
     protected List<? extends ILookupRow<ArrayDeque<IForm>>> execCreateLookupRows() {
       List<ILookupRow<ArrayDeque<IForm>>> formRows = new ArrayList<>();
-      for (IForm f : m_unsavedFormsStructured.keySet()) {
-        String text = getFormDisplayName(f);
-        formRows.add(new LookupRow<>(m_unsavedFormsStructured.get(f), text).withTooltipText(text));
+      for (Entry<IForm, ArrayDeque<IForm>> e : m_unsavedFormsStructured.entrySet()) {
+        String text = getFormDisplayName(e.getKey());
+        formRows.add(new LookupRow<>(e.getValue(), text).withTooltipText(text));
       }
       return formRows;
     }
