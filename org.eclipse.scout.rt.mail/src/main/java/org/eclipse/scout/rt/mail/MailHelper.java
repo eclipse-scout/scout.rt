@@ -496,7 +496,14 @@ public class MailHelper {
     MimeBodyPart part = new MimeBodyPart();
     DataHandler handler = new DataHandler(attachment.getDataSource());
     part.setDataHandler(handler);
-    part.setFileName(attachment.getDataSource().getName());
+    if (StringUtility.hasText(attachment.getDataSource().getName())) {
+      part.setFileName(attachment.getDataSource().getName());
+    }
+    else {
+      // part.setFilename would implicitly set disposition to attachment, but filename is null and therefore can not be set (would result in an npe)
+      // this case is used to create MimeMessages for unit tests
+      part.setDisposition(MimeBodyPart.ATTACHMENT);
+    }
     if (StringUtility.hasText(attachment.getContentId())) {
       part.setContentID("<" + attachment.getContentId() + ">");
     }
