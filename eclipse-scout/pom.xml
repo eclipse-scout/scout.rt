@@ -67,12 +67,21 @@
             </configuration>
           </execution>
           <execution>
-            <id>npm run build</id>
+            <id>npm run build:dev</id>
             <goals>
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run build</arguments>
+              <arguments>run build:dev</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm run build:prod</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build:prod</arguments>
             </configuration>
           </execution>
           <execution>
