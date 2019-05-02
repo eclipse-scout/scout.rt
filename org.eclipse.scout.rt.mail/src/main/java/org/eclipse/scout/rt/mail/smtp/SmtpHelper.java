@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.mail.smtp;
 
 import java.util.Properties;
+import java.util.function.BiConsumer;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
@@ -57,7 +58,10 @@ public class SmtpHelper {
    * Sends the message over the provided SMTP server.
    *
    * @param config
-   *          SMTP server configuration.
+   *          SMTP server configuration. If the {@link SmtpServerConfig#getPoolSize()} returns a value > 0, the
+   *          connection pool will be used to send the message. This also means, that the calling thread is potentially
+   *          blocked if no idle connection is available or the pool is at the maximum of its capacity, until a
+   *          connection becomes available.
    * @param message
    *          Message to send.
    * @see {@link MailHelper} to create a message
@@ -65,8 +69,21 @@ public class SmtpHelper {
   public void sendMessage(SmtpServerConfig config, MimeMessage message) {
     Assertions.assertNotNull(config, "SMTP server config must be set");
     Assertions.assertNotNull(message, "Message must be set");
-    Session session = createSession(config);
-    sendMessage(session, config.getPassword(), message);
+
+    if (config.getPoolSize() > 0) {
+      sendMessageInternal(message, (msg, addresses) -> {
+        try (LeasedSmtpConnection connection = BEANS.get(SmtpConnectionPool.class).leaseConnection(config)) {
+          connection.sendMessage(msg, addresses);
+        }
+        catch (MessagingException e) {
+          handleMessagingException(e);
+        }
+      });
+    }
+    else {
+      Session session = createSession(config);
+      sendMessage(session, config.getPassword(), message);
+    }
   }
 
   /**
@@ -84,6 +101,20 @@ public class SmtpHelper {
     Assertions.assertNotNull(message, "Message must be set");
     Assertions.assertNotNull(session, "Session must be set");
 
+    sendMessageInternal(message, (msg, addresses) -> {
+      try (Transport transport = session.getTransport()) {
+        connect(session, transport, password);
+        transport.sendMessage(msg, addresses);
+      }
+      catch (MessagingException e) {
+        handleMessagingException(e);
+      }
+    });
+  }
+
+  protected void sendMessageInternal(MimeMessage message, BiConsumer<MimeMessage, Address[]> messageSender) {
+    Assertions.assertNotNull(message, "Message must be set");
+
     try {
       Address[] allRecipients = getAllRecipients(message);
 
@@ -92,19 +123,20 @@ public class SmtpHelper {
         return;
       }
 
-      try (Transport transport = session.getTransport()) {
-        connect(session, transport, password);
+      message.setSentDate(BEANS.get(IDateProvider.class).currentMillis());
+      message.saveChanges();
 
-        message.setSentDate(BEANS.get(IDateProvider.class).currentMillis());
-        message.saveChanges();
-        transport.sendMessage(message, allRecipients);
+      messageSender.accept(message, allRecipients);
 
-        LOG.debug("Sent email with message id {}", BEANS.get(MailHelper.class).getMessageIdSafely(message));
-      }
+      LOG.debug("Sent email with message id {}", BEANS.get(MailHelper.class).getMessageIdSafely(message));
     }
     catch (MessagingException e) {
-      throw new ProcessingException("Cannot send message.", e);
+      handleMessagingException(e);
     }
+  }
+
+  protected void handleMessagingException(MessagingException e) {
+    throw new ProcessingException("Cannot send message.", e);
   }
 
   /**

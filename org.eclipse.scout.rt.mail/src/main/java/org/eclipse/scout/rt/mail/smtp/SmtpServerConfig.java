@@ -35,6 +35,9 @@ public class SmtpServerConfig {
 
   private Map<String, String> m_additionalSessionProperties;
 
+  private int m_poolSize = 0;
+  private int m_maxMessagesPerConnection = 0;
+
   public String getHost() {
     return m_host;
   }
@@ -157,5 +160,139 @@ public class SmtpServerConfig {
   public SmtpServerConfig withAdditionalSessionProperties(Map<String, String> additionalSessionProperties) {
     m_additionalSessionProperties = additionalSessionProperties;
     return this;
+  }
+
+  /**
+   * @return Returns the size of the connection pool to use with this {@link SmtpServerConfig}. If 0, smtp connection
+   *         pooling is disabled.
+   */
+  public int getPoolSize() {
+    return m_poolSize;
+  }
+
+  /**
+   * @param poolSize
+   *          Specifies the size of the connection pool to use with this {@link SmtpServerConfig#}. If 0, smtp
+   *          connection pooling is disabled.
+   */
+  public SmtpServerConfig withPoolSize(int poolSize) {
+    m_poolSize = poolSize;
+    return this;
+  }
+
+  /**
+   * @return Returns the maximum number of messages to send per connection with this {@link SmtpServerConfig}. If the
+   *         limit is reached the connection will not be returned to the pool to be used again. If 0, no limit will be
+   *         applied on the number of messages sent per connection. Only applies when {@link #withPoolSize(int)} > 0.
+   */
+  public int getMaxMessagesPerConnection() {
+    return m_maxMessagesPerConnection;
+  }
+
+  /**
+   * @param maxMessagesPerConnection
+   *          The maximum number of messages sent per connection. If the limit is reached, the connection will not be
+   *          returned to the pool to be used again. If the value of this property is 0, no limit will be applied on the
+   *          number of messages sent per connection. Only applies {@link #withPoolSize(int)} > 0.
+   */
+  public SmtpServerConfig withMaxMessagesPerConnection(int maxMessagesPerConnection) {
+    m_maxMessagesPerConnection = maxMessagesPerConnection;
+    return this;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_additionalSessionProperties == null) ? 0 : m_additionalSessionProperties.hashCode());
+    result = prime * result + ((m_host == null) ? 0 : m_host.hashCode());
+    result = prime * result + m_maxMessagesPerConnection;
+    result = prime * result + ((m_password == null) ? 0 : m_password.hashCode());
+    result = prime * result + m_poolSize;
+    result = prime * result + ((m_port == null) ? 0 : m_port.hashCode());
+    result = prime * result + ((m_sslProtocols == null) ? 0 : m_sslProtocols.hashCode());
+    result = prime * result + (m_useAuthentication ? 1231 : 1237);
+    result = prime * result + (m_useSmtps ? 1231 : 1237);
+    result = prime * result + (m_useStartTls ? 1231 : 1237);
+    result = prime * result + ((m_username == null) ? 0 : m_username.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    SmtpServerConfig other = (SmtpServerConfig) obj;
+    if (m_additionalSessionProperties == null) {
+      if (other.m_additionalSessionProperties != null) {
+        return false;
+      }
+    }
+    else if (!m_additionalSessionProperties.equals(other.m_additionalSessionProperties)) {
+      return false;
+    }
+    if (m_host == null) {
+      if (other.m_host != null) {
+        return false;
+      }
+    }
+    else if (!m_host.equals(other.m_host)) {
+      return false;
+    }
+    if (m_maxMessagesPerConnection != other.m_maxMessagesPerConnection) {
+      return false;
+    }
+    if (m_password == null) {
+      if (other.m_password != null) {
+        return false;
+      }
+    }
+    else if (!m_password.equals(other.m_password)) {
+      return false;
+    }
+    if (m_poolSize != other.m_poolSize) {
+      return false;
+    }
+    if (m_port == null) {
+      if (other.m_port != null) {
+        return false;
+      }
+    }
+    else if (!m_port.equals(other.m_port)) {
+      return false;
+    }
+    if (m_sslProtocols == null) {
+      if (other.m_sslProtocols != null) {
+        return false;
+      }
+    }
+    else if (!m_sslProtocols.equals(other.m_sslProtocols)) {
+      return false;
+    }
+    if (m_useAuthentication != other.m_useAuthentication) {
+      return false;
+    }
+    if (m_useSmtps != other.m_useSmtps) {
+      return false;
+    }
+    if (m_useStartTls != other.m_useStartTls) {
+      return false;
+    }
+    if (m_username == null) {
+      if (other.m_username != null) {
+        return false;
+      }
+    }
+    else if (!m_username.equals(other.m_username)) {
+      return false;
+    }
+    return true;
   }
 }
