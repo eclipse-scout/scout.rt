@@ -20,7 +20,8 @@ module.exports = (env, args) => {
     // a CDN source and develops a Scout app without a build stack.
     // see: https://webpack.js.org/configuration/externals/
     jquery: 'jQuery'
-  }
+  };
+  config.optimization.splitChunks = undefined; // no splitting for scout
 
   return config;
 };

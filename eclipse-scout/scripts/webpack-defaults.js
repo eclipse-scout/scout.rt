@@ -14,16 +14,17 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const exec = require('child_process').exec;
 const path = require('path');
 const webpack = require('webpack');
 const scoutBuild = require('./constants');
+const scoutPostBuild = require('./post-build');
 
 module.exports = (env, args) => {
   const devMode = args.mode !== scoutBuild.mode.production;
   const jsFilename = devMode ? '[name].js' : '[name]-[contenthash].min.js';
   const cssFilename = devMode ? '[name].css' : '[name]-[contenthash].min.css';
-  const outSubDir = devMode ? scoutBuild.outSubDir.development : scoutBuild.outSubDir.production;
+  const outSubDirName = devMode ? scoutBuild.outSubDir.development : scoutBuild.outSubDir.production;
+  const outDir = path.resolve(scoutBuild.outDir, outSubDirName);
   console.log(`Webpack mode: ${args.mode}`);
 
   return {
@@ -37,7 +38,7 @@ module.exports = (env, args) => {
     },
     output: {
       filename: jsFilename,
-      path: path.resolve(scoutBuild.outDir, outSubDir)
+      path: outDir
     },
     performance: {
       hints: false
@@ -110,11 +111,10 @@ module.exports = (env, args) => {
       {
         apply: (compiler) => {
           compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
-            exec('node ' + __dirname + '/post-build.js ' + args.mode, (err, stdout, stderr) => {
-              if (err) throw err;
-              if (stdout) process.stdout.write(stdout);
-              if (stderr) process.stderr.write(stderr);
-            });
+            scoutPostBuild.cleanOutDir(outDir);
+            if(!devMode) {
+              scoutPostBuild.createFileList(outDir);
+            }
           });
         }
       },
@@ -143,7 +143,26 @@ module.exports = (env, args) => {
           cache: true,
           parallel: true
         })
-      ]
+      ],
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          // # Eclipse Scout
+          scout: {
+            test: /.*[\\/]eclipse-scout[\\/]/,
+            name: 'eclipse-scout',
+            priority: -5,
+            reuseExistingChunk: true
+          },
+          //# jQuery
+          jquery: {
+            test: /.*[\\/]jquery[\\/]/,
+            name: 'jquery',
+            priority: -1,
+            reuseExistingChunk: true
+          }
+        }
+      }
     }
   };
 };
