@@ -18,7 +18,10 @@
   },
   "main": "index.js",
   "files": [
-    "dist", "res", "scripts", "src"
+    "dist",
+    "res",
+    "scripts",
+    "src"
   ],
   "scripts": {
     "build:dev": "webpack --mode=development --display-error-details",
