@@ -68,16 +68,7 @@ public class JettyServer {
     }
 
     // port
-    int port = 8080;
-    String portConfig = System.getProperty(SERVER_PORT_KEY);
-    if (portConfig != null && !portConfig.isEmpty()) {
-      try {
-        port = Integer.parseInt(portConfig);
-      }
-      catch (Exception e) {
-        LOG.error("Error while parsing value '{}' for property. Using default port {} instead. {}", portConfig, port, SERVER_PORT_KEY, e);
-      }
-    }
+    int port = new JettyConfiguration.ScoutJettyPortProperty().getValue();
 
     String contextPath = "/";
     String contextPathConfig = System.getProperty(WEB_APP_CONTEXT_PATH);

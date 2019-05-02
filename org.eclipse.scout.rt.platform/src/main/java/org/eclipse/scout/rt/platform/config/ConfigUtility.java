@@ -51,7 +51,7 @@ import java.util.Set;
  * <code>
  * <ul>
  * <li>import[0]=classpath:myConfigs/other.properties</li>
- * <li>import[1]=file:/C:/path/to/my/settings.properties</li>
+ * <li>import[settings]=file:/C:/path/to/my/settings.properties</li>
  * <li>customProperty=customValues</li>
  * <li>myProperty=${customProperty}/subfolders</li>
  * <li>my-namespace|myMap[key0]=value0</li>
@@ -67,10 +67,10 @@ public final class ConfigUtility {
    */
   public static final String CONFIG_FILE_NAME = "config.properties";
 
+  private static final PropertiesHelper INSTANCE = new PropertiesHelper(new ConfigPropertyProvider(CONFIG_FILE_NAME));
+
   private ConfigUtility() {
   }
-
-  private static final PropertiesHelper INSTANCE = new PropertiesHelper(CONFIG_FILE_NAME);
 
   /**
    * @see PropertiesHelper#getProperty(String)

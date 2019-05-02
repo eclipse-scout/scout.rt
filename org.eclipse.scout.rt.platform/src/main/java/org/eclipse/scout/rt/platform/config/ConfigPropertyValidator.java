@@ -11,8 +11,12 @@
 package org.eclipse.scout.rt.platform.config;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -25,6 +29,12 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
   private static final Logger LOG = LoggerFactory.getLogger(ConfigPropertyValidator.class);
 
   private Map<String, IConfigProperty<?>> m_configProperties;
+  private Set<String> m_specialValidKeys = new HashSet<>();
+
+  @PostConstruct
+  public void init() {
+    m_specialValidKeys.add(PropertiesHelper.IMPORT_KEY);// 'import' key should be accepted although there is no IConfigProperty class for this key.
+  }
 
   protected Map<String, IConfigProperty<?>> getAllConfigProperties() {
     if (m_configProperties == null) {
@@ -52,7 +62,7 @@ public class ConfigPropertyValidator implements IConfigurationValidator {
     String parsedKey = parseKey(key);
     IConfigProperty<?> property = getAllConfigProperties().get(parsedKey);
     if (property == null) {
-      return PropertiesHelper.IMPORT_KEY.equals(parsedKey); // 'import' key should be accepted although there is no IConfigProperty class for this key.
+      return m_specialValidKeys.contains(parsedKey);
     }
 
     try {

@@ -33,7 +33,7 @@ import javax.net.ssl.X509TrustManager;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
-import org.eclipse.scout.rt.platform.config.PropertiesHelper;
+import org.eclipse.scout.rt.platform.config.ConfigPropertyProvider;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -103,7 +103,7 @@ public class GlobalTrustManager {
     List<X509Certificate> trustedCerts = new ArrayList<>(certsNames.size());
     for (String certName : certsNames) {
       try {
-        URL url = PropertiesHelper.getResourceUrl(certName);
+        URL url = ConfigPropertyProvider.getResourceUrl(certName);
         if (url == null) {
           LOG.warn("Configured trusted certificate '{}' could not be found.", certName);
         }

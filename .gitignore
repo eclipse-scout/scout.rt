@@ -12,6 +12,9 @@
 
 *.log
 
+# DebugClasses 
+*_gitignore.java
+
 # Eclipse #
 /.project
 bin

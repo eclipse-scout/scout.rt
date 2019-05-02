@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.config;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,9 +22,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,54 +93,71 @@ public class PropertiesHelper {
   public static final char COLLECTION_DELIMITER_END = ']';
   public static final String CLASSPATH_PREFIX = CLASSPATH_PROTOCOL_NAME + PROTOCOL_DELIMITER;
   public static final String IMPORT_KEY = "import";
+  private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(\\[[^\\]]*\\])?$");
 
   private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
 
-  private final Map<String, String> m_configProperties;
-  private final boolean m_isInitialized;
+  private final Map<String, String> m_configProperties = new HashMap<>();
+  private boolean m_isInitialized = false;
+  private final Set<Object> m_parsedFiles = new HashSet<>();
+  private final Set<Object> m_referencedKeys = new HashSet<>();
+  private boolean m_initializing;
 
   /**
-   * Creates a new instance using the given {@link URL} as root config resource.
+   * Creates a new instance using the given property provider.<br>
    *
-   * @param propertiesFileUrl
+   * @param properties
+   *          the property provider.
+   * @see ConfigPropertyProvider
    */
-  public PropertiesHelper(URL propertiesFileUrl) {
-    this(propertiesFileUrl, getSelfIgnore(propertiesFileUrl));
+  public PropertiesHelper(IPropertyProvider properties) {
+    try {
+      m_initializing = true;
+      if (properties != null) {
+        m_isInitialized = parse(properties);
+      }
+      importSystemImports(new HashSet<String>(), null);
+    }
+    finally {
+      m_initializing = false;
+    }
   }
 
-  /**
-   * Creates a new instance using the given name identifier.<br>
-   * The identifier can be one of the following:
-   * <ul>
-   * <li>A {@link String} that contains a valid {@link URL} in external form containing at least one colon (:) to define
-   * a schema/protocol.</li>
-   * <li>A {@link String} without any protocol or schema that holds an absolute path on the java classpath. Such a
-   * string can also have a <code>classpath:</code> prefix (which is the default if no schema is present).</li>
-   * <li>The name of a system property ({@link System#getProperty(String)}) holding a value that corresponds to one of
-   * the two previous options.</li>
-   * </ul>
-   *
-   * @param name
-   *          the name identifier.
-   */
-  public PropertiesHelper(String name) {
-    this(name, Collections.singleton(name));
+  protected boolean parse(IPropertyProvider proptertyProvider) {
+    m_parsedFiles.add(proptertyProvider.getPropertiesIdentifier());
+    List<Entry<String, String>> properties = proptertyProvider.readProperties();
+    if (properties == null) {
+      return false;
+    }
+    properties.forEach(prop -> {
+      String key = prop.getKey();
+      String value = resolveProperty(key, prop.getValue());
+      String oldValue = m_configProperties.get(key);
+      if (oldValue != null && !oldValue.equals(value)) {
+        if (m_referencedKeys.contains(key)) {
+          LOG.error("Replacement of already used config key: '{}' is not allowed. Old value '{}' will NOT be replaced with '{}'", key, m_configProperties.get(key), value);
+          return;
+        }
+        else {
+          LOG.warn("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, m_configProperties.get(key), value);
+        }
+
+      }
+      if (StringUtility.hasText(key)) {
+        m_configProperties.put(key, value);
+      }
+    });
+    return true;
   }
 
-  protected PropertiesHelper(String fileName, Set<String> importsToIgnore) {
-    this(getPropertiesFileUrl(fileName), importsToIgnore);
-  }
-
-  protected PropertiesHelper(URL propertiesFileUrl, Set<String> importsToIgnore /* for loop detection */) {
-    m_configProperties = new HashMap<>();
-    if (propertiesFileUrl != null) {
-      parse(propertiesFileUrl);
-      importAll(importsToIgnore, PLACEHOLDER_PATTERN);
-      resolveAll(PLACEHOLDER_PATTERN);
-      m_isInitialized = true;
+  private String normalizeImportKey(String key) {
+    Pattern p = Pattern.compile("^" + IMPORT_KEY + "(\\_|\\.)(.*)$");
+    Matcher m = p.matcher(key);
+    if (m.find()) {
+      return IMPORT_KEY + "[" + m.group(2) + "]";
     }
     else {
-      m_isInitialized = false;
+      return key;
     }
   }
 
@@ -507,8 +524,8 @@ public class PropertiesHelper {
     String keyPrefix = toCollectionKeyPrefix(key, namespace).toString();
 
     Map<String, String> result = new HashMap<>();
-    collectMapEntriesWith(keyPrefix, System.getenv().keySet(), result);
     collectMapEntriesWith(keyPrefix, m_configProperties.keySet(), result);
+    collectMapEntriesWith(keyPrefix, System.getenv().keySet(), result);
     collectMapEntriesWith(keyPrefix, System.getProperties().keySet(), result);
 
     if (result.isEmpty()) {
@@ -876,6 +893,9 @@ public class PropertiesHelper {
       while (found) {
         String key = m.group(1);
         String value = getProperty(key);
+        if (m_initializing) {
+          m_referencedKeys.add(key);
+        }
 
         if (!StringUtility.hasText(value)) {
           throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
@@ -905,178 +925,75 @@ public class PropertiesHelper {
     return t;
   }
 
-  protected static Set<String> getSelfIgnore(URL url) {
-    if (url == null) {
-      return Collections.emptySet();
-    }
-    return Collections.singleton(url.toExternalForm());
-  }
-
-  protected static URL getPropertiesFileUrl(String filePath) {
-    if (!StringUtility.hasText(filePath)) {
-      return null;
-    }
-    String sysPropFileName = System.getProperty(filePath);
-    if (StringUtility.hasText(sysPropFileName)) {
-      filePath = sysPropFileName;
-    }
-    return getResourceUrl(filePath);
-  }
-
-  /**
-   * Parses the file path specified to an {@link URL}.
-   * <p>
-   * The method supports the classpath prefix (see {@link #CLASSPATH_PREFIX}) for resources that should be searched on
-   * the classpath. Besides classpath resources also all installed URL schemes and absolute local file paths are
-   * supported.
-   * <p>
-   * <b>Example:</b>
-   * <ul>
-   * <li>classpath:myfolder/myFile.txt</li>
-   * <li>file:/C:/path/to/my/file.ext</li>
-   * </ul>
-   *
-   * @param filePath
-   *          The absolute file path. May be {@code null}.
-   * @return An {@link URL} pointing to the file if it can be found. {@code null} otherwise.
-   */
-  public static URL getResourceUrl(String filePath) {
-    if (!StringUtility.hasText(filePath)) {
-      return null;
-    }
-
-    boolean isClasspathUrl = filePath.indexOf(PROTOCOL_DELIMITER) < 0; // if no protocol specified: Default is class-path
-    if (!isClasspathUrl && filePath.startsWith(CLASSPATH_PREFIX)) {
-      filePath = filePath.substring(CLASSPATH_PREFIX.length());
-      if (!StringUtility.hasText(filePath)) {
-        return null;
-      }
-      isClasspathUrl = true;
-    }
-
-    if (isClasspathUrl) {
-      return PropertiesHelper.class.getClassLoader().getResource(filePath);
-    }
-    return toPropertiesFileUrl(filePath);
-  }
-
-  protected static URL toPropertiesFileUrl(String filePath) {
-    try {
-      return new URL(filePath);
-    }
-    catch (MalformedURLException e) {
-      LOG.debug("Config file path '{}' is no valid URL. Trying to parse as absolute file path.", filePath, e);
-    }
-
-    try {
-      File local = new File(filePath);
-      if (local.isFile() && local.isAbsolute()) {
-        return local.toURI().toURL();
-      }
-      else {
-        throw new IllegalArgumentException("Invalid config file path: '" + filePath + "'.");
-      }
-    }
-    catch (Exception e) {
-      throw new IllegalArgumentException("Unable to load config file with URL '" + filePath + "'.", e);
-    }
-  }
-
-  protected void importAll(Set<String> importsToIgnore, Pattern pat) {
-    List<String> rawImports = getPropertyList(IMPORT_KEY);
-    if (rawImports.isEmpty()) {
+  protected void importSystemImports(Set<String> importsToIgnore, Pattern pat) {
+    Collection<String> systemImports = getPropertyMap(IMPORT_KEY).values();
+    if (systemImports.isEmpty()) {
       return;
     }
 
-    List<String> imports = new ArrayList<>(rawImports.size());
-    for (String s : rawImports) {
-      imports.add(resolve(s, pat));
-    }
-
-    Set<String> ignore = new HashSet<>(importsToIgnore);
-    ignore.addAll(imports);
-
-    for (String importUrl : imports) {
-      if (importsToIgnore.contains(importUrl)) {
-        LOG.warn("Import of '{}' skipped because already imported: {}.", importUrl, importsToIgnore);
-        continue; // skip ignores (loop detection)
+    systemImports.forEach(impUrl -> {
+      IPropertyProvider props = getPropertyProvider(impUrl);
+      if (!m_parsedFiles.contains(props.getPropertiesIdentifier())) {
+        parse(props);
       }
+    });
 
-      PropertiesHelper importHelper = new PropertiesHelper(importUrl, ignore);
-      if (importHelper.isInitialized()) {
-        importFrom(importHelper);
-      }
-      else {
-        throw new IllegalArgumentException("Config import with URL '" + importUrl + "' could not be found.");
-      }
-    }
-  }
-
-  protected void importFrom(PropertiesHelper other) {
-    for (Entry<String, String> importEntry : other.getAllEntries().entrySet()) {
-      String key = importEntry.getKey();
-      String valueFromImport = importEntry.getValue();
-
-      String existing = m_configProperties.get(key);
-      if (existing != null) {
-        // the import contains the same key as we already have in this file. Ignore the value from the import but log duplicate.
-        logDuplicateKey(key, valueFromImport, existing);
-      }
-      else {
-        m_configProperties.put(key, valueFromImport);
-      }
-    }
-  }
-
-  protected void resolveAll(Pattern pat) {
-    for (Entry<String, String> entry : m_configProperties.entrySet()) {
-      entry.setValue(resolve(entry.getValue(), pat));
-    }
-  }
-
-  private void logDuplicateKey(Object key, Object oldValue, Object newValue) {
-    LOG.warn("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, oldValue, newValue);
   }
 
   protected Map<String, String> getConfigPropertyMap() {
     return m_configProperties;
   }
 
-  protected void parse(URL propertiesFileUrl) {
-    ServiceLoader<IConfigFileLoader> services = ServiceLoader.load(IConfigFileLoader.class);
-    IConfigFileLoader loader = null;
-    for (IConfigFileLoader service : services) {
-      loader = service;
-      if (loader != null) {
-        break;
+  protected String resolveProperty(String key, String value) {
+    if (IMPORT_PATTERN.matcher(key).find()) {
+      // in case of an import evaluate system and environment write now to not import wrong properties
+
+      value = resolve(resolveSystemProperty(key, value), PLACEHOLDER_PATTERN);
+      IPropertyProvider propertyProvider = getPropertyProvider(value);
+      if (!m_parsedFiles.contains(propertyProvider.getPropertiesIdentifier())) {
+        parse(propertyProvider);
+      }
+      else {
+        LOG.warn("Import of '{}' skipped because already imported: {}.", value, m_parsedFiles);
       }
     }
-    if (loader == null) {
-      loader = new DefaultConfigFileLoader();
+    else {
+      value = resolve(value, PLACEHOLDER_PATTERN);
     }
-
-    Properties props = new Properties() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public synchronized Object put(Object key, Object value) {
-        Object oldValue = super.put(key, value);
-        if (oldValue != null) {
-          logDuplicateKey(key, oldValue, value);
-        }
-        return oldValue;
-      }
-    };
-
-    LOG.info("Reading properties from {} using {}", propertiesFileUrl, loader.getClass().getName());
-    loader.load(propertiesFileUrl, props);
-
-    for (Entry<Object, Object> entry : props.entrySet()) {
-      String key = (String) entry.getKey();
-      String value = (String) entry.getValue();
-      if (StringUtility.hasText(key)) {
-        m_configProperties.put(key, value); // we cannot have any duplicates here.
-      }
-    }
+    return value;
   }
+
+  protected String resolveSystemProperty(String key, String defaultValue) {
+    Function<Object, String> keyNormalizer = o -> {
+      String k = o.toString().toLowerCase();
+      if (k.startsWith(IMPORT_KEY)) {
+        k = normalizeImportKey(k);
+      }
+      return k;
+    };
+    String value = defaultValue;
+    if (StringUtility.isNullOrEmpty(key)) {
+      return value;
+    }
+    // try env
+    value = System.getenv().entrySet().stream()
+        .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue()))
+        .filter(e -> e.getKey().equals(key))
+        .map(e -> e.getValue())
+        .findFirst().orElse(value);
+    // try system properties
+    return System.getProperties().entrySet().stream()
+        .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue().toString()))
+        .filter(e -> {
+          return e.getKey().equals(key);
+        })
+        .map(e -> e.getValue())
+        .findFirst().orElse(value);
+
+  }
+
+  protected IPropertyProvider getPropertyProvider(String configUrl) {
+    return new ConfigPropertyProvider(configUrl);
+  }
+
 }

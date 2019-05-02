@@ -41,7 +41,7 @@ public class ConfigFileLoaderTest {
 
   @Test
   public void testDefault() {
-    PropertiesHelper p = new PropertiesHelper(ConfigUtility.CONFIG_FILE_NAME);
+    PropertiesHelper p = new PropertiesHelper(new ConfigPropertyProvider(ConfigUtility.CONFIG_FILE_NAME));
     assertFalse(p.getAllEntries().isEmpty());
   }
 
@@ -50,7 +50,7 @@ public class ConfigFileLoaderTest {
     ClassLoader loader = new ServiceLoaderClassLoaderMock(getClass().getClassLoader(), IConfigFileLoader.class, FixtureEmptyConfigFileLoader.class);
     Thread.currentThread().setContextClassLoader(loader);
 
-    PropertiesHelper p = new PropertiesHelper(ConfigUtility.CONFIG_FILE_NAME);
+    PropertiesHelper p = new PropertiesHelper(new ConfigPropertyProvider(ConfigUtility.CONFIG_FILE_NAME));
     assertTrue(p.getAllEntries().isEmpty());
   }
 
@@ -59,7 +59,7 @@ public class ConfigFileLoaderTest {
     ClassLoader loader = new ServiceLoaderClassLoaderMock(getClass().getClassLoader(), IConfigFileLoader.class, FixtureSinglePropertyConfigFileLoader.class);
     Thread.currentThread().setContextClassLoader(loader);
 
-    PropertiesHelper p = new PropertiesHelper(ConfigUtility.CONFIG_FILE_NAME);
+    PropertiesHelper p = new PropertiesHelper(new ConfigPropertyProvider(ConfigUtility.CONFIG_FILE_NAME));
     assertEquals(1, p.getAllEntries().size());
     assertEquals("bar", p.getProperty("foo"));
   }
