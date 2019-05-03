@@ -65,6 +65,21 @@
         display: block;
       }
     }
+
+    &.spread-even {
+      width: 100%;
+      display: flex;
+
+      & > .tab-item {
+          flex-grow: 1;
+          flex-basis: 0;
+          text-align: center;
+      }
+
+      & > .tab-item.first {
+          padding-left: @tab-item-padding-x;
+      }
+    }
   }
 
   & > .menubar {

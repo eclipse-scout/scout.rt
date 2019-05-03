@@ -127,6 +127,12 @@ scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options
   }
 
   this.visibleTabs = visibleTabItems;
+
+  // Use the total available space if spreading tabs evenly.
+  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
+    return scout.graphics.prefSize($container, options);
+  }
+
   return prefSize.add(htmlComp.insets());
 };
 
@@ -191,6 +197,11 @@ scout.TabAreaLayout.prototype._tabItemSize = function(htmlComp) {
   var prefSize,
     classList = htmlComp.$comp.attr('class');
 
+  // temporarly revert display style to default. otherwise the pref size of the tab item will be the size of the container.
+  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
+    this.tabArea.$container.removeClass('spread-even');
+  }
+
   htmlComp.$comp.removeClass('overflown');
   htmlComp.$comp.removeClass('hidden');
 
@@ -200,6 +211,10 @@ scout.TabAreaLayout.prototype._tabItemSize = function(htmlComp) {
   }).add(scout.graphics.margins(htmlComp.$comp));
 
   htmlComp.$comp.attrOrRemove('class', classList);
+
+  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
+    this.tabArea.$container.addClass('spread-even');
+  }
   return prefSize;
 };
 

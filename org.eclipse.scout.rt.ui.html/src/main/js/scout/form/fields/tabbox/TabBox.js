@@ -20,6 +20,8 @@ scout.TabBox = function() {
   this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
   this.selectedTab = null;
   this.tabItems = [];
+  this.tabAreaStyle = scout.TabArea.DisplayStyle.DEFAULT;
+
   this._addWidgetProperties(['tabItems', 'selectedTab']);
   this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
   this._$tabContent = null;
@@ -45,6 +47,7 @@ scout.TabBox.prototype._init = function(model) {
 scout.TabBox.prototype._initProperties = function(model) {
   this._setTabItems(this.tabItems);
   this._setSelectedTab(this.selectedTab);
+  this._setTabAreaStyle(this.tabAreaStyle);
 };
 
 scout.TabBox.prototype._destroy = function() {
@@ -174,6 +177,17 @@ scout.TabBox.prototype._renderSelectedTab = function() {
 scout.TabBox.prototype._removeSelectedTab = function() {
   if (this.selectedTab) {
     this.selectedTab.remove();
+  }
+};
+
+scout.TabBox.prototype.setTabAreaStyle = function(tabAreaStyle) {
+  this.setProperty('tabAreaStyle', tabAreaStyle);
+};
+
+scout.TabBox.prototype._setTabAreaStyle = function(tabAreaStyle) {
+  this.tabAreaStyle = tabAreaStyle;
+  if (this.header && this.header.tabArea) {
+    this.header.tabArea.setDisplayStyle(tabAreaStyle);
   }
 };
 

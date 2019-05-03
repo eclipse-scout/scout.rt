@@ -11,7 +11,6 @@
 scout.TabItem = function() {
   scout.TabItem.parent.call(this);
   this.marked = false;
-  this.tabOverflown = false;
   this.selectionKeystroke;
   this.$tabContainer;
 };

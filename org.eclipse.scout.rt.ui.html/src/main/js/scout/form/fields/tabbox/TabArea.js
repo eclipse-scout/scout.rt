@@ -12,6 +12,7 @@ scout.TabArea = function() {
   scout.TabArea.parent.call(this);
   this.tabBox = null;
   this.tabs = [];
+  this.displayStyle = scout.TabArea.DisplayStyle.DEFAULT;
 
   this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
@@ -21,6 +22,11 @@ scout.TabArea = function() {
   this.$selectionMarker = null;
 };
 scout.inherits(scout.TabArea, scout.Widget);
+
+scout.TabArea.DisplayStyle = {
+  DEFAULT: 'default',
+  SPREAD_EVEN: 'spreadEven'
+};
 
 scout.TabArea.prototype._init = function(options) {
   scout.TabArea.parent.prototype._init.call(this, options);
@@ -67,6 +73,7 @@ scout.TabArea.prototype._renderProperties = function() {
   this._renderTabs();
   this._renderSelectedTab();
   this._renderHasSubLabel();
+  this._renderDisplayStyle();
 };
 
 /**
@@ -165,6 +172,15 @@ scout.TabArea.prototype._removeTabs = function(tabs) {
     tab.off('select', this._tabSelectionHandler);
     tab.remove();
   }, this);
+};
+
+scout.TabArea.prototype.setDisplayStyle = function(displayStyle) {
+  this.setProperty('displayStyle', displayStyle);
+};
+
+scout.TabArea.prototype._renderDisplayStyle = function() {
+  this.$container.toggleClass('spread-even', this.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN);
+  this.invalidateLayoutTree();
 };
 
 scout.TabArea.prototype._onTabItemFocus = function() {
