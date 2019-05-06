@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
@@ -38,20 +39,29 @@ import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
 import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
+import org.eclipse.scout.rt.platform.util.LockFile;
 import org.junit.rules.ExternalResource;
 
 public class ArtemisJmsBrokerTestRule extends ExternalResource {
 
+  private LockFile m_lockFile;
   private EmbeddedActiveMQ m_embeddedArtemisServer;
 
   @Override
   protected void before() throws Throwable {
+    m_lockFile = new LockFile(Paths.get(System.getProperty("user.dir"), "target", "artemis-junit.lock").toFile());
+    m_lockFile.lock(30, TimeUnit.MINUTES);
     startArtemisJmsServer();
   }
 
   @Override
   protected void after() {
-    stopArtemisJmsServer();
+    try {
+      stopArtemisJmsServer();
+    }
+    finally {
+      m_lockFile.unlock();
+    }
   }
 
   protected void startArtemisJmsServer() throws Exception {
