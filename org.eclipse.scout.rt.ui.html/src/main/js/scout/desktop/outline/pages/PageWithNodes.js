@@ -39,9 +39,7 @@ scout.PageWithNodes.prototype._createTable = function() {
 };
 
 scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
-  var clickedRow = event.source.rowsMap[event.row.id];
-  var nodeToSelect = clickedRow.node;
-  this.getOutline().selectNode(nodeToSelect);
+  this.getOutline().mediator.onTableRowAction(event, this);
 };
 
 scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
