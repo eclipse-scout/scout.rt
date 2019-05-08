@@ -31,6 +31,7 @@ scout.PageWithTable.prototype._initTable = function(table) {
   table.on('rowAction', this._onTableRowAction.bind(this));
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
   table.on('reload', this.loadTableData.bind(this));
+  table.on('requestTiles', this.requestTiles.bind(this));
   table.hasReloadHandler = true;
 };
 
@@ -184,6 +185,27 @@ scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
 scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
   this.childrenLoaded = true;
   this.detailTable.setLoading(false);
+};
+
+scout.PageWithTable.prototype.requestTiles = function() {
+  return this._requestTiles()
+    .then(this._onRequestTilesDone.bind(this))
+    .catch(this._onRequestTilesFail.bind(this));
+};
+
+scout.PageWithTable.prototype._requestTiles = function() {
+  return $.resolvedDeferred();
+};
+
+scout.PageWithTable.prototype._onRequestTilesDone = function(tiles) {
+  this.detailTable.replaceTiles(tiles);
+};
+
+scout.PageWithTable.prototype._onRequestTilesFail = function(error) {
+  this.detailTable.setTableStatus(scout.Status.error({
+    message: this.session.text('ErrorWhileLoadingData')
+  }));
+  $.log.error('Failed to load tiles. error=', error);
 };
 
 /**

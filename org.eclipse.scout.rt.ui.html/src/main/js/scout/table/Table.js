@@ -51,6 +51,7 @@ scout.Table = function() {
   this.rows = [];
   this.rootRows = [];
   this.visibleRows = [];
+  this.tiles = [];
   this.estimatedRowCount = 0;
   this.maxRowCount = 0;
   this.truncatedCellTooltipEnabled = null;
@@ -90,7 +91,7 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tiles']);
 
   this.$data = null;
   this.$emptyData = null;
@@ -3715,6 +3716,10 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   }
 };
 
+scout.Table.prototype.replaceTiles = function(tiles) {
+  this.tiles = tiles || [];
+};
+
 /**
  * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
  */
@@ -3879,6 +3884,11 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   this.trigger('aggregationFunctionChanged', event);
 };
 
+scout.Table.prototype._triggerRequestTiles = function() {
+  var event = {};
+  this.trigger('requestTiles', event);
+};
+
 scout.Table.prototype.setHeaderVisible = function(visible) {
   this.setProperty('headerVisible', visible);
 };
@@ -3930,7 +3940,11 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 };
 
 scout.Table.prototype.setTileMode = function(tileMode) {
+  var changed = this.tileMode !== tileMode;
   this.setProperty('tileMode', tileMode);
+  if (this.tileMode && changed) {
+    this._triggerRequestTiles();
+  }
 };
 
 scout.Table.prototype.setRowIconVisible = function(rowIconVisible) {

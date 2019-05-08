@@ -103,6 +103,16 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
   this._send('aggregationFunctionChanged', data);
 };
 
+scout.TableAdapter.prototype._onWidgetRequestTiles = function(event) {
+  this._sendRequestTiles();
+};
+
+scout.TableAdapter.prototype._sendRequestTiles = function() {
+  var data = {
+  };
+  this._send('requestTiles', data);
+};
+
 scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
   this._sendColumnBackgroundEffectChanged(event.column);
 };
@@ -348,6 +358,8 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetColumnOrganizeAction(event);
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
+  } else if (event.type === 'requestTiles') {
+    this._onWidgetRequestTiles(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
