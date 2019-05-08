@@ -44,6 +44,7 @@ scout.Table = function() {
   this.sortEnabled = true;
   this.tableControls = [];
   this.tableStatusVisible = false;
+  this.tileMode = false;
   this.footer = null;
   this.footerVisible = false;
   this.filters = [];
@@ -3926,6 +3927,10 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
       this._permanentTailSortColumns.push(c);
     }
   }, this);
+};
+
+scout.Table.prototype.setTileMode = function(tileMode) {
+  this.setProperty('tileMode', tileMode);
 };
 
 scout.Table.prototype.setRowIconVisible = function(rowIconVisible) {
