@@ -13,6 +13,11 @@ scout.ColumnLayout = function(options) {
   options = options || {};
   this.stretch = scout.nvl(options.stretch, true);
   this.useCssWidth = scout.nvl(options.useCssWidth, false);
+
+  // ColumnLayout = each child element represents a column
+  // +------+---+------+
+  // |      |   |      |
+  // +------+---+------+
 };
 scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
 
