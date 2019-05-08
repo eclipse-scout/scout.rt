@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +97,9 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
           continue;
         }
       }
-      catch (Exception e) {
+      catch (Exception | ThreadInterruptedError e) {
+        //not catching ThreadInterruptedError would exit the event loop in case of accidential thread interruption
+        Thread.interrupted();
         if (IFuture.CURRENT.get().isCancelled() || m_sessionProvider.isClosing()) {
           LOG.debug("JMS MessageConsumer for {} was closed", m_destination);
           break;
@@ -109,7 +112,9 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
         LOG.debug("Receiving JMS message [message={}]", message);
         onJmsMessage(message);
       }
-      catch (Exception e) {
+      catch (Exception | ThreadInterruptedError e) {
+        //not catching ThreadInterruptedError would exit the event loop in case of accidential thread interruption in the downstream call to handleIncoming
+        Thread.interrupted();
         if (isRollbackNecessary(e)) {
           try {
             transactedSession.rollback();
@@ -130,7 +135,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
    * <p>
    * Once the scout JMS-Transaction-Member is registered it will safely be rollbacked on errors.
    */
-  protected boolean isRollbackNecessary(Exception e) {
+  protected boolean isRollbackNecessary(Throwable e) {
     return isTransacted() && !(e instanceof PlatformException);
   }
 

@@ -78,6 +78,10 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
 
   /**
    * Called by {@link JmsConnectionWrapper} upon failover
+   * <p>
+   * 
+   * @throws no
+   *           exceptions
    */
   public void invalidate() {
     synchronized (m_sessionProviderFunction) {
@@ -85,6 +89,9 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
         try {
           LOG.info("Invalidate sessionProvider {}", m_impl);
           m_impl.close();
+        }
+        catch (Throwable e) {//NOSONAR
+          //nop
         }
         finally {
           m_impl = null;
