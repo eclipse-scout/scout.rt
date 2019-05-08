@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.dataobject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -441,5 +442,29 @@ public class DoListTest {
     assertNull(new DoList<>().getAttributeName());
     assertNull(DoList.of(Collections.emptyList()).getAttributeName());
     assertEquals("foo", new DoList<>("foo", null).getAttributeName());
+  }
+
+  @Test
+  public void testEqualsHashCode() {
+    DoList<String> list1 = new DoList<>();
+    list1.add("foo");
+
+    DoList<String> list2 = new DoList<>();
+    list2.add("foo");
+
+    assertEquals(list1, list2);
+    assertEquals(list2, list1);
+    assertEquals(list1, list1);
+    assertEquals(list1.hashCode(), list2.hashCode());
+
+    list1.add("bar");
+    assertNotEquals(list1, list2);
+
+    list2.add("bar");
+    assertEquals(list1, list2);
+    assertEquals(list1.hashCode(), list2.hashCode());
+
+    assertFalse(list1.equals(null));
+    assertFalse(list1.equals(new Object()));
   }
 }

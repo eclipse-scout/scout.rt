@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.junit.ComparisonFailure;
 
 /**
@@ -36,20 +37,9 @@ public class DataObjectTestHelper {
    * Asserts (deep) equality for specified {@link DoEntity} objects and additionally asserts, that concrete
    * {@link DoEntity} class of expected entity and class of actual {@link DoEntity} is identical.
    */
+  // FIXME pbz: deprecate method, change to use DoEntity.equals() method directly
   public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual) {
-    assertDoEntityEquals(expected, actual, true);
-  }
-
-  /**
-   * Asserts (deep) equality for specified {@link DoEntity} objects.
-   *
-   * @param assertClassEquals
-   *          if {@code true} concrete class of both {@link DoEntity} must be the identical
-   */
-  public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual, boolean assertClassEquals) {
-    if (!equalsObject(expected, actual, assertClassEquals)) {
-      assertFail(expected, actual);
-    }
+    Assertions.assertEquals(expected, actual);
 
     // assert all attribute names are set correctly to be equals to the corresponding map key
     assertMapKeyEqualsAttributeName(actual);
