@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.platform.dataobject;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -593,5 +594,56 @@ public class DoEntityTest {
     barAttribute.setAttributeName("barAttribute");
     fixture.put("newBarAttribute", barAttribute);
     assertEquals("newBarAttribute", fixture.getNode("newBarAttribute").getAttributeName());
+  }
+
+  @Test
+  public void testEqualsHashCode() {
+    DoEntity entity1 = BEANS.get(DoEntity.class);
+    DoEntity entity2 = BEANS.get(DoEntity.class);
+
+    assertFalse(entity1.equals(null));
+    assertFalse(entity1.equals(new Object()));
+
+    assertEquals(entity1, entity1);
+    assertEquals(entity1, entity2);
+    assertEquals(entity2, entity1);
+    assertEquals(entity1.hashCode(), entity2.hashCode());
+
+    entity1.put("attribute1", "foo");
+    assertNotEquals(entity1, entity2);
+
+    entity2.put("attribute1", "foo");
+    assertEquals(entity1, entity2);
+    assertEquals(entity1.hashCode(), entity2.hashCode());
+
+    entity1.put("attribute2", Arrays.asList("l1", "l2"));
+    assertNotEquals(entity1, entity2);
+
+    entity2.put("attribute2", Arrays.asList("l1", "l2"));
+    assertEquals(entity1, entity2);
+    assertEquals(entity1.hashCode(), entity2.hashCode());
+
+    entity1.putList("attribute3", Arrays.asList("l1", "l2"));
+    assertNotEquals(entity1, entity2);
+
+    entity2.putList("attribute3", Arrays.asList("l1", "l2"));
+    assertEquals(entity1, entity2);
+    assertEquals(entity1.hashCode(), entity2.hashCode());
+  }
+
+  @Test
+  public void testEqualsHashCodeFixtureEntity() {
+    EntityFixtureDo entity1 = BEANS.get(EntityFixtureDo.class)
+        .withId("foo")
+        .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other1"), BEANS.get(OtherEntityFixtureDo.class).withId("other2"));
+    EntityFixtureDo entity2 = BEANS.get(EntityFixtureDo.class)
+        .withId("foo")
+        .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other1"), BEANS.get(OtherEntityFixtureDo.class).withId("other2"));
+
+    assertEquals(entity1, entity2);
+    assertEquals(entity1.hashCode(), entity2.hashCode());
+
+    entity2.getOtherEntities().get(0).withId("bar");
+    assertNotEquals(entity1, entity2);
   }
 }

@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.platform.dataobject;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+
 /**
  * This is the base type for all building blocks of of a data object such as {@link DoValue} and {@link DoList}.
  */
@@ -86,5 +88,43 @@ public class DoNode<T> {
    */
   public final String getAttributeName() {
     return m_attributeName;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    // treat exists() (e.g. member variable m_lazyCreate) as boolean value (null/not null) for hash code
+    result = prime * result + (exists() ? 1231 : 1237);
+    result = prime * result + ((m_attributeName == null) ? 0 : m_attributeName.hashCode());
+    result = prime * result + ((m_value == null) ? 0 : m_value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DoNode other = (DoNode) obj;
+    // treat exists() (e.g. member variable m_lazyCreate) as boolean value (null/not null) for equality
+    if (exists() != other.exists()) {
+      return false;
+    }
+    if (m_attributeName == null) {
+      if (other.m_attributeName != null) {
+        return false;
+      }
+    }
+    else if (!m_attributeName.equals(other.m_attributeName)) {
+      return false;
+    }
+    return ObjectUtility.equals(m_value, other.m_value);
   }
 }

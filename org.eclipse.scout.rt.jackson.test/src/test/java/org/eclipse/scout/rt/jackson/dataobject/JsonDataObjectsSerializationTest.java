@@ -724,12 +724,10 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testDeserialze_EntityWithNestedDoNodeRaw() throws Exception {
     String jsonInput = readResourceAsString("TestEntityWithNestedDoNodeRaw.json");
-    DoEntity entity = s_dataObjectMapper.readValue(jsonInput, DoEntity.class);
-
     TestComplexEntityDo testDo = BEANS.get(TestComplexEntityDo.class);
     testDo.itemAttribute().set(BEANS.get(TestItemDo.class).withId("1234-3").withStringAttribute("bar"));
-
-    s_testHelper.assertDoEntityEquals(testDo, entity, false);
+    String json = s_defaultJacksonObjectMapper.writeValueAsString(testDo); // write using default jackson (does not write _type attribute)
+    s_testHelper.assertJsonEquals(jsonInput, json);
   }
 
   /**

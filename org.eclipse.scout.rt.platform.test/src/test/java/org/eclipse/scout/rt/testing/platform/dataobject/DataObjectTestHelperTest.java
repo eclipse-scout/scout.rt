@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Before;
-import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 public class DataObjectTestHelperTest {
@@ -71,14 +71,14 @@ public class DataObjectTestHelperTest {
     s_dataObjectTestHelper.assertDoEntityEquals(actualFixture, m_expectedEntityFixture);
   }
 
-  @Test(expected = ComparisonFailure.class)
+  @Test(expected = AssertionException.class)
   public void testAssertDoEntityEquals_missingAttribute() {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
     s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
   }
 
-  @Test(expected = ComparisonFailure.class)
+  @Test(expected = AssertionException.class)
   public void testAssertDoEntityEquals_wrongAttribute() {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
@@ -86,22 +86,10 @@ public class DataObjectTestHelperTest {
     s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
   }
 
-  @Test(expected = ComparisonFailure.class)
+  @Test(expected = AssertionException.class)
   public void testAssertDoEntityEquals_wrongListItem() {
     EntityFixtureDo actual = createEntityFixture();
     actual.getOtherEntities().add(BEANS.get(OtherEntityFixtureDo.class));
     s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedEntityFixture);
-  }
-
-  @Test
-  public void testAssertDoEntityEquals_classesMustNotBeEquals() {
-    DoEntity entity = createEntityFixtureRaw();
-    s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, false);
-  }
-
-  @Test(expected = ComparisonFailure.class)
-  public void testAssertDoEntityEquals_classesMustBeEquals() {
-    DoEntity entity = createEntityFixtureRaw();
-    s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, true);
   }
 }
