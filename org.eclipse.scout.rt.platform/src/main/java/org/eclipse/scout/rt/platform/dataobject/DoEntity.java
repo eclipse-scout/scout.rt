@@ -158,6 +158,29 @@ public class DoEntity implements IDoEntity {
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + m_attributes.hashCode();
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    DoEntity other = (DoEntity) obj;
+    return m_attributes.equals(other.m_attributes);
+  }
+
+  @Override
   public String toString() {
     return getClass().getSimpleName() + " " + BEANS.get(DataObjectHelper.class).toString(this);
   }
