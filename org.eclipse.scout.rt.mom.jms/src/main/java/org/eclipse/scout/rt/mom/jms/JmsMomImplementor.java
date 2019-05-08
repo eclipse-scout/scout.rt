@@ -661,16 +661,30 @@ public class JmsMomImplementor implements IMomImplementor {
   protected Connection createConnection() throws JMSException {
     Object securityPrincipal = m_contextEnvironment.get(Context.SECURITY_PRINCIPAL);
     Object securityCredentials = m_contextEnvironment.get(Context.SECURITY_CREDENTIALS);
-    Connection connection;
-    if (securityPrincipal != null && securityCredentials != null) {
-      connection = m_connectionFactory.createConnection(securityPrincipal.toString(), securityCredentials.toString());
+    Connection connection = null;
+    boolean connectionValid = false;
+    try {
+      if (securityPrincipal != null && securityCredentials != null) {
+        connection = m_connectionFactory.createConnection(securityPrincipal.toString(), securityCredentials.toString());
+      }
+      else {
+        connection = m_connectionFactory.createConnection();
+      }
+      postCreateConnection(connection);
+      connectionValid = true;
+      return connection;
     }
-    else {
-      connection = m_connectionFactory.createConnection();
+    finally {
+      //detect failure
+      if (connection != null && !connectionValid) {
+        try {
+          connection.close();
+        }
+        catch (JMSException e2) {
+          LOG.info("Close invalid connection", e2);
+        }
+      }
     }
-
-    postCreateConnection(connection);
-    return connection;
   }
 
   protected void postCreateConnection(Connection connection) throws JMSException {
