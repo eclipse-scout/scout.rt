@@ -13,6 +13,16 @@ scout.RowLayout = function(options) {
   options = options || {};
   this.pixelBasedSizing = scout.nvl(options.pixelBasedSizing, true);
   this.stretch = scout.nvl(options.stretch, true);
+
+  // RowLayout = each child element represents a row
+  // +-----------------+
+  // |                 |
+  // +-----------------+
+  // |                 |
+  // |                 |
+  // +-----------------+
+  // |                 |
+  // +-----------------+
 };
 scout.inherits(scout.RowLayout, scout.AbstractLayout);
 
