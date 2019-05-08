@@ -13,14 +13,13 @@ scout.FormFieldMenuAdapter = function() {
 };
 scout.inherits(scout.FormFieldMenuAdapter, scout.MenuAdapter);
 
-
 /**
  * @override
  */
 scout.FormFieldMenuAdapter.prototype._postCreateWidget = function() {
   scout.FormFieldMenuAdapter.parent.prototype._postCreateWidget.call(this);
-  // Set gridDataHints to null -> Calculation happens on server side
-  if(this.widget.field){
-    this.widget.field.gridDataHints = null;
+  // Use grid data from server as hints
+  if (this.widget.field) {
+    this.widget.field.gridDataHints = new scout.GridData(this.widget.field.gridData);
   }
 };

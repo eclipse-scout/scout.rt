@@ -36,7 +36,7 @@ scout.FormFieldMenu.prototype._renderProperties = function() {
  */
 scout.FormFieldMenu.prototype._renderText = function(text) {
   scout.FormFieldMenu.parent.prototype._renderText.call(this, text);
-  if (this.$text) {
+  if (this.field && this.field.rendered && this.$text) {
     this.field.$container.insertAfter(this.$text);
   }
 };
@@ -49,9 +49,7 @@ scout.FormFieldMenu.prototype._renderField = function() {
   if (this.field) {
     // Use gridDataHints as "computed" gridData property, because FormFieldMenu
     // does not have a logical grid (see FormField._updateElementInnerAlignment()).
-    if (this.field.gridDataHints) {
-      this.field.gridData = scout.GridData.createFromHints(this.field, 1);
-    }
+    this.field.gridData = scout.GridData.createFromHints(this.field, 1);
 
     this.field.render(this.$container);
     var layoutData = new scout.LogicalGridData(this.field);
