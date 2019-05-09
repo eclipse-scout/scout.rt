@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.selenium.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,11 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.Command;
+import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import com.google.common.collect.ImmutableMap;
 
 public final class SeleniumDriver {
 
@@ -116,10 +121,36 @@ public final class SeleniumDriver {
     driver.manage().window().setPosition(new Point(0, 0));
     driver.manage().window().setSize(new Dimension(1200, 900));
 
+    // Start unit tests with the following VM property to simulate slow network:
+    // -Dslow.network=true
+    if (System.getProperty("slow.network") != null) {
+      setSlowNetwork(driver);
+    }
+
     Capabilities caps = driver.getCapabilities();
     System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
         + " browser.name=" + caps.getBrowserName()
         + " browser.version=" + caps.getVersion());
     return driver;
+  }
+
+  /**
+   * Set slow network conditions. You can do the same thing in the Chrome developer tools.
+   */
+  private static void setSlowNetwork(RemoteWebDriver driver) {
+    Map<String, Object> map = new HashMap<>();
+    map.put("offline", false);
+    map.put("latency", 199); // ms
+    map.put("download_throughput", 200 * 1024); // bytes
+    map.put("upload_throughput", 50 * 1024); // bytes
+    System.out.println("Simulate slow network conditions. Config=" + map);
+
+    try {
+      CommandExecutor executor = driver.getCommandExecutor();
+      executor.execute(new Command(driver.getSessionId(), "setNetworkConditions", ImmutableMap.of("network_conditions", ImmutableMap.copyOf(map))));
+    }
+    catch (IOException e) {
+      System.err.println(e);
+    }
   }
 }

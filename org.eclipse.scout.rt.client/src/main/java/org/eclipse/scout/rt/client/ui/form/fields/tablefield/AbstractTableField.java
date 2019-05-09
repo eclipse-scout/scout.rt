@@ -420,12 +420,16 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public IValidateContentDescriptor validateContent() {
     IValidateContentDescriptor desc = super.validateContent();
-    //super check
+    // super check
     if (desc != null) {
       return desc;
     }
     ITable table = getTable();
-    //check cells
+    // ensureCellEditComplete
+    if (table instanceof AbstractTable) {
+      table.completeCellEdit();
+    }
+    // check cells
     ValidateTableFieldDescriptor tableDesc = null;
     Set<String> columnNames = new TreeSet<>();
     if (table != null) {
