@@ -29,11 +29,11 @@ public class DoEntityBuilderTest {
         .put("attribute2", 42)
         .putList("listAttribute", 1, 2, 3)
         .build();
-    BEANS.get(DataObjectTestHelper.class).assertDoEntityEquals(expected, actual);
+    BEANS.get(DataObjectTestHelper.class).assertEquals(expected, actual);
 
     // ensure lists are mutable
     expected.getList("listAttribute").remove(1);
     actual.getList("listAttribute").remove(1);
-    BEANS.get(DataObjectTestHelper.class).assertDoEntityEquals(expected, actual);
+    BEANS.get(DataObjectTestHelper.class).assertEquals(expected, actual);
   }
 }
