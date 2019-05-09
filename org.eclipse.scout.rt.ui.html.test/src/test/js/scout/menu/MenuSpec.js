@@ -103,7 +103,7 @@ describe("Menu", function() {
   describe('isTabTarget', function() {
 
     it('should return true when menu can be a target of TAB action', function() {
-      menu1.enabled = true;
+      menu1.setEnabled(true);
       menu1.visible = true;
       menu1.actionStyle = scout.Action.ActionStyle.BUTTON;
       expect(menu1.isTabTarget()).toBe(true);
@@ -115,7 +115,7 @@ describe("Menu", function() {
       expect(menu1.isTabTarget()).toBe(false);
 
       menu1.separator = false;
-      menu1.enabled = false;
+      menu1.setEnabled(false);
       expect(menu1.isTabTarget()).toBe(false);
     });
 

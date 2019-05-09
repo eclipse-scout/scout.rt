@@ -821,6 +821,7 @@ $.fn.setEnabled = function(enabled) {
   if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
     this.toggleAttr('disabled', !enabled);
   }
+  this.trigger(enabled ? 'enable' : 'disable');
   return this;
 };
 
