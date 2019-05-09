@@ -580,11 +580,27 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   void requestFocus();
 
   /**
-   * Notify the ui factory to give focus to the table cell.
+   * Notify the UI factory to give focus to the table cell.
    * <p>
    * This will only work if the table cell is editable.
    */
   void requestFocusInCell(IColumn<?> column, ITableRow row);
+
+  /**
+   * Completes cell editing if a cell editor is currently opened. Note: this method does <strong>not</strong> call
+   * acceptInput() on the editor field. This means it will simply use the value which is already set on the editor-field
+   * and possibly not the value that is currently visible in the UI.
+   * <p>
+   * This will only work if the table cell is editable.
+   */
+  void completeCellEdit();
+
+  /**
+   * Cancels cell editing and closes the cell editor.
+   * <p>
+   * This will only work if the table cell is editable.
+   */
+  void cancelCellEdit();
 
   /**
    * Accessor to the table listener registry

@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +131,20 @@ public class TableEvent extends EventObject implements IModelEvent {
   public static final int TYPE_REQUEST_FOCUS_IN_CELL = 805;
 
   /**
+   * Request ui to START the editing of the cell by opening its editor.
+   * <p>
+   * Only for editable cells
+   */
+  public static final int TYPE_START_CELL_EDIT = 807;
+
+  /**
+   * Request ui to end the editing of the cell by closing its editor.
+   * <p>
+   * Only for editable cells
+   */
+  public static final int TYPE_END_CELL_EDIT = 808;
+
+  /**
    * A row has been clicked (by the mouse)
    * <p>
    * valid properties: rows, firstRow, lastRow
@@ -168,6 +183,7 @@ public class TableEvent extends EventObject implements IModelEvent {
   private Map<ITableRow, Set<IColumn<?>>> m_updatedColumns;
   private boolean m_sortInMemoryAllowed;
   private IUserFilterState m_userFilter;
+  private IFormField m_cellEditor;
 
   public TableEvent(ITable source, int type) {
     this(source, type, (ITableRow) null);
@@ -400,6 +416,14 @@ public class TableEvent extends EventObject implements IModelEvent {
 
   public IUserFilterState getUserFilter() {
     return m_userFilter;
+  }
+
+  public void setCellEditor(IFormField cellEditor) {
+    m_cellEditor = cellEditor;
+  }
+
+  public IFormField getCellEditor() {
+    return m_cellEditor;
   }
 
   /**

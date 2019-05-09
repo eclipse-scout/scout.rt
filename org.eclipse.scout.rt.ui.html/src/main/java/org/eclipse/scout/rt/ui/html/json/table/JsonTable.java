@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.rt.client.context.ClientRunContext;
+import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.services.common.clipboard.IClipboardService;
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -440,6 +442,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   @Override
   protected void disposeChildAdapters() {
+    // Ensure cell editor is closed and context set to null
+    if (ModelJobs.isModelThread()) {
+      getModel().getUIFacade().cancelCellEditFromUI();
+    }
+    else {
+      final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(getUiSession().getClientSession(), true);
+      ModelJobs.schedule(getModel().getUIFacade()::cancelCellEditFromUI, ModelJobs.newInput(clientRunContext)
+          .withName("Cancelling cell editor")
+          .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
+    }
+
     disposeAllColumns();
     disposeAllRows();
     getJsonContextMenu().dispose();
@@ -783,7 +796,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       return;
     }
     IColumn column = extractColumn(event.getData());
-    IFormField field = getModel().getUIFacade().prepareCellEditFromUI(row, column);
+    getModel().getUIFacade().prepareCellEditFromUI(row, column);
+  }
+
+  protected void startCellEdit(ITableRow row, IColumn<?> column, IFormField field) {
+    if (row == null || !isRowAccepted(row)) {
+      return;
+    }
     if (field == null) {
       // Cell is not editable, simply ignore the request for editing it.
       // This may happen if the JSON request contained other events that
@@ -794,40 +813,33 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     IJsonAdapter<?> jsonField = attachAdapter(field);
     LOG.debug("Created new field adapter for cell editing. Adapter: {}", jsonField);
     JSONObject json = new JSONObject();
-    json.put("columnId", event.getData().getString(PROP_COLUMN_ID));
-    json.put("rowId", event.getData().getString(PROP_ROW_ID));
+    json.put("columnId", getColumnId(column));
+    json.put("rowId", getTableRowId(row));
     json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_START_CELL_EDIT, json).protect();
   }
 
   protected void handleUiCompleteCellEdit(JsonEvent event) {
-    String fieldId = event.getData().getString("fieldId");
     getModel().getUIFacade().completeCellEditFromUI();
-    endCellEdit(fieldId);
   }
 
   protected void handleUiCancelCellEdit(JsonEvent event) {
-    String fieldId = event.getData().getString("fieldId");
     getModel().getUIFacade().cancelCellEditFromUI();
-    endCellEdit(fieldId);
   }
 
-  protected void endCellEdit(String fieldId) {
-    IJsonAdapter<?> jsonField = getUiSession().getJsonAdapter(fieldId);
+  protected void endCellEdit(IFormField field) {
+    IJsonAdapter<?> jsonField = getAdapter(field);
     if (jsonField == null) {
-      LOG.info("No field adapter found for cell-editor with id " + fieldId + ". Maybe the editor or the corresponding form had been closed during completeCellEdit.");
+      LOG.info("No field adapter found for cell-editor " + field + ". Maybe the editor or the corresponding form had been closed during completeCellEdit.");
       return;
     }
 
     // Confirm end cell edit so that gui can dispose the adapter.
-    // It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
-    // It would be possible if we added a filter mechanism so that events for disposed adapters won't be sent to client
-    // TODO [7.0] cgu: maybe optimize by adding a filter for disposed adapters
+    // (It is not possible to dispose the adapter on the gui before sending complete or cancelCellEdit, because the field may send property change events back)
     JSONObject json = new JSONObject();
     json.put("fieldId", jsonField.getId());
     addActionEvent(EVENT_END_CELL_EDIT, json).protect();
 
-    // TODO [7.0] cgu: remember field, revert at toJson for page reload
     jsonField.dispose();
   }
 
@@ -1286,6 +1298,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL:
         handleModelRequestFocusInCell(event);
         break;
+      case TableEvent.TYPE_START_CELL_EDIT:
+        handleModelStartCellEdit(event);
+        break;
+      case TableEvent.TYPE_END_CELL_EDIT:
+        handleModelEndCellEdit(event);
+        break;
       default:
         // NOP
     }
@@ -1522,6 +1540,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     putProperty(jsonEvent, PROP_ROW_ID, getOrCreateRowId(row));
     putProperty(jsonEvent, PROP_COLUMN_ID, getColumnId(CollectionUtility.firstElement(event.getColumns())));
     addActionEvent(EVENT_REQUEST_FOCUS_IN_CELL, jsonEvent).protect();
+  }
+
+  protected void handleModelStartCellEdit(TableEvent event) {
+    ITableRow row = CollectionUtility.firstElement(event.getRows());
+    IColumn<?> column = CollectionUtility.firstElement(event.getColumns());
+    startCellEdit(row, column, event.getCellEditor());
+  }
+
+  protected void handleModelEndCellEdit(TableEvent event) {
+    endCellEdit(event.getCellEditor());
   }
 
   protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {

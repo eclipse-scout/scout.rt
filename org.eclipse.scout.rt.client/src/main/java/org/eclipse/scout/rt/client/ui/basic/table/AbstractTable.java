@@ -1805,6 +1805,52 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  private void startCellEdit() {
+    if (m_editContext == null) {
+      return;
+    }
+    TableEvent tableEvent = new TableEvent(this, TableEvent.TYPE_START_CELL_EDIT);
+    tableEvent.setCellEditor(m_editContext.getFormField());
+    tableEvent.setRows(Arrays.asList(m_editContext.getRow()));
+    tableEvent.setColumns(Arrays.asList(m_editContext.getColumn()));
+    fireTableEventInternal(tableEvent);
+  }
+
+  private void endCellEdit() {
+    if (m_editContext == null) {
+      return;
+    }
+    TableEvent tableEvent = new TableEvent(this, TableEvent.TYPE_END_CELL_EDIT);
+    tableEvent.setCellEditor(m_editContext.getFormField());
+    fireTableEventInternal(tableEvent);
+    m_editContext = null;
+  }
+
+  @Override
+  public void completeCellEdit() {
+    if (m_editContext == null) {
+      return;
+    }
+    m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
+    endCellEdit();
+  }
+
+  @Override
+  public void cancelCellEdit() {
+    if (m_editContext == null) {
+      return;
+    }
+    cancelCellEditInternal();
+    endCellEdit();
+  }
+
+  protected void cancelCellEditInternal() {
+    if (m_editContext == null) {
+      return;
+    }
+    m_editContext.getFormField().dispose();
+  }
+
   @Override
   public ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) {
     return interceptCreateTableRowDataMapper(rowType);
@@ -4620,7 +4666,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       try {
         pushUIProcessor();
         //
-        m_editContext = null;
+        if (m_editContext != null) {
+          cancelCellEditInternal();
+          m_editContext = null;
+        }
         row = resolveRow(row);
         if (row != null && col != null) {
           // ensure the editable row to be selected.
@@ -4630,6 +4679,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
           if (f != null) {
             m_editContext = new P_CellEditorContext(row, col, f);
           }
+          startCellEdit();
           return f;
         }
       }
@@ -4646,15 +4696,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
       try {
         pushUIProcessor();
-        //
-        if (m_editContext != null) {
-          try {
-            m_editContext.getColumn().completeEdit(m_editContext.getRow(), m_editContext.getFormField());
-          }
-          finally {
-            m_editContext = null;
-          }
-        }
+        completeCellEdit();
       }
       finally {
         popUIProcessor();
@@ -4665,8 +4707,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     public void cancelCellEditFromUI() {
       try {
         pushUIProcessor();
-        //
-        m_editContext = null;
+        cancelCellEdit();
       }
       finally {
         popUIProcessor();
