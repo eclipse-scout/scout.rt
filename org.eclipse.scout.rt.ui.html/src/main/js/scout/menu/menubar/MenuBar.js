@@ -278,7 +278,7 @@ scout.MenuBar.prototype._updateTabbableMenu = function() {
   // Make first valid MenuItem tabbable so that it can be focused. All other items
   // are not tabbable. But they can be selected with the arrow keys.
   if (this.tabbable) {
-    if (this.defaultMenu && this.defaultMenu.enabled) {
+    if (this.defaultMenu && this.defaultMenu.enabledComputed) {
       this.setTabbableMenu(this.defaultMenu);
     } else {
       this.setTabbableMenu(scout.arrays.find(this.orderedMenuItems.all, function(item) {
