@@ -84,11 +84,11 @@ public class DataObjectSerializationTestHelperTest {
   @Test
   public void testParse() {
     DoEntity entity = s_testHelper.parse(JSON, DoEntity.class);
-    s_testHelper.assertDoEntityEquals(ENTITY, entity);
+    s_testHelper.assertEquals(ENTITY, entity);
   }
 
   @Test
   public void testCloneT() {
-    s_testHelper.assertDoEntityEquals(ENTITY, s_testHelper.clone(ENTITY));
+    s_testHelper.assertEquals(ENTITY, s_testHelper.clone(ENTITY));
   }
 }
