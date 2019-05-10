@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
 import javax.jms.JMSException;
@@ -33,61 +32,13 @@ import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.job.Jobs;
 import org.junit.Assume;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
 
   public JmsMomWithFailoverTest(AbstractJmsMomTestParameter parameter) {
     super(parameter);
-  }
-
-  @Ignore
-  @Test
-  public void testSubscribeMultipleFailover() throws InterruptedException {
-    Assume.assumeTrue("activemq".equals(m_testParameter.getName()));
-
-    //retryCount=3, retryInterval=1s, sesionRetryInterval=2s
-    FixtureMomWithFailover mom = installMom(FixtureMomWithFailover.class);
-
-    IDestination<String> queue = MOM.newDestination("test/mom/testSubscribeFailover", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, BEANS.get(ObjectMarshaller.class)));
-
-    // Register subscriber
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue,
-        new IMessageListener<String>() {
-          @Override
-          public void onMessage(IMessage<String> message) {
-            System.out.println("RECEIVED " + message.getTransferObject());
-          }
-        },
-        MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO)));
-
-    AtomicBoolean active = new AtomicBoolean();
-    mom.simulateConnectionDown(() -> active.get());
-
-    // Publish messages
-    Jobs.schedule(() -> {
-      int i = 0;
-      while (true) {
-        i++;
-        try {
-          MOM.publish(FixtureMom.class, queue, "message-" + i, MOM.newPublishInput());
-          System.out.println("SEND " + i + " OK");
-        }
-        catch (Exception e) {
-          System.out.println("SEND " + i + " FAILED");
-        }
-        Thread.sleep(1000);
-      }
-    }, Jobs.newInput());
-
-    while (true) {
-      active.set(true);
-      active.set(false);
-    }
   }
 
   @Test
