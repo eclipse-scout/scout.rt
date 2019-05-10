@@ -713,6 +713,24 @@
         <artifactId>xalan</artifactId>
         <version>2.7.2</version>
       </dependency>
+
+      <!-- CXF contains mixed asm dependency versions: 5.2, 6.1 & 6.2 -->
+      <!-- Specify the desired version explicitly here so that always the same version is used -->
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm-commons</artifactId>
+        <version>7.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm-tree</artifactId>
+        <version>7.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>7.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
