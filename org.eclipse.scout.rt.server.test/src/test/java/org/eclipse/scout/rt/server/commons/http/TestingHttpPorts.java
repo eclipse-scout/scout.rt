@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,5 +27,6 @@ public interface TestingHttpPorts {
   int PORT_33003 = 33003;
   int PORT_33004 = 33004;
   int PORT_33005 = 33005;
+  int PORT_33006 = 33006;
   //add new ports for every new test class
 }
