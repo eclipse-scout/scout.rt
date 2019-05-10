@@ -74,7 +74,7 @@ describe('Widget', function() {
   describe('visitChildren', function() {
     var child1, child2, grandChild1, grandChild2, grandChild2_1;
 
-    function createVisitStructure(){
+    function createVisitStructure() {
       child1 = new TestWidget();
       child1.init({
         id: 'child1',
@@ -1018,6 +1018,37 @@ describe('Widget', function() {
       widget.render(session.$entryPoint);
       widget.validateLayoutTree(); // <-- this triggers the focus to be set
       expect(document.activeElement).toBe(widget.$container[0]);
+    });
+  });
+
+  describe('prepareModel', function() {
+    it('default case', function() {
+      var model = {};
+      var widget = new scout.Widget();
+      widget._init = function(model0) {
+         expect(model0).toBe(model);
+      };
+
+      spyOn(widget, '_prepareModel').and.callThrough();
+      widget.init(model);
+      expect(widget._prepareModel.calls.count()).toBe(1);
+    });
+
+    it('changes the model before _init', function() {
+      var widget = new scout.Widget();
+
+      widget._prepareModel = function(model) {
+        model.message = 'B';
+        return model;
+      };
+
+      widget.init({
+        parent: parent,
+        session: session,
+        message: 'A'
+      });
+
+      expect(widget.message).toBe('B');
     });
   });
 

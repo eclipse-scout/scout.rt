@@ -102,10 +102,21 @@ scout.Widget.prototype.init = function(model) {
   if (staticModel) {
     model = $.extend({}, staticModel, model);
   }
+  model = model || {};
+  model = this._prepareModel(model);
   this._init(model);
   this._initKeyStrokeContext();
   this.initialized = true;
   this.trigger('init');
+};
+
+/**
+ * Default implementation simply returns the unmodified model. A Subclass
+ * may override this method to alter the JSON model before the widgets
+ * are created out of the widgetProperties in the model.
+ */
+scout.Widget.prototype._prepareModel = function(model) {
+  return model;
 };
 
 /**
@@ -114,7 +125,6 @@ scout.Widget.prototype.init = function(model) {
  * - session (optional): If not specified the session of the parent is used
  */
 scout.Widget.prototype._init = function(model) {
-  model = model || {};
   if (!model.parent) {
     throw new Error('Parent expected: ' + this);
   }
