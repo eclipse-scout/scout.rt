@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
-const baseConfig = require('./scripts/webpack-defaults');
+const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
 module.exports = (env, args) => {
   let config = baseConfig(env, args);
 

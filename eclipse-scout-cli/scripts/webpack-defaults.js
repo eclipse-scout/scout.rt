@@ -29,7 +29,7 @@ module.exports = (env, args) => {
 
   return {
     target: 'web',
-    mode: 'none',
+    mode: args.mode,
     devtool: devMode ? 'inline-module-source-map' : undefined,
     entry: {
       'eclipse-scout': './index.js',
@@ -43,6 +43,7 @@ module.exports = (env, args) => {
     performance: {
       hints: false
     },
+    stats: "normal",
     module: {
       // LESS
       rules: [{
@@ -60,7 +61,7 @@ module.exports = (env, args) => {
         }, {
           // Interprets @import and url() like import/require() and will resolve them.
           // see: https://webpack.js.org/loaders/css-loader/
-          loader: 'css-loader',
+          loader: require.resolve('css-loader'),
           options: {
             sourceMap: devMode,
             modules: false, // We don't want to work with CSS modules
@@ -69,7 +70,7 @@ module.exports = (env, args) => {
         }, {
           // Compiles Less to CSS.
           // see: https://webpack.js.org/loaders/less-loader/
-          loader: 'less-loader',
+          loader: require.resolve('less-loader'),
           options: {
             sourceMap: devMode
           }
@@ -79,13 +80,16 @@ module.exports = (env, args) => {
         test: /\.m?js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: require.resolve('babel-loader'),
           options: {
             compact: false,
             sourceMaps: devMode ? 'inline' : undefined,
-            plugins: ['@babel/plugin-transform-object-assign', '@babel/proposal-class-properties', '@babel/proposal-object-rest-spread'],
+            plugins: [
+              require.resolve('@babel/plugin-transform-object-assign'),
+              require.resolve('@babel/plugin-proposal-class-properties'),
+              require.resolve('@babel/plugin-proposal-object-rest-spread')],
             presets: [
-              ['@babel/preset-env', {
+              [require.resolve('@babel/preset-env'), {
                 debug: false,
                 targets: {
                   firefox: '35',

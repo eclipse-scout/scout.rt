@@ -1,0 +1,58 @@
+{
+  "name": "@eclipse-scout/cli",
+  "version": "10.0.0",
+  "description": "CLI for eclipse scout",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
+  },
+  "license": "EPL-1.0",
+  "publishConfig": {
+    "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
+  },
+  "engines": {
+    "node": ">=12.1.0",
+    "npm": ">=6.9.0"
+  },
+  "files": [
+    "bin",
+    "scripts"
+  ],
+  "scripts": {
+    "snapshot-version": "node scripts/snapshot-version"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
+    "@babel/preset-env": "^7.4.4",
+    "babel-loader": "^8.0.5",
+    "clean-webpack-plugin": "^2.0.1",
+    "copy-webpack-plugin": "^5.0.3",
+    "css-loader": "^2.1.1",
+    "jasmine-core": "^3.4.0",
+    "karma": "^4.1.0",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.2",
+    "karma-junit-reporter": "^1.2.0",
+    "karma-webpack": "^3.0.5",
+    "less": "^3.9.0",
+    "less-loader": "^5.0.0",
+    "mini-css-extract-plugin": "^0.6.0",
+    "npm": "^6.9.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "terser-webpack-plugin": "^1.2.3",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-dev-server": "^3.3.1",
+    "webpack-shell-plugin": "^0.5.0"
+  },
+  "bin": {
+    "scout-scripts": "./bin/scout-scripts.js"
+  }
+}
