@@ -160,4 +160,28 @@ public final class HttpConfigurationProperties {
       return "scout.http.retryOnSocketExceptionByConnectionReset";
     }
   }
+
+  /**
+   * Enable redirect of POST requests (includes non-idempotent requests). Default is true.
+   *
+   * @since 7.0
+   */
+  public static class ApacheHttpTransportRedirectPostProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public Boolean getDefaultValue() {
+      return true;
+    }
+
+    @Override
+    public String description() {
+      return "Enable redirect of POST requests (includes non-idempotent requests). "
+          + "The default value is true";
+    }
+
+    @Override
+    public String getKey() {
+      return "scout.http.redirectPost";
+    }
+  }
 }

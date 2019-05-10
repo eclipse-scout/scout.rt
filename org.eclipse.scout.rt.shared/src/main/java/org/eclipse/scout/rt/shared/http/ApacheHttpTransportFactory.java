@@ -24,6 +24,7 @@ import org.apache.http.conn.util.PublicSuffixMatcherLoader;
 import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultClientConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTr
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportKeepAliveProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsPerRouteProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportMaxConnectionsTotalProperty;
+import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRedirectPostProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnNoHttpResponseExceptionProperty;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRetryOnSocketExceptionByConnectionResetProperty;
 import org.eclipse.scout.rt.shared.http.proxy.ConfigurableProxySelector;
@@ -75,6 +77,7 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
   protected void setConnectionKeepAliveAndRetrySettings(HttpClientBuilder builder) {
     addConnectionKeepAliveSettings(builder);
     addRetrySettings(builder);
+    addRedirectSettings(builder);
   }
 
   /**
@@ -101,6 +104,19 @@ public class ApacheHttpTransportFactory implements IHttpTransportFactory {
     }
     else {
       builder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, false));
+    }
+  }
+
+  /**
+   * @param builder
+   */
+  protected void addRedirectSettings(HttpClientBuilder builder) {
+    final boolean redirectPost = CONFIG.getPropertyValue(ApacheHttpTransportRedirectPostProperty.class);
+    if (redirectPost) {
+      builder.setRedirectStrategy(EnhancedLaxRedirectStrategy.INSTANCE);
+    }
+    else {
+      builder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE);
     }
   }
 
