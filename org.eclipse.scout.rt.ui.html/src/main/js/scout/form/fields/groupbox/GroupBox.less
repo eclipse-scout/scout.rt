@@ -64,6 +64,17 @@
     padding-bottom: @group-box-title-with-sub-label-padding-bottom;
   }
 
+  &.has-menubar {
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    & > .menubar {
+      display: inline-block;
+      border: none;
+      background-color: transparent;
+    }
+  }
+
   & > .group-box-control {
     display: inline-block;
     color: @title-color;

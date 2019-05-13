@@ -75,7 +75,7 @@ scout.FormTableControl.prototype._setForm = function(form) {
 };
 
 scout.FormTableControl.prototype._adaptForm = function(form) {
-  form.rootGroupBox.menuBar.bottom();
+  form.rootGroupBox.setMenuBarPosition(scout.GroupBox.MenuBarPosition.BOTTOM);
   form.setDisplayHint(scout.Form.DisplayHint.VIEW);
   form.setModal(false);
   form.setAskIfNeedSave(false);

@@ -96,9 +96,9 @@ scout.Planner.prototype._init = function(model) {
   this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
   this.menuBar = scout.create('MenuBar', {
     parent: this,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
   });
-  this.menuBar.bottom();
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
   }

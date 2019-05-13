@@ -110,6 +110,7 @@ scout.Page.prototype._createTable = function() {
  * <code>filter</code> events to the outline mediator.
  */
 scout.Page.prototype._initTable = function(table) {
+  table.menuBar.setPosition(scout.MenuBar.Position.TOP);
   table.on('filter', this._onTableFilter.bind(this));
   if (this.drillDownOnRowClick) {
     table.on('rowClick', this._onTableRowClick.bind(this));

@@ -120,10 +120,10 @@ scout.Tree.prototype._init = function(model) {
   this.selectedNodes = this._nodesByIds(this.selectedNodes);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.MenuItemsOrder(this.session, 'Tree'),
     menuFilter: this._filterMenusHandler
   });
-  this.menuBar.bottom();
   this._updateItemPath(true);
   this._setDisplayStyle(this.displayStyle);
   this._setKeyStrokes(this.keyStrokes);

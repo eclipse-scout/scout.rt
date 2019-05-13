@@ -16,6 +16,8 @@ scout.GroupBox = function() {
   this.fields = [];
   this.menus = [];
   this.menuBarVisible = true;
+  this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
+  this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
   this.notification;
   this.bodyLayoutConfig = null;
   this.borderDecoration = scout.GroupBox.BorderDecoration.AUTO;
@@ -36,8 +38,6 @@ scout.GroupBox = function() {
   this.processButtons = [];
   this.processMenus = [];
   this.staticMenus = [];
-  this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
-  this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
   this.responsive = null;
 
   this.$body;
@@ -55,11 +55,16 @@ scout.GroupBox.BorderDecoration = {
 scout.GroupBox.MenuBarPosition = {
   AUTO: 'auto',
   TOP: 'top',
-  BOTTOM: 'bottom'
+  BOTTOM: 'bottom',
+  TITLE: 'title'
 };
 
 scout.GroupBox.prototype._init = function(model) {
   scout.GroupBox.parent.prototype._init.call(this, model);
+  this.resolveConsts([{
+    property: 'menuBarPosition',
+    constType: scout.GroupBox.MenuBarPosition
+  }]);
   this._setBodyLayoutConfig(this.bodyLayoutConfig);
   this.menuBar = scout.create('MenuBar', {
     parent: this,
@@ -69,7 +74,7 @@ scout.GroupBox.prototype._init = function(model) {
   this._setMainBox(this.mainBox);
   this._updateMenuBar();
 
-  scout.responsiveManager.registerHandler(this, scout.create("GroupBoxResponsiveHandler", {
+  scout.responsiveManager.registerHandler(this, scout.create('GroupBoxResponsiveHandler', {
     widget: this
   }));
 
@@ -334,7 +339,7 @@ scout.GroupBox.prototype.setMainBox = function(mainBox) {
 scout.GroupBox.prototype._setMainBox = function(mainBox) {
   this._setProperty('mainBox', mainBox);
   if (this.mainBox) {
-    this.menuBar.large();
+    this.menuBar.setCssClass('main-menubar');
     if (this.scrollable === null) {
       this.setScrollable(true);
     }
@@ -515,8 +520,11 @@ scout.GroupBox.prototype._renderMenuBarVisible = function() {
 
 scout.GroupBox.prototype._renderMenuBar = function() {
   this.menuBar.render();
-  if (this.menuBar.position === 'top') {
-    // move after title
+  if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
+    // move right of title
+    this.menuBar.$container.insertAfter(this.$subLabel);
+  } else if (this.menuBar.position === scout.MenuBar.Position.TOP) {
+    // move below title
     this.menuBar.$container.insertAfter(this.$title);
   }
 };
@@ -526,10 +534,18 @@ scout.GroupBox.prototype.setMenuBarPosition = function(menuBarPosition) {
 };
 
 scout.GroupBox.prototype._renderMenuBarPosition = function() {
-  if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.BOTTOM) {
-    this.menuBar.bottom();
-  } else if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TOP) {
-    this.menuBar.top();
+  var position = this.menuBarPosition;
+  if (position === scout.GroupBox.MenuBarPosition.AUTO) {
+    position = scout.GroupBox.MenuBarPosition.TOP;
+  }
+
+  var hasMenubar = position === scout.GroupBox.MenuBarPosition.TITLE;
+  this.$title.toggleClass('has-menubar', hasMenubar);
+
+  if (position === scout.GroupBox.MenuBarPosition.BOTTOM) {
+    this.menuBar.setPosition(scout.MenuBar.Position.BOTTOM);
+  } else { // top + inline
+    this.menuBar.setPosition(scout.MenuBar.Position.TOP);
   }
 
   if (this.rendered) {
@@ -540,15 +556,10 @@ scout.GroupBox.prototype._renderMenuBarPosition = function() {
 
 scout.GroupBox.prototype.setMenuBarEllipsisPosition = function(menuBarEllipsisPosition) {
   this.setProperty('menuBarEllipsisPosition', menuBarEllipsisPosition);
+  this.menuBar.setEllipsisPosition(menuBarEllipsisPosition);
 };
 
 scout.GroupBox.prototype._renderMenuBarEllipsisPosition = function() {
-  if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
-    this.menuBar.ellipsisRight();
-  } else if (this.menuBarEllipsisPosition === scout.MenuBar.EllipsisPosition.LEFT) {
-    this.menuBar.ellipsisLeft();
-  }
-
   this.menuBar.reorderMenus();
   if (this.rendered) {
     this.menuBar.remove();

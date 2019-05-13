@@ -411,8 +411,7 @@ scout.DesktopBench.prototype.updateOutlineContent = function() {
   }
   if (content) {
     if (content instanceof scout.Table) {
-      content.menuBar.top();
-      content.menuBar.large();
+      content.menuBar.setCssClass('main-menubar');
     }
     content.displayViewId = 'C';
   }

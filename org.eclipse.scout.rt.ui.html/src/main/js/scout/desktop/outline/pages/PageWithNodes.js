@@ -34,6 +34,7 @@ scout.PageWithNodes.prototype._createTable = function() {
     headerVisible: false,
     columns: [nodeColumn]
   });
+  table.menuBar.setPosition(scout.MenuBar.Position.TOP);
   table.on('rowAction', this._onDetailTableRowAction.bind(this));
   return table;
 };

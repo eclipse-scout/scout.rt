@@ -28,10 +28,10 @@ scout.TableHeader.prototype._init = function(options) {
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
+    tabbable: false,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  this.menuBar.tabbable = false;
-  this.menuBar.bottom();
   this.menuBar.on('propertyChange', this._onMenuBarPropertyChange.bind(this));
   this.updateMenuBar();
 };

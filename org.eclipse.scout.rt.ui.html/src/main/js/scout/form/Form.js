@@ -567,7 +567,7 @@ scout.Form.prototype._setRootGroupBox = function(rootGroupBox) {
     this.rootGroupBox.setMainBox(true);
 
     if (this.isDialog() || this.searchForm || this.parent instanceof scout.WrappedFormField) {
-      this.rootGroupBox.menuBar.bottom();
+      this.rootGroupBox.setMenuBarPosition(scout.GroupBox.MenuBarPosition.BOTTOM);
     }
   }
 };

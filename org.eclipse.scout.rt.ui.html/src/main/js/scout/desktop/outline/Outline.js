@@ -74,14 +74,14 @@ scout.Outline.prototype._init = function(model) {
   });
   this.nodeMenuBar = scout.create('MenuBar', {
     parent: this,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  this.nodeMenuBar.bottom();
   this.detailMenuBar = scout.create('MenuBar', {
     parent: this,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.GroupBoxMenuItemsOrder()
   });
-  this.detailMenuBar.bottom();
 
   this._setDefaultDetailForm(this.defaultDetailForm);
   this._setOutlineOverviewVisible(this.outlineOverviewVisible);

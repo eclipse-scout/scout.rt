@@ -187,10 +187,7 @@ scout.Table.prototype._init = function(model) {
   });
 
   this.menuBar = this._createMenuBar();
-  this.menuBar.bottom();
-
   this._setSelectedRows(this.selectedRows);
-
   this._setKeyStrokes(this.keyStrokes);
   this._setMenus(this.menus);
   this._setTableControls(this.tableControls);
@@ -3995,6 +3992,9 @@ scout.Table.prototype._setMenuBarVisible = function(visible) {
 scout.Table.prototype._renderMenuBarVisible = function() {
   if (this.menuBarVisible) {
     this.menuBar.render();
+    if (this.menuBar.position === scout.MenuBar.Position.TOP) {
+      this.menuBar.$container.prependTo(this.$container);
+    }
   } else {
     this.menuBar.remove();
   }
@@ -4005,6 +4005,7 @@ scout.Table.prototype._renderMenuBarVisible = function() {
 scout.Table.prototype._createMenuBar = function() {
   return scout.create('MenuBar', {
     parent: this,
+    position: scout.MenuBar.Position.BOTTOM,
     menuOrder: new scout.MenuItemsOrder(this.session, 'Table'),
     menuFilter: this._filterMenusHandler
   });

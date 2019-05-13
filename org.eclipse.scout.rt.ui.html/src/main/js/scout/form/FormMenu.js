@@ -97,7 +97,7 @@ scout.FormMenu.prototype._openPopup = function() {
  */
 scout.FormMenu.prototype._createPopup = function() {
   // Menu bar should always be on the bottom
-  this.form.rootGroupBox.menuBar.bottom();
+  this.form.rootGroupBox.setMenuBarPosition(scout.GroupBox.MenuBarPosition.BOTTOM);
 
   if (this.popupStyle === scout.FormMenu.PopupStyle.MOBILE) {
     return scout.create('MobilePopup', {

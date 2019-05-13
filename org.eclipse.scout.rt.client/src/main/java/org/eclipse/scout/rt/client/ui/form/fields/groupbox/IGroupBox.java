@@ -121,6 +121,11 @@ public interface IGroupBox extends ICompositeField, IContextMenuOwner {
   String MENU_BAR_POSITION_BOTTOM = "bottom";
 
   /**
+   * Render an {@link IGroupBox} with the menuBar merged into the title.
+   */
+  String MENU_BAR_POSITION_TITLE = "title";
+
+  /**
    * {@link String}
    */
   String PROP_MENU_BAR_ELLIPSIS_POSITION = "menuBarEllipsisPosition";

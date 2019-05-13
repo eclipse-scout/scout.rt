@@ -13,8 +13,7 @@ scout.MenuBar = function() {
 
   this.menuSorter = null;
   this.menuFilter = null;
-  this.position = 'top'; // or 'bottom'
-  this.size = 'small'; // or 'large'
+  this.position = scout.MenuBar.Position.TOP;
   this.tabbable = true;
   this.menuboxLeft = null;
   this.menuboxRight = null;
@@ -26,10 +25,8 @@ scout.MenuBar = function() {
   };
   this.defaultMenu = null;
   this.visible = false;
-  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.RIGHT;
-
+  this.ellipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
-
   this._addWidgetProperties('menuItems');
 };
 scout.inherits(scout.MenuBar, scout.Widget);
@@ -37,6 +34,11 @@ scout.inherits(scout.MenuBar, scout.Widget);
 scout.MenuBar.EllipsisPosition = {
   LEFT: 'left',
   RIGHT: 'right'
+};
+
+scout.MenuBar.Position = {
+  TOP: 'top',
+  BOTTOM: 'bottom'
 };
 
 scout.MenuBar.prototype._init = function(options) {
@@ -53,12 +55,12 @@ scout.MenuBar.prototype._init = function(options) {
   this.menuboxLeft = scout.create('MenubarBox', {
     parent: this,
     cssClass: 'left',
-    position: this.position
+    tooltipPosition: this._oppositePosition()
   });
   this.menuboxRight = scout.create('MenubarBox', {
     parent: this,
     cssClass: 'right',
-    position: this.position
+    tooltipPosition: this._oppositePosition()
   });
 
   this._setMenuItems(scout.arrays.ensure(this.menuItems));
@@ -93,18 +95,11 @@ scout.MenuBar.prototype._initKeyStrokeContext = function() {
  * @override Widget.js
  */
 scout.MenuBar.prototype._render = function() {
-  this.$container = this.$parent.makeDiv('menubar')
-    .toggleClass('main-menubar', this.size === 'large');
+  this.$container = this.$parent.appendDiv('menubar');
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MenuBarLayout(this));
 
-  if (this.position === 'top') {
-    this.$parent.prepend(this.$container);
-  } else {
-    this.$container.addClass('bottom');
-    this.$parent.append(this.$container);
-  }
   this.menuboxRight.render(this.$container);
   this.menuboxLeft.render(this.$container);
 };
@@ -112,6 +107,7 @@ scout.MenuBar.prototype._render = function() {
 scout.MenuBar.prototype._renderProperties = function() {
   scout.MenuBar.parent.prototype._renderProperties.call(this);
   this._renderMenuItems();
+  this._renderPosition();
 };
 
 scout.MenuBar.prototype._remove = function() {
@@ -119,24 +115,21 @@ scout.MenuBar.prototype._remove = function() {
   this._removeMenuItems();
 };
 
-scout.MenuBar.prototype.bottom = function() {
-  this.position = 'bottom';
+scout.MenuBar.prototype.setPosition = function(position) {
+  this.setProperty('position', position);
 };
 
-scout.MenuBar.prototype.top = function() {
-  this.position = 'top';
+scout.MenuBar.prototype._renderPosition = function() {
+  this.$container.toggleClass('bottom', this.position === scout.MenuBar.Position.BOTTOM);
 };
 
-scout.MenuBar.prototype.large = function() {
-  this.size = 'large';
+scout.MenuBar.prototype._oppositePosition = function() {
+  return this.position === scout.MenuBar.Position.TOP ?
+      scout.MenuBar.Position.BOTTOM : scout.MenuBar.Position.TOP;
 };
 
-scout.MenuBar.prototype.ellipsisRight = function() {
-  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.RIGHT;
-};
-
-scout.MenuBar.prototype.ellipsisLeft = function() {
-  this.ellipsisMenuPosition = scout.MenuBar.EllipsisPosition.LEFT;
+scout.MenuBar.prototype.setEllipsisPosition = function(ellipsisPosition) {
+  this.setProperty('ellipsisPosition', ellipsisPosition);
 };
 
 /**
@@ -179,7 +172,6 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   // remove property listeners of old menu items.
   this._detachMenuHandlers();
-
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
   if (rightFirst) {
@@ -227,7 +219,7 @@ scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
     this._ellipsis = ellipsis;
 
     // add ellipsis to the correct position
-    if (this.ellipsisMenuPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+    if (this.ellipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
       // try right
       var reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
       if (reverseIndexPosition > -1) {
@@ -286,6 +278,10 @@ scout.MenuBar.prototype._updateTabbableMenu = function() {
       }));
     }
   }
+};
+
+scout.MenuBar.prototype.setEllipsisPositon = function(ellipsisPositon) {
+  this.setProperty('ellipsisPositon', ellipsisPositon);
 };
 
 scout.MenuBar.prototype.setTabbableMenu = function(menu) {

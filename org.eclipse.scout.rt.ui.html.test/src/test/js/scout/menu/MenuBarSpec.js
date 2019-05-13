@@ -454,7 +454,7 @@ describe("MenuBar", function() {
       leftMenu1.horizontalAlignment = -1;
       leftMenu2.visible = true;
       leftMenu2.horizontalAlignment = -1;
-      menuBar.ellipsisRight();
+      menuBar.setEllipsisPosition(scout.MenuBar.EllipsisPosition.RIGHT);
       menuBar.setMenuItems(menus);
       menuBar.render();
 
@@ -495,7 +495,7 @@ describe("MenuBar", function() {
       leftMenu1.horizontalAlignment = -1;
       leftMenu2.visible = true;
       leftMenu2.horizontalAlignment = -1;
-      menuBar.ellipsisLeft();
+      menuBar.setEllipsisPosition(scout.MenuBar.EllipsisPosition.LEFT);
       menuBar.setMenuItems(menus);
       menuBar.render();
 

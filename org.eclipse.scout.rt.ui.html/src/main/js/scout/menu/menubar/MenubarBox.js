@@ -11,6 +11,7 @@
 scout.MenubarBox = function() {
   scout.MenubarBox.parent.call(this);
   this.menuItems = [];
+  this.tooltipPositon = scout.MenuBar.Position.TOP;
   this._addWidgetProperties('menuItems');
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
 };
@@ -70,10 +71,8 @@ scout.MenubarBox.prototype._removeMenuItems = function() {
 };
 
 scout.MenubarBox.prototype._renderMenuItems = function() {
-  var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
-
   this.menuItems.forEach(function(item) {
-    item.tooltipPosition = tooltipPosition;
+    item.tooltipPosition = this.tooltipPosition;
     item.render(this.$container);
     item.$container.addClass('menubar-item');
   }.bind(this));
