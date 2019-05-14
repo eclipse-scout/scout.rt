@@ -3898,8 +3898,9 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
 };
 
 scout.Table.prototype._triggerRequestTiles = function() {
-  var event = {};
+  var event = new scout.Event();
   this.trigger('requestTiles', event);
+  return event;
 };
 
 scout.Table.prototype.setHeaderVisible = function(visible) {
@@ -3957,8 +3958,23 @@ scout.Table.prototype.setTileMode = function(tileMode) {
   this.setHeaderVisible(!tileMode);
   this.setProperty('tileMode', tileMode);
   if (this.tileMode && changed) {
-    this._triggerRequestTiles();
+    var e = this._triggerRequestTiles();
+    if (!e.defaultPrevented) {
+      this.replaceTiles(this._createTiles(this.rows));
+    }
   }
+};
+
+scout.Table.prototype._createTiles = function(rows) {
+  return rows.map(function(row) {
+    var tile = this.createTileForRow(row);
+    tile.rowId = row.id;
+    return tile;
+  }, this);
+};
+
+scout.Table.prototype.createTileForRow = function(row) {
+  throw new Error('Not implemented');
 };
 
 scout.Table.prototype._renderTileMode = function() {

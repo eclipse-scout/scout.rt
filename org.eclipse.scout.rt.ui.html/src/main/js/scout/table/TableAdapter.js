@@ -104,6 +104,7 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
 };
 
 scout.TableAdapter.prototype._onWidgetRequestTiles = function(event) {
+  event.preventDefault();
   this._sendRequestTiles();
 };
 
