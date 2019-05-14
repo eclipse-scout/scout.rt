@@ -110,11 +110,6 @@ scout.MenuBar.prototype._renderProperties = function() {
   this._renderPosition();
 };
 
-scout.MenuBar.prototype._remove = function() {
-  scout.MenuBar.parent.prototype._remove.call(this);
-  this._removeMenuItems();
-};
-
 scout.MenuBar.prototype.setPosition = function(position) {
   this.setProperty('position', position);
 };
@@ -193,14 +188,8 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function() {
-  this._attachMenuHandlers();
-  this.updateLastItemMarker();
   this.updateLeftOfButtonMarker();
   this.invalidateLayoutTree();
-};
-
-scout.MenuBar.prototype._removeMenuItems = function() {
-  this._detachMenuHandlers();
 };
 
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
@@ -294,33 +283,6 @@ scout.MenuBar.prototype.setTabbableMenu = function(menu) {
   this.tabbableMenu = menu;
   if (menu) {
     menu.setTabbable(true);
-  }
-};
-
-/**
- * Ensures that the last visible menu item (no matter if it is in the left or the right menu box)
- * has the class 'last' (to remove the margin-right). Call this method whenever the visibility of
- * single items change.
- */
-scout.MenuBar.prototype.updateLastItemMarker = function() {
-  // Remove the 'last' class from the current last visible item
-  if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
-    this._lastVisibleItem.$container.removeClass('last');
-  }
-  this._lastVisibleItem = null;
-
-  // Find the new last visible item (from left to right)
-  var setLastVisibleItemFn = function(item) {
-    if (item.visible) {
-      this._lastVisibleItem = item;
-    }
-  }.bind(this);
-  this.orderedMenuItems.left.forEach(setLastVisibleItemFn);
-  this.orderedMenuItems.right.forEach(setLastVisibleItemFn);
-
-  // Assign the class to the found item
-  if (this._lastVisibleItem && this._lastVisibleItem.rendered) {
-    this._lastVisibleItem.$container.addClass('last');
   }
 };
 
