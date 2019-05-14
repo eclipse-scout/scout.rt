@@ -287,6 +287,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * <li>{@link #MENU_BAR_POSITION_AUTO}</li>
    * <li>{@link #MENU_BAR_POSITION_TOP}</li>
    * <li>{@link #MENU_BAR_POSITION_BOTTOM}</li>
+   * <li>{@link #MENU_BAR_POSITION_TITLE}</li>
    * </ul>
    */
   @ConfigProperty(ConfigProperty.GROUP_BOX_MENU_BAR_POSITION)
