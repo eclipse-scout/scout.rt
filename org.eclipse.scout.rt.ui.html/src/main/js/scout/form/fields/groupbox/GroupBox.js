@@ -544,7 +544,7 @@ scout.GroupBox.prototype._renderMenuBarPosition = function() {
 
   if (position === scout.GroupBox.MenuBarPosition.BOTTOM) {
     this.menuBar.setPosition(scout.MenuBar.Position.BOTTOM);
-  } else { // top + inline
+  } else { // top + title
     this.menuBar.setPosition(scout.MenuBar.Position.TOP);
   }
 

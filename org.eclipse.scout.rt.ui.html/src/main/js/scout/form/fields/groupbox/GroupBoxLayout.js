@@ -28,7 +28,7 @@ scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
 };
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var marginX, menuBarSize, gbBodySize,
+  var menuBarSize, gbBodySize,
     statusWidth = 0,
     statusPosition = this.groupBox.statusPosition,
     htmlContainer = this.groupBox.htmlComp,
@@ -51,46 +51,38 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     statusWidth = $status.outerWidth(true);
   }
 
-  if (this.groupBox.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
-    // position: TITLE
-    var titleSize = scout.graphics.prefSize(this.groupBox.$title);
-    var titleLabelWidth = scout.graphics.prefSize(this.groupBox.$label, true).width;
-
-    if (htmlMenuBar) {
+  // Menu-bar
+  if (htmlMenuBar) {
+    if (this.groupBox.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
+      // position: TITLE
+      var titleSize = scout.graphics.prefSize(this.groupBox.$title);
+      var titleLabelWidth = scout.graphics.prefSize(this.groupBox.$label, true).width;
       menuBarSize = this._menuBarSize(htmlMenuBar, titleSize, statusWidth);
       menuBarSize.width -= titleLabelWidth;
-      htmlMenuBar.setSize(menuBarSize);
-    }
-
-    gbBodySize = containerSize.subtract(htmlGbBody.margins());
-    gbBodySize.height -= this._titleHeight();
-    gbBodySize.height -= this._notificationHeight();
-  } else {
-    // position: TOP and BOTTOM
-    if (htmlMenuBar) {
-      menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
-      htmlMenuBar.setSize(menuBarSize);
     } else {
-      menuBarSize = new scout.Dimension(0, 0);
+      // position: TOP and BOTTOM
+      menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
     }
-
-    gbBodySize = containerSize.subtract(htmlGbBody.margins());
-    gbBodySize.height -= this._titleHeight();
-    gbBodySize.height -= this._notificationHeight();
-    gbBodySize.height -= menuBarSize.height;
+    htmlMenuBar.setSize(menuBarSize);
+  } else {
+    menuBarSize = new scout.Dimension(0, 0);
   }
 
   // Position of label and title
+  setWidthForStatus($label);
+  setWidthForStatus($groupBoxTitle);
   if (statusPosition === scout.FormField.StatusPosition.TOP) {
-    marginX = $label.cssMarginX() + statusWidth;
-    $label.cssWidth('calc(100% - ' + marginX + 'px)');
-    $groupBoxTitle.cssWidth('');
+    if (this.groupBox.menuBarPosition !== scout.GroupBox.MenuBarPosition.TITLE) {
+      setWidthForStatus($label, statusWidth);
+    }
   } else {
-    marginX = $groupBoxTitle.cssMarginX() + statusWidth;
-    $label.cssWidth('');
-    $groupBoxTitle.cssWidth('calc(100% - ' + marginX + 'px)');
+    setWidthForStatus($groupBoxTitle, statusWidth);
   }
 
+  gbBodySize = containerSize.subtract(htmlGbBody.margins());
+  gbBodySize.height -= this._titleHeight();
+  gbBodySize.height -= this._notificationHeight();
+  gbBodySize.height -= menuBarSize.height;
   $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
@@ -101,6 +93,16 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0) {
     scout.scrollbars.update(htmlGbBody.$comp);
+  }
+
+  // Make $element wider, so status is on the left
+  function setWidthForStatus($element, statusWidth) {
+    if (statusWidth) {
+      var marginX = $element.cssMarginX() + statusWidth;
+      $element.cssWidth('calc(100% - ' + marginX + 'px)');
+    } else {
+      $element.cssWidth('');
+    }
   }
 };
 
