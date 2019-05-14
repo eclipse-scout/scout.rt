@@ -194,7 +194,7 @@ scout.PageWithTable.prototype.requestTiles = function() {
 };
 
 scout.PageWithTable.prototype._requestTiles = function() {
-  return $.resolvedDeferred();
+  return $.resolvedDeferred([]);
 };
 
 scout.PageWithTable.prototype._onRequestTilesDone = function(tiles) {
