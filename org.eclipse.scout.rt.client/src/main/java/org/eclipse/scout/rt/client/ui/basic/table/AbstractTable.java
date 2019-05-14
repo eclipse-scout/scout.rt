@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableApp
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTileChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateRowChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
@@ -108,7 +108,9 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
+import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -202,6 +204,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private ITableOrganizer m_tableOrganizer;
   private boolean m_treeStructureDirty;
+  private Map<ITableRow, ITile> m_tiles; // synchronized map
 
   public AbstractTable() {
     this(true);
@@ -220,6 +223,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_rows = Collections.synchronizedList(new ArrayList<>(1));
     m_rootRows = Collections.synchronizedList(new ArrayList<>(1));
     m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
+    m_tiles = Collections.synchronizedMap(new HashMap<ITableRow, ITile>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
     m_attachmentSupport = BEANS.get(AttachmentSupport.class);
@@ -883,13 +887,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Called when this table requests tiles to be displayed.
-   * <p>
-   * Subclasses can override this method. The default does nothing.
+   * Called by {@link #createTiles(List)}
    */
   @ConfigOperation
   @Order(140)
-  protected void execCreateTiles(List<? extends ITableRow> rows) {
+  protected ITile execCreateTile(ITableRow row) {
+    return null;
   }
 
   /**
@@ -4307,6 +4310,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  private void fireTilesInserted(Map<? extends ITableRow, ? extends ITile> tiles) {
+    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_TILES_INSERTED, null, tiles));
+  }
+
   // main handler
   public void fireTableEventInternal(TableEvent e) {
     if (isTableChanging()) {
@@ -4432,12 +4439,23 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public void createTiles(List<? extends ITableRow> rows) {
     try {
       disposeTableInternal();
-      interceptCreateTiles(rows);
+
+      Map<ITableRow, ITile> rowToTileMap = rows.stream()
+          .map(r -> new ImmutablePair<>(r, interceptCreateTile(r)))
+          .filter(p -> p.getRight() != null)
+          .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+      insertTiles(rowToTileMap);
     }
     catch (Exception e) {
-      LOG.error("Could not request tiles [{}]", getClass().getName(), e);
+      LOG.error("Could not create tiles [{}]", getClass().getName(), e);
     }
     super.disposeInternal();
+  }
+
+  @Override
+  public void insertTiles(Map<ITableRow, ITile> rowToTileMap) {
+    m_tiles.putAll(rowToTileMap);
+    fireTilesInserted(rowToTileMap);
   }
 
   /*
@@ -5024,8 +5042,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
-    public void execCreateTiles(TableCreateTilesChain chain, List<? extends ITableRow> rows) {
-      getOwner().execCreateTiles(rows);
+    public ITile execCreateTile(TableCreateTileChain chain, ITableRow row) {
+      return getOwner().execCreateTile(row);
     }
   }
 
@@ -5119,10 +5137,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return chain.execDrag(rows);
   }
 
-  protected final void interceptCreateTiles(List<? extends ITableRow> rows) {
+  protected final ITile interceptCreateTile(ITableRow row) {
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
-    TableCreateTilesChain chain = new TableCreateTilesChain(extensions);
-    chain.execCreateTiles(rows);
+    TableCreateTileChain chain = new TableCreateTileChain(extensions);
+    return chain.execCreateTile(row);
   }
 
   @Override
@@ -5221,16 +5239,5 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setTileMode(boolean tileMode) {
     propertySupport.setProperty(PROP_TILE_MODE, tileMode);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<? extends ITile> getTiles() {
-    return (List<? extends ITile>) propertySupport.getProperty(PROP_TILES);
-  }
-
-  @Override
-  public void setTiles(List<? extends ITile> tiles) {
-    propertySupport.setProperty(PROP_TILES, tiles);
   }
 }

@@ -124,6 +124,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String EVENT_FILTERS_CHANGED = "filtersChanged";
   public static final String EVENT_FILTER = "filter";
   public static final String EVENT_REQUEST_TILES = "createTiles";
+  public static final String EVENT_TILES_INSERTED = "tilesInserted";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -136,6 +137,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String PROP_SELECTED_ROWS = "selectedRows";
   public static final String PROP_FILTERS = "filters";
   public static final String PROP_HAS_RELOAD_HANDLER = "hasReloadHandler";
+  public static final String PROP_TILES = "tiles";
 
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
@@ -406,12 +408,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       protected Boolean modelValue() {
         return getModel().isTileMode();
-      }
-    });
-    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TILES, model, getUiSession()) {
-      @Override
-      protected List<? extends ITile> modelValue() {
-        return getModel().getTiles();
       }
     });
   }
@@ -1360,6 +1356,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       case TableEvent.TYPE_END_CELL_EDIT:
         handleModelEndCellEdit(event);
         break;
+      case TableEvent.TYPE_TILES_INSERTED:
+        handleModelTilesInserted(event.getTiles());
+        break;
       default:
         // NOP
     }
@@ -1373,6 +1372,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_INSERTED, jsonEvent);
+  }
+
+  protected void handleModelTilesInserted(Map<? extends ITableRow, ? extends ITile> tiles) {
+    JSONObject data = new JSONObject();
+    tiles.entrySet().stream().forEach(e -> data.put(getTableRowId(e.getKey()), getUiSession().getOrCreateJsonAdapter(e.getValue(), this).getId()));
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_TILES, data);
+    addActionEvent(EVENT_TILES_INSERTED, jsonEvent);
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {

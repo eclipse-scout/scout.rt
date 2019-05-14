@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.extension.ui.tile.TileChains.TileLoadDataTile
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.DataChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeListener;
@@ -58,9 +57,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private IDataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
   private volatile boolean m_loaded = false;
-
-  // FIXME [10.0] rmu temporary workaround, remove later
-  private ITableRow m_tableRow;
 
   public AbstractTile() {
     this(true);
@@ -569,17 +565,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   protected ITileExtension<? extends AbstractTile> createLocalExtension() {
     return new LocalTileExtension<>(this);
-  }
-
-  // FIXME [10.0] rmu temporary workaround, remove later
-  @Override
-  public ITableRow getTableRow() {
-    return m_tableRow;
-  }
-
-  // FIXME [10.0] rmu temporary workaround, remove later
-  public void setTableRow(ITableRow tableRow) {
-    m_tableRow = tableRow;
   }
 
   /**

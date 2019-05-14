@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.tile;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
@@ -20,7 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 
 /**
  * @since 8.0
@@ -71,19 +69,6 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
       @Override
       public Object prepareValueForToJson(Object value) {
         return JsonGridData.toJson((GridData) value);
-      }
-    });
-    // FIXME [10.0] rmu temporary workaround, remove later
-    putJsonProperty(new JsonProperty<T>("rowId", model) {
-      @Override
-      protected String modelValue() {
-        ITableRow row = getModel().getTableRow();
-        if (row == null) {
-          return "";
-        }
-        else {
-          return ((JsonTable) getAdapter(row.getTable())).getTableRowId(row);
-        }
       }
     });
   }

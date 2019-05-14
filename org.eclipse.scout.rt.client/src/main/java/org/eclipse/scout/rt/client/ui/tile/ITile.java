@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.tile;
 
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
@@ -67,10 +66,9 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void onLoadDataCancel();
 
+  @Override
   void setLoading(boolean loading);
 
+  @Override
   boolean isLoading();
-
-  // FIXME [10.0] rmu temporary workaround, remove later
-  ITableRow getTableRow();
 }

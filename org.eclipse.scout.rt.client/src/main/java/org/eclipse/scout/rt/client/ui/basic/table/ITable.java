@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.AbstractEventBuffer;
@@ -242,13 +243,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 10.0
    */
   String PROP_TILE_MODE = "tileMode";
-
-  /**
-   * type {@link List} of {@link ITile}
-   *
-   * @since 10.0
-   */
-  String PROP_TILES = "tiles";
 
   /**
    * @since 5.1.0
@@ -1302,10 +1296,5 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   /**
    * @since 10.0
    */
-  List<? extends ITile> getTiles();
-
-  /**
-   * @since 10.0
-   */
-  void setTiles(List<? extends ITile> tiles);
+  void insertTiles(Map<ITableRow, ITile> rowToTileMap);
 }

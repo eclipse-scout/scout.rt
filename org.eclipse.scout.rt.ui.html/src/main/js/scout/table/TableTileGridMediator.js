@@ -172,6 +172,9 @@ scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = functio
 scout.TableTileGridMediator.prototype.syncScrollTopFromTableToTile = function() {
   var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
   var tile = this.tilesMap[this.table.rows[rowIndex].id];
+  if (!tile) {
+    return;
+  }
   this.tileGrid.scrollTo(tile, {
     align: 'top'
   });
