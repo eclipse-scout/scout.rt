@@ -292,4 +292,21 @@ public final class TableChains {
       return methodInvocation.getReturnValue();
     }
   }
+
+  public static class TableRequestTilesChain extends AbstractTableChain {
+
+    public TableRequestTilesChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+      super(extensions);
+    }
+
+    public void execRequestTiles() {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
+          next.execRequestTiles(TableRequestTilesChain.this);
+        }
+      };
+      callChain(methodInvocation);
+    }
+  }
 }

@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDis
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRequestTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
@@ -69,5 +70,7 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
   void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows);
 
   TransferObject execDrag(TableDragChain chain, List<ITableRow> rows);
+
+  void execRequestTiles(TableRequestTilesChain chain);
 
 }

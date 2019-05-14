@@ -129,4 +129,6 @@ public interface ITableUIFacade {
   void removeFilteredRowsFromUI();
 
   void setColumnBackgroundEffect(INumberColumn<?> column, String mode);
+
+  void fireRequestTiles();
 }

@@ -43,6 +43,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDis
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRequestTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
@@ -89,6 +90,7 @@ import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -630,6 +632,17 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
+   * Configures whether the table tile mode is enabled by default.
+   * <p>
+   * Subclasses can override this method. Default is <code>false</code>
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(280)
+  protected boolean getConfiguredTileModeEnabled() {
+    return false;
+  }
+
+  /**
    * <p>
    * Called after a drag operation was executed on one or several table rows.
    * </p>
@@ -870,6 +883,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
+   * Called when this table requests tiles to be displayed.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   */
+  @ConfigOperation
+  @Order(140)
+  protected void execRequestTiles() {
+  }
+
+  /**
    * This method is called during initializing the table and is thought to add header menus to the given collection of
    * menus. Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}.<br>
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
@@ -940,6 +963,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
     setTruncatedCellTooltipEnabled(getConfiguredTruncatedCellTooltipEnabled());
+    setTileMode(getConfiguredTileModeEnabled());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -978,6 +1002,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
+
       @Override
       public void tableChanged(TableEvent e) {
         //event history
@@ -1048,17 +1073,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             break;
         }
       }
-    },
-        TableEvent.TYPE_ROWS_DRAG_REQUEST,
-        TableEvent.TYPE_ROW_DROP_ACTION,
-        TableEvent.TYPE_ROWS_COPY_REQUEST,
-        TableEvent.TYPE_ALL_ROWS_DELETED,
-        TableEvent.TYPE_ROWS_DELETED,
-        TableEvent.TYPE_ROWS_INSERTED,
-        TableEvent.TYPE_ROWS_UPDATED,
-        TableEvent.TYPE_ROWS_CHECKED,
-        TableEvent.TYPE_COLUMN_HEADERS_UPDATED,
-        TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
+
+    }, TableEvent.TYPE_ROWS_DRAG_REQUEST, TableEvent.TYPE_ROW_DROP_ACTION, TableEvent.TYPE_ROWS_COPY_REQUEST, TableEvent.TYPE_ALL_ROWS_DELETED, TableEvent.TYPE_ROWS_DELETED, TableEvent.TYPE_ROWS_INSERTED, TableEvent.TYPE_ROWS_UPDATED,
+        TableEvent.TYPE_ROWS_CHECKED, TableEvent.TYPE_COLUMN_HEADERS_UPDATED, TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED);
   }
 
   protected void initMenus() {
@@ -4411,6 +4428,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
+  @Override
+  public void requestTiles() {
+    try {
+      disposeTableInternal();
+      interceptRequestTiles();
+    }
+    catch (Exception e) {
+      LOG.error("Could not request tiles [{}]", getClass().getName(), e);
+    }
+    super.disposeInternal();
+  }
+
   /*
    * UI Notifications
    */
@@ -4866,6 +4895,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         popUIProcessor();
       }
     }
+
+    @Override
+    public void fireRequestTiles() {
+      try {
+        pushUIProcessor();
+        //
+        AbstractTable.this.requestTiles();
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {
@@ -4981,6 +5022,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     public void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> row) {
       getOwner().execRowsChecked(row);
     }
+
+    @Override
+    public void execRequestTiles(TableRequestTilesChain chain) {
+      getOwner().execRequestTiles();
+    }
   }
 
   protected final void interceptAppLinkAction(String ref) {
@@ -5071,6 +5117,12 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableDragChain chain = new TableDragChain(extensions);
     return chain.execDrag(rows);
+  }
+
+  protected final void interceptRequestTiles() {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRequestTilesChain chain = new TableRequestTilesChain(extensions);
+    chain.execRequestTiles();
   }
 
   @Override
@@ -5169,5 +5221,26 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       truncatedCellTooltipEnabled = TriState.UNDEFINED;
     }
     propertySupport.setProperty(PROP_TRUNCATED_CELL_TOOLTIP_ENABLED, truncatedCellTooltipEnabled);
+  }
+
+  @Override
+  public boolean isTileMode() {
+    return BooleanUtility.nvl((Boolean) propertySupport.getProperty(PROP_TILE_MODE));
+  }
+
+  @Override
+  public void setTileMode(boolean tileMode) {
+    propertySupport.setProperty(PROP_TILE_MODE, tileMode);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<? extends ITile> getTiles() {
+    return (List<? extends ITile>) propertySupport.getProperty(PROP_TILES);
+  }
+
+  @Override
+  public void setTiles(List<? extends ITile> tiles) {
+    propertySupport.setProperty(PROP_TILES, tiles);
   }
 }
