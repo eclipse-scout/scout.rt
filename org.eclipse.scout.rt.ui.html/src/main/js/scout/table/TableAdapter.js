@@ -103,15 +103,15 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
   this._send('aggregationFunctionChanged', data);
 };
 
-scout.TableAdapter.prototype._onWidgetRequestTiles = function(event) {
+scout.TableAdapter.prototype._onWidgetCreateTiles = function(event) {
   event.preventDefault();
-  this._sendRequestTiles();
+  this._sendCreateTiles();
 };
 
-scout.TableAdapter.prototype._sendRequestTiles = function() {
+scout.TableAdapter.prototype._sendCreateTiles = function() {
   var data = {
   };
-  this._send('requestTiles', data);
+  this._send('createTiles', data);
 };
 
 scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
@@ -359,8 +359,8 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetColumnOrganizeAction(event);
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
-  } else if (event.type === 'requestTiles') {
-    this._onWidgetRequestTiles(event);
+  } else if (event.type === 'createTiles') {
+    this._onWidgetCreateTiles(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

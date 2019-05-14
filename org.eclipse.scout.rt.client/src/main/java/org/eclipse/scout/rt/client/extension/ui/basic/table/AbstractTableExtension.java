@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDis
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRequestTilesChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
@@ -121,7 +121,7 @@ public abstract class AbstractTableExtension<TABLE extends AbstractTable> extend
   }
 
   @Override
-  public void execRequestTiles(TableRequestTilesChain chain) {
-    chain.execRequestTiles();
+  public void execCreateTiles(TableCreateTilesChain chain) {
+    chain.execCreateTiles();
   }
 }

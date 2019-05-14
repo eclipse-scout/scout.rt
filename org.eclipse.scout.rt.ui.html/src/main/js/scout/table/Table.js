@@ -3897,9 +3897,9 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   this.trigger('aggregationFunctionChanged', event);
 };
 
-scout.Table.prototype._triggerRequestTiles = function() {
+scout.Table.prototype._triggerCreateTiles = function() {
   var event = new scout.Event();
-  this.trigger('requestTiles', event);
+  this.trigger('createTiles', event);
   return event;
 };
 
@@ -3958,7 +3958,7 @@ scout.Table.prototype.setTileMode = function(tileMode) {
   this.setHeaderVisible(!tileMode);
   this.setProperty('tileMode', tileMode);
   if (this.tileMode && changed) {
-    var e = this._triggerRequestTiles();
+    var e = this._triggerCreateTiles();
     if (!e.defaultPrevented) {
       this.replaceTiles(this._createTiles(this.rows));
     }

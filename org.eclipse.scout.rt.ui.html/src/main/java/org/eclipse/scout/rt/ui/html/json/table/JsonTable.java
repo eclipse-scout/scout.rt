@@ -123,7 +123,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String EVENT_FILTER_REMOVED = "filterRemoved";
   public static final String EVENT_FILTERS_CHANGED = "filtersChanged";
   public static final String EVENT_FILTER = "filter";
-  public static final String EVENT_REQUEST_TILES = "requestTiles";
+  public static final String EVENT_REQUEST_TILES = "createTiles";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -618,7 +618,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       handleUiColumnOrganizeAction(event);
     }
     else if (EVENT_REQUEST_TILES.equals(event.getType())) {
-      handleUiRequestTiles(event);
+      handleUiCreateTiles(event);
     }
     else {
       super.handleUiEvent(event);
@@ -963,8 +963,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
   }
 
-  protected void handleUiRequestTiles(JsonEvent event) {
-    getModel().getUIFacade().fireRequestTiles();
+  protected void handleUiCreateTiles(JsonEvent event) {
+    getModel().getUIFacade().fireCreateTiles();
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

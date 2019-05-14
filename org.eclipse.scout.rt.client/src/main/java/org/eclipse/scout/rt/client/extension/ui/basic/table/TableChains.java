@@ -293,17 +293,17 @@ public final class TableChains {
     }
   }
 
-  public static class TableRequestTilesChain extends AbstractTableChain {
+  public static class TableCreateTilesChain extends AbstractTableChain {
 
-    public TableRequestTilesChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+    public TableCreateTilesChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
       super(extensions);
     }
 
-    public void execRequestTiles() {
+    public void execCreateTiles() {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITableExtension<? extends AbstractTable> next) {
-          next.execRequestTiles(TableRequestTilesChain.this);
+          next.execCreateTiles(TableCreateTilesChain.this);
         }
       };
       callChain(methodInvocation);
