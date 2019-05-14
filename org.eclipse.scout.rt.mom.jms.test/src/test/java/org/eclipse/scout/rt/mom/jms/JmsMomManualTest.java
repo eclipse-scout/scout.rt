@@ -10,12 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms;
 
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 
+import org.apache.activemq.broker.BrokerRegistry;
+import org.apache.activemq.broker.BrokerService;
 import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
@@ -26,32 +34,80 @@ import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.ObjectMarshaller;
+import org.eclipse.scout.rt.platform.AnnotationFactory;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.BeanUtility;
+import org.eclipse.scout.rt.platform.util.IDisposable;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class JmsMomManualTest extends AbstractJmsMomTest {
+public class JmsMomManualTest {
+  private static final Logger LOG = LoggerFactory.getLogger(JmsMomManualTest.class);
 
-  public JmsMomManualTest(AbstractJmsMomTestParameter parameter) {
-    super(parameter);
+  protected final List<IBean<?>> m_beans = new ArrayList<>();
+  protected final List<IDisposable> m_disposables = new ArrayList<>();
+  protected FixtureMomWithManualEnvironment m_mom;
+
+  @Before
+  public void before() {
+    IJmsMessageHandler messageHandler = mock(IJmsMessageHandler.class);
+    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(IJmsMessageHandler.class, messageHandler).withAnnotation(AnnotationFactory.createApplicationScoped())));
+    assertSame(messageHandler, BEANS.get(IJmsMessageHandler.class));
+
+    FixtureMomWithManualEnvironment transport = BeanUtility.createInstance(FixtureMomWithManualEnvironment.class);
+    m_beans.add(BEANS.getBeanManager().registerBean(new BeanMetaData(FixtureMomWithManualEnvironment.class, transport)));
+    m_mom = BEANS.get(FixtureMomWithManualEnvironment.class);
+  }
+
+  @After
+  public void after() throws Exception {
+    dispose(m_disposables);
+    if (m_mom != null) {
+      m_mom.destroy();
+      m_mom = null;
+    }
+    BeanTestingHelper.get().unregisterBeans(m_beans);
+    m_beans.clear();
+
+    // ensure activeMQ is stopped
+    BrokerService brokerService = BrokerRegistry.getInstance().findFirst();
+    if (brokerService != null) {
+      brokerService.stop();
+      brokerService.waitUntilStopped();
+    }
+  }
+
+  protected void dispose(Collection<IDisposable> disposables) {
+    if (!disposables.isEmpty()) {
+      LOG.info("Disposing {} objects: {}", disposables.size(), disposables);
+      for (IDisposable disposable : disposables) {
+        disposable.dispose();
+      }
+      disposables.clear();
+    }
   }
 
   @Ignore
   @Test
   public void test() throws InterruptedException {
-    //retryCount=3, retryInterval=1s, sesionRetryInterval=2s
-
     final IDestination<String> queue = MOM.newDestination("test/mom/testSubscribeFailover", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
-    m_disposables.add(MOM.registerMarshaller(FixtureJmsMom.class, queue, BEANS.get(ObjectMarshaller.class)));
+    m_disposables.add(MOM.registerMarshaller(FixtureMomWithManualEnvironment.class, queue, BEANS.get(ObjectMarshaller.class)));
 
     // Register subscriber
-    m_disposables.add(MOM.subscribe(FixtureJmsMom.class, queue,
+    m_disposables.add(MOM.subscribe(FixtureMomWithManualEnvironment.class, queue,
         new IMessageListener<String>() {
           @Override
           public void onMessage(IMessage<String> message) {
@@ -68,7 +124,7 @@ public class JmsMomManualTest extends AbstractJmsMomTest {
         while (true) {
           i++;
           try {
-            MOM.publish(FixtureJmsMom.class, queue, "message-" + i, MOM.newPublishInput());
+            MOM.publish(FixtureMomWithManualEnvironment.class, queue, "message-" + i, MOM.newPublishInput());
             System.out.println("SEND " + i + " OK");
           }
           catch (Exception | ThreadInterruptedError e) {
@@ -87,7 +143,8 @@ public class JmsMomManualTest extends AbstractJmsMomTest {
    * Encapsulates {@link JmsMomImplementor} for testing purpose.
    */
   @IgnoreBean
-  public static class FixtureJmsMom extends AbstractMomTransport {
+  public static class FixtureMomWithManualEnvironment extends AbstractMomTransport {
+
     @Override
     protected Class<? extends IMomImplementor> getConfiguredImplementor() {
       return JmsMomImplementor.class;
