@@ -20,6 +20,7 @@ scout.TableLayout.prototype.layout = function($container) {
     footerHeight = 0,
     headerHeight = 0,
     controlContainerHeight = 0,
+    tileGridHeight = 0,
     controlContainerInsets,
     $data = this.table.$data,
     dataMargins = scout.graphics.margins($data),
@@ -27,6 +28,7 @@ scout.TableLayout.prototype.layout = function($container) {
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
+    tileGrid = this.table.tileGrid,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -57,7 +59,12 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
+  if (this.table.tileMode && tileGrid) {
+    tileGridHeight = 400;
+    tileGrid.$container.cssHeight(tileGridHeight);
+    tileGrid.revalidateLayout();
+  }
+  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileGridHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
 
   this._layoutColumns();

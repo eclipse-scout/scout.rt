@@ -45,6 +45,7 @@ scout.Table = function() {
   this.tableControls = [];
   this.tableStatusVisible = false;
   this.tileMode = false;
+  this.tileGrid = null;
   this.footer = null;
   this.footerVisible = false;
   this.filters = [];
@@ -443,6 +444,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
+  this._renderTileMode();
 };
 
 scout.Table.prototype._setCssClass = function(cssClass) {
@@ -463,6 +465,7 @@ scout.Table.prototype._remove = function() {
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
+  this.tileGrid = null;
   this._destroyCellEditorPopup();
   this._removeAggregateRows();
   this._uninstallImageListeners();
@@ -743,6 +746,15 @@ scout.Table.prototype._createFooter = function() {
   return scout.create('TableFooter', {
     parent: this,
     table: this
+  });
+};
+
+scout.Table.prototype._createTileGrid = function() {
+  return scout.create('TileGrid', {
+    parent: this,
+    selectable: true,
+    multiselect: true,
+    tiles: this.tiles
   });
 };
 
@@ -3718,6 +3730,7 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
 
 scout.Table.prototype.replaceTiles = function(tiles) {
   this.tiles = tiles || [];
+  this.tileGrid.insertTiles(this.tiles);
 };
 
 /**
@@ -3941,9 +3954,27 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 
 scout.Table.prototype.setTileMode = function(tileMode) {
   var changed = this.tileMode !== tileMode;
+  this.setHeaderVisible(!tileMode);
   this.setProperty('tileMode', tileMode);
   if (this.tileMode && changed) {
     this._triggerRequestTiles();
+  }
+};
+
+scout.Table.prototype._renderTileMode = function() {
+  var changed = false;
+  if (this.tileMode && !this.tileGrid) {
+    this.tileGrid = this._createTileGrid();
+    this.tileGrid.render();
+    changed = true;
+  } else if (!this.tileMode && this.tileGrid) {
+    this.tileGrid.destroy();
+    this.tileGrid = null;
+    this.tiles = [];
+    changed = true;
+  }
+  if (changed) {
+    this.invalidateLayoutTree();
   }
 };
 
