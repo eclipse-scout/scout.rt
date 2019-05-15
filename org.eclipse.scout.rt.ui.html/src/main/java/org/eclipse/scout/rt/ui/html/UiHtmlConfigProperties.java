@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
@@ -203,7 +204,10 @@ public final class UiHtmlConfigProperties {
    * Maximum time in seconds to wait for a client session to be stopped by the housekeeping job.<br/>
    * The value should be smaller than the session timeout (typically defined in the web.xml) and greater than
    * {@link org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown}.
+   *
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
    */
+  @Deprecated
   public static class SessionStoreHousekeepingMaxWaitShutdownProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -221,7 +225,10 @@ public final class UiHtmlConfigProperties {
    * Maximum time in seconds to wait for the write lock when the session store is unbounded from the HTTP session. This
    * value should not be too large because waiting on the lock might suspend background processes of the application
    * server.
+   *
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
    */
+  @Deprecated
   public static class SessionStoreMaxWaitWriteLockProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -239,7 +246,10 @@ public final class UiHtmlConfigProperties {
    * Maximum time in second to wait for all client sessions to be stopped after the HTTP session has become invalid.
    * After this amount of time, a "leak detection" test is performed. You are advised to change this value only if your
    * sessions need an unusual long time to shutdown.
+   *
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
    */
+  @Deprecated
   public static class SessionStoreMaxWaitAllShutdownProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override

@@ -38,9 +38,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.testing.TestEnvironmentUiSession;
@@ -62,40 +59,14 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
   public void before() {
     m_protocol.clear();
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
-              public Long getDefaultValue() {
-                return 0L;
-              }
-            };
+          protected Long getDefaultValue() {
+            return 1L;
           }
         }),
 
         new BeanMetaData(SessionStoreHousekeepingDelayProperty.class).withInitialInstance(new SessionStoreHousekeepingDelayProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreHousekeepingMaxWaitShutdownProperty.class).withInitialInstance(new SessionStoreHousekeepingMaxWaitShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitWriteLockProperty.class).withInitialInstance(new SessionStoreMaxWaitWriteLockProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitAllShutdownProperty.class).withInitialInstance(new SessionStoreMaxWaitAllShutdownProperty() {
           @Override
           public Integer getDefaultValue() {
             return 1;
