@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
@@ -218,6 +219,10 @@ public final class UiHtmlConfigProperties {
     }
   }
 
+  /**
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
+   */
+  @Deprecated
   public static class SessionStoreHousekeepingMaxWaitShutdownProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -239,6 +244,10 @@ public final class UiHtmlConfigProperties {
     }
   }
 
+  /**
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
+   */
+  @Deprecated
   public static class SessionStoreMaxWaitWriteLockProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
@@ -259,6 +268,10 @@ public final class UiHtmlConfigProperties {
     }
   }
 
+  /**
+   * @deprecated since 6.1 not used anymore, see {@link ClientSessionStopHelper}
+   */
+  @Deprecated
   public static class SessionStoreMaxWaitAllShutdownProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override

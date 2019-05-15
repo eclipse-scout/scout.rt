@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,22 +27,13 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.context.ClientRunContexts;
-import org.eclipse.scout.rt.client.job.ModelJobs;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -346,7 +337,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           // don't start housekeeping for persistent sessions to give the users more time on app switches in ios home screen mode
           return;
         }
-        startHousekeeping(clientSession);
+        startHousekeepingInsideWriteLock(clientSession);
       }
     }
     finally {
@@ -361,22 +352,15 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
    * <p>
    * <b>Important:</b>: This method must be called from within a lock!
    */
-  protected void startHousekeeping(final IClientSession clientSession) {
+  protected void startHousekeepingInsideWriteLock(final IClientSession clientSession) {
     // No client session, no house keeping necessary
     if (clientSession == null) {
       return;
     }
 
-    // If client session is already inactive, simply update the maps, but take no further action.
-    if (!clientSession.isActive()) {
-      LOG.info("Session housekeeping: Removing inactive client session with ID {} from store", clientSession.getId());
-      removeClientSession(clientSession);
-      return;
-    }
-
     // Check if client session is still used after a few moments
     LOG.debug("Session housekeeping: Schedule job for client session with ID {}", clientSession.getId());
-    final IFuture<Void> future = Jobs.schedule(() -> doHousekeeping(clientSession), Jobs.newInput()
+    final IFuture<Void> future = Jobs.schedule(() -> doHousekeepingOutsideWriteLock(clientSession), Jobs.newInput()
         .withName("Performing session housekeeping for client session with ID {}", clientSession.getId())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(CONFIG.getPropertyValue(SessionStoreHousekeepingDelayProperty.class), TimeUnit.SECONDS)));
@@ -388,17 +372,20 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   /**
    * Checks if the client session is still used by a UI session. If not, it is stopped and removed from the store.
    */
-  protected void doHousekeeping(final IClientSession clientSession) {
+  protected void doHousekeepingOutsideWriteLock(final IClientSession clientSession) {
     m_writeLock.lock();
     try {
-      if (IFuture.CURRENT.get().isCancelled()) {
+      if (IFuture.CURRENT.get() != null && IFuture.CURRENT.get().isCancelled()) {
         return;
       }
-      m_housekeepingFutures.remove(clientSession.getId());
+      IFuture<?> otherFuture = m_housekeepingFutures.remove(clientSession.getId());
+      if (otherFuture != null) {
+        otherFuture.cancel(false);
+      }
 
       if (!clientSession.isActive() || clientSession.isStopping()) {
         LOG.info("Session housekeeping: Client session {} is {}, removing it from store", clientSession.getId(), (!clientSession.isActive() ? "inactive" : "stopping"));
-        removeClientSession(clientSession);
+        removeClientSessionInsideWriteLock(clientSession);
         return;
       }
 
@@ -413,106 +400,49 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
       if ((uiSessions == null || uiSessions.isEmpty()) && (preregisteredUiSessions == null || preregisteredUiSessions.isEmpty())) {
         LOG.info("Session housekeeping: Shutting down client session with ID {} because it is not used anymore", clientSession.getId());
-        try {
-          final IFuture<Void> future = ModelJobs.schedule(() -> forceClientSessionShutdown(clientSession), ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true))
-              .withName("Force shutting down client session {} by session housekeeping", clientSession.getId()));
-
-          int timeout = CONFIG.getPropertyValue(SessionStoreHousekeepingMaxWaitShutdownProperty.class).intValue();
-          try { // NOSONAR
-            future.awaitDone(timeout, TimeUnit.SECONDS);
-          }
-          catch (TimedOutError e) { // NOSONAR
-            LOG.warn("Client session did not stop within {} seconds. Canceling shutdown job.", timeout);
-            future.cancel(true);
-          }
-        }
-        catch (ThreadInterruptedError e) {
-          LOG.warn("Interruption encountered while waiting for client session {} to stop. Continuing anyway.", clientSession.getId(), e);
-        }
-        finally {
-          removeClientSession(clientSession);
-        }
+        removeClientSessionInsideWriteLock(clientSession);
       }
     }
     finally {
       m_writeLock.unlock();
+      checkHttpSessionOutsideWriteLock();
+      BEANS.get(ClientSessionStopHelper.class).scheduleStop(clientSession, true, "session housekeeping");
     }
   }
 
-  protected void removeClientSession(final IClientSession clientSession) {
-    m_writeLock.lock();
-    try {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Remove client session with ID {} from session store", clientSession.getId());
-      }
-      m_clientSessionMap.remove(clientSession.getId());
-      if (LOG.isDebugEnabled()) {
-        Set<IClientSession> flatClientSessions = new HashSet<>();
-        flatClientSessions.addAll(m_uiSessionsByClientSession.keySet());
-        flatClientSessions.addAll(m_preregisteredUiSessionsByClientSession.keySet());
-
-        Set<IUiSession> uiSessionsByClientSession = new HashSet<>();
-        for (Set<IUiSession> s : m_uiSessionsByClientSession.values()) {
-          uiSessionsByClientSession.addAll(s);
-        }
-
-        Set<IUiSession> preregisteredUiSessionsByClientSession = new HashSet<>();
-        for (Set<IUiSession> s : m_preregisteredUiSessionsByClientSession.values()) {
-          preregisteredUiSessionsByClientSession.addAll(s);
-        }
-
-        LOG.debug("Remaining sessions: [clientSessions: {}, clientSessionFlat: {}, uiSessions: {}, uiSessionsByClientSession: {}, preregisteredUiSessions: {}, preregisteredUiSessionsByClientSession: {}]",
-            m_clientSessionMap.size(), flatClientSessions.size(), m_uiSessionMap.size(), uiSessionsByClientSession.size(), m_preregisteredUiSessionMap.size(), preregisteredUiSessionsByClientSession.size());
-      }
-
-      if (m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid) {
-        // no more client sessions -> invalidate HTTP session
-        try {
-          m_httpSession.getCreationTime(); // dummy call to prevent the following log statement when the session is already invalid
-          LOG.info("Invalidate HTTP session with ID {} because session store contains no more client sessions", m_httpSessionId);
-          m_httpSession.invalidate();
-        }
-        catch (IllegalStateException e) { // NOSONAR
-          // already invalid
-        }
-      }
+  protected void removeClientSessionInsideWriteLock(final IClientSession clientSession) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Remove client session with ID {} from session store", clientSession.getId());
     }
-    finally {
-      m_writeLock.unlock();
+    m_clientSessionMap.remove(clientSession.getId());
+    if (LOG.isDebugEnabled()) {
+      Set<IClientSession> flatClientSessions = new HashSet<>();
+      flatClientSessions.addAll(m_uiSessionsByClientSession.keySet());
+      flatClientSessions.addAll(m_preregisteredUiSessionsByClientSession.keySet());
+
+      Set<IUiSession> uiSessionsByClientSession = new HashSet<>();
+      for (Set<IUiSession> s : m_uiSessionsByClientSession.values()) {
+        uiSessionsByClientSession.addAll(s);
+      }
+
+      Set<IUiSession> preregisteredUiSessionsByClientSession = new HashSet<>();
+      for (Set<IUiSession> s : m_preregisteredUiSessionsByClientSession.values()) {
+        preregisteredUiSessionsByClientSession.addAll(s);
+      }
+
+      LOG.debug("Remaining sessions: [clientSessions: {}, clientSessionFlat: {}, uiSessions: {}, uiSessionsByClientSession: {}, preregisteredUiSessions: {}, preregisteredUiSessionsByClientSession: {}]",
+          m_clientSessionMap.size(), flatClientSessions.size(), m_uiSessionMap.size(), uiSessionsByClientSession.size(), m_preregisteredUiSessionMap.size(), preregisteredUiSessionsByClientSession.size());
     }
   }
 
   /**
-   * Stops the given session if it is active. To stop it, {@link IDesktopUIFacade#closeFromUI(boolean)} is called, which
-   * forces the desktop to close without opening any more forms (which could be the case when using
-   * {@link IClientSession#stop()}).
-   * <p>
-   * If the client session is still active after that, a warning is printed to the log.
+   * Moved to {@link ClientSessionStopHelper#scheduleStop(IClientSession)}
+   *
+   * @deprecated since 6.1
    */
+  @Deprecated
   protected void forceClientSessionShutdown(IClientSession clientSession) {
-    Assertions.assertNotNull(clientSession);
-    if (!clientSession.isActive()) {
-      LOG.debug("Client session with ID {} is already inactive.", clientSession.getId());
-    }
-    else if (clientSession.isStopping()) {
-      LOG.debug("Client session with ID {} is already stopping.", clientSession.getId());
-    }
-    else {
-      LOG.debug("Forcing session with ID {} to shut down...", clientSession.getId());
-      IDesktop desktop = clientSession.getDesktop();
-      if (desktop != null) {
-        desktop.getUIFacade().closeFromUI(true); // true = force
-      }
-      else {
-        clientSession.stop();
-      }
-      if (clientSession.isActive()) {
-        LOG.warn("Client session with ID {} is still {} after forcing it to shutdown!", clientSession.getId(), (clientSession.isStopping() ? "stopping" : "active"));
-      }
-      else {
-        LOG.info("Client session with ID {} terminated.", clientSession.getId());
-      }
-    }
+    LOG.error("This code moved to ClientSessionStopHelper#scheduleStop}");
   }
 
   @Override
@@ -528,71 +458,51 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     }
     m_httpSessionValid = false;
     LOG.info("Detected invalidation of HTTP session {}, cleaning up {} client sessions and {} UI sessions", m_httpSessionId, m_clientSessionMap.size(), m_uiSessionMap.size());
-    final List<IFuture<?>> futures = new ArrayList<>();
 
-    // Stop all client sessions (in parallel model jobs)
+    List<IClientSession> clientSessionList = new ArrayList<>();
+    m_writeLock.lock();
     try {
-      int timeout = CONFIG.getPropertyValue(SessionStoreMaxWaitWriteLockProperty.class).intValue();
-      if (m_writeLock.tryLock(timeout, TimeUnit.SECONDS)) {
-        try {
-          for (final IClientSession clientSession : m_clientSessionMap.values()) {
-            futures.add(ModelJobs.schedule(() -> {
-              LOG.debug("Shutting down client session with ID {} due to invalidation of HTTP session", clientSession.getId());
-              forceClientSessionShutdown(clientSession);
-              removeClientSession(clientSession);
-            }, ModelJobs.newInput(ClientRunContexts.empty()
-                .withSession(clientSession, true))
-                .withName("Closing desktop due to HTTP session invalidation")));
-          }
-        }
-        finally {
-          m_writeLock.unlock();
-        }
-      }
-      else {
-        LOG.warn("Could not acquire write lock within {} seconds: [HTTP session: {}, uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
-            timeout, m_uiSessionMap.size(), m_clientSessionMap.size(), m_uiSessionsByClientSession.size());
+      clientSessionList.addAll(m_clientSessionMap.values());
+      for (IUiSession uiSession : new ArrayList<>(m_uiSessionMap.values())) {
+        uiSession.dispose();
+        //this will schedule a housekeeping job that may start now or later
       }
     }
-    catch (InterruptedException e) {
-      LOG.warn("Interrupted while waiting on session store write lock", e);
+    finally {
+      m_writeLock.unlock();
+      for (IClientSession clientSession : clientSessionList) {
+        //the housekeeping may run immediately, this call may cancel a pending housekeeping job iff it did not start already
+        doHousekeepingOutsideWriteLock(clientSession);
+      }
     }
+  }
 
-    if (futures.isEmpty()) {
-      return;
-    }
-
-    LOG.debug("Waiting for {} client sessions to stop...", futures.size());
+  protected void checkHttpSessionOutsideWriteLock() {
+    m_writeLock.lock();
     try {
-      // Wait for all client sessions to stop. This is done in sync to ensure the session is not invalidated before the attached scout session has been stopped.
-      // Otherwise we would have a running scout session on an invalidated http session.
-      // Furthermore: on webapp shutdown we must first stop all sessions (scout and http) before we stop the platform. Therefore the stop must be sync!
-      Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(futures)
-          .toFilter(), CONFIG.getPropertyValue(SessionStoreMaxWaitAllShutdownProperty.class), TimeUnit.SECONDS);
-      LOG.info("Session shutdown complete.");
+      if (!(m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid)) {
+        return;
+      }
+      // Check if everything was cleaned up correctly ("leak detection").
+      int uiSessionMapSize = m_uiSessionMap.size();
+      int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
+      if (uiSessionMapSize != 0 || uiSessionsByClientSessionSize != 0) {
+        LOG.warn("Leak detection - Session store not empty before HTTP session invalidation: [uiSessionMap: {}, uiSessionsByClientSession: {}]",
+            uiSessionMapSize, uiSessionsByClientSessionSize);
+      }
+      // no more sessions -> exit lock and invalidate HTTP session
     }
-    catch (ThreadInterruptedError e) {
-      LOG.warn("Interruption encountered while waiting for all client session to stop. Continuing anyway.", e);
-    }
-    catch (TimedOutError e) {
-      LOG.warn("Timeout encountered while waiting for all client session to stop. Canceling still running client session shutdown jobs.", e);
-
-      // timeout while waiting for the sessions to stop. Force cancel them.
-      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(futures)
-          .andMatchNotState(JobState.DONE)
-          .toFilter(), true);
+    finally {
+      m_writeLock.unlock();
     }
 
-    // Check if everything was cleaned up correctly ("leak detection").
-    // Read map sizes outside a lock - dirty reads are acceptable here
-    final int uiSessionMapSize = m_uiSessionMap.size();
-    final int clientSessionMapSize = m_clientSessionMap.size();
-    final int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
-    if (uiSessionMapSize + clientSessionMapSize + uiSessionsByClientSessionSize > 0) {
-      LOG.warn("Leak detection - Session store not empty after HTTP session invalidation: [uiSessionMap: {}, clientSessionMap: {}, uiSessionsByClientSession: {}]",
-          uiSessionMapSize, clientSessionMapSize, uiSessionsByClientSessionSize);
+    try {
+      m_httpSession.getCreationTime(); // dummy call to prevent the following log statement when the session is already invalid
+      LOG.info("Invalidate HTTP session with ID {} because session store contains no more client sessions", m_httpSessionId);
+      m_httpSession.invalidate();
+    }
+    catch (IllegalStateException e) { // NOSONAR
+      // already invalid
     }
   }
 }

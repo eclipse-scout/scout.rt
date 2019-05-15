@@ -16,20 +16,16 @@ import java.security.AccessController;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 import javax.security.auth.Subject;
 
-import org.eclipse.scout.rt.client.ClientConfigProperties.JobCompletionDelayOnSessionShutdown;
 import org.eclipse.scout.rt.client.ClientConfigProperties.MemoryPolicyProperty;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
-import org.eclipse.scout.rt.client.job.filter.future.ModelJobFutureFilter;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -42,23 +38,18 @@ import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
-import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
@@ -82,6 +73,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private final Object m_stateLock;
   private volatile boolean m_active;
   private volatile boolean m_stopping;
+  private final Semaphore m_permitToSaveBeforeClosing = new Semaphore(1);
   private final Semaphore m_permitToStop = new Semaphore(1);
   private int m_exitCode = 0;
 
@@ -367,15 +359,18 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
 
   @Override
   public void stop(int exitCode) {
-    if (!m_permitToStop.tryAcquire()) {
-      // we are already stopping (or have been stopped)
-      return;
-    }
+    LOG.info("Enter stop({}) of clientSession {}", exitCode, this);
 
     try {
-      if (m_desktop != null && !m_desktop.doBeforeClosingInternal()) {
-        m_permitToStop.release();
-        return;
+      if (m_desktop != null) {
+        if (m_permitToSaveBeforeClosing.tryAcquire()) {//NOSONAR
+          LOG.info("Call desktop.doBeforeClosingInternal of clientSession {}", this);
+          if (!m_desktop.doBeforeClosingInternal()) {
+            m_permitToSaveBeforeClosing.release();
+            LOG.info("Not stopping clientSession, user veto on {}", this);
+            return;
+          }
+        }
       }
     }
     catch (RuntimeException | PlatformError e) {
@@ -383,91 +378,59 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
 
     // --- Point of no return ---
-
-    m_stopping = true;
-    m_exitCode = exitCode;
+    ClientSessionStopHelper helper = BEANS.get(ClientSessionStopHelper.class);
+    IFuture<?> termLoop = helper.scheduleJobTerminationLoop(this);
     try {
-      fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
-    }
-    catch (RuntimeException | PlatformError e) {
-      LOG.error("Failed to send STOPPING event.", e);
-    }
+      m_stopping = true;
 
-    try {
-      interceptStoreSession();
-    }
-    catch (RuntimeException | PlatformError e) {
-      LOG.error("Failed to store the client session.", e);
-    }
+      if (!m_permitToStop.tryAcquire()) {
+        // we are already stopping (or have been stopped)
+        LOG.warn("Not stopping clientSession, could not acquire stop lock of {}", this);
+        return;
+      }
 
-    if (m_desktop != null) {
+      LOG.info("Begin stop of clientSession {}, point of no return", this);
+      m_exitCode = exitCode;
       try {
-        m_desktop.dispose();
+        fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STOPPING));
       }
       catch (RuntimeException | PlatformError e) {
-        LOG.error("Failed to close the desktop.", e);
+        LOG.error("Failed to send STOPPING event.", e);
       }
-      m_desktop = null;
-    }
 
-    try {
-      cancelRunningJobs();
-    }
-    catch (RuntimeException | PlatformError e) {
-      LOG.error("Failed to cancel running jobs.", e);
+      try {
+        interceptStoreSession();
+      }
+      catch (RuntimeException | PlatformError e) {
+        LOG.error("Failed to store the client session.", e);
+      }
+
+      if (m_desktop != null) {
+        try {
+          m_desktop.dispose();
+        }
+        catch (RuntimeException | PlatformError e) {
+          LOG.error("Failed to close the desktop.", e);
+        }
+        finally {
+          m_desktop = null;
+        }
+      }
+
+      inactivateSession();
     }
     finally {
-      inactivateSession();
+      termLoop.cancel(true);
     }
   }
 
+  /**
+   * @deprecated since 6.1 this code moved to
+   *             {@link ClientSessionStopHelper#scheduleJobTerminationTimer(IClientSession)}
+   */
+  @Deprecated
   protected void cancelRunningJobs() {
-    // Filter matches all running jobs that have the same client session associated, except the current thread
-    // and model jobs. Because the current thread is (or should be) a model job, we cannot wait for other
-    // model threads. They are always cancelled.
-    Predicate<IFuture<?>> runningJobsFilter = Jobs.newFutureFilterBuilder()
-        .andMatch(new SessionFutureFilter(this))
-        .andMatchNotFuture(IFuture.CURRENT.get())
-        .andMatchNot(ModelJobFutureFilter.INSTANCE)
-        .andMatchNotState(JobState.DONE, JobState.REJECTED)
-        .toFilter();
-
-    // Wait for running jobs to complete before we cancel them
-    long delay = NumberUtility.nvl(CONFIG.getPropertyValue(JobCompletionDelayOnSessionShutdown.class), 0L);
-    if (delay > 0L) {
-      try {
-        Jobs.getJobManager().awaitDone(runningJobsFilter, delay, TimeUnit.SECONDS);
-      }
-      catch (TimedOutError e) { // NOSONAR
-        // NOP (not all jobs have been finished within the delay)
-      }
-      catch (ThreadInterruptedError e) {
-        LOG.warn("Failed to await for running jobs to complete.", e);
-      }
-    }
-
-    // Cancel remaining jobs and write a warning to the logger
-    Set<IFuture<?>> runningFutures = Jobs.getJobManager().getFutures(runningJobsFilter);
-    if (!runningFutures.isEmpty()) {
-      LOG.warn("Some running client jobs found while stopping the client session; sent a cancellation request to release associated worker threads. [session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningFutures);
-      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(runningFutures)
-          .toFilter(), true);
-    }
-
-    // Now cancel all other model jobs. Because the current thread is a model job, they can never run anyway.
-    Set<IFuture<?>> runningModelJobs = Jobs.getJobManager().getFutures(Jobs.newFutureFilterBuilder()
-        .andMatch(new SessionFutureFilter(this))
-        .andMatchNotFuture(IFuture.CURRENT.get())
-        .andMatch(ModelJobFutureFilter.INSTANCE)
-        .andMatchNotState(JobState.DONE, JobState.REJECTED)
-        .toFilter());
-    if (!runningModelJobs.isEmpty()) {
-      LOG.info("Cancel running model jobs because the client session was shut down. [session={}, user={}, jobs={}]", AbstractClientSession.this, getUserId(), runningModelJobs);
-      Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()
-          .andMatchFuture(runningModelJobs)
-          .toFilter(), true);
-    }
+    //nop
   }
 
   protected void inactivateSession() {
