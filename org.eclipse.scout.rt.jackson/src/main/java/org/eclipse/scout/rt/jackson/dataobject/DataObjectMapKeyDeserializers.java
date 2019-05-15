@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeyDeserializer;
 import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -38,6 +40,12 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
 
   @Override
   public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    Class<?> rawClass = type.getRawClass();
+    if (IId.class.isAssignableFrom(rawClass)) {
+      @SuppressWarnings("unchecked")
+      Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass.asSubclass(IId.class);
+      return new IIdMapKeyDeserializer(idClass);
+    }
     return null;
   }
 }

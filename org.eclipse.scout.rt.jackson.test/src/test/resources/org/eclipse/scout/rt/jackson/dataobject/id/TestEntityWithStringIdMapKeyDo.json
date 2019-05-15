@@ -1,0 +1,6 @@
+{
+  "_type" : "scout.TestEntityWithStringIdMapKey",
+  "map" : {
+    "aaabbbccc" : "test"
+  }
+}
