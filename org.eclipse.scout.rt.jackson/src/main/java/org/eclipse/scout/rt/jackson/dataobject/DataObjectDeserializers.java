@@ -12,6 +12,12 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.TypedId;
+import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumDeserializer;
+import org.eclipse.scout.rt.jackson.dataobject.id.IIdDeserializer;
+import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdDeserializer;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
@@ -51,21 +57,38 @@ public class DataObjectDeserializers extends Deserializers.Base {
   }
 
   @Override
+  public JsonDeserializer<?> findEnumDeserializer(Class<?> type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+    if (IEnum.class.isAssignableFrom(type)) {
+      return new EnumDeserializer(type.asSubclass(IEnum.class));
+    }
+    return super.findEnumDeserializer(type, config, beanDesc);
+  }
+
+  @Override
   public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
-    if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
+    Class<?> rawClass = type.getRawClass();
+    if (IDoEntity.class.isAssignableFrom(rawClass)) {
       return new DoEntityDeserializer(m_moduleContext, type);
     }
-    else if (DoList.class.isAssignableFrom(type.getRawClass())) {
+    else if (DoList.class.isAssignableFrom(rawClass)) {
       return new DoListDeserializer(type);
     }
-    else if (Date.class.isAssignableFrom(type.getRawClass())) {
+    else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateDeserializer();
     }
-    else if (IDataObject.class.isAssignableFrom(type.getRawClass())) {
+    else if (IDataObject.class.isAssignableFrom(rawClass)) {
       return new DataObjectDeserializer(type.getRawClass());
     }
-    else if (BinaryResource.class.isAssignableFrom(type.getRawClass())) {
+    else if (BinaryResource.class.isAssignableFrom(rawClass)) {
       return new DoBinaryResourceDeserializer();
+    }
+    else if (IId.class.isAssignableFrom(rawClass)) {
+      @SuppressWarnings("unchecked")
+      Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass;
+      return new IIdDeserializer(idClass);
+    }
+    else if (TypedId.class.isAssignableFrom(rawClass)) {
+      return new TypedIdDeserializer();
     }
     return super.findBeanDeserializer(type, config, beanDesc);
   }

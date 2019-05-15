@@ -1,0 +1,6 @@
+{
+  "_type" : "scout.TestEntityWithUuIdMapKey",
+  "map" : {
+    "38f760f7-c5c1-488c-81b4-cbe90c08423d" : "test"
+  }
+}
