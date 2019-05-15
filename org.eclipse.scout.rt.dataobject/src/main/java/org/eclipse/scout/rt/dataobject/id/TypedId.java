@@ -21,11 +21,11 @@ public class TypedId<ID extends IId> {
 
   private ID m_id;
 
-  public TypedId() {
-  }
-
-  public TypedId(ID id) {
-    m_id = id;
+  /**
+   * @return new {@link TypedId} instance wrapping the given {@code id}
+   */
+  public static <ID extends IId> TypedId<ID> of(ID id) {
+    return new TypedId<ID>().withId(id);
   }
 
   public TypedId<ID> withId(ID id) {

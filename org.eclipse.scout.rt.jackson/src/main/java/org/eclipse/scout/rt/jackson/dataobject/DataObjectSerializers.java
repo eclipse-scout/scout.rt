@@ -13,6 +13,12 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.dataobject.id.TypedId;
+import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumSerializer;
+import org.eclipse.scout.rt.jackson.dataobject.id.IIdSerializer;
+import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdSerializer;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
@@ -53,20 +59,30 @@ public class DataObjectSerializers extends Serializers.Base {
   // TODO [9.1] pbz: [JSON] Pass m_moduleContext to all Do* serializer
   @Override
   public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
-    if (IDoEntity.class.isAssignableFrom(type.getRawClass())) {
+    Class<?> rawClass = type.getRawClass();
+    if (IDoEntity.class.isAssignableFrom(rawClass)) {
       return new DoEntitySerializer(m_moduleContext, type);
     }
-    else if (DoList.class.isAssignableFrom(type.getRawClass())) {
+    else if (DoList.class.isAssignableFrom(rawClass)) {
       return new DoListSerializer(type);
     }
-    else if (Date.class.isAssignableFrom(type.getRawClass())) {
+    else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateSerializer();
     }
-    else if (Locale.class.isAssignableFrom(type.getRawClass())) {
+    else if (Locale.class.isAssignableFrom(rawClass)) {
       return new DoLocaleSerializer();
     }
-    else if (BinaryResource.class.isAssignableFrom(type.getRawClass())) {
+    else if (BinaryResource.class.isAssignableFrom(rawClass)) {
       return new DoBinaryResourceSerializer();
+    }
+    else if (IId.class.isAssignableFrom(rawClass)) {
+      return new IIdSerializer(type);
+    }
+    else if (TypedId.class.isAssignableFrom(rawClass)) {
+      return new TypedIdSerializer();
+    }
+    else if (IEnum.class.isAssignableFrom(rawClass)) {
+      return new EnumSerializer(type);
     }
     return super.findSerializer(config, type, beanDesc);
   }

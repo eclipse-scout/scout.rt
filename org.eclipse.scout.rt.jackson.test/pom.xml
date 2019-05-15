@@ -42,6 +42,11 @@
       <artifactId>org.eclipse.scout.rt.platform.test</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.dataobject.test</artifactId>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
