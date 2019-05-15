@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -794,5 +796,43 @@ public class JobCancelTest {
         assertFalse(cancelled.get());
       }
     });
+  }
+
+  /**
+   * A job runs a for-loop. Cancelling that job sets the job to {@link JobState#DONE} and returns. However the for-loop
+   * continues to run until its end.
+   */
+  @Test
+  public void testCancelJobWithForLoop() throws InterruptedException {
+    final CountDownLatch cancelLatch = new CountDownLatch(1);
+    final CountDownLatch endLatch = new CountDownLatch(1);
+    IFuture<?> forLoop = Jobs.schedule(new IRunnable() {
+      @Override
+      public void run() throws Exception {
+        int i = 0;
+        while (endLatch.getCount() != 0) {
+          cancelLatch.countDown();
+          if ((i++) % 1000000000 == 0) {
+            System.out.println("for-loop " + i + " in state " + IFuture.CURRENT.get().getState());
+          }
+        }
+      }
+    }, Jobs.newInput());
+
+    cancelLatch.await();
+    try {
+      assertEquals(JobState.RUNNING, forLoop.getState());
+      forLoop.cancel(true);
+      for (int i = 0; i < 20; i++) {
+        assertEquals(JobState.DONE, forLoop.getState());
+        SleepUtil.sleepSafe(100, TimeUnit.MILLISECONDS);
+      }
+    }
+    finally {
+      endLatch.countDown();
+    }
+    forLoop.awaitDone();
+    assertEquals(true, forLoop.isCancelled());
+    assertEquals(JobState.DONE, forLoop.getState());
   }
 }
