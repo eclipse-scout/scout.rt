@@ -34,19 +34,16 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
+import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm.CloseAction;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -71,15 +68,10 @@ public class UiSessionTest {
     RunContext.CURRENT.set(RunContexts.empty()); // Because this test must be executed by a bare JUnit runner (see JavaDoc of test class).
 
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
               public Long getDefaultValue() {
-                return 0L;
-              }
-            };
+            return 1L;
           }
         }),
 
@@ -87,27 +79,6 @@ public class UiSessionTest {
           @Override
           public Integer getDefaultValue() {
             return 0;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreHousekeepingMaxWaitShutdownProperty.class).withInitialInstance(new SessionStoreHousekeepingMaxWaitShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitWriteLockProperty.class).withInitialInstance(new SessionStoreMaxWaitWriteLockProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitAllShutdownProperty.class).withInitialInstance(new SessionStoreMaxWaitAllShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
           }
         }),
 
@@ -187,7 +158,7 @@ public class UiSessionTest {
 
   @Test
   public void testLogoutWithOpenFormThatWaitsOnLoop() throws Exception {
-    doTestLogoutWithBlockingModelDisposal(CloseAction.WAIT_FOR_LOOP, false, true);
+    doTestLogoutWithBlockingModelDisposal(CloseAction.WAIT_FOR_LOOP, true, false);
   }
 
   /**
@@ -201,7 +172,7 @@ public class UiSessionTest {
     // create new UI session along with client client and HTTP sessions
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
     final HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
-    IClientSession clientSession = uiSession.getClientSession();
+    final IClientSession clientSession = uiSession.getClientSession();
     assertFalse(uiSession.isDisposed());
 
     // register ui session in session store
@@ -210,7 +181,7 @@ public class UiSessionTest {
     assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
 
     // create and start test form in a model job
-    SessionStoreTestForm form = ModelJobs.schedule(new Callable<SessionStoreTestForm>() {
+    final SessionStoreTestForm form = ModelJobs.schedule(new Callable<SessionStoreTestForm>() {
       @Override
       public SessionStoreTestForm call() throws Exception {
         SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
@@ -221,7 +192,7 @@ public class UiSessionTest {
         .newInput(ClientRunContexts
             .empty()
             .withSession(clientSession, true)))
-        .awaitDoneAndGet(1, TimeUnit.SECONDS);
+        .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     // schedule a job that emulates servlet container that performs session invalidation on session timeout
     IFuture<Void> appServerSessionTimeoutFuture = Jobs.schedule(new IRunnable() {
@@ -239,27 +210,25 @@ public class UiSessionTest {
     uiSession.logout();
     assertTrue(uiSession.isDisposed());
 
-    if (expectFormFinallyCompleted) {
-      form.awaitDoFinallyCompleted(1, TimeUnit.SECONDS);
+    form.awaitDoFinallyEntered(5, TimeUnit.SECONDS);
+
+    if (!expectSessionActiveAfterwards) {
+      JobTestUtil.waitForCondition(new ICondition() {
+        @Override
+        public boolean isFulfilled() {
+          return !clientSession.isActive();
+        }
+      });
     }
-    else {
-      BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
+
+    if (expectFormFinallyCompleted) {
+      form.awaitDoFinallyCompleted(5, TimeUnit.SECONDS);
     }
 
     appServerSessionTimeoutFuture.awaitDone(3, TimeUnit.SECONDS);
     assertTrue(appServerSessionTimeoutFuture.isDone());
 
-    if (expectFormFinallyCompleted) {
-      assertTrue(form.isFinallyCompleted());
-      BEANS.get(UiJobs.class).awaitModelJobs(clientSession, JUnitExceptionHandler.class);
-    }
-    else {
-      assertFalse(form.isFinallyCompleted());
-      // The model job was canceled by the SessionStore. Hence we cannot use UiJobs.awaitModelJobs().
-      // We still sleep some time
-      SleepUtil.sleepSafe(200, TimeUnit.MILLISECONDS);
-    }
-
+    assertEquals(expectFormFinallyCompleted, form.isFinallyCompleted());
     assertEquals(expectSessionActiveAfterwards, clientSession.isActive());
   }
 
@@ -285,7 +254,7 @@ public class UiSessionTest {
 
   @Test
   public void testSessionTimeoutOpenFormThatWaitsOnLoop() throws Exception {
-    doTestSessionTimeoutWithBlockingModelDisposal(CloseAction.WAIT_FOR_LOOP, false, true);
+    doTestSessionTimeoutWithBlockingModelDisposal(CloseAction.WAIT_FOR_LOOP, false, false);
   }
 
   /**
@@ -297,7 +266,7 @@ public class UiSessionTest {
     // create new UI session along with client client and HTTP sessions
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
     final HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
-    IClientSession clientSession = uiSession.getClientSession();
+    final IClientSession clientSession = uiSession.getClientSession();
     assertFalse(uiSession.isDisposed());
 
     // register ui session in session store
@@ -330,13 +299,12 @@ public class UiSessionTest {
     else {
       assertFalse(form.isFinallyCompleted());
       // The model job was canceled by the SessionStore. Hence we cannot use UiJobs.awaitModelJobs().
-      // We still sleep some time
-      for (int i = 0; i < 10; i++) {
-        SleepUtil.sleepSafe(200, TimeUnit.MILLISECONDS);
-        if (expectSessionActiveAfterwards == clientSession.isActive()) {
-          break;
+      JobTestUtil.waitForCondition(new ICondition() {
+        @Override
+        public boolean isFulfilled() {
+          return !clientSession.isActive();
         }
-      }
+      });
     }
 
     assertTrue(uiSession.isDisposed());
