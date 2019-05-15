@@ -193,7 +193,8 @@ scout.MenuBar.prototype._renderMenuItems = function() {
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
-  this._detachMenuHandlers();
+  // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
+  // which would remove our menuItems, because they are defined as widget-property (see constructor).
 };
 
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
