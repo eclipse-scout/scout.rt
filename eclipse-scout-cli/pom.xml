@@ -11,37 +11,16 @@
     <relativePath>../org.eclipse.scout.rt/pom.xml</relativePath>
   </parent>
 
-  <artifactId>eclipse-scout</artifactId>
+  <artifactId>eclipse-scout-cli</artifactId>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>eclipse-scout-cli</artifactId>
-    </dependency>
-  </dependencies>
+  <properties>
+    <scout.skip.pnpm.install.dev>true</scout.skip.pnpm.install.dev>
+    <scout.skip.pnpm.install.prod>true</scout.skip.pnpm.install.prod>
+    <scout.skip.karma>true</scout.skip.karma>
+  </properties>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>add-dist-resource</id>
-            <goals>
-              <goal>add-resource</goal>
-            </goals>
-            <phase>generate-resources</phase>
-            <configuration>
-              <resources>
-                <resource>
-                  <directory>dist</directory>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
@@ -76,5 +55,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

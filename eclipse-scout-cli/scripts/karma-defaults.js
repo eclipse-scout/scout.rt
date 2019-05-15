@@ -30,6 +30,13 @@ module.exports = function(config) {
       outputDir: './test-results/',
       outputFile: 'test-results.xml'
     },
+    plugins:[
+      require('karma-jasmine-html-reporter'),
+      require('karma-junit-reporter'),
+      require('karma-jasmine'),
+      require('karma-webpack'),
+      require('karma-chrome-launcher')
+    ],
     client: {
       // Leave "Jasmine Spec Runner" output visible in browser
       clearContext: false
