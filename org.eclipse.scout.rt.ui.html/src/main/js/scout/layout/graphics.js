@@ -214,6 +214,20 @@ scout.graphics = {
     return new scout.Dimension($elem.cssWidth(), $elem.cssHeight());
   },
 
+  /**
+   * @returns {scout.Dimension} the max size of the element specified by the style.
+   */
+  cssMaxSize: function($elem) {
+    return new scout.Dimension($elem.cssMaxWidth(), $elem.cssMaxHeight());
+  },
+
+  /**
+   * @returns {scout.Dimension} the min size of the element specified by the style.
+   */
+  cssMinSize: function($elem) {
+    return new scout.Dimension($elem.cssMinWidth(), $elem.cssMinHeight());
+  },
+
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
       vararg : new scout.Dimension(vararg, height);
