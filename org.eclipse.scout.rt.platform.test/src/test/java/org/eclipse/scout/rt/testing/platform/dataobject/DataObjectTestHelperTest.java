@@ -68,17 +68,17 @@ public class DataObjectTestHelperTest {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
     actual.put("baz", 42);
-    s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
+    s_dataObjectTestHelper.assertEquals(actual, m_expectedDoEntity);
 
     EntityFixtureDo actualFixture = createEntityFixture();
-    s_dataObjectTestHelper.assertDoEntityEquals(actualFixture, m_expectedEntityFixture);
+    s_dataObjectTestHelper.assertEquals(actualFixture, m_expectedEntityFixture);
   }
 
   @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_missingAttribute() {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
-    s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
+    s_dataObjectTestHelper.assertEquals(actual, m_expectedDoEntity);
   }
 
   @Test(expected = ComparisonFailure.class)
@@ -86,26 +86,19 @@ public class DataObjectTestHelperTest {
     DoEntity actual = new DoEntity();
     actual.put("foo", "bar");
     actual.put("baz", 43);
-    s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedDoEntity);
+    s_dataObjectTestHelper.assertEquals(actual, m_expectedDoEntity);
   }
 
   @Test(expected = ComparisonFailure.class)
   public void testAssertDoEntityEquals_wrongListItem() {
     EntityFixtureDo actual = createEntityFixture();
     actual.getOtherEntities().add(BEANS.get(OtherEntityFixtureDo.class));
-    s_dataObjectTestHelper.assertDoEntityEquals(actual, m_expectedEntityFixture);
+    s_dataObjectTestHelper.assertEquals(actual, m_expectedEntityFixture);
   }
-
-  @Test
-  public void testAssertDoEntityEquals_classesMustNotBeEquals() {
-    DoEntity entity = createEntityFixtureRaw();
-    s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, false);
-  }
-
+  
   @Test(expected = ComparisonFailure.class)
-  public void testAssertDoEntityEquals_classesMustBeEquals() {
-    DoEntity entity = createEntityFixtureRaw();
-    s_dataObjectTestHelper.assertDoEntityEquals(entity, m_expectedEntityFixture, true);
+  public void testAssertEqualsMessage() {
+    s_dataObjectTestHelper.assertEquals("foo", createEntityFixture(), createEntityFixtureRaw());
   }
 
   @Test

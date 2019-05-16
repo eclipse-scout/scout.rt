@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**
  * Custom test implementation of {@link IDoEntity}, without extending {@link DoEntity}.
@@ -96,6 +97,11 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   @Override
   public Map<String, ?> all() {
     return allNodes().entrySet().stream().collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().get()));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return ObjectUtility.equals(m_attributes, ((TestCustomImplementedEntityDo) obj).m_attributes);
   }
 
   @Override

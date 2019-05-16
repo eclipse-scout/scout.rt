@@ -192,6 +192,11 @@ scout.MenuBar.prototype._renderMenuItems = function() {
   this.invalidateLayoutTree();
 };
 
+scout.MenuBar.prototype._removeMenuItems = function() {
+  // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
+  // which would remove our menuItems, because they are defined as widget-property (see constructor).
+};
+
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
   var orderedMenuItems = this.menuSorter.order(menuItems, this),
     ellipsisIndex = -1,

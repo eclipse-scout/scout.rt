@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Locale;
 
+import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeySerializer;
 import org.eclipse.scout.rt.platform.Bean;
 
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -28,9 +30,6 @@ import com.fasterxml.jackson.databind.ser.Serializers;
  * <b>Note:</b> The difference between a key serializer and an ordinary one is that the former transforms a map key into
  * a JSON name (i.e. always typed string), whereas the latter writes a JSON value (i.e. any JSON type, including objects
  * and arrays).
- * <p>
- * TODO [8.x] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600) (and LocaleMapKeySerializer is the
- * only key serializer)
  */
 @Bean
 public class DataObjectMapKeySerializers extends Serializers.Base {
@@ -48,6 +47,11 @@ public class DataObjectMapKeySerializers extends Serializers.Base {
     if (Locale.class.isAssignableFrom(rawClass)) {
       return new LocaleMapKeySerializer();
     }
+
+    if (IId.class.isAssignableFrom(rawClass)) {
+      return new IIdMapKeySerializer();
+    }
+
     return null;
   }
 }
