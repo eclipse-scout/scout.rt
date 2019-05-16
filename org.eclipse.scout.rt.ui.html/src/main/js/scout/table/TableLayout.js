@@ -20,7 +20,6 @@ scout.TableLayout.prototype.layout = function($container) {
     footerHeight = 0,
     headerHeight = 0,
     controlContainerHeight = 0,
-    tileGridHeight = 0,
     controlContainerInsets,
     $data = this.table.$data,
     dataMargins = scout.graphics.margins($data),
@@ -60,11 +59,13 @@ scout.TableLayout.prototype.layout = function($container) {
     }
   }
   if (this.table.tileMode && tileGrid) {
-    tileGridHeight = 400;
-    tileGrid.$container.cssHeight(tileGridHeight);
+    // TODO [10.0] rmu: temporary show both table-data and tileGrid
+    tileGrid.$container.css('height', 'calc(50% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) / 2 + 'px)');
     tileGrid.revalidateLayout();
+    $data.css('height', 'calc(50% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) / 2 + 'px)');
+  } else {
+    $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileGridHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
 
   this._layoutColumns();

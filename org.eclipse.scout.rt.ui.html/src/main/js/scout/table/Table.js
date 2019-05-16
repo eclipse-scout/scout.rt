@@ -53,6 +53,7 @@ scout.Table = function() {
   this.rootRows = [];
   this.visibleRows = [];
   this.tiles = [];
+  this.tilesMap = {}; // tiles by rowId
   this.estimatedRowCount = 0;
   this.maxRowCount = 0;
   this.truncatedCellTooltipEnabled = null;
@@ -813,6 +814,7 @@ scout.Table.prototype.reload = function(reloadReason) {
     return;
   }
   this._removeRows();
+  this._deleteTiles();
   this._renderFiller();
   this._triggerReload(reloadReason);
 };
@@ -1776,6 +1778,8 @@ scout.Table.prototype._removeRow = function(row) {
 
   this._destroyTooltipsForRow(row);
   this._removeCellEditorForRow(row);
+  // TODO [10.0] rmu check if something like this is necessary...?
+  //  this._removeTileForRow(row);
 
   // Do not remove rows which are removed using an animation
   if (!$row.hasClass('hiding')) {
@@ -2631,6 +2635,10 @@ scout.Table.prototype.insertRows = function(rows) {
     this._renderViewport();
     this.invalidateLayoutTree();
   }
+
+  if (this.tileMode) {
+    this._insertTiles(this._createTiles(rows));
+  }
 };
 
 scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
@@ -2699,6 +2707,10 @@ scout.Table.prototype.deleteRows = function(rows) {
     this._renderFiller();
     this._renderEmptyData();
     this.invalidateLayoutTree();
+  }
+
+  if (this.tileMode) {
+    this._deleteTiles(this.getTilesForRows(rows));
   }
 };
 
@@ -2898,6 +2910,12 @@ scout.Table.prototype._destroyTooltipsForRow = function(row) {
 scout.Table.prototype._removeCellEditorForRow = function(row) {
   if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
     this.cellEditorPopup.remove();
+  }
+};
+
+scout.Table.prototype._removeTileForRow = function(row) {
+  if (this.tileMode) {
+    this.tileGrid.deleteTile(this.tilesMap[row.id]);
   }
 };
 
@@ -3728,11 +3746,6 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   }
 };
 
-scout.Table.prototype.replaceTiles = function(tiles) {
-  this.tiles = tiles || [];
-  this.tileGrid.insertTiles(this.tiles);
-};
-
 /**
  * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
  */
@@ -3897,12 +3910,6 @@ scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
   this.trigger('aggregationFunctionChanged', event);
 };
 
-scout.Table.prototype._triggerCreateTiles = function() {
-  var event = new scout.Event();
-  this.trigger('createTiles', event);
-  return event;
-};
-
 scout.Table.prototype.setHeaderVisible = function(visible) {
   this.setProperty('headerVisible', visible);
 };
@@ -3956,12 +3963,61 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 scout.Table.prototype.setTileMode = function(tileMode) {
   var changed = this.tileMode !== tileMode;
   this.setHeaderVisible(!tileMode);
+  this.tableControls.find(function(control) {
+    return control instanceof scout.AggregateTableControl;
+  }).setVisible(!tileMode);
   this.setProperty('tileMode', tileMode);
   if (this.tileMode && changed) {
-    var e = this._triggerCreateTiles();
-    if (!e.defaultPrevented) {
-      this.replaceTiles(this._createTiles(this.rows));
-    }
+    this.createTiles(this.rows);
+  }
+};
+
+scout.Table.prototype.getTilesForRows = function(rows) {
+  return rows.map(function(row) {
+    return this.tilesMap[row.id];
+  }, this);
+};
+
+// update tilesMap with the given tiles or recreate tilesMap completely in case of null given
+scout.Table.prototype._refreshTilesMap = function(tiles) {
+  if (!tiles) {
+    tiles = this.tiles;
+    this.tilesMap = {};
+  }
+  tiles.forEach(function(tile) {
+    this.tilesMap[tile.rowId] = tile;
+  }, this);
+};
+
+scout.Table.prototype.setTiles = function(tiles) {
+  this.setProperty('tiles', tiles);
+  this._refreshTilesMap();
+  this.tileGrid.setTiles(this.tiles);
+  this.mediator.syncSelectionFromTableToTile(this.selectedRows);
+};
+
+scout.Table.prototype._deleteTiles = function(tiles) {
+  if (!tiles) {
+    tiles = this.tiles.slice();
+  }
+  scout.arrays.removeAll(this.tiles, tiles);
+  this._refreshTilesMap();
+  this.tileGrid.deleteTiles(tiles);
+};
+
+scout.Table.prototype._insertTiles = function(tiles) {
+  scout.arrays.pushAll(this.tiles, tiles);
+  this._refreshTilesMap(tiles);
+  this.tileGrid.insertTiles(tiles);
+};
+
+scout.Table.prototype.createTiles = function(rows) {
+  var event = new scout.Event({
+    rows: rows
+  });
+  this.trigger('createTiles', event);
+  if (!event.defaultPrevented) {
+    this.setTiles(this._createTiles(rows));
   }
 };
 
@@ -3981,11 +4037,14 @@ scout.Table.prototype._renderTileMode = function() {
   var changed = false;
   if (this.tileMode && !this.tileGrid) {
     this.tileGrid = this._createTileGrid();
+    // init logic
+    this.mediator = new scout.TableMediator(this);
     this.tileGrid.render();
     changed = true;
   } else if (!this.tileMode && this.tileGrid) {
     this.tileGrid.destroy();
     this.tileGrid = null;
+    this.mediator = null;
     this.tiles = [];
     changed = true;
   }
