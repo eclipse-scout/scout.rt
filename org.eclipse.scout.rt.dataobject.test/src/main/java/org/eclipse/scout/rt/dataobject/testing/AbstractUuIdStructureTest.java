@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.dataobject.testing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -62,7 +60,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
   }
 
   @Test
-  public void createMethod() throws Exception {
+  public void createMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
     Method create = getIdClass().getDeclaredMethod("create");
     assertNotNull("Method 'create()' is missing", create);
     int mod = create.getModifiers();
@@ -76,7 +74,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
   }
 
   @Test
-  public void ofUuidMethod() throws Exception {
+  public void ofUuidMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
     Method of = getIdClass().getDeclaredMethod("of", UUID.class);
     assertNotNull("Method 'of(UUID)' is missing", of);
     int mod = of.getModifiers();
@@ -91,7 +89,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
 
   @Test
   @Override
-  public void ofStringMethod() throws Exception {
+  public void ofStringMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String)' is missing", of);
     int mod = of.getModifiers();

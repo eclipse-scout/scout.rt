@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.dataobject.testing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -61,7 +59,7 @@ public abstract class AbstractStringIdStructureTest extends AbstractIdStructureT
   }
 
   @Test
-  public void invokeOfStringMethod() throws Exception {
+  public void invokeOfStringMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String) is missing", of);
     int mod = of.getModifiers();
