@@ -13,13 +13,6 @@
 
   <artifactId>eclipse-scout</artifactId>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>eclipse-scout-cli</artifactId>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
