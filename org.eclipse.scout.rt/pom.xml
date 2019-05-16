@@ -778,9 +778,6 @@
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
             <version>1.7.6</version>
-            <configuration>
-              <installDirectory>${basedir}/..</installDirectory>
-            </configuration>
             <executions>
               <execution>
                 <id>install-node-and-npm</id>
@@ -789,7 +786,7 @@
                 </goals>
                 <phase>initialize</phase>
                 <configuration>
-                  <nodeVersion>v12.1.0</nodeVersion>
+                  <nodeVersion>v12.2.0</nodeVersion>
                 </configuration>
               </execution>
               <execution>
@@ -833,7 +830,6 @@
                 <configuration>
                   <skip>${scout.skip.karma}</skip>
                   <arguments>run test:ci</arguments>
-                  <workingDirectory>${basedir}</workingDirectory>
                 </configuration>
               </execution>
             </executions>
@@ -849,9 +845,9 @@
                   <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <executable>${basedir}/../node/node</executable>
+                  <executable>${basedir}/node/node</executable>
                   <arguments>
-                    <argument>${basedir}/../node/node_modules/pnpm/bin/pnpm.js</argument>
+                    <argument>${basedir}/node/node_modules/pnpm/bin/pnpm.js</argument>
                     <argument>install</argument>
                   </arguments>
                 </configuration>
