@@ -78,7 +78,12 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
       @Override
       protected String modelValue() {
         ITableRow row = getModel().getTableRow();
-        return ((JsonTable) getAdapter(row.getTable())).getTableRowId(row);
+        if (row == null) {
+          return "";
+        }
+        else {
+          return ((JsonTable) getAdapter(row.getTable())).getTableRowId(row);
+        }
       }
     });
   }

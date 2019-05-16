@@ -814,7 +814,9 @@ scout.Table.prototype.reload = function(reloadReason) {
     return;
   }
   this._removeRows();
-  this._deleteTiles();
+  if (this.tileMode) {
+    this._deleteTiles();
+  }
   this._renderFiller();
   this._triggerReload(reloadReason);
 };
@@ -2637,7 +2639,7 @@ scout.Table.prototype.insertRows = function(rows) {
   }
 
   if (this.tileMode) {
-    this._insertTiles(this._createTiles(rows));
+    this._insertTiles(this.createTiles(rows));
   }
 };
 
@@ -3962,14 +3964,30 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 
 scout.Table.prototype.setTileMode = function(tileMode) {
   var changed = this.tileMode !== tileMode;
-  this.setHeaderVisible(!tileMode);
-  this.tableControls.find(function(control) {
-    return control instanceof scout.AggregateTableControl;
-  }).setVisible(!tileMode);
+  this._prepareTableForTileMode(tileMode);
   this.setProperty('tileMode', tileMode);
   if (this.tileMode && changed) {
     this.createTiles(this.rows);
   }
+};
+
+scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
+  this.setHeaderVisible(!tileMode);
+
+  // restore/store & remove grouping from tableRows
+  if (tileMode) {
+    this.columns.filter(function(column) {
+      return column.grouped;
+    }, this).forEach(function(column) {
+      this._removeGroupColumn(column);
+    }, this);
+    this._sort(false);
+  }
+
+  // show/hide aggregation table control
+  this.tableControls.find(function(control) {
+    return control instanceof scout.AggregateTableControl;
+  }).setVisible(!tileMode);
 };
 
 scout.Table.prototype.getTilesForRows = function(rows) {
