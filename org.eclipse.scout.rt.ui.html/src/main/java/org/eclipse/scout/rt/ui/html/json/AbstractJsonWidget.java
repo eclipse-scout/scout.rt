@@ -36,5 +36,11 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
         return getModel().getCssClass();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IWidget.PROP_LOADING, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isLoading();
+      }
+    });
   }
 }

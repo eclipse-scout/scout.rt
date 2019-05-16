@@ -35,6 +35,8 @@ public interface ITileAccordion<T extends ITile> extends IAccordion, IExtensible
 
   void addTiles(List<T> tilesToAdd);
 
+  IGroup getGroupById(Object groupId);
+
   IGroup getGroupByTile(T tile);
 
   <G extends IGroup> G getDefaultGroup();

@@ -30,6 +30,7 @@ public interface IWidget extends IPropertyObserver, IStyleable {
   String PROP_INIT_CONFIG_DONE = "initConfigDone";
   String PROP_INIT_DONE = "initDone";
   String PROP_DISPOSE_DONE = "disposeDone";
+  String PROP_LOADING = "loading";
 
   /**
    * @return {@code true} if {@link #initConfig()} has been called, {@code false} if not.
@@ -254,4 +255,13 @@ public interface IWidget extends IPropertyObserver, IStyleable {
    *           if widgetClassToFind is {@code null}.
    */
   <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind);
+
+  /**
+   * Flag to indicate whether this widget is currently loading data. Default is <code>false</code>. The exact
+   * interpretation of this flag (and also if it should be respected at all) is left to the UI.
+   */
+  boolean isLoading();
+
+  void setLoading(boolean loading);
+
 }

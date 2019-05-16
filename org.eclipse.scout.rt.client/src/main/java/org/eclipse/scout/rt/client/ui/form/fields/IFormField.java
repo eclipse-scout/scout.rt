@@ -109,12 +109,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
   String PROP_PREVENT_INITIAL_FOCUS = "preventInitialFocus";
 
   /**
-   * Flag to indicate whether this field is currently loading data. Default is <code>false</code>. The exact
-   * interpretation of this flag (and also if it should be respected at all) is left to the UI.
-   */
-  String PROP_LOADING = "loading";
-
-  /**
    * The style of the field.
    *
    * @since 8.0
@@ -567,10 +561,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    * @return true, if the mandatory property is fulfilled (a value set or not mandatory)
    */
   boolean isMandatoryFulfilled();
-
-  void setLoading(boolean loading);
-
-  boolean isLoading();
 
   /**
    * @return If the label of this {@link IFormField} is visible. It is visible if all label-visibility dimensions are

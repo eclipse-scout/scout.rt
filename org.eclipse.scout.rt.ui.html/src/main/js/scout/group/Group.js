@@ -235,6 +235,15 @@ scout.Group.prototype._setBody = function(body) {
   this._setProperty('body', body);
 };
 
+scout.Group.prototype._createLoadingSupport = function() {
+  return new scout.LoadingSupport({
+    widget: this,
+    $container: function() {
+      return this.$header;
+    }.bind(this)
+  });
+};
+
 scout.Group.prototype._renderHeader = function() {
   if (this.$header) {
     this.$header.remove();

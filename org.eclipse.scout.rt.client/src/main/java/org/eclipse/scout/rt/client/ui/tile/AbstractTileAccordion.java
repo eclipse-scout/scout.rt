@@ -140,7 +140,8 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     return getGroupById(groupId);
   }
 
-  protected IGroup getGroupById(Object groupId) {
+  @Override
+  public IGroup getGroupById(Object groupId) {
     return getGroups().stream()
         .filter(group -> ObjectUtility.equals(groupId, group.getGroupId()))
         .findFirst()

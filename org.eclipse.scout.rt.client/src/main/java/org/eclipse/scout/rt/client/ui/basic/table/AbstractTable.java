@@ -5099,16 +5099,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public void setLoading(boolean loading) {
-    propertySupport.setPropertyBool(PROP_LOADING, loading);
-  }
-
-  @Override
-  public boolean isLoading() {
-    return propertySupport.getPropertyBool(PROP_LOADING);
-  }
-
-  @Override
   public GroupingStyle getGroupingStyle() {
     return (GroupingStyle) propertySupport.getProperty(PROP_GROUPING_STYLE);
   }

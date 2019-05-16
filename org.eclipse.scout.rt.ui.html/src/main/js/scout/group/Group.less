@@ -27,6 +27,14 @@
   &.disabled {
     cursor: default;
   }
+
+  &.loading {
+    & > .loading-indicator {
+      #scout.loading-indicator(16px);
+      left: inherit;
+      right: 0;
+    }
+  }
 }
 
 .group-title {

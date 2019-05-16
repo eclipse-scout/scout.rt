@@ -302,16 +302,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     m_internalDataChangeListener = internalDataChangeListener;
   }
 
-  @Override
-  public boolean isLoading() {
-    return propertySupport.getPropertyBool(PROP_LOADING);
-  }
-
-  @Override
-  public void setLoading(boolean loading) {
-    propertySupport.setPropertyBool(PROP_LOADING, loading);
-  }
-
   public boolean isLoaded() {
     return m_loaded;
   }
