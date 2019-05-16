@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  *   ...
  * }
  * </pre>
- * 
+ *
  * @see DoEntity
  */
 @Documented
@@ -41,9 +41,7 @@ import java.lang.annotation.Target;
 public @interface TypeName {
 
   /**
-   * Unique type name used when serializing an instance of the annotated class
-   * <p>
-   * If value is left empty then the type name is derived from the simple class name.
+   * Unique type name used when serializing an instance of the annotated class. Do not use an empty string as value.
    */
-  String value() default "";
+  String value();
 }
