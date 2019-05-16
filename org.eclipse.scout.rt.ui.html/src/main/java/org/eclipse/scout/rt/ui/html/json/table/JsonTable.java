@@ -964,7 +964,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void handleUiCreateTiles(JsonEvent event) {
-    getModel().getUIFacade().fireCreateTiles();
+    List<ITableRow> tableRows = extractTableRows(event.getData());
+    getModel().getUIFacade().fireCreateTiles(tableRows);
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

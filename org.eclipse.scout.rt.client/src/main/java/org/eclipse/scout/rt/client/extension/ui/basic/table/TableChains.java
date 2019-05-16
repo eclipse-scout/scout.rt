@@ -299,14 +299,14 @@ public final class TableChains {
       super(extensions);
     }
 
-    public void execCreateTiles() {
+    public void execCreateTiles(final List<? extends ITableRow> rows) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITableExtension<? extends AbstractTable> next) {
-          next.execCreateTiles(TableCreateTilesChain.this);
+          next.execCreateTiles(TableCreateTilesChain.this, rows);
         }
       };
-      callChain(methodInvocation);
+      callChain(methodInvocation, rows);
     }
   }
 }

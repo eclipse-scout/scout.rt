@@ -17,13 +17,13 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableApp
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateRowChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
@@ -121,7 +121,7 @@ public abstract class AbstractTableExtension<TABLE extends AbstractTable> extend
   }
 
   @Override
-  public void execCreateTiles(TableCreateTilesChain chain) {
-    chain.execCreateTiles();
+  public void execCreateTiles(TableCreateTilesChain chain, List<? extends ITableRow> rows) {
+    chain.execCreateTiles(rows);
   }
 }

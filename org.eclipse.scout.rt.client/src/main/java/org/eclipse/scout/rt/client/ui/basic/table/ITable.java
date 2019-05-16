@@ -1308,7 +1308,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   /**
    * @since 10.0
    */
-  void createTiles();
+  void createTiles(List<? extends ITableRow> rows);
 
   /**
    * @since 10.0

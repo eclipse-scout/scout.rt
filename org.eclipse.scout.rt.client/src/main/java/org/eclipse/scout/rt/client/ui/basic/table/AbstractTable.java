@@ -37,13 +37,13 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableApp
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateRowChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTilesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
@@ -889,7 +889,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @ConfigOperation
   @Order(140)
-  protected void execCreateTiles() {
+  protected void execCreateTiles(List<? extends ITableRow> rows) {
   }
 
   /**
@@ -4429,10 +4429,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public void createTiles() {
+  public void createTiles(List<? extends ITableRow> rows) {
     try {
       disposeTableInternal();
-      interceptCreateTiles();
+      interceptCreateTiles(rows);
     }
     catch (Exception e) {
       LOG.error("Could not request tiles [{}]", getClass().getName(), e);
@@ -4897,11 +4897,11 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
-    public void fireCreateTiles() {
+    public void fireCreateTiles(List<? extends ITableRow> rows) {
       try {
         pushUIProcessor();
         //
-        AbstractTable.this.createTiles();
+        AbstractTable.this.createTiles(rows);
       }
       finally {
         popUIProcessor();
@@ -5024,8 +5024,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
 
     @Override
-    public void execCreateTiles(TableCreateTilesChain chain) {
-      getOwner().execCreateTiles();
+    public void execCreateTiles(TableCreateTilesChain chain, List<? extends ITableRow> rows) {
+      getOwner().execCreateTiles(rows);
     }
   }
 
@@ -5119,10 +5119,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return chain.execDrag(rows);
   }
 
-  protected final void interceptCreateTiles() {
+  protected final void interceptCreateTiles(List<? extends ITableRow> rows) {
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableCreateTilesChain chain = new TableCreateTilesChain(extensions);
-    chain.execCreateTiles();
+    chain.execCreateTiles(rows);
   }
 
   @Override

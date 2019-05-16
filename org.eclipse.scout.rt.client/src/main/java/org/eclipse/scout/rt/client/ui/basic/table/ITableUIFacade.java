@@ -130,5 +130,5 @@ public interface ITableUIFacade {
 
   void setColumnBackgroundEffect(INumberColumn<?> column, String mode);
 
-  void fireCreateTiles();
+  void fireCreateTiles(List<? extends ITableRow> rows);
 }

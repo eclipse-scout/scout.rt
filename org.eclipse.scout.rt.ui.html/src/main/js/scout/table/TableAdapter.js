@@ -105,13 +105,14 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
 
 scout.TableAdapter.prototype._onWidgetCreateTiles = function(event) {
   event.preventDefault();
-  this._sendCreateTiles();
+  var rowIds = this.widget._rowsToIds(event.rows);
+  this._sendCreateTiles(rowIds);
 };
 
-scout.TableAdapter.prototype._sendCreateTiles = function() {
-  var data = {
-  };
-  this._send('createTiles', data);
+scout.TableAdapter.prototype._sendCreateTiles = function(rowIds) {
+  this._send('createTiles', {
+    rowIds: rowIds
+  });
 };
 
 scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
