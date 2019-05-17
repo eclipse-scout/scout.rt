@@ -36,10 +36,7 @@ public abstract class AbstractId<WRAPPED_TYPE extends Comparable<WRAPPED_TYPE>> 
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((m_id == null) ? 0 : m_id.hashCode());
-    return result;
+    return m_id.hashCode();
   }
 
   @Override
@@ -54,15 +51,7 @@ public abstract class AbstractId<WRAPPED_TYPE extends Comparable<WRAPPED_TYPE>> 
       return false;
     }
     AbstractId other = (AbstractId) obj;
-    if (m_id == null) {
-      if (other.m_id != null) {
-        return false;
-      }
-    }
-    else if (!m_id.equals(other.m_id)) {
-      return false;
-    }
-    return true;
+    return m_id.equals(other.m_id);
   }
 
   @Override
