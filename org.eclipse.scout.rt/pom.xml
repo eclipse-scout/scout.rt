@@ -766,6 +766,40 @@
   <!-- TODO [10.0] mvi: move this profile to maven master -->
   <profiles>
     <profile>
+      <id>npm-root-dir-win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <scout.npm.subdir>/node_modules</scout.npm.subdir>
+      </properties>
+    </profile>
+    <profile>
+      <id>npm-root-dir-linux</id>
+      <activation>
+        <os>
+          <family>linux</family>
+        </os>
+      </activation>
+      <properties>
+        <scout.npm.subdir>/lib/node_modules</scout.npm.subdir>
+      </properties>
+    </profile>
+    <profile>
+      <id>npm-root-dir-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <scout.npm.subdir>/lib/node_modules</scout.npm.subdir>
+      </properties>
+    </profile>
+
+    <profile>
       <id>pnpm multi install</id>
       <activation>
         <file>
@@ -850,7 +884,7 @@
                 <configuration>
                   <executable>${basedir}/target/node/node</executable>
                   <arguments>
-                    <argument>${basedir}/target/node/node_modules/pnpm/bin/pnpm.js</argument>
+                    <argument>${basedir}/target/node${scout.npm.subdir}/pnpm/bin/pnpm.js</argument>
                     <argument>install</argument>
                   </arguments>
                 </configuration>
