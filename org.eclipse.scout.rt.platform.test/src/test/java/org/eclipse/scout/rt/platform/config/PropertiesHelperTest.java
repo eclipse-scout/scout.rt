@@ -267,7 +267,7 @@ public class PropertiesHelperTest {
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertEquals("resolving expression 'a${prop1}b': variable ${prop1} is not defined in the context.", e.getMessage());
+      assertEquals("resolving expression 'a${prop1}b': loop detected (the resolved value contains the original expression): a${prop1}b", e.getMessage());
     }
   }
 
@@ -276,11 +276,12 @@ public class PropertiesHelperTest {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
           .withProperty("prop1", "a${prop2}b")
-          .withProperty("prop2", "a${prop33}b"));
+          .withProperty("prop2", "a${prop33}b")
+      );
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertEquals("resolving expression 'a${prop2}b': variable ${prop2} is not defined in the context.", e.getMessage());
+      assertEquals("resolving expression 'a${prop33}b': variable ${prop33} is not defined in the context.", e.getMessage());
     }
   }
 
@@ -297,7 +298,7 @@ public class PropertiesHelperTest {
       Assert.fail();
     }
     catch (IllegalArgumentException e) {
-      assertEquals("resolving expression 'a${prop2}b': variable ${prop2} is not defined in the context.", e.getMessage());
+      assertEquals("resolving expression 'a${prop3}b': loop detected: [prop3, prop4, prop5]", e.getMessage());
     }
   }
 
@@ -526,7 +527,7 @@ public class PropertiesHelperTest {
   }
 
   @Test
-  public void testNotAllowedReplacementOfKeyAlreadyUsed() {
+  public void testReplacementOfKeyAlreadyUsed() {
     IPropertyProvider properties = new SimpleConfigPropertyProvider("ID1")
         .withProperty("prop1", "prop1")
         .withProperty("prop2", "${prop1}")
@@ -534,9 +535,9 @@ public class PropertiesHelperTest {
         .withProperty("prop4", "${prop1}");
 
     PropertiesHelper h = new PropertiesHelper(properties);
-    assertEquals("prop1", h.getProperty("prop1"));
-    assertEquals("prop1", h.getProperty("prop2"));
-    assertEquals("prop1", h.getProperty("prop4"));
+    assertEquals("prop3", h.getProperty("prop1"));
+    assertEquals("prop3", h.getProperty("prop2"));
+    assertEquals("prop3", h.getProperty("prop4"));
   }
 
   @Test

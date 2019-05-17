@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -97,10 +98,12 @@ public class PropertiesHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
 
-  private final Map<String, String> m_configProperties = new HashMap<>();
+  private Map<String, String> m_configProperties = new HashMap<>();
   private boolean m_isInitialized = false;
   private final Set<Object> m_parsedFiles = new HashSet<>();
   private final Set<Object> m_referencedKeys = new HashSet<>();
+  private final Set<String> m_resolvedKeys = new HashSet<>();
+  private final Set<String> m_usedInternalKeys = new HashSet<>();
   private boolean m_initializing;
 
   /**
@@ -115,6 +118,21 @@ public class PropertiesHelper {
       m_initializing = true;
       if (properties != null) {
         m_isInitialized = parse(properties);
+        if (m_isInitialized) {
+          resolveAll(PLACEHOLDER_PATTERN);
+          // remove internal properties
+          m_configProperties = m_configProperties.entrySet().stream()
+              .filter(e -> {
+                if(e.getKey().startsWith("_")){
+                  if(!m_referencedKeys.contains(e.getKey())){
+                    LOG.warn("The internal key '{}' is never referenced and should be removed from config property file. [{}:{}]", e.getKey(), e.getKey(), e.getValue());
+                  }
+                  return false;
+                }
+                return true;
+              })
+              .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+        }
       }
       importSystemImports(new HashSet<String>(), null);
     }
@@ -131,7 +149,7 @@ public class PropertiesHelper {
     }
     properties.forEach(prop -> {
       String key = prop.getKey();
-      String value = resolveProperty(key, prop.getValue());
+      String value = resolveImports(key, prop.getValue());
       String oldValue = m_configProperties.get(key);
       if (oldValue != null && !oldValue.equals(value)) {
         if (m_referencedKeys.contains(key)) {
@@ -868,6 +886,14 @@ public class PropertiesHelper {
     return propKey;
   }
 
+  protected void resolveAll(Pattern pat) {
+    for (Entry<String, String> entry : m_configProperties.entrySet()) {
+      if (!m_resolvedKeys.contains(entry.getKey())) {
+        entry.setValue(resolve(entry.getValue(), pat));
+      }
+    }
+  }
+
   /**
    * Resolves all variables of format <code>${variableName}</code> in the given expression according to the current
    * application context.
@@ -944,7 +970,7 @@ public class PropertiesHelper {
     return m_configProperties;
   }
 
-  protected String resolveProperty(String key, String value) {
+  protected String resolveImports(String key, String value) {
     if (IMPORT_PATTERN.matcher(key).find()) {
       // in case of an import evaluate system and environment write now to not import wrong properties
 
@@ -956,9 +982,7 @@ public class PropertiesHelper {
       else {
         LOG.warn("Import of '{}' skipped because already imported: {}.", value, m_parsedFiles);
       }
-    }
-    else {
-      value = resolve(value, PLACEHOLDER_PATTERN);
+      m_resolvedKeys.add(key);
     }
     return value;
   }
