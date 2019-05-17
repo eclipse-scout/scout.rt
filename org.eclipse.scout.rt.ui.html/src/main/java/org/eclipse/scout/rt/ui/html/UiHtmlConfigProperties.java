@@ -288,7 +288,8 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public String description() {
-      return "Specifies if scriptfiles should be rebuild on modification or with every request. False for rebuild on modifications. The default value is true.";
+      return "Specifies if scriptfiles (*.js, *.less) should be rebuilt only when the files change or with every page reload.\n" +
+          "True = Build on every page reload. False = Build only when a file is modified. The default value is false.";
     }
 
     @Override
@@ -302,7 +303,7 @@ public final class UiHtmlConfigProperties {
 
     @Override
     public Boolean getDefaultValue() {
-      return Boolean.TRUE;
+      return false;
     }
   }
 
