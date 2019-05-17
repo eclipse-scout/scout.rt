@@ -2155,7 +2155,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     boolean handled = false;
     IDeepLinks deepLinks = BEANS.get(IDeepLinks.class);
     if (deepLinks.canHandleDeepLink(deepLinkPath)) {
-      handled = deepLinks.handleDeepLink(deepLinkPath);
+      try {
+        handled = deepLinks.handleDeepLink(deepLinkPath);
+      }
+      catch (RuntimeException e) {
+        throw new DeepLinkException(e);
+      }
     }
     else {
       // non empty deepLinkPath provided but no handler found, throw exception to let user know
