@@ -799,7 +799,7 @@
                 </goals>
                 <phase>generate-sources</phase>
                 <configuration>
-                  <arguments>install -g pnpm@3.3.3</arguments> <!-- explicitly specify pnpm version to use -->
+                  <arguments>install -g --prefix ./target/node pnpm@3.3.3</arguments> <!-- explicitly specify pnpm version to use -->
                 </configuration>
               </execution>
               <execution>
