@@ -84,7 +84,7 @@ scout.TooltipSupport.prototype.uninstall = function($comp) {
   $comp
     .removeData('tooltipSupport')
     .off('mouseleave', this._options.selector, this._mouseLeaveHandler)
-    .off('mouseenter', this._options.selector, this._onMouseEnterHandler);
+    .off('mouseenter', this._options.selector, this._mouseEnterHandler);
   this._destroyTooltip();
   clearTimeout(this._tooltipTimeoutId);
 };
