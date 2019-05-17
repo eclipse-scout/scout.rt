@@ -60,7 +60,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
   }
 
   @Test
-  public void createMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void createMethod() throws ReflectiveOperationException {
     Method create = getIdClass().getDeclaredMethod("create");
     assertNotNull("Method 'create()' is missing", create);
     int mod = create.getModifiers();
@@ -74,7 +74,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
   }
 
   @Test
-  public void ofUuidMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void ofUuidMethod() throws ReflectiveOperationException {
     Method of = getIdClass().getDeclaredMethod("of", UUID.class);
     assertNotNull("Method 'of(UUID)' is missing", of);
     int mod = of.getModifiers();
@@ -89,7 +89,7 @@ public abstract class AbstractUuIdStructureTest extends AbstractIdStructureTest 
 
   @Test
   @Override
-  public void ofStringMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void ofStringMethod() throws ReflectiveOperationException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String)' is missing", of);
     int mod = of.getModifiers();

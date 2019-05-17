@@ -79,7 +79,7 @@ public abstract class AbstractIdStructureTest {
   }
 
   @Test
-  public void ofTypeMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void ofTypeMethod() throws ReflectiveOperationException {
     Class<?> wrappedTypeClass = TypeCastUtility.getGenericsParameterClass(getIdClass(), IId.class);
     Method of = getIdClass().getDeclaredMethod("of", wrappedTypeClass);
     assertNotNull("Method 'of(" + wrappedTypeClass.getName() + ")' is missing", of);
@@ -93,7 +93,7 @@ public abstract class AbstractIdStructureTest {
   }
 
   @Test
-  public void ofStringMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void ofStringMethod() throws ReflectiveOperationException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String)' is missing", of);
     int mod = of.getModifiers();

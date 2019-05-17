@@ -59,7 +59,7 @@ public abstract class AbstractStringIdStructureTest extends AbstractIdStructureT
   }
 
   @Test
-  public void invokeOfStringMethod() throws ReflectiveOperationException, SecurityException, IllegalAccessException, IllegalArgumentException {
+  public void invokeOfStringMethod() throws ReflectiveOperationException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String) is missing", of);
     int mod = of.getModifiers();
