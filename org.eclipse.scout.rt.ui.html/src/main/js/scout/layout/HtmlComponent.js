@@ -267,12 +267,14 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
     return prefSizeCached;
   }
 
+  var minSize = scout.graphics.cssMinSize(this.$comp);
+  var maxSize = scout.graphics.cssMaxSize(this.$comp);
   if (options.widthHint || options.heightHint) {
-    this._adjustSizeHintsForPrefSize(options);
+    this._adjustSizeHintsForPrefSize(options, minSize, maxSize);
   }
 
   var prefSize = this.layout.preferredLayoutSize(this.$comp, options);
-  this._adjustPrefSizeWithMinMaxSize(prefSize);
+  this._adjustPrefSizeWithMinMaxSize(prefSize, minSize, maxSize);
   this.prefSizeCached[prefSizeCacheKey] = prefSize;
 
   $.log.isTraceEnabled() && $.log.trace('(HtmlComponent#prefSize) ' + this.debug() + ' widthHint=' + options.widthHint + ' heightHint=' + options.heightHint + ' prefSize=' + prefSize);
@@ -286,28 +288,45 @@ scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
   return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1') + 'wOnly' + scout.nvl(options.widthOnly, '-1');
 };
 
-scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options) {
-  // Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it
-  var removeMargin = scout.nvl(options.removeMarginFromHints, true);
+
+/**
+ * Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it.
+ * Also makes sure the hints consider the min and max size set by CSS.
+ */
+scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options, minSize, maxSize) {
+  var removeMargins = scout.nvl(options.removeMarginFromHints, true);
   options.removeMarginFromHints = null;
+  if (!options.widthHint && !options.heightHint) {
+    return;
+  }
+  var margins = removeMargins ? this.margins() : new scout.Insets();
+  var insets = this.insets();
   if (options.widthHint) {
-    options.widthHint -= this.insets(removeMargin).horizontal();
+    // The order is important! Box-sizing: border-box is expected.
+    options.widthHint -= margins.horizontal();
+    options.widthHint = Math.max(options.widthHint, minSize.width);
+    options.widthHint = Math.min(options.widthHint, maxSize.width);
+    options.widthHint -= insets.horizontal();
   }
   if (options.heightHint) {
-    options.heightHint -= this.insets(removeMargin).vertical();
+    // The order is important! Box-sizing: border-box is expected.
+    options.heightHint -= margins.vertical();
+    options.heightHint = Math.max(options.heightHint, minSize.height);
+    options.heightHint = Math.min(options.heightHint, maxSize.height);
+    options.heightHint -= insets.vertical();
   }
 };
 
-scout.HtmlComponent.prototype._adjustPrefSizeWithMinMaxSize = function(prefSize) {
-  // Component may define a min or max height/height -> adjust the pref size accordingly
-  var minHeight = this.$comp.cssMinHeight();
-  var maxHeight = this.$comp.cssMaxHeight();
-  var minWidth = this.$comp.cssMinWidth();
-  var maxWidth = this.$comp.cssMaxWidth();
-  prefSize.height = Math.max(prefSize.height, minHeight);
-  prefSize.height = Math.min(prefSize.height, maxHeight);
-  prefSize.width = Math.max(prefSize.width, minWidth);
-  prefSize.width = Math.min(prefSize.width, maxWidth);
+/**
+ * The html element may define a min or max height/height -> adjust the pref size accordingly
+ */
+scout.HtmlComponent.prototype._adjustPrefSizeWithMinMaxSize = function(prefSize, minSize, maxSize) {
+  minSize = minSize || scout.graphics.cssMinSize(this.$comp);
+  maxSize = maxSize || scout.graphics.cssMaxSize(this.$comp);
+  prefSize.height = Math.max(prefSize.height, minSize.height);
+  prefSize.height = Math.min(prefSize.height, maxSize.height);
+  prefSize.width = Math.max(prefSize.width, minSize.width);
+  prefSize.width = Math.min(prefSize.width, maxSize.width);
 };
 
 /**

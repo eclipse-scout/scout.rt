@@ -83,7 +83,7 @@ public class DataObjectInventory {
 
   /**
    * @return type name for specified class {@code clazz}. If the class does not have a type name, the super class
-   *         hierarchy is searched for the first available type name.
+   *         hierarchy is searched for the first available type name. Returns {@code null} if no type name can be found.
    */
   public String toTypeName(Class<?> queryClazz) {
     Class<?> clazz = queryClazz;
@@ -93,9 +93,7 @@ public class DataObjectInventory {
         return name;
       }
       if (clazz == null || clazz == Object.class) {
-        String defaultTypeName = getDefaultName(queryClazz);
-        LOG.warn("Could not find type name for {}, using default value {}", queryClazz, defaultTypeName);
-        return defaultTypeName;
+        return null;
       }
       clazz = clazz.getSuperclass();
     }
@@ -171,10 +169,15 @@ public class DataObjectInventory {
     if (IDoEntity.class.isAssignableFrom(clazz)) {
       Class<? extends IDoEntity> entityClass = clazz.asSubclass(IDoEntity.class);
       String name = resolveTypeName(clazz);
-      String registeredName = m_classToTypeName.put(entityClass, name);
-      Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
-      checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
-      LOG.debug("Registered class {} with type name '{}'", entityClass, name);
+      if (StringUtility.hasText(name)) {
+        String registeredName = m_classToTypeName.put(entityClass, name);
+        Class<? extends IDoEntity> registeredClass = m_typeNameToClassMap.put(name, entityClass);
+        checkDuplicateClassMapping(clazz, name, registeredName, registeredClass);
+        LOG.debug("Registered class {} with type name '{}'", entityClass, name);
+      }
+      else {
+        LOG.warn("Class {} is annotated with @{} with an empty type name value, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
+      }
     }
     else {
       LOG.warn("Class {} is annotated with @{} but is not an instance of {}, skip registration", clazz.getName(), TypeName.class.getSimpleName(), IDoEntity.class);
@@ -245,17 +248,10 @@ public class DataObjectInventory {
 
   protected String resolveTypeName(Class<?> c) {
     TypeName typeNameAnn = c.getAnnotation(TypeName.class);
-    if (typeNameAnn != null && StringUtility.hasText(typeNameAnn.value())) {
+    if (typeNameAnn != null) {
       return typeNameAnn.value();
     }
-    return getDefaultName(c);
-  }
-
-  /**
-   * @return default type name to use for classes without {@link TypeName} annotation
-   */
-  protected String getDefaultName(Class<?> c) {
-    return c != null ? c.getSimpleName() : null;
+    return null;
   }
 
   protected String resolveTypeVersion(Class<?> c) {

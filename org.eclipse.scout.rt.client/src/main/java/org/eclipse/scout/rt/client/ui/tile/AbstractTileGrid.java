@@ -685,10 +685,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   @Override
   public void loadTileData() {
     BEANS.get(TileDataLoadManager.class).cancel(getAsyncLoadIdentifier(), getWindowIdentifier());
-
-    for (T tile : getTilesInternal()) {
-      tile.loadData();
-    }
+    getTilesInternal().forEach(tile -> tile.loadData());
   }
 
   @Override

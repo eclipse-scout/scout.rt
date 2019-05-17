@@ -10,10 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.dataobject.testing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -82,7 +79,7 @@ public abstract class AbstractIdStructureTest {
   }
 
   @Test
-  public void ofTypeMethod() throws Exception {
+  public void ofTypeMethod() throws ReflectiveOperationException {
     Class<?> wrappedTypeClass = TypeCastUtility.getGenericsParameterClass(getIdClass(), IId.class);
     Method of = getIdClass().getDeclaredMethod("of", wrappedTypeClass);
     assertNotNull("Method 'of(" + wrappedTypeClass.getName() + ")' is missing", of);
@@ -96,7 +93,7 @@ public abstract class AbstractIdStructureTest {
   }
 
   @Test
-  public void ofStringMethod() throws Exception {
+  public void ofStringMethod() throws ReflectiveOperationException {
     Method of = getIdClass().getDeclaredMethod("of", String.class);
     assertNotNull("Method 'of(String)' is missing", of);
     int mod = of.getModifiers();

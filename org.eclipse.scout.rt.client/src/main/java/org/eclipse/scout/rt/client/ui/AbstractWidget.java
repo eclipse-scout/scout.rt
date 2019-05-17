@@ -298,4 +298,14 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   public boolean hasProperty(String name) {
     return propertySupport.hasProperty(name);
   }
+
+  @Override
+  public boolean isLoading() {
+    return propertySupport.getPropertyBool(PROP_LOADING);
+  }
+
+  @Override
+  public void setLoading(boolean loading) {
+    propertySupport.setPropertyBool(PROP_LOADING, loading);
+  }
 }

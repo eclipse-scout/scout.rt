@@ -188,13 +188,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_UI_SORT_POSSIBLE = "uiSortPossible";
 
   /**
-   * type boolean
-   *
-   * @since 5.2.0
-   */
-  String PROP_LOADING = "loading";
-
-  /**
    * type GroupingStyle
    *
    * @since 6.1.0
@@ -1238,10 +1231,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @return True if the table has a table-customizer and the {@link CreateCustomColumnPermission}, false otherwise.
    */
   boolean isCustomizable();
-
-  void setLoading(boolean loading);
-
-  boolean isLoading();
 
   GroupingStyle getGroupingStyle();
 

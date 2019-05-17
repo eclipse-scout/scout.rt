@@ -140,7 +140,8 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     return getGroupById(groupId);
   }
 
-  protected IGroup getGroupById(Object groupId) {
+  @Override
+  public IGroup getGroupById(Object groupId) {
     return getGroups().stream()
         .filter(group -> ObjectUtility.equals(groupId, group.getGroupId()))
         .findFirst()
@@ -667,8 +668,18 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   }
 
   protected void updateGroupTitleSuffix(IGroup group) {
+    group.setTitleSuffix(createGroupTitleSuffixLabel(group));
+  }
+
+  /**
+   * Creates the label displayed as suffix in the title of the group-header. The default implementation returns the
+   * count of tiles and some braces. Example: "(19)".
+   * <p>
+   * Override this method if you need another suffix, or change the count.
+   */
+  protected String createGroupTitleSuffixLabel(IGroup group) {
     int numFilteredTiles = getTileGrid(group).getFilteredTileCount();
-    group.setTitleSuffix("(" + numFilteredTiles + ")");
+    return "(" + numFilteredTiles + ")";
   }
 
   @Override

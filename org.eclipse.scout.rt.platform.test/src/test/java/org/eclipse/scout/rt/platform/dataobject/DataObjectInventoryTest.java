@@ -10,21 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.DateFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
+import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureInvalidTypeNameDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.dataobject.fixture.ProjectFixtureDo;
+import org.eclipse.scout.rt.platform.dataobject.fixture.ScoutFixtureDo;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Before;
@@ -68,6 +66,7 @@ public class DataObjectInventoryTest {
     m_inventory.registerClassByTypeName(OtherEntityFixtureDo.class);
     m_inventory.registerClassByTypeName(DateFixtureDo.class);
     m_inventory.registerClassByTypeName(TestFixtureEntityDo.class);
+    m_inventory.registerClassByTypeName(EntityFixtureInvalidTypeNameDo.class);
   }
 
   @Test
@@ -76,12 +75,11 @@ public class DataObjectInventoryTest {
     assertEquals("OtherEntityFixture", m_inventory.toTypeName(OtherEntityFixtureDo.class));
     assertEquals("DateFixture", m_inventory.toTypeName(DateFixtureDo.class));
 
-    // fallback to simple class name
-    assertEquals("TestFixtureSubclass1Do", m_inventory.toTypeName(TestFixtureSubclass1Do.class));
-
+    assertNull(m_inventory.toTypeName(EntityFixtureInvalidTypeNameDo.class));
+    assertNull(m_inventory.toTypeName(TestFixtureSubclass1Do.class));
     assertNull(m_inventory.toTypeName(null));
-    assertEquals("Object", m_inventory.toTypeName(Object.class));
-    assertEquals("String", m_inventory.toTypeName(String.class));
+    assertNull(m_inventory.toTypeName(Object.class));
+    assertNull(m_inventory.toTypeName(String.class));
   }
 
   @Test
@@ -168,7 +166,9 @@ public class DataObjectInventoryTest {
   public void testResolveTypeName() {
     assertEquals("EntityFixture", m_inventory.resolveTypeName(EntityFixtureDo.class));
     assertEquals("TestBaseFixtureEntity", m_inventory.resolveTypeName(TestFixtureSubclass1Do.class));
-    assertEquals("Object", m_inventory.resolveTypeName(Object.class));
+    assertEquals("", m_inventory.resolveTypeName(EntityFixtureInvalidTypeNameDo.class));
+
+    assertNull(m_inventory.resolveTypeName(Object.class));
   }
 
   @Test

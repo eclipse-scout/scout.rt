@@ -831,4 +831,15 @@ public class VirtualDesktop implements IDesktop {
   public boolean isDense() {
     return false;
   }
+
+  @Override
+  public boolean isLoading() {
+    return false;
+  }
+
+  @Override
+  public void setLoading(boolean loading) {
+    // NOP
+  }
+
 }

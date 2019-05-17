@@ -27,7 +27,6 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
   String PROP_ORDER = "order";
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
-  String PROP_LOADING = "loading";
   String PROP_DISPLAY_STYLE = "displayStyle";
 
   /**

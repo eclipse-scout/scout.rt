@@ -2194,16 +2194,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     propertySupport.setPropertyString(PROP_STATUS_POSITION, statusPosition);
   }
 
-  @Override
-  public void setLoading(boolean loading) {
-    propertySupport.setPropertyBool(PROP_LOADING, loading);
-  }
-
-  @Override
-  public boolean isLoading() {
-    return propertySupport.getPropertyBool(PROP_LOADING);
-  }
-
   protected void handleChildFieldVisibilityChanged() {
     // nop
   }
