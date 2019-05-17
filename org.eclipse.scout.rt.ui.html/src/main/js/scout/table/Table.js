@@ -52,8 +52,6 @@ scout.Table = function() {
   this.rows = [];
   this.rootRows = [];
   this.visibleRows = [];
-  this.tiles = [];
-  this.tilesMap = {}; // tiles by rowId
   this.estimatedRowCount = 0;
   this.maxRowCount = 0;
   this.truncatedCellTooltipEnabled = null;
@@ -93,7 +91,7 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tiles']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
 
   this.$data = null;
   this.$emptyData = null;
@@ -466,7 +464,6 @@ scout.Table.prototype._remove = function() {
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
-  this.tileGrid = null;
   this._destroyCellEditorPopup();
   this._removeAggregateRows();
   this._uninstallImageListeners();
@@ -754,8 +751,7 @@ scout.Table.prototype._createTileGrid = function() {
   return scout.create('TileGrid', {
     parent: this,
     selectable: true,
-    multiselect: true,
-    tiles: this.tiles
+    multiselect: true
   });
 };
 
@@ -814,9 +810,6 @@ scout.Table.prototype.reload = function(reloadReason) {
     return;
   }
   this._removeRows();
-  if (this.tileMode) {
-    this._deleteTiles();
-  }
   this._renderFiller();
   this._triggerReload(reloadReason);
 };
@@ -1780,8 +1773,6 @@ scout.Table.prototype._removeRow = function(row) {
 
   this._destroyTooltipsForRow(row);
   this._removeCellEditorForRow(row);
-  // TODO [10.0] rmu check if something like this is necessary...?
-  //  this._removeTileForRow(row);
 
   // Do not remove rows which are removed using an animation
   if (!$row.hasClass('hiding')) {
@@ -2637,10 +2628,6 @@ scout.Table.prototype.insertRows = function(rows) {
     this._renderViewport();
     this.invalidateLayoutTree();
   }
-
-  if (this.tileMode) {
-    this._insertTiles(this.createTiles(rows));
-  }
 };
 
 scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
@@ -2709,10 +2696,6 @@ scout.Table.prototype.deleteRows = function(rows) {
     this._renderFiller();
     this._renderEmptyData();
     this.invalidateLayoutTree();
-  }
-
-  if (this.tileMode) {
-    this._deleteTiles(this.getTilesForRows(rows));
   }
 };
 
@@ -2912,12 +2895,6 @@ scout.Table.prototype._destroyTooltipsForRow = function(row) {
 scout.Table.prototype._removeCellEditorForRow = function(row) {
   if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
     this.cellEditorPopup.remove();
-  }
-};
-
-scout.Table.prototype._removeTileForRow = function(row) {
-  if (this.tileMode) {
-    this.tileGrid.deleteTile(this.tilesMap[row.id]);
   }
 };
 
@@ -3963,18 +3940,63 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 };
 
 scout.Table.prototype.setTileMode = function(tileMode) {
-  var changed = this.tileMode !== tileMode;
-  this._prepareTableForTileMode(tileMode);
-  this.setProperty('tileMode', tileMode);
-  if (this.tileMode && changed) {
-    this.createTiles(this.rows);
+  this._setProperty('tileMode', tileMode);
+
+  if (tileMode && !this.tileGrid) {
+    this.tileGrid = this._createTileGrid();
   }
+
+  if (tileMode && !this.mediator) {
+    this.mediator = new scout.TableTileGridMediator(this);
+    this.mediator.loadTiles();
+  }
+
+  this._prepareTableForTileMode(tileMode);
+
+  if (this.rendered) {
+    this._renderTileMode();
+  }
+  if (!tileMode && this.tileGrid) {
+    this.tileGrid.destroy();
+    this.tileGrid = null;
+  }
+  if (!tileMode && this.mediator) {
+    this.mediator.destroy();
+    this.mediator = null;
+  }
+
+};
+
+scout.Table.prototype._renderTileMode = function() {
+  if (!this.tileGrid) {
+    return;
+  }
+  if (this.tileMode) {
+    this._renderTileGrid();
+  } else {
+    this._removeTileGrid();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Table.prototype._renderTileGrid = function() {
+  if (this.tileGrid.rendered) {
+    return;
+  }
+  this.tileGrid.render();
+};
+
+scout.Table.prototype._removeTileGrid = function() {
+  if (!this.tileGrid.rendered) {
+    return;
+  }
+  this.tileGrid.remove();
 };
 
 scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
   this.setHeaderVisible(!tileMode);
 
-  // restore/store & remove grouping from tableRows
+  // restore/store & remove grouping on tableRows
   if (tileMode) {
     this.columns.filter(function(column) {
       return column.grouped;
@@ -3983,6 +4005,11 @@ scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
     }, this);
     this._sort(false);
   }
+  // restore/store & remove column filter on tableRows
+  if (tileMode) {
+    // TODO [10.0] rmu reset all filters... text filters could stay, maybe implement resetUserFilter(filterType)
+    this.resetUserFilter();
+  }
 
   // show/hide aggregation table control
   this.tableControls.find(function(control) {
@@ -3990,43 +4017,10 @@ scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
   }).setVisible(!tileMode);
 };
 
-scout.Table.prototype.getTilesForRows = function(rows) {
-  return rows.map(function(row) {
-    return this.tilesMap[row.id];
-  }, this);
-};
-
-// update tilesMap with the given tiles or recreate tilesMap completely in case of null given
-scout.Table.prototype._refreshTilesMap = function(tiles) {
-  if (!tiles) {
-    tiles = this.tiles;
-    this.tilesMap = {};
-  }
-  tiles.forEach(function(tile) {
-    this.tilesMap[tile.rowId] = tile;
-  }, this);
-};
-
+// TODO [10.0] rename to insertTiles, don't use widget property but regular table event
 scout.Table.prototype.setTiles = function(tiles) {
-  this.setProperty('tiles', tiles);
-  this._refreshTilesMap();
-  this.tileGrid.setTiles(this.tiles);
-  this.mediator.syncSelectionFromTableToTile(this.selectedRows);
-};
-
-scout.Table.prototype._deleteTiles = function(tiles) {
-  if (!tiles) {
-    tiles = this.tiles.slice();
-  }
-  scout.arrays.removeAll(this.tiles, tiles);
-  this._refreshTilesMap();
-  this.tileGrid.deleteTiles(tiles);
-};
-
-scout.Table.prototype._insertTiles = function(tiles) {
-  scout.arrays.pushAll(this.tiles, tiles);
-  this._refreshTilesMap(tiles);
-  this.tileGrid.insertTiles(tiles);
+  tiles = this._createChildren(tiles);
+  this.mediator.insertTiles(tiles);
 };
 
 scout.Table.prototype.createTiles = function(rows) {
@@ -4035,7 +4029,7 @@ scout.Table.prototype.createTiles = function(rows) {
   });
   this.trigger('createTiles', event);
   if (!event.defaultPrevented) {
-    this.setTiles(this._createTiles(rows));
+    return this._createTiles(rows);
   }
 };
 
@@ -4049,26 +4043,6 @@ scout.Table.prototype._createTiles = function(rows) {
 
 scout.Table.prototype.createTileForRow = function(row) {
   throw new Error('Not implemented');
-};
-
-scout.Table.prototype._renderTileMode = function() {
-  var changed = false;
-  if (this.tileMode && !this.tileGrid) {
-    this.tileGrid = this._createTileGrid();
-    // init logic
-    this.mediator = new scout.TableMediator(this);
-    this.tileGrid.render();
-    changed = true;
-  } else if (!this.tileMode && this.tileGrid) {
-    this.tileGrid.destroy();
-    this.tileGrid = null;
-    this.mediator = null;
-    this.tiles = [];
-    changed = true;
-  }
-  if (changed) {
-    this.invalidateLayoutTree();
-  }
 };
 
 scout.Table.prototype.setRowIconVisible = function(rowIconVisible) {
