@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.filter.IFilter;
+import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -106,18 +107,14 @@ public class ClientSessionStopHelper {
     return Jobs.schedule(new IRunnable() {
       @Override
       public void run() {
-        int cooldownSeconds = 1;
-        while (!IFuture.CURRENT.get().isCancelled()) {
+        if (!IFuture.CURRENT.get().isCancelled()) {
           runJobTermination(session);
-          try {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(cooldownSeconds));
-          }
-          catch (InterruptedException e) {//NOSONAR
-            break;
-          }
         }
       }
-    }, Jobs.newInput());
+    }, Jobs.newInput()
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.SECONDS)
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.SECONDS))));
   }
 
   /**
