@@ -95,13 +95,14 @@ public class DataObjectTestHelperTest {
     actual.getOtherEntities().add(BEANS.get(OtherEntityFixtureDo.class));
     s_dataObjectTestHelper.assertEquals(actual, m_expectedEntityFixture);
   }
-  
+
   @Test(expected = ComparisonFailure.class)
   public void testAssertEqualsMessage() {
     s_dataObjectTestHelper.assertEquals("foo", createEntityFixture(), createEntityFixtureRaw());
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void testEqualsObject() {
     DoEntity entity = createEntityFixtureRaw();
     DoEntity equalEntity = createEntityFixtureRaw();
