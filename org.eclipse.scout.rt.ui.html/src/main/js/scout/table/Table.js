@@ -433,6 +433,9 @@ scout.Table.prototype._render = function() {
   }
   this.session.desktop.on('popupOpen', this._popupOpenHandler);
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
+
+  // TODO [10.0] rmu ensure getConfiguredTileMode true works correctly
+  this.setTileMode(this.tileMode);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -4015,9 +4018,11 @@ scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
   }
 
   // show/hide aggregation table control
-  this.tableControls.find(function(control) {
-    return control instanceof scout.AggregateTableControl;
-  }).setVisible(!tileMode);
+  this.tableControls.filter(function(control) {
+    if (control instanceof scout.AggregateTableControl) {
+      control.setVisible(!tileMode);
+    }
+  });
 };
 
 // TODO [10.0] rename to insertTiles, don't use widget property but regular table event
