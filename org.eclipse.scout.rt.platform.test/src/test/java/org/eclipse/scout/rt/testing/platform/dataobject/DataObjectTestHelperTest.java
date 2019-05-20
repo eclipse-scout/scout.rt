@@ -14,6 +14,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
@@ -110,10 +111,10 @@ public class DataObjectTestHelperTest {
     differentEntity.put("foo", "bar");
     differentEntity.put("baz", 43);
 
-    assertTrue(s_dataObjectTestHelper.equalsObject(null, null, false));
-    assertFalse(s_dataObjectTestHelper.equalsObject(entity, null, false));
-    assertFalse(s_dataObjectTestHelper.equalsObject(null, entity, false));
-    assertTrue(s_dataObjectTestHelper.equalsObject(entity, equalEntity, false));
-    assertFalse(s_dataObjectTestHelper.equalsObject(entity, differentEntity, false));
+    assertTrue(Objects.deepEquals(null, null));
+    assertFalse(Objects.deepEquals(entity, null));
+    assertFalse(Objects.deepEquals(null, entity));
+    assertTrue(Objects.deepEquals(entity, equalEntity));
+    assertFalse(Objects.deepEquals(entity, differentEntity));
   }
 }
