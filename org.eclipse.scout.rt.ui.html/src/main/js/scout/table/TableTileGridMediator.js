@@ -89,7 +89,9 @@ scout.TableTileGridMediator.prototype._refreshTilesMap = function(tiles) {
 scout.TableTileGridMediator.prototype.getTilesForRows = function(rows) {
   return rows.map(function(row) {
     return this.tilesMap[row.id];
-  }, this);
+  }, this).filter(function(t) {
+    return !!t;
+  });
 };
 
 scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
