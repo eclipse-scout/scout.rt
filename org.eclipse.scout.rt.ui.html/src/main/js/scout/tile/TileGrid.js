@@ -906,7 +906,7 @@ scout.TileGrid.prototype._selectTileOnMouseDown = function(event) {
   this.selectionHandler.selectTileOnMouseDown(event);
 };
 
-scout.TileGrid.prototype.scrollTo = function(tile) {
+scout.TileGrid.prototype.scrollTo = function(tile, options) {
   this.ensureTileRendered(tile);
   // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
   // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
@@ -914,7 +914,7 @@ scout.TileGrid.prototype.scrollTo = function(tile) {
   this.scrollTopDirty = true;
   this.validateLayoutTree();
   this.scrolling = false;
-  tile.reveal();
+  scout.scrollbars.scrollTo(this.$container, tile.$container, options);
   this.scrollTopDirty = false;
 };
 

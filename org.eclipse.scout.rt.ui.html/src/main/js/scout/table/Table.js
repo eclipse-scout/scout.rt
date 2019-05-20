@@ -3984,6 +3984,9 @@ scout.Table.prototype._renderTileGrid = function() {
     return;
   }
   this.tileGrid.render();
+
+  this.mediator.syncSelectionFromTableToTile();
+  this.mediator.syncScrollTopFromTableToTile();
 };
 
 scout.Table.prototype._removeTileGrid = function() {

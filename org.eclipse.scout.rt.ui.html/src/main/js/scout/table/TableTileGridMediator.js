@@ -96,7 +96,6 @@ scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
   scout.arrays.pushAll(this.tiles, tiles);
   this._refreshTilesMap(tiles);
   this.tileGrid.insertTiles(tiles);
-  this.syncSelectionFromTableToTile();
 };
 
 scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
@@ -168,6 +167,14 @@ scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = functio
     return this.table.rowsMap[tile.rowId];
   }, this);
   this.table.selectRows(selectedRows);
+};
+
+scout.TableTileGridMediator.prototype.syncScrollTopFromTableToTile = function() {
+  var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
+  var tile = this.tilesMap[this.table.rows[rowIndex].id];
+  this.tileGrid.scrollTo(tile, {
+    align: 'top'
+  });
 };
 
 scout.TableTileGridMediator.prototype.syncSelectionFromTableToTile = function() {
