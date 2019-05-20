@@ -30,7 +30,7 @@ scout.TableTileGridMediator = function(table) {
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
-  this._tableReloadHandler = this._onTableReload.bind(this);
+  this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
 
   this._destroyHandler = this._uninstallListeners.bind(this);
 
@@ -49,7 +49,7 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
   this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('rowsInserted', this._tableRowsInsertedHandler);
   this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
-  this.table.on('reload', this._tableReloadHandler);
+  this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
 
   this.tileGrid.on('destroy', this._destroyHandler);
   this.table.on('destroy', this._destroyHandler);
@@ -63,7 +63,7 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.table.off('rowsSelected', this._onTableRowsSelected);
   this.table.off('rowsInserted', this._tableRowsInsertedHandler);
   this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
-  this.table.off('reload', this._tableReloadHandler);
+  this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
 
   this.tileGrid.off('destroy', this._destroyHandler);
   this.table.off('destroy', this._destroyHandler);
@@ -115,10 +115,6 @@ scout.TableTileGridMediator.prototype._onTileGridPropertyChange = function(event
   }
 };
 
-scout.TableTileGridMediator.prototype._onTableReload = function(event) {
-  this.deleteTiles();
-};
-
 scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
   var tiles = this.table.createTiles(event.rows);
   if (tiles) {
@@ -128,6 +124,10 @@ scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
 
 scout.TableTileGridMediator.prototype._onTableRowsDeleted = function(event) {
   this.deleteTiles(this.getTilesForRows(event.rows));
+};
+
+scout.TableTileGridMediator.prototype._onTableAllRowsDeleted = function(event) {
+  this.deleteTiles();
 };
 
 scout.TableTileGridMediator.prototype._onTableFilterAdded = function(event) {
@@ -167,12 +167,17 @@ scout.TableTileGridMediator.prototype._onTableRowsSelected = function(event) {
 scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = function(selectedTiles) {
   var selectedRows = selectedTiles.map(function(tile) {
     return this.table.rowsMap[tile.rowId];
-  }, this);
+  }, this).filter(function(t) {
+    return !!t;
+  });
   this.table.selectRows(selectedRows);
 };
 
 scout.TableTileGridMediator.prototype.syncScrollTopFromTableToTile = function() {
   var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
+  if (rowIndex < 0) {
+    return;
+  }
   var tile = this.tilesMap[this.table.rows[rowIndex].id];
   if (!tile) {
     return;
