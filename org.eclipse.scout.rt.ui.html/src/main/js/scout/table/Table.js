@@ -435,7 +435,9 @@ scout.Table.prototype._render = function() {
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
 
   // TODO [10.0] rmu ensure getConfiguredTileMode true works correctly
-  this.setTileMode(this.tileMode);
+  if (this.tileMode) {
+    this.setTileMode(this.tileMode);
+  }
 };
 
 scout.Table.prototype._renderProperties = function() {
