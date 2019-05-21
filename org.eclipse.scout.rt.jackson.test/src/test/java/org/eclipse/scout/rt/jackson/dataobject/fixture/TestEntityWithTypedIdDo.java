@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
