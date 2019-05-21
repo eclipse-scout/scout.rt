@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.mom.jms.internal;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.jms.Connection;
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -41,7 +43,7 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
 
   protected volatile IJmsSessionProvider m_impl;
   protected volatile TemporaryQueue m_temporaryQueue;
-  protected volatile boolean m_closing;
+  protected final AtomicBoolean m_closing = new AtomicBoolean();
 
   public JmsSessionProviderWrapper(JmsConnectionWrapper connectionWrapper, boolean transacted, ICreateJmsSessionProvider providerFunction) {
     m_connectionWrapper = connectionWrapper;
@@ -52,12 +54,15 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
 
   @Override
   public boolean isClosing() {
-    return m_closing;
+    return m_closing.get();
   }
 
   @Override
   public void close() {
-    m_closing = true;
+    if (!m_closing.compareAndSet(false, true)) {
+      return;
+    }
+    //this thread is closing
     try {
       synchronized (m_sessionProviderFunction) {
         if (m_impl != null) {
@@ -79,12 +84,18 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
   /**
    * Called by {@link JmsConnectionWrapper} upon failover
    * <p>
-   * 
+   *
    * @throws no
    *           exceptions
    */
   public void invalidate() {
+    if (isClosing()) {
+      return;
+    }
     synchronized (m_sessionProviderFunction) {
+      if (isClosing()) {
+        return;
+      }
       if (m_impl != null) {
         try {
           LOG.info("Invalidate sessionProvider {}", m_impl);
@@ -102,17 +113,28 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
 
   protected IJmsSessionProvider trySessionProvider() throws JMSException {
     synchronized (m_sessionProviderFunction) {
-      if (m_closing) {
+      if (isClosing()) {
         throw new ProcessingException("closed");
       }
       if (m_impl != null) {
         return m_impl;
       }
-      //create a new session
-      LOG.debug("Creating sessionProvider");
-      Connection c = m_connectionWrapper.getConnection();
+    }
+
+    //get a connection outside lock
+    LOG.debug("Creating sessionProvider");
+    Connection c = m_connectionWrapper.getConnection();
+
+    synchronized (m_sessionProviderFunction) {
+      if (isClosing()) {
+        throw new ProcessingException("closed");
+      }
+      if (m_impl != null) {
+        return m_impl;
+      }
       Session session = m_transacted ? c.createSession(true, Session.SESSION_TRANSACTED) : c.createSession(false, Session.AUTO_ACKNOWLEDGE);
       try {
+        LOG.debug("Creating sessionProvider...");
         m_impl = m_sessionProviderFunction.create(session);
         LOG.debug("Created sessionProvider {}", m_impl);
         return m_impl;
@@ -125,7 +147,7 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
   }
 
   protected void waitForRetry(JMSException e) throws JMSException {
-    if (m_closing) {
+    if (isClosing()) {
       throw e;
     }
     if (m_connectionWrapper.getConnectionRetryCount() <= 0) {
@@ -200,7 +222,7 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
 
   @Override
   public void deleteTemporaryQueue() throws JMSException {
-    Assertions.assertTrue(m_closing, "deleteTemporaryQueue can only be called on a closing session provider.");
+    Assertions.assertTrue(isClosing(), "deleteTemporaryQueue can only be called on a closing session provider.");
     if (m_temporaryQueue != null) {
       try {
         m_temporaryQueue.delete();

@@ -99,6 +99,7 @@ public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
     protected IMomImplementor initDelegate() throws Exception {
       IMomImplementor impl = super.initDelegate();
       m_oldCF = ((JmsMomImplementor) impl).m_connectionWrapper.getConnectionFunction();
+
       return impl;
     }
 
@@ -124,7 +125,7 @@ public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
         }
         return m_oldCF.create();
       });
-      impl.m_connectionWrapper.invalidate(new JMSException("JUnit fixture: connection failed"));
+      impl.m_connectionWrapper.invalidate(impl.getConnection(), new JMSException("JUnit fixture: connection failed"));
     }
 
     public void simulateConnectionDown(BooleanSupplier active) {
@@ -139,7 +140,7 @@ public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
           throw new JMSException("JUnit fixture: no connection");
         }
       });
-      impl.m_connectionWrapper.invalidate(new JMSException("JUnit fixture: connection failed"));
+      impl.m_connectionWrapper.invalidate(impl.getConnection(), new JMSException("JUnit fixture: connection failed"));
     }
   }
 }
