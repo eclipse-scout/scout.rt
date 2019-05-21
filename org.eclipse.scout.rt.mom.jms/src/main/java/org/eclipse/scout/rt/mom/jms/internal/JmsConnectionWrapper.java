@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.mom.jms.internal;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Connection;
 import javax.jms.ExceptionListener;
@@ -52,7 +53,7 @@ public class JmsConnectionWrapper {
   protected long m_sessionRetryIntervalMillis;
 
   protected volatile Connection m_impl;
-  protected volatile boolean m_closing;
+  protected final AtomicBoolean m_closing = new AtomicBoolean();
 
   public JmsConnectionWrapper(Map<Object, Object> properties) {
     m_connectionRetryCount = ObjectUtility.nvl(
@@ -64,6 +65,10 @@ public class JmsConnectionWrapper {
     m_sessionRetryIntervalMillis = ObjectUtility.nvl(
         TypeCastUtility.castValue(properties.get(IMomImplementor.SESSION_RETRY_INTERVAL_MILLIS), Integer.class),
         CONFIG.getPropertyValue(SessionRetryIntervalMillisProperty.class));
+  }
+
+  public boolean isClosing() {
+    return m_closing.get();
   }
 
   public ICreateJmsConnection getConnectionFunction() {
@@ -113,27 +118,38 @@ public class JmsConnectionWrapper {
   }
 
   public boolean isConnected() {
-    return !m_closing && m_impl != null;
+    return !m_closing.get() && m_impl != null;
   }
 
   public void close() {
-    m_closing = true;
+    if (!m_closing.compareAndSet(false, true)) {
+      return;
+    }
+    //this thread is closing
     synchronized (m_connectionFunction) {
       //close all sessions
+      int n = m_sessionWrappers.size();
+      LOG.info("close {} connection and {} sessions", m_impl != null ? 1 : 0, n);
+      int i = 0;
       for (JmsSessionProviderWrapper s : m_sessionWrappers.keySet()) {
+        i++;
+        LOG.info("closing session {} of {}", i, n);
         s.close();
       }
       //close real connection
-      if (m_impl != null) {
-        try {
-          m_impl.close();
-        }
-        catch (JMSException e) {
-          BEANS.get(MomExceptionHandler.class).handle(e);
-        }
-        finally {
-          m_impl = null;
-        }
+      if (m_impl == null) {
+        return;
+      }
+      try {
+        LOG.info("closing connection");
+        m_impl.close();
+        LOG.info("connection closed");
+      }
+      catch (JMSException e) {
+        BEANS.get(MomExceptionHandler.class).handle(e);
+      }
+      finally {
+        m_impl = null;
       }
     }
   }
@@ -141,28 +157,46 @@ public class JmsConnectionWrapper {
   /**
    * Called upon failover
    */
-  public void invalidate(JMSException e) {
+  public void invalidate(Connection affectedConnection, JMSException e) {
+    if (isClosing()) {
+      return;
+    }
+
     synchronized (m_connectionFunction) {
+      if (m_impl != affectedConnection) {
+        return;
+      }
+      if (isClosing()) {
+        return;
+      }
       try {
         try {
           //invalidate all sessions
-          LOG.warn("invalidate connection and {} sessions due to '{}'", m_sessionWrappers.size(), e.getMessage());
+          int n = m_sessionWrappers.size();
+          LOG.warn("invalidate {} connection and {} sessions due to '{}'", m_impl != null ? 1 : 0, m_sessionWrappers.size(), e.getMessage());
+          int i = 0;
           for (JmsSessionProviderWrapper s : m_sessionWrappers.keySet()) {
+            i++;
+            LOG.info("invalidating session {} of {}", i, n);
             s.invalidate();
           }
         }
         finally {
           //close real connection
           if (m_impl != null) {
-            m_impl.close();
+            try {
+              LOG.info("invalidating connection");
+              m_impl.close();
+              LOG.info("connection invalidated");
+            }
+            finally {
+              m_impl = null;
+            }
           }
         }
       }
       catch (JMSException e2) {
         BEANS.get(MomExceptionHandler.class).handle(e2);
-      }
-      finally {
-        m_impl = null;
       }
     }
   }
@@ -174,60 +208,64 @@ public class JmsConnectionWrapper {
    * @throws JMSException
    */
   public Connection getConnection() throws JMSException {
-    synchronized (m_connectionFunction) {
-      int retry = 0;
-      while (true) {
-        try {
-          return tryConnectionInsideLock();
-        }
-        catch (JMSException e/*do not catch RuntimeException, this could catch the 'closed' exception*/) {
-          retry++;
-          waitForRetry(retry, e);
-        }
+    int retry = 0;
+    //loop without locking
+    while (true) {
+      try {
+        return tryConnection();
+      }
+      catch (JMSException e/*do not catch RuntimeException, this could catch the 'closed' exception*/) {
+        retry++;
+        waitForRetry(retry, e);
       }
     }
   }
 
-  protected Connection tryConnectionInsideLock() throws JMSException {
-    if (m_closing) {
-      throw new ProcessingException("closed");
-    }
-    if (m_impl != null) {
-      return m_impl;
-    }
-
-    Connection tmp = null;
-    try {
-      tmp = m_connectionFunction.create();
-      if (m_connectionRetryCount > 0) {
-        tmp.setExceptionListener(new ExceptionListener() {
-          @Override
-          public void onException(final JMSException e1) {
-            if (m_connectionRetryCount > 0) {
-              LOG.info("JMS connection dropped; starting failover", e1);
-              invalidate(e1);
-              return;
+  protected Connection tryConnection() throws JMSException {
+    synchronized (m_connectionFunction) {
+      if (isClosing()) {
+        throw new ProcessingException("closed");
+      }
+      if (m_impl != null) {
+        return m_impl;
+      }
+      Connection tmp = null;
+      try {
+        tmp = m_connectionFunction.create();
+        if (isClosing()) {
+          throw new ProcessingException("closed");
+        }
+        if (m_connectionRetryCount > 0) {
+          final Connection newConnection = tmp;
+          tmp.setExceptionListener(new ExceptionListener() {
+            @Override
+            public void onException(final JMSException e1) {
+              if (m_connectionRetryCount > 0) {
+                LOG.info("JMS connection dropped; starting failover", e1);
+                invalidate(newConnection, e1);
+                return;
+              }
+              BEANS.get(MomExceptionHandler.class).handle(e1);
             }
-            BEANS.get(MomExceptionHandler.class).handle(e1);
+          });
+        }
+        //success
+        m_impl = tmp;
+        LOG.info("JMS connection established: {}", m_impl);
+        return m_impl;
+      }
+      finally {
+        //detect failure
+        if (m_impl == null && tmp != null) {
+          try {
+            tmp.close();
           }
-        });
-      }
-      //success
-      m_impl = tmp;
-      LOG.info("JMS connection established: {}", m_impl);
-      return m_impl;
-    }
-    finally {
-      //detect failure
-      if (m_impl == null && tmp != null) {
-        try {
-          tmp.close();
-        }
-        catch (JMSException e2) {
-          LOG.info("Close invalid connection", e2);
+          catch (JMSException e2) {
+            LOG.info("Close invalid connection", e2);
+          }
         }
       }
-    }
+    }//end lock
   }
 
   /**
