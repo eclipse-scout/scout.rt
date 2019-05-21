@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
 
-import org.eclipse.scout.rt.jackson.dataobject.fixture.FixtureEnum;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
