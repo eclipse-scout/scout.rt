@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
 
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
-import org.eclipse.scout.rt.jackson.dataobject.fixture.FixtureStringId;
-import org.eclipse.scout.rt.jackson.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithTypedIdDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;

@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.UUID;
 
-import org.eclipse.scout.rt.jackson.dataobject.fixture.FixtureUuId;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithUuIdDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithUuIdMapKeyDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
