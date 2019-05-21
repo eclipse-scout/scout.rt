@@ -80,7 +80,8 @@
       "statusVisible": false,
       "preventDoubleClick": false,
       "stackable": true,
-      "shrinkable": false
+      "shrinkable": false,
+      "htmlEnabled": false
     },
     "RadioButtonGroup": {
       "clearable": "never",
@@ -212,6 +213,9 @@
       "hasDate": true,
       "hasTime": false,
       "timePickerResolution": 30
+    },
+    "FileChooserButton": {
+      "htmlEnabled": false
     },
     "Table": {
       "autoResizeColumns": false,
@@ -528,6 +532,7 @@
           "CalendarField": null,
           "ClipboardField": null,
           "DateField": null,
+          "FileChooserButton": null,
           "FileChooserField": null,
           "HtmlField": null,
           "LabelField": null,
