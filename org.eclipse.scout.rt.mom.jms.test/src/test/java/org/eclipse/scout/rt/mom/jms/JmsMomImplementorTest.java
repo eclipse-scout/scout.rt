@@ -2224,6 +2224,8 @@ public class JmsMomImplementorTest {
     public void simulateConnectionDown(final CountDownLatch failingCount) {
       System.out.println("simulateConnectionDown");
       final JmsMomImplementor impl = (JmsMomImplementor) getImplementor();
+      @SuppressWarnings("resource")
+      Connection conn = impl.getConnection();
       impl.m_connectionWrapper.withConnectionFunction(new ICreateJmsConnection() {
         @Override
         public Connection create() throws JMSException {
@@ -2237,7 +2239,7 @@ public class JmsMomImplementorTest {
           return m_oldCF.create();
         }
       });
-      impl.m_connectionWrapper.invalidate(new JMSException("JUnit fixture: connection failed"));
+      impl.m_connectionWrapper.invalidate(conn, new JMSException("JUnit fixture: connection failed"));
     }
   }
 
