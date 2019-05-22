@@ -18,8 +18,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.junit.ComparisonFailure;
 
 public final class ScoutAssert {
 
@@ -155,5 +158,44 @@ public final class ScoutAssert {
     }
 
     throw new AssertionError("Expecting [" + expectedType.getName() + "] but nothing was thrown");
+  }
+
+  /**
+   * Asserts that two objects are equal. If they are not, an {@link ComparisonFailure} is thrown with a string
+   * representation of the given objects. If <code>expected</code> and <code>actual</code> are <code>null</code>, they
+   * are considered equal.
+   * <p>
+   * This method was motivated by the JUnit method org.junit.Assert.assertEquals(Object, Object) but extending its
+   * functionality to throw a {@link ComparisonFailure} also for non-String objects.
+   *
+   * @param expected
+   *          expected value
+   * @param actual
+   *          actual value
+   */
+  public static void assertEqualsWithComparisonFailure(Object expected, Object actual) {
+    assertEqualsWithComparisonFailure(null, expected, actual);
+  }
+
+  /**
+   * Asserts that two objects are equal. If they are not, an {@link ComparisonFailure} is thrown with the given message
+   * and a string representation of the given objects. If <code>expected</code> and <code>actual</code> are
+   * <code>null</code>, they are considered equal.
+   * <p>
+   * This method was motivated by the JUnit method org.junit.Assert.assertEquals(String, Object, Object) but extending
+   * its functionality to throw a {@link ComparisonFailure} also for non-String objects.
+   *
+   * @param message
+   *          the identifying message for the {@link ComparisonFailure} (<code>null</code> okay)
+   * @param expected
+   *          expected value
+   * @param actual
+   *          actual value
+   */
+  public static void assertEqualsWithComparisonFailure(String message, Object expected, Object actual) {
+    if (!ObjectUtility.equals(expected, actual)) {
+      String cleanMessage = message == null ? "objects not equals" : message;
+      throw new ComparisonFailure(cleanMessage, Objects.toString(expected), Objects.toString(actual));
+    }
   }
 }

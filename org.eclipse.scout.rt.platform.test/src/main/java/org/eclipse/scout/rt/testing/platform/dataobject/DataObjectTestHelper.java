@@ -24,12 +24,16 @@ import org.eclipse.scout.rt.platform.dataobject.DoNode;
 import org.eclipse.scout.rt.platform.dataobject.IDataObject;
 import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.ComparisonFailure;
 
 /**
  * Helper for unit tests dealing with {@link IDataObject}.
+ *
+ * @deprecated use {@link ScoutAssert#assertEqualsWithComparisonFailure(Object, Object)} or
+ *             {@link ScoutAssert#assertEqualsWithComparisonFailure(String, Object, Object)} instead
  */
+@Deprecated
 @ApplicationScoped
 public class DataObjectTestHelper {
 
@@ -44,7 +48,7 @@ public class DataObjectTestHelper {
    *          actual value
    */
   public void assertEquals(Object expected, Object actual) {
-    assertEquals(null, expected, actual);
+    ScoutAssert.assertEqualsWithComparisonFailure(null, expected, actual);
   }
 
   /**
@@ -60,19 +64,13 @@ public class DataObjectTestHelper {
    *          actual value
    */
   public void assertEquals(String message, Object expected, Object actual) {
-    if (!ObjectUtility.equals(expected, actual)) {
-      String cleanMessage = message == null ? "objects not equals" : message;
-      throw new ComparisonFailure(cleanMessage, Objects.toString(expected), Objects.toString(actual));
-    }
+    ScoutAssert.assertEqualsWithComparisonFailure(message, expected, actual);
   }
 
   /**
    * Asserts (deep) equality for specified {@link DoEntity} objects and additionally asserts, that concrete
    * {@link DoEntity} class of expected entity and class of actual {@link DoEntity} is identical.
-   *
-   * @deprecated use {@link #assertEquals(Object, Object)} instead
    */
-  @Deprecated
   public void assertDoEntityEquals(IDoEntity expected, IDoEntity actual) {
     Assertions.assertEquals(expected, actual);
 
@@ -84,10 +82,7 @@ public class DataObjectTestHelper {
   /**
    * Asserts (deep) equality for specified {@link DoList} objects and additionally asserts, that all nested concrete
    * {@link DoEntity} classes within the specified lists are identical.
-   *
-   * @deprecated use {@link #assertEquals(Object, Object)} instead
    */
-  @Deprecated
   public void assertDoListEquals(DoList<?> expected, DoList<?> actual) {
     assertDoListEquals(expected, actual, true);
   }
@@ -97,9 +92,7 @@ public class DataObjectTestHelper {
    *
    * @param assertClassEquals
    *          if {@code true} concrete class of all nested {@link DoEntity}'s must be the identical
-   * @deprecated use {@link #assertEquals(Object, Object)} instead
    */
-  @Deprecated
   public void assertDoListEquals(DoList<?> expected, DoList<?> actual, boolean assertClassEquals) {
     if (!equalsObject(expected, actual, assertClassEquals)) {
       assertFail(expected, actual);
@@ -107,22 +100,18 @@ public class DataObjectTestHelper {
   }
 
   /**
-   * @deprecated Method will be removed in a later release
+   * Method will be removed in a later release
    */
-  @Deprecated
   protected void assertMapKeyEqualsAttributeName(IDoEntity actual) {
     for (String key : actual.allNodes().keySet()) {
-      assertEquals("key of attribute map is not equals to node attribute name", key, actual.getNode(key).getAttributeName());
+      ScoutAssert.assertEqualsWithComparisonFailure("key of attribute map is not equals to node attribute name", key, actual.getNode(key).getAttributeName());
     }
   }
 
   /**
    * Asserts (deep) equality of two {@link Object}, taking into account nested {@link DoNode} elements which requires
    * custom equality check.
-   *
-   * @deprecated use {@link #assertEquals(Object, Object)} instead
    */
-  @Deprecated
   public void assertObjectEquals(Object expected, Object actual, boolean assertClassEquals) {
     if (!equalsObject(expected, actual, assertClassEquals)) {
       assertFail(expected, actual);
@@ -130,9 +119,8 @@ public class DataObjectTestHelper {
   }
 
   /**
-   * @deprecated Method will be removed in a later release
+   * Method will be removed in a later release
    */
-  @Deprecated
   protected void assertFail(Object expected, Object actual) {
     throw new ComparisonFailure("Objects not equal", Objects.toString(expected), Objects.toString(actual));
   }
@@ -142,10 +130,8 @@ public class DataObjectTestHelper {
    * equality check.
    * <p>
    *
-   * @deprecated use {@link #assertEquals(Object, Object)} instead
    * @return {@code true} if equal
    */
-  @Deprecated
   public boolean equalsObject(Object expected, Object actual, boolean assertClassEquals) {
     if (expected == null || actual == null) {
       return expected == actual;

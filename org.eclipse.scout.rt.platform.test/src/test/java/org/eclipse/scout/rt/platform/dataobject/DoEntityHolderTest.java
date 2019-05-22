@@ -13,14 +13,10 @@ package org.eclipse.scout.rt.platform.dataobject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
-import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 import org.junit.Test;
 
 public class DoEntityHolderTest {
-
-  protected static DataObjectTestHelper s_dataObjectTestUtility = BEANS.get(DataObjectTestHelper.class);
 
   @Test
   public void testSetGetValue() {
