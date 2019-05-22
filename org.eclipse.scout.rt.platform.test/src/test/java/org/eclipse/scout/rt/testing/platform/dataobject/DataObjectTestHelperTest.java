@@ -103,7 +103,6 @@ public class DataObjectTestHelperTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   public void testEqualsObject() {
     DoEntity entity = createEntityFixtureRaw();
     DoEntity equalEntity = createEntityFixtureRaw();
