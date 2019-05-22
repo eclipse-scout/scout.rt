@@ -29,8 +29,10 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.fixture.EntityFixtureDo;
@@ -629,6 +631,30 @@ public class DoEntityTest {
     entity2.putList("attribute3", Arrays.asList("l1", "l2"));
     assertEquals(entity1, entity2);
     assertEquals(entity1.hashCode(), entity2.hashCode());
+  }
+
+  @Test
+  public void testEqualsHashCode_attributeOrder() {
+    DoEntity entity1 = BEANS.get(DoEntity.class);
+    entity1.put("attr1", "foo");
+    entity1.put("attr2", "bar");
+
+    // assert attributes have insertion-order if using all() method
+    List<String> expectedKeys1 = Arrays.asList("attr1", "attr2");
+    List<String> actualKeys1 = entity1.all().entrySet().stream().map(Entry::getKey).collect(Collectors.toList());
+    assertEquals(expectedKeys1, actualKeys1);
+
+    DoEntity entity2 = BEANS.get(DoEntity.class);
+    entity2.put("attr2", "bar");
+    entity2.put("attr1", "foo");
+
+    // assert attributes have insertion-order if using all() method
+    List<String> expectedKeys2 = Arrays.asList("attr2", "attr1");
+    List<String> actualKeys2 = entity2.all().entrySet().stream().map(Entry::getKey).collect(Collectors.toList());
+    assertEquals(expectedKeys2, actualKeys2);
+
+    // assert entity equality (e.g. map identic) even if attribute order is not identical
+    assertEquals(entity1, entity2);
   }
 
   @Test
