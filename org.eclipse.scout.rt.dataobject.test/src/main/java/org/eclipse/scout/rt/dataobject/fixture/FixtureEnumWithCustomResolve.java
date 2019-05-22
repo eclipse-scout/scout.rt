@@ -24,7 +24,7 @@ public enum FixtureEnumWithCustomResolve implements IEnum {
 
   private final String m_stringValue;
 
-  private FixtureEnumWithCustomResolve(String stringValue) {
+  FixtureEnumWithCustomResolve(String stringValue) {
     m_stringValue = stringValue;
   }
 

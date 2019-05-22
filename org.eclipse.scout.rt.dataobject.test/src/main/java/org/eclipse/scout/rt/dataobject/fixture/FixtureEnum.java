@@ -24,7 +24,7 @@ public enum FixtureEnum implements IEnum {
 
   private final String m_stringValue;
 
-  private FixtureEnum(String stringValue) {
+  FixtureEnum(String stringValue) {
     m_stringValue = stringValue;
   }
 
