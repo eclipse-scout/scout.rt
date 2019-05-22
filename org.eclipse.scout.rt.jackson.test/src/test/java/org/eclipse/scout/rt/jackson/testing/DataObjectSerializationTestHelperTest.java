@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.testing;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.junit.BeforeClass;
@@ -84,11 +86,11 @@ public class DataObjectSerializationTestHelperTest {
   @Test
   public void testParse() {
     DoEntity entity = s_testHelper.parse(JSON, DoEntity.class);
-    s_testHelper.assertEquals(ENTITY, entity);
+    assertEqualsWithComparisonFailure(ENTITY, entity);
   }
 
   @Test
   public void testCloneT() {
-    s_testHelper.assertEquals(ENTITY, s_testHelper.clone(ENTITY));
+    assertEqualsWithComparisonFailure(ENTITY, s_testHelper.clone(ENTITY));
   }
 }

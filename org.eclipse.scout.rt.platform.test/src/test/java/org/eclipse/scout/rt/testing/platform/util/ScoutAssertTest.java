@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.junit.ComparisonFailure;
 import org.junit.Test;
 
 /**
@@ -140,5 +141,54 @@ public class ScoutAssertTest {
 
   private void raise(Throwable t) throws Throwable {
     throw t;
+  }
+
+  @Test
+  public void testAssertEqualsWithComparisonFailureWithStrings() {
+    try {
+      ScoutAssert.assertEqualsWithComparisonFailure("foo", "bar");
+      fail("expecting assertion to fail");
+    }
+    catch (ComparisonFailure e) {
+      assertEquals("foo", e.getExpected());
+      assertEquals("bar", e.getActual());
+    }
+  }
+
+  @Test
+  public void testAssertEqualsWithComparisonFailureMessageWithStrings() {
+    try {
+      ScoutAssert.assertEqualsWithComparisonFailure("message", "foo", "bar");
+      fail("expecting assertion to fail");
+    }
+    catch (ComparisonFailure e) {
+      assertEquals("foo", e.getExpected());
+      assertEquals("bar", e.getActual());
+      assertTrue(e.getMessage().startsWith("message"));
+    }
+  }
+
+  @Test
+  public void testAssertEqualsWithComparisonFailureWithObjects() {
+    Object o1 = new Object() {
+      @Override
+      public String toString() {
+        return "object1";
+      }
+    };
+    Object o2 = new Object() {
+      @Override
+      public String toString() {
+        return "object2";
+      }
+    };
+    try {
+      ScoutAssert.assertEqualsWithComparisonFailure(o1, o2);
+      fail("expecting assertion to fail");
+    }
+    catch (ComparisonFailure e) {
+      assertEquals("object1", e.getExpected());
+      assertEquals("object2", e.getActual());
+    }
   }
 }

@@ -23,10 +23,12 @@ import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
+import org.junit.Assert;
 
 /**
  * Helper dealing with JSON serialization/deserialization tests for data objects
  */
+@SuppressWarnings("deprecation")
 @ApplicationScoped
 public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
 
@@ -41,7 +43,7 @@ public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
   public void assertJsonEquals(String expected, String actual) {
     expected = toUnixLineEndingsAndTrim(expected);
     actual = toUnixLineEndingsAndTrim(actual);
-    assertEquals(expected, actual);
+    Assert.assertEquals(expected, actual);
   }
 
   /**

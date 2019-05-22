@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.dataobject;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
 import org.junit.Test;
 
 public class DoEntityBuilderTest {
@@ -29,11 +30,11 @@ public class DoEntityBuilderTest {
         .put("attribute2", 42)
         .putList("listAttribute", 1, 2, 3)
         .build();
-    BEANS.get(DataObjectTestHelper.class).assertEquals(expected, actual);
+    assertEqualsWithComparisonFailure(expected, actual);
 
     // ensure lists are mutable
     expected.getList("listAttribute").remove(1);
     actual.getList("listAttribute").remove(1);
-    BEANS.get(DataObjectTestHelper.class).assertEquals(expected, actual);
+    assertEqualsWithComparisonFailure(expected, actual);
   }
 }
