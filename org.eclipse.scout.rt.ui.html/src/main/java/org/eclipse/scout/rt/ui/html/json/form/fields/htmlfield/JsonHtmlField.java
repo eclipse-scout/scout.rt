@@ -50,10 +50,8 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
       }
 
       @Override
-      public Object prepareValueForToJson(Object value0) {
-        String value = (String) value0;
-        value = BinaryResourceUrlUtility.replaceIconIdHandlerWithUrl(value);
-        return BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(JsonHtmlField.this, value);
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.replaceImageUrls(JsonHtmlField.this, (String) value);
       }
     });
 
@@ -94,10 +92,8 @@ public class JsonHtmlField<HTML_FIELD extends IHtmlField> extends JsonValueField
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource att = getModel().getAttachment(filename);
-    if (att != null) {
-      return new BinaryResourceHolder(att);
-    }
-    return null;
+    BinaryResource attachment = getModel().getAttachment(filename);
+    return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
+
 }

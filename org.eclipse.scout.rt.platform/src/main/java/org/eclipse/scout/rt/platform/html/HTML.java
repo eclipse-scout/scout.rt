@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.html.internal.HtmlTableDataBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableHeadBuilder;
 import org.eclipse.scout.rt.platform.html.internal.HtmlTableRowBuilder;
 import org.eclipse.scout.rt.platform.html.internal.StyleElementBuilder;
+import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
 
 /**
  * Convenience for building a HTML document or parts of it with encoded text.
@@ -261,7 +262,7 @@ public final class HTML {
    *          image source path
    */
   public static IHtmlElement imgByBinaryResource(CharSequence binaryResource) {
-    return new HtmlImageBuilder("binaryResource:" + binaryResource);
+    return new HtmlImageBuilder(BinaryResourceUtility.createUrl(binaryResource.toString()));
   }
 
   /**

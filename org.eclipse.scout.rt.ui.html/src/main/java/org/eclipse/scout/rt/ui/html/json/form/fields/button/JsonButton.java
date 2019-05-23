@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.button;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
@@ -23,15 +24,18 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
 
-public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IJsonContextMenuOwner {
+public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> implements IJsonContextMenuOwner, IBinaryResourceProvider {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
   public static final String PROP_DEFAULT_BUTTON = "defaultButton";
   public static final String PROP_DISPLAY_STYLE = "displayStyle";
+
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
 
   public JsonButton(BUTTON model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -46,6 +50,18 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
   @Override
   protected void initJsonProperties(BUTTON model) {
     super.initJsonProperties(model);
+    // Overrides label-handling from super class
+    putJsonProperty(new JsonProperty<BUTTON>(IFormField.PROP_LABEL, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getLabel();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.replaceImageUrls(JsonButton.this, (String) value);
+      }
+    });
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
       @Override
       protected Integer modelValue() {
@@ -179,4 +195,10 @@ public class JsonButton<BUTTON extends IButton> extends JsonFormField<BUTTON> im
     addPropertyEventFilterCondition(IButton.PROP_SELECTED, selected);
     getModel().getUIFacade().setSelectedFromUI(selected);
   }
+
+  @Override
+  public BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint) {
+    return BinaryResourceUrlUtility.provideBinaryResource(filenameWithFingerprint, getModel()::getAttachment);
+  }
+
 }

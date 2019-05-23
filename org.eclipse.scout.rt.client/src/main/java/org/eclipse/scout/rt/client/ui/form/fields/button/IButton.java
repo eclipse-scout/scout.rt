@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
 /**
@@ -153,4 +157,14 @@ public interface IButton extends IFormField, IHtmlCapable, IContextMenuOwner {
    */
   @Override
   void setEnabledGranted(boolean enabled);
+
+  /**
+   * local images and local resources bound to the html text
+   */
+  Set<BinaryResource> getAttachments();
+
+  BinaryResource getAttachment(String filename);
+
+  void setAttachments(Collection<? extends BinaryResource> attachments);
+
 }

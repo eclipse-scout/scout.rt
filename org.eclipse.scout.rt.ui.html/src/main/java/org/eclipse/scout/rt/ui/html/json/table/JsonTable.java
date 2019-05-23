@@ -991,11 +991,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource att = getModel().getAttachment(filename);
-    if (att != null) {
-      return new BinaryResourceHolder(att);
-    }
-    return getBinaryResourceMediator().getBinaryResourceHolder(filename);
+    BinaryResource attachment = getModel().getAttachment(filename);
+    return attachment == null ? getBinaryResourceMediator().getBinaryResourceHolder(filename) : new BinaryResourceHolder(attachment);
   }
 
   /**

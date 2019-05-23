@@ -59,9 +59,7 @@ public class JsonCell implements IJsonObject {
     JSONObject json = new JSONObject();
     json.put("value", m_cellValue);
     if (getCell().isHtmlEnabled()) {
-      String cellText = BinaryResourceUrlUtility.replaceIconIdHandlerWithUrl(m_cellText);
-      cellText = BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(m_parentAdapter, cellText);
-      json.put("text", cellText);
+      json.put("text", BinaryResourceUrlUtility.replaceImageUrls(m_parentAdapter, m_cellText));
     }
     else {
       json.put("text", m_cellText);

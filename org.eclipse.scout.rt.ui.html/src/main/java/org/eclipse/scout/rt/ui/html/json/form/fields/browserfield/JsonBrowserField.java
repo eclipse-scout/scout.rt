@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListe
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField.SandboxPermission;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -137,10 +136,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint) {
-    Pair<String, Long> filenameAndFingerprint = BinaryResourceUrlUtility.extractFilenameWithFingerprint(filenameWithFingerprint);
-    String filename = filenameAndFingerprint.getLeft();
-    BinaryResource binaryResource = getModel().getUIFacade().requestBinaryResourceFromUI(filename);
-    BinaryResourceHolder holder = new BinaryResourceHolder(binaryResource);
+    BinaryResourceHolder holder = BinaryResourceUrlUtility.provideBinaryResource(filenameWithFingerprint, getModel().getUIFacade()::requestBinaryResourceFromUI);
     holder.addHttpResponseInterceptor(new BrowserFieldContentHttpResponseInterceptor(getUiSession()));
     return holder;
   }
