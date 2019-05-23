@@ -500,14 +500,6 @@ scout.TableAdapter.prototype._onRequestFocusInCell = function(event) {
   this.widget.focusCell(column, row);
 };
 
-scout.TableAdapter.prototype._onTilesInserted = function(event) {
-  this.widget.mediator.insertTiles($.map(event.tiles, function(tileAdapterId, rowId) {
-    var tile = this.widget._createChild(tileAdapterId);
-    tile.rowId = rowId;
-    return tile;
-  }.bind(this)));
-};
-
 scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
   var columns = [],
     functions = [];
@@ -579,8 +571,6 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
     this._onColumnBackgroundEffectChanged(event);
   } else if (event.type === 'requestFocusInCell') {
     this._onRequestFocusInCell(event);
-  } else if (event.type === 'tilesInserted') {
-    this._onTilesInserted(event);
   } else {
     scout.TableAdapter.parent.prototype.onModelAction.call(this, event);
   }

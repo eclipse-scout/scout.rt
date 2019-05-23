@@ -91,7 +91,7 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tiles']);
 
   this.$data = null;
   this.$emptyData = null;
@@ -4027,10 +4027,11 @@ scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
   });
 };
 
-// TODO [10.0] rename to insertTiles, don't use widget property but regular table event
-scout.Table.prototype.setTiles = function(tiles) {
-  tiles = this._createChildren(tiles);
-  this.mediator.insertTiles(tiles);
+scout.Table.prototype._setTiles = function(tiles) {
+  this.mediator.insertTiles(!!tiles ? tiles.map(function(e) {
+    e.tile.rowId = e.tableRow;
+    return e.tile;
+  }) : []);
 };
 
 scout.Table.prototype.createTiles = function(rows) {

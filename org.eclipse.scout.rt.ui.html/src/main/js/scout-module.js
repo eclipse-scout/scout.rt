@@ -287,6 +287,8 @@
   __include("scout/table/TableSelectionHandler.js");
   __include("scout/table/TableTileGridMediator.js");
   __include("scout/table/TableRowDetail.js");
+  __include("scout/table/TableRowTileMapping.js");
+  __include("scout/table/TableRowTileMappingAdapter.js");
   __include("scout/table/TableTooltip.js");
   __include("scout/table/TableUpdateBuffer.js");
   __include("scout/table/columns/comparators.js");

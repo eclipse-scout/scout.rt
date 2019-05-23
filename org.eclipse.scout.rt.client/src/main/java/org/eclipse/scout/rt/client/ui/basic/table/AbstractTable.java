@@ -108,9 +108,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
-import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
@@ -204,7 +202,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private ITableOrganizer m_tableOrganizer;
   private boolean m_treeStructureDirty;
-  private Map<ITableRow, ITile> m_tiles; // synchronized map
 
   public AbstractTable() {
     this(true);
@@ -223,7 +220,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_rows = Collections.synchronizedList(new ArrayList<>(1));
     m_rootRows = Collections.synchronizedList(new ArrayList<>(1));
     m_rowsByKey = Collections.synchronizedMap(new HashMap<>());
-    m_tiles = Collections.synchronizedMap(new HashMap<ITableRow, ITile>());
     m_deletedRows = new HashMap<>();
     m_rowFilters = new ArrayList<>(1);
     m_attachmentSupport = BEANS.get(AttachmentSupport.class);
@@ -887,11 +883,13 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * Called by {@link #createTiles(List)}
+   * Called when this table requests tile to be displayed, called by {@link #createTiles(List)}.
+   * <p>
+   * Subclasses can override this method. The default returns <code>null</code> (= no tile for this row).
    */
   @ConfigOperation
   @Order(140)
-  protected ITile execCreateTile(ITableRow row) {
+  protected ITile execCreateTile(ITableRow rows) {
     return null;
   }
 
@@ -4310,10 +4308,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
   }
 
-  private void fireTilesInserted(Map<? extends ITableRow, ? extends ITile> tiles) {
-    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_TILES_INSERTED, null, tiles));
-  }
-
   // main handler
   public void fireTableEventInternal(TableEvent e) {
     if (isTableChanging()) {
@@ -4440,22 +4434,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     try {
       disposeTableInternal();
 
-      Map<ITableRow, ITile> rowToTileMap = rows.stream()
-          .map(r -> new ImmutablePair<>(r, interceptCreateTile(r)))
-          .filter(p -> p.getRight() != null)
-          .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-      insertTiles(rowToTileMap);
+      List<TableRowTileMapping> rowToTilePairs = rows.stream()
+          .map(r -> BEANS.get(TableRowTileMapping.class)
+              .withTableRow(r)
+              .withTile(interceptCreateTile(r)))
+          .filter(m -> m.getTile() != null)
+          .collect(Collectors.toList());
+      setTiles(rowToTilePairs);
     }
     catch (Exception e) {
       LOG.error("Could not create tiles [{}]", getClass().getName(), e);
     }
     super.disposeInternal();
-  }
-
-  @Override
-  public void insertTiles(Map<ITableRow, ITile> rowToTileMap) {
-    m_tiles.putAll(rowToTileMap);
-    fireTilesInserted(rowToTileMap);
   }
 
   /*
@@ -5239,5 +5229,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setTileMode(boolean tileMode) {
     propertySupport.setProperty(PROP_TILE_MODE, tileMode);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<TableRowTileMapping> getTiles() {
+    return (List<TableRowTileMapping>) propertySupport.getProperty(PROP_TILES);
+  }
+
+  @Override
+  public void setTiles(List<TableRowTileMapping> tiles) {
+    propertySupport.setProperty(PROP_TILES, tiles);
   }
 }
