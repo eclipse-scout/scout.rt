@@ -34,6 +34,7 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
   protected void initConfig() {
     super.initConfig();
     setRadioValue(getConfiguredRadioValue());
+    setWrapText(getConfiguredWrapText());
   }
 
   /**
@@ -47,10 +48,16 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
    * @see AbstractRadioButtonGroup
    * @since moved to {@link AbstractRadioButton} in 4.0.0-M6
    */
-  @ConfigProperty(ConfigProperty.OBJECT)
   @Order(230)
+  @ConfigProperty(ConfigProperty.OBJECT)
   protected T getConfiguredRadioValue() {
     return null;
+  }
+
+  @Order(240)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredWrapText() {
+    return false;
   }
 
   @Override
@@ -66,12 +73,22 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
   @SuppressWarnings("unchecked")
   @Override
   public T getRadioValue() {
-    return (T) propertySupport.getProperty(PROP_RADIOVALUE);
+    return (T) propertySupport.getProperty(PROP_RADIO_VALUE);
   }
 
   @Override
   public void setRadioValue(T o) {
-    propertySupport.setProperty(PROP_RADIOVALUE, o);
+    propertySupport.setProperty(PROP_RADIO_VALUE, o);
+  }
+
+  @Override
+  public void setWrapText(boolean wrapText) {
+    propertySupport.setProperty(PROP_WRAP_TEXT, wrapText);
+  }
+
+  @Override
+  public boolean isWrapText() {
+    return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
   }
 
   protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER> implements IRadioButtonExtension<T, OWNER> {

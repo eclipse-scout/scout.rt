@@ -15,8 +15,7 @@
   margin-left: @mandatory-indicator-width;
   outline: none;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex;
 
   & > .radio-button-circle,
   & > .label,
@@ -24,14 +23,13 @@
     /* only the label should be clickable, not the whole field */
     cursor: pointer;
     vertical-align: middle;
-    display: inline-block;
   }
 
   & > .label {
     color: @control-color;
     padding-top: @radio-button-label-padding-top;
     padding-left: 7px;
-    #scout.overflow-ellipsis-nowrap();
+    #scout.overflow-ellipsis();
 
     &.empty {
       /* Make the label invisible if there is no text to not artificially make the button wider than it should be

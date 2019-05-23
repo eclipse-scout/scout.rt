@@ -12,6 +12,7 @@ scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
 
   this.triStateEnabled = false;
+  this.wrapText = false;
   this.keyStroke = null;
   this.checkBoxKeyStroke = new scout.CheckBoxToggleKeyStroke(this);
 
@@ -72,50 +73,34 @@ scout.CheckBoxField.prototype._render = function() {
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 };
 
+
+scout.CheckBoxField.prototype._renderProperties = function() {
+  scout.CheckBoxField.parent.prototype._renderProperties.call(this);
+  this._renderValue();
+  this._renderWrapText();
+};
+
 scout.CheckBoxField.prototype._remove = function() {
   scout.tooltips.uninstall(this.$checkBoxLabel);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   scout.CheckBoxField.parent.prototype._remove.call(this);
 };
 
-scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
-  //nop
-};
-
 scout.CheckBoxField.prototype._renderDisplayText = function() {
-  //nop
-};
-
-scout.CheckBoxField.prototype._onMouseDown = function(event) {
-  if (!this.enabledComputed) {
-    return;
-  }
-  this.toggleChecked();
-  // Also focus when check box is clicked otherwise firefox would loose the focus (see device.loosesFocusIfPseudoElementIsRemoved)
-  if (scout.isOneOf(event.currentTarget, this.$checkBox[0], this.$checkBoxLabel[0])) {
-    this.focusAndPreventDefault(event);
-  }
-};
-
-scout.CheckBoxField.prototype.toggleChecked = function() {
-  if (!this.enabledComputed) {
-    return;
-  }
-  if (this.triStateEnabled) {
-    if (this.value === false) {
-      this.setValue(true);
-    } else if (this.value === true) {
-      this.setValue(null);
-    } else {
-      this.setValue(false);
-    }
-  } else {
-    this.setValue(!this.value);
-  }
+  // NOP
 };
 
 scout.CheckBoxField.prototype.setValue = function(value) {
   this.setProperty('value', value);
+};
+
+/**
+ * The value may be false, true (and null in tri-state mode)
+ */
+scout.CheckBoxField.prototype._renderValue = function() {
+  this.$fieldContainer.toggleClass('checked', this.value === true);
+  this.$checkBox.toggleClass('checked', this.value === true);
+  this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
 };
 
 /**
@@ -128,25 +113,11 @@ scout.CheckBoxField.prototype._renderEnabled = function() {
     .setEnabled(this.enabledComputed);
 };
 
-scout.CheckBoxField.prototype._renderProperties = function() {
-  scout.CheckBoxField.parent.prototype._renderProperties.call(this);
-  this._renderValue();
-};
-
 scout.CheckBoxField.prototype.setTriStateEnabled = function(triStateEnabled) {
   this.setProperty('triStateEnabled', triStateEnabled);
   if (this.rendered) {
     this._renderValue();
   }
-};
-
-/**
- * The value may be false, true (and null in tri-state mode)
- */
-scout.CheckBoxField.prototype._renderValue = function() {
-  this.$fieldContainer.toggleClass('checked', this.value === true);
-  this.$checkBox.toggleClass('checked', this.value === true);
-  this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
 };
 
 /**
@@ -194,11 +165,6 @@ scout.CheckBoxField.prototype._renderGridDataHints = function() {
   });
 };
 
-scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
-  scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
-  this.$checkBoxLabel.hide();
-};
-
 scout.CheckBoxField.prototype.setKeyStroke = function(keyStroke) {
   this.setProperty('keyStroke', keyStroke);
 };
@@ -206,4 +172,50 @@ scout.CheckBoxField.prototype.setKeyStroke = function(keyStroke) {
 scout.CheckBoxField.prototype._setKeyStroke = function(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.checkBoxKeyStroke.parseAndSetKeyStroke(this.keyStroke);
+};
+
+scout.CheckBoxField.prototype.setWrapText = function(wrapText) {
+  this.setProperty('wrapText', wrapText);
+};
+
+scout.CheckBoxField.prototype._renderWrapText = function() {
+  this.$checkBoxLabel.toggleClass('white-space-nowrap', !this.wrapText);
+  this.invalidateLayoutTree();
+};
+
+scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
+  // NOP
+};
+
+scout.CheckBoxField.prototype.toggleChecked = function() {
+  if (!this.enabledComputed) {
+    return;
+  }
+  if (this.triStateEnabled) {
+    if (this.value === false) {
+      this.setValue(true);
+    } else if (this.value === true) {
+      this.setValue(null);
+    } else {
+      this.setValue(false);
+    }
+  } else {
+    this.setValue(!this.value);
+  }
+};
+
+scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
+  scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
+  this.$checkBoxLabel.hide();
+};
+
+scout.CheckBoxField.prototype._onMouseDown = function(event) {
+  if (!this.enabledComputed) {
+    return;
+  }
+  this.toggleChecked();
+  // Also focus when check box is clicked otherwise firefox would loose the focus (see device.loosesFocusIfPseudoElementIsRemoved)
+  if (scout.isOneOf(event.currentTarget, this.$checkBox[0], this.$checkBoxLabel[0])) {
+    this.focusAndPreventDefault(event);
+  }
 };

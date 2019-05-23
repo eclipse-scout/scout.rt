@@ -95,7 +95,8 @@
       }
     },
     "CheckBoxField": {
-      "triStateEnabled": false
+      "triStateEnabled": false,
+      "wrapText": false
     },
     "Graph": {
       "graphDepth": 1,
@@ -155,6 +156,9 @@
     "LabelField": {
       "htmlEnabled": false,
       "selectable": true,
+      "wrapText": false
+    },
+    "RadioButton": {
       "wrapText": false
     },
     "SequenceBox": {

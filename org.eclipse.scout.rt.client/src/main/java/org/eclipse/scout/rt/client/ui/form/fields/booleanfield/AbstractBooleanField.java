@@ -38,9 +38,9 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     super.initConfig();
     setTriStateEnabled(getConfiguredTriStateEnabled());
     setKeyStroke(getConfiguredKeyStroke());
+    setWrapText(getConfiguredWrapText());
     propertySupport.setProperty(PROP_VALUE, false);
-    // ticket 79554
-    propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
+    propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue())); // ticket 79554
   }
 
   @Override
@@ -80,6 +80,12 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return null;
   }
 
+  @Order(240)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredWrapText() {
+    return false;
+  }
+
   @Override
   public void setTriStateEnabled(boolean triStateEnabled) {
     propertySupport.setPropertyBool(PROP_TRI_STATE_ENABLED, triStateEnabled);
@@ -105,13 +111,23 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
   }
 
   @Override
-  public void setChecked(boolean b) {
-    setValue(b);
+  public void setChecked(boolean checked) {
+    setValue(checked);
   }
 
   @Override
   public boolean isChecked() {
     return getValue() != null && getValue().booleanValue();
+  }
+
+  @Override
+  public void setWrapText(boolean wrapText) {
+    propertySupport.setProperty(PROP_WRAP_TEXT, wrapText);
+  }
+
+  @Override
+  public boolean isWrapText() {
+    return propertySupport.getPropertyBool(PROP_WRAP_TEXT);
   }
 
   @Override

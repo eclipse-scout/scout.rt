@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButtonUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.json.JSONObject;
 
@@ -28,6 +29,17 @@ public class JsonRadioButton<RADIO_BUTTON extends IRadioButton> extends JsonButt
   @Override
   public String getObjectType() {
     return "RadioButton";
+  }
+
+  @Override
+  protected void initJsonProperties(RADIO_BUTTON model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IRadioButton>(IRadioButton.PROP_WRAP_TEXT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isWrapText();
+      }
+    });
   }
 
   @Override
