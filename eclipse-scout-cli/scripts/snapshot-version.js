@@ -4,7 +4,7 @@ The package.json is updated with the new version and the package is ready to be 
 After the publish you should revert the package.json to its initial state.
  */
 const path = require('path');
-let packageJson= require(path.resolve('./package.json'));
+const packageJson = require(path.resolve('./package.json'));
 
 let timestamp = new Date().toISOString(); //UTC
 
@@ -16,13 +16,13 @@ const oldVersion = packageJson.version;
 const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, "");
 const newVersion = cleanedVersion + '-snapshot.' + timestamp;
 
-const npmlog = require( "npm/node_modules/npmlog" );
+const npmlog = require("npm/node_modules/npmlog");
 const npm = require('npm');
 
-npmlog.on( "log", msg => {
- const {level} = msg;
-  if(level === 'info' || level === 'error' || level === 'warn'){
-    console.log({ msg });
+npmlog.on("log", msg => {
+  const {level} = msg;
+  if (level === 'info' || level === 'error' || level === 'warn') {
+    console.log({msg});
   }
 });
 
@@ -32,17 +32,17 @@ npm.load({
   "no-audit": true
 }, (err) => {
   // handle errors
-  if(err) {
+  if (err) {
     console.error(err);
   }
 
   // install module
   npm.commands.version([newVersion], (er, data) => {
-    if(err) {
+    if (err) {
       console.error(err);
     }
     // log errors or data
-    if(data){
+    if (data) {
       console.log('done');
     }
   });

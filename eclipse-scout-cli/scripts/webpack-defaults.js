@@ -13,18 +13,15 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
 
 const path = require('path');
 const webpack = require('webpack');
-const scoutBuild = require('./constants');
-const scoutPostBuild = require('./post-build');
+const scoutBuildConstants = require('./constants');
 
 module.exports = (env, args) => {
-  const devMode = args.mode !== scoutBuild.mode.production;
-  const jsFilename = devMode ? '[name].js' : '[name]-[contenthash].min.js';
-  const cssFilename = devMode ? '[name].css' : '[name]-[contenthash].min.css';
-  const outSubDirName = devMode ? scoutBuild.outSubDir.development : scoutBuild.outSubDir.production;
-  const outDir = path.resolve(scoutBuild.outDir, outSubDirName);
+  const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
+  const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
   console.log(`Webpack mode: ${args.mode}`);
 
   return {
@@ -112,16 +109,10 @@ module.exports = (env, args) => {
       // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
       new CleanWebpackPlugin(),
       // run post-build script hook
-      {
-        apply: (compiler) => {
-          compiler.hooks.afterEmit.tap('AfterEmitPlugin', (compilation) => {
-            scoutPostBuild.cleanOutDir(outDir);
-            if(!devMode) {
-              scoutPostBuild.createFileList(outDir);
-            }
-          });
-        }
-      },
+      new AfterEmitWebpackPlugin({
+        createFileList: !devMode,
+        outDir: outDir
+      }),
       // # Copy resources
       new CopyPlugin([{
         // # Copy static web-resources
@@ -137,7 +128,9 @@ module.exports = (env, args) => {
         new OptimizeCssAssetsPlugin({
           assetNameRegExp: /\.min\.css$/g,
           cssProcessorPluginOptions: {
-            preset: ['default', {discardComments: {removeAll: true}}],
+            preset: ['default', {
+              discardComments: {removeAll: true}
+            }],
           },
         }),
         // minify js

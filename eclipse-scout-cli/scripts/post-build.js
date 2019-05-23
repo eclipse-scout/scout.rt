@@ -29,8 +29,8 @@ function deleteFile(filename) {
 }
 
 module.exports = {
-  createFileList: function(dir) {
-    const scoutBuild = require('./constants')
+  createFileList: (dir) => {
+    const scoutBuild = require('./constants');
     let content = '';
     fs.readdirSync(dir, {withFileTypes: true})
       .filter(dirent => dirent.isFile())
@@ -42,7 +42,7 @@ module.exports = {
     fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
     console.log(`created ${scoutBuild.fileListName}:\n${content}`);
   },
-  cleanOutDir: function(dir) {
+  cleanOutDir: (dir) => {
     fs.readdirSync(dir)
       .filter(THEME_JS_OUT_FILTER)
       .forEach(f => deleteFile(path.join(dir, f)));

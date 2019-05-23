@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 const path = require('path');
-const scoutBuild = require('./constants')
+const scoutBuild = require('./constants');
 const specIndex = path.resolve('test', 'test-index.js');
 
 var preprocessorObj = {};
