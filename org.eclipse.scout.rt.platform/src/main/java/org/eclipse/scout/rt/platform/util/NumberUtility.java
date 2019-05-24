@@ -301,7 +301,13 @@ public final class NumberUtility {
 
   /**
    * rounding with big decimal precision
+   * <p>
+   * Method will be removed in a future release
+   *
+   * @deprecated use {@link DECIMAL#round(Number, int)} or if {@link BigDecimal} requires same scale as requested
+   *             precision use {@link DECIMAL#create(Number)} set scale manually
    */
+  @Deprecated
   public static Number roundBigDecimal(Number value, double precision) {
     if (value != null) {
       BigDecimal val = value instanceof BigDecimal ? (BigDecimal) value : new BigDecimal(value.toString());
