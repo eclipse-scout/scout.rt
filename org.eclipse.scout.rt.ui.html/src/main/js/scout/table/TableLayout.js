@@ -27,7 +27,7 @@ scout.TableLayout.prototype.layout = function($container) {
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
-    tileGrid = this.table.tileGrid,
+    tileGrid = this.table.mediator ? this.table.mediator.tileAccordion : null,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -58,11 +58,10 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  if (this.table.tileMode && tileGrid) {
-    // TODO [10.0] rmu: temporary show both table-data and tileGrid
-    tileGrid.$container.css('height', 'calc(50% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) / 2 + 'px)');
+  if (this.table.tileMode && tileGrid && tileGrid.rendered) {
+    tileGrid.$container.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
     tileGrid.revalidateLayout();
-    $data.css('height', 'calc(50% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) / 2 + 'px)');
+    $data.cssHeight(0); // TODO [10.0] rmu when in tile mode $data should not exist
   } else {
     $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
   }

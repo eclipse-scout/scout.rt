@@ -45,7 +45,6 @@ scout.Table = function() {
   this.tableControls = [];
   this.tableStatusVisible = false;
   this.tileMode = false;
-  this.tileGrid = null;
   this.footer = null;
   this.footerVisible = false;
   this.filters = [];
@@ -433,11 +432,6 @@ scout.Table.prototype._render = function() {
   }
   this.session.desktop.on('popupOpen', this._popupOpenHandler);
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-
-  // TODO [10.0] rmu ensure getConfiguredTileMode true works correctly
-  if (this.tileMode) {
-    this.setTileMode(this.tileMode);
-  }
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -749,14 +743,6 @@ scout.Table.prototype._createFooter = function() {
   return scout.create('TableFooter', {
     parent: this,
     table: this
-  });
-};
-
-scout.Table.prototype._createTileGrid = function() {
-  return scout.create('TileGrid', {
-    parent: this,
-    selectable: true,
-    multiselect: true
   });
 };
 
@@ -3947,84 +3933,28 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 scout.Table.prototype.setTileMode = function(tileMode) {
   this._setProperty('tileMode', tileMode);
 
-  if (tileMode && !this.tileGrid) {
-    this.tileGrid = this._createTileGrid();
-  }
-
   if (tileMode && !this.mediator) {
     this.mediator = new scout.TableTileGridMediator(this);
-    this.mediator.loadTiles();
   }
 
-  this._prepareTableForTileMode(tileMode);
-
-  if (this.rendered) {
-    this._renderTileMode();
-  }
-  if (!tileMode && this.tileGrid) {
-    this.tileGrid.destroy();
-    this.tileGrid = null;
-  }
-  if (!tileMode && this.mediator) {
-    this.mediator.destroy();
+  if (tileMode) {
+    this.mediator.activateTileMode();
+  } else {
+    this.mediator.deactivateTileMode();
     this.mediator = null;
   }
-
 };
 
 scout.Table.prototype._renderTileMode = function() {
-  if (!this.tileGrid) {
+  if (!this.mediator) {
     return;
   }
-  if (this.tileMode) {
-    this._renderTileGrid();
+  if (this.mediator) {
+    this.mediator._renderTileAccordion();
   } else {
-    this._removeTileGrid();
+    this.mediator._removeTileAccordion();
   }
   this.invalidateLayoutTree();
-};
-
-scout.Table.prototype._renderTileGrid = function() {
-  if (this.tileGrid.rendered) {
-    return;
-  }
-  this.tileGrid.render();
-
-  this.mediator.syncSelectionFromTableToTile();
-  this.mediator.syncScrollTopFromTableToTile();
-};
-
-scout.Table.prototype._removeTileGrid = function() {
-  if (!this.tileGrid.rendered) {
-    return;
-  }
-  this.tileGrid.remove();
-};
-
-scout.Table.prototype._prepareTableForTileMode = function(tileMode) {
-  this.setHeaderVisible(!tileMode);
-
-  // restore/store & remove grouping on tableRows
-  if (tileMode) {
-    this.columns.filter(function(column) {
-      return column.grouped;
-    }, this).forEach(function(column) {
-      this._removeGroupColumn(column);
-    }, this);
-    this._sort(false);
-  }
-  // restore/store & remove column filter on tableRows
-  if (tileMode) {
-    // TODO [10.0] rmu reset all filters... text filters could stay, maybe implement resetUserFilter(filterType)
-    this.resetUserFilter();
-  }
-
-  // show/hide aggregation table control
-  this.tableControls.filter(function(control) {
-    if (control instanceof scout.AggregateTableControl) {
-      control.setVisible(!tileMode);
-    }
-  });
 };
 
 scout.Table.prototype._setTiles = function(tiles) {
@@ -4032,6 +3962,8 @@ scout.Table.prototype._setTiles = function(tiles) {
     e.tile.rowId = e.tableRow;
     return e.tile;
   }) : []);
+  this.mediator._syncSelectionFromTableToTile();
+  //  this.mediator._syncScrollTopFromTableToTile();
 };
 
 scout.Table.prototype.createTiles = function(rows) {
