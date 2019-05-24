@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.html;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -34,13 +35,20 @@ public class StyleHelper {
    * @param cssClasses
    *          Existing class string (consisting of one or more CSS classes separated by space). Classes are added to
    *          this string.
-   * @param cssClass
+   * @param cssClassesToAdd
    *          Class string (consisting of one or more CSS classes separated by space) to add to the existing classes.
    * @return never <code>null</code>
    */
-  public String addCssClass(String cssClasses, String cssClass) {
+  public String addCssClass(String cssClasses, String cssClassesToAdd) {
+    return addCssClasses(cssClasses, cssClassesAsList(cssClassesToAdd));
+  }
+
+  public String addCssClasses(String cssClasses, String... cssClassesToAdd) {
+    return addCssClasses(cssClasses, Arrays.asList(cssClassesToAdd));
+  }
+
+  public String addCssClasses(String cssClasses, List<String> cssClassesToAdd) {
     List<String> existingCssClasses = cssClassesAsList(cssClasses);
-    List<String> cssClassesToAdd = cssClassesAsList(cssClass);
     for (String candidate : cssClassesToAdd) {
       if (existingCssClasses.indexOf(candidate) == -1) {
         existingCssClasses.add(candidate);
@@ -59,14 +67,21 @@ public class StyleHelper {
    * @param cssClasses
    *          Existing class string (consisting of one or more CSS classes separated by space). Classes are removed from
    *          this string.
-   * @param cssClass
+   * @param cssClassToRemove
    *          Class string (consisting of one or more CSS classes separated by space) to remove from the existing
    *          classes.
    * @return never <code>null</code>
    */
-  public String removeCssClass(String cssClasses, String cssClass) {
+  public String removeCssClass(String cssClasses, String cssClassToRemove) {
+    return removeCssClasses(cssClasses, cssClassesAsList(cssClassToRemove));
+  }
+
+  public String removeCssClasses(String cssClasses, String... cssClassesToRemove) {
+    return removeCssClasses(cssClasses, Arrays.asList(cssClassesToRemove));
+  }
+
+  public String removeCssClasses(String cssClasses, List<String> cssClassesToRemove) {
     List<String> existingCssClasses = cssClassesAsList(cssClasses);
-    List<String> cssClassesToRemove = cssClassesAsList(cssClass);
     existingCssClasses.removeAll(cssClassesToRemove);
     return CollectionUtility.format(existingCssClasses, " ");
   }
@@ -132,4 +147,5 @@ public class StyleHelper {
     }
     return cssClasses;
   }
+
 }

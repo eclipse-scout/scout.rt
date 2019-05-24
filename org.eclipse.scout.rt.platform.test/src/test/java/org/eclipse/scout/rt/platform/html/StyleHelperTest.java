@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.html;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,176 +36,188 @@ public class StyleHelperTest {
   @Test
   public void testAddCssClassNull() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, null);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testAddCssClassToNull() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass((String) null, ADDED_CLASS);
-    Assert.assertEquals(ADDED_CLASS, newClasses);
+    assertEquals(ADDED_CLASS, newClasses);
   }
 
   @Test
   public void testAddCssClassEmpty() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, "");
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testAddCssClassToEmpty() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass("", ADDED_CLASS);
-    Assert.assertEquals(ADDED_CLASS, newClasses);
+    assertEquals(ADDED_CLASS, newClasses);
   }
 
   @Test
   public void testAddCssClass() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, ADDED_CLASS);
-    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+    assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+  }
+
+  @Test
+  public void testAddCssClasses() {
+    String newClasses = BEANS.get(StyleHelper.class).addCssClasses(INITIAL_CLASSES, "a", "b");
+    assertEquals(INITIAL_CLASSES + " a b", newClasses);
   }
 
   @Test
   public void testAddMultipleCssClasses() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass("a b c", "e b d");
-    Assert.assertEquals("a b c e d", newClasses);
+    assertEquals("a b c e d", newClasses);
   }
 
   @Test
   public void testAddCssClassAlreadyContainedAsFirst() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, INITIAL_FIRST_CLASS);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testAddCssClassAlreadyContainedAsLast() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, INITIAL_LAST_CLASS);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testAddCssClassAlreadyContained() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(INITIAL_CLASSES, CLASS);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testAddCssClassToNullCssClasses() {
     String nullClasses = null;
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(nullClasses, ADDED_CLASS);
-    Assert.assertEquals(ADDED_CLASS, newClasses);
+    assertEquals(ADDED_CLASS, newClasses);
   }
 
   @Test
   public void testAddCssClassToEmptyCssClasses() {
     String emptyClasses = "";
     String newClasses = BEANS.get(StyleHelper.class).addCssClass(emptyClasses, ADDED_CLASS);
-    Assert.assertEquals(ADDED_CLASS, newClasses);
+    assertEquals(ADDED_CLASS, newClasses);
   }
 
   @Test
   public void testRemoveCssClassNull() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, null);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testRemoveCssClassToNull() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass((String) null, ADDED_CLASS);
-    Assert.assertEquals("", newClasses);
+    assertEquals("", newClasses);
   }
 
   @Test
   public void testRemoveCssClassEmpty() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, "");
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testRemoveCssClassToEmpty() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass("", ADDED_CLASS);
-    Assert.assertEquals("", newClasses);
+    assertEquals("", newClasses);
   }
 
   @Test
   public void testRemoveCssClassFirst() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, INITIAL_FIRST_CLASS);
-    Assert.assertEquals("class " + INITIAL_LAST_CLASS, newClasses);
+    assertEquals("class " + INITIAL_LAST_CLASS, newClasses);
   }
 
   @Test
   public void testRemoveCssClassLast() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, INITIAL_LAST_CLASS);
-    Assert.assertEquals(INITIAL_FIRST_CLASS + " " + CLASS, newClasses);
+    assertEquals(INITIAL_FIRST_CLASS + " " + CLASS, newClasses);
   }
 
   @Test
   public void testRemoveCssClass() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass(INITIAL_CLASSES, CLASS);
-    Assert.assertEquals(INITIAL_FIRST_CLASS + " " + INITIAL_LAST_CLASS, newClasses);
+    assertEquals(INITIAL_FIRST_CLASS + " " + INITIAL_LAST_CLASS, newClasses);
+  }
+
+  @Test
+  public void testRemoveCssClasses() {
+    String newClasses = BEANS.get(StyleHelper.class).removeCssClasses(INITIAL_CLASSES, INITIAL_FIRST_CLASS, INITIAL_LAST_CLASS);
+    assertEquals(CLASS, newClasses);
   }
 
   @Test
   public void testAllCssClasses() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass("a b c", "c b a");
-    Assert.assertEquals("", newClasses);
+    assertEquals("", newClasses);
   }
 
   @Test
   public void testRemoveMultipleCssClasses() {
     String newClasses = BEANS.get(StyleHelper.class).removeCssClass("a b c", "e b d");
-    Assert.assertEquals("a c", newClasses);
+    assertEquals("a c", newClasses);
   }
 
   @Test
   public void testToggleCssClass() {
     String newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, true);
-    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+    assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, true);
-    Assert.assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
+    assertEquals(INITIAL_CLASSES + " " + ADDED_CLASS, newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass(INITIAL_CLASSES, ADDED_CLASS, false);
-    Assert.assertEquals(INITIAL_CLASSES, newClasses);
+    assertEquals(INITIAL_CLASSES, newClasses);
   }
 
   @Test
   public void testToggleMultipleCssClasses() {
     String newClasses = BEANS.get(StyleHelper.class).toggleCssClass("a b c", "e b d", true);
-    Assert.assertEquals("a b c e d", newClasses);
+    assertEquals("a b c e d", newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass("a b c", "e b d", true);
-    Assert.assertEquals("a b c e d", newClasses);
+    assertEquals("a b c e d", newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass("a b c", "e b d", false);
-    Assert.assertEquals("a c", newClasses);
+    assertEquals("a c", newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass("a b c", "e b d", false);
-    Assert.assertEquals("a c", newClasses);
+    assertEquals("a c", newClasses);
   }
 
   @Test
   public void testFormatting() {
     String newClasses = BEANS.get(StyleHelper.class).toggleCssClass("           a\n b     c\r", "       e    b\n d       ", true);
-    Assert.assertEquals("a b c e d", newClasses);
+    assertEquals("a b c e d", newClasses);
     newClasses = BEANS.get(StyleHelper.class).toggleCssClass("           a\n b     c\r", "       e    b\n d       ", false);
-    Assert.assertEquals("a c", newClasses);
+    assertEquals("a c", newClasses);
   }
 
   @Test
   public void testMultipleOccurences() {
     String newClasses = BEANS.get(StyleHelper.class).addCssClass("a a b a c", "e b e d b d");
-    Assert.assertEquals("a a b a c e d", newClasses); // existing duplicates are unchanged
+    assertEquals("a a b a c e d", newClasses); // existing duplicates are unchanged
     newClasses = BEANS.get(StyleHelper.class).removeCssClass("a a b a c", "e b e d b d");
-    Assert.assertEquals("a a a c", newClasses); // existing duplicates are unchanged
+    assertEquals("a a a c", newClasses); // existing duplicates are unchanged
   }
 
   @Test
   public void testHasCssClass() {
     StyleHelper helper = BEANS.get(StyleHelper.class);
-    Assert.assertTrue(helper.hasCssClass("foo bar", "bar"));
-    Assert.assertTrue(helper.hasCssClass("foo bar", "foo"));
-    Assert.assertTrue(helper.hasCssClass("foo bar", "bar foo"));
-    Assert.assertFalse(helper.hasCssClass("foo bar", "bar baz"));
-    Assert.assertFalse(helper.hasCssClass("foo bar", "baz"));
-    Assert.assertTrue(helper.hasCssClass("          \nfoo\r bar", "    \rfoo"));
+    assertTrue(helper.hasCssClass("foo bar", "bar"));
+    assertTrue(helper.hasCssClass("foo bar", "foo"));
+    assertTrue(helper.hasCssClass("foo bar", "bar foo"));
+    assertFalse(helper.hasCssClass("foo bar", "bar baz"));
+    assertFalse(helper.hasCssClass("foo bar", "baz"));
+    assertTrue(helper.hasCssClass("          \nfoo\r bar", "    \rfoo"));
 
-    Assert.assertTrue(helper.hasCssClass("foo bar", null));
-    Assert.assertTrue(helper.hasCssClass("foo bar", ""));
-    Assert.assertFalse(helper.hasCssClass(null, "baz"));
-    Assert.assertFalse(helper.hasCssClass("", "baz"));
+    assertTrue(helper.hasCssClass("foo bar", null));
+    assertTrue(helper.hasCssClass("foo bar", ""));
+    assertFalse(helper.hasCssClass(null, "baz"));
+    assertFalse(helper.hasCssClass("", "baz"));
   }
 }
