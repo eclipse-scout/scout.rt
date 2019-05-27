@@ -40,6 +40,7 @@ public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner 
   String PROP_ANALYSIS_RECTANGLE = "analysisRectangle";
   String PROP_AUTO_FIT = "autoFit";
   String PROP_SCROLL_BAR_ENABLED = "scrollBarEnabled";
+  String PROP_UPLOAD_ENABLED = "uploadEnabled";
 
   String getImageUrl();
 
@@ -119,5 +120,10 @@ public interface IImageField extends IFormField, IDNDSupport, IContextMenuOwner 
 
   boolean isScrollBarEnabled();
 
-  void setScrollBarEnabled(boolean b);
+  void setScrollBarEnabled(boolean scrollBarEnabled);
+
+  boolean isUploadEnabled();
+
+  void setUploadEnabled(boolean uploadEnabled);
+
 }

@@ -327,7 +327,8 @@
       "autoFit": false,
       "dropType": 0,
       "dropMaximumSize": 52428800,
-      "scrollBarEnabled": false
+      "scrollBarEnabled": false,
+      "uploadEnabled": false
     },
     "HtmlField": {
       "scrollBarEnabled": false,

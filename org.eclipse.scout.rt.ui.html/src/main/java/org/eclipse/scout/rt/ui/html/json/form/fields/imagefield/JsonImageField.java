@@ -79,6 +79,12 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
         return getModel().getDropMaximumSize();
       }
     });
+    putJsonProperty(new JsonProperty<IMAGE_FIELD>(IImageField.PROP_UPLOAD_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isUploadEnabled();
+      }
+    });
   }
 
   @Override

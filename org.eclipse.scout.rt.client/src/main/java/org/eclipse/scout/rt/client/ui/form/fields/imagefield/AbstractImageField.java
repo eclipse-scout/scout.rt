@@ -137,6 +137,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return false;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(370)
+  protected boolean getConfiguredUploadEnabled() {
+    return false;
+  }
+
   /**
    * Configures the maximum size for a drop request (in bytes).
    * <p>
@@ -215,6 +221,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setDropType(getConfiguredDropType());
     setDropMaximumSize(getConfiguredDropMaximumSize());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
+    setUploadEnabled(getConfiguredUploadEnabled());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -477,6 +484,16 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     AffineTransformSpec t = getImageTransform();
     t.angle = t.angle + Math.toRadians(angleInDegrees);
     setImageTransform(t);
+  }
+
+  @Override
+  public boolean isUploadEnabled() {
+    return propertySupport.getPropertyBool(PROP_UPLOAD_ENABLED);
+  }
+
+  @Override
+  public void setUploadEnabled(boolean uploadEnabled) {
+    propertySupport.setPropertyBool(PROP_UPLOAD_ENABLED, uploadEnabled);
   }
 
   /*
