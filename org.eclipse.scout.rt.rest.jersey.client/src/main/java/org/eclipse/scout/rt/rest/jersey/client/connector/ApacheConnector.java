@@ -110,7 +110,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.io.ChunkedOutputStream;
 import org.apache.http.io.SessionOutputBuffer;
 import org.apache.http.util.TextUtils;
-import org.apache.http.util.VersionInfo;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.glassfish.jersey.client.ClientProperties;
@@ -185,18 +184,10 @@ class ApacheConnector implements Connector {
 
   private static final Logger LOGGER = Logger.getLogger(ApacheConnector.class.getName());
 
-  private static final VersionInfo vi;
-  private static final String release;
-
-  static {
-    vi = VersionInfo.loadVersionInfo("org.apache.http.client", HttpClientBuilder.class.getClassLoader());
-    release = (vi != null) ? vi.getRelease() : VersionInfo.UNAVAILABLE;
-  }
-
-  private final CloseableHttpClient client;
-  private final CookieStore cookieStore;
-  private final boolean preemptiveBasicAuth;
-  private final RequestConfig requestConfig;
+  private final CloseableHttpClient m_client;
+  private final CookieStore m_cookieStore;
+  private final boolean m_preemptiveBasicAuth;
+  private final RequestConfig m_requestConfig;
 
   /**
    * Create the new Apache HTTP Client connector.
@@ -266,7 +257,7 @@ class ApacheConnector implements Connector {
 
     final Boolean preemptiveBasicAuthProperty = (Boolean) config.getProperties()
         .get(ApacheClientProperties.PREEMPTIVE_BASIC_AUTHENTICATION);
-    this.preemptiveBasicAuth = (preemptiveBasicAuthProperty != null) ? preemptiveBasicAuthProperty : false;
+    this.m_preemptiveBasicAuth = (preemptiveBasicAuthProperty != null) ? preemptiveBasicAuthProperty : false;
 
     final boolean ignoreCookies = PropertiesHelper.isProperty(config.getProperties(), ApacheClientProperties.DISABLE_COOKIES);
 
@@ -275,24 +266,24 @@ class ApacheConnector implements Connector {
       if (ignoreCookies) {
         reqConfigBuilder.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
       }
-      requestConfig = reqConfigBuilder.build();
+      m_requestConfig = reqConfigBuilder.build();
     }
     else {
       if (ignoreCookies) {
         requestConfigBuilder.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
       }
-      requestConfig = requestConfigBuilder.build();
+      m_requestConfig = requestConfigBuilder.build();
     }
 
-    if (requestConfig.getCookieSpec() == null || !requestConfig.getCookieSpec().equals(CookieSpecs.IGNORE_COOKIES)) {
-      this.cookieStore = new BasicCookieStore();
-      clientBuilder.setDefaultCookieStore(cookieStore);
+    if (m_requestConfig.getCookieSpec() == null || !m_requestConfig.getCookieSpec().equals(CookieSpecs.IGNORE_COOKIES)) {
+      this.m_cookieStore = new BasicCookieStore();
+      clientBuilder.setDefaultCookieStore(m_cookieStore);
     }
     else {
-      this.cookieStore = null;
+      this.m_cookieStore = null;
     }
-    clientBuilder.setDefaultRequestConfig(requestConfig);
-    this.client = clientBuilder.build();
+    clientBuilder.setDefaultRequestConfig(m_requestConfig);
+    this.m_client = clientBuilder.build();
   }
 
   private HttpClientConnectionManager getConnectionManager(final Client client,
@@ -388,7 +379,7 @@ class ApacheConnector implements Connector {
    */
   @SuppressWarnings("UnusedDeclaration")
   public HttpClient getHttpClient() {
-    return client;
+    return m_client;
   }
 
   /**
@@ -398,7 +389,7 @@ class ApacheConnector implements Connector {
    *         to {@code true}.
    */
   public CookieStore getCookieStore() {
-    return cookieStore;
+    return m_cookieStore;
   }
 
   private static URI getProxyUri(final Object proxy) {
@@ -423,7 +414,7 @@ class ApacheConnector implements Connector {
     try {
       final CloseableHttpResponse response;
       final HttpClientContext context = HttpClientContext.create();
-      if (preemptiveBasicAuth) {
+      if (m_preemptiveBasicAuth) {
         final AuthCache authCache = new BasicAuthCache();
         final BasicScheme basicScheme = new BasicScheme();
         authCache.put(getHost(request), basicScheme);
@@ -437,7 +428,7 @@ class ApacheConnector implements Connector {
         context.setCredentialsProvider(credentialsProvider);
       }
 
-      response = client.execute(getHost(request), request, context);
+      response = m_client.execute(getHost(request), request, context);
       HeaderUtils.checkHeaderChanges(clientHeadersSnapshot, clientRequest.getHeaders(), this.getClass().getName());
 
       final Response.StatusType status = response.getStatusLine().getReasonPhrase() == null
@@ -530,13 +521,13 @@ class ApacheConnector implements Connector {
 
   @Override
   public String getName() {
-    return "Apache HttpClient " + release;
+    return "Apache HttpClient Jersey Connector";
   }
 
   @Override
   public void close() {
     try {
-      client.close();
+      m_client.close();
     }
     catch (final IOException e) {
       throw new ProcessingException("FAILED_TO_STOP_CLIENT", e);
@@ -548,7 +539,7 @@ class ApacheConnector implements Connector {
   }
 
   private HttpUriRequest getUriHttpRequest(final ClientRequest clientRequest) {
-    final RequestConfig.Builder requestConfigBuilder = RequestConfig.copy(requestConfig);
+    final RequestConfig.Builder requestConfigBuilder = RequestConfig.copy(m_requestConfig);
 
     final int connectTimeout = clientRequest.resolveProperty(ClientProperties.CONNECT_TIMEOUT, -1);
     final int socketTimeout = clientRequest.resolveProperty(ClientProperties.READ_TIMEOUT, -1);
@@ -561,7 +552,7 @@ class ApacheConnector implements Connector {
     }
 
     final Boolean redirectsEnabled =
-        clientRequest.resolveProperty(ClientProperties.FOLLOW_REDIRECTS, requestConfig.isRedirectsEnabled());
+        clientRequest.resolveProperty(ClientProperties.FOLLOW_REDIRECTS, m_requestConfig.isRedirectsEnabled());
     requestConfigBuilder.setRedirectsEnabled(redirectsEnabled);
 
     final Boolean bufferingEnabled = clientRequest.resolveProperty(ClientProperties.REQUEST_ENTITY_PROCESSING,
