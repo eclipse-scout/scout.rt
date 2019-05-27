@@ -25,8 +25,8 @@ import org.apache.http.conn.util.PublicSuffixMatcherLoader;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.rest.client.IRestClientConfigFactory;
-import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ClosingApacheConnectorProvider;
+import org.eclipse.scout.rt.rest.jersey.client.connector.ApacheClientProperties;
+import org.eclipse.scout.rt.rest.jersey.client.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 
 /**
@@ -45,7 +45,7 @@ public class JerseyClientConfigFactory implements IRestClientConfigFactory {
    * This default implementation delegates to {@link IJerseyConnectorProviderFactory#createConnectorProvider()}
    */
   protected void initConnectionProvider(ClientConfig clientConfig) {
-    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
+    clientConfig.connectorProvider(new ApacheConnectorProvider());
     clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createConnectionManager());
   }
 
