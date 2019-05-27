@@ -14,8 +14,11 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
-import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.config.AbstractClassConfigProperty;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
+import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a system-wide default {@link DecimalSupport} with a default scale and a default {@link MathContext}.
@@ -23,11 +26,30 @@ import org.eclipse.scout.rt.platform.BEANS;
  * @since 8.0
  */
 public final class DECIMAL {
+  private static final Logger LOG = LoggerFactory.getLogger(DECIMAL.class);
 
   private DECIMAL() {
   }
 
-  public static final DecimalSupport DECIMAL_SUPPORT = BEANS.get(DefaultDecimalSupportProvider.class).get();
+  public static final DecimalSupport DECIMAL_SUPPORT;
+
+  static {
+    DefaultDecimalSupportProvider provider = null;
+    String defaultDecimalSupportProviderClassName = ConfigUtility.getProperty(DefaultDecimalSupportProviderProperty.KEY);
+    if (defaultDecimalSupportProviderClassName != null) {
+      try {
+        Class<?> clazz = DECIMAL.class.getClassLoader().loadClass(defaultDecimalSupportProviderClassName);
+        provider = (DefaultDecimalSupportProvider) BeanInstanceUtil.createBean(clazz);
+      }
+      catch (Exception e) {
+        LOG.warn("Failed to create {} using instead DefaultDecimalSupportProvider", defaultDecimalSupportProviderClassName, e);
+      }
+    }
+    if (provider == null) {
+      provider = new DefaultDecimalSupportProvider();
+    }
+    DECIMAL_SUPPORT = provider.get();
+  }
 
   /**
    * Constant for zero (identity element for addition).
@@ -135,11 +157,33 @@ public final class DECIMAL {
     return DECIMAL_SUPPORT.round(value, precision);
   }
 
-  @ApplicationScoped
+  /**
+   * Provides default {@link DecimalSupport} for static context of this class.
+   */
   public static class DefaultDecimalSupportProvider {
 
     public DecimalSupport get() {
       return new DecimalSupport(10, new MathContext(30, RoundingMode.HALF_UP));
+    }
+  }
+
+  public static class DefaultDecimalSupportProviderProperty extends AbstractClassConfigProperty<DefaultDecimalSupportProvider> {
+
+    private static final String KEY = "scout.util.defaultDecimalSupportProvider";
+
+    @Override
+    public String getKey() {
+      return KEY;
+    }
+
+    @Override
+    public String description() {
+      return String.format("Specifies the default DefaultDecimalSupportProvider to use. By default the '%s' is used.", getDefaultValue().getSimpleName());
+    }
+
+    @Override
+    public Class<? extends DefaultDecimalSupportProvider> getDefaultValue() {
+      return DefaultDecimalSupportProvider.class;
     }
   }
 }
