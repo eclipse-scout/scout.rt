@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -298,24 +297,6 @@ public final class NumberUtility {
    */
   public static double randomDouble() {
     return UNSECURE_RANDOM.nextDouble();
-  }
-
-  /**
-   * rounding with big decimal precision
-   * <p>
-   * Method will be removed in a future release
-   *
-   * @deprecated use {@link DECIMAL#round(Number, int)} or if {@link BigDecimal} requires same scale as requested
-   *             precision use {@link DECIMAL#create(Number)} set scale manually
-   */
-  @Deprecated
-  public static Number roundBigDecimal(Number value, double precision) {
-    if (value != null) {
-      BigDecimal val = value instanceof BigDecimal ? (BigDecimal) value : new BigDecimal(value.toString());
-      BigDecimal prec = BigDecimal.valueOf(precision);
-      return val.divide(prec, RoundingMode.HALF_EVEN).setScale(0, RoundingMode.HALF_EVEN).multiply(prec);
-    }
-    return null;
   }
 
   /**
