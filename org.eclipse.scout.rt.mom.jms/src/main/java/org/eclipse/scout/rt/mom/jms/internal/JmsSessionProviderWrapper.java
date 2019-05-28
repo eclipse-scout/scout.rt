@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 6.1
  */
-public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
+public class JmsSessionProviderWrapper implements IJmsSessionProvider {
   private static final Logger LOG = LoggerFactory.getLogger(JmsSessionProviderWrapper.class);
 
   protected final JmsConnectionWrapper m_connectionWrapper;
@@ -200,11 +200,11 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
   @Override
   public Message receive(final SubscribeInput input, long receiveTimeoutMillis) throws JMSException {
     try {
-      return JmsSessionProviderMigration.receive(trySessionProvider(), input, receiveTimeoutMillis);
+      return trySessionProvider().receive(input, receiveTimeoutMillis);
     }
     catch (JMSException e) {
       waitForRetry(e);
-      return JmsSessionProviderMigration.receive(trySessionProvider(), input, receiveTimeoutMillis);
+      return trySessionProvider().receive(input, receiveTimeoutMillis);
     }
   }
 
@@ -236,8 +236,8 @@ public class JmsSessionProviderWrapper implements IJmsSessionProvider2 {
   @Override
   public ISubscriptionStats getStats() {
     IJmsSessionProvider impl = m_impl;
-    if (impl instanceof IJmsSessionProvider2) {
-      return ((IJmsSessionProvider2) impl).getStats();
+    if (impl != null) {
+      return impl.getStats();
     }
     return null;
   }

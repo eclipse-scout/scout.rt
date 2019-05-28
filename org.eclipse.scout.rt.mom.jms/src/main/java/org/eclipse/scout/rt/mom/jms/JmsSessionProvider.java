@@ -32,7 +32,6 @@ import javax.jms.TemporaryQueue;
 import javax.jms.Topic;
 
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
-import org.eclipse.scout.rt.mom.jms.internal.IJmsSessionProvider2;
 import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 import org.eclipse.scout.rt.mom.jms.internal.JmsSubscriptionStats;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -41,7 +40,7 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 
-public class JmsSessionProvider implements IJmsSessionProvider2 {
+public class JmsSessionProvider implements IJmsSessionProvider {
 
   private final Session m_session;
   private final Destination m_destination; // may be null

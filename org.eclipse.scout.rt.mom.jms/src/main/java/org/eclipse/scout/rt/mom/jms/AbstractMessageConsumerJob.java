@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
 import org.eclipse.scout.rt.mom.jms.JmsMomImplementor.MomExceptionHandler;
-import org.eclipse.scout.rt.mom.jms.internal.JmsSessionProviderMigration;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -91,7 +90,7 @@ public abstract class AbstractMessageConsumerJob<DTO> implements IRunnable {
       final Message message;
       try {
         transactedSession = m_sessionProvider.getSession();
-        message = JmsSessionProviderMigration.receive(m_sessionProvider, m_subscribeInput, m_receiveTimeoutMillis);
+        message = m_sessionProvider.receive(m_subscribeInput, m_receiveTimeoutMillis);
         if (message == null) {
           // consumer closed or connection failure, go to start of while loop
           continue;

@@ -21,12 +21,14 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TemporaryQueue;
 
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
+import org.eclipse.scout.rt.mom.jms.internal.ISubscriptionStats;
 
 /**
  * This provider is used as an abstraction to allow creation and destruction of session and if required also
@@ -108,4 +110,23 @@ public interface IJmsSessionProvider {
    * May be called from threads not owing this object.
    */
   void close();
+
+  /**
+   * @param subscribeInput
+   * @param receiveTimeoutMillis
+   *          0 for no timeout
+   * @return the next message or null if the consumer has no more messages
+   * @throws JMSException
+   *           if the jms connection was closed and failover was not possible
+   * @since 6.1 moved to this interface in 10.0
+   */
+  Message receive(SubscribeInput subscribeInput, long receiveTimeoutMillis) throws JMSException;
+
+  /**
+   * @return subscription statistics since the last (re-)connect
+   *         <p>
+   *         Used in {@link JmsSubscription#awaitStarted(int, java.util.concurrent.TimeUnit)} and for unit testing
+   * @since 6.1 moved to this interface in 10.0
+   */
+  ISubscriptionStats getStats();
 }
