@@ -31,6 +31,8 @@ scout.logging = {
     var enabled = !!(options.enabled || logging),
       showPopup = !!(options.showPopup || logging);
 
+    var resourceUrl = scout.strings.nvl(options.resourceUrl, 'res/');
+
     $.log = new scout.NullLogger();
     if (!enabled) {
       return $.resolvedPromise();
@@ -41,7 +43,7 @@ scout.logging = {
     }
 
     // If log4javascript is not yet installed, dynamically load the library
-    return $.injectScript('res/log4javascript-1.4.9/log4javascript.js')
+    return $.injectScript(resourceUrl + 'log4javascript-1.4.9/log4javascript.js')
       .done(this.initLog4Javascript.bind(this, logLevel, showPopup));
   },
 

@@ -12,9 +12,16 @@ scout.ErrorHandler = function() {
   this.logError = true;
   this.displayError = true;
   this.sendError = false;
-
   this.windowErrorHandler = this._onWindowError.bind(this);
 };
+
+/**
+ * Use this constant to configure whether or not all instances of the ErrorHandler should write
+ * to the console. When you've installed a console appender to log4javascript you can set the
+ * value to false, because the ErrorHandler also calls $.log.error and thus the appender has
+ * already written the message to the console. We don't want to see it twice.
+ */
+scout.ErrorHandler.CONSOLE_OUTPUT = true;
 
 scout.ErrorHandler.prototype.init = function(options) {
   $.extend(this, options);
@@ -155,10 +162,19 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
 scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
   if (this.logError && errorInfo.log) {
     $.log.error(errorInfo.log);
-    if (window && window.console && window.console.error) {
-      window.console.error(errorInfo.log);
-    } else if (window && window.console && window.console.log) {
-      window.console.log(errorInfo.log);
+
+    // Note: when the null-logger is active it has already written the error to the console
+    // when the $.log.error function has been called above, so we don't have to log again here.
+    var writeToConsole = scout.ErrorHandler.CONSOLE_OUTPUT;
+    if ($.log instanceof scout.NullLogger) {
+      writeToConsole = false;
+    }
+    if (writeToConsole && window && window.console) {
+      if (window.console.error) {
+        window.console.error(errorInfo.log);
+      } else if (window.console.log) {
+        window.console.log(errorInfo.log);
+      }
     }
   }
 
