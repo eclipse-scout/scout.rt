@@ -33,7 +33,6 @@ scout.ImageField.prototype._init = function(model) {
   });
   this.icon.on('load', this._onImageLoad.bind(this));
   this.icon.on('error', this._onImageError.bind(this));
-  this.icon.on('propertyChange', this._onIconPropertyChange.bind(this));
 };
 
 scout.ImageField.prototype._render = function() {
@@ -181,21 +180,15 @@ scout.ImageField.prototype._onFileChange = function(event) {
 };
 
 scout.ImageField.prototype._onImageLoad = function(event) {
-  scout.scrollbars.update(this.$fieldContainer);
+  this._onIconUpdated();
 };
 
 scout.ImageField.prototype._onImageError = function(event) {
-  scout.scrollbars.update(this.$fieldContainer);
+  this._onIconUpdated();
 };
 
-scout.ImageField.prototype._onIconPropertyChange = function(event) {
-  if (event.propertyName === 'iconDesc') {
-    // FIXME [awe] 16.2 QC: discuss with C.GU - problem is, the propertyChange event is too early
-    // and there is no event that comes after the render operation, maybe we could simply trigger
-    // an additional new event whenever a property has been rendered? Or maybe we could implement
-    // a specific event in the Icon.js for exactly that case.
-    setTimeout(function() {
-      this.$field = this.icon.$container;
-    }.bind(this));
-  }
+// FIXME [awe] CGU: must update instance variable when Icon.js renders a new image.
+scout.ImageField.prototype._onIconUpdated = function() {
+  scout.scrollbars.update(this.$fieldContainer);
+  this.$field = this.icon.$container;
 };
