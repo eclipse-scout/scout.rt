@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestProjectExample3")
 public class TestProjectExample3Do extends TestCoreExample3Do {

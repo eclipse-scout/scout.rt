@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;

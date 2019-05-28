@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.jackson.testing;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

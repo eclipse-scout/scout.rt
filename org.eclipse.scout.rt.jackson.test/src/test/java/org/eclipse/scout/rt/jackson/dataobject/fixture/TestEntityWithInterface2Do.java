@@ -15,10 +15,10 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestEntityWithInterface2")
 public class TestEntityWithInterface2Do extends DoEntity implements ITestBaseEntityDo {

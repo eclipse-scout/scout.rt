@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

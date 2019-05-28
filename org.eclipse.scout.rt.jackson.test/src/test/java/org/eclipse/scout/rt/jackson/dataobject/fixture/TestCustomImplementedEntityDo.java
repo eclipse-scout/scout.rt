@@ -19,14 +19,14 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoNode;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
-import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 /**

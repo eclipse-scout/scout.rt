@@ -18,16 +18,16 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.value.BigDecimalValueDo;
+import org.eclipse.scout.rt.dataobject.value.BooleanValueDo;
+import org.eclipse.scout.rt.dataobject.value.DateTimeValueDo;
+import org.eclipse.scout.rt.dataobject.value.DateValueDo;
+import org.eclipse.scout.rt.dataobject.value.IValueDo;
+import org.eclipse.scout.rt.dataobject.value.StringValueDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
-import org.eclipse.scout.rt.platform.dataobject.value.BigDecimalValueDo;
-import org.eclipse.scout.rt.platform.dataobject.value.BooleanValueDo;
-import org.eclipse.scout.rt.platform.dataobject.value.DateTimeValueDo;
-import org.eclipse.scout.rt.platform.dataobject.value.DateValueDo;
-import org.eclipse.scout.rt.platform.dataobject.value.IValueDo;
-import org.eclipse.scout.rt.platform.dataobject.value.StringValueDo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestPhysicalAddressEx")
 public class TestPhysicalAddressExDo extends TestPhysicalAddressDo {

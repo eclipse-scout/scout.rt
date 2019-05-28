@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.DoValue;
 
 public class TestDoValuePojo {
 

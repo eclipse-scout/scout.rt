@@ -15,10 +15,10 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.junit.Assert;

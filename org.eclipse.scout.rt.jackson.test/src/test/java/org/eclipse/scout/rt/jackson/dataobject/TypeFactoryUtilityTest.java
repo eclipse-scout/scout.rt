@@ -15,11 +15,11 @@ import static org.junit.Assert.assertEquals;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCollectionsDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestItemDo;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.junit.Test;
 

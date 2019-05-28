@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.json.PackageVersion;

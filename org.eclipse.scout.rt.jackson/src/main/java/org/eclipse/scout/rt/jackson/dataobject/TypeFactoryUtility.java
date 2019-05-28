@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 import com.fasterxml.jackson.databind.JavaType;

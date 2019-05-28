@@ -16,8 +16,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.ValueFormat;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonParser;

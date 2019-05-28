@@ -12,6 +12,10 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Date;
 
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.TypedId;
@@ -19,10 +23,6 @@ import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.IIdDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.TypedIdDeserializer;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDataObject;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
 import com.fasterxml.jackson.databind.BeanDescription;
