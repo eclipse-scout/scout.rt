@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -261,7 +262,7 @@ public class HttpProxy {
     final Set<String> hopByHopHeaderNames = getConnectionHeaderValues(httpResp);
     for (Entry<String, Object> entry : httpResp.getHeaders().entrySet()) {
       String name = entry.getKey();
-      String value = entry.getValue() instanceof Collection<?> ? CollectionUtility.firstElement(entry.getValue()).toString() : entry.getValue().toString();
+      String value = Objects.toString(entry.getValue() instanceof Collection<?> ? CollectionUtility.firstElement((Collection<?>) entry.getValue()) : entry.getValue());
       if (name != null && hopByHopHeaderNames.contains(name.toLowerCase(Locale.US))) {
         LOG.trace("Removed hop-by-hop response header: {} (original value: {})", name, value);
         continue;

@@ -10,12 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,19 +83,6 @@ public class CollectionUtilityTest {
     assertTrue(CollectionUtility.equalsCollection(createList("a", "b"), createList("a", "b")));
     assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("a")));
     assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("b", "a")));
-  }
-
-  /**
-   * Test for {@link CollectionUtility#firstElement(Object)}
-   */
-  @Test
-  public void testFirstElementObject() {
-    // null
-    assertNull(CollectionUtility.firstElement((Object) null));
-    // empty
-    assertNull(CollectionUtility.firstElement(new Object()));
-    // Cover switch to firstElement(Collection)
-    assertEquals(TriState.FALSE, CollectionUtility.firstElement((Object) EnumSet.of(TriState.FALSE)));
   }
 
   /**
