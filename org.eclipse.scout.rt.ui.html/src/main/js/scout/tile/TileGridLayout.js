@@ -228,8 +228,24 @@ scout.TileGridLayout.prototype._onAnimationDone = function() {
 };
 
 scout.TileGridLayout.prototype._animateTileBounds = function(tile, fromBounds, bounds) {
-  var promises = [];
+  // jQuery's animate() function sets "overflow: hidden" during the animation. After the animation, the
+  // original value is restored. (Search for "opts.overflow" in the jQuery source code, and see
+  // https://stackoverflow.com/a/5696656/7188380 for details why this is required.)
+  // Unfortunately, because we are running multiple animations in parallel here, the second animation will
+  // remember the temporary value set by the first animation and will restore it at the end. This causes the
+  // tile to have the inline style "overflow: hidden" after all animations have been completed, even if the
+  // CSS rules say something different.
+  // As a workaround, we remember the correct original value ourselves and restore it manually after all
+  // individual animations have been completed. Only then will the resulting promise be resolved.
+  var elem = tile.$container[0];
+  var oldOverflowStyles = [elem.style.overflow, elem.style.overflowX, elem.style.overflowY];
+  var restoreOverflowStyle = function() {
+    elem.style.overflow = oldOverflowStyles[0];
+    elem.style.overflowX = oldOverflowStyles[1];
+    elem.style.overflowY = oldOverflowStyles[2];
+  };
 
+  var promises = [];
   tile.$container
     .cssLeftAnimated(fromBounds.x, bounds.x, {
       start: function(promise) {
@@ -255,7 +271,8 @@ scout.TileGridLayout.prototype._animateTileBounds = function(tile, fromBounds, b
       },
       queue: false
     });
-  return promises;
+
+  return $.promiseAll(promises).then(restoreOverflowStyle);
 };
 
 scout.TileGridLayout.prototype._updateScrollbar = function() {
