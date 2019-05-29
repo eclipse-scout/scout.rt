@@ -72,6 +72,7 @@ scout.ModeSelector.prototype._setSelectedMode = function(selectedMode) {
   if (selectedMode && !selectedMode.selected) {
     selectedMode.setSelected(true);
   }
+  this._updateMarkers();
   this._setProperty('selectedMode', selectedMode);
 };
 
@@ -85,17 +86,24 @@ scout.ModeSelector.prototype._onModePropertyChange = function(event) {
 
 scout.ModeSelector.prototype._updateMarkers = function() {
   var visibleModes = [];
+  var selectedModeIndex = -1;
   this.modes.forEach(function(mode) {
     if (mode.rendered) {
-      mode.$container.removeClass('first last');
+      mode.$container.removeClass('first last after-selected');
       if (mode.isVisible()) {
         visibleModes.push(mode);
+        if (mode.selected) {
+          selectedModeIndex = visibleModes.length - 1;
+        }
       }
     }
   });
   if (visibleModes.length) {
     visibleModes[0].$container.addClass('first');
     visibleModes[visibleModes.length - 1].$container.addClass('last');
+    if (selectedModeIndex >= 0 && selectedModeIndex < (visibleModes.length - 1)) {
+      visibleModes[selectedModeIndex + 1].$container.addClass('after-selected');
+    }
   }
 };
 

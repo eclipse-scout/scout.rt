@@ -12,13 +12,31 @@
   display: table-cell;
   vertical-align: middle;
   text-align: center;
-  border-left: 1px solid @border-color;
+  border: 1px solid @border-color;
   height: 100%;
-  padding: 5px;
+  padding: @mode-padding;
   #scout.overflow-ellipsis();
 
   &.first {
-    border-left: 0;
+    border-radius: @button-border-radius 0px 0px @button-border-radius;
+  }
+
+  &.last {
+    border-radius: 0px @button-border-radius @button-border-radius 0px;
+  }
+
+  &.first.last {
+    border-radius:  @button-border-radius;
+  }
+
+  &:not(.last):not(.selected) {
+    border-right: none;
+    padding-right: @mode-padding + 1px; /* account for the missing border, so that text does not jump */
+  }
+
+  &.after-selected {
+    border-left: none;
+    padding-left: @mode-padding + 1px;  /* account for the missing border, so that text does not jump */
   }
 
   &:hover {
@@ -33,22 +51,35 @@
   &.selected {
     color: @mode-selected-text-color;
     background-color: @mode-selected-background-color;
+    border: none;
   }
 
   &:not(.disabled) {
     cursor: pointer;
   }
 
-  &.disabled {
-    color: @disabled-color;
+  &.disabled,
+  &.alternative.disabled {
+    color: @button-disabled-color;
 
     &.selected {
-      color: @mode-disabled-selected-text-color;
-      background-color: @mode-disabled-selected-background-color;
+      background-color: @button-disabled-background-color;
+      border: solid 1px @button-disabled-border-color;
     }
   }
 
   & > .icon.with-label {
     margin-right: 8px;
+  }
+}
+
+.mode-selector.alternative {
+  & > .mode {
+
+    &.selected:not(.disabled) {
+      background-color: inherit;
+      border: 1px solid @mode-alternative-selected-color;
+      color: @mode-alternative-selected-color;
+    }
   }
 }
