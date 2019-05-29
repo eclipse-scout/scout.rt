@@ -28,7 +28,6 @@ scout.FileChooserFieldAdapter.prototype._onValueChange = function(event) {
   }
 };
 
-
 /**
  * @override
  */
