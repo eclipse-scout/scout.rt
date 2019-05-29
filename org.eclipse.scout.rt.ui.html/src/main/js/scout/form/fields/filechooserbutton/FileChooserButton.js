@@ -13,6 +13,7 @@ scout.FileChooserButton = function() {
 
   this.button = null;
   this.fileInput = null;
+
   this.acceptTypes = null;
   this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
@@ -76,6 +77,24 @@ scout.FileChooserButton.prototype._render = function() {
   this.addStatus();
 };
 
+scout.FileChooserButton.prototype.setDisplayText = function(text) {
+  scout.FileChooserButton.parent.prototype.setDisplayText.call(this, text);
+  this.fileInput.setText(text);
+  if (!text) {
+    this.fileInput.clear();
+  }
+};
+
+/**
+ * @override
+ */
+scout.FileChooserButton.prototype._readDisplayText = function() {
+  return this.fileInput.text;
+};
+
+/**
+ * @override
+ */
 scout.FileChooserButton.prototype._renderLabel = function() {
   this._renderEmptyLabel();
 };

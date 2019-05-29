@@ -27,3 +27,11 @@ scout.FileChooserButtonAdapter.prototype._onValueChange = function(event) {
     this.widget.fileInput.clear();
   }
 };
+
+/**
+ * @override
+ */
+scout.FileChooserButtonAdapter.prototype._syncDisplayText = function(displayText) {
+  this.widget.setDisplayText(displayText);
+  // When displayText comes from the server we must not call parseAndSetValue here.
+};
