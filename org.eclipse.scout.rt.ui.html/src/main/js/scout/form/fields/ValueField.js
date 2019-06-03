@@ -497,7 +497,7 @@ scout.ValueField.prototype._updateDisplayText = function(value) {
       .done(this.setDisplayText.bind(this))
       .fail(function() {
         this.setDisplayText('');
-        $.log.error('Could not resolve display text.');
+        $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + value);
       }.bind(this));
   } else {
     this.setDisplayText(returned);
