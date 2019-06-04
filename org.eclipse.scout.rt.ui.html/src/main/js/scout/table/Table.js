@@ -173,6 +173,12 @@ scout.Table.prototype._init = function(model) {
   this.resolveConsts([{
     property: 'hierarchicalStyle',
     constType: scout.Table.HierarchicalStyle
+  }, {
+    property: 'checkableStyle',
+    constType: scout.Table.CheckableStyle
+  }, {
+    property: 'groupingStyle',
+    constType: scout.Table.GroupingStyle
   }]);
   this._initColumns();
 
