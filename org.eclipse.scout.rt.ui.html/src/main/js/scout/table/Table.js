@@ -127,7 +127,14 @@ scout.Table.prototype._init = function(model) {
   scout.Table.parent.prototype._init.call(this, model);
   this.resolveConsts([{
     property: 'hierarchicalStyle',
-    constType: scout.Table.HierarchicalStyle}]);
+    constType: scout.Table.HierarchicalStyle
+  }, {
+    property: 'checkableStyle',
+    constType: scout.Table.CheckableStyle
+  }, {
+    property: 'groupingStyle',
+    constType: scout.Table.GroupingStyle
+  }]);
   this._initColumns();
 
   this.rows.forEach(function(row, i) {
