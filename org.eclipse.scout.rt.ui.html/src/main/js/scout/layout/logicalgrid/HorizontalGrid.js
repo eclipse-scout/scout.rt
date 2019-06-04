@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.HorizontalGrid = function() {
-  scout.HorizontalGrid.parent.call(this);
+scout.HorizontalGrid = function(options) {
+  scout.HorizontalGrid.parent.call(this, options);
 };
 scout.inherits(scout.HorizontalGrid, scout.AbstractGrid);
 

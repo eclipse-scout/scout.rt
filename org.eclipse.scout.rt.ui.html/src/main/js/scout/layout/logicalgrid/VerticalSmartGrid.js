@@ -8,8 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.VerticalSmartGrid = function() {
-  scout.VerticalSmartGrid.parent.call(this);
+scout.VerticalSmartGrid = function(options) {
+  scout.VerticalSmartGrid.parent.call(this, options);
 };
 scout.inherits(scout.VerticalSmartGrid, scout.AbstractGrid);
 
