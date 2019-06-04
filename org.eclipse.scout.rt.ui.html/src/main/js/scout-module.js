@@ -63,6 +63,9 @@
   __include("scout/util/aggregation.js");
   __include("scout/util/webstorage.js");
   __include("scout/util/cookies.js");
+  __include("scout/ajax/ajax.js");
+  __include("scout/ajax/AjaxCall.js");
+  __include("scout/ajax/AjaxError.js");
   // Lookup calls
   __include("scout/lookup/LookupCall.js");
   __include("scout/lookup/LookupRow.js");
@@ -76,7 +79,6 @@
   __include("scout/code/codes.js");
   __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
-  __include("scout/session/AjaxCall.js");
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/RemoteEvent.js");
