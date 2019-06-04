@@ -111,12 +111,20 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
       errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
     }
 
-  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0]))) {
+  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof scout.AjaxError) {
     // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
-    var args = (Array.isArray(error) ? error : arguments);
-    var jqXHR = args[0];
-    var errorThrown = args[2];
-    var requestOptions = args[3]; // scout extension
+    var jqXHR, errorThrown, requestOptions;
+    if (error instanceof scout.AjaxError) {
+      jqXHR = error.jqXHR;
+      errorThrown = error.errorThrown;
+      requestOptions = error.requestOptions; // scout extension
+    } else {
+      var args = (Array.isArray(error) ? error : arguments);
+      jqXHR = args[0];
+      errorThrown = args[2];
+      requestOptions = args[3]; // scout extension
+    }
+
     var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
     var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
 
