@@ -60,7 +60,7 @@ scout.ajax = {
    * @returns {Promise} a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link scout.AjaxError} as argument.
    */
-  delete: function(url, options) {
+  remove: function(url, options) {
     var opts = $.extend({}, {
       url: url,
       type: 'DELETE'
@@ -130,7 +130,7 @@ scout.ajax = {
    * @returns {Promise} a promise which is resolved when the request succeeds.
    *          In case of an error the promise is rejected with an {@link scout.AjaxError} as argument.
    */
-  deleteJson: function(url, options) {
+  removeJson: function(url, options) {
     var opts = $.extend({}, {
       url: url,
       type: 'DELETE'
