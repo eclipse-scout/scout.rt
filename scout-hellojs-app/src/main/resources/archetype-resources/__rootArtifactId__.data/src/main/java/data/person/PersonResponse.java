@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoList;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("PersonResponse")
+@TypeName("${simpleArtifactName}.PersonResponse")
 public class PersonResponse extends DoEntity {
 
   public DoList<PersonDo> items() {

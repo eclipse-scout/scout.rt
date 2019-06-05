@@ -15,5 +15,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.eclipse.scout.dev.jetty.JettyServer"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="${rootArtifactId}.app.dev"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dscout.jetty.port=8084&#13;&#10;-Djandex.rebuild=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dscout.jetty.port=8084"/>
 </launchConfiguration>

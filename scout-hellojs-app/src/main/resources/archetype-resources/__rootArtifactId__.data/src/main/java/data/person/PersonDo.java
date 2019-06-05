@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("Person")
+@TypeName("${simpleArtifactName}.Person")
 public class PersonDo extends DoEntity {
   public DoValue<String> firstName() {
     return doValue("firstName");

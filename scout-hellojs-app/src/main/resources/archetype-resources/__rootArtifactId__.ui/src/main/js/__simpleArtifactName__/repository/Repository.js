@@ -38,7 +38,7 @@ ${simpleArtifactName}.Repository.prototype._ensureConverter = function(opts) {
 ${simpleArtifactName}.Repository.prototype._mapJson = function(data) {
   return JSON.parse(data, function(key, value) {
     if (key === '_type') {
-      this.objectType = scout.app.appPrefix + value;
+      this.objectType = value;
     }
     return value;
   });

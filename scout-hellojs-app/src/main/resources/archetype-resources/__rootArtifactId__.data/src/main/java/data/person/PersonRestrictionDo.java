@@ -7,7 +7,7 @@ import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
 
-@TypeName("PersonRestriction")
+@TypeName("${simpleArtifactName}.PersonRestriction")
 public class PersonRestrictionDo extends DoEntity {
   public DoValue<String> firstName() {
     return doValue("firstName");

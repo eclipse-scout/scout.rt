@@ -1,11 +1,10 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-  ${simpleArtifactName}.App = function() {
+${simpleArtifactName}.App = function() {
   ${simpleArtifactName}.App.parent.call(this);
   this.apiUrl = '../api/';
   this.appPrefix = '${simpleArtifactName}.';
-  this.desktop = null;
 };
 scout.inherits(${simpleArtifactName}.App, scout.App);
 
@@ -15,11 +14,6 @@ ${simpleArtifactName}.App.prototype._createSession = function(options) {
   return session;
 };
 
-${simpleArtifactName}.App.prototype._createDesktop = function(parent) {
-  this.desktop = scout.create('${simpleArtifactName}.Desktop', scout.models.getModel('${simpleArtifactName}.Desktop', parent));
-  return this.desktop;
-};
-
 ${simpleArtifactName}.App.prototype._loadLocale = function() {
   var localeTag = scout.webstorage.getItem(sessionStorage, "locale");
   if (scout.strings.hasText(localeTag)) {
@@ -27,10 +21,10 @@ ${simpleArtifactName}.App.prototype._loadLocale = function() {
     if (locale) {
       return locale;
     }
+    ${symbol_dollar}.log.warn('Unsupported languageTag in settings found: ' + localeTag + '. Using navigator locale.');
   }
 
   // Use the default locale
-  ${symbol_dollar}.log.warn('Unsupported languageTag in settings found: ' + localeTag + '. Using navigator locale.');
   return scout.locales.getNavigatorLocale();
 };
 
