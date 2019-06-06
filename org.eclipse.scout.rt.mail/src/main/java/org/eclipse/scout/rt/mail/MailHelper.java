@@ -150,13 +150,13 @@ public class MailHelper {
       else {
         Object content = null;
         try { // NOSONAR
-          checkValidCharset(part);
+          autoFixCharset(part);
 
           // getContent might throw a MessagingException for legitimate parts (e.g. some images end up in a javax.imageio.IIOException for example).
           content = part.getContent();
         }
         catch (MessagingException | IOException e) {
-          LOG.info("Unable to mime part content", e);
+          LOG.info("Unable to get mime part content due to {}: {}", e.getClass().getSimpleName(), e.getMessage(), LOG.isDebugEnabled() ? e : null);
         }
 
         if (content instanceof Multipart) {
@@ -227,17 +227,18 @@ public class MailHelper {
   }
 
   /**
+   * Fixes a special behavior when access of {@link Part#getContent()} results in an {@link NullPointerException} due to
+   * an invalid charset.
    * <p>
-   * Quick check if character set seems to be valid. If character set seems to be not valid a more detailed check is
-   * started.
-   * </p>
+   * If charset is valid or {@link Part#getContent()} doesn't result in a {@link NullPointerException}, no fix is
+   * applied.
    * <p>
    * As java.io.InputStreamReader.InputStreamReader(InputStream, String) might throw up with a
    * {@link NullPointerException} in case of an unknown character set, if such an exception occurs, the character set is
    * replaced with {@link StandardCharsets#UTF_8} even though this may lead to display errors.
    * </p>
    */
-  protected void checkValidCharset(Part part) throws MessagingException {
+  protected void autoFixCharset(Part part) throws MessagingException {
     String charset = getPartCharsetInternal(part);
     if (charset == null) {
       return;
@@ -248,8 +249,7 @@ public class MailHelper {
       return;
     }
     catch (UnsupportedCharsetException e) {
-      // ignore exception itself (use trace log)
-      LOG.trace("checkValidCharset: UnsupportedCharsetException has occured.", e);
+      LOG.trace("autoFixCharset: UnsupportedCharsetException has occured.", e); // explicitly trace
     }
 
     try {
@@ -257,12 +257,13 @@ public class MailHelper {
     }
     catch (NullPointerException e) { // NOSONAR
       LOG.info("Mail part seems to use an unsupported character set {}, use UTF-8 as fallback.", charset, e);
+      // Update charset of content type so that when accessing part.getContent() again no NPE is thrown
+      // (UnsupportedEncodingException might still be thrown when part.getContent() didn't result in an NPE).
       String contentType = part.getContentType(); // cannot be null because otherwise charset would have been null already
       part.setHeader(CONTENT_TYPE_ID, contentType.replace(charset, StandardCharsets.UTF_8.name()));
     }
-    catch (IOException e) {
-      // ignore exception itself (use trace log)
-      LOG.trace("checkValidCharset: IOException has occured.", e);
+    catch (IOException e) { // includes UnsupportedEncodingException
+      LOG.trace("autoFixCharset: IOException has occured.", e); // explicitly trace
     }
   }
 
