@@ -148,7 +148,7 @@ scout.ajax = {
   callJson: function(options) {
     var opts = $.extend({}, {
       dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
+      contentType: 'application/json; charset=UTF-8'
     }, options);
     return this.call(opts);
   },
