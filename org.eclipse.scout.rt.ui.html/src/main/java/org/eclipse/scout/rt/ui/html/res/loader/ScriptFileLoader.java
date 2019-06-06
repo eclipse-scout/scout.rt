@@ -74,7 +74,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   protected String requestWithoutFingerprint(ScriptRequest req) {
-    return req.toString(false, true);
+    return req.lookupPath();
   }
 
   @Override

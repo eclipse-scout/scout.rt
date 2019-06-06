@@ -63,4 +63,25 @@ public class ScriptRequestTest {
     assertTrue(opt.get().minimized());
     assertEquals(extension, opt.get().fileExtension());
   }
+
+  @Test
+  public void testToMinimized() throws Exception {
+    ScriptRequest request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.js").get();
+    ScriptRequest minRequest = request.toMinimized(true);
+    assertEquals("chartjs/Chart-2.8.0.min.js", minRequest.toString());
+
+    // already minified
+    request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.min.js").get();
+    minRequest = request.toMinimized(true);
+    assertEquals("chartjs/Chart-2.8.0.min.js", minRequest.toString());
+
+    // Should remove the .min suffix from the filename
+    ScriptRequest nonMinRequest = request.toMinimized(false);
+    assertEquals("chartjs/Chart-2.8.0.js", nonMinRequest.toString());
+
+    // already non-minified
+    request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.js").get();
+    nonMinRequest = request.toMinimized(false);
+    assertEquals("chartjs/Chart-2.8.0.js", nonMinRequest.toString());
+  }
 }

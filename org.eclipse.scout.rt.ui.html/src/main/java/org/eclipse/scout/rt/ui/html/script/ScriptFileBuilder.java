@@ -147,7 +147,7 @@ public class ScriptFileBuilder {
     }
     long lastModified = script.getURL().openConnection().getLastModified();
     String libraryContent = new String(IOUtility.readFromUrl(script.getURL()), StandardCharsets.UTF_8);
-    // only minfy if not already minified
+    // only minify if not already minified
     if (compileAndMinify && script.getNodeType() != NodeType.LIBRARY_MINIFIED) {
       libraryContent = compileAndMinifyContent(script.getFileType(), libraryContent);
     }
