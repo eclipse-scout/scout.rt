@@ -282,6 +282,10 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(By.cssSelector(".detail-form"));
   }
 
+  public WebElement waitUntilDetailTable() {
+    return waitUntilElementClickable(By.cssSelector(".detail-table"));
+  }
+
   /**
    * Finds the message box button at the given index position (1-based, or last() to get the last button).
    */
