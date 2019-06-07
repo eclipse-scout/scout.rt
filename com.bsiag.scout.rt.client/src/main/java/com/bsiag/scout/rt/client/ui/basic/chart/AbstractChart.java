@@ -10,12 +10,14 @@
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
@@ -23,7 +25,12 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 
+import com.bsiag.scout.rt.client.ui.basic.chart.ChartChains.ChartValueClickChain;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.ChartValueGroupBean;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
@@ -89,18 +96,22 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartType;
  * @since 5.2
  */
 @ClassId("c31e0b6e-77bd-4752-ab1a-bda7560230b2")
-public abstract class AbstractChart extends AbstractWidget implements IChart {
-  // TODO [15.4] bsh: make extensible
+public abstract class AbstractChart extends AbstractWidget implements IChart, IExtensibleObject {
 
   private IChartUIFacade m_uiFacade;
   private final FastListenerList<ChartListener> m_listenerList = new FastListenerList<>();
+  private final ObjectExtensions<AbstractChart, IChartExtension<? extends AbstractChart>> m_objectExtensions;
 
   public AbstractChart() {
     this(true);
   }
 
   public AbstractChart(boolean callInitializer) {
-    super(callInitializer);
+    super(false);
+    m_objectExtensions = new ObjectExtensions<>(this, false);
+    if (callInitializer) {
+      callInitializer();
+    }
   }
 
   @Override
@@ -125,11 +136,15 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
     setVisible(getConfiguredVisible());
     setMaxSegments(getConfiguredMaxSegments());
     setClickable(getConfiguredClickable());
-    setModelHandlesClick(getConfiguredModelHandelsClick());
     setAnimated(getConfiguredAnimated());
     setLegendPosition(getConfiguredLegendPosition());
     setLegendVisible(getConfiguredLegendVisible());
     setInteractiveLegendVisible(getConfiguredInteractiveLegendVisible());
+  }
+
+  @Override
+  protected void initConfigInternal() {
+    m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -221,10 +236,38 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
     return m_listenerList;
   }
 
-  public void fireValueClicked(int[] axesPosition, BigDecimal value) {
-    ChartEvent event = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICKED);
-    event.setAxesPosition(axesPosition);
+  protected final void interceptValueClick(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
+    List<? extends IChartExtension<? extends AbstractChart>> extensions = getAllExtensions();
+    ChartValueClickChain chain = new ChartValueClickChain(extensions);
+    chain.execValueClick(valueIndex, value, groupIndex, groupName);
+  }
+
+  @Override
+  public final List<? extends IChartExtension<? extends AbstractChart>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected IChartExtension<? extends AbstractChart> createLocalExtension() {
+    return new LocalChartExtension<>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> clazz) {
+    return m_objectExtensions.getExtension(clazz);
+  }
+
+  @ConfigOperation
+  @Order(10)
+  protected void execValueClick(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
+    ChartEvent event = new ChartEvent(this, ChartEvent.TYPE_VALUE_CLICK);
+    event.setValueIndex(valueIndex);
     event.setValue(value);
+    event.setGroupIndex(groupIndex);
+    event.setGroupName(groupName);
+    fireChartEventInternal(event);
+  }
+
+  protected void fireChartEventInternal(ChartEvent event) {
     chartListeners().list().forEach(listener -> listener.chartChanged(event));
   }
 
@@ -304,16 +347,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   }
 
   @Override
-  public boolean isModelHandlesClick() {
-    return propertySupport.getPropertyBool(PROP_MODEL_HANDLES_CLICK);
-  }
-
-  @Override
-  public void setModelHandlesClick(boolean modelHandlesClick) {
-    propertySupport.setPropertyBool(PROP_MODEL_HANDLES_CLICK, modelHandlesClick);
-  }
-
-  @Override
   public boolean isAnimated() {
     return propertySupport.getPropertyBool(PROP_ANIMATED);
   }
@@ -356,10 +389,10 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
   protected class P_UIFacade implements IChartUIFacade {
 
     @Override
-    public void fireValueClickedFromUI(int[] axesPosition, BigDecimal value) {
+    public void fireValueClickFromUI(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
       try {
         if (isEnabled() && isVisible()) {
-          fireValueClicked(axesPosition, value);
+          interceptValueClick(valueIndex, value, groupIndex, groupName);
         }
       }
       catch (Exception e) {
@@ -367,4 +400,17 @@ public abstract class AbstractChart extends AbstractWidget implements IChart {
       }
     }
   }
+
+  protected static class LocalChartExtension<CHART extends AbstractChart> extends AbstractExtension<CHART> implements IChartExtension<CHART> {
+
+    public LocalChartExtension(CHART owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execValueClick(ChartValueClickChain chain, int valueIndex, BigDecimal value, int groupIndex, String groupName) {
+      getOwner().execValueClick(valueIndex, value, groupIndex, groupName);
+    }
+  }
+
 }

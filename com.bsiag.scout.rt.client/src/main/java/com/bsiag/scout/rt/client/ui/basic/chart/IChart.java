@@ -28,7 +28,6 @@ public interface IChart extends IWidget, ITypeWithClassId {
   String PROP_VISIBLE = "visible";
   String PROP_MAX_SEGMENTS = "maxSegments";
   String PROP_CLICKABLE = "clickable";
-  String PROP_MODEL_HANDLES_CLICK = "modelHandlesClick";
   String PROP_ANIMATED = "animated";
   String PROP_LEGEND_VISIBLE = "legendVisible";
   String PROP_INTERACTIVE_LEGEND_VISIBLE = "interactiveLegendVisible";
@@ -96,10 +95,6 @@ public interface IChart extends IWidget, ITypeWithClassId {
   void setClickable(boolean clickable);
 
   boolean isClickable();
-
-  void setModelHandlesClick(boolean modelHandlesClick);
-
-  boolean isModelHandlesClick();
 
   boolean isAnimated();
 

@@ -20,5 +20,5 @@ public interface IChartUIFacade {
   /**
    * position for all axes in IChartBean.getAxes() ordered in same order like axes.
    */
-  void fireValueClickedFromUI(int[] axesPosition, BigDecimal value);
+  void fireValueClickFromUI(int valueIndex, BigDecimal value, int groupIndex, String groupName);
 }

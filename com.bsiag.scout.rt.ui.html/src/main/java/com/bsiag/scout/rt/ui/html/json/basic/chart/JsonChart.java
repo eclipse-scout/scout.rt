@@ -9,12 +9,15 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.ui.html.json.basic.chart;
 
+import java.math.BigDecimal;
+
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.MainJsonObjectFactory;
+import org.json.JSONObject;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.IChart;
 import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
@@ -85,12 +88,6 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
         return getModel().isClickable();
       }
     });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_MODEL_HANDLES_CLICK, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isModelHandlesClick();
-      }
-    });
     putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ANIMATED, model) {
       @Override
       protected Object modelValue() {
@@ -131,7 +128,11 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
   }
 
   protected void handleUiValueClicked(JsonEvent event) {
-    // TODO [15.4] bsh: ???
-    getModel().getUIFacade().fireValueClickedFromUI(new int[0], null);
+    JSONObject data = event.getData();
+    int valueIndex = data.getInt("valueIndex");
+    BigDecimal value = new BigDecimal(data.getString("value"));
+    int groupIndex = data.getInt("groupIndex");
+    String groupName = data.optString("groupName");
+    getModel().getUIFacade().fireValueClickFromUI(valueIndex, value, groupIndex, groupName);
   }
 }
