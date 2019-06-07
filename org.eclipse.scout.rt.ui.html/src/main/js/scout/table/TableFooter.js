@@ -396,7 +396,7 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
     if ($info[0].style.width === '') {
       $info.cssWidth(0);
     }
-    $info.setVisible(true).stop().widthToContent(animationOpts);
+    $info.stop().removeData('hiding').setVisible(true).widthToContent(animationOpts);
   } else {
     // Mark element as hiding so that the layout does not try to resize it
     $info.data('hiding', true);
