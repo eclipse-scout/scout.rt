@@ -27,7 +27,7 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
  */
 public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
 
-  public static final String EVENT_VALUE_CLICKED = "valueClicked";
+  public static final String EVENT_VALUE_CLICK = "valueClick";
 
   public JsonChart(CHART model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -119,15 +119,15 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
 
   @Override
   public void handleUiEvent(JsonEvent event) {
-    if (EVENT_VALUE_CLICKED.equals(event.getType())) {
-      handleUiValueClicked(event);
+    if (EVENT_VALUE_CLICK.equals(event.getType())) {
+      handleUiValueClick(event);
     }
     else {
       super.handleUiEvent(event);
     }
   }
 
-  protected void handleUiValueClicked(JsonEvent event) {
+  protected void handleUiValueClick(JsonEvent event) {
     JSONObject data = event.getData();
     int valueIndex = data.getInt("valueIndex");
     BigDecimal value = new BigDecimal(data.getString("value"));
