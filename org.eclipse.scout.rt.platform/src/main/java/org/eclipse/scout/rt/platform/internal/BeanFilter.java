@@ -73,7 +73,7 @@ public class BeanFilter {
    */
   private void collectWithSubClasses(IClassInfo ci) {
     if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic() || !ci.isPublic()) {
-      LOG.debug("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
+      LOG.error("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
       return;
     }
 
@@ -106,9 +106,7 @@ public class BeanFilter {
       return;
     }
     if (!(ci.hasNoArgsConstructor() || ci.hasInjectableConstructor())) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{}' because it has no empty or injectable constructor().", ci.name());
-      }
+      LOG.error("Skipping bean candidate '{}' because it has no empty or injectable constructor().", ci.name());
       return;
     }
     addBean(ci);
