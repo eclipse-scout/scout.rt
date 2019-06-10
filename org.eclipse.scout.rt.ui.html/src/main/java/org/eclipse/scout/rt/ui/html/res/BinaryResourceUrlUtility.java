@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -39,10 +41,10 @@ public final class BinaryResourceUrlUtility {
    * <li>1. Type of quotation mark, either " or '.
    * <li>2. Icon name, in the example <b>some_icon</b>
    */
-  public static final Pattern ICON_REGEX_PATTERN = Pattern.compile("([\"'])iconid:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
+  public static final Pattern ICON_REGEX_PATTERN = Pattern.compile("([\"'])iconId:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
 
   /**
-   * Regular expression pattern to find icons, e.g. to find &lt;img src="binaryResource:some_res"&gt;.
+   * Regular expression pattern to find icons, e.g. to find &lt;img src="binaryresource:some_res"&gt;.
    * <p>
    * Pattern does a search for binaryResource:some_res (in quotation marks) and has three groups:
    * <li>1. Type of quotation mark, either " or '.
@@ -115,13 +117,7 @@ public final class BinaryResourceUrlUtility {
   }
 
   public static String getFilenameWithFingerprint(BinaryResource binaryResource) {
-    if (!binaryResource.hasFilename()) {
-      return null;
-    }
-    if (binaryResource.getFingerprint() <= 0) {
-      return binaryResource.getFilename();
-    }
-    return binaryResource.getFingerprint() + "/" + binaryResource.getFilename();
+    return BinaryResourceUtility.createFilename(binaryResource);
   }
 
   public static Pair<String, Long> extractFilenameWithFingerprint(String filenameWithFingerprint) {
@@ -154,7 +150,7 @@ public final class BinaryResourceUrlUtility {
   }
 
   /**
-   * Helper method for {@link #BINARY_RESOURCE_REGEX_PATTERN} to replace all occurrences with the proper url.
+   * Helper method for {@link #BINARY_RESOURCE_REGEX_PATTERN} to replace all occurrences with the proper URL.
    */
   public static String replaceBinaryResourceHandlerWithUrl(IJsonAdapter<?> jsonAdapter, String str) {
     if (str == null) {
@@ -169,4 +165,28 @@ public final class BinaryResourceUrlUtility {
     m.appendTail(ret);
     return ret.toString();
   }
+
+  /**
+   * Helper method to replace all common placeholders for images in the given string.
+   * <ol>
+   * <li>Icon IDs in the format: <code>iconId:star</code></li>
+   * <li>Binary resources in the format: <code>binaryResource:image</code></li>
+   * </ol>
+   */
+  public static String replaceImageUrls(IJsonAdapter<?> jsonAdapter, String str) {
+    str = replaceIconIdHandlerWithUrl(str);
+    return replaceBinaryResourceHandlerWithUrl(jsonAdapter, str);
+  }
+
+  /**
+   * Provides a binary resource (holder) for the given filename, which may contain a fingerprint. The attachmentProvider
+   * is a callback to retrieve the right binary resource from the model.
+   */
+  public static BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint, Function<String, BinaryResource> attachmentProvider) {
+    Pair<String, Long> filenameAndFingerprint = extractFilenameWithFingerprint(filenameWithFingerprint);
+    String filename = filenameAndFingerprint.getLeft();
+    BinaryResource attachment = attachmentProvider.apply(filename);
+    return attachment == null ? null : new BinaryResourceHolder(attachment);
+  }
+
 }

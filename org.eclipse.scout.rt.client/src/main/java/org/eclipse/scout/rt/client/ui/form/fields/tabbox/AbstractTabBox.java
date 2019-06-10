@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IFormFieldContextMenu;
@@ -82,6 +83,18 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     return MARK_STRATEGY_EMPTY;
   }
 
+  /**
+   * Configures the appearance of the tabs in the tab box. If the style {@link ITabBox#TAB_AREA_STYLE_SPREAD_EVEN} is
+   * chosen, the tabs will occupy the whole available space and will push any defined menu into the overflow menu. To
+   * counteract that, make the menu not stackable (see {@link AbstractMenu#getConfiguredStackable}).
+   *
+   * @return one of the following {@link ITabBox#TAB_AREA_STYLE_DEFAULT}, {@link ITabBox#TAB_AREA_STYLE_SPREAD_EVEN}.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  protected String getConfiguredTabAreaStyle() {
+    return TAB_AREA_STYLE_DEFAULT;
+  }
+
   @Override
   public List<? extends IWidget> getChildren() {
     return CollectionUtility.flatten(super.getChildren(), getMenus());
@@ -98,10 +111,21 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
   }
 
   @Override
+  public String getTabAreaStyle() {
+    return propertySupport.getPropertyString(PROP_TAB_AREA_STYLE);
+  }
+
+  @Override
+  public void setTabAreaStyle(String tabAreaStyle) {
+    propertySupport.setPropertyString(PROP_TAB_AREA_STYLE, tabAreaStyle);
+  }
+
+  @Override
   protected void initConfig() {
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_grid = new TabBoxGrid();
     setMarkStrategy(getConfiguredMarkStrategy());
+    setTabAreaStyle(getConfiguredTabAreaStyle());
     super.initConfig();
     initMenus();
   }

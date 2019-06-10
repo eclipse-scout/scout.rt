@@ -724,6 +724,10 @@ scout.FormField.prototype.focus = function() {
     return false;
   }
 
+  if (!this.enabledComputed) {
+    return false;
+  }
+
   var focusableElement = this.getFocusableElement();
   if (focusableElement) {
     return this.session.focusManager.requestFocus(focusableElement);

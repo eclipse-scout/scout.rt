@@ -14,9 +14,9 @@ import java.util.List;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.dataobject.DoMapEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoMapEntity;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestDoMapListEntity")
 public class TestDoMapListEntityDo extends DoMapEntity<List<TestItemDo>> {

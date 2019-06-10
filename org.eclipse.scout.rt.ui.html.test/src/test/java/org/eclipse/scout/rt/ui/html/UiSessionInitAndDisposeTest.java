@@ -38,9 +38,6 @@ import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingMaxWaitShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitAllShutdownProperty;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreMaxWaitWriteLockProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.UnloadRequestHandler;
@@ -63,15 +60,10 @@ public class UiSessionInitAndDisposeTest {
   public void before() {
     m_protocol.clear();
     m_beans = TestingUtility.registerBeans(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
-              public Long getDefaultValue() {
-                return 10L;
-              }
-            };
+          public Long getDefaultValue() {
+            return 1L;
           }
         }),
 
@@ -79,27 +71,6 @@ public class UiSessionInitAndDisposeTest {
           @Override
           public Integer getDefaultValue() {
             return 2;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreHousekeepingMaxWaitShutdownProperty.class).withInitialInstance(new SessionStoreHousekeepingMaxWaitShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 10;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitWriteLockProperty.class).withInitialInstance(new SessionStoreMaxWaitWriteLockProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
-          }
-        }),
-
-        new BeanMetaData(SessionStoreMaxWaitAllShutdownProperty.class).withInitialInstance(new SessionStoreMaxWaitAllShutdownProperty() {
-          @Override
-          public Integer getDefaultValue() {
-            return 1;
           }
         }),
 
@@ -227,6 +198,8 @@ public class UiSessionInitAndDisposeTest {
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionId));
 
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
+
     assertEquals(
         Arrays.asList(
             "UiSession.init",
@@ -247,7 +220,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped();
       }
     });
 
@@ -287,6 +260,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotNull(store.getClientSessionMap().get(clientSessionId));
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionId));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
     assertEquals(
         Arrays.asList(
@@ -341,7 +316,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -420,6 +395,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotEquals(uiSessionIdA, uiSessionIdB);
     assertEquals(2, store.countUiSessions());
 
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
+
     //brower tab A closed -> json unload
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionIdA, null);
@@ -435,7 +412,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -487,6 +464,8 @@ public class UiSessionInitAndDisposeTest {
     assertNotNull(store.getClientSessionMap().get(clientSessionIdA));
     assertEquals(1, store.getUiSessionMap().size());
     assertNotNull(store.getUiSessionMap().get(uiSessionIdA));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
 
     assertEquals(
         Arrays.asList(
@@ -564,7 +543,7 @@ public class UiSessionInitAndDisposeTest {
     JobTestUtil.waitForCondition(new ICondition() {
       @Override
       public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
+        return clientSession.isStopped();
       }
     });
 
@@ -589,9 +568,9 @@ public class UiSessionInitAndDisposeTest {
 
     //this is entry point #1 of the race condition
     @Override
-    protected void doHousekeeping(IClientSession clientSession) {
+    protected void doHousekeepingOutsideWriteLock(IClientSession clientSession) {
       writeToProtocol("SessionStore.doHousekeeping");
-      super.doHousekeeping(clientSession);
+      super.doHousekeepingOutsideWriteLock(clientSession);
     }
   }
 
@@ -619,6 +598,7 @@ public class UiSessionInitAndDisposeTest {
 
   @IgnoreBean
   private class FixtureClientSession extends AbstractClientSession {
+    private boolean m_stopped;
 
     public FixtureClientSession() {
       super(true);
@@ -646,6 +626,11 @@ public class UiSessionInitAndDisposeTest {
       writeToProtocol("ClientSession.stopping");
       super.stop(exitCode);
       writeToProtocol("ClientSession.stopped");
+      m_stopped = true;
+    }
+
+    public boolean isStopped() {
+      return m_stopped;
     }
   }
 

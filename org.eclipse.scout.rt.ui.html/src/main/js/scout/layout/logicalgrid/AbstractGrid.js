@@ -11,8 +11,8 @@
 /**
  * @abstract
  */
-scout.AbstractGrid = function() {
-  scout.AbstractGrid.parent.call(this);
+scout.AbstractGrid = function(options) {
+  scout.AbstractGrid.parent.call(this, options);
   this.gridRows = 0;
   this.gridColumns = 0;
 };

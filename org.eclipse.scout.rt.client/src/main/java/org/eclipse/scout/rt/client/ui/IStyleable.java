@@ -32,12 +32,20 @@ public interface IStyleable {
     setCssClass(BEANS.get(StyleHelper.class).addCssClass(getCssClass(), cssClass));
   }
 
+  default void addCssClasses(String... cssClasses) {
+    setCssClass(BEANS.get(StyleHelper.class).addCssClasses(getCssClass(), cssClasses));
+  }
+
   /**
    * @param cssClass
    *          one or more CSS classes separated by space
    */
   default void removeCssClass(String cssClass) {
     setCssClass(BEANS.get(StyleHelper.class).removeCssClass(getCssClass(), cssClass));
+  }
+
+  default void removeCssClasses(String... cssClasses) {
+    setCssClass(BEANS.get(StyleHelper.class).removeCssClasses(getCssClass(), cssClasses));
   }
 
   default void toggleCssClass(String cssClass, boolean condition) {

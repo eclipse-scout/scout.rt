@@ -281,6 +281,10 @@ public abstract class AbstractSeleniumTest {
     return waitUntilElementClickable(By.cssSelector(".detail-form"));
   }
 
+  public WebElement waitUntilDetailTable() {
+    return waitUntilElementClickable(By.cssSelector(".detail-table"));
+  }
+
   /**
    * Finds the message box button at the given index position (1-based, or last() to get the last button).
    */
@@ -629,5 +633,15 @@ public abstract class AbstractSeleniumTest {
    */
   public void assertCssClassNotExists(WebElement element, String expectedCssClass) {
     waitUntil(SeleniumExpectedConditions.elementNotToHaveCssClass(element, expectedCssClass));
+  }
+
+  /**
+   * Hides the navigation and waits until it is gone.
+   */
+  public void hideDesktopNavigation() {
+    findElement(By.cssSelector(".collapse-handle-body.left")).click();
+    waitUntilElementClickable(By.cssSelector(".collapse-handle.both-visible"));
+    findElement(By.cssSelector(".collapse-handle-body.left")).click();
+    waitUntilElementStaleness(findElement(By.className("desktop-navigation")));
   }
 }

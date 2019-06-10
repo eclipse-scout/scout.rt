@@ -43,7 +43,7 @@ scout.App.prototype.init = function(options) {
  * This happens at the prepare phase because all these things should be available from the beginning.
  */
 scout.App.prototype._prepare = function(options) {
-  return this._prepareLogging().done(function() {
+  return this._prepareLogging(options).done(function() {
     this._prepareEssentials(options);
     this._prepareDone(options);
   }.bind(this));

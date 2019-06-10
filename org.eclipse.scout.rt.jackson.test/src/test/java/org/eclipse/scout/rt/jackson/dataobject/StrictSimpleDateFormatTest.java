@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;

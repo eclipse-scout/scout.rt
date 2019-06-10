@@ -260,7 +260,7 @@ scout.Menu.prototype._renderIconId = function() {
 };
 
 scout.Menu.prototype.isTabTarget = function() {
-  return this.enabled && this.visible && !this.overflown && (this.isButton() || !this.separator);
+  return this.enabledComputed && this.visible && !this.overflown && (this.isButton() || !this.separator);
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {

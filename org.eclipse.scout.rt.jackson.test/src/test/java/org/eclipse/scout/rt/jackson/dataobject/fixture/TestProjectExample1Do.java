@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.Replace;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
 
 @Replace
 public class TestProjectExample1Do extends TestCoreExample1Do {

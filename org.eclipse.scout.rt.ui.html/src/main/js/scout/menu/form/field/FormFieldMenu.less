@@ -44,3 +44,18 @@
     color: @menu-item-disabled-color;
   }
 }
+
+/* Inside context menu popup -> set preferred size */
+.context-menu > .menu-item.form-field-menu {
+  display: flex;
+  align-items: center;
+
+  & > .text,
+  & > .icon {
+    flex: none;
+  }
+
+  & > .form-field {
+    flex: 1 1 auto;
+  }
+}

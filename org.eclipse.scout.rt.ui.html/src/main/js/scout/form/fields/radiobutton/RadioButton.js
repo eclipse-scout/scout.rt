@@ -13,6 +13,7 @@ scout.RadioButton = function() {
 
   this.gridDataHints.fillHorizontal = true;
   this.focusWhenSelected = true;
+  this.wrapText = false;
   this.buttonKeyStroke = new scout.RadioButtonKeyStroke(this, null);
   this.radioValue = null;
 };
@@ -58,15 +59,22 @@ scout.RadioButton.prototype._remove = function() {
   scout.RadioButton.parent.prototype._remove.call(this);
 };
 
-scout.RadioButton.prototype._onMouseDown = function(event) {
-  var $icon = this.get$Icon();
-  if (!this.enabledComputed || !scout.isOneOf(event.target, this.$radioButton[0], this.$buttonLabel[0], $icon[0])) {
-    return;
-  }
-  this.select();
-  if (this.focusWhenSelected && scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
-    this.focusAndPreventDefault(event);
-  }
+/**
+ * @override
+ */
+scout.RadioButton.prototype._renderProperties = function() {
+  scout.RadioButton.parent.prototype._renderProperties.call(this);
+  this._renderWrapText();
+  this._renderSelected();
+};
+
+scout.RadioButton.prototype.setWrapText = function(wrapText) {
+  this.setProperty('wrapText', wrapText);
+};
+
+scout.RadioButton.prototype._renderWrapText = function() {
+  this.$buttonLabel.toggleClass('white-space-nowrap', !this.wrapText);
+  this.invalidateLayoutTree();
 };
 
 /**
@@ -78,6 +86,29 @@ scout.RadioButton.prototype.select = function() {
 
 scout.RadioButton.prototype.setSelected = function(selected) {
   this.setProperty('selected', selected);
+};
+
+scout.RadioButton.prototype._renderSelected = function() {
+  this.$fieldContainer.toggleClass('checked', this.selected);
+  this.$field.toggleClass('checked', this.selected);
+};
+
+scout.RadioButton.prototype.setTabbable = function(tabbable) {
+  if (this.rendered) {
+    this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
+  }
+};
+
+scout.RadioButton.prototype.isTabbable = function() {
+  return this.rendered && this.$field.isTabbable();
+};
+
+scout.RadioButton.prototype._renderIconId = function() {
+  scout.RadioButton.parent.prototype._renderIconId.call(this);
+  var $icon = this.get$Icon();
+  if ($icon.length > 0) {
+    $icon.insertAfter(this.$radioButton);
+  }
 };
 
 /**
@@ -92,33 +123,13 @@ scout.RadioButton.prototype.doAction = function(event) {
   return true;
 };
 
-scout.RadioButton.prototype.setTabbable = function(tabbable) {
-  if (this.rendered) {
-    this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
-  }
-};
-
-scout.RadioButton.prototype.isTabbable = function() {
-  return this.rendered && this.$field.isTabbable();
-};
-
-/**
- * @override
- */
-scout.RadioButton.prototype._renderProperties = function() {
-  scout.RadioButton.parent.prototype._renderProperties.call(this);
-  this._renderSelected();
-};
-
-scout.RadioButton.prototype._renderSelected = function() {
-  this.$fieldContainer.toggleClass('checked', this.selected);
-  this.$field.toggleClass('checked', this.selected);
-};
-
-scout.RadioButton.prototype._renderIconId = function() {
-  scout.RadioButton.parent.prototype._renderIconId.call(this);
+scout.RadioButton.prototype._onMouseDown = function(event) {
   var $icon = this.get$Icon();
-  if ($icon.length > 0) {
-    $icon.insertAfter(this.$radioButton);
+  if (!this.enabledComputed || !scout.isOneOf(event.target, this.$radioButton[0], this.$buttonLabel[0], $icon[0])) {
+    return;
+  }
+  this.select();
+  if (this.focusWhenSelected && scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
+    this.focusAndPreventDefault(event);
   }
 };

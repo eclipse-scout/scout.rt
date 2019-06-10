@@ -1328,7 +1328,7 @@ scout.SmartField.prototype.resetDisplayText = function() {
     returned
       .done(this._setAndRenderDisplayText.bind(this))
       .fail(function() {
-        $.log.error('Error while formatting display text');
+        $.log.isInfoEnabled() && $.log.info('Could not resolve display text for value: ' + this.value);
       }.bind(this));
   } else {
     this._setAndRenderDisplayText(returned);

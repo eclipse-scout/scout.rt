@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.rt.platform.dataobject.DoMapEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoMapEntity;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("TestDoMapEntity")
 public class TestDoMapEntityDo extends DoMapEntity<TestItemDo> {

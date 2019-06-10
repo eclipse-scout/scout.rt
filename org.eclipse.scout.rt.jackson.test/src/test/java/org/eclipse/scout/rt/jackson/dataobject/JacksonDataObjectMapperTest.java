@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -26,6 +27,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityHolder;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.testing.TestingDataObjectHelper;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestComplexEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestCustomImplementedEntityDo;
@@ -35,14 +41,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoEntityHolder;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CloneUtility;
-import org.eclipse.scout.rt.testing.platform.dataobject.TestingDataObjectHelper;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -154,7 +155,7 @@ public class JacksonDataObjectMapperTest {
     holder.setValue(entity);
 
     DoEntityHolder<DoEntity> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    m_testHelper.assertEquals(entity, holderClone.getValue());
+    assertEqualsWithComparisonFailure(entity, holderClone.getValue());
   }
 
   @Test
@@ -177,7 +178,7 @@ public class JacksonDataObjectMapperTest {
     holder.setValue(testDo);
 
     DoEntityHolder<TestComplexEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    m_testHelper.assertEquals(testDo, holderClone.getValue());
+    assertEqualsWithComparisonFailure(testDo, holderClone.getValue());
   }
 
   @Test
@@ -187,7 +188,7 @@ public class JacksonDataObjectMapperTest {
     holder.getValue().stringAttribute().set("foo");
 
     DoEntityHolder<ITestBaseEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    m_testHelper.assertEquals(holder.getValue(), holderClone.getValue());
+    assertEqualsWithComparisonFailure(holder.getValue(), holderClone.getValue());
   }
 
   @Test
@@ -197,7 +198,6 @@ public class JacksonDataObjectMapperTest {
     holder.getValue().put("stringAttribute", "foo");
 
     DoEntityHolder<TestCustomImplementedEntityDo> holderClone = CloneUtility.createDeepCopyBySerializing(holder);
-    m_testHelper.assertEquals(holder.getValue(), holderClone.getValue());
+    assertEqualsWithComparisonFailure(holder.getValue(), holderClone.getValue());
   }
-
 }

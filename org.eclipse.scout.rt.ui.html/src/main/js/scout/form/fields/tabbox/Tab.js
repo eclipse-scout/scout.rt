@@ -14,6 +14,7 @@ scout.Tab = function() {
   this.label = null;
   this.subLabel = null;
   this.selected = false;
+  this.tabOverflown = false;
   this._preventTabSelection = false;
 
   this.$label = null;
@@ -80,6 +81,7 @@ scout.Tab.prototype._renderProperties = function() {
   this._renderTooltipText();
   this._renderErrorStatus();
 };
+
 
 scout.Tab.prototype._renderVisible = function() {
   scout.Tab.parent.prototype._renderVisible.call(this);

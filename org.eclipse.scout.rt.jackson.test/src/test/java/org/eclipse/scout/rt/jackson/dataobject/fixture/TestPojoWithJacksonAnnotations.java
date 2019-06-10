@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
 
-import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
+import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

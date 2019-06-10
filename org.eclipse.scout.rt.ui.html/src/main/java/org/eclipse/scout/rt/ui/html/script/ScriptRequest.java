@@ -146,6 +146,26 @@ public final class ScriptRequest {
     return toString(true, true);
   }
 
+  /**
+   * @return The request path without the fingerprint. This is the path where the resource should be located on the
+   *         classpath
+   */
+  public String lookupPath() {
+    return toString(false, true);
+  }
+
+  /**
+   * @return A ScriptRequest instance with the requested 'minimized' state. When minimized is set to true, the file name
+   *         contains the '.min' suffix otherwise the file name does not contain the suffix.
+   */
+  public ScriptRequest toMinimized(boolean minimized) {
+    if (minimized == minimized()) {
+      return new ScriptRequest(m_matcher);
+    }
+    String minPath = toFullPath(path(), baseName(), fingerprint(), minimized, fileExtension());
+    return tryParse(minPath).get();
+  }
+
   @Override
   public String toString() {
     return fullPath();
@@ -229,4 +249,5 @@ public final class ScriptRequest {
     }
     return result.toString();
   }
+
 }

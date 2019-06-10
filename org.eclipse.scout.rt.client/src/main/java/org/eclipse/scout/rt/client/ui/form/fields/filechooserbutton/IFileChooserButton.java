@@ -12,10 +12,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
 import java.util.Collection;
 
+import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
-public interface IFileChooserButton extends IValueField<BinaryResource> {
+public interface IFileChooserButton extends IValueField<BinaryResource>, IHtmlCapable {
 
   String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
   String PROP_ICON_ID = "iconId";

@@ -761,6 +761,8 @@ scout.TableFooter.prototype._onTableFilterAdded = function(event) {
     var currentText = this._$textFilter.val();
     if (currentText !== event.filter.text) {
       this._$textFilter.val(event.filter.text);
+      this._updateHasFilterText();
+      this._applyFilter();
     }
   }
 };

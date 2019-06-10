@@ -13,6 +13,16 @@ scout.RowLayout = function(options) {
   options = options || {};
   this.pixelBasedSizing = scout.nvl(options.pixelBasedSizing, true);
   this.stretch = scout.nvl(options.stretch, true);
+
+  // RowLayout = each child element represents a row
+  // +-----------------+
+  // |                 |
+  // +-----------------+
+  // |                 |
+  // |                 |
+  // +-----------------+
+  // |                 |
+  // +-----------------+
 };
 scout.inherits(scout.RowLayout, scout.AbstractLayout);
 
@@ -37,7 +47,7 @@ scout.RowLayout.prototype.layout = function($container) {
 
     if (this.stretch) {
       // All elements in a row layout have the same width which is the width of the container
-      prefSize.width = containerSize.width;
+      prefSize.width = containerSize.width - htmlChild.margins().horizontal();
     }
 
     htmlChild.setSize(prefSize);

@@ -80,7 +80,8 @@
       "statusVisible": false,
       "preventDoubleClick": false,
       "stackable": true,
-      "shrinkable": false
+      "shrinkable": false,
+      "htmlEnabled": false
     },
     "RadioButtonGroup": {
       "clearable": "never",
@@ -94,7 +95,8 @@
       }
     },
     "CheckBoxField": {
-      "triStateEnabled": false
+      "triStateEnabled": false,
+      "wrapText": false
     },
     "Graph": {
       "graphDepth": 1,
@@ -156,6 +158,9 @@
       "selectable": true,
       "wrapText": false
     },
+    "RadioButton": {
+      "wrapText": false
+    },
     "SequenceBox": {
       "fields": [],
       "layoutConfig": {
@@ -212,6 +217,9 @@
       "hasDate": true,
       "hasTime": false,
       "timePickerResolution": 30
+    },
+    "FileChooserButton": {
+      "htmlEnabled": false
     },
     "Table": {
       "autoResizeColumns": false,
@@ -319,7 +327,8 @@
       "autoFit": false,
       "dropType": 0,
       "dropMaximumSize": 52428800,
-      "scrollBarEnabled": false
+      "scrollBarEnabled": false,
+      "uploadEnabled": false
     },
     "HtmlField": {
       "scrollBarEnabled": false,
@@ -528,6 +537,7 @@
           "CalendarField": null,
           "ClipboardField": null,
           "DateField": null,
+          "FileChooserButton": null,
           "FileChooserField": null,
           "HtmlField": null,
           "LabelField": null,

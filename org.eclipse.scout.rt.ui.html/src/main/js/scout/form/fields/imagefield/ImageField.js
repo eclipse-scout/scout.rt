@@ -10,8 +10,14 @@
  ******************************************************************************/
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
+
   this.autoFit = false;
   this.scrollBarEnabled = false;
+  this.uploadEnabled = false;
+  this.acceptTypes = null;
+  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+
+  this._clickHandler = null;
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
@@ -48,6 +54,7 @@ scout.ImageField.prototype._renderProperties = function() {
   this._renderScrollBarEnabled();
   this._renderDropType();
   this._renderImageUrl();
+  this._renderUploadEnabled();
 };
 
 scout.ImageField.prototype._installDragAndDropHandler = function(event) {
@@ -125,10 +132,63 @@ scout.ImageField.prototype._updateInnerAlignment = function() {
   });
 };
 
+scout.ImageField.prototype.setUploadEnabled = function(uploadEnabled) {
+  this.setProperty('uploadEnabled', uploadEnabled);
+};
+
+scout.ImageField.prototype._renderUploadEnabled = function() {
+  var enabled = this.uploadEnabled;
+  this.$fieldContainer.toggleClass('clickable', enabled);
+  if (enabled) {
+    this._clickHandler = this._onClickUpload.bind(this);
+    this.$fieldContainer.on('click', this._clickHandler);
+    this.fileInput = scout.create('FileInput', {
+      parent: this,
+      acceptTypes: this.acceptTypes,
+      text: this.displayText,
+      enabled: this.enabledComputed,
+      maximumUploadSize: this.maximumUploadSize,
+      visible: !scout.device.supportsFile()
+    });
+    this.fileInput.render(this.$fieldContainer);
+    this.fileInput.on('change', this._onFileChange.bind(this));
+  } else {
+    this.$fieldContainer.off('click', this._clickHandler);
+    this._clickHandler = null;
+    if (this.fileInput) {
+      this.fileInput.destroy();
+      this.fileInput = null;
+    }
+  }
+};
+
+/**
+ * The browse() function triggers an artificial click event on the INPUT element,
+ * this would trigger our own click handler again. We prevent recursion by
+ * checking the click target.
+ */
+scout.ImageField.prototype._onClickUpload = function(event) {
+  if ($(event.target).isOrHas(this.$field)) {
+    this.fileInput.browse();
+  }
+};
+
+scout.ImageField.prototype._onFileChange = function(event) {
+  this.trigger('fileUpload', {
+    file: scout.arrays.first(event.files)
+  });
+};
+
 scout.ImageField.prototype._onImageLoad = function(event) {
-  scout.scrollbars.update(this.$fieldContainer);
+  this._onIconUpdated();
 };
 
 scout.ImageField.prototype._onImageError = function(event) {
+  this._onIconUpdated();
+};
+
+// FIXME [awe] CGU: must update instance variable when Icon.js renders a new image.
+scout.ImageField.prototype._onIconUpdated = function() {
   scout.scrollbars.update(this.$fieldContainer);
+  this.$field = this.icon.$container;
 };

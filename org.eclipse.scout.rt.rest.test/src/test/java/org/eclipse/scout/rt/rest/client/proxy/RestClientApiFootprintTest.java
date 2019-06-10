@@ -15,9 +15,9 @@ import java.io.InputStream;
 
 import javax.ws.rs.client.Client;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.rest.client.proxy.api.ApiSignature;
 import org.eclipse.scout.rt.rest.client.proxy.api.ApiSignatureDo;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;

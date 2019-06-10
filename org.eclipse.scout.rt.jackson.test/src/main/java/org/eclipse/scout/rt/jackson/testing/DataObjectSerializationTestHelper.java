@@ -10,25 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.testing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
-import org.eclipse.scout.rt.testing.platform.dataobject.DataObjectTestHelper;
+import org.junit.Assert;
 
 /**
  * Helper dealing with JSON serialization/deserialization tests for data objects
  */
 @ApplicationScoped
-public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
+public class DataObjectSerializationTestHelper {
 
   protected static final LazyValue<IPrettyPrintDataObjectMapper> s_dataObjectMapper = new LazyValue<>(IPrettyPrintDataObjectMapper.class);
 
@@ -41,7 +40,7 @@ public class DataObjectSerializationTestHelper extends DataObjectTestHelper {
   public void assertJsonEquals(String expected, String actual) {
     expected = toUnixLineEndingsAndTrim(expected);
     actual = toUnixLineEndingsAndTrim(actual);
-    assertEquals(expected, actual);
+    Assert.assertEquals(expected, actual);
   }
 
   /**

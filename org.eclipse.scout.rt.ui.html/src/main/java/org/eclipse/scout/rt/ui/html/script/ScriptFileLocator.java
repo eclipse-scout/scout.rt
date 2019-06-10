@@ -43,8 +43,8 @@ public class ScriptFileLocator {
 
     // only (external) libraries are available minified and non-minified
     // all other files are always non-minified on the classpath
-    FileLookup library = new FileLookup(true, parent + fileName + "." + fileExtension, NodeType.LIBRARY);
-    FileLookup libraryMinified = new FileLookup(true, parent + fileName + ".min." + fileExtension, NodeType.LIBRARY_MINIFIED);
+    FileLookup library = new FileLookup(true, req.toMinimized(false).lookupPath(), NodeType.LIBRARY);
+    FileLookup libraryMinified = new FileLookup(true, req.toMinimized(true).lookupPath(), NodeType.LIBRARY_MINIFIED);
 
     List<FileLookup> lookups = new ArrayList<>(5);
     lookups.add(macro);

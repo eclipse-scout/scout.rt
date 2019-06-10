@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.FilteredJsonAdapterIds;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
@@ -46,6 +47,12 @@ public class JsonTabBox<TAB_BOX extends ITabBox> extends JsonCompositeField<TAB_
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
         return new JsonAdapterPropertyConfigBuilder().disposeOnChange(false).build();
+      }
+    });
+    putJsonProperty(new JsonProperty<TAB_BOX>(ITabBox.PROP_TAB_AREA_STYLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTabAreaStyle();
       }
     });
   }

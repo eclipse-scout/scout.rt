@@ -98,7 +98,7 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    */
   String getKeyStroke();
 
-  void setKeyStroke(String text);
+  void setKeyStroke(String keyStroke);
 
   int getKeyStrokeFirePolicy();
 
@@ -110,19 +110,19 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
 
   boolean isSeparator();
 
-  void setSeparator(boolean b);
+  void setSeparator(boolean separator);
 
   boolean isSelected();
 
-  void setSelected(boolean b);
+  void setSelected(boolean selected);
 
   boolean isEnabled();
 
-  void setEnabled(boolean b);
+  void setEnabled(boolean enabled);
 
   boolean isVisible();
 
-  void setVisible(boolean b);
+  void setVisible(boolean visible);
 
   /**
    * @return true if {@link #prepareAction()} should in addition consider the context of the action to decide for
@@ -135,17 +135,17 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   /**
    * @see #isInheritAccessibility()
    */
-  void setInheritAccessibility(boolean b);
+  void setInheritAccessibility(boolean inheritAccessibility);
 
   boolean isEnabledInheritAccessibility();
 
-  void setEnabledInheritAccessibility(boolean enabled);
+  void setEnabledInheritAccessibility(boolean enabledInheritAccessibility);
 
   /**
    * Access control<br>
    * when false, enabled property cannot be set to true
    */
-  void setEnabledPermission(Permission p);
+  void setEnabledPermission(Permission permission);
 
   /**
    * Access control<br>
@@ -157,13 +157,13 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    * Access control<br>
    * when false, enabled property cannot be set to true
    */
-  void setEnabledGranted(boolean b);
+  void setEnabledGranted(boolean enabledGranted);
 
   /**
    * Access control<br>
    * when false, visible property cannot be set to true
    */
-  void setVisiblePermission(Permission p);
+  void setVisiblePermission(Permission visiblePermission);
 
   /**
    * Access control<br>
@@ -175,11 +175,11 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
    * Access control<br>
    * when false, visible property cannot be set to true
    */
-  void setVisibleGranted(boolean b);
+  void setVisibleGranted(boolean visibleGranted);
 
   boolean isToggleAction();
 
-  void setToggleAction(boolean b);
+  void setToggleAction(boolean toggleAction);
 
   /**
    * UI processes

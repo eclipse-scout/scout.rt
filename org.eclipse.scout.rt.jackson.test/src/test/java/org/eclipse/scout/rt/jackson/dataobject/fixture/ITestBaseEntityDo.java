@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 
 public interface ITestBaseEntityDo extends IDoEntity {
 

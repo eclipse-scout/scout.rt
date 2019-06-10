@@ -63,7 +63,9 @@ public class ScriptFileLoader extends AbstractResourceLoader {
 
     if (FileType.JS == FileType.resolveFromFilename(lookupPath)) {
       // JavaScript files are always the same, no matter what the theme or the locale is
-      return super.createCacheKey(lookupPath);
+      Map<String, String> attributes = new HashMap<>(2);
+      attributes.put(MINIFYED_KEY, Boolean.toString(m_minify));
+      return new HttpCacheKey(lookupPath, Collections.unmodifiableMap(attributes));
     }
 
     // CSS files are different for depending on the current theme (but don't depend on the locale)
@@ -74,7 +76,7 @@ public class ScriptFileLoader extends AbstractResourceLoader {
   }
 
   protected String requestWithoutFingerprint(ScriptRequest req) {
-    return req.toString(false, true);
+    return req.lookupPath();
   }
 
   @Override

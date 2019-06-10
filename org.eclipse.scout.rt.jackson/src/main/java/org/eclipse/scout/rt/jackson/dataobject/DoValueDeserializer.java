@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.DoValue;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JavaType;

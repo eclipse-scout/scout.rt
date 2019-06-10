@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.util.Map;
 
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 
 /**

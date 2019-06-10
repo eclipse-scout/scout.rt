@@ -12,9 +12,16 @@ scout.ErrorHandler = function() {
   this.logError = true;
   this.displayError = true;
   this.sendError = false;
-
   this.windowErrorHandler = this._onWindowError.bind(this);
 };
+
+/**
+ * Use this constant to configure whether or not all instances of the ErrorHandler should write
+ * to the console. When you've installed a console appender to log4javascript you can set the
+ * value to false, because the ErrorHandler also calls $.log.error and thus the appender has
+ * already written the message to the console. We don't want to see it twice.
+ */
+scout.ErrorHandler.CONSOLE_OUTPUT = true;
 
 scout.ErrorHandler.prototype.init = function(options) {
   $.extend(this, options);
@@ -104,12 +111,20 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
       errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
     }
 
-  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0]))) {
+  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof scout.AjaxError) {
     // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
-    var args = (Array.isArray(error) ? error : arguments);
-    var jqXHR = args[0];
-    var errorThrown = args[2];
-    var requestOptions = args[3]; // scout extension
+    var jqXHR, errorThrown, requestOptions;
+    if (error instanceof scout.AjaxError) {
+      jqXHR = error.jqXHR;
+      errorThrown = error.errorThrown;
+      requestOptions = error.requestOptions; // scout extension
+    } else {
+      var args = (Array.isArray(error) ? error : arguments);
+      jqXHR = args[0];
+      errorThrown = args[2];
+      requestOptions = args[3]; // scout extension
+    }
+
     var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
     var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
 
@@ -155,10 +170,19 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
 scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
   if (this.logError && errorInfo.log) {
     $.log.error(errorInfo.log);
-    if (window && window.console && window.console.error) {
-      window.console.error(errorInfo.log);
-    } else if (window && window.console && window.console.log) {
-      window.console.log(errorInfo.log);
+
+    // Note: when the null-logger is active it has already written the error to the console
+    // when the $.log.error function has been called above, so we don't have to log again here.
+    var writeToConsole = scout.ErrorHandler.CONSOLE_OUTPUT;
+    if ($.log instanceof scout.NullLogger) {
+      writeToConsole = false;
+    }
+    if (writeToConsole && window && window.console) {
+      if (window.console.error) {
+        window.console.error(errorInfo.log);
+      } else if (window.console.log) {
+        window.console.log(errorInfo.log);
+      }
     }
   }
 

@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.io.IOException;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.core.JsonParser;

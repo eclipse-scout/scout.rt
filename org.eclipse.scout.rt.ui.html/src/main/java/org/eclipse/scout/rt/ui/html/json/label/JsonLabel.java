@@ -43,10 +43,8 @@ public class JsonLabel<T extends ILabel> extends AbstractJsonWidget<T> implement
       }
 
       @Override
-      public Object prepareValueForToJson(Object value0) {
-        String value = (String) value0;
-        value = BinaryResourceUrlUtility.replaceIconIdHandlerWithUrl(value);
-        return BinaryResourceUrlUtility.replaceBinaryResourceHandlerWithUrl(JsonLabel.this, value);
+      public Object prepareValueForToJson(Object value) {
+        return BinaryResourceUrlUtility.replaceImageUrls(JsonLabel.this, (String) value);
       }
     });
     putJsonProperty(new JsonProperty<ILabel>(ILabel.PROP_HTML_ENABLED, model) {
@@ -80,11 +78,8 @@ public class JsonLabel<T extends ILabel> extends AbstractJsonWidget<T> implement
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource att = getModel().getAttachment(filename);
-    if (att != null) {
-      return new BinaryResourceHolder(att);
-    }
-    return null;
+    BinaryResource attachment = getModel().getAttachment(filename);
+    return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
 
 }

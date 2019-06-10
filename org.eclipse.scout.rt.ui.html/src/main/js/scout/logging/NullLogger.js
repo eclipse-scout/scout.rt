@@ -8,17 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.NullLogger = function() {
 
+/**
+ * A NullLogger instance is installed when Log4Javascript is not active (the popup
+ * is not opened). In that case we write WARN, ERROR and FATAL to the console output
+ * because otherwise some errors are hard to track. This is true especially for errors
+ * that occur in a Promise. A developer should at least log these errors.
+ */
+scout.NullLogger = function() {
 };
 
 scout.NullLogger.prototype = {
   trace: function() {},
   debug: function() {},
   info: function() {},
-  warn: function() {},
-  error: function() {},
-  fatal: function() {},
+  warn: function() {
+    this._log('WARN', scout.objects.argumentsToArray(arguments));
+  },
+  error: function(logArgs) {
+    this._log('ERROR', scout.objects.argumentsToArray(arguments));
+  },
+  fatal: function(logArgs) {
+    this._log('FATAL', scout.objects.argumentsToArray(arguments));
+  },
   isEnabledFor: function() {
     return false;
   },
@@ -39,5 +51,20 @@ scout.NullLogger.prototype = {
   },
   isFatalEnabled: function() {
     return false;
+  },
+  _log: function(level, logArgs) {
+    if (logArgs.length > 0) {
+      logArgs[0] = this._formatTime() + ' [' + level + '] ' + logArgs[0];
+    }
+    if (window.console) {
+      window.console.error.apply(window.console, logArgs);
+    }
+  },
+  _formatTime: function() {
+    var date = new Date();
+    return scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
+      scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
+      scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
+      scout.strings.padZeroLeft(date.getMilliseconds(), 3);
   }
 };

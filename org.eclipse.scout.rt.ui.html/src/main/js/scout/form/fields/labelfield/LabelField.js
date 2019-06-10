@@ -34,7 +34,7 @@ scout.LabelField.prototype._render = function() {
 
 scout.LabelField.prototype._renderProperties = function() {
   scout.LabelField.parent.prototype._renderProperties.call(this);
-  this._renderWrapText(this.wrapText);
+  this._renderWrapText();
   // TODO [7.0] cgu: render selectable
 };
 

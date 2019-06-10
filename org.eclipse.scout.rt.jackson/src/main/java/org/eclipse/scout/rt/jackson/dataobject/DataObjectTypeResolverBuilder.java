@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTypeResolverBuilder;

@@ -13,8 +13,8 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;

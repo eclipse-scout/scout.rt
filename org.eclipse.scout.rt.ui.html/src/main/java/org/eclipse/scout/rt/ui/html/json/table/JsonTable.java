@@ -1013,11 +1013,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   @Override
   public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource att = getModel().getAttachment(filename);
-    if (att != null) {
-      return new BinaryResourceHolder(att);
-    }
-    return getBinaryResourceMediator().getBinaryResourceHolder(filename);
+    BinaryResource attachment = getModel().getAttachment(filename);
+    return attachment == null ? getBinaryResourceMediator().getBinaryResourceHolder(filename) : new BinaryResourceHolder(attachment);
   }
 
   /**
@@ -1202,14 +1199,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void bufferColumnStructureChanged(TableEvent event) {
     m_eventBuffer.add(event);
 
+    // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
+    // Before doing this, we need to delete all rows
+    m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
+
     // Resend filters because a column with a filter may got invisible (since the gui does not know invisible columns, the filter would fail).
     // Also necessary because column ids have changed.
     if (getModel().getUserFilterManager() != null && !getModel().getUserFilterManager().getFilters().isEmpty()) {
       m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_USER_FILTER_ADDED));
     }
 
-    // If a column got visible it is necessary to resend all rows to inform the gui about the new cells of the new column
-    m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ALL_ROWS_DELETED));
+    // Now resend the rows
     m_eventBuffer.add(new TableEvent(getModel(), TableEvent.TYPE_ROWS_INSERTED, getModel().getRows()));
 
     // Ensure selection is preserved.

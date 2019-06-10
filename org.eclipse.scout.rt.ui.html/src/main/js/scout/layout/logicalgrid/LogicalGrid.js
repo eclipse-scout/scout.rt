@@ -15,6 +15,7 @@ scout.LogicalGrid = function(options) {
   options = options || {};
   this.dirty = true;
   this.gridConfig = options.gridConfig || null;
+  this._setGridConfig(this.gridConfig);
 };
 
 scout.LogicalGrid.prototype.setDirty = function(dirty) {
@@ -22,6 +23,13 @@ scout.LogicalGrid.prototype.setDirty = function(dirty) {
 };
 
 scout.LogicalGrid.prototype.setGridConfig = function(gridConfig) {
+  this._setGridConfig(gridConfig);
+};
+
+scout.LogicalGrid.prototype._setGridConfig = function(gridConfig) {
+  if (gridConfig && !(gridConfig instanceof scout.LogicalGridConfig)) {
+    gridConfig = scout.create('LogicalGridConfig', gridConfig);
+  }
   this.gridConfig = gridConfig;
 };
 

@@ -17,10 +17,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
-import org.eclipse.scout.rt.platform.dataobject.DoNode;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoNode;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.core.JsonGenerator;

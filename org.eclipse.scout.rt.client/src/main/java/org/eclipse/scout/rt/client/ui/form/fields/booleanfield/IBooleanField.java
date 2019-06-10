@@ -14,13 +14,15 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface IBooleanField extends IValueField<Boolean> {
 
+  String PROP_WRAP_TEXT = "wrapText";
   String PROP_TRI_STATE_ENABLED = "triStateEnabled";
   String PROP_KEY_STROKE = "keyStroke";
 
-  /**
-   * Configuration
-   */
-  void setChecked(boolean b);
+  void setWrapText(boolean wrapText);
+
+  boolean isWrapText();
+
+  void setChecked(boolean checked);
 
   boolean isChecked();
 

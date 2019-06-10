@@ -13,6 +13,11 @@ scout.ColumnLayout = function(options) {
   options = options || {};
   this.stretch = scout.nvl(options.stretch, true);
   this.useCssWidth = scout.nvl(options.useCssWidth, false);
+
+  // ColumnLayout = each child element represents a column
+  // +------+---+------+
+  // |      |   |      |
+  // +------+---+------+
 };
 scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
 
@@ -34,7 +39,7 @@ scout.ColumnLayout.prototype.layout = function($container) {
 
     if (this.stretch) {
       // All elements in a column layout have the same height which is the height of the container
-      childPrefSize.height = containerSize.height;
+      childPrefSize.height = containerSize.height - htmlChild.margins().vertical();
     }
 
     // Use layout data width if set

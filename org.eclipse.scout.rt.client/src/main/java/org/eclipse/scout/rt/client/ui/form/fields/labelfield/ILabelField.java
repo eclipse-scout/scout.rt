@@ -14,10 +14,11 @@ import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 public interface ILabelField extends IValueField<String>, IHtmlCapable {
+
   String PROP_WRAP_TEXT = "wrapText";
   String PROP_SELECTABLE = "selectable";
 
-  void setWrapText(boolean b);
+  void setWrapText(boolean wrapText);
 
   boolean isWrapText();
 
@@ -26,7 +27,7 @@ public interface ILabelField extends IValueField<String>, IHtmlCapable {
    *
    * @since 3.10.0-M6
    */
-  void setSelectable(boolean b);
+  void setSelectable(boolean selectable);
 
   /**
    * returns <code>true</code> if the label is selectable, <code>false</code> otherwise

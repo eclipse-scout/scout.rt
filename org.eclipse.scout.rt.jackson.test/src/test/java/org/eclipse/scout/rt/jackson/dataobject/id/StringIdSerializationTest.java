@@ -17,14 +17,14 @@ import static org.junit.Assert.assertTrue;
 import java.net.URL;
 import java.util.Collections;
 
-import org.eclipse.scout.rt.jackson.dataobject.fixture.FixtureStringId;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureStringId;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithStringIdDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithStringIdMapKeyDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.junit.Before;
 import org.junit.Test;

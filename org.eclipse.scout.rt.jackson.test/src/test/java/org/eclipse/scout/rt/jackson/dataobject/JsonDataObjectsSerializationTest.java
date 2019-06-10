@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -36,6 +37,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.scout.rt.dataobject.DataObjectHelper;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
+import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBigIntegerDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestBinaryDo;
@@ -87,13 +95,6 @@ import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectHelper;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
-import org.eclipse.scout.rt.platform.dataobject.IDataObject;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
@@ -417,7 +418,7 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     TestRenamedAttributeDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestRenamedAttributeDo.class);
-    s_testHelper.assertEquals(testDo, testDoMarshalled);
+    assertEqualsWithComparisonFailure(testDo, testDoMarshalled);
   }
 
   @Test
@@ -426,7 +427,7 @@ public class JsonDataObjectsSerializationTest {
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     TestItemExDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestItemExDo.class);
-    s_testHelper.assertEquals(testDo, testDoMarshalled);
+    assertEqualsWithComparisonFailure(testDo, testDoMarshalled);
   }
 
   @Test
@@ -463,7 +464,7 @@ public class JsonDataObjectsSerializationTest {
     });
     String base64encoded = Base64Utility.encode(content);
     assertEquals(base64encoded, rawObject.get("content"));
-    s_testHelper.assertEquals(binary, marshalled);
+    assertEqualsWithComparisonFailure(binary, marshalled);
   }
 
   @Test
@@ -1005,7 +1006,7 @@ public class JsonDataObjectsSerializationTest {
     String jsonInput = readResourceAsString("TestComplexEntityDo.json");
     TestComplexEntityDo testDo = s_dataObjectMapper.readValue(jsonInput, TestComplexEntityDo.class);
     TestComplexEntityDo testDoExpected = createTestDo();
-    s_testHelper.assertEquals(testDoExpected, testDo);
+    assertEqualsWithComparisonFailure(testDoExpected, testDo);
   }
 
   @Test
@@ -1049,7 +1050,7 @@ public class JsonDataObjectsSerializationTest {
     String json = readResourceAsString("TestCollectionsDo.json");
     TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
     TestCollectionsDo expectedDo = createTestCollectionsDo();
-    s_testHelper.assertEquals(expectedDo, doMarhalled);
+    assertEqualsWithComparisonFailure(expectedDo, doMarhalled);
   }
 
   @Test
@@ -1196,7 +1197,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestMapDo.json", json);
 
     TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
-    s_testHelper.assertEquals(mapDo, marshalled);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
   }
 
   @Test
@@ -1289,7 +1290,7 @@ public class JsonDataObjectsSerializationTest {
     List<TestItemDo> actual = new ArrayList<>(marshalled.getItemDoSetAttribute());
     Collections.sort(actual, Comparator.comparing(TestItemDo::getId));
     for (int i = 0; i < expected.size(); i++) {
-      s_testHelper.assertEquals(expected.get(i), actual.get(i));
+      assertEqualsWithComparisonFailure(expected.get(i), actual.get(i));
     }
 
     // set of TestItemPojo must be unordered equals
@@ -1353,7 +1354,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestDoMapEntityDo.json", json);
 
     TestDoMapEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapEntityDo.class);
-    s_testHelper.assertEquals(mapDo, marshalled);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
 
     assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
     assertEquals("value-named", marshalled.get("namedItem").getStringAttribute());
@@ -1371,8 +1372,8 @@ public class JsonDataObjectsSerializationTest {
     TypeReference<Map<String, TestItemDo>> typeRef = new TypeReference<Map<String, TestItemDo>>() {
     };
     Map<String, TestItemDo> marshalled = s_dataObjectMapper.readValue(json, typeRef);
-    s_testHelper.assertEquals(mapDo.get("mapAttribute1", IDoEntity.class), marshalled.get("mapAttribute1"));
-    s_testHelper.assertEquals(mapDo.get("mapAttribute2", IDoEntity.class), marshalled.get("mapAttribute2"));
+    assertEqualsWithComparisonFailure(mapDo.get("mapAttribute1", IDoEntity.class), marshalled.get("mapAttribute1"));
+    assertEqualsWithComparisonFailure(mapDo.get("mapAttribute2", IDoEntity.class), marshalled.get("mapAttribute2"));
   }
 
   @Test
@@ -1405,7 +1406,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestDoMapListEntityDo.json", json);
 
     TestDoMapListEntityDo marshalled = s_dataObjectMapper.readValue(json, TestDoMapListEntityDo.class);
-    s_testHelper.assertEquals(mapDo, marshalled);
+    assertEqualsWithComparisonFailure(mapDo, marshalled);
 
     assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
     assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
@@ -1426,8 +1427,8 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-1a", marshalled.get("mapAttribute1").get(0).getStringAttribute());
     assertEquals("value-2b", marshalled.get("mapAttribute2").get(1).getStringAttribute());
 
-    s_testHelper.assertEquals((IDoEntity) mapDo.get("mapAttribute1", List.class).get(0), marshalled.get("mapAttribute1").get(0));
-    s_testHelper.assertEquals((IDoEntity) mapDo.get("mapAttribute2", List.class).get(1), marshalled.get("mapAttribute2").get(1));
+    assertEqualsWithComparisonFailure((IDoEntity) mapDo.get("mapAttribute1", List.class).get(0), marshalled.get("mapAttribute1").get(0));
+    assertEqualsWithComparisonFailure((IDoEntity) mapDo.get("mapAttribute2", List.class).get(1), marshalled.get("mapAttribute2").get(1));
   }
 
   @Test
@@ -1485,7 +1486,7 @@ public class JsonDataObjectsSerializationTest {
 
   protected void assertTestPersonDo(TestPersonDo actual) {
     TestPersonDo expected = createTestPersonDo();
-    s_testHelper.assertEquals(expected, actual);
+    assertEqualsWithComparisonFailure(expected, actual);
 
     assertEquals(expected.birthday().get(), actual.getBirthday());
     assertEquals(expected.birthday().get().getTime(), actual.getBirthday().getTime());
@@ -1578,7 +1579,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestCoreExample1Do coreDoMarshalled = s_dataObjectMapper.readValue(expectedJson, TestCoreExample1Do.class);
-    s_testHelper.assertEquals(coreDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(coreDo, coreDoMarshalled);
   }
 
   @Test
@@ -1591,7 +1592,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestProjectExample1Do coreDoMarshalled = s_dataObjectMapper.readValue(json, TestProjectExample1Do.class);
-    s_testHelper.assertEquals(projectDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(projectDo, coreDoMarshalled);
   }
 
   /**
@@ -1616,7 +1617,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestCoreExample2Do coreDoMarshalled = s_dataObjectMapper.readValue(expectedJson, TestCoreExample2Do.class);
-    s_testHelper.assertEquals(coreDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(coreDo, coreDoMarshalled);
   }
 
   @Test
@@ -1629,7 +1630,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestProjectExample2Do coreDoMarshalled = s_dataObjectMapper.readValue(json, TestProjectExample2Do.class);
-    s_testHelper.assertEquals(projectDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(projectDo, coreDoMarshalled);
   }
 
   /**
@@ -1654,7 +1655,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestCoreExample3Do coreDoMarshalled = s_dataObjectMapper.readValue(expectedJson, TestCoreExample3Do.class);
-    s_testHelper.assertEquals(coreDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(coreDo, coreDoMarshalled);
   }
 
   @Test
@@ -1667,7 +1668,7 @@ public class JsonDataObjectsSerializationTest {
     s_testHelper.assertJsonEquals(expectedJson, json);
 
     TestProjectExample3Do coreDoMarshalled = s_dataObjectMapper.readValue(json, TestProjectExample3Do.class);
-    s_testHelper.assertEquals(projectDo, coreDoMarshalled);
+    assertEqualsWithComparisonFailure(projectDo, coreDoMarshalled);
   }
 
   // ------------------------------------ exception handling tests ------------------------------------
@@ -1709,7 +1710,7 @@ public class JsonDataObjectsSerializationTest {
     }
     String json = s_dataObjectMapper.writeValueAsString(entity);
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
-    s_testHelper.assertEquals(entity, marshalled);
+    assertEqualsWithComparisonFailure(entity, marshalled);
   }
 
   // ------------------------------------ generic attribute definition tests -----------------------------
@@ -1739,7 +1740,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(1234567890.1234567890, marshalled.getGenericListAttribute().get(1).genericAttribute().get());
     assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
     assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
-    s_testHelper.assertEquals(genericDo, marshalled);
+    assertEqualsWithComparisonFailure(genericDo, marshalled);
   }
 
   @Test
@@ -1753,19 +1754,19 @@ public class JsonDataObjectsSerializationTest {
     // read value with complete generic type definition
     TestGenericDo<TestItemDo> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<TestItemDo>>() {
     });
-    s_testHelper.assertEquals(itemValueDo, marshalled);
+    assertEqualsWithComparisonFailure(itemValueDo, marshalled);
     assertEquals("foo-id", marshalled.getGenericAttribute().getId());
 
     // read value with incomplete generic type definition
     TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
     });
-    s_testHelper.assertEquals(itemValueDo, marshalled2);
+    assertEqualsWithComparisonFailure(itemValueDo, marshalled2);
     assertEquals("foo-id", marshalled2.getGenericAttribute().getId());
 
     // read value with no generic type definition
     @SuppressWarnings("unchecked")
     TestGenericDo<TestItemDo> marshalled3 = (TestGenericDo<TestItemDo>) s_dataObjectMapper.readValue(json, DoEntity.class);
-    s_testHelper.assertEquals(itemValueDo, marshalled3);
+    assertEqualsWithComparisonFailure(itemValueDo, marshalled3);
     assertEquals("foo-id", marshalled3.getGenericAttribute().getId());
   }
 
@@ -1785,7 +1786,7 @@ public class JsonDataObjectsSerializationTest {
 
     TestEntityWithGenericValuesDo marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestEntityWithGenericValuesDo>() {
     });
-    s_testHelper.assertEquals(genericDo, marshalled);
+    assertEqualsWithComparisonFailure(genericDo, marshalled);
     assertEquals("foo-id", marshalled.getGenericAttribute().get("genericAttribute", TestItemDo.class).getId());
     assertEquals("foo-id-2", marshalled.getGenericListAttribute().get(0).get("genericAttribute", TestItemDo.class).getId());
   }
@@ -1804,10 +1805,10 @@ public class JsonDataObjectsSerializationTest {
     TestGenericDo<List<TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<List<TestItemDo>>>() {
     });
     // Marshaled class is not equals to serialized class, since List<TestItemDo> is deserialized to DoList<TestItemDo>. Compare only the List<TestItemDo> content.
-    s_testHelper.assertEquals(items, marshalled.get("genericAttribute"));
+    assertEqualsWithComparisonFailure(items, marshalled.get("genericAttribute"));
 
     DoEntity entity = s_dataObjectMapper.readValue(json, DoEntity.class);
-    s_testHelper.assertEquals(items, entity.get("genericAttribute"));
+    assertEqualsWithComparisonFailure(items, entity.get("genericAttribute"));
   }
 
   @Test
@@ -1824,19 +1825,19 @@ public class JsonDataObjectsSerializationTest {
     // read value with complete generic type definition
     TestGenericDo<TestItemDo> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<TestItemDo>>() {
     });
-    s_testHelper.assertEquals(itemsDo, marshalled);
+    assertEqualsWithComparisonFailure(itemsDo, marshalled);
     assertEquals("foo-id-1", marshalled.getGenericListAttribute().get(0).getId());
 
     // read value with incomplete generic type definition
     TestGenericDo<TestItemDo> marshalled2 = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo>() {
     });
-    s_testHelper.assertEquals(itemsDo, marshalled2);
+    assertEqualsWithComparisonFailure(itemsDo, marshalled2);
     assertEquals("foo-id-1", marshalled2.getGenericListAttribute().get(0).getId());
 
     // read value with no generic type definition
     @SuppressWarnings("unchecked")
     TestGenericDo<TestItemDo> marshalled3 = (TestGenericDo<TestItemDo>) s_dataObjectMapper.readValue(json, DoEntity.class);
-    s_testHelper.assertEquals(itemsDo, marshalled3);
+    assertEqualsWithComparisonFailure(itemsDo, marshalled3);
     assertEquals("foo-id-1", marshalled3.getGenericListAttribute().get(0).getId());
   }
 
@@ -1855,7 +1856,7 @@ public class JsonDataObjectsSerializationTest {
     TestGenericDo<Map<String, TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDo<Map<String, TestItemDo>>>() {
     });
     // Marshaled class is not equals to serialized class, since Map<String, TestItemDo> is deserialized to a DoEntity. Compare the expected map with all attribute values.
-    s_testHelper.assertEquals(map, marshalled.get("genericAttribute", DoEntity.class).all());
+    assertEqualsWithComparisonFailure(map, marshalled.get("genericAttribute", DoEntity.class).all());
   }
 
   @Test
@@ -1872,7 +1873,7 @@ public class JsonDataObjectsSerializationTest {
 
     TestGenericDoEntityMapDo<Map<String, TestItemDo>> marshalled = s_dataObjectMapper.readValue(json, new TypeReference<TestGenericDoEntityMapDo<Map<String, TestItemDo>>>() {
     });
-    s_testHelper.assertEquals(itemsMapDo, marshalled);
+    assertEqualsWithComparisonFailure(itemsMapDo, marshalled);
     assertEquals("foo-id-1", marshalled.genericMapAttribute().get().get("foo-1").getId());
   }
 
@@ -1892,7 +1893,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithInterface1Do.json", json);
 
     ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
-    s_testHelper.assertEquals(baseEntity, marshalled);
+    assertEqualsWithComparisonFailure(baseEntity, marshalled);
   }
 
   @Test
@@ -1910,10 +1911,10 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithInterface2Do.json", json);
 
     ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
-    s_testHelper.assertEquals(baseEntity, marshalled);
+    assertEqualsWithComparisonFailure(baseEntity, marshalled);
 
     IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
-    s_testHelper.assertEquals(baseEntity, marshalledDoEntity);
+    assertEqualsWithComparisonFailure(baseEntity, marshalledDoEntity);
   }
 
   @Test
@@ -1928,7 +1929,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestCustomImplementedEntityDo.json", json);
 
     IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
-    s_testHelper.assertEquals(entity, marshalledDoEntity);
+    assertEqualsWithComparisonFailure(entity, marshalledDoEntity);
   }
 
   @Test
@@ -1939,7 +1940,7 @@ public class JsonDataObjectsSerializationTest {
 
     IDoEntity marshalledDoEntity = s_dataObjectMapper.readValue(json, IDoEntity.class);
     assertEquals(DoEntity.class, marshalledDoEntity.getClass());
-    s_testHelper.assertEquals(entity, marshalledDoEntity);
+    assertEqualsWithComparisonFailure(entity, marshalledDoEntity);
   }
 
   // ------------------------------------ IDataObject interface tests -----------------------------------
@@ -1967,7 +1968,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
-    s_testHelper.assertEquals(entity, (IDoEntity) marshalled);
+    assertEqualsWithComparisonFailure(entity, (IDoEntity) marshalled);
   }
 
   @Test
@@ -1981,7 +1982,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestStringListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
-    s_testHelper.assertEquals(list, marshalled);
+    assertEqualsWithComparisonFailure(list, marshalled);
   }
 
   @Test
@@ -1995,7 +1996,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestItemDoListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
-    s_testHelper.assertEquals(list, marshalled);
+    assertEqualsWithComparisonFailure(list, marshalled);
   }
 
   @Test
@@ -2013,12 +2014,12 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestObjectListIDataObject.json", json);
 
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
-    s_testHelper.assertEquals(list, marshalled);
+    assertEqualsWithComparisonFailure(list, marshalled);
     DoList marshalledList = DoList.class.cast(marshalled);
     assertEquals("foo", marshalledList.get(0));
-    s_testHelper.assertEquals(item1, TestItemDo.class.cast(marshalledList.get(1)));
+    assertEqualsWithComparisonFailure(item1, TestItemDo.class.cast(marshalledList.get(1)));
     assertEquals("bar", marshalledList.get(2));
-    s_testHelper.assertEquals(item2, TestItemDo.class.cast(marshalledList.get(3)));
+    assertEqualsWithComparisonFailure(item2, TestItemDo.class.cast(marshalledList.get(3)));
   }
 
   // ------------------------------------ tests with custom JSON type property name ------------------------------------

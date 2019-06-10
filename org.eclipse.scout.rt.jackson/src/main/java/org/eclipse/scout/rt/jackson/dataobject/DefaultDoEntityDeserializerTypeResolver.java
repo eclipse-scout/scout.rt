@@ -12,9 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Optional;
 
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DataObjectInventory;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.databind.JavaType;

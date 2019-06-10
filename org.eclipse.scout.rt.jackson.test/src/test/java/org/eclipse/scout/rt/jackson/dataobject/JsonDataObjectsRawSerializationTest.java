@@ -10,28 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
 
+import org.eclipse.scout.rt.dataobject.DataObjectVisitors;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.IDataObject;
+import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestVersionedDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.Bean;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.DoNode;
-import org.eclipse.scout.rt.platform.dataobject.IDataObject;
-import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
-import org.eclipse.scout.rt.platform.dataobject.IDoEntity;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,73 +34,6 @@ public class JsonDataObjectsRawSerializationTest {
 
   protected static IDataObjectMapper s_dataObjectMapper;
   protected static DataObjectSerializationTestHelper s_testHelper;
-
-  /**
-   * Visitor for {@link IDataObject} structures.
-   */
-  @Bean
-  public static class DataObjectVisitor {
-
-    /**
-     * Visits given {@code dataObject} and all its nested attributes.The given {@code visitor} is called for each
-     * attribute whose type is assignable from the given {@code type}.
-     *
-     * @param dataObject
-     *          data object to visit
-     * @param visitor
-     *          consumer called for each element whose type is assignable from the given {@code type}
-     * @param type
-     *          type of elements to be visited, only attributes which are assignable from the given {@code type} are
-     *          visited.
-     */
-    public <T> void visit(IDataObject dataObject, Consumer<T> visitor, Class<T> type) {
-      visitRec(dataObject, visitor, type);
-    }
-
-    protected <T> void visitRec(Object obj, Consumer<T> visitor, Class<T> type) {
-      if (obj == null) {
-        return;
-      }
-
-      // visit current object if type matches
-      if (type.isAssignableFrom(obj.getClass())) {
-        visitor.accept(type.cast(obj));
-      }
-
-      // visit all nested children
-      if (obj instanceof Collection) {
-        visitCollectionImpl((Collection) obj, visitor, type);
-      }
-      else if (obj instanceof Map) {
-        visitMapImpl((Map<?, ?>) obj, visitor, type);
-      }
-      else if (obj instanceof IDoEntity) {
-        visitDoEntityImpl((IDoEntity) obj, visitor, type);
-      }
-      else if (obj instanceof DoList) {
-        visitCollectionImpl(((DoList) obj).get(), visitor, type);
-      }
-    }
-
-    protected <T> void visitCollectionImpl(Collection collection, Consumer<T> visitor, Class<T> type) {
-      for (Object item : collection) {
-        visitRec(item, visitor, type);
-      }
-    }
-
-    protected <T> void visitMapImpl(Map<?, ?> map, Consumer<T> visitor, Class<T> type) {
-      for (Entry<?, ?> entry : map.entrySet()) {
-        visitRec(entry.getKey(), visitor, type);
-        visitRec(entry.getValue(), visitor, type);
-      }
-    }
-
-    protected <T> void visitDoEntityImpl(IDoEntity entity, Consumer<T> visitor, Class<T> type) {
-      for (DoNode node : entity.allNodes().values()) {
-        visitRec(node.get(), visitor, type);
-      }
-    }
-  }
 
   @BeforeClass
   public static void beforeClass() {
@@ -172,7 +97,7 @@ public class JsonDataObjectsRawSerializationTest {
    * {@link DoList}.
    */
   protected void assertNoTypes(IDataObject dataObject) {
-    BEANS.get(DataObjectVisitor.class).visit(dataObject, this::assertType, IDataObject.class);
+    DataObjectVisitors.forEach(dataObject, IDataObject.class, this::assertType);
   }
 
   protected void assertType(IDataObject entity) {

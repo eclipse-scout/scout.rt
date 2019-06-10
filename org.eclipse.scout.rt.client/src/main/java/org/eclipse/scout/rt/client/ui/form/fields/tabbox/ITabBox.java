@@ -32,6 +32,8 @@ public interface ITabBox extends ICompositeField, IContextMenuOwner {
    */
   String PROP_CONTEXT_MENU = "contextMenu";
 
+  String PROP_TAB_AREA_STYLE = "tabAreaStyle";
+
   /**
    * Define the default mark strategy of the tabs. This means the marker is set on the tabs if at least one field is not
    * empty.
@@ -43,6 +45,17 @@ public interface ITabBox extends ICompositeField, IContextMenuOwner {
    * marked as "save needed".
    */
   int MARK_STRATEGY_SAVE_NEEDED = 1;
+
+  /**
+   * Aligns the tabs on the left.
+   */
+  String TAB_AREA_STYLE_DEFAULT = "default";
+
+  /**
+   * Spreads the tabs evenly over the available space. If there isn't enough space, the tabs still move to the overflow
+   * menu.
+   */
+  String TAB_AREA_STYLE_SPREAD_EVEN = "spreadEven";
 
   /*
    * Runtime
@@ -59,6 +72,10 @@ public interface ITabBox extends ICompositeField, IContextMenuOwner {
 
   @Override
   IFormFieldContextMenu getContextMenu();
+
+  String getTabAreaStyle();
+
+  void setTabAreaStyle(String tabAreaStyle);
 
   ITabBoxUIFacade getUIFacade();
 }

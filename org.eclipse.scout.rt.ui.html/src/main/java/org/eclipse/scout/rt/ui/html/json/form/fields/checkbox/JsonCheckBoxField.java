@@ -53,6 +53,12 @@ public class JsonCheckBoxField<CHECK_BOX_FIELD extends IBooleanField> extends Js
         return getModel().getKeyStroke();
       }
     });
+    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_WRAP_TEXT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isWrapText();
+      }
+    });
 
     // No need to send display text for check box
     removeJsonProperty(IBooleanField.PROP_DISPLAY_TEXT);

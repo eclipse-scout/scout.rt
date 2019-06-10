@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -19,6 +21,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonClickActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension;
+import org.eclipse.scout.rt.client.res.AttachmentSupport;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -35,6 +38,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
@@ -50,6 +54,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_systemType;
   private int m_displayStyle;
   private boolean m_processButton;
+  private AttachmentSupport m_attachmentSupport;
 
   public AbstractButton() {
     this(true);
@@ -60,6 +65,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     m_listenerList = new FastListenerList<>();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     m_uiFacadeSetSelectedLock = new OptimisticLock();
+    m_attachmentSupport = BEANS.get(AttachmentSupport.class);
     if (callInitializer) {
       callInitializer();
     }
@@ -274,6 +280,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
     setStackable(getConfiguredStackable());
     setShrinkable(getConfiguredShrinkable());
+    setHtmlEnabled(getConfiguredHtmlEnabled());
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
@@ -512,6 +519,38 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   public void setView(boolean visible, boolean enabled) {
     setVisible(visible);
     setEnabled(enabled);
+  }
+
+  protected boolean getConfiguredHtmlEnabled() {
+    return false;
+  }
+
+  @Override
+  public void setHtmlEnabled(boolean enabled) {
+    propertySupport.setProperty(PROP_HTML_ENABLED, enabled);
+  }
+
+  @Override
+  public boolean isHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_HTML_ENABLED);
+  }
+
+  /**
+   * local images and local resources bound to the html text
+   */
+  @Override
+  public Set<BinaryResource> getAttachments() {
+    return m_attachmentSupport.getAttachments();
+  }
+
+  @Override
+  public BinaryResource getAttachment(String filename) {
+    return m_attachmentSupport.getAttachment(filename);
+  }
+
+  @Override
+  public void setAttachments(Collection<? extends BinaryResource> attachments) {
+    m_attachmentSupport.setAttachments(attachments);
   }
 
   /**

@@ -24,7 +24,8 @@ scout.FileChooserButton.prototype._init = function(model) {
   this.button = scout.create('Button', {
     parent: this,
     label: this._buttonLabel(),
-    iconId: this.iconId
+    iconId: this.iconId,
+    htmlEnabled: this.htmlEnabled
   });
   this.button.on('click', this._onButtonClick.bind(this));
 

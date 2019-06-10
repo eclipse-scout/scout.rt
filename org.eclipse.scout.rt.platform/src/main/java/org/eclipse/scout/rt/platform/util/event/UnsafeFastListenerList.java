@@ -31,8 +31,6 @@ import org.eclipse.scout.rt.platform.util.WeakEventListener;
  * @since 8.0
  */
 public class UnsafeFastListenerList<LISTENER> implements IFastListenerList<LISTENER> {
-  //TODO imo lazy create these fields
-  //TODO imo find all getters and add since 8.0
   private final List<Object> m_refs = new ArrayList<>();
   private final Map<LISTENER, Integer> m_indexes = new WeakHashMap<>();
 

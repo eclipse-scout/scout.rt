@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -127,6 +128,11 @@ public final class CollectionUtility {
     return c1.equals(c2);
   }
 
+  /**
+   * @deprecated do not use this 'dynamic-typed' method which could easily lead to errors. Use instead the strong typed
+   *             version {@link #firstElement(Collection)}
+   */
+  @Deprecated
   @SuppressWarnings("unchecked")
   public static <T> T firstElement(Object c) {
     if (c instanceof Collection<?>) {
@@ -746,22 +752,11 @@ public final class CollectionUtility {
   }
 
   /**
-   * combine all lists into one list containing all elements. the order of the items is preserved.
-   * <p>
-   * See {@link #flatten(Collection...)} for a type safe implementation whose results do not contain any {@code null}
-   * elements.
+   * @see #flatten(Collection)
    */
-  @SuppressWarnings("unchecked")
-  public static <T> List<T> combine(Collection<?>... collections) {
-    List<T> list = new ArrayList<>();
-    if (collections != null && collections.length > 0) {
-      for (Collection<?> c : collections) {
-        for (Object t : c) {
-          list.add((T) t);
-        }
-      }
-    }
-    return list;
+  @SafeVarargs
+  public static <T> List<T> combine(Collection<? extends T>... collections) {
+    return flatten(collections);
   }
 
   /**
@@ -769,9 +764,6 @@ public final class CollectionUtility {
    * <p>
    * The order of the specified {@link Collections} is preserved and the resulting {@link List} does not contain any
    * {@code null} elements.
-   * <p>
-   * The difference to {@link #combine(Collection...)} is that this implementation is type safe and removes {@code null}
-   * elements.
    *
    * @param collections
    *          The {@link Collection}s to flatten.
@@ -779,8 +771,7 @@ public final class CollectionUtility {
    *         {@code null}.
    * @see #combine(Collection...)
    */
-  @SafeVarargs
-  public static <T> List<T> flatten(Collection<? extends T>... collections) {
+  public static <T> List<T> flatten(Collection<? extends Collection<? extends T>> collections) {
     List<T> result = new ArrayList<>();
     if (collections == null) {
       return result;
@@ -796,6 +787,14 @@ public final class CollectionUtility {
       }
     }
     return result;
+  }
+
+  /**
+   * @see #flatten(Collection)
+   */
+  @SafeVarargs
+  public static <T> List<T> flatten(Collection<? extends T>... collections) {
+    return collections != null ? flatten(Arrays.asList(collections)) : null;
   }
 
   public static boolean isEmpty(Map<?, ?> m) {

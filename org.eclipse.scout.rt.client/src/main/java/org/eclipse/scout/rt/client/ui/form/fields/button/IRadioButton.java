@@ -16,7 +16,13 @@ package org.eclipse.scout.rt.client.ui.form.fields.button;
  * @since 4.0.0-M7
  */
 public interface IRadioButton<T> extends IButton {
-  String PROP_RADIOVALUE = "radioValue";
+
+  String PROP_WRAP_TEXT = "wrapText";
+  String PROP_RADIO_VALUE = "radioValue";
+
+  void setWrapText(boolean wrapText);
+
+  boolean isWrapText();
 
   /**
    * @return radio button value
@@ -29,5 +35,5 @@ public interface IRadioButton<T> extends IButton {
    *          radio button value
    * @since moved to {@link IRadioButton} in 4.0.0-M7
    */
-  void setRadioValue(T o);
+  void setRadioValue(T radioValue);
 }
