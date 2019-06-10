@@ -280,7 +280,7 @@ scout.Table.prototype._calculateTableNodeColumn = function() {
     this.tableNodeColumn.minWidth = this.rowLevelPadding * this._maxLevel + this.tableNodeColumn.tableNodeLevel0CellPadding + 8;
 
     if (this.tableNodeColumn.minWidth > this.tableNodeColumn.width) {
-      if (this.rendered) {
+      if (this._rendered()) {
         this.resizeColumn(this.tableNodeColumn, this.tableNodeColumn.minWidth);
       } else {
         this.tableNodeColumn.width = this.tableNodeColumn.minWidth;
@@ -397,6 +397,13 @@ scout.Table.prototype.handleAppLinkAction = function(event) {
   this._triggerAppLinkAction(column, $appLink.data('ref'));
 };
 
+scout.Table.prototype._rendered = function() {
+  if (this.tileMode && this.mediator) {
+    return false;
+  }
+  return this.rendered;
+};
+
 scout.Table.prototype._render = function() {
   this.$container = this.$parent.appendDiv('table');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
@@ -407,6 +414,17 @@ scout.Table.prototype._render = function() {
     this.$container.addClass(this.uiCssClass);
   }
 
+  if (this.tileMode && this.mediator) {
+    this.mediator.render();
+  } else {
+    this._renderData();
+  }
+
+  this.session.desktop.on('popupOpen', this._popupOpenHandler);
+  this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
+};
+
+scout.Table.prototype._renderData = function() {
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
@@ -436,8 +454,6 @@ scout.Table.prototype._render = function() {
   if (this.scrollToSelection) {
     this.revealSelection();
   }
-  this.session.desktop.on('popupOpen', this._popupOpenHandler);
-  this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
 };
 
 scout.Table.prototype._renderProperties = function() {
@@ -448,7 +464,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
-  this._renderTileMode();
 };
 
 scout.Table.prototype._setCssClass = function(cssClass) {
@@ -463,21 +478,31 @@ scout.Table.prototype._setCssClass = function(cssClass) {
   }, ''), 'width', 'width', 15));
 };
 
+scout.Table.prototype._removeData = function() {
+  this._destroyCellEditorPopup();
+  this._removeAggregateRows();
+  this._uninstallImageListeners();
+  this._uninstallCellTooltipSupport();
+  this._uninstallScrollbars();
+  this._removeRows();
+  this.$fillBefore = null;
+  this.$fillAfter = null;
+  this.$data.remove();
+  this.$data = null;
+  this.$emptyData = null;
+
+};
+
 scout.Table.prototype._remove = function() {
   this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.session.desktop.off('popupOpen', this._popupOpenHandler);
   this._uninstallDragAndDropHandler();
   // TODO [7.0] cgu do not delete header, implement according to footer
   this.header = null;
-  this._destroyCellEditorPopup();
-  this._removeAggregateRows();
-  this._uninstallImageListeners();
-  this._uninstallCellTooltipSupport();
-  this._removeRows();
-  this.$fillBefore = null;
-  this.$fillAfter = null;
-  this.$data = null;
-  this.$emptyData = null;
+  if (this.$data) {
+    this._removeData();
+  }
+  this._removeTileMode();
   scout.Table.parent.prototype._remove.call(this);
 };
 
@@ -632,7 +657,7 @@ scout.Table.prototype.showContextMenu = function(options) {
 
 scout.Table.prototype._showContextMenu = function(options) {
   options = options || {};
-  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
+  if (!this._rendered() || !this.attached) { // check needed because function is called asynchronously
     return;
   }
   if (this.selectedRows.length === 0) {
@@ -695,7 +720,7 @@ scout.Table.prototype.getLastSelectedAndVisibleRow = function() {
 
 scout.Table.prototype.onColumnVisibilityChanged = function(column) {
   this.columnLayoutDirty = true;
-  if (this.rendered) {
+  if (this._rendered()) {
     this._updateRowWidth();
     this._redraw();
     this.invalidateLayoutTree();
@@ -807,7 +832,9 @@ scout.Table.prototype.reload = function(reloadReason) {
     return;
   }
   this._removeRows();
-  this._renderFiller();
+  if (this._rendered()) {
+    this._renderFiller();
+  }
   this._triggerReload(reloadReason);
 };
 
@@ -911,7 +938,7 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
 
   this._sortImpl(sortColumns);
   this._triggerRowOrderChanged();
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderRowOrderChanges();
   }
 
@@ -1696,7 +1723,7 @@ scout.Table.prototype._removeRowsInRange = function(range) {
 };
 
 scout.Table.prototype.removeAllRows = function() {
-  if (this.rendered) {
+  if (this._rendered()) {
     this.$rows().each(function(i, elem) {
       var $row = $(elem),
         row = $row.data('row');
@@ -2122,7 +2149,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
     }
   }, this);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._removeAggregateRows(animate);
     this._renderSelection(); // fix selection borders
   }
@@ -2188,7 +2215,7 @@ scout.Table.prototype._group = function(animate) {
     }
   }.bind(this));
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderAggregateRows(animate);
     this._renderSelection(); // fix selection borders
   }
@@ -2442,7 +2469,7 @@ scout.Table.prototype.checkRows = function(rows, options) {
     checkedRows.push(row);
   }, this);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     checkedRows.forEach(function(row) {
       this._renderRowChecked(row);
     }, this);
@@ -2525,7 +2552,7 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
   });
   this._triggerRowsExpanded(changedRows);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderRowDelta();
     rowsForAnimation.forEach(function(row) {
       row.animateExpansion();
@@ -2607,7 +2634,7 @@ scout.Table.prototype.insertRows = function(rows) {
   this._sortAfterInsert(wasEmpty);
 
   // Update HTML
-  if (this.rendered) {
+  if (this._rendered()) {
     if (this.hierarchical) {
       this._renderRowOrderChanges();
     }
@@ -2647,7 +2674,7 @@ scout.Table.prototype.deleteRows = function(rows) {
 
     removedRows.push(row);
     // Update HTML
-    if (this.rendered) {
+    if (this._rendered()) {
       // Cancel cell editing if cell editor belongs to a cell of the deleted row
       if (this.cellEditorPopup && this.cellEditorPopup.row.id === row.id) {
         this.cellEditorPopup.cancelEdit();
@@ -2701,7 +2728,7 @@ scout.Table.prototype.deleteAllRows = function() {
     rows = this.rows;
 
   // Update HTML
-  if (this.rendered) {
+  if (this._rendered()) {
     // Cancel cell editing
     if (this.cellEditorPopup) {
       this.cellEditorPopup.cancelEdit();
@@ -2733,7 +2760,7 @@ scout.Table.prototype.deleteAllRows = function() {
   this._triggerAllRowsDeleted(rows);
 
   // Update HTML
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderFiller();
     this._renderViewport();
     this._renderEmptyData();
@@ -2812,7 +2839,7 @@ scout.Table.prototype.updateRows = function(rows) {
 
   this._triggerRowsUpdated(rows);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     // render row and replace div in DOM
     rows.forEach(function(row) {
       var oldRow = oldRowsMap[row.id],
@@ -2871,7 +2898,7 @@ scout.Table.prototype.updateRowOrder = function(rows) {
     visibleRows: true
   });
   this.clearAggregateRows(this._animateAggregateRows);
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderRowOrderChanges();
   }
   this._triggerRowOrderChanged();
@@ -2896,7 +2923,7 @@ scout.Table.prototype._removeCellEditorForRow = function(row) {
 };
 
 scout.Table.prototype.startCellEdit = function(column, row, field) {
-  if (!this.rendered || !this.isAttachedAndRendered()) {
+  if (!this._rendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
     return;
   }
@@ -2918,7 +2945,7 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
  *    value is updated by an updateRow event instead.
  */
 scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
-  if (!this.rendered || !this.isAttachedAndRendered()) {
+  if (!this._rendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
     return;
   }
@@ -3007,7 +3034,7 @@ scout.Table.prototype.scrollPageDown = function() {
 scout.Table.prototype.setScrollTop = function(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderViewport();
   }
 };
@@ -3027,7 +3054,12 @@ scout.Table.prototype._renderScrollTop = function() {
  * @override
  */
 scout.Table.prototype.get$Scrollable = function() {
-  return this.$data;
+  // XXX
+  if (this.$data) {
+    return this.$data;
+  } else {
+    return this.$container;
+  }
 };
 
 scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {
@@ -3035,7 +3067,7 @@ scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {
 };
 
 scout.Table.prototype.revealSelection = function() {
-  if (!this.rendered) {
+  if (!this._rendered()) {
     // Execute delayed because table may be not layouted yet
     this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
     return;
@@ -3152,7 +3184,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   this.selectedRows.push(row);
 
-  if (row.$row && this.rendered) {
+  if (row.$row && this._rendered()) {
     row.$row.select(true);
     this._renderSelection(row);
     if (this.scrollToSelection) {
@@ -3169,7 +3201,7 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
 scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
   if (scout.arrays.remove(this.selectedRows, row)) {
-    if (this.rendered) {
+    if (this._rendered()) {
       this._renderSelection(row);
     }
     if (!ongoingSelection) {
@@ -3197,7 +3229,7 @@ scout.Table.prototype.selectRows = function(rows, debounceSend) {
     return;
   }
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._removeSelection();
   }
 
@@ -3209,7 +3241,7 @@ scout.Table.prototype.selectRows = function(rows, debounceSend) {
   this._triggerRowsSelected(debounceSend);
 
   this._updateMenuBar();
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderSelection();
     if (this.scrollToSelection) {
       this.revealSelection();
@@ -3446,7 +3478,7 @@ scout.Table.prototype.visibleChildRows = function(row) {
 };
 
 scout.Table.prototype._renderRowDelta = function() {
-  if (!this.rendered) {
+  if (!this._rendered()) {
     return;
   }
   var renderedRows = [];
@@ -3717,7 +3749,7 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   });
 
   // move cells
-  if (this.rendered) {
+  if (this._rendered()) {
     this._rerenderViewport();
   }
 };
@@ -3936,31 +3968,42 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
   }, this);
 };
 
+// TODO [10.0] rmu make getConfiguredTileMode and refresh with active tile mode in scout classic work
 scout.Table.prototype.setTileMode = function(tileMode) {
-  this._setProperty('tileMode', tileMode);
-
-  if (tileMode && !this.mediator) {
+  if (scout.objects.equals(this.tileMode, tileMode)) {
+    return;
+  }
+  // lazy init mediator on first use
+  if (!this.mediator) {
     this.mediator = new scout.TableTileGridMediator(this);
+    this.mediator.init();
   }
 
   if (tileMode) {
-    this.mediator.activateTileMode();
-  } else {
-    this.mediator.deactivateTileMode();
-    this.mediator = null;
+    this.mediator.activate();
+  }
+
+  this.setProperty('tileMode', tileMode);
+
+  if (!tileMode) {
+    this.mediator.deactivate();
   }
 };
 
 scout.Table.prototype._renderTileMode = function() {
-  if (!this.mediator) {
-    return;
-  }
-  if (this.mediator) {
-    this.mediator._renderTileAccordion();
+  if (this.tileMode) {
+    this.mediator.render();
   } else {
-    this.mediator._removeTileAccordion();
+    // since tileMode is not a widget property remove is not called by setProperty
+    this._removeTileMode();
+    this._renderData();
   }
-  this.invalidateLayoutTree();
+};
+
+scout.Table.prototype._removeTileMode = function() {
+  if (this.mediator) {
+    this.mediator.remove();
+  }
 };
 
 scout.Table.prototype._setTiles = function(tiles) {
@@ -4162,7 +4205,7 @@ scout.Table.prototype.setFooterVisible = function(visible) {
     control.tableFooter = this.footer;
   }, this);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderFooterVisible();
   }
   if (!visible && this.footer) {
@@ -4245,7 +4288,7 @@ scout.Table.prototype._setCheckableStyle = function(checkableStyle) {
 scout.Table.prototype._renderCheckableStyle = function() {
   this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW));
   this.$container.toggleClass('table-row-check', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
-  if (this.rendered) {
+  if (this._rendered()) {
     this._redraw();
   }
 };
@@ -4375,10 +4418,15 @@ scout.Table.prototype._renderEnabled = function() {
   scout.Table.parent.prototype._renderEnabled.call(this);
 
   var enabled = this.enabled;
-  this.$data.setEnabled(enabled);
+
+  if (!this.tileMode) {
+    // XXX
+    this.$data.setEnabled(enabled);
+  }
+
   this.$container.setTabbable(enabled);
 
-  if (this.rendered) {
+  if (this._rendered()) {
     // Enable/disable all checkboxes
     this.$rows().each(function() {
       var $row = $(this),
@@ -4495,7 +4543,7 @@ scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
     return;
   }
   this._setProperty('viewRangeSize', viewRangeSize);
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderViewport();
   }
 };
@@ -4748,7 +4796,7 @@ scout.Table.prototype.updateColumnStructure = function(columns) {
   this.columns = columns;
   this._initColumns();
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._updateRowWidth();
     this.$rows(true).css('width', this.rowWidth);
     this._rerenderHeaderColumns();
@@ -4779,7 +4827,7 @@ scout.Table.prototype.updateColumnOrder = function(columns) {
     }
   }
 
-  if (this.rendered) {
+  if (this._rendered()) {
     this._renderColumnOrderChanges(oldColumnOrder);
   }
 };
@@ -4815,14 +4863,14 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
       column.sortIndex = columns[i].sortIndex;
     }
 
-    if (this.rendered && this.header) {
+    if (this._rendered() && this.header) {
       this.header.updateHeader(column, oldColumnState);
     }
   }
 };
 
 scout.Table.prototype.focusCell = function(column, row) {
-  if (!this.rendered || !this.isAttachedAndRendered()) {
+  if (!this._rendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.focusCell.bind(this, column, row));
     return;
   }
@@ -4922,7 +4970,7 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
   if (this.has(popup) && popup instanceof scout.ContextMenuPopup) {
     this.$container.addClass('focused');
     popup.one('destroy', function() {
-      if (this.rendered) {
+      if (this._rendered()) {
         this.$container.removeClass('focused');
       }
     }.bind(this));

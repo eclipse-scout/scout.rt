@@ -40,10 +40,6 @@ scout.TableTileGridMediator = function(table) {
   this._destroyHandler = this._uninstallListeners.bind(this);
 };
 
-scout.TableTileGridMediator.prototype.destroy = function() {
-  this._uninstallListeners();
-};
-
 scout.TableTileGridMediator.prototype._installListeners = function() {
   this.tileAccordion.on('propertyChange', this._tileAccordionPropertyChangeHandler);
   this.table.on('filterAdded', this._tableFilterAddedHandler);
@@ -160,8 +156,7 @@ scout.TableTileGridMediator.prototype._groupTiles = function(tiles) {
   }, this);
 };
 
-scout.TableTileGridMediator.prototype.activateTileMode = function() {
-
+scout.TableTileGridMediator.prototype.init = function() {
   if (!this.tileAccordion) {
     this.tileAccordion = this._createTileAccordion();
     this._installListeners();
@@ -170,11 +165,15 @@ scout.TableTileGridMediator.prototype.activateTileMode = function() {
   // create simplified grouping for tile accordion, grouping on the table can be left as is.
   this._initGroups();
 
-  if (this.table.rendered) {
-    this.table._renderTileMode();
-  }
-
   this.tableState.headerVisible = this.table.headerVisible;
+
+  this._syncFiltersFromTableToTile();
+
+  this.loadTiles();
+};
+
+scout.TableTileGridMediator.prototype.activate = function() {
+  // render/model? maybe _setHeaderVisible to not trigger rendering...?
   this.table.setHeaderVisible(false);
 
   // hide aggregation table control
@@ -183,31 +182,50 @@ scout.TableTileGridMediator.prototype.activateTileMode = function() {
       control.setVisible(false);
     }
   });
-
-  this._syncFiltersFromTableToTile();
-  this.loadTiles();
-  this._syncSelectionFromTableToTile();
-  //  this._syncScrollTopFromTableToTile();
 };
 
-scout.TableTileGridMediator.prototype.deactivateTileMode = function() {
-  this.table.setHeaderVisible(this.tableState.headerVisible);
-
+scout.TableTileGridMediator.prototype.deactivate = function() {
+  // model / render...?
   // hide aggregation table control
   this.table.tableControls.filter(function(control) {
     if (control instanceof scout.AggregateTableControl) {
       control.setVisible(true);
     }
   });
+  this.table.setHeaderVisible(this.tableState.headerVisible);
+};
 
+scout.TableTileGridMediator.prototype.render = function() {
+
+  // if the table was previously in tileMode this is not necessary...
+  if (this.table.$data) {
+    this.table._removeData();
+  }
+  this._renderTileAccordion();
+
+  // only makes sense after tiles are loaded... in scout classic this should be executed by the TableAdapter
+  this._syncSelectionFromTableToTile();
+  //  this._syncScrollTopFromTableToTile();
+};
+
+scout.TableTileGridMediator.prototype.remove = function() {
+  // render
   if (this.table.rendered) {
-    this.table._renderTileMode();
+    this._removeTileAccordion();
   }
 
-  if (this.tileAccordion) {
-    this.tileAccordion.destroy();
-    this.tileAccordion = null;
-  }
+  this.tileAccordion.remove();
+};
+
+scout.TableTileGridMediator.prototype.destroy = function() {
+  // model...?
+  // destroy tiles manually since owner is this.table thus the tileGrid can't destroy them
+  this.tiles.forEach(function(tile) {
+    tile.destroy();
+  });
+
+  this.tileAccordion.destroy();
+  this.tileAccordion = null;
 };
 
 scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
@@ -226,6 +244,9 @@ scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
   }
   scout.arrays.removeAll(this.tiles, tiles);
   this._refreshTilesMap();
+  tiles.forEach(function(tile) {
+    tile.destroy();
+  });
   this.tileAccordion.deleteTiles(tiles);
 };
 
