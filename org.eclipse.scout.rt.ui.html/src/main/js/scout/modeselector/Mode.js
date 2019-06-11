@@ -68,7 +68,7 @@ scout.Mode.prototype._renderIconId = function() {
 
   this._updateLabelAndIconStyle();
   // Invalidate layout because mode may now be longer or shorter
-  this.htmlComp.invalidateLayoutTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Mode.prototype._renderText = function() {
@@ -76,7 +76,7 @@ scout.Mode.prototype._renderText = function() {
 
   this._updateLabelAndIconStyle();
   // Invalidate layout because mode may now be longer or shorter
-  this.htmlComp.invalidateLayoutTree();
+  this.invalidateLayoutTree();
 };
 
 scout.Mode.prototype._updateLabelAndIconStyle = function() {

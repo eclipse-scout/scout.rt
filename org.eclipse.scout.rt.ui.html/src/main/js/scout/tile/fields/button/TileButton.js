@@ -61,7 +61,7 @@ scout.TileButton.prototype._renderIconId = function() {
     this.$field.addClass('without-icon');
   }
   // Invalidate layout because button may now be longer or shorter
-  this.htmlComp.invalidateLayoutTree();
+  this.invalidateLayoutTree();
 };
 
 scout.TileButton.prototype._renderTooltipText = function() {
