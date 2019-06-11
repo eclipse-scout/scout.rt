@@ -177,7 +177,6 @@ scout.FieldStatus.prototype.showTooltip = function() {
       this.hideTooltip();
     }.bind(this));
     this.tooltip.render();
-    this.validateLayoutTree(); // if showing the tooltip for the first time, validate immediately to prevent flickering
   }
 };
 
