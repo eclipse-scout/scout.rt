@@ -276,11 +276,7 @@ scout.FormField.prototype._renderErrorStatus = function() {
   this._updateErrorStatusClasses(statusClass, hasStatus);
   this._updateStatusVisible();
   if (hasStatus && this.visible) {
-    var tooltipExisted = !!this.tooltip;
     this._showStatusMessage();
-    if (!tooltipExisted) {
-      this.validateLayoutTree(); // if showing the tooltip for the first time, validate immediately to prevent flickering
-    }
   } else {
     this._hideStatusMessage();
   }
