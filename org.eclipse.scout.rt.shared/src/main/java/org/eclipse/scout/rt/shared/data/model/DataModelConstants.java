@@ -704,7 +704,18 @@ public interface DataModelConstants {
    * </p>
    */
   int OPERATOR_NOT_LIKE = 61;
-  //max is 61
+  /**
+   * <p>
+   * Is a date between the start of the year and today (including those dates)? The year is given as offset from the
+   * current year. 0 means this year, -1 the year before.
+   * </p>
+   * <p>
+   * When using the SqlService, this corresponds to
+   * {@link org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle#createYearToDate(String, String)}
+   * </p>
+   */
+  int OPERATOR_YEAR_TO_DATE = 62;
+  //max is 62
 
   int AGGREGATION_NONE = 0;
   int AGGREGATION_COUNT = 1;

@@ -79,6 +79,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_NEQ));
         }
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_BETWEEN));
+        operatorList.add(DataModelAttributeOp.create(OPERATOR_YEAR_TO_DATE));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_LT));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_LE));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_GT));
@@ -111,6 +112,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
           operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_NEQ));
         }
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_BETWEEN));
+        operatorList.add(DataModelAttributeOp.create(OPERATOR_YEAR_TO_DATE));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_LT));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_LE));
         operatorList.add(DataModelAttributeOp.create(OPERATOR_DATE_TIME_GT));
@@ -289,6 +291,9 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsNotToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsNotToday") : text, explanationText);
       case OPERATOR_DATE_IS_TODAY:
         return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsToday") : text, explanationText);
+      case OPERATOR_YEAR_TO_DATE:
+        return new YearToDate(OPERATOR_YEAR_TO_DATE, (shortText == null) ? TEXTS.get("LogicYearToDateShort") : shortText, (text == null) ? TEXTS.get("LogicYearToDate") : text,
+            explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
         return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
@@ -1134,6 +1139,61 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
     @Override
     public int getType() {
       return IDataModelAttribute.TYPE_NONE;
+    }
+  }
+
+  private static class YearToDate extends AbstractDataModelOp {
+    private static final long serialVersionUID = 1L;
+
+    private final String m_shortText;
+    private final String m_text;
+    private final String m_explanationText;
+
+    /**
+     * @param aggregationType
+     */
+    YearToDate(int operator, String shortText, String text, String explanationText) {
+      super(operator);
+      m_shortText = shortText;
+      m_text = text;
+      m_explanationText = explanationText;
+
+    }
+
+    @Override
+    public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
+      if (valueTexts != null && !valueTexts.isEmpty()) {
+        String text1 = "";
+        int offset = Integer.decode(valueTexts.get(0));
+        if (offset > 0) {
+          text1 = " + " + offset;
+        }
+        else if (offset < 0) {
+          text1 = " - " + (-offset);
+        }
+        return buildText(aggregationType, attributeText, getText(), text1);
+      }
+      return buildText(aggregationType, attributeText, getText(), valueTexts);
+    }
+
+    @Override
+    public String getText() {
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
+    }
+
+    @Override
+    public String getExplanationText() {
+      return m_explanationText;
+    }
+
+    @Override
+    public int getType() {
+      return IDataModelAttribute.TYPE_INTEGER;
     }
   }
 

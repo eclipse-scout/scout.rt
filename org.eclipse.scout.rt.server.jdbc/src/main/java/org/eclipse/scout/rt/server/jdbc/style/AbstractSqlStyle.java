@@ -613,6 +613,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle {
   }
 
   @Override
+  public String createYearToDate(String attribute, String bindName) {
+    return attribute + " BETWEEN ((DATE_TRUNC('year', CURRENT_DATE)+ INTERVAL '" + adaptBindName(bindName) + " year') and (current_date + interval '" + adaptBindName(bindName) + " year') ";
+  }
+
+  @Override
   public String createDateTimeBetween(String attribute, String bindName1, String bindName2) {
     return attribute + " BETWEEN TRUNC(" + adaptBindNameTimeDateOp(bindName1) + ",'MI') AND (TRUNC(" + adaptBindNameTimeDateOp(bindName2) + ",'MI')+(59/86400)) ";
   }

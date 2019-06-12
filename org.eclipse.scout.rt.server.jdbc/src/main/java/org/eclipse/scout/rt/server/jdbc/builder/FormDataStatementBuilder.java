@@ -1784,6 +1784,12 @@ public class FormDataStatementBuilder implements DataModelConstants {
       case OPERATOR_DATE_IS_TODAY: {
         return m_sqlStyle.createDateIsToday(sql);
       }
+      case OPERATOR_YEAR_TO_DATE: {
+        if (!plainBind) {
+          addBinds(names, values);
+        }
+        return m_sqlStyle.createYearToDate(sql, names[0]);
+      }
       case OPERATOR_DATE_TIME_IS_IN_GE_HOURS: {
         if (!plainBind) {
           addBinds(names, values);
