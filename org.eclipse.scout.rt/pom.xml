@@ -974,6 +974,7 @@
         <reportSets>
           <reportSet>
             <id>dual-report</id>
+            <reports></reports><!-- Empty tag necessary with maven 3.6.1 because of bug https://issues.apache.org/jira/browse/MNG-6636 -->
             <configuration>
               <displayFileDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%</displayFileDetailUrl>
               <displayFileRevDetailUrl>https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git/tree/%FILE%?id=%REV%</displayFileRevDetailUrl>
