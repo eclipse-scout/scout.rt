@@ -293,7 +293,7 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
         return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? TEXTS.get("LogicDateIsToday") : shortText, (text == null) ? TEXTS.get("LogicDateIsToday") : text, explanationText);
       case OPERATOR_YEAR_TO_DATE:
         return new YearToDate(OPERATOR_YEAR_TO_DATE, (shortText == null) ? TEXTS.get("LogicYearToDateShort") : shortText, (text == null) ? TEXTS.get("LogicYearToDate") : text,
-            explanationText);
+            (explanationText == null) ? TEXTS.get("LogicYearToDateExplanation") : explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
         return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : shortText, (text == null) ? TEXTS.get("LogicDateTimeIsInGEHours") : text, explanationText);
       case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
