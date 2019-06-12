@@ -21,10 +21,10 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.4.14.v20181114" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.4.14.v20181114" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-annotations:9.4.14.v20181114" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:7.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:7.0" level="project" />
-    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:7.0" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm:7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:7.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-plus:9.4.14.v20181114" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-jndi:9.4.14.v20181114" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.platform" />

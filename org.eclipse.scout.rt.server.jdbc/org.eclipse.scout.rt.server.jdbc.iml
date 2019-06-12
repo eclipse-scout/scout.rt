@@ -28,5 +28,6 @@
     <orderEntry type="module" module-name="org.eclipse.scout.rt.server.commons" />
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.mom.api" />
+    <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
   </component>
 </module>

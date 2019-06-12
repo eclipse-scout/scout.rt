@@ -11,6 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.rest" />
+    <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.platform" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.0.5.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
