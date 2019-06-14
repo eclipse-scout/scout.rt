@@ -41,7 +41,8 @@ scout.SmartField = function() {
                         // only when the result is up-to-date, we can use the selected lookup row
 
   this._addCloneProperties(['lookupRow', 'codeType', 'lookupCall', 'activeFilter', 'activeFilterEnabled', 'activeFilterLabels',
-    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors'
+    'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
+    'displayStyle'
   ]);
 };
 scout.inherits(scout.SmartField, scout.ValueField);
