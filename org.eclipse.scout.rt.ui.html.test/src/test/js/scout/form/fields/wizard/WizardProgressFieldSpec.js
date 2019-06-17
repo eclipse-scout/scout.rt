@@ -26,6 +26,7 @@ describe('WizardProgressField', function() {
       field = scout.create('WizardProgressField', {
         parent: session.desktop
       });
+      spyOn(field, '_onStepClick').and.callThrough();
 
       field.render();
       field.setProperty('activeStepIndex', 1);
@@ -47,6 +48,21 @@ describe('WizardProgressField', function() {
       field.setProperty('activeStepIndex', 0);
       expect($steps.eq(0).hasClass('action-enabled')).toBe(false);
       expect($steps.eq(1).hasClass('action-enabled')).toBe(true);
+
+      $steps.eq(0).click();
+      $steps.eq(1).click();
+      expect(field._onStepClick).toHaveBeenCalledTimes(1);
+      expect(field._onStepClick.calls.first().args[0].currentTarget).toBe($steps[1]);
+
+      field.setProperty('activeStepIndex', 1);
+      expect($steps.eq(0).hasClass('action-enabled')).toBe(true);
+      expect($steps.eq(1).hasClass('action-enabled')).toBe(false);
+
+      field._onStepClick.calls.reset();
+      $steps.eq(0).click();
+      $steps.eq(1).click();
+      expect(field._onStepClick).toHaveBeenCalledTimes(1);
+      expect(field._onStepClick.calls.first().args[0].currentTarget).toBe($steps[0]);
     });
 
   });

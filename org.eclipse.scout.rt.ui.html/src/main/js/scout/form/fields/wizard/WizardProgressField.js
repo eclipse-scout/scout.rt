@@ -133,6 +133,7 @@ scout.WizardProgressField.prototype._renderActiveStepIndex = function() {
 scout.WizardProgressField.prototype._updateStepClasses = function(step) {
   var $step = step.$step;
   $step.removeClass('active-step before-active-step after-active-step first last action-enabled disabled');
+  $step.off('click.active-step');
 
   // Important: those indices correspond to the UI's data structures (this.steps) and are not necessarily
   // consistent with the server indices (because the server does not send invisible steps).
@@ -141,7 +142,7 @@ scout.WizardProgressField.prototype._updateStepClasses = function(step) {
 
   if (this.enabledComputed && step.enabled && step.actionEnabled && stepIndex !== this.activeStepIndex) {
     $step.addClass('action-enabled');
-    $step.on('click', this._onStepClick.bind(this));
+    $step.on('click.active-step', this._onStepClick.bind(this));
   } else if (!this.enabledComputed || !step.enabled) {
     $step.addClass('disabled');
   }

@@ -1114,6 +1114,21 @@ public interface ISqlStyle extends Serializable {
   String createDateTimeGE(String attribute, String bindName);
 
   /**
+   * <code>P.EVT_CREATED between :bindName1 and today in year </code><br />
+   * (or "<code>&#38;text</code>" for non-binds, see also {@link ISqlStyle#PLAIN_BIND_MARKER_PREFIX})
+   * <p>
+   * In a Postgresql implementation this could be represented as
+   * </p>
+   * </p>
+   *
+   * <pre>
+   * attribute between ((DATE_TRUNC('year',
+   * current_date))+ interval ':firstbind year') and (current_date + interval ':firstbind year');
+   * </pre>
+   */
+  String createYearToDate(String attribute, String bindName);
+
+  /**
    * expression for the current date using the database specific keyword, <code>SYSDATE</code> on oracle
    */
   String getSysdateToken();

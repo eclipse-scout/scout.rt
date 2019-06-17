@@ -36,7 +36,7 @@ scout.SmartField = function() {
   this._notUnique = false; // used to store the error state 'not unique' which must not be showed while typing, but when the field loses focus
   this._lastSearchText = null;
   this.lookupStatus = null;
-  this._currentLookupCall = null;
+  this._currentLookupCall = null; // should only be accessed on the original widget since the adapter accesses it
   this.lookupSeqNo = 0; // used to detect if the proposal chooser contains the results of the latest lookup, or an out-dated result.
   // only when the result is up-to-date, we can use the selected lookup row
 
@@ -1181,9 +1181,11 @@ scout.SmartField.prototype._onLookupRowSelected = function(event) {
   // enter key in order to select a result (see ticket #229775).
   this._clearPendingLookup();
 
-  if (this._currentLookupCall) {
-    this._currentLookupCall.abort();
-    this._currentLookupCall = null;
+  var currentLookupCall = this.original()._currentLookupCall;
+
+  if (currentLookupCall) {
+    currentLookupCall.abort();
+    this.original()._currentLookupCall = null;
     this.setLoading(false);
   }
 
@@ -1232,10 +1234,12 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
   this.lookupSeqNo++;
   this.setLoading(true);
 
-  if (abortExisting && this._currentLookupCall) {
-    this._currentLookupCall.abort();
+  var currentLookupCall = this.original()._currentLookupCall;
+
+  if (abortExisting && currentLookupCall) {
+    currentLookupCall.abort();
   }
-  this._currentLookupCall = lookupCall;
+  this.original()._currentLookupCall = lookupCall;
   this.trigger('prepareLookupCall', {
     lookupCall: lookupCall
   });
@@ -1243,7 +1247,7 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
   return lookupCall
     .execute()
     .always(function() {
-      this._currentLookupCall = null;
+      this.original()._currentLookupCall = null;
       this.setLoading(false);
       this._clearLookupStatus();
       this._clearNoResultsErrorStatus();
