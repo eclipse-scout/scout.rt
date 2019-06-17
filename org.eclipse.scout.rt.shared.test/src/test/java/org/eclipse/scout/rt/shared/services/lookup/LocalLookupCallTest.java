@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
@@ -152,6 +154,13 @@ public class LocalLookupCallTest {
     }
 
     assertTrue("compare lookup call result with expected result", CollectionUtility.equalsCollection(expected, actual, false));
+  }
+
+  @Test
+  public void testRepeatingWildcards() throws Exception {
+    P_LocalLookupCall lc = new P_LocalLookupCall();
+    Pattern p = lc.createSearchPattern("***hello*world**test*");
+    assertFalse("no repeating wildcard should be contained in the search pattern.", p.toString().contains(".*.*"));
   }
 
   private void runGetDataByRec(int expectedLength, Integer parent) {
