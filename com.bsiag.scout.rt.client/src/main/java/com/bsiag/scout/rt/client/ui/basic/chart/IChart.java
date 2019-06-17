@@ -18,13 +18,11 @@ import com.bsiag.scout.rt.shared.data.basic.chart.IChartBean;
 /**
  * @since 5.2
  */
-public interface IChart extends IWidget, ITypeWithClassId {
+public interface IChart extends IWidget {
 
-  String PROP_CONTAINER = "container";
   String PROP_AUTO_COLOR = "autoColor";
   String PROP_CHART_TYPE = "chartType";
   String PROP_CHART_DATA = "chartData";
-  String PROP_ENABLED = "enabled";
   String PROP_VISIBLE = "visible";
   String PROP_MAX_SEGMENTS = "maxSegments";
   String PROP_CLICKABLE = "clickable";
@@ -42,8 +40,10 @@ public interface IChart extends IWidget, ITypeWithClassId {
 
   IChartUIFacade getUIFacade();
 
-  void setContainerInternal(ITypeWithClassId container);
-
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
+  @Deprecated
   ITypeWithClassId getContainer();
 
   IFastListenerList<ChartListener> chartListeners();
@@ -73,10 +73,6 @@ public interface IChart extends IWidget, ITypeWithClassId {
   void setChartData(IChartBean chartData);
 
   IChartBean getChartData();
-
-  void setEnabled(boolean enabled);
-
-  boolean isEnabled();
 
   void setVisible(boolean visible);
 

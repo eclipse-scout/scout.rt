@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -114,15 +113,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     }
   }
 
-  @Override
-  public String classId() {
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-    }
-    return simpleClassId;
-  }
-
   /*
    * Configuration
    */
@@ -132,7 +122,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
     setChartType(getConfiguredChartType());
     setAutoColor(getConfiguredAutoColor());
-    setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setMaxSegments(getConfiguredMaxSegments());
     setClickable(getConfiguredClickable());
@@ -156,12 +145,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredAutoColor() {
-    return true;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(20)
-  protected boolean getConfiguredEnabled() {
     return true;
   }
 
@@ -219,16 +202,13 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   }
 
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link IChart}
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
   @Override
-  public void setContainerInternal(ITypeWithClassId container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
-  }
-
-  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
+    return getParent();
   }
 
   @Override
@@ -304,16 +284,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   @Override
   public IChartBean getChartData() {
     return (IChartBean) propertySupport.getProperty(PROP_CHART_DATA);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
   @Override

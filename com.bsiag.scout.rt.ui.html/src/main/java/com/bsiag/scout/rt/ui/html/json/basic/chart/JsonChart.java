@@ -64,12 +64,6 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
         return getModel().getChartType();
       }
     });
-    putJsonProperty(new JsonProperty<IChart>(IChart.PROP_ENABLED, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().isEnabled();
-      }
-    });
     putJsonProperty(new JsonProperty<IChart>(IChart.PROP_VISIBLE, model) {
       @Override
       protected Object modelValue() {

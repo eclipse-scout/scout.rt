@@ -41,14 +41,6 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
   protected void initConfig() {
     super.initConfig();
     setChartInternal(createChart());
-    // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
-      if (m_chart == null) {
-        return;
-      }
-      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-      m_chart.setEnabled(newEnabled);
-    });
   }
 
   protected Class<? extends IChart> getConfiguredChart() {
@@ -101,11 +93,11 @@ public abstract class AbstractChartField<T extends IChart> extends AbstractFormF
       return;
     }
     if (m_chart != null) {
-      m_chart.setContainerInternal(null);
+      m_chart.setParentInternal(null);
     }
     m_chart = chart;
     if (m_chart != null) {
-      m_chart.setContainerInternal(this);
+      m_chart.setParentInternal(this);
       m_chart.setEnabled(isEnabled());
     }
     boolean changed = propertySupport.setProperty(PROP_CHART, m_chart);
