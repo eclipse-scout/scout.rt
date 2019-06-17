@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
+import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
@@ -1193,18 +1194,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    */
   private boolean existsDuplicateClassId() {
     IForm form = getForm();
-    String currentClassId = computeClassId();
     if (form != null) {
-      List<String> classIds = new ArrayList<>();
-      for (IFormField f : form.getAllFields()) {
-        if (f != this) {
-          String fClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(f.getClass(), true);
-          classIds.add(fClassId);
-        }
-      }
-      if (classIds.contains(currentClassId)) {
-        return true;
-      }
+      FindClassIdVisitor visitor = new FindClassIdVisitor(computeClassId(), this);
+      form.visit(visitor, IFormField.class);
+      return visitor.isFound();
     }
     return false;
   }
@@ -1995,6 +1988,32 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   protected void addChildFieldPropertyChangeListener(IPropertyObserver f) {
     f.addPropertyChangeListener(m_fieldPropertyChangeListener);
+  }
+
+  private final class FindClassIdVisitor implements IBreadthFirstTreeVisitor<IFormField> {
+    private final String m_currentClassId;
+    private boolean m_found = false;
+    private final AbstractFormField m_fixedField;
+
+    private FindClassIdVisitor(String currentClassId, AbstractFormField fixedField) {
+      m_currentClassId = currentClassId;
+      m_fixedField = fixedField;
+    }
+
+    @Override
+    public TreeVisitResult visit(IFormField element, int level, int index) {
+      if (m_fixedField != element && m_currentClassId.equals(ConfigurationUtility.getAnnotatedClassIdWithFallback(element.getClass(), true))) {
+        m_found = true;
+        return TreeVisitResult.TERMINATE;
+      }
+
+      return TreeVisitResult.CONTINUE;
+    }
+
+    public boolean isFound() {
+      return m_found;
+    }
+
   }
 
   /**
