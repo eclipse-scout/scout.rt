@@ -140,13 +140,6 @@ scout.scrollbars = {
     }
     $container.data('scrollbars', scrollbars);
 
-    // Container with JS scrollbars must have either relative or absolute position
-    // otherwise we cannot determine the correct dimension of the scrollbars
-    var cssPosition = $container.css('position');
-    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
-      $container.css('position', 'relative');
-    }
-
     scrollbars.forEach(function(scrollbar) {
       scrollbar.render($container);
       scrollbar.update();
