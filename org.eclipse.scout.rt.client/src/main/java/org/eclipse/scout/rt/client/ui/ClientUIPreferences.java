@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -81,6 +82,7 @@ public class ClientUIPreferences {
   protected static final String CALENDAR_DISPLAY_MODE = "calendar.display.mode";
   protected static final String CALENDAR_DISPLAY_CONDENSED = "calendar.display.condensed";
   protected static final String DESKTOP_COLUMN_SPLITS = "desktop.columnSplits";
+  protected static final String FIELD_COLLAPSED = "fieldCollapsed";
 
   protected IPreferences m_prefs;
 
@@ -182,18 +184,39 @@ public class ClientUIPreferences {
    * @since 9.0.0
    */
   public Boolean getSplitBoxFieldCollapsed(ISplitBox splitBox) {
+    return isFieldCollapsed(splitBox);
+  }
+
+  public Boolean isFieldCollapsed(IPreferenceField field) {
     if (m_prefs == null) {
       return null;
     }
 
-    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
-    if (baseKey == null) {
+    String propName = prepareCollapsedPropName(field);
+    if (propName == null) {
       return null;
     }
 
-    baseKey = getUserAgentPrefix() + baseKey;
-    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
-    return getPropertyBoolean(collapsedKey);
+    return getPropertyBoolean(propName);
+  }
+
+  public void setFieldCollapsed(IPreferenceField field, Boolean value) {
+    if (m_prefs == null) {
+      return;
+    }
+
+    String propName = prepareCollapsedPropName(field);
+    if (propName == null) {
+      return;
+    }
+
+    setPropertyBoolean(propName, value);
+  }
+
+  protected String prepareCollapsedPropName(IPreferenceField field) {
+    return Optional.ofNullable(field.getPreferenceBaseKey())
+        .map(k -> getUserAgentPrefix() + k + "#" + FIELD_COLLAPSED)
+        .orElse(null);
   }
 
   /**
@@ -225,7 +248,7 @@ public class ClientUIPreferences {
       return;
     }
 
-    String baseKey = splitBox.getCacheSplitterPositionPropertyName();
+    String baseKey = splitBox.getPreferenceBaseKey();
     if (baseKey == null) {
       return;
     }
@@ -234,12 +257,12 @@ public class ClientUIPreferences {
     String splitterPositionKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION;
     String splitterPositionTypeKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION_TYPE;
     String minimizedKey = baseKey + "#" + ISplitBox.PROP_FIELD_MINIMIZED;
-    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
 
     m_prefs.putDouble(splitterPositionKey, splitBox.getSplitterPosition());
     m_prefs.put(splitterPositionTypeKey, splitBox.getSplitterPositionType());
     m_prefs.putBoolean(minimizedKey, splitBox.isFieldMinimized());
-    m_prefs.putBoolean(collapsedKey, splitBox.isFieldCollapsed());
+
+    setFieldCollapsed(splitBox, splitBox.isFieldCollapsed());
     flush();
   }
 
@@ -262,7 +285,7 @@ public class ClientUIPreferences {
     String splitterPositionKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION;
     String splitterPositionTypeKey = baseKey + "#" + ISplitBox.PROP_SPLITTER_POSITION_TYPE;
     String minimizedKey = baseKey + "#" + ISplitBox.PROP_FIELD_MINIMIZED;
-    String collapsedKey = baseKey + "#" + ISplitBox.PROP_FIELD_COLLAPSED;
+    String collapsedKey = prepareCollapsedPropName(splitBox);
 
     m_prefs.remove(splitterPositionKey);
     m_prefs.remove(splitterPositionTypeKey);
@@ -924,6 +947,15 @@ public class ClientUIPreferences {
       }
     }
     return result;
+  }
+
+  public void setPropertyBoolean(String propName, boolean value) {
+    if (m_prefs == null) {
+      return;
+    }
+
+    m_prefs.put(propName, Boolean.toString(value));
+    flush();
   }
 
   public int[][] getDesktopColumnSplits(int rowCount, int colCount) {

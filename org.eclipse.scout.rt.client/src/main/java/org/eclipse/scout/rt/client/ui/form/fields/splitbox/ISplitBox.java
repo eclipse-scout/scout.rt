@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 
+import org.eclipse.scout.rt.client.ui.IPreferenceField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
 /**
  * @since 1.0.9 16.07.2008
  */
-public interface ISplitBox extends ICompositeField {
+public interface ISplitBox extends ICompositeField, IPreferenceField {
 
   String PROP_SPLITTER_ENABLED = "splitterEnabled";
   String PROP_SPLIT_HORIZONTAL = "splitHorizontal";

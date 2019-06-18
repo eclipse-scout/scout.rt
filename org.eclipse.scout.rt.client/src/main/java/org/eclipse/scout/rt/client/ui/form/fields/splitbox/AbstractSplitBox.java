@@ -94,6 +94,11 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
     return getClass().getName();
   }
 
+  @Override
+  public String getPreferenceBaseKey() {
+    return getConfiguredCacheSplitterPositionPropertyName();
+  }
+
   @ConfigProperty(ConfigProperty.OBJECT)
   @Order(370)
   protected Class<? extends IFormField> getConfiguredCollapsibleField() {
