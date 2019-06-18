@@ -201,6 +201,11 @@ scout.Table.prototype._init = function(model) {
   this._setTableStatus(this.tableStatus);
   this._calculateValuesForBackgroundEffect();
   this._group();
+
+  if (this.tileMode) {
+    this._ensureMediator();
+    this.mediator.activate();
+  }
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -414,7 +419,9 @@ scout.Table.prototype._render = function() {
     this.$container.addClass(this.uiCssClass);
   }
 
-  if (this.tileMode && this.mediator) {
+  if (this.tileMode) {
+    // TODO [10.0] rmu doesn't belong here, but on init is not possible since TableAdapter is not yet registered...?
+    this.mediator.loadTiles();
     this.mediator.render();
   } else {
     this._renderData();
@@ -3968,18 +3975,15 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
   }, this);
 };
 
-// TODO [10.0] rmu make getConfiguredTileMode and refresh with active tile mode in scout classic work
 scout.Table.prototype.setTileMode = function(tileMode) {
   if (scout.objects.equals(this.tileMode, tileMode)) {
     return;
   }
-  // lazy init mediator on first use
-  if (!this.mediator) {
-    this.mediator = new scout.TableTileGridMediator(this);
-    this.mediator.init();
-  }
+
+  this._ensureMediator();
 
   if (tileMode) {
+    this.mediator.loadTiles();
     this.mediator.activate();
   }
 
@@ -3987,6 +3991,13 @@ scout.Table.prototype.setTileMode = function(tileMode) {
 
   if (!tileMode) {
     this.mediator.deactivate();
+  }
+};
+
+scout.Table.prototype._ensureMediator = function() {
+  if (!this.mediator) {
+    this.mediator = new scout.TableTileGridMediator(this);
+    this.mediator.init();
   }
 };
 
@@ -4006,10 +4017,14 @@ scout.Table.prototype._removeTileMode = function() {
   }
 };
 
-scout.Table.prototype._setTiles = function(tiles) {
-  this.mediator.insertTiles(!!tiles ? tiles.map(function(e) {
-    e.tile.rowId = e.tableRow;
-    return e.tile;
+scout.Table.prototype._setTiles = function(tableRowTileMappings) {
+  this.mediator.insertTiles(!!tableRowTileMappings ? tableRowTileMappings.map(function(tableRowTileMapping) {
+    tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
+    // TODO [10.0] rmu duplicated code. maybe syncTiles on TableAdapter can help that this function only has to deal with tiles
+    tableRowTileMapping.tile.gridDataHints = {
+      weightX: 0
+    };
+    return tableRowTileMapping.tile;
   }) : []);
   this.mediator._syncSelectionFromTableToTile();
   //  this.mediator._syncScrollTopFromTableToTile();
@@ -4029,6 +4044,9 @@ scout.Table.prototype._createTiles = function(rows) {
   return rows.map(function(row) {
     var tile = this.createTileForRow(row);
     tile.rowId = row.id;
+    tile.gridDataHints = {
+      weightX: 0
+    };
     return tile;
   }, this);
 };
