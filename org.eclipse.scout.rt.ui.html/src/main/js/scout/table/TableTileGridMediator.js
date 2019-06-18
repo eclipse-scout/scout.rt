@@ -66,9 +66,14 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
 };
 
 scout.TableTileGridMediator.prototype.loadTiles = function() {
-  if (this.tiles.length === 0) {
-    this.insertTiles(this.table.createTiles(this.table.rows));
-  }
+  this.tiles = [];
+  this.tilesMap = {};
+  this.table._setTiles(this.table.createTiles(this.table.rows));
+};
+
+scout.TableTileGridMediator.prototype.resolveMapping = function(tableRowTileMapping) {
+  tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
+  return tableRowTileMapping.tile;
 };
 
 //update tilesMap with the given tiles or recreate tilesMap completely in case of null given
@@ -175,13 +180,9 @@ scout.TableTileGridMediator.prototype.activate = function() {
 
   // only makes sense after tiles are loaded... in scout classic this should be executed by the TableAdapter
   this._syncFiltersFromTableToTile();
-  //  this._syncScrollTopFromTableToTile();
-
-  // create simplified grouping for tile accordion, grouping on the table can be left as is.
-  this._initGroups();
-  this._groupTiles(this.tiles);
-
+  // TODO [10.0] rmu duplicated code for classic and js case: after insertion or after activation...
   this._syncSelectionFromTableToTile();
+  //  this._syncScrollTopFromTableToTile();
 
   this.tileAccordion.setTiles(this.tiles);
 };
@@ -236,10 +237,15 @@ scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
   scout.arrays.pushAll(this.tiles, tiles);
   this._refreshTilesMap(tiles);
 
+  // create simplified grouping for tile accordion, grouping on the table can be left as is.
+  this._initGroups();
+  this._groupTiles(this.tiles);
+
   // tileAccordion is only ready when in tileMode.
   if (this.table.tileMode) {
-    this._groupTiles(tiles);
     this.tileAccordion.setTiles(this.tiles);
+    this._syncSelectionFromTableToTile();
+    //  this.mediator._syncScrollTopFromTableToTile();
   }
 };
 
@@ -265,9 +271,9 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
 };
 
 scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
-  var tiles = this.table.createTiles(event.rows);
-  if (tiles) {
-    this.insertTiles(tiles);
+  var tableRowTileMappings = this.table.createTiles(event.rows);
+  if (tableRowTileMappings) {
+    this.insertTiles(tableRowTileMappings.map(this.resolveMapping));
   }
 };
 

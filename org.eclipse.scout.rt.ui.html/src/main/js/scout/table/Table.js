@@ -4017,17 +4017,11 @@ scout.Table.prototype._removeTileMode = function() {
   }
 };
 
+// TODO [10.0] should only the tableAdapter work with tableRowTileMappings?
 scout.Table.prototype._setTiles = function(tableRowTileMappings) {
-  this.mediator.insertTiles(!!tableRowTileMappings ? tableRowTileMappings.map(function(tableRowTileMapping) {
-    tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
-    // TODO [10.0] rmu duplicated code. maybe syncTiles on TableAdapter can help that this function only has to deal with tiles
-    tableRowTileMapping.tile.gridDataHints = {
-      weightX: 0
-    };
-    return tableRowTileMapping.tile;
-  }) : []);
-  this.mediator._syncSelectionFromTableToTile();
-  //  this.mediator._syncScrollTopFromTableToTile();
+  if (tableRowTileMappings) {
+    this.mediator.insertTiles(tableRowTileMappings.map(this.mediator.resolveMapping));
+  }
 };
 
 scout.Table.prototype.createTiles = function(rows) {
@@ -4043,11 +4037,14 @@ scout.Table.prototype.createTiles = function(rows) {
 scout.Table.prototype._createTiles = function(rows) {
   return rows.map(function(row) {
     var tile = this.createTileForRow(row);
-    tile.rowId = row.id;
     tile.gridDataHints = {
       weightX: 0
     };
-    return tile;
+    return scout.create('TableRowTileMapping', {
+      parent: this,
+      tableRow: row.id,
+      tile: tile
+    });
   }, this);
 };
 

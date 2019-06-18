@@ -109,6 +109,15 @@ scout.TableAdapter.prototype._onWidgetCreateTiles = function(event) {
   this._sendCreateTiles(rowIds);
 };
 
+scout.TableAdapter.prototype.syncTiles = function(tableRowTileMappings) {
+  tableRowTileMappings = this._prepareWidgetProperty('tiles', tableRowTileMappings);
+
+  this.widget.setTiles(!!tableRowTileMappings ? tableRowTileMappings.map(function(tableRowTileMapping) {
+    tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
+    return tableRowTileMapping.tile;
+  }) : []);
+};
+
 scout.TableAdapter.prototype._sendCreateTiles = function(rowIds) {
   this._send('createTiles', {
     rowIds: rowIds
