@@ -133,4 +133,57 @@ describe("scrollbars", function() {
 
   });
 
+  describe("render", function() {
+
+    it("ensures parent has position absolute or relative", function() {
+      // Create scrollable without explicit position
+      var $scrollable = $('<div>')
+        .css('height', '50px')
+        .css('width', '200px')
+        .appendTo($('#sandbox'));
+      expect($scrollable.css('position')).toBe('static');
+
+      // Install scrollbars --> position should have been set automatically by Scrollbar._render()
+      scout.scrollbars.install($scrollable, {
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      expect($scrollable.css('position')).toBe('relative');
+
+      // Clear
+      scout.scrollbars.uninstall($scrollable, session);
+      $scrollable.remove();
+
+      // ---------------------------
+
+      // Create a new scrollable without explicit position
+      $scrollable = $('<div>')
+        .css('height', '50px')
+        .css('width', '200px')
+        .appendTo($('#sandbox'));
+      expect($scrollable.css('position')).toBe('static');
+
+      // Detach the scrollable
+      $scrollable.detach();
+      expect($scrollable.css('position')).toBe('');
+
+      // Install scrollbars into the detached scrollable --> position should not be set yet
+      scout.scrollbars.install($scrollable, {
+        parent: new scout.NullWidget(),
+        session: session
+      });
+      expect($scrollable.css('position')).toBe('');
+
+      // Simulate "attach" lifecycle of widget
+      $scrollable.appendTo($('#sandbox'));
+      $scrollable.data('scrollbars').forEach(function(scrollbar) {
+        scrollbar.attached = false;
+        scrollbar.attach();
+      });
+      // Position should now have been set automatically by Scrollbar._afterAttach()
+      expect($scrollable.css('position')).toBe('relative');
+    });
+
+  });
+
 });

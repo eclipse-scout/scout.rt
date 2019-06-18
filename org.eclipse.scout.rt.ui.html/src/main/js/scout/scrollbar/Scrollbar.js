@@ -47,6 +47,8 @@ scout.Scrollbar = function() {
 scout.inherits(scout.Scrollbar, scout.Widget);
 
 scout.Scrollbar.prototype._render = function() {
+  this._ensureParentPosition();
+
   // Create scrollbar and thumb
   this.$container = this.$parent
     .appendDiv('scrollbar')
@@ -101,6 +103,22 @@ scout.Scrollbar.prototype._remove = function() {
   this._$ancestors = null;
 
   scout.Scrollbar.parent.prototype._remove.call(this);
+};
+
+scout.Scrollbar.prototype._afterAttach = function() {
+  scout.Scrollbar.parent.prototype._afterAttach.call(this);
+  this._ensureParentPosition();
+};
+
+scout.Scrollbar.prototype._ensureParentPosition = function() {
+  // Container with JS scrollbars must have either relative or absolute position
+  // otherwise we cannot determine the correct dimension of the scrollbars
+  if (this.$parent && this.$parent.isAttached()) {
+    var cssPosition = this.$parent.css('position');
+    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
+      this.$parent.css('position', 'relative');
+    }
+  }
 };
 
 /**
