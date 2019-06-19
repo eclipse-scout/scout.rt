@@ -1,5 +1,4 @@
 export default class DummyApp {
-
   constructor() {
     console.log('Constructing dummy app');
   }

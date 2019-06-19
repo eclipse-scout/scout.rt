@@ -6,31 +6,31 @@ After the publish you should revert the package.json to its initial state.
 const path = require('path');
 const packageJson = require(path.resolve('./package.json'));
 
-let timestamp = new Date().toISOString(); //UTC
+let timestamp = new Date().toISOString(); // UTC
 
 // Create a string with the pattern yyyyMMddHHmmss
 timestamp = timestamp.replace(/[-:.TZ]/g, '');
 timestamp = timestamp.substr(0, timestamp.length - 3);
 
 const oldVersion = packageJson.version;
-const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, "");
-const newVersion = cleanedVersion + '-snapshot.' + timestamp;
+const cleanedVersion = oldVersion.replace(/-snapshot(.)*/i, '');
+const newVersion = `${cleanedVersion}-snapshot.${timestamp}`;
 
-const npmlog = require("npm/node_modules/npmlog");
+const npmlog = require('npm/node_modules/npmlog');
 const npm = require('npm');
 
-npmlog.on("log", msg => {
-  const {level} = msg;
+npmlog.on('log', msg => {
+  const { level } = msg;
   if (level === 'info' || level === 'error' || level === 'warn') {
-    console.log({msg});
+    console.log({ msg });
   }
 });
 
 npm.load({
-  loaded: false,
-  progress: false,
-  "no-audit": true
-}, (err) => {
+  'loaded': false,
+  'progress': false,
+  'no-audit': true
+}, err => {
   // handle errors
   if (err) {
     console.error(err);
@@ -47,7 +47,7 @@ npm.load({
     }
   });
 
-  npm.on('log', (message) => {
+  npm.on('log', message => {
     // log installation progress
     console.log(message);
   });

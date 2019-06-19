@@ -14,13 +14,13 @@ const path = require('path');
 const THEME_JS_OUT_FILTER = f => /.*theme.*\.js/.test(f);
 
 function deleteFile(filename) {
-  fs.access(filename, fs.constants.W_OK, (err) => {
+  fs.access(filename, fs.constants.W_OK, err => {
     if (err) {
       console.error(`${filename} does not exist or cannot be deleted.`);
     } else {
-      fs.unlink(filename, (err) => {
-        if (err) {
-          throw err;
+      fs.unlink(filename, unlinkErr => {
+        if (unlinkErr) {
+          throw unlinkErr;
         }
         console.log(`deleted ${filename}`);
       });
@@ -29,20 +29,20 @@ function deleteFile(filename) {
 }
 
 module.exports = {
-  createFileList: (dir) => {
+  createFileList: dir => {
     const scoutBuild = require('./constants');
     let content = '';
-    fs.readdirSync(dir, {withFileTypes: true})
+    fs.readdirSync(dir, { withFileTypes: true })
       .filter(dirent => dirent.isFile())
       .map(dirent => dirent.name)
       .filter(fileName => fileName !== scoutBuild.fileListName)
       .filter(fileName => !THEME_JS_OUT_FILTER(fileName))
-      .map(fileName => fileName + '\n')
+      .map(fileName => `${fileName}\n`)
       .forEach(line => content += line);
-    fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
+    fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, { flag: 'w' });
     console.log(`created ${scoutBuild.fileListName}:\n${content}`);
   },
-  cleanOutDir: (dir) => {
+  cleanOutDir: dir => {
     fs.readdirSync(dir)
       .filter(THEME_JS_OUT_FILTER)
       .forEach(f => deleteFile(path.join(dir, f)));

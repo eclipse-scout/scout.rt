@@ -20,7 +20,7 @@ const webpack = require('webpack');
 const scoutBuildConstants = require('./constants');
 
 module.exports = (env, args) => {
-  const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
+  const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
   const resDir = args.resDir || 'res';
   console.log(`Webpack mode: ${args.mode}`);
@@ -36,7 +36,7 @@ module.exports = (env, args) => {
     performance: {
       hints: false
     },
-    stats: "normal",
+    stats: 'normal',
     module: {
       // LESS
       rules: [{
@@ -58,7 +58,7 @@ module.exports = (env, args) => {
           options: {
             sourceMap: devMode,
             modules: false, // We don't want to work with CSS modules
-            url: false      // Don't resolve URLs in LESS, because relative path does not match /res/fonts
+            url: false // Don't resolve URLs in LESS, because relative path does not match /res/fonts
           }
         }, {
           // Compiles Less to CSS.
@@ -125,8 +125,8 @@ module.exports = (env, args) => {
           assetNameRegExp: /\.min\.css$/g,
           cssProcessorPluginOptions: {
             preset: ['default', {
-              discardComments: {removeAll: true}
-            }],
+              discardComments: { removeAll: true }
+            }]
           }
         }),
         // minify js

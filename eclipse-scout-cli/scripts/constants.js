@@ -25,7 +25,7 @@ module.exports = {
   fileListName: 'file-list',
   jsFilename: jsFilename,
   cssFilename: cssFilename,
-  getConstantsForMode: (buildMode) => {
+  getConstantsForMode: buildMode => {
     if (buildMode !== mode.production) {
       return {
         devMode: true,
@@ -33,13 +33,12 @@ module.exports = {
         cssFilename: cssFilename.development,
         outSubDir: outSubDir.development
       };
-    } else {
-      return {
-        devMode: false,
-        jsFilename: jsFilename.production,
-        cssFilename: cssFilename.production,
-        outSubDir: outSubDir.production
-      };
     }
+    return {
+      devMode: false,
+      jsFilename: jsFilename.production,
+      cssFilename: cssFilename.production,
+      outSubDir: outSubDir.production
+    };
   }
 };
