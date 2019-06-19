@@ -11,8 +11,12 @@
 
 const baseConfig = require('@eclipse-scout/cli/scripts/webpack-defaults');
 module.exports = (env, args) => {
-  let config = baseConfig(env, args);
+  const config = baseConfig(env, args);
 
+  config.entry = {
+    'eclipse-scout-core': './index.js',
+    'scout-theme': './src/scout/theme.less'
+  };
   config.externals = {
     // The value of this property (jQuery) is the name of the global variable (window scope)
     // where the declared external library will be available in the browser. This is required

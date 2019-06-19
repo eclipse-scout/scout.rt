@@ -17,10 +17,13 @@ process.on('unhandledRejection', err => {
   throw err;
 });
 
-//argv[0] path to node
-//argv[1] path to js file
-//argv[2] name of called script
+// argv[0] path to node
+// argv[1] path to js file
+// argv[2] name of called script
 const script = process.argv[2];
+const fs = require('fs');
+const path = require('path');
+const webpackConfigFileName = './webpack.config.js';
 switch (script) {
   case 'test-server:start': {
     runKarma('./karma.conf.js');
@@ -58,36 +61,48 @@ switch (script) {
     break;
   }
   default:
-    console.log('Unknown script "' + script + '".');
+    console.log(`Unknown script "${script}"`);
     break;
 }
 
-function runKarma(configFileName){
+function runKarma(configFileName) {
   const cfg = require('karma').config;
-  const path = require('path');
-  const karmaConfig = cfg.parseConfig(path.resolve(configFileName));
+  const configFilePath = path.resolve(configFileName);
+  if (!fs.existsSync(configFilePath)) {
+    // No config file found -> abort
+    console.log(`Skipping karma test run (config file ${configFileName} not found)`);
+    return;
+  }
+  const karmaConfig = cfg.parseConfig(configFilePath);
   const Server = require('karma').Server;
   const serverInstance = new Server(karmaConfig, (exitCode) => {
-    console.log('Karma has exited with ' + exitCode);
+    console.log(`Karma has exited with ${exitCode}`);
     process.exit(exitCode);
   });
+  console.log(`Starting karma server using config file ${configFileName}`);
   serverInstance.start();
 }
 
 function runWebpack(webPackArgs) {
-  const compiler = createWebpackCompiler(webPackArgs);
+  const configFilePath = path.resolve(webpackConfigFileName)
+  if (!fs.existsSync(configFilePath)) {
+    // No config file found -> abort
+    console.log(`Skipping webpack build (config file ${webpackConfigFileName} not found)`);
+    return;
+  }
+  const compiler = createWebpackCompiler(configFilePath, webPackArgs);
   compiler.run(logWebpack);
 }
 
 function runWebpackWatch(webPackArgs) {
-  const compiler = createWebpackCompiler(webPackArgs);
+  const configFilePath = path.resolve(webpackConfigFileName)
+  const compiler = createWebpackCompiler(configFilePath, webPackArgs);
   compiler.watch({}, logWebpack);
 }
 
-function createWebpackCompiler(webPackArgs){
+function createWebpackCompiler(configFilePath, webPackArgs){
   const webpack = require('webpack');
-  const path = require('path');
-  const conf = require(path.resolve('./webpack.config.js'));
+  const conf = require(configFilePath);
   const webpackConfig = conf(process.env, webPackArgs);
   return webpack(webpackConfig);
 }
@@ -105,6 +120,6 @@ function logWebpack(err, stats) {
     console.warn(info.warnings);
   }
   console.log(stats.toString({
-    colors: true,
+    colors: true
   }) + '\n\n');
 }

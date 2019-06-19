@@ -20,31 +20,27 @@ const webpack = require('webpack');
 const scoutBuildConstants = require('./constants');
 
 module.exports = (env, args) => {
-  const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
+  const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
+  const resDir = args.resDir || 'res';
   console.log(`Webpack mode: ${args.mode}`);
 
   return {
     target: 'web',
     mode: args.mode,
     devtool: devMode ? 'inline-module-source-map' : undefined,
-    entry: {
-      'eclipse-scout': './index.js',
-      'scout-theme': './src/scout/scout-theme.less',
-      'scout-theme-dark': './src/scout/scout-theme-dark.less',
-    },
     output: {
       filename: jsFilename,
-      path: outDir,
+      path: outDir
     },
     performance: {
-      hints: false,
+      hints: false
     },
-    stats: 'normal',
+    stats: "normal",
     module: {
       // LESS
       rules: [{
-        test: /\.less$/u,
+        test: /\.less$/,
         use: [{
           // Extracts CSS into separate files. It creates a CSS file per JS file which contains CSS.
           // It supports On-Demand-Loading of CSS and SourceMaps.
@@ -54,7 +50,7 @@ module.exports = (env, args) => {
           // This seems to be an issue in webpack, workaround is to remove the files later
           // see: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/151
           // seems to be fixed in webpack 5, workaround to manually delete js files can be removed as soon as webpack 5 is released
-          loader: MiniCssExtractPlugin.loader,
+          loader: MiniCssExtractPlugin.loader
         }, {
           // Interprets @import and url() like import/require() and will resolve them.
           // see: https://webpack.js.org/loaders/css-loader/
@@ -62,20 +58,20 @@ module.exports = (env, args) => {
           options: {
             sourceMap: devMode,
             modules: false, // We don't want to work with CSS modules
-            url: false, // Don't resolve URLs in LESS, because relative path does not match /res/fonts
-          },
+            url: false      // Don't resolve URLs in LESS, because relative path does not match /res/fonts
+          }
         }, {
           // Compiles Less to CSS.
           // see: https://webpack.js.org/loaders/less-loader/
           loader: require.resolve('less-loader'),
           options: {
-            sourceMap: devMode,
-          },
-        }],
+            sourceMap: devMode
+          }
+        }]
       }, {
         // # Babel
-        test: /\.m?js$/u,
-        exclude: /node_modules/u,
+        test: /\.m?js$/,
+        exclude: /node_modules/,
         use: {
           loader: require.resolve('babel-loader'),
           options: {
@@ -93,73 +89,73 @@ module.exports = (env, args) => {
                   chrome: '40',
                   ie: '11',
                   edge: '12',
-                  safari: '8',
-                },
-              }],
-            ],
-          },
-        },
-      }],
+                  safari: '8'
+                }
+              }]
+            ]
+          }
+        }
+      }]
     },
     plugins: [
       // see: extracts css into separate files
       new MiniCssExtractPlugin({
-        filename: cssFilename,
+        filename: cssFilename
       }),
       // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
       new CleanWebpackPlugin(),
       // run post-build script hook
       new AfterEmitWebpackPlugin({
         createFileList: !devMode,
-        outDir: outDir,
+        outDir: outDir
       }),
       // # Copy resources
       new CopyPlugin([{
         // # Copy static web-resources
-        from: 'res',
-        to: '../res/',
+        from: resDir,
+        to: '../res/'
       }]),
       // Shows progress information in the console
-      new webpack.ProgressPlugin(),
+      new webpack.ProgressPlugin()
     ],
     optimization: {
       minimizer: [
         // minify css
         new OptimizeCssAssetsPlugin({
-          assetNameRegExp: /\.min\.css$/gu,
+          assetNameRegExp: /\.min\.css$/g,
           cssProcessorPluginOptions: {
             preset: ['default', {
-              discardComments: { removeAll: true },
+              discardComments: {removeAll: true}
             }],
-          },
+          }
         }),
         // minify js
         new TerserPlugin({
-          test: /\.js(\?.*)?$/iu,
+          test: /\.js(\?.*)?$/i,
           sourceMap: devMode,
           cache: true,
-          parallel: true,
-        }),
+          parallel: true
+        })
       ],
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
-          // Eclipse Scout
           scout: {
-            test: /.*[\\/]eclipse-scout[\\/]/u,
+            // Scout may be loaded as node module or may be part of the workspace
+            // Also make sure the regex only matches *.js files to prevent the output from mixing with css
+            test: /([\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|.*[\\/]eclipse-scout.*[\\/].*\.js)/,
             name: 'eclipse-scout',
             priority: -5,
-            reuseExistingChunk: true,
+            reuseExistingChunk: true
           },
-          // jQuery
           jquery: {
-            test: /.*[\\/]jquery[\\/]/u,
+            test: /[\\/]node_modules[\\/]jquery[\\/]/,
             name: 'jquery',
             priority: -1,
-            reuseExistingChunk: true,
-          },
-        },
-      },
-    },
+            reuseExistingChunk: true
+          }
+        }
+      }
+    }
   };
 };
