@@ -20,6 +20,7 @@ import java.util.Collection;
  */
 public enum MimeType {
   AA("audio/audible", "aa"),
+  AAC("audio/aac", "aac"),
   AMV("video/x-amv", "amv"),
   APPCACHE("text/cache-manifest", "appcache"),
   APPLICATION_OCTET_STREAM("application/octet-stream", "bin"),
@@ -50,6 +51,7 @@ public enum MimeType {
   MIME("message/rfc822", "mime"),
   MKV("video/x-matroska", "mkv"),
   MOV("video/quicktime", "mov"),
+  MP3("audio/mpeg", "mp3"),
   MP4("video/mp4", "mp4"),
   MPG("video/mpeg", "mpg"),
   MSG("application/vnd.ms-outlook", "msg"),
