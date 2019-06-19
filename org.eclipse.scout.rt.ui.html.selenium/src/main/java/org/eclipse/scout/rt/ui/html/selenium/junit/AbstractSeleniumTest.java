@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.selenium.junit;
 
 import static org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil.shortPause;
-import static org.eclipse.scout.rt.ui.html.selenium.util.SeleniumUtil.variablePause;
 
 import java.util.List;
 import java.util.Set;
@@ -197,45 +196,42 @@ public abstract class AbstractSeleniumTest {
    * Fills the given value into the first <code>input</code> {@link WebElement} that represents the given model class.
    * In turn, that field is the focus owner.
    */
-  public WebElement fillInputField(Class<? extends IValueField<?>> modelClass, String value) {
-    return fillInputField(null, modelClass, value);
+  public void fillInputField(Class<? extends IValueField<?>> modelClass, String value) {
+    fillInputField(null, modelClass, value);
   }
 
   /**
    * Fills the given value into the first <code>input</code> {@link WebElement} that represents the given model class,
    * and which is located somewhere beneath the given parent. In turn, that field is the focus owner.
    */
-  public WebElement fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
+  public void fillInputField(WebElement parent, Class<? extends IValueField<?>> modelClass, String value) {
     waitUntilDataRequestPendingDone();
     WebElement inputField = waitUntilInputFieldClickable(parent, modelClass);
-    return fillInputField(inputField, value);
+    fillInputField(inputField, value);
   }
 
   /**
-   * Fills in the given value into the given {@link WebElement}.
+   * Fills in the given value into the given {@link WebElement}. The method does this:
+   * <ul>
+   * <li>Click on the field</li>
+   * <li>Clear the field</li>
+   * <li>Set the given value by sending keys and wait for pending requests</li>
+   * <li>Tab out and wait for pending requests</li>
+   * <li>Tab in again (Shift + Tab)</li>
+   * </ul>
    */
-  public WebElement fillInputField(WebElement inputField, String value) {
+  public void fillInputField(WebElement inputField, String value) {
     inputField.click();
-    variablePause(1);
-    waitUntilDataRequestPendingDone();
-
     clearInput(inputField);
-    variablePause(2);
-    waitUntilDataRequestPendingDone();
-
     inputField.sendKeys(value);
-    variablePause(2);
-    waitUntilDataRequestPendingDone();
-
-    switchTo().activeElement().sendKeys(Keys.TAB);
-    variablePause(2);
-    waitUntilDataRequestPendingDone();
-
-    switchTo().activeElement().sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
     shortPause();
     waitUntilDataRequestPendingDone();
 
-    return inputField;
+    switchTo().activeElement().sendKeys(Keys.TAB);
+    shortPause();
+    waitUntilDataRequestPendingDone();
+
+    switchTo().activeElement().sendKeys(Keys.chord(Keys.SHIFT, Keys.TAB));
   }
 
   public void waitUntilScoutSession() {

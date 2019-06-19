@@ -21,15 +21,11 @@ import org.eclipse.scout.rt.platform.util.UriBuilder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for Selenium tests
  */
 public final class SeleniumUtil {
-
-  private static final Logger LOG = LoggerFactory.getLogger(SeleniumUtil.class);
 
   private static final String DEFAULT_WEB_APP_URL = "http://localhost:8082/";
 
@@ -39,13 +35,6 @@ public final class SeleniumUtil {
    * DOM attribute as used by Scout widgets to identify the Scout Java model class.
    */
   private static final String ATTR_DATA_MODELCLASS = "data-modelclass";
-
-  /**
-   * Slow down factor is used on CI-server to prevent test failures because sometimes the machine is slow - thus we wait
-   * longer on the CI-server than on the local server. By default the value is 0.1 which means, on the local machine we
-   * wait only 10% of the time we wait on the CI-server. The CI-server uses 1.0 as wait-factor (see pom.xml)
-   */
-  private static final double SLOW_DOWN_FACTOR = 0.1;
 
   private SeleniumUtil() {
   }
@@ -176,23 +165,6 @@ public final class SeleniumUtil {
   }
 
   /**
-   * Same as pause(TimeUnit, int), but waits longer on CI-server.
-   */
-  public static void variablePause(TimeUnit timeUnit, int duration) {
-    duration = (int) ((double) timeUnit.toMillis(duration) * getSlowDownFactor());
-    if (duration > 0) {
-      SleepUtil.sleepSafe(duration, TimeUnit.MILLISECONDS);
-    }
-  }
-
-  /**
-   * Same as pause(int), but waits longer on CI-server.
-   */
-  public static void variablePause(int seconds) {
-    variablePause(TimeUnit.SECONDS, seconds);
-  }
-
-  /**
    * @return a CSS selector for the given model class, with double quoted strings. Example:<br>
    *         <code>data-modelclass="com.bsiag.widgets.FooBar$MainBox"</code>
    */
@@ -262,19 +234,6 @@ public final class SeleniumUtil {
 
   public static boolean takeScreenShotOnFailure() {
     return TypeCastUtility.castValue(System.getProperty("take.screenshot.on.failure"), boolean.class);
-  }
-
-  public static double getSlowDownFactor() {
-    String slowDownFactor = System.getProperty("slow.down.factor");
-    if (slowDownFactor != null) {
-      try {
-        return Double.parseDouble(slowDownFactor);
-      }
-      catch (NumberFormatException e) {
-        LOG.warn("Failed to convert property slow.down.factor {} into a double", slowDownFactor);
-      }
-    }
-    return SLOW_DOWN_FACTOR;
   }
 
   public static URL getWebAppUrl() {
