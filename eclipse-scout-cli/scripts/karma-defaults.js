@@ -12,7 +12,7 @@ const path = require('path');
 const scoutBuild = require('./constants');
 const specIndex = path.resolve('test', 'test-index.js');
 
-var preprocessorObj = {};
+const preprocessorObj = {};
 preprocessorObj[specIndex] = ['webpack'];
 
 module.exports = function(config) {
@@ -20,7 +20,7 @@ module.exports = function(config) {
     browsers: ['Chrome'],
     files: [{
       pattern: specIndex,
-      watched: false
+      watched: false,
     }],
     frameworks: ['jasmine'],
     // Reporter for "Jasmine Spec Runner" results in browser
@@ -28,18 +28,18 @@ module.exports = function(config) {
     reporters: ['kjhtml', 'junit'],
     junitReporter: {
       outputDir: './test-results/',
-      outputFile: 'test-results.xml'
+      outputFile: 'test-results.xml',
     },
-    plugins:[
+    plugins: [
       require('karma-jasmine-html-reporter'),
       require('karma-junit-reporter'),
       require('karma-jasmine'),
       require('karma-webpack'),
-      require('karma-chrome-launcher')
+      require('karma-chrome-launcher'),
     ],
     client: {
       // Leave "Jasmine Spec Runner" output visible in browser
-      clearContext: false
+      clearContext: false,
     },
     preprocessors: preprocessorObj,
     // If true, Karma will start and capture all configured browsers, run tests and then exit with an exit code of 0 or 1
@@ -47,10 +47,10 @@ module.exports = function(config) {
     singleRun: false,
     // Webpack
     webpack: {
-      mode: scoutBuild.mode.development
+      mode: scoutBuild.mode.development,
     },
     webpackServer: {
-      noInfo: true
-    }
+      noInfo: true,
+    },
   });
 };
