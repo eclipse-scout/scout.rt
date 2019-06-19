@@ -52,10 +52,13 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
     if (!ObjectUtility.equals(req.getPathInfo(), HANDLER_PATH)) {
       return false;
     }
+    log(getReport(req));
+    return true;
+  }
 
-    String cspReportData;
+  protected String getReport(final HttpServletRequest req) throws IOException {
     try (Reader in = req.getReader()) {
-      cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATALENGTH);
+      String cspReportData = IOUtility.readString(in, MAX_CSP_REPORT_DATALENGTH);
       if (in.read() != -1) {
         cspReportData += "... [only first " + MAX_CSP_REPORT_DATALENGTH + " bytes shown]";
       }
@@ -69,10 +72,11 @@ public class ContentSecurityPolicyReportHandler extends AbstractUiServletRequest
           LOG.trace("Error while converting CSP report to JSON", e);
         }
       }
+      return cspReportData;
     }
-
-    LOG.warn("CSP-REPORT: {}", cspReportData);
-    return true;
   }
 
+  protected void log(final String report) {
+    LOG.info("CSP-REPORT: {}", report);
+  }
 }
