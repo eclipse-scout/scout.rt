@@ -132,12 +132,16 @@ scout.TableTileGridMediator.prototype._createTileAccordion = function() {
 };
 
 scout.TableTileGridMediator.prototype._createTileGroup = function(groupId) {
+  var count = Object.values(this.groupForTileMap).filter(function(x) {
+    return x === groupId;
+  }).length;
   return new scout.create('Group', {
     parent: this.tileAccordion,
     id: groupId,
     // TODO [10.0] rmu temporary workaround that in case of default group no title is shown...
     headerVisible: groupId === 'default' ? false : true,
     title: groupId,
+    titleSuffix: '(' + count + ')',
     body: {
       objectType: 'TileGrid'
     }
