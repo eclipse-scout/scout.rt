@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
-import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -31,46 +29,7 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractContextM
   }
 
   @Override
-  protected void initConfig() {
-    super.initConfig();
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
-    super.afterChildMenusAdd(newChildMenus);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    super.afterChildMenusRemove(childMenusToRemove);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected boolean getConfiguredInheritAccessibility() {
+  protected boolean isOwnerPropertyChangedListenerRequired() {
     return false;
-  }
-
-  protected void handleOwnerEnabledChanged() {
-    if (getContainer() == null) {
-      return;
-    }
-
-    final boolean enabled = getContainer().isEnabledIncludingParents();
-    visit(menu -> {
-      if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-        menu.setEnabledInheritAccessibility(enabled);
-      }
-    }, IMenu.class);
-  }
-
-  @Override
-  protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    super.handleOwnerPropertyChanged(evt);
-    if (IFormField.PROP_ENABLED_COMPUTED.equals(evt.getPropertyName())) {
-      handleOwnerEnabledChanged();
-    }
   }
 }

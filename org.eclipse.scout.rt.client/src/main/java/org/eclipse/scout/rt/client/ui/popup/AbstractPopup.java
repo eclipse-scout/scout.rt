@@ -16,10 +16,12 @@ import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 9.0
  */
+@ClassId("8d02c4fd-2d8b-4630-9fd2-69fea7f8c364")
 public abstract class AbstractPopup extends AbstractWidget implements IPopup {
 
   private IPopupUIFacade m_uiFacade;

@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
@@ -119,8 +120,12 @@ public class FormFieldEnabledTest {
     Assert.assertFalse(box.isEnabled());
     Assert.assertFalse(tableField.isEnabledIncludingParents());
     Assert.assertTrue(tableField.isEnabled());
-    Assert.assertFalse(table.isEnabled());
-    Assert.assertFalse(table.getMenus().get(0).isEnabled());
+    Assert.assertTrue(table.isEnabled());
+    Assert.assertFalse(table.isEnabledIncludingParents());
+
+    IMenu firstTableMenu = table.getMenus().get(0);
+    Assert.assertTrue(firstTableMenu.isEnabled());
+    Assert.assertFalse(firstTableMenu.isEnabledIncludingParents());
   }
 
   @Test
@@ -133,8 +138,12 @@ public class FormFieldEnabledTest {
     Assert.assertFalse(box.isEnabled());
     Assert.assertFalse(treeField.isEnabledIncludingParents());
     Assert.assertTrue(treeField.isEnabled());
-    Assert.assertFalse(tree.isEnabled());
-    Assert.assertFalse(tree.getMenus().get(0).isEnabled());
+    Assert.assertTrue(tree.isEnabled());
+    Assert.assertFalse(tree.isEnabledIncludingParents());
+
+    IMenu firstMenu = tree.getMenus().get(0);
+    Assert.assertTrue(firstMenu.isEnabled());
+    Assert.assertFalse(firstMenu.isEnabledIncludingParents());
   }
 
   @Test
@@ -147,7 +156,8 @@ public class FormFieldEnabledTest {
     Assert.assertFalse(box.isEnabled());
     Assert.assertFalse(listBox.isEnabledIncludingParents());
     Assert.assertTrue(listBox.isEnabled());
-    Assert.assertFalse(table.isEnabled());
+    Assert.assertTrue(table.isEnabled());
+    Assert.assertFalse(table.isEnabledIncludingParents());
   }
 
   @Test
@@ -160,7 +170,8 @@ public class FormFieldEnabledTest {
     Assert.assertFalse(box.isEnabled());
     Assert.assertFalse(composerField.isEnabledIncludingParents());
     Assert.assertTrue(composerField.isEnabled());
-    Assert.assertFalse(tree.isEnabled());
+    Assert.assertTrue(tree.isEnabled());
+    Assert.assertFalse(tree.isEnabledIncludingParents());
   }
 
   @Test
@@ -185,7 +196,7 @@ public class FormFieldEnabledTest {
       public void accept(IFormField field) {
         counter.incrementAndGet();
       }
-    });
+    }, IFormField.class);
     Assert.assertEquals(7, counter.intValue());
 
     MainBox innerMainBox = frm.getFieldByClass(Wrapped.class).getInnerForm().getFieldByClass(MainBox.class);
@@ -195,7 +206,7 @@ public class FormFieldEnabledTest {
       public void accept(IFormField field) {
         counter2.incrementAndGet();
       }
-    });
+    }, IFormField.class);
     Assert.assertEquals(2, counter2.intValue());
   }
 

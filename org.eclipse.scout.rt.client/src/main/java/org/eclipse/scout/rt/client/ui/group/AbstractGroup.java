@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
@@ -44,7 +45,6 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   private IGroupUIFacade m_uiFacade;
   private final ObjectExtensions<AbstractGroup, IGroupExtension<? extends AbstractGroup>> m_objectExtensions;
   protected ContributionComposite m_contributionHolder;
-  private ITypeWithClassId m_container;
 
   /**
    * Provides 8 dimensions for visibility.<br>
@@ -101,9 +101,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   }
 
   protected void initGroupInternal() {
-    if (getContainer() == null) {
-      throw new IllegalStateException("Group is not connected to a container");
-    }
+    Assertions.assertNotNull(getParent(), "Group is not connected to a container");
   }
 
   protected void handleInitException(Exception exception) {
@@ -379,14 +377,14 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
     return (IWidget) propertySupport.getProperty(PROP_BODY);
   }
 
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public ITypeWithClassId getContainer() {
-    return m_container;
-  }
-
-  @Override
-  public void setContainer(ITypeWithClassId container) {
-    m_container = container;
+    return getParent();
   }
 
   @Override
@@ -412,7 +410,7 @@ public abstract class AbstractGroup extends AbstractWidget implements IGroup {
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
-    return getContainer().classId() + ID_CONCAT_SYMBOL + simpleClassId;
+    return getParent().classId() + ID_CONCAT_SYMBOL + simpleClassId;
   }
 
   @Override

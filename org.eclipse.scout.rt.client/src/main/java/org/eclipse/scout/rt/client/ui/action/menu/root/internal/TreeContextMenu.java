@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
-import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +17,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
@@ -40,7 +37,8 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
   @Override
   protected void initConfig() {
     super.initConfig();
-    getContainer().addTreeListener(
+    ITree container = getContainer();
+    container.addTreeListener(
         e -> {
           switch (e.getType()) {
             case TreeEvent.TYPE_NODES_SELECTED: {
@@ -58,32 +56,8 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
         TreeEvent.TYPE_NODES_SELECTED,
         TreeEvent.TYPE_NODES_UPDATED);
     // init current menu types
-    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedNodes()));
+    setCurrentMenuTypes(getMenuTypesForSelection(container.getSelectedNodes()));
     calculateLocalVisibility();
-  }
-
-  @Override
-  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
-    super.afterChildMenusAdd(newChildMenus);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    super.afterChildMenusRemove(childMenusToRemove);
-    handleOwnerEnabledChanged();
-  }
-
-  protected void handleOwnerEnabledChanged() {
-    ITree container = getContainer();
-    if (container != null) {
-      final boolean enabled = container.isEnabled();
-      visit(menu -> {
-        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-          menu.setEnabledInheritAccessibility(enabled);
-        }
-      }, IMenu.class);
-    }
   }
 
   @Override
@@ -91,42 +65,44 @@ public class TreeContextMenu extends AbstractContextMenu<ITree> implements ITree
     handleOwnerValueChanged();
   }
 
-  protected void handleOwnerValueChanged() {
-    if (getContainer() != null) {
-      final Set<ITreeNode> ownerSelection = getContainer().getSelectedNodes();
-      m_currentSelection = CollectionUtility.hashSet(ownerSelection);
-      setCurrentMenuTypes(getMenuTypesForSelection(ownerSelection));
-      visit(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()), IMenu.class);
-      // update menu types
-      calculateLocalVisibility();
-      calculateEnableState(ownerSelection);
-    }
-  }
-
-  /**
-   * @param ownerSelection
-   */
-  protected void calculateEnableState(Collection<? extends ITreeNode> ownerSelection) {
-    boolean enabled = true;
-    for (ITreeNode node : ownerSelection) {
-      if (!node.isEnabled()) {
-        enabled = false;
-        break;
-      }
-    }
-    final boolean inheritedEnability = enabled;
-    visit(menu -> {
-      if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-        menu.setEnabledInheritAccessibility(inheritedEnability);
-      }
-    }, IMenu.class);
-  }
-
   @Override
-  protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
-      handleOwnerEnabledChanged();
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return false;
+  }
+
+  protected void handleOwnerValueChanged() {
+    ITree container = getContainer();
+    if (container == null) {
+      return;
     }
+
+    final Set<ITreeNode> ownerSelection = container.getSelectedNodes();
+    m_currentSelection = CollectionUtility.hashSet(ownerSelection);
+    setCurrentMenuTypes(getMenuTypesForSelection(ownerSelection));
+    visit(new MenuOwnerChangedVisitor(ownerSelection, getCurrentMenuTypes()), IMenu.class);
+    // update menu types
+    calculateLocalVisibility();
+    calculateEnableState();
+  }
+
+  protected boolean isTreeAndSelectionEnabled() {
+    ITree container = getContainer();
+    boolean enabled = container.isEnabled();
+    if (!enabled) {
+      return false;
+    }
+
+    final Set<ITreeNode> containerSelection = container.getSelectedNodes();
+    for (ITreeNode node : containerSelection) {
+      if (!node.isEnabled()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  protected void calculateEnableState() {
+    setEnabled(isTreeAndSelectionEnabled());
   }
 
   protected Set<TreeMenuType> getMenuTypesForSelection(Set<? extends ITreeNode> selection) {

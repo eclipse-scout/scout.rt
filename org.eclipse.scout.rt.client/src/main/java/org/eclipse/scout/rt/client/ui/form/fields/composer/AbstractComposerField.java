@@ -346,6 +346,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       m_tree.setRootNode(rootNode);
       m_tree.setNodeExpanded(rootNode, true);
       m_tree.setEnabled(isEnabled());
+      m_tree.setParentInternal(this);
       m_tree.addTreeListener(
           e -> {
             checkSaveNeeded();
@@ -356,15 +357,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           TreeEvent.TYPE_NODES_INSERTED,
           TreeEvent.TYPE_NODES_UPDATED,
           TreeEvent.TYPE_NODES_CHECKED);
-
-      // local enabled listener
-      addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
-        if (m_tree == null) {
-          return;
-        }
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_tree.setEnabled(newEnabled);
-      });
     }
     else {
       LOG.warn("there is no inner class of type ITree in {}", getClass().getName());
@@ -782,6 +774,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   /**
    * inner tree type
    */
+  @ClassId("2f9212f9-6c18-46dd-9d9b-d3bd590bd8fc")
   public class Tree extends AbstractTree {
 
     @Override

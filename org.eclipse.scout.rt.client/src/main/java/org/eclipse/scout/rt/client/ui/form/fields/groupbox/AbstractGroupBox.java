@@ -377,10 +377,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    // set container on menus
-    IFormFieldContextMenu contextMenu = new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList());
-    contextMenu.setContainerInternal(this);
-    setContextMenu(contextMenu);
+    setContextMenu(new FormFieldContextMenu<IGroupBox>(this, menus.getOrderedList()));
   }
 
   private void categorizeFields() {

@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -42,7 +43,6 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.TriState;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
-import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
@@ -53,16 +53,12 @@ import org.eclipse.scout.rt.shared.services.common.code.ICode;
  * </p>
  * For every inner column class there is a generated getXYColumn method directly on the table.
  */
-public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
+public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner {
 
   /**
    * String
    */
   String PROP_TITLE = "title";
-  /**
-   * Boolean
-   */
-  String PROP_ENABLED = "enabled";
   /**
    * String
    */
@@ -128,7 +124,7 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    */
   String PROP_SCROLL_TO_SELECTION = "scrollToSelection";
   /**
-   * Object
+   * {@link IPage} or {@link IWidget}
    * <p>
    * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
@@ -546,10 +542,6 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
 
   void setMultiCheck(boolean b);
 
-  boolean isEnabled();
-
-  void setEnabled(boolean b);
-
   /**
    * This property changes the behaviour of {@link #replaceRows(List<? extends ITableRow>)} and
    * {@link #deleteRows(int[])} true discards rows when deleted, false keeps them in the cache for later usage in change
@@ -932,12 +924,12 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   /**
    * Container of this table, {@link org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage IPage},
    * {@link org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField ITableField},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox},
-   * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfieldold.IPlannerFieldOld IPlannerField}
+   * {@link org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox IListBox}, etc.
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
    *
    * @since 3.8.1
+   * @see #getParent()
    */
   ITypeWithClassId getContainer();
 

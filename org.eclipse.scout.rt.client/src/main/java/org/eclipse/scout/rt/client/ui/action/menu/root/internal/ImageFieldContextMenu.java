@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -63,18 +62,6 @@ public class ImageFieldContextMenu extends FormFieldContextMenu<IImageField> imp
     }
   }
 
-  @Override
-  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
-    super.afterChildMenusAdd(newChildMenus);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    super.afterChildMenusRemove(childMenusToRemove);
-    handleOwnerEnabledChanged();
-  }
-
   protected void handleOwnerValueChanged() {
     IImageField container = getContainer();
     if (container != null) {
@@ -86,16 +73,18 @@ public class ImageFieldContextMenu extends FormFieldContextMenu<IImageField> imp
   }
 
   @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return true;
+  }
+
+  @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
+    super.handleOwnerPropertyChanged(evt);
     String propertyName = evt.getPropertyName();
     if (IImageField.PROP_IMAGE_ID.equals(propertyName) ||
         IImageField.PROP_IMAGE_URL.equals(propertyName) ||
         IImageField.PROP_IMAGE.equals(propertyName)) {
       handleOwnerValueChanged();
     }
-    else {
-      super.handleOwnerPropertyChanged(evt);
-    }
   }
-
 }

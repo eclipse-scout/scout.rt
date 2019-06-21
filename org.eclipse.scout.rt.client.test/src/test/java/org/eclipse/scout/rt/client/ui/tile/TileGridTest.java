@@ -583,9 +583,9 @@ public class TileGridTest {
     P_Tile tile1 = createTestTile();
     P_Tile tile2 = createTestTile();
     tileGrid.addTiles(Arrays.asList(tile0, tile1, tile2));
-    assertEquals(tile0.getContainer(), tileGrid);
-    assertEquals(tile1.getContainer(), tileGrid);
-    assertEquals(tile2.getContainer(), tileGrid);
+    assertEquals(tile0.getParent(), tileGrid);
+    assertEquals(tile1.getParent(), tileGrid);
+    assertEquals(tile2.getParent(), tileGrid);
 
     ITileFilter<P_Tile> filter1 = (tile) -> tile != tile1; // accept tile0 and tile2
     tileGrid.addFilter(filter1);
@@ -602,9 +602,9 @@ public class TileGridTest {
 
     P_TileGrid tileGrid2 = createTestTileGrid();
     tileGrid2.setTiles(Arrays.asList(tile0, tile1, tile2));
-    assertEquals(tile0.getContainer(), tileGrid2);
-    assertEquals(tile1.getContainer(), tileGrid2);
-    assertEquals(tile2.getContainer(), tileGrid2);
+    assertEquals(tile0.getParent(), tileGrid2);
+    assertEquals(tile1.getParent(), tileGrid2);
+    assertEquals(tile2.getParent(), tileGrid2);
 
     // Assert that filter works correctly
     tileGrid2.addFilter(filter1);

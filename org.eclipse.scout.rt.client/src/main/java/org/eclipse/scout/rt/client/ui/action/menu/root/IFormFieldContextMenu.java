@@ -10,10 +10,5 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-
 public interface IFormFieldContextMenu extends IContextMenu {
-
-  @Override
-  IFormField getContainer();
 }

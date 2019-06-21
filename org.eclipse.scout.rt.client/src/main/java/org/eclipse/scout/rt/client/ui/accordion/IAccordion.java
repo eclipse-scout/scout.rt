@@ -17,13 +17,16 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.group.IGroup;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 
-public interface IAccordion extends IWidget, ITypeWithClassId {
+public interface IAccordion extends IWidget {
 
   String PROP_GROUPS = "groups";
   String PROP_EXCLUSIVE_EXPAND = "exclusiveExpand";
   String PROP_SCROLLABLE = "scrollable";
-  String PROP_CONTAINER = "container";
 
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
+  @Deprecated
   ITypeWithClassId getContainer();
 
   /**

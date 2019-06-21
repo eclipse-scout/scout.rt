@@ -64,12 +64,6 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return (int) getModel().getLabelPosition();
       }
     });
-    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
-      }
-    });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {

@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelect
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -32,10 +35,8 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -49,23 +50,12 @@ import org.slf4j.LoggerFactory;
 @ClassId("d3cdbb0d-4c53-4854-b6f2-23465050c3c5")
 public abstract class AbstractAction extends AbstractWidget implements IAction, IExtensibleObject {
 
-  private static final String ENABLED_INHERIT_ACCESSIBILITY = "ENABLED_INHERIT_ACCESSIBILITY";
-  private static final String INHERIT_ACCESSIBILITY = "INHERIT_ACCESSIBILITY";
   private static final String TOGGLE_ACTION = "TOGGLE_ACTION";
   private static final String SEPARATOR = "SEPARATOR";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAction.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_INHERIT_ACCESSIBILITY);
-  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(INHERIT_ACCESSIBILITY, TOGGLE_ACTION, SEPARATOR);
-
-  /**
-   * Provides 8 dimensions for enabled state.<br>
-   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}, {@link #ACTION_RUNNING},
-   * {@link #ENABLED_INHERIT_ACCESSIBILITY}.<br>
-   * 4 dimensions remain for custom use. This Action is enabled, if all dimensions are enabled (all bits set).
-   */
-  private byte m_enabled;
+  private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TOGGLE_ACTION, SEPARATOR);
 
   /**
    * Provides 8 dimensions for visibility.<br>
@@ -76,7 +66,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INHERIT_ACCESSIBILITY}, {@link #TOGGLE_ACTION}, {@link #SEPARATOR}
+   * Currently used: {@link #TOGGLE_ACTION}, {@link #SEPARATOR}
    */
   private byte m_flags;
 
@@ -95,7 +85,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   public AbstractAction(boolean callInitializer) {
     super(false);
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
-    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_flags = NamedBitMaskHelper.NO_BITS_SET; // default all to false. are initialized in initConfig()
     m_objectExtensions = new ObjectExtensions<>(this, false);
@@ -176,17 +165,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   /**
-   * Configures whether the action can be selected or not
-   *
-   * @return <code>true</code> if the action can be selected and <code>false</code> otherwise
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(10)
-  protected boolean getConfiguredEnabled() {
-    return true;
-  }
-
-  /**
    * Configures whether the action is visible or not
    *
    * @return <code>true</code> if the action is visible and <code>false</code> otherwise
@@ -194,18 +172,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredVisible() {
-    return true;
-  }
-
-  /**
-   * @return true if {@link #prepareAction()} should in addition consider the context of the action to decide for
-   *         visibility and enabled.<br>
-   *         For example a menu of a table field with {@link #isInheritAccessibility()}==true is invisible when the
-   *         table field is disabled or invisible
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(22)
-  protected boolean getConfiguredInheritAccessibility() {
     return true;
   }
 
@@ -299,8 +265,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     setTooltipText(getConfiguredTooltipText());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeFirePolicy(getConfiguredKeyStrokeFirePolicy());
-    setInheritAccessibility(getConfiguredInheritAccessibility());
-    setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setToggleAction(getConfiguredToggleAction());
     setSeparator(getConfiguredSeparator());
@@ -363,7 +327,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
 
   @Override
   public void doAction() {
-    if (isEnabled() && isVisible()) {
+    if (isEnabledIncludingParents() && isVisibleIncludingParents()) {
       doActionInternal();
     }
   }
@@ -485,99 +449,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @Override
-  public boolean isInheritAccessibility() {
-    return FLAGS_BIT_HELPER.isBitSet(INHERIT_ACCESSIBILITY, m_flags);
-  }
-
-  @Override
-  public void setInheritAccessibility(boolean b) {
-    m_flags = FLAGS_BIT_HELPER.changeBit(INHERIT_ACCESSIBILITY, b, m_flags);
-  }
-
-  @Override
-  public boolean isEnabledIncludingParents() {
-    if (!isEnabled()) {
-      return false;
-    }
-    IAction temp = this;
-    while (temp instanceof IActionNode) {
-      temp = ((IActionNode) temp).getParent();
-      if (temp == null) {
-        return true;
-      }
-      if (!temp.isEnabled()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    setEnabled(enabled, IDimensions.ENABLED);
-  }
-
-  @Override
-  public void setEnabledInheritAccessibility(boolean b) {
-    setEnabled(b, ENABLED_INHERIT_ACCESSIBILITY);
-  }
-
-  @Override
-  public boolean isEnabledInheritAccessibility() {
-    return isEnabled(ENABLED_INHERIT_ACCESSIBILITY);
-  }
-
-  /**
-   * Access control<br>
-   * when false, overrides isEnabled with false
-   */
-  @Override
-  public void setEnabledPermission(Permission p) {
-    boolean b;
-    if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
-    }
-    setEnabledGranted(b);
-  }
-
-  @Override
-  public boolean isEnabledGranted() {
-    return isEnabled(IDimensions.ENABLED_GRANTED);
-  }
-
-  /**
-   * Access control<br>
-   * when false, overrides isEnabled with false
-   */
-  @Override
-  public void setEnabledGranted(boolean enabled) {
-    setEnabled(enabled, IDimensions.ENABLED_GRANTED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled, String dimension) {
-    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
-    setEnabledInternal();
-  }
-
-  @Override
-  public boolean isEnabled(String dimension) {
-    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
-  }
-
-  private void setEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
-  }
-
-  @Override
   public boolean isVisible() {
     return propertySupport.getPropertyBool(PROP_VISIBLE);
   }
@@ -596,17 +467,21 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     if (!isVisible()) {
       return false;
     }
-    IAction temp = this;
-    while (temp instanceof IActionNode) {
-      temp = ((IActionNode) temp).getParent();
-      if (temp == null) {
-        return true;
+
+    AtomicReference<Boolean> result = new AtomicReference<Boolean>(true);
+    Predicate<IWidget> visitor = widget -> {
+      if (!(widget instanceof IActionNode)) {
+        return false; // cancel traversal
       }
-      if (!temp.isVisible() && !(temp instanceof IContextMenu)) {
-        return false;
+      IActionNode node = (IActionNode) widget;
+      if (!node.isVisible() && !(node instanceof IContextMenu)) {
+        result.set(false);
+        return false; // cancel traversal
       }
-    }
-    return true;
+      return true;
+    };
+    visitParents(visitor);
+    return result.get();
   }
 
   @Override
@@ -639,11 +514,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     setVisible(visible, IDimensions.VISIBLE_GRANTED);
   }
 
+  /**
+   * Override because the container is used for classId instead of the parent which is used by the default
+   * implementation of AbstractWidget
+   */
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() instanceof ITypeWithClassId) {
-      return simpleClassId + ID_CONCAT_SYMBOL + ((ITypeWithClassId) getContainer()).classId();
+    IWidget container = getContainer();
+    if (container != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + container.classId();
     }
     return simpleClassId;
   }
@@ -684,12 +564,12 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @Override
-  public IPropertyObserver getContainer() {
-    return (IPropertyObserver) propertySupport.getProperty(PROP_CONTAINER);
+  public IWidget getContainer() {
+    return (IWidget) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   @Override
-  public void setContainerInternal(IPropertyObserver container) {
+  public void setContainerInternal(IWidget container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
   }
 

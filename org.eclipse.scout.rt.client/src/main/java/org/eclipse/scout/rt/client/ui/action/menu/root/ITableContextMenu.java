@@ -10,15 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-
 /**
  * The table menu container is the invisible root container for all context menus on a table.
  */
 public interface ITableContextMenu extends IContextMenu {
-
-  @Override
-  ITable getContainer();
 
   void callOwnerValueChanged();
 }

@@ -134,11 +134,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    */
   Object computeExclusiveKey();
 
-  /*
-   * Runtime
-   */
-  void setEnabledPermission(Permission p);
-
   /**
    * Activate the form in terms of UI visibility / focus target<br>
    * This will send a desktop event {@link DesktopEvent#TYPE_FORM_ENSURE_VISIBLE}
@@ -158,10 +153,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * This will send a desktop event {@link FormEvent#TYPE_TO_BACK}
    */
   void toBack();
-
-  boolean isEnabledGranted();
-
-  void setEnabledGranted(boolean b);
 
   void setVisiblePermission(Permission p);
 
@@ -360,13 +351,6 @@ public interface IForm extends IWidget, ITypeWithSettableClassId, IStyleable, ID
    * @return the outer form field if this form is inside a {@link IWrappedFormField}
    */
   IWrappedFormField getOuterFormField();
-
-  /**
-   * When a form is set as the inner form of a {@link IWrappedFormField}<br>
-   * Do not use this internal method directly, it is automatically called by
-   * {@link IWrappedFormField#setInnerForm(IForm)}
-   */
-  void setWrapperFieldInternal(IWrappedFormField w);
 
   /**
    * the field ID is the simple class name of a field without the suffixes "Box", "Field", "Button"

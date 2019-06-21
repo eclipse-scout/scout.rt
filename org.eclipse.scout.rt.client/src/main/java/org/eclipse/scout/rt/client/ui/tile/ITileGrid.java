@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 /**
  * @since 8.0
  */
-public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, IExtensibleObject, IContributionOwner, IContextMenuOwner {
+public interface ITileGrid<T extends ITile> extends IWidget, IExtensibleObject, IContributionOwner, IContextMenuOwner {
 
   String PROP_TILES = "tiles";
   String PROP_SELECTED_TILES = "selectedTiles";
@@ -38,7 +38,6 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_LOGICAL_GRID = "logicalGrid";
   String PROP_LAYOUT_CONFIG = "layoutConfig";
-  String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
   String PROP_VIRTUAL = "virtual";
 
@@ -139,8 +138,9 @@ public interface ITileGrid<T extends ITile> extends IWidget, ITypeWithClassId, I
   T getTileByClass(Class<T> tileClass);
 
   /**
-   * Container of the tiles.
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
+  @Deprecated
   ITypeWithClassId getContainer();
 
   /**

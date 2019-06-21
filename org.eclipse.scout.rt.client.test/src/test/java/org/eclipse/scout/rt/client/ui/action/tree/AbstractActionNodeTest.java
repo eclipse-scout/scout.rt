@@ -14,9 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -33,11 +33,12 @@ public class AbstractActionNodeTest {
       }
     };
 
-    IPropertyObserver container = Mockito.mock(IPropertyObserver.class);
+    IWidget container = Mockito.mock(IWidget.class);
     m.setContainerInternal(container);
+    m.setParentInternal(container);
     assertSame(container, m.getContainer());
     assertEquals(1, m.getChildActionCount());
-    assertNull(m.getParent());
+    assertSame(container, m.getParent());
 
     IMenu childAction = m.getChildActions().get(0);
     assertSame(container, childAction.getContainer());

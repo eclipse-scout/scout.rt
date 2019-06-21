@@ -87,13 +87,6 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       }
     });
 
-    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
-      }
-    });
-
     putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {

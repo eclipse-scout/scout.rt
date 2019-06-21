@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
@@ -29,7 +30,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.platform.classid.ClassId;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 /**
@@ -136,13 +136,14 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public IMenu getParent() {
+  public IWidget getParent() {
     return m_wrappedMenu.getParent();
   }
 
   @Override
-  public void setParent(IMenu parent) {
+  public boolean setParentInternal(IWidget parent) {
     unsupported();
+    return false;
   }
 
   private void unsupported() {
@@ -305,11 +306,6 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public void setEnabled(boolean b) {
-    // NOP
-  }
-
-  @Override
   public boolean isVisible() {
     return m_wrappedMenu.isVisible();
   }
@@ -330,28 +326,8 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public void setEnabledPermission(Permission p) {
-    unsupported();
-  }
-
-  @Override
   public boolean isEnabledGranted() {
     return m_wrappedMenu.isEnabledGranted();
-  }
-
-  @Override
-  public void setEnabledGranted(boolean b) {
-    // NOP
-  }
-
-  @Override
-  public boolean isEnabledInheritAccessibility() {
-    return m_wrappedMenu.isEnabledInheritAccessibility();
-  }
-
-  @Override
-  public void setEnabledInheritAccessibility(boolean enabled) {
-    // NOP
   }
 
   @Override
@@ -395,13 +371,13 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public IPropertyObserver getContainer() {
+  public IWidget getContainer() {
     return m_wrappedMenu.getContainer();
   }
 
   @Override
-  public void setContainerInternal(IPropertyObserver container) {
-    // void
+  public void setContainerInternal(IWidget container) {
+    unsupported();
   }
 
   @Override
@@ -460,13 +436,18 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
-  public void setEnabled(boolean enabled, String dimension) {
-    unsupported();
+  public void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension) {
+    // NOP
   }
 
   @Override
   public boolean isEnabled(String dimension) {
     return m_wrappedMenu.isEnabled(dimension);
+  }
+
+  @Override
+  public boolean isEnabled(Predicate<String> filter) {
+    return m_wrappedMenu.isEnabled(filter);
   }
 
   @Override

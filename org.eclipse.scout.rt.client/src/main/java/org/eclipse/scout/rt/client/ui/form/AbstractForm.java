@@ -195,7 +195,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   private int m_closeType;
   private String m_cancelVerificationText;
   private IGroupBox m_mainBox;
-  private IWrappedFormField m_wrappedFormField;
   private ButtonListener m_systemButtonListener;
   private String m_classId;
   private ModelContext m_callingModelContext; // ModelContext of the calling context during initialization.
@@ -683,6 +682,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
       }
     }
     if (rootBox != null) {
+      rootBox.setParentInternal(this);
       rootBox.setMainBox(true);
       rootBox.updateKeyStrokes();
       if (rootBox.isScrollable().isUndefined()) {
@@ -752,32 +752,6 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     visit(v2, IButton.class);
     getRootGroupBox().addPropertyChangeListener(new P_MainBoxPropertyChangeProxy());
     setButtonsArmed(true);
-  }
-
-  @Override
-  public void setEnabledPermission(Permission p) {
-    boolean b = true;
-    if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    setEnabledGranted(b);
-  }
-
-  @Override
-  public boolean isEnabledGranted() {
-    IGroupBox box = getRootGroupBox();
-    if (box == null) {
-      return false;
-    }
-    return box.isEnabledGranted();
-  }
-
-  @Override
-  public void setEnabledGranted(boolean b) {
-    IGroupBox box = getRootGroupBox();
-    if (box != null) {
-      box.setEnabledGranted(b);
-    }
   }
 
   @Override
@@ -1332,11 +1306,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     if (m_classId != null) {
       return m_classId;
     }
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getOuterFormField() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getOuterFormField().classId();
-    }
-    return simpleClassId;
+    return super.classId();
   }
 
   @Override
@@ -1537,17 +1507,13 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   @Override
   public IForm getOuterForm() {
-    return m_wrappedFormField != null ? m_wrappedFormField.getForm() : null;
+    IWrappedFormField outerFormField = getOuterFormField();
+    return outerFormField != null ? outerFormField.getForm() : null;
   }
 
   @Override
   public IWrappedFormField getOuterFormField() {
-    return m_wrappedFormField;
-  }
-
-  @Override
-  public void setWrapperFieldInternal(IWrappedFormField w) {
-    m_wrappedFormField = w;
+    return getParentOfType(IWrappedFormField.class);
   }
 
   @Override

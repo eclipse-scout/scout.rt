@@ -118,23 +118,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         .withOutline(this, true);
   }
 
-  /*
-   * Configuration
-   */
-
-  /**
-   * Configures whether this outline is enabled.
-   * <p>
-   * Subclasses can override this method. Default is {@code true}.
-   *
-   * @return {@code true} if this outline is enabled, {@code false} otherwise
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(80)
-  protected boolean getConfiguredEnabled() {
-    return true;
-  }
-
   /**
    * Configures the visibility of this outline.
    * <p>
@@ -320,7 +303,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     super.initConfig();
     IPage<?> rootPage = interceptCreateRootPage();
     setRootNode(rootPage);
-    setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
     setNavigateButtonsVisible(getConfiguredNavigateButtonsVisible());

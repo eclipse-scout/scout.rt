@@ -195,12 +195,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MULTI_SELECT, model) {
       @Override
       protected Boolean modelValue() {

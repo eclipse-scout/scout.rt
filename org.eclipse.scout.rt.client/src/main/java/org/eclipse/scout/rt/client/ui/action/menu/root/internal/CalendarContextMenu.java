@@ -29,10 +29,10 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 @ClassId("7c6a0c17-90f1-4f1f-bad0-c6d417eaf5b5")
 public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implements ICalendarContextMenu {
   /**
-   * @param owner
+   * @param container
    */
-  public CalendarContextMenu(ICalendar owner, List<? extends IMenu> initialChildMenus) {
-    super(owner, initialChildMenus);
+  public CalendarContextMenu(ICalendar container, List<? extends IMenu> initialChildMenus) {
+    super(container, initialChildMenus);
   }
 
   @Override
@@ -56,6 +56,11 @@ public class CalendarContextMenu extends AbstractContextMenu<ICalendar> implemen
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
     }
+  }
+
+  @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return true;
   }
 
   @Override

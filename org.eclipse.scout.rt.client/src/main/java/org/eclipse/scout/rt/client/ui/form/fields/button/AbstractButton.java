@@ -270,7 +270,9 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   @Override
   protected void initConfig() {
     super.initConfig();
-    setSystemType(getConfiguredSystemType());
+    int systemType = getConfiguredSystemType();
+    setSystemType(systemType);
+    setInheritAccessibility(getConfiguredInheritAccessibility() && systemType != SYSTEM_TYPE_CANCEL && systemType != SYSTEM_TYPE_CLOSE);
     setDisplayStyleInternal(getConfiguredDisplayStyle());
     setProcessButton(getConfiguredProcessButton());
     setDefaultButton(getConfiguredDefaultButton());
@@ -294,9 +296,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    IContextMenu contextMenu = new FormFieldContextMenu<IButton>(this, menus.getOrderedList());
-    contextMenu.setContainerInternal(this);
-    setContextMenu(contextMenu);
+    setContextMenu(new FormFieldContextMenu<IButton>(this, menus.getOrderedList()));
   }
 
   @Override
@@ -313,16 +313,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    *          live and mutable collection of configured menus
    */
   protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
-  }
-
-  @Override
-  public boolean isEnabledIncludingParents() {
-    boolean isFormCloseButtonType = getSystemType() == IButton.SYSTEM_TYPE_CANCEL || getSystemType() == IButton.SYSTEM_TYPE_CLOSE;
-    if (isFormCloseButtonType) {
-      // for close & cancel buttons: ignore the enabled state of the parent form fields.
-      return isEnabled();
-    }
-    return super.isEnabledIncludingParents();
   }
 
   /*

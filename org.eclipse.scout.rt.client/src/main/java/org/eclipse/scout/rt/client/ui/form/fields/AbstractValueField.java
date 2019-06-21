@@ -131,10 +131,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    //set container on menus
-    IValueFieldContextMenu contextMenu = createContextMenu(menus);
-    contextMenu.setContainerInternal(this);
-    setContextMenu(contextMenu);
+    setContextMenu(createContextMenu(menus));
     setStatusMenuMappings(createStatusMenuMappings());
   }
 

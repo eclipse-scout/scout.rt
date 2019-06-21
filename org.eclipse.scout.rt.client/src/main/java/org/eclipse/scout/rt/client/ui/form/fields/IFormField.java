@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
@@ -22,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
-import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -68,17 +65,9 @@ import org.w3c.dom.Element;
  *
  * @see IForm
  */
-public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension, IDataChangeObserver {
-  /*
-   * Properties
-   */
-  /**
-   * {@link ICompositeField}
-   */
-  String PROP_PARENT_FIELD = "parentField";
+public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimension, IDataChangeObserver {
+
   String PROP_VISIBLE = "visible";
-  String PROP_ENABLED = "enabled";
-  String PROP_ENABLED_COMPUTED = "enabledComputed";
   String PROP_MANDATORY = "mandatory";
   String PROP_ORDER = "order";
   String PROP_ERROR_STATUS = "errorStatus";
@@ -220,15 +209,10 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    */
   ICompositeField getParentField();
 
-  /**
-   * do not use this internal method
-   */
-  void setParentFieldInternal(ICompositeField f);
-
   void setView(boolean visible, boolean enabled, boolean mandatory);
 
   /**
-   * create a FormData structure to be sent to the backend the configurator is creating typed subclasses of FormData and
+   * create a FormData structure to be sent to the backend the Scout SDK is creating typed subclasses of FormData and
    * FormFieldData
    * <p>
    * Do not override this method
@@ -772,196 +756,6 @@ public interface IFormField extends IWidget, ITypeWithClassId, IOrdered, IStylea
    *           available by instance but by class!
    */
   void setVisible(boolean visible, boolean updateParents, boolean updateChildren, String dimension);
-
-  /**
-   * @return <code>true</code> if this {@link IFormField} and all parent {@link IFormField}s are enabled (all
-   *         dimensions).
-   * @see #isEnabled()
-   */
-  boolean isEnabledIncludingParents();
-
-  /**
-   * @return If this {@link IFormField} is enabled. It is enabled if all enabled-dimensions are <code>true</code>.
-   */
-  boolean isEnabled();
-
-  /**
-   * @return The enabled property value of this {@link IFormField}.
-   */
-  boolean getEnabledProperty();
-
-  /**
-   * Changes the enabled property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enabled value.
-   */
-  void setEnabled(boolean b);
-
-  /**
-   * Changes the enabled property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enabled value.
-   * @param updateParents
-   *          if <code>true</code> the enabled property of all parent {@link IFormField}s are updated to same value as
-   *          well.
-   */
-  void setEnabled(boolean enabled, boolean updateParents);
-
-  /**
-   * Changes the enabled property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enabled value.
-   * @param updateParents
-   *          if <code>true</code> the enabled property of all parent {@link IFormField}s are updated to same value as
-   *          well.
-   * @param updateChildren
-   *          if <code>true</code> the enabled property of all child {@link IFormField}s (recursive) are updated to same
-   *          value as well.
-   */
-  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren);
-
-  /**
-   * @return The enabled-permission of this {@link IFormField}.
-   */
-  Permission getEnabledPermission();
-
-  /**
-   * Sets a new enabled-permission that is used to calculate the enabled-granted property of this {@link IFormField}.
-   *
-   * @param p
-   *          The new {@link Permission} that is used to calculate the enabled-granted value.
-   * @see IAccessControlService#checkPermission(Permission)
-   * @see #setEnabledGranted(boolean)
-   */
-  void setEnabledPermission(Permission p);
-
-  /**
-   * @return The enable-granted property of this {@link IFormField}.
-   */
-  boolean isEnabledGranted();
-
-  /**
-   * Changes the enabled-granted property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enable-granted value.
-   */
-  void setEnabledGranted(boolean b);
-
-  /**
-   * Changes the enabled-granted property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enable-granted value.
-   * @param updateParents
-   *          if <code>true</code> the enabled-granted property of all parent {@link IFormField}s are updated to same
-   *          value as well.
-   */
-  void setEnabledGranted(boolean enabled, boolean updateParents);
-
-  /**
-   * Changes the enabled-granted property of this {@link IFormField} to the given value.
-   *
-   * @param enabled
-   *          The new enable-granted value.
-   * @param updateParents
-   *          if <code>true</code> the enabled-granted property of all parent {@link IFormField}s are updated to same
-   *          value as well.
-   * @param updateChildren
-   *          if <code>true</code> the enabled-granted property of all child {@link IFormField}s (recursive) are updated
-   *          to same value as well.
-   */
-  void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren);
-
-  /**
-   * Changes the enabled-state value of the given dimension.
-   *
-   * @param enabled
-   *          The new enabled-state value for the given dimension.
-   * @param dimension
-   *          The dimension to change. Must not be <code>null</code>.
-   * @throws AssertionException
-   *           if the given dimension is <code>null</code>.
-   * @throws IllegalStateException
-   *           if too many dimensions are used. This {@link IFormField} supports up to
-   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
-   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
-   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
-   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *           available by instance but by class!
-   */
-  @Override
-  void setEnabled(boolean enabled, String dimension);
-
-  /**
-   * Changes the enabled-state value of the given dimension.
-   *
-   * @param enabled
-   *          The new enabled-state value for the given dimension.
-   * @param updateParents
-   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
-   * @param dimension
-   *          The dimension to change. Must not be <code>null</code>.
-   * @throws AssertionException
-   *           if the given dimension is <code>null</code>.
-   * @throws IllegalStateException
-   *           if too many dimensions are used. This {@link IFormField} supports up to
-   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
-   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
-   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
-   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *           available by instance but by class!
-   */
-  void setEnabled(boolean enabled, boolean updateParents, String dimension);
-
-  /**
-   * Changes the enabled-state value of the given dimension.
-   *
-   * @param enabled
-   *          The new enabled-state value for the given dimension.
-   * @param updateParents
-   *          if <code>true</code> all parent {@link IFormField}s are updated to same value as well.
-   * @param updateChildren
-   *          if <code>true</code> all child {@link IFormField}s (recursive) are updated to same value as well.
-   * @param dimension
-   *          The dimension to change. Must not be <code>null</code>.
-   * @throws AssertionException
-   *           if the given dimension is <code>null</code>.
-   * @throws IllegalStateException
-   *           if too many dimensions are used. This {@link IFormField} supports up to
-   *           {@link NamedBitMaskHelper#NUM_BITS} dimensions for enabled-state. Three dimensions are already used by
-   *           the {@link IFormField} itself ({@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED},
-   *           ENABLED_SLAVE). Therefore 5 dimensions may be used by developers.<br>
-   *           <b>Note:</b> these dimensions are shared amongst all {@link IFormField}s of an application. They are not
-   *           available by instance but by class!
-   */
-  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
-
-  /**
-   * Checks all existing enabled dimensions of this {@link IFormField} if their enabled state equals the value returned
-   * by the {@link Predicate} specified.
-   *
-   * @param filter
-   *          A {@link Predicate} that is called for each enabled dimension. The corresponding enabled-bit of this
-   *          {@link IFormField} must be equal to the result of the {@link Predicate}. In case {@code null} is passed
-   *          all bits are compared against {@code true} (which is the same as {@link #isEnabled()}).
-   * @return {@code true} if all enabled dimensions bits have the same value as returned by the specified
-   *         {@link Predicate}.
-   */
-  boolean isEnabled(Predicate<String> filter);
-
-  /**
-   * Visits all parent {@link IFormField}s
-   *
-   * @param v
-   *          The visitor to use. Must not be <code>null</code>.
-   * @return <code>true</code> if all parent fields have been visited. <code>false</code> if the visitor cancelled the
-   *         visit.
-   */
-  boolean visitParents(Predicate<IFormField> visitor);
 
   /**
    * Sets the field style on this field and on every child field.<br>

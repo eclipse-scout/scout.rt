@@ -158,22 +158,6 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
   }
 
   @Override
-  public void setEnabledGranted(boolean b) {
-    super.setEnabledGranted(b);
-    if (getInnerForm() != null) {
-      getInnerForm().setEnabledGranted(b);
-    }
-  }
-
-  @Override
-  public void setEnabled(boolean b) {
-    super.setEnabled(b);
-    if (getInnerForm() != null) {
-      getInnerForm().setAllEnabled(b);
-    }
-  }
-
-  @Override
   public final FORM getInnerForm() {
     return m_innerForm;
   }
@@ -211,7 +195,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     checkSaveNeeded();
     checkEmpty();
     if (m_innerForm != null) {
-      fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
+      fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), PROP_PARENT_WIDGET, null, null));
       if (m_manageInnerFormLifeCycle && m_innerForm.isFormStartable()) { // TODO [7.0] bsh: Remove 'started check' once assertion is in place
         m_innerForm.start();
       }
@@ -241,7 +225,7 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
     }
 
     m_innerForm.setShowOnStart(false);
-    m_innerForm.setWrapperFieldInternal(this);
+    m_innerForm.setParentInternal(this);
     m_innerForm.getRootGroupBox().setBorderVisible(false);
     m_innerForm.getRootGroupBox().updateKeyStrokes();
     m_innerForm.addPropertyChangeListener(m_innerFormPropertyListener);
@@ -254,11 +238,11 @@ public abstract class AbstractWrappedFormField<FORM extends IForm> extends Abstr
       return;
     }
 
-    fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), IFormField.PROP_PARENT_FIELD, null, null));
+    fireSubtreePropertyChange(new PropertyChangeEvent(m_innerForm.getRootGroupBox(), PROP_PARENT_WIDGET, null, null));
     m_innerForm.removePropertyChangeListener(m_innerFormPropertyListener);
     m_innerForm.getRootGroupBox().removeSubtreePropertyChangeListener(m_innerFormSubtreePropertyListener);
     m_innerForm.removeFormListener(m_innerFormListener);
-    m_innerForm.setWrapperFieldInternal(null);
+    m_innerForm.setParentInternal(null);
     if (m_manageInnerFormLifeCycle && !m_innerForm.isFormClosed()) {
       m_innerForm.doClose();
     }

@@ -234,7 +234,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     injectMenusInternal(menus);
     new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_contextMenu = new ImageFieldContextMenu(this, menus.getOrderedList());
-    m_contextMenu.setContainerInternal(this);
   }
 
   /**

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -25,13 +26,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.BooleanHolder;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("b34571a2-032b-4910-921a-bec4acd110ed")
-public abstract class AbstractContextMenu<T extends IPropertyObserver> extends AbstractMenu implements IContextMenu {
+public abstract class AbstractContextMenu<T extends IWidget> extends AbstractMenu implements IContextMenu {
 
   private final FastListenerList<ContextMenuListener> m_listeners = new FastListenerList<>();
   private final PropertyChangeListener m_menuVisibilityListener = new P_VisibilityOfMenuItemChangedListener();
@@ -43,14 +43,15 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
   public AbstractContextMenu(T container, List<? extends IMenu> initialChildList, boolean callInitializer) {
     super(false);
     setContainerInternal(container);
+    setParentInternal(container);
     if (callInitializer) {
       callInitializer();
     }
     setChildActions(initialChildList);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
+  @SuppressWarnings("unchecked")
   public T getContainer() {
     return (T) super.getContainer();
   }
@@ -59,7 +60,9 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
   protected void initConfig() {
     super.initConfig();
     calculateLocalVisibility();
-    getContainer().addPropertyChangeListener(new P_OwnerPropertyListener());
+    if (isOwnerPropertyChangedListenerRequired()) {
+      getContainer().addPropertyChangeListener(new P_OwnerPropertyListener());
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -147,6 +150,8 @@ public abstract class AbstractContextMenu<T extends IPropertyObserver> extends A
 
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
   }
+
+  protected abstract boolean isOwnerPropertyChangedListenerRequired();
 
   private class P_VisibilityOfMenuItemChangedListener implements PropertyChangeListener {
     @SuppressWarnings("unchecked")

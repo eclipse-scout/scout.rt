@@ -37,11 +37,6 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered, IDisplayPar
   /**
    * {@link Boolean}
    */
-  String PROP_ENABLED = "enabled";
-
-  /**
-   * {@link Boolean}
-   */
   String PROP_VISIBLE = "visible";
 
   /**

@@ -10,16 +10,19 @@
   "defaults": {
 
     // Model adapters
+    "Widget": {
+      "enabled": true,
+      "loading": false,
+      "inheritAccessibility": true
+    },
     "FormField": {
       "disabledStyle": 0,
-      "enabled": true,
       "fieldStyle": "alternative",
       "visible": true,
       "keyStrokes": [],
       "labelVisible": true,
       "labelPosition": 0,
       "labelWidthInPixel": 0,
-      "loading": false,
       "mandatory": false,
       "statusVisible": true,
       "statusPosition": "default",
@@ -52,7 +55,6 @@
       "statusMenuMappings": []
     },
     "Action": {
-      "enabled": true,
       "visible": true,
       "selected": false,
       "horizontalAlignment": -1,
@@ -225,7 +227,6 @@
       "autoResizeColumns": false,
       "checkable": false,
       "columnAddable": false,
-      "enabled": true,
       "dropType": 0,
       "dropMaximumSize": 52428800,
       "filters": [],
@@ -235,7 +236,6 @@
       "headerVisible": true,
       "keyStrokes": [],
       "keyboardNavigation": true,
-      "loading": false,
       "menus": [],
       "multiCheck": true,
       "multiSelect": true,
@@ -314,7 +314,6 @@
       "dropMaximumSize": 52428800,
       "autoCheckChildren": false,
       "checkable": false,
-      "enabled": true,
       "menus": [],
       "keyStrokes": [],
       "multiCheck": true,
@@ -437,8 +436,7 @@
         "fillVertical": true,
         "widthInPixel": 0,
         "heightInPixel": 0
-      },
-      "loading": false
+      }
     },
     "FormFieldTile": {
       "displayStyle": "dashboard"

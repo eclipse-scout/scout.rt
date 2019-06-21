@@ -80,7 +80,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
 
     if (m_calendar != null) {
       if (m_calendar instanceof AbstractCalendar) {
-        ((AbstractCalendar) m_calendar).setContainerInternal(this);
+        ((AbstractCalendar) m_calendar).setParentInternal(this);
       }
 
       // restore calendar settings

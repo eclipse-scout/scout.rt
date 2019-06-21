@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
@@ -149,14 +148,6 @@ public interface IButton extends IFormField, IHtmlCapable, IContextMenuOwner {
   void setView(boolean visible, boolean enabled);
 
   Object getKeyStrokeScope();
-
-  /**
-   * Note: This method has no effect if the button is of system type {@link #SYSTEM_TYPE_CANCEL} or
-   * {@link #SYSTEM_TYPE_CLOSE}. This allows the user to still close a form that is entirely disabled
-   * ({@link IForm#setEnabledGranted(boolean)}).
-   */
-  @Override
-  void setEnabledGranted(boolean enabled);
 
   /**
    * local images and local resources bound to the html text

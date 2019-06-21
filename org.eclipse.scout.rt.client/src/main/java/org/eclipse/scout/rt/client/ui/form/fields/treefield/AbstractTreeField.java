@@ -185,14 +185,6 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       }
     }
     setTreeInternal(tree);
-    // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
-      if (m_tree == null) {
-        return;
-      }
-      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-      m_tree.setEnabled(newEnabled);
-    });
   }
 
   @Override
@@ -255,7 +247,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       return;
     }
     if (m_tree instanceof AbstractTree) {
-      ((AbstractTree) m_tree).setContainerInternal(null);
+      ((AbstractTree) m_tree).setParentInternal(null);
     }
     if (m_tree != null && !m_treeExternallyManaged && m_treeListener != null) {
       m_tree.removeTreeListener(m_treeListener);
@@ -263,7 +255,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     }
     m_tree = tree;
     if (m_tree instanceof AbstractTree) {
-      ((AbstractTree) m_tree).setContainerInternal(this);
+      ((AbstractTree) m_tree).setParentInternal(this);
     }
     if (m_tree != null && !m_treeExternallyManaged) {
       m_tree.setAutoDiscardOnDelete(false);

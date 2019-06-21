@@ -19,8 +19,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
-import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
-import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
@@ -71,17 +69,6 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
    * type {@link Boolean}
    */
   String PROP_SHOW_DISPLAY_MODE_SELECTION = "showDisplayModeSelection";
-
-  /**
-   * {@link Object}
-   * <p>
-   * Container of this calendar, {@link ICalendarField}
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   *
-   * @since 3.8.1
-   */
-  String PROP_CONTAINER = "container";
 
   /**
    * @since 4.0.0 {@link IContextMenu}
@@ -205,19 +192,10 @@ public interface ICalendar extends IWidget, IContextMenuOwner {
 
   void setShowDisplayModeSelection(boolean showDisplayModeSelection);
 
-  /*
-   * UI interface
-   */
-
   /**
-   * {@link Object}
-   * <p>
-   * Container of this calendar, {@link ICalendarField}
-   * <p>
-   * {@link IListBox} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   *
-   * @since 3.8.1
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
+  @Deprecated
   Object getContainer();
 
   /*

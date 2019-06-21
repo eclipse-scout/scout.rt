@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
-import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +40,8 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
   @Override
   protected void initConfig() {
     super.initConfig();
-    getContainer().addTableListener(
+    ITable container = getContainer();
+    container.addTableListener(
         e -> {
           switch (e.getType()) {
             case TableEvent.TYPE_ROWS_SELECTED:
@@ -58,32 +57,8 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
         TableEvent.TYPE_ROWS_SELECTED,
         TableEvent.TYPE_ROWS_UPDATED);
     // set active filter
-    setCurrentMenuTypes(getMenuTypesForSelection(getContainer().getSelectedRows()));
+    setCurrentMenuTypes(getMenuTypesForSelection(container.getSelectedRows()));
     calculateLocalVisibility();
-  }
-
-  @Override
-  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
-    super.afterChildMenusAdd(newChildMenus);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    super.afterChildMenusRemove(childMenusToRemove);
-    handleOwnerEnabledChanged();
-  }
-
-  protected void handleOwnerEnabledChanged() {
-    ITable container = getContainer();
-    if (container != null) {
-      final boolean enabled = container.isEnabled();
-      visit(menu -> {
-        if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-          menu.setEnabled(enabled);
-        }
-      }, IMenu.class);
-    }
   }
 
   @Override
@@ -91,44 +66,42 @@ public class TableContextMenu extends AbstractContextMenu<ITable> implements ITa
     handleOwnerValueChanged();
   }
 
+  @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return false;
+  }
+
   protected void handleOwnerValueChanged() {
     m_currentSelection = null;
-    if (getContainer() != null) {
-      final List<ITableRow> ownerValue = getContainer().getSelectedRows();
+    ITable container = getContainer();
+    if (container != null) {
+      final List<ITableRow> ownerValue = container.getSelectedRows();
       m_currentSelection = CollectionUtility.arrayList(ownerValue);
       setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
       visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
       calculateLocalVisibility();
-      calculateEnableState(ownerValue);
+      calculateEnableState();
     }
   }
 
-  /**
-   * @param ownerValue
-   */
-  protected void calculateEnableState(List<? extends ITableRow> ownerValue) {
-    boolean enabled = getContainer().isEnabled();
-    if (enabled) {
-      for (ITableRow row : ownerValue) {
-        if (!row.isEnabled()) {
-          enabled = false;
-          break;
-        }
+  protected boolean isTableAndSelectionEnabled() {
+    ITable container = getContainer();
+    boolean enabled = container.isEnabled();
+    if (!enabled) {
+      return false;
+    }
+
+    final List<ITableRow> ownerValue = container.getSelectedRows();
+    for (ITableRow row : ownerValue) {
+      if (!row.isEnabled()) {
+        return false;
       }
     }
-    final boolean inheritedEnability = enabled;
-    visit(menu -> {
-      if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-        menu.setEnabledInheritAccessibility(inheritedEnability);
-      }
-    }, IMenu.class);
+    return true;
   }
 
-  @Override
-  protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
-    if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
-      handleOwnerEnabledChanged();
-    }
+  protected void calculateEnableState() {
+    setEnabled(isTableAndSelectionEnabled());
   }
 
   protected Set<TableMenuType> getMenuTypesForSelection(List<? extends ITableRow> selection) {

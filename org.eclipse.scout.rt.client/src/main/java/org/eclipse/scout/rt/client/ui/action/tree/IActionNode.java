@@ -22,19 +22,6 @@ public interface IActionNode<T extends IActionNode> extends IAction {
    */
   String PROP_CHILD_ACTIONS = "childActions";
 
-  /*
-   * Runtime
-   */
-  /**
-   * @since 3.8.1
-   */
-  T getParent();
-
-  /**
-   * @since 3.8.1
-   */
-  void setParent(T parent);
-
   /**
    * @return if child has actions
    */

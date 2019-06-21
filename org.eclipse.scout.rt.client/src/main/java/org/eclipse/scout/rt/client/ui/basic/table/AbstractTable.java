@@ -84,6 +84,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterState;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -118,7 +119,6 @@ import org.eclipse.scout.rt.platform.util.visitor.TreeTraversals;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
-import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
@@ -144,7 +144,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(AUTO_DISCARD_ON_DELETE, SORT_VALID, INITIAL_MULTI_LINE_TEXT, ACTION_RUNNING);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED);
 
   public interface IResetColumnsOption {
     String VISIBILITY = "visibility";
@@ -166,13 +165,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private final TableListeners m_listeners;
   private final Object m_cachedFilteredRowsLock;
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
-
-  /**
-   * Provides 8 dimensions for enabled state.<br>
-   * Internally used: {@link IDimensions#ENABLED}.<br>
-   * 7 dimensions remain for custom use. This Table is enabled, if all dimensions are enabled (all bits set).
-   */
-  private byte m_enabled;
 
   /**
    * Provides 8 boolean flags.<br>
@@ -209,7 +201,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   public AbstractTable(boolean callInitializer) {
     super(false);
-    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_selectedRows = new ArrayList<>();
     m_checkedRows = new LinkedHashSet<>();
     m_rowDecorationBuffer = new HashSet<>();
@@ -263,11 +254,16 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_objectExtensions.initConfigAndBackupExtensionContext(createLocalExtension(), this::initConfig);
   }
 
+  /**
+   * Override because the container is used for classId (which may also be a {@link IPage}) instead of the parent which
+   * is used by the default implementation of AbstractWidget
+   */
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
+    Object container = getContainer();
+    if (container instanceof ITypeWithClassId) {
+      return simpleClassId + ID_CONCAT_SYMBOL + ((ITypeWithClassId) container).classId();
     }
     return simpleClassId;
   }
@@ -937,7 +933,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_eventBuffer = createEventBuffer();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
-    setEnabled(true);
     setLoading(false);
     setGroupingStyle(getConfiguredGroupingStyle());
     setHierarchicalStyle(getConfiguredHierarchicalStyle());
@@ -1095,14 +1090,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     injectMenusInternal(menus);
 
     addHeaderMenus(menus);
-    //set container on menus
-    for (IMenu menu : menus) {
-      menu.setContainerInternal(this);
-    }
-
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    ITableContextMenu contextMenu = new TableContextMenu(this, menus.getOrderedList());
-    setContextMenu(contextMenu);
+    setContextMenu(new TableContextMenu(this, menus.getOrderedList()));
   }
 
   @Override
@@ -1974,14 +1963,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   public boolean runMenu(Class<? extends IMenu> menuType) {
     Class<? extends IMenu> c = getReplacingMenuClass(menuType);
     for (IMenu m : getMenus()) {
-      if (m.getClass() == c && ((!m.isInheritAccessibility()) || isEnabled())) {
-        if (m.isVisible() && m.isEnabled()) {
-          m.doAction();
-          return true;
-        }
-        else {
-          return false;
-        }
+      if (m.getClass() == c) {
+        m.doAction();
+        return true;
       }
     }
     return false;
@@ -2689,31 +2673,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setRowIconColumnWidth(int width) {
     propertySupport.setPropertyInt(PROP_ROW_ICON_COLUMN_WIDTH, width);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
-
-  @Override
-  public final void setEnabled(boolean enabled) {
-    setEnabled(enabled, IDimensions.ENABLED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled, String dimension) {
-    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
-    setEnabledInternal();
-  }
-
-  @Override
-  public boolean isEnabled(String dimension) {
-    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
-  }
-
-  private void setEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
   }
 
   @Override
@@ -3550,11 +3509,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public ITypeWithClassId getContainer() {
+    IWidget parentWidget = getParent();
+    if (parentWidget != null) {
+      return parentWidget;
+    }
     return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
   }
 
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITable}
+   * do not use this internal method
    */
   public void setContainerInternal(ITypeWithClassId container) {
     propertySupport.setProperty(PROP_CONTAINER, container);

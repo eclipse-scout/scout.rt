@@ -10,15 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
-
 /**
  * The table menu container is the invisible root container for all context menus on a table.
  */
 public interface ICalendarContextMenu extends IContextMenu {
-
-  @Override
-  ICalendar getContainer();
 
   void callOwnerValueChanged();
 }

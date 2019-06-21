@@ -50,12 +50,15 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
   }
 
   protected void handleOwnerValueChanged() {
-    if (getContainer() != null) {
-      final List<? extends ITile> ownerValue = getContainer().getSelectedTiles();
-      setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
-      visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
-      calculateLocalVisibility();
+    ITileGrid<? extends ITile> container = getContainer();
+    if (container == null) {
+      return;
     }
+
+    final List<? extends ITile> ownerValue = container.getSelectedTiles();
+    setCurrentMenuTypes(getMenuTypesForSelection(ownerValue));
+    visit(new MenuOwnerChangedVisitor(ownerValue, getCurrentMenuTypes()), IMenu.class);
+    calculateLocalVisibility();
   }
 
   @Override
@@ -65,6 +68,11 @@ public class TileGridContextMenu extends AbstractContextMenu<ITileGrid<? extends
       handleOwnerValueChanged();
     }
     // FIXME [8.0] CGU tiles necessary to handle tile update events as done in table?
+  }
+
+  @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return true;
   }
 
   protected Set<TileGridMenuType> getMenuTypesForSelection(List<? extends ITile> selection) {

@@ -15,14 +15,13 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.desktop.datachange.IDataChangeObserver;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.shared.data.tile.ITileColorScheme;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * @since 8.0
  */
-public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject, ITypeWithClassId, IDataChangeObserver {
+public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject, IDataChangeObserver {
   String PROP_ORDER = "order";
   String PROP_COLOR_SCHEME = "colorScheme";
   String PROP_GRID_DATA_HINTS = "gridDataHints";
@@ -52,9 +51,11 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void setGridDataHints(GridData data);
 
-  ITileGrid<? extends ITile> getContainer();
-
-  void setContainer(ITileGrid<? extends ITile> container);
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
+  @Deprecated
+  ITileGrid<?> getContainer();
 
   void setFilterAccepted(boolean filterAccepted);
 

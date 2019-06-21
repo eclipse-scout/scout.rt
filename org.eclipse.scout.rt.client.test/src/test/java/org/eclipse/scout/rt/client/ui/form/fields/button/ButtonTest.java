@@ -127,6 +127,7 @@ public class ButtonTest {
   public void testEnabledOfSystemButtons() {
     PushButton1 button1 = m_form.getFieldByClass(PushButton1.class);
     button1.setSystemType(IButton.SYSTEM_TYPE_CANCEL);
+    button1.setInheritAccessibility(false);
     Assert.assertTrue(button1.isEnabled());
     Assert.assertTrue(button1.isEnabledIncludingParents());
 
@@ -156,6 +157,7 @@ public class ButtonTest {
 
     m_form.setEnabledGranted(false);
     button1.setSystemType(IButton.SYSTEM_TYPE_NONE);
+    button1.setInheritAccessibility(true);
     Assert.assertTrue(button1.isEnabled());
     Assert.assertFalse(button1.isEnabledIncludingParents());
     m_form.setEnabledGranted(true);

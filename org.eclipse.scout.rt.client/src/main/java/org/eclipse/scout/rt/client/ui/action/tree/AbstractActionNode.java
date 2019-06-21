@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IReadOnlyMenu;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -33,7 +32,6 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 
 @ClassId("bacb13e3-6627-4d87-bb8c-fc578ceb1bfe")
 public abstract class AbstractActionNode<T extends IActionNode> extends AbstractAction implements IActionNode<T>, IContributionOwner {
-  private T m_parent;
   private IContributionOwner m_contributionHolder;
 
   public AbstractActionNode() {
@@ -104,7 +102,6 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
   protected void injectActionNodesInternal(OrderedCollection<T> actionNodes) {
   }
 
-  @SuppressWarnings("unchecked")
   protected static <T extends IActionNode> void connectActionNode(T child, IActionNode<T> parent) {
     assertNotNull(child);
     if (child instanceof IReadOnlyMenu) {
@@ -114,53 +111,35 @@ public abstract class AbstractActionNode<T extends IActionNode> extends Abstract
 
     if (parent == null) {
       // disconnect from existing parent
-      child.setParent(null);
+      child.setParentInternal(null);
       child.setContainerInternal(null);
       return;
     }
 
-    assertNull(child.getParent(), "Action '{}' cannot be added to '{}' because it is still connected to '{}'.", child, parent, child.getParent());
-
-    child.setParent(parent); // connect to new parent
-    IPropertyObserver containerOfChild = child.getContainer();
-    IPropertyObserver containerOfParent = parent.getContainer();
-    if (containerOfChild == containerOfParent) {
-      return;
+    IWidget currentChildParent = child.getParent();
+    if (currentChildParent != parent) {
+      // connect to new parent
+      assertNull(currentChildParent, "Action '{}' cannot be added to '{}' because it is still connected to '{}'.", child, parent, child.getParent());
+      child.setParentInternal(parent);
     }
-    child.setContainerInternal(containerOfParent);
+
+    IWidget containerOfChild = child.getContainer();
+    IWidget containerOfParent = parent.getContainer();
+    if (containerOfChild != containerOfParent) {
+      // connect to new container
+      child.setContainerInternal(containerOfParent);
+    }
   }
 
   @Override
-  public void setContainerInternal(IPropertyObserver container) {
+  public void setContainerInternal(IWidget container) {
     super.setContainerInternal(container);
     // children
-    setContainerOnActions(getChildActionsInternal());
-  }
-
-  protected void setContainerOnActions(List<? extends T> actions) {
-    if (actions == null || actions.isEmpty()) {
+    List<T> childActions = getChildActionsInternal();
+    if (childActions == null || childActions.isEmpty()) {
       return;
     }
-
-    IPropertyObserver newContainer = getContainer();
-    for (T childAction : actions) {
-      if (childAction != null) {
-        childAction.setContainerInternal(newContainer);
-      }
-    }
-  }
-
-  /*
-   * Runtime
-   */
-  @Override
-  public T getParent() {
-    return m_parent;
-  }
-
-  @Override
-  public void setParent(T parent) {
-    m_parent = parent;
+    childActions.forEach(a -> connectActionNode(a, this));
   }
 
   private List<T> getChildActionsInternal() {

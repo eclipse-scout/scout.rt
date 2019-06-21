@@ -209,20 +209,21 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public void setParentFieldInternal(ICompositeField parentField) {
-    super.setParentFieldInternal(parentField);
+  public boolean setParentInternal(IWidget parentField) {
+    boolean result = super.setParentInternal(parentField);
     if (!(parentField instanceof AbstractCompositeField)) {
-      return;
+      return result;
     }
 
     // check if this is a template field box
     if (isTemplateField()) {
       // do not publish replacement map for template field boxes
-      return;
+      return result;
     }
 
     // publish replacement map to parent AbstractCompositeField and keep local map for better performance (see getReplacingFieldClass)
     ((AbstractCompositeField) parentField).registerFormFieldReplacements(m_formFieldReplacements);
+    return result;
   }
 
   /**

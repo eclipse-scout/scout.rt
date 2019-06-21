@@ -58,13 +58,13 @@ public final class CompositeFieldUtility {
    */
   public static void connectFields(IFormField child, ICompositeField parent) {
     if (parent == null) {
-      child.setParentFieldInternal(null);
+      child.setParentInternal(null);
       // do not clear form here so that a form field cannot be added to a different form later on
       return;
     }
 
     assertNull(child.getParentField());
-    child.setParentFieldInternal(parent);
+    child.setParentInternal(parent);
     IForm formOfParentField = parent.getForm();
     IForm formOfChildField = child.getForm();
     if (formOfChildField == formOfParentField) {

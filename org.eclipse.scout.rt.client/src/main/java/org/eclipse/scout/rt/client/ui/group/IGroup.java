@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
-public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject, IContributionOwner, ITypeWithClassId, IVisibleDimension {
+public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject, IContributionOwner, IVisibleDimension {
 
   String PROP_ORDER = "order";
   String PROP_COLLAPSED = "collapsed";
@@ -39,9 +39,11 @@ public interface IGroup extends IWidget, IOrdered, IStyleable, IExtensibleObject
   String COLLAPSE_STYLE_RIGHT = "right";
   String COLLAPSE_STYLE_BOTTOM = "bottom";
 
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
+  @Deprecated
   ITypeWithClassId getContainer();
-
-  void setContainer(ITypeWithClassId container);
 
   boolean isCollapsed();
 

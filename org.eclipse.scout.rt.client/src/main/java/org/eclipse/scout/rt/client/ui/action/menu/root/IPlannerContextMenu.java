@@ -10,12 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.root;
 
-import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
-
 public interface IPlannerContextMenu extends IContextMenu {
-
-  @Override
-  IPlanner<?, ?> getContainer();
 
   void callOwnerValueChanged();
 }

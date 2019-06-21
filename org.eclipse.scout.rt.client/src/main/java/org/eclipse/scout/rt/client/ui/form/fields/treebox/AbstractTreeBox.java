@@ -323,7 +323,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
     if (m_tree != null) {
       if (m_tree instanceof AbstractTree) {
-        ((AbstractTree) m_tree).setContainerInternal(this);
+        ((AbstractTree) m_tree).setParentInternal(this);
       }
       m_tree.setRootNode(getTreeNodeBuilder().createTreeNode(new LookupRow(null, "Root"), ITreeNode.STATUS_NON_CHANGED, false));
       m_tree.setAutoDiscardOnDelete(false);
@@ -375,11 +375,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
       }
 
       String name = e.getPropertyName();
-      if (PROP_ENABLED_COMPUTED.equals(name)) {
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_tree.setEnabled(newEnabled);
-      }
-      else if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
+      if (PROP_FILTER_CHECKED_NODES_VALUE.equals(name)) {
         updateCheckedNodesFilter();
       }
       else if (PROP_FILTER_ACTIVE_NODES_VALUE.equals(name)) {
@@ -1087,6 +1083,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   }
 
+  @ClassId("abc77329-ab0d-484c-9027-d517de928b76")
   public class DefaultTreeBoxTree extends AbstractTree {
 
     @Override

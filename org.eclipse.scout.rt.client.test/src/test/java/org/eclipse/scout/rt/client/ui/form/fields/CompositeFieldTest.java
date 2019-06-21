@@ -87,7 +87,8 @@ public class CompositeFieldTest {
 
     Assert.assertFalse(add.isEnabledIncludingParents());
     Assert.assertTrue(add.isEnabled());
-    Assert.assertFalse(menu.isEnabled());
+    Assert.assertTrue(menu.isEnabled());
+    Assert.assertFalse(menu.isEnabledIncludingParents());
   }
 }
 

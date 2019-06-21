@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -41,18 +40,6 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   }
 
   @Override
-  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
-    super.afterChildMenusAdd(newChildMenus);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
-  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
-    super.afterChildMenusRemove(childMenusToRemove);
-    handleOwnerEnabledChanged();
-  }
-
-  @Override
   public void callOwnerValueChanged() {
     handleOwnerValueChanged();
   }
@@ -68,6 +55,11 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   }
 
   @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return true;
+  }
+
+  @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     super.handleOwnerPropertyChanged(evt);
     if (IValueField.PROP_VALUE.equals(evt.getPropertyName())) {
@@ -79,9 +71,6 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
     if (value == null) {
       return CollectionUtility.hashSet(ValueFieldMenuType.Null);
     }
-    else {
-      return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
-    }
+    return CollectionUtility.hashSet(ValueFieldMenuType.NotNull);
   }
-
 }

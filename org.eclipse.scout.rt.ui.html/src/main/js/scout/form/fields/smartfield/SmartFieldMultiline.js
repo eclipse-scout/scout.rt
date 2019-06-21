@@ -49,7 +49,7 @@ scout.SmartFieldMultiline.prototype._render = function() {
 
 scout.SmartFieldMultiline.prototype._renderEnabled = function() {
   scout.SmartFieldMultiline.parent.prototype._renderEnabled.call(this);
-  this._$multilineLines.setEnabled(this.enabled);
+  this._$multilineLines.setEnabled(this.enabledComputed);
 };
 
 /**

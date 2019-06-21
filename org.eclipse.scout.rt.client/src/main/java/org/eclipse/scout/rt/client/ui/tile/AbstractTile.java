@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
@@ -53,7 +54,6 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTile.class);
 
   private final ObjectExtensions<AbstractTile, ITileExtension<? extends AbstractTile>> m_objectExtensions;
-  private ITileGrid<? extends ITile> m_container;
   private IDataChangeListener m_internalDataChangeListener;
   private boolean m_filterAccepted = true;
   private volatile boolean m_loaded = false;
@@ -98,9 +98,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   protected void initTileInternal() {
-    if (getContainer() == null) {
-      throw new IllegalStateException("Tile is not connected to a container");
-    }
+    Assertions.assertNotNull(getParent(), "Tile is not connected to a container");
     if (getConfiguredAutoLoadDataOnInit()) {
       loadData();
     }
@@ -347,20 +345,20 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     return true;
   }
 
+  /**
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
+   */
   @Override
+  @Deprecated
+  @SuppressWarnings({"unchecked", "deprecation"})
   public ITileGrid<? extends ITile> getContainer() {
-    return m_container;
-  }
-
-  @Override
-  public void setContainer(ITileGrid<? extends ITile> container) {
-    m_container = container;
+    return getParentOfType(ITileGrid.class);
   }
 
   @Override
   public String classId() {
     String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass(), true);
-    return getContainer().classId() + ID_CONCAT_SYMBOL + simpleClassId;
+    return getParent().classId() + ID_CONCAT_SYMBOL + simpleClassId;
   }
 
   @Override
@@ -417,7 +415,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " [m_container=" + m_container + "]";
+    return getClass().getSimpleName() + " [m_container=" + getParent() + "]";
   }
 
   /**
@@ -486,7 +484,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
               handleLoadDataException(e);
             });
           }
-        }, m_container.createAsyncLoadJobInput(AbstractTile.this));
+        }, getParentOfType(ITileGrid.class).createAsyncLoadJobInput(AbstractTile.this));
       }
       catch (RuntimeException e) {
         setLoading(false);

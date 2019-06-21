@@ -136,7 +136,7 @@ public class TableMenuTest {
     t.selectRows(CollectionUtility.<ITableRow> emptyArrayList(), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabled());
+    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**
@@ -152,7 +152,7 @@ public class TableMenuTest {
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabled());
+    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**
@@ -186,7 +186,7 @@ public class TableMenuTest {
     t.selectRows(CollectionUtility.arrayList(t.getRow(0)), false);
     Predicate<IAction> filter = ActionUtility.createMenuFilterMenuTypes(contextMenu.getCurrentMenuTypes(), true);
     List<IMenu> visibleMenus = ActionUtility.normalizedActions(contextMenu.getChildActions(), filter);
-    assertEquals(false, visibleMenus.get(0).isEnabled());
+    assertEquals(false, visibleMenus.get(0).isEnabledIncludingParents());
   }
 
   /**

@@ -689,7 +689,9 @@ scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
   }
 
   this.children.forEach(function(child) {
-    child.recomputeEnabled(enabledComputed);
+    if (child.inheritAccessibility) {
+      child.recomputeEnabled(enabledComputed);
+    }
   });
 };
 

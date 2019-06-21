@@ -80,9 +80,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
           if (n.equals(IOutline.PROP_VISIBLE)) {
             setVisible((Boolean) v);
           }
-          else if (n.equals(IOutline.PROP_ENABLED)) {
-            setEnabled((Boolean) v);
-          }
           else if (n.equals(IOutline.PROP_TITLE)) {
             setText((String) v);
           }

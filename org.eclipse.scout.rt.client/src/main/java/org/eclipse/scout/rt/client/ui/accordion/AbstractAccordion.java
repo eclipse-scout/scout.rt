@@ -51,16 +51,14 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     setGroups(groups.getOrderedList());
   }
 
-  @Override
-  public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
-  }
-
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls groups.
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
-  public void setContainerInternal(ITypeWithClassId container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public ITypeWithClassId getContainer() {
+    return getParent();
   }
 
   protected void injectGroupsInternal(OrderedCollection<IGroup> groups) {
@@ -137,7 +135,7 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
   }
 
   protected void addGroupInternal(IGroup group) {
-    group.setContainer(this);
+    group.setParentInternal(this);
   }
 
   protected void deleteGroupsInternal(List<IGroup> groupsToDelete) {
@@ -267,14 +265,4 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     }
     groups.sort((Comparator<? super IGroup>) comparator);
   }
-
-  @Override
-  public String classId() {
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-    }
-    return simpleClassId;
-  }
-
 }

@@ -65,6 +65,11 @@ public class PlannerContextMenu extends AbstractContextMenu<IPlanner<?, ?>> impl
   }
 
   @Override
+  protected boolean isOwnerPropertyChangedListenerRequired() {
+    return true;
+  }
+
+  @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (IPlanner.PROP_SELECTED_ACTIVITY.equals(evt.getPropertyName())) {
       handleOwnerValueChanged();

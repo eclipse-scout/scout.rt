@@ -115,9 +115,6 @@ public abstract class AbstractOutlineButton extends AbstractButton {
             if (n.equals(IOutline.PROP_VISIBLE)) {
               setVisible((Boolean) v);
             }
-            else if (n.equals(IOutline.PROP_ENABLED)) {
-              setEnabled((Boolean) v, true, false);
-            }
             else if (n.equals(IOutline.PROP_TITLE)) {
               setLabel((String) v);
             }

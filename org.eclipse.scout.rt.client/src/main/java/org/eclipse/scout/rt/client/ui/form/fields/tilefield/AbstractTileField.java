@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -141,12 +140,12 @@ public abstract class AbstractTileField<T extends ITileGrid<? extends ITile>> ex
       return;
     }
 
-    if (oldTileGrid instanceof AbstractTileGrid) {
-      ((AbstractTileGrid) oldTileGrid).setContainerInternal(null);
+    if (oldTileGrid != null) {
+      oldTileGrid.setParentInternal(null);
     }
     propertySupport.setProperty(PROP_TILE_GRID, tiles);
-    if (tiles instanceof AbstractTileGrid) {
-      ((AbstractTileGrid) tiles).setContainerInternal(this);
+    if (tiles != null) {
+      tiles.setParentInternal(this);
     }
   }
 

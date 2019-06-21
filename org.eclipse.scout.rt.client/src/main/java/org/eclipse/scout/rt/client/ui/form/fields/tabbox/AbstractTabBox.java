@@ -157,10 +157,7 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
       LOG.error("error occured while dynamically contributing menus.", e);
     }
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    // set container on menus
-    IFormFieldContextMenu contextMenu = new FormFieldContextMenu<ITabBox>(this, menus.getOrderedList());
-    contextMenu.setContainerInternal(this);
-    setContextMenu(contextMenu);
+    setContextMenu(new FormFieldContextMenu<ITabBox>(this, menus.getOrderedList()));
   }
 
   /*

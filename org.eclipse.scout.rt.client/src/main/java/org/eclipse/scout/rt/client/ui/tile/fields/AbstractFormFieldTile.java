@@ -140,6 +140,6 @@ public abstract class AbstractFormFieldTile<T extends IFormField> extends Abstra
 
   @Override
   public String toString() {
-    return getClass().getSimpleName() + " [m_widget=" + getTileWidget() + ", m_container=" + getContainer() + "]";
+    return getClass().getSimpleName() + " [m_widget=" + getTileWidget() + ", m_container=" + getParent() + "]";
   }
 }

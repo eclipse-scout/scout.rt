@@ -10,27 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
+import java.security.Permission;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
+import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 
 /**
  * Root interface for Scout UI components.
  *
  * @since 8.0
  */
-public interface IWidget extends IPropertyObserver, IStyleable {
+public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimension, ITypeWithClassId {
 
   String PROP_INIT_CONFIG_DONE = "initConfigDone";
   String PROP_INIT_DONE = "initDone";
   String PROP_DISPOSE_DONE = "disposeDone";
+
   String PROP_LOADING = "loading";
+  String PROP_ENABLED = "enabled";
+  String PROP_PARENT_WIDGET = "parentWidget";
+  String PROP_INHERIT_ACCESSIBILITY = "inheritAccessibility";
 
   /**
    * @return {@code true} if {@link #initConfig()} has been called, {@code false} if not.
@@ -264,4 +272,213 @@ public interface IWidget extends IPropertyObserver, IStyleable {
 
   void setLoading(boolean loading);
 
+  /**
+   * @return {@code true} if this widget is enabled.
+   *         <p>
+   *         The result of this method does not respect any parent widgets. Use {@link #isEnabledIncludingParents()}
+   *         whenever necessary.
+   */
+  boolean isEnabled();
+
+  /**
+   * Sets the enabled state for the default dimension.
+   * <p>
+   * The actual enabled state depends on all dimensions. So the call to this method may not be sufficient to enable a
+   * widget (if other dimensions are still disabled).
+   *
+   * @param enabled
+   *          the new enabled state.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
+   * @return {@code true} if this widget respects the enabled state of parent widgets. If property is set to
+   *         {@code false}, this widget may be enabled even if parent widgets are disabled.
+   */
+  boolean isInheritAccessibility();
+
+  /**
+   * @see #isInheritAccessibility()
+   */
+  void setInheritAccessibility(boolean inheritAccessibility);
+
+  /**
+   * Uses the {@link Permission} provided to calculated the enabled granted state of this widget.
+   */
+  void setEnabledPermission(Permission permission);
+
+  /**
+   * @return The value for the enabled granted dimension.
+   */
+  boolean isEnabledGranted();
+
+  /**
+   * @param enabledGranted
+   *          the new value for the enabled granted dimension.
+   */
+  void setEnabledGranted(boolean enabledGranted);
+
+  /**
+   * Changes the default enabled dimension of this widget to the given value.
+   *
+   * @param enabled
+   *          The new enabled value.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   */
+  void setEnabled(boolean enabled, boolean updateParents);
+
+  /**
+   * Changes the default enabled dimension of this widget to the given value.
+   *
+   * @param enabled
+   *          The new enabled value.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   * @param updateChildren
+   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *          well.
+   */
+  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren);
+
+  /**
+   * Changes the granted enabled dimension of this widget to the given value.
+   *
+   * @param enabled
+   *          The new enable-granted value.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   */
+  void setEnabledGranted(boolean enabled, boolean updateParents);
+
+  /**
+   * Changes the granted enabled dimension of this widget to the given value.
+   *
+   * @param enabled
+   *          The new enable-granted value.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   * @param updateChildren
+   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *          well.
+   */
+  void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren);
+
+  /**
+   * Checks all existing enabled dimensions of this widget if their enabled state equals the value returned by the
+   * {@link Predicate} specified.
+   *
+   * @param filter
+   *          A {@link Predicate} that is called for each enabled dimension. The corresponding enabled-bit of this
+   *          widget must be equal to the result of the {@link Predicate}. In case {@code null} is passed all bits are
+   *          compared against {@code true} (which is the same as {@link #isEnabled()}).
+   * @return {@code true} if all enabled dimensions bits have the same value as returned by the specified
+   *         {@link Predicate}.
+   */
+  boolean isEnabled(Predicate<String> filter);
+
+  /**
+   * Changes the enabled-state value of the given dimension.
+   *
+   * @param enabled
+   *          The new enabled-state value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all items of an
+   *           application. They are not available by instance but by class!
+   */
+  void setEnabled(boolean enabled, boolean updateParents, String dimension);
+
+  /**
+   * Changes the enabled-state value of the given dimension.
+   *
+   * @param enabled
+   *          The new enabled-state value for the given dimension.
+   * @param updateParents
+   *          if <code>true</code> the enabled properties of all parent widgets are updated to same value as well. This
+   *          argument only has an effect if the new enabled state is {@code true}.
+   * @param updateChildren
+   *          if <code>true</code> the enabled properties of all child widgets (recursive) are updated to same value as
+   *          well.
+   * @param dimension
+   *          The dimension to change. Must not be <code>null</code>.
+   * @throws AssertionException
+   *           if the given dimension is <code>null</code>.
+   * @throws IllegalStateException
+   *           if too many dimensions are used. <b>Note:</b> these dimensions are shared amongst all elements of an
+   *           application. They are not available by instance but by class!
+   */
+  void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension);
+
+  /**
+   * @return the parent widget or {@code null} if this widget has no parent.
+   * @see #getParentOfType(Class)
+   * @see #visitParents(Predicate)
+   */
+  IWidget getParent();
+
+  /**
+   * @return The first parent widget that is {@code instanceof} the given type or {@code null} if no such parent can be
+   *         found.
+   */
+  <T extends IWidget> T getParentOfType(Class<T> type);
+
+  /**
+   * Sets the parent widget.
+   * <p>
+   * Do not use this internal method.
+   */
+  boolean setParentInternal(IWidget w);
+
+  /**
+   * @return {@code true} if this widget is enabled for all dimensions and all parent widgets are enabled for all
+   *         dimensions as well. The parent widgets are only considered as long as {@link #isInheritAccessibility()} is
+   *         {@code true}.
+   */
+  boolean isEnabledIncludingParents();
+
+  /**
+   * Visits all parent widgets. The receiver itself is not visited
+   *
+   * @param visitor
+   *          The visitor to call. Must not be {@code null}.
+   */
+  boolean visitParents(Consumer<IWidget> visitor);
+
+  /**
+   * Visits all parent widgets that are {@code instanceof} the given type filter. The receiver itself is not visited.
+   *
+   * @param visitor
+   *          The visitor to call. Must not be {@code null}.
+   */
+  <T extends IWidget> boolean visitParents(Consumer<T> visitor, Class<T> typeFilter);
+
+  /**
+   * Visits all parent widgets as long as the {@link Predicate} specified returns {@code true}.
+   *
+   * @param visitor
+   *          The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
+   *          {@code false}.
+   */
+  boolean visitParents(Predicate<IWidget> visitor);
+
+  /**
+   * Visits all parent widgets that are {@code instanceof} the given type filter as long as the {@link Predicate}
+   * specified returns {@code true}.
+   *
+   * @param visitor
+   *          The visitor to call. Must not be {@code null}. The visit aborts when the {@link Predicate} returns
+   *          {@code false}.
+   */
+  <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter);
 }

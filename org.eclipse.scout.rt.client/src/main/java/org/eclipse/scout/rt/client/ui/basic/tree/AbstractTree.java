@@ -58,6 +58,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
@@ -79,10 +80,10 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("b177affd-790b-4908-b608-ac00b996b10e")
 public abstract class AbstractTree extends AbstractWidget implements ITree, IContributionOwner, IExtensibleObject {
 
   private static final String AUTO_DISCARD_ON_DELETE = "AUTO_DISCARD_ON_DELETE";
@@ -90,7 +91,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   private static final String ACTION_RUNNING = "ACTION_RUNNING";
   private static final String SAVE_AND_RESTORE_SCROLLBARS = "SAVE_AND_RESTORE_SCROLLBARS";
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTree.class);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(AUTO_DISCARD_ON_DELETE, AUTO_TITLE, ACTION_RUNNING, SAVE_AND_RESTORE_SCROLLBARS);
 
   private final TreeListeners m_listeners = new TreeListeners();
@@ -113,13 +113,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
    * {@link #ACTION_RUNNING}, {@link #SAVE_AND_RESTORE_SCROLLBARS}
    */
   private byte m_flags;
-
-  /**
-   * Provides 8 dimensions for enabled state.<br>
-   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}.<br>
-   * 6 dimensions remain for custom use. This Tree is enabled, if all dimensions are enabled (all bits set).
-   */
-  private byte m_enabled;
 
   private ITreeNode m_rootNode;
   private int m_treeChanging;
@@ -562,12 +555,10 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
     m_eventHistory = createEventHistory();
     m_eventBuffer = createEventBuffer();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     m_contributionHolder = new ContributionComposite(this);
-    setEnabled(true);
     setTitle(getConfiguredTitle());
     setIconId(getConfiguredIconId());
     setDefaultIconId(getConfiguredDefaultIconId());
@@ -988,50 +979,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   @Override
   public long getDropMaximumSize() {
     return propertySupport.getPropertyInt(PROP_DROP_MAXIMUM_SIZE);
-  }
-
-  @Override
-  public void setEnabledPermission(Permission p) {
-    boolean enabled = true;
-    if (p != null) {
-      enabled = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    setEnabledGranted(enabled);
-  }
-
-  @Override
-  public boolean isEnabledGranted() {
-    return isEnabled(IDimensions.ENABLED_GRANTED);
-  }
-
-  @Override
-  public void setEnabledGranted(boolean enabled) {
-    setEnabled(enabled, IDimensions.ENABLED_GRANTED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled) {
-    setEnabled(enabled, IDimensions.ENABLED);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled, String dimension) {
-    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
-    calculateEnabled();
-  }
-
-  @Override
-  public boolean isEnabled(String dimension) {
-    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
-  }
-
-  private void calculateEnabled() {
-    propertySupport.setPropertyBool(PROP_ENABLED, NamedBitMaskHelper.allBitsSet(m_enabled));
   }
 
   @Override
@@ -1514,16 +1461,14 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     }
   }
 
-  @Override
-  public Object getContainer() {
-    return propertySupport.getProperty(PROP_CONTAINER);
-  }
-
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link ITree}
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} instead.
    */
-  public void setContainerInternal(Object container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public Object getContainer() {
+    return getParent();
   }
 
   private void ensureParentExpanded(ITreeNode parent) {

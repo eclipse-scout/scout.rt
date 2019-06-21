@@ -189,7 +189,7 @@ public class ActionTest {
     Assert.assertFalse(f.getRootGroupBox().isEnabled());
 
     // check that the menu inherits the state of the field
-    Assert.assertFalse(menu.isEnabled());
+    Assert.assertFalse(menu.isEnabledIncludingParents());
   }
 
   @ClassId(TEST_ACTION_CLASS_ID)

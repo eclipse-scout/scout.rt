@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IPlannerContextMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 
@@ -77,7 +76,6 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
    * {@link Activity}
    */
   String PROP_SELECTED_ACTIVITY = "selectedActivity";
-  String PROP_CONTAINER = "container";
   String PROP_CONTEXT_MENU = "contextMenus";
 
   int SELECTION_MODE_NONE = 0;
@@ -212,10 +210,9 @@ public interface IPlanner<RESOURCE_ID, ACTIVITY_ID> extends IWidget, IContextMen
   void deselectAllResources();
 
   /**
-   * Container of this map, typically the {@link IPlannerField}
-   *
-   * @since 3.8.1
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
+  @Deprecated
   Object getContainer();
 
   /**

@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ public class MenuUtilityTest {
 
   @Test
   public void testGetMenuByClassNullMenuType() {
-    TestContextMenu contextMenu = new TestContextMenu(mock(IPropertyObserver.class), Collections.<IMenu> emptyList());
+    TestContextMenu contextMenu = new TestContextMenu(mock(IWidget.class), Collections.<IMenu> emptyList());
     when(m_contextMenuOwner.getContextMenu()).thenReturn(contextMenu);
     assertNull(MenuUtility.getMenuByClass(m_contextMenuOwner, null));
   }
@@ -56,7 +56,7 @@ public class MenuUtilityTest {
 
   @Test
   public void testGetMenuByClassMenuDoesNotExist() {
-    TestContextMenu contextMenu = new TestContextMenu(mock(IPropertyObserver.class), Collections.<IMenu> emptyList());
+    TestContextMenu contextMenu = new TestContextMenu(mock(IWidget.class), Collections.<IMenu> emptyList());
     when(m_contextMenuOwner.getContextMenu()).thenReturn(contextMenu);
     assertNull(MenuUtility.getMenuByClass(m_contextMenuOwner, TestMenu.class));
   }
@@ -64,14 +64,19 @@ public class MenuUtilityTest {
   @Test
   public void testGetMenuByClassMenuExists() {
     TestMenu menu = new TestMenu();
-    TestContextMenu contextMenu = new TestContextMenu(mock(IPropertyObserver.class), Collections.singletonList(menu));
+    TestContextMenu contextMenu = new TestContextMenu(mock(IWidget.class), Collections.singletonList(menu));
     when(m_contextMenuOwner.getContextMenu()).thenReturn(contextMenu);
     assertSame(menu, MenuUtility.getMenuByClass(m_contextMenuOwner, TestMenu.class));
   }
 
-  private static class TestContextMenu extends AbstractContextMenu<IPropertyObserver> {
-    public TestContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList) {
+  private static class TestContextMenu extends AbstractContextMenu<IWidget> {
+    public TestContextMenu(IWidget owner, List<? extends IMenu> initialChildList) {
       super(owner, initialChildList);
+    }
+
+    @Override
+    protected boolean isOwnerPropertyChangedListenerRequired() {
+      return false;
     }
   }
 

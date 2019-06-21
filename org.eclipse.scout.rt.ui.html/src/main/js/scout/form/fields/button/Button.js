@@ -55,6 +55,7 @@ scout.Button.prototype._init = function(model) {
   this.resolveIconIds(['iconId']);
   this._setKeyStroke(this.keyStroke);
   this._setKeyStrokeScope(this.keyStrokeScope);
+  this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
 };
 
 /**
@@ -80,14 +81,6 @@ scout.Button.prototype._initKeyStrokeContext = function() {
     // use desktop otherwise
     return this.session.desktop.$container;
   }.bind(this);
-};
-
-/**
- * @override Widget.js
- */
-scout.Button.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
-  return scout.Button.parent.prototype._computeEnabled.call(this,
-    inheritAccessibility && !this._isIgnoreAccessibilityFlags(), parentEnabled);
 };
 
 scout.Button.prototype._isIgnoreAccessibilityFlags = function() {

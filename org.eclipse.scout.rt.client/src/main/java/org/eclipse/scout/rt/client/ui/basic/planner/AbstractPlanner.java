@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -58,6 +59,7 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ClassId("38cbdf76-8742-4c1c-89b3-ef994391a7a5")
 public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements IPlanner<RI, AI>, IContributionOwner, IExtensibleObject {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPlanner.class);
 
@@ -918,16 +920,14 @@ public abstract class AbstractPlanner<RI, AI> extends AbstractWidget implements 
     return getSelectionRange().getTo();
   }
 
-  @Override
-  public Object getContainer() {
-    return propertySupport.getProperty(PROP_CONTAINER);
-  }
-
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls an {@link IPlanner}
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
-  public void setContainerInternal(Object container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public Object getContainer() {
+    return getParent();
   }
 
   @Override

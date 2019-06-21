@@ -27,8 +27,9 @@ public class MoveActionNodesHandler<T extends IActionNode<T>> extends AbstractMo
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   protected T getParent(T child) {
-    return child.getParent();
+    return (T) child.getParentOfType(IActionNode.class);
   }
 
   @Override

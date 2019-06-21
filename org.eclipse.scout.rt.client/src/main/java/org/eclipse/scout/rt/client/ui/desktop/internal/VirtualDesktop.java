@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.desktop.internal;
 
 import java.beans.PropertyChangeListener;
+import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.Coordinates;
@@ -48,6 +50,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -62,6 +65,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * forms, fields, pages that must be done while the desktop is loading. This pattern solves the bird/egg problem in
  * initialization of an object with self-references.
  */
+@ClassId("3184965f-010b-4d1b-9c08-d5cd35eedf2b")
 public class VirtualDesktop implements IDesktop {
   private final DesktopListeners m_listeners;
   private final BasicPropertySupport m_propertyChangeListeners;
@@ -842,4 +846,128 @@ public class VirtualDesktop implements IDesktop {
     // NOP
   }
 
+  @Override
+  public boolean isEnabled() {
+    return false;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabledPermission(Permission permission) {
+    // NOP
+  }
+
+  @Override
+  public boolean isEnabledGranted() {
+    return false;
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabledGranted) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    // NOP
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return false;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, boolean updateParents) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren) {
+    // NOP
+  }
+
+  @Override
+  public boolean isEnabled(Predicate<String> filter) {
+    return false;
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, boolean updateParents, String dimension) {
+    // NOP
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, boolean updateParents, boolean updateChildren, String dimension) {
+    // NOP
+  }
+
+  @Override
+  public IWidget getParent() {
+    return null;
+  }
+
+  @Override
+  public boolean setParentInternal(IWidget w) {
+    return false;
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    return false;
+  }
+
+  @Override
+  public boolean visitParents(Consumer<IWidget> visitor) {
+    return false;
+  }
+
+  @Override
+  public <T extends IWidget> boolean visitParents(Consumer<T> visitor, Class<T> typeFilter) {
+    return false;
+  }
+
+  @Override
+  public boolean visitParents(Predicate<IWidget> visitor) {
+    return false;
+  }
+
+  @Override
+  public <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter) {
+    return false;
+  }
+
+  @Override
+  public <T extends IWidget> T getParentOfType(Class<T> type) {
+    return null;
+  }
+
+  @Override
+  public String classId() {
+    return null;
+  }
+
+  @Override
+  public boolean isInheritAccessibility() {
+    return false;
+  }
+
+  @Override
+  public void setInheritAccessibility(boolean inheritAccessibility) {
+    // NOP
+  }
 }

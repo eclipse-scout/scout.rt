@@ -123,7 +123,7 @@ public abstract class AbstractPlannerField<P extends IPlanner<RI, AI>, RI, AI> e
       throw new IllegalStateException("No planner found.");
     }
     if (m_planner instanceof AbstractPlanner) {
-      ((AbstractPlanner) m_planner).setContainerInternal(this);
+      ((AbstractPlanner) m_planner).setParentInternal(this);
     }
   }
 

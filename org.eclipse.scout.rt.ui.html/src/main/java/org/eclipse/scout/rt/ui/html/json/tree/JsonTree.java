@@ -173,12 +173,6 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         return getModel().isMultiCheck();
       }
     });
-    putJsonProperty(new JsonProperty<TREE>(ITree.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
-      }
-    });
     putJsonProperty(new JsonProperty<TREE>(ITree.PROP_LAZY_EXPANDING_ENABLED, model) {
       @Override
       protected Boolean modelValue() {

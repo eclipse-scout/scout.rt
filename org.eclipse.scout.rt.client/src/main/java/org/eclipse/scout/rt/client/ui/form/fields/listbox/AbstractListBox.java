@@ -305,7 +305,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
 
     if (m_table != null) {
       if (m_table instanceof AbstractTable) {
-        ((AbstractTable) m_table).setContainerInternal(this);
+        ((AbstractTable) m_table).setParentInternal(this);
       }
       updateActiveRowsFilter();
       updateCheckedRowsFilter();
@@ -355,11 +355,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       }
 
       String name = e.getPropertyName();
-      if (PROP_ENABLED_COMPUTED.equals(name)) {
-        boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-        m_table.setEnabled(newEnabled);
-      }
-      else if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
+      if (PROP_FILTER_CHECKED_ROWS_VALUE.equals(name)) {
         updateCheckedRowsFilter();
       }
       else if (PROP_FILTER_ACTIVE_ROWS_VALUE.equals(name)) {

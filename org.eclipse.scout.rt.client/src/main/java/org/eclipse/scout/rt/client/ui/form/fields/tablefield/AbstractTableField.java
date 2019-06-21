@@ -162,14 +162,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   protected void initConfig() {
     super.initConfig();
     setTableInternal(createTable());
-    // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED_COMPUTED, e -> {
-      if (m_table == null) {
-        return;
-      }
-      boolean newEnabled = ((Boolean) e.getNewValue()).booleanValue();
-      m_table.setEnabled(newEnabled);
-    });
   }
 
   @SuppressWarnings("unchecked")
@@ -222,10 +214,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     if (m_table == table) {
       return;
     }
-    if (m_table instanceof AbstractTable) {
-      ((AbstractTable) m_table).setContainerInternal(null);
-    }
     if (m_table != null) {
+      m_table.setParentInternal(null);
       if (!m_tableExternallyManaged && m_managedTableListener != null) {
         m_table.removeTableListener(m_managedTableListener);
         m_managedTableListener = null;
@@ -237,10 +227,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
       }
     }
     m_table = table;
-    if (m_table instanceof AbstractTable) {
-      ((AbstractTable) m_table).setContainerInternal(this);
-    }
     if (m_table != null) {
+      m_table.setParentInternal(this);
       if (!m_tableExternallyManaged) {
         m_managedTableListener = e -> {
           checkSaveNeeded();

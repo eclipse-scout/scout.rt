@@ -23,19 +23,14 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenuOwner;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITreeContextMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
-import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
-import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
-import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 
-public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner, IEnabledDimension {
+public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable, IContextMenuOwner {
 
   String PROP_TITLE = "title";
-  String PROP_ENABLED = "enabled";
   String PROP_DRAG_ENABLED = "dragEnabled";
   String PROP_ICON_ID = "iconId";
   String PROP_DEFAULT_ICON_ID = "defaultIconId";
@@ -64,17 +59,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
 
   String DISPLAY_STYLE_DEFAULT = "default";
   String DISPLAY_STYLE_BREADCRUMB = "breadcrumb";
-
-  /**
-   * Object
-   * <p>
-   * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   *
-   * @since 3.8.1
-   */
-  String PROP_CONTAINER = "container";
 
   /**
    * {@link ITreeContextMenu}
@@ -194,16 +178,6 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
    */
   void collapseAll(ITreeNode parent);
 
-  boolean isEnabled();
-
-  void setEnabled(boolean b);
-
-  boolean isEnabledGranted();
-
-  void setEnabledGranted(boolean b);
-
-  void setEnabledPermission(Permission p);
-
   boolean isLazyExpandingEnabled();
 
   void setLazyExpandingEnabled(boolean lazyExpandingEnabled);
@@ -270,12 +244,9 @@ public interface ITree extends IWidget, IDNDSupport, IStyleable, IAppLinkCapable
   int getCheckedNodesCount();
 
   /**
-   * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
-   * <p>
-   * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   *
-   * @since 3.8.1
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} instead.
    */
+  @Deprecated
   Object getContainer();
 
   /**

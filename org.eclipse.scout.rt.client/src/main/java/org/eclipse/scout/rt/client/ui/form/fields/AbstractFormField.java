@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -92,15 +91,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   private static final Logger LOG = LoggerFactory.getLogger(AbstractFormField.class);
   private static final NamedBitMaskHelper VISIBLE_BIT_HELPER = new NamedBitMaskHelper(IDimensions.VISIBLE, IDimensions.VISIBLE_GRANTED);
   private static final NamedBitMaskHelper LABEL_VISIBLE_BIT_HELPER = new NamedBitMaskHelper(LABEL_VISIBLE);
-  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED, ENABLED_SLAVE);
   private static final NamedBitMaskHelper FLAGS_BIT_HELPER = new NamedBitMaskHelper(TOUCHED, MASTER_REQUIRED);
-
-  /**
-   * Provides 8 dimensions for enabled state.<br>
-   * Internally used: {@link IDimensions#ENABLED}, {@link IDimensions#ENABLED_GRANTED}, {@link #ENABLED_SLAVE}.<br>
-   * 5 dimensions remain for custom use. This FormField is enabled, if all dimensions are enabled (all bits set).
-   */
-  private byte m_enabled;
 
   /**
    * Provides 8 dimensions for visibility.<br>
@@ -126,7 +117,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   private IForm m_form;
   private byte m_labelHorizontalAlignment;
   private Permission m_visiblePermission;
-  private Permission m_enabledPermission;
   private IValueField<?> m_masterField;
   protected int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private BasicPropertySupport m_subtreePropertyChangeSupport;
@@ -143,7 +133,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   public AbstractFormField(boolean callInitializer) {
     super(false);
-    m_enabled = NamedBitMaskHelper.ALL_BITS_SET; // default enabled
+    setEnabled(true, ENABLED_SLAVE); // lease enabled bit for master-slave
     m_visible = NamedBitMaskHelper.ALL_BITS_SET; // default visible
     m_labelVisible = NamedBitMaskHelper.ALL_BITS_SET; // default label visible
     m_objectExtensions = new ObjectExtensions<>(this, false);
@@ -248,15 +238,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredLabelVisible() {
-    return true;
-  }
-
-  /**
-   * Specifies if the form field is enabled initially.
-   */
-  @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(30)
-  protected boolean getConfiguredEnabled() {
     return true;
   }
 
@@ -837,7 +818,6 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     m_contributionHolder = new ContributionComposite(this);
     m_form = IForm.CURRENT.get();
     setFieldStyle(getConfiguredFieldStyle());
-    setEnabled(getConfiguredEnabled());
     setDisabledStyle(getConfiguredDisabledStyle());
     setVisible(getConfiguredVisible());
     setMandatory(getConfiguredMandatory());
@@ -1056,26 +1036,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
 
   @Override
   public IGroupBox getParentGroupBox() {
-    ICompositeField f = getParentField();
-    while (f != null && !(f instanceof IGroupBox)) {
-      f = f.getParentField();
-    }
-    return (IGroupBox) f;
+    return getParentOfType(IGroupBox.class);
   }
 
   @Override
   public ICompositeField getParentField() {
-    return (ICompositeField) propertySupport.getProperty(PROP_PARENT_FIELD);
-  }
-
-  @Override
-  public void setParentFieldInternal(ICompositeField f) {
-    propertySupport.setProperty(PROP_PARENT_FIELD, f);
-
-    if (f != null && f.isEnabled() != isEnabled()) {
-      // if the disabled state of this field is different than the new parent, it is required to inform the child fields so that they can update their state (e.g. menus).
-      fireEnabledComputetChangedRec();
-    }
+    return getParentOfType(ICompositeField.class);
   }
 
   @Override
@@ -1413,191 +1379,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     propertySupport.setPropertyBool(PROP_LABEL_VISIBLE, NamedBitMaskHelper.allBitsSet(m_labelVisible));
   }
 
-  @Override
-  public Permission getEnabledPermission() {
-    return m_enabledPermission;
-  }
-
-  @Override
-  public void setEnabledPermission(Permission p) {
-    m_enabledPermission = p;
-    boolean b = true;
-    if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    setEnabledGranted(b);
-  }
-
-  @Override
-  public boolean isEnabledGranted() {
-    return isEnabled(IDimensions.ENABLED_GRANTED);
-  }
-
-  @Override
-  public void setEnabledGranted(boolean enabled) {
-    setEnabledGranted(enabled, false);
-  }
-
-  @Override
-  public void setEnabledGranted(boolean enabled, boolean updateParents) {
-    setEnabledGranted(enabled, updateParents, false);
-  }
-
-  @Override
-  public void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren) {
-    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED_GRANTED);
-  }
-
   private void setEnabledSlave(boolean enabled) {
     setEnabled(enabled, ENABLED_SLAVE);
   }
 
   @Override
-  public boolean getEnabledProperty() {
-    return isEnabled(IDimensions.ENABLED);
-  }
-
-  @Override
   public void setEnabled(boolean enabled) {
-    setEnabled(enabled, false);
+    super.setEnabled(enabled);
     if (enabled) {
       setEnabledSlave(true);
     }
-  }
-
-  @Override
-  public void setEnabled(final boolean enabled, final boolean updateParents) {
-    setEnabled(enabled, updateParents, false);
-  }
-
-  @Override
-  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren) {
-    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED);
-  }
-
-  @Override
-  public void setEnabled(boolean enabled, String dimension) {
-    setEnabled(enabled, false, dimension);
-  }
-
-  @Override
-  public void setEnabled(final boolean enabled, final boolean updateParents, final String dimension) {
-    setEnabled(enabled, updateParents, false, dimension);
-  }
-
-  @Override
-  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren, final String dimension) {
-    m_enabled = ENABLED_BIT_HELPER.changeBit(dimension, enabled, m_enabled);
-    calculateEnabledInternal();
-
-    if (enabled && updateParents) {
-      // also enable all parents
-      visitParents(field -> {
-        field.setEnabled(true, dimension);
-        return true;
-      });
-    }
-
-    if (updateChildren) {
-      // propagate change to children
-      for (IWidget w : getChildren()) {
-        w.<IFormField> visit(field -> field.setEnabled(enabled, dimension), IFormField.class);
-      }
-    }
-  }
-
-  @Override
-  public boolean isEnabled(Predicate<String> filter) {
-    return ENABLED_BIT_HELPER.allBitsEqual(m_enabled, filter);
-  }
-
-  @Override
-  public boolean isEnabled(String dimension) {
-    return ENABLED_BIT_HELPER.isBitSet(dimension, m_enabled);
-  }
-
-  @Override
-  public boolean isEnabledIncludingParents() {
-    if (!isEnabled()) {
-      return false;
-    }
-
-    Predicate<IFormField> visitor = IFormField::isEnabled;
-    return visitParents(visitor);
-  }
-
-  public boolean visitParents(Consumer<IFormField> v) {
-    return visitParents(field -> {
-      v.accept(field);
-      return true;
-    });
-  }
-
-  @Override
-  public boolean visitParents(Predicate<IFormField> v) {
-    IFormField curField = findParentField(this);
-    if (curField == null) {
-      return true;
-    }
-
-    do {
-      if (!v.test(curField)) {
-        return false;
-      }
-      curField = findParentField(curField);
-    }
-    while (curField != null);
-    return true;
-  }
-
-  protected IFormField findParentField(IFormField f) {
-    IFormField parent = f.getParentField();
-    if (parent != null) {
-      return parent;
-    }
-    return getOuterFormField(f);
-  }
-
-  protected IFormField getOuterFormField(IFormField owner) {
-    if (owner == null) {
-      return null;
-    }
-    IForm innerForm = owner.getForm();
-    if (innerForm == null) {
-      return null;
-    }
-    return innerForm.getOuterFormField();
-  }
-
-  /**
-   * Do not use this internal method
-   */
-  protected void calculateEnabledInternal() {
-    final boolean enabled = NamedBitMaskHelper.allBitsSet(m_enabled);
-    boolean changed = propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-    if (!changed || !isInitConfigDone()) {
-      return;
-    }
-    fireEnabledComputetChangedRec();
-  }
-
-  /**
-   * notify myself and children that their inherited value might have changed
-   *
-   * @param enabled
-   *          The enabled state of the root field.
-   */
-  protected void fireEnabledComputetChangedRec() {
-    final boolean thisEnabled = isEnabled();
-    visit(field -> {
-      boolean b = thisEnabled && field.isEnabledIncludingParents();
-      field.propertySupport.firePropertyChange(PROP_ENABLED_COMPUTED, !b, b);
-    }, AbstractFormField.class);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
   }
 
   @Override
@@ -1784,7 +1575,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
       visitParents(field -> {
         field.setVisible(true, dimension);
         return true;
-      });
+      }, IFormField.class);
     }
 
     if (updateChildren) {
@@ -1818,7 +1609,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     }
 
     Predicate<IFormField> visitor = IFormField::isVisible;
-    return visitParents(visitor);
+    return visitParents(visitor, IFormField.class);
   }
 
   /**

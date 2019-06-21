@@ -14,28 +14,25 @@ import java.security.Permission;
 
 import org.eclipse.scout.rt.client.ui.IStyleable;
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.platform.IOrdered;
-import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
-import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
-import org.eclipse.scout.rt.shared.dimension.IEnabledDimension;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 
 /**
  * Actions have a trigger scope that is a combination of the "locations" {@link #isSingleSelectionAction()},
  * {@link #isMultiSelectionAction()}, {@link #isNonSelectionAction()}, {@link #isEmptySpaceAction()} and the granting
- * {@link #isInheritAccessibility()}
+ * {@link #isEnabledIncludingParents()}, {@link #isInheritAccessibility()}.
  * <p>
  * Examples:<br>
  * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
  * enabled would have emptySpaceAction=false;
  */
-public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable, IVisibleDimension, IEnabledDimension {
+public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimension {
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
   String PROP_TEXT = "text";
   String PROP_TOOLTIP_TEXT = "tooltipText";
-  String PROP_ENABLED = "enabled";
   String PROP_SELECTED = "selected";
   String PROP_VISIBLE = "visible";
   String PROP_KEY_STROKE = "keyStroke";
@@ -116,48 +113,9 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
 
   void setSelected(boolean selected);
 
-  boolean isEnabled();
-
-  void setEnabled(boolean enabled);
-
   boolean isVisible();
 
   void setVisible(boolean visible);
-
-  /**
-   * @return true if {@link #prepareAction()} should in addition consider the context of the action to decide for
-   *         visibility and enabled.<br>
-   *         For example a menu of a table field with {@link #isInheritAccessibility()}==true is invisible when the
-   *         table field is disabled or invisible
-   */
-  boolean isInheritAccessibility();
-
-  /**
-   * @see #isInheritAccessibility()
-   */
-  void setInheritAccessibility(boolean inheritAccessibility);
-
-  boolean isEnabledInheritAccessibility();
-
-  void setEnabledInheritAccessibility(boolean enabledInheritAccessibility);
-
-  /**
-   * Access control<br>
-   * when false, enabled property cannot be set to true
-   */
-  void setEnabledPermission(Permission permission);
-
-  /**
-   * Access control<br>
-   * when false, enabled property cannot be set to true
-   */
-  boolean isEnabledGranted();
-
-  /**
-   * Access control<br>
-   * when false, enabled property cannot be set to true
-   */
-  void setEnabledGranted(boolean enabledGranted);
 
   /**
    * Access control<br>
@@ -187,13 +145,6 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   IActionUIFacade getUIFacade();
 
   /**
-   * Checks if this action and all its parent actions are enabled
-   *
-   * @since 3.8.1
-   */
-  boolean isEnabledIncludingParents();
-
-  /**
    * Checks if this action and all of its parent actions are visible.
    *
    * @since 3.8.1
@@ -201,15 +152,21 @@ public interface IAction extends IWidget, ITypeWithClassId, IOrdered, IStyleable
   boolean isVisibleIncludingParents();
 
   /**
-   * The container of the action, e.g. {@link org.eclipse.scout.rt.client.ui.basic.table.ITable ITable}
+   * The container of the action, e.g. {@link ITable}.
+   * <p>
+   * The difference to {@link #getParent()} is that a sub-menus parent is the parent menu while the sub-menus container
+   * is still e.g. the {@link ITable}. So the container for a menu hierarchy is always the same.
+   * 
+   * @see #getParent()
+   * @see #getParentOfType(Class)
    **/
-  IPropertyObserver getContainer();
+  IWidget getContainer();
 
   /**
    * The container of the action node, e.g. a {@link org.eclipse.scout.rt.client.ui.basic.table.ITable ITable} or
    * {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}
    **/
-  void setContainerInternal(IPropertyObserver container);
+  void setContainerInternal(IWidget container);
 
   /**
    * @param horizontalAlignment

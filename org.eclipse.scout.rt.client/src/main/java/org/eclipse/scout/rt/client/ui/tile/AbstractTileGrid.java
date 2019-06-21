@@ -125,14 +125,8 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     menus.addAllOrdered(contributedMenus);
     injectMenusInternal(menus);
 
-    // set container on menus
-    for (IMenu menu : menus) {
-      menu.setContainerInternal(this);
-    }
-
     new MoveActionNodesHandler<>(menus).moveModelObjects();
-    ITileGridContextMenu contextMenu = new TileGridContextMenu(this, menus.getOrderedList());
-    setContextMenu(contextMenu);
+    setContextMenu(new TileGridContextMenu(this, menus.getOrderedList()));
   }
 
   protected void injectTilesInternal(OrderedCollection<T> tiles) {
@@ -388,7 +382,7 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   protected void addTileInternal(T tile) {
-    tile.setContainer(this);
+    tile.setParentInternal(this);
     // Reset state in case tile was used in another grid
     tile.setFilterAccepted(true);
   }
@@ -622,15 +616,6 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
   }
 
   @Override
-  public String classId() {
-    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
-    if (getContainer() != null) {
-      return simpleClassId + ID_CONCAT_SYMBOL + getContainer().classId();
-    }
-    return simpleClassId;
-  }
-
-  @Override
   public T getTileByClass(Class<T> tileClass) {
     T candidate = null;
     for (T tile : getTilesInternal()) {
@@ -644,16 +629,14 @@ public abstract class AbstractTileGrid<T extends ITile> extends AbstractWidget i
     return candidate;
   }
 
-  @Override
-  public ITypeWithClassId getContainer() {
-    return (ITypeWithClassId) propertySupport.getProperty(PROP_CONTAINER);
-  }
-
   /**
-   * do not use this internal method unless you are implementing a container that holds and controls tiles.
+   * @deprecated Will be removed in Scout 11. Use {@link #getParent()} or {@link #getParentOfType(Class)} instead.
    */
-  public void setContainerInternal(ITypeWithClassId container) {
-    propertySupport.setProperty(PROP_CONTAINER, container);
+  @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
+  public ITypeWithClassId getContainer() {
+    return getParent();
   }
 
   protected String getAsyncLoadIdentifier() {

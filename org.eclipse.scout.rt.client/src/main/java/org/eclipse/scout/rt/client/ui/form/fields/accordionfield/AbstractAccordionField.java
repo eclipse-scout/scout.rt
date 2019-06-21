@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.accordionfield.Accor
 import org.eclipse.scout.rt.client.extension.ui.form.fields.accordionfield.AccordionFieldChains.AccordionFieldDropRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.accordionfield.IAccordionFieldExtension;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.accordion.AbstractAccordion;
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
@@ -132,12 +131,12 @@ public abstract class AbstractAccordionField<T extends IAccordion> extends Abstr
       return;
     }
 
-    if (oldAccordion instanceof AbstractAccordion) {
-      ((AbstractAccordion) oldAccordion).setContainerInternal(null);
+    if (oldAccordion != null) {
+      oldAccordion.setParentInternal(null);
     }
     propertySupport.setProperty(PROP_ACCORDION, accordion);
-    if (accordion instanceof AbstractAccordion) {
-      ((AbstractAccordion) accordion).setContainerInternal(this);
+    if (accordion != null) {
+      accordion.setParentInternal(this);
     }
   }
 

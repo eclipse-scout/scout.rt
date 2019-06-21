@@ -12,35 +12,48 @@ package org.eclipse.scout.rt.client.ui;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
+import java.security.Permission;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeTraversals;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
+import org.eclipse.scout.rt.shared.dimension.IDimensions;
+import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @since 8.0
  */
+@ClassId("c11a79f7-0af6-430e-9700-2d050e3aa41e")
 public abstract class AbstractWidget extends AbstractPropertyObserver implements IWidget {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWidget.class);
+  private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
+  private static final String PROP_ENABLED_BYTE = "enabledByte";
 
   public AbstractWidget() {
     this(true);
   }
 
   public AbstractWidget(boolean callInitializer) {
+    setEnabledByte(NamedBitMaskHelper.ALL_BITS_SET, false); // default enabled
     if (callInitializer) {
       callInitializer();
     }
@@ -63,6 +76,8 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   protected void initConfig() {
     setCssClass(getConfiguredCssClass());
+    setEnabled(getConfiguredEnabled());
+    setInheritAccessibility(getConfiguredInheritAccessibility());
   }
 
   @Override
@@ -262,14 +277,50 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   }
 
   /**
+   * Configures whether this widget is enabled or not.
+   * <p>
+   * The value returned by this method is used for the default enabled dimension only.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if this widget is enabled and {@code false} otherwise.
+   * @see #setEnabled(boolean, String)
+   * @see #isEnabledIncludingParents()
+   */
+  @Order(10)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredEnabled() {
+    return true;
+  }
+
+  /**
+   * Configures whether this widgets inherits the enabled state of its parent widgets.
+   * <p>
+   * For example a menu of a table field with {@link #isInheritAccessibility()}{@code == true} is automatically disabled
+   * if the table field is disabled.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if this widget is only enabled if all parent widgets are enabled as well. {@code false} if the
+   *         enabled state of this widget is independent of the parent widgets.
+   * @see #setInheritAccessibility(boolean)
+   * @see #isEnabledIncludingParents()
+   */
+  @Order(20)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredInheritAccessibility() {
+    return true;
+  }
+
+  /**
    * Configures the css class(es) of this widget.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
    *
    * @return a string containing one or more classes separated by space, or null if no class should be set.
    */
+  @Order(30)
   @ConfigProperty(ConfigProperty.STRING)
-  @Order(55)
   protected String getConfiguredCssClass() {
     return null;
   }
@@ -307,5 +358,194 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   @Override
   public void setLoading(boolean loading) {
     propertySupport.setPropertyBool(PROP_LOADING, loading);
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return NamedBitMaskHelper.allBitsSet(getEnabledByte());
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED);
+  }
+
+  @Override
+  public boolean isEnabledGranted() {
+    return isEnabled(IDimensions.ENABLED_GRANTED);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled) {
+    setEnabled(enabled, IDimensions.ENABLED_GRANTED);
+  }
+
+  @Override
+  public boolean isEnabled(String dimension) {
+    return ENABLED_BIT_HELPER.isBitSet(dimension, getEnabledByte());
+  }
+
+  @Override
+  public boolean isInheritAccessibility() {
+    return propertySupport.getPropertyBool(PROP_INHERIT_ACCESSIBILITY);
+  }
+
+  @Override
+  public void setInheritAccessibility(boolean b) {
+    propertySupport.setPropertyBool(PROP_INHERIT_ACCESSIBILITY, b);
+  }
+
+  @Override
+  public void setEnabledPermission(Permission permission) {
+    boolean b = true;
+    if (permission != null) {
+      b = BEANS.get(IAccessControlService.class).checkPermission(permission);
+    }
+    setEnabledGranted(b);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents) {
+    setEnabledGranted(enabled, updateParents, false);
+  }
+
+  @Override
+  public void setEnabledGranted(boolean enabled, boolean updateParents, boolean updateChildren) {
+    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED_GRANTED);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents) {
+    setEnabled(enabled, updateParents, false);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren) {
+    setEnabled(enabled, updateParents, updateChildren, IDimensions.ENABLED);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled, String dimension) {
+    setEnabled(enabled, false, dimension);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final String dimension) {
+    setEnabled(enabled, updateParents, false, dimension);
+  }
+
+  @Override
+  public void setEnabled(final boolean enabled, final boolean updateParents, final boolean updateChildren, final String dimension) {
+    setEnabledByte(ENABLED_BIT_HELPER.changeBit(dimension, enabled, getEnabledByte()), true);
+
+    if (enabled && updateParents) {
+      // also enable all parents
+      visitParents(field -> field.setEnabled(true, dimension));
+    }
+
+    if (updateChildren) {
+      // propagate change to children
+      for (IWidget w : getChildren()) {
+        w.visit(field -> field.setEnabled(enabled, dimension));
+      }
+    }
+  }
+
+  @Override
+  public boolean isEnabled(Predicate<String> filter) {
+    return ENABLED_BIT_HELPER.allBitsEqual(getEnabledByte(), filter);
+  }
+
+  private byte getEnabledByte() {
+    return propertySupport.getPropertyByte(PROP_ENABLED_BYTE);
+  }
+
+  private boolean setEnabledByte(byte enabled, boolean fireListeners) {
+    boolean changed = propertySupport.setPropertyByte(PROP_ENABLED_BYTE, enabled);
+    if (changed && fireListeners) {
+      boolean newEnabled = isEnabled();
+      propertySupport.firePropertyChange(PROP_ENABLED, !newEnabled, newEnabled);
+    }
+    return changed;
+  }
+
+  @Override
+  public IWidget getParent() {
+    return (IWidget) propertySupport.getProperty(PROP_PARENT_WIDGET);
+  }
+
+  @Override
+  public boolean setParentInternal(IWidget w) {
+    return propertySupport.setProperty(PROP_PARENT_WIDGET, w);
+  }
+
+  @Override
+  public boolean isEnabledIncludingParents() {
+    if (!isEnabled()) {
+      return false;
+    }
+    if (!isInheritAccessibility()) {
+      return true;
+    }
+
+    AtomicReference<Boolean> result = new AtomicReference<Boolean>(true);
+    visitParents(w -> {
+      if (!w.isEnabled()) {
+        result.set(false);
+        return false; // disabled parent found: cancel search
+      }
+      if (!w.isInheritAccessibility()) {
+        return false; // no need to check any more parents
+      }
+      return true; // check next parent
+    });
+    return result.get();
+  }
+
+  @Override
+  public boolean visitParents(Consumer<IWidget> visitor) {
+    return visitParents(visitor, IWidget.class);
+  }
+
+  @Override
+  public <T extends IWidget> boolean visitParents(Consumer<T> visitor, Class<T> typeFilter) {
+    return visitParents(w -> {
+      visitor.accept(w);
+      return true;
+    }, typeFilter);
+  }
+
+  @Override
+  public boolean visitParents(Predicate<IWidget> visitor) {
+    return visitParents(visitor, IWidget.class);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter) {
+    IWidget cur = this;
+    while ((cur = cur.getParent()) != null) {
+      if (typeFilter.isInstance(cur) && !visitor.test((T) cur)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public <T extends IWidget> T getParentOfType(Class<T> type) {
+    AtomicReference<T> result = new AtomicReference<>();
+    visitParents(composite -> !result.compareAndSet(null, composite), type);
+    return result.get();
+  }
+
+  @Override
+  public String classId() {
+    String simpleClassId = ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+    IWidget parent = getParent();
+    if (parent != null) {
+      return simpleClassId + ID_CONCAT_SYMBOL + parent.classId();
+    }
+    return simpleClassId;
   }
 }
