@@ -576,7 +576,7 @@ public class UiSession implements IUiSession {
         detachGui.run();
       }
       else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
         ModelJobs.schedule(new IRunnable() {
           @Override
           public void run() throws Exception {
