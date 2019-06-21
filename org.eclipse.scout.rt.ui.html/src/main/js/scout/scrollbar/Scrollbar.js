@@ -112,8 +112,8 @@ scout.Scrollbar.prototype._remove = function() {
   scout.Scrollbar.parent.prototype._remove.call(this);
 };
 
-scout.Scrollbar.prototype._afterAttach = function() {
-  scout.Scrollbar.parent.prototype._afterAttach.call(this);
+scout.Scrollbar.prototype._renderOnAttach = function() {
+  scout.Scrollbar.parent.prototype._renderOnAttach.call(this);
   this._ensureParentPosition();
 };
 

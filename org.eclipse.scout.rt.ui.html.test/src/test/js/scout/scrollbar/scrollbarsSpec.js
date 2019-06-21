@@ -180,7 +180,7 @@ describe("scrollbars", function() {
         scrollbar.attached = false;
         scrollbar.attach();
       });
-      // Position should now have been set automatically by Scrollbar._afterAttach()
+      // Position should now have been set automatically by Scrollbar._renderOnAttach()
       expect($scrollable.css('position')).toBe('relative');
     });
 
