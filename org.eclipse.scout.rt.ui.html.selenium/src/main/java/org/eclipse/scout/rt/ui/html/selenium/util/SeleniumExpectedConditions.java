@@ -179,4 +179,44 @@ public final class SeleniumExpectedConditions {
       }
     };
   }
+
+  /**
+   * @param parentElement
+   *          if not null, findElement below the given parent, if null, findElements in document
+   * @param rowText
+   *          text of element table-row, compared with 'contains'
+   * @param numRows
+   * @return The table-rows found by the expected condition
+   */
+  public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final String rowText, final int numRows) {
+    return new ExpectedCondition<List<WebElement>>() {
+      @Override
+      public List<WebElement> apply(WebDriver driver) {
+        try {
+          By by = By.className("table-row");
+          List<WebElement> tableRows = parentElement != null ? parentElement.findElements(by) : driver.findElements(by);
+          // we must have exactly the requested count of rows (too many rows is as bad as too few rows)
+          if (numRows != tableRows.size()) {
+            return null;
+          }
+          // and each one of these rows must contain the given text
+          for (WebElement tableRow : tableRows) {
+            if (!tableRow.getText().contains(rowText)) {
+              return null;
+            }
+          }
+          return tableRows;
+        }
+        catch (StaleElementReferenceException e) { // NOSONAR
+          // NOP
+        }
+        return null;
+      }
+
+      @Override
+      public String toString() {
+        return String.format("table should have %d rows with text '%s'", numRows, rowText);
+      }
+    };
+  }
 }
