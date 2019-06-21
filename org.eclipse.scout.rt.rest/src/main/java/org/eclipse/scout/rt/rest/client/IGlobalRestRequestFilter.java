@@ -15,7 +15,10 @@ import javax.ws.rs.client.ClientRequestFilter;
 import org.eclipse.scout.rt.platform.Bean;
 
 /**
- * Global REST client request filter added to all APIs and invoked for every REST call.
+ * Global REST client request filter added to all APIs and invoked for <strong>every</strong> REST call.
+ * <p>
+ * When you implement a REST client helper for a specific purpose you should not implement this interface but use
+ * <code>ClientRequestFilter</code> instead.
  */
 @Bean
 public interface IGlobalRestRequestFilter extends ClientRequestFilter {

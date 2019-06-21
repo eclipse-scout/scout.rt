@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Configuration;
@@ -90,7 +91,6 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   protected void initClientBuilder(ClientBuilder clientBuilder) {
     registerContextResolvers(clientBuilder);
     registerRequestFilters(clientBuilder);
-
     configureClientBuilder(clientBuilder);
   }
 
@@ -102,13 +102,13 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
   }
 
   protected void registerRequestFilters(ClientBuilder clientBuilder) {
-    for (IGlobalRestRequestFilter filter : getRequestFiltersToRegister()) {
+    for (ClientRequestFilter filter : getRequestFiltersToRegister()) {
       clientBuilder.register(filter);
     }
   }
 
   protected void configureClientBuilder(ClientBuilder clientBuilder) {
-    for (IGlobalRestClientConfigurator configurator : getClientConfiguratorsToRegister()) {
+    for (IGlobalRestClientConfigurator configurator : getClientConfigurators()) {
       configurator.configure(clientBuilder);
     }
   }
@@ -125,7 +125,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * @return list of request filters for this REST client helper. Result is modifiable and never <code>null</code>. Can
    *         be overridden by subclasses. The default returns all {@link IGlobalRestRequestFilter} beans.
    */
-  protected List<IGlobalRestRequestFilter> getRequestFiltersToRegister() {
+  protected List<ClientRequestFilter> getRequestFiltersToRegister() {
     return new ArrayList<>(BEANS.all(IGlobalRestRequestFilter.class));
   }
 
@@ -133,7 +133,7 @@ public abstract class AbstractRestClientHelper implements IRestClientHelper {
    * @return list of client configurators for this REST client helper. Result is modifiable and never <code>null</code>.
    *         Can be overridden by subclasses. The default returns all {@link IGlobalRestClientConfigurator} beans.
    */
-  protected List<IGlobalRestClientConfigurator> getClientConfiguratorsToRegister() {
+  protected List<IGlobalRestClientConfigurator> getClientConfigurators() {
     return new ArrayList<>(BEANS.all(IGlobalRestClientConfigurator.class));
   }
 

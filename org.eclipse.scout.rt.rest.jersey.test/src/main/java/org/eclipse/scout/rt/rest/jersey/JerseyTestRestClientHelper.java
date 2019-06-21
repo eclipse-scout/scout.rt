@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.jersey;
 
+import java.util.List;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.config.RegistryBuilder;
@@ -67,8 +70,9 @@ public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
   }
 
   @Override
-  protected void registerRequestFilters(ClientBuilder clientBuilder) {
-    super.registerRequestFilters(clientBuilder);
-    clientBuilder.register(new LanguageAndCorrelationIdRestRequestFilter());
+  protected List<ClientRequestFilter> getRequestFiltersToRegister() {
+    List<ClientRequestFilter> filters = super.getRequestFiltersToRegister();
+    filters.add(new LanguageAndCorrelationIdRestRequestFilter());
+    return filters;
   }
 }
