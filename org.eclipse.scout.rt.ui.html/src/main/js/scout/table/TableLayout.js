@@ -19,6 +19,7 @@ scout.TableLayout.prototype.layout = function($container) {
   var menuBarHeight = 0,
     footerHeight = 0,
     headerHeight = 0,
+    tileTableHeight = 0,
     controlContainerHeight = 0,
     controlContainerInsets,
     tileGrid = this.table.mediator ? this.table.mediator.tileAccordion : null,
@@ -28,6 +29,7 @@ scout.TableLayout.prototype.layout = function($container) {
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
+    tileTableHeader = this.table.tileTableHeader,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -58,7 +60,11 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
+  if (tileTableHeader) {
+    tileTableHeight = scout.graphics.size(tileTableHeader.$container).height;
+    tileTableHeader.groupBox.validateLayout();
+  }
+  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight+ tileTableHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
 
   if (tileGrid) {

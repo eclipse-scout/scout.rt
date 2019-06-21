@@ -23,7 +23,6 @@ scout.TableTileGridMediator = function(table) {
   this.tiles = [];
   this.tilesMap = {}; // tiles by rowId
   this.tileFilterMap = {};
-  this.primaryGroupingColumn = null;
   this.groups = {};
   this.groupForTileMap = {}; // groupId by tile
   this.tableState = {}; // always stores the last table state before tileMode activation
@@ -32,9 +31,11 @@ scout.TableTileGridMediator = function(table) {
   this._tableFilterAddedHandler = this._onTableFilterAdded.bind(this);
   this._tableFilterRemovedHandler = this._onTableFilterRemoved.bind(this);
   this._tableFilterHandler = this._onTableFilter.bind(this);
+  this._tableGroupHandler = this._onTableGroup.bind(this);
   this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
   this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
+  this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
 
   this._destroyHandler = this._uninstallListeners.bind(this);
 };
@@ -44,9 +45,11 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
   this.table.on('filterAdded', this._tableFilterAddedHandler);
   this.table.on('filterRemoved', this._tableFilterRemovedHandler);
   this.table.on('filter', this._tableFilterHandler);
+  this.table.on('group', this._tableGroupHandler);
   this.table.on('rowsInserted', this._tableRowsInsertedHandler);
   this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
+  this.table.on('rowOrderChanged', this._tableRowOrderChangedHandler);
 
   this.tileAccordion.on('destroy', this._destroyHandler);
   this.table.on('destroy', this._destroyHandler);
@@ -57,18 +60,22 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.table.off('filterAdded', this._tableFilterAddedHandler);
   this.table.off('filterRemoved', this._tableFilterRemovedHandler);
   this.table.off('filter', this._tableFilterHandler);
+  this.table.off('group', this._tableGroupHandler);
   this.table.off('rowsInserted', this._tableRowsInsertedHandler);
   this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
+  this.table.off('rowOrderChanged', this._tableRowOrderChangedHandler);
 
   this.tileAccordion.off('destroy', this._destroyHandler);
   this.table.off('destroy', this._destroyHandler);
 };
 
 scout.TableTileGridMediator.prototype.loadTiles = function() {
-  this.tiles = [];
-  this.tilesMap = {};
-  this.table._setTiles(this.table.createTiles(this.table.rows));
+  var tiles = this.table.createTiles(this.table.rows);
+  // scoutJs delivers the tiles right away, in scout classic the backend will call setTiles once the tiles are loaded
+  if (tiles) {
+    this.table._setTiles(tiles);
+  }
 };
 
 scout.TableTileGridMediator.prototype.resolveMapping = function(tableRowTileMapping) {
@@ -95,31 +102,24 @@ scout.TableTileGridMediator.prototype.getTilesForRows = function(rows) {
   });
 };
 
-scout.TableTileGridMediator.prototype._initGroups = function() {
-  this.groups = {};
-
-  this.primaryGroupingColumn = this.table.columns.find(function(column) {
+scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
+  var primaryGroupingColumn = this.table.columns.find(function(column) {
     return column.grouped && column.sortIndex === 0;
   });
 
-  this.table.rows.forEach(function(row) {
-    var groupId = this._groupIdForRow(row);
+  tiles.forEach(function(tile) {
+    var row = this.table.rowsMap[tile.rowId];
+    var groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
     this.groupForTileMap[row.id] = groupId;
-    // used as a set
-    this.groups[groupId] = null;
+    // check if group already exists, otherwise create it
+    var group = this.tileAccordion.getGroupById(groupId);
+    if (!group) {
+      group = this._createTileGroup(groupId);
+      this.tileAccordion.insertGroup(group);
+    }
+    tile.parent = group;
+    group.setTitleSuffix('(' + (++group.tileCount) + ')');
   }, this);
-
-  Object.keys(this.groups).forEach(function(groupId) {
-    this.tileAccordion.insertGroup(this._createTileGroup(groupId));
-  }, this);
-};
-
-scout.TableTileGridMediator.prototype._groupIdForRow = function(row) {
-  if (this.primaryGroupingColumn) {
-    return this.primaryGroupingColumn.cellTextForGrouping(row);
-  } else {
-    return 'default';
-  }
 };
 
 scout.TableTileGridMediator.prototype._createTileAccordion = function() {
@@ -132,34 +132,16 @@ scout.TableTileGridMediator.prototype._createTileAccordion = function() {
 };
 
 scout.TableTileGridMediator.prototype._createTileGroup = function(groupId) {
-  var count = Object.values(this.groupForTileMap).filter(function(x) {
-    return x === groupId;
-  }).length;
   return new scout.create('Group', {
     parent: this.tileAccordion,
     id: groupId,
-    // TODO [10.0] rmu temporary workaround that in case of default group no title is shown...
     headerVisible: groupId === 'default' ? false : true,
     title: groupId,
-    titleSuffix: '(' + count + ')',
     body: {
       objectType: 'TileGrid'
-    }
+    },
+    tileCount: 0
   });
-};
-
-scout.TableTileGridMediator.prototype._groupTiles = function(tiles) {
-  tiles.forEach(function(tile) {
-    var groupId = 'default';
-    if (this.groupForTileMap[tile.rowId]) {
-      groupId = this.groupForTileMap[tile.rowId];
-    } else {
-      // try to evaluate grouping info for this tile
-      groupId = this._groupIdForRow(this.table.rowsMap[tile.rowId]);
-      this.groupForTileMap[tile.rowId] = groupId;
-    }
-    tile.parent = this.tileAccordion.getGroupById(groupId);
-  }, this);
 };
 
 scout.TableTileGridMediator.prototype.init = function() {
@@ -172,8 +154,8 @@ scout.TableTileGridMediator.prototype.init = function() {
 };
 
 scout.TableTileGridMediator.prototype.activate = function() {
-  // render/model? maybe _setHeaderVisible to not trigger rendering...?
   this.table.setHeaderVisible(false);
+  this.table.setTileTableHeaderVisible(true);
 
   // hide aggregation table control
   this.table.tableControls.filter(function(control) {
@@ -182,25 +164,29 @@ scout.TableTileGridMediator.prototype.activate = function() {
     }
   });
 
-  // only makes sense after tiles are loaded... in scout classic this should be executed by the TableAdapter
+  // doesn't depend upon any tile data, therefore execute on activation
+  this._syncGroupingAndSortingColumns();
   this._syncFiltersFromTableToTile();
-  // TODO [10.0] rmu duplicated code for classic and js case: after insertion or after activation...
-  this._syncSelectionFromTableToTile();
-  //  this._syncScrollTopFromTableToTile();
-
-  this.tileAccordion.setTiles(this.tiles);
 };
 
 scout.TableTileGridMediator.prototype.deactivate = function() {
-  // model / render...?
-  // hide aggregation table control
+  // show aggregation table control
   this.table.tableControls.filter(function(control) {
     if (control instanceof scout.AggregateTableControl) {
       control.setVisible(true);
     }
   });
+  // restore from tableState
   this.table.setHeaderVisible(this.tableState.headerVisible);
+  this.table.setTileTableHeaderVisible(false);
 
+  // TODO [10.0] rmu: reload tiles on every mode-switch. loadTiles() could be optimized so that only not already existing tiles are reloaded
+  // complete reset
+  this.tiles = [];
+  this.tilesMap = {};
+  this.tileFilterMap = {};
+  this.groups = {};
+  this.groupForTileMap = {};
   this.tileAccordion.deleteAllTiles();
   this.tileAccordion.deleteAllGroups();
 };
@@ -224,7 +210,6 @@ scout.TableTileGridMediator.prototype.remove = function() {
 };
 
 scout.TableTileGridMediator.prototype.destroy = function() {
-  // model...?
   // destroy tiles manually since owner is this.table thus the tileGrid can't destroy them
   this.tiles.forEach(function(tile) {
     tile.destroy();
@@ -242,15 +227,12 @@ scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
   this._refreshTilesMap(tiles);
 
   // create simplified grouping for tile accordion, grouping on the table can be left as is.
-  this._initGroups();
-  this._groupTiles(this.tiles);
+  this._initGroups(tiles);
 
-  // tileAccordion is only ready when in tileMode.
-  if (this.table.tileMode) {
-    this.tileAccordion.setTiles(this.tiles);
-    this._syncSelectionFromTableToTile();
-    //  this.mediator._syncScrollTopFromTableToTile();
-  }
+  this.tileAccordion.setTiles(this.tiles);
+
+  this._syncSelectionFromTableToTile();
+  //  this.mediator._syncScrollTopFromTableToTile();
 };
 
 scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
@@ -258,10 +240,16 @@ scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
     tiles = this.tiles.slice();
   }
   scout.arrays.removeAll(this.tiles, tiles);
-  this._refreshTilesMap();
   tiles.forEach(function(tile) {
+    delete this.tilesMap[tile.rowId];
+    delete this.groupForTileMap[tile.rowId];
+    var group = this.tileAccordion.getGroupByTile(tile);
+    group.setTitleSuffix('(' + (--group.tileCount) + ')');
+    if (group.tileCount === 0) {
+      this.tileAccordion.deleteGroup(group);
+    }
     tile.destroy();
-  });
+  }, this);
   this.tileAccordion.deleteTiles(tiles);
 };
 
@@ -275,6 +263,9 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
 };
 
 scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
   var tableRowTileMappings = this.table.createTiles(event.rows);
   if (tableRowTileMappings) {
     this.insertTiles(tableRowTileMappings.map(this.resolveMapping));
@@ -282,11 +273,39 @@ scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
 };
 
 scout.TableTileGridMediator.prototype._onTableRowsDeleted = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
   this.deleteTiles(this.getTilesForRows(event.rows));
 };
 
 scout.TableTileGridMediator.prototype._onTableAllRowsDeleted = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
   this.deleteTiles();
+};
+
+// TODO [10.0] rmu: what is the best way to do this?
+scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
+  var tiles = [];
+  this.table.visibleRows.forEach(function(row) {
+    tiles.push(this.tilesMap[row.id]);
+  }, this);
+  this.tiles = tiles;
+  this.tileAccordion.setTiles(this.tiles);
+};
+
+scout.TableTileGridMediator.prototype._onTableGroup = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
+  this.tileAccordion.deleteAllGroups();
+  this._initGroups(this.tiles);
+  this.tileAccordion.setTiles(this.tiles);
 };
 
 scout.TableTileGridMediator.prototype._onTableFilterAdded = function(event) {
@@ -387,6 +406,26 @@ scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
 scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function() {
   if (this.tileAccordion) {
     this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
+  }
+};
+
+scout.TableTileGridMediator.prototype._syncGroupingAndSortingColumns = function() {
+  if (this.table.tileTableHeaderVisible) {
+
+    var primaryGroupingColumnIndex = this.table.visibleColumns().findIndex(function(column) {
+      return column.grouped && column.sortIndex === 0;
+    });
+    if (primaryGroupingColumnIndex >= 0) {
+      this.table.tileTableHeader.groupByField.setValue(primaryGroupingColumnIndex);
+    }
+
+    var primarySortingColumnIndex = this.table.visibleColumns().findIndex(function(column) {
+      return column.sortActive && column.sortIndex === 0;
+    });
+
+    if (primarySortingColumnIndex >= 0) {
+      this.table.tileTableHeader.sortByField.setValue(primarySortingColumnIndex);
+    }
   }
 };
 

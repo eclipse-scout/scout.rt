@@ -37,7 +37,13 @@ scout.TableHeader.prototype._init = function(options) {
 };
 
 scout.TableHeader.prototype._render = function() {
-  this.$container = this.table.$data.beforeDiv('table-header');
+  // TODO [10.0] rmu: check which way is the best
+  //  this.$container = this.table.$data.beforeDiv('table-header');
+  if (this.table.menuBar.position === scout.MenuBar.Position.TOP && this.table.menuBar.$container) {
+    this.$container = this.table.menuBar.$container.afterDiv('table-header');
+  } else {
+    this.$container = this.table.$container.makeDiv('table-header').prependTo(this.table.$container);
+  }
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');

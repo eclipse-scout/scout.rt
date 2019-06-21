@@ -293,6 +293,7 @@
   __include("scout/table/TableRowTileMappingAdapter.js");
   __include("scout/table/TableTooltip.js");
   __include("scout/table/TableUpdateBuffer.js");
+  __include("scout/table/TileTableHeader.js");
   __include("scout/table/columns/comparators.js");
   __include("scout/table/columns/Column.js");
   __include("scout/table/columns/ColumnOptimalWidthMeasurer.js");

@@ -45,6 +45,8 @@ scout.Table = function() {
   this.tableControls = [];
   this.tableStatusVisible = false;
   this.tileMode = false;
+  this.tileTableHeader = null;
+  this.tileTableHeaderVisible = false;
   this.footer = null;
   this.footerVisible = false;
   this.filters = [];
@@ -206,6 +208,7 @@ scout.Table.prototype._init = function(model) {
     this._ensureMediator();
     this.mediator.activate();
   }
+  this.setTileTableHeaderVisible(this.tileTableHeaderVisible);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -420,8 +423,6 @@ scout.Table.prototype._render = function() {
   }
 
   if (this.tileMode) {
-    // TODO [10.0] rmu doesn't belong here, but on init is not possible since TableAdapter is not yet registered...?
-    this.mediator.loadTiles();
     this.mediator.render();
   } else {
     this._renderData();
@@ -471,6 +472,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
+  this._renderTileTableHeaderVisible();
 };
 
 scout.Table.prototype._setCssClass = function(cssClass) {
@@ -779,6 +781,13 @@ scout.Table.prototype._createHeader = function() {
 
 scout.Table.prototype._createFooter = function() {
   return scout.create('TableFooter', {
+    parent: this,
+    table: this
+  });
+};
+
+scout.Table.prototype._createTileTableHeader = function() {
+  return scout.create('TileTableHeader', {
     parent: this,
     table: this
   });
@@ -3983,8 +3992,8 @@ scout.Table.prototype.setTileMode = function(tileMode) {
   this._ensureMediator();
 
   if (tileMode) {
-    this.mediator.loadTiles();
     this.mediator.activate();
+    this.mediator.loadTiles();
   }
 
   this.setProperty('tileMode', tileMode);
@@ -4229,6 +4238,21 @@ scout.Table.prototype.setFooterVisible = function(visible) {
   }
 };
 
+scout.Table.prototype.setTileTableHeaderVisible = function(visible) {
+  this._setProperty('tileTableHeaderVisible', visible);
+  if (visible && !this.tileTableHeader) {
+    this.tileTableHeader = this._createTileTableHeader();
+  }
+
+  if (this._rendered()) {
+    this._renderTileTableHeaderVisible();
+  }
+  if (!visible && this.tileTableHeader) {
+    this.tileTableHeader.destroy();
+    this.tileTableHeader = null;
+  }
+};
+
 /**
  * Renders the background effect of every column, if column.backgroundEffect is set
  */
@@ -4424,6 +4448,33 @@ scout.Table.prototype._removeFooter = function() {
     return;
   }
   this.footer.remove();
+};
+
+scout.Table.prototype._renderTileTableHeaderVisible = function() {
+  if (!this.tileTableHeader) {
+    return;
+  }
+  if (this.tileTableHeaderVisible) {
+    this._renderTileTableHeader();
+  } else {
+    this._removeTileTableHeader();
+  }
+  this.invalidateLayoutTree();
+};
+
+scout.Table.prototype._renderTileTableHeader = function() {
+  if (this.tileTableHeader.rendered) {
+    return;
+  }
+
+  this.tileTableHeader.render();
+};
+
+scout.Table.prototype._removeTileTableHeader = function() {
+  if (!this.tileTableHeader.rendered) {
+    return;
+  }
+  this.tileTableHeader.remove();
 };
 
 /**
