@@ -568,7 +568,7 @@ public class UiSession implements IUiSession {
         detachGui.run();
       }
       else {
-        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(clientSession, true);
+        final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
         ModelJobs.schedule(
             () -> detachGui.run(),
             ModelJobs.newInput(clientRunContext)
