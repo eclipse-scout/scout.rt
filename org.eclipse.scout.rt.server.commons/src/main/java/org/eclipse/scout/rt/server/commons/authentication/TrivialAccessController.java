@@ -85,14 +85,15 @@ public class TrivialAccessController implements IAccessController {
   }
 
   protected boolean handleRequest(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain) throws IOException, ServletException {
-    // Is running within a valid subject?
-    if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(request)) {
-      chain.doFilter(request, response);
+    // Is a request to base URL? (copy from UiServlet.doGet)
+    final String contextPath = request.getServletContext().getContextPath();
+    if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
+      response.sendRedirect(request.getRequestURI() + "/");
       return true;
     }
 
-    // Is request path excluded from authentication?
-    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
+    // Is running within a valid subject?
+    if (BEANS.get(ServletFilterHelper.class).isRunningWithValidSubject(request)) {
       chain.doFilter(request, response);
       return true;
     }
@@ -104,10 +105,9 @@ public class TrivialAccessController implements IAccessController {
       return true;
     }
 
-    // Is a request to base URL? (copy from UiServlet.doGet)
-    final String contextPath = request.getServletContext().getContextPath();
-    if (StringUtility.hasText(contextPath) && request.getRequestURI().endsWith(contextPath)) {
-      response.sendRedirect(request.getRequestURI() + "/");
+    // Is request path excluded from authentication?
+    if (m_config.getPathInfoFilter().accepts(StringUtility.emptyIfNull(request.getServletPath()) + StringUtility.emptyIfNull(request.getPathInfo()))) {
+      chain.doFilter(request, response);
       return true;
     }
 

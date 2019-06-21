@@ -169,7 +169,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         } else {
           var format = axis.format;
           if (format) {
-            format = new scout.DateFormat(locale, format);
+            format = scout.DateFormat.ensure(locale, format);
           } else {
             format = locale.dateFormat;
           }

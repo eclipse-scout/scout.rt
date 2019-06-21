@@ -37,6 +37,8 @@ public class LocalLookupCall<T> extends LookupCall<T> {
 
   private boolean m_hierarchicalLookup;
 
+  private static final String WILDCARD_PLACEHOLDER = "@wildcard@";
+
   @Override
   @SuppressWarnings("squid:S1185") // method is required to satisfy LookupCall quality checks that require equals to be overridden
   public boolean equals(Object obj) {
@@ -59,13 +61,21 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     if (s == null) {
       s = "";
     }
-    s = s.replace(getWildcard(), "@wildcard@");
+    s = s.replace(getWildcard(), WILDCARD_PLACEHOLDER);
     s = s.toLowerCase();
     s = StringUtility.escapeRegexMetachars(s);
-    s = s.replace("@wildcard@", ".*");
-    if (!s.contains(".*")) {
-      s = s + ".*";
+
+    // replace repeating wildcards to prevent regex DoS
+    String duplicateWildcards = WILDCARD_PLACEHOLDER.concat(WILDCARD_PLACEHOLDER);
+    while (s.contains(duplicateWildcards)) {
+      s = s.replace(duplicateWildcards, WILDCARD_PLACEHOLDER);
     }
+
+    if (!s.contains(WILDCARD_PLACEHOLDER)) {
+      s = s.concat(WILDCARD_PLACEHOLDER);
+    }
+
+    s = s.replace(WILDCARD_PLACEHOLDER, ".*");
     return Pattern.compile(s, Pattern.DOTALL);
   }
 

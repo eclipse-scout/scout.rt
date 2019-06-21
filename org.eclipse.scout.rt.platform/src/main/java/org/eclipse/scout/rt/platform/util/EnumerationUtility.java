@@ -27,7 +27,7 @@ public final class EnumerationUtility {
    *
    * @return an Iterator representing the remaining elements of this Enumeration
    */
-  public static <T> Iterator<T> asIterator(final Enumeration<T> enumeration) {
+  public static <T> Iterator<T> asIterator(final Enumeration<? extends T> enumeration) {
     return new Iterator<T>() {
       @Override
       public boolean hasNext() {
@@ -48,7 +48,7 @@ public final class EnumerationUtility {
    *
    * @return an Enumeration representing the remaining elements of this Iterator
    */
-  public static <T> Enumeration<T> asEnumeration(final Iterator<T> iterator) {
+  public static <T> Enumeration<T> asEnumeration(final Iterator<? extends T> iterator) {
     return new Enumeration<T>() {
       @Override
       public boolean hasMoreElements() {
