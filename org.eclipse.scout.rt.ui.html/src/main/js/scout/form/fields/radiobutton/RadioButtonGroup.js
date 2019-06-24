@@ -210,8 +210,8 @@ scout.RadioButtonGroup.prototype._renderFields = function() {
     this._linkWithLabel(formField.$field);
   }, this);
   this._provideTabIndex(); // depends on rendered fields
-  this.invalidateLogicalGrid(false);
-  this.validateLayoutTree(false); // prevent flickering
+  this.invalidateLogicalGrid();
+  this.validateLayoutTree(); // prevent flickering
 };
 
 /**
