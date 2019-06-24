@@ -56,7 +56,7 @@ scout.MenuBar.prototype._init = function(options) {
 
 scout.MenuBar.prototype._destroy = function() {
   scout.MenuBar.parent.prototype._destroy.call(this);
-  this._removeMenuHandlers();
+  this._detachMenuHandlers();
 };
 
 /**
@@ -103,11 +103,6 @@ scout.MenuBar.prototype._renderProperties = function() {
   this._renderMenuItems();
 };
 
-scout.MenuBar.prototype._remove = function() {
-  scout.MenuBar.parent.prototype._remove.call(this);
-  this._removeMenuItems();
-};
-
 scout.MenuBar.prototype.bottom = function() {
   this.position = 'bottom';
 };
@@ -120,7 +115,18 @@ scout.MenuBar.prototype.large = function() {
   this.size = 'large';
 };
 
-scout.MenuBar.prototype._removeMenuHandlers = function() {
+/**
+ * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
+ */
+scout.MenuBar.prototype._attachMenuHandlers = function() {
+  this.orderedMenuItems.all.forEach(function(item) {
+    if (item.events.count('propertyChange', this._menuItemPropertyChangeHandler) === 0) {
+      item.on('propertyChange', this._menuItemPropertyChangeHandler);
+    }
+  }, this);
+};
+
+scout.MenuBar.prototype._detachMenuHandlers = function() {
   this.orderedMenuItems.all.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
   }.bind(this));
@@ -135,8 +141,7 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 
 scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   // remove property listeners of old menu items.
-  this._removeMenuHandlers();
-
+  this._detachMenuHandlers();
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
   if (rightFirst) {
@@ -149,9 +154,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   }
 
   // add property listener of new menus
-  this.orderedMenuItems.all.forEach(function(item) {
-    item.on('propertyChange', this._menuItemPropertyChangeHandler);
-  }, this);
+  this._attachMenuHandlers();
 
   this.updateVisibility();
   this.updateDefaultMenu();
@@ -167,8 +170,8 @@ scout.MenuBar.prototype._renderMenuItems = function() {
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
-  this.setDefaultMenu(null);
-  this._removeMenuHandlers();
+  // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
+  // which would remove our menuItems, because they are defined as widget-property (see constructor).
 };
 
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {

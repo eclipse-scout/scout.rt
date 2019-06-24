@@ -155,6 +155,48 @@ describe("MenuBar", function() {
       menuBar.destroy();
       expect(menu.events.count()).toBe(1);
     });
+
+    it('automatically hides unused separators', function() {
+      var menu1 = helper.createMenu(createModel('Menu 1'));
+      var menu2 = helper.createMenu(createModel('Menu 2'));
+      var menu3 = helper.createMenu(createModel('Menu 3'));
+      var separator = helper.createMenu($.extend({}, createModel(), { separator: true }));
+
+      var menuBar = createMenuBar();
+      menuBar.render();
+      menuBar.setMenuItems([menu1, separator, menu2, menu3]);
+
+      expect(menuBar.orderedMenuItems.all.length).toBeGreaterThanOrEqual(4); // because the elements have no real size, an artificial EllipsisMenu might be added
+      expect(menuBar.orderedMenuItems.all[0]).toBe(menu1);
+      expect(menuBar.orderedMenuItems.all[1]).toBe(separator);
+      expect(menuBar.orderedMenuItems.all[2]).toBe(menu2);
+      expect(menuBar.orderedMenuItems.all[3]).toBe(menu3);
+
+      menu2.setVisible(false);
+      expect(menu1.visible).toBe(true);
+      expect(separator.visible).toBe(true);
+      expect(menu2.visible).toBe(false); // <--
+      expect(menu3.visible).toBe(true);
+
+      menu3.setVisible(false);
+      expect(menu1.visible).toBe(true);
+      expect(separator.visible).toBe(false); // <--
+      expect(menu2.visible).toBe(false);
+      expect(menu3.visible).toBe(false); // <--
+
+      menuBar.remove();
+      menu2.setVisible(true);
+      expect(menu1.visible).toBe(true);
+      expect(separator.visible).toBe(true); // <--
+      expect(menu2.visible).toBe(true); // <--
+      expect(menu3.visible).toBe(false);
+
+      menuBar.render();
+      expect(menu1.$container.isVisible()).toBe(true);
+      expect(separator.$container.isVisible()).toBe(true);
+      expect(menu2.$container.isVisible()).toBe(true);
+      expect(menu3.$container.isVisible()).toBe(false);
+    });
   });
 
   describe('layout', function() {
