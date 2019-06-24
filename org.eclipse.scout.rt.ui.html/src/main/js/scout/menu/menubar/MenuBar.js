@@ -180,6 +180,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
 
   this._setChildMenuFilters();
   this._attachMenuHandlers();
+
   this.updateVisibility();
   this.updateDefaultMenu();
   this._updateTabbableMenu();
