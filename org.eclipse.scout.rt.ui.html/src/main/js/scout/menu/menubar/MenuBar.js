@@ -114,11 +114,6 @@ scout.MenuBar.prototype._renderProperties = function() {
   this._renderMenuItems();
 };
 
-scout.MenuBar.prototype._remove = function() {
-  scout.MenuBar.parent.prototype._remove.call(this);
-  this._removeMenuItems();
-};
-
 scout.MenuBar.prototype.bottom = function() {
   this.position = 'bottom';
 };
@@ -179,7 +174,6 @@ scout.MenuBar.prototype.setMenuItems = function(menuItems) {
 scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   // remove property listeners of old menu items.
   this._detachMenuHandlers();
-
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
 
   if (rightFirst) {
@@ -193,6 +187,7 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
 
   this._setChildMenuFilters();
   this._attachMenuHandlers();
+
   this.updateVisibility();
   this.updateDefaultMenu();
   this._updateTabbableMenu();
@@ -208,7 +203,8 @@ scout.MenuBar.prototype._renderMenuItems = function() {
 };
 
 scout.MenuBar.prototype._removeMenuItems = function() {
-  this._detachMenuHandlers();
+  // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
+  // which would remove our menuItems, because they are defined as widget-property (see constructor).
 };
 
 scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
