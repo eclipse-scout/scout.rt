@@ -87,6 +87,7 @@ public class PropertiesHelper {
 
   private static final char ENVIRONMENT_VARIABLE_DOT_REPLACEMENT = '_';
   private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
+  private static final Pattern PATH_PLACEHOLDER_PATTERN = Pattern.compile("^\\$([^\\$]+)\\$");
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
   public static final char NAMESPACE_DELIMITER = '|';
@@ -103,7 +104,6 @@ public class PropertiesHelper {
   private final Set<Object> m_parsedFiles = new HashSet<>();
   private final Set<Object> m_referencedKeys = new HashSet<>();
   private final Set<String> m_resolvedKeys = new HashSet<>();
-  private final Set<String> m_usedInternalKeys = new HashSet<>();
   private boolean m_initializing;
 
   /**
@@ -119,12 +119,14 @@ public class PropertiesHelper {
       if (properties != null) {
         m_isInitialized = parse(properties);
         if (m_isInitialized) {
+          importSystemImports(new HashSet<String>(), null);
           resolveAll(PLACEHOLDER_PATTERN);
+
           // remove internal properties
           m_configProperties = m_configProperties.entrySet().stream()
               .filter(e -> {
-                if(e.getKey().startsWith("_")){
-                  if(!m_referencedKeys.contains(e.getKey())){
+                if (e.getKey().startsWith("_")) {
+                  if (!m_referencedKeys.contains(e.getKey())) {
                     LOG.warn("The internal key '{}' is never referenced and should be removed from config property file. [{}:{}]", e.getKey(), e.getKey(), e.getValue());
                   }
                   return false;
@@ -134,7 +136,7 @@ public class PropertiesHelper {
               .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
         }
       }
-      importSystemImports(new HashSet<String>(), null);
+
     }
     finally {
       m_initializing = false;
@@ -999,6 +1001,7 @@ public class PropertiesHelper {
     if (StringUtility.isNullOrEmpty(key)) {
       return value;
     }
+
     // try env
     value = System.getenv().entrySet().stream()
         .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue()))
@@ -1006,14 +1009,18 @@ public class PropertiesHelper {
         .map(e -> e.getValue())
         .findFirst().orElse(value);
     // try system properties
-    return System.getProperties().entrySet().stream()
+    value = System.getProperties().entrySet().stream()
         .map(e -> new AbstractMap.SimpleEntry<>(keyNormalizer.apply(e.getKey()), e.getValue().toString()))
         .filter(e -> {
           return e.getKey().equals(key);
         })
         .map(e -> e.getValue())
         .findFirst().orElse(value);
-
+    // skip unresolved path variables (used for development mode)
+    if (PATH_PLACEHOLDER_PATTERN.matcher(value).matches()) {
+      return defaultValue;
+    }
+    return value;
   }
 
   protected IPropertyProvider getPropertyProvider(String configUrl) {
