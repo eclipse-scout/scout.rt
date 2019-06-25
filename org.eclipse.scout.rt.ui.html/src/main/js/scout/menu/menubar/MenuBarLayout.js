@@ -119,7 +119,7 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
   this._setFirstLastMenuMarker(visibleMenuItems);
   prefSize = this._prefSize(visibleMenuItems);
   while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
-    if (this._menuBar.ellipsisMenuPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+    if (this._menuBar.ellipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
       overflowIndex = overflowableIndexes.splice(-1)[0];
     } else {
       overflowIndex = overflowableIndexes.splice(0, 1)[0] - this._overflowMenuItems.length;
