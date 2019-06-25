@@ -103,6 +103,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
+import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.BeforeClass;
 import org.junit.Test;
