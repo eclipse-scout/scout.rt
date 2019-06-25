@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.jackson.dataobject;
+package org.eclipse.scout.rt.platform.util.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.Test;
@@ -71,19 +70,15 @@ public class StrictSimpleDateFormatTest {
     final StringHolder pattern = new StringHolder();
     final String input = "2019-01-18T12:42:03.409Z";
 
-    pattern.setValue(IValueFormatConstants.DEFAULT_DATE_PATTERN);
+    pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS");
     ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input));
     ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input));
 
-    pattern.setValue(IValueFormatConstants.TIMESTAMP_PATTERN);
+    pattern.setValue("yyyy-MM-dd HH:mm:ss.SSS Z");
     ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input));
     ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input));
 
-    pattern.setValue(IValueFormatConstants.TIMESTAMP_WITH_TIMEZONE_PATTERN);
-    ScoutAssert.assertThrows(ParseException.class, () -> new SimpleDateFormat(pattern.getValue()).parse(input));
-    ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input));
-
-    pattern.setValue(IValueFormatConstants.DATE_PATTERN);
+    pattern.setValue("yyyy-MM-dd");
     new SimpleDateFormat(pattern.getValue()).parse(input);
     ScoutAssert.assertThrows(ParseException.class, () -> new StrictSimpleDateFormat(pattern.getValue()).parse(input));
   }

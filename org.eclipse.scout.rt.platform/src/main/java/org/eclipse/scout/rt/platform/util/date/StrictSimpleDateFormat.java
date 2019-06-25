@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.jackson.dataobject;
+package org.eclipse.scout.rt.platform.util.date;
 
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
@@ -95,10 +95,5 @@ public class StrictSimpleDateFormat extends SimpleDateFormat {
       }
     }
     return parsedDate;
-  }
-
-  public static void main(String[] args) throws ParseException {
-    SimpleDateFormat f = new StrictSimpleDateFormat("yyyy/yyyy");
-    f.parse("2018/2019");
   }
 }
