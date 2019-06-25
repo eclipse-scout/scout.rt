@@ -21,3 +21,4 @@ export { default as Desktop } from './desktop/Desktop';
 export { default as NullWidget } from './widget/NullWidget';
 export { default as ViewButton } from './desktop/ViewButton';
 export { default as OutlineViewButton } from './outline/OutlineViewButton';
+export { default as Device } from './util/Device';

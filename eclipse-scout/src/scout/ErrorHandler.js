@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import * as strings from './util/strings';
-import { instance as app } from './App';
+import App from './App';
 
 export default class ErrorHandler {
 
@@ -151,8 +151,8 @@ export default class ErrorHandler {
     // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    if (app.getSessions().length > 0) {
-      var session = app.getSessions()[0];
+    if (App.get().getSessions().length > 0) {
+      var session = App.get().getSessions()[0];
       if (this.displayError) {
         this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
       }

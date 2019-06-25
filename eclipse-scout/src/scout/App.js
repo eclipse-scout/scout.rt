@@ -11,26 +11,24 @@ import * as models from './util/models';
 import JQueryUtils from './util/JQueryUtils';
 import { JsonResponseError } from './constants';
 
-let scout_appListeners = [];
-let scout_errorHandler = null;
-
-// FIXME [awe] ES6: talk about this pattern, see: https://k94n.com/es6-modules-single-instance-pattern
-// Let used in global scope makes sure 'instance' is not reused.
-export let instance = null;
+let instance = null;
 
 export default class App {
+  static _listeners = [];
 
   constructor() {
     this.events = this._createEventSupport();
     this.sessions = [];
 
-    /// register the listeners which were added to scout before the app is created
-    scout_appListeners.forEach(function(listener) {
+
+    // register the listeners which were added to scout before the app is created
+    App._listeners .forEach(function(listener) {
       this.addListener(listener);
     }, this);
-    scout_appListeners = [];
+    App._listeners = [];
     instance = this;
-    scout_errorHandler = this._createErrorHandler();
+
+    this.errorHandler = this._createErrorHandler();
   }
 
   getSessions() { // FIXME [awe] ES6: discuss where to put the sessions
@@ -240,7 +238,7 @@ export default class App {
    * the stack trace is much longer :)
    */
   _installErrorHandler() {
-    window.onerror = scout_errorHandler.windowErrorHandler;
+    window.onerror = this.errorHandler.windowErrorHandler;
   };
 
   _createErrorHandler() {
@@ -340,7 +338,7 @@ export default class App {
     $error.appendDiv('startup-error-title', 'The application could not be started');
 
     var args = scout.argumentsToArray(arguments).slice(1);
-    var errorInfo = scout_errorHandler.handle(args);
+    var errorInfo = this.errorHandler.handle(args);
     if (errorInfo.message) {
       $error.appendDiv('startup-error-message', errorInfo.message);
     }
@@ -391,5 +389,17 @@ export default class App {
     this.events.removeListener(listener);
   };
 
+  static addListener(type, func) {
+    var listener = {
+      type: type,
+      func: func
+    };
+    if (instance) {
+      instance.events.addListener(listener);
+    } else {
+      App._listeners.push(listener);
+    }
+    return listener;
+  };
 }
 

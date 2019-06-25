@@ -10,7 +10,6 @@ import DetachHelper from '../util/DetachHelper';
 import { Severity, FileInput, BackgroundJobPollingStatus, JsonResponseError } from '../constants';
 import RemoteEvent from './RemoteEvent';
 import URL from '../util/URL';
-import { instance as app } from '../App';
 
 export default class Session {
 
@@ -282,8 +281,8 @@ export default class Session {
     if (this.clientSessionId) {
       request.clientSessionId = this.clientSessionId;
     }
-    if (app.version) {
-      request.version = app.version;
+    if (App.get().version) {
+      request.version = App.get().version;
     }
     request.userAgent = this.userAgent;
     request.sessionStartupParams = this._createSessionStartupParams();
