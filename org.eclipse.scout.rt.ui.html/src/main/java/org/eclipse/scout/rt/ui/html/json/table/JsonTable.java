@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.table.TableRowTileMapping;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
@@ -122,6 +123,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   public static final String EVENT_FILTER_REMOVED = "filterRemoved";
   public static final String EVENT_FILTERS_CHANGED = "filtersChanged";
   public static final String EVENT_FILTER = "filter";
+  public static final String EVENT_REQUEST_TILES = "createTiles";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -400,6 +402,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().isTruncatedCellTooltipEnabled().getBooleanValue();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TILE_MODE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTileMode();
+      }
+    });
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TILES, model, getUiSession()) {
+      @Override
+      protected List<TableRowTileMapping> modelValue() {
+        return getModel().getTiles();
+      }
+    });
   }
 
   @Override
@@ -602,6 +616,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
     else if (EVENT_COLUMN_ORGANIZE_ACTION.equals(event.getType())) {
       handleUiColumnOrganizeAction(event);
+    }
+    else if (EVENT_REQUEST_TILES.equals(event.getType())) {
+      handleUiCreateTiles(event);
     }
     else {
       super.handleUiEvent(event);
@@ -944,6 +961,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       List<ITableRow> tableRows = extractTableRows(event.getData());
       getModel().getUIFacade().setFilteredRowsFromUI(tableRows);
     }
+  }
+
+  protected void handleUiCreateTiles(JsonEvent event) {
+    List<ITableRow> tableRows = extractTableRows(event.getData());
+    getModel().getUIFacade().fireCreateTiles(tableRows);
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {

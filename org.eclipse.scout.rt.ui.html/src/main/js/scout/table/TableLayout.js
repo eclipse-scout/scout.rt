@@ -19,14 +19,17 @@ scout.TableLayout.prototype.layout = function($container) {
   var menuBarHeight = 0,
     footerHeight = 0,
     headerHeight = 0,
+    tileTableHeight = 0,
     controlContainerHeight = 0,
     controlContainerInsets,
-    $data = this.table.$data,
+    tileGrid = this.table.mediator ? this.table.mediator.tileAccordion : null,
+    $data = this.table.$data ? this.table.$data : tileGrid.$container,
     dataMargins = scout.graphics.margins($data),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
+    tileTableHeader = this.table.tileTableHeader,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -57,8 +60,16 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight) + 'px)');
+  if (tileTableHeader) {
+    tileTableHeight = scout.graphics.size(tileTableHeader.$container).height;
+    tileTableHeader.groupBox.validateLayout();
+  }
+  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight+ tileTableHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
+
+  if (tileGrid) {
+    tileGrid.revalidateLayout();
+  }
 
   this._layoutColumns();
 
@@ -67,27 +78,29 @@ scout.TableLayout.prototype.layout = function($container) {
     header.resizeHeaderItem(lastColumn);
   }
 
-  this.table.setViewRangeSize(this.table.calculateViewRangeSize());
+  if (!this.table.tileMode) {
+    this.table.setViewRangeSize(this.table.calculateViewRangeSize());
 
-  if (!htmlContainer.layouted) {
-    this.table._renderScrollTop();
-  }
-
-  // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
-  this.table._renderViewport();
-
-  // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
-  this.table.tooltips.forEach(function(tooltip) {
-    if (tooltip.rendered) {
-      tooltip.position();
+    if (!htmlContainer.layouted) {
+      this.table._renderScrollTop();
     }
-  }.bind(this));
-  if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
-    this.table.cellEditorPopup.position();
-    this.table.cellEditorPopup.pack();
-  }
 
-  this.table.updateScrollbars();
+    // Always render viewport (not only when viewRangeSize changes), because view range depends on scroll position and data height
+    this.table._renderViewport();
+
+    // Make sure tooltips and editor popup are at correct position after layouting (e.g after window resizing)
+    this.table.tooltips.forEach(function(tooltip) {
+      if (tooltip.rendered) {
+        tooltip.position();
+      }
+    }.bind(this));
+    if (this.table.cellEditorPopup && this.table.cellEditorPopup.rendered) {
+      this.table.cellEditorPopup.position();
+      this.table.cellEditorPopup.pack();
+    }
+
+    this.table.updateScrollbars();
+  }
 };
 
 scout.TableLayout.prototype._layoutColumns = function(widthHint) {

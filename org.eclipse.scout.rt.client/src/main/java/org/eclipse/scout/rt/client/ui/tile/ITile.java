@@ -66,4 +66,9 @@ public interface ITile extends IWidget, IOrdered, IStyleable, IExtensibleObject,
 
   void onLoadDataCancel();
 
+  @Override
+  void setLoading(boolean loading);
+
+  @Override
+  boolean isLoading();
 }

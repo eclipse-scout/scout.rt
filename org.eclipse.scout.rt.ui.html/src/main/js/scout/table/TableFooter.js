@@ -544,7 +544,7 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     containerHeight = scout.graphics.size(table.$container).height,
     maxControlHeight,
     controlContainerHeight = 0,
-    dataMargins = scout.graphics.margins(table.$data),
+    dataMargins = scout.graphics.margins(scout.nvl(table.$data, table.$container)),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = table.menuBar,
     footer = table.footer,

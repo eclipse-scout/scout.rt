@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IUserFilterState;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,13 @@ public class TableEvent extends EventObject implements IModelEvent {
    * Filter has changed
    */
   public static final int TYPE_ROW_FILTER_CHANGED = 210;
+
+  /**
+   * Some tiles have been added
+   * <p>
+   * valid properties: tiles
+   */
+  public static final int TYPE_TILES_INSERTED = 300;
 
   /**
    * Broadcast request to get drag object
@@ -174,6 +182,7 @@ public class TableEvent extends EventObject implements IModelEvent {
 
   private final int m_type;
   private List<? extends ITableRow> m_rows;
+  private Map<? extends ITableRow, ? extends ITile> m_tiles;
   private List<IMenu> m_popupMenus;
   private boolean m_consumed;
   private TransferObject m_dragObject;
@@ -194,9 +203,14 @@ public class TableEvent extends EventObject implements IModelEvent {
   }
 
   public TableEvent(ITable source, int type, List<? extends ITableRow> rows) {
+    this(source, type, rows, Collections.emptyMap());
+  }
+
+  public TableEvent(ITable source, int type, List<? extends ITableRow> rows, Map<? extends ITableRow, ? extends ITile> tiles) {
     super(source);
     m_type = type;
     m_rows = CollectionUtility.arrayList(rows);
+    m_tiles = new HashMap<>(tiles);
   }
 
   public ITable getTable() {
@@ -282,6 +296,14 @@ public class TableEvent extends EventObject implements IModelEvent {
 
   public ITableRow getLastRow() {
     return CollectionUtility.lastElement(m_rows);
+  }
+
+  public Map<? extends ITableRow, ? extends ITile> getTiles() {
+    return m_tiles;
+  }
+
+  public void setTiles(Map<? extends ITableRow, ? extends ITile> tiles) {
+    m_tiles = new HashMap<>(tiles);
   }
 
   /**

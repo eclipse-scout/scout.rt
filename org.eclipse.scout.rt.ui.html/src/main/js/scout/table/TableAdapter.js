@@ -103,6 +103,27 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
   this._send('aggregationFunctionChanged', data);
 };
 
+scout.TableAdapter.prototype._onWidgetCreateTiles = function(event) {
+  event.preventDefault();
+  var rowIds = this.widget._rowsToIds(event.rows);
+  this._sendCreateTiles(rowIds);
+};
+
+scout.TableAdapter.prototype.syncTiles = function(tableRowTileMappings) {
+  tableRowTileMappings = this._prepareWidgetProperty('tiles', tableRowTileMappings);
+
+  this.widget.setTiles(!!tableRowTileMappings ? tableRowTileMappings.map(function(tableRowTileMapping) {
+    tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
+    return tableRowTileMapping.tile;
+  }) : []);
+};
+
+scout.TableAdapter.prototype._sendCreateTiles = function(rowIds) {
+  this._send('createTiles', {
+    rowIds: rowIds
+  });
+};
+
 scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
   this._sendColumnBackgroundEffectChanged(event.column);
 };
@@ -348,6 +369,8 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetColumnOrganizeAction(event);
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
+  } else if (event.type === 'createTiles') {
+    this._onWidgetCreateTiles(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

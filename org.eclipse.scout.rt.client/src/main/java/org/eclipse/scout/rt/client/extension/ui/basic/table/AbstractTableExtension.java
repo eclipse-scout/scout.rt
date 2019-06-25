@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableApp
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTileChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateRowChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
@@ -35,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 
@@ -117,5 +119,10 @@ public abstract class AbstractTableExtension<TABLE extends AbstractTable> extend
   @Override
   public TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) {
     return chain.execDrag(rows);
+  }
+
+  @Override
+  public ITile execCreateTile(TableCreateTileChain chain, ITableRow row) {
+    return chain.execCreateTile(row);
   }
 }

@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowDataMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -289,6 +290,24 @@ public final class TableChains {
         }
       };
       callChain(methodInvocation, rows);
+      return methodInvocation.getReturnValue();
+    }
+  }
+
+  public static class TableCreateTileChain extends AbstractTableChain {
+
+    public TableCreateTileChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+      super(extensions);
+    }
+
+    public ITile execCreateTile(ITableRow row) {
+      MethodInvocation<ITile> methodInvocation = new MethodInvocation<ITile>() {
+        @Override
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) {
+          setReturnValue(next.execCreateTile(TableCreateTileChain.this, row));
+        }
+      };
+      callChain(methodInvocation);
       return methodInvocation.getReturnValue();
     }
   }

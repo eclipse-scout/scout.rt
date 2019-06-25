@@ -236,6 +236,20 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
   String PROP_TRUNCATED_CELL_TOOLTIP_ENABLED = "truncatedCellTooltipEnabled";
 
   /**
+   * type boolean
+   *
+   * @since 10.0
+   */
+  String PROP_TILE_MODE = "tileMode";
+
+  /**
+   * type {@link List} of {@link ITableRowTileMapping}
+   *
+   * @since 10.0
+   */
+  String PROP_TILES = "tiles";
+
+  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TableEvent> createEventBuffer();
@@ -1268,4 +1282,29 @@ public interface ITable extends IWidget, IDNDSupport, ITypeWithClassId, IStyleab
    * @since 9.0
    */
   void setTruncatedCellTooltipEnabled(TriState truncatedCellTooltipEnabled);
+
+  /**
+   * @since 10.0
+   */
+  boolean isTileMode();
+
+  /**
+   * @since 10.0
+   */
+  void setTileMode(boolean tileMode);
+
+  /**
+   * @since 10.0
+   */
+  void createTiles(List<? extends ITableRow> rows);
+
+  /**
+   * @since 10.0
+   */
+  List<TableRowTileMapping> getTiles();
+
+  /**
+   * @since 10.0
+   */
+  void setTiles(List<TableRowTileMapping> tiles);
 }
