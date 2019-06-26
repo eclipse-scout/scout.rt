@@ -187,6 +187,45 @@ describe("scout.objects", function() {
       expect(o2.hamlet.refs.length).toBe(2);
     });
 
+    it("works for objects created with createMap() function", function() {
+      // Top-level map
+      var map = scout.objects.createMap();
+      map.name = 'Linda';
+      map.book = null;
+      map.author = undefined;
+
+      var map2 = scout.objects.valueCopy(map);
+      map.name = 'Hans';
+      map.total = 444;
+      expect(map).not.toBe(map2);
+      expect(Object.keys(map).length).toBe(4);
+      expect(Object.keys(map2).length).toBe(3);
+      expect(map2.name).toBe('Linda');
+      expect(map2.book).toBe(null);
+      expect(map2.author).toBe(undefined);
+
+      // Nested map
+      var o = {
+        first: 1,
+        second: 2
+      };
+      o.map = scout.objects.createMap();
+      o.map['a-b-c'] = 'ABC';
+
+      var o2 = scout.objects.valueCopy(o);
+      o.first = 'one';
+      o.second = 'two';
+      o.map['a-b-c'] = 'GREEN';
+      o.map['d-e-f'] = 'BLUE';
+
+      expect(o2).not.toBe(o);
+      expect(o2.first).toBe(1);
+      expect(o2.second).toBe(2);
+      expect(Object.keys(o.map).length).toEqual(2);
+      expect(Object.keys(o2.map).length).toEqual(1);
+      expect(o2.map['a-b-c']).toEqual('ABC');
+    });
+
   });
 
   describe('isNumber', function() {
