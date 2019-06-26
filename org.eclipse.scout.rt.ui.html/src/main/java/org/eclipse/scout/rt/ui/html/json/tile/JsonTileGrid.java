@@ -181,17 +181,35 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITileGrid.PROP_SELECTED_TILES.equals(propertyName)) {
-      List<ITile> tiles = extractTiles(data);
-      addPropertyEventFilterCondition(propertyName, tiles);
-      getModel().getUIFacade().setSelectedTilesFromUI(tiles);
+      handleUiSelectedTiles(data);
     }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected void handleUiSelectedTiles(JSONObject data) {
+    JSONArray tileIds = data.getJSONArray(ITileGrid.PROP_SELECTED_TILES);
+    List<ITile> tiles = extractTiles(tileIds);
+    if (tiles.size() > 0) {
+      addPropertyEventFilterCondition(ITileGrid.PROP_SELECTED_TILES, tiles);
+      getModel().getUIFacade().setSelectedTilesFromUI(tiles);
+    }
+  }
+
+  protected List<ITile> extractTiles(JSONArray tileIds) {
+    List<ITile> tiles = new ArrayList<ITile>(tileIds.length());
+    for (int i = 0; i < tileIds.length(); i++) {
+      ITile tile = optTile(tileIds.getString(i));
+      if (tile != null) {
+        tiles.add(tile);
+      }
+    }
+    return tiles;
   }
 
   @SuppressWarnings("unchecked")
@@ -225,16 +243,6 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
       return;
     }
     getModel().getUIFacade().handleTileActionFromUI(tile);
-  }
-
-  protected List<ITile> extractTiles(JSONObject json) {
-    JSONArray tileIds = json.getJSONArray(ITileGrid.PROP_SELECTED_TILES);
-    List<ITile> tiles = new ArrayList<ITile>(tileIds.length());
-    for (int i = 0; i < tileIds.length(); i++) {
-      String tileId = tileIds.getString(i);
-      tiles.add(getTile(tileId));
-    }
-    return tiles;
   }
 
   protected ITile extractTile(JSONObject json) {
