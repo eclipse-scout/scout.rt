@@ -418,4 +418,9 @@ export default class JQueryUtils extends $ {
     }
     return this.cssPxValue('max-height', maxHeight);
   };
+
+  static unfocusable() {
+    return this.addClass('unfocusable');
+  };
+
 }

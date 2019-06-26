@@ -22,3 +22,4 @@ export { default as NullWidget } from './widget/NullWidget';
 export { default as ViewButton } from './desktop/ViewButton';
 export { default as OutlineViewButton } from './outline/OutlineViewButton';
 export { default as Device } from './util/Device';
+export { default as Menu } from './menu/Menu';

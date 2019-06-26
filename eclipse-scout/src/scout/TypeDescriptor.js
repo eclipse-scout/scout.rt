@@ -1,11 +1,11 @@
 import * as arrays from './util/arrays';
 import * as strings from './util/strings';
+import * as scout from './scout';
 
 export const NAMESPACE_SEPARATOR = '.';
 export const MODEL_VARIANT_SEPARATOR = ':';
 
 export default class TypeDescriptor {
-
   constructor(typeDescriptor, objectType, modelVariant) {
     this.typeDescriptor = typeDescriptor;
     this.objectType = objectType;
@@ -13,57 +13,46 @@ export default class TypeDescriptor {
   }
 
   newInstance(options) {
-    let cls = this.objectType.name;
-    if (this.modelVariant) {
-      cls = this.modelVariant.name + cls;
-    }
+    var i, namespaces, className,
+      namespace = window.scout; // default namespace
+
     if (this.modelVariant) {
       className = this.modelVariant.name + this.objectType.name;
+      namespaces = this.modelVariant.namespaces;
     } else {
       className = this.objectType.name;
-    }
-
-    /*
-    var i, namespaces, className,
-        namespace = scout; // default namespace
-
-    if (this.modelVariant) {
-        className = this.modelVariant.name + this.objectType.name;
-        namespaces = this.modelVariant.namespaces;
-    } else {
-        className = this.objectType.name;
-        namespaces = this.objectType.namespaces;
+      namespaces = this.objectType.namespaces;
     }
 
     if (namespaces.length) {
-        namespace = window;
-        for (i = 0; i < namespaces.length; i++) {
-            namespace = namespace[namespaces[i]];
-            if (!namespace) {
-                throw this.error('Could not resolve namespace '' + namespaces[i] + ''');
-            }
+      namespace = window;
+      for (i = 0; i < namespaces.length; i++) {
+        namespace = namespace[namespaces[i]];
+        if (!namespace) {
+          throw this.error('Could not resolve namespace "' + namespaces[i] + '"');
         }
+      }
     }
 
     if (!namespace[className]) { // Try without variant if variantLenient is true
-        if (options.variantLenient && this.modelVariant) {
-            var infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
-            return infoWithoutVariant.newInstance(options);
-        }
-        throw this.error('Could not find '' + className + '' in namespace '' + namespaces.join('.') + ''');
+      if (options.variantLenient && this.modelVariant) {
+        var infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
+        return infoWithoutVariant.newInstance(options);
+      }
+      throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
     }
 
-    return new namespace[className](options.model);*/
-  };
+    return new namespace[className](options.model);
+  }
 
   error(details) {
     return new Error('Failed to create object for objectType "' + this.typeDescriptor + '": ' + details);
-  };
+  }
 
   static newInstance(typeDescriptor, options) {
     var info = TypeDescriptor.parse(typeDescriptor);
     return info.newInstance(options);
-  };
+  }
 
   static parse(typeDescriptor) {
     var typePart = null,
@@ -107,6 +96,5 @@ export default class TypeDescriptor {
 
       return createInfo(descriptorPart, namespaces);
     }
-  };
-
+  }
 }

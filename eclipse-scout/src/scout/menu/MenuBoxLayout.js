@@ -1,5 +1,6 @@
 import AbstractLayout from '../layout/AbstractLayout';
 import * as graphics from '../util/graphics';
+import * as scout from '../scout';
 
 export default class MenuBoxLayout extends AbstractLayout {
 
@@ -193,7 +194,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   };
 
   _createAndRenderEllipsis($container) {
-    var ellipsis = scout.menus.createEllipsisMenu({
+    var ellipsis = scout.create('Menu', {
       parent: this.menuBox,
       horizontalAlignment: 1,
       compact: this.menuBox.compact
@@ -224,7 +225,7 @@ export default class MenuBoxLayout extends AbstractLayout {
         // Menu does not fit -> move to ellipsis menu
         menuSize = graphics.size(menu.$container, true);
         menusWidth -= menuSize.width;
-        scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
+        // scout.menus.moveMenuIntoEllipsis(menu, this._ellipsis);
       } else {
         collapsedMenus.unshift(menu); // add as first element
       }
@@ -235,7 +236,7 @@ export default class MenuBoxLayout extends AbstractLayout {
   _removeMenusFromEllipsis(menus) {
     menus = menus || this.visibleMenus();
     menus.forEach(function(menu) {
-      scout.menus.removeMenuFromEllipsis(menu, this.menuBox.$container);
+      // scout.menus.removeMenuFromEllipsis(menu, this.menuBox.$container);
     }, this);
   };
 
