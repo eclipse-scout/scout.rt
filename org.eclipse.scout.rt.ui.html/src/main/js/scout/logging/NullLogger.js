@@ -19,17 +19,23 @@ scout.NullLogger = function() {
 };
 
 scout.NullLogger.prototype = {
-  trace: function() {},
-  debug: function() {},
-  info: function() {},
+  trace: function() {
+    // NOP - don't log trace, we don't want to spam the browser console
+  },
+  debug: function() {
+    // NOP - don't log debug, we don't want to spam the browser console
+  },
+  info: function() {
+    this._log('info', scout.objects.argumentsToArray(arguments));
+  },
   warn: function() {
-    this._log('WARN', scout.objects.argumentsToArray(arguments));
+    this._log('warn', scout.objects.argumentsToArray(arguments));
   },
   error: function(logArgs) {
-    this._log('ERROR', scout.objects.argumentsToArray(arguments));
+    this._log('error', scout.objects.argumentsToArray(arguments));
   },
   fatal: function(logArgs) {
-    this._log('FATAL', scout.objects.argumentsToArray(arguments));
+    this._log('fatal', scout.objects.argumentsToArray(arguments));
   },
   isEnabledFor: function() {
     return false;
@@ -53,11 +59,36 @@ scout.NullLogger.prototype = {
     return false;
   },
   _log: function(level, logArgs) {
-    if (logArgs.length > 0) {
-      logArgs[0] = this._formatTime() + ' [' + level + '] ' + logArgs[0];
+    // check if console is available
+    var myConsole = scout.objects.optProperty(window, 'console');
+    if (!myConsole) {
+      return;
     }
-    if (window.console) {
-      window.console.error.apply(window.console, logArgs);
+
+    // map level to log function
+    var funcName;
+    if ('fatal' === level) {
+      funcName = 'error';
+    } else {
+      funcName = level;
+    }
+
+    // check if log function exists on console
+    var logFunc = myConsole[funcName];
+    if (!logFunc) {
+      return;
+    }
+
+    // log the message
+    if (logArgs.length > 0) {
+      logArgs[0] = this._formatTime() + ' [' + level.toUpperCase() + '] ' + logArgs[0];
+    }
+    try {
+      logFunc.apply(myConsole, logArgs);
+    } catch (e) {
+      // NOP - this seems a bit paranoid, because we've already checked that the error function exists,
+      // but some restrictive security settings in Internet Explorer may cause an Error when the function
+      // is called. Our logger should not produce additional errors #249626.
     }
   },
   _formatTime: function() {

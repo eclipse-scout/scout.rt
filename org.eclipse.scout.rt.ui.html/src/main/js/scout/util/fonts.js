@@ -40,15 +40,11 @@ scout.fonts = {
       fonts: fonts,
       onComplete: function(success, badFonts) {
         if (!success && badFonts && badFonts.length) {
-          var msg = '[Scout] WARNING: Timeout ocurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
+          $.log.warn('Timeout ocurred while pre-loading the following fonts:\n\n- ' + badFonts.join('\n- ') + '\n\n' +
             'Rendering will now continue, but font measurements may be inaccurate. ' +
             'To prevent unnecessary startup delays and layout problems, check the @font-face ' +
             'definitions and the referenced "src" URLs or programmatically add additional font-specific ' +
-            'characters to scout.fonts.TEST_STRING before calling app.init().';
-          $.log.warn(msg);
-          if (window && window.console) {
-            (window.console.warn || window.console.log)(msg);
-          }
+            'characters to scout.fonts.TEST_STRING before calling app.init().');
         }
         this.loadingComplete = true;
         this._deferred.resolve();
@@ -282,11 +278,8 @@ scout.fonts = {
       } catch (error) {
         // In some browsers, access to style sheets of other origins is blocked:
         // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet#Notes
-        var msg = '[Scout] INFO: Skipped automatic font detection for style sheet ' + styleSheet.href + ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.';
-        $.log.info(msg);
-        if (window && window.console) {
-          (window.console.info || window.console.log)(msg);
-        }
+        $.log.info('Skipped automatic font detection for style sheet ' + styleSheet.href +
+            ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.');
         continue;
       }
       for (var j = 0; j < styleSheet.cssRules.length; j++) {
