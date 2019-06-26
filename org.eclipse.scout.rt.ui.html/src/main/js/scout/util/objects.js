@@ -56,7 +56,7 @@ scout.objects = {
     var propertyName;
     filter = scout.arrays.ensure(filter);
     for (propertyName in source) {
-      if (source.hasOwnProperty(propertyName) && (filter.length === 0 || filter.indexOf(propertyName) !== -1)) {
+      if (Object.prototype.hasOwnProperty.call(source, propertyName) && (filter.length === 0 || filter.indexOf(propertyName) !== -1)) {
         dest[propertyName] = source[propertyName];
       }
     }
@@ -76,7 +76,7 @@ scout.objects = {
     // we're only interested in own properties
     var count = 0;
     for (var prop in obj) {
-      if (obj.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         count++;
       }
     }
@@ -108,7 +108,7 @@ scout.objects = {
   someOwnProperties: function(obj, properties) {
     var propArr = scout.arrays.ensure(properties);
     return propArr.some(function(prop) {
-      return obj.hasOwnProperty(prop);
+      return Object.prototype.hasOwnProperty.call(obj, prop);
     });
   },
 
@@ -145,7 +145,7 @@ scout.objects = {
     // All other objects
     copy = {};
     for (var prop in obj) {
-      if (obj.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         copy[prop] = scout.objects.valueCopy(obj[prop]);
       }
     }
@@ -176,7 +176,7 @@ scout.objects = {
       }
     }
     for (var prop in parentObj) {
-      if (parentObj.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(parentObj, prop)) {
         child = scout.objects.findChildObjectByKey(parentObj[prop], property, propertyValue);
         if (child) {
           return child;
