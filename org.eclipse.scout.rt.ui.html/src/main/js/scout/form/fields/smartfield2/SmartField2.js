@@ -857,6 +857,14 @@ scout.SmartField2.prototype._onFieldMouseDown = function(event) {
     return;
   }
   if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
+    if (this.popup && this.popup.removalPending) {
+      // If smart field is activated while it is closing (during remove animation), wait for the animation to finish and activate it afterwards
+      this.popup.one('remove', function() {
+        if (this.rendered) {
+          this._onFieldMouseDown(event);
+        }
+      }.bind(this));
+    }
     return;
   }
   this.$field.focus(); // required for touch case where field is a DIV
