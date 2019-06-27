@@ -4814,9 +4814,14 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
   // When a cell editor popup is open and table is detached, we close the popup immediately
   // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
   // with invalid focus contexts.
+  // However: when 'completeCellEdit' is already scheduled, we must wait because Scout classic
+  // must send a request to the server first #249385.
   if (this.cellEditorPopup) {
-    this.cellEditorPopup.destroy();
-    this.cellEditorPopup = null;
+    this.cellEditorPopup.waitForCompleteCellEdit()
+      .then(function() {
+        this.cellEditorPopup.destroy();
+        this.cellEditorPopup = null;
+      }.bind(this));
   }
 };
 
