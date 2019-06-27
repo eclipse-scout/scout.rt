@@ -909,6 +909,14 @@ scout.SmartField.prototype.activate = function(onField) {
     return;
   }
   if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
+    if (this.popup && this.popup.removalPending) {
+      // If smart field is activated while it is closing (during remove animation), wait for the animation to finish and activate it afterwards
+      this.popup.one('remove', function() {
+        if (this.rendered) {
+          this.activate(onField);
+        }
+      }.bind(this));
+    }
     return;
   }
   // Don't focus on desktop devices when click is on field #217192
