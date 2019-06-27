@@ -1,0 +1,6 @@
+{
+  "_type" : "scout.TestEntityWithEnumMapKey",
+  "map" : {
+    "one" : "test"
+  }
+}
