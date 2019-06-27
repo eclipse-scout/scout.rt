@@ -13,13 +13,16 @@ package org.eclipse.scout.rt.jackson.dataobject.enumeration;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
+import java.util.Collections;
 
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumMapKeyDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,6 +48,26 @@ public class EnumSerializationTest {
 
     TestEntityWithEnumDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithEnumDo.class);
     assertEquals(FixtureEnum.ONE, marshalled.getValue());
+  }
+
+  @Test
+  public void testSerializeDeserialize_EntityWithEnumMapKey() throws Exception {
+    TestEntityWithEnumMapKeyDo entity = new TestEntityWithEnumMapKeyDo();
+    entity.withMap(Collections.singletonMap(FixtureEnum.ONE, "test"));
+    String json = m_dataObjectMapper.writeValue(entity);
+
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEntityWithEnumMapKeyDo.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    TestEntityWithEnumMapKeyDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithEnumMapKeyDo.class);
+    assertEquals(Collections.singletonMap(FixtureEnum.ONE, "test"), marshalled.getMap());
+  }
+
+  @Test(expected = PlatformException.class)
+  public void testSerializeDeserialize_EntityWithEnumMapKeyNull() throws Exception {
+    TestEntityWithEnumMapKeyDo entity = new TestEntityWithEnumMapKeyDo();
+    entity.withMap(Collections.singletonMap(null, "test"));
+    m_dataObjectMapper.writeValue(entity);
   }
 
   protected URL toURL(String resourceName) {

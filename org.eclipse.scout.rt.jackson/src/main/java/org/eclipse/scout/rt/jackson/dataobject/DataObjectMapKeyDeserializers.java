@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeyDeserializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeyDeserializer;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -45,6 +47,10 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
       @SuppressWarnings("unchecked")
       Class<? extends IId<?>> idClass = (Class<? extends IId<?>>) rawClass.asSubclass(IId.class);
       return new IIdMapKeyDeserializer(idClass);
+    }
+    else if (IEnum.class.isAssignableFrom(rawClass)) {
+      Class<? extends IEnum> enumClass = (Class<? extends IEnum>) rawClass.asSubclass(IEnum.class);
+      return new EnumMapKeyDeserializer(enumClass);
     }
     return null;
   }
