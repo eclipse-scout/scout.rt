@@ -264,6 +264,7 @@ describe("CellEditor", function() {
 
       table.completeCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field, true);
+      jasmine.clock().tick();
       expect($findPopup().length).toBe(0);
     });
 
@@ -312,6 +313,7 @@ describe("CellEditor", function() {
 
       table.cancelCellEdit();
       expect(table.endCellEdit).toHaveBeenCalledWith(field);
+      jasmine.clock().tick();
       expect($findPopup().length).toBe(0);
     });
 
@@ -356,6 +358,7 @@ describe("CellEditor", function() {
       expect(field.destroyed).toBe(false);
 
       table.endCellEdit(field);
+      jasmine.clock().tick();
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
       expect(popup.rendered).toBe(false);
@@ -466,6 +469,7 @@ describe("CellEditor", function() {
       jasmine.clock().tick();
       expect(table.cellEditorPopup).toBeTruthy();
       table._beforeDetach(); // called by parent.detach();
+      jasmine.clock().tick();
       expect(table.cellEditorPopup).toBe(null);
     });
 
@@ -476,6 +480,7 @@ describe("CellEditor", function() {
       jasmine.clock().tick();
       expect(table.cellEditorPopup).toBeTruthy();
       table.remove();
+      jasmine.clock().tick();
       expect(table.cellEditorPopup).toBe(null);
     });
 

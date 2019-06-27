@@ -91,6 +91,7 @@ describe("CellEditorAdapter", function() {
       };
       session._processSuccessResponse(message);
 
+      jasmine.clock().tick();
       expect($findPopup().length).toBe(0);
       expect($findPopup().find('.form-field').length).toBe(0);
       expect(popup.rendered).toBe(false);
