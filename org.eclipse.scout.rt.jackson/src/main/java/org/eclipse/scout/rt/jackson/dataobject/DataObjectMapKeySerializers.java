@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import java.util.Locale;
 
+import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.dataobject.id.IId;
+import org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeySerializer;
 import org.eclipse.scout.rt.jackson.dataobject.id.IIdMapKeySerializer;
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -50,6 +52,10 @@ public class DataObjectMapKeySerializers extends Serializers.Base {
 
     if (IId.class.isAssignableFrom(rawClass)) {
       return new IIdMapKeySerializer();
+    }
+
+    if (IEnum.class.isAssignableFrom(rawClass)) {
+      return new EnumMapKeySerializer();
     }
 
     return null;
