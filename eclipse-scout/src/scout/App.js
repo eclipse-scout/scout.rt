@@ -12,20 +12,18 @@ import JQueryUtils from './util/JQueryUtils';
 import { JsonResponseError } from './constants';
 
 let instance = null;
+let listeners = [];
 
 export default class App {
-  static _listeners = [];
-
   constructor() {
     this.events = this._createEventSupport();
     this.sessions = [];
 
-
     // register the listeners which were added to scout before the app is created
-    App._listeners .forEach(function(listener) {
+    listeners.forEach(function(listener) {
       this.addListener(listener);
     }, this);
-    App._listeners = [];
+    listeners = [];
     instance = this;
 
     this.errorHandler = this._createErrorHandler();
@@ -50,7 +48,7 @@ export default class App {
       .then(this._init.bind(this, options))
       .then(this._initDone.bind(this, options))
       .catch(this._fail.bind(this, options));
-  };
+  }
 
   /**
    * Initializes the logging framework, polyfills and the object factory.
@@ -61,23 +59,23 @@ export default class App {
       this._prepareEssentials(options);
       this._prepareDone(options);
     }.bind(this));
-  };
+  }
 
   _prepareEssentials(options) {
     //scout.polyfills.install(window);
     ObjectFactory.getInstance().init();
-  };
+  }
 
   _prepareDone(options) {
     this.trigger('prepare', {
       options: options
     });
-  };
+  }
 
   _prepareLogging(options) {
     return JQueryUtils.resolvedPromise();
     //return scout.logging.bootstrap();
-  };
+  }
 
   /**
    * Executes the default bootstrap functions and returns an array of promises.<p>
@@ -100,7 +98,7 @@ export default class App {
     return JQueryUtils.promiseAll(promises)
       .done(this._bootstrapDone.bind(this, options))
       .catch(this._bootstrapFail.bind(this, options));
-  };
+  }
 
   _doBootstrap(options) {
     return [
@@ -112,14 +110,14 @@ export default class App {
       //scout.texts.bootstrap(options.textsUrl),
       //scout.codes.bootstrap(options.codesUrl)
     ];
-  };
+  }
 
   _bootstrapDone(options) {
     //scout.webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
     this.trigger('bootstrap', {
       options: options
     });
-  };
+  }
 
   _bootstrapFail(options, vararg, textStatus, errorThrown, requestOptions) {
 
@@ -150,11 +148,11 @@ export default class App {
     // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
     var args = scout.argumentsToArray(arguments).slice(1);
     return $.rejectedPromise.apply($, args);
-  };
+  }
 
   _isSessionTimeoutStatus(httpStatus) {
     return httpStatus === 401;
-  };
+  }
 
   _handleBootstrapTimeoutError(error, url) {
     /*if (scout.webstorage.getItem(sessionStorage, 'scout:timeoutPageReload')) {
@@ -166,7 +164,7 @@ export default class App {
 */
     // See comment in _bootstrapFail for the reasons why to reload here
     scout.reloadPage();
-  };
+  }
 
   /**
    * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
@@ -184,7 +182,7 @@ export default class App {
     this._ajaxSetup();
     this._installExtensions();
     this._loadSessions(options.session);
-  };
+  }
 
   _checkBrowserCompability(options) {
     /*var device = scout.device;
@@ -209,22 +207,22 @@ export default class App {
         });
     });*/
     return true;
-  };
+  }
 
   _initVersion(options) {
     this.version = scout.nvl(
       this.version,
       options.version,
       $('scout-version').data('value'));
-  };
+  }
 
   _prepareDOM() {
     scout.prepareDOM(document);
-  };
+  }
 
   _installGlobalMouseDownInterceptor() {
     scout.installGlobalMouseDownInterceptor(document);
-  };
+  }
 
   /**
    * Installs a global error handler.
@@ -239,18 +237,18 @@ export default class App {
    */
   _installErrorHandler() {
     window.onerror = this.errorHandler.windowErrorHandler;
-  };
+  }
 
   _createErrorHandler() {
     return scout.create(ErrorHandler);
-  };
+  }
 
   _ajaxSetup() {
     var ajaxDefaults = this._ajaxDefaults();
     if (ajaxDefaults) {
       $.ajaxSetup(ajaxDefaults);
     }
-  };
+  }
 
   /**
    * Returns the defaults for every ajax call. You may override it to set custom defaults.
@@ -262,7 +260,7 @@ export default class App {
     return {
       beforeSend: this._beforeAjaxCall.bind(this)
     };
-  };
+  }
 
   /**
    * Called before every ajax call. Sets the header X-Scout-Correlation-Id.
@@ -271,7 +269,7 @@ export default class App {
    */
   _beforeAjaxCall(request) {
     //request.setRequestHeader('X-Scout-Correlation-Id', scout.numbers.correlationId());
-  };
+  }
 
   _loadSessions(options) {
     options = options || {};
@@ -281,7 +279,7 @@ export default class App {
       var session = this._loadSession($entryPoint, options);
       this.getSessions().push(session);
     }.bind(this));
-  };
+  }
 
   _loadSession($entryPoint, options) {
     options.locale = options.locale || this._loadLocale();
@@ -305,19 +303,19 @@ export default class App {
       });
     }.bind(this));
     return session;
-  };
+  }
 
   _createSession(options) {
     return scout.create(Session, options, {
       ensureUniqueId: false
     });
-  };
+  }
 
   _createDesktop(parent) {
     return scout.create(Desktop, {
       parent: parent
     });
-  };
+  }
 
   /**
    * @returns the locale to be used when no locale is provided as app option. By default the navigators locale is used.
@@ -325,13 +323,13 @@ export default class App {
   _loadLocale() {
     return Locale.getDefault();
     //return scout.locales.getNavigatorLocale();
-  };
+  }
 
   _initDone(options) {
     this.trigger('init', {
       options: options
     });
-  };
+  }
 
   _fail(options, error) {
     var $error = $('body').appendDiv('startup-error', null);
@@ -345,7 +343,7 @@ export default class App {
 
     // Reject with original rejection arguments
     return $.rejectedPromise.apply($, args);
-  };
+  }
 
   /**
    * Override this method to install extensions to Scout objects. Since the extension feature replaces functions
@@ -356,38 +354,38 @@ export default class App {
    */
   _installExtensions() {
     // NOP
-  };
+  }
 
   //--- Event handling methods ---
   _createEventSupport() {
     return new EventSupport();
-  };
+  }
 
   trigger(type, event) {
     event = event || {};
     event.source = this;
     this.events.trigger(type, event);
-  };
+  }
 
   one(type, func) {
     this.events.one(type, func);
-  };
+  }
 
   on(type, func) {
     return this.events.on(type, func);
-  };
+  }
 
   off(type, func) {
     this.events.off(type, func);
-  };
+  }
 
   addListener(listener) {
     this.events.addListener(listener);
-  };
+  }
 
   removeListener(listener) {
     this.events.removeListener(listener);
-  };
+  }
 
   static addListener(type, func) {
     var listener = {
@@ -397,9 +395,9 @@ export default class App {
     if (instance) {
       instance.events.addListener(listener);
     } else {
-      App._listeners.push(listener);
+      listeners.push(listener);
     }
     return listener;
-  };
+  }
 }
 
