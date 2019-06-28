@@ -445,6 +445,11 @@ scout.ValueField.prototype.validateValue = function(value) {
  * @throws a message, a scout.Status or an error if the validation fails
  */
 scout.ValueField.prototype._validateValue = function(value) {
+  if (typeof value === 'string' && value === '') {
+    // Convert empty string to null.
+    // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
+    value = null;
+  }
   return value;
 };
 

@@ -66,7 +66,7 @@ describe('ProposalField', function() {
       expect(field.empty).toBe(false);
 
       field.setValue('');
-      expect(field.value).toBe('');
+      expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(field.empty).toBe(true);
 
