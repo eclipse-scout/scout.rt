@@ -71,6 +71,9 @@ scout.ProposalField.prototype._validateValue = function(value) {
   if (validValue.length > this.maxLength) {
     validValue = validValue.substring(0, this.maxLength);
   }
+  if (validValue === '') {
+    validValue = null;
+  }
   return validValue;
 };
 

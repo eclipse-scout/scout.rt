@@ -264,7 +264,7 @@ describe("BasicField", function() {
 
       field.clear();
       expect(field.$field.val()).toBe('');
-      expect(field.value).toBe('');
+      expect(field.value).toBe(null);
       expect(field.displayText).toBe('');
       expect(inputAccepted).toBe(true);
     });
