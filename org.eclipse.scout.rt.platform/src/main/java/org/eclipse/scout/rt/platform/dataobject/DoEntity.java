@@ -96,8 +96,8 @@ public class DoEntity implements IDoEntity {
    * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
    */
   @Override
-  public void remove(String attributeName) {
-    m_attributes.remove(attributeName);
+  public boolean remove(String attributeName) {
+    return m_attributes.remove(attributeName) != null;
   }
 
   /**
@@ -105,8 +105,8 @@ public class DoEntity implements IDoEntity {
    * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
    */
   @Override
-  public void removeIf(Predicate<? super DoNode<?>> filter) {
-    m_attributes.values().removeIf(filter);
+  public boolean removeIf(Predicate<? super DoNode<?>> filter) {
+    return m_attributes.values().removeIf(filter);
   }
 
   @Override
