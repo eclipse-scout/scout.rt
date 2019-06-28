@@ -72,14 +72,18 @@ public interface IDoEntity extends IDataObject {
 
   /**
    * Removes {@link DoValue} or {@link DoList} attribute from attributes map.
+   *
+   * @return {@code true} if an element was removed
    */
-  void remove(String attributeName);
+  boolean remove(String attributeName);
 
   /**
    * Removes all {@link DoValue} or {@link DoList} attribute from attributes map that satisfy the given predicate.
    * Errors or runtime exceptions thrown during iteration or by the predicate are relayed to the caller.
+   *
+   * @return {@code true} if any element were removed
    */
-  void removeIf(Predicate<? super DoNode<?>> filter);
+  boolean removeIf(Predicate<? super DoNode<?>> filter);
 
   /**
    * @return the map of all attributes as (key, unwrapped value)
@@ -226,9 +230,11 @@ public interface IDoEntity extends IDataObject {
    * <pre>
    * dataObject.remove(dataObject::attributeName);
    * </pre>
+   *
+   * @return {@code true} if an element was removed
    */
-  default void remove(Supplier<? extends DoNode<?>> nodeAccessor) {
-    remove(nodeAccessor.get());
+  default boolean remove(Supplier<? extends DoNode<?>> nodeAccessor) {
+    return remove(nodeAccessor.get());
   }
 
   /**
@@ -239,9 +245,11 @@ public interface IDoEntity extends IDataObject {
    * <pre>
    * dataObject.remove(dataObject:attributeName());
    * </pre>
+   *
+   * @return {@code true} if an element was removed
    */
-  default void remove(DoNode<?> node) {
-    remove(node.getAttributeName());
+  default boolean remove(DoNode<?> node) {
+    return remove(node.getAttributeName());
   }
 
   /**
