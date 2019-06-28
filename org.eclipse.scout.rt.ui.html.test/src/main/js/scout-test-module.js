@@ -13,8 +13,9 @@
     __include("scout/form/fields/beanfield/TestBeanField.js");
     __include("scout/form/fields/tabbox/TabBoxSpecHelper.js");
     __include("scout/form/fields/CloneSpecHelper.js");
+    __include("scout/lookup/ActiveDummyLookupCall.js");
     __include("scout/lookup/DummyLookupCall.js");
-    __include("scout/lookup/AnotherDummyLookupCall.js");
+    __include("scout/lookup/LanguageDummyLookupCall.js");
     __include("scout/lookup/ColumnDescriptorDummyLookupCall.js");
     __include("scout/menu/MenuSpecHelper.js");
     __include("scout/table/TableSpecHelper.js");

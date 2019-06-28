@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
+import org.eclipse.scout.rt.platform.util.TriState;
 import org.junit.Test;
 
 /**
@@ -48,8 +49,25 @@ public class LocalLookupCallTest {
   @Test
   public void testGetDataByAll() throws Exception {
     P_LocalLookupCall lc = new P_LocalLookupCall();
+    assertEquals("default value for 'active' property", TriState.UNDEFINED, lc.getActive());
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
     assertEquals("rows lengh", 8, rows.size());
+  }
+
+  @Test
+  public void testGetDataByAll_FilterActive() throws Exception {
+    P_LocalLookupCall lc = new P_LocalLookupCall();
+    lc.setActive(TriState.TRUE);
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
+    assertEquals("rows lengh", 6, rows.size());
+  }
+
+  @Test
+  public void testGetDataByAll_FilterInactive() throws Exception {
+    P_LocalLookupCall lc = new P_LocalLookupCall();
+    lc.setActive(TriState.FALSE);
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
+    assertEquals("rows lengh", 2, rows.size());
   }
 
   @Test
@@ -183,8 +201,8 @@ public class LocalLookupCallTest {
       rows.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT).withParentKey(ROW10_KEY));
       rows.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT).withParentKey(ROW10_KEY));
       rows.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT).withParentKey(ROW30_KEY));
-      rows.add(new LookupRow<Integer>(ROW40_KEY, ROW40_TEXT));
-      rows.add(new LookupRow<Integer>(ROW50_KEY, ROW50_TEXT));
+      rows.add(new LookupRow<Integer>(ROW40_KEY, ROW40_TEXT).withActive(false));
+      rows.add(new LookupRow<Integer>(ROW50_KEY, ROW50_TEXT).withActive(false));
       return rows;
     }
   }

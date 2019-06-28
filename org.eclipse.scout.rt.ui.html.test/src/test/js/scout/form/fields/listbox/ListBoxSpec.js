@@ -189,7 +189,7 @@ describe("ListBox", function() {
 
     it('switching should refill table', function() {
       var field = createFieldWithLookupCall({}, {
-        objectType: 'AnotherDummyLookupCall'
+        objectType: 'LanguageDummyLookupCall'
       });
 
       field.setValue([100, 500]);

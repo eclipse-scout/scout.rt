@@ -20,6 +20,7 @@ scout.LookupCall = function() {
   this.searchText = null; // used on QueryBy.TEXT
   this.key = null; // used on QueryBy.KEY
   this.parentKey = null; // used on QueryBy.REC
+  this.active = null;
 };
 
 scout.LookupCall.prototype.init = function(model) {

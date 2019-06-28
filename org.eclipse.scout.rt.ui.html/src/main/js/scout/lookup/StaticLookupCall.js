@@ -24,6 +24,7 @@ scout.StaticLookupCall = function() {
 
   this.delay = 0; // delay in [ms]
   this.data = null;
+  this.active = true;
 };
 scout.inherits(scout.StaticLookupCall, scout.LookupCall);
 
@@ -60,7 +61,16 @@ scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
 
 scout.StaticLookupCall.prototype._lookupRowsByAll = function() {
   var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
-  return datas.map(this._dataToLookupRow, this);
+  return datas
+    .map(this._dataToLookupRow, this)
+    .filter(this._filterActiveLookupRow, this);
+};
+
+scout.StaticLookupCall.prototype._filterActiveLookupRow = function(dataRow) {
+  if (scout.objects.isNullOrUndefined(this.active)) {
+    return true;
+  }
+  return this.active === scout.nvl(dataRow.active, true);
 };
 
 scout.StaticLookupCall.prototype._getByText = function(text) {
@@ -111,7 +121,9 @@ scout.StaticLookupCall.prototype._lookupRowsByText = function(text) {
   var datas = this.data.filter(function(data) {
     return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
-  return datas.map(this._dataToLookupRow, this);
+  return datas
+    .map(this._dataToLookupRow, this)
+    .filter(this._filterActiveLookupRow, this);
 };
 
 scout.StaticLookupCall.prototype._getByKey = function(key) {
@@ -162,7 +174,8 @@ scout.StaticLookupCall.prototype._lookupRowsByRec = function(rec) {
       aggr.push(this._dataToLookupRow(data));
     }
     return aggr;
-  }.bind(this), []);
+  }.bind(this), [])
+  .filter(this._filterActiveLookupRow, this);
 };
 
 scout.StaticLookupCall.prototype.setDelay = function(delay) {
@@ -184,10 +197,11 @@ scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
 /**
  * Implement this function to provide static data. The data should be an array of arrays,
  * where the inner array contains the values required to create a scout.LookupRow. By
- * default the first two elements of the array must be:
+ * default the first two elements of the array are mandatory, the others are optional:
  *
  *   0: Key
  *   1: Text
+ *   2: ParentKey (optional)
  *
  * When your data contains more elements you must also implement the _dataToLookupRow() function.
  */

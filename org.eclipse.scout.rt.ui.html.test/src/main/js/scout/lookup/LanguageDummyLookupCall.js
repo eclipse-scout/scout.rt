@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-scout.AnotherDummyLookupCall = function() {
-  scout.AnotherDummyLookupCall.parent.call(this);
+scout.LanguageDummyLookupCall = function() {
+  scout.LanguageDummyLookupCall.parent.call(this);
 
   this.multiline = false;
   this.showText = true;
   this.setDelay(250);
 };
-scout.inherits(scout.AnotherDummyLookupCall, scout.StaticLookupCall);
+scout.inherits(scout.LanguageDummyLookupCall, scout.StaticLookupCall);
 
-scout.AnotherDummyLookupCall.prototype._data = function() {
+scout.LanguageDummyLookupCall.prototype._data = function() {
   return [
     [100, line.call(this, 'English')],
     [200, line.call(this, 'German')],

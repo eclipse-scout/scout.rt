@@ -17,12 +17,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.platform.util.TriState;
 
 /**
  * LookupCall for cases where no backend service exists.<br>
@@ -55,6 +58,22 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   @Order(30)
   protected List<? extends ILookupRow<T>> execCreateLookupRows() {
     return null;
+  }
+
+  protected List<? extends ILookupRow<T>> interceptCreateLookupRows() {
+    return filterActiveLookupRows(execCreateLookupRows());
+  }
+
+  protected List<? extends ILookupRow<T>> filterActiveLookupRows(List<? extends ILookupRow<T>> allRows) {
+    TriState lookupCallActive0 = getActive();
+    if (TriState.UNDEFINED == lookupCallActive0) {
+      return allRows;
+    }
+
+    boolean lookupCallActive = BooleanUtility.nvl(lookupCallActive0.getBooleanValue());
+    return allRows.stream()
+        .filter(row -> row.isActive() == lookupCallActive)
+        .collect(Collectors.toList());
   }
 
   protected Pattern createSearchPattern(String s) {
@@ -93,7 +112,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
       return CollectionUtility.emptyArrayList();
     }
     Object key = getKey();
-    List<? extends ILookupRow<T>> rows = execCreateLookupRows();
+    List<? extends ILookupRow<T>> rows = interceptCreateLookupRows();
     if (rows == null) {
       return CollectionUtility.emptyArrayList();
     }
@@ -113,7 +132,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   public List<? extends ILookupRow<T>> getDataByText() {
     List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getText());
-    List<? extends ILookupRow<T>> lookupRows = execCreateLookupRows();
+    List<? extends ILookupRow<T>> lookupRows = interceptCreateLookupRows();
     for (ILookupRow<T> row : lookupRows) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
@@ -185,7 +204,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   public List<? extends ILookupRow<T>> getDataByAll() {
     List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getAll());
-    for (ILookupRow<T> row : execCreateLookupRows()) {
+    for (ILookupRow<T> row : interceptCreateLookupRows()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
@@ -201,14 +220,14 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     List<ILookupRow<T>> list = new ArrayList<>();
     Object parentKey = getRec();
     if (parentKey == null) {
-      for (ILookupRow<T> row : execCreateLookupRows()) {
+      for (ILookupRow<T> row : interceptCreateLookupRows()) {
         if (row.getParentKey() == null) {
           list.add(row);
         }
       }
     }
     else {
-      for (ILookupRow<T> row : execCreateLookupRows()) {
+      for (ILookupRow<T> row : interceptCreateLookupRows()) {
         if (parentKey.equals(row.getParentKey())) {
           list.add(row);
         }

@@ -190,7 +190,7 @@ describe("TreeBox", function() {
 
     it('switching should refill tree', function() {
       var field = createFieldWithLookupCall({}, {
-        objectType: 'AnotherDummyLookupCall'
+        objectType: 'LanguageDummyLookupCall'
       });
 
       field.setValue([100, 500]);
