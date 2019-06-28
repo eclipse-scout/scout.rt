@@ -222,6 +222,28 @@ describe("StringField", function() {
       expect(field.value).toBe('10');
       expect(field.displayText).toBe('10');
     });
+
+    it('sets the value to null if given value is empty', function() {
+      field.render();
+      field.setValue('');
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+    });
+
+    it('sets value to null if given value only consists of whitespaces and trim is true', function() {
+      field.render();
+      field.setValue('  ');
+      expect(field.value).toBe(null);
+      expect(field.displayText).toBe('');
+    });
+
+    it('does not set value to null if given value only consists of whitespaces and trim is false', function() {
+      field.setTrimText(false);
+      field.render();
+      field.setValue('  ');
+      expect(field.value).toBe('  ');
+      expect(field.displayText).toBe('  ');
+    });
   });
 
 });
