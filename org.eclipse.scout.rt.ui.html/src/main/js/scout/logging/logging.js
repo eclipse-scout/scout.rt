@@ -31,7 +31,7 @@ scout.logging = {
     var enabled = !!(options.enabled || logging),
       showPopup = !!(options.showPopup || logging);
 
-    var resourceUrl = scout.strings.nvl(options.resourceUrl, 'res/');
+    var resourceUrl = scout.nvl(options.resourceUrl, 'res/');
 
     $.log = new scout.NullLogger();
     if (!enabled) {
