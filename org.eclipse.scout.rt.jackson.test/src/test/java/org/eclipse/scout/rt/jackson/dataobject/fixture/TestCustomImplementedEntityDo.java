@@ -80,13 +80,13 @@ public class TestCustomImplementedEntityDo implements IDoEntity {
   }
 
   @Override
-  public void remove(String attributeName) {
-    m_attributes.remove(attributeName);
+  public boolean remove(String attributeName) {
+    return m_attributes.remove(attributeName) != null;
   }
 
   @Override
-  public void removeIf(Predicate<? super DoNode<?>> filter) {
-    m_attributes.values().removeIf(filter);
+  public boolean removeIf(Predicate<? super DoNode<?>> filter) {
+    return m_attributes.values().removeIf(filter);
   }
 
   @Override

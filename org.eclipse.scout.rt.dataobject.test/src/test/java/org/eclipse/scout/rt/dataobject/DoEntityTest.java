@@ -196,17 +196,17 @@ public class DoEntityTest {
         .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other"));
 
     assertTrue(entity.id().exists());
-    entity.remove(entity::id);
+    assertTrue(entity.remove(entity::id));
     assertFalse(entity.has("id"));
     assertFalse(entity.id().exists());
 
     assertTrue(entity.otherEntities().exists());
-    entity.remove(entity::otherEntities);
+    assertTrue(entity.remove(entity::otherEntities));
     assertFalse(entity.has("otherEntities"));
     assertFalse(entity.otherEntities().exists());
 
     // repeat call -> void
-    entity.remove(entity::otherEntities);
+    assertFalse(entity.remove(entity::otherEntities));
 
     assertTrue(entity.isEmpty());
   }
@@ -218,17 +218,17 @@ public class DoEntityTest {
         .withOtherEntities(BEANS.get(OtherEntityFixtureDo.class).withId("other"));
 
     assertTrue(entity.id().exists());
-    entity.remove(entity.id());
+    assertTrue(entity.remove(entity.id()));
     assertFalse(entity.has("id"));
     assertFalse(entity.id().exists());
 
     assertTrue(entity.otherEntities().exists());
-    entity.remove(entity.otherEntities());
+    assertTrue(entity.remove(entity.otherEntities()));
     assertFalse(entity.has("otherEntities"));
     assertFalse(entity.otherEntities().exists());
 
     // repeat call -> void
-    entity.remove(entity.otherEntities());
+    assertFalse(entity.remove(entity.otherEntities()));
 
     assertTrue(entity.isEmpty());
   }
@@ -241,12 +241,14 @@ public class DoEntityTest {
     entity.put("foo3", null);
     entity.put("foo4", "value2");
 
+    assertFalse(entity.removeIf(n -> false));
     assertEquals(CollectionUtility.hashSet("foo", "foo2", "foo3", "foo4"), entity.allNodes().keySet());
-    entity.removeIf(n -> "value2".equals(n.get()));
+    assertTrue(entity.removeIf(n -> "value2".equals(n.get())));
+    assertFalse(entity.removeIf(n -> "value2".equals(n.get())));
     assertEquals(CollectionUtility.hashSet("foo", "foo3"), entity.allNodes().keySet());
-    entity.removeIf(n -> n.get() == null);
+    assertTrue(entity.removeIf(n -> n.get() == null));
     assertEquals(CollectionUtility.hashSet("foo"), entity.allNodes().keySet());
-    entity.removeIf(n -> n.getAttributeName().equals("foo"));
+    assertTrue(entity.removeIf(n -> n.getAttributeName().equals("foo")));
     assertEquals(Collections.emptySet(), entity.allNodes().keySet());
   }
 
