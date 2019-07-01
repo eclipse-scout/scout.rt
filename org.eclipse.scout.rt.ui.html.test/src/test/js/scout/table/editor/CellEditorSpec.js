@@ -278,6 +278,20 @@ describe("CellEditor", function() {
       expect(table.rows[0].cells[0].value).toBe('my new value');
     });
 
+    it("does not reopen the editor again", function() {
+      table.columns[0].setEditable(true);
+      table.prepareCellEdit(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      table.cellEditorPopup.cell.field.setValue('my new value');
+
+      var triggeredStartCellEditEvent = null;
+      table.on('startCellEdit', function(event) {
+        triggeredStartCellEditEvent = event;
+      });
+      table.completeCellEdit();
+      // CompleteCellEdit triggers updateRows which would reopen the editor -> this must not happen if the editor was closed
+      expect(triggeredStartCellEditEvent).toBe(null);
+    });
   });
 
   describe("cancelCellEdit", function() {
