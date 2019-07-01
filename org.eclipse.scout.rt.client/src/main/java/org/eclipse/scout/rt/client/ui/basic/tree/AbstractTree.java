@@ -1227,8 +1227,21 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
   }
 
   @Override
-  public void setNodeExpanded(ITreeNode node, boolean expand) {
-    setNodeExpanded(node, expand, node.isLazyExpandingEnabled());
+  public void setNodeExpanded(ITreeNode node, boolean expanded) {
+    boolean lazy;
+    if (node.isExpanded() == expanded) {
+      // no state change: Keep the current "expandedLazy" state
+      lazy = node.isExpandedLazy();
+    }
+    else if (expanded) {
+      // collapsed -> expanded: Set the "expandedLazy" state to the node's "lazyExpandingEnabled" flag
+      lazy = node.isLazyExpandingEnabled();
+    }
+    else {
+      // expanded -> collapsed: Set the "expandedLazy" state to false
+      lazy = false;
+    }
+    setNodeExpanded(node, expanded, lazy);
   }
 
   @Override
@@ -1236,11 +1249,6 @@ public abstract class AbstractTree extends AbstractWidget implements ITree, ICon
     // Never do lazy expansion if it is disabled on the tree
     if (!isLazyExpandingEnabled()) {
       lazy = false;
-    }
-
-    // Do not allow a lazy expansion/collapse if the node was manually expanded
-    if (lazy && node.isExpanded() && !node.isExpandedLazy()) {
-      return;
     }
 
     node = resolveNode(node);
