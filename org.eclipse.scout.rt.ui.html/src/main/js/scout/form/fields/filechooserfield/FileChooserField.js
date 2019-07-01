@@ -12,7 +12,7 @@ scout.FileChooserField = function() {
   scout.FileChooserField.parent.call(this);
 
   this.fileInput = null;
-  
+
   this.acceptTypes = null;
   this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 };
