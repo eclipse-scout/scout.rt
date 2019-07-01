@@ -1524,7 +1524,7 @@ describe("Tree", function() {
       tree.expandNode(node0, {lazy: false});
       expect(node0.expanded).toBe(true);
       tree.collapseNode(node0, {lazy: true});
-      expect(node0.expanded).toBe(true);
+      expect(node0.expanded).toBe(false);
     });
 
     it("lazy expand -> manual collapse node", function() {
