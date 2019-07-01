@@ -431,7 +431,7 @@ public class AbstractTreeTest {
     assertTrue(d.isExpanded());
     assertFalse(d.isExpandedLazy());
 
-    // Lazy-Collapse D --> Collapse of D should be prevented
+    // Lazy-Collapse D --> D should be collapsed
     m_tree.setNodeExpanded(d, false, true);
     assertTrue(a.isExpanded());
     assertFalse(a.isExpandedLazy());
@@ -439,19 +439,19 @@ public class AbstractTreeTest {
     assertFalse(b.isExpandedLazy());
     assertTrue(c.isExpanded());
     assertFalse(c.isExpandedLazy());
-    assertTrue(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertTrue(d.isExpandedLazy());
 
-    // Lazy-Collapse C --> Collapse of C and D should be prevented
+    // Lazy-Collapse C --> C and D should be collapsed
     m_tree.setNodeExpanded(c, false, true);
     assertTrue(a.isExpanded());
     assertFalse(a.isExpandedLazy());
     assertFalse(b.isExpanded());
     assertFalse(b.isExpandedLazy());
-    assertTrue(c.isExpanded());
-    assertFalse(c.isExpandedLazy());
-    assertTrue(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertFalse(c.isExpanded());
+    assertTrue(c.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertTrue(d.isExpandedLazy());
 
     // Collapse C --> C is collapsed
     m_tree.setNodeExpanded(c, false, false);
@@ -461,8 +461,8 @@ public class AbstractTreeTest {
     assertFalse(b.isExpandedLazy());
     assertFalse(c.isExpanded());
     assertFalse(c.isExpandedLazy());
-    assertTrue(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertFalse(d.isExpanded());
+    assertTrue(d.isExpandedLazy());
 
     // Collapse all
     m_tree.collapseAll(a);
@@ -473,7 +473,7 @@ public class AbstractTreeTest {
     assertFalse(c.isExpanded());
     assertFalse(c.isExpandedLazy());
     assertFalse(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertTrue(d.isExpandedLazy());
 
     // Lazy-Expand B --> A and B are expanded
     m_tree.setNodeExpanded(b, true, true);
@@ -484,18 +484,18 @@ public class AbstractTreeTest {
     assertFalse(c.isExpanded());
     assertFalse(c.isExpandedLazy());
     assertFalse(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertTrue(d.isExpandedLazy());
 
-    // Lazy-Collapse A --> Collapse of A and B should be prevented
+    // Lazy-Collapse A --> A and B should be collapsed
     m_tree.setNodeExpanded(a, false, true);
-    assertTrue(a.isExpanded());
-    assertFalse(a.isExpandedLazy());
+    assertFalse(a.isExpanded());
+    assertTrue(a.isExpandedLazy());
     assertTrue(b.isExpanded());
     assertTrue(b.isExpandedLazy());
     assertFalse(c.isExpanded());
     assertFalse(c.isExpandedLazy());
     assertFalse(d.isExpanded());
-    assertFalse(d.isExpandedLazy());
+    assertTrue(d.isExpandedLazy());
   }
 
   public static class P_Tree extends AbstractTree {

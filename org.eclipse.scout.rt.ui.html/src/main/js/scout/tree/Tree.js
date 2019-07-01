@@ -1387,7 +1387,19 @@ scout.Tree.prototype.collapseAll = function() {
 
 scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
   opts = opts || {};
-  var lazy = scout.nvl(opts.lazy, node.lazyExpandingEnabled);
+  var lazy = opts.lazy;
+  if (scout.objects.isNullOrUndefined(lazy)) {
+    if (node.expanded === expanded) {
+      // no state change: Keep the current "expandedLazy" state
+      lazy = node.expandedLazy;
+    } else if (expanded) {
+      // collapsed -> expanded: Set the "expandedLazy" state to the node's "lazyExpandingEnabled" flag
+      lazy = node.lazyExpandingEnabled;
+    } else {
+      // expanded -> collapsed: Set the "expandedLazy" state to false
+      lazy = false;
+    }
+  }
   var renderAnimated = scout.nvl(opts.renderAnimated, true);
 
   // Never do lazy expansion if it is disabled on the tree
@@ -1401,11 +1413,6 @@ scout.Tree.prototype.setNodeExpanded = function(node, expanded, opts) {
       this.setNodeExpanded(node, true, opts);
       return;
     }
-  }
-
-  // Do not allow a lazy expansion/collapse if the node was manually expanded
-  if (lazy && node.expanded && !node.expandedLazy) {
-    return;
   }
 
   // Optionally collapse all children (recursively)
