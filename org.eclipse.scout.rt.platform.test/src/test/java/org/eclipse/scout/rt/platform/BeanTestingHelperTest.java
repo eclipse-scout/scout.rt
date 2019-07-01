@@ -28,6 +28,17 @@ public class BeanTestingHelperTest {
   }
 
   @Test
+  public void testRegisterBeanNull() {
+    BeanTestingHelper.get().registerBean(null);
+  }
+
+  @Test
+  public void testUnregisterBeanNull() {
+    BeanTestingHelper.get().unregisterBean(null);
+    BeanTestingHelper.get().unregisterBeans(null);
+  }
+
+  @Test
   public void testMockConfigProperty() {
     Assert.assertEquals(1L, CONFIG.getPropertyValue(TestingUtilityLongConfigProperty.class).longValue());
     IBean<?> mockProperty = BeanTestingHelper.get().mockConfigProperty(TestingUtilityLongConfigProperty.class, 2L);
