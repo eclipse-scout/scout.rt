@@ -23,6 +23,7 @@ package org.eclipse.scout.rt.testing.platform;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -115,9 +116,8 @@ public class BeanTestingHelper {
     if (beans == null) {
       return;
     }
-    for (IBean<?> bean : beans) {
-      Platform.get().getBeanManager().unregisterBean(bean);
-    }
+    IBeanManager manager = Platform.get().getBeanManager();
+    beans.stream().filter(Objects::nonNull).forEach(manager::unregisterBean);
   }
 
   @SuppressWarnings("unchecked")
