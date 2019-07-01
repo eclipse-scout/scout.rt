@@ -50,7 +50,7 @@ public class SocketWithInterception extends Socket {
         if (m_eof) {
           return -1;
         }
-        int i = super.read();
+        int i = in.read();
         if (i >= 0) {
           i = m_readInterceptor.intercept(i);
         }
@@ -65,7 +65,7 @@ public class SocketWithInterception extends Socket {
         if (m_eof) {
           return -1;
         }
-        int n = super.read(b, off, len);
+        int n = in.read(b, off, len);
         if (n < 0) {
           m_eof = true;
         }
@@ -90,7 +90,17 @@ public class SocketWithInterception extends Socket {
       @Override
       public void write(int b) throws IOException {
         b = ((int) m_writeInterceptor.intercept((byte) b)) & 0xff;
-        super.write(b);
+        out.write(b);
+      }
+
+      @Override
+      public void write(byte[] b, int off, int len) throws IOException {
+        for (int k = 0; k < len; k++) {
+          int i = ((int) b[off + k]) & 0xff;
+          i = m_readInterceptor.intercept(i);
+          b[off + k] = (byte) i;
+        }
+        out.write(b, off, len);
       }
     };
   }
