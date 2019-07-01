@@ -4817,11 +4817,20 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
   // However: when 'completeCellEdit' is already scheduled, we must wait because Scout classic
   // must send a request to the server first #249385.
   if (this.cellEditorPopup) {
-    this.cellEditorPopup.waitForCompleteCellEdit()
-      .then(function() {
-        this.cellEditorPopup.destroy();
-        this.cellEditorPopup = null;
-      }.bind(this));
+    var destroyEditor = function() {
+      this.cellEditorPopup.destroy();
+      this.cellEditorPopup = null;
+    }.bind(this);
+
+    var promise = this.cellEditorPopup.waitForCompleteCellEdit();
+    if (promise.state() === 'resolved') {
+      // Do it immediately if promise has already been resolved. 
+      // This makes sure updateRow does not immediately reopen the editor after closing.
+      // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
+      destroyEditor();
+    } else {
+      promise.then(destroyEditor);
+    }
   }
 };
 
