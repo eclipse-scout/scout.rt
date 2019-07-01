@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
 import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.IStreamInterceptor;
 import org.eclipse.scout.rt.shared.INode;
@@ -40,11 +41,14 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.RemoteServiceInvocationCallable;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
+import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Simple test if the Google HTTP Client API (here called 'google level') together with the Apache HTTP Client (here
@@ -55,6 +59,8 @@ import org.junit.Test;
  * <p>
  * Apache HTTP client also handles various http retry scenarios in its exec loop.
  */
+@RunWith(PlatformTestRunner.class)
+@RunWithNewPlatform
 public class HttpServiceTunnelNetworkTest {
   private static final String X_TRUNCATE_BODY = "X-Truncate-Body";
   private static final String X_WAIT_AFTER_BYTES = "X-Wait-After-Bytes";
@@ -87,18 +93,18 @@ public class HttpServiceTunnelNetworkTest {
     TestingUtility.unregisterBean(m_exceptionHandlerReplacement);
     m_client.stop();
     m_server.stop();
-    sysout("# HttpClient.read\n" + m_clientRead);
-    sysout("# HttpClient.write\n" + m_clientWrite);
+    sysout("# HttpClient.read\n" + m_clientRead + "\n");
+    sysout("# HttpClient.write\n" + m_clientWrite + "\n");
   }
 
   @Test
   public void testPostWithChunkedResponseAndSuccess() throws IOException, NoSuchMethodException, SecurityException {
     m_client.withSocketReadInterceptor(() -> b -> {
-      m_clientRead.append((char) b);
+      m_clientRead.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
       return b;
     });
     m_client.withSocketWriteInterceptor(() -> b -> {
-      m_clientWrite.append((char) b);
+      m_clientWrite.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
       return b;
     });
 
@@ -113,6 +119,9 @@ public class HttpServiceTunnelNetworkTest {
     tunnel.setContentHandler(contentHandler);
 
     m_server.withServletPostHandler((req, resp) -> {
+      //consume input to avoid java.net.SocketException: Software caused connection abort: socket write error
+      IOUtility.readBytes(req.getInputStream(), req.getContentLength());
+
       resp.setContentType(contentHandler.getContentType());
       resp.setHeader("Transfer-Encoding", "chunked");
       ByteArrayOutputStream buf = new ByteArrayOutputStream();
