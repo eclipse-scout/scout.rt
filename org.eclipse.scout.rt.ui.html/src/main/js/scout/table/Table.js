@@ -848,6 +848,7 @@ scout.Table.prototype.reload = function(reloadReason) {
     return;
   }
   this._removeRows();
+  this._removeAggregateRows();
   if (this._rendered()) {
     this._renderFiller();
   }
@@ -5007,7 +5008,7 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
 
     var promise = this.cellEditorPopup.waitForCompleteCellEdit();
     if (promise.state() === 'resolved') {
-      // Do it immediately if promise has already been resolved. 
+      // Do it immediately if promise has already been resolved.
       // This makes sure updateRow does not immediately reopen the editor after closing.
       // At least for Scout JS, for Scout Classic it prevents flickering (endCellEdit comes after updateRows, but updateRows does not know whether the editor is closing so it will reopen it)
       destroyEditor();
