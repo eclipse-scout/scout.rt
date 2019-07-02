@@ -1284,11 +1284,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       lazy = false;
     }
 
-    // Do not allow a lazy expansion/collapse if the node was manually expanded
-    if (lazy && node.isExpanded() && !node.isExpandedLazy()) {
-      return;
-    }
-
     node = resolveNode(node);
     if (node != null && (node.isExpanded() != b || node.isExpandedLazy() != lazy)) {
       setNodeExpandedInternal(node, b, lazy);
