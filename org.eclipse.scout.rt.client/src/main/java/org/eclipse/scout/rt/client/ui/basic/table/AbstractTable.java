@@ -102,6 +102,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -4407,6 +4408,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     }
     catch (Exception e) {
       LOG.error("Could not create tiles [{}]", getClass().getName(), e);
+      throw new ProcessingException("Could not create tiles", e);
     }
     super.disposeInternal();
   }
