@@ -4396,8 +4396,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void createTiles(List<? extends ITableRow> rows) {
     try {
-      disposeTableInternal();
-
       List<TableRowTileMapping> rowToTilePairs = rows.stream()
           .map(r -> BEANS.get(TableRowTileMapping.class)
               .withTableRow(r)
@@ -4410,7 +4408,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       LOG.error("Could not create tiles [{}]", getClass().getName(), e);
       throw new ProcessingException("Could not create tiles", e);
     }
-    super.disposeInternal();
   }
 
   /*
