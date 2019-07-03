@@ -28,7 +28,9 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("2a476704-dc92-435f-8d7f-32aafcae7840")
 public abstract class AbstractLabel extends AbstractWidget implements ILabel {
   private final ObjectExtensions<AbstractLabel, ILabelExtension<? extends AbstractLabel>> m_objectExtensions;
   private ILabelUIFacade m_uiFacade;

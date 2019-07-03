@@ -37,12 +37,14 @@ import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * Implementation of message box.<br/>
  * Use {@link MessageBoxes} to create a message box.
  */
 @Bean
+@ClassId("b22a87dc-b40c-4c4f-96cc-356aef66e508")
 public class MessageBox extends AbstractWidget implements IMessageBox {
 
   private static final Logger LOG = LoggerFactory.getLogger(MessageBox.class);

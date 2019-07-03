@@ -18,10 +18,12 @@ import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 9.0
  */
+@ClassId("4ec758a3-178f-4de9-bc56-a4f28f801df1")
 public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPopup implements IWidgetPopup<T> {
 
   private T m_widget;

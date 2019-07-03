@@ -17,7 +17,9 @@ import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("cd82392d-609d-44c2-ac41-87fca7a78646")
 public class DesktopNotification extends Notification implements IDesktopNotification {
 
   private final long m_duration;

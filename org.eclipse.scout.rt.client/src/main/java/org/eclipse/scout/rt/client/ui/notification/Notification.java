@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.client.ui.notification;
 import org.eclipse.scout.rt.client.ui.AbstractWidget;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("759627bb-02e5-4db2-812c-aac00b80cdb6")
 public class Notification extends AbstractWidget implements INotification {
 
   private final IStatus m_status;

@@ -15,10 +15,12 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 9.0
  */
+@ClassId("5930294f-05ea-4fd3-be84-963aac6ee4f8")
 public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
 
   public AbstractFormPopup() {

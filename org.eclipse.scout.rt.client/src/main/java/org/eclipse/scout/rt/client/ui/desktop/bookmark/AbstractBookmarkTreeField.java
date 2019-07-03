@@ -304,6 +304,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     BEANS.get(IBookmarkService.class).storeBookmarks();
   }
 
+  @ClassId("bdd00c51-0678-4fcd-b1ff-be172832a196")
   public class Tree extends AbstractTree {
 
     @Override

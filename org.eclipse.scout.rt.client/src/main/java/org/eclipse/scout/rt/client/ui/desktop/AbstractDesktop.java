@@ -120,6 +120,7 @@ import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * The desktop model (may) consist of
@@ -137,6 +138,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * The Eclipse Scout SDK creates a subclass of this class that can be used as initial desktop.
  */
+@ClassId("a6761d3f-7627-4e10-8440-f5c4865ca73c")
 public abstract class AbstractDesktop extends AbstractWidget implements IDesktop, IContributionOwner, IExtensibleObject {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDesktop.class);
