@@ -47,8 +47,9 @@ public final class SeleniumJavaScript {
       String scriptAsJsString = "'" + js
           .replaceAll("\\r", "") // remove \r
           .replaceAll("\\n$", "") // remove trailing \n
+          .replaceAll("\\\\", "\\\\\\\\") // escape backslashes
           .replaceAll("'", "\\\\'") // escape single quotes
-          .replaceAll("\\n", "' + \n'") + // split javascript string at inner line breaks
+          .replaceAll("\\n", "\\\\n' + \n'") + // split content at line breaks (but preserve them to allow single-line comments)
           "'";
       executeScript(test, "$('body').prependElement('<script>').text(" + scriptAsJsString + ");");
       LOG.info("Injected selenium.js");
