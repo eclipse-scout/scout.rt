@@ -240,6 +240,58 @@ describe('SequenceBox', function() {
       expect(field.fields[0].errorStatus.message).toBe('foo');
     });
 
+    it('shows the error status of the seq box', function() {
+      var field = createField({
+        errorStatus: {
+          statusVisible: false,
+          message: 'foo'
+        }
+      });
+      field.render();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.errorStatus.message).toBe('foo');
+    });
+
+    it('shows the tooltip of the seq box', function() {
+      var field = createField({
+        statusVisible: false,
+        tooltipText: 'foo'
+      });
+      field.render();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.tooltipText).toBe('foo');
+    });
+
+    it('renders invisible menus of the seq box', function() {
+      var menu0 = menuHelper.createMenu(menuHelper.createModel());
+      var field = createField({
+        statusVisible: false,
+        menus: [menu0],
+        menusVisible: false
+      });
+      field.render();
+
+      expect(field.$status.isVisible()).toBe(false);
+      expect(field.menus.length).toBe(1);
+      expect(field.$container).not.toHaveClass('has-menus');
+    });
+
+    it('renders visible menus of the seq box', function() {
+      var menu0 = menuHelper.createMenu(menuHelper.createModel());
+      var field = createField({
+        statusVisible: false,
+        menus: [menu0],
+        menusVisible: true
+      });
+      field.render();
+
+      expect(field.$status.isVisible()).toBe(true);
+      expect(field.menus.length).toBe(1);
+      expect(field.$container).toHaveClass('has-menus');
+    });
+
     it('prefers the error status of the last visible field', function() {
       var field = createField({
         statusVisible: false

@@ -24,6 +24,11 @@ scout.SequenceBox.prototype._init = function(model) {
   this._setLayoutConfig(this.layoutConfig);
 
   this._initDateFields();
+
+  this.setErrorStatus(this.errorStatus);
+  this.setTooltipText(this.tooltipText);
+  this.setMenus(this.menus);
+  this.setMenusVisible(this.menusVisible);
 };
 
 /**
@@ -159,7 +164,7 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
     this._isTooltipTextOverwritten = false;
   }
 
-  if (this._lastVisibleField.menus) {
+  if (this._lastVisibleField.menus && this._lastVisibleField.menus.length > 0) {
     this.setMenus(this._lastVisibleField.menus);
     this.setMenusVisible(this._lastVisibleField.menusVisible);
     this._isMenusOverwritten = true;
