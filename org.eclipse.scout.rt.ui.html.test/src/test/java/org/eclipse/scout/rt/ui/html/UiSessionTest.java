@@ -70,7 +70,7 @@ public class UiSessionTest {
     m_beans = TestingUtility.registerBeans(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
-              public Long getDefaultValue() {
+          public Long getDefaultValue() {
             return 1L;
           }
         }),
