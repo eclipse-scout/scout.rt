@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
@@ -31,6 +32,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private final String m_id;
   private boolean m_initialized;
   private boolean m_disposed;
+  private final AtomicBoolean m_disposing = new AtomicBoolean();
   private final IJsonAdapter<?> m_parent;
 
   public AbstractJsonAdapter(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
@@ -111,8 +113,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public final void dispose() {
-    if (m_disposed) {
-      throw new IllegalStateException("Adapter already disposed");
+    if (!m_disposing.compareAndSet(false, true)) {
+      // Already disposing -> do nothing
+      // Using an atomic boolean makes sure the same adapter is not disposed twice at the same time from 2 different threads.
+      // This could happen if a model job fires an event which would dispose an adapter while the ui session is already disposing.
+      return;
     }
     detachModel();
     disposeChildAdapters();
