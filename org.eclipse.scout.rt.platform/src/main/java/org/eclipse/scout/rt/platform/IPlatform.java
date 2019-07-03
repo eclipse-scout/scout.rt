@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
 
@@ -28,14 +29,15 @@ public interface IPlatform {
      * This event signals that {@link IPlatform#getBeanManager()} was prepared with the beans found in the
      * {@link ClassInventory#get()} and may manipulated using {@link IBeanManager#registerBean(BeanMetaData)} etc.
      * <p>
-     * However, {@link IBean#getInstance()} is not available yet
+     * However, {@link IBean#getInstance()} is not available yet. This means, you cannot access {@link CONFIG}
+     * properties in this state.
      */
     BeanManagerPrepared,
 
     /**
      * This event signals that {@link IPlatform#getBeanManager()} is now valid and should not be manipulated anymore
      * <p>
-     * {@link IBean#getInstance()} is valid now.
+     * {@link IBean#getInstance()} is valid now and it is possible to access {@link CONFIG} properties.
      */
     BeanManagerValid,
 
