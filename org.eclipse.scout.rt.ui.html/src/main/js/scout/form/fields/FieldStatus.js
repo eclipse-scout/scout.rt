@@ -142,7 +142,7 @@ scout.FieldStatus.prototype._updatePopup = function(showStatus) {
 };
 
 scout.FieldStatus.prototype.showTooltip = function() {
-  if (!this.status) {
+  if (!this.status || !this.rendered) {
     return;
   }
   if (scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {

@@ -345,6 +345,39 @@ describe('Form', function() {
       expect(form.rootGroupBox.fields[0].destroyed).toBeTruthy();
     });
 
+    it('does not fail on form close if a field has focus and validation wants to show a warning', function(done) {
+      var form = helper.createFormWithOneField();
+      form.setDisplayHint(scout.Form.DisplayHint.DIALOG);
+      var field = helper.createField('DateField');
+      field.setValidator(function(value) {
+        throw scout.Status.warning({
+          message: 'Invalid value'
+        });
+      });
+      field.getValidationResult = function() {
+        // Form has to close (warning state is not supported yet in Scout JS)
+        return {
+          valid: true,
+          validByErrorStatus: true,
+          validByMandatory: true
+        };
+      };
+      field.setOwner(form.rootGroupBox);
+      form.rootGroupBox.insertField(field);
+      form.open()
+        .then(function() {
+          field.focus();
+          field.setValue(new Date());
+          expect(field.errorStatus.message).toBe('Invalid value');
+
+          // Field will be validated when it loses the focus which will happen when it is removed
+          // -> The warning cannot be displayed because the field status is already removed
+          // Test itself won't fail but there will be an error on console if it goes wrong. Don't know why.
+          return form.ok();
+        })
+        .catch(fail)
+        .then(done);
+    });
   });
 
   describe('cacheBounds', function() {
