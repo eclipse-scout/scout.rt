@@ -21,7 +21,8 @@
     "scripts"
   ],
   "scripts": {
-    "snapshot-version": "node scripts/snapshot-version"
+    "snapshot-version": "node scripts/snapshot-version",
+    "snapshot-cleanup": "node scripts/snapshot-cleanup"
   },
   "dependencies": {
     "npm": "^6.9.0",
@@ -53,7 +54,8 @@
     "karma-jasmine-html-reporter": "^1.4.2",
     "karma-junit-reporter": "^1.2.0",
     "karma-webpack": "^4.0.2",
-    "jasmine-core": "^3.4.0"
+    "jasmine-core": "^3.4.0",
+    "axios": "^0.19.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"

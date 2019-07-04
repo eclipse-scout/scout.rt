@@ -32,7 +32,7 @@ switch (script) {
   case 'test-server:stop': {
     // TODO default port wird angenommen
     const stopper = require('karma').stopper;
-    stopper.stop({port: 9876}, (exitCode) => {
+    stopper.stop({ port: 9876 }, exitCode => {
       if (exitCode === 0) {
         console.log('Server stop as initiated');
       }
@@ -45,15 +45,15 @@ switch (script) {
     break;
   }
   case 'build:dev': {
-    runWebpack({mode: 'development'});
+    runWebpack({ mode: 'development' });
     break;
   }
   case 'build:prod': {
-    runWebpack({mode: 'production'});
+    runWebpack({ mode: 'production' });
     break;
   }
   case 'build:dev:watch': {
-    runWebpackWatch({mode: 'development'});
+    runWebpackWatch({ mode: 'development' });
     break;
   }
   case 'snapshot-version': {
@@ -75,7 +75,7 @@ function runKarma(configFileName) {
   }
   const karmaConfig = cfg.parseConfig(configFilePath);
   const Server = require('karma').Server;
-  const serverInstance = new Server(karmaConfig, (exitCode) => {
+  const serverInstance = new Server(karmaConfig, exitCode => {
     console.log(`Karma has exited with ${exitCode}`);
     process.exit(exitCode);
   });
@@ -84,7 +84,7 @@ function runKarma(configFileName) {
 }
 
 function runWebpack(webPackArgs) {
-  const configFilePath = path.resolve(webpackConfigFileName)
+  const configFilePath = path.resolve(webpackConfigFileName);
   if (!fs.existsSync(configFilePath)) {
     // No config file found -> abort
     console.log(`Skipping webpack build (config file ${webpackConfigFileName} not found)`);
@@ -95,12 +95,12 @@ function runWebpack(webPackArgs) {
 }
 
 function runWebpackWatch(webPackArgs) {
-  const configFilePath = path.resolve(webpackConfigFileName)
+  const configFilePath = path.resolve(webpackConfigFileName);
   const compiler = createWebpackCompiler(configFilePath, webPackArgs);
   compiler.watch({}, logWebpack);
 }
 
-function createWebpackCompiler(configFilePath, webPackArgs){
+function createWebpackCompiler(configFilePath, webPackArgs) {
   const webpack = require('webpack');
   const conf = require(configFilePath);
   const webpackConfig = conf(process.env, webPackArgs);
