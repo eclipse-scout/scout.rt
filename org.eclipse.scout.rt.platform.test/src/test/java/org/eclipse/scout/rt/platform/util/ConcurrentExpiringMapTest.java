@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.holders.IntegerHolder;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap.ExpiringElement;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -266,6 +268,30 @@ public class ConcurrentExpiringMapTest {
     TestConcurrentExpiringMap map = new TestConcurrentExpiringMap(0, TimeUnit.MILLISECONDS, 0);
     ConcurrentExpiringMap mapCopy = new ConcurrentExpiringMap<Integer, String>(map, 100);
     assertEquals(0, mapCopy.size());
+  }
+
+  @Test
+  public void testReplaceIfDifferent() {
+    ConcurrentExpiringMap<Integer, String> map = new ConcurrentExpiringMap<>(10, TimeUnit.SECONDS);
+    assertFalse(map.replace(1, "old", "new"));
+
+    map.put(1, "orig");
+    assertTrue(map.replace(1, "orig", "new"));
+    assertFalse(map.replace(1, "orig", "new 2"));
+
+    assertTrue(map.replace(1, "new", "new 2"));
+    assertFalse(map.replace(2, "new 2", "other"));
+  }
+
+  @Test
+  public void testExpiringElementEquality() {
+    ExpiringElement<String> foo = new ExpiringElement<>("foo");
+    ExpiringElement<String> otherFoo = new ExpiringElement<>("foo");
+    ExpiringElement<String> bar = new ExpiringElement<>("bar");
+
+    assertEquals(foo, foo);
+    assertEquals(foo, otherFoo);
+    assertNotEquals(foo, bar);
   }
 
   /**
