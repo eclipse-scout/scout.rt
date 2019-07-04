@@ -125,9 +125,6 @@ scout.FocusContext.prototype._onFocusOut = function(event) {
  */
 scout.FocusContext.prototype._onRemove = function(event) {
   // This listener is installed on the focused element only.
-  //if (this.lastValidFocusedElement === event.target) {
-  //  this.lastValidFocusedElement = null;
-  //} XXX check if this is needed
   this.validateAndSetFocus(null, scout.filters.notSameFilter(event.target));
   event.stopPropagation(); // Prevent a possible 'parent' focus context to consume this event.
 };
