@@ -81,12 +81,12 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     return;
   }
 
-  this.$body = parentMenu.parentMenu.$subMenuBody;
+  this.$body = parentMenu.__originalParent.$subMenuBody;
   // move new body to back
   this.$body.insertBefore(parentMenu.$subMenuBody);
 
-  if (parentMenu.parentMenu._doActionTogglesSubMenu) {
-    parentMenu.parentMenu._doActionTogglesSubMenu();
+  if (parentMenu.__originalParent._doActionTogglesSubMenu) {
+    parentMenu.__originalParent._doActionTogglesSubMenu();
   }
 
   var actualBounds = this.htmlComp.offsetBounds();
@@ -178,7 +178,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
 
   var actualBounds = this.htmlComp.offsetBounds();
 
-  parentMenu.parentMenu.$subMenuBody = this.$body;
+  parentMenu.__originalParent.$subMenuBody = this.$body;
 
   var $all = this.$body.find('.' + 'menu-item');
   $all.removeClass('next-to-selected');
@@ -199,10 +199,10 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   if ($insertAfterElement.length) {
     parentMenu.$placeHolder.insertAfter($insertAfterElement);
   } else {
-    parentMenu.parentMenu.$subMenuBody.prepend(parentMenu.$placeHolder);
+    parentMenu.__originalParent.$subMenuBody.prepend(parentMenu.$placeHolder);
   }
 
-  this.$body.insertAfter(parentMenu.parentMenu.$subMenuBody);
+  this.$body.insertAfter(parentMenu.__originalParent.$subMenuBody);
   this.$body.prepend(parentMenu.$container);
   parentMenu.$container.toggleClass('expanded');
 
@@ -214,7 +214,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   if (animated) {
     this.bodyAnimating = true;
     var duration = 300;
-    parentMenu.parentMenu.$subMenuBody.css({
+    parentMenu.__originalParent.$subMenuBody.css({
       width: 'auto',
       height: 'auto'
     });
@@ -234,7 +234,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     });
 
     var endTopposition = 0 - targetBounds.height,
-      startTopposition = position.top - parentMenu.parentMenu.$subMenuBody.cssHeight(),
+      startTopposition = position.top - parentMenu.__originalParent.$subMenuBody.cssHeight(),
       topMargin = 0;
 
     // move new body to top of popup.
@@ -243,9 +243,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       queue: false,
       complete: function() {
         this.bodyAnimating = false;
-        if (parentMenu.parentMenu.$subMenuBody) {
-          scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
-          parentMenu.parentMenu.$subMenuBody.detach();
+        if (parentMenu.__originalParent.$subMenuBody) {
+          scout.scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
+          parentMenu.__originalParent.$subMenuBody.detach();
           this.$body.cssTop(topMargin);
           this._installScrollbars();
           this._updateFirstLastClass();
@@ -261,7 +261,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     });
 
     if (actualBounds.height !== targetBounds.height) {
-      parentMenu.parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
+      parentMenu.__originalParent.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
         duration: duration,
         queue: false
       });
@@ -287,9 +287,9 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     }
   } else {
     if (!initialSubMenuRendering) {
-      scout.scrollbars.uninstall(parentMenu.parentMenu.$subMenuBody, this.session);
+      scout.scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
     }
-    parentMenu.parentMenu.$subMenuBody.detach();
+    parentMenu.__originalParent.$subMenuBody.detach();
     this._installScrollbars();
     this._updateFirstLastClass();
   }
@@ -312,7 +312,7 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     }
 
     // prevent loosing original parent
-    var parentMenu = menu.parent;
+    var originalParent = menu.parent;
     if (this.cloneMenuItems && !menu.cloneOf) {
       // clone will recursively also clone all child actions.
       menu = menu.clone({
@@ -328,8 +328,8 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
     }
 
     // just set once because on second execution of this menu.parent is set to a popup
-    if (!menu.parentMenu) {
-      menu.parentMenu = parentMenu;
+    if (!menu.__originalParent) {
+      menu.__originalParent = originalParent;
     }
     menu.render(this.$body);
     this._attachMenuListeners(menu);

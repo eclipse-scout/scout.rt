@@ -15,7 +15,6 @@ scout.EllipsisMenu = function() {
   this.stackable = false;
   this.horizontalAlignment = 1;
   this.iconId = scout.icons.ELLIPSIS_V;
-  this.inheritAccessibility = false;
   this.tabbable = false;
   this.rightAligned = false;
   this._addPreserveOnPropertyChangeProperties(['childActions']);

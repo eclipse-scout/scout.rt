@@ -681,16 +681,21 @@ scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
   }
 
   var enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
+  this._updateEnabledComputed(enabledComputed);
+};
+
+scout.Widget.prototype._updateEnabledComputed = function(enabledComputed, enabledComputedForChildren) {
   this.setProperty('enabledComputed', enabledComputed);
 
   // Manually call _renderEnabled(), because _renderEnabledComputed() does not exist
   if (this.rendered) {
-    this._renderEnabled(); // refresh
+    this._renderEnabled();
   }
 
+  var computedStateForChildren = scout.nvl(enabledComputedForChildren, enabledComputed);
   this.children.forEach(function(child) {
     if (child.inheritAccessibility) {
-      child.recomputeEnabled(enabledComputed);
+      child.recomputeEnabled(computedStateForChildren);
     }
   });
 };

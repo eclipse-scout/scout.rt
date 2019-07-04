@@ -23,7 +23,7 @@ scout.Menu = function() {
    */
   this.overflown = false;
   /**
-   * This property is set if this is a subMenu. The property is set when this submenu is rendered.
+   * This property is set if this is a subMenu
    */
   this.parentMenu = null;
   this.popup = null;
@@ -34,7 +34,7 @@ scout.Menu = function() {
 
   this.menuFilter = null;
 
-  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable']);
+  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu']);
   this._addWidgetProperties('childActions');
 };
 scout.inherits(scout.Menu, scout.Action);
@@ -51,6 +51,7 @@ scout.Menu.MenuStyle = {
 
 scout.Menu.prototype._init = function(options) {
   scout.Menu.parent.prototype._init.call(this, options);
+  this._setChildActions(this.childActions);
 };
 
 /**
@@ -263,6 +264,86 @@ scout.Menu.prototype.isTabTarget = function() {
   return this.enabledComputed && this.visible && !this.overflown && (this.isButton() || !this.separator);
 };
 
+/**
+ * @override Widget.js
+ */
+scout.Menu.prototype.recomputeEnabled = function(parentEnabled) {
+  if (parentEnabled === undefined) {
+    parentEnabled = true;
+    // use the state of the container because the parent might be a menu which is only enabled because it has children with inheritAccessibility=false.
+    // in that case the parent menus enabledComputed state is wrong for the children because the actual state of the container is required to do a correct calculation.
+    var container = this._findRootMenu().parent;
+    if (container && container.initialized && container.enabledComputed !== undefined) {
+      parentEnabled = container.enabledComputed;
+    }
+  }
+
+  var enabledComputed;
+  var enabledStateForChildren;
+  if (this.enabled && this.inheritAccessibility && !parentEnabled && this.childActions.length > 0) {
+    // the enabledComputed state here depends on the child actions:
+    // - if there are childActions which have inheritAccessibility=false (recursively): this action must be enabledComputed=true so that these children can be reached
+    // - otherwise this menu is set to enabledComputed=false
+    enabledComputed = this._hasChildMenuWithoutInheritAccessibility();
+    if (enabledComputed) {
+      // this composite menu is only active because it has children with inheritAccessibility=true
+      // but child-menus should consider the container parent instead, otherwise all children would be enabled (because this composite menu is enabled now)
+      enabledStateForChildren = parentEnabled;
+    } else {
+      enabledStateForChildren = false;
+    }
+  } else {
+    enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
+    enabledStateForChildren = enabledComputed;
+  }
+
+  this._updateEnabledComputed(enabledComputed, enabledStateForChildren);
+};
+
+scout.Menu.prototype._findRootMenu = function() {
+  var menu = this;
+  var result;
+  while (menu) {
+    result = menu;
+    menu = menu.parentMenu;
+  }
+  return result;
+};
+
+scout.Menu.prototype._hasChildMenuWithoutInheritAccessibility = function() {
+  var childFound = false;
+  this.visitChildMenus(function(child) {
+    if (!child.inheritAccessibility) {
+      childFound = true;
+      return scout.TreeVisitResult.TERMINATE;
+    }
+    return scout.TreeVisitResult.CONTINUE;
+  });
+  return childFound;
+};
+
+/**
+ * cannot use Widget#visitChildren() here because the child actions are not always part of the children collection
+ * e.g. for ellipsis menus which declare childActions as 'PreserveOnPropertyChangeProperties'. this means the childActions are not automatically added to the children list even it is a widget property!
+ */
+scout.Menu.prototype.visitChildMenus = function(visitor) {
+  for (var i = 0; i < this.childActions.length; i++) {
+    var child = this.childActions[i];
+    if (child instanceof scout.Menu) {
+      var treeVisitResult = visitor(child);
+      if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
+        // Visitor wants to abort the visiting
+        return scout.TreeVisitResult.TERMINATE;
+      } else if (treeVisitResult !== scout.TreeVisitResult.SKIP_SUBTREE) {
+        treeVisitResult = child.visitChildMenus(visitor);
+        if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
+          return scout.TreeVisitResult.TERMINATE;
+        }
+      }
+    }
+  }
+};
+
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var hasText = scout.strings.hasText(this.text) && this.textVisible;
   var hasTextAndIcon = !!(hasText && this.iconId);
@@ -324,8 +405,40 @@ scout.Menu.prototype.isButton = function() {
   return scout.Action.ActionStyle.BUTTON === this.actionStyle;
 };
 
+scout.Menu.prototype.addChildActions = function(childActions) {
+  var newActions = this.childActions.slice();
+  scout.arrays.pushAll(newActions, scout.arrays.ensure(childActions));
+  this.setChildActions(newActions);
+};
+
 scout.Menu.prototype.setChildActions = function(childActions) {
   this.setProperty('childActions', childActions);
+};
+
+scout.Menu.prototype._setChildActions = function(childActions) {
+  // disconnect existing
+  this.childActions.forEach(function(childAction) {
+    childAction.parentMenu = null;
+  });
+
+  this._setProperty('childActions', childActions);
+
+  // connect new actions
+  this.childActions.forEach(function(childAction) {
+    childAction.parentMenu = this;
+  }.bind(this));
+
+  if (this.initialized) {
+    this.recomputeEnabled();
+  }
+};
+
+/**
+ * @override Widget.js
+ */
+scout.Menu.prototype._setInheritAccessibility = function(inheritAccessibility) {
+  this._setProperty('inheritAccessibility', inheritAccessibility);
+  this._findRootMenu().recomputeEnabled();
 };
 
 scout.Menu.prototype.setSelected = function(selected) {
@@ -395,5 +508,6 @@ scout.Menu.prototype.setMenuFilter = function(menuFilter) {
 scout.Menu.prototype.clone = function(model, options) {
   var clone = scout.Menu.parent.prototype.clone.call(this, model, options);
   this._deepCloneProperties(clone, 'childActions', options);
+  clone._setChildActions(clone.childActions);
   return clone;
 };

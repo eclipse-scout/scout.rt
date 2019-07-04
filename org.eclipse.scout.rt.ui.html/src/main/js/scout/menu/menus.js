@@ -173,7 +173,10 @@ scout.menus = {
     menu.remove();
     menu.overflow = true;
     menu.overflowMenu = ellipsis;
-    ellipsis.childActions.unshift(menu); // add as first element
+
+    var menusInEllipsis = ellipsis.childActions.slice();
+    menusInEllipsis.unshift(menu); // add as first element
+    ellipsis.setChildActions(menusInEllipsis);
   },
 
   removeMenuFromEllipsis: function(menu, $parent) {

@@ -18,26 +18,29 @@ scout.inherits(scout.CalendarModesMenu, scout.Menu);
 scout.CalendarModesMenu.prototype._init = function(model) {
   scout.CalendarModesMenu.parent.prototype._init.call(this, model);
   this.calendar = this.parent;
-  this.childActions.push(scout.create('CalendarModeMenu', {
+  var menusToAdd = [];
+  menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
     displayMode: scout.Calendar.DisplayMode.DAY,
     text: this.session.text('ui.CalendarDay')
   }));
-  this.childActions.push(scout.create('CalendarModeMenu', {
+  menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
     displayMode: scout.Calendar.DisplayMode.WORK_WEEK,
     text: this.session.text('ui.CalendarWorkWeek')
   }));
-  this.childActions.push(scout.create('CalendarModeMenu', {
+  menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
     displayMode: scout.Calendar.DisplayMode.WEEK,
     text: this.session.text('ui.CalendarWeek')
   }));
-  this.childActions.push(scout.create('CalendarModeMenu', {
+  menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
     displayMode: scout.Calendar.DisplayMode.MONTH,
     text: this.session.text('ui.CalendarMonth')
   }));
+  this.addChildActions(menusToAdd);
+
   this.childActions.forEach(function(menu) {
     menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
   }, this);
