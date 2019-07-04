@@ -94,8 +94,8 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
   private IRequestInterceptor m_requestInterceptor;
   private IResponseInterceptor m_responseInterceptor;
 
-  private Supplier<SocketWithInterception.IStreamInterceptor> m_socketReadInterceptor;
-  private Supplier<SocketWithInterception.IStreamInterceptor> m_socketWriteInterceptor;
+  private Supplier<SocketWithInterception.ISocketReadInterceptor> m_socketReadInterceptor;
+  private Supplier<SocketWithInterception.ISocketWriteInterceptor> m_socketWriteInterceptor;
 
   @Override
   protected HttpTransport createHttpTransport() {
@@ -144,12 +144,12 @@ public class TestingHttpClient extends DefaultHttpTransportManager {
     return this;
   }
 
-  public TestingHttpClient withSocketReadInterceptor(Supplier<SocketWithInterception.IStreamInterceptor> socketReadInterceptor) {
+  public TestingHttpClient withSocketReadInterceptor(Supplier<SocketWithInterception.ISocketReadInterceptor> socketReadInterceptor) {
     m_socketReadInterceptor = socketReadInterceptor;
     return this;
   }
 
-  public TestingHttpClient withSocketWriteInterceptor(Supplier<SocketWithInterception.IStreamInterceptor> socketWriteInterceptor) {
+  public TestingHttpClient withSocketWriteInterceptor(Supplier<SocketWithInterception.ISocketWriteInterceptor> socketWriteInterceptor) {
     m_socketWriteInterceptor = socketWriteInterceptor;
     return this;
   }

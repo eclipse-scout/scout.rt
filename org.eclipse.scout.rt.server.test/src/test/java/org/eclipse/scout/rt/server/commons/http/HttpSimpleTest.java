@@ -19,7 +19,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.IStreamInterceptor;
+import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketReadInterceptor;
+import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,17 +64,37 @@ public class HttpSimpleTest {
     System.out.println("# HttpClient.read\n" + m_clientRead);
   }
 
-  private IStreamInterceptor createClientReadInterceptor() {
-    return b -> {
-      m_clientRead.append((char) b);
-      return b;
+  private ISocketReadInterceptor createClientReadInterceptor() {
+    return new ISocketReadInterceptor() {
+      @Override
+      public int read(InputStream in, byte[] b, int off, int len) throws IOException {
+        int n = in.read(b, off, len);
+        m_clientRead.append(new String(b, off, len));
+        return n;
+      }
+
+      @Override
+      public int read(InputStream in) throws IOException {
+        int b = in.read();
+        m_clientRead.append((char) b);
+        return b;
+      }
     };
   }
 
-  private IStreamInterceptor createClientWriteInterceptor() {
-    return b -> {
-      m_clientWrite.append((char) b);
-      return b;
+  private ISocketWriteInterceptor createClientWriteInterceptor() {
+    return new ISocketWriteInterceptor() {
+      @Override
+      public void write(OutputStream out, byte[] b, int off, int len) throws IOException {
+        m_clientWrite.append(new String(b, off, len));
+        out.write(b, off, len);
+      }
+
+      @Override
+      public void write(OutputStream out, int b) throws IOException {
+        m_clientWrite.append((char) b);
+        out.write(b);
+      }
     };
   }
 

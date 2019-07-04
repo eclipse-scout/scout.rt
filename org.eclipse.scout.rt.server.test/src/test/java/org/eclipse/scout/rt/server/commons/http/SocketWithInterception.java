@@ -18,68 +18,52 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class SocketWithInterception extends Socket {
-  @FunctionalInterface
-  public interface IStreamInterceptor {
-    int intercept(int b) throws IOException;
+  public interface ISocketReadInterceptor {
+    int read(InputStream in) throws IOException;
+
+    int read(InputStream in, byte[] b, int off, int len) throws IOException;
   }
 
-  private IStreamInterceptor m_readInterceptor = b -> b;
-  private IStreamInterceptor m_writeInterceptor = b -> b;
+  public interface ISocketWriteInterceptor {
+    void write(OutputStream out, int b) throws IOException;
 
-  public SocketWithInterception withInterceptRead(IStreamInterceptor i) throws IOException {
-    if (i != null) {
-      m_readInterceptor = i;
-    }
+    void write(OutputStream out, byte[] b, int off, int len) throws IOException;
+  }
+
+  private ISocketReadInterceptor m_readInterceptor = null;
+  private ISocketWriteInterceptor m_writeInterceptor = null;
+
+  public SocketWithInterception withInterceptRead(ISocketReadInterceptor i) throws IOException {
+    m_readInterceptor = i;
     return this;
   }
 
-  public SocketWithInterception withInterceptWrite(IStreamInterceptor i) throws IOException {
-    if (i != null) {
-      m_writeInterceptor = i;
-    }
+  public SocketWithInterception withInterceptWrite(ISocketWriteInterceptor i) throws IOException {
+    m_writeInterceptor = i;
     return this;
   }
 
   @Override
   public InputStream getInputStream() throws IOException {
     return new FilterInputStream(super.getInputStream()) {
-      private boolean m_eof;
-
       @Override
       public int read() throws IOException {
-        if (m_eof) {
-          return -1;
+        if (m_readInterceptor != null) {
+          return m_readInterceptor.read(in);
         }
-        int i = in.read();
-        if (i >= 0) {
-          i = m_readInterceptor.intercept(i);
+        else {
+          return in.read();
         }
-        if (i < 0) {
-          m_eof = true;
-        }
-        return i;
       }
 
       @Override
       public int read(byte[] b, int off, int len) throws IOException {
-        if (m_eof) {
-          return -1;
+        if (m_readInterceptor != null) {
+          return m_readInterceptor.read(in, b, off, len);
         }
-        int n = in.read(b, off, len);
-        if (n < 0) {
-          m_eof = true;
+        else {
+          return in.read(b, off, len);
         }
-        for (int k = 0; k < n; k++) {
-          int i = ((int) b[off + k]) & 0xff;
-          i = m_readInterceptor.intercept(i);
-          if (i < 0) {
-            //fixture EOF
-            m_eof = true;
-            return k > 0 ? k : -1;
-          }
-          b[off + k] = (byte) i;
-        }
-        return n;
       }
     };
   }
@@ -89,18 +73,22 @@ public class SocketWithInterception extends Socket {
     return new FilterOutputStream(super.getOutputStream()) {
       @Override
       public void write(int b) throws IOException {
-        b = ((int) m_writeInterceptor.intercept((byte) b)) & 0xff;
-        out.write(b);
+        if (m_writeInterceptor != null) {
+          m_writeInterceptor.write(out, b);
+        }
+        else {
+          out.write(b);
+        }
       }
 
       @Override
       public void write(byte[] b, int off, int len) throws IOException {
-        for (int k = 0; k < len; k++) {
-          int i = ((int) b[off + k]) & 0xff;
-          i = m_readInterceptor.intercept(i);
-          b[off + k] = (byte) i;
+        if (m_writeInterceptor != null) {
+          m_writeInterceptor.write(out, b, off, len);
         }
-        out.write(b, off, len);
+        else {
+          out.write(b, off, len);
+        }
       }
     };
   }

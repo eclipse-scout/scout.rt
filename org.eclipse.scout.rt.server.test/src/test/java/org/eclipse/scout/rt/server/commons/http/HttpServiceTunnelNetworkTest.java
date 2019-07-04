@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.server.commons.http;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.CancellationException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,7 +32,8 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.concurrent.ICancellable;
-import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.IStreamInterceptor;
+import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketReadInterceptor;
+import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
 import org.eclipse.scout.rt.shared.INode;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.services.common.context.IRunMonitorCancelService;
@@ -99,13 +102,40 @@ public class HttpServiceTunnelNetworkTest {
 
   @Test
   public void testPostWithChunkedResponseAndSuccess() throws IOException, NoSuchMethodException, SecurityException {
-    m_client.withSocketReadInterceptor(() -> b -> {
-      m_clientRead.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
-      return b;
+    m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
+      @Override
+      public int read(InputStream in, byte[] buf, int off, int len) throws IOException {
+        int n = in.read(buf, off, len);
+        for (int i = 0; i < n; i++) {
+          int b = buf[i] & 0xff;
+          m_clientRead.append(b < 7 ? "#" + Integer.toHexString(b) : (char) b);
+        }
+        return n;
+      }
+
+      @Override
+      public int read(InputStream in) throws IOException {
+        int b = in.read();
+        m_clientRead.append(b < 7 ? "#" + Integer.toHexString(b) : (char) b);
+        return b;
+      }
     });
-    m_client.withSocketWriteInterceptor(() -> b -> {
-      m_clientWrite.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
-      return b;
+
+    m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
+      @Override
+      public void write(OutputStream out, byte[] buf, int off, int len) throws IOException {
+        for (int i = 0; i < len; i++) {
+          int b = buf[i] & 0xff;
+          m_clientWrite.append(b < 7 ? "#" + Integer.toHexString(b) : (char) b);
+        }
+        out.write(buf, off, len);
+      }
+
+      @Override
+      public void write(OutputStream out, int b) throws IOException {
+        m_clientWrite.append(b < 7 ? "#" + Integer.toHexString(b) : (char) b);
+        out.write(b);
+      }
     });
 
     HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl()) {
@@ -147,16 +177,16 @@ public class HttpServiceTunnelNetworkTest {
    */
   @Test
   public void testPostWithChunkedResponseThatIsCancelled() throws IOException, NoSuchMethodException, SecurityException, InterruptedException {
-    m_client.withSocketReadInterceptor(() -> new IStreamInterceptor() {
+    m_client.withSocketReadInterceptor(() -> new ISocketReadInterceptor() {
       int m_contentStart;
       int m_truncatedContentLength;
       int m_waitAfterContentBytes;
       final StringBuffer m_buf = new StringBuffer();
 
-      @Override
-      public int intercept(int b) throws IOException {
+      private int intercept(int b) throws IOException {
         m_clientRead.append((char) b);
         m_buf.append((char) b);
+
         Matcher m = Pattern.compile(Pattern.quote(X_TRUNCATE_BODY + ": ") + "([0-9]+)").matcher(m_buf.toString());
         if (m.find()) {
           m_truncatedContentLength = Integer.parseInt(m.group(1));
@@ -188,10 +218,46 @@ public class HttpServiceTunnelNetworkTest {
         }
         return b;
       }
+
+      @Override
+      public int read(InputStream in, byte[] buf, int off, int len) throws IOException {
+        int n = in.read(buf, off, len);
+        for (int i = 0; i < n; i++) {
+          int b = intercept(buf[i]);
+          if (b < 0) {
+            return i;
+          }
+          m_clientRead.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
+        }
+        return n;
+      }
+
+      @Override
+      public int read(InputStream in) throws IOException {
+        int b = intercept(in.read());
+        if (b < 0) {
+          return b;
+        }
+        m_clientRead.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
+        return b;
+      }
     });
-    m_client.withSocketWriteInterceptor(() -> b -> {
-      m_clientWrite.append((char) b);
-      return b;
+
+    m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
+      @Override
+      public void write(OutputStream out, byte[] buf, int off, int len) throws IOException {
+        for (int i = 0; i < len; i++) {
+          int b = buf[i];
+          m_clientWrite.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
+        }
+        out.write(buf, off, len);
+      }
+
+      @Override
+      public void write(OutputStream out, int b) throws IOException {
+        m_clientWrite.append(b < 30 ? "#" + Integer.toHexString(b) : (char) b);
+        out.write(b);
+      }
     });
 
     HttpServiceTunnel tunnel = new HttpServiceTunnel(m_server.getServletUrl()) {
