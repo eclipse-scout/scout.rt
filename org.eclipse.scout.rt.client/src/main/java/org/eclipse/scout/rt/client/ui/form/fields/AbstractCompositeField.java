@@ -32,16 +32,19 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 
 @ClassId("4a641cd4-801f-45d2-9f08-5798e20b03c4")
 public abstract class AbstractCompositeField extends AbstractFormField implements ICompositeField {
 
   private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
   private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
+  private static final ThreadLocal<Boolean> REPLACEMENT_LOOKUP_DONE = ThreadLocal.withInitial(() -> false);
 
   public AbstractCompositeField() {
     this(true);
@@ -290,8 +293,38 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
-    return CompositeFieldUtility.getWidgetByClass(this, getReplacingFieldClass(widgetClassToFind));
+  public <T extends IWidget> TreeVisitResult getWidgetByClassInternal(Holder<T> result, Class<T> widgetClassToFind) {
+    // Compared to the default implementation of AbstractWidget, this implementation allows the retrieval of a form field which extends another form field in the same group box.
+    // With the default implementation the retrieval would depend on the order of the form field in the group box.
+    // Since this is a very rare use case and something we would actually like to drop, it is only supported for form fields to support backward compatibility.
+    Class<T> classToFind = widgetClassToFind;
+    boolean replacementLookupDone = false;
+    if (!REPLACEMENT_LOOKUP_DONE.get()) {
+      // Do the replacement lookup only the first time a composite field is visited. The getReplacingFieldClass checks the parent fields anyway.
+      classToFind = getReplacingFieldClass(widgetClassToFind);
+      replacementLookupDone = true;
+      REPLACEMENT_LOOKUP_DONE.set(true);
+    }
+    try {
+      // Now use the the new classTofind to first check the composite field itself and then its children
+      TreeVisitResult visitResult = super.getWidgetByClassInternal(result, classToFind);
+      if (visitResult == TreeVisitResult.SKIP_SUBTREE || visitResult == TreeVisitResult.TERMINATE) {
+        return visitResult;
+      }
+      for (IWidget child : getChildren()) {
+        T widget = child.getWidgetByClass(classToFind);
+        if (widget != null) {
+          result.setValue(widget);
+          return TreeVisitResult.TERMINATE;
+        }
+      }
+    }
+    finally {
+      if (replacementLookupDone) {
+        REPLACEMENT_LOOKUP_DONE.remove();
+      }
+    }
+    return TreeVisitResult.SKIP_SUBTREE;
   }
 
   @Override
@@ -325,11 +358,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * @see Replace
    * @since 3.8.2
    */
-  private <T extends IWidget> Class<? extends T> getReplacingFieldClass(Class<T> c) {
+  private <T extends IWidget> Class<T> getReplacingFieldClass(Class<T> c) {
     // 1. check local replacements
     if (m_formFieldReplacements != null) {
       @SuppressWarnings("unchecked")
-      Class<? extends T> replacementFieldClass = (Class<? extends T>) m_formFieldReplacements.get(c);
+      Class<T> replacementFieldClass = (Class<T>) m_formFieldReplacements.get(c);
       if (replacementFieldClass != null) {
         return replacementFieldClass;
       }
@@ -340,7 +373,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       Map<Class<?>, Class<? extends IFormField>> mapping = ((AbstractForm) form).getFormFieldReplacementsInternal();
       if (mapping != null) {
         @SuppressWarnings("unchecked")
-        Class<? extends T> replacementFieldClass = (Class<? extends T>) mapping.get(c);
+        Class<T> replacementFieldClass = (Class<T>) mapping.get(c);
         if (replacementFieldClass != null) {
           return replacementFieldClass;
         }
@@ -353,7 +386,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         Map<Class<?>, Class<? extends IFormField>> parentReplacements = ((AbstractCompositeField) parentField).m_formFieldReplacements;
         if (parentReplacements != null) {
           @SuppressWarnings("unchecked")
-          Class<? extends T> replacementFieldClass = (Class<? extends T>) parentReplacements.get(c);
+          Class<T> replacementFieldClass = (Class<T>) parentReplacements.get(c);
           if (replacementFieldClass != null) {
             return replacementFieldClass;
           }

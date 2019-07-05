@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
@@ -84,7 +84,25 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   @Override
   public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
-    return CompositeFieldUtility.getWidgetByClass(this, widgetClassToFind);
+    assertNotNull(widgetClassToFind);
+
+    final Holder<T> result = new Holder<>(widgetClassToFind);
+    Function<IWidget, TreeVisitResult> visitor = w -> {
+      if (w instanceof AbstractWidget) {
+        return ((AbstractWidget) w).getWidgetByClassInternal(result, widgetClassToFind);
+      }
+      return TreeVisitResult.CONTINUE;
+    };
+    visit(visitor);
+    return result.getValue();
+  }
+
+  public <T extends IWidget> TreeVisitResult getWidgetByClassInternal(Holder<T> result, Class<T> widgetClassToFind) {
+    if (widgetClassToFind.isInstance(this)) {
+      result.setValue(widgetClassToFind.cast(this));
+      return TreeVisitResult.TERMINATE;
+    }
+    return TreeVisitResult.CONTINUE;
   }
 
   private void doInit(boolean recursive) {
