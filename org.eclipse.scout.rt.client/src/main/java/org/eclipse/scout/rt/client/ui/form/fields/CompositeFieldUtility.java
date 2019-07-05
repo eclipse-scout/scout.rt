@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -95,25 +93,25 @@ public final class CompositeFieldUtility {
     movedFormFieldsByClass.put(f.getClass(), f);
   }
 
+  /**
+   * @deprecated use {@link IWidget#getWidgetByClass(Class)} instead. Will be removed with 10.0
+   */
+  @Deprecated
   public static <T extends IWidget> T getWidgetByClass(final IWidget widget, final Class<T> classToFind) {
-    assertNotNull(widget);
-    assertNotNull(classToFind);
+    return widget.getWidgetByClass(classToFind);
+  }
 
-    final Holder<T> result = new Holder<>(classToFind);
-    Function<IWidget, TreeVisitResult> visitor = w -> {
-      if (w.getClass() == classToFind) {
-        result.setValue(classToFind.cast(w));
+  public static <T extends IWidget> TreeVisitResult getWidgetByClassInternal(final IWidget widget, Holder<T> result, Class<T> classToFind) {
+    if (widget.getClass() == classToFind) {
+      result.setValue(classToFind.cast(widget));
+    }
+    else {
+      T movedFieldByClass = getMovedFieldByClassIfComposite(widget, classToFind);
+      if (movedFieldByClass != null) {
+        result.setValue(movedFieldByClass);
       }
-      else {
-        T movedFieldByClass = getMovedFieldByClassIfComposite(w, classToFind);
-        if (movedFieldByClass != null) {
-          result.setValue(movedFieldByClass);
-        }
-      }
-      return result.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
-    };
-    widget.visit(visitor);
-    return result.getValue();
+    }
+    return result.getValue() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
   }
 
   private static <T extends IWidget> T getMovedFieldByClassIfComposite(IWidget widget, Class<T> classToFind) {

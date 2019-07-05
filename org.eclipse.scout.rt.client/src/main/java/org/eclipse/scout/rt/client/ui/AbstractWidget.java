@@ -21,11 +21,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -102,7 +102,25 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   @Override
   public <T extends IWidget> T getWidgetByClass(Class<T> widgetClassToFind) {
-    return CompositeFieldUtility.getWidgetByClass(this, widgetClassToFind);
+    assertNotNull(widgetClassToFind);
+
+    final Holder<T> result = new Holder<>(widgetClassToFind);
+    Function<IWidget, TreeVisitResult> visitor = w -> {
+      if (w instanceof AbstractWidget) {
+        return ((AbstractWidget) w).getWidgetByClassInternal(result, widgetClassToFind);
+      }
+      return TreeVisitResult.CONTINUE;
+    };
+    visit(visitor);
+    return result.getValue();
+  }
+
+  public <T extends IWidget> TreeVisitResult getWidgetByClassInternal(Holder<T> result, Class<T> widgetClassToFind) {
+    if (widgetClassToFind.isInstance(this)) {
+      result.setValue(widgetClassToFind.cast(this));
+      return TreeVisitResult.TERMINATE;
+    }
+    return TreeVisitResult.CONTINUE;
   }
 
   private void doInit(boolean recursive) {
@@ -206,7 +224,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   @Override
   public <T extends IWidget> TreeVisitResult visit(Function<T, TreeVisitResult> visitor, Class<T> type) {
-    return visit(new WidgetVisitorTypeAdapter<T>(visitor, type));
+    return visit(new WidgetVisitorTypeAdapter<>(visitor, type));
   }
 
   @Override
@@ -244,7 +262,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
   @SuppressWarnings("unchecked")
   protected <T extends IWidget> TreeVisitResult visit(IDepthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends IWidget>> childrenSupplier, Class<T> type) {
-    IDepthFirstTreeVisitor<IWidget> widgetVisitorTypeAdapter = new WidgetVisitorTypeAdapter<T>(visitor, type);
+    IDepthFirstTreeVisitor<IWidget> widgetVisitorTypeAdapter = new WidgetVisitorTypeAdapter<>(visitor, type);
     Function<IWidget, Collection<? extends IWidget>> cs = widget -> {
       if (type.isAssignableFrom(widget.getClass())) {
         childrenSupplier.apply((T) widget);
@@ -443,13 +461,17 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
 
     if (enabled && updateParents) {
       // also enable all parents
-      visitParents(field -> field.setEnabled(true, dimension));
+      visitParents(field -> {
+        field.setEnabled(true, dimension);
+      });
     }
 
     if (updateChildren) {
       // propagate change to children
       for (IWidget w : getChildren()) {
-        w.visit(field -> field.setEnabled(enabled, dimension));
+        w.visit(field -> {
+          field.setEnabled(enabled, dimension);
+        });
       }
     }
   }
@@ -482,6 +504,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     return propertySupport.setProperty(PROP_PARENT_WIDGET, w);
   }
 
+  @SuppressWarnings("RedundantIfStatement")
   @Override
   public boolean isEnabledIncludingParents() {
     if (!isEnabled()) {
@@ -491,7 +514,7 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
       return true;
     }
 
-    AtomicReference<Boolean> result = new AtomicReference<Boolean>(true);
+    AtomicReference<Boolean> result = new AtomicReference<>(true);
     visitParents(w -> {
       if (!w.isEnabled()) {
         result.set(false);

@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.reflect.BasicPropertySupport;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.reflect.IPropertyObserver;
@@ -162,6 +163,11 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public final <T> T optContribution(Class<T> contribution) {
     return m_contributionHolder.optContribution(contribution);
+  }
+
+  @Override
+  public <T extends IWidget> TreeVisitResult getWidgetByClassInternal(Holder<T> result, Class<T> widgetClassToFind) {
+    return CompositeFieldUtility.getWidgetByClassInternal(this, result, widgetClassToFind);
   }
 
   @Override
