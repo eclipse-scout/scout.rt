@@ -6,8 +6,8 @@ package ${package}.persistence.common;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class DoEntityBeanMapping<DO_ENTITY extends DoEntity, ENTITY_BEAN, VALUE> {

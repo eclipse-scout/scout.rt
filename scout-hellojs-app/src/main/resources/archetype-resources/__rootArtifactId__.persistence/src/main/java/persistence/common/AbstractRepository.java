@@ -8,7 +8,7 @@ import static ${package}.persistence.JooqSqlService.jooq;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.jooq.Record;
 import org.jooq.Table;
 

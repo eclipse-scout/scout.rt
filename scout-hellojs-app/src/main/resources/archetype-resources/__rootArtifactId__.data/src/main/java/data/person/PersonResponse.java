@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoList;
-import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.TypeName;
 
 @TypeName("${simpleArtifactName}.PersonResponse")
 public class PersonResponse extends DoEntity {
