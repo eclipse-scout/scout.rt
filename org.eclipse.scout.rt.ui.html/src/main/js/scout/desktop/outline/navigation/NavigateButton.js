@@ -26,7 +26,7 @@ scout.NavigateButton = function() {
    * Additional CSS class to be applied in _render method.
    */
   this._additionalCssClass = '';
-  this._addCloneProperties(['node', 'outline']);
+  this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
   this.inheritAccessibility = false;
 };
 scout.inherits(scout.NavigateButton, scout.Menu);
