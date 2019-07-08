@@ -51,7 +51,7 @@ public class LocalLookupCallTest {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     assertEquals("default value for 'active' property", TriState.UNDEFINED, lc.getActive());
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
-    assertEquals("rows lengh", 8, rows.size());
+    assertEquals("rows length", 8, rows.size());
   }
 
   @Test
@@ -59,7 +59,19 @@ public class LocalLookupCallTest {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setActive(TriState.TRUE);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
-    assertEquals("rows lengh", 6, rows.size());
+    assertEquals("rows length", 6, rows.size());
+  }
+
+  /**
+   * Key lookup must return row even when it is inactive (no filtering).
+   */
+  @Test
+  public void testGetDataByKey_InactiveRow() throws Exception {
+    P_LocalLookupCall lc = new P_LocalLookupCall();
+    lc.setActive(TriState.TRUE);
+    lc.setKey(ROW40_KEY);
+    List<? extends ILookupRow<Integer>> rows = lc.getDataByKey();
+    assertEquals("rows length", 1, rows.size());
   }
 
   @Test
@@ -67,7 +79,7 @@ public class LocalLookupCallTest {
     P_LocalLookupCall lc = new P_LocalLookupCall();
     lc.setActive(TriState.FALSE);
     List<? extends ILookupRow<Integer>> rows = lc.getDataByAll();
-    assertEquals("rows lengh", 2, rows.size());
+    assertEquals("rows length", 2, rows.size());
   }
 
   @Test

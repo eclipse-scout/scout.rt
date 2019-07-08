@@ -61,7 +61,11 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   }
 
   protected List<? extends ILookupRow<T>> interceptCreateLookupRows() {
-    return filterActiveLookupRows(execCreateLookupRows());
+    return execCreateLookupRows();
+  }
+
+  protected List<? extends ILookupRow<T>> createLookupRowsFiltered() {
+    return filterActiveLookupRows(interceptCreateLookupRows());
   }
 
   protected List<? extends ILookupRow<T>> filterActiveLookupRows(List<? extends ILookupRow<T>> allRows) {
@@ -104,7 +108,8 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   }
 
   /**
-   * Complete override using local data
+   * Complete override using local data. This method does intentionally <em>not</em> filter inactive lookup-rows. A
+   * key-lookup must return the lookup-row even when it is not active anymore.
    */
   @Override
   public List<? extends ILookupRow<T>> getDataByKey() {
@@ -132,7 +137,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   public List<? extends ILookupRow<T>> getDataByText() {
     List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getText());
-    List<? extends ILookupRow<T>> lookupRows = interceptCreateLookupRows();
+    List<? extends ILookupRow<T>> lookupRows = createLookupRowsFiltered();
     for (ILookupRow<T> row : lookupRows) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
@@ -204,7 +209,7 @@ public class LocalLookupCall<T> extends LookupCall<T> {
   public List<? extends ILookupRow<T>> getDataByAll() {
     List<ILookupRow<T>> list = new ArrayList<>();
     Pattern p = createSearchPattern(getAll());
-    for (ILookupRow<T> row : interceptCreateLookupRows()) {
+    for (ILookupRow<T> row : createLookupRowsFiltered()) {
       if (row.getText() != null && p.matcher(row.getText().toLowerCase()).matches()) {
         list.add(row);
       }
@@ -220,14 +225,14 @@ public class LocalLookupCall<T> extends LookupCall<T> {
     List<ILookupRow<T>> list = new ArrayList<>();
     Object parentKey = getRec();
     if (parentKey == null) {
-      for (ILookupRow<T> row : interceptCreateLookupRows()) {
+      for (ILookupRow<T> row : createLookupRowsFiltered()) {
         if (row.getParentKey() == null) {
           list.add(row);
         }
       }
     }
     else {
-      for (ILookupRow<T> row : interceptCreateLookupRows()) {
+      for (ILookupRow<T> row : createLookupRowsFiltered()) {
         if (parentKey.equals(row.getParentKey())) {
           list.add(row);
         }
