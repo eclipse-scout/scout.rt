@@ -34,7 +34,7 @@ scout.Menu = function() {
 
   this.menuFilter = null;
 
-  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu']);
+  this._addCloneProperties(['defaultMenu', 'menuTypes', 'overflow', 'stackable', 'separator', 'shrinkable', 'parentMenu', 'menuFilter']);
   this._addWidgetProperties('childActions');
 };
 scout.inherits(scout.Menu, scout.Action);
@@ -284,7 +284,7 @@ scout.Menu.prototype.recomputeEnabled = function(parentEnabled) {
     // the enabledComputed state here depends on the child actions:
     // - if there are childActions which have inheritAccessibility=false (recursively): this action must be enabledComputed=true so that these children can be reached
     // - otherwise this menu is set to enabledComputed=false
-    enabledComputed = this._hasChildMenuWithoutInheritAccessibility();
+    enabledComputed = this._hasAccessibleChildMenu();
     if (enabledComputed) {
       // this composite menu is only active because it has children with inheritAccessibility=true
       // but child-menus should consider the container parent instead, otherwise all children would be enabled (because this composite menu is enabled now)
@@ -310,10 +310,10 @@ scout.Menu.prototype._findRootMenu = function() {
   return result;
 };
 
-scout.Menu.prototype._hasChildMenuWithoutInheritAccessibility = function() {
+scout.Menu.prototype._hasAccessibleChildMenu = function() {
   var childFound = false;
   this.visitChildMenus(function(child) {
-    if (!child.inheritAccessibility) {
+    if (!child.inheritAccessibility && child.enabled /* do not use enabledComputed here*/ && child.visible) {
       childFound = true;
       return scout.TreeVisitResult.TERMINATE;
     }
@@ -441,6 +441,19 @@ scout.Menu.prototype._setInheritAccessibility = function(inheritAccessibility) {
   this._findRootMenu().recomputeEnabled();
 };
 
+/**
+ * @override Widget.js
+ */
+scout.Menu.prototype._setEnabled = function(enabled) {
+  this._setProperty('enabled', enabled);
+  this._findRootMenu().recomputeEnabled();
+};
+
+scout.Menu.prototype._setVisible = function(visible) {
+  this._setProperty('visible', visible);
+  this._findRootMenu().recomputeEnabled();
+};
+
 scout.Menu.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
@@ -503,6 +516,9 @@ scout.Menu.prototype.setDefaultMenu = function(defaultMenu) {
 
 scout.Menu.prototype.setMenuFilter = function(menuFilter) {
   this.setProperty('menuFilter', menuFilter);
+  this.childActions.forEach(function(child) {
+    child.setMenuFilter(menuFilter);
+  });
 };
 
 scout.Menu.prototype.clone = function(model, options) {

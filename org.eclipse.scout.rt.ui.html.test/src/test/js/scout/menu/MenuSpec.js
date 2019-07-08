@@ -388,6 +388,64 @@ describe("Menu", function() {
       expect(parent.enabled).toBe(false);
       expect(parent.enabledComputed).toBe(false);
     });
+
+    it('is updated if a child menus enabled or visible status changes', function() {
+      var menu = helper.createMenu({
+        text: 'menu',
+        inheritAccessibility: true,
+        enabled: true,
+        childActions: [{
+          objectType: 'Menu',
+          text: 'child0',
+          inheritAccessibility: true,
+          enabled: true
+        }, {
+          objectType: 'Menu',
+          text: 'child1',
+          inheritAccessibility: true,
+          enabled: true,
+          childActions: [{
+            objectType: 'Menu',
+            text: 'child1_0',
+            inheritAccessibility: false,
+            enabled: true
+          }]
+        }]
+      });
+
+      var parent = menu.parent;
+      parent.setEnabled(false);
+
+      expect(menu.inheritAccessibility).toBe(true);
+      expect(menu.enabled).toBe(true);
+      expect(menu.childActions.length).toBe(2);
+      expect(menu.enabledComputed).toBe(true);
+
+      expect(menu.childActions[0].childActions.length).toBe(0);
+      expect(menu.childActions[0].inheritAccessibility).toBe(true);
+      expect(menu.childActions[0].enabledComputed).toBe(false);
+
+      expect(menu.childActions[1].childActions.length).toBe(1);
+      expect(menu.childActions[1].inheritAccessibility).toBe(true);
+      expect(menu.childActions[1].enabledComputed).toBe(true);
+
+      expect(menu.childActions[1].childActions[0].inheritAccessibility).toBe(false);
+      expect(menu.childActions[1].childActions[0].enabled).toBe(true);
+      expect(menu.childActions[1].childActions[0].enabledComputed).toBe(true);
+
+      expect(parent.enabled).toBe(false);
+      expect(parent.enabledComputed).toBe(false);
+
+      // toggle the enabled and visible state of the child menu
+      menu.childActions[1].childActions[0].setEnabled(false);
+      expect(menu.enabledComputed).toBe(false);
+      menu.childActions[1].childActions[0].setEnabled(true);
+      expect(menu.enabledComputed).toBe(true);
+      menu.childActions[1].childActions[0].setVisible(false);
+      expect(menu.enabledComputed).toBe(false);
+      menu.childActions[1].childActions[0].setVisible(true);
+      expect(menu.enabledComputed).toBe(true);
+    });
   });
 
   describe('clone', function() {
