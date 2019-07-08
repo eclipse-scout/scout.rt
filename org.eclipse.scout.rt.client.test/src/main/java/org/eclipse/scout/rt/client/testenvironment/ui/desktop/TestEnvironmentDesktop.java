@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.client.testenvironment.ui.desktop;
 
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * {@link IDesktop} for Client Test Environment
  *
  * @author jbr
  */
+@ClassId("3240b80d-d6ef-461e-a625-6d42cc715471")
 public class TestEnvironmentDesktop extends AbstractDesktop {
 
   @Override

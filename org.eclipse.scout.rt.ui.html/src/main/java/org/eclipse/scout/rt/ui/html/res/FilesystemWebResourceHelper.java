@@ -1,12 +1,12 @@
 package org.eclipse.scout.rt.ui.html.res;
 
-import org.eclipse.scout.rt.platform.exception.PlatformException;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.eclipse.scout.rt.platform.exception.PlatformException;
 
 public class FilesystemWebResourceHelper extends AbstractWebResourceHelper {
 
@@ -30,8 +30,8 @@ public class FilesystemWebResourceHelper extends AbstractWebResourceHelper {
     return null;
   }
 
+  @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
   protected static Path findModuleRoot() {
-    // TODO [mvi]: add property to override root folder path
     Path workingDir = Paths.get("").toAbsolutePath();
     Path parentDir = workingDir.getParent();
     String folderName = workingDir.getFileName().toString();
