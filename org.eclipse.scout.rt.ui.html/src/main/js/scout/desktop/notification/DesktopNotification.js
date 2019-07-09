@@ -12,6 +12,7 @@ scout.DesktopNotification = function() {
   scout.DesktopNotification.parent.call(this);
   this.closable = true;
   this.duration = 5000;
+  this.htmlEnabled = false;
   this.removeTimeout;
   this._removing = false;
 };
@@ -48,8 +49,15 @@ scout.DesktopNotification.prototype._renderProperties = function() {
 };
 
 scout.DesktopNotification.prototype._renderMessage = function() {
-  var message = scout.nvl(scout.strings.nl2br(this.status.message), '');
-  this.$messageText.html(message);
+  var message = this.status.message || '';
+  if (this.htmlEnabled) {
+    this.$messageText.html(message);
+    // Add action to app-links
+    this.$messageText.find('.app-link')
+      .on('click', this._onAppLinkAction.bind(this));
+  } else {
+    this.$messageText.html(scout.strings.nl2br(message));
+  }
 };
 
 /**
@@ -139,4 +147,16 @@ scout.DesktopNotification.prototype.fadeOut = function() {
  */
 scout.DesktopNotification.prototype.invalidateLayoutTree = function() {
   // called by notification.js. Since desktop notification has no htmlComp, no need to invalidate
+};
+
+scout.DesktopNotification.prototype._onAppLinkAction = function(event) {
+  var $target = $(event.delegateTarget);
+  var ref = $target.data('ref');
+  this.triggerAppLinkAction(ref);
+};
+
+scout.DesktopNotification.prototype.triggerAppLinkAction = function(ref) {
+  this.trigger('appLinkAction', {
+    ref: ref
+  });
 };

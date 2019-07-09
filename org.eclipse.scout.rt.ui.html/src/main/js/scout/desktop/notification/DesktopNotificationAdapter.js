@@ -19,9 +19,17 @@ scout.DesktopNotificationAdapter.prototype._onWidgetClose = function(event) {
   });
 };
 
+scout.DesktopNotificationAdapter.prototype._onWidgetAppLinkAction = function(event) {
+  this._send('appLinkAction', {
+    ref: event.ref
+  });
+};
+
 scout.DesktopNotificationAdapter.prototype._onWidgetEvent = function(event) {
   if (event.type === 'close') {
     this._onWidgetClose(event);
+  } else if (event.type === 'appLinkAction') {
+    this._onWidgetAppLinkAction(event);
   } else {
     scout.DesktopNotificationAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }

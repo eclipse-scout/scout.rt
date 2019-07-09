@@ -44,5 +44,10 @@ public interface IDesktopNotification extends INotification {
    */
   boolean isClosable();
 
+  /**
+   * @return true, if the notification may contain html that needs to be rendered. false otherwise.
+   */
+  boolean isHtmlEnabled();
+
   IDesktopNotificationUIFacade getUIFacade();
 }

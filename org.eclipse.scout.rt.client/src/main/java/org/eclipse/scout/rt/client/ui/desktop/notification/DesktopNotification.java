@@ -10,20 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.notification;
 
+import java.util.function.Consumer;
+
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.notification.Notification;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("cd82392d-609d-44c2-ac41-87fca7a78646")
 public class DesktopNotification extends Notification implements IDesktopNotification {
 
   private final long m_duration;
   private final boolean m_closable;
+  private final boolean m_htmlEnabled;
+  private final Consumer<String> m_appLinkConsumer;
   private final IDesktopNotificationUIFacade m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
 
   /**
@@ -39,9 +43,7 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    * duration}.
    */
   public DesktopNotification(IStatus status) {
-    super(status);
-    m_duration = DEFAULT_DURATION;
-    m_closable = true;
+    this(status, DEFAULT_DURATION, true);
   }
 
   /**
@@ -54,9 +56,27 @@ public class DesktopNotification extends Notification implements IDesktopNotific
    *          see {@link #isClosable()}
    */
   public DesktopNotification(IStatus status, long duration, boolean closable) {
+    this(status, duration, closable, false, null);
+  }
+
+  /**
+   * Creates a notification with the given attributes.
+   *
+   * @param status
+   * @param duration
+   *          see {@link #getDuration()}
+   * @param closable
+   *          see {@link #isClosable()}
+   * @param htmlEnabled
+   *          see {@link #isHtmlEnabled()}
+   * @param appLinkConsumer
+   */
+  public DesktopNotification(IStatus status, long duration, boolean closable, boolean htmlEnabled, Consumer<String> appLinkConsumer) {
     super(status);
     m_duration = duration;
     m_closable = closable;
+    m_htmlEnabled = htmlEnabled;
+    m_appLinkConsumer = appLinkConsumer;
   }
 
   @Override
@@ -70,6 +90,11 @@ public class DesktopNotification extends Notification implements IDesktopNotific
   }
 
   @Override
+  public boolean isHtmlEnabled() {
+    return m_htmlEnabled;
+  }
+
+  @Override
   public IDesktopNotificationUIFacade getUIFacade() {
     return m_uiFacade;
   }
@@ -79,6 +104,13 @@ public class DesktopNotification extends Notification implements IDesktopNotific
     @Override
     public void fireClosedFromUI() {
       IDesktop.CURRENT.get().getUIFacade().removedNotificationFromUI(DesktopNotification.this);
+    }
+
+    @Override
+    public void fireAppLinkActionFromUI(String ref) {
+      if (m_appLinkConsumer != null) {
+        m_appLinkConsumer.accept(ref);
+      }
     }
   }
 }
