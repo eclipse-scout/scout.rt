@@ -4,11 +4,14 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.migration.ecma6.regex.Function;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -21,9 +24,10 @@ public class T500_CreateClasses extends AbstractTask{
   private static Pattern CONSTUCTOR_REGEX = Pattern.compile("(\\s+)([^\\.\\s]*)\\.([^\\.\\s]*)\\s*\\=\\s*function\\(\\)\\s*\\{");
 //  scout.inherits(scout.FormField, scout.Widget);
   private Pattern m_functionOrConstructorRegex;
-  private static Pattern INHERIT_REGEX = Pattern.compile("scout\\.inherits\\(^\\,]*\\,\\s([^\\)]*\\)\\;)");
+  private static Pattern INHERIT_REGEX = Pattern.compile("scout\\.inherits\\([^\\,]*\\,\\s*([^\\)]*)\\)\\;");
   private String m_constuctorName = "TODO MIG [constuctorName]";
   private List<Function> m_functions = new ArrayList<>();
+  private String m_superClass = null;
 
 
   @Override
@@ -34,20 +38,22 @@ public class T500_CreateClasses extends AbstractTask{
   @Override
   public boolean accept(Path file, Context context) {
     return FileUtility.hasExtension(file, "js")
-      ;
-//      && file.endsWith(Paths.get("src/main/js/scout/form/fields/FormField.js"));
+//      ;
+      && file.endsWith(Paths.get("src/main/js/scout/form/fields/FormField.js"));
   }
 
   @Override
   public void process(Path file, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(file);
     try {
+      JsFileParser parser = new JsFileParser(workingCopy);
+      parser.parse();
       parseClasses(workingCopy, context);
       readSuperClass(workingCopy,context);
       createClasses(workingCopy);
-    }catch (VetoException e){
+    }catch (VetoException| IOException e){
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
-      System.out.println("ERROR ["+file.getFileName()+"]: "+e.getDisplayMessage());
+      System.out.println("ERROR ["+file.getFileName()+"]: "+e.getMessage());
     }
 //    String source = workingCopy.getSource();
 //    Matcher matcher = CONSTUCTOR_REGEX.matcher(source);
@@ -83,11 +89,16 @@ public class T500_CreateClasses extends AbstractTask{
   }
 
   protected void readSuperClass(WorkingCopy workingCopy, Context context){
-
+    String source = workingCopy.getSource();
+    Matcher matcher = INHERIT_REGEX.matcher(source);
+    if(matcher.find()){
+      m_superClass = matcher.group(1);
+    }
 
   }
 
   protected void createClasses(WorkingCopy workingCopy){
+
 
 
   }

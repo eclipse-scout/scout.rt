@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class Migration {
 
+  private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
 
 
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsiagbsicrm\\com.bsiag.bsicrm.ui.html");
@@ -29,7 +30,6 @@ public class Migration {
 
   private List<ITask> tasks ;
   private Context m_context;
-  private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
 
   public static void main(String[] args) {
     try {
