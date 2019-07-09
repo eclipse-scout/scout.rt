@@ -90,7 +90,7 @@
   </modules>
 
   <properties>
-    <scout.base.version>10.0.0</scout.base.version>
+    <scout.base.version>10</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
