@@ -212,8 +212,8 @@
   & > .calendar-component-leftcolorborder {
     position: relative;
     float: left;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 4px;
     margin-right: 4px;
@@ -353,7 +353,6 @@
 
 .calendar-grid {
   display: block;
-  vertical-align: top;
   height: calc(~'100% - 25px');
 }
 
@@ -363,7 +362,6 @@
 
 .calendar-top-grid {
   display: block;
-  vertical-align: top;
   overflow: hidden;
   border-bottom: 1px solid @palette-gray-3;
   height: 105px;
@@ -380,7 +378,7 @@
   white-space: nowrap;
 }
 
-.calendar-week-allday-container{
+.calendar-week-allday-container {
   height: 80px;
 }
 
@@ -411,12 +409,12 @@
   padding: 0;
 
   &:not(.calendar-no-label)::before {
-  position: absolute;
-  content: attr(data-day-name);
-  color: @calendar-day-color;
-  left: 7px;
-  top: 7px;
-  z-index: 1; /* draw over calendar items */
+    position: absolute;
+    content: attr(data-day-name);
+    color: @calendar-day-color;
+    left: 7px;
+    top: 7px;
+    z-index: 1; /* draw over calendar items */
   }
 
   &.out {
@@ -475,8 +473,8 @@
 
       /* Compensate for open top padding */
       & > .calendar-component-leftcolorborder {
-        height: calc( 100% ~'+' 10px );
-        top:-10px;
+        height: calc(~'100% + 10px');
+        top: -10px;
       }
 
       &::before {

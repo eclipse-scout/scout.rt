@@ -85,9 +85,9 @@ scout.CalendarComponent.prototype._render = function() {
     }
 
     if (this.fullDay && !this.parent._isMonth()) {
-      $day = this._findDayInTopGrid(partDay);
+      $day = this._findDayInGrid(partDay, this.parent.$topGrid);
     } else {
-      $day = this._findDayInGrid(partDay);
+      $day = this._findDayInGrid(partDay, this.parent.$grid);
     }
     if (!$day) {
       // next day, partDay not found in grid
@@ -155,16 +155,9 @@ scout.CalendarComponent.prototype._getHours = function(date) {
   return d.getHours() + d.getMinutes() / 60;
 };
 
-scout.CalendarComponent.prototype._findDayInGrid = function(date) {
-  return this.parent.$grid.find('.calendar-day').filter(
+scout.CalendarComponent.prototype._findDayInGrid = function(date, $grid) {
+  return $grid.find('.calendar-day').filter(
     function(i, elem) {
-      return scout.dates.isSameDay($(this).data('date'), date);
-    }).eq(0);
-};
-
-scout.CalendarComponent.prototype._findDayInTopGrid = function(date) {
-  return this.parent.$topGrid.find('.calendar-day').filter(
-    function() {
       return scout.dates.isSameDay($(this).data('date'), date);
     }).eq(0);
 };

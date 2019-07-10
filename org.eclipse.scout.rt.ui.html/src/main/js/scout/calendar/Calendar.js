@@ -1001,11 +1001,12 @@ scout.Calendar.prototype._arrangeComponents = function() {
     }
   }
 
-  // If we're in the non-month views, the time can scroll. Add scrollbars
+
+  scout.scrollbars.uninstall(this.$grid, this.session);
   if (this._isMonth()) {
-    scout.scrollbars.uninstall(this.$grid, this.session);
     this.$grid.removeClass('calendar-scrollable-components');
   } else {
+    // If we're in the non-month views, the time can scroll. Add scrollbars
     this.$grid.addClass('calendar-scrollable-components');
     scout.scrollbars.install(this.$grid, {
       parent: this,

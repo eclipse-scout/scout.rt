@@ -21,7 +21,6 @@ scout.CalendarLayout.prototype.layout = function($container) {
     headerHeight = 0,
     $yearContainer = this.calendar._yearPanel.$container,
     $grids = this.calendar.$grids,
-    $grid = this.calendar.$grid,
     $header = this.calendar.$header;
 
   height += $container.cssMarginTop() + $container.cssMarginBottom();
@@ -38,7 +37,7 @@ scout.CalendarLayout.prototype.layout = function($container) {
 
   headerHeight = $header.outerHeight(true);
   $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
-  $grids.css('height', 'calc(100% - ' + (headerHeight + $grid.cssMarginY()) + 'px)');
+  $grids.css('height', 'calc(100% - ' + (headerHeight + $grids.cssMarginY()) + 'px)');
 
   this.calendar.layoutSize();
   this.calendar.layoutYearPanel();
