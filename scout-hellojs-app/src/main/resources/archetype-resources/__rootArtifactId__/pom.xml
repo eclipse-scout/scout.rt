@@ -13,7 +13,7 @@
 
   <properties>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <org.eclipse.scout.rt.version>10-SNAPSHOT</org.eclipse.scout.rt.version>
+    <org.eclipse.scout.rt.version>10.0.0-SNAPSHOT</org.eclipse.scout.rt.version>
     <org.glassfish.jersey.version>2.27</org.glassfish.jersey.version>
     <org.jooq.version>3.11.9</org.jooq.version>
     <derby.version>10.14.2.0</derby.version>
