@@ -481,4 +481,11 @@ public interface IWidget extends IPropertyObserver, IStyleable, IEnabledDimensio
    *          {@code false}.
    */
   <T extends IWidget> boolean visitParents(Predicate<T> visitor, Class<T> typeFilter);
+
+  void scrollToTop();
+
+  void addWidgetListener(WidgetListener listener);
+
+  void removeWidgetListener(WidgetListener listener);
+
 }

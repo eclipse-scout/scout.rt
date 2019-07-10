@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -47,6 +48,8 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
   private static final Logger LOG = LoggerFactory.getLogger(AbstractWidget.class);
   private static final NamedBitMaskHelper ENABLED_BIT_HELPER = new NamedBitMaskHelper(IDimensions.ENABLED, IDimensions.ENABLED_GRANTED);
   private static final String PROP_ENABLED_BYTE = "enabledByte";
+
+  private List<WidgetListener> m_listeners;
 
   public AbstractWidget() {
     this(true);
@@ -548,4 +551,31 @@ public abstract class AbstractWidget extends AbstractPropertyObserver implements
     }
     return simpleClassId;
   }
+
+  @Override
+  public void scrollToTop() {
+    fireWidgetEvent(new WidgetEvent(this, WidgetEvent.TYPE_SCROLL_TO_TOP));
+  }
+
+  protected void fireWidgetEvent(WidgetEvent event) {
+    if (m_listeners != null) {
+      m_listeners.forEach(listener -> listener.widgetChanged(event));
+    }
+  }
+
+  @Override
+  public void addWidgetListener(WidgetListener listener) {
+    if (m_listeners == null) {
+      m_listeners = new ArrayList<>();
+    }
+    m_listeners.add(listener);
+  }
+
+  @Override
+  public void removeWidgetListener(WidgetListener listener) {
+    if (m_listeners != null) {
+      m_listeners.remove(listener);
+    }
+  }
+
 }

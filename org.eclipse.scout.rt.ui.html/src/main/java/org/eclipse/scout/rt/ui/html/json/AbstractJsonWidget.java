@@ -11,12 +11,18 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
+import org.eclipse.scout.rt.client.ui.WidgetEvent;
+import org.eclipse.scout.rt.client.ui.WidgetListener;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 
 /**
  * @since 8.0
  */
 public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJsonPropertyObserver<T> {
+
+  protected static final String EVENT_SCROLL_TO_TOP = "scrollToTop";
+
+  private WidgetListener m_listener;
 
   public AbstractJsonWidget(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -54,5 +60,29 @@ public abstract class AbstractJsonWidget<T extends IWidget> extends AbstractJson
         return getModel().isLoading();
       }
     });
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+    m_listener = event -> {
+      if (event.getType() == WidgetEvent.TYPE_SCROLL_TO_TOP) {
+        handleModelScrollTopTop();
+      }
+      else {
+        throw new IllegalStateException("Unsupported event type " + event.getType());
+      }
+    };
+    getModel().addWidgetListener(m_listener);
+  }
+
+  protected void handleModelScrollTopTop() {
+    addActionEvent(EVENT_SCROLL_TO_TOP);
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+    getModel().removeWidgetListener(m_listener);
   }
 }

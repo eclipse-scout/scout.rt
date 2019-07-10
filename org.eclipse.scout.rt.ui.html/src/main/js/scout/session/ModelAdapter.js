@@ -383,7 +383,11 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
  * The default impl. only logs a warning that the event is not supported.
  */
 scout.ModelAdapter.prototype.onModelAction = function(event) {
-  $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
+  if (event.type === 'scrollToTop') {
+    this.widget.scrollToTop();
+  } else {
+    $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
+  }
 };
 
 scout.ModelAdapter.prototype.toString = function() {
