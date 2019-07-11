@@ -389,6 +389,52 @@ describe("Menu", function() {
       expect(parent.enabledComputed).toBe(false);
     });
 
+    it('depends on next parent with inheritAccessibility=false if this.inheritAccessibility=true', function() {
+      var menu = helper.createMenu({
+        text: 'menu',
+        inheritAccessibility: true,
+        enabled: true,
+        childActions: [{
+          objectType: 'Menu',
+          text: 'child1',
+          inheritAccessibility: false,
+          enabled: true,
+          childActions: [{
+            objectType: 'Menu',
+            text: 'child1_0',
+            inheritAccessibility: true,
+            enabled: true
+          }]
+        }]
+      });
+
+      var parent = menu.parent;
+      parent.setEnabled(false);
+
+      expect(menu.inheritAccessibility).toBe(true);
+      expect(menu.enabled).toBe(true);
+      expect(menu.childActions.length).toBe(1);
+      expect(menu.enabledComputed).toBe(true);
+
+      expect(menu.childActions[0].childActions.length).toBe(1);
+      expect(menu.childActions[0].inheritAccessibility).toBe(false);
+      expect(menu.childActions[0].enabledComputed).toBe(true);
+
+      expect(menu.childActions[0].childActions[0].inheritAccessibility).toBe(true);
+      expect(menu.childActions[0].childActions[0].enabled).toBe(true);
+      expect(menu.childActions[0].childActions[0].enabledComputed).toBe(true);
+
+      expect(parent.enabled).toBe(false);
+      expect(parent.enabledComputed).toBe(false);
+
+      // explicitly call recompute on leaf without passing a parent-state
+      menu.childActions[0].childActions[0].recomputeEnabled();
+
+      expect(menu.childActions[0].childActions[0].inheritAccessibility).toBe(true);
+      expect(menu.childActions[0].childActions[0].enabled).toBe(true);
+      expect(menu.childActions[0].childActions[0].enabledComputed).toBe(true); // must stay true!
+    });
+
     it('is updated if a child menus enabled or visible status changes', function() {
       var menu = helper.createMenu({
         text: 'menu',

@@ -269,13 +269,7 @@ scout.Menu.prototype.isTabTarget = function() {
  */
 scout.Menu.prototype.recomputeEnabled = function(parentEnabled) {
   if (parentEnabled === undefined) {
-    parentEnabled = true;
-    // use the state of the container because the parent might be a menu which is only enabled because it has children with inheritAccessibility=false.
-    // in that case the parent menus enabledComputed state is wrong for the children because the actual state of the container is required to do a correct calculation.
-    var container = this._findRootMenu().parent;
-    if (container && container.initialized && container.enabledComputed !== undefined) {
-      parentEnabled = container.enabledComputed;
-    }
+    parentEnabled = this._getInheritedAccessibility();
   }
 
   var enabledComputed;
@@ -298,6 +292,34 @@ scout.Menu.prototype.recomputeEnabled = function(parentEnabled) {
   }
 
   this._updateEnabledComputed(enabledComputed, enabledStateForChildren);
+};
+
+/**
+ * Calculates the inherited enabled state of this menu. This is the enabled state of the next relevant parent.
+ * A relevant parent is either
+ * - the next parent menu with inheritAccessibility=false
+ * - or the container of the menu (the parent of the root menu)
+ *
+ * The enabled state of the container must be used because the parent menu might be a menu which is only enabled because it has children with inheritAccessibility=false.
+ * One exception: if a parent menu itself is inheritAccessibility=false. Then the container is not relevant anymore but this parent is taken instead.
+ */
+scout.Menu.prototype._getInheritedAccessibility = function() {
+  var menu = this;
+  var rootMenu = menu;
+  while (menu) {
+    if (!menu.inheritAccessibility) {
+      // not inherited. no need to check any more parent widgets
+      return menu.enabled; /* do not use enabledComputed here because the parents have no effect */
+    }
+    rootMenu = menu;
+    menu = menu.parentMenu;
+  }
+
+  var container = rootMenu.parent;
+  if (container && container.initialized && container.enabledComputed !== undefined) {
+    return container.enabledComputed;
+  }
+  return true;
 };
 
 scout.Menu.prototype._findRootMenu = function() {
