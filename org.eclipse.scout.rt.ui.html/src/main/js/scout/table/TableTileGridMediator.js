@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+
 /**
  * Delegates events between the Table and it's internal TileGrid.
  *

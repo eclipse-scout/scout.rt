@@ -33,7 +33,7 @@ scout.addAppListener = function(type, func) {
 };
 
 /**
-    session.start();
+ *  session.start();
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
  */
 scout.inherits = function(childCtor, parentCtor) {
