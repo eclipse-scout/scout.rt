@@ -20,7 +20,6 @@ public class Migration {
 
   private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
 
-
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsiagbsicrm\\com.bsiag.bsicrm.ui.html");
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsistudio\\com.bsiag.bsistudio.lab.ui.html");
   private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\org.eclipse.scout.rt\\org.eclipse.scout.rt.ui.html");
@@ -28,7 +27,7 @@ public class Migration {
   private static String NAMESPACE = "scout";
   private static boolean CLEAN_TARGET = true;
 
-  private List<ITask> tasks ;
+  private List<ITask> m_tasks;
   private Context m_context;
 
   public static void main(String[] args) {
@@ -55,8 +54,8 @@ public class Migration {
     // setup context properties
     BEANS.all(IContextProperty.class).forEach(contextProperty -> contextProperty.setup(m_context));
 
-    tasks = BEANS.all(ITask.class);
-    tasks.forEach(task -> task.setup(m_context));
+    m_tasks = BEANS.all(ITask.class);
+    m_tasks.forEach(task -> task.setup(m_context));
   }
 
   public void run() throws IOException {
@@ -72,14 +71,20 @@ public class Migration {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
-        processFile( file, m_context);
+        processFile(file, m_context);
         return FileVisitResult.CONTINUE;
       }
 
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         String dirName = dir.getFileName().toString();
-        if("target".equalsIgnoreCase(dirName)){
+        if ("target".equalsIgnoreCase(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        if (".git".equals(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        if ("node_modules".equals(dirName)) {
           return FileVisitResult.SKIP_SUBTREE;
         }
         return FileVisitResult.CONTINUE;
@@ -91,13 +96,13 @@ public class Migration {
   private void processFile(Path file, Context context) {
     // create working copy
     context.ensureWorkingCopy(file);
-    tasks.stream().filter(task -> task.accept(file, context))
+    m_tasks.stream().filter(task -> task.accept(file, context))
         .forEach(task -> task.process(file, context));
 
   }
 
   private void writeWorkingCopies() {
-    if(CLEAN_TARGET){
+    if (CLEAN_TARGET) {
       try {
         FileUtility.deleteDirectory(m_context.getTargetRootDirectory());
       }
@@ -108,16 +113,17 @@ public class Migration {
     m_context.getWorkingCopies().forEach(workingCopy -> writeWorkingCopy(workingCopy));
   }
 
-  private void writeWorkingCopy(WorkingCopy workingCopy){
+  private void writeWorkingCopy(WorkingCopy workingCopy) {
     try {
 
-    final Path destination ;
-    if(workingCopy.getRelativeTargetPath() != null){
-      destination = TARGET_ROOT_DIR.resolve(workingCopy.getRelativeTargetPath());
-    }else{
-      Path relativePath = SOURCE_ROOT_DIRECTORY.relativize(workingCopy.getPath());
-      destination = TARGET_ROOT_DIR.resolve(relativePath);
-    }
+      final Path destination;
+      if (workingCopy.getRelativeTargetPath() != null) {
+        destination = TARGET_ROOT_DIR.resolve(workingCopy.getRelativeTargetPath());
+      }
+      else {
+        Path relativePath = SOURCE_ROOT_DIRECTORY.relativize(workingCopy.getPath());
+        destination = TARGET_ROOT_DIR.resolve(relativePath);
+      }
       workingCopy.persist(destination);
     }
     catch (IOException e) {
