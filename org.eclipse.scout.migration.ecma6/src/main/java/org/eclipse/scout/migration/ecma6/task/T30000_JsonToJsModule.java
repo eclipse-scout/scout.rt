@@ -133,7 +133,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
   protected String migratePlaceholderTextKey(String key, Path file, Set<String> importsToAdd) {
     Assertions.assertTrue(StringUtility.hasText(key), "Empty textKey placeholder in json model '{}'.", file);
     // TODO: improve nls lookup?
-    // TODO: how is scout.texts migrated? whats the new name/import?
     importsToAdd.add(SCOUT_IMPORT);
     return "scout.texts.resolveText('" + key + "', " + MODEL_OWNER_PARAM_NAME + ".session.locale.languageTag)";
   }
@@ -161,7 +160,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
       }
     }
     importsToAdd.add(SCOUT_IMPORT);
-    // TODO: how is scout.objects migrated? whats the new name/import?
     return "scout.objects.resolveConst('" + constValue + "')"; // default migration
   }
 }
