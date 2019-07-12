@@ -162,7 +162,8 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     if (dataObjectTypeVersion != null) {
       // entity class type has a type version, check deserialized type version against entity class type version
       if (!dataObjectTypeVersion.equals(version)) {
-        LOG.warn("Found version mismatch while deserializing DoEntity '{}'. Data object version (in class file) '{}', deserialized data version '{}'", entity.getClass(), dataObjectTypeVersion, version);
+        LOG.warn("Found version mismatch while deserializing DoEntity {}. Data object version (in class file) '{}', deserialized data version '{}'",
+            (entity.getClass() == null ? null : entity.getClass().getName()), dataObjectTypeVersion, version);
       }
     }
     else {
@@ -237,6 +238,6 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     else if (BEANS.getBeanManager().isBean(entityType)) {
       return BEANS.get(entityType);
     }
-    throw JsonMappingException.from(ctxt, "Could not instantiate bean,  " + entityType + " is not a Scout bean");
+    throw JsonMappingException.from(ctxt, "Could not instantiate class, " + (entityType == null ? null : entityType.getName()) + " is not a Scout bean");
   }
 }
