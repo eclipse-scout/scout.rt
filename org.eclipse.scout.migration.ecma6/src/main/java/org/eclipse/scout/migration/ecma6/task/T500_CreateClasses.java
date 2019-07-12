@@ -4,12 +4,11 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
-import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
+import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.regex.Function;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,12 +45,11 @@ public class T500_CreateClasses extends AbstractTask{
   public void process(Path file, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(file);
     try {
-      JsFileParser parser = new JsFileParser(workingCopy);
-      parser.parse();
-      parseClasses(workingCopy, context);
-      readSuperClass(workingCopy,context);
-      createClasses(workingCopy);
-    }catch (VetoException| IOException e){
+
+//      parseClasses(workingCopy, context);
+//      readSuperClass(workingCopy,context);
+      createClasses(workingCopy, context);
+    }catch (VetoException e){
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
       System.out.println("ERROR ["+file.getFileName()+"]: "+e.getMessage());
     }
@@ -97,9 +95,8 @@ public class T500_CreateClasses extends AbstractTask{
 
   }
 
-  protected void createClasses(WorkingCopy workingCopy){
-
-
+  protected void createClasses(WorkingCopy workingCopy, Context context){
+    JsFile jsFile = context.ensureJsFile(workingCopy);
 
   }
 }

@@ -10,6 +10,7 @@ public class WorkingCopy {
 
   private final Path m_path;
   private Path m_relativeTargetPath;
+  private String m_initialSource;
   private String m_source;
 
   public WorkingCopy(Path path){
@@ -32,6 +33,13 @@ public class WorkingCopy {
     return m_source != null;
   }
 
+  public String getInitialSource() {
+    if(m_initialSource == null){
+      return getSource();
+    }
+    return m_initialSource;
+  }
+
   public String getSource() {
     if(m_source == null){
       readSource();
@@ -40,6 +48,9 @@ public class WorkingCopy {
   }
 
   public void setSource(String source){
+    if(m_initialSource == null){
+      m_initialSource = m_source;
+    }
     m_source = source;
   }
 
@@ -66,5 +77,13 @@ public class WorkingCopy {
         e.printStackTrace();
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(m_path)
+      .append(" [dirty:").append(isDirty()).append("]");
+    return builder.toString();
   }
 }

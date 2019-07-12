@@ -10,8 +10,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.context.IContextProperty;
 import org.eclipse.scout.migration.ecma6.task.ITask;
+import org.eclipse.scout.migration.ecma6.task.post.IPostMigrationTask;
+import org.eclipse.scout.migration.ecma6.task.pre.IPreMigrationTask;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class Migration {
   private static String NAMESPACE = "scout";
   private static boolean CLEAN_TARGET = true;
 
-  private List<ITask> m_tasks;
+  private List<ITask> m_tasks ;
   private Context m_context;
 
   public static void main(String[] args) {
@@ -51,17 +52,23 @@ public class Migration {
     }
     Files.createDirectories(TARGET_ROOT_DIR);
     m_context = new Context(SOURCE_ROOT_DIRECTORY, TARGET_ROOT_DIR, NAMESPACE);
-    // setup context properties
-    BEANS.all(IContextProperty.class).forEach(contextProperty -> contextProperty.setup(m_context));
+    m_context.setup();
 
     m_tasks = BEANS.all(ITask.class);
     m_tasks.forEach(task -> task.setup(m_context));
   }
 
   public void run() throws IOException {
-    LOG.debug("Start migration");
+    List<IPreMigrationTask> preMigrationTasks = BEANS.all(IPreMigrationTask.class);
+    LOG.info("Execute pre migration tasks (#: "+preMigrationTasks.size()+")");
+    preMigrationTasks.forEach(task -> task.execute(m_context));
 
+    LOG.debug("Execute migration tasks (#: "+m_tasks.size()+")");
     visitFiles();
+
+    List<IPostMigrationTask> postMigrationTasks = BEANS.all(IPostMigrationTask.class);
+    LOG.info("Execute post migration tasks (#: "+postMigrationTasks.size()+")");
+    postMigrationTasks.forEach(task -> task.execute(m_context));
 
   }
 
@@ -94,8 +101,6 @@ public class Migration {
   }
 
   private void processFile(Path file, Context context) {
-    // create working copy
-    context.ensureWorkingCopy(file);
     m_tasks.stream().filter(task -> task.accept(file, context))
         .forEach(task -> task.process(file, context));
 
