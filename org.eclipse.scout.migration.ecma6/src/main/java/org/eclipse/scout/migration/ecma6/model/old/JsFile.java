@@ -55,7 +55,7 @@ public class JsFile extends AbstractSourceRange {
   public JsClass getLastOrAppend(String fqn){
     JsClass jsClass = null;
     if(m_jsClasses.isEmpty()){
-      jsClass = new JsClass(fqn);
+      jsClass = new JsClass(fqn, this);
       m_jsClasses.add(jsClass);
       return jsClass;
     }
@@ -67,7 +67,7 @@ public class JsFile extends AbstractSourceRange {
     if(jsClass != null){
       throw new VetoException("Tried to access last class '"+fqn+"' in file '"+getPath().getFileName()+"', but is not last one!");
     }
-    jsClass = new JsClass(fqn);
+    jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;
   }

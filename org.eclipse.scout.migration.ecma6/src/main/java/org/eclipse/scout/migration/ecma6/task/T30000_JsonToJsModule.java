@@ -35,7 +35,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
   private List<IConstPlaceholderMapper> m_placeholderMappers;
 
   @Override
-  public boolean accept(Path file, Context context) {
+  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
     if (!FileUtility.hasExtension(file, JSON_EXTENSION)) {
       return false;
     }

@@ -19,7 +19,7 @@ public class T400_IndexHtmlIncludeHead extends AbstractTask{
   private static Path FILE_PATH = Paths.get("src/main/resources/WebContent/index.html");
 
   @Override
-  public boolean accept(Path file, Context context) {
+  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
     return file.endsWith(FILE_PATH);
   }
 

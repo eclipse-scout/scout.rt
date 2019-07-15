@@ -12,21 +12,24 @@ import java.util.Map;
 
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class Context {
 
   private final Path m_sourceRootDirectory;
   private final Path m_targetRootDirectory;
   private final String m_namespace;
+  private Path m_currentModuleDirectory;
 
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
-  private Map<String /*fgn*/, Path /*file*/> m_fqnToFiles = new HashMap<>();
+  private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
 
   public Context(Path sourceRootDirectory, Path targetRootDirectory, String namespace){
     m_sourceRootDirectory = sourceRootDirectory;
@@ -76,8 +79,21 @@ public class Context {
     return BEANS.get(propertyClass).getValue();
   }
 
-  public Path getFile(String fullyQuallifiedName){
-    return m_fqnToFiles.get(fullyQuallifiedName);
+  public JsClass getFile(String fullyQuallifiedName){
+    return m_jsClasses.get(fullyQuallifiedName);
+  }
+
+  public Path getCurrentModuleDirectory() {
+    return m_currentModuleDirectory;
+  }
+
+  public void setCurrentModuleDirectory(Path currentModuleDirectory) {
+    m_currentModuleDirectory = currentModuleDirectory;
+  }
+
+  public Path relativeToModule(Path path){
+    Assertions.assertNotNull(getCurrentModuleDirectory());
+    return path.relativize(getCurrentModuleDirectory());
   }
 
   public JsFile ensureJsFile(WorkingCopy workingCopy){
@@ -102,7 +118,7 @@ public class Context {
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if(FileUtility.hasExtension(file, "js")){
           JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
-          jsClasses.getJsClasses().forEach(jsClazz -> m_fqnToFiles.put(jsClazz.getFullyQuallifiedName(), file));
+          jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQuallifiedName(), jsClazz));
         }
         return FileVisitResult.CONTINUE;
       }

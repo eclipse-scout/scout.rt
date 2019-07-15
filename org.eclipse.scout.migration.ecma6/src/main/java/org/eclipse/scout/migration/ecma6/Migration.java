@@ -14,6 +14,7 @@ import org.eclipse.scout.migration.ecma6.task.ITask;
 import org.eclipse.scout.migration.ecma6.task.post.IPostMigrationTask;
 import org.eclipse.scout.migration.ecma6.task.pre.IPreMigrationTask;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,7 @@ public class Migration {
 
   public void init() throws IOException {
     if (!Files.exists(SOURCE_ROOT_DIRECTORY)) {
-      System.err.println("Source DIR '" + SOURCE_ROOT_DIRECTORY + "' does not exist. Exit migration.");
-      return;
+      throw new VetoException("Source DIR '" + SOURCE_ROOT_DIRECTORY + "' does not exist. Exit migration.");
     }
     Files.createDirectories(TARGET_ROOT_DIR);
     m_context = new Context(SOURCE_ROOT_DIRECTORY, TARGET_ROOT_DIR, NAMESPACE);
@@ -94,14 +94,28 @@ public class Migration {
         if ("node_modules".equals(dirName)) {
           return FileVisitResult.SKIP_SUBTREE;
         }
+        if(Files.exists(dir.resolve(".classpath"))){
+          m_context.setCurrentModuleDirectory(dir);
+        }
         return FileVisitResult.CONTINUE;
       }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        if(Files.exists(dir.resolve(".classpath"))){
+          m_context.setCurrentModuleDirectory(null);
+        }
+        return super.postVisitDirectory(dir, exc);
+      }
     });
+
     writeWorkingCopies();
   }
 
   private void processFile(Path file, Context context) {
-    m_tasks.stream().filter(task -> task.accept(file, context))
+    Path relativeToModule = context.getCurrentModuleDirectory().relativize(file);
+    System.out.println("rel path: "+relativeToModule);
+    m_tasks.stream().filter(task -> task.accept(file, relativeToModule,  context))
         .forEach(task -> task.process(file, context));
 
   }

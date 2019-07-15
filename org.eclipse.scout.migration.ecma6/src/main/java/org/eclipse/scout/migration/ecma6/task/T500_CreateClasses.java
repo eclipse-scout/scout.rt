@@ -1,7 +1,7 @@
 package org.eclipse.scout.migration.ecma6.task;
 
+import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +21,8 @@ public class T500_CreateClasses extends AbstractTask{
 
 //  scout.FormField = function() {
   private static Pattern CONSTUCTOR_REGEX = Pattern.compile("(\\s+)([^\\.\\s]*)\\.([^\\.\\s]*)\\s*\\=\\s*function\\(\\)\\s*\\{");
+
+  private Predicate<Path> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 //  scout.inherits(scout.FormField, scout.Widget);
   private Pattern m_functionOrConstructorRegex;
   private static Pattern INHERIT_REGEX = Pattern.compile("scout\\.inherits\\([^\\,]*\\,\\s*([^\\)]*)\\)\\;");
@@ -35,10 +37,8 @@ public class T500_CreateClasses extends AbstractTask{
   }
 
   @Override
-  public boolean accept(Path file, Context context) {
-    return FileUtility.hasExtension(file, "js")
-//      ;
-      && file.endsWith(Paths.get("src/main/js/scout/form/fields/FormField.js"));
+  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
+    return m_filter.test(file);
   }
 
   @Override

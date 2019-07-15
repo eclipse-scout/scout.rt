@@ -1,5 +1,6 @@
 package org.eclipse.scout.migration.ecma6.task;
 
+import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -16,16 +17,17 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Order(200)
 public class T200_IndexHtmlScriptTags extends AbstractTask{
-  private static Path FILE_PATH = Paths.get("src/main/resources/WebContent/index.html");
 
   private static Pattern END_BODY_REGEX = Pattern.compile("(\\s*)\\<\\/body\\>");
   private static Pattern APP_NAME_REGEX = Pattern.compile("res\\/([^\\-]*)\\-all\\-macro\\.js");
 
+  private Predicate m_indexJsFilter;
 
   private Set<String> m_scriptSourcesToRemove = CollectionUtility.hashSet(
     "res/jquery-all-macro.js",
@@ -37,8 +39,13 @@ public class T200_IndexHtmlScriptTags extends AbstractTask{
   private List<String> m_scriptsMoveToBody = new ArrayList<>();
 
   @Override
-  public boolean accept(Path file, Context context) {
-    return file.endsWith(FILE_PATH);
+  public void setup(Context context) {
+    m_indexJsFilter = PathFilters.oneOf(context.getSourceRootDirectory().resolve(Paths.get("src/main/resources/WebContent/index.html")));
+  }
+
+  @Override
+  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
+    return m_indexJsFilter.test(file);
   }
 
   @Override

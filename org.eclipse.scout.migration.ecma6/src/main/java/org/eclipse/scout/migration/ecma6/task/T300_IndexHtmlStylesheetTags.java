@@ -25,7 +25,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
   private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/libs-all-macro.less");
 
   @Override
-  public boolean accept(Path file, Context context) {
+  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
     return file.endsWith(FILE_PATH);
   }
 

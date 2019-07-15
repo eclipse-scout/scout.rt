@@ -10,7 +10,7 @@ public interface ITask {
 
   void setup(Context context);
 
-  boolean accept(Path file, Context context);
+  boolean accept(Path file, Path moduleRelativeFile, Context context);
 
   void process(Path file, Context context);
 

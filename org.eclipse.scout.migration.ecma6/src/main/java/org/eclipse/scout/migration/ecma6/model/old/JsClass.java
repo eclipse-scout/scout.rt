@@ -10,13 +10,15 @@ import java.util.stream.Collectors;
 public class JsClass {
 
   private final String m_fullyQuallifiedName;
+  private final JsFile m_jsFile;
   private final String m_namespace;
   private final String m_name;
   private JsSuperCall m_superCall;
   private final List<JsFunction> m_functions = new ArrayList<>();
 
-  public JsClass(String fqn) {
+  public JsClass(String fqn, JsFile jsFile) {
     m_fullyQuallifiedName = fqn;
+    m_jsFile = jsFile;
     String[] split = m_fullyQuallifiedName.split("\\.");
     if (split.length != 2) {
       throw new VetoException("Could not separate fqn('" + m_fullyQuallifiedName + "') in namespace and name!");
@@ -35,6 +37,10 @@ public class JsClass {
 
   public String getName() {
     return m_name;
+  }
+
+  public JsFile getJsFile() {
+    return m_jsFile;
   }
 
   public void setSuperCall(JsSuperCall superCall) {
