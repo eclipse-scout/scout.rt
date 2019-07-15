@@ -163,7 +163,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       // entity class type has a type version, check deserialized type version against entity class type version
       if (!dataObjectTypeVersion.equals(version)) {
         LOG.warn("Found version mismatch while deserializing DoEntity {}. Data object version (in class file) '{}', deserialized data version '{}'",
-            (entity.getClass() == null ? null : entity.getClass().getName()), dataObjectTypeVersion, version);
+            entity.getClass().getName(), dataObjectTypeVersion, version);
       }
     }
     else {
