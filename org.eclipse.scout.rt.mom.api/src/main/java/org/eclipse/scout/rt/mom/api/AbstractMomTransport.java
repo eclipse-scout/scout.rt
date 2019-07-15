@@ -126,6 +126,12 @@ public abstract class AbstractMomTransport implements IMomTransport {
     return m_delegate.get();
   }
 
+  /**
+   * @return {@link IMomImplementor} which may not have been initialized yet. The implementor does not get initialized
+   *         when this method is called. Use {@link #getDelegate()} to safely access the initialized
+   *         {@link IMomImplementor} instance.
+   * @see #getDelegate()
+   */
   public IMomImplementor getImplementor() {
     return m_delegate.get();
   }
