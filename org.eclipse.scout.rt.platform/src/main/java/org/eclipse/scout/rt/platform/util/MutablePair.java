@@ -51,4 +51,11 @@ public class MutablePair<L, R> extends Pair<L, R> {
   public void setRight(R right) {
     m_right = right;
   }
+
+  /**
+   * @return {@link MutablePair} instance with given values
+   */
+  public static <L, R> MutablePair<L, R> of(L left, R right) {
+    return new MutablePair<>(left, right);
+  }
 }

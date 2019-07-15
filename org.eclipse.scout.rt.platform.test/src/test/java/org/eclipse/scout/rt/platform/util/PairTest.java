@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
@@ -24,12 +25,14 @@ public class PairTest {
   public void testImmutable() throws Exception {
     Pair<String, Integer> pair = new ImmutablePair<>("Foo", 123);
     assertPair(pair);
+    assertPair(ImmutablePair.of("Foo", 123));
   }
 
   @Test
   public void testMutable() throws Exception {
     Pair<String, Integer> pair = new MutablePair<>("Foo", 123);
     assertPair(pair);
+    assertPair(MutablePair.of("Foo", 123));
   }
 
   @Test
@@ -55,6 +58,8 @@ public class PairTest {
     Pair<String, Integer> pairB = new ImmutablePair<>("Foo", 123);
     Pair<String, String> pairC = new ImmutablePair<>("Foo", "Bar");
     assertEqualsPair(pairA, pairB, pairC);
+    assertEquals(ImmutablePair.of("foo", "bar"), ImmutablePair.of("foo", "bar"));
+    assertNotEquals(ImmutablePair.of("foo", "bar"), MutablePair.of("foo", "bar"));
   }
 
   @Test
@@ -63,6 +68,8 @@ public class PairTest {
     Pair<String, Integer> pairB = new MutablePair<>("Foo", 123);
     Pair<String, String> pairC = new MutablePair<>("Foo", "Bar");
     assertEqualsPair(pairA, pairB, pairC);
+    assertEquals(MutablePair.of("foo", "bar"), MutablePair.of("foo", "bar"));
+    assertNotEquals(MutablePair.of("foo", "bar"), ImmutablePair.of("foo", "bar"));
   }
 
   protected void assertEqualsPair(Pair<String, Integer> pairA, Pair<String, Integer> pairB, Pair<String, String> pairC) {
