@@ -38,4 +38,11 @@ public class ImmutablePair<L, R> extends Pair<L, R> {
   public R getRight() {
     return m_right;
   }
+
+  /**
+   * @return {@link ImmutablePair} instance with given values
+   */
+  public static <L, R> ImmutablePair<L, R> of(L left, R right) {
+    return new ImmutablePair<>(left, right);
+  }
 }
