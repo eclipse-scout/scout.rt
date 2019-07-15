@@ -1211,10 +1211,12 @@ public final class StringUtility {
     if (s == null || fill == null || s.length() >= len || fill.isEmpty()) {
       return s;
     }
-    StringBuilder buf = new StringBuilder(s);
-    while (buf.length() < len) {
-      buf.insert(0, fill);
+    StringBuilder buf = new StringBuilder(len);
+    int padding = len - s.length();
+    while (buf.length() < padding) {
+      buf.append(fill);
     }
+    buf.append(s);
     return buf.substring(buf.length() - len, buf.length());
   }
 
