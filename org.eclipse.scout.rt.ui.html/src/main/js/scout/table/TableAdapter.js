@@ -14,6 +14,16 @@ scout.TableAdapter = function() {
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
+scout.TableAdapter.prototype._postCreateWidget = function() {
+  // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
+  // because the original event had been fired before the eventhandler was registered.
+  if (scout.objects.values(this.widget._filterMap).some(function(filter) {
+    return filter instanceof scout.TableUserFilter;
+  })) {
+    this._onWidgetFilter();
+  }
+};
+
 scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) {
   var eventData = {
     rowIds: rowIds
