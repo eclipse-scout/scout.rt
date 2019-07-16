@@ -129,6 +129,51 @@ describe("MenuBar", function() {
       expect(menuBar.$container.isVisible()).toBe(true);
     });
 
+    it('hides unnecessary explicit separator menus', function() {
+      var menuModel = helper.createModel();
+      menuModel.menuTypes = ['Table.EmptySpace'];
+
+      var sep1a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep1a', separator: true }));
+      var sep1b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep1b', separator: true }));
+      var menu1 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu1', text: 'Menu 1 (L)' }));
+      var sep12a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep12a', separator: true }));
+      var sep12b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep12b', separator: true, menuTypes: ['Table.SingleSelection'] })); // <-- will generate an additional artificial separator menu
+      var menu2 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: ['Table.SingleSelection'] }));
+      var sep2a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep2a', separator: true, menuTypes: ['Table.SingleSelection'] }));
+      var sep2b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep2b', separator: true, menuTypes: ['Table.SingleSelection'] }));
+
+      var sep3a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep3a', horizontalAlignment: 1, separator: true }));
+      var sep3b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep3b', horizontalAlignment: 1, separator: true }));
+      var menu3 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)' }));
+      var sep34a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep34a', horizontalAlignment: 1, separator: true }));
+      var sep34b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep34b', horizontalAlignment: 1, separator: true }));
+      var menu4 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)' }));
+      var sep4a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep4a', horizontalAlignment: 1, separator: true }));
+      var sep4b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep4b', horizontalAlignment: 1, separator: true }));
+
+      var menuBar = createMenuBar();
+      menuBar.render();
+      menuBar.setMenuItems([
+        sep1a, sep1b, menu1, sep12a, sep12b, menu2, sep2a, sep2b,
+        sep3a, sep3b, menu3, sep34a, sep34b, menu4, sep4a, sep4b
+      ]);
+
+      expect(menuBar.orderedMenuItems.all.length).toBe(18); // all menus + one artificial separator menu + one artificial ellipsis menu
+      expect(menuBar.orderedMenuItems.left.length).toBe(9);
+      expect(menuBar.orderedMenuItems.right.length).toBe(9);
+
+      function listVisibleMenuIds(menus) {
+        return menus
+          .filter(function(menu) { return menu.visible && !menu.ellipsis; })
+          .map(function(menu) { return menu.id; })
+          .join(', ');
+      }
+
+      expect(listVisibleMenuIds(menuBar.orderedMenuItems.all)).toBe('test.menu1, test.sep12b, test.menu2, test.menu3, test.sep34b, test.menu4');
+      expect(listVisibleMenuIds(menuBar.orderedMenuItems.left)).toBe('test.menu1, test.sep12b, test.menu2');
+      expect(listVisibleMenuIds(menuBar.orderedMenuItems.right)).toBe('test.menu3, test.sep34b, test.menu4');
+    });
+
   });
 
   describe('propertyChange', function() {

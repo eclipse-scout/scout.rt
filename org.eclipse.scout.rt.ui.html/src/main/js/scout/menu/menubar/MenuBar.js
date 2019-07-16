@@ -293,7 +293,8 @@ scout.MenuBar.prototype.setTabbableMenu = function(menu) {
 };
 
 scout.MenuBar.prototype.updateVisibility = function() {
-  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.all);
+  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.left);
+  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.right);
   this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(function(m) {
     return m.visible && !m.ellipsis;
   }));
