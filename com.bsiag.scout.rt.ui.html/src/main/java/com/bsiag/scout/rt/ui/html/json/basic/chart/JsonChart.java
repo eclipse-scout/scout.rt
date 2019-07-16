@@ -11,6 +11,7 @@ package com.bsiag.scout.rt.ui.html.json.basic.chart;
 
 import java.math.BigDecimal;
 
+import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -124,7 +125,7 @@ public class JsonChart<CHART extends IChart> extends AbstractJsonWidget<CHART> {
   protected void handleUiValueClick(JsonEvent event) {
     JSONObject data = event.getData();
     int valueIndex = data.getInt("valueIndex");
-    BigDecimal value = new BigDecimal(data.getString("value"));
+    BigDecimal value = NumberUtility.getBigDecimalValue(data.optString("value"));
     int groupIndex = data.getInt("groupIndex");
     String groupName = data.optString("groupName");
     getModel().getUIFacade().fireValueClickFromUI(valueIndex, value, groupIndex, groupName);
