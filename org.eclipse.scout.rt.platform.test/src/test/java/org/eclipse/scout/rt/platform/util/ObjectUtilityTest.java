@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -34,14 +30,18 @@ public class ObjectUtilityTest {
   private static final String BAR_STRING = "bar";
 
   private static final long TEST_NUMBER = 12L;
-  private static final long TEST_MILLIS = 1398071807000L;
+  private static final long TEST_MILLIS = 1398071807123L;
+  private static final int TEST_NANOS = 123456789; // same millis as TEST_MILLIS
 
   private static Timestamp m_testTimestamp;
+  private static Timestamp m_testTimestampPlusNanos;
   private static Date m_testDate;
 
   @BeforeClass
   public static void beforeClass() {
     m_testTimestamp = new Timestamp(TEST_MILLIS);
+    m_testTimestampPlusNanos = new Timestamp(TEST_MILLIS);
+    m_testTimestampPlusNanos.setNanos(TEST_NANOS);
     m_testDate = new Date(TEST_MILLIS);
   }
 
@@ -118,6 +118,12 @@ public class ObjectUtilityTest {
     assertFalse(ObjectUtility.equals(testDate2, m_testDate));
   }
 
+  @Test
+  public void testTimestampDateEquality_DifferentTypes_UnequalDatesNanos() {
+    assertFalse(ObjectUtility.equals(m_testDate, m_testTimestampPlusNanos));
+    assertFalse(ObjectUtility.equals(m_testTimestampPlusNanos, m_testDate));
+  }
+
   /**
    * Tests {@link org.eclipse.scout.rt.platform.util.ObjectUtility#equals(T, T) ObjectUtility#equals(T, T)} with respect
    * to {@link java.util.Date} and {@link java.sql.Timestamp}. <br>
@@ -176,6 +182,20 @@ public class ObjectUtilityTest {
     assertEquals(-1, ObjectUtility.compareTo(null, "b"));
     assertEquals(1, ObjectUtility.compareTo("a", null));
     assertTrue(ObjectUtility.compareTo("a", "b") < 0);
+    assertTrue(ObjectUtility.compareTo(m_testTimestamp, m_testTimestampPlusNanos) < 0);
+    assertTrue(ObjectUtility.compareTo(m_testTimestampPlusNanos, m_testTimestamp) > 0);
+  }
+
+  @Test
+  public void testTimestampDateComparison_DifferentTypes_EqualDates() {
+    assertEquals(0, ObjectUtility.compareTo(m_testTimestamp, m_testDate));
+    assertEquals(0, ObjectUtility.compareTo(m_testDate, m_testTimestamp)); // <-- this fails with default Date.compareTo() on Java 8 (JDK-8135055)
+  }
+
+  @Test
+  public void testTimestampDateComparison_DifferentTypes_UnequalDatesNanos() {
+    assertTrue(ObjectUtility.compareTo(m_testDate, m_testTimestampPlusNanos) < 0);
+    assertTrue(ObjectUtility.compareTo(m_testTimestampPlusNanos, m_testDate) > 0);
   }
 
   @Test

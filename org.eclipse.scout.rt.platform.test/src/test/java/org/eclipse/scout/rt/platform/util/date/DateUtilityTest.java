@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -856,6 +854,76 @@ public class DateUtilityTest {
     cal = calendarOf("2015-01-01 23:59:59.999");
     DateUtility.truncCalendarToHour(cal);
     assertCalendarEquals("2015-01-01 23:00:00.000", cal);
+  }
+
+  @Test
+  public void testEqualsDate() {
+    Date date = dateOf("2000-01-02 04:56:59.123");
+    Timestamp timestamp = Timestamp.valueOf("2000-01-02 04:56:59.123");
+    Timestamp timestampNanos = Timestamp.valueOf("2000-01-02 04:56:59.123999999");
+
+    // same millis
+    assertTrue(DateUtility.equals(timestamp, date));
+    assertTrue(DateUtility.equals(date, timestamp));
+
+    // truncating to same millis
+    assertTrue(DateUtility.equals(new Date(timestampNanos.getTime()), date));
+    assertTrue(DateUtility.equals(date, new Date(timestampNanos.getTime())));
+
+    // same millis, different nanos
+    assertFalse(DateUtility.equals(timestampNanos, date));
+    assertFalse(DateUtility.equals(date, timestampNanos));
+  }
+
+  /**
+   * Fractional parts of Timestamp were ignored in {@link Date#compareTo)} in Java < 9 (see JDK-8135055) which could
+   * lead to wrong results when the date either had the same millis or zero millis, see JDK-8135055.
+   */
+  @Test
+  public void testCompareToJDK8135055() {
+    Date date = dateOf("2000-01-02 04:56:59.123");
+    Date dateTruncSeconds = dateOf("2000-01-02 04:56:59.000");
+
+    // timestamp should never read as zero millis
+    Timestamp timestamp = Timestamp.valueOf("2000-01-02 04:56:59.123");
+
+    // compareTo
+    assertTrue(DateUtility.compareTo(timestamp, dateTruncSeconds) > 0);
+    assertTrue(DateUtility.compareTo(dateTruncSeconds, timestamp) < 0);
+
+    // equals
+    assertFalse(DateUtility.equals(timestamp, dateTruncSeconds));
+    assertFalse(DateUtility.equals(dateTruncSeconds, timestamp));
+
+    assertTrue(DateUtility.equals(timestamp, date));
+    assertTrue(DateUtility.equals(date, timestamp));
+  }
+
+  @Test
+  public void testCompareDate() {
+    Date date = dateOf("2000-01-02 04:56:59.123");
+    Timestamp timestamp = Timestamp.valueOf("2000-01-02 04:56:59.123");
+    Timestamp timestampNanos = Timestamp.valueOf("2000-01-02 04:56:59.123999999");
+
+    assertEquals(0, DateUtility.compareTo(date, date));
+    assertEquals(0, DateUtility.compareTo(timestamp, timestamp));
+    assertEquals(0, DateUtility.compareTo(timestampNanos, timestampNanos));
+    assertEquals(0, DateUtility.compareTo(timestamp, date));
+    assertEquals(0, DateUtility.compareTo(date, timestamp));
+    assertEquals(1, DateUtility.compareTo(timestampNanos, timestamp));
+    assertEquals(-1, DateUtility.compareTo(timestamp, timestampNanos));
+    assertEquals(1, DateUtility.compareTo(timestampNanos, date));
+    assertEquals(-1, DateUtility.compareTo(date, timestampNanos));
+  }
+
+  @Test
+  public void testCompareToDateJDK8135055() {
+    Date dateTruncSeconds = dateOf("2000-01-02 04:56:59.000");
+    Timestamp timestamp = Timestamp.valueOf("2000-01-02 04:56:59.123");
+
+    // date has zero millis, timestamp should not be treated as having zero fractional seconds
+    assertEquals(1, DateUtility.compareTo(timestamp, dateTruncSeconds));
+    assertEquals(-1, DateUtility.compareTo(dateTruncSeconds, timestamp));
   }
 
   @Test(expected = IllegalArgumentException.class)

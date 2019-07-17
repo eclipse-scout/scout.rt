@@ -14,8 +14,11 @@ import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Objects;
 import java.util.function.Supplier;
+
+import org.eclipse.scout.rt.platform.util.date.DateUtility;
 
 /**
  * Utility for null-safe operations on {@link Object}.
@@ -67,14 +70,7 @@ public final class ObjectUtility {
    * <b>Timestamp and Date:</b> {@link Timestamp#equals(Object)} is not symmetric. E.g. when comparing a Date d and
    * Timestamp t, d.equals(t) may return true while t.equals(d) returns false. This is not "expected" and inconvenient
    * when performing operations like sorting on collections containing both Dates and Timestamps. Therefore, this method
-   * handles <code> java.sql.Timestamp</code> specifically to provide a symmetric implementation of the equivalence
-   * comparison.
-   * </p>
-   * <p>
-   * <code>java.sql.Timestamp</code> is a subclass of <code>java.util.Date</code>, which additionally allows to specify
-   * fractional seconds to a precision of nanoseconds. <br>
-   * This method returns <code>true</code>, if and only if both arguments of Type <code>java.util.Date</code> or
-   * <code>java.sql.Timestamp</code> represent the same point in time.
+   * defers to {@link DateUtility#equals(Object)} to provide a symmetric implementation of the equivalence comparison.
    * </p>
    *
    * @param a
@@ -95,9 +91,9 @@ public final class ObjectUtility {
     else if (b == null) {
       return false;
     }
-    // Special case: If 'a' is Timestamp and 'b' is not, flip comparison order (because of non-symmetry of Timestamp.equals())
-    if (a instanceof Timestamp && !(b instanceof Timestamp)) {
-      return b.equals(a);
+    // Special case: defer to DateUtility because of non-symmetry of Timestamp.equals()
+    if (a instanceof Date && b instanceof Date) {
+      return DateUtility.equals((Date) a, (Date) b);
     }
     if (a.equals(b)) {
       return true;
@@ -133,7 +129,7 @@ public final class ObjectUtility {
   }
 
   /**
-   * Null-safe implementation of {@code a.compareTo(b)}
+   * Null-safe implementation of {@code a.compareTo(b)}.
    *
    * @return
    *         <li>{@code 0} if both values are {@code null}
@@ -150,6 +146,10 @@ public final class ObjectUtility {
     }
     else if (b == null) {
       return 1;
+    }
+    // Special case: defer to DateUtility because of non-symmetry of Timestamp.compareTo()
+    else if (a instanceof Date && b instanceof Date) {
+      return DateUtility.compareTo((Date) a, (Date) b);
     }
     else {
       return a.compareTo(b);

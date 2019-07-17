@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform.util.date;
 
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -507,7 +509,7 @@ public final class DateUtility {
     if (d == null || minDate == null || maxDate == null) {
       return false;
     }
-    return minDate.compareTo(d) <= 0 && d.compareTo(maxDate) <= 0;
+    return compareTo(minDate, d) <= 0 && compareTo(d, maxDate) <= 0;
   }
 
   /**
@@ -521,13 +523,13 @@ public final class DateUtility {
       return false;
     }
     if (fromDate == null) {
-      return toDate.compareTo(minDate) >= 0;
+      return compareTo(toDate, minDate) >= 0;
     }
     else if (toDate == null) {
-      return fromDate.compareTo(maxDate) <= 0;
+      return compareTo(fromDate, maxDate) <= 0;
     }
     else {
-      return fromDate.compareTo(maxDate) <= 0 && toDate.compareTo(minDate) >= 0;
+      return compareTo(fromDate, maxDate) <= 0 && compareTo(toDate, minDate) >= 0;
     }
   }
 
@@ -558,7 +560,7 @@ public final class DateUtility {
         if (max == null) {
           max = d;
         }
-        else if (d.compareTo(max) > 0) {
+        else if (compareTo(d, max) > 0) {
           max = d;
         }
       }
@@ -573,7 +575,7 @@ public final class DateUtility {
         if (min == null) {
           min = d;
         }
-        else if (d.compareTo(min) < 0) {
+        else if (compareTo(d, min) < 0) {
           min = d;
         }
       }
@@ -581,9 +583,47 @@ public final class DateUtility {
     return min;
   }
 
+  /**
+   * <b>Timestamp and Date:</b> {@link Timestamp#equals(Object)} is not symmetric. E.g. when comparing a Date d and
+   * Timestamp t, d.equals(t) may return true while t.equals(d) will always return false. This is not "expected" and
+   * inconvenient when performing operations like sorting on collections containing both Dates and Timestamps.
+   * Therefore, this method handles <code>java.sql.Timestamp</code> specifically to provide a symmetric implementation
+   * of the equivalence comparison.
+   * <p>
+   * <code>java.sql.Timestamp</code> is a subclass of <code>java.util.Date</code>, which additionally allows to specify
+   * fractional seconds to a precision of nanoseconds. This method returns <code>true</code>, if and only if both
+   * arguments of Type <code>java.util.Date</code> or <code>java.sql.Timestamp</code> represent the same point in time
+   * at full precision.
+   */
   @SuppressWarnings("squid:S1201")
   public static boolean equals(Date a, Date b) {
-    return a == b || (a != null && b != null && a.compareTo(b) == 0);
+    return a == b || (a != null && b != null && compareTo(a, b) == 0);
+  }
+
+  /**
+   * Both parameters must be non-null. Implementation of {@code a.compareTo(b)} that works for Timestamp and Date.
+   * <p>
+   * <b>Timestamp and Date:</b> {@link Timestamp#compareTo(Date)} is not symmetric. E.g. when comparing a Date d and
+   * Timestamp t, d.compareTo(t) may return true while t.compareTo(d) returns false. This is not "expected" and
+   * inconvenient when performing operations like sorting on collections containing both Dates and Timestamps.
+   * Therefore, this method handles <code>java.sql.Timestamp</code> specifically to provide a symmetric implementation
+   * of the comparison operation.
+   * <p>
+   * On Java 8 and below, {@link Date#compareTo} returns erroneous results when the argument is a Timestamp, due to
+   * ignoring the fractional seconds part of the Timestamp (see JDK-8135055). Due to this and in order to retain full
+   * precision, {@link Timestamp#compareTo} must be called. This method returns <code>0</code> if and only if both
+   * arguments of Type <code>java.util.Date</code> or <code>java.sql.Timestamp</code> represent the same point in time
+   * at full precision.
+   * <p>
+   * Not null safe, see {@link ObjectUtility#compareTo} for a null-safe implementation of compareTo.
+   */
+  public static int compareTo(Date a, Date b) {
+    if (b instanceof java.sql.Timestamp && !(a instanceof java.sql.Timestamp)) {
+      // ensure Timestamp.compareTo is called, not Date.compareTo
+      // note: could also call use -1 * b.compareTo(a) here, but that equivalence is not specified and a new Timestamp object would be created regardless (in Timestamp.compareTo)
+      return (new Timestamp(a.getTime())).compareTo(b);
+    }
+    return a.compareTo(b);
   }
 
   public static boolean isSameDay(Date a, Date b) {
