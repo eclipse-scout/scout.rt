@@ -195,10 +195,8 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
   protected void handleUiSelectedTiles(JSONObject data) {
     JSONArray tileIds = data.getJSONArray(ITileGrid.PROP_SELECTED_TILES);
     List<ITile> tiles = extractTiles(tileIds);
-    if (tiles.size() > 0) {
-      addPropertyEventFilterCondition(ITileGrid.PROP_SELECTED_TILES, tiles);
-      getModel().getUIFacade().setSelectedTilesFromUI(tiles);
-    }
+    addPropertyEventFilterCondition(ITileGrid.PROP_SELECTED_TILES, tiles);
+    getModel().getUIFacade().setSelectedTilesFromUI(tiles);
   }
 
   protected List<ITile> extractTiles(JSONArray tileIds) {
