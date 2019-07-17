@@ -151,7 +151,7 @@ public final class MOM {
    *          the type of the transfer object to be published.
    * @see #newQueue(String)
    * @see #newTopic(String)
-   * @see #subscribe(IDestination, IMessageListener, RunContext)
+   * @see #subscribe(Class, IDestination, IMessageListener)
    */
   public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject) {
     publish(transport, destination, transferObject, null);
@@ -175,7 +175,7 @@ public final class MOM {
    *          the type of the transfer object to be published.
    * @see #newQueue(String)
    * @see #newTopic(String)
-   * @see #subscribe(IDestination, IMessageListener, RunContext)
+   * @see #subscribe(Class, IDestination, IMessageListener)
    */
   public static <DTO> void publish(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final DTO transferObject, final PublishInput input) {
     BEANS.get(transport).publish(destination, transferObject, input != null ? input : newPublishInput());
@@ -198,7 +198,7 @@ public final class MOM {
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
-   * @see #publish(IDestination, Object)
+   * @see #publish(Class, IDestination, Object)
    */
   public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener) {
     return subscribe(transport, destination, listener, null);
@@ -220,7 +220,7 @@ public final class MOM {
    * @return subscription handle to unsubscribe from the destination.
    * @param <DTO>
    *          the type of the transfer object a subscription is created for.
-   * @see #publish(IDestination, Object)
+   * @see #publish(Class, IDestination, Object)
    */
   public static <DTO> ISubscription subscribe(final Class<? extends IMomTransport> transport, final IDestination<DTO> destination, final IMessageListener<DTO> listener, final SubscribeInput input) {
     return BEANS.get(transport).subscribe(destination, listener, input != null ? input : newSubscribeInput());
