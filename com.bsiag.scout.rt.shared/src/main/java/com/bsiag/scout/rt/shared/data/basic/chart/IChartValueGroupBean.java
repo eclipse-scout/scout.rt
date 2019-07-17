@@ -35,4 +35,8 @@ public interface IChartValueGroupBean extends Serializable {
   String getCssClass();
 
   void setCssClass(String cssClass);
+
+  boolean isClickable();
+
+  void setClickable(boolean clickable);
 }

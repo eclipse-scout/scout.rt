@@ -24,8 +24,9 @@ public class ChartValueGroupBean implements IChartValueGroupBean {
   private Object m_groupKey;
   private String m_groupName;
   private final List<BigDecimal> m_values = new ArrayList<>();
-  private String m_colorHexValue = null;
-  private String m_cssClass = null;
+  private String m_colorHexValue;
+  private String m_cssClass;
+  private boolean m_clickable = true;
 
   @Override
   @IgnoreProperty
@@ -72,5 +73,15 @@ public class ChartValueGroupBean implements IChartValueGroupBean {
   @Override
   public void setCssClass(String cssClass) {
     m_cssClass = cssClass;
+  }
+
+  @Override
+  public boolean isClickable() {
+    return m_clickable;
+  }
+
+  @Override
+  public void setClickable(boolean clickable) {
+    this.m_clickable = clickable;
   }
 }
