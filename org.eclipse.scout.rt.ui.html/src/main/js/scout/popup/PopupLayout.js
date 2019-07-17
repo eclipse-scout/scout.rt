@@ -12,6 +12,8 @@ scout.PopupLayout = function(popup) {
   scout.PopupLayout.parent.call(this);
   this.popup = popup;
   this.doubleCalcPrefSize = true; // enables popups with a height which depends on the width (= popups with wrapping content)
+  this.autoPosition = true;
+  this.autoSize = true;
 };
 scout.inherits(scout.PopupLayout, scout.AbstractLayout);
 
@@ -19,9 +21,16 @@ scout.PopupLayout.prototype.layout = function($container) {
   if (this.popup.isOpeningAnimationRunning()) {
     this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));
     return;
-  } else if (this.popup.removalPending || this.popup.removing || !this.popup.rendered) {
+  }
+  if (this.popup.removalPending || this.popup.removing || !this.popup.rendered) {
     return;
   }
+  if (!this.autoSize) {
+    // Just layout the popup with the current size
+    this._setSize(this.popup.htmlComp.size());
+    return;
+  }
+
   var htmlComp = this.popup.htmlComp;
   // Read current bounds before calling pref size, because pref size may change position (_calcMaxSize)
   var currentBounds = scout.graphics.bounds(htmlComp.$comp);
@@ -47,7 +56,7 @@ scout.PopupLayout.prototype.layout = function($container) {
 };
 
 scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) {
-  this.popup.position();
+  this._position();
   var htmlComp = this.popup.htmlComp;
   var prefPosition = htmlComp.$comp.position();
 
@@ -74,9 +83,15 @@ scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) 
           return;
         }
         // Ensure the arrow is at the correct position after the animation
-        this.popup.position();
+        this._position();
       }.bind(this)
     });
+};
+
+scout.PopupLayout.prototype._position = function(switchIfNecessary) {
+  if (this.autoPosition) {
+    this.popup.position(switchIfNecessary);
+  }
 };
 
 scout.PopupLayout.prototype._setSize = function(prefSize) {
@@ -112,7 +127,7 @@ scout.PopupLayout.prototype._adjustSize = function(prefSize) {
  */
 scout.PopupLayout.prototype._calcMaxSize = function() {
   // Position the popup at the desired location before doing any calculations to consider the preferred bounds
-  this.popup.position(false);
+  this._position(false);
 
   var maxWidth, maxHeight,
     htmlComp = this.popup.htmlComp,
@@ -203,7 +218,7 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
  */
 scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
   // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
-  this.popup.position(false);
+  this._position(false);
 
   var maxWidthLeft, maxWidthRight, maxHeightDown, maxHeightUp,
     htmlComp = this.popup.htmlComp,

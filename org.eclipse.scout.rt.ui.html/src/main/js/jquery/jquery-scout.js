@@ -1398,7 +1398,27 @@ $.fn.isOrHas = function(elem) {
  * in the E, SE and S of the element. This is primarily useful for (modal) dialogs.
  */
 $.fn.resizable = function() {
-  scout.create('Resizable', $(this));
+  var $this = $(this);
+  var resizable = $this.data('resizable');
+  if (resizable) {
+    // Already resizable
+    return this;
+  }
+  resizable = scout.create('Resizable', $this);
+  $this.data('resizable', resizable);
+  return this;
+};
+
+/**
+ * Removes the resize handles and event handlers in order to make the element un resizable again.
+ */
+$.fn.unresizable = function() {
+  var $this = $(this);
+  var resizable = $this.data('resizable');
+  if (resizable) {
+    resizable.destroy();
+    $this.removeData('resizable');
+  }
   return this;
 };
 
@@ -1442,6 +1462,16 @@ $.fn.draggable = function($handle, callback) {
       });
     event.preventDefault();
   });
+};
+
+/**
+ *
+ * Removes the mouse down handler which was added by draggable() in order to make it un draggable again.
+ */
+$.fn.undraggable = function($handle) {
+  var $draggable = this;
+  $handle = $handle || $draggable;
+  return $handle.off('mousedown.draggable');
 };
 
 /**

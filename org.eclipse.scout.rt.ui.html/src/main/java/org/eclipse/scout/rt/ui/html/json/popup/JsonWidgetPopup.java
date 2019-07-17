@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.popup.IWidgetPopup;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 
 /**
@@ -37,6 +38,24 @@ public class JsonWidgetPopup<T extends IWidgetPopup> extends JsonPopup<T> {
       @Override
       protected IWidget modelValue() {
         return getModel().getWidget();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IWidgetPopup.PROP_CLOSABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isClosable();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IWidgetPopup.PROP_MOVABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMovable();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(IWidgetPopup.PROP_RESIZABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isResizable();
       }
     });
   }

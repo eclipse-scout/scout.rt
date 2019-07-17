@@ -19,7 +19,7 @@ scout.WidgetPopupLayout.prototype._setSize = function(prefSize) {
   var htmlPopup = this.popup.htmlComp;
   var htmlWidget = this.popup.widget.htmlComp;
   var widgetSize = prefSize.subtract(htmlPopup.insets());
-  htmlWidget.setSize(widgetSize);
+  htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
 };
 
 scout.WidgetPopupLayout.prototype.preferredLayoutSize = function($container, options) {

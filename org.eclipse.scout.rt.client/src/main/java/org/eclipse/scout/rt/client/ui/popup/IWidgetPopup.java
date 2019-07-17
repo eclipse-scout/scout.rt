@@ -20,6 +20,21 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 public interface IWidgetPopup<T extends IWidget> extends IPopup {
 
   String PROP_WIDGET = "widget";
+  String PROP_CLOSABLE = "closable";
+  String PROP_MOVABLE = "movable";
+  String PROP_RESIZABLE = "resizable";
 
   T getWidget();
+
+  void setClosable(boolean closable);
+
+  boolean isClosable();
+
+  void setMovable(boolean movable);
+
+  boolean isMovable();
+
+  void setResizable(boolean resizable);
+
+  boolean isResizable();
 }

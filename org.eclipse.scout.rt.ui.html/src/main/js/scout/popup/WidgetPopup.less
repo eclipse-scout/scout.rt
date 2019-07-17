@@ -33,4 +33,18 @@
       #scout.drop-shadow-large(@y: 4px, @spread: -2px);
     }
   }
+
+  & > .closer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* should lay over drag and resize handles */
+    z-index: 11;
+    padding: 10px;
+  }
+
+  & > .popup-widget {
+    position: relative;
+    background-color: inherit;
+  }
 }

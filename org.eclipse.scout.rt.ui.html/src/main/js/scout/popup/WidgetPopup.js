@@ -13,10 +13,18 @@ scout.WidgetPopup = function() {
   this.animateOpening = true;
   this.animateResize = true;
   this.animateRemoval = true;
+  this.closable = false;
+  this.movable = false;
+  this.resizable = false;
   this.widget = null;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
   this.windowResizeType = 'layoutAndPosition';
+  this.$close = null;
+  this.$dragHandle = null;
+  this._moveHandler = this._onMove.bind(this);
+  this._resizeHandler = this._onResize.bind(this);
+  this._autoPositionOrig = null;
   this._addWidgetProperties(['widget']);
 };
 scout.inherits(scout.WidgetPopup, scout.Popup);
@@ -33,6 +41,9 @@ scout.WidgetPopup.prototype._render = function() {
 scout.WidgetPopup.prototype._renderProperties = function() {
   scout.WidgetPopup.parent.prototype._renderProperties.call(this);
   this._renderWidget();
+  this._renderClosable();
+  this._renderMovable();
+  this._renderResizable();
 };
 
 scout.WidgetPopup.prototype.setWidget = function(widget) {
@@ -46,4 +57,87 @@ scout.WidgetPopup.prototype._renderWidget = function() {
   this.widget.render();
   this.widget.$container.addClass('popup-widget');
   this.invalidateLayoutTree();
+};
+
+scout.WidgetPopup.prototype.setClosable = function(closable) {
+  this.setProperty('closable', closable);
+};
+
+scout.WidgetPopup.prototype._renderClosable = function() {
+  if (this.closable) {
+    if (this.$close) {
+      return;
+    }
+    this.$close = this.$container
+      .prependDiv('closer')
+      .on('click', this._onCloseIconClick.bind(this));
+  } else {
+    if (!this.$close) {
+      return;
+    }
+    this.$close.remove();
+    this.$close = null;
+  }
+};
+
+scout.WidgetPopup.prototype._onCloseIconClick = function() {
+  this.close();
+};
+
+scout.WidgetPopup.prototype.setResizable = function(resizable) {
+  this.setProperty('resizable', resizable);
+};
+
+scout.WidgetPopup.prototype._renderResizable = function() {
+  if (this.resizable) {
+    this.$container
+      .resizable()
+      .on('resize', this._resizeHandler);
+  } else {
+    this.$container
+      .unresizable()
+      .off('resize', this._resizeHandler);
+    this.invalidateLayoutTree(); // Resize popup to preferred size
+  }
+};
+
+scout.WidgetPopup.prototype._onResize = function(event) {
+  var autoSizeOrig = this.htmlComp.layout.autoSize;
+  this.htmlComp.layout.autoSize = false;
+  this.htmlComp.revalidateLayout();
+  this.htmlComp.layout.autoSize = autoSizeOrig;
+  return false;
+};
+
+scout.WidgetPopup.prototype.setMovable = function(movable) {
+  this.setProperty('movable', movable);
+};
+
+scout.WidgetPopup.prototype._renderMovable = function() {
+  if (this.movable) {
+    if (this.$dragHandle) {
+      return;
+    }
+    this.$dragHandle = this.$container.prependDiv('drag-handle');
+    this.$container.draggable(this.$dragHandle, $.throttle(this._moveHandler, 1000 / 60)); // 60fps
+  } else {
+    if (!this.$dragHandle) {
+      return;
+    }
+    this.$container.undraggable(this.$dragHandle);
+    this.$dragHandle.remove();
+    this.$dragHandle = null;
+    this.htmlComp.layout.autoPosition = this._autoPositionOrig;
+    this._autoPositionOrig = null;
+    this.invalidateLayoutTree(); // move popup to preferred position
+  }
+};
+
+scout.WidgetPopup.prototype._onMove = function(newOffset) {
+  // Disable automatic positioning as soon as the user drags the popup
+  if (this._autoPositionOrig === null) {
+    this._autoPositionOrig = this.htmlComp.layout.autoPosition;
+    this.htmlComp.layout.autoPosition = false;
+  }
+  this.trigger('move', newOffset);
 };

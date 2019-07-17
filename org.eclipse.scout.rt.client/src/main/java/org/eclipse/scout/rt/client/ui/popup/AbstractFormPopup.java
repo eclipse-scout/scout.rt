@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.classid.ClassId;
+import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 
 /**
  * @since 9.0
@@ -31,6 +32,11 @@ public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
     super(callInitializer);
   }
 
+  /**
+   * Uses {@link #createForm()} to create a new form instance and starts that form afterwards.
+   * 
+   * @return the newly created and started form.
+   */
   @Override
   protected IForm createWidget() {
     IForm form = createForm();
@@ -44,7 +50,19 @@ public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
     return form;
   }
 
-  protected abstract IForm createForm();
+  /**
+   * Creates a new instance of the form specified by {@link #getConfiguredWidget()}. Can be overridden to create the new
+   * instance manually.
+   * 
+   * @return a new form instance.
+   */
+  protected IForm createForm() {
+    Class<IForm> configuredWidget = getConfiguredWidget();
+    if (configuredWidget != null) {
+      return ConfigurationUtility.newInnerInstance(this, configuredWidget);
+    }
+    return null;
+  }
 
   @Override
   public void open() {

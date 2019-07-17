@@ -16,6 +16,9 @@ scout.Resizable = function($container) {
   scout.assertParameter('$container', $container);
   this.$container = $container;
   this.$window = $container.window();
+  this.$resizableS = null;
+  this.$resizableE = null;
+  this.$resizableSE = null;
   this._context = null;
 
   this._mouseDownHandler = this._onMouseDown.bind(this);
@@ -31,13 +34,13 @@ scout.Resizable = function($container) {
 scout.Resizable.FPS = 1000 / 15;
 
 scout.Resizable.prototype._appendResizeHandles = function() {
-  this.$container.appendDiv('resizable-handle resizable-s')
+  this.$resizableS = this.$container.appendDiv('resizable-handle resizable-s')
     .data('axis', 'y')
     .on('mousedown.resizable', this._mouseDownHandler);
-  this.$container.appendDiv('resizable-handle resizable-e')
+  this.$resizableE = this.$container.appendDiv('resizable-handle resizable-e')
     .data('axis', 'x')
     .on('mousedown.resizable', this._mouseDownHandler);
-  this.$container.appendDiv('resizable-handle resizable-se resizable-gripsmall-se')
+  this.$resizableSE = this.$container.appendDiv('resizable-handle resizable-se resizable-gripsmall-se')
     .data('axis', 'xy')
     .on('mousedown.resizable', this._mouseDownHandler);
 };
@@ -53,6 +56,21 @@ scout.Resizable.prototype._installRemoveHandler = function() {
 };
 
 scout.Resizable.prototype.destroy = function() {
+  if (this.$resizableS) {
+    this.$resizableS.remove();
+    this.$resizableS = null;
+  }
+  if (this.$resizableE) {
+    this.$resizableE.remove();
+    this.$resizableE = null;
+  }
+  if (this.$resizableSE) {
+    this.$resizableSE.remove();
+    this.$resizableSE = null;
+  }
+  if (this.$container) {
+    this.$container.removeClass('resizable');
+  }
   this.$window
     .off('mouseup.resizable', this._mouseUpHandler)
     .off('mousemove.resizable', this._mousemoveHandler);

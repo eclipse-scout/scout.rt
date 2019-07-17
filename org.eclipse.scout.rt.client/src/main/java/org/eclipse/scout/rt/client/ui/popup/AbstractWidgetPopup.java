@@ -16,9 +16,9 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * @since 9.0
@@ -39,10 +39,54 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
   @Override
   protected void initConfig() {
     super.initConfig();
+    setClosable(getConfiguredClosable());
+    setMovable(getConfiguredMovable());
+    setResizable(getConfiguredResizable());
     setWidget(createWidget());
     if (getWidget() instanceof ICompositeField) {
       FormUtility.rebuildFieldGrid((ICompositeField) getWidget());
     }
+  }
+
+  protected boolean getConfiguredClosable() {
+    return false;
+  }
+
+  public void setClosable(boolean closable) {
+    propertySupport.setPropertyBool(PROP_CLOSABLE, closable);
+  }
+
+  @Override
+  public boolean isClosable() {
+    return propertySupport.getPropertyBool(PROP_CLOSABLE);
+  }
+
+  protected boolean getConfiguredMovable() {
+    return false;
+  }
+
+  @Override
+  public void setMovable(boolean movable) {
+    propertySupport.setPropertyBool(PROP_MOVABLE, movable);
+  }
+
+  @Override
+  public boolean isMovable() {
+    return propertySupport.getPropertyBool(PROP_MOVABLE);
+  }
+
+  protected boolean getConfiguredResizable() {
+    return false;
+  }
+
+  @Override
+  public void setResizable(boolean enabled) {
+    propertySupport.setPropertyBool(PROP_RESIZABLE, enabled);
+  }
+
+  @Override
+  public boolean isResizable() {
+    return propertySupport.getPropertyBool(PROP_RESIZABLE);
   }
 
   protected Class<T> getConfiguredWidget() {
