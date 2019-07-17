@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 /**
  * Listener to receive messages.
  *
- * @see IMom#subscribe(IDestination, IMessageListener, RunContext)
+ * @see IMom#subscribe(IDestination, IMessageListener, SubscribeInput)
  * @since 6.1
  */
 @FunctionalInterface
