@@ -52,33 +52,78 @@ public interface IPopup extends IWidget {
   String POPUP_ALIGNMENT_BOTTOM = "bottom";
   String POPUP_ALIGNMENT_BOTTOMEDGE = "bottomedge";
 
+  void setAnchor(IWidget anchor);
+
   IWidget getAnchor();
+
+  void setAnimateOpening(boolean animateOpening);
 
   boolean isAnimateOpening();
 
+  void setAnimateResize(boolean nnimateResize);
+
   boolean isAnimateResize();
+
+  /**
+   * Note: setting this property while the popup is open has no effect.
+   */
+  void setWithGlassPane(boolean withGlassPane);
 
   boolean isWithGlassPane();
 
+  /**
+   * Note: setting this property while the popup is open has no effect.
+   */
+  void setScrollType(String scrollType);
+
   String getScrollType();
+
+  void setTrimWidth(boolean trimWidth);
 
   boolean isTrimWidth();
 
+  void setTrimHeight(boolean trimHeight);
+
   boolean isTrimHeight();
+
+  void setHorizontalAlignment(String horizontalAlignment);
 
   String getHorizontalAlignment();
 
+  void setVerticalAlignment(String verticalAlignment);
+
   String getVerticalAlignment();
+
+  void setWithArrow(boolean withArrow);
 
   boolean isWithArrow();
 
+  void setHorizontalSwitch(boolean horizontalSwitch);
+
   boolean isHorizontalSwitch();
+
+  void setVerticalSwitch(boolean verticalSwitch);
 
   boolean isVerticalSwitch();
 
+  /**
+   * Note: setting this property while the popup is open has no effect.
+   */
+  void setCloseOnAnchorMouseDown(boolean closeOnAnchorMouseDown);
+
   boolean isCloseOnAnchorMouseDown();
 
+  /**
+   * Note: setting this property while the popup is open has no effect.
+   */
+  void setCloseOnMouseDownOutside(boolean closeOnMouseDownOutside);
+
   boolean isCloseOnMouseDownOutside();
+
+  /**
+   * Note: setting this property while the popup is open has no effect.
+   */
+  void setCloseOnOtherPopupOpen(boolean closeOnOtherPopupOpen);
 
   boolean isCloseOnOtherPopupOpen();
 

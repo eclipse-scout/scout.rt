@@ -43,6 +43,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return (IWidget) propertySupport.getProperty(PROP_ANCHOR);
   }
 
+  @Override
   public void setAnchor(IWidget anchor) {
     propertySupport.setProperty(PROP_ANCHOR, anchor);
   }
@@ -56,6 +57,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_ANIMATE_OPENING);
   }
 
+  @Override
   public void setAnimateOpening(boolean animateOpening) {
     propertySupport.setPropertyBool(PROP_ANIMATE_OPENING, animateOpening);
   }
@@ -69,6 +71,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_ANIMATE_RESIZE);
   }
 
+  @Override
   public void setAnimateResize(boolean animateResize) {
     propertySupport.setPropertyBool(PROP_ANIMATE_RESIZE, animateResize);
   }
@@ -82,6 +85,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_WITH_GLASS_PANE);
   }
 
+  @Override
   public void setWithGlassPane(boolean withGlassPane) {
     propertySupport.setPropertyBool(PROP_WITH_GLASS_PANE, withGlassPane);
   }
@@ -95,6 +99,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyString(PROP_SCROLL_TYPE);
   }
 
+  @Override
   public void setScrollType(String scrollType) {
     propertySupport.setPropertyString(PROP_SCROLL_TYPE, scrollType);
   }
@@ -108,6 +113,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_TRIM_WIDTH);
   }
 
+  @Override
   public void setTrimWidth(boolean trimWidth) {
     propertySupport.setPropertyBool(PROP_TRIM_WIDTH, trimWidth);
   }
@@ -121,6 +127,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_TRIM_HEIGHT);
   }
 
+  @Override
   public void setTrimHeight(boolean trimHeight) {
     propertySupport.setPropertyBool(PROP_TRIM_HEIGHT, trimHeight);
   }
@@ -134,6 +141,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyString(PROP_HORIZONTAL_ALIGNMENT);
   }
 
+  @Override
   public void setHorizontalAlignment(String horizontalAlignment) {
     propertySupport.setPropertyString(PROP_HORIZONTAL_ALIGNMENT, horizontalAlignment);
   }
@@ -147,6 +155,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyString(PROP_VERTICAL_ALIGNMENT);
   }
 
+  @Override
   public void setVerticalAlignment(String verticalAlignment) {
     propertySupport.setPropertyString(PROP_VERTICAL_ALIGNMENT, verticalAlignment);
   }
@@ -160,6 +169,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_WITH_ARROW);
   }
 
+  @Override
   public void setWithArrow(boolean withArrow) {
     propertySupport.setPropertyBool(PROP_WITH_ARROW, withArrow);
   }
@@ -173,6 +183,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_CLOSE_ON_ANCHOR_MOUSE_DOWN);
   }
 
+  @Override
   public void setCloseOnAnchorMouseDown(boolean closeOnAnchorMouseDown) {
     propertySupport.setPropertyBool(PROP_CLOSE_ON_ANCHOR_MOUSE_DOWN, closeOnAnchorMouseDown);
   }
@@ -186,6 +197,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_CLOSE_ON_MOUSE_DOWN_OUTSIDE);
   }
 
+  @Override
   public void setCloseOnMouseDownOutside(boolean closeOnMouseDownOutside) {
     propertySupport.setPropertyBool(PROP_CLOSE_ON_MOUSE_DOWN_OUTSIDE, closeOnMouseDownOutside);
   }
@@ -199,6 +211,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_CLOSE_ON_OTHER_POPUP_OPEN);
   }
 
+  @Override
   public void setCloseOnOtherPopupOpen(boolean closeOnOtherPopupOpen) {
     propertySupport.setPropertyBool(PROP_CLOSE_ON_OTHER_POPUP_OPEN, closeOnOtherPopupOpen);
   }
@@ -212,6 +225,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_HORIZONTAL_SWITCH);
   }
 
+  @Override
   public void setHorizontalSwitch(boolean horizontalSwitch) {
     propertySupport.setPropertyBool(PROP_HORIZONTAL_SWITCH, horizontalSwitch);
   }
@@ -225,6 +239,7 @@ public abstract class AbstractPopup extends AbstractWidget implements IPopup {
     return propertySupport.getPropertyBool(PROP_VERTICAL_SWITCH);
   }
 
+  @Override
   public void setVerticalSwitch(boolean verticalSwitch) {
     propertySupport.setPropertyBool(PROP_VERTICAL_SWITCH, verticalSwitch);
   }

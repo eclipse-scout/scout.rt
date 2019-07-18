@@ -858,7 +858,7 @@ scout.Popup.prototype._setAnchor = function(anchor) {
   if (anchor) {
     this.setParent(anchor);
   }
-  this.setProperty('anchor', anchor);
+  this._setProperty('anchor', anchor);
 };
 
 scout.Popup.prototype._onAnchorRender = function() {
