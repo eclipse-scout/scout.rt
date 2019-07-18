@@ -6,12 +6,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.scout.migration.ecma6.FileUtility;
+import org.eclipse.scout.migration.ecma6.PathFilters;
+import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.task.json.IConstPlaceholderMapper;
@@ -32,15 +34,18 @@ public class T30000_JsonToJsModule extends AbstractTask {
 
   private static final Pattern PLACEHOLDER_PAT = Pattern.compile("(\\w+):\\s*'\\$\\{(\\w+):([^}]+)}'");
 
+  private Predicate<PathInfo> m_fileFilter = PathFilters.withExtension(JSON_EXTENSION);
+
   private List<IConstPlaceholderMapper> m_placeholderMappers;
 
   @Override
-  public boolean accept(Path file, Path moduleRelativeFile, Context context) {
-    if (!FileUtility.hasExtension(file, JSON_EXTENSION)) {
+  public boolean accept(PathInfo pathInfo, Context context) {
+
+    if (!m_fileFilter.test(pathInfo)) {
       return false;
     }
 
-    WorkingCopy candidate = context.ensureWorkingCopy(file);
+    WorkingCopy candidate = context.ensureWorkingCopy(pathInfo.getPath());
     return candidate.getSource().contains("\"objectType\":");
   }
 
@@ -50,8 +55,8 @@ public class T30000_JsonToJsModule extends AbstractTask {
   }
 
   @Override
-  public void process(Path file, Context context) {
-    WorkingCopy workingCopy = context.ensureWorkingCopy(file);
+  public void process(PathInfo pathInfo, Context context) {
+    WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     String originalSource = workingCopy.getSource();
 
     // migrate scout json model file to js file
@@ -63,16 +68,16 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step6 = "export default function(" + MODEL_OWNER_PARAM_NAME + ") {\n" +
         "  return " + step5 + ";\n}\n";
 
-    String step7 = migratePlaceholders(step6, file, context);
+    String step7 = migratePlaceholders(step6, pathInfo.getPath(), context);
 
     // change file name from Xyz.json to XyzModel.js
-    Path jsonRelPath = context.getSourceRootDirectory().relativize(file);
+    Path jsonRelPath = context.getSourceRootDirectory().relativize(pathInfo.getPath());
     String jsonFileName = jsonRelPath.getFileName().toString();
     String jsFileName = jsonFileName.substring(0, jsonFileName.length() - JSON_EXTENSION.length() - 1) + JSON_MODEL_NAME_SUFFIX + '.' + JS_EXTENSION;
     Path newRelPath = jsonRelPath.getParent().resolve(jsFileName);
-    Path newFileNameInSourceFolder = file.getParent().resolve(jsFileName);
+    Path newFileNameInSourceFolder = pathInfo.getPath().getParent().resolve(jsFileName);
     Assertions.assertFalse(Files.exists(newFileNameInSourceFolder),
-        "The migration of file '{}' would be stored in '{}' but this file already exists in the source folder!", file, newRelPath);
+        "The migration of file '{}' would be stored in '{}' but this file already exists in the source folder!", pathInfo.getPath(), newRelPath);
 
     workingCopy.setSource(step7);
     workingCopy.setRelativeTargetPath(newRelPath);

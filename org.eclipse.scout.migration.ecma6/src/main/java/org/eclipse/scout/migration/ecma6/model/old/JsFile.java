@@ -9,14 +9,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsFile extends AbstractSourceRange {
+public class JsFile extends AbstractJsElement {
 
   private final Path m_path;
   private JsCommentBlock m_copyRight;
   private List<JsClass> m_jsClasses = new ArrayList<>();
 
 
-  public JsFile(Path path){
+  public JsFile(Path path) {
     Assertions.assertNotNull(path);
     m_path = path;
   }
@@ -24,6 +24,7 @@ public class JsFile extends AbstractSourceRange {
   public Path getPath() {
     return m_path;
   }
+
 
   public void setCopyRight(JsCommentBlock copyRight) {
     m_copyRight = copyRight;

@@ -2,7 +2,7 @@ package org.eclipse.scout.migration.ecma6.model.old;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
-public class JsSuperCall extends AbstractSourceRange {
+public class JsSuperCall extends AbstractJsElement {
 
   private final String m_fullyQuallifiedName;
   private final String m_namespace;

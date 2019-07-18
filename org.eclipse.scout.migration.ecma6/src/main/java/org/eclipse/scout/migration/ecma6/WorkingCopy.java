@@ -9,16 +9,23 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class WorkingCopy {
 
   private final Path m_path;
+  private final String m_lineSeparator;
   private Path m_relativeTargetPath;
   private String m_initialSource;
   private String m_source;
 
-  public WorkingCopy(Path path){
+
+  public WorkingCopy(Path path, String lineSeparator){
     m_path = path;
+    m_lineSeparator = lineSeparator;
   }
 
   public Path getPath() {
     return m_path;
+  }
+
+  public String getLineSeparator() {
+    return m_lineSeparator;
   }
 
   public void setRelativeTargetPath(Path relativeTargetPath) {
@@ -30,7 +37,7 @@ public class WorkingCopy {
   }
 
   public boolean isDirty(){
-    return m_source != null;
+    return m_initialSource != null;
   }
 
   public String getInitialSource() {

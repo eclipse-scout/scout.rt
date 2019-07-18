@@ -68,7 +68,7 @@ public class Context {
   }
 
   public WorkingCopy ensureWorkingCopy(Path file) {
-    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p));
+    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p, FileUtility.lineSeparator(p)));
   }
 
   public Collection<WorkingCopy> getWorkingCopies(){
@@ -79,7 +79,7 @@ public class Context {
     return BEANS.get(propertyClass).getValue();
   }
 
-  public JsClass getFile(String fullyQuallifiedName){
+  public JsClass getJsClass(String fullyQuallifiedName){
     return m_jsClasses.get(fullyQuallifiedName);
   }
 

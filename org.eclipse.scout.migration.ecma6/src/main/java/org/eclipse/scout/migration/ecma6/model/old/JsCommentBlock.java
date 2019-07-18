@@ -1,6 +1,6 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-public class JsCommentBlock extends AbstractSourceRange {
+public class JsCommentBlock extends AbstractJsElement {
   private String m_source;
 
   public void setSource(String source) {

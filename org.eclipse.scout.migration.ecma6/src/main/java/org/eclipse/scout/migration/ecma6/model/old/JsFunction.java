@@ -1,7 +1,11 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-public class JsFunction extends AbstractSourceRange{
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+public class JsFunction extends AbstractJsElement{
+
+  private final JsClass m_jsClass;
   private final String m_name;
   private String m_args;
   private String m_body;
@@ -10,8 +14,13 @@ public class JsFunction extends AbstractSourceRange{
   private boolean m_constructor;
 
 
-  public JsFunction(String name){
+  public JsFunction(JsClass jsClass, String name){
+    m_jsClass = jsClass;
     m_name = name;
+  }
+
+  public JsClass getJsClass() {
+    return m_jsClass;
   }
 
   public String getName() {
@@ -68,4 +77,5 @@ public class JsFunction extends AbstractSourceRange{
     builder.append(getName()).append(" [constuctor:").append(isConstructor()).append(", static:").append(isStatic()).append(", hasComment:").append(getComment()!= null).append("]");
     return builder.toString();
   }
+
 }

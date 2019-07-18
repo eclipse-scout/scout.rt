@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 
 public class Migration {
 
+  public static String TODO_PREFIX = "TODO MIG: ";
   private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
+
 
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsiagbsicrm\\com.bsiag.bsicrm.ui.html");
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsistudio\\com.bsiag.bsistudio.lab.ui.html");
@@ -113,10 +115,9 @@ public class Migration {
   }
 
   private void processFile(Path file, Context context) {
-    Path relativeToModule = context.getCurrentModuleDirectory().relativize(file);
-    System.out.println("rel path: "+relativeToModule);
-    m_tasks.stream().filter(task -> task.accept(file, relativeToModule,  context))
-        .forEach(task -> task.process(file, context));
+    PathInfo info = new PathInfo(file, context.getCurrentModuleDirectory());
+    m_tasks.stream().filter(task -> task.accept(info,  context))
+        .forEach(task -> task.process(info, context));
 
   }
 

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JsClass {
+public class JsClass extends AbstractJsElement{
 
   private final String m_fullyQuallifiedName;
   private final JsFile m_jsFile;
@@ -15,6 +15,7 @@ public class JsClass {
   private final String m_name;
   private JsSuperCall m_superCall;
   private final List<JsFunction> m_functions = new ArrayList<>();
+  private final List<JsConstant> m_constants = new ArrayList<>();
 
   public JsClass(String fqn, JsFile jsFile) {
     m_fullyQuallifiedName = fqn;
@@ -63,10 +64,25 @@ public class JsClass {
     return m_functions.stream().filter(fun -> name.equals(fun.getName())).findFirst().orElse(null);
   }
 
-  public JsFunction getConstructor(){
+  public JsFunction getConstructor() {
     return m_functions.stream()
-      .filter(f -> f.isConstructor())
-      .findFirst().orElse(null);
+        .filter(f -> f.isConstructor())
+        .findFirst().orElse(null);
+  }
+
+  public void addConstant(JsConstant constant) {
+    m_constants.add(constant);
+  }
+
+  public List<JsConstant> getConstants() {
+    return Collections.unmodifiableList(m_constants);
+  }
+
+  public JsConstant getConstant(String name) {
+    return m_constants.stream()
+        .filter(c -> name.equals(c.getName()))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override
@@ -74,10 +90,19 @@ public class JsClass {
     return toString("");
   }
 
-  public String toString(String indent){
+  public String toString(String indent) {
     StringBuilder builder = new StringBuilder();
-    builder.append(getFullyQuallifiedName()).append(" [hasConstructor:").append(getConstructor() != null).append(", #functions:").append(m_functions.size()).append("]").append(System.lineSeparator())
-        .append(m_functions.stream().filter(f -> !f.isConstructor()).map(f -> indent+"- "+f.toString(indent+"  ")).collect(Collectors.joining(System.lineSeparator())));
+    builder.append(getFullyQuallifiedName()).append(" [hasConstructor:").append(getConstructor() != null).append(", #functions:").append(m_functions.size()).append("]");
+    if (m_functions.size() > 0) {
+      builder.append(System.lineSeparator()).append(indent).append("FUNCTIONS:").append(System.lineSeparator())
+          .append(m_functions.stream().filter(f -> !f.isConstructor()).map(f -> indent + "- " + f.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
+    }
+    if (m_constants.size() > 0) {
+      builder.append(System.lineSeparator()).append(indent).append("CONSTANTS:").append(System.lineSeparator())
+          .append(m_constants.stream()
+              .map(c -> indent + "- " + c.toString(indent + "  "))
+              .collect(Collectors.joining(System.lineSeparator())));
+    }
     return builder.toString();
   }
 }

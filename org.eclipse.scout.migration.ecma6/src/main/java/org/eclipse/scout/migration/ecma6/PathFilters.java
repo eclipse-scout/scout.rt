@@ -9,39 +9,40 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public final class PathFilters {
+  private static Path SRC_MAIN_JS = Paths.get("src/main/js");
 
   private PathFilters(){
   }
 
-  public static Predicate<Path> and(Predicate<Path>... predicates){
+  public static Predicate<PathInfo> and(Predicate<PathInfo>... predicates){
     if(predicates.length == 0){
       return p -> true;
     }
     return p ->  Arrays.stream(predicates).allMatch(predicate -> predicate.test(p));
   }
 
-  public static Predicate<Path> withExtension(String extension){
-    return p -> FileUtility.hasExtension(p, extension);
+  public static Predicate<PathInfo> withExtension(String extension){
+    return fileInfo -> FileUtility.hasExtension(fileInfo.getPath(), extension);
   }
 
-  public static Predicate<Path> inSrcMainJs(){
-    return p -> p.toString().contains(Paths.get("src/main/js").toString());
+  public static Predicate<PathInfo> inSrcMainJs(){
+    return info -> info.getModuleRelativePath() != null && info.getModuleRelativePath().startsWith(SRC_MAIN_JS);
   }
 
-  public static Predicate<Path> notOneOf(Path... notAccepted){
-    return notOneOf(CollectionUtility.hashSet(notAccepted));
+  public static Predicate<PathInfo> notOneOf(Path... notAcceptedRelativeToModule){
+    return notOneOf(CollectionUtility.hashSet(notAcceptedRelativeToModule));
   }
 
-  public static Predicate<Path> notOneOf(Set<Path> notAccepted){
-    return p -> !notAccepted.contains(p);
+  public static Predicate<PathInfo> notOneOf(Set<Path> notAcceptedRelativeToModule){
+     return info -> info.getModuleRelativePath() == null || !notAcceptedRelativeToModule.contains(info.getModuleRelativePath());
   }
 
-  public static Predicate<Path> oneOf(Path... accepted){
-    return oneOf(CollectionUtility.hashSet(accepted));
+  public static Predicate<PathInfo> oneOf(Path... acceptedRelativeToModule){
+    return oneOf(CollectionUtility.hashSet(acceptedRelativeToModule));
   }
 
-  public static Predicate<Path> oneOf(Set<Path> accepted){
-    return p -> accepted.contains(p);
+  public static Predicate<PathInfo> oneOf(Set<Path> acceptedRelativeToModule){
+    return info -> info.getModuleRelativePath()!= null && acceptedRelativeToModule.contains(info.getModuleRelativePath());
   }
 
 }

@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -19,7 +18,6 @@ public class JsFileParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsFileParser.class);
 
-
   private static Pattern START_COPY_RIGHT = Pattern.compile("^\\/\\*{5,}$");
   private static Pattern END_COPY_RIGHT = Pattern.compile("^\\ \\*{5,}\\/$");
   private static Pattern START_FUNCITON_COMMENT = Pattern.compile("^\\/\\*\\*$");
@@ -30,6 +28,8 @@ public class JsFileParser {
   private static Pattern START_STATIC_FUNCTION = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\ \\=\\s*function\\(([^\\)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
   private static Pattern END_BLOCK = Pattern.compile("^\\}\\;");
   private static Pattern SUPER_BLOCK = Pattern.compile("scout\\.inherits\\(([^\\,]+)\\,\\s*([^\\,]+)\\)\\;");
+//  scout.Menu.MenuStyle = {
+  private static Pattern CONST_START = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\s*\\=\\s*(\\{)\\s*(\\}\\;)?");
 
   private WorkingCopy m_workingCopy;
   private final JsFile m_jsFile;
@@ -37,11 +37,14 @@ public class JsFileParser {
   private String m_currentLine;
   private int m_currentLineNumber = 0;
   private int m_offsetStartLine = 0;
+  private final String m_lineSeparator;
 
   public JsFileParser(WorkingCopy workingCopy) {
     m_workingCopy = workingCopy;
+    String source = workingCopy.getInitialSource();
+    m_lineSeparator = workingCopy.getLineSeparator();
+    m_sourceReader = new BufferedReader(new StringReader(source));
     m_jsFile = new JsFile(workingCopy.getPath());
-    m_sourceReader = new BufferedReader(new StringReader(workingCopy.getInitialSource()));
   }
 
   public JsFile parse() throws IOException {
@@ -50,7 +53,7 @@ public class JsFileParser {
       JsCommentBlock comment = null;
       while (m_currentLine != null) {
         Matcher matcher = START_COPY_RIGHT.matcher(m_currentLine);
-        if(matcher.find()){
+        if (matcher.find()) {
           readCopyRight();
           continue;
         }
@@ -60,25 +63,29 @@ public class JsFileParser {
           continue;
         }
         matcher = START_CONSTRUCTOR.matcher(m_currentLine);
-        if(matcher.find()){
-          readFunction(matcher,comment, true, false);
+        if (matcher.find()) {
+          readFunction(matcher, comment, true, false);
           comment = null;
           continue;
         }
         matcher = START_FUNCTION.matcher(m_currentLine);
         if (matcher.find()) {
-          readFunction(matcher,comment, false, false);
+          readFunction(matcher, comment, false, false);
           comment = null;
           continue;
         }
         matcher = START_STATIC_FUNCTION.matcher(m_currentLine);
-        if(matcher.find()){
-          readFunction(matcher,comment, false, true);
+        if (matcher.find()) {
+          readFunction(matcher, comment, false, true);
           comment = null;
           continue;
         }
-        matcher = SUPER_BLOCK.matcher(m_currentLine);
+        matcher = CONST_START.matcher(m_currentLine);
         if(matcher.find()){
+          readConst(matcher);
+        }
+        matcher = SUPER_BLOCK.matcher(m_currentLine);
+        if (matcher.find()) {
           JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
           clazz.setSuperCall(readSuperCall(matcher));
 
@@ -91,16 +98,18 @@ public class JsFileParser {
       MigrationUtility.prependTodo(m_workingCopy, e.getMessage());
       throw e;
     }
-    // debug
-    if(LOG.isInfoEnabled()){
-      List<JsClass> jsClasses = m_jsFile.getJsClasses();
-      if(jsClasses.size() != 1){
-        LOG.info("JsFile '"+m_jsFile.getPath().getFileName()+"' does have a strange amount of classes["+
-          jsClasses.stream().map(jsC -> "'"+jsC.getFullyQuallifiedName()+"'").collect(Collectors.joining(", "))+"]");
-      }
+
+    List<JsClass> jsClasses = m_jsFile.getJsClasses();
+    if (jsClasses.size() == 0) {
+      LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
+    }
+    else if (jsClasses.size() > 1) {
+      LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
     }
     return m_jsFile;
   }
+
+
 
   private void readCopyRight() throws IOException {
     JsCommentBlock comment = new JsCommentBlock();
@@ -110,15 +119,15 @@ public class JsFileParser {
 
     while (m_currentLine != null) {
       if (END_COPY_RIGHT.matcher(m_currentLine).find()) {
-        commentBody.append(System.lineSeparator()).append(m_currentLine);
+        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
         break;
       }
       else if (FUNCITON_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(System.lineSeparator()).append(m_currentLine);
+        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
       }
       else {
         // no comment
-        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '"+m_currentLine+"']! ");
+        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
       }
       nextLine();
     }
@@ -128,7 +137,6 @@ public class JsFileParser {
     nextLine();
   }
 
-
   private JsCommentBlock readFunctionComment() throws IOException {
     JsCommentBlock comment = new JsCommentBlock();
     comment.setStartOffset(m_offsetStartLine);
@@ -137,15 +145,15 @@ public class JsFileParser {
 
     while (m_currentLine != null) {
       if (END_FUNCITON_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(System.lineSeparator()).append(m_currentLine);
+        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
         break;
       }
       else if (FUNCITON_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(System.lineSeparator()).append(m_currentLine);
+        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
       }
       else {
         // no comment
-        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '"+m_currentLine+"']! ");
+        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
       }
       nextLine();
     }
@@ -156,23 +164,25 @@ public class JsFileParser {
   }
 
   private JsFunction readFunction(Matcher matcher, JsCommentBlock comment, boolean constructor, boolean isStatic) throws IOException {
-    JsFunction function = new JsFunction(matcher.group(2));
+    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
+    JsFunction function = new JsFunction(clazz, matcher.group(2));
     function.setComment(comment);
     function.setStartOffset(m_offsetStartLine);
     function.setConstructor(constructor);
     function.setStatic(isStatic);
     function.setArgs(matcher.group(3));
     StringBuilder functionBody = new StringBuilder(matcher.group(4));
-    if(StringUtility.hasText(matcher.group(5))){
+    if (StringUtility.hasText(matcher.group(5))) {
       functionBody.append(matcher.group(5));
       function.setBody(functionBody.toString());
       nextLine();
+      clazz.addFunction(function);
       return function;
     }
     nextLine();
     while (m_currentLine != null) {
+      functionBody.append(m_currentLine);
       if (END_BLOCK.matcher(m_currentLine).find()) {
-        functionBody.append(m_currentLine);
         break;
       }
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
@@ -183,9 +193,39 @@ public class JsFileParser {
     function.setBody(functionBody.toString());
     function.setEndOffset(m_offsetStartLine + m_currentLine.length());
 
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
     clazz.addFunction(function);
     return function;
+  }
+
+  protected JsConstant readConst(Matcher matcher) throws IOException {
+    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
+    JsConstant constant = new JsConstant(clazz, matcher.group(2));
+    constant.setStartOffset(m_offsetStartLine);
+    StringBuilder bodyBuilder = new StringBuilder(matcher.group(3));
+    if (StringUtility.hasText(matcher.group(4))) {
+      // take care dynamic values can not be implemented as cons
+      LOG.warn("Dynamic const '"+constant.getName()+"' found in "+m_workingCopy.getPath().getFileName()+":"+m_currentLineNumber);
+      constant.addParseError("Looks like a dynamic constant. Must be migrated by hand.");
+      clazz.addConstant(constant);
+      return constant;
+    }
+    nextLine();
+    while (m_currentLine != null) {
+      bodyBuilder.append(m_currentLine);
+      if (END_BLOCK.matcher(m_currentLine).find()) {
+        break;
+      }
+      if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
+        throw new VetoException("Could not parse constant body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+      }
+      nextLine();
+    }
+    constant.setBody(bodyBuilder.toString());
+    constant.setEndOffset(m_offsetStartLine + m_currentLine.length());
+
+    clazz.addConstant(constant);
+    return constant;
+
   }
 
   protected JsSuperCall readSuperCall(Matcher matcher) throws IOException {
@@ -198,11 +238,10 @@ public class JsFileParser {
 
   private void nextLine() throws IOException {
     if (m_currentLine != null) {
-      m_offsetStartLine += (m_currentLine.length()+1);
+      m_offsetStartLine += (m_currentLine.length() + m_lineSeparator.length());
     }
     m_currentLine = m_sourceReader.readLine();
     m_currentLineNumber++;
   }
-
 
 }
