@@ -50,8 +50,8 @@ public class ObjectUtilityTest {
   }
 
   @Test
-  public void testNvlOptional() {
-    testNvlInternal((o1, o2) -> ObjectUtility.nvlOptional(o1, () -> o2));
+  public void testNvlOpt() {
+    testNvlInternal((o1, o2) -> ObjectUtility.nvlOpt(o1, () -> o2));
   }
 
   protected <T> void testNvlInternal(BiFunction<Object, Object, Object> nvlFunction) {

@@ -26,7 +26,7 @@ public final class ObjectUtility {
   }
 
   /**
-   * @return {@code value} if it is not {@code null} otherwise {@code valueWhenNull}.
+   * @return {@code value} if it is not {@code null}, otherwise {@code valueWhenNull}.
    */
   public static <T> T nvl(T value, T valueWhenNull) {
     if (value != null) {
@@ -36,10 +36,10 @@ public final class ObjectUtility {
   }
 
   /**
-   * @return {@code value} if it is not {@code null} otherwise the {@code valueSupplierWhenNull} is called to supply an
-   *         alternative which is returned.
+   * @return {@code value} if it is not {@code null}, otherwise the {@code valueSupplierWhenNull} is called to supply an
+   *         alternative which is returned. If {@code valueSupplierWhenNull} is absent, {@code null} is returned.
    */
-  public static <T> T nvlOptional(T value, Supplier<T> valueSupplierWhenNull) {
+  public static <T> T nvlOpt(T value, Supplier<T> valueSupplierWhenNull) {
     if (value != null) {
       return value;
     }
