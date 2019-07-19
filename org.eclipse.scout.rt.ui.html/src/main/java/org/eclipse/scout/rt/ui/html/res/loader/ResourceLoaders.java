@@ -10,19 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Pattern;
-
 @ApplicationScoped
 public class ResourceLoaders {
 
-  private static final Pattern ICON_PAT = Pattern.compile("^/icon/.*");
-  private static final Pattern DYNAMIC_RESOURCES_PAT = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
-  private static final Pattern DEFAULT_VALUES_PAT = Pattern.compile("^/defaultValues$");
+  protected static final Pattern ICON_PATTERN = Pattern.compile("^/icon/.*");
+  protected static final Pattern DYNAMIC_RESOURCES_PATTERN = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
+  protected static final Pattern DEFAULT_VALUES_PATTERN = Pattern.compile("^/defaultValues$");
 
   public static boolean isNewMode() {
     return Boolean.parseBoolean(System.getProperty("newMode")); // TODO [mvi]: remove
@@ -33,13 +34,12 @@ public class ResourceLoaders {
       return null;
     }
 
-    if (resourcePath.endsWith(".html")) {
-      String theme = UiThemeHelper.get().getTheme(req);
-      boolean cacheEnabled = UrlHints.isCacheHint(req);
-      boolean minify = UrlHints.isMinifyHint(req);
-      return new HtmlFileLoader(theme, minify, cacheEnabled);
+    if (ICON_PATTERN.matcher(resourcePath).matches()) {
+      return new IconLoader();
     }
-
+    if (DYNAMIC_RESOURCES_PATTERN.matcher(resourcePath).matches()) {
+      return new DynamicResourceLoader(req);
+    }
     boolean newMode = isNewMode();
     if (newMode) {
       boolean minify = UrlHints.isMinifyHint(req);
@@ -57,14 +57,14 @@ public class ResourceLoaders {
         return new ScriptFileLoader(theme, minify);
       }
     }
-    if (ICON_PAT.matcher(resourcePath).matches()) {
-      return new IconLoader();
-    }
-    if (DYNAMIC_RESOURCES_PAT.matcher(resourcePath).matches()) {
-      return new DynamicResourceLoader(req);
-    }
-    if (DEFAULT_VALUES_PAT.matcher(resourcePath).matches()) {
+    if (DEFAULT_VALUES_PATTERN.matcher(resourcePath).matches()) {
       return new DefaultValuesLoader();
+    }
+    if (resourcePath.endsWith(".html")) {
+      String theme = UiThemeHelper.get().getTheme(req);
+      boolean cacheEnabled = UrlHints.isCacheHint(req);
+      boolean minify = UrlHints.isMinifyHint(req);
+      return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
     if (resourcePath.endsWith("/locales.json")) {
       return new LocalesLoader();
@@ -87,4 +87,3 @@ public class ResourceLoaders {
     }
   }
 }
-
