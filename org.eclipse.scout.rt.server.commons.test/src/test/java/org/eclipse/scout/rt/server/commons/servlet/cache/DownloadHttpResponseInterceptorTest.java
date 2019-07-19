@@ -10,102 +10,108 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servlet.cache;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.scout.rt.platform.util.DownloadResponseHelper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class DownloadHttpResponseInterceptorTest {
   @Test
   public void testContentDispositionResponseHeader() {
-    String actual = new DownloadHttpResponseInterceptor("simple.pdf").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("simple.pdf", "attachment; filename=\""
         + "simple.pdf"
         + "\"; filename*=utf-8''"
         + "simple.pdf"
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderNullFillsDefaultValue() {
-    String actual = new DownloadHttpResponseInterceptor(null).getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept(null, "attachment; filename=\""
         + "Download"
         + "\"; filename*=utf-8''"
         + "Download"
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderEmptyFillsDefaultValue() {
-    String actual = new DownloadHttpResponseInterceptor("").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("", "attachment; filename=\""
         + "Download"
         + "\"; filename*=utf-8''"
         + "Download"
-        + "", actual);
+        + "");
+  }
+
+  @Test
+  public void testContentDispositionResponseHeaderContainsOnlyNonQuotesFillsDefaultValue() {
+    testIntercept("\"", "attachment; filename=\""
+        + "Download"
+        + "\"; filename*=utf-8''"
+        + "%22"
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderDoubleQuotes() {
-    String actual = new DownloadHttpResponseInterceptor("x\"x").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("x\"x", "attachment; filename=\""
         + "xx"
         + "\"; filename*=utf-8''"
         + "x%22x"
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderNewlinesTabsSpaces() {
-    String actual = new DownloadHttpResponseInterceptor("x\r\f\n\tx\b x").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("x\r\f\n\tx\b x", "attachment; filename=\""
         + "xx x"
         + "\"; filename*=utf-8''"
         + "xx%20x"
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderUrlEncodeTrimsWhitespace() {
-    String actual = new DownloadHttpResponseInterceptor("   x   ").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("   x   ", "attachment; filename=\""
         + "   x   "
         + "\"; filename*=utf-8''"
         + "x"
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderUrlEncodeTrimsWhitespace2() {
-    String actual = new DownloadHttpResponseInterceptor(" ").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept(" ", "attachment; filename=\""
         + " "
         + "\"; filename*=utf-8''"
         + ""
-        + "", actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderUmlauts() {
-    String actual = new DownloadHttpResponseInterceptor("TestäüöÄÜÖ.pdf").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("TestäüöÄÜÖ.pdf", "attachment; filename=\""
         + "TestäüöÄÜÖ.pdf"
         + "\"; filename*=utf-8''"
         + "Test%C3%A4%C3%BC%C3%B6%C3%84%C3%9C%C3%96.pdf"
-        + "", actual);
-    Assert.assertEquals(new String(actual.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.ISO_8859_1), actual);
+        + "");
   }
 
   @Test
   public void testContentDispositionResponseHeaderEuroSignIsRemovedInIso88591() {
-    String actual = new DownloadHttpResponseInterceptor("Test 5€.pdf").getContentDispositionHeaderValue();
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept("Test 5€.pdf", "attachment; filename=\""
         + "Test 5.pdf"
         + "\"; filename*=utf-8''"
         + "Test%205%E2%82%AC.pdf"
-        + "", actual);
+        + "");
   }
 
   @Test
@@ -116,12 +122,20 @@ public class DownloadHttpResponseInterceptorTest {
     }
     s = s + ".pdf";
     Assert.assertEquals("test.pdf".length() + 32, s.length());
-    String actual = new DownloadHttpResponseInterceptor(s).getContentDispositionHeaderValue();
 
-    Assert.assertEquals("attachment; filename=\""
+    testIntercept(s, "attachment; filename=\""
         + "test.pdf"
         + "\"; filename*=utf-8''"
         + "test.pdf"
-        + "", actual);
+        + "");
+  }
+
+  protected void testIntercept(String filename, String expectedContentDispositionHeader) {
+    DownloadHttpResponseInterceptor downloadHttpResponseInterceptor = new DownloadHttpResponseInterceptor(filename);
+    HttpServletResponse responseMock = mock(HttpServletResponse.class);
+    downloadHttpResponseInterceptor.intercept(null, responseMock);
+
+    Mockito.verify(responseMock, times(1)).setHeader(DownloadResponseHelper.HEADER_X_CONTENT_TYPE_OPTIONS, "nosniff");
+    Mockito.verify(responseMock, times(1)).setHeader(DownloadResponseHelper.HEADER_CONTENT_DISPOSITION, expectedContentDispositionHeader);
   }
 }
