@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.popup;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @since 9.0
@@ -52,6 +52,7 @@ public abstract class AbstractWidgetPopup<T extends IWidget> extends AbstractPop
     return false;
   }
 
+  @Override
   public void setClosable(boolean closable) {
     propertySupport.setPropertyBool(PROP_CLOSABLE, closable);
   }
