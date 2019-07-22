@@ -50,6 +50,9 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
+import org.eclipse.scout.rt.platform.dataobject.DoEntity;
+import org.eclipse.scout.rt.platform.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.html.HTML;
@@ -76,6 +79,22 @@ import org.eclipse.scout.rt.rest.IRestResource;
  * public Response getDocAsHtml(@QueryParam(ApiDocGenerator.STATIC_RESOURCE_PARAM) String staticResource) {
  *   return BEANS.get(ApiDocGenerator.class).getWebContent(staticResource);
  * }
+ *
+ * &#64;GET
+ * &#64;Path("doc")
+ * &#64;ApiDocIgnore
+ * &#64;Produces(MediaType.TEXT_PLAIN)
+ * public Response getDocAsText() {
+ *   return BEANS.get(ApiDocGenerator.class).getTextContent();
+ * }
+ *
+ * &#64;GET
+ * &#64;Path("doc")
+ * &#64;ApiDocIgnore
+ * &#64;Produces(MediaType.APPLICATION_JSON)
+ * public Response getDocAsJson() {
+ *   return BEANS.get(ApiDocGenerator.class).getJsonContent();
+ * }
  * </pre>
  */
 @ApplicationScoped
@@ -86,6 +105,9 @@ public class ApiDocGenerator {
    * {@link #getWebContent(String)}.
    */
   public static final String STATIC_RESOURCE_PARAM = "r";
+
+  protected static final String TEXT_ELEMENT_SEPARATOR = "\t";
+  protected static final String TEXT_LINE_SEPARATOR = "\n";
 
   public List<ResourceDescriptor> getResourceDescriptors() {
     return BEANS.all(IRestResource.class).stream()
@@ -102,7 +124,7 @@ public class ApiDocGenerator {
     String basePath = resourcePath.replaceAll("(/[^/]+).*", "$1");
     String name = resource.getClass().getSimpleName();
     String anchor = resource.getClass().getSimpleName();
-    String descriptionHtml = generateResourceDescriptionHtml(resource);
+    DescriptionDescriptor description = generateResourceDescription(resource);
 
     return new ResourceDescriptor()
         .withResource(resource)
@@ -110,7 +132,7 @@ public class ApiDocGenerator {
         .withBasePath(basePath)
         .withName(name)
         .withAnchor(anchor)
-        .withDescriptionHtml(descriptionHtml)
+        .withDescription(description)
         .withMethods(Stream.of(resource.getClass().getMethods())
             .filter(this::acceptMethod)
             .sorted(Comparator.comparing(this::generateMethodSignature)) // to make sure sorting is stable
@@ -128,7 +150,7 @@ public class ApiDocGenerator {
 
     String path = getPath(m);
     String signature = generateMethodSignature(m);
-    String descriptionHtml = generateMethodDescriptionHtml(m);
+    DescriptionDescriptor description = generateMethodDescription(m);
     String produces = getProduces(m);
     String consumes = getConsumes(m);
 
@@ -137,9 +159,28 @@ public class ApiDocGenerator {
         .withHttpMethod(httpMethod)
         .withPath(path)
         .withSignature(signature)
-        .withDescriptionHtml(descriptionHtml)
+        .withDescription(description)
         .withConsumes(consumes)
         .withProduces(produces);
+  }
+
+  protected DescriptionDescriptor toDescriptionDescriptor(ApiDocDescription desc) {
+    if (desc == null) {
+      return null;
+    }
+
+    String text = null;
+    if (StringUtility.hasText(desc.text())) {
+      text = desc.text();
+    }
+    else if (StringUtility.hasText(desc.textKey())) {
+      text = TEXTS.get(desc.textKey());
+    }
+
+    if (!StringUtility.hasText(text)) {
+      return null;
+    }
+    return DescriptionDescriptor.of(text, desc.htmlEnabled());
   }
 
   protected boolean acceptRestResource(IRestResource res) {
@@ -238,24 +279,8 @@ public class ApiDocGenerator {
     return (path != null ? stripSlashes(path.value()) : null);
   }
 
-  protected String getDescriptionHtml(ApiDocDescription desc) {
-    if (desc != null) {
-      String text = null;
-      if (StringUtility.hasText(desc.text())) {
-        text = desc.text();
-      }
-      else if (StringUtility.hasText(desc.textKey())) {
-        text = TEXTS.get(desc.textKey());
-      }
-      if (StringUtility.hasText(text)) {
-        return desc.htmlEnabled() ? text : BEANS.get(HtmlHelper.class).escapeAndNewLineToBr(text);
-      }
-    }
-    return null;
-  }
-
-  protected String generateResourceDescriptionHtml(IRestResource res) {
-    return getDescriptionHtml(res.getClass().getAnnotation(ApiDocDescription.class));
+  protected DescriptionDescriptor generateResourceDescription(IRestResource res) {
+    return ObjectUtility.nvl(toDescriptionDescriptor(res.getClass().getAnnotation(ApiDocDescription.class)), DescriptionDescriptor.NONE);
   }
 
   protected String generateMethodSignature(Method m) {
@@ -283,12 +308,11 @@ public class ApiDocGenerator {
     return m.getReturnType().getSimpleName() + " " + m.getName() + "(" + sb.toString() + ")" + ex;
   }
 
-  protected String generateMethodDescriptionHtml(Method m) {
-    String text = getDescriptionHtml(m.getAnnotation(ApiDocDescription.class));
-    if (text != null) {
-      return text;
-    }
+  protected DescriptionDescriptor generateMethodDescription(Method m) {
+    return ObjectUtility.nvlOpt(toDescriptionDescriptor(m.getAnnotation(ApiDocDescription.class)), () -> generateMethodDescriptionFallback(m));
+  }
 
+  protected DescriptionDescriptor generateMethodDescriptionFallback(Method m) {
     // Fallback: convert method name from camel case to human readable text.
     // (?<=...) positive look-behind
     // (?=...)  positive look-ahead
@@ -296,7 +320,7 @@ public class ApiDocGenerator {
     if (nameParts.length == 0) {
       return null;
     }
-    return IntStream.range(0, nameParts.length)
+    String text = IntStream.range(0, nameParts.length)
         .mapToObj(i -> {
           String word = StringUtility.lowercase(nameParts[i]);
           if (isAcronym(word)) {
@@ -305,6 +329,7 @@ public class ApiDocGenerator {
           return (i == 0 ? StringUtility.uppercaseFirst(word) : word);
         })
         .collect(Collectors.joining(" ")) + (StringUtility.equalsIgnoreCase(nameParts[0], "is") ? "?" : ".");
+    return DescriptionDescriptor.of(text, false);
   }
 
   protected boolean isAcronym(String lowercaseWord) {
@@ -368,8 +393,8 @@ public class ApiDocGenerator {
               .addAttribute("title", "Go to top"))
           .cssClass("title"));
 
-      if (r.getDescriptionHtml() != null) {
-        elements.add(HTML.div(HTML.raw(r.getDescriptionHtml())).cssClass("resource-description"));
+      if (!r.getDescription().isEmpty()) {
+        elements.add(HTML.div(HTML.raw(r.getDescription().toHtml())).cssClass("resource-description"));
       }
 
       r.getMethods().stream().forEach(m -> {
@@ -381,7 +406,7 @@ public class ApiDocGenerator {
                     HTML.span(StringUtility.box("/", m.getPath(), "")).cssClass("method")).cssClass("path"))
                 .cssClass("header"),
             HTML.div(
-                HTML.div(HTML.raw(m.getDescriptionHtml())).cssClass("description"),
+                HTML.div(HTML.raw(m.getDescription().toHtml())).cssClass("description"),
                 HTML.div(m.getSignature()).cssClass("signature"),
                 HTML.div(
                     StringUtility.hasText(m.getConsumes()) ? HTML.div(HTML.span("Consumes ").cssClass("k"), HTML.span(m.getConsumes()).cssClass("v")).cssClass("line") : null,
@@ -476,6 +501,109 @@ public class ApiDocGenerator {
     return s.replaceAll("^/+|/+$", "");
   }
 
+  /**
+   * Returns a generated API documentation in plain text format.
+   * <p>
+   * The first line contains a list of the returned fields (header). Each subsequent line describes one API call:
+   * <ul>
+   * <li><b>resource</b>
+   * <li><b>method</b>
+   * <li><b>path</b>
+   * <li><b>consumes</b>
+   * <li><b>produces</b>
+   * <li><b>description</b> (without line breaks)
+   * </ul>
+   * Lines are separated by {@link #TEXT_LINE_SEPARATOR}, fields are separated by {@link #TEXT_ELEMENT_SEPARATOR}.
+   */
+  public Response getTextContent() {
+    final String content = toText(getResourceDescriptors());
+    return Response.ok()
+        .type(MediaType.TEXT_PLAIN)
+        .entity(content)
+        .build();
+  }
+
+  protected String toText(List<ResourceDescriptor> resourceDescriptors) {
+    final StringBuilder sb = new StringBuilder();
+
+    // append header
+    sb.append("resource");
+    sb.append(TEXT_ELEMENT_SEPARATOR);
+    sb.append("method");
+    sb.append(TEXT_ELEMENT_SEPARATOR);
+    sb.append("path");
+    sb.append(TEXT_ELEMENT_SEPARATOR);
+    sb.append("consumes");
+    sb.append(TEXT_ELEMENT_SEPARATOR);
+    sb.append("produces");
+    sb.append(TEXT_ELEMENT_SEPARATOR);
+    sb.append("description");
+    sb.append(TEXT_LINE_SEPARATOR);
+
+    // append all resources and methods
+    resourceDescriptors.stream().forEach(r -> {
+      r.getMethods().stream().forEach(m -> {
+        sb.append(r.getName());
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(m.getHttpMethod());
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(r.getPath());
+        if (!StringUtility.isNullOrEmpty(m.getPath())) {
+          sb.append("/");
+          sb.append(m.getPath());
+        }
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(StringUtility.emptyIfNull(m.getConsumes()));
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(StringUtility.emptyIfNull(m.getProduces()));
+        sb.append(TEXT_ELEMENT_SEPARATOR);
+        sb.append(m.getDescription().toPlainText(true));
+        sb.append(TEXT_LINE_SEPARATOR);
+      });
+    });
+    return sb.toString();
+  }
+
+  /**
+   * Returns a generated API documentation in JSON format.
+   * <p>
+   * The result is an array of objects with the following fields:
+   * <ul>
+   * <li><b>resource</b>
+   * <li><b>method</b>
+   * <li><b>path</b>
+   * <li><b>description</b>
+   * <li><b>signature</b>
+   * <li><b>consumes</b>
+   * <li><b>produces</b>
+   * </ul>
+   */
+  public Response getJsonContent() {
+    final String content = toJsonString(getResourceDescriptors());
+    return Response.ok()
+        .type(MediaType.APPLICATION_JSON)
+        .entity(content)
+        .build();
+  }
+
+  protected String toJsonString(List<ResourceDescriptor> resourceDescriptors) {
+    List<DoEntity> jsonMethods = resourceDescriptors.stream()
+        .flatMap(r -> r.getMethods().stream()
+            .map(m -> {
+              return BEANS.get(DoEntityBuilder.class)
+                  .put("resource", r.getName())
+                  .put("method", m.getHttpMethod())
+                  .put("path", StringUtility.join("/", r.getPath(), m.getPath()))
+                  .put("description", m.getDescription().toPlainText(false))
+                  .put("signature", m.getSignature())
+                  .putIf("consumes", m.getConsumes(), Objects::nonNull)
+                  .putIf("produces", m.getProduces(), Objects::nonNull)
+                  .build();
+            }))
+        .collect(Collectors.toList());
+    return BEANS.get(IPrettyPrintDataObjectMapper.class).writeValue(jsonMethods);
+  }
+
   public static class ResourceDescriptor {
 
     private IRestResource m_resource;
@@ -484,7 +612,7 @@ public class ApiDocGenerator {
     private String m_basePath; // first segment of "path"
     private String m_name;
     private String m_anchor;
-    private String m_descriptionHtml;
+    private DescriptionDescriptor m_description;
 
     private List<MethodDescriptor> m_methods;
 
@@ -533,12 +661,12 @@ public class ApiDocGenerator {
       return this;
     }
 
-    public String getDescriptionHtml() {
-      return m_descriptionHtml;
+    public DescriptionDescriptor getDescription() {
+      return m_description;
     }
 
-    public ResourceDescriptor withDescriptionHtml(String descriptionHtml) {
-      m_descriptionHtml = descriptionHtml;
+    public ResourceDescriptor withDescription(DescriptionDescriptor description) {
+      m_description = description;
       return this;
     }
 
@@ -560,7 +688,7 @@ public class ApiDocGenerator {
     private String m_path;
 
     private String m_signature;
-    private String m_descriptionHtml;
+    private DescriptionDescriptor m_description;
 
     private String m_consumes;
     private String m_produces;
@@ -601,12 +729,12 @@ public class ApiDocGenerator {
       return this;
     }
 
-    public String getDescriptionHtml() {
-      return m_descriptionHtml;
+    public DescriptionDescriptor getDescription() {
+      return m_description;
     }
 
-    public MethodDescriptor withDescriptionHtml(String descriptionHtml) {
-      m_descriptionHtml = descriptionHtml;
+    public MethodDescriptor withDescription(DescriptionDescriptor description) {
+      m_description = description;
       return this;
     }
 
@@ -626,6 +754,51 @@ public class ApiDocGenerator {
     public MethodDescriptor withProduces(String produces) {
       m_produces = produces;
       return this;
+    }
+  }
+
+  public static class DescriptionDescriptor {
+
+    private String m_rawDescription;
+    private boolean m_htmlEnabled;
+
+    public static final DescriptionDescriptor NONE = of(null, false);
+
+    public static DescriptionDescriptor of(String rawDescription, boolean htmlEnabled) {
+      return new DescriptionDescriptor()
+          .withRawDescription(rawDescription)
+          .withHtmlEnabled(htmlEnabled);
+    }
+
+    public String getRawDescription() {
+      return m_rawDescription;
+    }
+
+    public DescriptionDescriptor withRawDescription(String description) {
+      m_rawDescription = description;
+      return this;
+    }
+
+    public boolean isHtmlEnabled() {
+      return m_htmlEnabled;
+    }
+
+    public DescriptionDescriptor withHtmlEnabled(boolean htmlEnabled) {
+      m_htmlEnabled = htmlEnabled;
+      return this;
+    }
+
+    public boolean isEmpty() {
+      return !StringUtility.hasText(m_rawDescription);
+    }
+
+    public String toHtml() {
+      return (m_htmlEnabled ? m_rawDescription : BEANS.get(HtmlHelper.class).escapeAndNewLineToBr(m_rawDescription));
+    }
+
+    public String toPlainText(boolean removeNewLines) {
+      String plainText = (m_htmlEnabled ? BEANS.get(HtmlHelper.class).toPlainText(m_rawDescription) : m_rawDescription);
+      return (removeNewLines ? StringUtility.removeNewLines(plainText) : plainText);
     }
   }
 }
