@@ -15,9 +15,11 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -69,6 +71,13 @@ public class ConfigFileCredentialVerifier implements ICredentialVerifier {
   @PostConstruct
   protected void init() {
     loadCredentials(BEANS.get(getCredentialPropertyClass()));
+  }
+
+  /**
+   * @return unmodifiable set containing usernames
+   */
+  protected Set<String> getUsernames() {
+    return Collections.unmodifiableSet(m_credentials.keySet());
   }
 
   /**
