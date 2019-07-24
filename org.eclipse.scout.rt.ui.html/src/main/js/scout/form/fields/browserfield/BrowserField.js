@@ -12,17 +12,18 @@ scout.BrowserField = function() {
   scout.BrowserField.parent.call(this);
 
   this.autoCloseExternalWindow = false;
-  this.externalWindowButtonText;
-  this.externalWindowFieldText;
+  this.externalWindowButtonText = null;
+  this.externalWindowFieldText = null;
   this.location = null;
+  this.trackLocation = false;
   this.sandboxEnabled = true;
   this.sandboxPermissions = null;
   this.scrollBarEnabled = false;
   this.showInExternalWindow = false;
-  this._messageListener;
-  this._popupWindow;
-  this._externalWindowTextField;
-  this._externalWindowButton;
+  this._messageListener = null;
+  this._popupWindow = null;
+  this._externalWindowTextField = null;
+  this._externalWindowButton = null;
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
@@ -39,8 +40,10 @@ scout.BrowserField.prototype._init = function(model) {
     location: model.location,
     sandboxEnabled: model.sandboxEnabled,
     sandboxPermissions: model.sandboxPermissions,
-    scrollBarEnabled: model.scrollBarEnabled
+    scrollBarEnabled: model.scrollBarEnabled,
+    trackLocation: model.trackLocation
   });
+  this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
 };
 
 scout.BrowserField.prototype._render = function() {
@@ -118,15 +121,27 @@ scout.BrowserField.prototype._renderLocation = function() {
   }
 };
 
+scout.BrowserField.prototype.setAutoCloseExternalWindow = function(autoCloseExternalWindow) {
+  this.setProperty('autoCloseExternalWindow', autoCloseExternalWindow);
+};
+
+scout.BrowserField.prototype.setExternalWindowButtonText = function(externalWindowButtonText) {
+  this.setProperty('externalWindowButtonText', externalWindowButtonText);
+};
+
 scout.BrowserField.prototype._renderExternalWindowButtonText = function() {
   if (this.showInExternalWindow) {
-    this._externalWindowButton.text(this.externalWindowButtonText);
+    this._externalWindowButton.text(this.externalWindowButtonText || '');
   }
+};
+
+scout.BrowserField.prototype.setExternalWindowFieldText = function(externalWindowFieldText) {
+  this.setProperty('externalWindowFieldText', externalWindowFieldText);
 };
 
 scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
   if (this.showInExternalWindow) {
-    this._externalWindowTextField.text(this.externalWindowFieldText);
+    this._externalWindowTextField.text(this.externalWindowFieldText || '');
   }
 };
 
@@ -256,10 +271,25 @@ scout.BrowserField.prototype._onMessage = function(event) {
   });
 };
 
+scout.BrowserField.prototype.setTrackLocationChange = function(trackLocation) {
+  this.setProperty('trackLocation', trackLocation);
+  this.iframe.setTrackLocationChange(trackLocation);
+};
+
+scout.BrowserField.prototype._onIFramePropertyChange = function(event) {
+  if (!this.trackLocation) {
+    return;
+  }
+  if (event.propertyName === 'location') {
+    this._setProperty('location', event.newValue);
+  }
+};
+
 scout.BrowserField.prototype._onLoad = function(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
+
   this.invalidateLayoutTree();
 };
 

@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.BrowserFieldAdapter = function() {
   scout.BrowserFieldAdapter.parent.call(this);
+  this._addRemoteProperties(['location']);
 };
 scout.inherits(scout.BrowserFieldAdapter, scout.ValueFieldAdapter);
 

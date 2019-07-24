@@ -15,10 +15,12 @@ scout.IFrame = function() {
   this.sandboxEnabled = true;
   this.sandboxPermissions = null;
   this.scrollBarEnabled = true;
+  this.trackLocation = false;
   // Iframe on iOS is always as big as its content. Workaround it by using a wrapper div with overflow: auto
   // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
   this.wrapIframe = scout.device.isIosPlatform();
-  this.$iframe;
+  this.$iframe = null;
+  this._loadHandler = this._onLoad.bind(this);
 };
 scout.inherits(scout.IFrame, scout.Widget);
 
@@ -41,6 +43,7 @@ scout.IFrame.prototype._renderProperties = function() {
   this._renderScrollBarEnabled(); // Needs to be before _renderLocation, see comment in _renderScrollBarEnabled
   this._renderLocation();
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
+  this._renderTrackLocationChange();
 };
 
 scout.IFrame.prototype.setLocation = function(location) {
@@ -52,6 +55,37 @@ scout.IFrame.prototype._renderLocation = function() {
   // empty locations simply remove the src attribute but don't remove the old content.
   var location = this.location || 'about:blank';
   this.$iframe.attr('src', location);
+};
+
+scout.IFrame.prototype.setTrackLocationChange = function(trackLocation) {
+  this.setProperty('trackLocation', trackLocation);
+};
+
+scout.IFrame.prototype._renderTrackLocationChange = function(trackLocation) {
+  if (this.trackLocation) {
+    this.$iframe.on('load', this._loadHandler);
+  } else {
+    this.$iframe.off('load', this._loadHandler);
+  }
+};
+
+scout.IFrame.prototype._onLoad = function(event) {
+  if (!this.rendered) { // check needed, because this is an async callback
+    return;
+  }
+
+  if (this.trackLocation) {
+    var doc = this.$iframe[0].contentDocument;
+    if (!doc) {
+      // Doc can be null if website cannot be loaded or if website is not from same origin
+      return;
+    }
+    var location = doc.location.href;
+    if (location === 'about:blank') {
+      location = null;
+    }
+    this._setProperty('location', location);
+  }
 };
 
 scout.IFrame.prototype.setScrollBarEnabled = function(scrollBarEnabled) {

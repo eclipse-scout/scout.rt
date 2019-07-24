@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
-import java.util.Set;
-
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
@@ -27,6 +25,8 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
+
+import java.util.Set;
 
 public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD> implements IBinaryResourceProvider {
 
@@ -105,6 +105,12 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
         return getModel().isAutoCloseExternalWindow();
       }
     });
+    putJsonProperty(new JsonProperty<IBrowserField>(IBrowserField.PROP_TRACK_LOCATION, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTrackLocationChange();
+      }
+    });
   }
 
   @Override
@@ -162,6 +168,22 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
     else {
       super.handleUiEvent(event);
     }
+  }
+
+  @Override
+  protected void handleUiPropertyChange(String propertyName, JSONObject data) {
+    if (IBrowserField.PROP_LOCATION.equals(propertyName)) {
+      handleUiLocationChange(data);
+    }
+    else {
+      super.handleUiPropertyChange(propertyName, data);
+    }
+  }
+
+  protected void handleUiLocationChange(JSONObject data) {
+    String location = data.getString(IBrowserField.PROP_LOCATION);
+    addPropertyEventFilterCondition(IBrowserField.PROP_LOCATION, location);
+    getModel().getUIFacade().setLocationFromUi(location);
   }
 
   protected void handleUiPostMessage(JsonEvent event) {

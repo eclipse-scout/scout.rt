@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * This model represents a separate "website" inside the application.
@@ -66,6 +66,7 @@ public interface IBrowserField extends IFormField {
   String PROP_EXTERNAL_WINDOW_FIELD_TEXT = "externalWindowFieldText";
   String PROP_EXTERNAL_WINDOW_BUTTON_TEXT = "externalWindowButtonText";
   String PROP_AUTO_CLOSE_EXTERNAL_WINDOW = "autoCloseExternalWindow";
+  String PROP_TRACK_LOCATION = "trackLocation";
 
   IBrowserFieldUIFacade getUIFacade();
 
@@ -242,4 +243,18 @@ public interface IBrowserField extends IFormField {
    * @see #isAutoCloseExternalWindow()
    */
   void setAutoCloseExternalWindow(boolean autoCloseExternalWindow);
+
+  /**
+   * Configures whether the location property should be updated whenever the location of the iframe changes. Default is
+   * false.
+   * <p>
+   * Note: This does only work if the iframe and the iframe's parent document have the same origin (protocol, port and
+   * host are the same).
+   */
+  boolean isTrackLocationChange();
+
+  /**
+   * @see #isTrackLocationChange()
+   */
+  void setTrackLocationChange(boolean trackLocation);
 }

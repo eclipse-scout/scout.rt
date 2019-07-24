@@ -10,13 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.dto.FormData;
@@ -43,6 +36,13 @@ import org.eclipse.scout.rt.shared.data.form.fields.browserfield.AbstractBrowser
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @ClassId("6402e68c-abd1-42b8-8da2-b4a12f910c98")
 @FormData(value = AbstractBrowserFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE)
@@ -138,6 +138,18 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
   }
 
   /**
+   * If true, the location property is updated whenever the location of the iframe changes. Default is false.
+   * <p>
+   * Note: This does only work if the iframe and the iframe's parent document have the same origin (protocol, port and
+   * host are the same).
+   */
+  @Order(240)
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  protected boolean getConfiguredTrackLocationChange() {
+    return false;
+  }
+
+  /**
    * This callback is invoked when the application has received a post-message from the embedded browser (IFRAME) or
    * external window.
    * <p>
@@ -194,6 +206,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     setExternalWindowButtonText(getConfiguredExternalWindowButtonText());
     setExternalWindowFieldText(getConfiguredExternalWindowFieldText());
     setAutoCloseExternalWindow(getConfiguredAutoCloseExternalWindow());
+    setTrackLocationChange(getConfiguredTrackLocationChange());
   }
 
   @Override
@@ -425,6 +438,16 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     propertySupport.setPropertyBool(PROP_AUTO_CLOSE_EXTERNAL_WINDOW, autoCloseExternalWindow);
   }
 
+  @Override
+  public boolean isTrackLocationChange() {
+    return propertySupport.getPropertyBool(PROP_TRACK_LOCATION);
+  }
+
+  @Override
+  public void setTrackLocationChange(boolean trackLocation) {
+    propertySupport.setPropertyBool(PROP_TRACK_LOCATION, trackLocation);
+  }
+
   protected class P_UIFacade implements IBrowserFieldUIFacade {
 
     @Override
@@ -443,6 +466,11 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     @Override
     public BinaryResource requestBinaryResourceFromUI(String filename) {
       return resolveBinaryResource(filename);
+    }
+
+    @Override
+    public void setLocationFromUi(String location) {
+      setLocation(location);
     }
   }
 
