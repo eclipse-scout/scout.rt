@@ -12,17 +12,14 @@ package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
 
-public class VetoExceptionMapper extends AbstractVetoExceptionMapper<VetoException> {
+public class AccessForbiddenExceptionMapper extends AbstractVetoExceptionMapper<AccessForbiddenException> {
 
   @Override
-  protected ErrorResponseBuilder createErrorResponseBuilder(VetoException exception) {
-    // Veto Exception is thrown if access is denied, but may also in other circumstances (like failed validation, missing item, etc.).
-    // Since we cannot distinguish them at the moment, always use forbidden status code.
-    // We should consider using status codes for veto exceptions so they can be mapped to a HTTP status code.
+  protected ErrorResponseBuilder createErrorResponseBuilder(AccessForbiddenException exception) {
     return super.createErrorResponseBuilder(exception)
-        .withStatus(Response.Status.FORBIDDEN); // TODO [10.0] rst use instead Response.Status.BAD_REQUEST
+        .withStatus(Response.Status.FORBIDDEN);
   }
 }

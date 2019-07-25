@@ -14,15 +14,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 /**
- * Strategy used by proxied REST clients for transforming technical REST exceptions, i.e.
- * {@link WebApplicationException} and {@link javax.ws.rs.ProcessingException}, into the current application context.
+ * Strategy used by proxied REST clients for transforming technical REST exceptions ({@link WebApplicationException} and
+ * {@link javax.ws.rs.ProcessingException}) into the current application context.
  */
 @FunctionalInterface
 public interface IRestClientExceptionTransformer {
 
-  IRestClientExceptionTransformer IDENTITY = (e, r) -> {
-    throw e;
-  };
+  IRestClientExceptionTransformer IDENTITY = (e, r) -> e;
 
   static IRestClientExceptionTransformer identityIfNull(IRestClientExceptionTransformer t) {
     return t == null ? IDENTITY : t;
