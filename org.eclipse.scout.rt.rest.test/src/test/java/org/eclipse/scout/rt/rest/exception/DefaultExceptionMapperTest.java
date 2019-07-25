@@ -144,7 +144,7 @@ public class DefaultExceptionMapperTest {
     VetoExceptionMapper mapper = new VetoExceptionMapper();
     VetoException exception = new VetoException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
     try (Response response = mapper.toResponse(exception)) {
-      assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+      assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());

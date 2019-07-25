@@ -19,10 +19,7 @@ public class VetoExceptionMapper extends AbstractVetoExceptionMapper<VetoExcepti
 
   @Override
   protected ErrorResponseBuilder createErrorResponseBuilder(VetoException exception) {
-    // Veto Exception is thrown if access is denied, but may also in other circumstances (like failed validation, missing item, etc.).
-    // Since we cannot distinguish them at the moment, always use forbidden status code.
-    // We should consider using status codes for veto exceptions so they can be mapped to a HTTP status code.
     return super.createErrorResponseBuilder(exception)
-        .withStatus(Response.Status.FORBIDDEN); // TODO [10.0] rst use instead Response.Status.BAD_REQUEST
+        .withStatus(Response.Status.BAD_REQUEST);
   }
 }

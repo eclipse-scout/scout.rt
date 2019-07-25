@@ -15,6 +15,8 @@ import java.util.function.BiFunction;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
+import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -31,10 +33,20 @@ public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestCli
   protected RuntimeException transformByResponseStatus(Response.Status status, RuntimeException e, Response response) {
     switch (status) {
       case FORBIDDEN:
-        // TODO [10.0] rst use instead AccessForbiddenException & add transformers for other client errors
-        return transformClientError(e, response, VetoException::new);
+        return transformClientError(e, response, AccessForbiddenException::new);
+      case NOT_FOUND:
+        return transformClientError(e, response, ResourceNotFoundException::new);
     }
     return super.transformByResponseStatus(status, e, response);
+  }
+
+  @Override
+  protected RuntimeException transformByResponseStatusFamily(Response.Status.Family family, RuntimeException e, Response response) {
+    switch (family) {
+      case CLIENT_ERROR:
+        return transformClientError(e, response, VetoException::new);
+    }
+    return super.transformByResponseStatusFamily(family, e, response);
   }
 
   protected RuntimeException transformClientError(RuntimeException e, Response response, BiFunction<String, RuntimeException, VetoException> vetoExceptionFactory) {
