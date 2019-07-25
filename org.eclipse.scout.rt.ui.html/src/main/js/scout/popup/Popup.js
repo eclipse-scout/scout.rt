@@ -674,7 +674,7 @@ scout.Popup.prototype.getWindowSize = function() {
 scout.Popup.prototype.overlap = function(location, includeMargin) {
   var $container = this.$container;
   if (!$container || !location) {
-    return;
+    return null;
   }
   includeMargin = scout.nvl(includeMargin, true);
   var height = $container.outerHeight(includeMargin);
@@ -863,12 +863,18 @@ scout.Popup.prototype._setAnchor = function(anchor) {
 
 scout.Popup.prototype._onAnchorRender = function() {
   this.session.layoutValidator.schedulePostValidateFunction(function() {
-    if (!this.rendered) {
-      var currentAnimateOpening = this.animateOpening;
-      this.animateOpening = false;
-      this.open();
-      this.animateOpening = currentAnimateOpening;
+    if (this.rendered || this.destroyed) {
+      return;
     }
+    if (this.anchor && !this.anchor.rendered) {
+      // Anchor was removed again while this function was scheduled -> wait again for rendering
+      this.anchor.one('render', this._anchorRenderHandler);
+      return;
+    }
+    var currentAnimateOpening = this.animateOpening;
+    this.animateOpening = false;
+    this.open();
+    this.animateOpening = currentAnimateOpening;
   }.bind(this));
 };
 
