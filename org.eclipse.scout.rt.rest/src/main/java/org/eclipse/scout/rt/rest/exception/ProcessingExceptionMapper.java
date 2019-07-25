@@ -30,8 +30,8 @@ public class ProcessingExceptionMapper extends AbstractExceptionMapper<Processin
 
   protected Response createResponse(ProcessingException exception) {
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
-        .withCode(exception.getStatus().getCode())
+        .withHttpStatus(Response.Status.INTERNAL_SERVER_ERROR)
+        .withErrorCode(exception.getStatus().getCode())
         .withMessage(defaultErrorMessage(exception))
         .build();
   }

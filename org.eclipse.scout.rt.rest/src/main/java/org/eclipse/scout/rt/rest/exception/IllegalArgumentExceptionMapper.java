@@ -29,7 +29,7 @@ public class IllegalArgumentExceptionMapper extends AbstractExceptionMapper<Ille
   protected Response toResponseImpl(IllegalArgumentException exception) {
     LOG.info("{}: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.BAD_REQUEST)
+        .withHttpStatus(Response.Status.BAD_REQUEST)
         .withMessage(Response.Status.BAD_REQUEST.getReasonPhrase()) // do not return internal exception message
         .build();
   }

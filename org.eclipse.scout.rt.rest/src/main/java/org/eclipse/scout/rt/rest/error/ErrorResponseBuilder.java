@@ -24,18 +24,18 @@ import org.eclipse.scout.rt.platform.context.CorrelationId;
 @Bean
 public class ErrorResponseBuilder {
 
-  private int m_status;
-  private String m_code;
+  private int m_httpStatus;
+  private String m_errorCode;
   private String m_title;
   private String m_message;
 
-  public ErrorResponseBuilder withStatus(int status) {
-    m_status = status;
+  public ErrorResponseBuilder withHttpStatus(int httpStatus) {
+    m_httpStatus = httpStatus;
     return this;
   }
 
-  public ErrorResponseBuilder withStatus(Status status) {
-    m_status = status.getStatusCode();
+  public ErrorResponseBuilder withHttpStatus(Status httpStatus) {
+    m_httpStatus = httpStatus.getStatusCode();
     return this;
   }
 
@@ -49,18 +49,18 @@ public class ErrorResponseBuilder {
     return this;
   }
 
-  public ErrorResponseBuilder withCode(int code) {
-    m_code = String.valueOf(code);
+  public ErrorResponseBuilder withErrorCode(int errorCode) {
+    m_errorCode = String.valueOf(errorCode);
     return this;
   }
 
-  public ErrorResponseBuilder withCode(String code) {
-    m_code = code;
+  public ErrorResponseBuilder withErrorCode(String errorCode) {
+    m_errorCode = errorCode;
     return this;
   }
 
   public Response build() {
-    return Response.status(m_status)
+    return Response.status(m_httpStatus)
         .entity(BEANS.get(ErrorResponse.class).withError(buildError()))
         .type(MediaType.APPLICATION_JSON)
         .build();
@@ -68,10 +68,10 @@ public class ErrorResponseBuilder {
 
   protected ErrorDo buildError() {
     ErrorDo error = BEANS.get(ErrorDo.class)
-        .withStatus(m_status)
+        .withHttpStatus(m_httpStatus)
         .withCorrelationId(CorrelationId.CURRENT.get());
-    if (m_code != null) {
-      error.withCode(m_code);
+    if (m_errorCode != null) {
+      error.withErrorCode(m_errorCode);
     }
     if (m_title != null) {
       error.withTitle(m_title);

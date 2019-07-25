@@ -30,7 +30,7 @@ public class WebApplicationExceptionMapper extends AbstractExceptionMapper<WebAp
 
   protected Response createResponse(WebApplicationException exception) {
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(exception.getResponse().getStatus())
+        .withHttpStatus(exception.getResponse().getStatus())
         .withMessage(exception.getMessage())
         .build();
   }

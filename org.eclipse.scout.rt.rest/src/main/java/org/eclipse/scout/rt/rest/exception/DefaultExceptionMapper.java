@@ -42,7 +42,7 @@ public class DefaultExceptionMapper extends AbstractExceptionMapper<Exception> {
 
   protected Response createResponse(Exception exception) {
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
+        .withHttpStatus(Response.Status.INTERNAL_SERVER_ERROR)
         .withMessage(DEFAULT_ERROR_MESSAGE)
         .build();
   }

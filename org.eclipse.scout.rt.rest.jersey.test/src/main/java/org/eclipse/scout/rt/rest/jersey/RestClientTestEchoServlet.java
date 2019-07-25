@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.jersey;
 
-import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.EMPTY_BODY;
-import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.LARGE_MESSAGE;
-import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.REQUEST_ID;
-import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.SLEEP_SEC;
-import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.STATUS;
+import static org.eclipse.scout.rt.rest.jersey.EchoServletParameters.*;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -121,7 +117,7 @@ public class RestClientTestEchoServlet extends HttpServlet {
 
       ErrorResponse errorResponse = BEANS.get(ErrorResponse.class)
           .withError(BEANS.get(ErrorDo.class)
-              .withStatus(statusCode)
+              .withHttpStatus(statusCode)
               .withMessage(status == null ? "unknown" : status.getReasonPhrase())
               .withTitle("REST Client Test"));
       BEANS.get(IDataObjectMapper.class).writeValue(resp.getOutputStream(), errorResponse);

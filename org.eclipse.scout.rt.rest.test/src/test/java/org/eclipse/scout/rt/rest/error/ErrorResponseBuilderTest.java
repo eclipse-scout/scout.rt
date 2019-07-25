@@ -23,12 +23,12 @@ public class ErrorResponseBuilderTest {
 
   @Test
   public void testBuild() {
-    ErrorDo error = BEANS.get(ErrorResponseBuilder.class).withCode(42).withMessage("message").withTitle("title").withStatus(10).buildError();
+    ErrorDo error = BEANS.get(ErrorResponseBuilder.class).withErrorCode(42).withMessage("message").withTitle("title").withHttpStatus(10).buildError();
 
     assertEquals("message", error.getMessage());
     assertEquals("title", error.getTitle());
-    assertEquals("42", error.getCode());
-    assertEquals(Integer.valueOf(10), error.getStatus());
+    assertEquals("42", error.getErrorCode());
+    assertEquals(Integer.valueOf(10), error.getHttpStatus());
     assertEquals(CorrelationId.CURRENT.get(), error.getCorrelationId());
   }
 }

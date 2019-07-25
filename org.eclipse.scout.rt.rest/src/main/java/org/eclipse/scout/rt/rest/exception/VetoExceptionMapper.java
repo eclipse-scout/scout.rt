@@ -20,6 +20,6 @@ public class VetoExceptionMapper extends AbstractVetoExceptionMapper<VetoExcepti
   @Override
   protected ErrorResponseBuilder createErrorResponseBuilder(VetoException exception) {
     return super.createErrorResponseBuilder(exception)
-        .withStatus(Response.Status.BAD_REQUEST);
+        .withHttpStatus(Response.Status.BAD_REQUEST);
   }
 }

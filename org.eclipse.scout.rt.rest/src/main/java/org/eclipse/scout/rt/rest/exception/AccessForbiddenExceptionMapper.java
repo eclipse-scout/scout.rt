@@ -20,6 +20,6 @@ public class AccessForbiddenExceptionMapper extends AbstractVetoExceptionMapper<
   @Override
   protected ErrorResponseBuilder createErrorResponseBuilder(AccessForbiddenException exception) {
     return super.createErrorResponseBuilder(exception)
-        .withStatus(Response.Status.FORBIDDEN);
+        .withHttpStatus(Response.Status.FORBIDDEN);
   }
 }

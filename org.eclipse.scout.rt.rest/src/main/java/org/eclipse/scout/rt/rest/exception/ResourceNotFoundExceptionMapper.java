@@ -20,6 +20,6 @@ public class ResourceNotFoundExceptionMapper extends AbstractVetoExceptionMapper
   @Override
   protected ErrorResponseBuilder createErrorResponseBuilder(ResourceNotFoundException exception) {
     return super.createErrorResponseBuilder(exception)
-        .withStatus(Response.Status.NOT_FOUND);
+        .withHttpStatus(Response.Status.NOT_FOUND);
   }
 }

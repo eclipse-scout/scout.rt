@@ -30,9 +30,9 @@ public abstract class AbstractVetoExceptionMapper<E extends VetoException> exten
 
   protected ErrorResponseBuilder createErrorResponseBuilder(E exception) {
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.BAD_REQUEST)
+        .withHttpStatus(Response.Status.BAD_REQUEST)
         .withTitle(exception.getStatus().getTitle())
         .withMessage(exception.getStatus().getBody())
-        .withCode(exception.getStatus().getCode());
+        .withErrorCode(exception.getStatus().getCode());
   }
 }

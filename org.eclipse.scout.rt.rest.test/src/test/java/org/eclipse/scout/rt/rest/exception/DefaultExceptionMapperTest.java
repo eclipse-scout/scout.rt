@@ -148,7 +148,7 @@ public class DefaultExceptionMapperTest {
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());
-      assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+      assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
     }
   }
 
@@ -161,7 +161,7 @@ public class DefaultExceptionMapperTest {
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());
-      assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+      assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
     }
   }
 
@@ -174,7 +174,7 @@ public class DefaultExceptionMapperTest {
       ErrorDo error = response.readEntity(ErrorResponse.class).getError();
       assertEquals(exception.getStatus().getTitle(), error.getTitle());
       assertEquals(exception.getStatus().getBody(), error.getMessage());
-      assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+      assertEquals(exception.getStatus().getCode(), error.getErrorCodeAsInt());
     }
   }
 

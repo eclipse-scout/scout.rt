@@ -23,15 +23,15 @@ public class ErrorDo extends DoEntity {
   /**
    * HTTP status code
    */
-  public DoValue<Integer> status() {
-    return doValue("status");
+  public DoValue<Integer> httpStatus() {
+    return doValue("httpStatus");
   }
 
   /**
    * Application error code
    */
-  public DoValue<String> code() {
-    return doValue("code");
+  public DoValue<String> errorCode() {
+    return doValue("errorCode");
   }
 
   public DoValue<String> title() {
@@ -47,12 +47,12 @@ public class ErrorDo extends DoEntity {
   }
 
   /**
-   * @return {@link #getCode()} as int if it contains an integer else zero
+   * @return {@link #getErrorCode()} as int if it contains an integer else zero
    */
   @SuppressWarnings("squid:S1166")
-  public int getCodeAsInt() {
+  public int getErrorCodeAsInt() {
     try {
-      return TypeCastUtility.castValue(getCode(), int.class);
+      return TypeCastUtility.castValue(getErrorCode(), int.class);
     }
     catch (RuntimeException e) {
       return 0;
@@ -64,25 +64,25 @@ public class ErrorDo extends DoEntity {
    * *************************************************************************/
 
   @Generated("DoConvenienceMethodsGenerator")
-  public ErrorDo withStatus(Integer status) {
-    status().set(status);
+  public ErrorDo withHttpStatus(Integer httpStatus) {
+    httpStatus().set(httpStatus);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public Integer getStatus() {
-    return status().get();
+  public Integer getHttpStatus() {
+    return httpStatus().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public ErrorDo withCode(String code) {
-    code().set(code);
+  public ErrorDo withErrorCode(String errorCode) {
+    errorCode().set(errorCode);
     return this;
   }
 
   @Generated("DoConvenienceMethodsGenerator")
-  public String getCode() {
-    return code().get();
+  public String getErrorCode() {
+    return errorCode().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")
