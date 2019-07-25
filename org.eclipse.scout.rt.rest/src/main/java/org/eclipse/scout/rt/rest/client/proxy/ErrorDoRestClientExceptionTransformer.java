@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.client.proxy;
 
+import java.util.function.BiFunction;
+
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -25,14 +28,37 @@ import org.eclipse.scout.rt.rest.error.ErrorResponse;
 public class ErrorDoRestClientExceptionTransformer extends AbstractEntityRestClientExceptionTransformer {
 
   @Override
-  protected RuntimeException transformEntityForbidden(RuntimeException cause, Response response) {
-    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-    return new VetoException(error.getMessage(), cause).withTitle(error.getTitle());
+  protected RuntimeException transformByResponseStatus(Response.Status status, RuntimeException e, Response response) {
+    switch (status) {
+      case FORBIDDEN:
+        // TODO [10.0] rst use instead AccessForbiddenException & add transformers for other client errors
+        return transformClientError(e, response, VetoException::new);
+    }
+    return super.transformByResponseStatus(status, e, response);
+  }
+
+  protected RuntimeException transformClientError(RuntimeException e, Response response, BiFunction<String, RuntimeException, VetoException> vetoExceptionFactory) {
+    return safeTransformEntityErrorResponse(e, response, () -> {
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      return vetoExceptionFactory.apply(error.getMessage(), e)
+          .withTitle(error.getTitle())
+          .withCode(error.getCodeAsInt());
+    }, () -> {
+      StatusType statusInfo = response.getStatusInfo();
+      return vetoExceptionFactory.apply(statusInfo.getReasonPhrase(), e);
+    });
   }
 
   @Override
-  protected RuntimeException transformEntityError(RuntimeException cause, Response response) {
-    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-    return new ProcessingException(error.getMessage(), cause).withTitle(error.getTitle());
+  protected RuntimeException defaultTransform(RuntimeException e, Response response) {
+    return safeTransformEntityErrorResponse(e, response, () -> {
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      return new ProcessingException(error.getMessage(), e)
+          .withTitle(error.getTitle())
+          .withCode(error.getCodeAsInt());
+    }, () -> {
+      StatusType statusInfo = response.getStatusInfo();
+      return new ProcessingException("REST call failed: {} {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), e);
+    });
   }
 }

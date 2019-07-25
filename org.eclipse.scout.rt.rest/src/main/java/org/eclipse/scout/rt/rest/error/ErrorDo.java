@@ -15,14 +15,21 @@ import javax.annotation.Generated;
 import org.eclipse.scout.rt.platform.dataobject.DoEntity;
 import org.eclipse.scout.rt.platform.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.dataobject.TypeName;
+import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 
 @TypeName("Error")
 public class ErrorDo extends DoEntity {
 
+  /**
+   * HTTP status code
+   */
   public DoValue<Integer> status() {
     return doValue("status");
   }
 
+  /**
+   * Application error code
+   */
   public DoValue<String> code() {
     return doValue("code");
   }
@@ -37,6 +44,19 @@ public class ErrorDo extends DoEntity {
 
   public DoValue<String> correlationId() {
     return doValue("correlationId");
+  }
+
+  /**
+   * @return {@link #getCode()} as int if it contains an integer else zero
+   */
+  @SuppressWarnings("squid:S1166")
+  public int getCodeAsInt() {
+    try {
+      return TypeCastUtility.castValue(getCode(), int.class);
+    }
+    catch (RuntimeException e) {
+      return 0;
+    }
   }
 
   /* **************************************************************************

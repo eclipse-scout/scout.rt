@@ -20,9 +20,14 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
+import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
 import org.eclipse.scout.rt.platform.context.RunContexts;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
+import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.AfterClass;
@@ -66,8 +71,11 @@ public class DefaultExceptionMapperTest {
     });
 
     when((responseBuilder.entity(Mockito.any(ErrorResponse.class)))).then(new Answer<ResponseBuilder>() {
+      @SuppressWarnings("unchecked")
       @Override
       public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
+        Response response = responseBuilder.build();
+        when(response.readEntity(Mockito.any(Class.class))).thenReturn(invocation.getArgument(0));
         return responseBuilder;
       }
     });
@@ -116,6 +124,50 @@ public class DefaultExceptionMapperTest {
     IllegalArgumentException illegalArgException = new IllegalArgumentException("foo");
     Response response = mapper.toResponse(illegalArgException);
     assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testToResponseProcessingException() {
+    ProcessingExceptionMapper mapper = new ProcessingExceptionMapper();
+    ProcessingException exception = new ProcessingException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    Response response = mapper.toResponse(exception);
+    assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
+  }
+
+  @Test
+  public void testToResponseVetoException() {
+    VetoExceptionMapper mapper = new VetoExceptionMapper();
+    VetoException exception = new VetoException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    Response response = mapper.toResponse(exception);
+    assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+    assertEquals(exception.getStatus().getTitle(), error.getTitle());
+    assertEquals(exception.getStatus().getBody(), error.getMessage());
+    assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+  }
+
+  @Test
+  public void testToResponseAccessForbiddenException() {
+    AccessForbiddenExceptionMapper mapper = new AccessForbiddenExceptionMapper();
+    AccessForbiddenException exception = (AccessForbiddenException) new AccessForbiddenException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    Response response = mapper.toResponse(exception);
+    assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+    assertEquals(exception.getStatus().getTitle(), error.getTitle());
+    assertEquals(exception.getStatus().getBody(), error.getMessage());
+    assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+  }
+
+  @Test
+  public void testToResponseResourceNotFoundException() {
+    ResourceNotFoundExceptionMapper mapper = new ResourceNotFoundExceptionMapper();
+    ResourceNotFoundException exception = (ResourceNotFoundException) new ResourceNotFoundException("foo {}", "bar", new Exception()).withTitle("hagbard").withCode(37);
+    Response response = mapper.toResponse(exception);
+    assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+    assertEquals(exception.getStatus().getTitle(), error.getTitle());
+    assertEquals(exception.getStatus().getBody(), error.getMessage());
+    assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
   }
 
   @Test

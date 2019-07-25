@@ -12,31 +12,17 @@ package org.eclipse.scout.rt.rest.exception;
 
 import javax.ws.rs.core.Response;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.rest.error.ErrorResponseBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class VetoExceptionMapper extends AbstractExceptionMapper<VetoException> {
-
-  private static final Logger LOG = LoggerFactory.getLogger(VetoExceptionMapper.class);
+public class VetoExceptionMapper extends AbstractVetoExceptionMapper<VetoException> {
 
   @Override
-  public Response toResponseImpl(VetoException exception) {
-    LOG.info("{}: {}", exception.getClass().getSimpleName(), exception.getMessage());
-    return createResponse(exception);
-  }
-
-  protected Response createResponse(VetoException exception) {
+  protected ErrorResponseBuilder createErrorResponseBuilder(VetoException exception) {
     // Veto Exception is thrown if access is denied, but may also in other circumstances (like failed validation, missing item, etc.).
     // Since we cannot distinguish them at the moment, always use forbidden status code.
     // We should consider using status codes for veto exceptions so they can be mapped to a HTTP status code.
-    return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.FORBIDDEN)
-        .withTitle(exception.getStatus().getTitle())
-        .withMessage(exception.getStatus().getBody())
-        .withCode(exception.getStatus().getCode())
-        .build();
+    return super.createErrorResponseBuilder(exception)
+        .withStatus(Response.Status.FORBIDDEN); // TODO [10.0] rst use instead Response.Status.BAD_REQUEST
   }
 }

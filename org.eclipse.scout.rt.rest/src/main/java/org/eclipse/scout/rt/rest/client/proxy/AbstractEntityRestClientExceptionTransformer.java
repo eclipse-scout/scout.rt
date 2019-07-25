@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.rest.client.proxy;
 
-import javax.ws.rs.core.MediaType;
+import java.util.function.Supplier;
+
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.StatusType;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 
 /**
  * Base implementation for reading the entity of an unsuccessful REST {@link Response}.
@@ -26,55 +24,89 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
 
   @Override
   public RuntimeException transform(RuntimeException e, Response response) {
-    if (response != null) {
-      if (response.getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
-        return transformForbiddenResponse(e, response);
-      }
-      if (response.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-        return transformErrorResponse(e, response);
-      }
+    if (response == null) {
+      return e;
     }
-    return e;
+
+    RuntimeException result = transformByResponseStatus(Response.Status.fromStatusCode(response.getStatusInfo().getStatusCode()), e, response);
+    if (result == null) {
+      result = transformByResponseStatusFamily(response.getStatusInfo().getFamily(), e, response);
+    }
+    return result != null ? result : defaultTransform(e, response);
   }
 
-  protected RuntimeException transformForbiddenResponse(RuntimeException e, Response response) {
+  /**
+   * Transform logic for a given {@link Response.Status}.
+   * <p>
+   * Implementation should simply use a switch statement on status parameter:
+   *
+   * <pre>
+   * switch (status) {
+   *   case BAD_GATEWAY:
+   *   case SERVICE_UNAVAILABLE:
+   *   case GATEWAY_TIMEOUT:
+   *     return transformUnavailableResponse(e, response);
+   *   case FORBIDDEN:
+   *     return transformForbidden(e, response);
+   *   case NOT_FOUND:
+   *     return transformNotFound(e, response);
+   * }
+   * return super.transformByResponseStatus(status, e, response);
+   * </pre>
+   *
+   * @return {@code null} if there is no special transformation for given status required else transformed exception
+   */
+  protected RuntimeException transformByResponseStatus(Response.Status status, RuntimeException e, Response response) {
+    return null;
+  }
+
+  /**
+   * Transform logic if there is no special logic for current {@link Response.Status}
+   *
+   * @return {@code null} if there is no special transformation for given status family required else transformed
+   *         exception
+   */
+  protected RuntimeException transformByResponseStatusFamily(Response.Status.Family family, RuntimeException e, Response response) {
+    switch (family) {
+      case SUCCESSFUL:
+        return e;
+    }
+    return null;
+  }
+
+  /**
+   * Default transform logic if there is no specific handling for current {@link Response.Status} nor
+   * {@link Response.Status.Family}
+   *
+   * @return transformed exception
+   */
+  protected abstract RuntimeException defaultTransform(RuntimeException e, Response response);
+
+  /**
+   * First tries to extract a error from a response by calling {@link Response#readEntity}. If this fails, a fallback
+   * logic is called to transform the exception.
+   *
+   * @param entityExceptionSupplier
+   *          responsible to read entity and then providing new exception
+   * @param fallbackExceptionSupplier
+   *          creates fallback exception in case entity reading fails
+   * @return transformed exception
+   */
+  protected RuntimeException safeTransformEntityErrorResponse(RuntimeException e, Response response, Supplier<RuntimeException> entityExceptionSupplier, Supplier<RuntimeException> fallbackExceptionSupplier) {
     RuntimeException suppressedException = null;
     try {
       if (response.hasEntity()) {
-        return transformEntityForbidden(e, response);
+        return entityExceptionSupplier.get();
       }
     }
-    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException ex) {
+    catch (RuntimeException ex) {
       suppressedException = ex;
     }
 
-    VetoException vetoException = new VetoException(response.getStatusInfo().getReasonPhrase(), e);
+    RuntimeException exception = fallbackExceptionSupplier.get();
     if (suppressedException != null) {
-      vetoException.addSuppressed(suppressedException);
+      exception.addSuppressed(suppressedException);
     }
-    return vetoException;
+    return exception;
   }
-
-  protected RuntimeException transformErrorResponse(RuntimeException e, Response response) {
-    RuntimeException suppressedException = null;
-    try {
-      if (response.hasEntity() && MediaType.APPLICATION_JSON_TYPE.equals(response.getMediaType())) {
-        return transformEntityError(e, response);
-      }
-    }
-    catch (@SuppressWarnings("squid:S1166") javax.ws.rs.ProcessingException | IllegalStateException ex) {
-      suppressedException = ex;
-    }
-
-    StatusType statusInfo = response.getStatusInfo();
-    ProcessingException processingException = new ProcessingException("REST call failed: {} {}", statusInfo.getStatusCode(), statusInfo.getReasonPhrase(), e);
-    if (suppressedException != null) {
-      processingException.addSuppressed(suppressedException);
-    }
-    return processingException;
-  }
-
-  protected abstract RuntimeException transformEntityForbidden(RuntimeException cause, Response response);
-
-  protected abstract RuntimeException transformEntityError(RuntimeException cause, Response response);
 }

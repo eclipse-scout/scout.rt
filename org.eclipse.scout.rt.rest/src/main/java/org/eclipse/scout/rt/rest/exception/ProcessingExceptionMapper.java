@@ -32,11 +32,11 @@ public class ProcessingExceptionMapper extends AbstractExceptionMapper<Processin
     return BEANS.get(ErrorResponseBuilder.class)
         .withStatus(Response.Status.INTERNAL_SERVER_ERROR)
         .withCode(exception.getStatus().getCode())
-        .withMessage(defaultErrorMessage())
+        .withMessage(defaultErrorMessage(exception))
         .build();
   }
 
-  protected String defaultErrorMessage() {
+  protected String defaultErrorMessage(ProcessingException exception) {
     return DefaultExceptionMapper.DEFAULT_ERROR_MESSAGE;
   }
 }
