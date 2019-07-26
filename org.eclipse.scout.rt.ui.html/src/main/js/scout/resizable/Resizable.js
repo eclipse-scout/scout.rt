@@ -9,8 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 /**
- * Resizable makes a DOM element resizable by adding resize handlers to the
- * E, SE and S of the given $container. This is primarily used for (modal) dialogs.
+ * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given $container. This is primarily used for (modal) dialogs.
  */
 scout.Resizable = function($container) {
   scout.assertParameter('$container', $container);
@@ -35,13 +34,28 @@ scout.Resizable.FPS = 1000 / 15;
 
 scout.Resizable.prototype._appendResizeHandles = function() {
   this.$resizableS = this.$container.appendDiv('resizable-handle resizable-s')
-    .data('axis', 'y')
+    .data('edge', 's')
     .on('mousedown.resizable', this._mouseDownHandler);
   this.$resizableE = this.$container.appendDiv('resizable-handle resizable-e')
-    .data('axis', 'x')
+    .data('edge', 'e')
     .on('mousedown.resizable', this._mouseDownHandler);
   this.$resizableSE = this.$container.appendDiv('resizable-handle resizable-se resizable-gripsmall-se')
-    .data('axis', 'xy')
+    .data('edge', 'se')
+    .on('mousedown.resizable', this._mouseDownHandler);
+  this.$resizableW = this.$container.appendDiv('resizable-handle resizable-w')
+    .data('edge', 'w')
+    .on('mousedown.resizable', this._mouseDownHandler);
+  this.$resizableSW = this.$container.appendDiv('resizable-handle resizable-sw')
+    .data('edge', 'sw')
+    .on('mousedown.resizable', this._mouseDownHandler);
+  this.$resizableN = this.$container.appendDiv('resizable-handle resizable-n')
+    .data('edge', 'n')
+    .on('mousedown.resizable', this._mouseDownHandler);
+  this.$resizableNW = this.$container.appendDiv('resizable-handle resizable-nw')
+    .data('edge', 'nw')
+    .on('mousedown.resizable', this._mouseDownHandler);
+  this.$resizableN = this.$container.appendDiv('resizable-handle resizable-ne')
+    .data('edge', 'ne')
     .on('mousedown.resizable', this._mouseDownHandler);
 };
 
@@ -81,23 +95,25 @@ scout.Resizable.prototype._onMouseDown = function(event) {
     $myWindow = $resizable.window(),
     $handle = $(event.target),
     minWidth = $resizable.cssPxValue('min-width'),
-    minHeight = $resizable.cssPxValue('min-height');
+    minHeight = $resizable.cssPxValue('min-height'),
+    initialBounds = scout.graphics.bounds($resizable);
 
   this._context = {
-    initialSize: [
-      $resizable.outerWidth(),
-      $resizable.outerHeight()
-    ],
-    minSize: [
+    initialBounds: initialBounds,
+    minBounds: new scout.Rectangle(
+      initialBounds.right() - minWidth,
+      initialBounds.bottom() - minHeight,
       minWidth,
       minHeight
-    ],
-    maxSize: [
+    ),
+    maxBounds: new scout.Rectangle(
+      -$resizable.cssMarginLeft(),
+      -$resizable.cssMarginTop(),
       $myWindow.width() - $resizable[0].offsetLeft,
       $myWindow.height() - $resizable[0].offsetTop
-    ],
+    ),
     distance: [0, 0],
-    axis: $handle.data('axis'),
+    edge: $handle.data('edge'),
     mousedownEvent: event
   };
 
@@ -120,32 +136,36 @@ scout.Resizable.prototype._onMouseUp = function(event) {
 };
 
 scout.Resizable.prototype._onMousemove = function(event) {
-  var newSize = [0, 0],
-    ctx = this._context,
+  var ctx = this._context,
+    newBounds = ctx.initialBounds.clone(),
     distance = this._calcDistance(ctx.mousedownEvent, event);
 
-  if (ctx.axis.indexOf('x') > -1) {
-    newSize[0] = Math.max(ctx.minSize[0],
-      Math.min(ctx.maxSize[0], ctx.initialSize[0] + distance[0]));
-
+  if (scout.isOneOf(ctx.edge, 'ne', 'e', 'se')) {
+    newBounds.width = Math.max(ctx.minBounds.width,
+      Math.min(ctx.maxBounds.width, ctx.initialBounds.width + distance[0]));
+  } else if (scout.isOneOf(ctx.edge, 'nw', 'w', 'sw')) {
+    // Resize to the left
+    newBounds.x = Math.min(ctx.minBounds.x,
+      Math.max(ctx.maxBounds.x, ctx.initialBounds.x + distance[0]));
+    newBounds.width += ctx.initialBounds.x - newBounds.x;
   }
-  if (ctx.axis.indexOf('y') > -1) {
-    newSize[1] = Math.max(ctx.minSize[1],
-      Math.min(ctx.maxSize[1], ctx.initialSize[1] + distance[1]));
+  if (scout.isOneOf(ctx.edge, 'sw', 's', 'se')) {
+    newBounds.height = Math.max(ctx.minBounds.height,
+      Math.min(ctx.maxBounds.height, ctx.initialBounds.height + distance[1]));
+  } else if (scout.isOneOf(ctx.edge, 'nw', 'n', 'ne')) {
+    // Resize to the bottom
+    newBounds.y = Math.min(ctx.minBounds.y,
+      Math.max(ctx.maxBounds.y, ctx.initialBounds.y + distance[1]));
+    newBounds.height += ctx.initialBounds.y - newBounds.y;
   }
-  $.throttle(this._resizeHandler, scout.Resizable.FPS)(newSize);
+  $.throttle(this._resizeHandler, scout.Resizable.FPS)(newBounds);
 };
 
-scout.Resizable.prototype._resize = function(newSize) {
-  if (newSize[0] > 0) {
-    this.$container.cssWidth(newSize[0]);
-  }
-  if (newSize[1] > 0) {
-    this.$container.cssHeight(newSize[1]);
-  }
+scout.Resizable.prototype._resize = function(newBounds) {
+  scout.graphics.setBounds(this.$container, newBounds);
   this.$container.trigger('resize', {
-    newSize: newSize,
-    initialSize: this._context.initialSize
+    newBounds: newBounds,
+    initialBounds: this._context.initialBounds
   });
 };
 

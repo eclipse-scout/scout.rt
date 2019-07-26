@@ -22,10 +22,10 @@
 }
 
 .dialog {
-  position: absolute !important; /* NOSONAR (ignore positioning of 'resizable') */
+  position: absolute;
   background-color: @background-color;
   border: solid 1px @border-color;
-  border-top: 5px solid @active-color;
+  border-top: @dialog-border-top-size solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
   #scout.drop-shadow-large();
@@ -60,6 +60,12 @@
 
   &.full-height {
     border-bottom: 0;
+  }
+
+  & > .resizable-nw,
+  & > .resizable-n,
+  & > .resizable-ne {
+    margin-top: -@dialog-border-top-size;
   }
 
   & > .header {
@@ -128,9 +134,7 @@
     /* otherwise on iphone5, cancel button on a dialog would always be stacked in ellipsis if there is another menu item */
     margin: 0;
 
-    & > .resizable-e,
-    & > .resizable-se,
-    & > .resizable-s {
+    & > .resizable-handle {
       /* Remove handle, it is not useful anymore
          and it increases the dialog size which has the effect that the body may be scrolled (on iphone).
          Important is necessary because jquery ui sets it to display: block using inline style */
