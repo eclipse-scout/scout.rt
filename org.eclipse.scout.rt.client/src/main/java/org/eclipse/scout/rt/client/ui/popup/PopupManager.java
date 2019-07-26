@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.popup;
 
-import java.util.Set;
-
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+
+import java.util.Set;
 
 /**
  * @since 9.0
@@ -34,6 +34,11 @@ public class PopupManager extends AbstractPropertyObserver {
 
   protected Set<IPopup> getPopupsInternal() {
     return propertySupport.getPropertySet(PROP_POPUPS);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends IPopup> T getPopupByClass(Class<T> popupClass) {
+    return (T) getPopupsInternal().stream().filter(popupClass::isInstance).findFirst().orElse(null);
   }
 
   protected void setPopupsInternal(Set<? extends IPopup> popups) {
