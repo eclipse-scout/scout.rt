@@ -36,21 +36,23 @@ const getPackageName = itemName => {
   return itemName.replace(NAME_REGEX, '');
 };
 
-const getSnapshots = async(artifactoryUrl, config) => {
+const getSnapshots = async(artifactoryUrl, repoName, config, verbose) => {
   const AQL_API = 'api/search/aql'; // use aql for search
-  const SEARCH_URL = `${artifactoryUrl}${AQL_API}`;
-  const QUERY = 'items.find({"repo":"com.bsiag.scout-npm-local","name":{"$match":"*snapshot.*tgz"}})';
+  const searchUrl = `${artifactoryUrl}${AQL_API}`;
+  const query = `items.find({"repo":"${repoName}","name":{"$match":"*snapshot.*tgz"}})`;
 
   const snapshotMap = new Map();
   try {
-    const response = await axios.post(SEARCH_URL, QUERY, config);
+    const response = await axios.post(searchUrl, query, config);
     if (response.status !== 200) {
       console.log(`NOK: ${response.statusText}`);
       return snapshotMap;
     }
     const data = response.data;
 
-    console.log('found items:\n' + JSON.stringify(data, null, 2));
+    if (verbose) {
+      console.log('found items:\n' + JSON.stringify(data, null, 2));
+    }
 
     if (data && data.results) {
       for (const item of data.results) {
@@ -91,9 +93,12 @@ const calculateItemsToDelete = async(itemMap, noToKeep) => {
 };
 
 const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
+  if (!items || items.length === 0) {
+    console.log('Nothing to cleanup');
+  }
   for (const item of items) {
     const itemUrl = constructPath(artifactoryUrl, item);
-    console.log(`delete: ${itemUrl}; dryrun=${dryrun}`);
+    console.log(`delete: ${itemUrl}; ${dryrun ? 'dryrun=true' : ''}`);
     if (dryrun) {
       continue;
     }
@@ -107,27 +112,62 @@ const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
 };
 
 const doCleanup = async() => {
-  const ARTIFACTORY_URL = 'https://scout.bsiag.com/repository/'; // Artifactory server
-  const NO_KEEP = 1;
-  const DRY_RUN = true;
+  const yargs = require('yargs');
+  const argv = yargs
+    .option('apikey', {
+      description: 'API Key for authentication',
+      type: 'string'
+    })
+    .option('url', {
+      description: 'URL of the artifactory',
+      type: 'string'
+    })
+    .option('reponame', {
+      description: 'name of the repository',
+      type: 'string'
+    })
+    .option('dryrun', {
+      description: 'If true, the command only indicates which artifacts would have been deleted.',
+      type: 'boolean',
+      default: false
+    })
+    .option('keep', {
+      description: 'Number of Artifacts to keep',
+      type: 'number',
+      default: 5
+    })
+    .option('verbose', {
+      description: 'More Logging',
+      type: 'boolean',
+      default: false
+    })
+    .argv;
 
-  const config = {
-    headers: {
-      'Content-Type': 'text/plain'
-    },
-    auth: { // TODO auth anpassen
-      username: 'dsh',
-      password: 'AKCp5ccv1eWCa8gV62LEbYGAt9CuXpsHiD3mXpCxsRqHDVddN8yfhvsbQpoRRbzxuZXzsNTz8'
-    }
+  console.log(`Arguments: url: ${argv.url}; repo-name: ${argv.reponame}; number of artifacts to keep: ${argv.keep}; dry-run: ${argv.dryrun}; verbose: ${argv.verbose}`);
+
+  if (!argv.reponame || !argv.url) {
+    throw new Error('Please provide arguments for --url and --repo-name');
+  }
+
+  const headers = {
+    'Content-Type': 'text/plain'
   };
 
-  const foundItems = await getSnapshots(ARTIFACTORY_URL, config);
-  const itemsToDelete = await calculateItemsToDelete(foundItems, NO_KEEP);
-  await deleteItems(ARTIFACTORY_URL, itemsToDelete, config, DRY_RUN);
+  if (argv.apikey) {
+    headers['X-JFrog-Art-Api'] = argv.apikey;
+  }
+
+  const config = {
+    headers: headers
+  };
+
+  const foundItems = await getSnapshots(argv.url, argv.reponame, config, argv.verbose);
+  const itemsToDelete = await calculateItemsToDelete(foundItems, argv.keep);
+  await deleteItems(argv.url, itemsToDelete, config, argv.dryrun);
 };
 
 doCleanup()
-  .then(() => console.log('Repository cleanup finished'))
+  .then(() => console.log('Repository cleanup done'))
   .catch(e => console.error(e));
 
 
