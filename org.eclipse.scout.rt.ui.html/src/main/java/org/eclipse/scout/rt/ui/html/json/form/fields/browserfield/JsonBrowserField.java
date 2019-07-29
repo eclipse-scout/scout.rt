@@ -183,7 +183,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   protected void handleUiLocationChange(JSONObject data) {
     String location = data.getString(IBrowserField.PROP_LOCATION);
     addPropertyEventFilterCondition(IBrowserField.PROP_LOCATION, location);
-    getModel().getUIFacade().setLocationFromUi(location);
+    getModel().getUIFacade().setLocationFromUI(location);
   }
 
   protected void handleUiPostMessage(JsonEvent event) {

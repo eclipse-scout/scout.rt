@@ -20,5 +20,5 @@ public interface IBrowserFieldUIFacade {
 
   BinaryResource requestBinaryResourceFromUI(String filename);
 
-  void setLocationFromUi(String location);
+  void setLocationFromUI(String location);
 }

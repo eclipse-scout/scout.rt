@@ -469,7 +469,7 @@ public abstract class AbstractBrowserField extends AbstractFormField implements 
     }
 
     @Override
-    public void setLocationFromUi(String location) {
+    public void setLocationFromUI(String location) {
       setLocation(location);
     }
   }
