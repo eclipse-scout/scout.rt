@@ -42,42 +42,33 @@ const getSnapshots = async(artifactoryUrl, repoName, config, verbose) => {
   const query = `items.find({"repo":"${repoName}","name":{"$match":"*snapshot.*tgz"}})`;
 
   const snapshotMap = new Map();
-  try {
-    const response = await axios.post(searchUrl, query, config);
-    if (response.status !== 200) {
-      console.log(`NOK: ${response.statusText}`);
-      return snapshotMap;
-    }
-    const data = response.data;
+  const response = await axios.post(searchUrl, query, config);
+  const data = response.data;
 
-    if (verbose) {
-      console.log('found items:\n' + JSON.stringify(data, null, 2));
-    }
-
-    if (data && data.results) {
-      for (const item of data.results) {
-        // group the snapshots by package and version to ensure that old versions wont be deleted e.g. groupName = @scout/cli-10.0.0
-        const groupName = `${getScopeName(item.path)}/${getPackageName(item.name)}`;
-
-        let groupSet = snapshotMap.get(groupName);
-        if (!groupSet) {
-          groupSet = new Set();
-          snapshotMap.set(groupName, groupSet);
-        }
-        groupSet.add({
-          groupName,
-          filename: item.name,
-          path: item.path,
-          created: new Date(item.created),
-          repo: item.repo
-        });
-      }
-    }
-    return snapshotMap;
-  } catch (error) {
-    console.error(error);
-    return snapshotMap;
+  if (verbose) {
+    console.log('found items:\n' + JSON.stringify(data, null, 2));
   }
+
+  if (data && data.results) {
+    for (const item of data.results) {
+      // group the snapshots by package and version to ensure that old versions wont be deleted e.g. groupName = @scout/cli-10.0.0
+      const groupName = `${getScopeName(item.path)}/${getPackageName(item.name)}`;
+
+      let groupSet = snapshotMap.get(groupName);
+      if (!groupSet) {
+        groupSet = new Set();
+        snapshotMap.set(groupName, groupSet);
+      }
+      groupSet.add({
+        groupName,
+        filename: item.name,
+        path: item.path,
+        created: new Date(item.created),
+        repo: item.repo
+      });
+    }
+  }
+  return snapshotMap;
 };
 
 const calculateItemsToDelete = async(itemMap, noToKeep) => {
@@ -93,6 +84,7 @@ const calculateItemsToDelete = async(itemMap, noToKeep) => {
 };
 
 const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
+  let success = true;
   if (!items || items.length === 0) {
     console.log('Nothing to cleanup');
   }
@@ -106,8 +98,14 @@ const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
       const response = await axios.delete(itemUrl, config);
       console.log(response.status);
     } catch (error) {
+      success = false;
+      console.error(`couldn't delete item: ${itemUrl}`);
       console.error(error);
     }
+  }
+
+  if (!success) {
+    throw Error('Not every item could be deleted');
   }
 };
 
@@ -151,7 +149,7 @@ const doCleanup = async() => {
     })
     .argv;
 
-  console.log(`Arguments: url: ${argv.url}; repo-name: ${argv.reponame}; number of artifacts to keep: ${argv.keep}; dry-run: ${argv.dryrun}; verbose: ${argv.verbose}`);
+  console.log(`Input arguments: url=${argv.url}; repo-name=${argv.reponame}; number of artifacts to keep=${argv.keep}; dry-run=${argv.dryrun}; verbose=${argv.verbose}`);
 
   if (!argv.reponame || !argv.url) {
     throw new Error('Please provide arguments for --url and --repo-name');
@@ -183,6 +181,10 @@ const doCleanup = async() => {
 
 doCleanup()
   .then(() => console.log('Repository cleanup done'))
-  .catch(e => console.error(e));
+  .catch(e => {
+    console.error('Repository cleanup failed');
+    console.error(e);
+    process.exit(1);
+  });
 
 
