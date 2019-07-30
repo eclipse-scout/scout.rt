@@ -122,6 +122,14 @@ const doCleanup = async() => {
       description: 'URL of the artifactory',
       type: 'string'
     })
+    .option('user', {
+      description: 'username',
+      type: 'string'
+    })
+    .option('pwd', {
+      description: 'password',
+      type: 'string'
+    })
     .option('reponame', {
       description: 'name of the repository',
       type: 'string'
@@ -160,6 +168,13 @@ const doCleanup = async() => {
   const config = {
     headers: headers
   };
+
+  if (!argv.apikey && argv.user && argv.pwd) {
+    config.auth = {
+      username: argv.user,
+      password: argv.pwd
+    };
+  }
 
   const foundItems = await getSnapshots(argv.url, argv.reponame, config, argv.verbose);
   const itemsToDelete = await calculateItemsToDelete(foundItems, argv.keep);
