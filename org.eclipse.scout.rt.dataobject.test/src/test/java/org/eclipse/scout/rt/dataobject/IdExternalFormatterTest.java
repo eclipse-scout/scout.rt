@@ -33,19 +33,19 @@ public class IdExternalFormatterTest {
   public void testToExternalForm() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     String ext1 = BEANS.get(IdExternalFormatter.class).toExternalForm(id1);
-    assertEquals("FixtureUuId:" + TEST_UUID.toString(), ext1);
+    assertEquals("scout.FixtureUuId:" + TEST_UUID.toString(), ext1);
   }
 
   @Test
   public void testFromExternalForm() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
-    FixtureUuId id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("FixtureUuId:" + TEST_UUID.toString());
+    FixtureUuId id2 = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
     assertEquals(id1, id2);
   }
 
   @Test(expected = ClassCastException.class)
   public void testFromExternalForm_InvalidType() {
-    FixtureStringId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("FixtureUuId:" + TEST_UUID.toString());
+    FixtureStringId id = BEANS.get(IdExternalFormatter.class).fromExternalForm("scout.FixtureUuId:" + TEST_UUID.toString());
     assertEquals(id, id);
   }
 
