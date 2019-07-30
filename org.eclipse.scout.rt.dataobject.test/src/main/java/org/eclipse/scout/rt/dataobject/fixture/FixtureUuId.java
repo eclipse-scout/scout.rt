@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.eclipse.scout.rt.dataobject.id.AbstractUuId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
-@IdTypeName("FixtureUuId")
+@IdTypeName("scout.FixtureUuId")
 public final class FixtureUuId extends AbstractUuId {
   private static final long serialVersionUID = 1L;
 

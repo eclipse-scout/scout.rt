@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.dataobject.fixture;
 import org.eclipse.scout.rt.dataobject.id.AbstractStringId;
 import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 
-@IdTypeName("FixtureStringId")
+@IdTypeName("scout.FixtureStringId")
 public final class FixtureStringId extends AbstractStringId {
   private static final long serialVersionUID = 1L;
 
