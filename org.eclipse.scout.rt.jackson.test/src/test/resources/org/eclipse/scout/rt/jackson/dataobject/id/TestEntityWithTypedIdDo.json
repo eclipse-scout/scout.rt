@@ -1,5 +1,5 @@
 {
   "_type" : "scout.TestEntityWithTypedId",
-  "stringId" : "FixtureStringId:foo",
-  "uuId" : "FixtureUuId:8fa211b0-fd83-42cb-96c9-1942e274ce79"
+  "stringId" : "scout.FixtureStringId:foo",
+  "uuId" : "scout.FixtureUuId:8fa211b0-fd83-42cb-96c9-1942e274ce79"
 }
