@@ -10,7 +10,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -33,14 +32,14 @@ public final class ChartChains {
       super(extensions);
     }
 
-    public void execValueClick(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
+    public void execValueClick(int axisIndex, int valueIndex, int groupIndex) {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IChartExtension<? extends AbstractChart> next) {
-          next.execValueClick(ChartValueClickChain.this, valueIndex, value, groupIndex, groupName);
+          next.execValueClick(ChartValueClickChain.this, axisIndex, valueIndex, groupIndex);
         }
       };
-      callChain(methodInvocation, valueIndex, value, groupIndex, groupName);
+      callChain(methodInvocation, axisIndex, valueIndex, groupIndex);
     }
   }
 

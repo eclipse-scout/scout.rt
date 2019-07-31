@@ -9,7 +9,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import java.math.BigDecimal;
 import java.util.EventObject;
 
 import org.eclipse.scout.rt.client.ui.IModelEvent;
@@ -23,10 +22,9 @@ public class ChartEvent extends EventObject implements IModelEvent {
   public static final int TYPE_VALUE_CLICK = 1;
 
   private final int m_type;
+  private int m_axisIndex;
   private int m_valueIndex;
-  private BigDecimal m_value;
   private int m_groupIndex;
-  private String m_groupName;
 
   public ChartEvent(IChart source, int type) {
     super(source);
@@ -41,14 +39,6 @@ public class ChartEvent extends EventObject implements IModelEvent {
   @Override
   public int getType() {
     return m_type;
-  }
-
-  public BigDecimal getValue() {
-    return m_value;
-  }
-
-  public void setValue(BigDecimal value) {
-    m_value = value;
   }
 
   public int getValueIndex() {
@@ -67,12 +57,12 @@ public class ChartEvent extends EventObject implements IModelEvent {
     m_groupIndex = groupIndex;
   }
 
-  public String getGroupName() {
-    return m_groupName;
+  public int getAxisIndex() {
+    return m_axisIndex;
   }
 
-  public void setGroupName(String groupName) {
-    m_groupName = groupName;
+  public void setAxisIndex(int axisIndex) {
+    m_axisIndex = axisIndex;
   }
 
 }

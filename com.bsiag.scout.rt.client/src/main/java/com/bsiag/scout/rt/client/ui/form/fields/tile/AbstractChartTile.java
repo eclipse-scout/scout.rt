@@ -9,8 +9,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.form.fields.tile;
 
-import java.math.BigDecimal;
-
 import org.eclipse.scout.rt.client.ui.tile.fields.AbstractFormFieldTile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
@@ -132,7 +130,7 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
   /**
    * Delegated exec-method of the Chart widget. Override to handle click events on the chart.
    */
-  protected void execValueClick(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
+  protected void execValueClick(int axisIndex, int valueIndex, int groupIndex) {
     // NOP
   }
 
@@ -153,8 +151,8 @@ public abstract class AbstractChartTile extends AbstractFormFieldTile<ChartField
     public class Chart extends AbstractChart {
 
       @Override
-      protected void execValueClick(int valueIndex, BigDecimal value, int groupIndex, String groupName) {
-        AbstractChartTile.this.execValueClick(valueIndex, value, groupIndex, groupName);
+      protected void execValueClick(int axisIndex, int valueIndex, int groupIndex) {
+        AbstractChartTile.this.execValueClick(axisIndex, valueIndex, groupIndex);
       }
     }
   }

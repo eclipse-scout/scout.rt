@@ -9,8 +9,6 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import java.math.BigDecimal;
-
 /**
  * @since 5.2
  */
@@ -18,7 +16,14 @@ import java.math.BigDecimal;
 public interface IChartUIFacade {
 
   /**
-   * position for all axes in IChartBean.getAxes() ordered in same order like axes.
+   * For all parameters: use -1 when parameter is not used or set by a chart type.
+   *
+   * @param axisIndex
+   *          number
+   * @param valueIndex
+   *          number
+   * @param groupIndex
+   *          number
    */
-  void fireValueClickFromUI(int valueIndex, BigDecimal value, int groupIndex, String groupName);
+  void fireValueClickFromUI(int axisIndex, int valueIndex, int groupIndex);
 }

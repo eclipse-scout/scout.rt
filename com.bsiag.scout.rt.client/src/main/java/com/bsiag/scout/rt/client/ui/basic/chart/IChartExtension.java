@@ -10,14 +10,12 @@
  ******************************************************************************/
 package com.bsiag.scout.rt.client.ui.basic.chart;
 
-import java.math.BigDecimal;
-
 import org.eclipse.scout.rt.shared.extension.IExtension;
 
 import com.bsiag.scout.rt.client.ui.basic.chart.ChartChains.ChartValueClickChain;
 
 public interface IChartExtension<CHART extends AbstractChart> extends IExtension<CHART> {
 
-  void execValueClick(ChartValueClickChain chain, int valueIndex, BigDecimal value, int groupIndex, String groupName);
+  void execValueClick(ChartValueClickChain chain, int axisIndex, int valueIndex, int groupIndex);
 
 }
