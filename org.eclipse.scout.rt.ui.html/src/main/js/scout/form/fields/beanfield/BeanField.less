@@ -8,7 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-.bean-field > .field {
-  margin-left: @mandatory-indicator-width;
+.bean-field {
+  /* whole bean-field must be selectable, otherwise focusUtils.js would bail out
+     if a user starts a selection on the padding of the .bean-field element and
+     not exactly on the .field child element. */
   #scout.user-select(text);
+
+  & > .field {
+    margin-left: @mandatory-indicator-width;
+  }
 }
