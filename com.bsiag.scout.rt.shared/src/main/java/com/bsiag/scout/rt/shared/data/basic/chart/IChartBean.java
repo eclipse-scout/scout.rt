@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface IChartBean extends Serializable {
 
-  List<List<String>> getAxes();
+  List<List<IChartAxisBean>> getAxes();
 
   List<IChartValueGroupBean> getChartValueGroups();
 

@@ -20,12 +20,12 @@ import java.util.Map;
 public class ChartBean implements IChartBean {
   private static final long serialVersionUID = 1L;
 
-  private final List<List<String>> m_axes = new ArrayList<>();
+  private final List<List<IChartAxisBean>> m_axes = new ArrayList<>();
   private final List<IChartValueGroupBean> m_valueGroups = new ArrayList<>();
   private final Map<String, Object> m_customProperties = new HashMap<>();
 
   @Override
-  public List<List<String>> getAxes() {
+  public List<List<IChartAxisBean>> getAxes() {
     return m_axes;
   }
 
