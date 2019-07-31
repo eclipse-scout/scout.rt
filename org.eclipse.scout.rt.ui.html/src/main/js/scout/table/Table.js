@@ -974,6 +974,11 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   // This may happen if grouping gets deactivated and another column will get the new first sort column
   this._order$AggregateRows();
 
+  // Ensure selected row is visible after ordering
+  if (this.scrollToSelection) {
+    this.revealSelection();
+  }
+
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
     $rows = this.$rows();
