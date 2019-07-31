@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.dataobject;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import javax.annotation.PostConstruct;
 
@@ -40,7 +41,19 @@ public class DoEntityBuilder {
   }
 
   /**
+   * Adds new value to attribute map of entity if the value satisfies the given {@code predicate}.
+   */
+  public DoEntityBuilder putIf(String attributeName, Object value, Predicate<? super Object> predicate) {
+    if (predicate.test(value)) {
+      put(attributeName, value);
+    }
+    return this;
+  }
+
+  /**
    * Adds new list value to attribute map of entity.
+   * <p>
+   * If {@code value} is null, an empty list is added.
    */
   public <V> DoEntityBuilder putList(String attributeName, List<V> value) {
     m_entity.putList(attributeName, value);
@@ -49,6 +62,8 @@ public class DoEntityBuilder {
 
   /**
    * Adds list of values to attribute map of entity.
+   * <p>
+   * If {@code value} is null, an empty list is added.
    */
   public <V> DoEntityBuilder putList(String attributeName, @SuppressWarnings("unchecked") V... values) {
     m_entity.putList(attributeName, CollectionUtility.arrayList(values));
