@@ -578,7 +578,8 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   /**
    * Configures whether the table always scrolls to the selection. When activated and the selection in a table changes,
-   * the table is scrolled to the selection so that the selected row is visible.
+   * the table is scrolled to the selection so that the selected row is visible. The selection is also revealed on row
+   * order changes (e.g. when the table is sorted or rows are inserted above the selected row).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
