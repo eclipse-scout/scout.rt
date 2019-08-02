@@ -87,10 +87,7 @@ scout.StringField.prototype._makeMultilineField = function() {
   }.bind(this);
 
   return this.$parent.makeElement('<textarea>')
-    .on('DOMMouseScroll mousewheel', function(event) {
-      // otherwise scout.Scrollbar.prototype would handle this event for scrollable group boxes and prevent scrolling on textarea
-      event.stopPropagation();
-    })
+    .on('DOMMouseScroll mousewheel', this._onMouseWheel.bind(this))
     .on('mousedown', mouseDownHandler)
     .on('focus', function(event) {
       this.$field.off('mousedown', mouseDownHandler);
@@ -120,6 +117,24 @@ scout.StringField.prototype._onFieldBlur = function() {
     // Restore obfuscated display text.
     this.$field.val(this.displayText);
   }
+};
+
+scout.StringField.prototype._onMouseWheel = function(event) {
+  event = event.originalEvent || this.$container.window(true).event.originalEvent;
+  var delta = event.wheelDelta ? -event.wheelDelta : event.detail;
+  var scrollTop = this.$field[0].scrollTop;
+  if (delta < 0 && scrollTop === 0) {
+    // StringField is scrolled to the very top -> parent may scroll
+    return;
+  }
+  var maxScrollTop = this.$field[0].scrollHeight - this.$field[0].clientHeight;
+  if (delta > 0 && scrollTop >= maxScrollTop - 1) { // -1 because it can sometimes happen that scrollTop is maxScrollTop -1 or +1, just because clientHeight and scrollHeight are rounded values
+    // StringField is scrolled to the very bottom -> parent may scroll
+    this.$field[0].scrollTop = maxScrollTop; // Ensure it is really at the bottom (not -1px above)
+    return;
+  }
+  // Don't allow others to scroll (e.g. scout.Scrollbar) while scrolling in the text area
+  event.stopPropagation();
 };
 
 scout.StringField.prototype._renderProperties = function() {
