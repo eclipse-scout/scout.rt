@@ -991,7 +991,10 @@ scout.Table.prototype._renderRowOrderChanges = function() {
         $row.css('top', oldTop - $row.offset().top).animate({
           top: 0
         }, {
-          progress: this._triggerRowOrderChanged.bind(this, row, true)
+          progress: function() {
+            this._triggerRowOrderChanged(row, true);
+            this.updateScrollbars();
+          }.bind(this)
         });
       }
     }.bind(this));
