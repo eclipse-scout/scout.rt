@@ -559,7 +559,7 @@ scout.Widget.prototype.setParent = function(parent) {
       this.parent._removeChild(this);
     }
   }
-  this.parent = parent;
+  this._setProperty('parent', parent);
   this.parent._addChild(this);
   if (this.initialized) {
     this.recomputeEnabled(this.parent.enabledComputed);
