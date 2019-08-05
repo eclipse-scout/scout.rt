@@ -305,9 +305,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   scout.sessions.push(session);
 
   // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
-  var parent = new scout.NullWidget();
-  parent.session = session;
-  var desktop = this._createDesktop(parent);
+  var desktop = this._createDesktop(session.root);
   this.trigger('desktopReady', {
     desktop: desktop
   });

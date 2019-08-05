@@ -10,7 +10,7 @@
  */
 describe('Widget', function() {
 
-  var session, widget, parent;
+  var session, parent;
 
   var TestWidget = function() {
     TestWidget.parent.call(this);
@@ -56,8 +56,11 @@ describe('Widget', function() {
     setFixtures(sandbox());
     session = sandboxSession();
 
-    widget = new TestWidget();
     parent = new TestWidget();
+    parent.init({
+      parent: session.root,
+      session: session
+    });
   });
 
   function createWidget(model) {
@@ -112,7 +115,7 @@ describe('Widget', function() {
     }
 
     it('visits all descendants', function() {
-      widget.init({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -361,7 +364,7 @@ describe('Widget', function() {
 
   describe('enabled', function() {
     it('should be propagated correctly', function() {
-      widget.init({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -403,7 +406,7 @@ describe('Widget', function() {
     });
 
     it('should not be inherited if inheritAccessibility is disabled', function() {
-      widget.init({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -424,8 +427,48 @@ describe('Widget', function() {
       expect(widget.parent.enabledComputed).toBe(false);
     });
 
+    it('recomputeEnabled should be called for all widgets at least once', function() {
+
+      var widget = scout.create('Form', {
+        session: session,
+        parent: parent,
+        rootGroupBox: {
+          objectType: 'GroupBox',
+          fields: [{
+            objectType: 'StringField'
+          }, {
+            objectType: 'StringField',
+            inheritAccessibility: false
+          }, {
+            objectType: 'StringField',
+            enabled: false,
+            inheritAccessibility: false
+          }],
+          menus: [{
+            objectType: 'Menu'
+          }]
+        }
+      });
+
+      // check setup
+      expect(widget.parent.initialized).toBe(true);
+      expect(widget.parent.enabledComputed).toBe(true);
+      expect(widget.rootGroupBox.fields.length).toBe(3);
+      expect(widget.rootGroupBox.menus.length).toBe(1);
+      expect(widget.rootGroupBox.fields[0].enabled).toBe(true);
+      expect(widget.rootGroupBox.fields[1].enabled).toBe(true);
+      expect(widget.rootGroupBox.fields[2].enabled).toBe(false);
+      expect(widget.rootGroupBox.menus[0].enabled).toBe(true);
+
+      // check that enabled
+      expect(widget.rootGroupBox.fields[0].enabledComputed).toBe(true);
+      expect(widget.rootGroupBox.fields[1].enabledComputed).toBe(true);
+      expect(widget.rootGroupBox.fields[2].enabledComputed).toBe(false);
+      expect(widget.rootGroupBox.menus[0].enabledComputed).toBe(true);
+    });
+
     it('should correctly recalculate enabled state when adding a new field', function() {
-      widget.init({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -437,11 +480,10 @@ describe('Widget', function() {
       expect(widget.parent.enabledComputed).toBe(false);
 
       // add a new field which itself is enabled
-      var tmpParent = new TestWidget();
       var additionalWidget = new TestWidget();
       additionalWidget.init({
         session: session,
-        parent: tmpParent
+        parent: session.root
       });
 
       expect(additionalWidget.enabled).toBe(true);
@@ -457,7 +499,7 @@ describe('Widget', function() {
   describe('rendering', function() {
 
     it('should set rendering, rendered flags correctly', function() {
-      widget.init({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -470,6 +512,7 @@ describe('Widget', function() {
 
     it('should set rendering flag to true _while_ the component is rendering', function() {
       var rendering;
+      var widget = createWidget();
       widget._render = function() {
         rendering = this.rendering;
       };
@@ -1348,7 +1391,7 @@ describe('Widget', function() {
       var model = {};
       var widget = new scout.Widget();
       widget._init = function(model0) {
-         expect(model0).toBe(model);
+        expect(model0).toBe(model);
       };
 
       spyOn(widget, '_prepareModel').and.callThrough();

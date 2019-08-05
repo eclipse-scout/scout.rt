@@ -153,6 +153,7 @@ scout.Widget.prototype._init = function(model) {
   this._setCssClass(this.cssClass);
   this._setLogicalGrid(this.logicalGrid);
   this._setEnabled(this.enabled);
+  this.recomputeEnabled();
 };
 
 /**
@@ -677,7 +678,9 @@ scout.Widget.prototype.setEnabled = function(enabled, updateParents, updateChild
 
 scout.Widget.prototype._setEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
-  this.recomputeEnabled();
+  if (this.initialized) {
+    this.recomputeEnabled();
+  }
 };
 
 scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
@@ -693,6 +696,12 @@ scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
 };
 
 scout.Widget.prototype._updateEnabledComputed = function(enabledComputed, enabledComputedForChildren) {
+  if (this.enabledComputed === enabledComputed && enabledComputedForChildren === undefined) {
+    // no change for this instance. there is no need to propagate to children
+    // exception: the enabledComputed for the children differs from the one for me. In this case the propagation is necessary.
+    return;
+  }
+
   this.setProperty('enabledComputed', enabledComputed);
 
   // Manually call _renderEnabled(), because _renderEnabledComputed() does not exist
@@ -726,7 +735,9 @@ scout.Widget.prototype.setInheritAccessibility = function(inheritAccessibility) 
 
 scout.Widget.prototype._setInheritAccessibility = function(inheritAccessibility) {
   this._setProperty('inheritAccessibility', inheritAccessibility);
-  this.recomputeEnabled();
+  if (this.initialized) {
+    this.recomputeEnabled();
+  }
 };
 
 scout.Widget.prototype.setDisabledStyle = function(disabledStyle) {

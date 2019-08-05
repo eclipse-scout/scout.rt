@@ -335,7 +335,7 @@ scout.Menu.prototype._findRootMenu = function() {
 scout.Menu.prototype._hasAccessibleChildMenu = function() {
   var childFound = false;
   this.visitChildMenus(function(child) {
-    if (!child.inheritAccessibility && child.enabled /* do not use enabledComputed here*/ && child.visible) {
+    if (!child.inheritAccessibility && child.enabled /* do not use enabledComputed here */ && child.visible) {
       childFound = true;
       return scout.TreeVisitResult.TERMINATE;
     }
@@ -460,7 +460,9 @@ scout.Menu.prototype._setChildActions = function(childActions) {
  */
 scout.Menu.prototype._setInheritAccessibility = function(inheritAccessibility) {
   this._setProperty('inheritAccessibility', inheritAccessibility);
-  this._findRootMenu().recomputeEnabled();
+  if (this.initialized) {
+    this._findRootMenu().recomputeEnabled();
+  }
 };
 
 /**
@@ -468,12 +470,16 @@ scout.Menu.prototype._setInheritAccessibility = function(inheritAccessibility) {
  */
 scout.Menu.prototype._setEnabled = function(enabled) {
   this._setProperty('enabled', enabled);
-  this._findRootMenu().recomputeEnabled();
+  if (this.initialized) {
+    this._findRootMenu().recomputeEnabled();
+  }
 };
 
 scout.Menu.prototype._setVisible = function(visible) {
   this._setProperty('visible', visible);
-  this._findRootMenu().recomputeEnabled();
+  if (this.initialized) {
+    this._findRootMenu().recomputeEnabled();
+  }
 };
 
 scout.Menu.prototype.setSelected = function(selected) {

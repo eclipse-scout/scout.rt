@@ -68,11 +68,16 @@ scout.Session = function() {
     id: '1',
     objectType: 'RootAdapter'
   });
+
+  var rootParent = new scout.NullWidget();
+  rootParent.session = this;
+  rootParent.initialized = true;
+
   this.root = this.rootAdapter.createWidget({
     session: this,
     id: '1',
     objectType: 'NullWidget'
-  }, new scout.NullWidget());
+  }, rootParent);
   this.events = this._createEventSupport();
 };
 

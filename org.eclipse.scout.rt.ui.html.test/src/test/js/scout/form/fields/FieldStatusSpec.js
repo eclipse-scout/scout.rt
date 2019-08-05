@@ -72,8 +72,8 @@ describe('FieldStatus', function() {
     });
 
     it('de-register all listeners when tooltip is destroyed', function() {
-      // parents = StringField, Desktop, NullWidget
-      expect(formField.fieldStatus._parents.length).toBe(3);
+      // parents = StringField, Desktop, NullWidget, NullWidget (root parent)
+      expect(formField.fieldStatus._parents.length).toBe(4);
       formField.setErrorStatus(null);
       expect(formField.fieldStatus._parents.length).toBe(0);
     });
