@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.rest.jersey;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.config.RegistryBuilder;
@@ -24,6 +25,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
 import org.eclipse.scout.rt.rest.client.proxy.ErrorDoRestClientExceptionTransformer;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ClosingApacheConnectorProvider;
+import org.glassfish.jersey.client.ClientConfig;
 
 @ApplicationScoped
 public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
@@ -46,9 +49,11 @@ public class JerseyTestRestClientHelper extends AbstractRestClientHelper {
   }
 
   @Override
-  protected void configureClientBuilder(ClientBuilder clientBuilder) {
-    super.configureClientBuilder(clientBuilder);
-    clientBuilder.property(ApacheClientProperties.CONNECTION_MANAGER, createTestingConnectionManager());
+  protected Configuration createClientConfig() {
+    ClientConfig clientConfig = new ClientConfig();
+    clientConfig.connectorProvider(new ClosingApacheConnectorProvider());
+    clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, createTestingConnectionManager());
+    return clientConfig;
   }
 
   /**

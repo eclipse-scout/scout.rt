@@ -209,7 +209,7 @@ public class RestClientProxyFactory {
 
     protected void warnDiscouragedMethodUsage(Method method) {
       if (isDiscouraged(method)) {
-        LOG.warn("Discuraged method invocation (e.g. running outside a RunContext or exeptions transofrmation not available)");
+        LOG.warn("Discuraged method invocation (e.g. running outside a RunContext or exeption transformation not available)");
       }
     }
 
