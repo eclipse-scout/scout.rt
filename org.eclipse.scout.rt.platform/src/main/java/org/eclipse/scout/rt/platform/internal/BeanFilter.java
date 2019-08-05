@@ -72,8 +72,8 @@ public class BeanFilter {
    * @param ci
    */
   private void collectWithSubClasses(IClassInfo ci) {
-    if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic() || !ci.isPublic()) {
-      LOG.error("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class) or is not public.", ci.name());
+    if (ci.isEnum() || ci.isAnnotation() || ci.isSynthetic()) {
+      LOG.error("Skipping bean candidate '{}' because it is no supported class type (enum, annotation, anonymous class).", ci.name());
       return;
     }
 
@@ -94,15 +94,11 @@ public class BeanFilter {
 
   private void collect(IClassInfo ci) {
     if (ci.hasAnnotation(IgnoreBean.class)) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{}' because it is annotated with '{}'.", ci.name(), IgnoreBean.class.getSimpleName());
-      }
+      LOG.debug("Skipping bean candidate '{}' because it is annotated with '{}'.", ci.name(), IgnoreBean.class.getSimpleName());
       return;
     }
     if (!ci.isInstanciable()) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Skipping bean candidate '{}' because it is not instanciable.", ci.name());
-      }
+      LOG.debug("Skipping bean candidate '{}' because it is not instanciable.", ci.name());
       return;
     }
     if (!(ci.hasNoArgsConstructor() || ci.hasInjectableConstructor())) {
