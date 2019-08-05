@@ -298,7 +298,7 @@ scout.Session.prototype._sendStartupRequest = function() {
   // Send request
   var ajaxOptions = this.defaultAjaxOptions(request);
 
-  $.ajax(ajaxOptions)
+  return $.ajax(ajaxOptions)
     .done(onAjaxDone.bind(this))
     .fail(onAjaxFail.bind(this));
 
@@ -1396,7 +1396,7 @@ scout.Session.prototype.start = function() {
   this._setApplicationLoading(true);
 
   // Send startup request
-  this._sendStartupRequest();
+  return this._sendStartupRequest();
 };
 
 // TODO [7.0] awe: discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently

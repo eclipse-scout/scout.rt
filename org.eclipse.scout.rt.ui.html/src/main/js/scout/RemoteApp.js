@@ -36,6 +36,6 @@ scout.RemoteApp.prototype._loadSession = function($entryPoint, options) {
   options = options || {};
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
-  session.start();
-  return session;
+  scout.sessions.push(session);
+  return session.start();
 };

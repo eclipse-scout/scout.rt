@@ -173,7 +173,16 @@ scout.App.prototype._init = function(options) {
   this._installSyntheticActiveStateHandler();
   this._ajaxSetup();
   this._installExtensions();
-  this._loadSessions(options.session);
+  return this._load(options)
+    .then(this._loadSessions.bind(this, options.session));
+};
+
+/**
+ * Maybe implemented to load data from a server before the desktop is created.
+ * @returns {Promise} promise which is resolved after the loading is complete
+ */
+scout.App.prototype._load = function(options) {
+  return $.resolvedPromise();
 };
 
 scout.App.prototype._checkBrowserCompability = function(options) {
@@ -275,18 +284,24 @@ scout.App.prototype._beforeAjaxCall = function(request) {
 
 scout.App.prototype._loadSessions = function(options) {
   options = options || {};
+  var promises = [];
   $('.scout').each(function(i, elem) {
     var $entryPoint = $(elem);
     options.portletPartId = options.portletPartId || $entryPoint.data('partid') || '0';
-    var session = this._loadSession($entryPoint, options);
-    scout.sessions.push(session);
+    var promise = this._loadSession($entryPoint, options);
+    promises.push(promise);
   }.bind(this));
+  return $.promiseAll(promises);
 };
 
+/**
+ * @returns {Promise} promise which is resolved when the session is ready
+ */
 scout.App.prototype._loadSession = function($entryPoint, options) {
   options.locale = options.locale || this._loadLocale();
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
+  scout.sessions.push(session);
 
   // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
@@ -306,7 +321,7 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
     });
     $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
   }.bind(this));
-  return session;
+  return $.resolvedPromise();
 };
 
 scout.App.prototype._createSession = function(options) {
