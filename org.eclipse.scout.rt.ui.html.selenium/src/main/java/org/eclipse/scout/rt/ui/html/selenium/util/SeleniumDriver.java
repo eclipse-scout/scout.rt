@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.selenium.util;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 public final class SeleniumDriver {
+
+  static final int WINDOW_HEIGHT = 900;
+  static final int WINDOW_WIDTH = 1200;
 
   private SeleniumDriver() {
   }
@@ -98,6 +102,18 @@ public final class SeleniumDriver {
     logPrefs.enable(LogType.BROWSER, Level.ALL);
     capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
+    // With ChromeDriver v75 W3C mode was introduced. This breaks several existing tests, because of two reasons:
+    // 1. all offsets are now calculated from the center of an element, and not from the upper-left corner anymore
+    // 2. copy command (CTRL + C) does not work anymore. This may be related to a bug in ChromeDriver, but the bugfix
+    //    mentioned here does not seem to solve the problem (note: document.execCommand('copy') doesn't work either)
+    //    See: https://bugs.chromium.org/p/chromedriver/issues/detail?id=2975
+    options.setExperimentalOption("w3c", false);
+    // The following two lines are a replacement for --disable-infobars since this option
+    // does not remove the "Chrome is being controlled..." info-bar anymore.
+    // See: https://stackoverflow.com/questions/49169990/disable-infobars-argument-unable-to-hide-the-infobar-with-the-message-chrome-is
+    options.setExperimentalOption("useAutomationExtension", false);
+    options.setExperimentalOption("excludeSwitches", Collections.singletonList("enable-automation"));
+
     // TODO [7.0] bsh: Remove workaround, when Chrome bug is fixed
     // <WORKAROUND> https://bugs.chromium.org/p/chromedriver/issues/detail?id=1552
     Map<String, String> env = new HashMap<>();
@@ -116,7 +132,7 @@ public final class SeleniumDriver {
     // Set window size roughly to the minimal supported screen size
     // (1280x1024 minus some borders for browser toolbar and windows taskbar)
     driver.manage().window().setPosition(new Point(0, 0));
-    driver.manage().window().setSize(new Dimension(1200, 900));
+    driver.manage().window().setSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
     Capabilities caps = driver.getCapabilities();
     System.out.println("Selenium driver configured with driver=" + driver.getClass().getName()
