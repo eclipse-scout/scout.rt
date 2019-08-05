@@ -85,9 +85,13 @@ scout.TabArea.prototype._remove = function() {
 };
 
 scout.TabArea.prototype.setSelectedTabItem = function(tabItem) {
-  this.setSelectedTab(scout.arrays.find(this.tabs, function(tab) {
+  this.setSelectedTab(this.getTabForItem(tabItem));
+};
+
+scout.TabArea.prototype.getTabForItem = function(tabItem) {
+  return scout.arrays.find(this.tabs, function(tab) {
     return tab.tabItem === tabItem;
-  }, this));
+  }, this)
 };
 
 scout.TabArea.prototype.setSelectedTab = function(tab) {
@@ -113,9 +117,7 @@ scout.TabArea.prototype._renderSelectedTab = function() {
 };
 
 scout.TabArea.prototype.focusTabItem = function(tabItem) {
-  this.focusTab(scout.arrays.find(this.tabs, function(tab) {
-    return tab.tabItem === tabItem;
-  }, this));
+  this.focusTab(this.getTabForItem(tabItem));
 };
 
 scout.TabArea.prototype.focusTab = function(tabItem) {
@@ -131,9 +133,7 @@ scout.TabArea.prototype.setTabItems = function(tabItems) {
 scout.TabArea.prototype._setTabs = function(tabItems) {
   var tabsToRemove = this.tabs.slice(),
     tabs = tabItems.map(function(tabItem) {
-      var tab = scout.arrays.find(this.tabs, function(tab) {
-        return tab.tabItem === tabItem;
-      });
+      var tab = this.getTabForItem(tabItem);
       if (!tab) {
         tab = scout.create('Tab', {
           parent: this,
