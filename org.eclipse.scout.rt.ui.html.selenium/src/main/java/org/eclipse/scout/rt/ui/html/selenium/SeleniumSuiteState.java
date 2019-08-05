@@ -27,8 +27,19 @@ public final class SeleniumSuiteState {
   }
 
   public static void setUpBeforeClass() {
+    try {
+      s_driver = SeleniumDriver.setUpDriver();
+    }
+    catch (Exception e) {
+      System.err.println("Failed to create Selenium driver instance. Reason:\n" +
+          "<<<" + e + ">>>\n" +
+          "Info: if there's a version mismatch between the browser and the web-driver you may need to " +
+          "update the web-driver in your pom.xml (for Chrome check the 'chromedriver_base_url' property). " +
+          "When Maven has trouble to update the web-driver on a system you should check if there are " +
+          "running processes using the old web-driver binary and kill these processes first.");
+      throw e;
+    }
     s_suiteStarted = true;
-    s_driver = SeleniumDriver.setUpDriver();
     System.out.println("Selenium driver started by SeleniumTestSuite");
   }
 
