@@ -45,14 +45,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
+import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
-import org.eclipse.scout.rt.platform.dataobject.DoEntity;
-import org.eclipse.scout.rt.platform.dataobject.DoEntityBuilder;
-import org.eclipse.scout.rt.platform.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.StringHolder;
 import org.eclipse.scout.rt.platform.html.HTML;
