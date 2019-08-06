@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel.http;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -25,6 +26,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ServiceTunnelTargetUrlProperty;
+import org.eclipse.scout.rt.shared.http.AbstractHttpTransportManager;
 import org.eclipse.scout.rt.shared.http.IHttpTransportBuilder;
 import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -55,14 +57,37 @@ public class HttpServiceTunnelTest {
   @Test
   public void testTunnel() throws IOException {
     when(mockUrl.getValue()).thenReturn("http://localhost");
+    MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData")));
+    HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
+    tunnel.setContentHandler(getTestContentHandler());
 
-    final MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setContent(getInputStream(new ServiceTunnelResponse("testData")));
+    ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
+    ServiceTunnelResponse response = tunnel.tunnel(request);
+    assertNotNull(response);
+    assertEquals("testData", response.getData());
+  }
 
+  @Test
+  public void testTunnelException() throws IOException {
+    when(mockUrl.getValue()).thenReturn("http://localhost");
+    MockLowLevelHttpResponse expectedResponse = new MockLowLevelHttpResponse().setStatusCode(401);
+    HttpServiceTunnel tunnel = createHttpServiceTunnel(expectedResponse);
+    tunnel.setContentHandler(getTestContentHandler());
+
+    ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
+    ServiceTunnelResponse response = tunnel.tunnel(request);
+    assertNotNull(response);
+    assertTrue(response.getException() instanceof HttpServiceTunnelException);
+    assertEquals(401, ((HttpServiceTunnelException) response.getException()).getHttpStatus());
+  }
+
+  protected HttpServiceTunnel createHttpServiceTunnel(final MockLowLevelHttpResponse expectedResponse) {
     HttpServiceTunnel tunnel = new HttpServiceTunnel() {
 
       @Override
       protected IHttpTransportManager getHttpTransportManager() {
-        return new IHttpTransportManager() {
+
+        return new AbstractHttpTransportManager() {
 
           private MockHttpTransport m_transport = new MockHttpTransport.Builder()
               .setLowLevelHttpResponse(expectedResponse)
@@ -75,20 +100,18 @@ public class HttpServiceTunnelTest {
 
           @Override
           public HttpRequestFactory getHttpRequestFactory() {
-            return m_transport.createRequestFactory();
+            return m_transport.createRequestFactory(createHttpRequestInitializer());
           }
 
           @Override
           public void interceptNewHttpTransport(IHttpTransportBuilder builder) {
             // nop
           }
+
         };
       }
     };
-    tunnel.setContentHandler(getTestContentHandler());
-    ServiceTunnelRequest request = new ServiceTunnelRequest("IPingService", "ping", null, null);
-    ServiceTunnelResponse response = tunnel.tunnel(request);
-    assertNotNull(response);
+    return tunnel;
   }
 
   /**
