@@ -55,7 +55,7 @@ public final class GoToUtil {
   public static WebElement goToView(AbstractSeleniumTest test, int viewTabIndex) {
     test.waitUntilDataRequestPendingDone();
     WebElement viewTab = test.waitUntilElementClickable(By.cssSelector(String.format(".simple-tab:nth-child(%s)", viewTabIndex)));
-    test.clickAtOffset(viewTab, 15, 5); // cannot click in the middle of the view-tab because its sometimes overlaid with a dialog
+    test.clickAtOffset(viewTab, 15, 2); // cannot click in the middle of the view-tab because its sometimes overlaid with a dialog
     test.waitUntilDataRequestPendingDone();
     test.assertCssClass(viewTab, "selected");
     return test.waitUntilView();
