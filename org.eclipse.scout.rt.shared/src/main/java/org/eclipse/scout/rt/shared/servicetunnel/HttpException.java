@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
+import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnelException;
 
 /**
  * TODO [9.1] pbz: Remove class
  *
- * @deprecated Use {@link RemoteSystemUnavailableException} instead.
+ * @deprecated Use {@link HttpServiceTunnelException} instead.
  */
 @Deprecated
 public class HttpException extends Exception {
