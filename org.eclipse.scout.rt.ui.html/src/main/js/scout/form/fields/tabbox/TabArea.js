@@ -91,7 +91,7 @@ scout.TabArea.prototype.setSelectedTabItem = function(tabItem) {
 scout.TabArea.prototype.getTabForItem = function(tabItem) {
   return scout.arrays.find(this.tabs, function(tab) {
     return tab.tabItem === tabItem;
-  }, this)
+  }, this);
 };
 
 scout.TabArea.prototype.setSelectedTab = function(tab) {
