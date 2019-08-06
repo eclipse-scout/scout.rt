@@ -19,6 +19,7 @@ scout.FieldStatus = function() {
 
   this._parents = [];
   this._parentPropertyChangeListener = this._onParentPropertyChange.bind(this);
+  this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
 };
 scout.inherits(scout.FieldStatus, scout.Widget);
 
@@ -281,13 +282,13 @@ scout.FieldStatus.prototype._updateTooltipVisibility = function(parent) {
   }
 };
 
-scout.FieldStatus.prototype._onParentPropertyChange = function(event) {
+scout.FieldStatus.prototype._onParentHierarchyChange = function(event) {
   // If the parent of a widget we're listening to changes, we must re-check the parent hierarchy
   // and re-install the property change listener
-  if ('parent' === event.propertyName) {
-    this._updateParentListeners();
-    return;
-  }
+  this._updateParentListeners();
+};
+
+scout.FieldStatus.prototype._onParentPropertyChange = function(event) {
   if ('visible' === event.propertyName) {
     this._updateTooltipVisibility(event.source);
   }
@@ -295,6 +296,7 @@ scout.FieldStatus.prototype._onParentPropertyChange = function(event) {
 
 scout.FieldStatus.prototype._removeParentListeners = function() {
   this._parents.forEach(function(parent) {
+    parent.off('hierarchyChange', this._parentHierarchyChangeListener);
     parent.off('propertyChange', this._parentPropertyChangeListener);
   }.bind(this));
   this._parents = [];
@@ -308,6 +310,7 @@ scout.FieldStatus.prototype._updateParentListeners = function() {
   this._removeParentListeners();
   var parent = this.parent;
   while (parent) {
+    parent.on('hierarchyChange', this._parentHierarchyChangeListener);
     parent.on('propertyChange', this._parentPropertyChangeListener);
     this._parents.push(parent);
     parent = parent.parent;

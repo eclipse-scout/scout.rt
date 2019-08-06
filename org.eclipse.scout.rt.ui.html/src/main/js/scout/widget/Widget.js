@@ -559,8 +559,13 @@ scout.Widget.prototype.setParent = function(parent) {
       this.parent._removeChild(this);
     }
   }
-  this._setProperty('parent', parent);
+  var oldParent = this.parent;
+  this.parent = parent;
   this.parent._addChild(this);
+  this.trigger('hierarchyChange', {
+    oldParent: oldParent,
+    parent: parent
+  });
   if (this.initialized) {
     this.recomputeEnabled(this.parent.enabledComputed);
   }
