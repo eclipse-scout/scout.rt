@@ -293,7 +293,8 @@
   __include("scout/table/TableRowTileMappingAdapter.js");
   __include("scout/table/TableTooltip.js");
   __include("scout/table/TableUpdateBuffer.js");
-  __include("scout/table/TileTableHeader.js");
+  __include("scout/table/TileTableHeaderGroupByLookupCall.js");
+  __include("scout/table/TileTableHeaderSortByLookupCall.js");
   __include("scout/table/columns/comparators.js");
   __include("scout/table/columns/Column.js");
   __include("scout/table/columns/ColumnOptimalWidthMeasurer.js");
@@ -648,4 +649,5 @@
   __include("scout/resizable/Resizable.js");
   __include("scout/desktop/unsavedchanges/UnsavedFormChangesForm.js");
   __include("scout/desktop/unsavedchanges/UnsavedFormsLookupCall.js");
+  __include("scout/table/TileTableHeaderBox.js");  // requires GroupBox.js
 }(window.scout = window.scout || {}, jQuery)); //NOSONAR

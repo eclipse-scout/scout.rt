@@ -30,10 +30,12 @@ scout.TableTileGridMediator = function(table) {
   this.tableState = {}; // always stores the last table state before tileMode activation
 
   this._tileAccordionPropertyChangeHandler = this._onTileAccordionPropertyChange.bind(this);
+  this._tileAccordionActionHandler = this._onTileAccordionAction.bind(this);
   this._tableFilterAddedHandler = this._onTableFilterAdded.bind(this);
   this._tableFilterRemovedHandler = this._onTableFilterRemoved.bind(this);
   this._tableFilterHandler = this._onTableFilter.bind(this);
   this._tableGroupHandler = this._onTableGroup.bind(this);
+  this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableRowsInsertedHandler = this._onTableRowsInserted.bind(this);
   this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
   this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
@@ -42,12 +44,26 @@ scout.TableTileGridMediator = function(table) {
   this._destroyHandler = this._uninstallListeners.bind(this);
 };
 
+scout.TableTileGridMediator.prototype.init = function(model) {
+  scout.assertParameter('table', model.table);
+  $.extend(this, model);
+
+  if (!this.tileAccordion) {
+    this.tileAccordion = this._createTileAccordion();
+    this._installListeners();
+  }
+
+  this.tableState.headerVisible = this.table.headerVisible;
+};
+
 scout.TableTileGridMediator.prototype._installListeners = function() {
   this.tileAccordion.on('propertyChange', this._tileAccordionPropertyChangeHandler);
+  this.tileAccordion.on('tileAction', this._tileAccordionActionHandler);
   this.table.on('filterAdded', this._tableFilterAddedHandler);
   this.table.on('filterRemoved', this._tableFilterRemovedHandler);
   this.table.on('filter', this._tableFilterHandler);
   this.table.on('group', this._tableGroupHandler);
+  this.table.on('rowsSelected', this._tableRowsSelectedHandler);
   this.table.on('rowsInserted', this._tableRowsInsertedHandler);
   this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
@@ -59,10 +75,12 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
 
 scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.tileAccordion.off('propertyChange', this._tileAccordionPropertyChangeHandler);
+  this.tileAccordion.off('tileAction', this._tileAccordionActionHandler);
   this.table.off('filterAdded', this._tableFilterAddedHandler);
   this.table.off('filterRemoved', this._tableFilterRemovedHandler);
   this.table.off('filter', this._tableFilterHandler);
   this.table.off('group', this._tableGroupHandler);
+  this.table.off('rowsSelected', this._tableRowsSelectedHandler);
   this.table.off('rowsInserted', this._tableRowsInsertedHandler);
   this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
@@ -74,7 +92,6 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
 
 scout.TableTileGridMediator.prototype.loadTiles = function() {
   var tiles = this.table.createTiles(this.table.rows);
-  // scoutJs delivers the tiles right away, in scout classic the backend will call setTiles once the tiles are loaded
   if (tiles) {
     this.table._setTiles(tiles);
   }
@@ -105,18 +122,19 @@ scout.TableTileGridMediator.prototype.getTilesForRows = function(rows) {
 };
 
 scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
-  var primaryGroupingColumn = this.table.columns.find(function(column) {
+  var primaryGroupingColumn = scout.arrays.find(this.table.columns, function(column) {
     return column.grouped && column.sortIndex === 0;
   });
 
   tiles.forEach(function(tile) {
     var row = this.table.rowsMap[tile.rowId];
     var groupId = primaryGroupingColumn ? primaryGroupingColumn.cellTextForGrouping(row) : 'default';
+    var htmlEnabled = primaryGroupingColumn ? primaryGroupingColumn.htmlEnabled : false;
     this.groupForTileMap[row.id] = groupId;
     // check if group already exists, otherwise create it
     var group = this.tileAccordion.getGroupById(groupId);
     if (!group) {
-      group = this._createTileGroup(groupId);
+      group = this._createTileGroup(groupId, htmlEnabled);
       this.tileAccordion.insertGroup(group);
     }
     tile.parent = group;
@@ -133,12 +151,13 @@ scout.TableTileGridMediator.prototype._createTileAccordion = function() {
   });
 };
 
-scout.TableTileGridMediator.prototype._createTileGroup = function(groupId) {
+scout.TableTileGridMediator.prototype._createTileGroup = function(groupId, htmlEnabled) {
   return new scout.create('Group', {
     parent: this.tileAccordion,
     id: groupId,
     headerVisible: groupId === 'default' ? false : true,
     title: groupId,
+    titleHtmlEnabled: htmlEnabled,
     body: {
       objectType: 'TileGrid'
     },
@@ -146,18 +165,11 @@ scout.TableTileGridMediator.prototype._createTileGroup = function(groupId) {
   });
 };
 
-scout.TableTileGridMediator.prototype.init = function() {
-  if (!this.tileAccordion) {
-    this.tileAccordion = this._createTileAccordion();
-    this._installListeners();
-  }
-
-  this.tableState.headerVisible = this.table.headerVisible;
-};
-
 scout.TableTileGridMediator.prototype.activate = function() {
   this.table.setHeaderVisible(false);
-  this.table.setTileTableHeaderVisible(true);
+  if (this.table.tileTableHeaderBox) {
+    this.table.tileTableHeaderBox.setVisible(true);
+  }
 
   // hide aggregation table control
   this.table.tableControls.filter(function(control) {
@@ -167,7 +179,6 @@ scout.TableTileGridMediator.prototype.activate = function() {
   });
 
   // doesn't depend upon any tile data, therefore execute on activation
-  this._syncGroupingAndSortingColumns();
   this._syncFiltersFromTableToTile();
 };
 
@@ -178,12 +189,18 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
       control.setVisible(true);
     }
   });
-  // restore from tableState
-  this.table.setHeaderVisible(this.tableState.headerVisible);
-  this.table.setTileTableHeaderVisible(false);
+  // use _setProperty to avoid instant rendering, render manually later on (this is necessary since TableHeader depends upon table.$data)
+  this.table._setProperty('headerVisible', this.tableState.headerVisible);
+  if (this.table.tileTableHeaderBox) {
+    this.table.tileTableHeaderBox.setVisible(false);
+  }
 
   // TODO [10.0] rmu: reload tiles on every mode-switch. loadTiles() could be optimized so that only not already existing tiles are reloaded
   // complete reset
+  this.reset();
+};
+
+scout.TableTileGridMediator.prototype.reset = function() {
   this.tiles = [];
   this.tilesMap = {};
   this.tileFilterMap = {};
@@ -193,22 +210,25 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
   this.tileAccordion.deleteAllGroups();
 };
 
-scout.TableTileGridMediator.prototype.render = function() {
-
-  // if the table was previously in tileMode this is not necessary...
-  if (this.table.$data) {
-    this.table._removeData();
+scout.TableTileGridMediator.prototype.renderTileMode = function() {
+  if (this.table.tileMode) {
+    // if the table was previously in tileMode this is not necessary...
+    if (this.table.$data) {
+      this.table._removeData();
+    }
+    this._renderTileAccordion();
+  } else {
+    // since tileMode is not a widget property remove is not called by setProperty
+    this._removeTileAccordion();
+    this.table._renderData();
+    this.table._renderTableHeader();
   }
-  this._renderTileAccordion();
 };
 
-scout.TableTileGridMediator.prototype.remove = function() {
-  // render
+scout.TableTileGridMediator.prototype.removeTileMode = function() {
   if (this.table.rendered) {
     this._removeTileAccordion();
   }
-
-  this.tileAccordion.remove();
 };
 
 scout.TableTileGridMediator.prototype.destroy = function() {
@@ -264,6 +284,20 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
   }
 };
 
+scout.TableTileGridMediator.prototype._onTileAccordionAction = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
+  this.table.doRowAction(this.table.rowsMap[event.tile.rowId]);
+};
+
+scout.TableTileGridMediator.prototype._onTableRowsSelected = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
+  this._syncSelectionFromTableToTile();
+};
+
 scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
   if (!this.table.tileMode) {
     return;
@@ -288,16 +322,13 @@ scout.TableTileGridMediator.prototype._onTableAllRowsDeleted = function(event) {
   this.deleteTiles();
 };
 
-// TODO [10.0] rmu: what is the best way to do this?
 scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(event) {
   if (!this.table.tileMode) {
     return;
   }
-  var tiles = [];
-  this.table.visibleRows.forEach(function(row) {
-    tiles.push(this.tilesMap[row.id]);
+  this.tiles = this.table.visibleRows.map(function(row) {
+    return this.tilesMap[row.id];
   }, this);
-  this.tiles = tiles;
   this.tileAccordion.setTiles(this.tiles);
 };
 
@@ -351,26 +382,12 @@ scout.TableTileGridMediator.prototype._onTableFilter = function(event) {
     return;
   }
   this.tileAccordion.filterTiles();
-  // TODO [10.0] rmu instead of filtering again use this.setProperty('filteredTiles', tiles);
-  //  var filteredTiles = this.table._filteredRows.map(function(row) {
-  //    return this.tilesMap[row.id];
-  //  }, this);
-  //  this.tileAccordion.groups.forEach(function(group) {
-  //    var tilesForGroup = filteredTiles.filter(function(tile) {
-  //      return this.groupForTileMap[tile.rowId] === group.id;
-  //    }, this);
-  //
-  //    // TODO [10.0] move and refactor this code into TileGrid.js (see scout.TileGrid.prototype.filter)
-  //    group.body.setProperty('filteredTiles', tilesForGroup);
-  //    group.body.invalidateLogicalGrid(false);
-  //
-  //    if (group.rendered) {
-  //      // Not all tiles may be rendered yet (e.g. if filter is active before grid is rendered and removed after grid is rendered)
-  //      // But updating the view range is necessary anyway (fillers, scrollbars, viewRangeRendered etc.)
-  //      group.body._renderTileDelta();
-  //      group.body._renderTileOrder(group.body.tiles);
-  //    }
-  //  }, this);
+};
+
+scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function() {
+  if (this.tileAccordion) {
+    this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
+  }
 };
 
 scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = function(selectedTiles) {
@@ -402,32 +419,7 @@ scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
     Object.values(this.table._filterMap).forEach(function(tableFilter) {
       this._addFilter(tableFilter);
     }, this);
-  }
-};
-
-scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function() {
-  if (this.tileAccordion) {
-    this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
-  }
-};
-
-scout.TableTileGridMediator.prototype._syncGroupingAndSortingColumns = function() {
-  if (this.table.tileTableHeaderVisible) {
-
-    var primaryGroupingColumnIndex = this.table.visibleColumns().findIndex(function(column) {
-      return column.grouped && column.sortIndex === 0;
-    });
-    if (primaryGroupingColumnIndex >= 0) {
-      this.table.tileTableHeader.groupByField.setValue(primaryGroupingColumnIndex);
-    }
-
-    var primarySortingColumnIndex = this.table.visibleColumns().findIndex(function(column) {
-      return column.sortActive && column.sortIndex === 0;
-    });
-
-    if (primarySortingColumnIndex >= 0) {
-      this.table.tileTableHeader.sortByField.setValue(primarySortingColumnIndex);
-    }
+    this.tileAccordion.filterTiles();
   }
 };
 

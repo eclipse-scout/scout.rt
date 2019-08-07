@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.GroupingStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.HierarchicalStyle;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITileTableHeaderBox;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -406,6 +407,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       @Override
       protected List<TableRowTileMapping> modelValue() {
         return getModel().getTiles();
+      }
+    });
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TILE_TABLE_HEADER_BOX, model, getUiSession()) {
+      @Override
+      protected ITileTableHeaderBox modelValue() {
+        return getModel().getTileTableHeaderBox();
       }
     });
   }

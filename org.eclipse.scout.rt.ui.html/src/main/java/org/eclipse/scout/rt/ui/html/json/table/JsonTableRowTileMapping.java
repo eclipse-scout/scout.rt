@@ -51,7 +51,7 @@ public class JsonTableRowTileMapping<TABLE_ROW_TILE_MAPPING extends ITableRowTil
       @Override
       public Object prepareValueForToJson(Object value) {
         if (value instanceof ITableRow) {
-          return getParent().getTableRowId(((ITableRow) value));
+          return getParent().getOrCreateRowId(((ITableRow) value));
         }
         return null;
       }

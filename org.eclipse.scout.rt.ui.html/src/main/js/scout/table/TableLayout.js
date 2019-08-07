@@ -29,7 +29,7 @@ scout.TableLayout.prototype.layout = function($container) {
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
-    tileTableHeader = this.table.tileTableHeader,
+    tileTableHeaderBox = this.table.tileTableHeaderBox,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -60,25 +60,29 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  if (tileTableHeader) {
-    tileTableHeight = scout.graphics.size(tileTableHeader.$container).height;
-    tileTableHeader.groupBox.validateLayout();
+  if (tileTableHeaderBox && tileTableHeaderBox.visible) {
+    var htmlTileTableHeaderBox = scout.HtmlComponent.get(tileTableHeaderBox.$container);
+    var tileTableHeaderBoxSize = scout.GroupBoxLayout.size(htmlTileTableHeaderBox, containerSize);
+    htmlTileTableHeaderBox.setSize(tileTableHeaderBoxSize);
+    tileTableHeight = tileTableHeaderBoxSize.height;
+    tileTableHeaderBox.revalidateLayout();
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight+ tileTableHeight) + 'px)');
+  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight) + 'px)');
   this._dataHeightPositive = $data.height() > 0;
 
   if (tileGrid) {
     tileGrid.revalidateLayout();
   }
 
-  this._layoutColumns();
-
-  // Size of last column may have to be adjusted due to the header menu items
-  if (header) {
-    header.resizeHeaderItem(lastColumn);
-  }
-
   if (!this.table.tileMode) {
+
+    this._layoutColumns();
+
+    // Size of last column may have to be adjusted due to the header menu items
+    if (header) {
+      header.resizeHeaderItem(lastColumn);
+    }
+
     this.table.setViewRangeSize(this.table.calculateViewRangeSize());
 
     if (!htmlContainer.layouted) {

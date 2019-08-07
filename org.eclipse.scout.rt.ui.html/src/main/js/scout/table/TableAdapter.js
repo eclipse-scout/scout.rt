@@ -14,12 +14,24 @@ scout.TableAdapter = function() {
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
+/**
+ * @override
+ */
+scout.TableAdapter.prototype._initProperties = function(model) {
+  scout.TableAdapter.parent.prototype._initProperties.call(this, model);
+
+  if (!model.tileTableHeaderBox) {
+    model.preventDefaultTileTableHeaderBoxCreation = true;
+  }
+
+};
+
 scout.TableAdapter.prototype._postCreateWidget = function() {
   // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
   // because the original event had been fired before the eventhandler was registered.
   if (scout.objects.values(this.widget._filterMap).some(function(filter) {
-    return filter instanceof scout.TableUserFilter;
-  })) {
+      return filter instanceof scout.TableUserFilter;
+    })) {
     this._onWidgetFilter();
   }
 };
@@ -474,6 +486,13 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
     scout.defaultValues.applyTo(column);
   });
   this.widget.updateColumnHeaders(columns);
+
+  if (this.widget.tileMode && this.widget.mediator) {
+    // grouping might have changed, trigger reinit of the groups on the tileGrid in tileMode
+    this.widget.mediator._onTableGroup();
+    // removing of a group column doesn't cause a rowOrderChange, nonetheless aggregation columns might need to be removed.
+    this.widget.updateRowOrder(this.widget.rows);
+  }
 };
 
 scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {

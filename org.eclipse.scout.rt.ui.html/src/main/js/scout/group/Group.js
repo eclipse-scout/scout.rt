@@ -15,6 +15,7 @@ scout.Group = function() {
   this.collapsed = false;
   this.collapsible = true;
   this.title = null;
+  this.titleHtmlEnabled = false;
   this.titleSuffix = null;
   this.header = null;
   this.headerFocusable = false;
@@ -192,7 +193,11 @@ scout.Group.prototype.setTitle = function(title) {
 
 scout.Group.prototype._renderTitle = function() {
   if (this.$title) {
-    this.$title.textOrNbsp(this.title);
+    if (this.titleHtmlEnabled) {
+      this.$title.htmlOrNbsp(this.title);
+    } else {
+      this.$title.textOrNbsp(this.title);
+    }
     this._updateIconStyle();
   }
 };

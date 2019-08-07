@@ -246,6 +246,13 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   String PROP_TILES = "tiles";
 
   /**
+   * type {@link ITileTableHeaderBox}
+   *
+   * @since 10.0
+   */
+  String PROP_TILE_TABLE_HEADER_BOX = "tileTableHeaderBox";
+
+  /**
    * @since 5.1.0
    */
   AbstractEventBuffer<TableEvent> createEventBuffer();
@@ -1299,4 +1306,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * @since 10.0
    */
   void setTiles(List<TableRowTileMapping> tiles);
+
+  /**
+   * @since 10.0
+   */
+  ITileTableHeaderBox getTileTableHeaderBox();
+
 }

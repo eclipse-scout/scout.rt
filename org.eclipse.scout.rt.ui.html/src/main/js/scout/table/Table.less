@@ -101,6 +101,11 @@
       font-weight: bold;
     }
   }
+
+  &.detail-table > .tile-table-filter-box {
+    margin-right: @root-group-box-padding-right;
+    overflow: hidden;
+  }
 }
 
 .table-data {
@@ -492,10 +497,4 @@
   &::before {
     .animation-collapse-rotate();
   }
-}
-
-/* TODO [10.0] rmu: Workaround because layouting doesn't work correctly yet */
-.tile-table-header {
-  height: 62px;
-  margin-right: 20px;
 }

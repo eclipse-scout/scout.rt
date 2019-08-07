@@ -38,6 +38,7 @@ scout.Table = function() {
   this.multiCheck = true;
   this.multiSelect = true;
   this.multilineText = false;
+  this.preventDefaultTileTableHeaderBoxCreation = false;
   this.scrollToSelection = false;
   this.scrollTop = 0;
   this.selectedRows = [];
@@ -45,8 +46,7 @@ scout.Table = function() {
   this.tableControls = [];
   this.tableStatusVisible = false;
   this.tileMode = false;
-  this.tileTableHeader = null;
-  this.tileTableHeaderVisible = false;
+  this.tileTableHeaderBox = null;
   this.footer = null;
   this.footerVisible = false;
   this.filters = [];
@@ -92,7 +92,7 @@ scout.Table = function() {
   this._rerenderViewPortAfterAttach = false;
   this._renderViewPortAfterAttach = false;
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
-  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tiles']);
+  this._addWidgetProperties(['tableControls', 'menus', 'keyStrokes', 'staticMenus', 'tiles', 'tileTableHeaderBox']);
 
   this.$data = null;
   this.$emptyData = null;
@@ -203,12 +203,9 @@ scout.Table.prototype._init = function(model) {
   this._setTableStatus(this.tableStatus);
   this._calculateValuesForBackgroundEffect();
   this._group();
-
-  if (this.tileMode) {
-    this._ensureMediator();
-    this.mediator.activate();
-  }
-  this.setTileTableHeaderVisible(this.tileTableHeaderVisible);
+  this._setTileMode(this.tileMode);
+  this._setTiles(this.tiles);
+  this._setTileTableHeaderBox(this.tileTableHeaderBox);
 };
 
 scout.Table.prototype._initRow = function(row) {
@@ -304,7 +301,7 @@ scout.Table.prototype._createLoadingSupport = function() {
   return new scout.LoadingSupport({
     widget: this,
     $container: function() {
-      return this.$data;
+      return this.$container;
     }.bind(this)
   });
 };
@@ -423,7 +420,7 @@ scout.Table.prototype._render = function() {
   }
 
   if (this.tileMode) {
-    this.mediator.render();
+    this._renderTileMode();
   } else {
     this._renderData();
   }
@@ -472,7 +469,7 @@ scout.Table.prototype._renderProperties = function() {
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
-  this._renderTileTableHeaderVisible();
+  this._renderTileTableHeaderBox();
 };
 
 scout.Table.prototype._setCssClass = function(cssClass) {
@@ -781,13 +778,6 @@ scout.Table.prototype._createHeader = function() {
 
 scout.Table.prototype._createFooter = function() {
   return scout.create('TableFooter', {
-    parent: this,
-    table: this
-  });
-};
-
-scout.Table.prototype._createTileTableHeader = function() {
-  return scout.create('TileTableHeader', {
     parent: this,
     table: this
   });
@@ -3994,18 +3984,24 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
 };
 
 scout.Table.prototype.setTileMode = function(tileMode) {
-  if (scout.objects.equals(this.tileMode, tileMode)) {
-    return;
-  }
+  this.setProperty('tileMode', tileMode);
+};
 
+scout.Table.prototype._setTileMode = function(tileMode) {
   this._ensureMediator();
 
   if (tileMode) {
-    this.mediator.activate();
-    this.mediator.loadTiles();
-  }
+    if (!this.tileTableHeaderBox) {
+      this.setTileTableHeaderBox(this._createTileTableHeaderBox());
+    }
 
-  this.setProperty('tileMode', tileMode);
+    // TODO [10.0] rmu: only execute this in JS-case. Check for modelAdapter since the listener is only attached after init.
+    if (!this.modelAdapter) {
+      this.mediator.loadTiles();
+    }
+    this.mediator.activate();
+  }
+  this._setProperty('tileMode', tileMode);
 
   if (!tileMode) {
     this.mediator.deactivate();
@@ -4014,31 +4010,31 @@ scout.Table.prototype.setTileMode = function(tileMode) {
 
 scout.Table.prototype._ensureMediator = function() {
   if (!this.mediator) {
-    this.mediator = new scout.TableTileGridMediator(this);
-    this.mediator.init();
+    this.mediator = scout.create('TableTileGridMediator', {
+      table: this
+    });
   }
 };
 
 scout.Table.prototype._renderTileMode = function() {
-  if (this.tileMode) {
-    this.mediator.render();
-  } else {
-    // since tileMode is not a widget property remove is not called by setProperty
-    this._removeTileMode();
-    this._renderData();
+  if (this.mediator) {
+    this.mediator.renderTileMode();
   }
 };
 
 scout.Table.prototype._removeTileMode = function() {
   if (this.mediator) {
-    this.mediator.remove();
+    this.mediator.removeTileMode();
   }
 };
 
 // TODO [10.0] should only the tableAdapter work with tableRowTileMappings?
 scout.Table.prototype._setTiles = function(tableRowTileMappings) {
   if (tableRowTileMappings) {
-    this.mediator.insertTiles(tableRowTileMappings.map(this.mediator.resolveMapping));
+    this.mediator.insertTiles(tableRowTileMappings.map(this.mediator.resolveMapping, this.mediator));
+  } else {
+    // reset
+    this.mediator.reset();
   }
 };
 
@@ -4247,21 +4243,6 @@ scout.Table.prototype.setFooterVisible = function(visible) {
   }
 };
 
-scout.Table.prototype.setTileTableHeaderVisible = function(visible) {
-  this._setProperty('tileTableHeaderVisible', visible);
-  if (visible && !this.tileTableHeader) {
-    this.tileTableHeader = this._createTileTableHeader();
-  }
-
-  if (this._rendered()) {
-    this._renderTileTableHeaderVisible();
-  }
-  if (!visible && this.tileTableHeader) {
-    this.tileTableHeader.destroy();
-    this.tileTableHeader = null;
-  }
-};
-
 /**
  * Renders the background effect of every column, if column.backgroundEffect is set
  */
@@ -4459,31 +4440,46 @@ scout.Table.prototype._removeFooter = function() {
   this.footer.remove();
 };
 
-scout.Table.prototype._renderTileTableHeaderVisible = function() {
-  if (!this.tileTableHeader) {
-    return;
+scout.Table.prototype._setTileTableHeaderBox = function(tileTableHeaderBox) {
+  if (tileTableHeaderBox) {
+    tileTableHeaderBox.addCssClass('tile-table-filter-box');
   }
-  if (this.tileTableHeaderVisible) {
-    this._renderTileTableHeader();
-  } else {
-    this._removeTileTableHeader();
-  }
-  this.invalidateLayoutTree();
+  this._setProperty('tileTableHeaderBox', tileTableHeaderBox);
 };
 
-scout.Table.prototype._renderTileTableHeader = function() {
-  if (this.tileTableHeader.rendered) {
-    return;
-  }
-
-  this.tileTableHeader.render();
+scout.Table.prototype.setTileTableHeaderBox = function(tileTableHeaderBox) {
+  this.setProperty('tileTableHeaderBox', tileTableHeaderBox);
 };
 
-scout.Table.prototype._removeTileTableHeader = function() {
-  if (!this.tileTableHeader.rendered) {
+scout.Table.prototype._createTileTableHeaderBox = function() {
+  if (this.preventDefaultTileTableHeaderBoxCreation) {
     return;
   }
-  this.tileTableHeader.remove();
+  return scout.create('TileTableHeaderBox', {
+    parent: this
+  });
+};
+
+scout.Table.prototype._renderTileTableHeaderBox = function() {
+  if (this.tileTableHeaderBox) {
+
+    this.tileTableHeaderBox.render();
+
+    if (this.menuBar.position === scout.MenuBar.Position.TOP) {
+      this.tileTableHeaderBox.$container.insertAfter(this.menuBar.$container);
+    } else {
+      this.tileTableHeaderBox.$container.prependTo(this.$container);
+    }
+
+  } else if (!this.tileTableHeaderVisible && this.tileTableHeaderBox) {
+    this.tileTableHeaderBox.remove();
+  }
+};
+
+scout.Table.prototype._removeTileTableHeaderBox = function() {
+  if (this.tileTableHeaderBox) {
+    this.tileTableHeaderBox.remove();
+  }
 };
 
 /**

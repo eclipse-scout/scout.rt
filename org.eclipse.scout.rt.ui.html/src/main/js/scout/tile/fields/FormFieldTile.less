@@ -252,4 +252,23 @@
       }
     }
   }
+
+  /* TODO [10.0] rmu: copied from StudioTile.less, refactor & adapt */
+  &.selected {
+    /* Use mix() instead of fade(), because the background is opaque */
+    background-color: mix(@control-background-color, @item-selection-background-color, 35%);
+
+    /* Because changing the border width would cause the content box to change, */
+    /* we use an independent pseudo element for the tile border */
+    &::before {
+      content: '';
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 2px solid @item-selection-border-color;
+    }
+  }
 }
