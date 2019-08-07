@@ -914,7 +914,7 @@ scout.TileGrid.prototype.scrollTo = function(tile, options) {
   this.scrollTopDirty = true;
   this.validateLayoutTree();
   this.scrolling = false;
-  scout.scrollbars.scrollTo(this.$container, tile.$container, options);
+  tile.reveal(options);
   this.scrollTopDirty = false;
 };
 

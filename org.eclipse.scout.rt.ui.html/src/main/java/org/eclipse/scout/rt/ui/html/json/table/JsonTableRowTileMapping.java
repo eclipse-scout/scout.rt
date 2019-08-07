@@ -26,7 +26,7 @@ public class JsonTableRowTileMapping<TABLE_ROW_TILE_MAPPING extends ITableRowTil
 
   public JsonTableRowTileMapping(TABLE_ROW_TILE_MAPPING model, IUiSession uiSession, String id, IJsonAdapter parent) {
     super(model, uiSession, id, parent);
-    assertTrue(parent instanceof JsonTable<?>);
+    assertTrue(parent instanceof JsonTableTileGridMediator<?>);
   }
 
   @Override
@@ -34,9 +34,8 @@ public class JsonTableRowTileMapping<TABLE_ROW_TILE_MAPPING extends ITableRowTil
     return "TableRowTileMapping";
   }
 
-  @Override
-  public JsonTable<?> getParent() {
-    return assertNotNull((JsonTable<?>) super.getParent());
+  protected JsonTable<?> getTable() {
+    return assertNotNull((JsonTable<?>) getParent().getParent());
   }
 
   @Override
@@ -51,7 +50,7 @@ public class JsonTableRowTileMapping<TABLE_ROW_TILE_MAPPING extends ITableRowTil
       @Override
       public Object prepareValueForToJson(Object value) {
         if (value instanceof ITableRow) {
-          return getParent().getOrCreateRowId(((ITableRow) value));
+          return getTable().getOrCreateRowId(((ITableRow) value));
         }
         return null;
       }

@@ -13,9 +13,10 @@
  * Delegates events between the Table and it's internal TileGrid.
  *
  */
-scout.TableTileGridMediator = function(table) {
-  this.table = table;
+scout.TableTileGridMediator = function() {
+  scout.TableTileGridMediator.parent.call(this);
 
+  this.table = null;
   this.tileAccordion = null;
 
   this._tileGridListener = null;
@@ -23,6 +24,7 @@ scout.TableTileGridMediator = function(table) {
   this._destroyHandler = null;
 
   this.tiles = [];
+  this.tileMappings = []; // used only in scout classic
   this.tilesMap = {}; // tiles by rowId
   this.tileFilterMap = {};
   this.groups = {};
@@ -42,18 +44,30 @@ scout.TableTileGridMediator = function(table) {
   this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
 
   this._destroyHandler = this._uninstallListeners.bind(this);
+
+  // properties for internal tileAccordion
+  this.exclusiveExpand = false;
+  this.gridColumnCount = null;
+  this.tileGridLayoutConfig = null;
+  this.withPlaceholders = null;
+
+  this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
 };
+scout.inherits(scout.TableTileGridMediator, scout.Widget);
 
 scout.TableTileGridMediator.prototype.init = function(model) {
-  scout.assertParameter('table', model.table);
-  $.extend(this, model);
+  scout.TableTileGridMediator.parent.prototype._init.call(this, model);
+
+  this.table = this.parent;
 
   if (!this.tileAccordion) {
     this.tileAccordion = this._createTileAccordion();
     this._installListeners();
   }
-
   this.tableState.headerVisible = this.table.headerVisible;
+
+  this._setTiles(this.tiles);
+  this._setTileMappings(this.tileMappings);
 };
 
 scout.TableTileGridMediator.prototype._installListeners = function() {
@@ -90,16 +104,88 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.table.off('destroy', this._destroyHandler);
 };
 
+scout.TableTileGridMediator.prototype.setGridColumnCount = function(gridColumnCount) {
+  this.setProperty('gridColumnCount', gridColumnCount);
+  if (this.tileAccordion) {
+    this.tileAccordion.setGridColumnCount(gridColumnCount);
+  }
+};
+
+scout.TableTileGridMediator.prototype.setTileGridLayoutConfig = function(tileGridLayoutConfig) {
+  this.setProperty('tileGridLayoutConfig', tileGridLayoutConfig);
+  if (this.tileAccordion) {
+    this.tileAccordion.setTileGridLayoutConfig(tileGridLayoutConfig);
+  }
+};
+
+scout.TableTileGridMediator.prototype.setWithPlaceholders = function(withPlaceholders) {
+  this.setProperty('withPlaceholders', withPlaceholders);
+  if (this.tileAccordion) {
+    this.tileAccordion.setWithPlaceholders(withPlaceholders);
+  }
+};
+
+scout.TableTileGridMediator.prototype._setTileMappings = function(tableRowTileMappings) {
+  if (!tableRowTileMappings) {
+    return;
+  }
+  var tiles = tableRowTileMappings.map(this.resolveMapping, this);
+  this._setTiles(tiles);
+};
+
+scout.TableTileGridMediator.prototype.setTiles = function(tiles) {
+  this.setProperty('tiles', tiles);
+};
+
+scout.TableTileGridMediator.prototype._setTiles = function(tiles) {
+  this.reset();
+  this._setTilesInternal(tiles);
+};
+
+scout.TableTileGridMediator.prototype._setTilesInternal = function(tiles) {
+  // check if all tiles are already available in the table
+  var tableRowMissing = tiles.some(function(tile) {
+    return this.table.rowsMap[tile.rowId] === undefined;
+  }, this);
+
+  if (tableRowMissing) {
+    if (this.table.initialized) {
+      // wait for next insertRows event on the table to execute this function again
+      this.table.one('rowsInserted', this._setTilesInternal.bind(this, tiles));
+    } else {
+      // if table is not initialized already wait for the init event
+      this.table.one('init', this._setTilesInternal.bind(this, tiles));
+    }
+    return;
+  }
+
+  this._refreshTilesMap(tiles);
+
+  // create simplified grouping for tile accordion, grouping on the table can be left as is.
+  this._initGroups(tiles);
+
+  this._setProperty('tiles', tiles);
+
+  this.tileAccordion.setTiles(this.tiles);
+  this._updateGroupVisibility();
+
+  this._syncSelectionFromTableToTile();
+};
+
+// only used in ScoutJS, see TableAdapter.modifyTablePrototype()
 scout.TableTileGridMediator.prototype.loadTiles = function() {
   var tiles = this.table.createTiles(this.table.rows);
   if (tiles) {
-    this.table._setTiles(tiles);
+    this.setTiles(tiles);
   }
 };
 
 scout.TableTileGridMediator.prototype.resolveMapping = function(tableRowTileMapping) {
-  tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
-  return tableRowTileMapping.tile;
+  var tile = tableRowTileMapping.tile;
+  tile.rowId = tableRowTileMapping.tableRow;
+  tile.setParent(this);
+  tile.setOwner(this);
+  return tile;
 };
 
 //update tilesMap with the given tiles or recreate tilesMap completely in case of null given
@@ -138,16 +224,19 @@ scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
       this.tileAccordion.insertGroup(group);
     }
     tile.parent = group;
-    group.setTitleSuffix('(' + (++group.tileCount) + ')');
   }, this);
 };
 
 scout.TableTileGridMediator.prototype._createTileAccordion = function() {
   return scout.create('TileAccordion', {
     parent: this.table,
+    virtual: true,
     selectable: true,
-    multiselect: true,
-    gridColumnCount: 10
+    multiselect: this.table.multiSelect,
+    exclusiveExpand: this.exclusiveExpand,
+    gridColumnCount: this.gridColumnCount,
+    tileGridLayoutConfig: this.tileGridLayoutConfig,
+    withPlaceholders: this.withPlaceholders
   });
 };
 
@@ -159,16 +248,17 @@ scout.TableTileGridMediator.prototype._createTileGroup = function(groupId, htmlE
     title: groupId,
     titleHtmlEnabled: htmlEnabled,
     body: {
-      objectType: 'TileGrid'
-    },
-    tileCount: 0
+      objectType: 'TileGrid',
+      scrollable: false
+    }
   });
 };
 
 scout.TableTileGridMediator.prototype.activate = function() {
+  this.tableState.headerVisible = this.table.headerVisible;
   this.table.setHeaderVisible(false);
-  if (this.table.tileTableHeaderBox) {
-    this.table.tileTableHeaderBox.setVisible(true);
+  if (this.table.tileTableHeader) {
+    this.table.tileTableHeader.setVisible(true);
   }
 
   // hide aggregation table control
@@ -178,8 +268,14 @@ scout.TableTileGridMediator.prototype.activate = function() {
     }
   });
 
+  this.tableState.loadingSupportContainer = this.table.loadingSupport.options$Container;
+  this.table.loadingSupport.options$Container = function() {
+    return this.tileAccordion.$container;
+  }.bind(this);
+
   // doesn't depend upon any tile data, therefore execute on activation
   this._syncFiltersFromTableToTile();
+  this._syncScrollTopFromTableToTile();
 };
 
 scout.TableTileGridMediator.prototype.deactivate = function() {
@@ -191,19 +287,22 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
   });
   // use _setProperty to avoid instant rendering, render manually later on (this is necessary since TableHeader depends upon table.$data)
   this.table._setProperty('headerVisible', this.tableState.headerVisible);
-  if (this.table.tileTableHeaderBox) {
-    this.table.tileTableHeaderBox.setVisible(false);
+  if (this.table.tileTableHeader) {
+    this.table.tileTableHeader.setVisible(false);
   }
 
-  // TODO [10.0] rmu: reload tiles on every mode-switch. loadTiles() could be optimized so that only not already existing tiles are reloaded
+  if (this.tableState.loadingSupportContainer) {
+    this.table.loadingSupport.options$Container = this.tableState.loadingSupportContainer;
+  }
+
+  this._syncScrollTopFromTileGridToTable();
+
   // complete reset
   this.reset();
 };
 
 scout.TableTileGridMediator.prototype.reset = function() {
-  this.tiles = [];
   this.tilesMap = {};
-  this.tileFilterMap = {};
   this.groups = {};
   this.groupForTileMap = {};
   this.tileAccordion.deleteAllTiles();
@@ -216,19 +315,15 @@ scout.TableTileGridMediator.prototype.renderTileMode = function() {
     if (this.table.$data) {
       this.table._removeData();
     }
+    this._renderTileTableHeader();
     this._renderTileAccordion();
   } else {
-    // since tileMode is not a widget property remove is not called by setProperty
+    this._removeTileTableHeader();
     this._removeTileAccordion();
     this.table._renderData();
     this.table._renderTableHeader();
   }
-};
-
-scout.TableTileGridMediator.prototype.removeTileMode = function() {
-  if (this.table.rendered) {
-    this._removeTileAccordion();
-  }
+  this.table._refreshMenuBarPosition();
 };
 
 scout.TableTileGridMediator.prototype.destroy = function() {
@@ -242,19 +337,11 @@ scout.TableTileGridMediator.prototype.destroy = function() {
 };
 
 scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
-  if (!tiles) {
+  tiles = scout.arrays.ensure(tiles);
+  if (tiles.length === 0) {
     return;
   }
-  scout.arrays.pushAll(this.tiles, tiles);
-  this._refreshTilesMap(tiles);
-
-  // create simplified grouping for tile accordion, grouping on the table can be left as is.
-  this._initGroups(tiles);
-
-  this.tileAccordion.setTiles(this.tiles);
-
-  this._syncSelectionFromTableToTile();
-  //  this.mediator._syncScrollTopFromTableToTile();
+  this.setTiles(this.tiles.concat(tiles));
 };
 
 scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
@@ -266,9 +353,11 @@ scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
     delete this.tilesMap[tile.rowId];
     delete this.groupForTileMap[tile.rowId];
     var group = this.tileAccordion.getGroupByTile(tile);
-    group.setTitleSuffix('(' + (--group.tileCount) + ')');
-    if (group.tileCount === 0) {
-      this.tileAccordion.deleteGroup(group);
+    if (group) {
+      // if there's only one left remove the group (tile is removed later)
+      if (group.body.tiles.length === 1) {
+        this.tileAccordion.deleteGroup(group);
+      }
     }
     tile.destroy();
   }, this);
@@ -281,6 +370,9 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
   }
   if (event.propertyName === 'selectedTiles') {
     this.syncSelectionFromTileGridToTable(event.source.getSelectedTiles());
+  }
+  if (event.propertyName === 'filteredTiles') {
+    this._updateGroupVisibility();
   }
 };
 
@@ -302,10 +394,7 @@ scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
   if (!this.table.tileMode) {
     return;
   }
-  var tableRowTileMappings = this.table.createTiles(event.rows);
-  if (tableRowTileMappings) {
-    this.insertTiles(tableRowTileMappings.map(this.resolveMapping));
-  }
+  this.insertTiles(this.table.createTiles(event.rows));
 };
 
 scout.TableTileGridMediator.prototype._onTableRowsDeleted = function(event) {
@@ -326,7 +415,7 @@ scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(
   if (!this.table.tileMode) {
     return;
   }
-  this.tiles = this.table.visibleRows.map(function(row) {
+  this.tiles = this.table.rows.map(function(row) {
     return this.tilesMap[row.id];
   }, this);
   this.tileAccordion.setTiles(this.tiles);
@@ -399,18 +488,52 @@ scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = functio
   this.table.selectRows(selectedRows);
 };
 
+scout.TableTileGridMediator.prototype._updateGroupVisibility = function() {
+  this.tileAccordion.groups.forEach(function(group) {
+    // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
+    var groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
+    group.setVisible(!groupEmpty);
+    group.setTitleSuffix('(' + group.body.filteredTiles.length + ')');
+  });
+};
+
 scout.TableTileGridMediator.prototype._syncScrollTopFromTableToTile = function() {
   var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
-  if (rowIndex < 0) {
+  if (rowIndex <= 0) {
     return;
   }
   var tile = this.tilesMap[this.table.rows[rowIndex].id];
   if (!tile) {
     return;
   }
-  this.tileAccordion.scrollTo(tile, {
+
+  // reset scrollTop on tileAccordion, otherwise it would overwrite the synced scrollTop
+  this.tileAccordion.scrollTop = null;
+
+  var options = {
     align: 'top'
-  });
+  };
+
+  if (!tile.rendered) {
+    // Execute delayed because table may be not layouted yet
+    this.table.session.layoutValidator.schedulePostValidateFunction(tile.reveal.bind(tile, options));
+    return;
+  }
+  tile.reveal(options);
+};
+
+scout.TableTileGridMediator.prototype._syncScrollTopFromTileGridToTable = function() {
+  var tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
+  if (tile) {
+    var options = {
+      align: 'top'
+    };
+    if (!this.table._isDataRendered()) {
+      this.table.session.layoutValidator.schedulePostValidateFunction(this.table.scrollTo.bind(this.table, this.table.rowsMap[tile.rowId], options));
+    } else {
+      this.table.scrollTo(this.table.rowsMap[tile.rowId], options);
+    }
+  }
 };
 
 scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
@@ -423,16 +546,26 @@ scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
   }
 };
 
-scout.TableTileGridMediator.prototype._renderTileAccordion = function() {
-  if (this.tileAccordion.rendered) {
-    return;
+scout.TableTileGridMediator.prototype._renderTileTableHeader = function() {
+  if (this.table.tileTableHeader) {
+    this.table.tileTableHeader.render();
   }
-  this.tileAccordion.render();
+};
+
+scout.TableTileGridMediator.prototype._removeTileTableHeader = function() {
+  if (this.table.tileTableHeader) {
+    this.table.tileTableHeader.remove();
+  }
+};
+
+scout.TableTileGridMediator.prototype._renderTileAccordion = function() {
+  if (!this.tileAccordion.rendered) {
+    this.tileAccordion.render();
+  }
 };
 
 scout.TableTileGridMediator.prototype._removeTileAccordion = function() {
-  if (!this.tileAccordion.rendered) {
-    return;
+  if (this.tileAccordion.rendered) {
+    this.tileAccordion.remove();
   }
-  this.tileAccordion.remove();
 };

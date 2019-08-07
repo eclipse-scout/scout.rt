@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowTileMapping;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableTileGridMediator;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IAlphanumericSortingStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBeanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
@@ -187,6 +188,7 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonStringColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTableRowTileMapping;
+import org.eclipse.scout.rt.ui.html.json.table.JsonTableTileGridMediator;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAggregateTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonFormTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonTableControl;
@@ -387,6 +389,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITableRowTileMapping) {
       return new JsonTableRowTileMapping<>((ITableRowTileMapping) model, session, id, parent);
+    }
+    if (model instanceof ITableTileGridMediator) {
+      return new JsonTableTileGridMediator<>((ITableTileGridMediator) model, session, id, parent);
     }
     if (model instanceof IClientSession) {
       return new JsonClientSession<>((IClientSession) model, session, id, parent);

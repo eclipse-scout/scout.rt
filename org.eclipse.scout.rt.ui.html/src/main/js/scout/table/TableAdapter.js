@@ -14,18 +14,6 @@ scout.TableAdapter = function() {
 };
 scout.inherits(scout.TableAdapter, scout.ModelAdapter);
 
-/**
- * @override
- */
-scout.TableAdapter.prototype._initProperties = function(model) {
-  scout.TableAdapter.parent.prototype._initProperties.call(this, model);
-
-  if (!model.tileTableHeaderBox) {
-    model.preventDefaultTileTableHeaderBoxCreation = true;
-  }
-
-};
-
 scout.TableAdapter.prototype._postCreateWidget = function() {
   // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
   // because the original event had been fired before the eventhandler was registered.
@@ -123,27 +111,6 @@ scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) 
     aggregationFunction: column.aggregationFunction
   };
   this._send('aggregationFunctionChanged', data);
-};
-
-scout.TableAdapter.prototype._onWidgetCreateTiles = function(event) {
-  event.preventDefault();
-  var rowIds = this.widget._rowsToIds(event.rows);
-  this._sendCreateTiles(rowIds);
-};
-
-scout.TableAdapter.prototype.syncTiles = function(tableRowTileMappings) {
-  tableRowTileMappings = this._prepareWidgetProperty('tiles', tableRowTileMappings);
-
-  this.widget.setTiles(!!tableRowTileMappings ? tableRowTileMappings.map(function(tableRowTileMapping) {
-    tableRowTileMapping.tile.rowId = tableRowTileMapping.tableRow;
-    return tableRowTileMapping.tile;
-  }) : []);
-};
-
-scout.TableAdapter.prototype._sendCreateTiles = function(rowIds) {
-  this._send('createTiles', {
-    rowIds: rowIds
-  });
 };
 
 scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
@@ -391,8 +358,6 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
     this._onWidgetColumnOrganizeAction(event);
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
-  } else if (event.type === 'createTiles') {
-    this._onWidgetCreateTiles(event);
   } else {
     scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
   }
@@ -487,9 +452,9 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
   });
   this.widget.updateColumnHeaders(columns);
 
-  if (this.widget.tileMode && this.widget.mediator) {
+  if (this.widget.tileMode && this.widget.tableTileGridMediator) {
     // grouping might have changed, trigger reinit of the groups on the tileGrid in tileMode
-    this.widget.mediator._onTableGroup();
+    this.widget.tableTileGridMediator._onTableGroup();
     // removing of a group column doesn't cause a rowOrderChange, nonetheless aggregation columns might need to be removed.
     this.widget.updateRowOrder(this.widget.rows);
   }
@@ -676,6 +641,24 @@ scout.TableAdapter.modifyTablePrototype = function() {
       return;
     }
     this.sortOrig(column, direction, multiSort, remove);
+  }, true);
+
+  // no js default tileTableHeader in classic mode
+  scout.objects.replacePrototypeFunction(scout.Table, '_createTileTableHeader', function() {
+    if (this.modelAdapter) {
+      // nop in classic mode
+      return;
+    }
+    return this._createTileTableHeaderOrig();
+  }, true);
+
+  // not used in classic mode since tiles are created by the server
+  scout.objects.replacePrototypeFunction(scout.Table, 'createTiles', function() {
+    if (this.modelAdapter) {
+      // nop in classic mode
+      return;
+    }
+    return this.createTilesOrig();
   }, true);
 };
 

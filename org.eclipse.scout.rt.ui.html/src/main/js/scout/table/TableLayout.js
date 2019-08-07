@@ -22,14 +22,14 @@ scout.TableLayout.prototype.layout = function($container) {
     tileTableHeight = 0,
     controlContainerHeight = 0,
     controlContainerInsets,
-    tileGrid = this.table.mediator ? this.table.mediator.tileAccordion : null,
-    $data = this.table.$data ? this.table.$data : tileGrid.$container,
-    dataMargins = scout.graphics.margins($data),
+    tileAccordion = this.table.tableTileGridMediator ? this.table.tableTileGridMediator.tileAccordion : null,
+    $data = this.table.$data,
+    dataMargins = scout.graphics.margins(scout.nvl($data, this.table.$container)),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
-    tileTableHeaderBox = this.table.tileTableHeaderBox,
+    tileTableHeader = this.table.tileTableHeader,
     visibleColumns = this.table.visibleColumns(),
     lastColumn = visibleColumns[visibleColumns.length - 1],
     htmlContainer = this.table.htmlComp,
@@ -60,19 +60,24 @@ scout.TableLayout.prototype.layout = function($container) {
       footer.revalidateLayout();
     }
   }
-  if (tileTableHeaderBox && tileTableHeaderBox.visible) {
-    var htmlTileTableHeaderBox = scout.HtmlComponent.get(tileTableHeaderBox.$container);
-    var tileTableHeaderBoxSize = scout.GroupBoxLayout.size(htmlTileTableHeaderBox, containerSize);
-    htmlTileTableHeaderBox.setSize(tileTableHeaderBoxSize);
-    tileTableHeight = tileTableHeaderBoxSize.height;
-    tileTableHeaderBox.revalidateLayout();
+  if (tileTableHeader && tileTableHeader.visible) {
+    var groupBoxSize = tileTableHeader.htmlComp.prefSize({
+      widthHint: containerSize.width
+    });
+    groupBoxSize.width = containerSize.width;
+    groupBoxSize = groupBoxSize.subtract(tileTableHeader.htmlComp.margins());
+    tileTableHeader.htmlComp.setSize(groupBoxSize);
+    tileTableHeight = groupBoxSize.height;
   }
-  $data.css('height', 'calc(100% - ' + (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight) + 'px)');
-  this._dataHeightPositive = $data.height() > 0;
-
-  if (tileGrid) {
-    tileGrid.revalidateLayout();
+  var dataHeight = containerSize.height - (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight);
+  if ($data) {
+    $data.css('height', dataHeight);
+  } else {
+    if (tileAccordion && tileAccordion.htmlComp) {
+      tileAccordion.htmlComp.setSize(new scout.Dimension(containerSize.width, dataHeight));
+    }
   }
+  this._dataHeightPositive = dataHeight > 0;
 
   if (!this.table.tileMode) {
 

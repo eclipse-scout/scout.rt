@@ -63,7 +63,7 @@ scout.TableUpdateBuffer.prototype.process = function() {
   // Update the viewport as well if rendering was blocked
   this.table.setLoading(false);
   this.table._renderViewportBlocked = false;
-  if (this.table.rendered) {
+  if (this.table._isDataRendered()) {
     this.table._renderViewport();
   }
 };

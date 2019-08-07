@@ -230,15 +230,3 @@ scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
   return scout.HtmlComponent.get(this.groupBox.$body);
 };
-
-/* --- STATIC HELPERS ------------------------------------------------------------- */
-
-/**
- * @memberOf GroupBoxLayout
- */
-scout.GroupBoxLayout.size = function(htmlGroupBox, containerSize) {
-  var groupBoxSize = htmlGroupBox.prefSize();
-  groupBoxSize.width = containerSize.width;
-  groupBoxSize = groupBoxSize.subtract(htmlGroupBox.margins());
-  return groupBoxSize;
-};

@@ -90,6 +90,7 @@ import org.eclipse.scout.rt.client.ui.dnd.TextTransferObject;
 import org.eclipse.scout.rt.client.ui.dnd.TransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -191,12 +192,10 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   private IEventHistory<TableEvent> m_eventHistory;
   private ContributionComposite m_contributionHolder;
   private List<ITableControl> m_tableControls;
-  private ITileTableHeaderBox m_tileTableHeaderBox;
   private IReloadHandler m_reloadHandler;
   private int m_valueChangeTriggerEnabled = 1;// >=1 is true
   private ITableOrganizer m_tableOrganizer;
   private boolean m_treeStructureDirty;
-  private TableTileGridMediator m_tableTileGridMediator;
 
   public AbstractTable() {
     this(true);
@@ -916,7 +915,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @ConfigOperation
   @Order(140)
-  protected ITile execCreateTile(ITableRow rows) {
+  protected ITile execCreateTile(ITableRow row) {
     return null;
   }
 
@@ -957,9 +956,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
-  private Class<? extends ITileTableHeaderBox> getConfiguredTileTableHeaderBox() {
+  private Class<? extends ITileTableHeader> getConfiguredTileTableHeader() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<ITileTableHeaderBox>> fca = ConfigurationUtility.filterClasses(dca, ITileTableHeaderBox.class);
+    List<Class<ITileTableHeader>> fca = ConfigurationUtility.filterClasses(dca, ITileTableHeader.class);
     return CollectionUtility.firstElement(ConfigurationUtility.removeReplacedClasses(fca));
   }
 
@@ -1032,8 +1031,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
-
-    createTileHeaderBox();
 
     m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
 
@@ -1163,21 +1160,43 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     m_tableControls = tableControls.getOrderedList();
   }
 
-  private void createTileHeaderBox() {
-    Class<? extends ITileTableHeaderBox> headerBox = getConfiguredTileTableHeaderBox();
-    if (headerBox != null) {
-      m_tileTableHeaderBox = ConfigurationUtility.newInnerInstance(this, headerBox);
-      m_tileTableHeaderBox.setParentInternal(this);
-      m_tileTableHeaderBox.rebuildFieldGrid();
+  protected ITileTableHeader createTileTableHeader() {
+    ITileTableHeader tileTableHeader = null;
+    Class<? extends ITileTableHeader> tth = getConfiguredTileTableHeader();
+    if (tth != null) {
+      tileTableHeader = ConfigurationUtility.newInnerInstance(this, tth);
+      tileTableHeader.setParentInternal(this);
+      // since we create the tileTableHeader lazy the table is already initialized and we must init the header manually.
+      tileTableHeader.init();
+      if (tileTableHeader instanceof IGroupBox) {
+        ((IGroupBox) tileTableHeader).rebuildFieldGrid();
+      }
     }
+    return tileTableHeader;
   }
 
-  protected void createTableTileGridMediator() {
-    m_tableTileGridMediator = new TableTileGridMediator(this);
+  @Override
+  public ITileTableHeader getTileTableHeader() {
+    return (ITileTableHeader) propertySupport.getProperty(PROP_TILE_TABLE_HEADER);
   }
 
-  public TableTileGridMediator getTableTileGridMediator() {
-    return m_tableTileGridMediator;
+  @Override
+  public void setTileTableHeader(ITileTableHeader tileTableHeader) {
+    propertySupport.setProperty(PROP_TILE_TABLE_HEADER, tileTableHeader);
+  }
+
+  protected ITableTileGridMediator createTableTileGridMediator() {
+    return new TableTileGridMediator(this);
+  }
+
+  @Override
+  public ITableTileGridMediator getTableTileGridMediator() {
+    return (ITableTileGridMediator) propertySupport.getProperty(PROP_TABLE_TILE_GRID_MEDIATOR);
+  }
+
+  @Override
+  public void setTableTileGridMediator(ITableTileGridMediator mediator) {
+    propertySupport.setProperty(PROP_TABLE_TILE_GRID_MEDIATOR, mediator);
   }
 
   private void createColumnsInternal() {
@@ -1840,7 +1859,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public List<? extends IWidget> getChildren() {
-    return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal(), m_tableControls, CollectionUtility.arrayList(m_tileTableHeaderBox));
+    return CollectionUtility.flatten(super.getChildren(), getMenus(), getKeyStrokesInternal(), m_tableControls, CollectionUtility.arrayList(getTileTableHeader()));
   }
 
   @Override
@@ -4413,11 +4432,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     return null;
   }
 
-  @Override
-  public ITileTableHeaderBox getTileTableHeaderBox() {
-    return m_tileTableHeaderBox;
-  }
-
   /**
    * Configures the visibility of the table status.
    * <p>
@@ -4476,15 +4490,14 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   @Override
-  public void createTiles(List<? extends ITableRow> rows) {
+  public List<ITableRowTileMapping> createTiles(List<? extends ITableRow> rows) {
     try {
-      List<TableRowTileMapping> rowToTilePairs = rows.stream()
+      return rows.stream()
           .map(r -> BEANS.get(TableRowTileMapping.class)
               .withTableRow(r)
               .withTile(interceptCreateTile(r)))
           .filter(m -> m.getTile() != null)
           .collect(Collectors.toList());
-      setTiles(rowToTilePairs);
     }
     catch (Exception e) {
       LOG.error("Could not create tiles [{}]", getClass().getName(), e);
@@ -4947,18 +4960,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
         popUIProcessor();
       }
     }
-
-    @Override
-    public void fireCreateTiles(List<? extends ITableRow> rows) {
-      try {
-        pushUIProcessor();
-        //
-        AbstractTable.this.createTiles(rows);
-      }
-      finally {
-        popUIProcessor();
-      }
-    }
   }
 
   private class P_TableRowBuilder extends AbstractTableRowBuilder<Object> {
@@ -5272,20 +5273,15 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public void setTileMode(boolean tileMode) {
-    if (m_tableTileGridMediator == null) {
-      createTableTileGridMediator();
+    if (tileMode) {
+      // create mediator and header lazy
+      if (getTableTileGridMediator() == null) {
+        setTableTileGridMediator(createTableTileGridMediator());
+      }
+      if (getTileTableHeader() == null) {
+        setTileTableHeader(createTileTableHeader());
+      }
     }
     propertySupport.setProperty(PROP_TILE_MODE, tileMode);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public List<TableRowTileMapping> getTiles() {
-    return (List<TableRowTileMapping>) propertySupport.getProperty(PROP_TILES);
-  }
-
-  @Override
-  public void setTiles(List<TableRowTileMapping> tiles) {
-    propertySupport.setProperty(PROP_TILES, tiles);
   }
 }

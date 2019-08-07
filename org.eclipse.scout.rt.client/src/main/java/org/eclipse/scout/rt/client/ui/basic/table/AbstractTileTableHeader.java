@@ -1,4 +1,4 @@
-/*
+/*******************************************************************************
  * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- */
+ ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 @ClassId("c6ee18fd-e630-4d92-81b1-cd0147c902d4")
-public abstract class AbstractTileTableHeaderBox extends AbstractGroupBox implements ITileTableHeaderBox {
+public abstract class AbstractTileTableHeader extends AbstractGroupBox implements ITileTableHeader {
 
   private TableListener m_tableListener;
   private boolean m_isGrouping;
@@ -287,7 +287,7 @@ public abstract class AbstractTileTableHeaderBox extends AbstractGroupBox implem
     protected List<? extends ILookupRow<ImmutablePair<IColumn, Boolean>>> execCreateLookupRows() {
       final List<LookupRow<ImmutablePair<IColumn, Boolean>>> lookupRows = new ArrayList<>();
 
-      lookupRows.add(new LookupRow<>(null, TEXTS.get("NoGrouping")));
+      lookupRows.add(new LookupRow<>(null, TEXTS.get("NoSorting")));
       for (IColumn col : getTable().getColumns()) {
         lookupRows.add(new LookupRow<>(new ImmutablePair<IColumn, Boolean>(col, true), col.getHeaderCell().getText() + " (" + TEXTS.get("Ascending") + ")")
             .withIconId(AbstractIcons.LongArrowUpBold));

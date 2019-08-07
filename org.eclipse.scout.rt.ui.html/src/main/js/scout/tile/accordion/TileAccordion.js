@@ -606,3 +606,14 @@ scout.TileAccordion.prototype._onGroupBodyHeightChange = function(event) {
 scout.TileAccordion.prototype._onGroupBodyHeightChangeDone = function(event) {
   event.source.off('bodyHeightChange', this._groupBodyHeightChangeHandler);
 };
+
+/**
+ * @returns the first fully visible tile at the scrollTop.
+ */
+scout.TileAccordion.prototype._tileAtScrollTop = function(scrollTop) {
+  return scout.arrays.find(this.getTiles().filter(function(tile) {
+    return tile.rendered;
+  }), function(tile) {
+    return tile.$container.position().top >= scrollTop;
+  }, this);
+};

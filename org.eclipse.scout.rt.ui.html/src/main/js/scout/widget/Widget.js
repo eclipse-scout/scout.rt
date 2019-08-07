@@ -2087,7 +2087,7 @@ scout.Widget.prototype.scrollToBottom = function() {
 /**
  * Brings the widget into view by scrolling the first scrollable parent.
  */
-scout.Widget.prototype.reveal = function() {
+scout.Widget.prototype.reveal = function(options) {
   if (!this.rendered) {
     return;
   }
@@ -2096,7 +2096,7 @@ scout.Widget.prototype.reveal = function() {
     // No scrollable parent found -> scrolling is not possible
     return;
   }
-  scout.scrollbars.scrollTo($scrollParent, this.$container);
+  scout.scrollbars.scrollTo($scrollParent, this.$container, options);
 };
 
 /**

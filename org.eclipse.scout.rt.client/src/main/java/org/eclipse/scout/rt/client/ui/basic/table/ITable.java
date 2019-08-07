@@ -243,18 +243,18 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   String PROP_TILE_MODE = "tileMode";
 
   /**
-   * type {@link List} of {@link ITableRowTileMapping}
+   * type {@link ITileTableHeader}
    *
    * @since 10.0
    */
-  String PROP_TILES = "tiles";
+  String PROP_TILE_TABLE_HEADER = "tileTableHeader";
 
   /**
-   * type {@link ITileTableHeaderBox}
+   * type {@link ITableTileGridMediator}
    *
    * @since 10.0
    */
-  String PROP_TILE_TABLE_HEADER_BOX = "tileTableHeaderBox";
+  String PROP_TABLE_TILE_GRID_MEDIATOR = "tableTileGridMediator";
 
   /**
    * type boolean
@@ -1314,21 +1314,26 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * @since 10.0
    */
-  void createTiles(List<? extends ITableRow> rows);
+  List<ITableRowTileMapping> createTiles(List<? extends ITableRow> rows);
 
   /**
    * @since 10.0
    */
-  List<TableRowTileMapping> getTiles();
+  ITileTableHeader getTileTableHeader();
 
   /**
    * @since 10.0
    */
-  void setTiles(List<TableRowTileMapping> tiles);
+  void setTileTableHeader(ITileTableHeader tileTableHeader);
 
   /**
    * @since 10.0
    */
-  ITileTableHeaderBox getTileTableHeaderBox();
+  ITableTileGridMediator getTableTileGridMediator();
+
+  /**
+   * @since 10.0
+   */
+  void setTableTileGridMediator(ITableTileGridMediator mediator);
 
 }
