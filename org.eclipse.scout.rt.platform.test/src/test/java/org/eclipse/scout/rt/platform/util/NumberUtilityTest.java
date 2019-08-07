@@ -76,6 +76,17 @@ public class NumberUtilityTest {
   }
 
   @Test
+  public void testToDouble() {
+    assertNull(NumberUtility.toDouble(null));
+
+    Integer intValue = Integer.valueOf(42);
+    assertEquals(Double.valueOf(42), NumberUtility.toDouble(intValue));
+
+    Float floatValue = 42.0001f;
+    assertEquals(Double.valueOf(42.0001), NumberUtility.toDouble(floatValue));
+  }
+
+  @Test
   public void testDivideAndCeil() {
     assertEquals(2, divideAndCeil(8, 4));
     assertEquals(3, divideAndCeil(9, 4));

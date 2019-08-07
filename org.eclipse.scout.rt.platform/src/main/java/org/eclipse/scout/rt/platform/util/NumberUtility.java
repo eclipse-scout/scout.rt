@@ -44,7 +44,7 @@ public final class NumberUtility {
     }
     if (n instanceof Float) {
       // rounding error workaround
-      return new Double(n.toString());
+      return Double.valueOf(n.toString());
     }
     else {
       return n.doubleValue();
