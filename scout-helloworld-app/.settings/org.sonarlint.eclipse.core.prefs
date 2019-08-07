@@ -5,4 +5,4 @@ fileExclusions=
 idePrefixKey=
 projectKey=org.eclipse.scout.sdk\:org.eclipse.scout.sdk\:releases_10.0
 serverId=Scout
-sqPrefixKey=org.eclipse.scout.sdk.s2e.doc
+sqPrefixKey=org.eclipse.scout.sdk.core.ecj
