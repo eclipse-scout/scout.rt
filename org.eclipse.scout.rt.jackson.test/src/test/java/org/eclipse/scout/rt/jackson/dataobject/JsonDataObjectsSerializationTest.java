@@ -1741,7 +1741,7 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("foo", marshalled.getGenericListAttribute().get(0).genericAttribute().get());
     assertEquals(1234567890.1234567890, marshalled.getGenericListAttribute().get(1).genericAttribute().get());
     assertEquals("bar", marshalled.getGenericStringAttribute().genericAttribute().get());
-    assertEquals(new Double("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
+    assertEquals(Double.valueOf("789.123"), marshalled.getGenericDoubleAttribute().genericAttribute().get());
     assertEqualsWithComparisonFailure(genericDo, marshalled);
   }
 
