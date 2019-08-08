@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.concurrent.AbstractInterruptionError;
+import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -148,8 +149,16 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
         LOG.debug("Connection Error", e);
       }
       else if (isInterruption(e)) {
-        LOG.info("Interruption", e);
-        servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
+        if (isCancellation(e)) {
+          // cancelled by client
+          LOG.debug("Future cancelled", e);
+          servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was cancelled");
+        }
+        else {
+          // other interruption
+          LOG.info("Interruption", e);
+          servletResponse.sendError(HttpServletResponse.SC_ACCEPTED, "Request processing was interrupted");
+        }
       }
       else {
         LOG.error("Client={}@{}/{}", servletRequest.getRemoteUser(), servletRequest.getRemoteAddr(), servletRequest.getRemoteHost(), e);
@@ -277,6 +286,21 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
     Throwable cause = e;
     while (cause != null) {
       if (cause instanceof AbstractInterruptionError) {
+        return true;
+      }
+      // next
+      cause = cause.getCause();
+    }
+    return false;
+  }
+
+  /**
+   * Special case of {@link AbstractInterruptionError}.
+   */
+  protected boolean isCancellation(Throwable e) {
+    Throwable cause = e;
+    while (cause != null) {
+      if (cause instanceof FutureCancelledError) {
         return true;
       }
       // next
