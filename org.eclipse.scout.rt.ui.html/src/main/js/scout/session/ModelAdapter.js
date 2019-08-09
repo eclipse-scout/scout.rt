@@ -16,14 +16,14 @@ scout.ModelAdapter = function() {
   this.initialized = false;
   this.attached = false;
   this.destroyed = false;
-  this.widget;
+  this.widget = null;
   this._enabledBeforeOffline = true;
 
   /**
    * Widget properties which should be sent to server on property change.
    */
   this._remoteProperties = [];
-  this._widgetListener;
+  this._widgetListener = null;
 
   this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
   this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
@@ -161,12 +161,21 @@ scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
   this._addProperties('_remoteProperties', properties);
 };
 
+scout.ModelAdapter.prototype._removeRemoteProperties = function(properties) {
+  this._removeProperties('_remoteProperties', properties);
+};
+
 scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
   if (Array.isArray(properties)) {
     this[propertyName] = this[propertyName].concat(properties);
   } else {
     this[propertyName].push(properties);
   }
+};
+
+scout.ModelAdapter.prototype._removeProperties = function(propertyName, properties) {
+  properties = scout.arrays.ensure(properties);
+  scout.arrays.removeAll(this[propertyName], properties);
 };
 
 /**
@@ -321,7 +330,6 @@ scout.ModelAdapter.prototype._onWidgetDestroy = function() {
 
 /**
  * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
- * @param event
  */
 scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
   if (!this._isWidgetEventFiltered(event)) {
