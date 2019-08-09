@@ -141,3 +141,12 @@ scout.WidgetPopup.prototype._onMove = function(newOffset) {
   }
   this.trigger('move', newOffset);
 };
+
+scout.WidgetPopup.prototype.set$Anchor = function($anchor) {
+  if (this._autoPositionOrig && $anchor && this.$anchor !== $anchor) {
+    // If a new anchor is set, the popup is positioned automatically -> reset flag to make animation work
+    this.htmlComp.layout.autoPosition = this._autoPositionOrig;
+    this._autoPositionOrig = null;
+  }
+  scout.WidgetPopup.parent.prototype.set$Anchor.call(this, $anchor);
+};
