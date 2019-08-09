@@ -299,18 +299,23 @@ scout.Session.prototype._sendStartupRequest = function() {
   var ajaxOptions = this.defaultAjaxOptions(request);
 
   return $.ajax(ajaxOptions)
-    .done(onAjaxDone.bind(this))
-    .fail(onAjaxFail.bind(this));
+    .catch(onAjaxFail.bind(this))
+    .then(onAjaxDone.bind(this));
 
   // ----- Helper methods -----
 
   function onAjaxDone(data) {
     this._processStartupResponse(data);
+    if (data.error) {
+      return $.rejectedPromise(data);
+    }
   }
 
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     this._setApplicationLoading(false);
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
+    var args = scout.objects.argumentsToArray(arguments);
+    return $.rejectedPromise.apply($, args);
   }
 };
 

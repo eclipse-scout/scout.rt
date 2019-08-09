@@ -10,6 +10,7 @@
  ******************************************************************************/
 scout.App = function() {
   this.events = this._createEventSupport();
+  this.initialized = false;
 
   /// register the listeners which were added to scout before the app is created
   scout.appListeners.forEach(function(listener) {
@@ -306,8 +307,10 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
   // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
   var parent = new scout.NullWidget();
   parent.session = session;
-  this._createDesktop(parent);
-  this.trigger('desktopReady');
+  var desktop = this._createDesktop(parent);
+  this.trigger('desktopReady', {
+    desktop: desktop
+  });
   session.render(function() {
     session._renderDesktop();
 
@@ -344,6 +347,7 @@ scout.App.prototype._loadLocale = function() {
 };
 
 scout.App.prototype._initDone = function(options) {
+  this.initialized = true;
   this.trigger('init', {
     options: options
   });
@@ -405,4 +409,8 @@ scout.App.prototype.addListener = function(listener) {
 
 scout.App.prototype.removeListener = function(listener) {
   this.events.removeListener(listener);
+};
+
+scout.App.prototype.when = function(type) {
+  return this.events.when(type);
 };

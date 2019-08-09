@@ -39,3 +39,11 @@ scout.RemoteApp.prototype._loadSession = function($entryPoint, options) {
   scout.sessions.push(session);
   return session.start();
 };
+
+scout.RemoteApp.prototype._fail = function(options, error) {
+  $.log.error('App initialization failed', error);
+  // Session.js already handled the error -> don't show a message here
+  // Reject with original rejection arguments
+  var args = scout.objects.argumentsToArray(arguments).slice(1);
+  return $.rejectedPromise.apply($, args);
+};
