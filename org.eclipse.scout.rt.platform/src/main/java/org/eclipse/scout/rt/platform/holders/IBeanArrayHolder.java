@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.holders;
 
 /**
@@ -19,7 +19,7 @@ package org.eclipse.scout.rt.platform.holders;
  * The <code>Order</code> class would contain at least the attributes <code>OrderNr</code>, <code>Reporting </code>and
  * <code>Year</code>.
  * </p>
- * 
+ *
  * <pre>
  * BeanArrayHolder&lt;Order&gt; orders = new BeanArrayHolder&lt;Order&gt;(Order.class);
  * SQL.selectInto(
@@ -31,7 +31,7 @@ package org.eclipse.scout.rt.platform.holders;
  *     orders);
  * Order[] allOrders = orders.getBeans();
  * </pre>
- * 
+ *
  * @since 3.0
  */
 
@@ -49,7 +49,7 @@ public interface IBeanArrayHolder<T> {
   /**
    * Gets the the number of beans with a state that is contained in the passed states. If no states are passed the
    * number of all beans in the holder is returned.
-   * 
+   *
    * @param states
    * @return a value corresponding to the number of beans in this holder with a given state
    */
@@ -57,7 +57,7 @@ public interface IBeanArrayHolder<T> {
 
   /**
    * gets all beans with belonging to the set of supplied states
-   * 
+   *
    * @param states
    *          that should be returned. If <code>null</code> or an empty array is passed, then all beans regardless of
    *          state are returned.
@@ -68,14 +68,14 @@ public interface IBeanArrayHolder<T> {
   /**
    * Creates a new bean by calling <code>newInstance</code> on the class of beans. An constructor without parameters
    * must exist. The bean is added to this holder.
-   * 
+   *
    * @return the newly created bean.
    */
   T addBean();
 
   /**
    * Adjusts the size of the holder to the size given in the parameter. New beans are added or existing beans removed.
-   * 
+   *
    * @param size
    */
   void ensureSize(int size);

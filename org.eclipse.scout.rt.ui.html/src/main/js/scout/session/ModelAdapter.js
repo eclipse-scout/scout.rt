@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.

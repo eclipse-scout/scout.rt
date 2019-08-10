@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.valuecontainer;
 
 import java.math.RoundingMode;
@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 
 /**
  * common interface for number fields and number columns
- * 
+ *
  * @param <T>
  */
 public interface INumberValueContainer<T extends Number> {
@@ -40,7 +40,7 @@ public interface INumberValueContainer<T extends Number> {
    * Sets the format used for formatting and parsing. (The properties of the provided format are applied to the internal
    * DecimalFormat instance. Therefore changes on the provided formats instance after this method returns have no
    * influence to the internal instance.)
-   * 
+   *
    * @param format
    * @throws IllegalArgumentException
    *           if format is null
@@ -82,7 +82,7 @@ public interface INumberValueContainer<T extends Number> {
 
   /**
    * set the rounding mode used for formatting and parsing
-   * 
+   *
    * @param roundingMode
    */
   void setRoundingMode(RoundingMode roundingMode);
@@ -91,7 +91,7 @@ public interface INumberValueContainer<T extends Number> {
 
   /**
    * Sets the maximum number of digits allowed in the integer portion of a number.
-   * 
+   *
    * @param maxIntegerDigits
    *          the maximum number of digits allowed
    */

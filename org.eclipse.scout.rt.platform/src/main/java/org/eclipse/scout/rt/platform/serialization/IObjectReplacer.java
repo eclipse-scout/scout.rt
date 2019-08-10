@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.serialization;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.io.ObjectOutputStream;
 /**
  * Object replacing strategy used for replacing and resolving objects during the serialization and deserialization
  * process, respectively.
- * 
+ *
  * @since 3.8.2
  */
 public interface IObjectReplacer {

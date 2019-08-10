@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.server.jdbc.builder;
 
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class EntityContribution {
    * group by parts as well.
    * <p/>
    * <b>Note</b>: The given expression represents exactly one column in the result set and it must not define an alias.
-   * 
+   *
    * @param expression
    *          SQL expression representing a single column in the result set without an attribute alias
    * @param aggregating
@@ -122,7 +122,7 @@ public class EntityContribution {
 
   /**
    * Adds the given expression to the list of from parts.
-   * 
+   *
    * @param expression
    *          SQL table expression (e.g. table name or subquery)
    * @since 3.8.1
@@ -133,7 +133,7 @@ public class EntityContribution {
 
   /**
    * Adds the given constraint to the list of where parts.
-   * 
+   *
    * @param constraint
    *          SQL where constraint
    * @since 3.8.1
@@ -146,7 +146,7 @@ public class EntityContribution {
    * Adds the given expression to the list of group by parts.
    * <p/>
    * <b>Note</b>: The given expression represents exactly one column in the result set.
-   * 
+   *
    * @param expression
    *          SQL expression representing a single column in the result set
    * @since 3.8.1
@@ -157,7 +157,7 @@ public class EntityContribution {
 
   /**
    * Adds the given constraint to the list of having parts.
-   * 
+   *
    * @param constraint
    *          SQL having constraint
    * @since 3.8.1

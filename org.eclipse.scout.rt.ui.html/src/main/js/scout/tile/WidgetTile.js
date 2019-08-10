@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 /**
  * A tile containing a widget. The widget will be rendered and its $container used as $container for the tile.
  * If the widget has gridDataHints, they will be used as gridDataHints for the tile.

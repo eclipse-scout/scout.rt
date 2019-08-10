@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2005-2010 The Android Open Source Project
+/*
+ * Copyright (c) 2005-2010 The Android Open Source Project
  * Copyright (c) 2015 BSI Business Systems Integration AG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@
  * Contributors:
  *     The Android Open Source Project - initial implementation
  *     BSI Business Systems Integration AG - changes and improvements
- ******************************************************************************/
+ */
 package org.json;
 
 import java.util.Arrays;

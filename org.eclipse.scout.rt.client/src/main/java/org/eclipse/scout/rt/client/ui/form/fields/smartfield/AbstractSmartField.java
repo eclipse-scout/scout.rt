@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
 import java.beans.PropertyChangeEvent;
@@ -1410,16 +1410,16 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
             /*
             This state can be reached by a race condition when the job's RunMonitor is in canceled state and later the ModelJob is run.
             This yields to a Thread.interrupt in the RunContext.ThreadInterrupter...
-            
+
             at RunContext$ThreadInterrupter.cancel(boolean) line: 563
             at RunMonitor.cancel(ICancellable, boolean) line: 160
             at RunMonitor.registerCancellable(ICancellable) line: 104  <---------------------
             at RunContext$ThreadInterrupter.<init>(Thread, RunMonitor) line: 545
             at ClientRunContext(RunContext).call(Callable<RESULT>, Class<IExceptionTranslator<EXCEPTION>>) line: 154
             at RunContextRunner<RESULT>.intercept(Chain<RESULT>) line: 38
-            
+
             which itself causes the running job to be interrupted with a InterruptedException
-            
+
             at org.eclipse.scout.rt.platform.job.internal.JobExceptionTranslator.translateInterruptedException(JobExceptionTranslator.java:49)
             at org.eclipse.scout.rt.platform.job.internal.JobFutureTask.awaitDone(JobFutureTask.java:339)
             at org.eclipse.scout.rt.client.ui.form.fields.smartfield2.AbstractSmartField2$7.joinModelThreadAndUpdateField(AbstractSmartField2.java:1598)

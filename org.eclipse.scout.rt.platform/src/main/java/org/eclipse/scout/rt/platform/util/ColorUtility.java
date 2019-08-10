@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.util;
 
 import java.awt.Color;
@@ -47,7 +47,7 @@ public final class ColorUtility {
    * Example: r = 255, g = 0, b = 0 --> "#ff0000"
    * <p>
    * Note: the hexadecimal representation is lowercase
-   * 
+   *
    * @return hexadecimal representation of RGB in lowercase.
    * @since 4.0-M7
    */

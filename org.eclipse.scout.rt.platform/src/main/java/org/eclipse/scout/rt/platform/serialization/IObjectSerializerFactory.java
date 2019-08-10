@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.serialization;
 
 /**
  * Factory for creating new {@link IObjectSerializer} instances.
- * 
+ *
  * @since 3.8.2
  */
 public interface IObjectSerializerFactory {
@@ -20,7 +20,7 @@ public interface IObjectSerializerFactory {
   /**
    * Creates a new instance of an {@link IObjectSerializer} using the given {@link IObjectReplacer}. Implementing
    * classes may share expensive objects like class loaders.
-   * 
+   *
    * @param objectReplacer
    *          an {@link IObjectReplacer} instance of <code>null</code>
    * @return

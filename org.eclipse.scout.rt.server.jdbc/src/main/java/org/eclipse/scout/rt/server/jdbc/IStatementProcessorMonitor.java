@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.server.jdbc;
 
 import java.sql.Connection;
@@ -20,7 +20,7 @@ public interface IStatementProcessorMonitor {
 
   /**
    * Called after data has been completely fetched and before operation is going to close affected resources.
-   * 
+   *
    * @param rows
    *          is the life list of rows fetched so far, changes to this list will be returned by the original method
    *          call. Used in methods

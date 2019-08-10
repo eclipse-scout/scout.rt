@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
  * creating all graph nodes once with single parent linkage. Therefore when holding a {@link IDataModelAttribute} or
  * {@link IDataModelEntity} the forward path to this object from the {@link IDataModel} root is ambiguous. This class
  * solves that problem by containing the complete path.
- * 
+ *
  * @since 3.8
  */
 public final class AttributePath implements IDataModelPath {

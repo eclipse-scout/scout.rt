@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.shared.extension;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public interface IExtensibleObject {
 
   /**
    * Gets the extension of this object that exactly matches the given class.
-   * 
+   *
    * @param c
    *          The filter class to specify which {@link IExtension} to return. This class must exactly match. no
    *          <code>instanceof</code> is performed.

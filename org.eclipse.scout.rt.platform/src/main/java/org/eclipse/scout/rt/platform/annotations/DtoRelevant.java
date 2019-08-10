@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.annotations;
 
 import java.lang.annotation.ElementType;
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marker for Annotations that should be copied over from the client to the corresponding representation in the DTO.
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0
  */

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.valuecontainer;
 
 import java.text.DecimalFormat;
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 
 /**
  * common interface for decimal fields and decimal columns
- * 
+ *
  * @param <T>
  */
 public interface IDecimalValueContainer<T extends Number> extends INumberValueContainer<T> {
@@ -64,7 +64,7 @@ public interface IDecimalValueContainer<T extends Number> extends INumberValueCo
    * value is rounded to this number of digits according to {@link #getRoundingMode()}<br>
    * <b>Note:</b> This property is only used when parsing text input from GUI, and not when setting the value over
    * {@link #setValue(Object)}.
-   * 
+   *
    * @param i
    */
   void setFractionDigits(int i);

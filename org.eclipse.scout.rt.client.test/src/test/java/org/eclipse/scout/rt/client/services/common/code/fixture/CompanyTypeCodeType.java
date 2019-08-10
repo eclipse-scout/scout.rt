@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.services.common.code.fixture;
 
 import org.eclipse.scout.rt.platform.Order;
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
 /**
  * Example code type for the CodeServiceClientProxyTest
- * 
+ *
  * @since Scout 4.1-M2
  */
 public class CompanyTypeCodeType extends AbstractCodeType<Long, Long> {

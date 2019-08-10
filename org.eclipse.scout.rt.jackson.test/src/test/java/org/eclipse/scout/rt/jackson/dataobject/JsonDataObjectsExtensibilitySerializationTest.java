@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.jackson.dataobject;
 
 import static org.junit.Assert.assertEquals;
@@ -56,7 +56,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   }
 
   /* ------ Test case CoreBean as base, a project template bean and two concrete project bean implementations
-  
+
   +---------------------+
   |      CoreBean       |
   +----------^----------+
@@ -70,7 +70,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
    +--------------------+   +--------------------+
    |  ProjectBean1      |   |    ProjectBean2    |
    +--------------------+   +--------------------+
-  
+
   */
 
   @IgnoreBean
@@ -208,7 +208,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   }
 
   /* ------ Test case with an ICustomer interface extending IDataObject, multiple implementations, which are then replaced by project classes
-  
+
                +--------------------+
                |    IDataObject     |<-------------+
                +---------^----------+              |
@@ -228,7 +228,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   +--------+-----------+   +----------+---------+
   |   ProjectPerson    |   |   ProjectCompany   |
   +--------------------+   +--------------------+
-  
+
   */
 
   static interface ITestCustomerDo extends IDataObject {

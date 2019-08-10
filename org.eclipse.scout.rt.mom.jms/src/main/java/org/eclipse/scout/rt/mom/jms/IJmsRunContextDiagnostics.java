@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.mom.jms;
 
 import org.eclipse.scout.rt.platform.context.RunContext;
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.logger.DiagnosticContextValueProcessor.IDia
 /**
  * Marker interface for {@link IDiagnosticContextValueProvider} which are registered in {@link RunContext} in JMS
  * communication.
- * 
+ *
  * @since 6.1
  */
 public interface IJmsRunContextDiagnostics extends IDiagnosticContextValueProvider {

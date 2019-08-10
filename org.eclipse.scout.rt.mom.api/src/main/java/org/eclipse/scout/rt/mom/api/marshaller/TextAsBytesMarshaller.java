@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.mom.api.marshaller;
 
 import java.nio.charset.StandardCharsets;
@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.platform.Bean;
  * This marshaller allows to transport an object's {@link #toString()} representation as binary data across the network.
  * <p>
  * This marshaller does not support the serialization of exceptions.
- * 
+ *
  * @see IMarshaller#MESSAGE_TYPE_BYTES
  * @since 6.1
  */

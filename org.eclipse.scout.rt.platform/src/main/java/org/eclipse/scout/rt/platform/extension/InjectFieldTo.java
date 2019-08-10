@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.extension;
 
 import java.lang.annotation.ElementType;
@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
  * The container may be another field inside the same form or a container in the super classes form fields.
  * <p>
  * The example adds a salary field to the existing BaseForm by injection in an extension form (simplified):
- * 
+ *
  * <pre>
  * public class BaseForm {
  *   &#064;Order(10)
@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  *     }
  *   }
  * }
- * 
+ *
  * public class ExtendedForm extends BaseForm {
  *   &#064;Order(20)
  *   &#064;InjectFieldTo(BaseForm.MainBox.FirstGroupBox.class)
@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  *   }
  * }
  * </pre>
- * 
+ *
  * @since 3.9
  */
 @Retention(RetentionPolicy.RUNTIME)

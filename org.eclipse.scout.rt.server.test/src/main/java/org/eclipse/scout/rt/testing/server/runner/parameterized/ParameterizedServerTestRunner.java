@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.testing.server.runner.parameterized;
 
 import java.util.List;
@@ -34,7 +34,7 @@ import org.junit.runners.model.Statement;
  * <pre>
  * &#064;RunWith(ParameterizedServerTestRunner.class)
  * public class SampleParameterizedServerTest {
- * 
+ *
  *   &#064;Parameters
  *   public static List&lt;IScoutTestParameter&gt; getParameters() {
  *     List&lt;IScoutTestParameter&gt; parametersList = new LinkedList&lt;IScoutTestParameter&gt;();
@@ -42,32 +42,32 @@ import org.junit.runners.model.Statement;
  *     parametersList.add(new MathTestParameter(&quot;Scenario 2&quot;, 5));
  *     return parametersList;
  *   }
- * 
+ *
  *   private final MathTestParameter m_testParameter;
- * 
+ *
  *   public SampleParameterizedServerTest(MathTestParameter testParameter) {
  *     m_testParameter = testParameter;
  *   }
- * 
+ *
  *   &#064;Test
  *   public void testIsGreaterZero() {
  *     assertTrue(m_testParameter.getX() &gt; 0);
  *   }
- * 
+ *
  *   &#064;Test
  *   &#064;NonParameterized
  *   public void testGeneral() {
  *     assertFalse(0 &gt; 0);
  *   }
- * 
+ *
  *   static class MathTestParameter extends AbstractScoutTestParameter {
  *     private int m_x;
- * 
+ *
  *     public MathTestParameter(String name, int x) {
  *       super(name);
  *       m_x = x;
  *     }
- * 
+ *
  *     public int getX() {
  *       return m_x;
  *     }

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.reflect;
 
 @FunctionalInterface
@@ -15,7 +15,7 @@ public interface IPropertyFilter {
 
   /**
    * If the given descriptor should be analyzed.
-   * 
+   *
    * @param descriptor
    * @return if accepts the given descriptor
    * @see AbstractForm.updateForm(...)

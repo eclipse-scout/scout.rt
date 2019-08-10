@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform.logger;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import ch.qos.logback.classic.Level;
 
 /**
  * Logger support for Logback.
- * 
+ *
  * @since 5.2
  */
 public class LogbackLoggerSupport extends AbstractLoggerSupport {

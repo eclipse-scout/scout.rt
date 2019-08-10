@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 /**
  * The popup layout is different from other layouts, since it can determine its own size
  * when the autoSize flag is set to true. Otherwise it uses the given size, like a regular

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 /**
  * @param {optional boolean} preserveOpener A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.
  */

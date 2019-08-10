@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.form.fixture;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +27,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 /**
  * Fixture form {@link AbstractForm} with different implementation of {@link AbstractFormHandler#execStore()} defined in
  * {@link MethodImplementation}
- * 
+ *
  * @since 4.1.0
  */
 public class FormToStore extends AbstractForm {

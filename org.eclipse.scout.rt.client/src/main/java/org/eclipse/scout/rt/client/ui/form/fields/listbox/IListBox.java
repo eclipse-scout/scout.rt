@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
 import java.util.Collection;
@@ -92,7 +92,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
   /**
    * Populate table with data from data service<br>
    * all existing data in the table is discarded
-   * 
+   *
    * @see execFilterTableRow
    */
   void loadListBoxData();
@@ -110,7 +110,7 @@ public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   /**
    * Convenience for getting the first value of {@link #getValue()}
-   * 
+   *
    * @return the first selected/checked value if any
    *         <p>
    *         By default a listbox is checkable, so its value is the array of all checked keys

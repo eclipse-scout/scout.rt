@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.platform;
 
 /**
@@ -17,14 +17,14 @@ package org.eclipse.scout.rt.platform;
  * <p>
  * May be provided using {@link BeanMetaData#withProducer(IBeanInstanceProducer)} and
  * {@link IBeanManager#registerBean(BeanMetaData)}.
- * 
+ *
  * @since 5.1
  */
 @FunctionalInterface
 public interface IBeanInstanceProducer<T> {
   /**
    * Creates an instance for the given {@link IBean}.
-   * 
+   *
    * @param bean
    *          The {@link IBean} to create the instance for.
    * @return The created instance or <code>null</code>.

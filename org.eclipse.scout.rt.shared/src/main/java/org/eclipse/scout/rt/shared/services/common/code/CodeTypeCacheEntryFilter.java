@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import java.util.Collection;
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
  * Filter to match according code type classes.
  * <p>
  * This class is immutable.
- * 
+ *
  * @since 5.2
  */
 public class CodeTypeCacheEntryFilter implements ICacheEntryFilter<CodeTypeCacheKey, ICodeType<?, ?>> {

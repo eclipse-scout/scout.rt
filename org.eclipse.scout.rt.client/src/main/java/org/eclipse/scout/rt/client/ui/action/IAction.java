@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
+ */
 package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
@@ -156,7 +156,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
    * <p>
    * The difference to {@link #getParent()} is that a sub-menus parent is the parent menu while the sub-menus container
    * is still e.g. the {@link ITable}. So the container for a menu hierarchy is always the same.
-   * 
+   *
    * @see #getParent()
    * @see #getParentOfType(Class)
    **/
