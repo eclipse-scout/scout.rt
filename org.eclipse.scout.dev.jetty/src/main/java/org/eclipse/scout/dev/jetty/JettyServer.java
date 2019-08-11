@@ -39,6 +39,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
@@ -51,6 +52,8 @@ public class JettyServer {
   public static final String WEB_APP_FOLDER_KEY = "scout.jetty.webapp.folder";
   public static final String WEB_APP_CONTEXT_PATH = "scout.jetty.webapp.contextpath";
   public static final String SERVER_PORT_KEY = "scout.jetty.port"; // see also org.eclipse.scout.rt.platform.context.NodeIdentifier.compute()
+
+  private boolean m_isInDevMode;
 
   public static void main(String[] args) throws Exception {
     new JettyServer().start();
@@ -78,6 +81,8 @@ public class JettyServer {
       }
       contextPath = contextPathConfig;
     }
+
+    m_isInDevMode = new PlatformDevModeProperty().getValue();
 
     WebAppContext webApp = createWebApp(webappFolder, contextPath);
     Handler serverHandler = createServerHandler(webApp);
@@ -178,6 +183,10 @@ public class JettyServer {
     return webAppContext;
   }
 
+  protected boolean isInDevMode() {
+    return m_isInDevMode;
+  }
+
   protected class P_WebAppContext extends WebAppContext {
 
     public P_WebAppContext() {
@@ -205,10 +214,18 @@ public class JettyServer {
         if (url != null) {
           return url;
         }
-        else {
-          // 2. Look for a dependent JAR resource (relative to META-INF/resources).
-          return getClassLoader().getResource("META-INF/resources" + path);
+        // 2. Look for a dependent JAR resource (relative to META-INF/resources).
+        url = getClassLoader().getResource("META-INF/resources" + path);
+        if (url != null) {
+          return url;
         }
+
+        // 3. In Dev mode only: The resource might be directly on the classpath because the IDE build copies it to the output dir.
+        //                      Maven on the other hand copies it to outputDir/META-INF/resources
+        if (isInDevMode()) {
+          return getClassLoader().getResource(path);
+        }
+        return null;
       }
 
       /**
