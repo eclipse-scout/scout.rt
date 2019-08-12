@@ -28,8 +28,22 @@ public class JsFileParser {
   private static Pattern START_STATIC_FUNCTION = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\ \\=\\s*function\\(([^\\)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
   private static Pattern END_BLOCK = Pattern.compile("^\\}\\;");
   private static Pattern SUPER_BLOCK = Pattern.compile("scout\\.inherits\\(([^\\,]+)\\,\\s*([^\\,]+)\\)\\;");
-//  scout.Menu.MenuStyle = {
-  private static Pattern CONST_START = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\s*\\=\\s*(\\{)\\s*(\\}\\;)?");
+  /**
+   * Groups:
+   *  1 namespace
+   *  2 name
+   *  3 open bracket
+   *  4 closing bracket (opt)
+   */
+  private static Pattern ENUM_START = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\s*\\=\\s*(\\{)\\s*(\\}\\;)?");
+  /**
+   * Groups:
+   *  1 namespace
+   *  2 name
+   *  3 allocation (opt)
+   *  4 delimiter semicolumn (opt)
+   */
+  private static Pattern CONSTANT_START = Pattern.compile("^([^\\.\\ ]+\\.[^\\.]+)\\.([A-Z0-9\\_]+)(\\s*\\=\\s*.*)?(\\;)$");
 
   private WorkingCopy m_workingCopy;
   private final JsFile m_jsFile;
@@ -80,26 +94,35 @@ public class JsFileParser {
           comment = null;
           continue;
         }
-        matcher = CONST_START.matcher(m_currentLine);
+        matcher = ENUM_START.matcher(m_currentLine);
         if(matcher.find()){
-          readConst(matcher);
+          readEnum(matcher);
+          continue;
+        }
+        matcher= CONSTANT_START.matcher(m_currentLine);
+        if(matcher.find()){
+          readConstant(matcher);
+          continue;
         }
         matcher = SUPER_BLOCK.matcher(m_currentLine);
         if (matcher.find()) {
           JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
           clazz.setSuperCall(readSuperCall(matcher));
-
           continue;
         }
         nextLine();
       }
     }
     catch (VetoException e) {
-      MigrationUtility.prependTodo(m_workingCopy, e.getMessage());
+      LOG.error("Could not parse file '"+m_jsFile.getPath().getFileName()+":"+m_currentLineNumber+"'.",e);
       throw e;
     }
 
     List<JsClass> jsClasses = m_jsFile.getJsClasses();
+    if(jsClasses.size() == 1){
+      jsClasses.get(0).setDefault(true);
+    }
+    // log
     if (jsClasses.size() == 0) {
       LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
     }
@@ -175,8 +198,8 @@ public class JsFileParser {
     if (StringUtility.hasText(matcher.group(5))) {
       functionBody.append(matcher.group(5));
       function.setBody(functionBody.toString());
-      nextLine();
       clazz.addFunction(function);
+      nextLine();
       return function;
     }
     nextLine();
@@ -197,17 +220,18 @@ public class JsFileParser {
     return function;
   }
 
-  protected JsConstant readConst(Matcher matcher) throws IOException {
+  protected JsEnum readEnum(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
-    JsConstant constant = new JsConstant(clazz, matcher.group(2));
-    constant.setStartOffset(m_offsetStartLine);
+    JsEnum jsEnum = new JsEnum(clazz, matcher.group(2));
+    jsEnum.setStartOffset(m_offsetStartLine);
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(3));
     if (StringUtility.hasText(matcher.group(4))) {
       // take care dynamic values can not be implemented as cons
-      LOG.warn("Dynamic const '"+constant.getName()+"' found in "+m_workingCopy.getPath().getFileName()+":"+m_currentLineNumber);
-      constant.addParseError("Looks like a dynamic constant. Must be migrated by hand.");
-      clazz.addConstant(constant);
-      return constant;
+      LOG.warn("Dynamic enum '"+jsEnum.getName()+"' found in "+m_workingCopy.getPath().getFileName()+":"+m_currentLineNumber);
+      jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand.");
+      clazz.addEnum(jsEnum);
+      nextLine();
+      return jsEnum;
     }
     nextLine();
     while (m_currentLine != null) {
@@ -216,13 +240,24 @@ public class JsFileParser {
         break;
       }
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
-        throw new VetoException("Could not parse constant body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
       }
       nextLine();
     }
-    constant.setBody(bodyBuilder.toString());
-    constant.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    jsEnum.setBody(bodyBuilder.toString());
+    jsEnum.setEndOffset(m_offsetStartLine + m_currentLine.length());
 
+    clazz.addEnum(jsEnum);
+    return jsEnum;
+
+  }
+
+  protected JsConstant readConstant(Matcher matcher) throws IOException {
+    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
+    JsConstant constant = new JsConstant(clazz, matcher.group(2));
+    constant.setStartOffset(m_offsetStartLine);
+    constant.setBody(matcher.group(3));
+    nextLine();
     clazz.addConstant(constant);
     return constant;
 

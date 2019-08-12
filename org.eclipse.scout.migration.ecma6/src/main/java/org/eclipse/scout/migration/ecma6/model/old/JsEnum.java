@@ -1,12 +1,12 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-public class JsConstant extends AbstractJsElement {
+public class JsEnum extends  AbstractJsElement{
 
-  private final JsClass m_jsClass;
-  private final String m_name;
+  private JsClass m_jsClass;
+  private String m_name;
   private String m_body;
 
-  public JsConstant(JsClass jsClass, String name){
+  public JsEnum(JsClass jsClass, String name){
     m_jsClass = jsClass;
     m_name = name;
   }

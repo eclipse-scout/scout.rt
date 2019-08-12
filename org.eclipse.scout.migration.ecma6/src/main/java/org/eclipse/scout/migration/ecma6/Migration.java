@@ -8,8 +8,10 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationPathFilter;
 import org.eclipse.scout.migration.ecma6.task.ITask;
 import org.eclipse.scout.migration.ecma6.task.post.IPostMigrationTask;
 import org.eclipse.scout.migration.ecma6.task.pre.IPreMigrationTask;
@@ -75,12 +77,16 @@ public class Migration {
   }
 
   private void visitFiles() throws IOException {
+
+    IMigrationPathFilter pathFilter = BEANS.opt(IMigrationPathFilter.class);
     Files.walkFileTree(m_context.getSourceRootDirectory(), new SimpleFileVisitor<Path>() {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-
-        processFile(file, m_context);
+        PathInfo info = new PathInfo(file, m_context.getCurrentModuleDirectory());
+        if(pathFilter == null || pathFilter.test(info)){
+          processFile(info, m_context);
+        }
         return FileVisitResult.CONTINUE;
       }
 
@@ -114,8 +120,8 @@ public class Migration {
     writeWorkingCopies();
   }
 
-  private void processFile(Path file, Context context) {
-    PathInfo info = new PathInfo(file, context.getCurrentModuleDirectory());
+  private void processFile(PathInfo info, Context context) {
+
     m_tasks.stream().filter(task -> task.accept(info,  context))
         .forEach(task -> task.process(info, context));
 

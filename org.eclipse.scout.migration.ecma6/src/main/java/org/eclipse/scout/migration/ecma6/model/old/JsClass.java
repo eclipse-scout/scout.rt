@@ -11,10 +11,12 @@ public class JsClass extends AbstractJsElement{
 
   private final String m_fullyQuallifiedName;
   private final JsFile m_jsFile;
+  private boolean m_default = false;
   private final String m_namespace;
   private final String m_name;
   private JsSuperCall m_superCall;
   private final List<JsFunction> m_functions = new ArrayList<>();
+  private final List<JsEnum> m_enums = new ArrayList<>();
   private final List<JsConstant> m_constants = new ArrayList<>();
 
   public JsClass(String fqn, JsFile jsFile) {
@@ -38,6 +40,14 @@ public class JsClass extends AbstractJsElement{
 
   public String getName() {
     return m_name;
+  }
+
+  public void setDefault(boolean aDefault) {
+    m_default = aDefault;
+  }
+
+  public boolean isDefault() {
+    return m_default;
   }
 
   public JsFile getJsFile() {
@@ -70,7 +80,22 @@ public class JsClass extends AbstractJsElement{
         .findFirst().orElse(null);
   }
 
-  public void addConstant(JsConstant constant) {
+  public void addEnum(JsEnum jsEnum) {
+    m_enums.add(jsEnum);
+  }
+
+  public List<JsEnum> getEnums() {
+    return Collections.unmodifiableList(m_enums);
+  }
+
+  public JsEnum getEnum(String name) {
+    return m_enums.stream()
+        .filter(c -> name.equals(c.getName()))
+        .findFirst()
+        .orElse(null);
+  }
+
+  public void addConstant(JsConstant constant){
     m_constants.add(constant);
   }
 
@@ -80,9 +105,9 @@ public class JsClass extends AbstractJsElement{
 
   public JsConstant getConstant(String name) {
     return m_constants.stream()
-        .filter(c -> name.equals(c.getName()))
-        .findFirst()
-        .orElse(null);
+      .filter(c -> name.equals(c.getName()))
+      .findFirst()
+      .orElse(null);
   }
 
   @Override
@@ -97,11 +122,17 @@ public class JsClass extends AbstractJsElement{
       builder.append(System.lineSeparator()).append(indent).append("FUNCTIONS:").append(System.lineSeparator())
           .append(m_functions.stream().filter(f -> !f.isConstructor()).map(f -> indent + "- " + f.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
     }
-    if (m_constants.size() > 0) {
-      builder.append(System.lineSeparator()).append(indent).append("CONSTANTS:").append(System.lineSeparator())
-          .append(m_constants.stream()
+    if (m_enums.size() > 0) {
+      builder.append(System.lineSeparator()).append(indent).append("ENUMS:").append(System.lineSeparator())
+          .append(m_enums.stream()
               .map(c -> indent + "- " + c.toString(indent + "  "))
               .collect(Collectors.joining(System.lineSeparator())));
+    }
+    if (m_constants.size() > 0) {
+      builder.append(System.lineSeparator()).append(indent).append("CONSTANTS:").append(System.lineSeparator())
+        .append(m_constants.stream()
+          .map(c -> indent + "- " + c.toString(indent + "  "))
+          .collect(Collectors.joining(System.lineSeparator())));
     }
     return builder.toString();
   }

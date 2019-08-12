@@ -5,8 +5,11 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JsFile extends AbstractJsElement {
@@ -14,6 +17,7 @@ public class JsFile extends AbstractJsElement {
   private final Path m_path;
   private JsCommentBlock m_copyRight;
   private List<JsClass> m_jsClasses = new ArrayList<>();
+  private final Map<JsFile, JsImport> m_imports = new HashMap<>();
 
 
   public JsFile(Path path) {
@@ -54,23 +58,47 @@ public class JsFile extends AbstractJsElement {
 
 
   public JsClass getLastOrAppend(String fqn){
-    JsClass jsClass = null;
+    JsClass jsClass, lastJsClass = null;
     if(m_jsClasses.isEmpty()){
       jsClass = new JsClass(fqn, this);
       m_jsClasses.add(jsClass);
       return jsClass;
     }
-    jsClass = m_jsClasses.get(m_jsClasses.size() - 1);
-    if(jsClass.getFullyQuallifiedName().equals(fqn)){
-      return jsClass;
+    lastJsClass = m_jsClasses.get(m_jsClasses.size() - 1);
+    if(lastJsClass.getFullyQuallifiedName().equals(fqn)){
+      return lastJsClass;
     }
     jsClass = m_jsClasses.stream().filter(c -> c.getFullyQuallifiedName().equals(fqn)).findFirst().orElse(null);
     if(jsClass != null){
-      throw new VetoException("Tried to access last class '"+fqn+"' in file '"+getPath().getFileName()+"', but is not last one!");
+      throw new VetoException("Tried to access last class '"+fqn+"' in file '"+getPath().getFileName()+"', but is not last one (last:'"+lastJsClass.getFullyQuallifiedName()+"')!");
     }
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;
+  }
+
+  public AliasedJsClass getOrCreateImport(JsClass jsClass){
+    return m_imports.computeIfAbsent(jsClass.getJsFile(), c -> new JsImport(c, this))
+      .computeAliasIfAbsent(jsClass);
+  }
+
+//  public JsImport resolveReference(String namespace, String classname){
+//
+//    String fqn = namespace+"."+classname;
+//    JsImport imp = m_imports.get(fqn);
+//    if(imp == null){
+//      String alias = classname;
+//      if(m_jsClasses.stream().filter(c -> c.getName().equalsIgnoreCase(classname)).findFirst().isPresent()){
+//        alias = StringUtility.uppercaseFirst(namespace)+classname;
+//      }
+//      imp = new JsImport(namespace,classname, alias);
+//      m_imports.put(fqn, imp);
+//    }
+//    return imp;
+//  }
+
+  public Collection<JsImport> getImports(){
+    return Collections.unmodifiableCollection(m_imports.values());
   }
 
   @Override

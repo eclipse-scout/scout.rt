@@ -1,5 +1,11 @@
 package org.eclipse.scout.migration.ecma6;
 
+import org.eclipse.scout.migration.ecma6.model.old.ISourceRange;
+import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.migration.ecma6.model.old.JsImport;
+
+import java.util.regex.Pattern;
+
 public final class MigrationUtility {
   private MigrationUtility() {
   }
