@@ -41,9 +41,12 @@ public class RestClientProxyWebAppExceptionMappingTest {
   public void testExceptionMapping() {
     TestingRestClientProxyFactory proxyFactory = new TestingRestClientProxyFactory();
     JerseyTestRestClientHelper helper = BEANS.get(JerseyTestRestClientHelper.class);
+
+    // do not follow redirects (otherwise 301 check will not work)
+    helper.client().property(ClientProperties.FOLLOW_REDIRECTS, false);
+
     WebTarget target = helper
-        .target("echo", null) // use identity exception transformer
-        .property(ClientProperties.FOLLOW_REDIRECTS, false); // do not follow redirects (otherwise 301 check will not work)
+        .target("echo", null); // use identity exception transformer
 
     // status 1xx and 2xx are not checked because some of them change the behavior of HTTP clients
     for (int status = 300; status < 1000; status++) {
