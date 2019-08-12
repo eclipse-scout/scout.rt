@@ -46,6 +46,12 @@ scout.WidgetPopup.prototype._renderProperties = function() {
   this._renderResizable();
 };
 
+scout.WidgetPopup.prototype._remove = function() {
+  this.$close = null;
+  this.$dragHandle = null;
+  scout.WidgetPopup.parent.prototype._remove.call(this);
+};
+
 scout.WidgetPopup.prototype.setWidget = function(widget) {
   this.setProperty('widget', widget);
 };
