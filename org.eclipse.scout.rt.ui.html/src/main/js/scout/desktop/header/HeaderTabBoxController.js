@@ -18,10 +18,10 @@
 scout.HeaderTabBoxController = function() {
   scout.HeaderTabBoxController.parent.call(this);
 
-  this.bench;
+  this.bench = null;
   this._viewsChangedHandler = this._onViewsChanged.bind(this);
 
-  this.tabAreaCenter;
+  this.tabAreaCenter = null;
   this.tabAreaInHeader = false;
 };
 scout.inherits(scout.HeaderTabBoxController, scout.DesktopTabBoxController);

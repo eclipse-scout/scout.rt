@@ -14,9 +14,9 @@
  */
 scout.MenuBarPopup = function() {
   scout.MenuBarPopup.parent.call(this);
-  this.menu;
-  this.$headBlueprint;
-  this.ignoreEvent;
+  this.menu = null;
+  this.$headBlueprint = null;
+  this.ignoreEvent = null;
   this._headVisible = true;
   this.parentMenuPropertyChangeHandler = this._onParentMenuPropertyChange.bind(this);
 };

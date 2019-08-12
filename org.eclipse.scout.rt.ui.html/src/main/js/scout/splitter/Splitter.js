@@ -11,8 +11,8 @@
 scout.Splitter = function() {
   scout.Splitter.parent.call(this);
   this.splitHorizontal = true;
-  this.$anchor;
-  this.$root;
+  this.$anchor = null;
+  this.$root = null;
   this.position = null; // current splitter position in pixels, updated by updatePosition()
   this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'

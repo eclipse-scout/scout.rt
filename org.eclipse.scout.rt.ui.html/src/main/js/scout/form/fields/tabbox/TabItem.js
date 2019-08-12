@@ -12,7 +12,6 @@ scout.TabItem = function() {
   scout.TabItem.parent.call(this);
   this.marked = false;
   this.selectionKeystroke;
-  this.$tabContainer;
 };
 scout.inherits(scout.TabItem, scout.GroupBox);
 

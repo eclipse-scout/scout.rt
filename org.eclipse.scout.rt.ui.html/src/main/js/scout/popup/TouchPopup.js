@@ -12,14 +12,14 @@ scout.TouchPopup = function() {
   scout.TouchPopup.parent.call(this);
 
   // the original touch field from the form
-  this._touchField;
+  this._touchField = null;
   this._touchFieldTooltip = null;
   // the cloned field from the popup
-  this._field;
+  this._field = null;
   // the widget placed below the field
-  this._widget;
-  this._$widgetContainer;
-  this._widgetContainerHtmlComp;
+  this._widget = null;
+  this._$widgetContainer = null;
+  this._widgetContainerHtmlComp = null;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
   this.withGlassPane = true;

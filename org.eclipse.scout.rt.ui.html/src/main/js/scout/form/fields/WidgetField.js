@@ -12,7 +12,7 @@ scout.WidgetField = function() {
   scout.WidgetField.parent.call(this);
 
   this.scrollable = true;
-
+  this.fieldWidget = null;
   this._addWidgetProperties(['fieldWidget']);
 };
 scout.inherits(scout.WidgetField, scout.FormField);

@@ -11,9 +11,8 @@
 scout.TextColumnUserFilter = function() {
   scout.TextColumnUserFilter.parent.call(this);
 
-  this.freeText;
-  this.freeTextField;
-
+  this.freeText = null;
+  this.freeTextField = null;
   this.hasFilterFields = true;
 };
 scout.inherits(scout.TextColumnUserFilter, scout.ColumnUserFilter);

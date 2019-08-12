@@ -14,7 +14,7 @@
  * Note: It does not extend from Widget because widget has too many dependencies which are not needed for this simple use case (login-module does not include these dependencies)
  */
 scout.Box = function() {
-  this.$parent;
+  this.$parent = null;
 };
 
 scout.Box.prototype.render = function($parent) {

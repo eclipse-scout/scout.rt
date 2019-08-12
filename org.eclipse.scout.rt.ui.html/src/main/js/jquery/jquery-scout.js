@@ -590,7 +590,7 @@ $.fn.window = function(domElement) {
 
 /**
  * @returns the active element of the current document
- * @param domElement (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
+ * @param [domElement] (optional) if true the result is returned as DOM element, otherwise it is returned as jQuery object. The default is false.
  */
 $.fn.activeElement = function(domElement) {
   var myDocument = this.document(true),

@@ -16,8 +16,8 @@ scout.ButtonAdapterMenu = function() {
   this._buttonDestroyHandler = this._onButtonDestroy.bind(this);
 
   this._addCloneProperties(['button']);
-  this.button;
-  this.menubar;
+  this.button = null;
+  this.menubar = null;
 };
 scout.inherits(scout.ButtonAdapterMenu, scout.Menu);
 

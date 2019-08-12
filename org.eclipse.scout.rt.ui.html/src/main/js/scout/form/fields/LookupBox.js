@@ -194,7 +194,7 @@ scout.LookupBox.prototype.refreshLookup = function() {
 };
 
 /**
- * @return true if a lookup call execution has been scheduled now. false otherwise.
+ * @return {boolean} true if a lookup call execution has been scheduled now. false otherwise.
  */
 scout.LookupBox.prototype._ensureLookupCallExecuted = function() {
   if (this._lookupExecuted) {

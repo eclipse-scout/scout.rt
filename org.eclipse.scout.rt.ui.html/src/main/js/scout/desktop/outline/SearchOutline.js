@@ -11,10 +11,10 @@
 scout.SearchOutline = function() {
   scout.SearchOutline.parent.call(this);
   this.hasText = false;
-  this.$searchPanel;
-  this.$clearIcon;
-  this.$searchStatus;
-  this.$queryField;
+  this.$searchPanel = null;
+  this.$clearIcon = null;
+  this.$searchStatus = null;
+  this.$queryField = null;
 };
 scout.inherits(scout.SearchOutline, scout.Outline);
 

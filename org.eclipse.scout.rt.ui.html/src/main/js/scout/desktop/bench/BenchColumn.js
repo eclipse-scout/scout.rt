@@ -10,10 +10,9 @@
  */
 scout.BenchColumn = function() {
   scout.BenchColumn.parent.call(this);
-  this.htmlComp;
   this.tabBoxes = [];
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
-  this.components;
+  this.components = null;
   this._removeViewInProgress = 0;
   this.layoutData;
 

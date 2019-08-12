@@ -862,6 +862,7 @@ scout.Widget.prototype.cssClassAsArray = function() {
 
 /**
  * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
+ * @returns {scout.LoadingSupport}
  */
 scout.Widget.prototype._createLoadingSupport = function() {
   return null;
@@ -1245,6 +1246,7 @@ scout.Widget.prototype._installFocusContext = function() {
 
 /**
  * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default scout.KeyStrokeContext.
+ * @returns {scout.KeyStrokeContext}
  */
 scout.Widget.prototype._createKeyStrokeContext = function() {
   return null;
@@ -1598,10 +1600,9 @@ scout.Widget.prototype._removeWidgetProperties = function(properties) {
  * Clones the widget and mirrors the events, see this.clone() and this.mirror() for details.
  */
 scout.Widget.prototype.cloneAndMirror = function(model) {
-  var clone = this.clone(model, {
+  return this.clone(model, {
     delegateAllPropertiesToClone: true
   });
-  return clone;
 };
 
 /**

@@ -11,7 +11,7 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
   scout.TableControl.CONTAINER_SIZE = scout.styles.getSize('table-control-container', 'height', 'height', scout.TableControl.CONTAINER_SIZE);
-  this.tableFooter;
+  this.tableFooter = null;
   this.contentRendered = false;
   this.height = scout.TableControl.CONTAINER_SIZE;
   this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;

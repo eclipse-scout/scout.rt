@@ -20,7 +20,7 @@ scout.Tooltip = function() {
   this.arrowPositionUnit = '%';
   this.windowPaddingX = 10;
   this.windowPaddingY = 5;
-  this.origin;
+  this.origin = null;
 
   /**
    * When the origin point is calculated using $element.offset(),
@@ -29,13 +29,12 @@ scout.Tooltip = function() {
    * "true" to disable this additional calculation.
    */
   this.originRelativeToParent = false;
-  this.$anchor;
+  this.$anchor = null;
   this.autoRemove = true;
-  this.cssClass;
   this.tooltipPosition = 'top';
   this.scrollType = 'position';
   this.htmlEnabled = false;
-  this.$content;
+  this.$content = null;
   this.menus = [];
   this._addWidgetProperties(['menus']);
 

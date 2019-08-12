@@ -12,11 +12,9 @@ scout.SimpleTabBox = function() {
   scout.SimpleTabBox.parent.call(this);
   this._addWidgetProperties(['tabArea']);
 
-  this.$body;
-  this.htmlComp;
-  this.tabArea;
+  this.tabArea = null;
   this.viewStack = [];
-  this.currentView;
+  this.currentView = null;
   this._removeViewInProgress = 0;
 };
 scout.inherits(scout.SimpleTabBox, scout.Widget);

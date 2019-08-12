@@ -10,8 +10,7 @@
  */
 scout.DesktopNavigation = function() {
   scout.DesktopNavigation.parent.call(this);
-  this.$container;
-  this.$body;
+  this.$body = null;
   this.layoutData = {};
   this.toolBoxVisible = false;
   this.viewButtonBox = null;

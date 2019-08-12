@@ -11,7 +11,7 @@
 scout.FlexboxLayout = function(direction, cacheKey) {
   scout.FlexboxLayout.parent.call(this);
   this.childrenLayoutDatas = [];
-  this.cacheKey;
+  this.cacheKey = null;
   this.setCacheKey(cacheKey);
   if (direction === scout.FlexboxLayout.Direction.ROW) {
     this.preferredLayoutSize = this.preferredLayoutSizeRow;

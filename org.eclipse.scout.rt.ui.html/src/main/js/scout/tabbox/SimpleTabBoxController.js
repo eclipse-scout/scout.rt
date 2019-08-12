@@ -17,13 +17,13 @@
  * updates the {@link {@link scout.SimpleTabArea}}.
  */
 scout.SimpleTabBoxController = function(tabBox, tabArea) {
-  this.tabBox;
+  this.tabBox = null;
   this._viewAddHandler = this._onViewAdd.bind(this);
   this._viewRemoveHandler = this._onViewRemove.bind(this);
   this._viewActivateHandler = this._onViewActivate.bind(this);
   this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
-  this.tabArea;
+  this.tabArea = null;
   this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
 };
 
@@ -120,7 +120,7 @@ scout.SimpleTabBoxController.prototype._getTab = function(view) {
   if (!view) {
     return;
   }
-  var viewTab;
+  var viewTab = null;
   this.tabArea.getTabs().some(function(tab) {
     if (tab.view === view) {
       viewTab = tab;

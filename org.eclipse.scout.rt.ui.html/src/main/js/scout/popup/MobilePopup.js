@@ -16,8 +16,8 @@ scout.MobilePopup = function() {
   this.windowPaddingY = 0;
   this.closable = true;
   this.animateRemoval = true;
-  this.widget;
-  this.title;
+  this.widget = null;
+  this.title = null;
   this.withGlassPane = true;
   this._addWidgetProperties('widget');
 };

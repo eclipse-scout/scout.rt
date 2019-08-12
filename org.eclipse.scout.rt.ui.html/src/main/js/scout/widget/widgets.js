@@ -55,7 +55,7 @@ scout.widgets = {
   /**
    * @param {scout.Widget[]} widgets the widgets to check.
    * @param {scout.Widget} [container] if specified, the function returns false if the container is not visible or not rendered. This allows for an early return without the need to check every given widget.
-   * @returns the first widget of the given list which is focusable.
+   * @returns {boolean} the first widget of the given list which is focusable.
    */
   findFirstFocusableWidget: function(widgets, container) {
     if (container && (!container.rendered || !container.visible)) {

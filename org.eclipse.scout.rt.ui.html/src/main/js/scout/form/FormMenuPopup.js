@@ -10,7 +10,7 @@
  */
 scout.FormMenuPopup = function() {
   scout.FormMenuPopup.parent.call(this);
-  this.formMenu;
+  this.formMenu = null;
   this.formMenuPropertyChangeHandler = this._onFormMenuPropertyChange.bind(this);
   this._addWidgetProperties('form');
 };

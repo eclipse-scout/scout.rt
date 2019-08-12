@@ -14,7 +14,7 @@ scout.Form = function() {
   this._addPreserveOnPropertyChangeProperties(['initialFocus']);
 
   this.askIfNeedSave = true;
-  this.askIfNeedSaveText; // if not set, a default text is used (see Lifecycle.js)
+  this.askIfNeedSaveText = null; // if not set, a default text is used (see Lifecycle.js)
   this.data = {};
   this.displayHint = scout.Form.DisplayHint.DIALOG;
   this.displayParent = null; // only relevant if form is opened, not relevant if form is just rendered into another widget (not managed by a form controller)
@@ -991,7 +991,7 @@ scout.Form.findNonWrappedForm = function(widget) {
   if (!widget) {
     return null;
   }
-  var form;
+  var form = null;
   widget.findParent(function(parent) {
     if (parent instanceof scout.Form) {
       form = parent;

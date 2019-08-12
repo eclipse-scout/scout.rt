@@ -14,10 +14,10 @@ scout.TimePicker = function() {
   // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
   // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
   // the UP or DOWN key while no date is selected.)
-  this.preselectedTime;
-  this.selectedTime;
-  this.resolution;
-  this.$scrollable;
+  this.preselectedTime = null;
+  this.selectedTime = null;
+  this.resolution = null;
+  this.$scrollable = null;
 
   this.touch = scout.device.supportsTouch();
 };

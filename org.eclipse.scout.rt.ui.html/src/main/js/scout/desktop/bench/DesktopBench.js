@@ -10,9 +10,8 @@
  */
 scout.DesktopBench = function() {
   scout.DesktopBench.parent.call(this);
-  this.htmlComp;
   this.columns = [];
-  this.components;
+  this.components = null;
   this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
   this._removeViewInProgress = 0;
   this.changingCounter = 0;
@@ -748,7 +747,7 @@ scout.DesktopBench.prototype.getViews = function(displayViewId) {
 };
 
 scout.DesktopBench.prototype.getViewTab = function(view) {
-  var viewTab;
+  var viewTab = null;
   this.getTabs().some(function(vt) {
     if (vt.view === view) {
       viewTab = vt;

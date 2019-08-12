@@ -10,7 +10,7 @@
  */
 scout.ViewButtonBox = function() {
   scout.ViewButtonBox.parent.call(this);
-  this.viewMenuTab;
+  this.viewMenuTab = null;
   this.viewButtons = [];
   this.menuButtons = [];
   this.tabButtons = [];

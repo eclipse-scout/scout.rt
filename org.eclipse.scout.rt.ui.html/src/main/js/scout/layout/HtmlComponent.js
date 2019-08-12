@@ -17,7 +17,7 @@ scout.HtmlComponent = function($comp, session) {
   }
   this.$comp = $comp;
   this.layout = new scout.NullLayout();
-  this.layoutData;
+  this.layoutData = null;
   this.valid = false;
 
   /**
@@ -64,7 +64,7 @@ scout.HtmlComponent.prototype.getParent = function() {
 };
 
 /**
- * @returns true if the given htmlComponent is an ancestor, false if not
+ * @returns {boolean} true if the given htmlComponent is an ancestor, false if not
  */
 scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
   var $parent = this.$comp.parent();
@@ -110,7 +110,7 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
 
 /**
  * Invalidates the component (sets the valid property to false and calls layout.invalidate()).
- * @param {scout.HtmlComponent} htmlSource The component the invalidation originated from.
+ * @param {scout.HtmlComponent} [htmlSource] The component the invalidation originated from.
  *        Is always set if the invalidation is triggered by using invalidateLayoutTree, may be undefined otherwise.
  */
 scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
@@ -124,7 +124,7 @@ scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
 /**
  * Calls the layout of the component to layout its children but only if the component is not valid.
  * @exception when component has no layout
- * @return true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
+ * @return {boolean} true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
  */
 scout.HtmlComponent.prototype.validateLayout = function() {
   if (!this.layout) {

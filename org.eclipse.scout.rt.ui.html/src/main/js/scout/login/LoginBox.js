@@ -16,13 +16,13 @@ scout.LoginBox = function() {
   };
   this.authUrl = 'auth';
   this.onPostDoneFunc = this.redirect.bind(this);
-  this.redirectUrl;
+  this.redirectUrl = null;
   this.logoUrl = 'res/logo.png';
   this.userDataKey = 'user';
   this.passwordDataKey = 'password';
   this.additionalData = {};
   this.prepareRedirectUrlFunc = scout.LoginBox.prepareRedirectUrl;
-  this.messageKey;
+  this.messageKey = null;
   this.texts = {
     'ui.Login': 'Login',
     'ui.LoginFailed': 'Login failed',

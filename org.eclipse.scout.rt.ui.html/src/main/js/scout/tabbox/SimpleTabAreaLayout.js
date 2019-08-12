@@ -11,7 +11,7 @@
 scout.SimpleTabAreaLayout = function(tabArea) {
   scout.SimpleTabAreaLayout.parent.call(this);
   this.tabArea = tabArea;
-  this._$overflowTab;
+  this._$overflowTab = null;
   this._overflowTabsIndizes = [];
 };
 scout.inherits(scout.SimpleTabAreaLayout, scout.AbstractLayout);

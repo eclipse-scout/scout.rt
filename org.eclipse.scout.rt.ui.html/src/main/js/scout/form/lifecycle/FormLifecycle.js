@@ -46,7 +46,6 @@ scout.FormLifecycle.prototype._invalidElements = function() {
     }
     if (!result.validByMandatory) {
       missingFields.push(field);
-      return;
     }
   });
 

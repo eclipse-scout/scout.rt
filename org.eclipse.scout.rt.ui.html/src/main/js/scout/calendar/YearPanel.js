@@ -11,7 +11,6 @@
 scout.YearPanel = function() {
   scout.YearPanel.parent.call(this);
 
-  this.$container;
   this.$yearTitle;
   this.$yearList;
   this.selectedDate;

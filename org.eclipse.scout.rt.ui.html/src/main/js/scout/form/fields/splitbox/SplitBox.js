@@ -26,8 +26,8 @@ scout.SplitBox = function() {
   this.fieldMinimized = false;
   this.minimizeEnabled = true;
 
-  this._$splitArea;
-  this._$splitter;
+  this._$splitArea = null;
+  this._$splitter = null;
 };
 scout.inherits(scout.SplitBox, scout.CompositeField);
 

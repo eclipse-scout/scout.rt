@@ -11,12 +11,12 @@
 scout.SimpleTabArea = function() {
   scout.SimpleTabArea.parent.call(this);
   this.tabs = [];
+  this._selectedViewTab = null;
 };
 scout.inherits(scout.SimpleTabArea, scout.Widget);
 
 scout.SimpleTabArea.prototype._init = function(model) {
   scout.SimpleTabArea.parent.prototype._init.call(this, model);
-  this._selectedViewTab;
 
   this._tabClickHandler = this._onTabClick.bind(this);
 };

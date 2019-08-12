@@ -27,10 +27,10 @@ scout.SimpleTab = function() {
   // Order: $statusContainer, $iconContainer, $title, $subTitle
   // - Status container needs to be the first element because it is "float: right".
   // - Icon container is "float: left" , must be before title.
-  this.$title;
-  this.$subTitle;
-  this.$iconContainer;
-  this.$statusContainer;
+  this.$title = null;
+  this.$subTitle = null;
+  this.$iconContainer = null;
+  this.$statusContainer = null;
 
   this._statusContainerUsageCounter = 0;
   this._statusIconDivs = [];

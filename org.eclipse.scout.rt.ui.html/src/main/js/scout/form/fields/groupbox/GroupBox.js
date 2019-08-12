@@ -18,7 +18,7 @@ scout.GroupBox = function() {
   this.menuBarVisible = true;
   this.menuBarPosition = scout.GroupBox.MenuBarPosition.AUTO;
   this.menuBarEllipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
-  this.notification;
+  this.notification = null;
   this.bodyLayoutConfig = null;
   this.borderDecoration = scout.GroupBox.BorderDecoration.AUTO;
   this.borderVisible = true;
@@ -40,8 +40,8 @@ scout.GroupBox = function() {
   this.staticMenus = [];
   this.responsive = null;
 
-  this.$body;
-  this.$title;
+  this.$body = null;
+  this.$title = null;
   this.$subLabel = null;
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
@@ -596,7 +596,7 @@ scout.GroupBox.prototype._renderExpandable = function() {
   if (expandable) {
     if ($control.length === 0) {
       // Create control if necessary
-      $control = this.$container.makeDiv('group-box-control')
+      this.$container.makeDiv('group-box-control')
         .on('click', this._onControlClick.bind(this))
         .insertAfter(this.$label);
     }

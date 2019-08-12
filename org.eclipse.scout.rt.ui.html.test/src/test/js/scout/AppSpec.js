@@ -14,6 +14,10 @@ describe('App', function() {
     setFixtures(sandbox().addClass('scout'));
   });
 
+  afterEach(function() {
+    $('.startup-error').remove();
+  });
+
   describe('initDone', function() {
     it('is executed after desktop is rendered', function(done) {
       var app = new scout.App();

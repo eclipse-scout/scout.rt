@@ -13,12 +13,12 @@ scout.KeyStrokeContext = function(options) {
    * Holds the target where to bind this context as keydown listener.
    * This can either be a static value or a function to resolve the target.
    */
-  this.$bindTarget;
+  this.$bindTarget = null;
   /*
    * Holds the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
    * This can either be a static value or a function to resolve the target.
    */
-  this.$scopeTarget;
+  this.$scopeTarget = null;
   /*
    * Holds the keystrokes registered within this context.
    */

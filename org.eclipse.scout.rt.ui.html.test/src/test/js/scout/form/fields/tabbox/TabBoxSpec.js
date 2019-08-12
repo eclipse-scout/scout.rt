@@ -34,7 +34,7 @@ describe('TabBox', function() {
 
     it('must not create LogicalGridData for tab items', function() {
       tabBox.render();
-      expect(tabBox.tabItems[0].htmlComp.layoutData).toBe(undefined);
+      expect(tabBox.tabItems[0].htmlComp.layoutData).toBe(null);
     });
 
   });

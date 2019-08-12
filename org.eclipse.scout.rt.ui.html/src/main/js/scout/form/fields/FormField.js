@@ -1129,8 +1129,7 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     location: {
       x: event.pageX,
       y: event.pageY
-    },
-    $anchor: this._$disabledOverlay
+    }
   });
   popup.open();
 };

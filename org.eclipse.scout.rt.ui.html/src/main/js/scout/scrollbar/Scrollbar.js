@@ -12,9 +12,9 @@ scout.Scrollbar = function() {
   scout.Scrollbar.parent.call(this);
 
   // jQuery Elements
-  this.$container; // Scrollbar <div>
-  this.$thumb; // thumb body for layout purposes <div>
-  this.$thumbHandle; // thumb handle <div>
+  this.$container = null; // Scrollbar <div>
+  this.$thumb = null; // thumb body for layout purposes <div>
+  this.$thumbHandle = null; // thumb handle <div>
 
   // Defaults
   this.axis = 'y';
@@ -22,8 +22,8 @@ scout.Scrollbar = function() {
   this.mouseWheelNeedsShift = false;
 
   // Varaibles for calculation
-  this._scrollSize;
-  this._offsetSize;
+  this._scrollSize = null;
+  this._offsetSize = null;
 
   // Axis based helper variables (y)
   this._dim = 'Height'; // x: 'Width'

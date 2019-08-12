@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 scout.KeyStroke = function() {
-  this.field; // optional model field
+  this.field = null; // optional model field
 
   this.which = []; // keys which this keystroke is bound to. Typically, this is a single key, but may be multiple keys if handling the same action (e.g. ENTER and SPACE on a button).
   this.ctrl = false;
