@@ -54,7 +54,6 @@ describe('RemoteApp', function() {
       app._createSession = function(options) {
         return session;
       };
-      ;
       var loaded = false;
       session.start = function() {
         var def = $.Deferred();
