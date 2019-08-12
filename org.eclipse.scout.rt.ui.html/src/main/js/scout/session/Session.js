@@ -9,7 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 scout.Session = function() {
-  this.$entryPoint;
+  this.$entryPoint = null;
   this.partId = 0;
 
   this.url = new scout.URL();
@@ -18,7 +18,7 @@ scout.Session = function() {
     touch: scout.device.supportsTouch(),
     standalone: scout.device.isStandalone()
   });
-  this.locale;
+  this.locale = null;
   this.textMap = new scout.TextMap();
 
   this.ready = false; // true after desktop has been completely rendered
@@ -27,13 +27,13 @@ scout.Session = function() {
   this.loggedOut = false;
   this.inspector = false;
   this.persistent = false;
-  this.desktop;
+  this.desktop = null;
   this.layoutValidator = new scout.LayoutValidator();
-  this.focusManager;
-  this.keyStrokeManager;
+  this.focusManager = null;
+  this.keyStrokeManager = null;
 
   // TODO [7.0] awe, cgu, bsh: Split in "RemoteSession" and "???" (maybe move to App)
-  this.uiSessionId; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
+  this.uiSessionId = null; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = this._getClientSessionIdFromStorage();
   this.forceNewClientSession = false;
   this.remoteUrl = 'json';
@@ -54,13 +54,12 @@ scout.Session = function() {
   this.adapterExportEnabled = false;
   this._adapterDataCache = {};
   this._busy = false;
-  this._busyIndicator;
-  this._busyIndicatorTimeoutId;
-  this._$requestPending;
-  this._deferred;
+  this._busyIndicator = null;
+  this._busyIndicatorTimeoutId = null;
+  this._deferred = null;
   this._fatalMessagesOnScreen = {};
-  this._retryRequest;
-  this._queuedRequest;
+  this._retryRequest = null;
+  this._queuedRequest = null;
   this.requestSequenceNo = 0;
 
   this.rootAdapter = new scout.ModelAdapter();
@@ -204,11 +203,10 @@ scout.Session.prototype.getWidget = function(adapterId) {
   if (!adapter) {
     return null;
   }
-  var widget = adapter.widget;
-  return widget;
+  return adapter.widget;
 };
 
-scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
+scout.Session.prototype.getOrCreateWidget = function(adapterId, parent, strict) {
   if (!adapterId) {
     return null;
   }
@@ -221,7 +219,10 @@ scout.Session.prototype.getOrCreateWidget = function(adapterId, parent) {
   }
   var adapterData = this._getAdapterData(adapterId);
   if (!adapterData) {
-    throw new Error('no adapterData found for adapterId=' + adapterId);
+    if (scout.nvl(strict, true)) {
+      throw new Error('no adapterData found for adapterId=' + adapterId);
+    }
+    return null;
   }
   var adapter = this.createModelAdapter(adapterData);
   return adapter.createWidget(adapterData, parent);
