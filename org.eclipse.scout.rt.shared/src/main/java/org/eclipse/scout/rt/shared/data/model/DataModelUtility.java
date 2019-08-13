@@ -55,7 +55,7 @@ public final class DataModelUtility {
    *         {@link IDataModelEntity#getMetaDataOfEntity()}
    * @since 3.8.0
    */
-  public static String entityPathToExternalId(IDataModel f, EntityPath entityPath) {
+  public static String entityPathToExternalId(IDataModel dataModel, EntityPath entityPath) {
     if (entityPath == null || entityPath.isEmpty()) {
       return "";
     }
@@ -69,7 +69,7 @@ public final class DataModelUtility {
     }
     String externalId = buf.toString();
     if (Platform.get().inDevelopmentMode() || LOG.isDebugEnabled()) {
-      EntityPath verify = externalIdToEntityPath(f, externalId);
+      EntityPath verify = externalIdToEntityPath(dataModel, externalId);
       if (verify == null) {
         LOG.info("entity externalId {} resolves to null", externalId);
       }
@@ -87,12 +87,12 @@ public final class DataModelUtility {
    *         {@link IDataModelEntity#getMetaDataOfEntity()}, {@link IDataModelAttribute#getMetaDataOfAttribute()}
    * @since 3.8.0
    */
-  public static String attributePathToExternalId(IDataModel f, AttributePath attributePath) {
+  public static String attributePathToExternalId(IDataModel dataModel, AttributePath attributePath) {
     if (attributePath == null) {
       return "";
     }
     StringBuilder buf = new StringBuilder();
-    buf.append(entityPathToExternalId(f, attributePath.getEntityPath()));
+    buf.append(entityPathToExternalId(dataModel, attributePath.getEntityPath()));
     if (buf.length() > 0) {
       buf.append("/");
     }
@@ -101,7 +101,7 @@ public final class DataModelUtility {
     buf.append(exportMetaData(a.getMetaDataOfAttribute()));
     String externalId = buf.toString();
     if (Platform.get().inDevelopmentMode() || LOG.isDebugEnabled()) {
-      AttributePath verify = externalIdToAttributePath(f, externalId);
+      AttributePath verify = externalIdToAttributePath(dataModel, externalId);
       if (verify == null) {
         LOG.info("attribute externalId {} resolves to null", externalId);
       }
@@ -115,18 +115,18 @@ public final class DataModelUtility {
   /**
    * Returns the path of entities starting by the root, which is described by the external ID.
    *
-   * @param f
+   * @param dataModel
    *          the data model
    * @param externalId
    *          string representation of an entity
    * @return
    * @since 3.8.0
    */
-  public static EntityPath externalIdToEntityPath(IDataModel f, String externalId) {
+  public static EntityPath externalIdToEntityPath(IDataModel dataModel, String externalId) {
     if (externalId == null || externalId.isEmpty()) {
       return EntityPath.EMPTY;
     }
-    return resolveEntityPathRec(f, externalId, EntityPath.EMPTY);
+    return resolveEntityPathRec(dataModel, externalId, EntityPath.EMPTY);
   }
 
   /**
@@ -134,11 +134,11 @@ public final class DataModelUtility {
    *         {@link IDataModel#getMetaDataOfAttribute(IDataModelAttribute)}
    * @since 3.8.0
    */
-  public static AttributePath externalIdToAttributePath(IDataModel f, String externalId) {
+  public static AttributePath externalIdToAttributePath(IDataModel dataModel, String externalId) {
     if (externalId == null || externalId.isEmpty()) {
       return null;
     }
-    return resolveAttributePath(f, externalId);
+    return resolveAttributePath(dataModel, externalId);
   }
 
   /**
@@ -149,7 +149,7 @@ public final class DataModelUtility {
    *          is the entity on which to start resolving or null to start on top of the entity/attribute tree
    * @since 3.8.0
    */
-  private static EntityPath resolveEntityPathRec(IDataModel f, String externalId, EntityPath inputPath) {
+  private static EntityPath resolveEntityPathRec(IDataModel dataModel, String externalId, EntityPath inputPath) {
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
     if (!m.matches()) {
       throw new IllegalArgumentException("externalId is invalid: " + externalId);
@@ -159,7 +159,7 @@ public final class DataModelUtility {
     Map<String, String> meta = importMetaData(m.group(5));
     EntityPath resolvedPath;
     if (folderName != null) {
-      resolvedPath = resolveEntityPathRec(f, folderName, inputPath);
+      resolvedPath = resolveEntityPathRec(dataModel, folderName, inputPath);
       if (resolvedPath == null) {
         return null;
       }
@@ -173,7 +173,7 @@ public final class DataModelUtility {
       e = findEntity(parentEntity.getEntities(), elemName, meta);
     }
     else {
-      e = findEntity(f.getEntities(), elemName, meta);
+      e = findEntity(dataModel.getEntities(), elemName, meta);
     }
     if (e == null) {
       LOG.info("entity externalId {} resolves to null", externalId);
@@ -182,7 +182,7 @@ public final class DataModelUtility {
     return resolvedPath.addToEnd(e);
   }
 
-  private static AttributePath resolveAttributePath(IDataModel f, String externalId) {
+  private static AttributePath resolveAttributePath(IDataModel dataModel, String externalId) {
     Matcher m = PAT_EXTERNAL_ID.matcher(externalId);
     if (!m.matches()) {
       throw new IllegalArgumentException("externalId is invalid: " + externalId);
@@ -192,7 +192,7 @@ public final class DataModelUtility {
     Map<String, String> meta = importMetaData(m.group(5));
     EntityPath entityPath;
     if (folderName != null) {
-      entityPath = resolveEntityPathRec(f, folderName, EntityPath.EMPTY);
+      entityPath = resolveEntityPathRec(dataModel, folderName, EntityPath.EMPTY);
       if (entityPath == null) {
         return null;
       }
@@ -206,7 +206,7 @@ public final class DataModelUtility {
       a = findAttribute(parentEntity.getAttributes(), elemName, meta);
     }
     else {
-      a = findAttribute(f.getAttributes(), elemName, meta);
+      a = findAttribute(dataModel.getAttributes(), elemName, meta);
     }
     if (a == null) {
       LOG.info("attribute externalId {} resolves to null", externalId);
