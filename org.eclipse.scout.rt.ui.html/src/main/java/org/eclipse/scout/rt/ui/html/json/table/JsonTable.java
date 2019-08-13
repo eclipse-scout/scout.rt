@@ -244,6 +244,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().isHeaderEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_HEADER_MENUS_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isHeaderMenusEnabled();
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEYBOARD_NAVIGATION, model) {
       @Override
       protected Boolean modelValue() {

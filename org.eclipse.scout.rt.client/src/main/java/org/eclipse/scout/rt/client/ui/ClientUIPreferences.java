@@ -361,6 +361,13 @@ public class ClientUIPreferences {
     return key;
   }
 
+  protected boolean isTableClientUiPreferencesEnabled(IColumn col) {
+    if (m_prefs == null) {
+      return false;
+    }
+    return col.getTable().isClientUiPreferencesEnabled();
+  }
+
   public void setTableColumnPreferences(IColumn col) {
     setTableColumnPreferences(col, true);
   }
@@ -370,7 +377,7 @@ public class ClientUIPreferences {
   }
 
   public void setTableColumnPreferences(IColumn col, boolean flush, String configName) {
-    if (m_prefs == null) {
+    if (!isTableClientUiPreferencesEnabled(col)) {
       return;
     }
 
@@ -548,10 +555,9 @@ public class ClientUIPreferences {
   }
 
   public void setAllTableColumnPreferences(ITable table, String configName) {
-    if (table == null) {
+    if (table == null || !table.isClientUiPreferencesEnabled()) {
       return;
     }
-
     for (IColumn col : table.getColumns()) {
       if (col.isDisplayable()) {
         setTableColumnPreferences(col, false, configName);

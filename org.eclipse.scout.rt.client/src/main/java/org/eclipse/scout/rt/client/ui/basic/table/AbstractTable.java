@@ -462,6 +462,33 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
+   * Configures whether the header menus are enabled. When header menus are disabled, a click on the header will toggle
+   * between ascending and descending sorting instead of opening the header popup.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if header menus are enabled, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(75)
+  protected boolean getConfiguredHeaderMenusEnabled() {
+    return true;
+  }
+
+  /**
+   * Configures whether the client UI preferences for this table are (re)-stored.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @return {@code true} if client UI preferences are enabled, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(77)
+  protected boolean getConfiguredClientUiPreferencesEnabled() {
+    return true;
+  }
+
+  /**
    * Configures whether the columns are auto resized. If true, all columns are resized so that the table never needs
    * horizontal scrolling. This is especially useful for tables inside a form.
    * <p>
@@ -956,6 +983,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setRowIconColumnWidth(getConfiguredRowIconColumnWidth());
     setHeaderVisible(getConfiguredHeaderVisible());
     setHeaderEnabled(getConfiguredHeaderEnabled());
+    setHeaderMenusEnabled(getConfiguredHeaderMenusEnabled());
     setAutoResizeColumns(getConfiguredAutoResizeColumns());
     setCheckable(getConfiguredCheckable());
     setMultiCheck(getConfiguredMultiCheck());
@@ -970,6 +998,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setTableStatusVisible(getConfiguredTableStatusVisible());
     setTruncatedCellTooltipEnabled(getConfiguredTruncatedCellTooltipEnabled());
     setTileMode(getConfiguredTileModeEnabled());
+    setClientUiPreferencesEnabled(getConfiguredClientUiPreferencesEnabled());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -4056,6 +4085,26 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   @Override
   public void setHeaderEnabled(boolean headerEnabled) {
     propertySupport.setPropertyBool(PROP_HEADER_ENABLED, headerEnabled);
+  }
+
+  @Override
+  public boolean isHeaderMenusEnabled() {
+    return propertySupport.getPropertyBool(PROP_HEADER_MENUS_ENABLED);
+  }
+
+  @Override
+  public void setHeaderMenusEnabled(boolean headerMenusEnabled) {
+    propertySupport.setPropertyBool(PROP_HEADER_MENUS_ENABLED, headerMenusEnabled);
+  }
+
+  @Override
+  public boolean isClientUiPreferencesEnabled() {
+    return propertySupport.getPropertyBool(PROP_CLIENT_UI_PREFERENCES_ENABLED);
+  }
+
+  @Override
+  public void setClientUiPreferencesEnabled(boolean clientUiPreferencesEnabled) {
+    propertySupport.setPropertyBool(PROP_CLIENT_UI_PREFERENCES_ENABLED, clientUiPreferencesEnabled);
   }
 
   @Override

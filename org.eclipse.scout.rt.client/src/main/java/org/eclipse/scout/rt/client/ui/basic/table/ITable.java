@@ -101,6 +101,10 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   /**
    * Boolean
    */
+  String PROP_HEADER_MENUS_ENABLED = "headerMenusEnabled";
+  /**
+   * Boolean
+   */
   String PROP_KEYBOARD_NAVIGATION = "keyboardNavigation";
   /**
    * Boolean
@@ -251,6 +255,13 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
    * @since 10.0
    */
   String PROP_TILE_TABLE_HEADER_BOX = "tileTableHeaderBox";
+
+  /**
+   * type boolean
+   *
+   * @since 10.0
+   */
+  String PROP_CLIENT_UI_PREFERENCES_ENABLED = "clientUiPreferencesEnabled";
 
   /**
    * @since 5.1.0
@@ -510,6 +521,14 @@ public interface ITable extends IWidget, IDNDSupport, IStyleable, IAppLinkCapabl
   boolean isHeaderEnabled();
 
   void setHeaderEnabled(boolean headerEnabled);
+
+  boolean isHeaderMenusEnabled();
+
+  void setHeaderMenusEnabled(boolean headerMenusEnabled);
+
+  boolean isClientUiPreferencesEnabled();
+
+  void setClientUiPreferencesEnabled(boolean clientUiPreferencesEnabled);
 
   boolean isMultilineText();
 
