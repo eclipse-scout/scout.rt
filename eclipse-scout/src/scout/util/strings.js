@@ -14,7 +14,7 @@ function encode(string) {
   }
   elem.textContent = string;
   return elem.innerHTML;
-};
+}
 
 function asString(input) {
   if (input === undefined || input === null) {
@@ -24,7 +24,7 @@ function asString(input) {
     return input;
   }
   return String(input);
-};
+}
 
 function hasText(text) {
   if (text === undefined || text === null) {
@@ -35,7 +35,7 @@ function hasText(text) {
     return false;
   }
   return !/^\s*$/.test(text);
-};
+}
 
 /**
  * Inverse operation of hasText(string). Used because empty(s) is more readable than !hasText(s).
@@ -43,7 +43,7 @@ function hasText(text) {
  */
 function empty(text) {
   return !hasText(text);
-};
+}
 
 function box(prefix, string, suffix) {
   prefix = asString(prefix);
@@ -60,7 +60,7 @@ function box(prefix, string, suffix) {
     }
   }
   return s;
-};
+}
 
 function startsWith(fullString, startString) {
   if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
@@ -75,7 +75,7 @@ function startsWith(fullString, startString) {
     return false; // empty string cannot start with non-empty string
   }
   return (fullString.substr(0, startString.length) === startString);
-};
+}
 
 function quote(string) {
   if (string === undefined || string === null) {
@@ -84,7 +84,7 @@ function quote(string) {
   string = asString(string);
   // see 'escapeRegExp()' from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#Using_special_characters
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& = last match
-};
+}
 
 function count(string, separator) {
   if (!string || separator === undefined || separator === null) {
@@ -93,7 +93,7 @@ function count(string, separator) {
   string = asString(string);
   separator = asString(separator);
   return string.split(separator).length - 1;
-};
+}
 
 function repeat(pattern, count) {
   if (pattern === undefined || pattern === null) {
@@ -107,7 +107,7 @@ function repeat(pattern, count) {
     result += pattern;
   }
   return result;
-};
+}
 
 function padZeroLeft(string, padding) {
   string = asString(string);
@@ -116,7 +116,7 @@ function padZeroLeft(string, padding) {
   }
   var z = repeat('0', padding) + string;
   return z.slice(-padding);
-};
+}
 
 function join(separator, vararg) {
   var stringsToJoin;
@@ -137,14 +137,14 @@ function join(separator, vararg) {
     }
   }
   return s;
-};
+}
 
 function contains(string, searchFor) {
   if (!string) {
     return false;
   }
   return string.indexOf(searchFor) > -1;
-};
+}
 
 // not exported!
 function _changeFirstLetter(string, funcName) {
@@ -157,11 +157,11 @@ function _changeFirstLetter(string, funcName) {
     s = string.charAt(0)[funcName]() + string.slice(1);
   }
   return s;
-};
+}
 
 function uppercaseFirstLetter(string) {
   return _changeFirstLetter(string, 'toUpperCase');
-};
+}
 
 export {
   asString,
