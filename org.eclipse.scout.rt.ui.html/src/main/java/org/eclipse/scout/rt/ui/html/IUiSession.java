@@ -52,8 +52,8 @@ public interface IUiSession {
   void init(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq);
 
   /**
-   * @return <code>true</code> if {@link #init(HttpServletRequest, JsonStartupRequest)} was been called. Note: This will
-   *         also be <code>true</code> after the session has been disposed.
+   * @return <code>true</code> if {@link #init(HttpServletRequest, HttpServletResponse, JsonStartupRequest)} was been
+   *         called. Note: This will also be <code>true</code> after the session has been disposed.
    */
   boolean isInitialized();
 
@@ -106,8 +106,8 @@ public interface IUiSession {
 
   /**
    * @return the current UI response that is collecting changes for the next
-   *         {@link #processJsonRequest(HttpServletRequest, JsonRequest)} cycle. This is never <code>null</code>,
-   *         <b>except</b> when the UI session is disposed (see {@link #isDisposed()}).
+   *         {@link #processJsonRequest(HttpServletRequest, HttpServletResponse, JsonRequest)} cycle. This is never
+   *         <code>null</code>, <b>except</b> when the UI session is disposed (see {@link #isDisposed()}).
    */
   JsonResponse currentJsonResponse();
 
@@ -127,7 +127,7 @@ public interface IUiSession {
   JSONObject processJsonRequest(HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq);
 
   /**
-   * @param httpRequest
+   * @param req
    *          the HTTP request
    * @param uploadable
    *          the target adapter that receives the uploaded files
@@ -224,4 +224,13 @@ public interface IUiSession {
    */
   IHttpResourceCache getHttpResourceCache();
 
+  UiSessionListeners listeners();
+
+  default void addListener(UiSessionListener listener, Integer... eventTypes) {
+    listeners().add(listener, false, eventTypes);
+  }
+
+  default void removeListener(UiSessionListener listener, Integer... eventTypes) {
+    listeners().remove(listener, eventTypes);
+  }
 }

@@ -123,6 +123,7 @@ public class UiSession implements IUiSession {
   private final Object m_pollerQueueLock = new Object();
   private final Object m_notificationToken = new Object();
   private final IHttpResourceCache m_httpResourceCache = BEANS.get(HttpResourceCache.class);
+  private final UiSessionListeners m_listeners = new UiSessionListeners();
 
   private volatile boolean m_initialized;
   private volatile ISessionStore m_sessionStore;
@@ -418,6 +419,7 @@ public class UiSession implements IUiSession {
     return reloadPage;
   }
 
+  @SuppressWarnings("RedundantCast")
   protected JsonClientSession<?> createClientSessionAdapter(final IClientSession clientSession) {
     // Ensure adapter is created in model job, because the model might be accessed during the adapter's initialization
     final IFuture<JsonClientSession<?>> future = ModelJobs.schedule(() -> (JsonClientSession<?>) createJsonAdapter(clientSession, m_rootJsonAdapter), ModelJobs.newInput(
@@ -570,7 +572,7 @@ public class UiSession implements IUiSession {
       else {
         final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(clientSession, true);
         ModelJobs.schedule(
-            () -> detachGui.run(),
+            detachGui::run,
             ModelJobs.newInput(clientRunContext)
                 .withName("Detaching Gui")
                 .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
@@ -779,8 +781,8 @@ public class UiSession implements IUiSession {
 
   /**
    * <b>Do not call this internal method directly!</b> It should only be called by
-   * {@link #processJsonRequest(HttpServletRequest, JsonRequest)} which ensures that the required state is set up
-   * correctly (and will be cleaned up later) and is run as a model job.
+   * {@link #processJsonRequest(HttpServletRequest, HttpServletResponse, JsonRequest)} which ensures that the required
+   * state is set up correctly (and will be cleaned up later) and is run as a model job.
    */
   protected void processJsonRequestInternal() {
     m_jsonEventProcessor.processEvents(m_currentJsonRequest, m_currentJsonResponse);
@@ -885,9 +887,7 @@ public class UiSession implements IUiSession {
       List<BinaryResource> uploadResources, Map<String, String> uploadProperties) {
     ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(m_clientSession, true);
 
-    IFuture<List<String>> future = ModelJobs.schedule(() -> {
-      return resourceUploader.uploadBinaryResources(uploadResources, uploadProperties);
-    }, createFileUploadModelJobInput(clientRunContext));
+    IFuture<List<String>> future = ModelJobs.schedule(() -> resourceUploader.uploadBinaryResources(uploadResources, uploadProperties), createFileUploadModelJobInput(clientRunContext));
 
     List<String> links = future.awaitDoneAndGet();
     if (uploadResources.size() != links.size()) {
@@ -900,7 +900,7 @@ public class UiSession implements IUiSession {
     }
     else {
       JSONArray array = new JSONArray();
-      links.forEach(link -> array.put(link));
+      links.forEach(array::put);
       json.put("links", array);
     }
     LOG.debug("Uploaded " + links.size() + " resources. Returning links to resoruce=" + json);
@@ -908,8 +908,8 @@ public class UiSession implements IUiSession {
   }
 
   /**
-   * Creates a new {@link JobInput} for the model job created by {@link #processFileUpload(HttpServletRequest,
-   * HttpServletResponse, IBinaryResourceConsumer, List, Map).<br>
+   * Creates a new {@link JobInput} for the model job created by
+   * {@link #processFileUpload(HttpServletRequest, HttpServletResponse, IUploadable, List, Map)}.<br>
    * May be overridden to customize the input.
    */
   protected JobInput createFileUploadModelJobInput(final ClientRunContext clientRunContext) {
@@ -1032,6 +1032,7 @@ public class UiSession implements IUiSession {
   @Override
   public void registerJsonAdapter(IJsonAdapter<?> jsonAdapter) {
     m_jsonAdapterRegistry.add(jsonAdapter);
+    m_listeners.fireEvent(new UiSessionEvent(this, UiSessionEvent.TYPE_ADAPTER_REGISTERED, jsonAdapter));
   }
 
   @Override
@@ -1094,6 +1095,7 @@ public class UiSession implements IUiSession {
         }
       }
 
+      @SuppressWarnings("RedundantIfStatement")
       private boolean isJobDone(final JobState jobState, final IFuture<?> future) {
         if (jobState == JobState.DONE) {
           // UI data possibly available because job completed.
@@ -1244,6 +1246,11 @@ public class UiSession implements IUiSession {
   @Override
   public IHttpResourceCache getHttpResourceCache() {
     return m_httpResourceCache;
+  }
+
+  @Override
+  public UiSessionListeners listeners() {
+    return m_listeners;
   }
 
   protected static HttpSessionHelper getHttpSessionHelper() {
