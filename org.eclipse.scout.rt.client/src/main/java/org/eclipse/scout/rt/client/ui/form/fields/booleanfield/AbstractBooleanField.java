@@ -34,13 +34,17 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   @Override
   protected void initConfig() {
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
     super.initConfig();
     setTriStateEnabled(getConfiguredTriStateEnabled());
     setKeyStroke(getConfiguredKeyStroke());
     setWrapText(getConfiguredWrapText());
     propertySupport.setProperty(PROP_VALUE, false);
     propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue())); // ticket 79554
+  }
+
+  protected IBooleanFieldUIFacade createUIFacade() {
+    return new P_UIFacade();
   }
 
   @Override
