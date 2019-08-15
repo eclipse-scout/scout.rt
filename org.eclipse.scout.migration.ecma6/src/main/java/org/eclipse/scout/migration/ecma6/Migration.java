@@ -28,6 +28,7 @@ public class Migration {
 
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsiagbsicrm\\com.bsiag.bsicrm.ui.html");
 //  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsistudio\\com.bsiag.bsistudio.lab.ui.html");
+  private static Path PERSIST_CONSTANTS = Paths.get("");
   private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\org.eclipse.scout.rt\\org.eclipse.scout.rt.ui.html");
   private static Path TARGET_ROOT_DIR = Paths.get("C:/tmp/max24h/migEcma6/org.eclipse.scout.rt.ui.html");
   private static String NAMESPACE = "scout";
@@ -97,6 +98,9 @@ public class Migration {
           return FileVisitResult.SKIP_SUBTREE;
         }
         if (".git".equals(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        if(dir.endsWith(Paths.get("src/main/js/jquery"))){
           return FileVisitResult.SKIP_SUBTREE;
         }
         if ("node_modules".equals(dirName)) {

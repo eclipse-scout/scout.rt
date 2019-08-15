@@ -45,4 +45,12 @@ public final class PathFilters {
     return info -> info.getModuleRelativePath()!= null && acceptedRelativeToModule.contains(info.getModuleRelativePath());
   }
 
+  public static Predicate<PathInfo> isClass(){
+    return info -> info.getPath().getFileName().toString().matches("^[A-Z]{1}.*$");
+  }
+
+  public static Predicate<PathInfo> isUtility(){
+    return info -> info.getPath().getFileName().toString().matches("^[a-z]{1}.*$");
+  }
+
 }

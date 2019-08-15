@@ -29,4 +29,11 @@ public class PathInfo {
   public Path getModuleRelativePath() {
     return m_moduleRelativePath;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append(getPath()).append(" - ").append(getModuleRelativePath());
+    return builder.toString();
+  }
 }

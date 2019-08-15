@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.Map;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
+import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -115,6 +117,14 @@ public class Context {
     final Path src = getSourceRootDirectory().resolve("src/main/js");
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        if(dir.endsWith(Paths.get("src/main/js/jquery"))){
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if(FileUtility.hasExtension(file, "js")){
           JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
@@ -123,6 +133,7 @@ public class Context {
         return FileVisitResult.CONTINUE;
       }
     });
+    m_jsClasses.values().stream().map(f -> f.getFullyQuallifiedName()).forEach(s -> System.out.println(s));
   }
 
 }

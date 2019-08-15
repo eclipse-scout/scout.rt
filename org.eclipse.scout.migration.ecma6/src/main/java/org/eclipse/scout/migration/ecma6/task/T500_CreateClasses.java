@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @Order(500)
 public class T500_CreateClasses extends AbstractTask {
 
-  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
+  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -136,10 +136,14 @@ public class T500_CreateClasses extends AbstractTask {
         StringBuilder replacement = new StringBuilder();
         replacement.append("super(");
         if (matcher.group(1) != null) {
-          replacement.append(matcher.group(1));
+          replacement.append(matcher.group(1).replace("$","\\$"));
         }
         replacement.append(");");
-        source = matcher.replaceFirst(replacement.toString());
+        try {
+          source = matcher.replaceFirst(replacement.toString());
+        }catch (RuntimeException e){
+          e.printStackTrace();
+        }
       }
     }
     return source;

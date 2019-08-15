@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class WorkingCopy {
@@ -55,6 +57,9 @@ public class WorkingCopy {
   }
 
   public void setSource(String source){
+    if(!isDirty()&& ObjectUtility.equals(source, m_source) ){
+      return;
+    }
     if(m_initialSource == null){
       m_initialSource = m_source;
     }
