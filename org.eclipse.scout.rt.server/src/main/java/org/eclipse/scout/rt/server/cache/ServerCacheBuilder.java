@@ -46,12 +46,10 @@ public class ServerCacheBuilder<K, V> extends CacheBuilder<K, V> {
     cache = super.addBeforeCustomWrappers(cache);
     if (isShared()) {
       cache = new ClientNotificationServerCacheWrapper<>(cache);
-      addCacheInstance(cache);
     }
     // it is important, that the ClusterNotificationCacheWrapper is added after the client notification cache wrapper
     if (isClusterEnabled()) {
       cache = new ClusterNotificationCacheWrapper<>(cache);
-      addCacheInstance(cache);
     }
     return cache;
   }

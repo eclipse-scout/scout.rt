@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.shared.cache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,6 @@ import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap.Expir
 @Order(5100)
 public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
-  // list containing created cache instances
-  private final List<ICache<K, V>> m_cacheInstances;
   private final List<CustomWrapperInitializer> m_customWrappers;
 
   private String m_cacheId;
@@ -53,7 +50,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   private Integer m_maxConcurrentResolve;
 
   public CacheBuilder() {
-    m_cacheInstances = new ArrayList<>();
     m_customWrappers = new ArrayList<>();
     m_remoteValueResolverEnabled = true;
     m_threadSafe = true;
@@ -75,21 +71,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
 
   protected void register(ICache<K, V> cache) {
     BEANS.get(ICacheRegistryService.class).register(cache);
-  }
-
-  /**
-   * When a cache instance was created, it is important, that it is added to this list. Else the instance will not be
-   * initialized.
-   *
-   * @param cache
-   * @return this builder
-   */
-  protected void addCacheInstance(ICache<K, V> cache) {
-    m_cacheInstances.add(cache);
-  }
-
-  protected List<ICache<K, V>> getCacheInstances() {
-    return Collections.unmodifiableList(m_cacheInstances);
   }
 
   protected Map<K, V> createCacheMap() {
@@ -114,15 +95,12 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   protected ICache<K, V> createBasicCache(Map<K, V> cacheMap) {
-    BasicCache<K, V> cache = new BasicCache<>(getCacheId(), getValueResolver(), cacheMap, isAtomicInsertion());
-    addCacheInstance(cache);
-    return cache;
+    return new BasicCache<>(getCacheId(), getValueResolver(), cacheMap, isAtomicInsertion());
   }
 
   protected ICache<K, V> addBeforeCustomWrappers(ICache<K, V> cache) {
     if (getMaxConcurrentResolve() != null) {
       cache = new BoundedResolveCacheWrapper<>(cache, getMaxConcurrentResolve());
-      addCacheInstance(cache);
     }
     return cache;
   }
@@ -139,7 +117,6 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
         arguments[0] = cache;
         // create the new instance
         cache = BeanUtility.createInstance(initializer.getWrapperClass(), arguments);
-        addCacheInstance(cache);
       }
       catch (Exception e) {
         throw new IllegalArgumentException(String.format("Failed creating cache instance of %s", initializer), e);

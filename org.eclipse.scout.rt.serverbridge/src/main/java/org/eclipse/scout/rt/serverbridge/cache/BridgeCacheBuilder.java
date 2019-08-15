@@ -51,7 +51,6 @@ public class BridgeCacheBuilder<K, V> extends CacheBuilder<K, V> {
     cache = super.addBeforeCustomWrappers(cache);
     if (isClusterEnabled()) {
       cache = new ClusterNotificationCacheWrapper<>(cache);
-      addCacheInstance(cache);
     }
     return cache;
   }

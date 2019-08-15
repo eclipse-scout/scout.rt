@@ -32,9 +32,7 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
     if (isSharedAndRemoteAvailable() && isRemoteValueResolverEnabled()) {
       valueResolver = new RemoteCacheValueResolver<>(getCacheId());
     }
-    BasicCache<K, V> cache = new BasicCache<>(getCacheId(), valueResolver, cacheMap, isAtomicInsertion());
-    addCacheInstance(cache);
-    return cache;
+    return new BasicCache<>(getCacheId(), valueResolver, cacheMap, isAtomicInsertion());
   }
 
   @Override
@@ -42,7 +40,6 @@ public class ClientCacheBuilder<K, V> extends CacheBuilder<K, V> {
     cache = super.addBeforeCustomWrappers(cache);
     if (isSharedAndRemoteAvailable()) {
       cache = new ClientNotificationClientCacheWrapper<>(cache);
-      addCacheInstance(cache);
     }
     return cache;
   }
