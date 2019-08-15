@@ -26,8 +26,12 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RestClientProxyWebAppExceptionMappingTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RestClientProxyWebAppExceptionMappingTest.class);
 
   @BeforeClass
   public static void beforeClass() {
@@ -56,6 +60,7 @@ public class RestClientProxyWebAppExceptionMappingTest {
           .queryParam("status", finalStatus)
           .request()
           .get());
+      LOG.info("Testing echo for status {} returned '{}'", finalStatus, remoteException.getMessage());
 
       // mock response and convert it into an exception using duplicated converter method
       Response mockResponse = Response.status(status).build();
