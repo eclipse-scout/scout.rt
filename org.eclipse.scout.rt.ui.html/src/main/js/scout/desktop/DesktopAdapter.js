@@ -68,11 +68,17 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
 
   if (displayParent) {
     form = this.session.getOrCreateWidget(event.form, displayParent.widget);
-    this.addFilterForWidgetEvent(function(widgetEvent) {
-      return (widgetEvent.type === 'formActivate' &&
-        widgetEvent.form === form);
-    });
     form.setDisplayParent(displayParent.widget);
+
+    var hasPendingFormActivateEvent = this.session.asyncEvents.some(function(event) {
+      return event.type === 'formActivate' && event.target === this.id;
+    }, this);
+    if (!hasPendingFormActivateEvent) {
+      this.addFilterForWidgetEvent(function(widgetEvent) {
+        return (widgetEvent.type === 'formActivate' && widgetEvent.form === form);
+      }.bind(this));
+    }
+
     this.widget.showForm(form, event.position);
   }
 };
