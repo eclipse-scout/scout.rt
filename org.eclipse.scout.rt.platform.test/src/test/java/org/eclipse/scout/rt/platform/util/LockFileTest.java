@@ -29,7 +29,6 @@ public class LockFileTest {
   @Test
   public void testLock() throws IOException, InterruptedException {
     File f = File.createTempFile(getClass().getName() + "-testWithLockCall", ".lock");
-    f = new File("C:/dev/data-2019/test.lock");//XXX
 
     LockFile a = new LockFile(f);
     LockFile b = new LockFile(f);
