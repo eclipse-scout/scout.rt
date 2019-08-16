@@ -952,7 +952,7 @@ scout.FormField.prototype._onIconMouseDown = function(event) {
  *
  * @param $parent to which container is appended
  * @param cssClass cssClass to add to the new container DIV
- * @param layout when layout is undefined, scout.FormFieldLayout() is set
+ * @param layout when layout is undefined, this#_createLayout() is called
  *
  */
 scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
@@ -961,8 +961,15 @@ scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
     this.$container.addClass(cssClass);
   }
   var htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
+  htmlComp.setLayout(layout || this._createLayout());
   this.htmlComp = htmlComp;
+};
+
+/**
+ * @return the default layout scout.FormFieldLayout. Override this function if your field needs another layout.
+ */
+scout.FormField.prototype._createLayout = function() {
+  return new scout.FormFieldLayout(this);
 };
 
 /**
