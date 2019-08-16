@@ -72,6 +72,89 @@ describe('DesktopAdapter', function() {
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
+
+    it('can close and open new form in the same response', function() {
+      var formModel = createAndRegisterFormModel();
+      var form = session.getOrCreateWidget(formModel.id, desktop);
+      desktop.dialogs = [form];
+      session._renderDesktop();
+
+      desktop.activateForm(form);
+      expect(desktop.activeForm).toBe(form);
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+
+      // ------------------------
+
+      // Close form and open new form --> new form must be activated
+
+      var response = {
+        adapterData: {
+          '400': {
+            displayHint: 'view',
+            global: true,
+            id: '400',
+            objectType: 'Form',
+            owner: '1',
+            rootGroupBox: '401'
+          },
+          '401': {
+            fields: [],
+            id: '401',
+            objectType: 'GroupBox',
+            owner: '400'
+          }
+        },
+        events: [
+          {
+            target: desktopAdapter.id,
+            type: 'formHide',
+            displayParent:  desktopAdapter.id,
+            form: formModel.id
+          },
+          {
+            target: desktopAdapter.id,
+            type: 'formShow',
+            displayParent:  desktopAdapter.id,
+            form: '400'
+          }
+        ]
+      };
+      session._processSuccessResponse(response);
+      sendQueuedAjaxCalls();
+
+      var expectedEvents = [
+        new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+          formId: null
+        }),
+        new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+          formId: '400'
+        })
+      ];
+      expect(mostRecentJsonRequest()).toContainEventsExactly(expectedEvents);
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+
+      // ------------------------
+
+      // Only hide form --> no formActivate event is sent
+
+      response = {
+        events: [
+          {
+            target: desktopAdapter.id,
+            type: 'formHide',
+            displayParent:  desktopAdapter.id,
+            form: '400'
+          }
+        ]
+      };
+      session._processSuccessResponse(response);
+      sendQueuedAjaxCalls();
+      expect(jasmine.Ajax.requests.count()).toBe(2);
+    });
   });
 
   describe('onFormShow', function() {
