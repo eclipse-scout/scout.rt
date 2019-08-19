@@ -1086,7 +1086,7 @@ public class TreeEventBufferTest {
     when(node.getChildNodes()).thenReturn(childNodeList);
     when(node.getChildNodeCount()).thenReturn(childNodeList.size());
     doAnswer((Answer<Void>) invocation -> {
-      Set collector = invocation.getArgument(0);
+      Set<ITreeNode> collector = invocation.getArgument(0);
       collector.addAll(childNodeList);
       Boolean argument = invocation.getArgument(1);
       boolean recursive = Boolean.valueOf(argument);

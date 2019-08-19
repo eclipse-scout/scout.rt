@@ -11,7 +11,10 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
-import static org.eclipse.scout.rt.platform.util.Assertions.*;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertEqual;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -75,13 +78,13 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
-import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;

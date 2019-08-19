@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.rest.exception;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -39,6 +40,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(PlatformTestRunner.class)
 public class DefaultExceptionMapperTest {
 
+  @SuppressWarnings("unchecked")
   @BeforeClass
   public static void beforeClass() {
     // Setup mocked JAX-RS runtime (without a mock, a real JAX-RS runtime needs to be on the classpath during test execution)
