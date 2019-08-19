@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,7 +81,7 @@ public class JsonBeanTest {
   @Test
   public void testBeanWithCollection() {
     BeanWithCollection bean = new BeanWithCollection();
-    List<Long> list = new ArrayList<Long>();
+    List<Long> list = new ArrayList<>();
     list.add(2L);
     list.add(400L);
     list.add(5000L);
@@ -101,7 +100,7 @@ public class JsonBeanTest {
   @Test
   public void testBeanWithMap() {
     BeanWithMap bean = new BeanWithMap();
-    Map<Object, Object> map = new HashMap<Object, Object>();
+    Map<Object, Object> map = new HashMap<>();
     map.put("key1", Integer.valueOf(2));
     map.put("key2", Integer.valueOf(3));
     bean.setMap(map);
@@ -117,7 +116,7 @@ public class JsonBeanTest {
   @Test(expected = IllegalArgumentException.class)
   public void testBeanWithMapIllegal() {
     BeanWithMap bean = new BeanWithMap();
-    Map<Object, Object> map = new HashMap<Object, Object>();
+    Map<Object, Object> map = new HashMap<>();
     map.put(Integer.valueOf(1), Integer.valueOf(2));
     map.put(Integer.valueOf(4), Integer.valueOf(3));
     bean.setMap(map);
@@ -204,7 +203,7 @@ public class JsonBeanTest {
   }
 
   public static class BeanWithMap {
-    private Map<Object, Object> m_map = new HashMap<Object, Object>();
+    private Map<Object, Object> m_map = new HashMap<>();
 
     public Map getMap() {
       return m_map;

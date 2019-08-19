@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,12 +58,12 @@ public class FormFieldInjectionTest {
     FormFieldInjectionTestForm form = new FormFieldInjectionTestForm(injection);
 
     // build expected filterFields container field lists
-    List<List<ICompositeField>> expectedFilterFieldsContainerFields = new ArrayList<List<ICompositeField>>();
+    List<List<ICompositeField>> expectedFilterFieldsContainerFields = new ArrayList<>();
     expectedFilterFieldsContainerFields.add(Arrays.<ICompositeField> asList(form.getMainBox()));
     expectedFilterFieldsContainerFields.add(Arrays.<ICompositeField> asList(form.getMainBox(), form.getTopBox()));
 
     // build expected injectFields container field lists -> is just the reverse list of filterFields, because it starts client-first
-    List<List<ICompositeField>> expectedInjectFieldsContainerFields = new ArrayList<List<ICompositeField>>(expectedFilterFieldsContainerFields);
+    List<List<ICompositeField>> expectedInjectFieldsContainerFields = new ArrayList<>(expectedFilterFieldsContainerFields);
     Collections.reverse(expectedInjectFieldsContainerFields);
 
     // verify container fields
@@ -76,19 +73,19 @@ public class FormFieldInjectionTest {
 
   public static class TestingFormFieldInjection implements IFormFieldInjection {
 
-    private final List<List<ICompositeField>> m_injectFieldsContainerFields = new ArrayList<List<ICompositeField>>();
-    private final List<List<ICompositeField>> m_filterFieldsContainerFields = new ArrayList<List<ICompositeField>>();
+    private final List<List<ICompositeField>> m_injectFieldsContainerFields = new ArrayList<>();
+    private final List<List<ICompositeField>> m_filterFieldsContainerFields = new ArrayList<>();
 
     @Override
     public void injectFields(IFormField container, OrderedCollection<IFormField> fields) {
       System.out.println("injectFields: " + container);
-      m_injectFieldsContainerFields.add(new ArrayList<ICompositeField>(FormFieldInjectionThreadLocal.getContainerFields()));
+      m_injectFieldsContainerFields.add(new ArrayList<>(FormFieldInjectionThreadLocal.getContainerFields()));
     }
 
     @Override
     public void filterFields(IFormField container, List<Class<? extends IFormField>> fieldList) {
       System.out.println("filterFields: " + container);
-      m_filterFieldsContainerFields.add(new ArrayList<ICompositeField>(FormFieldInjectionThreadLocal.getContainerFields()));
+      m_filterFieldsContainerFields.add(new ArrayList<>(FormFieldInjectionThreadLocal.getContainerFields()));
     }
 
     public List<List<ICompositeField>> getInjectFieldsContainerFields() {

@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.notification.INotificationListener;
 import org.eclipse.scout.rt.shared.session.SessionEvent;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -76,15 +75,11 @@ public class AbstractObservableNotificationHandlerTest {
   public void testListenerInModelJob_SingleSession() {
     final AbstractObservableNotificationHandler<Serializable> testHandler = createGlobalHandler();
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        final CountCondition cc = new CountCondition(1);
-        testHandler.addListener(createVerifyingListener(cc, m_testSession1));
-        testHandler.notifyListenersOfAllSessions(m_testNotification);
-        cc.waitFor();
-      }
+    ModelJobs.schedule(() -> {
+      final CountCondition cc = new CountCondition(1);
+      testHandler.addListener(createVerifyingListener(cc, m_testSession1));
+      testHandler.notifyListenersOfAllSessions(m_testNotification);
+      cc.waitFor();
     }, ModelJobs
         .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
         .awaitDone();
@@ -94,31 +89,23 @@ public class AbstractObservableNotificationHandlerTest {
   public void testListenerInModelJob_MultipleSessions() {
     final AbstractObservableNotificationHandler<Serializable> testHandler = createGlobalHandler();
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        final CountCondition cc = new CountCondition(2);
-        testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
-        testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
-        testHandler.notifyListenersOfAllSessions(m_testNotification);
-        assertEquals(m_testSession1, IClientSession.CURRENT.get());
-        cc.waitFor();
-      }
+    ModelJobs.schedule(() -> {
+      final CountCondition cc = new CountCondition(2);
+      testHandler.addListener(m_testSession1, createVerifyingListener(cc, m_testSession1));
+      testHandler.addListener(m_testSession2, createVerifyingListener(cc, m_testSession2));
+      testHandler.notifyListenersOfAllSessions(m_testNotification);
+      assertEquals(m_testSession1, IClientSession.CURRENT.get());
+      cc.waitFor();
     }, ModelJobs
         .newInput(ClientRunContexts.empty().withSession(m_testSession1, true)))
         .awaitDone();
   }
 
   private INotificationListener<Serializable> createVerifyingListener(final CountCondition cc, final IClientSession session) {
-    return new INotificationListener<Serializable>() {
-
-      @Override
-      public void handleNotification(Serializable notification) {
-        assertEquals(session, IClientSession.CURRENT.get());
-        assertEquals(m_testNotification, notification);
-        cc.countDown();
-      }
+    return notification -> {
+      assertEquals(session, IClientSession.CURRENT.get());
+      assertEquals(m_testNotification, notification);
+      cc.countDown();
     };
   }
 

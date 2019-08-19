@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.inventory.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -286,41 +281,35 @@ public class JandexInventoryBuilderTest {
     final CountDownLatch waitInsideLock2 = new CountDownLatch(1);
     final CountDownLatch isAfterLock1 = new CountDownLatch(1);
     final CountDownLatch isAfterLock2 = new CountDownLatch(1);
-    Callable<String> job1 = new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        isBeforeLock.countDown();
-        waitBeforeLock1.await();
-        String s = null;
-        try (LockedFile r = new LockedFile(f)) {
-          isInsideLock1.countDown();
-          waitInsideLock1.await();
-          //read
-          s = nioRead(r);
-          //write
-          nioWrite(r, "job1");
-        }
-        isAfterLock1.countDown();
-        return s;
+    Callable<String> job1 = () -> {
+      isBeforeLock.countDown();
+      waitBeforeLock1.await();
+      String s = null;
+      try (LockedFile r = new LockedFile(f)) {
+        isInsideLock1.countDown();
+        waitInsideLock1.await();
+        //read
+        s = nioRead(r);
+        //write
+        nioWrite(r, "job1");
       }
+      isAfterLock1.countDown();
+      return s;
     };
-    Callable<String> job2 = new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        isBeforeLock.countDown();
-        waitBeforeLock2.await();
-        String s = null;
-        try (LockedFile r = new LockedFile(f)) {
-          isInsideLock2.countDown();
-          waitInsideLock2.await();
-          //read
-          s = nioRead(r);
-          //write
-          nioWrite(r, "job2");
-        }
-        isAfterLock2.countDown();
-        return s;
+    Callable<String> job2 = () -> {
+      isBeforeLock.countDown();
+      waitBeforeLock2.await();
+      String s = null;
+      try (LockedFile r = new LockedFile(f)) {
+        isInsideLock2.countDown();
+        waitInsideLock2.await();
+        //read
+        s = nioRead(r);
+        //write
+        nioWrite(r, "job2");
       }
+      isAfterLock2.countDown();
+      return s;
     };
     IFuture<String> f1 = Jobs.schedule(job1, Jobs.newInput());
     IFuture<String> f2 = Jobs.schedule(job2, Jobs.newInput());

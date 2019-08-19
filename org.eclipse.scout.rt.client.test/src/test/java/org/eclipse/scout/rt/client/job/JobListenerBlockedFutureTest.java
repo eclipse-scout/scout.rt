@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.client.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +31,6 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
@@ -67,12 +63,8 @@ public class JobListenerBlockedFutureTest {
 
     IClientSession clientSession = mock(IClientSession.class);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withRunContext(ClientRunContexts.empty().withSession(clientSession, true)));
 
@@ -120,26 +112,18 @@ public class JobListenerBlockedFutureTest {
     final JobInput modelJobInput = ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession, true));
 
     // start recording of events
-    outerFuture = Jobs.getJobManager().schedule(new IRunnable() {
+    outerFuture = Jobs.getJobManager().schedule(() -> {
+      innerFuture.set(Jobs.getJobManager().schedule(() -> {
+        condition.setBlocking(false);
 
-      @Override
-      public void run() throws Exception {
-        innerFuture.set(Jobs.getJobManager().schedule(new IRunnable() {
+        // Wait until the outer future is re-acquiring the mutex.
+        JobTestUtil.waitForPermitCompetitors(modelJobInput.getExecutionSemaphore(), 2); // 2=outer-job + inner-job
+      }, modelJobInput.copy()
+          .withName("inner")
+          .withExecutionTrigger(Jobs.newExecutionTrigger()
+              .withStartIn(2, TimeUnit.SECONDS))));
 
-          @Override
-          public void run() throws Exception {
-            condition.setBlocking(false);
-
-            // Wait until the outer future is re-acquiring the mutex.
-            JobTestUtil.waitForPermitCompetitors(modelJobInput.getExecutionSemaphore(), 2); // 2=outer-job + inner-job
-          }
-        }, modelJobInput.copy()
-            .withName("inner")
-            .withExecutionTrigger(Jobs.newExecutionTrigger()
-                .withStartIn(2, TimeUnit.SECONDS))));
-
-        condition.waitFor();
-      }
+      condition.waitFor();
     }, modelJobInput.copy()
         .withName("outer"));
 

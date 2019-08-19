@@ -10,17 +10,9 @@
  */
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,13 +68,7 @@ public class ClusterSynchronizationServiceTest {
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(TestClusterMom.class)));
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer(new IBeanInstanceProducer<IMomImplementor>() {
-
-      @Override
-      public IMomImplementor produce(IBean<IMomImplementor> bean) {
-        return m_nullMomImplementorSpy;
-      }
-    })));
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));
     // verify that replacement works
     assertSame("NullMomImplementor-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
 

@@ -52,7 +52,7 @@ public class TableEventOrderTest {
       table.setTableChanging(false);
     }
 
-    List<Integer> eventTypes = new ArrayList<Integer>();
+    List<Integer> eventTypes = new ArrayList<>();
     for (TableEvent event : tableListener.getBatch()) {
       eventTypes.add(event.getType());
     }

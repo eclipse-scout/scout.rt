@@ -59,7 +59,7 @@ public class ClientSessionDisposeTest {
     TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
 
     IClientSession session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
-    WeakReference<IClientSession> ref = new WeakReference<IClientSession>(session);
+    WeakReference<IClientSession> ref = new WeakReference<>(session);
 
     session.stop();
     assertTrue(session.isStopping());

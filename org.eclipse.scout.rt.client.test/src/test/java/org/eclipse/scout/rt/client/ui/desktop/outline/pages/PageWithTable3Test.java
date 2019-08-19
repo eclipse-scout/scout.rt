@@ -69,7 +69,7 @@ public class PageWithTable3Test {
   }
 
   private static void assertSortState(PageWithTable.Table table, List<Integer> expectedValues, List<Integer> expectedExplicitSortIndices) {
-    List<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
+    List<Integer> actualExplicitSortIndices = new ArrayList<>();
     for (IColumn<?> c : table.getColumnSet().getSortColumns()) {
       actualExplicitSortIndices.add(c.getColumnIndex());
     }

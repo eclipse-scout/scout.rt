@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,7 +103,7 @@ public class PlannerTest {
     planner.selectResource(resource);
     assertEquals(resource, planner.getSelectedResource());
 
-    List<Resource<Integer>> newResources = new ArrayList<Resource<Integer>>();
+    List<Resource<Integer>> newResources = new ArrayList<>();
     newResources.add(createTestResource(0));
     newResources.add(createTestResource(1));
     planner.replaceResources(newResources);
@@ -127,7 +124,7 @@ public class PlannerTest {
     planner.selectResource(resource);
     assertEquals(resource, planner.getSelectedResource());
 
-    List<Resource<Integer>> newResources = new ArrayList<Resource<Integer>>();
+    List<Resource<Integer>> newResources = new ArrayList<>();
     newResources.add(createTestResource(0));
     planner.replaceResources(newResources);
 
@@ -144,11 +141,11 @@ public class PlannerTest {
   }
 
   private Resource<Integer> createTestResource(int id) {
-    return new Resource<Integer>(id, "resource" + id);
+    return new Resource<>(id, "resource" + id);
   }
 
   private Activity<Resource<Integer>, Integer> createTestActivity(Resource<Integer> resource, int id) {
-    return new Activity<Resource<Integer>, Integer>(resource, id);
+    return new Activity<>(resource, id);
   }
 
   @Test
@@ -266,7 +263,7 @@ public class PlannerTest {
       super(owner);
     }
 
-    private static Set<ExtensionMethod> calledInterceptors = new HashSet<ExtensionMethod>();
+    private static Set<ExtensionMethod> calledInterceptors = new HashSet<>();
 
     public static Set<ExtensionMethod> getCalledInterceptors() {
       return Collections.unmodifiableSet(calledInterceptors);

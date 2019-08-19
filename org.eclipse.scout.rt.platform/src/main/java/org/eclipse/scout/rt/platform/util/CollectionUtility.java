@@ -724,7 +724,7 @@ public final class CollectionUtility {
       return emptyHashSet();
     }
 
-    HashSet<T> set = new HashSet<T>(1);
+    HashSet<T> set = new HashSet<>(1);
     set.add(value);
     return set;
   }

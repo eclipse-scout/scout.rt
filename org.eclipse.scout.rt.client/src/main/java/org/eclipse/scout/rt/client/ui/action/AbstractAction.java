@@ -143,8 +143,6 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
    * <li>f11 (IKeyStroke.F11)
    * <li>alt-f11 (combineKeyStrokes(IKeyStroke.ALT,IKeyStroke.F11))
    * </ul>
-   *
-   * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(55)
@@ -468,7 +466,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
       return false;
     }
 
-    AtomicReference<Boolean> result = new AtomicReference<Boolean>(true);
+    AtomicReference<Boolean> result = new AtomicReference<>(true);
     Predicate<IWidget> visitor = widget -> {
       if (!(widget instanceof IActionNode)) {
         return false; // cancel traversal

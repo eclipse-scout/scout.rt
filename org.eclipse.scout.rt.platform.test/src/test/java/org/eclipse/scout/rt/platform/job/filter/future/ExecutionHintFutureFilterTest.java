@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.filter.future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.TimeUnit;
@@ -34,21 +33,13 @@ public class ExecutionHintFutureFilterTest {
         .withExecutionHint("ui-interaction-required"));
 
     // job2
-    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        IFuture.CURRENT.get().removeExecutionHint("ui-interaction-required");
-      }
+    IFuture<Void> future2 = Jobs.schedule(() -> {
+      IFuture.CURRENT.get().removeExecutionHint("ui-interaction-required");
     }, Jobs.newInput().withExecutionHint("ui-interaction-required"));
 
     // job3
-    IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        IFuture.CURRENT.get().addExecutionHint("ui-interaction-required");
-      }
+    IFuture<Void> future3 = Jobs.schedule(() -> {
+      IFuture.CURRENT.get().addExecutionHint("ui-interaction-required");
     }, Jobs.newInput());
 
     // job4

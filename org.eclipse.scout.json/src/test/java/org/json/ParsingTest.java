@@ -268,7 +268,7 @@ public class ParsingTest extends TestCase {
   private Object canonicalize(Object input) throws JSONException {
     if (input instanceof JSONArray) {
       JSONArray array = (JSONArray) input;
-      List<Object> result = new ArrayList<Object>();
+      List<Object> result = new ArrayList<>();
       for (int i = 0; i < array.length(); i++) {
         result.add(canonicalize(array.opt(i)));
       }
@@ -276,7 +276,7 @@ public class ParsingTest extends TestCase {
     }
     else if (input instanceof JSONObject) {
       JSONObject object = (JSONObject) input;
-      Map<String, Object> result = new HashMap<String, Object>();
+      Map<String, Object> result = new HashMap<>();
       for (Iterator<?> i = object.keys(); i.hasNext();) {
         String key = (String) i.next();
         result.put(key, canonicalize(object.get(key)));

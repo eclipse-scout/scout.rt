@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,7 +31,7 @@ public class LookupRowTest {
    */
   @Test
   public void testCreateEmpty() {
-    ILookupRow<String> row = new LookupRow<String>((String) null, (String) null);
+    ILookupRow<String> row = new LookupRow<>((String) null, (String) null);
     assertNull(row.getKey());
     assertNull(row.getText());
     assertNull(row.getTooltipText());
@@ -121,7 +118,7 @@ public class LookupRowTest {
    */
   @Test
   public void testSerializeDeserialize() throws IOException, ClassNotFoundException {
-    ILookupRow<String> row = new LookupRow<String>("key", "text");
+    ILookupRow<String> row = new LookupRow<>("key", "text");
     byte[] data = serialize(row);
     Object obj = deserialize(data);
 

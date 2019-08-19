@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class CacheRegistryServiceTest {
   public void testRegistry() {
     CacheRegistryService s = new CacheRegistryService();
     String testKey = "testkey";
-    BasicCache<String, String> testCache = new BasicCache<String, String>(testKey, mock(ICacheValueResolver.class), new HashMap<String, String>(), false);
+    BasicCache<String, String> testCache = new BasicCache<String, String>(testKey, mock(ICacheValueResolver.class), new HashMap<>(), false);
     s.register(testCache);
     assertEquals(testCache, s.get(testKey));
   }

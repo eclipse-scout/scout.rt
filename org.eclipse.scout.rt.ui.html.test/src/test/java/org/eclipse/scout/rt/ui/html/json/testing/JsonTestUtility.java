@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 public final class JsonTestUtility {
@@ -74,12 +73,9 @@ public final class JsonTestUtility {
     Mockito.when(httpSession.getAttribute(HttpSessionMutex.SESSION_MUTEX_ATTRIBUTE_NAME)).thenReturn(sessionMutex);
     final ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     Mockito.when(httpSession.getAttribute(HttpSessionHelper.SESSION_STORE_ATTRIBUTE_NAME)).thenReturn(sessionStore);
-    Mockito.doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) {
-        ((HttpSessionBindingListener) sessionStore).valueUnbound(null);
-        return null;
-      }
+    Mockito.doAnswer((Answer<Void>) invocation -> {
+      ((HttpSessionBindingListener) sessionStore).valueUnbound(null);
+      return null;
     }).when(httpSession).invalidate();
     return httpSession;
   }

@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -51,32 +48,28 @@ public class JobCancelTest {
 
   @Test
   public void testCancelSoft() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("cancelled-before");
-        }
-
-        try {
-          setupLatch.countDownAndBlock(2, TimeUnit.SECONDS);
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted");
-        }
-
-        if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("cancelled-after");
-        }
-
-        verifyLatch.countDown();
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("cancelled-before");
       }
+
+      try {
+        setupLatch.countDownAndBlock(2, TimeUnit.SECONDS);
+      }
+      catch (InterruptedException e) {
+        protocol.add("interrupted");
+      }
+
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("cancelled-after");
+      }
+
+      verifyLatch.countDown();
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     assertTrue(setupLatch.await());
@@ -95,32 +88,28 @@ public class JobCancelTest {
 
   @Test
   public void testCancelForce() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("cancelled-before");
-        }
-
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted");
-        }
-
-        if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("cancelled-after");
-        }
-
-        verifyLatch.countDown();
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("cancelled-before");
       }
+
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("interrupted");
+      }
+
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("cancelled-after");
+      }
+
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -141,14 +130,10 @@ public class JobCancelTest {
 
   @Test
   public void testCancelBeforeRunning() throws Exception {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("running");
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      protocol.add("running");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -172,14 +157,10 @@ public class JobCancelTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (count.incrementAndGet() == 3) {
-          setupLatch.countDown();
-          verifyLatch.await();
-        }
+    final IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (count.incrementAndGet() == 3) {
+        setupLatch.countDown();
+        verifyLatch.await();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -210,43 +191,35 @@ public class JobCancelTest {
       // must be a subclass in order to replace JobManager
     });
     try {
-      final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+      final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
       final BlockingCountDownLatch latch = new BlockingCountDownLatch(2);
 
-      Jobs.getJobManager().schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          protocol.add("running-1");
-          try {
-            latch.countDownAndBlock();
-          }
-          catch (InterruptedException e) {
-            protocol.add("interrupted-1");
-          }
-          finally {
-            protocol.add("done-1");
-          }
+      Jobs.getJobManager().schedule(() -> {
+        protocol.add("running-1");
+        try {
+          latch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("interrupted-1");
+        }
+        finally {
+          protocol.add("done-1");
         }
       }, Jobs.newInput()
           .withRunContext(RunContexts.copyCurrent())
           .withExceptionHandling(null, false));
 
-      IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          protocol.add("running-2");
-          try {
-            latch.countDownAndBlock();
-          }
-          catch (InterruptedException e) {
-            protocol.add("interrupted-2");
-          }
-          finally {
-            protocol.add("done-2");
-          }
+      IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+        protocol.add("running-2");
+        try {
+          latch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("interrupted-2");
+        }
+        finally {
+          protocol.add("done-2");
         }
       }, Jobs.newInput()
           .withRunContext(RunContexts.copyCurrent())
@@ -281,7 +254,7 @@ public class JobCancelTest {
    */
   @Test
   public void testCancelChildJob() throws Exception {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(2);
     final BlockingCountDownLatch job2DoneLatch = new BlockingCountDownLatch(1);
@@ -289,51 +262,43 @@ public class JobCancelTest {
 
     final AtomicReference<IFuture<?>> childFutureRef = new AtomicReference<>();
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(() -> {
 
-      @Override
-      public void run() throws Exception {
-
-        //attach to child runmonitor -> nested cancel
-        IFuture<?> childFuture = Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              setupLatch.countDownAndBlock();
-            }
-            catch (InterruptedException e) {
-              protocol.add("job-2-interrupted");
-            }
-            if (IFuture.CURRENT.get().isCancelled()) {
-              protocol.add("job-2-cancelled (future)");
-            }
-            if (RunMonitor.CURRENT.get().isCancelled()) {
-              protocol.add("job-2-cancelled (monitor)");
-            }
-            job2DoneLatch.countDown();
-            verifyLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())
-            .withName("job-2")
-            .withExceptionHandling(null, false));
-        childFutureRef.set(childFuture);
-
+      //attach to child runmonitor -> nested cancel
+      IFuture<?> childFuture = Jobs.getJobManager().schedule(() -> {
         try {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          protocol.add("job-1-interrupted");
+          protocol.add("job-2-interrupted");
         }
         if (IFuture.CURRENT.get().isCancelled()) {
-          protocol.add("job-1-cancelled (future)");
+          protocol.add("job-2-cancelled (future)");
         }
         if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("job-1-cancelled (monitor)");
+          protocol.add("job-2-cancelled (monitor)");
         }
+        job2DoneLatch.countDown();
         verifyLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())
+          .withName("job-2")
+          .withExceptionHandling(null, false));
+      childFutureRef.set(childFuture);
+
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job-1-interrupted");
+      }
+      if (IFuture.CURRENT.get().isCancelled()) {
+        protocol.add("job-1-cancelled (future)");
+      }
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("job-1-cancelled (monitor)");
+      }
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-1"));
@@ -355,79 +320,67 @@ public class JobCancelTest {
    */
   @Test
   public void testCancelParentJob() throws Exception {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>());
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch job1DoneLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        //re-use runmonitor -> nested cancel
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              setupLatch.countDownAndBlock();
-            }
-            catch (InterruptedException e) {
-              protocol.add("job-2-interrupted");
-            }
-            if (IFuture.CURRENT.get().isCancelled()) {
-              protocol.add("job-2-cancelled (future)");
-            }
-            if (RunMonitor.CURRENT.get().isCancelled()) {
-              protocol.add("job-2-cancelled (monitor)");
-            }
-            verifyLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())
-            .withName("job-2")
-            .withExceptionHandling(null, false));
-
-        //does not re-use runmonitor -> no nested cancel
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              setupLatch.countDownAndBlock();
-            }
-            catch (InterruptedException e) {
-              protocol.add("job-3-interrupted");
-            }
-            if (IFuture.CURRENT.get().isCancelled()) {
-              protocol.add("job-3-cancelled (future)");
-            }
-            if (RunMonitor.CURRENT.get().isCancelled()) {
-              protocol.add("job-3-cancelled (monitor)");
-            }
-            verifyLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
-            .withName("job-3")
-            .withExceptionHandling(null, false));
-
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(() -> {
+      //re-use runmonitor -> nested cancel
+      Jobs.getJobManager().schedule(() -> {
         try {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          protocol.add("job-1-interrupted");
+          protocol.add("job-2-interrupted");
         }
         if (IFuture.CURRENT.get().isCancelled()) {
-          protocol.add("job-1-cancelled (future)");
+          protocol.add("job-2-cancelled (future)");
         }
         if (RunMonitor.CURRENT.get().isCancelled()) {
-          protocol.add("job-1-cancelled (monitor)");
+          protocol.add("job-2-cancelled (monitor)");
         }
-        job1DoneLatch.countDown();
         verifyLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())
+          .withName("job-2")
+          .withExceptionHandling(null, false));
+
+      //does not re-use runmonitor -> no nested cancel
+      Jobs.getJobManager().schedule(() -> {
+        try {
+          setupLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("job-3-interrupted");
+        }
+        if (IFuture.CURRENT.get().isCancelled()) {
+          protocol.add("job-3-cancelled (future)");
+        }
+        if (RunMonitor.CURRENT.get().isCancelled()) {
+          protocol.add("job-3-cancelled (monitor)");
+        }
+        verifyLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
+          .withName("job-3")
+          .withExceptionHandling(null, false));
+
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job-1-interrupted");
+      }
+      if (IFuture.CURRENT.get().isCancelled()) {
+        protocol.add("job-1-cancelled (future)");
+      }
+      if (RunMonitor.CURRENT.get().isCancelled()) {
+        protocol.add("job-1-cancelled (monitor)");
+      }
+      job1DoneLatch.countDown();
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName("job-1"));
@@ -452,7 +405,7 @@ public class JobCancelTest {
    */
   @Test
   public void testCancelMultipleJobsByName() throws Exception {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>());
 
     final String commonJobName = "777";
 
@@ -460,18 +413,14 @@ public class JobCancelTest {
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(4);
 
     // Job-1 (common-id) => CANCEL
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job-1-interrupted");
-        }
-        verifyLatch.countDown();
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job-1-interrupted");
+      }
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
@@ -479,18 +428,14 @@ public class JobCancelTest {
         .withExceptionHandling(null, false));
 
     // Job-2 (common-id) => CANCEL
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job-2-interrupted");
-        }
-        verifyLatch.countDown();
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job-2-interrupted");
+      }
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
@@ -498,71 +443,55 @@ public class JobCancelTest {
         .withExceptionHandling(null, false));
 
     // Job-3 (common-id) => CANCEL
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // Job-3a (other name, same re-used runMonitor => CANCEL AS WELL)
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              setupLatch.countDownAndBlock();
-            }
-            catch (InterruptedException e) {
-              protocol.add("job-3a-interrupted");
-            }
-            verifyLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())
-            .withName("otherName")
-            .withExecutionSemaphore(null)
-            .withExceptionHandling(null, false));
-
-        // Job-3b (other name, other runMonitor => NO CANCEL)
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            try {
-              setupLatch.countDownAndBlock();
-            }
-            catch (InterruptedException e) {
-              protocol.add("job-3b-interrupted");
-            }
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
-            .withName("otherName")
-            .withExecutionSemaphore(null)
-            .withExceptionHandling(null, false));
-
+    Jobs.getJobManager().schedule(() -> {
+      // Job-3a (other name, same re-used runMonitor => CANCEL AS WELL)
+      Jobs.getJobManager().schedule(() -> {
         try {
           setupLatch.countDownAndBlock();
         }
         catch (InterruptedException e) {
-          protocol.add("job-3-interrupted");
+          protocol.add("job-3a-interrupted");
         }
         verifyLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())
+          .withName("otherName")
+          .withExecutionSemaphore(null)
+          .withExceptionHandling(null, false));
+
+      // Job-3b (other name, other runMonitor => NO CANCEL)
+      Jobs.getJobManager().schedule(() -> {
+        try {
+          setupLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("job-3b-interrupted");
+        }
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent().withRunMonitor(new RunMonitor()))
+          .withName("otherName")
+          .withExecutionSemaphore(null)
+          .withExceptionHandling(null, false));
+
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job-3-interrupted");
+      }
+      verifyLatch.countDown();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withName(commonJobName)
         .withExecutionSemaphore(null));
 
     // Job-4 (common-id, but not-null mutex)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job-4-interrupted");
-        }
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("job-4-interrupted");
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
@@ -593,13 +522,7 @@ public class JobCancelTest {
 
     // 2. Schedule the job (should never)
     final AtomicBoolean executed = new AtomicBoolean(false);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        executed.set(true);
-      }
-    }, Jobs.newInput().withRunContext(runContext));
+    IFuture<Void> future = Jobs.schedule(() -> executed.set(true), Jobs.newInput().withRunContext(runContext));
 
     future.awaitDone();
     assertFalse(executed.get());
@@ -621,13 +544,7 @@ public class JobCancelTest {
 
     // 2. Schedule the job (should never)
     final AtomicBoolean executed = new AtomicBoolean(false);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        executed.set(true);
-      }
-    }, Jobs.newInput().withRunContext(runContext));
+    IFuture<Void> future = Jobs.schedule(() -> executed.set(true), Jobs.newInput().withRunContext(runContext));
 
     future.awaitFinished(1, TimeUnit.MINUTES);
     assertFalse(executed.get());
@@ -644,27 +561,19 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(null));
 
-      @Override
-      public void run() throws Exception {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(null));
-
-        setupLatch.await();
-        RunMonitor.CURRENT.get().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertFalse("no nested cancellation expected", cancelled.get());
-      }
+      setupLatch.await();
+      RunMonitor.CURRENT.get().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertFalse("no nested cancellation expected", cancelled.get());
     });
   }
 
@@ -676,27 +585,19 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent()));
 
-      @Override
-      public void run() throws Exception {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent()));
-
-        setupLatch.await();
-        RunMonitor.CURRENT.get().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertTrue("nested cancellation expected", cancelled.get());
-      }
+      setupLatch.await();
+      RunMonitor.CURRENT.get().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertTrue("nested cancellation expected", cancelled.get());
     });
   }
 
@@ -708,27 +609,19 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.empty()));
 
-      @Override
-      public void run() throws Exception {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.empty()));
-
-        setupLatch.await();
-        RunMonitor.CURRENT.get().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertFalse("no nested cancellation expected", cancelled.get()); // RunMonitor of context is not associated with the current monitor
-      }
+      setupLatch.await();
+      RunMonitor.CURRENT.get().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertFalse("no nested cancellation expected", cancelled.get()); // RunMonitor of context is not associated with the current monitor
     });
   }
 
@@ -740,28 +633,20 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      RunContext emptyRunContext = RunContexts.empty();
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(emptyRunContext));
 
-      @Override
-      public void run() throws Exception {
-        RunContext emptyRunContext = RunContexts.empty();
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(emptyRunContext));
-
-        setupLatch.await();
-        emptyRunContext.getRunMonitor().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertTrue("cancellation expected", cancelled.get());
-      }
+      setupLatch.await();
+      emptyRunContext.getRunMonitor().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertTrue("cancellation expected", cancelled.get());
     });
   }
 
@@ -773,27 +658,19 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.empty().withRunMonitor(RunMonitor.CURRENT.get())));
 
-      @Override
-      public void run() throws Exception {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.empty().withRunMonitor(RunMonitor.CURRENT.get())));
-
-        setupLatch.await();
-        RunMonitor.CURRENT.get().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertTrue("no nested cancellation expected", cancelled.get());
-      }
+      setupLatch.await();
+      RunMonitor.CURRENT.get().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertTrue("no nested cancellation expected", cancelled.get());
     });
   }
 
@@ -805,27 +682,19 @@ public class JobCancelTest {
     final AtomicBoolean cancelled = new AtomicBoolean();
 
     // Run test within RunContext to ensure a current RunMonitor
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      Jobs.schedule(() -> {
+        setupLatch.countDownAndBlock();
+        cancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        assertLatch.countDown();
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))));
 
-      @Override
-      public void run() throws Exception {
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            setupLatch.countDownAndBlock();
-            cancelled.set(RunMonitor.CURRENT.get().isCancelled());
-            assertLatch.countDown();
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.empty().withRunMonitor(BEANS.get(RunMonitor.class))));
-
-        setupLatch.await();
-        RunMonitor.CURRENT.get().cancel(false);
-        setupLatch.unblock();
-        assertLatch.await();
-        assertFalse(cancelled.get());
-      }
+      setupLatch.await();
+      RunMonitor.CURRENT.get().cancel(false);
+      setupLatch.unblock();
+      assertLatch.await();
+      assertFalse(cancelled.get());
     });
   }
 
@@ -837,15 +706,12 @@ public class JobCancelTest {
   public void testCancelJobWithForLoop() throws InterruptedException {
     final CountDownLatch cancelLatch = new CountDownLatch(1);
     final CountDownLatch endLatch = new CountDownLatch(1);
-    IFuture<?> forLoop = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        int i = 0;
-        while (endLatch.getCount() != 0) {
-          cancelLatch.countDown();
-          if ((i++) % 1000000000 == 0) {
-            System.out.println("for-loop " + i + " in state " + IFuture.CURRENT.get().getState());
-          }
+    IFuture<?> forLoop = Jobs.schedule(() -> {
+      int i = 0;
+      while (endLatch.getCount() != 0) {
+        cancelLatch.countDown();
+        if ((i++) % 1000000000 == 0) {
+          System.out.println("for-loop " + i + " in state " + IFuture.CURRENT.get().getState());
         }
       }
     }, Jobs.newInput());

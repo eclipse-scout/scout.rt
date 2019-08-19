@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -259,7 +256,7 @@ public class JsonDesktopTest {
     JSONObject json = jsonDesktop.toJson();
     JSONArray jsonActions = json.getJSONArray("menus");
     assertEquals(2, jsonActions.length());
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     ids.add(jsonActions.getString(0));
     ids.add(jsonActions.getString(1));
     assertTrue(ids.contains(jsonDisplayableMenu.getId()));

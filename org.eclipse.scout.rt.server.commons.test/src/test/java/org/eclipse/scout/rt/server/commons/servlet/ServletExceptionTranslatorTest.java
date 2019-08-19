@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -58,85 +56,43 @@ public class ServletExceptionTranslatorTest {
 
   @Test
   public void testTranslate() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return throwable;
-      }
-    });
+    testTranslate(throwable -> throwable);
   }
 
   @Test
   public void testTranslateWithExecutionException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new ExecutionException(throwable);
-      }
-    });
+    testTranslate(throwable -> new ExecutionException(throwable));
   }
 
   @Test
   public void testTranslateWithExecutionException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new ExecutionException(
-            new ExecutionException(
-                throwable));
-      }
-    });
+    testTranslate(throwable -> new ExecutionException(
+        new ExecutionException(
+            throwable)));
   }
 
   @Test
   public void testTranslateWithUndeclaredThrowableException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(throwable);
-      }
-    });
+    testTranslate(throwable -> new UndeclaredThrowableException(throwable));
   }
 
   @Test
   public void testTranslateWithUndeclaredThrowableException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(
-            new UndeclaredThrowableException(
-                throwable));
-      }
-    });
+    testTranslate(throwable -> new UndeclaredThrowableException(
+        new UndeclaredThrowableException(
+            throwable)));
   }
 
   @Test
   public void testTranslateWithInvocationTargetException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(throwable);
-      }
-    });
+    testTranslate(throwable -> new InvocationTargetException(throwable));
   }
 
   @Test
   public void testTranslateWithInvocationTargetException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(
-            new InvocationTargetException(
-                throwable));
-      }
-    });
+    testTranslate(throwable -> new InvocationTargetException(
+        new InvocationTargetException(
+            throwable)));
   }
 
   private void testTranslate(IThrowableProducer throwableProducer) {

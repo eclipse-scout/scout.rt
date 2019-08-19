@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
@@ -100,7 +99,7 @@ public class PlatformTestRunnerTransactionTest {
 
   protected static Result runServerTestRunner(String testMethod, boolean expectingTestFails, boolean expectingCommit) throws Exception {
     final Class<?> testClass = PlatformTestRunnerTransactionTestFixture.class;
-    final FinalValue<PlatformTestRunnerTransactionTestFixture> testInstance = new FinalValue<PlatformTestRunnerTransactionTestFixture>();
+    final FinalValue<PlatformTestRunnerTransactionTestFixture> testInstance = new FinalValue<>();
     final PlatformTestRunner serverTestRunner = new PlatformTestRunner(PlatformTestRunnerTransactionTestFixture.class) {
       @Override
       protected Object createTest() throws Exception {

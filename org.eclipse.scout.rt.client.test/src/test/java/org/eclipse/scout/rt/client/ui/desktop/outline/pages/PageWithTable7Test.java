@@ -68,7 +68,7 @@ public class PageWithTable7Test {
   }
 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
-    public List<String> m_protocol = new ArrayList<String>();
+    public List<String> m_protocol = new ArrayList<>();
     public int m_counter = 0;
     private String[] m_data = new String[]{"first", "second", "third", "fourth"};
 

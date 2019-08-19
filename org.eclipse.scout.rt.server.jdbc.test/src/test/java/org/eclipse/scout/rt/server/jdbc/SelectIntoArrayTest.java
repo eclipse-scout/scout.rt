@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jdbc;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -78,7 +75,7 @@ public class SelectIntoArrayTest {
   public void testSelectIntoBeanArray() throws Exception {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
-    BeanArrayHolder<MyBean> h = new BeanArrayHolder<SelectIntoArrayTest.MyBean>(MyBean.class);
+    BeanArrayHolder<MyBean> h = new BeanArrayHolder<>(MyBean.class);
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{h.active},:{h.state},:{h.name}", new NVPair("h", h));
     MyBean[] a = h.getBeans();
     assertNotNull(a);
@@ -118,7 +115,7 @@ public class SelectIntoArrayTest {
     SqlServiceMock sql = createSqlServiceMock(DATA);
     //
     Object[][] expectedData = DATA;
-    BeanArrayHolder<MyFormData> h = new BeanArrayHolder<SelectIntoArrayTest.MyFormData>(MyFormData.class);
+    BeanArrayHolder<MyFormData> h = new BeanArrayHolder<>(MyFormData.class);
     sql.selectInto("SELECT A,B,C FROM T WHERE D=0 INTO :{h.active},:{h.state},:{h.name}", new NVPair("h", h));
     MyFormData[] a = h.getBeans();
     assertNotNull(a);
@@ -231,7 +228,7 @@ public class SelectIntoArrayTest {
     SqlServiceMock sql = createSqlServiceMock(ROLES_DATA);
     //
 
-    Holder<List> rolesHolder = new Holder<List>(List.class);
+    Holder<List> rolesHolder = new Holder<>(List.class);
 
     sql.selectInto("SELECT ROLE_NR FROM USER_ROLE WHERE USER_NR = :personNr INTO :{roles}", new NVPair("personNr", 63L), new NVPair("roles", rolesHolder));
     List r = rolesHolder.getValue();

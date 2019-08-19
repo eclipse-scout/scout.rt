@@ -35,7 +35,7 @@ public class JsonCompositeField<COMPOSITE_FIELD extends ICompositeField, F exten
     putJsonProperty(new JsonAdapterProperty<COMPOSITE_FIELD>(ICompositeField.PROP_FIELDS, model, getUiSession()) {
       @Override
       protected JsonAdapterPropertyConfig createConfig() {
-        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableFormFieldFilter<IFormField>()).build();
+        return new JsonAdapterPropertyConfigBuilder().filter(new DisplayableFormFieldFilter<>()).build();
       }
 
       @Override

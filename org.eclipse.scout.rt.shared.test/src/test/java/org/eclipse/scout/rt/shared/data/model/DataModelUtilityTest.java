@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,24 +38,21 @@ public class DataModelUtilityTest {
     CustomDataModel dataModel = new CustomDataModel();
     dataModel.init();
     //
-    IDataModelVisitor v = new IDataModelVisitor() {
-      @Override
-      public void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf) {
-        buf.append(prefix);
-        buf.append("[" + o.getClass().getName() + "] ");
-        if (o instanceof IDataModel) {
-          buf.append("DataModel");
-        }
-        else if (o instanceof IDataModelAttribute) {
-          IDataModelAttribute x = (IDataModelAttribute) o;
-          buf.append(x.getText() + " (type-" + x.getType() + ") " + DataModelUtility.attributePathToExternalId(m, ePath.addToEnd(x)));
-        }
-        else if (o instanceof IDataModelEntity) {
-          IDataModelEntity x = (IDataModelEntity) o;
-          buf.append(x.getText() + " " + DataModelUtility.entityPathToExternalId(m, ePath));
-        }
-        buf.append("\n");
+    IDataModelVisitor v = (m, ePath, o, prefix, buf) -> {
+      buf.append(prefix);
+      buf.append("[" + o.getClass().getName() + "] ");
+      if (o instanceof IDataModel) {
+        buf.append("DataModel");
       }
+      else if (o instanceof IDataModelAttribute) {
+        IDataModelAttribute x = (IDataModelAttribute) o;
+        buf.append(x.getText() + " (type-" + x.getType() + ") " + DataModelUtility.attributePathToExternalId(m, ePath.addToEnd(x)));
+      }
+      else if (o instanceof IDataModelEntity) {
+        IDataModelEntity x = (IDataModelEntity) o;
+        buf.append(x.getText() + " " + DataModelUtility.entityPathToExternalId(m, ePath));
+      }
+      buf.append("\n");
     };
     String s;
     //
@@ -76,35 +72,32 @@ public class DataModelUtilityTest {
     CustomDataModel dataModel = new CustomDataModel();
     dataModel.init();
     final AtomicInteger counter = new AtomicInteger();
-    final HashSet<Object> refSet = new HashSet<Object>();
-    final HashSet<String> externaIdSet = new HashSet<String>();
+    final HashSet<Object> refSet = new HashSet<>();
+    final HashSet<String> externaIdSet = new HashSet<>();
     //
-    IDataModelVisitor v = new IDataModelVisitor() {
-      @Override
-      public void visit(IDataModel m, EntityPath ePath, Object o, String prefix, StringBuilder buf) {
-        if (o instanceof IDataModel) {
-        }
-        else if (o instanceof IDataModelAttribute) {
-          counter.incrementAndGet();
-          IDataModelAttribute x = (IDataModelAttribute) o;
-          refSet.add(x);
-          AttributePath aPath = ePath.addToEnd(x);
-          String extId = DataModelUtility.attributePathToExternalId(m, aPath);
-          externaIdSet.add(extId);
-          AttributePath aPath2 = DataModelUtility.externalIdToAttributePath(m, extId);
-          assertEquals(aPath, aPath2);
-          assertSame(x, aPath2.getAttribute());
-        }
-        else if (o instanceof IDataModelEntity) {
-          counter.incrementAndGet();
-          IDataModelEntity x = (IDataModelEntity) o;
-          refSet.add(x);
-          String extId = DataModelUtility.entityPathToExternalId(m, ePath);
-          externaIdSet.add(extId);
-          EntityPath ePath2 = DataModelUtility.externalIdToEntityPath(m, extId);
-          assertEquals(ePath, ePath2);
-          assertSame(x, ePath2.lastElement());
-        }
+    IDataModelVisitor v = (m, ePath, o, prefix, buf) -> {
+      if (o instanceof IDataModel) {
+      }
+      else if (o instanceof IDataModelAttribute) {
+        counter.incrementAndGet();
+        IDataModelAttribute x = (IDataModelAttribute) o;
+        refSet.add(x);
+        AttributePath aPath = ePath.addToEnd(x);
+        String extId = DataModelUtility.attributePathToExternalId(m, aPath);
+        externaIdSet.add(extId);
+        AttributePath aPath2 = DataModelUtility.externalIdToAttributePath(m, extId);
+        assertEquals(aPath, aPath2);
+        assertSame(x, aPath2.getAttribute());
+      }
+      else if (o instanceof IDataModelEntity) {
+        counter.incrementAndGet();
+        IDataModelEntity x = (IDataModelEntity) o;
+        refSet.add(x);
+        String extId = DataModelUtility.entityPathToExternalId(m, ePath);
+        externaIdSet.add(extId);
+        EntityPath ePath2 = DataModelUtility.externalIdToEntityPath(m, extId);
+        assertEquals(ePath, ePath2);
+        assertSame(x, ePath2.lastElement());
       }
     };
     visit(dataModel, v, 7);

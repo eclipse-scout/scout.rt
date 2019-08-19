@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -512,7 +510,7 @@ public class AbstractTreeTest {
 
   public static class P_TreeListener implements TreeListener {
     int m_notificationCounter = 0;
-    ArrayList<TreeEvent> m_treeEvents = new ArrayList<TreeEvent>();
+    ArrayList<TreeEvent> m_treeEvents = new ArrayList<>();
 
     @Override
     public void treeChanged(TreeEvent e) {

@@ -37,7 +37,7 @@ public class JUnitExceptionHandler extends ExceptionHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(JUnitExceptionHandler.class);
 
-  private final List<Throwable> m_errors = Collections.synchronizedList(new ArrayList<Throwable>());
+  private final List<Throwable> m_errors = Collections.synchronizedList(new ArrayList<>());
 
   @Override
   public void handle(final Throwable t) {

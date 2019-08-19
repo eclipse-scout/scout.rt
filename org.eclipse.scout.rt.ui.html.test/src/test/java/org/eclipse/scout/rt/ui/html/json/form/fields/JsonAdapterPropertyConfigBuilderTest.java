@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.ui.html.json.action.DisplayableActionFilter;
@@ -47,7 +44,7 @@ public class JsonAdapterPropertyConfigBuilderTest {
 
   @Test
   public void testFilter() throws Exception {
-    DisplayableActionFilter<IAction> actionFilter = new DisplayableActionFilter<IAction>();
+    DisplayableActionFilter<IAction> actionFilter = new DisplayableActionFilter<>();
     JsonAdapterPropertyConfig config = new JsonAdapterPropertyConfigBuilder().filter(actionFilter).build();
     assertTrue(config.isDisposeOnChange());
     assertFalse(config.isGlobal());

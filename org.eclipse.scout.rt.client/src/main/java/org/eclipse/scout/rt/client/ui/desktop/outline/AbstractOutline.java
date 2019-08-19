@@ -662,7 +662,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     List<IMenu> pageMenus = page.getMenus();
     List<IMenu> inheritedMenus = computeInheritedMenusOfPage(page);
 
-    List<IMenu> result = new ArrayList<IMenu>(pageMenus.size() + inheritedMenus.size());
+    List<IMenu> result = new ArrayList<>(pageMenus.size() + inheritedMenus.size());
     result.addAll(pageMenus);
     result.addAll(inheritedMenus);
     return result;

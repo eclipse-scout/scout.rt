@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +23,6 @@ import org.eclipse.scout.rt.platform.job.internal.JobManager;
 import org.eclipse.scout.rt.platform.job.listener.IJobListener;
 import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.job.listener.JobEventType;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -65,13 +60,9 @@ public class JobStateTest {
 
     final BlockingCountDownLatch runningLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.schedule(() -> {
+      runningLatch.countDownAndBlock();
 
-      @Override
-      public void run() throws Exception {
-        runningLatch.countDownAndBlock();
-
-      }
     }, Jobs.newInput());
 
     assertTrue(runningLatch.await());
@@ -115,12 +106,8 @@ public class JobStateTest {
     final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     // Schedule job-1
-    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job1RunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future1 = Jobs.schedule(() -> {
+      job1RunningLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionSemaphore(mutex));
@@ -128,14 +115,10 @@ public class JobStateTest {
     assertTrue(job1RunningLatch.await()); // wait until running (for idempotent event assertion)
 
     // Schedule job-2
-    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job2RunningLatch.countDownAndBlock();
-        condition.waitFor();
-        job2UnblockedLatch.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.schedule(() -> {
+      job2RunningLatch.countDownAndBlock();
+      condition.waitFor();
+      job2UnblockedLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-2")
         .withExecutionSemaphore(mutex));
@@ -146,13 +129,9 @@ public class JobStateTest {
     JobTestUtil.waitForPermitCompetitors(mutex, 2);
 
     // Schedule job-3
-    IFuture<Void> future3 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job3RunningLatch.countDownAndBlock();
-        JobTestUtil.waitForPermitCompetitors(mutex, 2);
-      }
+    IFuture<Void> future3 = Jobs.schedule(() -> {
+      job3RunningLatch.countDownAndBlock();
+      JobTestUtil.waitForPermitCompetitors(mutex, 2);
     }, Jobs.newInput()
         .withName("job-3")
         .withExecutionSemaphore(mutex));
@@ -274,12 +253,8 @@ public class JobStateTest {
 
     final BlockingCountDownLatch runningLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        runningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      runningLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(2, TimeUnit.SECONDS)));
@@ -326,22 +301,18 @@ public class JobStateTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
-    final IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        workerThread.set(Thread.currentThread());
+    final IFuture<Void> future1 = Jobs.schedule(() -> {
+      workerThread.set(Thread.currentThread());
+      assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
+      try {
+        condition.waitFor("ABC");
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.interrupted());
+        Thread.currentThread().interrupt(); // Restore interrupted status
+        assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
         assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
-        try {
-          condition.waitFor("ABC");
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.interrupted());
-          Thread.currentThread().interrupt(); // Restore interrupted status
-          assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
-          assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
-        }
       }
     }, Jobs.newInput()
         .withName("job-1")
@@ -412,21 +383,17 @@ public class JobStateTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
     final AtomicReference<Thread> workerThread = new AtomicReference<>();
 
-    final IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
+    final IFuture<Void> future1 = Jobs.schedule(() -> {
+      workerThread.set(Thread.currentThread());
+      assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
 
-      @Override
-      public void run() throws Exception {
-        workerThread.set(Thread.currentThread());
+      try {
+        condition.waitFor(1, TimeUnit.MILLISECONDS, "ABC");
+        fail("timeout expected");
+      }
+      catch (TimedOutError e) {
+        assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
         assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
-
-        try {
-          condition.waitFor(1, TimeUnit.MILLISECONDS, "ABC");
-          fail("timeout expected");
-        }
-        catch (TimedOutError e) {
-          assertTrue(mutex.isPermitOwner(IFuture.CURRENT.get()));
-          assertSame(JobState.RUNNING, IFuture.CURRENT.get().getState());
-        }
       }
     }, Jobs.newInput()
         .withName("job-1")
@@ -489,13 +456,9 @@ public class JobStateTest {
     Jobs.getJobManager().addListener(captureListener);
 
     final AtomicInteger rounds = new AtomicInteger(0);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (rounds.incrementAndGet() == 3) {
-          IFuture.CURRENT.get().cancel(false);
-        }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      if (rounds.incrementAndGet() == 3) {
+        IFuture.CURRENT.get().cancel(false);
       }
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -552,13 +515,9 @@ public class JobStateTest {
     Jobs.getJobManager().addListener(captureListener);
 
     final AtomicInteger rounds = new AtomicInteger(0);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (rounds.incrementAndGet() == 3) {
-          IFuture.CURRENT.get().cancel(false);
-        }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      if (rounds.incrementAndGet() == 3) {
+        IFuture.CURRENT.get().cancel(false);
       }
     }, Jobs.newInput()
         .withExecutionSemaphore(Jobs.newExecutionSemaphore(1))
@@ -627,12 +586,8 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)
@@ -685,12 +640,8 @@ public class JobStateTest {
     JobEventCaptureListener captureListener = new JobEventCaptureListener();
     Jobs.getJobManager().addListener(captureListener);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withExecutionSemaphore(Jobs.newExecutionSemaphore(1))
         .withExecutionTrigger(Jobs.newExecutionTrigger()

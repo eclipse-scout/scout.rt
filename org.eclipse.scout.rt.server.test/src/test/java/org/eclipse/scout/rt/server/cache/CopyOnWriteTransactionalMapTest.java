@@ -19,6 +19,6 @@ public class CopyOnWriteTransactionalMapTest extends AbstractTransactionalMapTes
 
   @Override
   protected <K, V> Map<K, V> createTransactionalMap(String transactionMemberId, boolean fastForward, Map<K, V> initialMap) {
-    return new CopyOnWriteTransactionalMap<K, V>(transactionMemberId, fastForward, initialMap);
+    return new CopyOnWriteTransactionalMap<>(transactionMemberId, fastForward, initialMap);
   }
 }

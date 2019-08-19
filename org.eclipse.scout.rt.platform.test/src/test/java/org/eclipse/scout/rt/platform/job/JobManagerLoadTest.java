@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.UUID;
@@ -19,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -46,12 +44,8 @@ public class JobManagerLoadTest {
 
     final AtomicLong counter = new AtomicLong();
     for (int i = 0; i < JOB_COUNT; i++) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          counter.incrementAndGet();
-        }
+      Jobs.schedule(() -> {
+        counter.incrementAndGet();
       }, Jobs.newInput()
           .withExecutionHint(JOB_IDENTIFIER));
     }
@@ -76,12 +70,8 @@ public class JobManagerLoadTest {
 
     final AtomicLong counter = new AtomicLong();
     for (int i = 0; i < JOB_COUNT; i++) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          counter.incrementAndGet();
-        }
+      Jobs.schedule(() -> {
+        counter.incrementAndGet();
       }, Jobs.newInput()
           .withExecutionHint(JOB_IDENTIFIER)
           .withExecutionTrigger(Jobs.newExecutionTrigger()

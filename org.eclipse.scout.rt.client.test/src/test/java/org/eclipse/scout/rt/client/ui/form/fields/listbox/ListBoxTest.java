@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -73,16 +71,16 @@ public class ListBoxTest extends AbstractListBox<Long> {
    */
   @Before
   public void setup() {
-    m_testValue = new HashSet<Long>();
+    m_testValue = new HashSet<>();
     m_testValue.add(1L);
   }
 
   @Override
   protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {
-    result.add(new LookupRow<Long>(1L, "a"));
-    result.add(new LookupRow<Long>(2L, "b"));
-    result.add(new LookupRow<Long>(3L, "c"));
-    result.add(new LookupRow<Long>(null, "null value"));
+    result.add(new LookupRow<>(1L, "a"));
+    result.add(new LookupRow<>(2L, "b"));
+    result.add(new LookupRow<>(3L, "c"));
+    result.add(new LookupRow<>(null, "null value"));
   }
 
   @Test

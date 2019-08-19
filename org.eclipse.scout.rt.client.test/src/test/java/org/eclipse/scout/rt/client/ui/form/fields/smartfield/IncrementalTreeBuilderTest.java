@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +53,7 @@ public class IncrementalTreeBuilderTest {
   @Test
   public void testCreatePaths_Empty() {
     ITree tree = createTestTree();
-    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(null);
+    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<>(null);
     ArrayList<ILookupRow<Long>> rows = new ArrayList<>();
     List<List<ILookupRow<Long>>> paths = builder.createPaths(rows, tree);
     assertTrue(paths.isEmpty());
@@ -65,10 +64,10 @@ public class IncrementalTreeBuilderTest {
     @SuppressWarnings("unchecked")
     ILookupRowByKeyProvider<Long> mockProvider = Mockito.mock(ILookupRowByKeyProvider.class);
     ITree tree = createTestTree();
-    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(mockProvider);
+    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<>(mockProvider);
     ArrayList<ILookupRow<Long>> rows = new ArrayList<>();
-    rows.add(new LookupRow<Long>(1L, ""));
-    rows.add(new LookupRow<Long>(2L, "").withParentKey(1L));
+    rows.add(new LookupRow<>(1L, ""));
+    rows.add(new LookupRow<>(2L, "").withParentKey(1L));
     List<List<ILookupRow<Long>>> paths = builder.createPaths(rows, tree);
     assertTrue(paths.size() == 2);
   }
@@ -76,21 +75,15 @@ public class IncrementalTreeBuilderTest {
   @Test
   public void testCreatePaths_NullKeyLookupRow() {
     final Map<Long, ILookupRow<Long>> lookupRowsMap = new HashMap<>();
-    lookupRowsMap.put(1L, new LookupRow<Long>(1L, "A"));
-    lookupRowsMap.put(2L, new LookupRow<Long>(2L, "A-B").withParentKey(1L));
-    lookupRowsMap.put(null, new LookupRow<Long>(null, "(none)"));
+    lookupRowsMap.put(1L, new LookupRow<>(1L, "A"));
+    lookupRowsMap.put(2L, new LookupRow<>(2L, "A-B").withParentKey(1L));
+    lookupRowsMap.put(null, new LookupRow<>(null, "(none)"));
     Collection<ILookupRow<Long>> rows = lookupRowsMap.values();
 
-    ILookupRowByKeyProvider<Long> provider = new ILookupRowByKeyProvider<Long>() {
-
-      @Override
-      public ILookupRow<Long> getLookupRow(Long key) {
-        return lookupRowsMap.get(key);
-      }
-    };
+    ILookupRowByKeyProvider<Long> provider = key -> lookupRowsMap.get(key);
 
     ITree tree = createTestTree();
-    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<Long>(provider);
+    IncrementalTreeBuilder<Long> builder = new IncrementalTreeBuilder<>(provider);
 
     List<List<ILookupRow<Long>>> paths = builder.createPaths(rows, tree);
     assertEquals(3, paths.size());
@@ -106,7 +99,7 @@ public class IncrementalTreeBuilderTest {
   private AbstractTreeNode createNode(Long key) {
     AbstractTreeNode node = new AbstractTreeNode() {
     };
-    node.getCellForUpdate().setValue(new LookupRow<Long>(1L, ""));
+    node.getCellForUpdate().setValue(new LookupRow<>(1L, ""));
     return node;
   }
 

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.junit.Assert;
@@ -29,13 +28,10 @@ public class PropertyEventFilterTest {
     filter.addCondition(new PropertyChangeEventFilterCondition(MY_PROP, FILTERED_VALUE));
 
     PropertyChangeSupport support = new PropertyChangeSupport(this);
-    support.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        PropertyChangeEvent filteredEvt = filter.filter(evt);
-        Assert.assertNull(filteredEvt);
-        called[0] = true;
-      }
+    support.addPropertyChangeListener(evt -> {
+      PropertyChangeEvent filteredEvt = filter.filter(evt);
+      Assert.assertNull(filteredEvt);
+      called[0] = true;
     });
 
     support.firePropertyChange(MY_PROP, null, FILTERED_VALUE);
@@ -55,13 +51,10 @@ public class PropertyEventFilterTest {
     filter.addCondition(new PropertyChangeEventFilterCondition(MY_PROP, FILTERED_VALUE));
 
     PropertyChangeSupport support = new PropertyChangeSupport(this);
-    support.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        PropertyChangeEvent filteredEvt = filter.filter(evt);
-        assertProperty(filteredEvt, "fooBar");
-        called[0] = true;
-      }
+    support.addPropertyChangeListener(evt -> {
+      PropertyChangeEvent filteredEvt = filter.filter(evt);
+      assertProperty(filteredEvt, "fooBar");
+      called[0] = true;
     });
 
     support.firePropertyChange(MY_PROP, null, "fooBar");
@@ -81,27 +74,24 @@ public class PropertyEventFilterTest {
     filter.addCondition(new PropertyChangeEventFilterCondition(MY_PROP, FILTERED_VALUE));
 
     PropertyChangeSupport support = new PropertyChangeSupport(this);
-    support.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        PropertyChangeEvent filteredEvt = filter.filter(evt);
-        if (numCalls[0] == 0) {
-          Assert.assertNull(filteredEvt);
-        }
-        else if (numCalls[0] == 1) {
-          assertProperty(filteredEvt, "fooBar");
-        }
-        else if (numCalls[0] == 2) {
-          Assert.assertNull(filteredEvt);
-        }
-        else if (numCalls[0] == 3) {
-          assertProperty(filteredEvt, FILTERED_VALUE);
-        }
-        else if (numCalls[0] == 4) {
-          Assert.assertNull(filteredEvt);
-        }
-        numCalls[0]++;
+    support.addPropertyChangeListener(evt -> {
+      PropertyChangeEvent filteredEvt = filter.filter(evt);
+      if (numCalls[0] == 0) {
+        Assert.assertNull(filteredEvt);
       }
+      else if (numCalls[0] == 1) {
+        assertProperty(filteredEvt, "fooBar");
+      }
+      else if (numCalls[0] == 2) {
+        Assert.assertNull(filteredEvt);
+      }
+      else if (numCalls[0] == 3) {
+        assertProperty(filteredEvt, FILTERED_VALUE);
+      }
+      else if (numCalls[0] == 4) {
+        Assert.assertNull(filteredEvt);
+      }
+      numCalls[0]++;
     });
 
     support.firePropertyChange(MY_PROP, null, FILTERED_VALUE);

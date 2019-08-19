@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,12 +33,8 @@ public class ExecutionTriggerWithCalendarTest {
   @Test
   public void testExclusion() throws ParseException {
     final AtomicInteger counter = new AtomicInteger();
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        counter.incrementAndGet();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      counter.incrementAndGet();
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withModifiedByCalendar(new CronCalendar("0/2 * * ? * *"))

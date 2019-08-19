@@ -38,7 +38,7 @@ public class HtmlContentBuilderTest {
   }
 
   private String createTableString(String prefix) {
-    List<String> rows = new ArrayList<String>();
+    List<String> rows = new ArrayList<>();
     for (int i = 0; i < 1; i++) {
       rows.add(createRowString(prefix, i));
     }
@@ -51,7 +51,7 @@ public class HtmlContentBuilderTest {
   }
 
   private IHtmlTable createTable(String prefix) {
-    List<IHtmlTableRow> rows = new ArrayList<IHtmlTableRow>();
+    List<IHtmlTableRow> rows = new ArrayList<>();
     for (int i = 0; i < 1; i++) {
       rows.add(createRow(prefix, i));
     }

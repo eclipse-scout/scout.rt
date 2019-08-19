@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,7 +22,6 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -60,20 +58,16 @@ public class JobFutureVisitTest {
     m_mutex3 = Jobs.newExecutionSemaphore(1);
 
     // prepare the test-case
-    protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
     bc1 = Jobs.newBlockingCondition(true);
     bc2 = Jobs.newBlockingCondition(true);
 
     m_latch = new BlockingCountDownLatch(3);
 
     // SESSION 1 (JOB-1)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        bc1.waitFor();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+      bc1.waitFor();
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job1")
@@ -82,13 +76,9 @@ public class JobFutureVisitTest {
         .withExceptionHandling(null, false));
 
     // SESSION 1 (JOB-2)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        m_latch.countDownAndBlock();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+      m_latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job2")
@@ -97,12 +87,8 @@ public class JobFutureVisitTest {
         .withExceptionHandling(null, false));
 
     // SESSION 1 (JOB-3)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex1_job3")
@@ -111,12 +97,8 @@ public class JobFutureVisitTest {
 
     // =========
     // SESSION 2 (JOB-1)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job1")
@@ -124,13 +106,9 @@ public class JobFutureVisitTest {
         .withExecutionSemaphore(m_mutex2));
 
     // SESSION 2 (JOB-2)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        bc2.waitFor();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+      bc2.waitFor();
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job2")
@@ -139,17 +117,13 @@ public class JobFutureVisitTest {
         .withExceptionHandling(null, false));
 
     // SESSION 2  (JOB-3)
-    Jobs.getJobManager().schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+      bc2.setBlocking(false);
 
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        bc2.setBlocking(false);
+      JobTestUtil.waitForPermitCompetitors(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
 
-        JobTestUtil.waitForPermitCompetitors(m_mutex2, 3); // Wait until job 'mutex2_job2' is re-acquiring the mutex. [3=job-2, job-3, job-4]
-
-        m_latch.countDownAndBlock();
-      }
+      m_latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job3")
@@ -158,12 +132,8 @@ public class JobFutureVisitTest {
         .withExceptionHandling(null, false));
 
     // SESSION 2  (JOB-4)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex2_job4")
@@ -172,13 +142,9 @@ public class JobFutureVisitTest {
 
     // =========
     // SESSION 3 (JOB-1)
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        m_latch.countDownAndBlock();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(IFuture.CURRENT.get().getJobInput().getName());
+      m_latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withName("mutex3_job1")

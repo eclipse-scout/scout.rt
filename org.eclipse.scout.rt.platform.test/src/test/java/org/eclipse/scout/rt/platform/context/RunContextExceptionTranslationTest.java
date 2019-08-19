@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.DefaultRuntimeExceptionTranslator;
@@ -26,12 +25,8 @@ public class RunContextExceptionTranslationTest {
   public void test() {
     final Exception error = new Exception("expected JUnit test exception");
 
-    IRunnable runnableWithError = new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw error;
-      }
+    IRunnable runnableWithError = () -> {
+      throw error;
     };
 
     // Test with DefaultRuntimeExceptionTranslator

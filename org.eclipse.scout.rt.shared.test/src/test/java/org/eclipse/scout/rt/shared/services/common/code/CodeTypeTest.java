@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,8 +102,8 @@ public class CodeTypeTest {
 
     @Override
     protected List<ICodeRow<String>> execLoadCodes(Class<? extends ICodeRow<String>> codeRowType) {
-      List<ICodeRow<String>> codeRows = new ArrayList<ICodeRow<String>>();
-      codeRows.add(new CodeRow<String>(
+      List<ICodeRow<String>> codeRows = new ArrayList<>();
+      codeRows.add(new CodeRow<>(
           Test1Code.ID,
           DYNAMIC_TEXT,
           null, // icon
@@ -120,7 +119,7 @@ public class CodeTypeTest {
           null, // value
           DYNAMIC_PARTITION_ID));
       codeRows.add(
-          new CodeRow<String>(
+          new CodeRow<>(
               Test2Code.ID,
               DYNAMIC_TEXT,
               DYNAMIC_ICON,

@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,7 +59,7 @@ public class StreamUtilityTest {
     assertEquals(Arrays.asList(0), StreamUtility.iterate(0, i -> i <= 0, i -> i + 1).collect(Collectors.toList()));
     assertEquals(Arrays.asList(0, 1), StreamUtility.iterate(0, i -> i <= 1, i -> i + 1).collect(Collectors.toList()));
 
-    CircuitBreaker<Integer> cb = new CircuitBreaker<Integer>();
+    CircuitBreaker<Integer> cb = new CircuitBreaker<>();
     try {
       StreamUtility.iterate(0, i -> i <= 0, cb::next).count();
       fail("expecting " + IllegalStateException.class.getName());

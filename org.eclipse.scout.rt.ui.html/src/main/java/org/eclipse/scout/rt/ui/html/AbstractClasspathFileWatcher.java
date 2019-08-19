@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +32,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,44 +64,41 @@ public abstract class AbstractClasspathFileWatcher {
   protected abstract void execFileChanged(Path path);
 
   protected void start() {
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        try {
-          WatchKey key;
-          while ((key = m_watcher.take()) != null) {
-            final Path keyPath;
-            try {
-              m_watchKeyReadWriteLock.readLock().lock();
-              keyPath = m_watchKeys.get(key);
-            }
-            finally {
-              m_watchKeyReadWriteLock.readLock().unlock();
-            }
-            if (keyPath == null) {
-              LOG.error("Unregistered watch key '" + key + "'.");
-              break;
-            }
-            for (WatchEvent<?> event : key.pollEvents()) {
-              Path path = keyPath.resolve((Path) event.context());
-              if (Files.isDirectory(path)) {
-                if (event.kind() == ENTRY_CREATE) {
-                  registerDirectory(path);
-                }
-                else if (event.kind() == ENTRY_DELETE) {
-                  unregisterDirectory(key, path);
-                }
-              }
-              else if (event.kind() == ENTRY_MODIFY) {
-                execFileChanged(path);
-              }
-            }
-            key.reset();
+    Jobs.schedule(() -> {
+      try {
+        WatchKey key;
+        while ((key = m_watcher.take()) != null) {
+          final Path keyPath;
+          try {
+            m_watchKeyReadWriteLock.readLock().lock();
+            keyPath = m_watchKeys.get(key);
           }
+          finally {
+            m_watchKeyReadWriteLock.readLock().unlock();
+          }
+          if (keyPath == null) {
+            LOG.error("Unregistered watch key '" + key + "'.");
+            break;
+          }
+          for (WatchEvent<?> event : key.pollEvents()) {
+            Path path = keyPath.resolve((Path) event.context());
+            if (Files.isDirectory(path)) {
+              if (event.kind() == ENTRY_CREATE) {
+                registerDirectory(path);
+              }
+              else if (event.kind() == ENTRY_DELETE) {
+                unregisterDirectory(key, path);
+              }
+            }
+            else if (event.kind() == ENTRY_MODIFY) {
+              execFileChanged(path);
+            }
+          }
+          key.reset();
         }
-        catch (ClosedWatchServiceException e) { //NOSONAR
-          LOG.debug("Watcher stopped");
-        }
+      }
+      catch (ClosedWatchServiceException e) { //NOSONAR
+        LOG.debug("Watcher stopped");
       }
     }, Jobs.newInput()
         .withName("Less File change watch"));

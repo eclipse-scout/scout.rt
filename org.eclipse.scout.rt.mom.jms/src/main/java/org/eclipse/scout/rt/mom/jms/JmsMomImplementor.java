@@ -11,10 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.eclipse.scout.rt.mom.jms.IJmsMomProperties.JMS_PROP_REPLY_ID;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertEqual;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertTrue;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -78,13 +75,13 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.Assertions;
-import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.platform.util.Assertions.*;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
@@ -200,13 +197,10 @@ public class JmsMomImplementor implements IMomImplementor {
   protected JmsConnectionWrapper createConnectionWrapper(final Map<Object, Object> properties) {
     return new JmsConnectionWrapper(properties)
         .withConnectionFunction(
-            new ICreateJmsConnection() {
-              @Override
-              public Connection create() throws JMSException {
-                Connection c = createConnection();
-                m_connection = c;
-                return c;
-              }
+            () -> {
+              Connection c = createConnection();
+              m_connection = c;
+              return c;
             });
   }
 
@@ -379,7 +373,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> IRunnable createMessageConsumerJob(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, IMessageListener<DTO> listener, SubscribeInput input) {
-    return new MessageConsumerJob<DTO>(this, sessionProvider, destination, listener, input, m_messageConsumerJobReceiveTimeout);
+    return new MessageConsumerJob<>(this, sessionProvider, destination, listener, input, m_messageConsumerJobReceiveTimeout);
   }
 
   @Override
@@ -526,7 +520,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <REQUEST, REPLY> IRunnable createReplyMessageConsumerJob(IJmsSessionProvider sessionProvider, IBiDestination<REQUEST, REPLY> destination, IRequestListener<REQUEST, REPLY> listener, SubscribeInput input) {
-    return new ReplyMessageConsumerJob<REQUEST, REPLY>(this, sessionProvider, destination, listener, input, m_replyMessageConsumerJobReceiveTimeout);
+    return new ReplyMessageConsumerJob<>(this, sessionProvider, destination, listener, input, m_replyMessageConsumerJobReceiveTimeout);
   }
 
   protected synchronized void ensureRequestCancellationSubscription() throws JMSException {
@@ -543,7 +537,7 @@ public class JmsMomImplementor implements IMomImplementor {
   }
 
   protected <DTO> IRunnable createRequestCancellationMessageConsumerJob(IJmsSessionProvider sessionProvider, final IDestination<DTO> cancellationTopic, final SubscribeInput input) {
-    return new RequestCancellationMessageConsumerJob<DTO>(this, sessionProvider, cancellationTopic, input, m_requestCancellationMessageConsumerJobReceiveTimeout);
+    return new RequestCancellationMessageConsumerJob<>(this, sessionProvider, cancellationTopic, input, m_requestCancellationMessageConsumerJobReceiveTimeout);
   }
 
   @Override

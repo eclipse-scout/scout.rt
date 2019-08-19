@@ -33,7 +33,7 @@ public class SampleParameterizedTestClass {
 
   @Parameters
   public static List<IScoutTestParameter> getParameters() {
-    List<IScoutTestParameter> parametersList = new LinkedList<IScoutTestParameter>();
+    List<IScoutTestParameter> parametersList = new LinkedList<>();
     parametersList.add(new ParameterizedTestClassParameter(TEST_PARAMETER_NAME_1));
     parametersList.add(new ParameterizedTestClassParameter("Scenario 2"));
     return parametersList;

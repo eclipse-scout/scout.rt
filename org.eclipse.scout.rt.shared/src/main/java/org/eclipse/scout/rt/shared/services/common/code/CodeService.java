@@ -69,19 +69,15 @@ public class CodeService implements ICodeService {
   }
 
   protected ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>> createCacheValueResolver() {
-    return new ICacheValueResolver<CodeTypeCacheKey, ICodeType<?, ?>>() {
-
-      @Override
-      public ICodeType<?, ?> resolve(CodeTypeCacheKey key) {
-        try {
-          return key.getCodeTypeClass().getConstructor().newInstance();
-        }
-        catch (ReflectiveOperationException e) {
-          throw BEANS.get(PlatformExceptionTranslator.class)
-              .translate(e)
-              .withContextInfo("key", key)
-              .withContextInfo("codeTypeClass", key.getCodeTypeClass());
-        }
+    return key -> {
+      try {
+        return key.getCodeTypeClass().getConstructor().newInstance();
+      }
+      catch (ReflectiveOperationException e) {
+        throw BEANS.get(PlatformExceptionTranslator.class)
+            .translate(e)
+            .withContextInfo("key", key)
+            .withContextInfo("codeTypeClass", key.getCodeTypeClass());
       }
     };
   }

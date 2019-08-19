@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldVisibilityTest.P_GroupBox.P_RadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.FormFieldVisibilityTest.P_GroupBox.P_RadioButtonGroup.P_Button1;
@@ -44,13 +43,10 @@ public class FormFieldVisibilityTest {
   public void testVisitFields() {
     ICompositeField field = createFixture();
     final AtomicInteger counter = new AtomicInteger(0);
-    field.visit(new Consumer<IFormField>() {
-      @Override
-      public void accept(IFormField f) {
-        if (f.getClass().getName().startsWith(FormFieldVisibilityTest.class.getName())) {
-          // ignore the filter boxes of treebox and listbox
-          counter.incrementAndGet();
-        }
+    field.visit(f -> {
+      if (f.getClass().getName().startsWith(FormFieldVisibilityTest.class.getName())) {
+        // ignore the filter boxes of treebox and listbox
+        counter.incrementAndGet();
       }
     }, IFormField.class);
     Assert.assertEquals(12, counter.intValue());

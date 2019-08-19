@@ -11,11 +11,7 @@
 package org.eclipse.scout.rt.server.jaxws.handler;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -102,7 +98,7 @@ public class WsProviderCorrelationIdHandlerTest {
 
   protected void assertHandleInboundMessage(String expectedCid, String cidHeaderValue) {
     // create HTTP headers
-    Map<String, List<String>> httpHeaders = new HashMap<String, List<String>>();
+    Map<String, List<String>> httpHeaders = new HashMap<>();
     if (cidHeaderValue != null) {
       httpHeaders.put(CorrelationId.HTTP_HEADER_NAME, Collections.singletonList(cidHeaderValue));
     }

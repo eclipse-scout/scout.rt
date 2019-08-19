@@ -646,7 +646,7 @@ public abstract class AbstractSmartField<VALUE> extends AbstractValueField<VALUE
   protected void handleValidationFailed(ProcessingException e, VALUE rawValue) {
     // don't call super, because we don't want to update the display text
     // because this would trigger execFormatValue and start a new lookup
-    addErrorStatus(new ValidationFailedStatus<VALUE>(e, rawValue));
+    addErrorStatus(new ValidationFailedStatus<>(e, rawValue));
     m_validationError = e;
   }
 

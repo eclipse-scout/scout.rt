@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 @Times(2)
 public class TimesClassLevelTest {
 
-  private static final List<String> s_protocol = Collections.synchronizedList(new ArrayList<String>());
+  private static final List<String> s_protocol = Collections.synchronizedList(new ArrayList<>());
 
   @BeforeClass
   public static void beforeClass() {

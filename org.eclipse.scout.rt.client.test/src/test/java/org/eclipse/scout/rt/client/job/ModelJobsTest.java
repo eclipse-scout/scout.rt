@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.rt.client.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.Callable;
 
@@ -101,75 +97,37 @@ public class ModelJobsTest {
     final IClientSession clientSession2 = mock(IClientSession.class);
     when(clientSession2.getModelJobSemaphore()).thenReturn(Jobs.newExecutionSemaphore(1));
 
-    ModelJobs.schedule(new IRunnable() {
+    ModelJobs.schedule(() -> {
+      // Test model thread for same session (1)
+      assertTrue(ModelJobs.isModelThread());
 
-      @Override
-      public void run() throws Exception {
-        // Test model thread for same session (1)
-        assertTrue(ModelJobs.isModelThread());
-
-        // Test model thread for same session (2)
-        ClientRunContexts.copyCurrent().run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertTrue(ModelJobs.isModelThread());
-          }
-        });
-        // Test model thread for other session
-        ClientRunContexts.copyCurrent().withSession(clientSession2, true).run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertTrue(ModelJobs.isModelThread());
-          }
-        });
-      }
+      // Test model thread for same session (2)
+      ClientRunContexts.copyCurrent().run(() -> assertTrue(ModelJobs.isModelThread()));
+      // Test model thread for other session
+      ClientRunContexts.copyCurrent().withSession(clientSession2, true).run(() -> assertTrue(ModelJobs.isModelThread()));
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession1, true))).awaitDoneAndGet();
   }
 
   @Test
   public void testScheduleWithoutInput() {
-    ClientRunContexts.copyCurrent().withSession(m_clientSession, false).run(new IRunnable() {
+    ClientRunContexts.copyCurrent().withSession(m_clientSession, false).run(() -> {
+      // Test schedule
+      IFuture<?> actualFuture = ModelJobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), ModelJobs.newInput(ClientRunContexts.copyCurrent()))
+          .awaitDoneAndGet();
 
-      @Override
-      public void run() throws Exception {
-        // Test schedule
-        IFuture<?> actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
+      assertTrue(ModelJobs.isModelJob(actualFuture));
 
-          @Override
-          public IFuture<?> call() throws Exception {
-            return IFuture.CURRENT.get();
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent()))
-            .awaitDoneAndGet();
+      // Test schedule with delay
+      actualFuture = ModelJobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDoneAndGet();
 
-        assertTrue(ModelJobs.isModelJob(actualFuture));
-
-        // Test schedule with delay
-        actualFuture = ModelJobs.schedule(new Callable<IFuture<?>>() {
-
-          @Override
-          public IFuture<?> call() throws Exception {
-            return IFuture.CURRENT.get();
-          }
-        }, ModelJobs.newInput(ClientRunContexts.copyCurrent())).awaitDoneAndGet();
-
-        assertTrue(ModelJobs.isModelJob(actualFuture));
-        assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);
-      }
+      assertTrue(ModelJobs.isModelJob(actualFuture));
+      assertTrue(actualFuture.getJobInput().getRunContext() instanceof ClientRunContext);
     });
   }
 
   @Test(expected = AssertionException.class)
   public void testScheduleWithoutInputWithoutSession() {
-    ClientRunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-      }
-    });
+    ClientRunContexts.empty().run(() -> ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent())));
   }
 
   @Test

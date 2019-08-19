@@ -11,22 +11,13 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.reset;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,11 +30,9 @@ import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
 import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMom;
 import org.eclipse.scout.rt.mom.api.IMom.DefaultMarshallerProperty;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
-import org.eclipse.scout.rt.mom.api.IRequestListener;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.mom.api.marshaller.BytesMarshaller;
@@ -68,7 +57,6 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.IDisposable;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
@@ -140,13 +128,9 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
       IBiDestination<Person, Void> queue = MOM.newBiDestination("test/mom/testCurrentMessageRequestReply", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
       m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
-      m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<Person, Void>() {
-
-        @Override
-        public Void onRequest(IMessage<Person> request) {
-          capturer.set(IMessage.CURRENT.get());
-          return null;
-        }
+      m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> {
+        capturer.set(IMessage.CURRENT.get());
+        return null;
       }));
       MOM.request(FixtureMom.class, queue, person);
 
@@ -180,13 +164,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     }
 
     try {
-      disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<Object, Object>() {
-
-        @Override
-        public Object onRequest(IMessage<Object> req) {
-          return req.getTransferObject();
-        }
-      }, MOM.newSubscribeInput()
+      disposables.add(MOM.reply(FixtureMom.class, queue, req -> req.getTransferObject(), MOM.newSubscribeInput()
           // use single threaded in order to block dispose until subscription is completely released
           .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
@@ -206,13 +184,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     IBiDestination<String, String> queue = MOM.newBiDestination("test/momtestQueueRequestReply", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        return request.getTransferObject().toUpperCase();
-      }
-    }));
+    m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> request.getTransferObject().toUpperCase()));
 
     // Initiate 'request-reply' communication
     final String request = "hello world";
@@ -240,31 +212,21 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
   }
 
   private void testRequestReplyCorrelationIdInternal(final IBiDestination<String, String> destination) throws InterruptedException {
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        return CorrelationId.CURRENT.get();
-      }
-    }, MOM.newSubscribeInput()
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> CorrelationId.CURRENT.get(), MOM.newSubscribeInput()
         .withRunContext(RunContexts.copyCurrent()
             .withCorrelationId("cid:xyz"))));
 
     // Initiate 'request-reply' communication
     RunContexts.empty()
         .withCorrelationId("cid:abc")
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            final String request = "hello world";
-            String testee = MOM.request(FixtureMom.class, destination, request);
-            // Verify
-            final String expectedReply = "cid:abc";
-            assertEquals(expectedReply, testee);
-            IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
-            verifyRequestReplyMessageHandler(destination, marshaller, request, expectedReply);
-          }
+        .run(() -> {
+          final String request = "hello world";
+          String testee = MOM.request(FixtureMom.class, destination, request);
+          // Verify
+          final String expectedReply = "cid:abc";
+          assertEquals(expectedReply, testee);
+          IMarshaller marshaller = BEANS.get(CONFIG.getPropertyValue(DefaultMarshallerProperty.class));
+          verifyRequestReplyMessageHandler(destination, marshaller, request, expectedReply);
         });
   }
 
@@ -274,13 +236,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     IBiDestination<String, String> topic = MOM.newBiDestination("test/mom/testTopicRequestReply", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, topic, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        return request.getTransferObject().toUpperCase();
-      }
-    }));
+    m_disposables.add(MOM.reply(FixtureMom.class, topic, request -> request.getTransferObject().toUpperCase()));
 
     // Initiate 'request-reply' communication
     String testee = MOM.request(FixtureMom.class, topic, "hello world");
@@ -298,23 +254,15 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        msgLatch.countDown();
-        return request.getTransferObject().toUpperCase();
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> {
+      msgLatch.countDown();
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        msgLatch.countDown();
-        return request.getTransferObject().toUpperCase();
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> {
+      msgLatch.countDown();
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Initiate 'request-reply' communication
@@ -333,23 +281,15 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final CountDownLatch msgLatch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, topic, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        msgLatch.countDown();
-        return request.getTransferObject().toUpperCase();
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, topic, request -> {
+      msgLatch.countDown();
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, topic, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        msgLatch.countDown();
-        return request.getTransferObject().toUpperCase();
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, topic, request -> {
+      msgLatch.countDown();
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Initiate 'request-reply' communication
@@ -367,13 +307,7 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final IBiDestination<String, String> queue = MOM.newBiDestination("test/mom/testQueueRequestReplyRequestFirst", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
     // 1. Initiate 'request-reply' communication
-    IFuture<String> requestFuture = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return MOM.request(FixtureMom.class, queue, "hello world");
-      }
-    }, Jobs.newInput()
+    IFuture<String> requestFuture = Jobs.schedule(() -> MOM.request(FixtureMom.class, queue, "hello world"), Jobs.newInput()
         .withName("requester (Q)")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT));
 
@@ -382,19 +316,9 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     Thread.sleep(300);
 
     // 2. Subscribe for reply
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // Subscribe replier
-        m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<String, String>() {
-
-          @Override
-          public String onRequest(IMessage<String> request) {
-            return request.getTransferObject().toUpperCase();
-          }
-        }));
-      }
+    Jobs.schedule(() -> {
+      // Subscribe replier
+      m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> request.getTransferObject().toUpperCase()));
     }, Jobs.newInput()
         .withName("replier (Q)")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT));
@@ -412,31 +336,24 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
 
     //prepare the reply
     final CountDownLatch replyLatch = new CountDownLatch(1);
-    m_disposables.add(MOM.reply(FixtureMom.class, queue, new IRequestListener<String, String>() {
-      @Override
-      public String onRequest(IMessage<String> request) {
-        try {
-          replyLatch.await();
-        }
-        catch (InterruptedException e) {
-          throw new ThreadInterruptedError("Interrupted", e);
-        }
-        return "TheReply";
+    m_disposables.add(MOM.reply(FixtureMom.class, queue, request -> {
+      try {
+        replyLatch.await();
       }
+      catch (InterruptedException e) {
+        throw new ThreadInterruptedError("Interrupted", e);
+      }
+      return "TheReply";
     }));
 
     // semaphore for jobs
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
     // request should block with IBlockingCondition.waitFor in order to release semaphore
-    IFuture<String> requestFuture = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        String reply = MOM.request(FixtureMom.class, queue, "hello world");
-        System.out.println("Reply: " + reply);
-        return reply;
-      }
+    IFuture<String> requestFuture = Jobs.schedule(() -> {
+      String reply = MOM.request(FixtureMom.class, queue, "hello world");
+      System.out.println("Reply: " + reply);
+      return reply;
     }, Jobs.newInput()
         .withName("requester (T)")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT)
@@ -444,12 +361,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
         .withExecutionSemaphore(mutex));
 
     // test if semaphore was released (with waitFor)
-    IFuture<Void> otherFuture = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // nop
-      }
+    IFuture<Void> otherFuture = Jobs.schedule(() -> {
+      // nop
     }, Jobs.newInput()
         .withName("null job")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT)
@@ -493,24 +406,20 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final AtomicBoolean replierInterrupted = new AtomicBoolean();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        try {
-          /*
-           * MARKER
-           */
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          replierInterrupted.set(true);
-        }
-        finally {
-          verifyLatch.countDown();
-        }
-        return request.getTransferObject().toUpperCase();
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      try {
+        /*
+         * MARKER
+         */
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        replierInterrupted.set(true);
+      }
+      finally {
+        verifyLatch.countDown();
+      }
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Initiate 'request-reply' communication
@@ -558,17 +467,11 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     IDestination<String> differentTopic = MOM.newDestination("differentTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.DEFINE, null);
     final Capturer<String> capturer1 = new Capturer<>();
     final Capturer<String> capturer2 = new Capturer<>();
-    m_disposables.add(MOM.subscribe(FixtureMom.class, defaultTopic, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer1.set("cancelled!"); // should not be called
-      }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, defaultTopic, message -> {
+      capturer1.set("cancelled!"); // should not be called
     }));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, differentTopic, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer2.set("cancelled!"); // should be called
-      }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, differentTopic, message -> {
+      capturer2.set("cancelled!"); // should be called
     }));
 
     // Run test
@@ -585,11 +488,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     installMom(FixtureMomWithCustomRequestReplyCancellationTopic.class);
     IDestination<String> differentTopic = MOM.newDestination("UnitTestTopic", IDestination.DestinationType.TOPIC, IDestination.ResolveMethod.JNDI, null);
     final Capturer<String> capturer = new Capturer<>();
-    m_disposables.add(MOM.subscribe(FixtureMom.class, differentTopic, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set("cancelled!"); // should be called
-      }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, differentTopic, message -> {
+      capturer.set("cancelled!"); // should be called
     }));
 
     // Run test
@@ -610,41 +510,33 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final AtomicBoolean replierCancelled = new AtomicBoolean();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<String, String>() {
-
-      @Override
-      public String onRequest(IMessage<String> request) {
-        setupLatch.countDown();
-        try {
-          neverLatch.await();
-        }
-        catch (InterruptedException e) {
-          replierInterrupted.set(true);
-        }
-        finally {
-          replierCancelled.set(RunMonitor.CURRENT.get().isCancelled());
-          verifyLatch.countDown();
-        }
-        return request.getTransferObject().toUpperCase();
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      setupLatch.countDown();
+      try {
+        neverLatch.await();
       }
+      catch (InterruptedException e) {
+        replierInterrupted.set(true);
+      }
+      finally {
+        replierCancelled.set(RunMonitor.CURRENT.get().isCancelled());
+        verifyLatch.countDown();
+      }
+      return request.getTransferObject().toUpperCase();
     }));
 
     // Initiate 'request-reply' communication
     final FinalValue<String> testee = new FinalValue<>();
-    IFuture<Void> requestFuture = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          String result = MOM.request(FixtureMom.class, destination, "hello world");
-          testee.set(result);
-        }
-        catch (ThreadInterruptedError e) {
-          requestorInterrupted.set(true);
-        }
-        finally {
-          verifyLatch.countDown();
-        }
+    IFuture<Void> requestFuture = Jobs.schedule(() -> {
+      try {
+        String result = MOM.request(FixtureMom.class, destination, "hello world");
+        testee.set(result);
+      }
+      catch (ThreadInterruptedError e) {
+        requestorInterrupted.set(true);
+      }
+      finally {
+        verifyLatch.countDown();
       }
     }, Jobs.newInput()
         .withName("initiator")
@@ -688,15 +580,11 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     person.setFirstname("anna");
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<Person, Person>() {
-
-      @Override
-      public Person onRequest(IMessage<Person> request) {
-        Person result = new Person();
-        result.setLastname(request.getTransferObject().getLastname().toUpperCase());
-        result.setFirstname(request.getTransferObject().getFirstname().toUpperCase());
-        return result;
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      Person result = new Person();
+      result.setLastname(request.getTransferObject().getLastname().toUpperCase());
+      result.setFirstname(request.getTransferObject().getFirstname().toUpperCase());
+      return result;
     }));
 
     // Initiate 'request-reply' communication
@@ -718,12 +606,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<Void, String>() {
-
-      @Override
-      public String onRequest(IMessage<Void> request) {
-        throw runtimeException;
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      throw runtimeException;
     }));
 
     // Initiate 'request-reply' communication
@@ -748,12 +632,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<Void, String>() {
-
-      @Override
-      public String onRequest(IMessage<Void> request) {
-        throw runtimeException;
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      throw runtimeException;
     }));
 
     // Initiate 'request-reply' communication
@@ -778,12 +658,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final RuntimeException runtimeException = new VetoException();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<Void, String>() {
-
-      @Override
-      public String onRequest(IMessage<Void> request) {
-        throw runtimeException;
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      throw runtimeException;
     }));
 
     // Initiate 'request-reply' communication
@@ -808,12 +684,8 @@ public class JmsMomWithRequestReplyTest extends AbstractJmsMomTest {
     final RuntimeException runtimeException = new SomethingWrongException("expected-expected-junit-exception");
 
     // Subscribe for the destination
-    m_disposables.add(MOM.reply(FixtureMom.class, destination, new IRequestListener<Void, String>() {
-
-      @Override
-      public String onRequest(IMessage<Void> request) {
-        throw runtimeException;
-      }
+    m_disposables.add(MOM.reply(FixtureMom.class, destination, request -> {
+      throw runtimeException;
     }));
 
     // Initiate 'request-reply' communication

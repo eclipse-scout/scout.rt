@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.exception;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -49,79 +47,37 @@ public class DefaultRuntimeExceptionTranslatorTest {
 
   @Test
   public void testTranslate() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return throwable;
-      }
-    });
+    testTranslate(throwable -> throwable);
   }
 
   @Test
   public void testTranslateWithExecutionException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new ExecutionException("expected JUnit test exception", throwable);
-      }
-    });
+    testTranslate(throwable -> new ExecutionException("expected JUnit test exception", throwable));
   }
 
   @Test
   public void testTranslateWithExecutionException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new ExecutionException("expected JUnit test exception", new ExecutionException("expected JUnit test exception", throwable));
-      }
-    });
+    testTranslate(throwable -> new ExecutionException("expected JUnit test exception", new ExecutionException("expected JUnit test exception", throwable)));
   }
 
   @Test
   public void testTranslateWithUndeclaredThrowableException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(throwable, "expected JUnit test exception");
-      }
-    });
+    testTranslate(throwable -> new UndeclaredThrowableException(throwable, "expected JUnit test exception"));
   }
 
   @Test
   public void testTranslateWithUndeclaredThrowableException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new UndeclaredThrowableException(new UndeclaredThrowableException(throwable, "expected JUnit test exception"), "expected JUnit test exception");
-      }
-    });
+    testTranslate(throwable -> new UndeclaredThrowableException(new UndeclaredThrowableException(throwable, "expected JUnit test exception"), "expected JUnit test exception"));
   }
 
   @Test
   public void testTranslateWithInvocationTargetException() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(throwable, "expected JUnit test exception");
-      }
-    });
+    testTranslate(throwable -> new InvocationTargetException(throwable, "expected JUnit test exception"));
   }
 
   @Test
   public void testTranslateWithInvocationTargetException_Nested() {
-    testTranslate(new IThrowableProducer() {
-
-      @Override
-      public Throwable produce(Throwable throwable) {
-        return new InvocationTargetException(new InvocationTargetException(throwable, "expected JUnit test exception"), "expected JUnit test exception");
-      }
-    });
+    testTranslate(throwable -> new InvocationTargetException(new InvocationTargetException(throwable, "expected JUnit test exception"), "expected JUnit test exception"));
   }
 
   private void testTranslate(IThrowableProducer throwableProducer) {

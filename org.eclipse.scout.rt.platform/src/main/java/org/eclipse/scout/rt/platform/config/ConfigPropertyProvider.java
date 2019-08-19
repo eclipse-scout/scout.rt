@@ -84,7 +84,7 @@ public class ConfigPropertyProvider implements IPropertyProvider {
           logDuplicateKey(rawKey, oldValue, rawValue);
         }
         if (StringUtility.hasText(key)) {
-          result.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+          result.add(new AbstractMap.SimpleEntry<>(key, value));
         }
         return oldValue;
       }

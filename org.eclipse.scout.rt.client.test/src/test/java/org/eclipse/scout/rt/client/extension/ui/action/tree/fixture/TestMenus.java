@@ -26,11 +26,11 @@ public class TestMenus {
   private List<IMenu> m_menus;
 
   public TestMenus() {
-    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
     }
-    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    new MoveActionNodesHandler<>(menus).moveModelObjects();
     m_menus = menus.getOrderedList();
   }
 

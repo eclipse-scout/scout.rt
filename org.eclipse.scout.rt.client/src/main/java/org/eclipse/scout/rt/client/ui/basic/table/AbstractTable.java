@@ -3171,7 +3171,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     boolean hierarchical = parentToChildren.size() > 0;
     setHierarchicalInternal(hierarchical);
     if (hierarchical) {
-      CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+      CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
       rootNodes.forEach(root -> TreeTraversals.create(collector, node -> {
         List<ITableRow> childRows = parentToChildren.getOrDefault(node, Collections.emptyList());
         node.setChildRowsInternal(childRows);
@@ -3310,7 +3310,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     //peformance quick-check
     if (rows != existingRows) {
       rows = resolveRows(rows);
-      CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+      CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
       rows.forEach(parent -> TreeTraversals.create(collector, node -> {
         return node.getChildRows();
       }).traverse(parent));
@@ -3671,7 +3671,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
       }
     });
 
-    CollectingVisitor<ITableRow> collector = new CollectingVisitor<ITableRow>();
+    CollectingVisitor<ITableRow> collector = new CollectingVisitor<>();
     if (comparator != null) {
       rootNodes.sort(comparator);
     }

@@ -19,6 +19,6 @@ public class ConcurrentTransactionalMapTest extends AbstractTransactionalMapTest
 
   @Override
   protected <K, V> Map<K, V> createTransactionalMap(String transactionMemberId, boolean fastForward, Map<K, V> initialMap) {
-    return new ConcurrentTransactionalMap<K, V>(transactionMemberId, fastForward, initialMap);
+    return new ConcurrentTransactionalMap<>(transactionMemberId, fastForward, initialMap);
   }
 }

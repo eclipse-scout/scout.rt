@@ -108,7 +108,7 @@ public class CollectionUtilityTest {
     // null
     assertNull(CollectionUtility.firstElement((List<?>) null));
     // empty
-    assertNull(CollectionUtility.firstElement((new ArrayList<Object>())));
+    assertNull(CollectionUtility.firstElement((new ArrayList<>())));
     // one element
     assertEquals((Long) 1L, CollectionUtility.firstElement(new ArrayList<Long>() {
       private static final long serialVersionUID = 1L;
@@ -148,7 +148,7 @@ public class CollectionUtilityTest {
     assertNull(CollectionUtility.firstElement((SortedMap<?, ?>) null));
     // empty
     assertNull(CollectionUtility.firstElement((Collections
-        .unmodifiableSortedMap(new TreeMap<Object, Object>()))));
+        .unmodifiableSortedMap(new TreeMap<>()))));
     // one element
     assertEquals("ABC", CollectionUtility.firstElement(new TreeMap<Integer, String>() {
       private static final long serialVersionUID = 1L;
@@ -177,7 +177,7 @@ public class CollectionUtilityTest {
   @Test
   public void testLastElementList() {
     assertNull(CollectionUtility.lastElement((List<Object>) null));
-    assertNull(CollectionUtility.lastElement(new ArrayList<Object>()));
+    assertNull(CollectionUtility.lastElement(new ArrayList<>()));
     assertEquals("a", CollectionUtility.lastElement(createList("a")));
     assertEquals("b", CollectionUtility.lastElement(createList("a", "b")));
   }
@@ -188,7 +188,7 @@ public class CollectionUtilityTest {
   @Test
   public void testSlice() {
     List<String> nullList = null;
-    List<String> emptyList = new ArrayList<String>();
+    List<String> emptyList = new ArrayList<>();
     List<String> testList = Arrays.asList("foo", "bar", "test");
     List<String> testList_1 = Arrays.asList("foo");
     List<String> testList_23 = Arrays.asList("bar", "test");
@@ -236,7 +236,7 @@ public class CollectionUtilityTest {
   @Test
   public void testLastElementMap() {
     assertNull(CollectionUtility.lastElement((SortedMap<Object, Object>) null));
-    assertNull(CollectionUtility.lastElement(new TreeMap<Object, Object>()));
+    assertNull(CollectionUtility.lastElement(new TreeMap<>()));
     assertEquals("a", CollectionUtility.lastElement(createSortedMap("a")));
     assertEquals("b", CollectionUtility.lastElement(createSortedMap("a", "b")));
   }
@@ -247,7 +247,7 @@ public class CollectionUtilityTest {
   @Test
   public void testSize() {
     assertEquals(0, CollectionUtility.size(null));
-    assertEquals(0, CollectionUtility.size(new ArrayList<Object>()));
+    assertEquals(0, CollectionUtility.size(new ArrayList<>()));
     assertEquals(1, CollectionUtility.size(createList("1")));
     assertEquals(2, CollectionUtility.size(createList("1", "2")));
   }
@@ -378,7 +378,7 @@ public class CollectionUtilityTest {
   @Test
   public void testHashMap() {
     // test that it is null safe
-    assertEquals(1, CollectionUtility.hashMap(null, new ImmutablePair<Integer, String>(2, "test")).size());
+    assertEquals(1, CollectionUtility.hashMap(null, new ImmutablePair<>(2, "test")).size());
     HashMap<Integer, String> map = CollectionUtility.hashMap();
     assertNotNull(map);
     assertTrue(map.isEmpty());
@@ -431,7 +431,7 @@ public class CollectionUtilityTest {
   }
 
   private List<Object> createList(Object... elements) {
-    List<Object> list = new ArrayList<Object>();
+    List<Object> list = new ArrayList<>();
     for (Object o : elements) {
       list.add(o);
     }
@@ -439,7 +439,7 @@ public class CollectionUtilityTest {
   }
 
   private SortedMap<Integer, Object> createSortedMap(Object... elements) {
-    SortedMap<Integer, Object> map = new TreeMap<Integer, Object>();
+    SortedMap<Integer, Object> map = new TreeMap<>();
     int counter = 0;
     for (Object o : elements) {
       map.put(counter++, o);
@@ -448,7 +448,7 @@ public class CollectionUtilityTest {
   }
 
   private Queue<Object> createQueue(Object... elements) {
-    Queue<Object> list = new ConcurrentLinkedQueue<Object>();
+    Queue<Object> list = new ConcurrentLinkedQueue<>();
     for (Object o : elements) {
       list.add(o);
     }

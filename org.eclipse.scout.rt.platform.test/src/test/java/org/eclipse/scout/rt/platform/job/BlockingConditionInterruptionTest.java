@@ -20,11 +20,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +34,7 @@ public class BlockingConditionInterruptionTest {
 
   @Test
   public void testInterruptibly_interruptBeforeEntering() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     runTest(protocol, WaitMethod.WAIT_INTERRUPTIBLY, InterruptionAction.INTERRUPT_BEFORE_ENTERING);
 
@@ -49,7 +47,7 @@ public class BlockingConditionInterruptionTest {
 
   @Test
   public void testInterruptibly_interruptWhileBlocking() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     runTest(protocol, WaitMethod.WAIT_INTERRUPTIBLY, InterruptionAction.INTERRUPT_WHILE_BLOCKING);
 
@@ -62,7 +60,7 @@ public class BlockingConditionInterruptionTest {
 
   @Test
   public void testInterruptiblyWithTimeout_interruptBeforeEntering() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     runTest(protocol, WaitMethod.WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT, InterruptionAction.INTERRUPT_BEFORE_ENTERING);
 
@@ -80,55 +78,45 @@ public class BlockingConditionInterruptionTest {
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
     // Schedule job to enter blocking condition
-    final IFuture<Void> future = Jobs.schedule(new IRunnable() {
+    final IFuture<Void> future = Jobs.schedule(() -> {
+      runnerThread.set(Thread.currentThread());
 
-      @Override
-      public void run() throws Exception {
-        runnerThread.set(Thread.currentThread());
+      if (InterruptionAction.INTERRUPT_BEFORE_ENTERING.equals(interruptionAction)) {
+        Thread.currentThread().interrupt();
+      }
 
-        if (InterruptionAction.INTERRUPT_BEFORE_ENTERING.equals(interruptionAction)) {
-          Thread.currentThread().interrupt();
+      try {
+        protocol.add("beforeBlockingCondition");
+
+        switch (waitForMethod) {
+          case WAIT_INTERRUPTIBLY:
+            bc.waitFor(HINT_BLOCKED);
+            break;
+          case WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT:
+            bc.waitFor(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
+            break;
+          default:
+            throw new UnsupportedOperationException();
         }
 
-        try {
-          protocol.add("beforeBlockingCondition");
+        protocol.add("afterBlockingCondition");
+      }
+      catch (ThreadInterruptedError e) {
+        protocol.add("InterruptedException");
+      }
+      catch (TimedOutError e) {
+        protocol.add("TimeoutException");
+      }
 
-          switch (waitForMethod) {
-            case WAIT_INTERRUPTIBLY:
-              bc.waitFor(HINT_BLOCKED);
-              break;
-            case WAIT_FOR_INTERRUPTIBLY_WITH_TIMEOUT:
-              bc.waitFor(0, TimeUnit.MILLISECONDS, HINT_BLOCKED);
-              break;
-            default:
-              throw new UnsupportedOperationException();
-          }
-
-          protocol.add("afterBlockingCondition");
-        }
-        catch (ThreadInterruptedError e) {
-          protocol.add("InterruptedException");
-        }
-        catch (TimedOutError e) {
-          protocol.add("TimeoutException");
-        }
-
-        if (Thread.currentThread().isInterrupted()) {
-          protocol.add("threadInterrupted");
-        }
+      if (Thread.currentThread().isInterrupted()) {
+        protocol.add("threadInterrupted");
       }
     }, Jobs.newInput()
         .withName("test job")
         .withExecutionHint(JOB_IDENTIFIER));
 
     // Wait until the job enters blocking condition, or is done.
-    JobTestUtil.waitForCondition(new ICondition() {
-
-      @Override
-      public boolean isFulfilled() {
-        return future.containsExecutionHint(HINT_BLOCKED) || future.isDone();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> future.containsExecutionHint(HINT_BLOCKED) || future.isDone());
 
     if (InterruptionAction.INTERRUPT_WHILE_BLOCKING.equals(interruptionAction)) {
       runnerThread.get().interrupt();

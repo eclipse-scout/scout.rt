@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -41,19 +40,15 @@ public class SerialFutureExecutionTest {
    */
   @Test
   public void testAtFixedRate_NowWithRemainingCount() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("before");
-        latch.countDownAndBlock();
-        protocol.add("after");
-      }
+    Jobs.schedule(() -> {
+      protocol.add("before");
+      latch.countDownAndBlock();
+      protocol.add("after");
     }, Jobs.newInput()
         .withExecutionHint(jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -91,19 +86,15 @@ public class SerialFutureExecutionTest {
    */
   @Test
   public void testAtFixedRate_NowWithExistingCount() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("before");
-        latch.countDownAndBlock();
-        protocol.add("after");
-      }
+    Jobs.schedule(() -> {
+      protocol.add("before");
+      latch.countDownAndBlock();
+      protocol.add("after");
     }, Jobs.newInput()
         .withExecutionHint(jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -142,19 +133,15 @@ public class SerialFutureExecutionTest {
    */
   @Test
   public void testWithFixedDelay() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("before");
-        latch.countDownAndBlock();
-        protocol.add("after");
-      }
+    Jobs.schedule(() -> {
+      protocol.add("before");
+      latch.countDownAndBlock();
+      protocol.add("after");
     }, Jobs.newInput()
         .withExecutionHint(jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()

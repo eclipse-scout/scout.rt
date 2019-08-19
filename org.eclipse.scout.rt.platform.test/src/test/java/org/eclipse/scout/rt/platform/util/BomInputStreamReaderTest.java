@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static java.nio.charset.StandardCharsets.ISO_8859_1;
-import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.nio.charset.StandardCharsets.UTF_16BE;
-import static java.nio.charset.StandardCharsets.UTF_16LE;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.charset.StandardCharsets.*;
 import static org.eclipse.scout.rt.platform.util.BomInputStreamReader.BOM_CHAR;
 import static org.junit.Assert.assertEquals;
 
@@ -80,7 +76,7 @@ public class BomInputStreamReaderTest {
         new Object[]{"BOM-Text-BOM", BOM_TEXT_BOM_STRING, TEXT_BOM_STRING, true});
 
     // build test data matrix
-    List<Object[]> testData = new ArrayList<Object[]>();
+    List<Object[]> testData = new ArrayList<>();
     for (Charset charset : allCharsets) {
       for (Object[] iv : inputVector) {
         boolean requiresUnicode = (boolean) iv[3];

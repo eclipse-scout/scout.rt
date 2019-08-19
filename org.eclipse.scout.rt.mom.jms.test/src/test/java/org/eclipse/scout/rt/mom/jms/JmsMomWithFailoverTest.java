@@ -21,8 +21,6 @@ import javax.jms.JMSException;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
-import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.ISubscription;
 import org.eclipse.scout.rt.mom.api.MOM;
@@ -57,12 +55,9 @@ public class JmsMomWithFailoverTest extends AbstractJmsMomTest {
     // Register subscriber
     ISubscription subs;
     m_disposables.add(subs = MOM.subscribe(FixtureMom.class, queue,
-        new IMessageListener<String>() {
-          @Override
-          public void onMessage(IMessage<String> message) {
-            message1CountDown.countDown();
-            message2CountDown.countDown();
-          }
+        message -> {
+          message1CountDown.countDown();
+          message2CountDown.countDown();
         },
         MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO)));
 

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -107,7 +105,7 @@ public class ProposalFieldTest {
 
   @Test
   public void testLookupRowWithNullText() throws Exception {
-    LookupRow<Long> nullLookupRow = new LookupRow<Long>(1L, null);
+    LookupRow<Long> nullLookupRow = new LookupRow<>(1L, null);
     m_proposalField.setLookupRow(nullLookupRow);
     assertEquals("", m_proposalField.getDisplayText());
   }
@@ -156,7 +154,7 @@ public class ProposalFieldTest {
 
   @Test
   public void testValueAsLookupKey() {
-    m_proposalField.setLookupRow(new LookupRow<Long>(1L, "aName"));
+    m_proposalField.setLookupRow(new LookupRow<>(1L, "aName"));
     assertEquals(Long.valueOf(1L), m_proposalField.getLookupRow().getKey());
   }
 

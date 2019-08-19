@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.platform.interceptor;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.Callable;
 
@@ -32,26 +30,13 @@ public class DecoratingProxyTest {
   @BeforeClass
   public static void setup() {
     final P_TestBean testBean = new P_TestBean();
-    m_targetInstanceProvider = new Callable<ITestBean>() {
-      @Override
-      public ITestBean call() throws Exception {
-        return testBean;
-      }
-    };
-    m_nullInstanceProvider = new Callable<ITestBean>() {
-      @Override
-      public ITestBean call() throws Exception {
+    m_targetInstanceProvider = () -> testBean;
+    m_nullInstanceProvider = () -> null;
+    m_handler = (i, method, args) -> {
+      if (i == null) {
         return null;
       }
-    };
-    m_handler = new IInstanceInvocationHandler<ITestBean>() {
-      @Override
-      public Object invoke(ITestBean i, Method method, Object[] args) throws Throwable {
-        if (i == null) {
-          return null;
-        }
-        return method.invoke(i, args);
-      }
+      return method.invoke(i, args);
     };
   }
 
@@ -101,12 +86,7 @@ public class DecoratingProxyTest {
     ITestBean proxy1 = DecoratingProxy.newInstance(m_handler, provider, ITestBean.class).getProxy();
     ITestBean proxy2 = DecoratingProxy.newInstance(m_handler, provider, ITestBean.class).getProxy();
 
-    Object otherProxy = Proxy.newProxyInstance(DecoratingProxyTest.class.getClassLoader(), new Class[]{ITestBean.class}, new InvocationHandler() {
-      @Override
-      public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        return null;
-      }
-    });
+    Object otherProxy = Proxy.newProxyInstance(DecoratingProxyTest.class.getClassLoader(), new Class[]{ITestBean.class}, (proxy, method, args) -> null);
 
     Assert.assertTrue(proxy1.equals(proxy1));
     Assert.assertTrue(proxy2.equals(proxy2));

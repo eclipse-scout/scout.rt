@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -22,7 +20,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,26 +33,14 @@ public class JobsTest {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule
-    IFuture<?> actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
-
-      @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
-      }
-    }, Jobs.newInput()
+    IFuture<?> actualFuture = Jobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()))
         .awaitDoneAndGet();
 
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule with delay
-    actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
-
-      @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
-      }
-    }, Jobs.newInput()
+    actualFuture = Jobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)))
@@ -64,14 +49,10 @@ public class JobsTest {
     assertEquals(Locale.CANADA_FRENCH, actualFuture.getJobInput().getRunContext().getLocale());
 
     // schedule at fixed rate
-    final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualFutureHolder.setValue(IFuture.CURRENT.get());
-        IFuture.CURRENT.get().cancel(false); // cancel periodic action
-      }
+    final Holder<IFuture<?>> actualFutureHolder = new Holder<>();
+    Jobs.schedule(() -> {
+      actualFutureHolder.setValue(IFuture.CURRENT.get());
+      IFuture.CURRENT.get().cancel(false); // cancel periodic action
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -84,13 +65,9 @@ public class JobsTest {
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualFutureHolder.setValue(IFuture.CURRENT.get());
-        IFuture.CURRENT.get().cancel(false); // cancel periodic action
-      }
+    Jobs.schedule(() -> {
+      actualFutureHolder.setValue(IFuture.CURRENT.get());
+      IFuture.CURRENT.get().cancel(false); // cancel periodic action
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -105,24 +82,12 @@ public class JobsTest {
     NlsLocale.set(Locale.CANADA_FRENCH);
 
     // Test schedule
-    IFuture<?> actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
-
-      @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
-      }
-    }, Jobs.newInput()).awaitDoneAndGet();
+    IFuture<?> actualFuture = Jobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), Jobs.newInput()).awaitDoneAndGet();
 
     assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule with delay
-    actualFuture = Jobs.schedule(new Callable<IFuture<?>>() {
-
-      @Override
-      public IFuture<?> call() throws Exception {
-        return IFuture.CURRENT.get();
-      }
-    }, Jobs.newInput()
+    actualFuture = Jobs.schedule((Callable<IFuture<?>>) () -> IFuture.CURRENT.get(), Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)))
         .awaitDoneAndGet();
@@ -130,14 +95,10 @@ public class JobsTest {
     assertNull(actualFuture.getJobInput().getRunContext());
 
     // schedule at fixed rate
-    final Holder<IFuture<?>> actualFutureHolder = new Holder<IFuture<?>>();
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualFutureHolder.setValue(IFuture.CURRENT.get());
-        IFuture.CURRENT.get().cancel(false); // cancel periodic action
-      }
+    final Holder<IFuture<?>> actualFutureHolder = new Holder<>();
+    Jobs.schedule(() -> {
+      actualFutureHolder.setValue(IFuture.CURRENT.get());
+      IFuture.CURRENT.get().cancel(false); // cancel periodic action
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
@@ -149,13 +110,9 @@ public class JobsTest {
 
     // schedule with fixed delay
     actualFutureHolder.setValue(null);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualFutureHolder.setValue(IFuture.CURRENT.get());
-        IFuture.CURRENT.get().cancel(false); // cancel periodic action
-      }
+    Jobs.schedule(() -> {
+      actualFutureHolder.setValue(IFuture.CURRENT.get());
+      IFuture.CURRENT.get().cancel(false); // cancel periodic action
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MILLISECONDS))))

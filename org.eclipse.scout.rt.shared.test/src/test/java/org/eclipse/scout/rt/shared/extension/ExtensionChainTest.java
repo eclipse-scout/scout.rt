@@ -10,12 +10,9 @@
  */
 package org.eclipse.scout.rt.shared.extension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,7 +52,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testEmptyExtensionChain() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.<TestingExtension> emptyList(), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Collections.<TestingExtension> emptyList(), TestingExtension.class);
 
     assertState(chain, false, false);
     assertNextFails(chain);
@@ -64,7 +61,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainOneExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(m_extensionA), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Collections.singletonList(m_extensionA), TestingExtension.class);
 
     assertState(chain, false, true);
     assertPreviousFails(chain);
@@ -79,7 +76,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainTwoExtensions() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.asList(m_extensionA, m_extensionB), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.asList(m_extensionA, m_extensionB), TestingExtension.class);
 
     assertState(chain, false, true);
     assertPreviousFails(chain);
@@ -104,7 +101,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainWithOneOtherExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(m_otherExtensionA), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Collections.singletonList(m_otherExtensionA), TestingExtension.class);
 
     assertState(chain, false, false);
     assertNextFails(chain);
@@ -113,7 +110,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainWithTwoOtherExtensions() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.asList(m_otherExtensionA, m_otherExtensionB), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.asList(m_otherExtensionA, m_otherExtensionB), TestingExtension.class);
 
     assertState(chain, false, false);
     assertNextFails(chain);
@@ -122,7 +119,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainWithExtensionAndOtherExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionB), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionB), TestingExtension.class);
 
     assertState(chain, false, true);
     assertPreviousFails(chain);
@@ -137,7 +134,7 @@ public class ExtensionChainTest {
 
   @Test
   public void testExtensionChainWithOtherExtensionAndExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionB, m_extensionA), TestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_otherExtensionB, m_extensionA), TestingExtension.class);
 
     assertState(chain, false, true);
     assertPreviousFails(chain);
@@ -154,43 +151,43 @@ public class ExtensionChainTest {
   public void testExtensionChainWithExtensionAAndExtensionBAndOtherExtensionst() {
     TestingExtensionChain<TestingExtension> chain;
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_extensionB, m_otherExtensionA), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_extensionB, m_otherExtensionA), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_extensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_extensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_extensionB, m_otherExtensionA, m_otherExtensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_extensionB, m_otherExtensionA, m_otherExtensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_extensionB, m_otherExtensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_extensionB, m_otherExtensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_extensionB, m_otherExtensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_extensionB, m_otherExtensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_otherExtensionB, m_extensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_extensionA, m_otherExtensionB, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_otherExtensionB, m_extensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, m_otherExtensionA, m_otherExtensionB, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
 
-    chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_otherExtensionB, m_extensionA, m_extensionB), TestingExtension.class);
+    chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_otherExtensionA, m_otherExtensionB, m_extensionA, m_extensionB), TestingExtension.class);
     doTestExtesionAAndExtensionB(chain);
   }
 
   @Test
   public void testExtensionChainOperationWithLocalExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(m_localExtension), ITestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Collections.singletonList(m_localExtension), ITestingExtension.class);
     chain.execOperation();
   }
 
   @Test
   public void testExtensionChainOperationWithLocalAndAdditionalExtension() {
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_localExtension, m_extensionA), ITestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_localExtension, m_extensionA), ITestingExtension.class);
     chain.execOperation();
   }
 
@@ -198,7 +195,7 @@ public class ExtensionChainTest {
   public void testExtensionChainOperationWithLocalExtensionThrowingException() {
     ITestingExtension extension = mock(ITestingExtension.class);
     doThrow(new ProcessingException()).when(extension).execOperation((TestingExtensionChain<?>) any(TestingExtensionChain.class));
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Collections.singletonList(extension), ITestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Collections.singletonList(extension), ITestingExtension.class);
     try {
       chain.execOperation();
       fail("expecting exception");
@@ -212,7 +209,7 @@ public class ExtensionChainTest {
   public void testExtensionChainOperationWithTwoExtensionsThrowingException() {
     ITestingExtension extension = mock(ITestingExtension.class);
     doThrow(new ProcessingException()).when(extension).execOperation((TestingExtensionChain<?>) any(TestingExtensionChain.class));
-    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<TestingExtension>(Arrays.<IExtension<?>> asList(m_extensionA, extension), ITestingExtension.class);
+    TestingExtensionChain<TestingExtension> chain = new TestingExtensionChain<>(Arrays.<IExtension<?>> asList(m_extensionA, extension), ITestingExtension.class);
     try {
       chain.execOperation();
       fail("expecting exception");

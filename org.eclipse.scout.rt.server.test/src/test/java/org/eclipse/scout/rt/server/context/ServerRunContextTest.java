@@ -11,11 +11,7 @@
 package org.eclipse.scout.rt.server.context;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
@@ -30,7 +26,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
@@ -96,63 +91,44 @@ public class ServerRunContextTest {
         .withUserAgent(userAgent)
         .withLocale(locale)
         .withSubject(subject)
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            RunContext runContext = RunContexts.copyCurrent();
-            assertThat(runContext, CoreMatchers.instanceOf(ServerRunContext.class));
-            ServerRunContext serverCtx = (ServerRunContext) runContext;
+        .run(() -> {
+          RunContext runContext = RunContexts.copyCurrent();
+          assertThat(runContext, CoreMatchers.instanceOf(ServerRunContext.class));
+          ServerRunContext serverCtx = (ServerRunContext) runContext;
 
-            assertSame(session, serverCtx.getSession());
-            assertSame(userAgent, serverCtx.getUserAgent());
-            assertSame(locale, serverCtx.getLocale());
-            assertSame(subject, serverCtx.getSubject());
-          }
+          assertSame(session, serverCtx.getSession());
+          assertSame(userAgent, serverCtx.getUserAgent());
+          assertSame(locale, serverCtx.getLocale());
+          assertSame(subject, serverCtx.getSubject());
         });
   }
 
   @Test
   public void testCurrentTransactionScope() {
-    RunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
-      }
-    });
-    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRED).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope());
-      }
-    });
+    RunContexts.empty().run(() -> assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope()));
+    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRED).run(() -> assertEquals(TransactionScope.REQUIRES_NEW, ServerRunContexts.copyCurrent().getTransactionScope()));
   }
 
   @Test
   public void testCopyCurrentOrElseEmpty() {
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          ServerRunContexts.copyCurrent();
-          fail("AssertionException expected because not running in a RunContext");
-        }
-        catch (AssertionException e) {
-          // expected
-        }
-
-        try {
-          ServerRunContexts.copyCurrent(false);
-          fail("AssertionException expected because not running in a RunContext");
-        }
-        catch (AssertionException e) {
-          // expected
-        }
-
-        assertNotNull(ServerRunContexts.copyCurrent(true));
+    Jobs.schedule(() -> {
+      try {
+        ServerRunContexts.copyCurrent();
+        fail("AssertionException expected because not running in a RunContext");
       }
+      catch (AssertionException e) {
+        // expected
+      }
+
+      try {
+        ServerRunContexts.copyCurrent(false);
+        fail("AssertionException expected because not running in a RunContext");
+      }
+      catch (AssertionException e) {
+        // expected
+      }
+
+      assertNotNull(ServerRunContexts.copyCurrent(true));
     }, Jobs.newInput())
         .awaitDoneAndGet();
   }

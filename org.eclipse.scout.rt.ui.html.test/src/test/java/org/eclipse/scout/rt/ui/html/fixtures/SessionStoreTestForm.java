@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm.MainBox.CloseButton;
 
 /**
@@ -82,12 +81,7 @@ public class SessionStoreTestForm extends AbstractForm {
             .show();
         break;
       case WAIT_FOR_JOB:
-        Jobs.schedule(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            SleepUtil.sleepSafe(5, TimeUnit.SECONDS);
-          }
-        }, Jobs.newInput()).awaitDone();
+        Jobs.schedule(() -> SleepUtil.sleepSafe(5, TimeUnit.SECONDS), Jobs.newInput()).awaitDone();
         break;
       case WAIT_FOR_LOOP:
         long runUntil = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(5);

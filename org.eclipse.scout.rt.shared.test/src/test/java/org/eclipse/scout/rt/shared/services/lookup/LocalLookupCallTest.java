@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -206,15 +204,15 @@ public class LocalLookupCallTest {
 
     @Override
     protected List<ILookupRow<Integer>> execCreateLookupRows() {
-      List<ILookupRow<Integer>> rows = new ArrayList<ILookupRow<Integer>>();
-      rows.add(new LookupRow<Integer>(ROW10_KEY, ROW10_TEXT));
-      rows.add(new LookupRow<Integer>(ROW20_KEY, ROW20_TEXT));
-      rows.add(new LookupRow<Integer>(ROW30_KEY, ROW30_TEXT));
-      rows.add(new LookupRow<Integer>(ROW11_KEY, ROW11_TEXT).withParentKey(ROW10_KEY));
-      rows.add(new LookupRow<Integer>(ROW12_KEY, ROW12_TEXT).withParentKey(ROW10_KEY));
-      rows.add(new LookupRow<Integer>(ROW31_KEY, ROW31_TEXT).withParentKey(ROW30_KEY));
-      rows.add(new LookupRow<Integer>(ROW40_KEY, ROW40_TEXT).withActive(false));
-      rows.add(new LookupRow<Integer>(ROW50_KEY, ROW50_TEXT).withActive(false));
+      List<ILookupRow<Integer>> rows = new ArrayList<>();
+      rows.add(new LookupRow<>(ROW10_KEY, ROW10_TEXT));
+      rows.add(new LookupRow<>(ROW20_KEY, ROW20_TEXT));
+      rows.add(new LookupRow<>(ROW30_KEY, ROW30_TEXT));
+      rows.add(new LookupRow<>(ROW11_KEY, ROW11_TEXT).withParentKey(ROW10_KEY));
+      rows.add(new LookupRow<>(ROW12_KEY, ROW12_TEXT).withParentKey(ROW10_KEY));
+      rows.add(new LookupRow<>(ROW31_KEY, ROW31_TEXT).withParentKey(ROW30_KEY));
+      rows.add(new LookupRow<>(ROW40_KEY, ROW40_TEXT).withActive(false));
+      rows.add(new LookupRow<>(ROW50_KEY, ROW50_TEXT).withActive(false));
       return rows;
     }
   }

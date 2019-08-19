@@ -123,7 +123,7 @@ public class DefaultAuthToken {
       withValidUntil(Long.parseLong(parts[1], 16));
       if (parts.length > 3) {
         int numberOfCustomArgs = parts.length - 1;
-        List<String> customArgs = new ArrayList<String>(numberOfCustomArgs);
+        List<String> customArgs = new ArrayList<>(numberOfCustomArgs);
         for (int i = 2; i < numberOfCustomArgs; i++) {
           customArgs.add(new String(HexUtility.decode(parts[i]), StandardCharsets.UTF_8));
         }

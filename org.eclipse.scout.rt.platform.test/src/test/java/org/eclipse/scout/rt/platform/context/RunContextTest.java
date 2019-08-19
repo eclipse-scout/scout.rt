@@ -10,18 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
@@ -55,7 +45,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.MDC;
 
@@ -75,15 +64,11 @@ public class RunContextTest {
     assertEquals(TransactionScope.REQUIRED, runContext.getTransactionScope());
 
     assertNotNull(runContext.getRunMonitor());
-    RunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        RunMonitor currentMonitor = RunMonitor.CURRENT.get();
-        RunMonitor newMonitor = RunContexts.empty().getRunMonitor();
-        assertNotSame(currentMonitor, newMonitor);
-        assertFalse(currentMonitor.getCancellables().contains(newMonitor));
-      }
+    RunContexts.empty().run(() -> {
+      RunMonitor currentMonitor = RunMonitor.CURRENT.get();
+      RunMonitor newMonitor = RunContexts.empty().getRunMonitor();
+      assertNotSame(currentMonitor, newMonitor);
+      assertFalse(currentMonitor.getCancellables().contains(newMonitor));
     });
   }
 
@@ -123,46 +108,34 @@ public class RunContextTest {
     // test running on the copy
     copy
         .withTransactionScope(TransactionScope.REQUIRED)
-        .run(new IRunnable() {
+        .run(() -> {
+          assertEquals("value", PropertyMap.CURRENT.get().get("key"));
+          assertSame(subject, Subject.getSubject(AccessController.getContext()));
+          assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
+          assertSame(monitor, RunMonitor.CURRENT.get());
+          assertEquals("cid", CorrelationId.CURRENT.get());
+          assertSame(tx, ITransaction.CURRENT.get());
+          assertEquals("thread-local", THREAD_LOCAL.get());
 
-          @Override
-          public void run() throws Exception {
+          RunContexts.copyCurrent().run(() -> {
             assertEquals("value", PropertyMap.CURRENT.get().get("key"));
             assertSame(subject, Subject.getSubject(AccessController.getContext()));
             assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
-            assertSame(monitor, RunMonitor.CURRENT.get());
+            assertNotSame(monitor, RunMonitor.CURRENT.get());
             assertEquals("cid", CorrelationId.CURRENT.get());
             assertSame(tx, ITransaction.CURRENT.get());
             assertEquals("thread-local", THREAD_LOCAL.get());
+          });
 
-            RunContexts.copyCurrent().run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertEquals("value", PropertyMap.CURRENT.get().get("key"));
-                assertSame(subject, Subject.getSubject(AccessController.getContext()));
-                assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
-                assertNotSame(monitor, RunMonitor.CURRENT.get());
-                assertEquals("cid", CorrelationId.CURRENT.get());
-                assertSame(tx, ITransaction.CURRENT.get());
-                assertEquals("thread-local", THREAD_LOCAL.get());
-              }
-            });
-
-            RunContexts.empty().run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertNull(PropertyMap.CURRENT.get().get("key"));
-                assertNull(Subject.getSubject(AccessController.getContext()));
-                assertNull(NlsLocale.CURRENT.get());
-                assertNotSame(monitor, RunMonitor.CURRENT.get());
-                assertNull(CorrelationId.CURRENT.get());
-                assertNotSame(tx, ITransaction.CURRENT.get());
-                assertEquals("thread-local", THREAD_LOCAL.get());
-              }
-            });
-          }
+          RunContexts.empty().run(() -> {
+            assertNull(PropertyMap.CURRENT.get().get("key"));
+            assertNull(Subject.getSubject(AccessController.getContext()));
+            assertNull(NlsLocale.CURRENT.get());
+            assertNotSame(monitor, RunMonitor.CURRENT.get());
+            assertNull(CorrelationId.CURRENT.get());
+            assertNotSame(tx, ITransaction.CURRENT.get());
+            assertEquals("thread-local", THREAD_LOCAL.get());
+          });
         });
 
     // test copy of transaction members
@@ -171,232 +144,148 @@ public class RunContextTest {
         .withTransactionMember(txMember1)
         .withTransactionMember(txMember2)
         .copy()
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertSame(txMember1, ITransaction.CURRENT.get().getMember("txMember1"));
-            assertSame(txMember2, ITransaction.CURRENT.get().getMember("txMember2"));
-          }
+        .run(() -> {
+          assertSame(txMember1, ITransaction.CURRENT.get().getMember("txMember1"));
+          assertSame(txMember2, ITransaction.CURRENT.get().getMember("txMember2"));
         });
   }
 
   @Test
   public void testCopySubject() {
-    RunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertNull(RunContexts.copyCurrent().getSubject());
-        assertNull(Subject.getSubject(AccessController.getContext()));
-      }
+    RunContexts.empty().run(() -> {
+      assertNull(RunContexts.copyCurrent().getSubject());
+      assertNull(Subject.getSubject(AccessController.getContext()));
     });
 
     final Subject john = newSubject("john");
-    RunContexts.empty().withSubject(john).run(new IRunnable() {
+    RunContexts.empty().withSubject(john).run(() -> {
+      assertSame(john, RunContexts.copyCurrent().getSubject());
+      assertSame(Subject.getSubject(AccessController.getContext()), RunContexts.copyCurrent().getSubject());
 
-      @Override
-      public void run() throws Exception {
-        assertSame(john, RunContexts.copyCurrent().getSubject());
-        assertSame(Subject.getSubject(AccessController.getContext()), RunContexts.copyCurrent().getSubject());
-
-        // Change Subject directly
-        final Subject anna = newSubject("anna");
-        Subject.doAs(anna, new PrivilegedExceptionAction<Void>() {
-
-          @Override
-          public Void run() throws Exception {
-            // Test copy via 'RunContexts.copyCurrent'
-            assertSame(anna, RunContexts.copyCurrent().getSubject());
-            RunContexts.copyCurrent().run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertSame(anna, RunContexts.copyCurrent().getSubject());
-                assertSame(anna, Subject.getSubject(AccessController.getContext()));
-              }
-            });
-
-            RunContext.CURRENT.get().run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertSame(john, RunContexts.copyCurrent().getSubject());
-                assertSame(john, Subject.getSubject(AccessController.getContext()));
-              }
-            });
-
-            // Test copy via direct 'RunContext.copy'
-            assertEquals(john, RunContext.CURRENT.get().copy().getSubject());
-            Jobs.schedule(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertSame(john, RunContexts.copyCurrent().getSubject());
-                assertSame(john, Subject.getSubject(AccessController.getContext()));
-              }
-            }, Jobs.newInput()
-                .withRunContext(RunContext.CURRENT.get().copy()))
-                .awaitDoneAndGet();
-            return null;
-          }
+      // Change Subject directly
+      final Subject anna = newSubject("anna");
+      Subject.doAs(anna, (PrivilegedExceptionAction<Void>) () -> {
+        // Test copy via 'RunContexts.copyCurrent'
+        assertSame(anna, RunContexts.copyCurrent().getSubject());
+        RunContexts.copyCurrent().run(() -> {
+          assertSame(anna, RunContexts.copyCurrent().getSubject());
+          assertSame(anna, Subject.getSubject(AccessController.getContext()));
         });
-      }
+
+        RunContext.CURRENT.get().run(() -> {
+          assertSame(john, RunContexts.copyCurrent().getSubject());
+          assertSame(john, Subject.getSubject(AccessController.getContext()));
+        });
+
+        // Test copy via direct 'RunContext.copy'
+        assertEquals(john, RunContext.CURRENT.get().copy().getSubject());
+        Jobs.schedule(() -> {
+          assertSame(john, RunContexts.copyCurrent().getSubject());
+          assertSame(john, Subject.getSubject(AccessController.getContext()));
+        }, Jobs.newInput()
+            .withRunContext(RunContext.CURRENT.get().copy()))
+            .awaitDoneAndGet();
+        return null;
+      });
     });
 
-    RunContexts.empty().withSubject(null).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertNull(RunContexts.copyCurrent().getSubject());
-        assertNull(Subject.getSubject(AccessController.getContext()));
-      }
+    RunContexts.empty().withSubject(null).run(() -> {
+      assertNull(RunContexts.copyCurrent().getSubject());
+      assertNull(Subject.getSubject(AccessController.getContext()));
     });
   }
 
   @Test
   public void testCopyCurrent_PropertyMap() {
-    RunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertNotNull(RunContexts.copyCurrent());
-        assertTrue(toSet(RunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
-      }
+    RunContexts.empty().run(() -> {
+      assertNotNull(RunContexts.copyCurrent());
+      assertTrue(toSet(RunContexts.copyCurrent().getPropertyMap().iterator()).isEmpty());
     });
-    RunContexts.empty().withProperties(Collections.singletonMap("prop", "value")).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertNotSame(PropertyMap.CURRENT.get(), RunContexts.copyCurrent().getPropertyMap()); // test for copy
-        assertEquals(toSet(PropertyMap.CURRENT.get().iterator()), toSet(RunContexts.copyCurrent().getPropertyMap().iterator()));
-      }
+    RunContexts.empty().withProperties(Collections.singletonMap("prop", "value")).run(() -> {
+      assertNotSame(PropertyMap.CURRENT.get(), RunContexts.copyCurrent().getPropertyMap()); // test for copy
+      assertEquals(toSet(PropertyMap.CURRENT.get().iterator()), toSet(RunContexts.copyCurrent().getPropertyMap().iterator()));
     });
   }
 
   @Test
   public void testCopyLocale() {
-    RunContexts.empty().withLocale(null).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertNull(RunContexts.copyCurrent().getLocale());
-        assertNull(NlsLocale.CURRENT.get());
-      }
+    RunContexts.empty().withLocale(null).run(() -> {
+      assertNull(RunContexts.copyCurrent().getLocale());
+      assertNull(NlsLocale.CURRENT.get());
     });
 
-    RunContexts.empty().withLocale(Locale.CANADA_FRENCH).run(new IRunnable() {
+    RunContexts.empty().withLocale(Locale.CANADA_FRENCH).run(() -> {
+      assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
+      assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
+      assertEquals(Locale.KOREAN, RunContexts.copyCurrent().withLocale(Locale.KOREAN).getLocale());
 
-      @Override
-      public void run() throws Exception {
-        assertEquals(Locale.CANADA_FRENCH, NlsLocale.CURRENT.get());
+      // Change Locale directly via 'thread-local'
+      NlsLocale.CURRENT.set(Locale.ITALY);
+      assertEquals(Locale.ITALY, RunContexts.copyCurrent().getLocale());
+      RunContexts.copyCurrent().run(() -> assertEquals(Locale.ITALY, NlsLocale.get()));
+
+      // Test copy via 'RunContexts.copyCurrent'
+      Jobs.schedule(() -> assertEquals(Locale.ITALY, NlsLocale.get()), Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent()))
+          .awaitDoneAndGet();
+
+      // Test copy via direct 'RunContext.copy'
+      assertEquals(Locale.CANADA_FRENCH, RunContext.CURRENT.get().copy().getLocale());
+      Jobs.schedule(() -> {
+        assertEquals(Locale.CANADA_FRENCH, NlsLocale.get());
         assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
-        assertEquals(Locale.KOREAN, RunContexts.copyCurrent().withLocale(Locale.KOREAN).getLocale());
+      }, Jobs.newInput()
+          .withRunContext(RunContext.CURRENT.get().copy()))
+          .awaitDoneAndGet();
 
-        // Change Locale directly via 'thread-local'
-        NlsLocale.CURRENT.set(Locale.ITALY);
-        assertEquals(Locale.ITALY, RunContexts.copyCurrent().getLocale());
-        RunContexts.copyCurrent().run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertEquals(Locale.ITALY, NlsLocale.get());
-          }
-        });
-
-        // Test copy via 'RunContexts.copyCurrent'
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertEquals(Locale.ITALY, NlsLocale.get());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent()))
-            .awaitDoneAndGet();
-
-        // Test copy via direct 'RunContext.copy'
-        assertEquals(Locale.CANADA_FRENCH, RunContext.CURRENT.get().copy().getLocale());
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertEquals(Locale.CANADA_FRENCH, NlsLocale.get());
-            assertEquals(Locale.CANADA_FRENCH, RunContexts.copyCurrent().getLocale());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContext.CURRENT.get().copy()))
-            .awaitDoneAndGet();
-
-      }
     });
   }
 
   @Test
   public void testCopyRunMonitor() {
-    RunContexts.empty().run(new IRunnable() {
+    RunContexts.empty().run(() -> {
+      final RunMonitor currentMonitor = RunMonitor.CURRENT.get();
+      assertNotNull(currentMonitor);
 
-      @Override
-      public void run() throws Exception {
-        final RunMonitor currentMonitor = RunMonitor.CURRENT.get();
-        assertNotNull(currentMonitor);
+      // Test new run monitor and no registration as child monitor
+      RunMonitor childMonitor = RunContexts.copyCurrent().getRunMonitor();
+      assertNotSame(currentMonitor, childMonitor);
+      assertFalse(currentMonitor.getCancellables().contains(childMonitor));
 
-        // Test new run monitor and no registration as child monitor
-        RunMonitor childMonitor = RunContexts.copyCurrent().getRunMonitor();
-        assertNotSame(currentMonitor, childMonitor);
-        assertFalse(currentMonitor.getCancellables().contains(childMonitor));
+      // Test specific monitor and no registration as child monitor
+      final RunMonitor specificRunMonitor = BEANS.get(RunMonitor.class);
+      assertSame(specificRunMonitor, RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor());
+      assertFalse(currentMonitor.getCancellables().contains(RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor()));
+      RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).run(() -> assertSame(specificRunMonitor, RunMonitor.CURRENT.get()));
 
-        // Test specific monitor and no registration as child monitor
-        final RunMonitor specificRunMonitor = BEANS.get(RunMonitor.class);
-        assertSame(specificRunMonitor, RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor());
-        assertFalse(currentMonitor.getCancellables().contains(RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).getRunMonitor()));
-        RunContexts.copyCurrent().withRunMonitor(specificRunMonitor).run(new IRunnable() {
+      // Test new run monitor and no registration as child monitor (empty)
+      RunMonitor detachedMonitor = RunContexts.empty().getRunMonitor();
+      assertNotSame(currentMonitor, detachedMonitor);
+      assertFalse(currentMonitor.getCancellables().contains(detachedMonitor));
 
-          @Override
-          public void run() throws Exception {
-            assertSame(specificRunMonitor, RunMonitor.CURRENT.get());
-          }
-        });
+      // Change monitor directly via 'thread-local'
+      final RunMonitor newMonitor = BEANS.get(RunMonitor.class);
+      RunMonitor.CURRENT.set(newMonitor);
 
-        // Test new run monitor and no registration as child monitor (empty)
-        RunMonitor detachedMonitor = RunContexts.empty().getRunMonitor();
-        assertNotSame(currentMonitor, detachedMonitor);
-        assertFalse(currentMonitor.getCancellables().contains(detachedMonitor));
+      // Test copy via 'RunContexts.copyCurrent'
+      assertNotSame(newMonitor, RunContexts.copyCurrent().getRunMonitor());
+      assertNotSame(currentMonitor, RunContexts.copyCurrent().getRunMonitor());
+      assertFalse(newMonitor.getCancellables().contains(RunContexts.copyCurrent().getRunMonitor()));
+      Jobs.schedule(() -> {
+        assertNotNull(RunMonitor.CURRENT.get());
+        assertNotSame(newMonitor, RunMonitor.CURRENT.get());
+        assertNotSame(currentMonitor, RunMonitor.CURRENT.get());
+        assertTrue(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent()))
+          .awaitDoneAndGet();
 
-        // Change monitor directly via 'thread-local'
-        final RunMonitor newMonitor = BEANS.get(RunMonitor.class);
-        RunMonitor.CURRENT.set(newMonitor);
+      // Test copy via direct 'RunContext.copy'
+      assertSame(currentMonitor, RunContext.CURRENT.get().copy().getRunMonitor());
+      Jobs.schedule(() -> assertSame(currentMonitor, RunMonitor.CURRENT.get()), Jobs.newInput()
+          .withRunContext(RunContext.CURRENT.get().copy()))
+          .awaitDoneAndGet();
 
-        // Test copy via 'RunContexts.copyCurrent'
-        assertNotSame(newMonitor, RunContexts.copyCurrent().getRunMonitor());
-        assertNotSame(currentMonitor, RunContexts.copyCurrent().getRunMonitor());
-        assertFalse(newMonitor.getCancellables().contains(RunContexts.copyCurrent().getRunMonitor()));
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertNotNull(RunMonitor.CURRENT.get());
-            assertNotSame(newMonitor, RunMonitor.CURRENT.get());
-            assertNotSame(currentMonitor, RunMonitor.CURRENT.get());
-            assertTrue(newMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent()))
-            .awaitDoneAndGet();
-
-        // Test copy via direct 'RunContext.copy'
-        assertSame(currentMonitor, RunContext.CURRENT.get().copy().getRunMonitor());
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertSame(currentMonitor, RunMonitor.CURRENT.get());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContext.CURRENT.get().copy()))
-            .awaitDoneAndGet();
-
-      }
     });
   }
 
@@ -412,70 +301,34 @@ public class RunContextTest {
 
   @Test
   public void testCopyCurrent_TransactionScope() {
-    RunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope());
-      }
-    });
-    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRES_NEW).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope());
-      }
-    });
+    RunContexts.empty().run(() -> assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope()));
+    RunContexts.empty().withTransactionScope(TransactionScope.REQUIRES_NEW).run(() -> assertEquals(TransactionScope.REQUIRED, RunContexts.copyCurrent().getTransactionScope()));
   }
 
   @Test
   public void testCopyCurrent_Transaction() {
     final ITransaction tx = mock(ITransaction.class);
 
-    RunContexts.empty().withTransaction(tx).run(new IRunnable() {
+    RunContexts.empty().withTransaction(tx).run(() -> assertEquals(tx, RunContexts.copyCurrent().getTransaction()));
 
-      @Override
-      public void run() throws Exception {
-        assertEquals(tx, RunContexts.copyCurrent().getTransaction());
-      }
+    RunContexts.empty().withTransaction(null).run(() -> {
+      assertNotNull(ITransaction.CURRENT.get());
+      assertNotNull(RunContexts.copyCurrent().getTransaction());
+      assertNull(RunContext.CURRENT.get().getTransaction());
+
+      RunContexts.copyCurrent().run(() -> assertNotNull(ITransaction.CURRENT.get()));
     });
 
-    RunContexts.empty().withTransaction(null).run(new IRunnable() {
+    RunContexts.empty().withTransaction(tx).run(() -> {
+      assertSame(tx, ITransaction.CURRENT.get());
+      assertSame(tx, RunContexts.copyCurrent().getTransaction());
+      assertSame(tx, RunContext.CURRENT.get().getTransaction());
 
-      @Override
-      public void run() throws Exception {
-        assertNotNull(ITransaction.CURRENT.get());
-        assertNotNull(RunContexts.copyCurrent().getTransaction());
-        assertNull(RunContext.CURRENT.get().getTransaction());
-
-        RunContexts.copyCurrent().run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertNotNull(ITransaction.CURRENT.get());
-          }
-        });
-      }
-    });
-
-    RunContexts.empty().withTransaction(tx).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
+      RunContexts.copyCurrent().run(() -> {
         assertSame(tx, ITransaction.CURRENT.get());
         assertSame(tx, RunContexts.copyCurrent().getTransaction());
         assertSame(tx, RunContext.CURRENT.get().getTransaction());
-
-        RunContexts.copyCurrent().run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertSame(tx, ITransaction.CURRENT.get());
-            assertSame(tx, RunContexts.copyCurrent().getTransaction());
-            assertSame(tx, RunContext.CURRENT.get().getTransaction());
-          }
-        });
-      }
+      });
     });
   }
 
@@ -484,45 +337,29 @@ public class RunContextTest {
     final ITransactionMember txMember = mock(ITransactionMember.class);
     when(txMember.getMemberId()).thenReturn("txMember");
 
-    RunContexts.empty().withTransactionMember(txMember).run(new IRunnable() {
+    RunContexts.empty().withTransactionMember(txMember).run(() -> {
+      final ITransaction tx = ITransaction.CURRENT.get();
+      assertNotNull(tx);
+      assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
 
-      @Override
-      public void run() throws Exception {
-        final ITransaction tx = ITransaction.CURRENT.get();
-        assertNotNull(tx);
-        assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
-
-        RunContexts.copyCurrent()
-            .withTransactionScope(TransactionScope.REQUIRED)
-            .run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertSame(tx, ITransaction.CURRENT.get());
-                assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
-              }
-            });
-        RunContexts.copyCurrent()
-            .withTransactionScope(TransactionScope.REQUIRES_NEW)
-            .run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertNotSame(tx, ITransaction.CURRENT.get());
-                assertNull(ITransaction.CURRENT.get().getMember("txMember"));
-              }
-            });
-        RunContexts.copyCurrent()
-            .withTransactionScope(TransactionScope.MANDATORY)
-            .run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertSame(tx, ITransaction.CURRENT.get());
-                assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
-              }
-            });
-      }
+      RunContexts.copyCurrent()
+          .withTransactionScope(TransactionScope.REQUIRED)
+          .run(() -> {
+            assertSame(tx, ITransaction.CURRENT.get());
+            assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
+          });
+      RunContexts.copyCurrent()
+          .withTransactionScope(TransactionScope.REQUIRES_NEW)
+          .run(() -> {
+            assertNotSame(tx, ITransaction.CURRENT.get());
+            assertNull(ITransaction.CURRENT.get().getMember("txMember"));
+          });
+      RunContexts.copyCurrent()
+          .withTransactionScope(TransactionScope.MANDATORY)
+          .run(() -> {
+            assertSame(tx, ITransaction.CURRENT.get());
+            assertSame(txMember, ITransaction.CURRENT.get().getMember("txMember"));
+          });
     });
   }
 
@@ -536,13 +373,7 @@ public class RunContextTest {
     RunContexts.empty()
         .withTransactionScope(TransactionScope.REQUIRES_NEW)
         .withTransactionMember(txMember)
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
-          }
-        });
+        .run(() -> assertSame(txMember, ITransaction.CURRENT.get().getMember("abc")));
 
     InOrder inOrder = Mockito.inOrder(txMember);
     inOrder.verify(txMember, times(1)).commitPhase1();
@@ -557,16 +388,10 @@ public class RunContextTest {
 
     RunContexts.empty()
         .withTransactionScope(TransactionScope.REQUIRES_NEW)
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            RunContexts.copyCurrent()
-                .withTransactionScope(TransactionScope.REQUIRED)
-                .withTransactionMember(txMember)
-                .run(mock(IRunnable.class));
-          }
-        });
+        .run(() -> RunContexts.copyCurrent()
+            .withTransactionScope(TransactionScope.REQUIRED)
+            .withTransactionMember(txMember)
+            .run(mock(IRunnable.class)));
   }
 
   @Test
@@ -579,13 +404,7 @@ public class RunContextTest {
     RunContexts.empty()
         .withTransactionScope(TransactionScope.REQUIRED)
         .withTransactionMember(txMember)
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
-          }
-        });
+        .run(() -> assertSame(txMember, ITransaction.CURRENT.get().getMember("abc")));
 
     InOrder inOrder = Mockito.inOrder(txMember);
     inOrder.verify(txMember, times(1)).commitPhase1();
@@ -598,60 +417,34 @@ public class RunContextTest {
   public void testThreadLocal() {
     RunContexts.empty()
         .withThreadLocal(THREAD_LOCAL, "initial_value")
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            assertEquals("initial_value", THREAD_LOCAL.get());
-          }
-        });
+        .run(() -> assertEquals("initial_value", THREAD_LOCAL.get()));
   }
 
   @Test
   public void testCopyThreadLocal() {
     RunContexts.empty()
         .withThreadLocal(THREAD_LOCAL, "initial_value")
-        .run(new IRunnable() {
+        .run(() -> {
+          assertEquals("initial_value", THREAD_LOCAL.get());
 
-          @Override
-          public void run() throws Exception {
+          // Change ThreadLocal directly
+          THREAD_LOCAL.set("updated_value");
+
+          RunContexts.copyCurrent().run(() -> assertEquals("updated_value", THREAD_LOCAL.get()));
+
+          // Test copy via copyCurrent
+          Jobs.schedule(() -> assertEquals("updated_value", THREAD_LOCAL.get()), Jobs.newInput()
+              .withRunContext(RunContexts.copyCurrent()))
+              .awaitDoneAndGet();
+
+          // Test copy directly
+          assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
+          Jobs.schedule(() -> {
             assertEquals("initial_value", THREAD_LOCAL.get());
-
-            // Change ThreadLocal directly
-            THREAD_LOCAL.set("updated_value");
-
-            RunContexts.copyCurrent().run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertEquals("updated_value", THREAD_LOCAL.get());
-              }
-            });
-
-            // Test copy via copyCurrent
-            Jobs.schedule(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertEquals("updated_value", THREAD_LOCAL.get());
-              }
-            }, Jobs.newInput()
-                .withRunContext(RunContexts.copyCurrent()))
-                .awaitDoneAndGet();
-
-            // Test copy directly
             assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
-            Jobs.schedule(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertEquals("initial_value", THREAD_LOCAL.get());
-                assertEquals("initial_value", RunContext.CURRENT.get().copy().getThreadLocal(THREAD_LOCAL));
-              }
-            }, Jobs.newInput()
-                .withRunContext(RunContext.CURRENT.get().copy()))
-                .awaitDoneAndGet();
-          }
+          }, Jobs.newInput()
+              .withRunContext(RunContext.CURRENT.get().copy()))
+              .awaitDoneAndGet();
         });
   }
 
@@ -659,13 +452,7 @@ public class RunContextTest {
   public void testCurrentRunContext() {
     final RunContext runContext = RunContexts.empty();
 
-    runContext.run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertSame(runContext, RunContext.CURRENT.get());
-      }
-    });
+    runContext.run(() -> assertSame(runContext, RunContext.CURRENT.get()));
   }
 
   @Test
@@ -675,29 +462,19 @@ public class RunContextTest {
     final AtomicBoolean interrupted = new AtomicBoolean();
     final RunMonitor monitor = BEANS.get(RunMonitor.class);
 
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        RunContexts.empty()
-            .withRunMonitor(monitor)
-            .run(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                try {
-                  assertTrue(setupLatch.countDownAndBlock(10, TimeUnit.SECONDS));
-                }
-                catch (InterruptedException e) {
-                  interrupted.set(true);
-                }
-                finally {
-                  verifyLatch.countDown();
-                }
-              }
-            });
-      }
-    }, Jobs.newInput());
+    Jobs.schedule(() -> RunContexts.empty()
+        .withRunMonitor(monitor)
+        .run(() -> {
+          try {
+            assertTrue(setupLatch.countDownAndBlock(10, TimeUnit.SECONDS));
+          }
+          catch (InterruptedException e) {
+            interrupted.set(true);
+          }
+          finally {
+            verifyLatch.countDown();
+          }
+        }), Jobs.newInput());
 
     assertTrue(setupLatch.await());
     monitor.cancel(true);
@@ -707,28 +484,24 @@ public class RunContextTest {
 
   @Test
   public void testCopyCurrentOrElseEmpty() {
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          RunContexts.copyCurrent();
-          fail("AssertionException expected because not running in a RunContext");
-        }
-        catch (AssertionException e) {
-          // expected
-        }
-
-        try {
-          RunContexts.copyCurrent(false);
-          fail("AssertionException expected because not running in a RunContext");
-        }
-        catch (AssertionException e) {
-          // expected
-        }
-
-        assertNotNull(RunContexts.copyCurrent(true));
+    Jobs.schedule(() -> {
+      try {
+        RunContexts.copyCurrent();
+        fail("AssertionException expected because not running in a RunContext");
       }
+      catch (AssertionException e) {
+        // expected
+      }
+
+      try {
+        RunContexts.copyCurrent(false);
+        fail("AssertionException expected because not running in a RunContext");
+      }
+      catch (AssertionException e) {
+        // expected
+      }
+
+      assertNotNull(RunContexts.copyCurrent(true));
     }, Jobs.newInput()
         .withRunContext(null))
         .awaitDoneAndGet();
@@ -741,58 +514,34 @@ public class RunContextTest {
 
     IDiagnosticContextValueProvider diagnostic1 = mock(IDiagnosticContextValueProvider.class);
     when(diagnostic1.key()).thenReturn("test-key-1");
-    when(diagnostic1.value()).thenAnswer(new Answer<String>() {
-
-      @Override
-      public String answer(InvocationOnMock invocation) throws Throwable {
-        return diagnosticThreadLocal1.get();
-      }
-    });
+    when(diagnostic1.value()).thenAnswer((Answer<String>) invocation -> diagnosticThreadLocal1.get());
 
     IDiagnosticContextValueProvider diagnostic2 = mock(IDiagnosticContextValueProvider.class);
     when(diagnostic2.key()).thenReturn("test-key-2");
-    when(diagnostic2.value()).thenAnswer(new Answer<String>() {
-
-      @Override
-      public String answer(InvocationOnMock invocation) throws Throwable {
-        return diagnosticThreadLocal2.get();
-      }
-    });
+    when(diagnostic2.value()).thenAnswer((Answer<String>) invocation -> diagnosticThreadLocal2.get());
 
     RunContexts.empty()
         .withDiagnostic(diagnostic1)
         .withDiagnostic(diagnostic2)
         .withThreadLocal(diagnosticThreadLocal1, "value-1")
         .withThreadLocal(diagnosticThreadLocal2, "value-2")
-        .run(new IRunnable() {
+        .run(() -> {
+          assertEquals("value-1", MDC.get("test-key-1"));
+          assertEquals("value-2", MDC.get("test-key-2"));
 
-          @Override
-          public void run() throws Exception {
+          RunContexts.copyCurrent()
+              .withThreadLocal(diagnosticThreadLocal2, "ABC")
+              .run(() -> {
+                assertEquals("value-1", MDC.get("test-key-1"));
+                assertEquals("ABC", MDC.get("test-key-2"));
+              });
+
+          Jobs.schedule(() -> {
             assertEquals("value-1", MDC.get("test-key-1"));
             assertEquals("value-2", MDC.get("test-key-2"));
-
-            RunContexts.copyCurrent()
-                .withThreadLocal(diagnosticThreadLocal2, "ABC")
-                .run(new IRunnable() {
-
-                  @Override
-                  public void run() throws Exception {
-                    assertEquals("value-1", MDC.get("test-key-1"));
-                    assertEquals("ABC", MDC.get("test-key-2"));
-                  }
-                });
-
-            Jobs.schedule(new IRunnable() {
-
-              @Override
-              public void run() throws Exception {
-                assertEquals("value-1", MDC.get("test-key-1"));
-                assertEquals("value-2", MDC.get("test-key-2"));
-              }
-            }, Jobs.newInput()
-                .withRunContext(RunContext.CURRENT.get()))
-                .awaitDoneAndGet();
-          }
+          }, Jobs.newInput()
+              .withRunContext(RunContext.CURRENT.get()))
+              .awaitDoneAndGet();
         });
   }
 
@@ -817,12 +566,8 @@ public class RunContextTest {
 
     final Exception exception = new Exception();
     try {
-      runContext.run(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          throw exception;
-        }
+      runContext.run(() -> {
+        throw exception;
       });
     }
     catch (PlatformException e) {
@@ -870,15 +615,11 @@ public class RunContextTest {
     final ICancellable c1 = new LocalCancellable();
     final ICancellable c2 = new LocalCancellable();
 
-    runContext.run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        newRunMonitor.registerCancellable(c1);
-        newRunMonitor.registerCancellable(c2);
-        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
-      }
+    runContext.run(() -> {
+      assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+      newRunMonitor.registerCancellable(c1);
+      newRunMonitor.registerCancellable(c2);
+      assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor.getCancellables().contains(RunMonitor.CURRENT.get()));
     });
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());
@@ -933,14 +674,10 @@ public class RunContextTest {
     final ICancellable c1 = new LocalCancellable();
     final ICancellable c2 = new LocalCancellable();
 
-    runContext.run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        newRunMonitor.registerCancellable(c1);
-        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
-      }
+    runContext.run(() -> {
+      assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+      newRunMonitor.registerCancellable(c1);
+      assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
     });
 
     // set new current run monitor
@@ -948,14 +685,10 @@ public class RunContextTest {
     final RunMonitor currentRunMonitor2 = new RunMonitor();
     RunMonitor.CURRENT.set(currentRunMonitor2);
 
-    runContext.withParentRunMonitor(currentRunMonitor2).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        newRunMonitor.registerCancellable(c2);
-        assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
-      }
+    runContext.withParentRunMonitor(currentRunMonitor2).run(() -> {
+      assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+      newRunMonitor.registerCancellable(c2);
+      assertTrue("Run monitor should be registered within current run monitor", currentRunMonitor1.getCancellables().contains(RunMonitor.CURRENT.get()));
     });
 
     assertSame(currentRunMonitor2, RunMonitor.CURRENT.get());
@@ -1007,26 +740,18 @@ public class RunContextTest {
 
     assertFalse("New run monitor must not be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
 
-    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        startedCondition1.setBlocking(false);
-        blockingCondition1.waitFor();
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
-      }
+    IFuture<Void> future1 = Jobs.schedule(() -> {
+      startedCondition1.setBlocking(false);
+      blockingCondition1.waitFor();
+      assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+      assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
     }, Jobs.newInput().withRunContext(runContext));
 
-    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        startedCondition2.setBlocking(false);
-        blockingCondition2.waitFor();
-        assertSame(newRunMonitor, RunMonitor.CURRENT.get());
-        assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
-      }
+    IFuture<Void> future2 = Jobs.schedule(() -> {
+      startedCondition2.setBlocking(false);
+      blockingCondition2.waitFor();
+      assertSame(newRunMonitor, RunMonitor.CURRENT.get());
+      assertTrue("New run monitor must be registered with current run monitor", currentRunMonitor.containsCancellable(newRunMonitor));
     }, Jobs.newInput().withRunContext(runContext));
 
     assertSame(currentRunMonitor, RunMonitor.CURRENT.get());

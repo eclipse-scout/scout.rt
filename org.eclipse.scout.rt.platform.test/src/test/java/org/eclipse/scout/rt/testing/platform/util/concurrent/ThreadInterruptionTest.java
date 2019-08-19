@@ -10,11 +10,9 @@
  */
 package org.eclipse.scout.rt.testing.platform.util.concurrent;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruption.IRestorer;
 import org.junit.Test;
@@ -23,16 +21,12 @@ public class ThreadInterruptionTest {
 
   @Test
   public void testThreadNotInterrupted() {
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertFalse(Thread.currentThread().isInterrupted());
-        IRestorer interruption = ThreadInterruption.clear();
-        assertFalse(Thread.currentThread().isInterrupted());
-        interruption.restore();
-        assertFalse(Thread.currentThread().isInterrupted());
-      }
+    Jobs.schedule(() -> {
+      assertFalse(Thread.currentThread().isInterrupted());
+      IRestorer interruption = ThreadInterruption.clear();
+      assertFalse(Thread.currentThread().isInterrupted());
+      interruption.restore();
+      assertFalse(Thread.currentThread().isInterrupted());
     }, Jobs.newInput()
         .withExceptionHandling(null, false))
         .awaitDoneAndGet();
@@ -40,18 +34,14 @@ public class ThreadInterruptionTest {
 
   @Test
   public void testThreadInterrupted() {
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
 
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-
-        assertTrue(Thread.currentThread().isInterrupted());
-        IRestorer interruption = ThreadInterruption.clear();
-        assertFalse(Thread.currentThread().isInterrupted());
-        interruption.restore();
-        assertTrue(Thread.currentThread().isInterrupted());
-      }
+      assertTrue(Thread.currentThread().isInterrupted());
+      IRestorer interruption = ThreadInterruption.clear();
+      assertFalse(Thread.currentThread().isInterrupted());
+      interruption.restore();
+      assertTrue(Thread.currentThread().isInterrupted());
     }, Jobs.newInput()
         .withExceptionHandling(null, false))
         .awaitDoneAndGet();
@@ -59,21 +49,17 @@ public class ThreadInterruptionTest {
 
   @Test
   public void testInterruptionAfterClear() {
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      assertFalse(Thread.currentThread().isInterrupted());
 
-      @Override
-      public void run() throws Exception {
-        assertFalse(Thread.currentThread().isInterrupted());
+      IRestorer interruption = ThreadInterruption.clear();
+      assertFalse(Thread.currentThread().isInterrupted());
 
-        IRestorer interruption = ThreadInterruption.clear();
-        assertFalse(Thread.currentThread().isInterrupted());
+      Thread.currentThread().interrupt();
 
-        Thread.currentThread().interrupt();
+      interruption.restore();
 
-        interruption.restore();
-
-        assertTrue(Thread.currentThread().isInterrupted());
-      }
+      assertTrue(Thread.currentThread().isInterrupted());
     }, Jobs.newInput()
         .withExceptionHandling(null, false))
         .awaitDoneAndGet();

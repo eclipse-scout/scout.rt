@@ -98,7 +98,7 @@ public class JsonLookupRow<T> implements IJsonObject {
     if (lookupRow == null) {
       return null;
     }
-    return new JsonLookupRow<T>(lookupRow, multipleColumns, keyMapper).toJson();
+    return new JsonLookupRow<>(lookupRow, multipleColumns, keyMapper).toJson();
   }
 
 }

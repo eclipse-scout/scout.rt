@@ -11,12 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +66,7 @@ public class CodeServiceTest {
     ICodeService service = newCodeServiceInstance();
     Collection<ICodeType<?, ?>> codeTypes1 = service.getAllCodeTypes();
     assertEquals("size", 2, codeTypes1.size());
-    Set<Class<?>> codeTypeClasses = new HashSet<Class<?>>(2);
+    Set<Class<?>> codeTypeClasses = new HashSet<>(2);
     for (ICodeType<?, ?> ct : codeTypes1) {
       codeTypeClasses.add(ct.getClass());
     }
@@ -108,18 +103,18 @@ public class CodeServiceTest {
     ICodeService service = newCodeServiceInstance();
     service.getAllCodeTypes();
 
-    List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<>();
     types1.add(AbcCodeType.class);
     types1.add(ZyxCodeType.class);
     List<ICodeType<?, ?>> codeTypes1 = service.getCodeTypes(types1);
     assertEquals("codeTypes1 size", 2, codeTypes1.size());
 
-    List<Class<? extends ICodeType<?, ?>>> types2 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> types2 = new ArrayList<>();
     types2.add(AbcCodeType.class);
     List<ICodeType<?, ?>> codeTypes2 = service.getCodeTypes(types2);
     assertEquals("codeTypes2 size", 1, codeTypes2.size());
 
-    List<Class<? extends ICodeType<?, ?>>> types3 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> types3 = new ArrayList<>();
     types3.add(ZyxCodeType.class);
     List<ICodeType<?, ?>> codeTypes3 = service.getCodeTypes(types3);
     assertEquals("codeTypes2 size", 1, codeTypes3.size());
@@ -127,7 +122,7 @@ public class CodeServiceTest {
     assertSame(codeTypes1.get(0), codeTypes2.get(0));
     assertSame(codeTypes1.get(1), codeTypes3.get(0));
 
-    List<Class<? extends ICodeType<?, ?>>> types4 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> types4 = new ArrayList<>();
     types4.add(ZyxCodeType.class);
     types4.add(AbcCodeType.class);
     List<ICodeType<?, ?>> codeTypes4 = service.getCodeTypes(types4);
@@ -173,7 +168,7 @@ public class CodeServiceTest {
     AbcCodeType abcCodeType1 = service.getCodeType(AbcCodeType.class);
     ZyxCodeType zyxCodeType1 = service.getCodeType(ZyxCodeType.class);
 
-    List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> types1 = new ArrayList<>();
     types1.add(AbcCodeType.class);
     types1.add(ZyxCodeType.class);
     List<ICodeType<?, ?>> codeTypes1 = service.reloadCodeTypes(types1);

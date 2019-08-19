@@ -10,17 +10,10 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -60,14 +53,8 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput();
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new ExceptionProcessor<String>(jobInput));
-    String result = chain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "result";
-      }
-    });
+    chain.add(new ExceptionProcessor<>(jobInput));
+    String result = chain.call(() -> "result");
 
     assertEquals("result", result);
   }
@@ -79,15 +66,11 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput();
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new CallableChainExceptionHandler<String>());
-    chain.add(new ExceptionProcessor<String>(jobInput));
+    chain.add(new CallableChainExceptionHandler<>());
+    chain.add(new ExceptionProcessor<>(jobInput));
     try {
-      chain.call(new Callable<String>() {
-
-        @Override
-        public String call() throws Exception {
-          throw exception;
-        }
+      chain.call(() -> {
+        throw exception;
       });
       fail();
     }
@@ -105,13 +88,9 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput().withExceptionHandling(BEANS.get(ExceptionHandler.class), true);
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new ExceptionProcessor<String>(jobInput));
-    chain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw exception;
-      }
+    chain.add(new ExceptionProcessor<>(jobInput));
+    chain.call(() -> {
+      throw exception;
     });
     verify(m_exceptionHandler, times(1)).handle(eq(exception));
     verifyNoMoreInteractions(m_exceptionHandler);
@@ -124,13 +103,9 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, true);
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new ExceptionProcessor<String>(jobInput));
-    chain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw exception;
-      }
+    chain.add(new ExceptionProcessor<>(jobInput));
+    chain.call(() -> {
+      throw exception;
     });
     verify(m_exceptionHandler, never()).handle(eq(exception));
   }
@@ -142,14 +117,10 @@ public class ExceptionProcessorTest {
     JobInput jobInput = Jobs.newInput().withExceptionHandling(null, false);
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new ExceptionProcessor<String>(jobInput));
+    chain.add(new ExceptionProcessor<>(jobInput));
     try {
-      chain.call(new Callable<String>() {
-
-        @Override
-        public String call() throws Exception {
-          throw exception;
-        }
+      chain.call(() -> {
+        throw exception;
       });
       fail();
     }
@@ -176,13 +147,9 @@ public class ExceptionProcessorTest {
         }, true);
 
     CallableChain<String> chain = new CallableChain<>();
-    chain.add(new ExceptionProcessor<String>(jobInput));
-    chain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw exception;
-      }
+    chain.add(new ExceptionProcessor<>(jobInput));
+    chain.call(() -> {
+      throw exception;
     });
     assertSame(exception, error.get());
     verify(m_exceptionHandler, never()).handle(eq(exception));

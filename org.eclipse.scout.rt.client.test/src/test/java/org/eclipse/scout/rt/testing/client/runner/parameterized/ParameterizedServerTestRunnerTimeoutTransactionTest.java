@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.client.runner.parameterized;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +53,7 @@ public class ParameterizedServerTestRunnerTimeoutTransactionTest {
   public ParameterizedServerTestRunnerTimeoutTransactionTest(ParameterizedServerTestRunnerTestParameter param) {
     m_param = param;
 
-    s_protocolByTestMethod = new HashMap<String, Set<PropertyMap>>();
+    s_protocolByTestMethod = new HashMap<>();
     s_expectedPropertyMapsCountByTestMethod = new HashMap<>();
     s_expectedPropertyMapsCountByTestMethod.put("testDefault", 1);
     s_expectedPropertyMapsCountByTestMethod.put("testTimeout", 3);

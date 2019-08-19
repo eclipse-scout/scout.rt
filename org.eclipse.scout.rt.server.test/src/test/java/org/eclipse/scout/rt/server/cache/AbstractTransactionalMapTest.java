@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public abstract class AbstractTransactionalMapTest {
 
   @SuppressWarnings("unchecked")
   protected <K, V> void assertMapStateSimple(Map<K, V> actualMap, Object... expectedKeyValuePairs) {
-    Map<K, V> expectedMap = new HashMap<K, V>();
+    Map<K, V> expectedMap = new HashMap<>();
     for (int i = 0; i < expectedKeyValuePairs.length; i = i + 2) {
       expectedMap.put((K) expectedKeyValuePairs[i], (V) expectedKeyValuePairs[i + 1]);
     }
@@ -77,7 +76,7 @@ public abstract class AbstractTransactionalMapTest {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(1, "1");
     Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, initalMap);
 
@@ -116,11 +115,11 @@ public abstract class AbstractTransactionalMapTest {
   public void testPutAll() {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
-    Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, new HashMap<Integer, String>());
+    Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, new HashMap<>());
 
     // tr1
     ITransaction.CURRENT.set(tr1);
-    Map<Integer, String> tr1Map = new HashMap<Integer, String>();
+    Map<Integer, String> tr1Map = new HashMap<>();
     tr1Map.put(1, "1");
     tr1Map.put(2, "2");
     map.putAll(tr1Map);
@@ -128,7 +127,7 @@ public abstract class AbstractTransactionalMapTest {
 
     // tr2
     ITransaction.CURRENT.set(tr2);
-    Map<Integer, String> tr2Map = new HashMap<Integer, String>();
+    Map<Integer, String> tr2Map = new HashMap<>();
     tr2Map.put(2, "3");// transactional concurrent modification
     tr2Map.put(3, "3");
     tr2Map.put(4, "4");
@@ -153,7 +152,7 @@ public abstract class AbstractTransactionalMapTest {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(1, "1");
     initalMap.put(2, "2");
     initalMap.put(3, "3");
@@ -195,7 +194,7 @@ public abstract class AbstractTransactionalMapTest {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(1, "1");
     initalMap.put(2, "2");
     initalMap.put(3, "3");
@@ -242,7 +241,7 @@ public abstract class AbstractTransactionalMapTest {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(1, "1");
     Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, true, initalMap);
 
@@ -284,7 +283,7 @@ public abstract class AbstractTransactionalMapTest {
     ITransaction tr1 = createNewTransaction();
     ITransaction tr2 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(1, "1");
     initalMap.put(2, "2");
     initalMap.put(3, "3");
@@ -319,7 +318,7 @@ public abstract class AbstractTransactionalMapTest {
   public void testIteratorRemove() {
     ITransaction tr1 = createNewTransaction();
 
-    Map<Integer, String> initalMap = new HashMap<Integer, String>();
+    Map<Integer, String> initalMap = new HashMap<>();
     initalMap.put(2, "2");
     initalMap.put(3, "3");
     Map<Integer, String> map = createTransactionalMap(TRANSACTION_MEMBER_ID, false, initalMap);

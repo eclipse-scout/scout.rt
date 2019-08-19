@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
@@ -93,13 +90,7 @@ public class JobListenerTest {
     Jobs.getJobManager().addListener(captureListener);
 
     final BooleanHolder hasStarted = new BooleanHolder(Boolean.FALSE);
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        hasStarted.setValue(Boolean.TRUE);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> hasStarted.setValue(Boolean.TRUE), Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.HOURS)));
@@ -196,12 +187,8 @@ public class JobListenerTest {
   public void testLocalListener1() throws InterruptedException {
     // schedule job, and install listener once started running
     final BlockingCountDownLatch jobRunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        jobRunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      jobRunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(jobRunningLatch.await());
 
@@ -234,12 +221,8 @@ public class JobListenerTest {
 
     // schedule job-2, and install listener once started running
     final BlockingCountDownLatch job2RunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job2RunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+      job2RunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(job2RunningLatch.await());
 
@@ -270,12 +253,8 @@ public class JobListenerTest {
     future1.awaitDone();
 
     final BlockingCountDownLatch job2RunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job2RunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+      job2RunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(job2RunningLatch.await());
 
@@ -299,12 +278,8 @@ public class JobListenerTest {
     future1.awaitDone();
 
     final BlockingCountDownLatch job2RunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        job2RunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+      job2RunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(job2RunningLatch.await());
 
@@ -324,12 +299,8 @@ public class JobListenerTest {
   @Test
   public void testLocalListener4() throws InterruptedException {
     final BlockingCountDownLatch jobRunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        jobRunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      jobRunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(jobRunningLatch.await());
 
@@ -354,12 +325,8 @@ public class JobListenerTest {
   @Test
   public void testLocalListener5() throws InterruptedException {
     final BlockingCountDownLatch jobRunningLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        jobRunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      jobRunningLatch.countDownAndBlock();
     }, Jobs.newInput());
     assertTrue(jobRunningLatch.await());
 

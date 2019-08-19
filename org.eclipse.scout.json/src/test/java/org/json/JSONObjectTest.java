@@ -719,7 +719,7 @@ public class JSONObjectTest extends TestCase {
    * constructor.
    */
   public void testCreateWithUnsupportedNumbers() throws JSONException {
-    Map<String, Object> contents = new HashMap<String, Object>();
+    Map<String, Object> contents = new HashMap<>();
     contents.put("foo", Double.NaN);
     contents.put("bar", Double.NEGATIVE_INFINITY);
     contents.put("baz", Double.POSITIVE_INFINITY);
@@ -737,7 +737,7 @@ public class JSONObjectTest extends TestCase {
   }
 
   public void testMapConstructorCopiesContents() throws JSONException {
-    Map<String, Object> contents = new HashMap<String, Object>();
+    Map<String, Object> contents = new HashMap<>();
     contents.put("foo", 5);
     JSONObject object = new JSONObject(contents);
     contents.put("foo", 10);
@@ -745,7 +745,7 @@ public class JSONObjectTest extends TestCase {
   }
 
   public void testMapConstructorWithBogusEntries() {
-    Map<Object, Object> contents = new HashMap<Object, Object>();
+    Map<Object, Object> contents = new HashMap<>();
     contents.put(5, 5);
 
     try {
@@ -986,13 +986,13 @@ public class JSONObjectTest extends TestCase {
     object.put("foo", 7);
 
     Iterator<String> keys = (Iterator<String>) object.keys();
-    Set<String> result = new HashSet<String>();
+    Set<String> result = new HashSet<>();
     assertTrue(keys.hasNext());
     result.add(keys.next());
     assertTrue(keys.hasNext());
     result.add(keys.next());
     assertFalse(keys.hasNext());
-    assertEquals(new HashSet<String>(Arrays.asList("foo", "bar")), result);
+    assertEquals(new HashSet<>(Arrays.asList("foo", "bar")), result);
 
     try {
       keys.next();
@@ -1078,10 +1078,10 @@ public class JSONObjectTest extends TestCase {
 
   // https://code.google.com/p/android/issues/detail?id=55114
   public void test_toString_listAsMapValue() throws Exception {
-    ArrayList<Object> list = new ArrayList<Object>();
+    ArrayList<Object> list = new ArrayList<>();
     list.add("a");
     list.add(new ArrayList<String>());
-    Map<String, Object> map = new TreeMap<String, Object>();
+    Map<String, Object> map = new TreeMap<>();
     map.put("x", "l");
     map.put("y", list);
     assertEquals("{\"x\":\"l\",\"y\":[\"a\",[]]}", new JSONObject(map).toString());

@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -81,12 +80,12 @@ public class BeanInstanceUtilTest {
     Collection<Method> postConstructMethods = BeanInstanceUtil.collectPostConstructMethods(PostConstructBase.class);
     assertEquals(4, postConstructMethods.size());
 
-    Set<Method> expectedMethods = new HashSet<Method>();
+    Set<Method> expectedMethods = new HashSet<>();
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PUBLIC_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PROTECTED_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PACKAGE_PRIVATE_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PRIVATE_POST_CONSTRUCT));
-    assertEquals(expectedMethods, new HashSet<Method>(postConstructMethods));
+    assertEquals(expectedMethods, new HashSet<>(postConstructMethods));
   }
 
   @Test
@@ -94,13 +93,13 @@ public class BeanInstanceUtilTest {
     Collection<Method> postConstructMethods = BeanInstanceUtil.collectPostConstructMethods(PostConstructEx1.class);
     assertEquals(5, postConstructMethods.size());
 
-    Set<Method> expectedMethods = new HashSet<Method>();
+    Set<Method> expectedMethods = new HashSet<>();
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PRIVATE_POST_CONSTRUCT));
     expectedMethods.add(PostConstructEx1.class.getDeclaredMethod(METHOD_NAME_PUBLIC_POST_CONSTRUCT));
     expectedMethods.add(PostConstructEx1.class.getDeclaredMethod(METHOD_NAME_PROTECTED_POST_CONSTRUCT));
     expectedMethods.add(PostConstructEx1.class.getDeclaredMethod(METHOD_NAME_PACKAGE_PRIVATE_POST_CONSTRUCT));
     expectedMethods.add(PostConstructEx1.class.getDeclaredMethod(METHOD_NAME_PRIVATE_POST_CONSTRUCT));
-    assertEquals(expectedMethods, new HashSet<Method>(postConstructMethods));
+    assertEquals(expectedMethods, new HashSet<>(postConstructMethods));
   }
 
   @Test
@@ -108,13 +107,13 @@ public class BeanInstanceUtilTest {
     Collection<Method> postConstructMethods = BeanInstanceUtil.collectPostConstructMethods(PostConstructEx2.class);
     assertEquals(5, postConstructMethods.size());
 
-    Set<Method> expectedMethods = new HashSet<Method>();
+    Set<Method> expectedMethods = new HashSet<>();
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PUBLIC_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PROTECTED_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PACKAGE_PRIVATE_POST_CONSTRUCT));
     expectedMethods.add(PostConstructBase.class.getDeclaredMethod(METHOD_NAME_PRIVATE_POST_CONSTRUCT));
     expectedMethods.add(PostConstructEx2.class.getDeclaredMethod(METHOD_NAME_PRIVATE_POST_CONSTRUCT));
-    assertEquals(expectedMethods, new HashSet<Method>(postConstructMethods));
+    assertEquals(expectedMethods, new HashSet<>(postConstructMethods));
   }
 
   @Test(expected = BeanCreationException.class)

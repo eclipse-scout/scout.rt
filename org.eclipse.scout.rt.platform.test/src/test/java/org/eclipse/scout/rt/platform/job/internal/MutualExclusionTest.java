@@ -10,16 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -132,13 +124,7 @@ public class MutualExclusionTest {
 
     // Make task1 to acquire the mutex.
     final AtomicReference<Thread> thread = new AtomicReference<>();
-    assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, new IPermitAcquiredCallback() {
-
-      @Override
-      public void onPermitAcquired() {
-        thread.set(Thread.currentThread());
-      }
-    }));
+    assertTrue(mutex.compete(m_task1, QueuePosition.HEAD, () -> thread.set(Thread.currentThread())));
     assertSame(Thread.currentThread(), thread.get());
 
     assertTrue(mutex.isPermitOwner(m_task1));
@@ -227,13 +213,7 @@ public class MutualExclusionTest {
     assertEquals(1, mutex.getCompetitorCount());
 
     // Task2 tries to acquire the mutex, and blocks until acquired
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        mutex.acquire(m_task2, QueuePosition.TAIL);
-      }
-    }, Jobs.newInput());
+    IFuture<Void> future = Jobs.schedule(() -> mutex.acquire(m_task2, QueuePosition.TAIL), Jobs.newInput());
 
     try {
       future.awaitDone(1, TimeUnit.SECONDS);
@@ -275,16 +255,12 @@ public class MutualExclusionTest {
 
     // Task2 tries to acquire the mutex, and blocks until acquired
     final BlockingCountDownLatch interruptedLatch = new BlockingCountDownLatch(1);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          mutex.acquire(m_task2, QueuePosition.TAIL);
-        }
-        catch (ThreadInterruptedError e) {
-          interruptedLatch.countDown();
-        }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      try {
+        mutex.acquire(m_task2, QueuePosition.TAIL);
+      }
+      catch (ThreadInterruptedError e) {
+        interruptedLatch.countDown();
       }
     }, Jobs.newInput()
         .withExceptionHandling(null, false));

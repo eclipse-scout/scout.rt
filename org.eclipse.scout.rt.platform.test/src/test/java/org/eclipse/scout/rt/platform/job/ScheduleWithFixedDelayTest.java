@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -34,7 +31,7 @@ public class ScheduleWithFixedDelayTest {
 
   @Test
   public void testFiveRunsAndCancel() {
-    final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
+    final List<Long> protocol = Collections.synchronizedList(new ArrayList<>());
 
     final AtomicInteger counter = new AtomicInteger();
 
@@ -44,16 +41,12 @@ public class ScheduleWithFixedDelayTest {
     long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == nRuns) {
-          IFuture.CURRENT.get().cancel(false);
-        }
-        else {
-          protocol.add(System.currentTimeMillis());
-        }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == nRuns) {
+        IFuture.CURRENT.get().cancel(false);
+      }
+      else {
+        protocol.add(System.currentTimeMillis());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -79,7 +72,7 @@ public class ScheduleWithFixedDelayTest {
 
   @Test
   public void testFiveRunsAndException() {
-    final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
+    final List<Long> protocol = Collections.synchronizedList(new ArrayList<>());
 
     final AtomicInteger counter = new AtomicInteger();
 
@@ -89,16 +82,12 @@ public class ScheduleWithFixedDelayTest {
     long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("expected JUnit test exception");
-        }
-        else {
-          protocol.add(System.currentTimeMillis());
-        }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == nRuns) {
+        throw new Exception("expected JUnit test exception");
+      }
+      else {
+        protocol.add(System.currentTimeMillis());
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -125,7 +114,7 @@ public class ScheduleWithFixedDelayTest {
 
   @Test
   public void testFiveShortRunsAndException() {
-    final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
+    final List<Long> protocol = Collections.synchronizedList(new ArrayList<>());
 
     final AtomicInteger counter = new AtomicInteger();
 
@@ -136,17 +125,13 @@ public class ScheduleWithFixedDelayTest {
     long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 'nRuns' times and cancels itself afterwards.
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("expected JUnit test exception");
-        }
-        else {
-          protocol.add(System.currentTimeMillis());
-          Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
-        }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == nRuns) {
+        throw new Exception("expected JUnit test exception");
+      }
+      else {
+        protocol.add(System.currentTimeMillis());
+        Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -173,7 +158,7 @@ public class ScheduleWithFixedDelayTest {
 
   @Test
   public void testFiveLongRunsAndException() {
-    final List<Long> protocol = Collections.synchronizedList(new ArrayList<Long>());
+    final List<Long> protocol = Collections.synchronizedList(new ArrayList<>());
 
     final AtomicInteger counter = new AtomicInteger();
 
@@ -184,17 +169,13 @@ public class ScheduleWithFixedDelayTest {
     long tStartMillis = System.currentTimeMillis();
 
     // Schedule a job which runs 5 times and cancels itself afterwards.
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == nRuns) {
-          throw new Exception("expected JUnit test exception");
-        }
-        else {
-          protocol.add(System.currentTimeMillis());
-          Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
-        }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == nRuns) {
+        throw new Exception("expected JUnit test exception");
+      }
+      else {
+        protocol.add(System.currentTimeMillis());
+        Thread.sleep(TimeUnit.MILLISECONDS.toMillis(sleepTimeMillis));
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -222,16 +203,12 @@ public class ScheduleWithFixedDelayTest {
   @Test
   public void testSwallowException() {
     final AtomicInteger counter = new AtomicInteger();
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == 2) {
-          RunMonitor.CURRENT.get().cancel(false);
-        }
-        else {
-          throw new Exception("expected JUnit test exception");
-        }
+    Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == 2) {
+        RunMonitor.CURRENT.get().cancel(false);
+      }
+      else {
+        throw new Exception("expected JUnit test exception");
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -245,16 +222,12 @@ public class ScheduleWithFixedDelayTest {
   @Test
   public void testPropagatedException() {
     final AtomicInteger counter = new AtomicInteger();
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == 2) {
-          RunMonitor.CURRENT.get().cancel(false);
-        }
-        else {
-          throw new Exception("expected JUnit test exception");
-        }
+    Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == 2) {
+        RunMonitor.CURRENT.get().cancel(false);
+      }
+      else {
+        throw new Exception("expected JUnit test exception");
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -271,16 +244,12 @@ public class ScheduleWithFixedDelayTest {
     BEANS.getBeanManager().unregisterBean(BEANS.getBeanManager().getBean(JUnitExceptionHandler.class));
 
     final AtomicInteger counter = new AtomicInteger();
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        if (counter.incrementAndGet() == 2) {
-          RunMonitor.CURRENT.get().cancel(false);
-        }
-        else {
-          throw new Exception("expected JUnit test exception");
-        }
+    Jobs.getJobManager().schedule(() -> {
+      if (counter.incrementAndGet() == 2) {
+        RunMonitor.CURRENT.get().cancel(false);
+      }
+      else {
+        throw new Exception("expected JUnit test exception");
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
@@ -293,12 +262,8 @@ public class ScheduleWithFixedDelayTest {
   @Test
   public void testRepetiveWithTotalCount() {
     final AtomicInteger counter = new AtomicInteger();
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        counter.incrementAndGet();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      counter.incrementAndGet();
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(3, 1, TimeUnit.MILLISECONDS))))
@@ -309,12 +274,8 @@ public class ScheduleWithFixedDelayTest {
   @Test
   public void testRepetiveWithEndTime() {
     final AtomicInteger counter = new AtomicInteger();
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        counter.incrementAndGet();
-      }
+    Jobs.getJobManager().schedule(() -> {
+      counter.incrementAndGet();
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withEndIn(1, TimeUnit.SECONDS)

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -23,7 +21,6 @@ import java.util.concurrent.Future;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.IPlatformListener;
-import org.eclipse.scout.rt.platform.PlatformEvent;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -70,12 +67,9 @@ public class PlatformImplementorTest {
     // create platform listener that fails in given state
     BeanMetaData bean = new BeanMetaData(IPlatformListener.class)
         .withApplicationScoped(true)
-        .withInitialInstance(new IPlatformListener() {
-          @Override
-          public void stateChanged(PlatformEvent event) {
-            if (event.getState() == platformStartFailsInState) {
-              throw new TestingPlatformStartupException();
-            }
+        .withInitialInstance((IPlatformListener) event -> {
+          if (event.getState() == platformStartFailsInState) {
+            throw new TestingPlatformStartupException();
           }
         });
 
@@ -112,17 +106,14 @@ public class PlatformImplementorTest {
     // crate platform listener that signals stopping state
     BeanMetaData bean = new BeanMetaData(IPlatformListener.class)
         .withApplicationScoped(true)
-        .withInitialInstance(new IPlatformListener() {
-          @Override
-          public void stateChanged(PlatformEvent event) {
-            if (event.getState() == State.PlatformStopping) {
-              stoppingLatch.countDown();
-              try {
-                continueStoppingLatch.await();
-              }
-              catch (InterruptedException e) {
-                // nop
-              }
+        .withInitialInstance((IPlatformListener) event -> {
+          if (event.getState() == State.PlatformStopping) {
+            stoppingLatch.countDown();
+            try {
+              continueStoppingLatch.await();
+            }
+            catch (InterruptedException e) {
+              // nop
             }
           }
         });
@@ -133,12 +124,7 @@ public class PlatformImplementorTest {
     // expect platform started
     platform.awaitPlatformStarted();
 
-    Future<?> platformStopFuture = s_executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        platform.stop();
-      }
-    });
+    Future<?> platformStopFuture = s_executor.submit(() -> platform.stop());
 
     stoppingLatch.await();
 
@@ -169,12 +155,7 @@ public class PlatformImplementorTest {
   }
 
   protected Future<?> startPlatformInAnotherThread(final TestingPlatformImplementor platform) {
-    return s_executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        platform.start();
-      }
-    });
+    return s_executor.submit(() -> platform.start());
   }
 
   private static class TestingPlatformImplementor extends PlatformImplementor {

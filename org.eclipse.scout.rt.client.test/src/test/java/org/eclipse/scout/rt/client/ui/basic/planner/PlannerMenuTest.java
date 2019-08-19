@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.planner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,7 +77,7 @@ public class PlannerMenuTest {
     final ContextMenuPlanner planner = createContextMenuPlanner();
     addTestMenus(planner);
     planner.selectResource(planner.getResources().get(0));
-    planner.setSelectionRange(new Range<Date>(new Date(), new Date()));
+    planner.setSelectionRange(new Range<>(new Date(), new Date()));
 
     assertOwnerValueChange(m_resourceMenu, 2);
     assertOwnerValueChange(m_rangeMenu, 1);
@@ -135,11 +134,11 @@ public class PlannerMenuTest {
   /// FIXTURES
 
   private Resource<Integer> createResource(int id) {
-    return new Resource<Integer>(id, "resource" + id);
+    return new Resource<>(id, "resource" + id);
   }
 
   private Activity<Resource<Integer>, Integer> createActivity(Resource<Integer> resource, int id) {
-    return new Activity<Resource<Integer>, Integer>(resource, id);
+    return new Activity<>(resource, id);
   }
 
   class CapturingPlannerAdapter extends PlannerAdapter {

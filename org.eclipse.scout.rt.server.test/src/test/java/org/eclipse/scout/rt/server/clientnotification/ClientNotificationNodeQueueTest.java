@@ -10,11 +10,9 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
@@ -57,13 +55,7 @@ public class ClientNotificationNodeQueueTest {
 
   @Test
   public void testBlockingWait() {
-    IFuture<List<ClientNotificationMessage>> res = Jobs.schedule(new Callable<List<ClientNotificationMessage>>() {
-
-      @Override
-      public List<ClientNotificationMessage> call() throws Exception {
-        return m_queue.getNotifications(10, 100, TimeUnit.MILLISECONDS);
-      }
-    }, Jobs.newInput()
+    IFuture<List<ClientNotificationMessage>> res = Jobs.schedule(() -> m_queue.getNotifications(10, 100, TimeUnit.MILLISECONDS), Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
     ClientNotificationAddress allNodes = ClientNotificationAddress.createAllNodesAddress();
     m_queue.put(new ClientNotificationMessage(allNodes, "test", true, "cid"));

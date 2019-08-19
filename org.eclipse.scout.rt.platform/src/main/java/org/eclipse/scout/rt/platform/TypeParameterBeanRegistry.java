@@ -46,7 +46,7 @@ public class TypeParameterBeanRegistry<BEAN> {
 
   protected final IndexedStore<BeanRegistration<BEAN>> m_inventory = new IndexedStore<>();
   protected final IMultiValueIndex<Class<?>, BeanRegistration<BEAN>> m_genericTypeIndex;
-  protected final Set<Class<?>> m_computedLookupTypes = Collections.synchronizedSet(new HashSet<Class<?>>());
+  protected final Set<Class<?>> m_computedLookupTypes = Collections.synchronizedSet(new HashSet<>());
 
   public TypeParameterBeanRegistry(final Class<BEAN> beanType) {
     m_beanType = beanType;

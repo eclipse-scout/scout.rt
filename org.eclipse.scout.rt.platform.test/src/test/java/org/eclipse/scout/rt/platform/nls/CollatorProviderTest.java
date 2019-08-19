@@ -14,7 +14,6 @@ import static org.junit.Assert.assertArrayEquals;
 
 import java.text.Collator;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -60,12 +59,7 @@ public class CollatorProviderTest {
   }
 
   private void sort(final Collator collator, String[] array) {
-    Arrays.sort(array, 0, array.length, new Comparator<String>() {
-      @Override
-      public int compare(String a, String b) {
-        return collator.compare(a, b);
-      }
-    });
+    Arrays.sort(array, 0, array.length, (a, b) -> collator.compare(a, b));
   }
 
 }

@@ -10,14 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,12 +32,9 @@ public class LazyValueTest {
   public void testGetWithProducer() {
     final AtomicInteger producerCounter = new AtomicInteger();
     final Object testObject = new Object();
-    final LazyValue<Object> lazy = new LazyValue<>(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        producerCounter.incrementAndGet();
-        return testObject;
-      }
+    final LazyValue<Object> lazy = new LazyValue<>(() -> {
+      producerCounter.incrementAndGet();
+      return testObject;
     });
 
     assertFalse(lazy.isSet());
@@ -78,14 +69,11 @@ public class LazyValueTest {
   public void testGetWithException() {
     final AtomicBoolean flag = new AtomicBoolean();
 
-    final LazyValue<String> lazy = new LazyValue<>(new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        if (flag.get()) {
-          return "Hello";
-        }
-        throw new P_MyRuntimException();
+    final LazyValue<String> lazy = new LazyValue<>(() -> {
+      if (flag.get()) {
+        return "Hello";
       }
+      throw new P_MyRuntimException();
     });
 
     assertFalse(lazy.isSet());

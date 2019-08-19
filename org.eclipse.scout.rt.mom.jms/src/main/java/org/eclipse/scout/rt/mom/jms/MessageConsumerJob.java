@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.mom.api.SubscribeInput;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 
 public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
   protected final IMessageListener<DTO> m_listener;
@@ -40,13 +39,7 @@ public class MessageConsumerJob<DTO> extends AbstractMessageConsumerJob<DTO> {
       handleMessageInRunContext(jmsMessage);
     }
     else {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          handleMessageInRunContext(jmsMessage);
-        }
-      }, m_mom.newJobInput().withName("Receiving JMS message [dest={}]", m_destination));
+      Jobs.schedule(() -> handleMessageInRunContext(jmsMessage), m_mom.newJobInput().withName("Receiving JMS message [dest={}]", m_destination));
     }
   }
 

@@ -10,14 +10,11 @@
  */
 package org.eclipse.scout.rt.platform.chain.callable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.junit.Test;
@@ -26,16 +23,12 @@ public class CallableChainTest {
 
   @Test
   public void testEmptyChain() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     // run the test
-    String result = new CallableChain<String>().call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("command:call");
-        return "command-result";
-      }
+    String result = new CallableChain<String>().call(() -> {
+      protocol.add("command:call");
+      return "command-result";
     });
 
     // assert
@@ -45,51 +38,23 @@ public class CallableChainTest {
 
   @Test
   public void testDecoratorChain() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     String result = new CallableChain<String>()
-        .add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator1:onAfter");
-              }
-            };
-          }
+        .add(() -> {
+          protocol.add("decorator1:onBefore");
+          return () -> protocol.add("decorator1:onAfter");
         })
-        .add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator2:onBefore");
-            return null;
-          }
+        .add(() -> {
+          protocol.add("decorator2:onBefore");
+          return null;
         })
-        .add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator3:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator3:onAfter");
-              }
-            };
-          }
-        }).call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
+        .add(() -> {
+          protocol.add("decorator3:onBefore");
+          return () -> protocol.add("decorator3:onAfter");
+        }).call(() -> {
+          protocol.add("command:call");
+          return "command-result";
         });
 
     // assert
@@ -105,52 +70,26 @@ public class CallableChainTest {
 
   @Test
   public void testDecoratorChainWithException() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     final Exception exception = new Exception("expected JUnit test exception");
     try {
       new CallableChain<String>()
-          .add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator1:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator1:onAfter");
-                  throw new RuntimeException("expected JUnit test exception");
-                }
-              };
-            }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator2:onBefore");
-              throw exception;
-            }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator3:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator3:onAfter");
-                }
-              };
-            }
-          }).call(new Callable<String>() {
-
-            @Override
-            public String call() throws Exception {
-              protocol.add("command:call");
-              return "command-result";
-            }
+          .add(() -> {
+            protocol.add("decorator1:onBefore");
+            return () -> {
+              protocol.add("decorator1:onAfter");
+              throw new RuntimeException("expected JUnit test exception");
+            };
+          }).add(() -> {
+            protocol.add("decorator2:onBefore");
+            throw exception;
+          }).add(() -> {
+            protocol.add("decorator3:onBefore");
+            return () -> protocol.add("decorator3:onAfter");
+          }).call(() -> {
+            protocol.add("command:call");
+            return "command-result";
           });
       fail();
     }
@@ -167,7 +106,7 @@ public class CallableChainTest {
 
   @Test
   public void testInterceptorChain() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     String result = new CallableChain<String>()
         .add(new ICallableInterceptor<String>() {
@@ -238,13 +177,9 @@ public class CallableChainTest {
           public boolean isEnabled() {
             return false;
           }
-        }).call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
+        }).call(() -> {
+          protocol.add("command:call");
+          return "command-result";
         });
 
     // assert
@@ -261,7 +196,7 @@ public class CallableChainTest {
 
   @Test
   public void testInterceptorChainWithException() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
     final Exception exception = new Exception("expected JUnit test exception");
 
     try {
@@ -312,13 +247,9 @@ public class CallableChainTest {
             public boolean isEnabled() {
               return true;
             }
-          }).call(new Callable<String>() {
-
-            @Override
-            public String call() throws Exception {
-              protocol.add("command:call");
-              return "command-result";
-            }
+          }).call(() -> {
+            protocol.add("command:call");
+            return "command-result";
           });
       fail();
     }
@@ -335,7 +266,7 @@ public class CallableChainTest {
 
   @Test
   public void testInterceptorChainWithPreemtiveResult() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     String result = new CallableChain<String>()
         .add(new ICallableInterceptor<String>() {
@@ -384,13 +315,9 @@ public class CallableChainTest {
           public boolean isEnabled() {
             return true;
           }
-        }).call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
+        }).call(() -> {
+          protocol.add("command:call");
+          return "command-result";
         });
 
     // assert
@@ -403,7 +330,7 @@ public class CallableChainTest {
 
   @Test
   public void testInterceptorChainWithNoContinue() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     String result = new CallableChain<String>()
         .add(new ICallableInterceptor<String>() {
@@ -457,13 +384,9 @@ public class CallableChainTest {
           public boolean isEnabled() {
             return true;
           }
-        }).call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
+        }).call(() -> {
+          protocol.add("command:call");
+          return "command-result";
         });
 
     // assert
@@ -477,35 +400,15 @@ public class CallableChainTest {
 
   @Test
   public void testMixed() throws Exception {
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     String result = new CallableChain<String>()
-        .add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator1:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator1:onAfter");
-              }
-            };
-          }
-        }).add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator2:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator2:onAfter");
-              }
-            };
-          }
+        .add(() -> {
+          protocol.add("decorator1:onBefore");
+          return () -> protocol.add("decorator1:onAfter");
+        }).add(() -> {
+          protocol.add("decorator2:onBefore");
+          return () -> protocol.add("decorator2:onAfter");
         }).add(new ICallableInterceptor<String>() {
 
           @Override
@@ -523,32 +426,12 @@ public class CallableChainTest {
           public boolean isEnabled() {
             return true;
           }
-        }).add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator3:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator3:onAfter");
-              }
-            };
-          }
-        }).add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator4:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator4:onAfter");
-              }
-            };
-          }
+        }).add(() -> {
+          protocol.add("decorator3:onBefore");
+          return () -> protocol.add("decorator3:onAfter");
+        }).add(() -> {
+          protocol.add("decorator4:onBefore");
+          return () -> protocol.add("decorator4:onAfter");
         }).add(new ICallableInterceptor<String>() {
 
           @Override
@@ -566,26 +449,12 @@ public class CallableChainTest {
           public boolean isEnabled() {
             return true;
           }
-        }).add(new ICallableDecorator() {
-
-          @Override
-          public IUndecorator decorate() throws Exception {
-            protocol.add("decorator5:onBefore");
-            return new IUndecorator() {
-
-              @Override
-              public void undecorate() {
-                protocol.add("decorator5:onAfter");
-              }
-            };
-          }
-        }).call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            protocol.add("command:call");
-            return "command-result";
-          }
+        }).add(() -> {
+          protocol.add("decorator5:onBefore");
+          return () -> protocol.add("decorator5:onAfter");
+        }).call(() -> {
+          protocol.add("command:call");
+          return "command-result";
         });
 
     // assert
@@ -611,36 +480,16 @@ public class CallableChainTest {
   @Test
   public void testMixedWithException() throws Exception {
     final Exception exception = new Exception("expected JUnit test exception");
-    final List<String> protocol = new ArrayList<String>();
+    final List<String> protocol = new ArrayList<>();
 
     try {
       new CallableChain<String>()
-          .add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator1:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator1:onAfter");
-                }
-              };
-            }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator2:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator2:onAfter");
-                }
-              };
-            }
+          .add(() -> {
+            protocol.add("decorator1:onBefore");
+            return () -> protocol.add("decorator1:onAfter");
+          }).add(() -> {
+            protocol.add("decorator2:onBefore");
+            return () -> protocol.add("decorator2:onAfter");
           }).add(new ICallableInterceptor<String>() {
 
             @Override
@@ -658,32 +507,12 @@ public class CallableChainTest {
             public boolean isEnabled() {
               return true;
             }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator3:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator3:onAfter");
-                }
-              };
-            }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator4:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator4:onAfter");
-                }
-              };
-            }
+          }).add(() -> {
+            protocol.add("decorator3:onBefore");
+            return () -> protocol.add("decorator3:onAfter");
+          }).add(() -> {
+            protocol.add("decorator4:onBefore");
+            return () -> protocol.add("decorator4:onAfter");
           }).add(new ICallableInterceptor<String>() {
 
             @Override
@@ -701,26 +530,12 @@ public class CallableChainTest {
             public boolean isEnabled() {
               return true;
             }
-          }).add(new ICallableDecorator() {
-
-            @Override
-            public IUndecorator decorate() throws Exception {
-              protocol.add("decorator5:onBefore");
-              return new IUndecorator() {
-
-                @Override
-                public void undecorate() {
-                  protocol.add("decorator5:onAfter");
-                }
-              };
-            }
-          }).call(new Callable<String>() {
-
-            @Override
-            public String call() throws Exception {
-              protocol.add("command:call");
-              throw exception;
-            }
+          }).add(() -> {
+            protocol.add("decorator5:onBefore");
+            return () -> protocol.add("decorator5:onAfter");
+          }).call(() -> {
+            protocol.add("command:call");
+            throw exception;
           });
       fail();
     }

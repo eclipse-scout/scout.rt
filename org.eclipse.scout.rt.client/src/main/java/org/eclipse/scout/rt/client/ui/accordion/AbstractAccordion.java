@@ -107,14 +107,14 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
     groups = ObjectUtility.nvl(groups, new ArrayList<>());
 
     // Dispose old groups (only if they are not in the new list)
-    List<IGroup> groupsToDelete = new ArrayList<IGroup>(existingGroups);
+    List<IGroup> groupsToDelete = new ArrayList<>(existingGroups);
     groupsToDelete.removeAll(groups);
     deleteGroupsInternal(groupsToDelete);
 
     // Initialize new groups
     // Only initialize when groups are added later,
     // if they are added while initConfig runs, initGroups() will take care of the initialization which will be called by the container (e.g. GroupsField)
-    List<IGroup> groupsToInsert = new ArrayList<IGroup>(groups);
+    List<IGroup> groupsToInsert = new ArrayList<>(groups);
     groupsToInsert.removeAll(existingGroups);
     addGroupsInternal(groupsToInsert);
 
@@ -183,7 +183,7 @@ public abstract class AbstractAccordion extends AbstractWidget implements IAccor
 
   @Override
   public void deleteAllGroups() {
-    setGroups(new ArrayList<IGroup>());
+    setGroups(new ArrayList<>());
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)

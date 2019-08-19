@@ -25,7 +25,7 @@ public final class FixtureParameters {
   private static final AtomicInteger MOM_COUNTER = new AtomicInteger(0);
 
   public static List<IScoutTestParameter> createParameters() {
-    List<IScoutTestParameter> parametersList = new LinkedList<IScoutTestParameter>();
+    List<IScoutTestParameter> parametersList = new LinkedList<>();
 
     // We do not need jmx for unit testing. Also we must disable watchTopicAdvisories else some concurrent issues with broker recreation will happen
     final String activeMQUrlOptions = "?broker.persistent=false&broker.useJmx=false&jms.watchTopicAdvisories=false";

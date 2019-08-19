@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.tablefield;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +50,7 @@ public class JsonTableFieldTest {
   @Test
   public void testTableDisposal() {
     ITable table = new Table();
-    ITableField<ITable> tableField = new TableField<ITable>(table);
+    ITableField<ITable> tableField = new TableField<>(table);
     JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
 
     assertNotNull(jsonTableField.getAdapter(table));
@@ -64,7 +62,7 @@ public class JsonTableFieldTest {
   public void testTableDisposalOnPropertyChange() {
     ITable table = new Table();
     ITable table2 = new Table();
-    ITableField<ITable> tableField = new TableField<ITable>(table);
+    ITableField<ITable> tableField = new TableField<>(table);
     JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
 
     //Switch table -> old one needs to be disposed
@@ -87,7 +85,7 @@ public class JsonTableFieldTest {
     Assert.assertNotNull(jsonOutline.getAdapter(tablePageTable));
 
     // Create table field which uses the table from the table page
-    ITableField<ITable> tableField = new TableField<ITable>();
+    ITableField<ITable> tableField = new TableField<>();
     JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
     tableField.setTable(tablePageTable, true);
 
@@ -99,7 +97,7 @@ public class JsonTableFieldTest {
 
   private IPageWithTable<?> createTablePageAndSelectNode() {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(tablePage);
     IOutline outline = new Outline(pages);
     outline.selectNode(tablePage);
@@ -116,7 +114,7 @@ public class JsonTableFieldTest {
     Assert.assertNotNull(jsonOutline.getAdapter(tablePageTable));
 
     // Create table field which uses the table from the table page
-    ITableField<ITable> tableField = new TableField<ITable>();
+    ITableField<ITable> tableField = new TableField<>();
     JsonTableField<ITableField<?>> jsonTableField = UiSessionTestUtility.newJsonAdapter(m_uiSession, tableField, null);
     tableField.setTable(tablePageTable, true);
 

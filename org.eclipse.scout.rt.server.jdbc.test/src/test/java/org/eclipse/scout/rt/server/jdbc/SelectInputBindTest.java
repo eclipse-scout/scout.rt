@@ -242,7 +242,7 @@ public class SelectInputBindTest {
     SqlServiceMock sql = createSqlServiceMock();
 
     Long person = 9L;
-    Set<Long> roles = new HashSet<Long>();
+    Set<Long> roles = new HashSet<>();
     roles.add(5L);
     roles.add(6L);
     sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", roles), new NVPair("value", "lorem"));
@@ -258,7 +258,7 @@ public class SelectInputBindTest {
 
     Long person = 9L;
     List<Long> roles = Arrays.asList(5L, 6L);
-    Holder<List> holder = new Holder<List>(List.class, roles);
+    Holder<List> holder = new Holder<>(List.class, roles);
     sql.update("UDPATE this_table SET v = :value where r = :{roles} and p = :personNr", new NVPair("personNr", person), new NVPair("roles", holder), new NVPair("value", "lorem"));
     assertExpectedProtocol2(sql);
   }
@@ -285,7 +285,7 @@ public class SelectInputBindTest {
   public void testBatchUpdateFromSetInValueField() throws Exception {
     SqlServiceMock sql = createSqlServiceMock();
 
-    Set<Long> roles = new HashSet<Long>();
+    Set<Long> roles = new HashSet<>();
     roles.add(5L);
     roles.add(6L);
 

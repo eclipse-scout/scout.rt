@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.Collections;
@@ -55,32 +53,20 @@ public class JobManagerTest {
   public void testVisit() throws Exception {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -98,60 +84,48 @@ public class JobManagerTest {
 
   @Test
   public void testShutdown() throws Exception {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(3);
 
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted-1");
-        }
-        finally {
-          verifyLatch.countDown();
-        }
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("interrupted-1");
+      }
+      finally {
+        verifyLatch.countDown();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted-2");
-        }
-        finally {
-          verifyLatch.countDown();
-        }
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("interrupted-2");
+      }
+      finally {
+        verifyLatch.countDown();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("interrupted-3");
-        }
-        finally {
-          verifyLatch.countDown();
-        }
+    Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("interrupted-3");
+      }
+      finally {
+        verifyLatch.countDown();
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())

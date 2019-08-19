@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.services.common.code;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.verify;
 
@@ -24,7 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
@@ -96,7 +92,7 @@ public class CodeServiceTest {
   public void testReloadCodeTypes() {
     ICodeService codeService = BEANS.get(ICodeService.class);
 
-    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<>();
     list.add(SomeCodeType.class);
     list.add(DummyCodeType.class);
     codeService.reloadCodeTypes(list);
@@ -147,28 +143,22 @@ public class CodeServiceTest {
     assertTrue(SomeCodeType.EXEC_LOAD_CODES_INVOKED.getAndSet(false));
 
     // invalidate code type in another transaction
-    ServerRunContexts.copyCurrent().run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        // invalidate code type
-        codeService.invalidateCodeType(SomeCodeType.class);
-        // verify that code type has not been loaded yet
-        assertFalse(SomeCodeType.EXEC_LOAD_CODES_INVOKED.get());
-      }
+    ServerRunContexts.copyCurrent().run(() -> {
+      // invalidate code type
+      codeService.invalidateCodeType(SomeCodeType.class);
+      // verify that code type has not been loaded yet
+      assertFalse(SomeCodeType.EXEC_LOAD_CODES_INVOKED.get());
     });
 
     // verify that code type has not been loaded yet
     assertFalse(SomeCodeType.EXEC_LOAD_CODES_INVOKED.get());
 
     // load code type in another transaction
-    ServerRunContexts.copyCurrent().run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        // invalidate code type
-        assertNotNull(codeService.getCodeType(SomeCodeType.class));
-        // verify that execLoadCodes has been invoked and reset flag, so that next execLoadCodes can be detected
-        assertTrue(SomeCodeType.EXEC_LOAD_CODES_INVOKED.getAndSet(false));
-      }
+    ServerRunContexts.copyCurrent().run(() -> {
+      // invalidate code type
+      assertNotNull(codeService.getCodeType(SomeCodeType.class));
+      // verify that execLoadCodes has been invoked and reset flag, so that next execLoadCodes can be detected
+      assertTrue(SomeCodeType.EXEC_LOAD_CODES_INVOKED.getAndSet(false));
     });
 
     assertNotNull(codeService.getCodeType(SomeCodeType.class));
@@ -183,7 +173,7 @@ public class CodeServiceTest {
   public void testInvlidateCodeTypes() {
     ICodeService codeService = BEANS.get(ICodeService.class);
 
-    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+    List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<>();
     list.add(SomeCodeType.class);
     list.add(DummyCodeType.class);
     codeService.invalidateCodeTypes(list);

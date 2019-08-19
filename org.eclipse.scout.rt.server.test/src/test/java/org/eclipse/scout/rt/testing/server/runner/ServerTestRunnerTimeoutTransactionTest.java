@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.server.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,7 @@ public class ServerTestRunnerTimeoutTransactionTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_protocolByTestMethod = new HashMap<String, Set<ITransaction>>();
+    s_protocolByTestMethod = new HashMap<>();
     s_expectedTransactionCountByTestMethod = new HashMap<>();
     s_expectedTransactionCountByTestMethod.put("testDefault", 1);
     s_expectedTransactionCountByTestMethod.put("testTimeout", 2);

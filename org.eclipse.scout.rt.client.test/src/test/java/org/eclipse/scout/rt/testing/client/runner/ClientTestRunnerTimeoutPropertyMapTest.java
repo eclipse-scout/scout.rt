@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.client.runner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,7 @@ public class ClientTestRunnerTimeoutPropertyMapTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_protocolByTestMethod = new HashMap<String, Set<PropertyMap>>();
+    s_protocolByTestMethod = new HashMap<>();
     s_expectedPropertyMapCountByTestMethod = new HashMap<>();
     s_expectedPropertyMapCountByTestMethod.put("testDefault", 1);
     s_expectedPropertyMapCountByTestMethod.put("testTimeout", 3);

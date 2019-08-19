@@ -10,13 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -595,7 +589,7 @@ public class JsonTableTest {
     Table table = new Table();
     JsonTable<ITable> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, table, null);
 
-    WeakReference<JsonTable> ref = new WeakReference<JsonTable>(object);
+    WeakReference<JsonTable> ref = new WeakReference<>(object);
     object.dispose();
     m_uiSession = null;
     object = null;
@@ -626,11 +620,8 @@ public class JsonTableTest {
     assertNotNull(row1Id);
     assertNotNull(jsonTable.getTableRow(row1Id));
 
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() > 0; // hide first row
     });
 
     // After flushing the event buffers and applying the model changes
@@ -676,11 +667,8 @@ public class JsonTableTest {
     assertNotNull(jsonTable.tableRowIdsMap().get(row1));
     assertNotNull(jsonTable.tableRowIdsMap().get(row2));
 
-    ITableRowFilter filter = new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    ITableRowFilter filter = r -> {
+      return r.getRowIndex() > 0; // hide first row
     };
     table.addRowFilter(filter);
     assertEquals(2, table.getFilteredRowCount());
@@ -714,11 +702,8 @@ public class JsonTableTest {
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRow(row0Id));
 
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() > 0; // hide first row
     });
 
     // Update the (now hidden) row --> should not trigger an update event, because the row does not exist in the UI
@@ -744,11 +729,8 @@ public class JsonTableTest {
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Filter the first row
-    ITableRowFilter filter = new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    ITableRowFilter filter = r -> {
+      return r.getRowIndex() > 0; // hide first row
     };
     table.addRowFilter(filter);
     assertEquals(3, table.getRowCount());
@@ -794,11 +776,8 @@ public class JsonTableTest {
 
     JsonTable<ITable> jsonTable = m_uiSession.createJsonAdapter(table, null);
     // Filter the first row
-    ITableRowFilter filter = new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    ITableRowFilter filter = r -> {
+      return r.getRowIndex() > 0; // hide first row
     };
     table.addRowFilter(filter);
     assertEquals(1, table.getRowCount());
@@ -895,7 +874,7 @@ public class JsonTableTest {
     ITableRow row0 = table.getRow(0);
     ITableRow row2 = table.getRow(2);
 
-    List<ITableRow> filteredRows = new ArrayList<ITableRow>();
+    List<ITableRow> filteredRows = new ArrayList<>();
     filteredRows.add(row0);
     filteredRows.add(row2);
     table.getUIFacade().setFilteredRowsFromUI(filteredRows);
@@ -930,11 +909,8 @@ public class JsonTableTest {
     assertNotNull(row0Id);
     assertNotNull(jsonTable.getTableRow(row0Id));
 
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() > 0; // hide first row
     });
 
     // and reject the third row by the user row filter
@@ -986,11 +962,8 @@ public class JsonTableTest {
     String row0Id = jsonTable.getOrCreateRowId(row0);
     String row2Id = jsonTable.getOrCreateRowId(row2);
 
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() > 0; // hide first row
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() > 0; // hide first row
     });
 
     JsonEvent event = createJsonRowsFilteredEvent(row0Id, row2Id);
@@ -1058,11 +1031,8 @@ public class JsonTableTest {
 
     jsonTable.toJson();
 
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() == 0; // hide second row
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() == 0; // hide second row
     });
 
     table.deleteRow(row0);
@@ -1210,11 +1180,8 @@ public class JsonTableTest {
 
     table.fill(2, false);
     table.getRow(2).setChecked(true); // would normally trigger an event, but we filter the row in the next step
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r.getRowIndex() == 0; // hide everything expect the first (already existing row)
-      }
+    table.addRowFilter(r -> {
+      return r.getRowIndex() == 0; // hide everything expect the first (already existing row)
     });
 
     response = m_uiSession.currentJsonResponse().toJson();
@@ -1237,11 +1204,8 @@ public class JsonTableTest {
     // -------------
 
     table.fill(2, false);
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return false; // filter all rows
-      }
+    table.addRowFilter(r -> {
+      return false; // filter all rows
     });
 
     response = m_uiSession.currentJsonResponse().toJson();
@@ -1264,12 +1228,12 @@ public class JsonTableTest {
   public void testTableEventCoalesceInUi_ReplaceRows() throws Exception {
 
     ListBoxTable listbox = new ListBoxTable();
-    ILookupRow<Long> row1 = new LookupRow<Long>(1L, "Row1");
-    ILookupRow<Long> row2 = new LookupRow<Long>(2L, "Row2").withActive(false);
-    ILookupRow<Long> row3 = new LookupRow<Long>(3L, "Row3");
-    ILookupRow<Long> row4 = new LookupRow<Long>(4L, "Row4");
+    ILookupRow<Long> row1 = new LookupRow<>(1L, "Row1");
+    ILookupRow<Long> row2 = new LookupRow<>(2L, "Row2").withActive(false);
+    ILookupRow<Long> row3 = new LookupRow<>(3L, "Row3");
+    ILookupRow<Long> row4 = new LookupRow<>(4L, "Row4");
 
-    ArrayList<ITableRow> rowsInitial = new ArrayList<ITableRow>();
+    ArrayList<ITableRow> rowsInitial = new ArrayList<>();
 
     rowsInitial.add(listbox.getTableRowBuilder().createTableRow(row1));
     rowsInitial.add(listbox.getTableRowBuilder().createTableRow(row2));
@@ -1284,7 +1248,7 @@ public class JsonTableTest {
     JsonTestUtility.endRequest(m_uiSession);
     JSONArray events = response.optJSONArray("events");
 
-    ArrayList<ITableRow> rowsUpdate = new ArrayList<ITableRow>();
+    ArrayList<ITableRow> rowsUpdate = new ArrayList<>();
     rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row1));
     rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row2));
     rowsUpdate.add(listbox.getTableRowBuilder().createTableRow(row3));
@@ -1356,12 +1320,7 @@ public class JsonTableTest {
 
     ITableRow newRow0 = table.addRow();
     ITableRow newRow1 = table.addRow();
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow r) {
-        return r == row0;
-      }
-    });
+    table.addRowFilter(r -> r == row0);
     // Remove filter again -> NOP
     table.removeRowFilter(table.getRowFilters().get(0));
     // delete the first row -> this will "destroy" the row order changed event

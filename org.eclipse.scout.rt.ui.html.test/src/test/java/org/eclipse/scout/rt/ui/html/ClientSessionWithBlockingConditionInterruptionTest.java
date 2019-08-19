@@ -29,11 +29,9 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -53,7 +51,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
 
   private SessionBehaviour m_sessionBehaviour;
   private DesktopBehaviour m_desktopBehaviour;
-  private List<String> m_protocol = Collections.synchronizedList(new ArrayList<String>());
+  private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
 
   @Before
   public void before() {
@@ -73,19 +71,9 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
           }
         }),
 
-        new BeanMetaData(FixtureUiSession.class).withProducer(new IBeanInstanceProducer<FixtureUiSession>() {
-          @Override
-          public FixtureUiSession produce(IBean<FixtureUiSession> bean) {
-            return new FixtureUiSession();
-          }
-        }),
+        new BeanMetaData(FixtureUiSession.class).withProducer((IBeanInstanceProducer<FixtureUiSession>) bean -> new FixtureUiSession()),
 
-        new BeanMetaData(FixtureClientSession.class).withProducer(new IBeanInstanceProducer<FixtureClientSession>() {
-          @Override
-          public FixtureClientSession produce(IBean<FixtureClientSession> bean) {
-            return new FixtureClientSession();
-          }
-        }));
+        new BeanMetaData(FixtureClientSession.class).withProducer((IBeanInstanceProducer<FixtureClientSession>) bean -> new FixtureClientSession()));
   }
 
   @After
@@ -107,21 +95,11 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return session.getDesktop() != null && session.getDesktop().desktopFuture != null && session.getDesktop().desktopFuture.getState() == JobState.WAITING_FOR_BLOCKING_CONDITION;
-      }
-    });
+    JobTestUtil.waitForCondition(() -> session.getDesktop() != null && session.getDesktop().desktopFuture != null && session.getDesktop().desktopFuture.getState() == JobState.WAITING_FOR_BLOCKING_CONDITION);
     writeToProtocol("MessageBox is open");
 
     writeToProtocol("Session stopping");
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDone();
 
     Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
@@ -146,40 +124,27 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     IUiSession uiSession = JsonTestUtility.createAndInitializeUiSession();
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
-    final IFuture<?> callingFuture = ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        FixtureForm f = new FixtureForm();
-        f.start();
-        try {
-          writeToProtocol("Before Form.waitFor");
-          f.waitFor();
-          writeToProtocol("After Form.waitFor, interrupted=" + Thread.currentThread().isInterrupted() + ", futureCancelled=" + IFuture.CURRENT.get().isCancelled());
-        }
-        catch (ThreadInterruptedError e) {
-          writeToProtocol("Interrupted Form");
-          throw e;
-        }
+    final IFuture<?> callingFuture = ModelJobs.schedule(() -> {
+      FixtureForm f = new FixtureForm();
+      f.start();
+      try {
+        writeToProtocol("Before Form.waitFor");
+        f.waitFor();
+        writeToProtocol("After Form.waitFor, interrupted=" + Thread.currentThread().isInterrupted() + ", futureCancelled=" + IFuture.CURRENT.get().isCancelled());
+      }
+      catch (ThreadInterruptedError e) {
+        writeToProtocol("Interrupted Form");
+        throw e;
       }
     }, ModelJobs
         .newInput(ClientRunContexts.empty().withSession(session, true))
         .withExceptionHandling(new ClientExceptionHandler(), false));
 
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return callingFuture.getState() == JobState.WAITING_FOR_BLOCKING_CONDITION;
-      }
-    });
+    JobTestUtil.waitForCondition(() -> callingFuture.getState() == JobState.WAITING_FOR_BLOCKING_CONDITION);
     writeToProtocol("Form is open");
 
     writeToProtocol("Session stopping");
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDone();
 
     Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
@@ -208,12 +173,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
     writeToProtocol("Session stopping");
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDone();
 
     Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
@@ -238,12 +198,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
     writeToProtocol("Session stopping");
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDone();
 
     Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()
@@ -281,12 +236,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     final FixtureClientSession session = (FixtureClientSession) uiSession.getClientSession();
 
     writeToProtocol("Session stopping");
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(session, true)))
         .awaitDone();
 
     Jobs.getJobManager().awaitFinished(ModelJobs.newFutureFilterBuilder()

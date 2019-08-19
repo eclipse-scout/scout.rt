@@ -15,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Connection;
-import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 
 import org.eclipse.scout.rt.mom.api.IMom.ConnectionRetryCountProperty;
@@ -237,16 +236,13 @@ public class JmsConnectionWrapper {
         }
         if (m_connectionRetryCount > 0) {
           final Connection newConnection = tmp;
-          tmp.setExceptionListener(new ExceptionListener() {
-            @Override
-            public void onException(final JMSException e1) {
-              if (m_connectionRetryCount > 0) {
-                LOG.info("JMS connection dropped; starting failover", e1);
-                invalidate(newConnection, e1);
-                return;
-              }
-              BEANS.get(MomExceptionHandler.class).handle(e1);
+          tmp.setExceptionListener(e1 -> {
+            if (m_connectionRetryCount > 0) {
+              LOG.info("JMS connection dropped; starting failover", e1);
+              invalidate(newConnection, e1);
+              return;
             }
+            BEANS.get(MomExceptionHandler.class).handle(e1);
           });
         }
         //success

@@ -1,12 +1,8 @@
 package org.eclipse.scout.rt.ui.html;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -59,18 +55,15 @@ public class UiJobsTest {
   public void testCancelOrdinaryModelJob() throws InterruptedException {
     final CountDownLatch jobStarted = new CountDownLatch(1);
     final CountDownLatch jobsCancelled = new CountDownLatch(1);
-    IFuture<String> future = ModelJobs.schedule(new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        jobStarted.countDown();
-        try {
-          jobsCancelled.await();
-        }
-        catch (InterruptedException expected) {
-          // expected
-        }
-        return "completed";
+    IFuture<String> future = ModelJobs.schedule(() -> {
+      jobStarted.countDown();
+      try {
+        jobsCancelled.await();
       }
+      catch (InterruptedException expected) {
+        // expected
+      }
+      return "completed";
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession(), true)));
 
     jobStarted.await();
@@ -91,14 +84,11 @@ public class UiJobsTest {
   public void testCancelNotCancellableByUserModelJob() throws InterruptedException {
     final CountDownLatch jobStarted = new CountDownLatch(1);
     final CountDownLatch jobsCancelled = new CountDownLatch(1);
-    IFuture<String> future = ModelJobs.schedule(new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        jobStarted.countDown();
-        jobsCancelled.await();
-        SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
-        return "completed";
-      }
+    IFuture<String> future = ModelJobs.schedule(() -> {
+      jobStarted.countDown();
+      jobsCancelled.await();
+      SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
+      return "completed";
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(clientSession(), true))
         .withExecutionHint(ModelJobs.EXECUTION_HINT_NOT_CANCELLABLE_BY_USER));
 

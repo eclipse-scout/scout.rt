@@ -101,16 +101,12 @@ public class ClientNotificationPoller {
           RunContexts.copyCurrent()
               .withRunMonitor(tempRunMonitor)
               .withParentRunMonitor(outerRunMonitor)
-              .run(new IRunnable() {
-
-                @Override
-                public void run() throws Exception {
-                  try {
-                    handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
-                  }
-                  finally {
-                    outerRunMonitor.unregisterCancellable(tempRunMonitor);
-                  }
+              .run(() -> {
+                try {
+                  handleMessagesReceived(BEANS.get(IClientNotificationService.class).getNotifications(INode.ID));
+                }
+                finally {
+                  outerRunMonitor.unregisterCancellable(tempRunMonitor);
                 }
               });
         }

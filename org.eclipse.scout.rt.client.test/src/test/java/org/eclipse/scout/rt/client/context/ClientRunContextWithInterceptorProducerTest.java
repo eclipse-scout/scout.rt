@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContextChainIntercepterRegistry;
 import org.eclipse.scout.rt.platform.context.RunContexts.RunContextFactory;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Assert;
@@ -37,8 +36,8 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class ClientRunContextWithInterceptorProducerTest {
 
-  private static final ThreadLocal<String> TL_CLIENT_RUN_CONTEXT = new ThreadLocal<String>();
-  private static final ThreadLocal<String> TL_RUN_CONTEXT = new ThreadLocal<String>();
+  private static final ThreadLocal<String> TL_CLIENT_RUN_CONTEXT = new ThreadLocal<>();
+  private static final ThreadLocal<String> TL_RUN_CONTEXT = new ThreadLocal<>();
   private List<IBean<?>> m_registeredBeans = new ArrayList<>();
 
   @Before
@@ -72,13 +71,9 @@ public class ClientRunContextWithInterceptorProducerTest {
       TL_CLIENT_RUN_CONTEXT.set("client.runcontext");
       TL_RUN_CONTEXT.set("runcontext");
 
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          Assert.assertNull(TL_CLIENT_RUN_CONTEXT.get());
-          Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
-        }
+      Jobs.schedule(() -> {
+        Assert.assertNull(TL_CLIENT_RUN_CONTEXT.get());
+        Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
       }, Jobs.newInput().withRunContext(new RunContextFactory().copyCurrent())).awaitDone();
 
     }
@@ -94,13 +89,9 @@ public class ClientRunContextWithInterceptorProducerTest {
       TL_CLIENT_RUN_CONTEXT.set("client.runcontext");
       TL_RUN_CONTEXT.set("runcontext");
 
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          Assert.assertEquals("client.runcontext", TL_CLIENT_RUN_CONTEXT.get());
-          Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
-        }
+      Jobs.schedule(() -> {
+        Assert.assertEquals("client.runcontext", TL_CLIENT_RUN_CONTEXT.get());
+        Assert.assertEquals("runcontext", TL_RUN_CONTEXT.get());
       }, Jobs.newInput().withRunContext(BEANS.get(ClientRunContextFactory.class).copyCurrent())).awaitDone();
 
     }

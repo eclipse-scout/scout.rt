@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.lookup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,9 +20,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeRow;
-import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
-import org.eclipse.scout.rt.shared.services.lookup.fixture.ILegacyCodeLookupCallVisitor;
 import org.eclipse.scout.rt.shared.services.lookup.fixture.LegacyCodeLookupCall;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
@@ -154,23 +151,11 @@ public class CodeLookupCallTest {
   public void testGetFilteredData() throws Exception {
 
     P_LegacyCodeLookupCall oldLc = new P_LegacyCodeLookupCall();
-    oldLc.setFilter(new ILegacyCodeLookupCallVisitor<Integer>() {
-
-      @Override
-      public boolean visit(LegacyCodeLookupCall call, ICode code, int treeLevel) {
-        return true;
-      }
-    });
+    oldLc.setFilter((call, code, treeLevel) -> true);
     List<ILookupRow<Integer>> oldRows = oldLc.getDataByAll();
 
     P_NewCodeLookupCall newLc = new P_NewCodeLookupCall();
-    newLc.setFilter(new ICodeLookupCallVisitor<Integer>() {
-
-      @Override
-      public boolean visit(CodeLookupCall<Integer> call, ICode<Integer> code, int treeLevel) {
-        return true;
-      }
-    });
+    newLc.setFilter((call, code, treeLevel) -> true);
     List<ILookupRow<Integer>> newRows = newLc.getDataByAll();
 
     assertTrue("identical rows for old and new lookup call", equals(oldRows, newRows));
@@ -243,7 +228,7 @@ public class CodeLookupCallTest {
 
     @Override
     protected List<ICodeRow<Integer>> execLoadCodes(Class<? extends ICodeRow<Integer>> codeRowType) {
-      List<ICodeRow<Integer>> result = new ArrayList<ICodeRow<Integer>>();
+      List<ICodeRow<Integer>> result = new ArrayList<>();
       result.add(createTestCodeRow(ROW10_KEY, null, ROW10_TEXT));
       result.add(createTestCodeRow(ROW11_KEY, ROW10_KEY, ROW11_TEXT));
       result.add(createTestCodeRow(ROW12_KEY, ROW10_KEY, ROW12_TEXT));
@@ -255,7 +240,7 @@ public class CodeLookupCallTest {
   }
 
   private static CodeRow<Integer> createTestCodeRow(Integer key, Integer parentKey, String text) {
-    return new CodeRow<Integer>(key,
+    return new CodeRow<>(key,
         text,
         CodeLookupCallTestCodeType.ICON,
         CodeLookupCallTestCodeType.TOOLTIP,

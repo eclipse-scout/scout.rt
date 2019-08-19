@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -71,57 +67,41 @@ public class CompletionPromiseTest {
     final CompletionPromise<String> promise = new CompletionPromise<>(future, m_executor);
 
     // Schedule job-1
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      protocol.add("1");
+      setupLatch.countDownAndBlock();
 
-      @Override
-      public void run() throws Exception {
-        protocol.add("1");
-        setupLatch.countDownAndBlock();
+      // Simulate the Future to be in done state
+      when(future.isDone()).thenReturn(true);
 
-        // Simulate the Future to be in done state
-        when(future.isDone()).thenReturn(true);
-
-        // Run the test
-        promise.done();
-      }
+      // Run the test
+      promise.done();
     }, Jobs.newInput().withName("job-1"));
 
     // Schedule job-2
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        setupLatch.countDown();
-        promise.awaitDoneAndGet();
-        doneLatch.countDown();
-      }
+    Jobs.schedule(() -> {
+      setupLatch.countDown();
+      promise.awaitDoneAndGet();
+      doneLatch.countDown();
     }, Jobs.newInput().withName("job-2"));
 
     // Schedule job-3
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        setupLatch.countDown();
-        promise.awaitDoneAndGet(10, TimeUnit.SECONDS);
-        doneLatch.countDown();
-      }
+    Jobs.schedule(() -> {
+      setupLatch.countDown();
+      promise.awaitDoneAndGet(10, TimeUnit.SECONDS);
+      doneLatch.countDown();
     }, Jobs.newInput().withName("job-3"));
 
     // Wait until all jobs are running
     assertTrue(setupLatch.await());
 
     // Asynchronous callback invocation
-    promise.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("3");
-        if (callingThread != Thread.currentThread()) {
-          protocol.add("4");
-        }
-        doneLatch.countDown();
+    promise.whenDone(event -> {
+      protocol.add("3");
+      if (callingThread != Thread.currentThread()) {
+        protocol.add("4");
       }
+      doneLatch.countDown();
     }, RunContexts.copyCurrent());
 
     protocol.add("2");
@@ -133,16 +113,12 @@ public class CompletionPromiseTest {
     assertTrue(doneLatch.await());
 
     // Synchronous callback invocation
-    promise.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("5");
-        if (callingThread == Thread.currentThread()) {
-          protocol.add("6");
-        }
-        doneLatch.countDown();
+    promise.whenDone(event -> {
+      protocol.add("5");
+      if (callingThread == Thread.currentThread()) {
+        protocol.add("6");
       }
+      doneLatch.countDown();
     }, RunContexts.copyCurrent());
     protocol.add("7");
 

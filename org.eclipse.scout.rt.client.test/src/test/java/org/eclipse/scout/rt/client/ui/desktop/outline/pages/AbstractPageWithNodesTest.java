@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -27,7 +24,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -118,39 +114,36 @@ public class AbstractPageWithNodesTest {
         .copyCurrent()
         .withOutline(mockOutline, true)
         .withForm(mockForm)
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
-            assertNotNull(desktop);
+        .run(() -> {
+          IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
+          assertNotNull(desktop);
 
-            desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithNodeOutline()));
-            desktop.setOutline(PageWithNodeOutline.class);
-            desktop.activateFirstPage();
+          desktop.setAvailableOutlines(CollectionUtility.arrayList(new PageWithNodeOutline()));
+          desktop.setOutline(PageWithNodeOutline.class);
+          desktop.activateFirstPage();
 
-            IOutline outline = desktop.getOutline();
-            assertNotNull(outline);
-            assertSame(PageWithNodeOutline.class, outline.getClass());
+          IOutline outline = desktop.getOutline();
+          assertNotNull(outline);
+          assertSame(PageWithNodeOutline.class, outline.getClass());
 
-            IPage<?> page = outline.getActivePage();
-            assertNotNull(page);
-            assertSame(ParentItemNodePage.class, page.getClass());
-            ParentItemNodePage nodePage = (ParentItemNodePage) page;
+          IPage<?> page = outline.getActivePage();
+          assertNotNull(page);
+          assertSame(ParentItemNodePage.class, page.getClass());
+          ParentItemNodePage nodePage = (ParentItemNodePage) page;
 
-            // init page
-            ModelContext initPageContext = nodePage.getInitPageContext();
-            assertNotNull(initPageContext);
-            assertSame(desktop, initPageContext.getDesktop());
-            assertSame(outline, initPageContext.getOutline());
-            assertNull(initPageContext.getForm()); // no context form must be set
+          // init page
+          ModelContext initPageContext = nodePage.getInitPageContext();
+          assertNotNull(initPageContext);
+          assertSame(desktop, initPageContext.getDesktop());
+          assertSame(outline, initPageContext.getOutline());
+          assertNull(initPageContext.getForm()); // no context form must be set
 
-            // init table
-            ModelContext initTableContext = nodePage.getInitTableContext();
-            assertNotNull(initTableContext);
-            assertSame(desktop, initTableContext.getDesktop());
-            assertSame(outline, initTableContext.getOutline());
-            assertNull(initTableContext.getForm()); // no context form must be set
-          }
+          // init table
+          ModelContext initTableContext = nodePage.getInitTableContext();
+          assertNotNull(initTableContext);
+          assertSame(desktop, initTableContext.getDesktop());
+          assertSame(outline, initTableContext.getOutline());
+          assertNull(initTableContext.getForm()); // no context form must be set
         });
   }
 

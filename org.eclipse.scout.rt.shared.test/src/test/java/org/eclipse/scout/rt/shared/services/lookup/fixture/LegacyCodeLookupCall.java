@@ -88,13 +88,13 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
    * Called by {@link #execCreateLookupRowsFromCodes(List)}.
    */
   protected List<ILookupRow<CODE_ID_TYPE>> createLookupRowArray(List<? extends ICode<CODE_ID_TYPE>> codes) {
-    List<ILookupRow<CODE_ID_TYPE>> rows = new ArrayList<ILookupRow<CODE_ID_TYPE>>();
+    List<ILookupRow<CODE_ID_TYPE>> rows = new ArrayList<>();
     for (ICode<CODE_ID_TYPE> code : codes) {
       CODE_ID_TYPE parentId = null;
       if (code.getParentCode() != null) {
         parentId = code.getParentCode().getId();
       }
-      rows.add(new LookupRow<CODE_ID_TYPE>(code.getId(), code.getText())
+      rows.add(new LookupRow<>(code.getId(), code.getText())
           .withIconId(code.getIconId())
           .withTooltipText(code.getTooltipText())
           .withBackgroundColor(code.getBackgroundColor())
@@ -125,7 +125,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
   @Override
   public List<ILookupRow<CODE_ID_TYPE>> getDataByKey() {
     CODE_ID_TYPE key = getKey();
-    List<ICode<CODE_ID_TYPE>> list = new ArrayList<ICode<CODE_ID_TYPE>>(1);
+    List<ICode<CODE_ID_TYPE>> list = new ArrayList<>(1);
     ICodeType<?, CODE_ID_TYPE> t = BEANS.opt(m_codeTypeClass);
     if (t != null) {
       ICode<CODE_ID_TYPE> c = t.getCode(key);
@@ -227,7 +227,7 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
   }
 
   private abstract class P_AbstractCollectingCodeVisitor implements ICodeVisitor<ICode<CODE_ID_TYPE>> {
-    private final ArrayList<ICode<CODE_ID_TYPE>> m_list = new ArrayList<ICode<CODE_ID_TYPE>>();
+    private final ArrayList<ICode<CODE_ID_TYPE>> m_list = new ArrayList<>();
 
     public P_AbstractCollectingCodeVisitor() {
     }

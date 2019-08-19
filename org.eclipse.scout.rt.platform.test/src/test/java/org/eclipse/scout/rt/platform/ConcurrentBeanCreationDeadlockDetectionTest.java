@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,12 +110,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
   }
 
   protected <T extends AbstractConcurrentTestBean> void testConcurrentTestBeanSingleThread(final Class<T> type) throws Exception {
-    IFuture<T> future = Jobs.schedule(new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return BEANS.get(type);
-      }
-    }, Jobs.newInput());
+    IFuture<T> future = Jobs.schedule(() -> BEANS.get(type), Jobs.newInput());
 
     s_beanInitializingLatch.await();
     s_delayLatch.countDown();
@@ -130,21 +121,11 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
   }
 
   protected <T extends AbstractConcurrentTestBean> void testConcurrentTestBeanWithTwoIndependentThreads(final Class<T> type) throws Exception {
-    IFuture<T> future1 = Jobs.schedule(new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return BEANS.get(type);
-      }
-    }, Jobs.newInput());
+    IFuture<T> future1 = Jobs.schedule(() -> BEANS.get(type), Jobs.newInput());
 
     s_beanInitializingLatch.await();
 
-    IFuture<T> future2 = Jobs.schedule(new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return BEANS.get(type);
-      }
-    }, Jobs.newInput());
+    IFuture<T> future2 = Jobs.schedule(() -> BEANS.get(type), Jobs.newInput());
 
     T bean2;
     try {
@@ -166,12 +147,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
   }
 
   protected <T extends AbstractConcurrentSelfReferencingTestBean> void testConcurrentSelfReferencingTestBean(final Class<T> type) throws Exception {
-    IFuture<T> future1 = Jobs.schedule(new Callable<T>() {
-      @Override
-      public T call() throws Exception {
-        return BEANS.get(type);
-      }
-    }, Jobs.newInput());
+    IFuture<T> future1 = Jobs.schedule(() -> BEANS.get(type), Jobs.newInput());
 
     s_beanInitializingLatch.await();
     s_delayLatch.countDown();
@@ -227,12 +203,7 @@ public class ConcurrentBeanCreationDeadlockDetectionTest {
     protected void initialize() {
       try {
         s_beanInitializingLatch.countDown();
-        m_otherBean = Jobs.schedule(new Callable<AbstractConcurrentSelfReferencingTestBean>() {
-          @Override
-          public AbstractConcurrentSelfReferencingTestBean call() throws Exception {
-            return BEANS.get(AbstractConcurrentSelfReferencingTestBean.this.getClass());
-          }
-        }, Jobs
+        m_otherBean = Jobs.schedule((Callable<AbstractConcurrentSelfReferencingTestBean>) () -> BEANS.get(AbstractConcurrentSelfReferencingTestBean.this.getClass()), Jobs
             .newInput()
             .withExceptionHandling(new ExceptionHandler(), false))
             .awaitDoneAndGet();

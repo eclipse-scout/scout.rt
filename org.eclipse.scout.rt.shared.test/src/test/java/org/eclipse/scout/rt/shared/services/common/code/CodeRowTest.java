@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.code;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.junit.Test;
@@ -42,7 +39,7 @@ public class CodeRowTest {
    */
   @Test
   public void testCreateEmpty() {
-    ICodeRow<String> row = new CodeRow<String>((String) null, (String) null);
+    ICodeRow<String> row = new CodeRow<>((String) null, (String) null);
     assertNull(row.getKey());
     assertNull(row.getText());
     assertNull(row.getTooltipText());
@@ -91,7 +88,7 @@ public class CodeRowTest {
 
   @Test
   public void testCreateWithArray() throws Exception {
-    ICodeRow<String> row = new CodeRow<String>(OBJECT_ARRAY, String.class);
+    ICodeRow<String> row = new CodeRow<>(OBJECT_ARRAY, String.class);
     assertCodeRowCreatedWithObjectArray(row);
 
   }

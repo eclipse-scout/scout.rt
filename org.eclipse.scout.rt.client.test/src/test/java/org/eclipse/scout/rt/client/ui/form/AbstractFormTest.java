@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -254,12 +251,9 @@ public class AbstractFormTest {
   public void testGetSetTitle() throws Exception {
     final boolean[] called = {false};
     IForm form = new TestFormWithClassId();
-    PropertyChangeListener l = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if ("title".equals(evt.getPropertyName()) && "foo".equals(evt.getNewValue())) {
-          called[0] = true;
-        }
+    PropertyChangeListener l = evt -> {
+      if ("title".equals(evt.getPropertyName()) && "foo".equals(evt.getNewValue())) {
+        called[0] = true;
       }
     };
     form.addPropertyChangeListener(l);
@@ -272,12 +266,9 @@ public class AbstractFormTest {
   public void testGetSetSubTitle() throws Exception {
     final boolean[] called = {false};
     IForm form = new TestFormWithClassId();
-    PropertyChangeListener l = new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if ("subTitle".equals(evt.getPropertyName()) && "bar".equals(evt.getNewValue())) {
-          called[0] = true;
-        }
+    PropertyChangeListener l = evt -> {
+      if ("subTitle".equals(evt.getPropertyName()) && "bar".equals(evt.getNewValue())) {
+        called[0] = true;
       }
     };
     form.addPropertyChangeListener(l);
@@ -311,14 +302,11 @@ public class AbstractFormTest {
     final Boolean[] resultStarted = {null};
     final Boolean[] resultBlocking = {null};
     final AbstractForm form = new TestForm(false);
-    form.addFormListener(new FormListener() {
-      @Override
-      public void formChanged(FormEvent e) {
-        if (e.getType() == FormEvent.TYPE_LOAD_AFTER) {
-          resultStartable[0] = Boolean.valueOf(form.isFormStartable());
-          resultStarted[0] = Boolean.valueOf(form.isFormStarted());
-          resultBlocking[0] = Boolean.valueOf(form.isBlockingInternal());
-        }
+    form.addFormListener(e -> {
+      if (e.getType() == FormEvent.TYPE_LOAD_AFTER) {
+        resultStartable[0] = Boolean.valueOf(form.isFormStartable());
+        resultStarted[0] = Boolean.valueOf(form.isFormStarted());
+        resultBlocking[0] = Boolean.valueOf(form.isBlockingInternal());
       }
     });
     form.start();
@@ -331,12 +319,9 @@ public class AbstractFormTest {
   public void testFormEventResetComplete() throws Exception {
     final Boolean[] called = {false};
     final AbstractForm form = new TestForm(false);
-    form.addFormListener(new FormListener() {
-      @Override
-      public void formChanged(FormEvent e) {
-        if (e.getType() == FormEvent.TYPE_RESET_COMPLETE) {
-          called[0] = true;
-        }
+    form.addFormListener(e -> {
+      if (e.getType() == FormEvent.TYPE_RESET_COMPLETE) {
+        called[0] = true;
       }
     });
     form.start();

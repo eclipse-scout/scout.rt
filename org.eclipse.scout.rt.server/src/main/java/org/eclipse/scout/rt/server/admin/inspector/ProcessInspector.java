@@ -46,7 +46,7 @@ public class ProcessInspector {
 
   public ProcessInspector() {
     m_sessionToInspectorMap = new ConcurrentExpiringMap<>(2, TimeUnit.MINUTES);
-    m_ignoredCallSet = Collections.synchronizedSet(new HashSet<String>());
+    m_ignoredCallSet = Collections.synchronizedSet(new HashSet<>());
   }
 
   public boolean isEnabled() {

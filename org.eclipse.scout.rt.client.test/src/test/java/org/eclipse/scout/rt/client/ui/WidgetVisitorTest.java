@@ -12,8 +12,7 @@ package org.eclipse.scout.rt.client.ui;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +77,7 @@ public class WidgetVisitorTest {
   @Test
   public void testVisitorFull() {
     FixtureWidget root = new FixtureWidget();
-    CollectingVisitorWrapper<IWidget> visitor = new CollectingVisitorWrapper<IWidget>(action -> TreeVisitResult.CONTINUE);
+    CollectingVisitorWrapper<IWidget> visitor = new CollectingVisitorWrapper<>(action -> TreeVisitResult.CONTINUE);
     root.visit(visitor);
     visitor.expectCollectedWidgets(FixtureWidget.class,
         MainBox.class,
@@ -171,7 +170,7 @@ public class WidgetVisitorTest {
   @Test
   public void testVisitorMenusOnly() {
     FixtureWidget root = new FixtureWidget();
-    CollectingVisitorWrapper<IActionNode> visitor = new CollectingVisitorWrapper<IActionNode>(action -> TreeVisitResult.CONTINUE);
+    CollectingVisitorWrapper<IActionNode> visitor = new CollectingVisitorWrapper<>(action -> TreeVisitResult.CONTINUE);
     root.visit(visitor, IActionNode.class);
     visitor.expectCollectedWidgets(OrganizeColumnsMenu.class, FormFieldMenuMenu.class);
   }
@@ -179,7 +178,7 @@ public class WidgetVisitorTest {
   @Test
   public void testVisitorWithTerminate() {
     FixtureWidget root = new FixtureWidget();
-    CollectingVisitorWrapper<IFormField> visitor = new CollectingVisitorWrapper<IFormField>(formField -> {
+    CollectingVisitorWrapper<IFormField> visitor = new CollectingVisitorWrapper<>(formField -> {
       if (org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBoxFilterBox.CheckedStateRadioButtonGroup.AllButton.class == formField.getClass()) {
         return TreeVisitResult.TERMINATE;
       }
@@ -447,7 +446,7 @@ public class WidgetVisitorTest {
   @Test
   public void testVisitorWithSkipSubTree() {
     FixtureWidget root = new FixtureWidget();
-    CollectingVisitorWrapper<IFormField> visitor = new CollectingVisitorWrapper<IFormField>(formField -> {
+    CollectingVisitorWrapper<IFormField> visitor = new CollectingVisitorWrapper<>(formField -> {
       if (TreeBoxFilterBox.class == formField.getClass() || ListBoxFilterBox.class == formField.getClass()) {
         return TreeVisitResult.SKIP_SUBTREE;
       }
@@ -473,7 +472,7 @@ public class WidgetVisitorTest {
   @Test
   public void testVisitorWithSkipSiblings() {
     FixtureWidget root = new FixtureWidget();
-    CollectingVisitorWrapper<IWidget> visitor = new CollectingVisitorWrapper<IWidget>(widget -> {
+    CollectingVisitorWrapper<IWidget> visitor = new CollectingVisitorWrapper<>(widget -> {
       if (ActiveButton.class == widget.getClass()) {
         return TreeVisitResult.SKIP_SIBLINGS;
       }

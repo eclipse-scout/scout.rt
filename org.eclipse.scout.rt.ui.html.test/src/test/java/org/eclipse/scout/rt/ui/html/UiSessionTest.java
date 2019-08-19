@@ -10,17 +10,11 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpSession;
@@ -38,9 +32,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
@@ -94,7 +86,7 @@ public class UiSessionTest {
   @Test
   public void testDispose() throws Exception {
     UiSession session = (UiSession) JsonTestUtility.createAndInitializeUiSession();
-    WeakReference<IUiSession> ref = new WeakReference<IUiSession>(session);
+    WeakReference<IUiSession> ref = new WeakReference<>(session);
 
     JsonTestUtility.endRequest(session);
     session.dispose();
@@ -122,7 +114,7 @@ public class UiSessionTest {
     assertFalse(uiSession.isDisposed());
 
     // Don't waste time waiting for client jobs to finish. Test job itself runs inside a client job so we always have to wait until max time
-    WeakReference<IUiSession> ref = new WeakReference<IUiSession>(uiSession);
+    WeakReference<IUiSession> ref = new WeakReference<>(uiSession);
     ISessionStore sessionStore = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
     sessionStore.registerUiSession(uiSession);
 
@@ -181,13 +173,10 @@ public class UiSessionTest {
     assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
 
     // create and start test form in a model job
-    final SessionStoreTestForm form = ModelJobs.schedule(new Callable<SessionStoreTestForm>() {
-      @Override
-      public SessionStoreTestForm call() throws Exception {
-        SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
-        f.start();
-        return f;
-      }
+    final SessionStoreTestForm form = ModelJobs.schedule(() -> {
+      SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
+      f.start();
+      return f;
     }, ModelJobs
         .newInput(ClientRunContexts
             .empty()
@@ -195,12 +184,7 @@ public class UiSessionTest {
         .awaitDoneAndGet(5, TimeUnit.SECONDS);
 
     // schedule a job that emulates servlet container that performs session invalidation on session timeout
-    IFuture<Void> appServerSessionTimeoutFuture = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        httpSession.invalidate();
-      }
-    }, Jobs.newInput()
+    IFuture<Void> appServerSessionTimeoutFuture = Jobs.schedule(() -> httpSession.invalidate(), Jobs.newInput()
         .withName("simulate session timeout")
         .withExecutionTrigger(Jobs
             .newExecutionTrigger()
@@ -213,12 +197,7 @@ public class UiSessionTest {
     form.awaitDoFinallyEntered(5, TimeUnit.SECONDS);
 
     if (!expectSessionActiveAfterwards) {
-      JobTestUtil.waitForCondition(new ICondition() {
-        @Override
-        public boolean isFulfilled() {
-          return !clientSession.isActive();
-        }
-      });
+      JobTestUtil.waitForCondition(() -> !clientSession.isActive());
     }
 
     if (expectFormFinallyCompleted) {
@@ -275,13 +254,10 @@ public class UiSessionTest {
     assertThat(sessionStore, is(instanceOf(HttpSessionBindingListener.class)));
 
     // create and start test form in a model job
-    SessionStoreTestForm form = ModelJobs.schedule(new Callable<SessionStoreTestForm>() {
-      @Override
-      public SessionStoreTestForm call() throws Exception {
-        SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
-        f.start();
-        return f;
-      }
+    SessionStoreTestForm form = ModelJobs.schedule(() -> {
+      SessionStoreTestForm f = new SessionStoreTestForm(openFormCloseAction);
+      f.start();
+      return f;
     }, ModelJobs
         .newInput(ClientRunContexts
             .empty()
@@ -299,12 +275,7 @@ public class UiSessionTest {
     else {
       assertFalse(form.isFinallyCompleted());
       // The model job was canceled by the SessionStore. Hence we cannot use UiJobs.awaitModelJobs().
-      JobTestUtil.waitForCondition(new ICondition() {
-        @Override
-        public boolean isFulfilled() {
-          return !clientSession.isActive();
-        }
-      });
+      JobTestUtil.waitForCondition(() -> !clientSession.isActive());
     }
 
     assertTrue(uiSession.isDisposed());

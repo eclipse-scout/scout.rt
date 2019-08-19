@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server.notification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class NotificationCoalescerTest {
 
   @Test
   public void testCoalesceEmptySet() {
-    List<? extends Serializable> res = BEANS.get(NotificationCoalescer.class).coalesce(new ArrayList<Serializable>());
+    List<? extends Serializable> res = BEANS.get(NotificationCoalescer.class).coalesce(new ArrayList<>());
     assertTrue(res.isEmpty());
   }
 

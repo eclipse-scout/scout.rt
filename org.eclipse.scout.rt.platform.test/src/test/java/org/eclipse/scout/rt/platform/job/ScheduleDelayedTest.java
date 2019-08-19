@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,13 +29,7 @@ public class ScheduleDelayedTest {
 
     long tStartMillis = System.currentTimeMillis();
     long delayMillis = TimeUnit.SECONDS.toMillis(1);
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        actualExecutionTime.set(System.currentTimeMillis());
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> actualExecutionTime.set(System.currentTimeMillis()), Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(delayMillis, TimeUnit.MILLISECONDS)));

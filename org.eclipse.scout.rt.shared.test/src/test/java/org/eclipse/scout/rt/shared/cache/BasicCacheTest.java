@@ -74,14 +74,14 @@ public class BasicCacheTest {
     assertEquals(5, cache.getUnmodifiableMap().size());
 
     // test invalidate
-    cache.invalidate(new KeyCacheEntryFilter<Integer, String>(CollectionUtility.arrayList(5, 8)), true);
+    cache.invalidate(new KeyCacheEntryFilter<>(CollectionUtility.arrayList(5, 8)), true);
     assertEquals("5.6", cache.get(5));
     assertEquals("8.7", cache.get(8));
 
     assertEquals(5, cache.getUnmodifiableMap().size());
 
     // test invalidate all
-    cache.invalidate(new AllCacheEntryFilter<Integer, String>(), true);
+    cache.invalidate(new AllCacheEntryFilter<>(), true);
     assertEquals(0, cache.getUnmodifiableMap().size());
   }
 
@@ -103,7 +103,7 @@ public class BasicCacheTest {
 
     assertEquals(2, cache.getUnmodifiableMap().size());
 
-    cache.invalidate(new KeyCacheEntryFilter<Integer, String>(CollectionUtility.arrayList(2, null)), true);
+    cache.invalidate(new KeyCacheEntryFilter<>(CollectionUtility.arrayList(2, null)), true);
     assertEquals(1, cache.getUnmodifiableMap().size());
     assertEquals("3.2", resultMap.get(3));
 

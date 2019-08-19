@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,15 +38,15 @@ public class InvalidateCacheNofificationCoalescerTest {
   @Test
   public void testCoalesceEmptySet() {
     InvalidateCacheNotificationCoalescer coalescer = new InvalidateCacheNotificationCoalescer();
-    List<InvalidateCacheNotification> res = coalescer.coalesce(new ArrayList<InvalidateCacheNotification>());
+    List<InvalidateCacheNotification> res = coalescer.coalesce(new ArrayList<>());
     assertTrue(res.isEmpty());
   }
 
   @Test
   public void testCoalesceNotificationsSet() {
     InvalidateCacheNotificationCoalescer coalescer = new InvalidateCacheNotificationCoalescer();
-    ICacheEntryFilter<Object, Object> filter1 = new KeyCacheEntryFilter<Object, Object>(CollectionUtility.<Object> arrayList(CodeType1.class));
-    ICacheEntryFilter<Object, Object> filter2 = new KeyCacheEntryFilter<Object, Object>(CollectionUtility.<Object> arrayList(CodeType2.class));
+    ICacheEntryFilter<Object, Object> filter1 = new KeyCacheEntryFilter<>(CollectionUtility.<Object> arrayList(CodeType1.class));
+    ICacheEntryFilter<Object, Object> filter2 = new KeyCacheEntryFilter<>(CollectionUtility.<Object> arrayList(CodeType2.class));
     List<InvalidateCacheNotification> testList = CollectionUtility.arrayList(
         new InvalidateCacheNotification(CACHE_ID_1, filter1),
         new InvalidateCacheNotification(CACHE_ID_1, filter2),

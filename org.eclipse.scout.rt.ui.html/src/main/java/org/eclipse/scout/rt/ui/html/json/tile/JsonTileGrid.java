@@ -200,7 +200,7 @@ public class JsonTileGrid<T extends ITileGrid<? extends ITile>> extends Abstract
   }
 
   protected List<ITile> extractTiles(JSONArray tileIds) {
-    List<ITile> tiles = new ArrayList<ITile>(tileIds.length());
+    List<ITile> tiles = new ArrayList<>(tileIds.length());
     for (int i = 0; i < tileIds.length(); i++) {
       ITile tile = optTile(tileIds.getString(i));
       if (tile != null) {

@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class JsonTabBoxTest {
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
     Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
     Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
-    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, uiSession, "123", null);
+    m_tabBox = new JsonTabBox<>(m_tabBoxModel, uiSession, "123", null);
     m_tabBox.attachAdapters(m_tabBoxModel.getGroupBoxes());
     m_uiSession = new UiSessionMock();
   }

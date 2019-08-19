@@ -321,18 +321,15 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   }
 
   protected DesktopListener createDesktopListener() {
-    return new DesktopListener() {
-      @Override
-      public void desktopChanged(DesktopEvent e) {
-        switch (e.getType()) {
-          case DesktopEvent.TYPE_OUTLINE_CHANGED: {
-            setActiveOutline(e.getOutline());
-            break;
-          }
-          case DesktopEvent.TYPE_DESKTOP_CLOSED: {
-            if (e.getSource() instanceof IDesktop) {
-              deregisterDesktop((IDesktop) e.getSource());
-            }
+    return e -> {
+      switch (e.getType()) {
+        case DesktopEvent.TYPE_OUTLINE_CHANGED: {
+          setActiveOutline(e.getOutline());
+          break;
+        }
+        case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+          if (e.getSource() instanceof IDesktop) {
+            deregisterDesktop((IDesktop) e.getSource());
           }
         }
       }

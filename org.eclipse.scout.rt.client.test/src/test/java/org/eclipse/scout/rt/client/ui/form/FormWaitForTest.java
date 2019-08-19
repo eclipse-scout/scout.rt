@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -52,7 +51,7 @@ public class FormWaitForTest {
   }
 
   protected void testStartAndWaitImpl(final boolean modal, final int displayHint, final String viewId) throws Exception {
-    final ArrayList<Integer> testSequence = new ArrayList<Integer>();
+    final ArrayList<Integer> testSequence = new ArrayList<>();
     DynamicGroupBox mainBox = new DynamicGroupBox(
         new DynamicStringField("f1", "First Name"),
         new DynamicOkButton(),
@@ -64,15 +63,12 @@ public class FormWaitForTest {
 
     testSequence.add(0);
 
-    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        testSequence.add(3);
-        form.doClose();
-        testSequence.add(4);
+    IFuture<Void> future = ModelJobs.schedule(() -> {
+      testSequence.add(3);
+      form.doClose();
+      testSequence.add(4);
 
-        LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
-      }
+      LOG.debug("ClientSyncWaitForTest.testStartAndWaitImpl(...).new ClientSyncJob() {...}.runVoid() finished");
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent()));
 
     LOG.debug("ClientSessionProvider.currentSession()");

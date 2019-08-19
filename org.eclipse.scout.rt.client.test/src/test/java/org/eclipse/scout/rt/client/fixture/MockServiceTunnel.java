@@ -30,7 +30,7 @@ import com.google.api.client.http.HttpResponse;
 @IgnoreBean
 public class MockServiceTunnel extends ClientHttpServiceTunnel {
 
-  private final HashMap<Long, Thread> m_runningMap = new HashMap<Long, Thread>();
+  private final HashMap<Long, Thread> m_runningMap = new HashMap<>();
 
   public MockServiceTunnel() throws Exception {
     super(UriUtility.toUrl("http://mock/process"));

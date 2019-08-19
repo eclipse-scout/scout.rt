@@ -41,12 +41,7 @@ public abstract class JsonAdapterRefProperty<MODEL> extends JsonProperty<MODEL> 
     // The referenced adapter might not be created yet
     // (e.g. a detail table created by JsonOutline is not created because the EventBuffer has not been processed yet)
     // -> IJsonObject is resolved later by JsonPropertyChangeEvent
-    return new IJsonObject() {
-      @Override
-      public Object toJson() {
-        return toJsonInternal(value);
-      }
-    };
+    return (IJsonObject) () -> toJsonInternal(value);
   }
 
   protected Object toJsonInternal(Object value) {

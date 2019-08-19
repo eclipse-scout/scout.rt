@@ -10,13 +10,10 @@
  */
 package org.eclipse.scout.rt.client.job.filter.future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -62,22 +59,10 @@ public class ClientRunContextFutureFilterTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     // Client Job
-    m_clientJobFuture = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        condition.waitFor(10, TimeUnit.SECONDS);
-      }
-    }, Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true)));
+    m_clientJobFuture = Jobs.schedule(() -> condition.waitFor(10, TimeUnit.SECONDS), Jobs.newInput().withRunContext(ClientRunContexts.empty().withSession(m_clientSession1, true)));
 
     // Model Job
-    m_modelJobFuture = ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        condition.waitFor(10, TimeUnit.SECONDS);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)));
+    m_modelJobFuture = ModelJobs.schedule(() -> condition.waitFor(10, TimeUnit.SECONDS), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true)));
 
     JobTestUtil.waitForState(m_clientJobFuture, JobState.WAITING_FOR_BLOCKING_CONDITION);
     JobTestUtil.waitForState(m_modelJobFuture, JobState.WAITING_FOR_BLOCKING_CONDITION);
@@ -431,36 +416,12 @@ public class ClientRunContextFutureFilterTest {
   @Test
   public void testCustomFilter() {
     // False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return false;
-      }
-    }).toFilter().test(m_clientJobFuture));
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(future -> false).toFilter().test(m_clientJobFuture));
 
     // True Filter
-    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return true;
-      }
-    }).toFilter().test(m_clientJobFuture));
+    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(future -> true).toFilter().test(m_clientJobFuture));
 
     // True/False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return true;
-      }
-    }).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return false;
-      }
-    }).toFilter().test(m_clientJobFuture));
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ClientRunContext.class).andMatch(future -> true).andMatch(future -> false).toFilter().test(m_clientJobFuture));
   }
 }

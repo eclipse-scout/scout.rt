@@ -65,7 +65,7 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
       if (!m_isSorting) {
         IColumn<?> primarySortColumn = CollectionUtility.firstElement(getTable().getColumnSet().getSortColumns());
         if (primarySortColumn != null) {
-          getSortByField().setValue(new ImmutablePair<IColumn, Boolean>(primarySortColumn, primarySortColumn.isSortAscending()));
+          getSortByField().setValue(new ImmutablePair<>(primarySortColumn, primarySortColumn.isSortAscending()));
         }
         else {
           getSortByField().setValue(null);
@@ -289,9 +289,9 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
 
       lookupRows.add(new LookupRow<>(null, TEXTS.get("NoSorting")));
       for (IColumn col : getTable().getColumns()) {
-        lookupRows.add(new LookupRow<>(new ImmutablePair<IColumn, Boolean>(col, true), col.getHeaderCell().getText() + " (" + TEXTS.get("Ascending") + ")")
+        lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), col.getHeaderCell().getText() + " (" + TEXTS.get("Ascending") + ")")
             .withIconId(AbstractIcons.LongArrowUpBold));
-        lookupRows.add(new LookupRow<>(new ImmutablePair<IColumn, Boolean>(col, false), col.getHeaderCell().getText() + " (" + TEXTS.get("Descending") + ")")
+        lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), col.getHeaderCell().getText() + " (" + TEXTS.get("Descending") + ")")
             .withIconId(AbstractIcons.LongArrowDownBold));
       }
 

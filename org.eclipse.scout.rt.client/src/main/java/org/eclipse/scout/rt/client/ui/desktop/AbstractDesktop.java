@@ -87,6 +87,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.context.PropertyMap;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
@@ -120,7 +121,6 @@ import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 
 /**
  * The desktop model (may) consist of
@@ -168,7 +168,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
-  private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<ClientCallback<Coordinates>>());
+  private final List<ClientCallback<Coordinates>> m_pendingPositionResponses = Collections.synchronizedList(new ArrayList<>());
   private int m_attachedGuis = 0;
   private final IDataChangeManager m_dataChangeListeners;
   private final IDataChangeManager m_dataChangeDesktopInForegroundListeners;
@@ -1035,12 +1035,7 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     final IOutline newOutline = resolveOutline(outline);
     if (m_outline == newOutline) {
       if (m_outline != null && getActiveForm() != null) {
-        m_outline.createDisplayParentRunContext().run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            fireOutlineContentActivate();
-          }
-        });
+        m_outline.createDisplayParentRunContext().run(() -> fireOutlineContentActivate());
       }
       return;
     }

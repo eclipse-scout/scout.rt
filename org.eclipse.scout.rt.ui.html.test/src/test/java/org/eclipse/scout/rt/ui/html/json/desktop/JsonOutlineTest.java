@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -75,7 +73,7 @@ public class JsonOutlineTest {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePageWithForm nodePage = new NodePageWithForm();
 
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     pages.add(tablePage);
     IOutline outline = new Outline(pages);
@@ -98,7 +96,7 @@ public class JsonOutlineTest {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePage nodePage = new NodePage();
 
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
 
@@ -108,7 +106,7 @@ public class JsonOutlineTest {
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
 
     List<ITreeNode> allNodes = JsonTreeTest.getAllTreeNodes(outline);
-    List<String> allNodeIds = new LinkedList<String>();
+    List<String> allNodeIds = new LinkedList<>();
 
     for (ITreeNode node : allNodes) {
       String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, node);
@@ -141,7 +139,7 @@ public class JsonOutlineTest {
     NodePage childPage = new NodePage();
     childPage.getTable(true); // trigger table creation
 
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     outline.addChildNode(nodePage, childPage);
@@ -183,7 +181,7 @@ public class JsonOutlineTest {
     childPage.getCellForUpdate().setText("child");
     childPage.getTable(true); // trigger table creation
 
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     outline.addChildNode(nodePage, childPage);
@@ -229,7 +227,7 @@ public class JsonOutlineTest {
     nodePage.getTable(true); // trigger table creation
     nodePage.setTableVisible(false);
 
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     JsonOutline<IOutline> jsonOutline = UiSessionTestUtility.newJsonAdapter(m_uiSession, outline, null);
@@ -247,7 +245,7 @@ public class JsonOutlineTest {
   public void testDispose() {
     ITree tree = new OutlineWithOneNode();
     JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
-    WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
+    WeakReference<JsonTree> ref = new WeakReference<>(object);
 
     object.dispose();
     m_uiSession = null;
@@ -281,7 +279,7 @@ public class JsonOutlineTest {
         super.execCreateChildPages(pageList);
       }
     };
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     pages.add(page2);
     IOutline outline = new Outline(pages);
     outline.selectNode(page1);
@@ -313,7 +311,7 @@ public class JsonOutlineTest {
    */
   @Test
   public void testDontSendNonDisplayableMenus() throws Exception {
-    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    List<IPage<?>> pages = new ArrayList<>();
     IOutline outline = new Outline(pages);
     IMenu headerMenu = new HeaderMenu();
     headerMenu.init();

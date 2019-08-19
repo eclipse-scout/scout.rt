@@ -30,12 +30,7 @@ public class ConfigPropertyTest {
   public void testListener() {
     final List<ConfigPropertyChangeEvent> b = new ArrayList<>();
     TestProperty testProperty = new TestProperty();
-    IConfigChangedListener listener = new IConfigChangedListener() {
-      @Override
-      public void configPropertyChanged(ConfigPropertyChangeEvent event) {
-        b.add(event);
-      }
-    };
+    IConfigChangedListener listener = event -> b.add(event);
     testProperty.addListener(listener);
     Assert.assertEquals("default", testProperty.getValue());
     testProperty.invalidate();
@@ -91,7 +86,7 @@ public class ConfigPropertyTest {
 
     @Override
     protected List<Integer> parse(List<String> value) {
-      List<Integer> result = new ArrayList<Integer>(value.size());
+      List<Integer> result = new ArrayList<>(value.size());
       for (String s : value) {
         result.add(Integer.valueOf(s));
       }

@@ -30,7 +30,7 @@ public class OrigForm extends AbstractForm {
 
   public OrigForm() {
     super(false);
-    m_operations = new ArrayList<String>();
+    m_operations = new ArrayList<>();
     callInitializer();
   }
 

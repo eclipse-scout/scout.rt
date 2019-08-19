@@ -12,10 +12,7 @@ package org.eclipse.scout.rt.client.ui.desktop;
 
 import static java.util.Collections.emptySet;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.hashSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,7 +57,6 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 @RunWith(ClientTestRunner.class)
@@ -105,13 +101,10 @@ public class AbstractDesktopTest {
     prepareMockDesktopWithOutline();
     final boolean[] called = {false};
     assertFalse(m_desktop.isOutlineChanging());
-    m_desktop.addDesktopListener(new DesktopListener() {
-      @Override
-      public void desktopChanged(DesktopEvent e) {
-        if (DesktopEvent.TYPE_OUTLINE_CHANGED == e.getType()) {
-          called[0] = true;
-          assertTrue(m_desktop.isOutlineChanging());
-        }
+    m_desktop.addDesktopListener(e -> {
+      if (DesktopEvent.TYPE_OUTLINE_CHANGED == e.getType()) {
+        called[0] = true;
+        assertTrue(m_desktop.isOutlineChanging());
       }
     });
     m_desktop.activateOutline(m_outline);
@@ -606,12 +599,9 @@ public class AbstractDesktopTest {
       }
     };
 
-    Mockito.doAnswer(new Answer<Void>() {
-      @Override
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        assertEquals(IDesktop.CURRENT.get(), m_desktop); // init must be called within run context with reference to currently initializing desktop
-        return null;
-      }
+    Mockito.doAnswer((Answer<Void>) invocation -> {
+      assertEquals(IDesktop.CURRENT.get(), m_desktop); // init must be called within run context with reference to currently initializing desktop
+      return null;
     }).when(m_outline).init();
 
     m_desktop.init();

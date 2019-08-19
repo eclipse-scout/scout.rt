@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -41,13 +40,7 @@ public class ServiceWithSessionInterceptorTest {
 
   @Test
   public void testService() throws Exception {
-    ServerRunContexts.empty().withSession(m_serverSession).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        runInServerRunContext();
-      }
-    });
+    ServerRunContexts.empty().withSession(m_serverSession).run(() -> runInServerRunContext());
   }
 
   protected void runInServerRunContext() {

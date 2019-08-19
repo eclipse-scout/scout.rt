@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.mail;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -140,9 +135,9 @@ public class MailHelperTest {
     BEANS.get(MailHelper.class).collectMailParts(null, null, null, null);
     BEANS.get(MailHelper.class).collectMailParts(message, null, null, null);
 
-    List<Part> bodyCollector = new ArrayList<Part>();
-    List<Part> attachmentCollector = new ArrayList<Part>();
-    List<Part> inlineAttachmentCollector = new ArrayList<Part>();
+    List<Part> bodyCollector = new ArrayList<>();
+    List<Part> attachmentCollector = new ArrayList<>();
+    List<Part> inlineAttachmentCollector = new ArrayList<>();
     BEANS.get(MailHelper.class).collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
     assertEquals("body parts size is wrong", 2, bodyCollector.size());
     assertEquals("attachments parts size is wrong", 3, attachmentCollector.size());
@@ -167,9 +162,9 @@ public class MailHelperTest {
     inlineAttachmentPart.addHeader("Content-Disposition", Part.INLINE);
     multiPart.addBodyPart(inlineAttachmentPart);
 
-    List<Part> bodyCollector = new ArrayList<Part>();
-    List<Part> attachmentCollector = new ArrayList<Part>();
-    List<Part> inlineAttachmentCollector = new ArrayList<Part>();
+    List<Part> bodyCollector = new ArrayList<>();
+    List<Part> attachmentCollector = new ArrayList<>();
+    List<Part> inlineAttachmentCollector = new ArrayList<>();
     BEANS.get(MailHelper.class).collectMailParts(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
     assertEquals("body parts size is wrong", 1, bodyCollector.size());
     assertEquals("attachments parts size is wrong", 0, attachmentCollector.size());
@@ -188,12 +183,12 @@ public class MailHelperTest {
     // add no attachments
     BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, null);
     verifyMimeMessage(message, plainText, html);
-    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<File>());
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<>());
     verifyMimeMessage(message, plainText, html);
 
     // add 3 attachments to mime message
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
-    List<File> attachments = new ArrayList<File>();
+    List<File> attachments = new ArrayList<>();
     attachments.add(IOUtility.createTempFile("sample1.dat", sampleData));
     attachments.add(IOUtility.createTempFile("sample2.dat", sampleData));
     attachments.add(IOUtility.createTempFile("sample3_öüä.dat", sampleData));
@@ -223,12 +218,12 @@ public class MailHelperTest {
     // add no attachments
     BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, null);
     verifyMimeMessage(message, plainText, html);
-    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<File>());
+    BEANS.get(MailHelper.class).addAttachmentsToMimeMessage(message, new ArrayList<>());
     verifyMimeMessage(message, plainText, html);
 
     // add 3 attachments to mime message
     final byte[] sampleData = new byte[]{0x0, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF};
-    List<BinaryResource> attachments = new ArrayList<BinaryResource>();
+    List<BinaryResource> attachments = new ArrayList<>();
     attachments.add(new BinaryResource("sample1.dat", sampleData));
     attachments.add(new BinaryResource("sample2.dat", sampleData));
     attachments.add(new BinaryResource("sample3_öüä.dat", sampleData));
@@ -797,7 +792,7 @@ public class MailHelperTest {
 
     List<Part> attachmentParts = BEANS.get(MailHelper.class).getAttachmentParts(message);
     assertEquals("attachments parts size is wrong", attachmentFilenames.length, attachmentParts.size());
-    Set<String> attachmentFilenamesSet = new HashSet<String>();
+    Set<String> attachmentFilenamesSet = new HashSet<>();
     for (Part part : attachmentParts) {
       attachmentFilenamesSet.add(MimeUtility.decodeText(part.getFileName()));
     }
@@ -818,7 +813,7 @@ public class MailHelperTest {
    * Helper method for test.
    */
   protected static List<MailParticipant> createMailParticipants(List<String> emails) {
-    List<MailParticipant> participants = new ArrayList<MailParticipant>();
+    List<MailParticipant> participants = new ArrayList<>();
     for (String email : emails) {
       participants.add(new MailParticipant().withEmail(email));
     }

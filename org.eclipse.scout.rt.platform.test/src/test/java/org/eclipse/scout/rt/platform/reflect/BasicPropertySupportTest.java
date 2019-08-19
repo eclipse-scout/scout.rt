@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.reflect;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.beans.PropertyChangeListener;
@@ -86,7 +84,7 @@ public class BasicPropertySupportTest {
     WeakPropertyChangeListener weakEventListener2 = mock(WeakPropertyChangeListener.class);
     PropertyChangeListener testPropertyListener = mock(PropertyChangeListener.class);
     WeakPropertyChangeListener weakTestPropertyListener = mock(WeakPropertyChangeListener.class);
-    ArrayList<PropertyChangeListener> specificListeners = new ArrayList<PropertyChangeListener>();
+    ArrayList<PropertyChangeListener> specificListeners = new ArrayList<>();
 
     //initial empty
     checkExpectedListeners(propertySupport, specificListeners);
@@ -145,7 +143,7 @@ public class BasicPropertySupportTest {
       WeakPropertyChangeListener weakEventListener2 = mock(WeakPropertyChangeListener.class);
       PropertyChangeListener testPropertyListener = mock(PropertyChangeListener.class);
       WeakPropertyChangeListener weakTestPropertyListener = mock(WeakPropertyChangeListener.class);
-      ArrayList<PropertyChangeListener> specificListeners = new ArrayList<PropertyChangeListener>();
+      ArrayList<PropertyChangeListener> specificListeners = new ArrayList<>();
 
       //initial empty
       checkExpectedListeners(propertySupport, specificListeners);

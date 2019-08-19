@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.server.commons.http.TestingHttpServer.IServletRequestHandler;
 import org.eclipse.scout.rt.shared.http.HttpConfigurationProperties.ApacheHttpTransportRedirectPostProperty;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
@@ -64,8 +63,8 @@ public class HttpRedirectTest {
 
   private TestingHttpClient m_client;
   private TestingHttpServer m_server;
-  private final List<String> m_servletGetLog = Collections.synchronizedList(new ArrayList<String>());
-  private final List<String> m_servletPostLog = Collections.synchronizedList(new ArrayList<String>());
+  private final List<String> m_servletGetLog = Collections.synchronizedList(new ArrayList<>());
+  private final List<String> m_servletPostLog = Collections.synchronizedList(new ArrayList<>());
   private final Queue<String> m_redirectUrls = new ArrayBlockingQueue<>(10);
 
   @Before
@@ -74,18 +73,8 @@ public class HttpRedirectTest {
     m_servletPostLog.clear();
     m_client = new TestingHttpClient();
     m_server = new TestingHttpServer(TestingHttpPorts.PORT_33006)
-        .withServletGetHandler(new IServletRequestHandler() {
-          @Override
-          public void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            fixtureServletGet(req, resp);
-          }
-        })
-        .withServletPostHandler(new IServletRequestHandler() {
-          @Override
-          public void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            fixtureServletPost(req, resp);
-          }
-        });
+        .withServletGetHandler((req, resp) -> fixtureServletGet(req, resp))
+        .withServletPostHandler((req, resp) -> fixtureServletPost(req, resp));
     m_server.start();
   }
 

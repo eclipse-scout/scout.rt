@@ -20,7 +20,7 @@ public class ExtensionTestDesktop extends AbstractDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    List<Class<? extends IOutline>> outlines = new ArrayList<Class<? extends IOutline>>();
+    List<Class<? extends IOutline>> outlines = new ArrayList<>();
     outlines.add(FirstOutline.class);
     outlines.add(SecondOutline.class);
     return outlines;

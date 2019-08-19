@@ -55,13 +55,9 @@ public class RunMonitorCancellableProcessor implements ICallableDecorator {
 
     m_parentRunMonitor.registerCancellable(m_runMonitor);
 
-    return new IUndecorator() {
-
-      @Override
-      public void undecorate() {
-        // setCleanupRunMonitor also checks itself if cleanup is already possible
-        m_runMonitor.addCleanupRunMonitor(m_parentRunMonitor);
-      }
+    return () -> {
+      // setCleanupRunMonitor also checks itself if cleanup is already possible
+      m_runMonitor.addCleanupRunMonitor(m_parentRunMonitor);
     };
   }
 

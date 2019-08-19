@@ -22,7 +22,6 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -63,15 +62,11 @@ public class ThreadNameDecoratorTest {
     final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(1);
 
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        workerThread.set(Thread.currentThread());
-        latch1.countDownAndBlock();
-        condition.waitFor(10, TimeUnit.SECONDS);
-        latch2.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      workerThread.set(Thread.currentThread());
+      latch1.countDownAndBlock();
+      condition.waitFor(10, TimeUnit.SECONDS);
+      latch2.countDownAndBlock();
     }, Jobs.newInput()
         .withExecutionSemaphore(semaphore)
         .withThreadName("test-thread")

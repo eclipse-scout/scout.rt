@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.calendar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.util.Set;
@@ -145,7 +144,7 @@ public class CalendarComponentTest {
   }
 
   private Set<CalendarComponent> createSet(CalendarComponent... calendarComponents) {
-    Set<CalendarComponent> set = new TreeSet<CalendarComponent>();
+    Set<CalendarComponent> set = new TreeSet<>();
     for (CalendarComponent component : calendarComponents) {
       set.add(component);
     }

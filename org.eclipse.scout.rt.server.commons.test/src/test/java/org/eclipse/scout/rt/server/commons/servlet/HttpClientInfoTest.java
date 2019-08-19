@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.server.commons.servlet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -974,12 +971,9 @@ public class HttpClientInfoTest {
     assertHttpClientInfo(httpClientInfo2);
     assertSame(httpClientInfoOnSession, httpClientInfo2);
 
-    Mockito.verify(session).setAttribute(Mockito.matches(HttpClientInfo.HTTP_CLIENT_INFO_ATTRIBUTE_NAME), Mockito.argThat(new ArgumentMatcher<HttpClientInfo>() {
-      @Override
-      public boolean matches(HttpClientInfo argument) {
-        assertHttpClientInfo(argument);
-        return true;
-      }
+    Mockito.verify(session).setAttribute(Mockito.matches(HttpClientInfo.HTTP_CLIENT_INFO_ATTRIBUTE_NAME), Mockito.argThat((ArgumentMatcher<HttpClientInfo>) argument -> {
+      assertHttpClientInfo(argument);
+      return true;
     }));
   }
 
@@ -995,7 +989,7 @@ public class HttpClientInfoTest {
   }
 
   private Map<String, HttpClientInfo> initTestMap() {
-    Map<String, HttpClientInfo> testMap = new HashMap<String, HttpClientInfo>();
+    Map<String, HttpClientInfo> testMap = new HashMap<>();
 
     putIosBrowsers(testMap);
     putAndroidBrowsers(testMap);

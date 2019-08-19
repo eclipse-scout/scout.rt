@@ -51,7 +51,7 @@ public class UnsafeFastListenerList<LISTENER> implements IFastListenerList<LISTE
     }
     Object ref;
     if (weak || listener instanceof WeakEventListener) {
-      ref = new WeakReference<LISTENER>(listener);
+      ref = new WeakReference<>(listener);
     }
     else {
       ref = listener;

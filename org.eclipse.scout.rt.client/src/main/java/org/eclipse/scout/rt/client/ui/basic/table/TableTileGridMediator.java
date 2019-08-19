@@ -77,7 +77,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
           setTileMappings(tileMappings);
           break;
         case TableEvent.TYPE_ALL_ROWS_DELETED:
-          setTileMappings(new ArrayList<ITableRowTileMapping>());
+          setTileMappings(new ArrayList<>());
           break;
       }
     }

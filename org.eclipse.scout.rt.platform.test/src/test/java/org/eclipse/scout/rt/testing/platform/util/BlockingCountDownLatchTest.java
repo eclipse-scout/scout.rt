@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,72 +42,56 @@ public class BlockingCountDownLatchTest {
 
   @Test(timeout = 10000)
   public void test() throws InterruptedException {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>());
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>());
 
     final BlockingCountDownLatch testee = new BlockingCountDownLatch(4);
     final CountDownLatch latch = new CountDownLatch(3);
 
-    s_executor.schedule(new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        protocol.add("1-beforeCountDownAndBlock");
-        try {
-          testee.countDownAndBlock();
-        }
-        finally {
-          protocol.add("1-afterCountDownAndBlock");
-          latch.countDown();
-        }
-        return null;
+    s_executor.schedule((Callable<Void>) () -> {
+      protocol.add("1-beforeCountDownAndBlock");
+      try {
+        testee.countDownAndBlock();
       }
+      finally {
+        protocol.add("1-afterCountDownAndBlock");
+        latch.countDown();
+      }
+      return null;
     }, 1, TimeUnit.SECONDS);
-    s_executor.schedule(new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        protocol.add("2-beforeCountDownAndBlock");
-        try {
-          testee.countDownAndBlock();
-        }
-        finally {
-          protocol.add("2-afterCountDownAndBlock");
-          latch.countDown();
-        }
-        return null;
+    s_executor.schedule((Callable<Void>) () -> {
+      protocol.add("2-beforeCountDownAndBlock");
+      try {
+        testee.countDownAndBlock();
       }
+      finally {
+        protocol.add("2-afterCountDownAndBlock");
+        latch.countDown();
+      }
+      return null;
     }, 1, TimeUnit.SECONDS);
-    s_executor.schedule(new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        protocol.add("3-beforeCountDownAndBlock");
-        try {
-          testee.countDownAndBlock();
-        }
-        finally {
-          protocol.add("3-afterCountDownAndBlock");
-          latch.countDown();
-        }
-        return null;
+    s_executor.schedule((Callable<Void>) () -> {
+      protocol.add("3-beforeCountDownAndBlock");
+      try {
+        testee.countDownAndBlock();
       }
+      finally {
+        protocol.add("3-afterCountDownAndBlock");
+        latch.countDown();
+      }
+      return null;
     }, 1, TimeUnit.SECONDS);
 
     final CountDownLatch latch4 = new CountDownLatch(1);
-    s_executor.schedule(new Callable<Void>() {
-
-      @Override
-      public Void call() throws Exception {
-        protocol.add("4-beforeCountDownAndBlock");
-        try {
-          testee.countDown();
-        }
-        finally {
-          protocol.add("4-afterCountDownAndBlock");
-          latch4.countDown();
-        }
-        return null;
+    s_executor.schedule((Callable<Void>) () -> {
+      protocol.add("4-beforeCountDownAndBlock");
+      try {
+        testee.countDown();
       }
+      finally {
+        protocol.add("4-afterCountDownAndBlock");
+        latch4.countDown();
+      }
+      return null;
     }, 1, TimeUnit.SECONDS);
     assertTrue(latch4.await(30, TimeUnit.SECONDS));
 

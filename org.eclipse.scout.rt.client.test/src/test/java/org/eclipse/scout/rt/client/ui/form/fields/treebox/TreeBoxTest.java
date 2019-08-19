@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -66,7 +63,7 @@ public class TreeBoxTest {
 
   @Before
   public void setUp() {
-    testValue = new HashSet<Long>();
+    testValue = new HashSet<>();
     testValue.add(1L);
   }
 
@@ -84,7 +81,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    Set<Long> valueSet = new HashSet<>(treeBox.getValue());
 
     // only one node selected
     assertEquals(1, valueSet.size());
@@ -128,7 +125,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    Set<Long> valueSet = new HashSet<>(treeBox.getValue());
 
     // parent node and 3 childs nodes selected
     assertEquals(4, valueSet.size());
@@ -155,7 +152,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, true);
 
-    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    Set<Long> valueSet = new HashSet<>(treeBox.getValue());
 
     // parent node and 4 childs nodes selected
     assertEquals(5, valueSet.size());
@@ -172,7 +169,7 @@ public class TreeBoxTest {
     assertNotNull(node);
     tree.setNodeChecked(node, false);
 
-    valueSet = new HashSet<Long>(treeBox.getValue());
+    valueSet = new HashSet<>(treeBox.getValue());
 
     // parent node and all minus one childs nodes selected
     assertEquals(4, valueSet.size());
@@ -207,14 +204,14 @@ public class TreeBoxTest {
 
     treeBox.checkKey(9L);
 
-    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    Set<Long> valueSet = new HashSet<>(treeBox.getValue());
     assertEquals(1, valueSet.size());
     assertEquals(true, valueSet.contains(9L)); // C-B
     assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L)), tree.getCheckedNodes()));
 
     treeBox.checkKeys(CollectionUtility.hashSet(9L, 12L));
 
-    valueSet = new HashSet<Long>(treeBox.getValue());
+    valueSet = new HashSet<>(treeBox.getValue());
     assertEquals(2, valueSet.size());
     assertEquals(true, valueSet.contains(9L)); // C-B
     assertEquals(true, valueSet.contains(12L)); // C-B-B
@@ -236,14 +233,14 @@ public class TreeBoxTest {
     // Checking nodes by model should not auto-check child nodes
     treeBox.checkKey(9L);
 
-    Set<Long> valueSet = new HashSet<Long>(treeBox.getValue());
+    Set<Long> valueSet = new HashSet<>(treeBox.getValue());
     assertEquals(1, valueSet.size());
     assertEquals(true, valueSet.contains(9L)); // C-B
     assertTrue(CollectionUtility.equalsCollection(tree.findNodes(CollectionUtility.hashSet(9L)), tree.getCheckedNodes()));
 
     treeBox.checkKeys(CollectionUtility.hashSet(9L, 12L));
 
-    valueSet = new HashSet<Long>(treeBox.getValue());
+    valueSet = new HashSet<>(treeBox.getValue());
     assertEquals(2, valueSet.size());
     assertEquals(true, valueSet.contains(9L)); // C-B
     assertEquals(true, valueSet.contains(12L)); // C-B-B
@@ -459,21 +456,21 @@ public class TreeBoxTest {
 
     @Override
     protected List<ILookupRow<Long>> execCreateLookupRows() {
-      List<ILookupRow<Long>> list = new ArrayList<ILookupRow<Long>>();
-      list.add(new LookupRow<Long>(1L, "A"));
-      list.add(new LookupRow<Long>(2L, "B"));
-      list.add(new LookupRow<Long>(3L, "C"));
-      list.add(new LookupRow<Long>(4L, "D"));
-      list.add(new LookupRow<Long>(5L, "A-A").withParentKey(1L));
-      list.add(new LookupRow<Long>(6L, "A-B").withParentKey(1L));
-      list.add(new LookupRow<Long>(7L, "A-C").withParentKey(1L));
-      list.add(new LookupRow<Long>(8L, "C-A").withParentKey(3L));
-      list.add(new LookupRow<Long>(9L, "C-B").withParentKey(3L));
-      list.add(new LookupRow<Long>(10L, "C-C").withParentKey(3L));
-      list.add(new LookupRow<Long>(11L, "C-B-A").withParentKey(9L));
-      list.add(new LookupRow<Long>(12L, "C-B-B").withParentKey(9L));
-      list.add(new LookupRow<Long>(13L, "C-B-C").withParentKey(9L));
-      list.add(new LookupRow<Long>(14L, "C-B-D").withParentKey(9L));
+      List<ILookupRow<Long>> list = new ArrayList<>();
+      list.add(new LookupRow<>(1L, "A"));
+      list.add(new LookupRow<>(2L, "B"));
+      list.add(new LookupRow<>(3L, "C"));
+      list.add(new LookupRow<>(4L, "D"));
+      list.add(new LookupRow<>(5L, "A-A").withParentKey(1L));
+      list.add(new LookupRow<>(6L, "A-B").withParentKey(1L));
+      list.add(new LookupRow<>(7L, "A-C").withParentKey(1L));
+      list.add(new LookupRow<>(8L, "C-A").withParentKey(3L));
+      list.add(new LookupRow<>(9L, "C-B").withParentKey(3L));
+      list.add(new LookupRow<>(10L, "C-C").withParentKey(3L));
+      list.add(new LookupRow<>(11L, "C-B-A").withParentKey(9L));
+      list.add(new LookupRow<>(12L, "C-B-B").withParentKey(9L));
+      list.add(new LookupRow<>(13L, "C-B-C").withParentKey(9L));
+      list.add(new LookupRow<>(14L, "C-B-D").withParentKey(9L));
       list.add(new LookupRow<Long>(null, "null key").withParentKey(9L));
       return list;
     }

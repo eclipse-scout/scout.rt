@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,7 +158,7 @@ public class ConcurrentExpiringMapTest {
 
   @Test
   public void testBulk() {
-    Map<Integer, String> otherMap = new HashMap<Integer, String>();
+    Map<Integer, String> otherMap = new HashMap<>();
     otherMap.put(2, "2");
     otherMap.put(3, "3");
     ConcurrentExpiringMap<Integer, String> map = createMap(false);
@@ -266,7 +262,7 @@ public class ConcurrentExpiringMapTest {
   @Test
   public void testCopyConstructorDivisionByZero() {
     TestConcurrentExpiringMap map = new TestConcurrentExpiringMap(0, TimeUnit.MILLISECONDS, 0);
-    ConcurrentExpiringMap mapCopy = new ConcurrentExpiringMap<Integer, String>(map, 100);
+    ConcurrentExpiringMap mapCopy = new ConcurrentExpiringMap<>(map, 100);
     assertEquals(0, mapCopy.size());
   }
 

@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -132,7 +127,7 @@ public class FormFieldTest {
   }
 
   private void verifyNoDuplicateClassIds(List<IFormField> formFields) {
-    Set<String> ids = new HashSet<String>();
+    Set<String> ids = new HashSet<>();
     for (IFormField f : formFields) {
       String classId = f.classId();
       assertFalse("Duplicate classid" + classId, ids.contains(classId));
@@ -264,12 +259,9 @@ public class FormFieldTest {
   public void testStatusVisible_setStatusVisible() throws Exception {
     final boolean[] called = {false};
     SimpleTestFormField testField = new SimpleTestFormField();
-    testField.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if ("statusVisible".equals(evt.getPropertyName()) && evt.getNewValue().equals(Boolean.FALSE)) {
-          called[0] = true;
-        }
+    testField.addPropertyChangeListener(evt -> {
+      if ("statusVisible".equals(evt.getPropertyName()) && evt.getNewValue().equals(Boolean.FALSE)) {
+        called[0] = true;
       }
     });
     testField.setStatusVisible(false);

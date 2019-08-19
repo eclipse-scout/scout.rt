@@ -17,8 +17,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -65,15 +63,12 @@ public class JsonListBoxTest {
     JsonTable<ITable> jsonTable = jsonListBox.getAdapter(table);
 
     // Filter the first row
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow row) {
-        Long key = (Long) row.getKeyValues().get(0);
-        if (key.equals(0L)) {
-          return false;
-        }
-        return true;
+    table.addRowFilter(row -> {
+      Long key = (Long) row.getKeyValues().get(0);
+      if (key.equals(0L)) {
+        return false;
       }
+      return true;
     });
     assertEquals(3, table.getRowCount());
     assertEquals(2, table.getFilteredRowCount());
@@ -89,15 +84,12 @@ public class JsonListBoxTest {
 
     // Filter second row as well
     String row1Id = jsonTable.getTableRowId(table.getRowByKey(Arrays.asList(1L)));
-    table.addRowFilter(new ITableRowFilter() {
-      @Override
-      public boolean accept(ITableRow row) {
-        Long key = (Long) row.getKeyValues().get(0);
-        if (key.equals(1L)) {
-          return false;
-        }
-        return true;
+    table.addRowFilter(row -> {
+      Long key = (Long) row.getKeyValues().get(0);
+      if (key.equals(1L)) {
+        return false;
       }
+      return true;
     });
     assertEquals(1, table.getFilteredRowCount());
 
@@ -118,9 +110,9 @@ public class JsonListBoxTest {
   public static class ListBox extends AbstractListBox<Long> {
     @Override
     protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {
-      result.add(new LookupRow<Long>(0L, "a"));
-      result.add(new LookupRow<Long>(1L, "b"));
-      result.add(new LookupRow<Long>(2L, "c"));
+      result.add(new LookupRow<>(0L, "a"));
+      result.add(new LookupRow<>(1L, "b"));
+      result.add(new LookupRow<>(2L, "c"));
     }
 
   }

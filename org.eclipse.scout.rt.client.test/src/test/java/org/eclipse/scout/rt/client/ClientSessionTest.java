@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.rt.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -31,13 +27,11 @@ import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.DefaultPlatform;
-import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -89,12 +83,7 @@ public class ClientSessionTest {
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //run a job
-    String jobResult = ModelJobs.schedule(new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        return "OK";
-      }
-    }, ModelJobs
+    String jobResult = ModelJobs.schedule(() -> "OK", ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)))
@@ -111,24 +100,16 @@ public class ClientSessionTest {
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //show a messagebox
-    IFuture<Integer> f = ModelJobs.schedule(new Callable<Integer>() {
-      @Override
-      public Integer call() throws Exception {
-        messageBox = MessageBoxes.createYesNo();
-        return messageBox.show();
-      }
+    IFuture<Integer> f = ModelJobs.schedule(() -> {
+      messageBox = MessageBoxes.createYesNo();
+      return messageBox.show();
     }, ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)));
 
     //confirm the messagebox
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
-      }
-    }, ModelJobs
+    ModelJobs.schedule(() -> messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION), ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)));
@@ -139,12 +120,7 @@ public class ClientSessionTest {
     assertTrue(f.isDone());
 
     //close from ui
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)))
@@ -155,27 +131,19 @@ public class ClientSessionTest {
   public void testStopWithBlockingMessageBox() throws Exception {
     TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     TestingUtility.registerBean(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
-              public Long getDefaultValue() {
-                return 1000L;
-              }
-            };
+          public Long getDefaultValue() {
+            return 1000L;
           }
         }));
 
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //show a messagebox
-    IFuture<Integer> f = ModelJobs.schedule(new Callable<Integer>() {
-      @Override
-      public Integer call() throws Exception {
-        messageBox = MessageBoxes.createYesNo();
-        return messageBox.show();
-      }
+    IFuture<Integer> f = ModelJobs.schedule(() -> {
+      messageBox = MessageBoxes.createYesNo();
+      return messageBox.show();
     }, ModelJobs
         .newInput(ClientRunContexts
             .empty()
@@ -191,12 +159,7 @@ public class ClientSessionTest {
     assertFalse(f.isDone());
 
     //close from ui
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)))
@@ -209,27 +172,17 @@ public class ClientSessionTest {
   public void testStopWithBlockingClientCallback() throws Exception {
     TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     TestingUtility.registerBean(
-        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer(new IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>() {
+        new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {
           @Override
-          public JobCompletionDelayOnSessionShutdown produce(IBean<JobCompletionDelayOnSessionShutdown> bean) {
-            return new JobCompletionDelayOnSessionShutdown() {
-              @Override
-              public Long getDefaultValue() {
-                return 1000L;
-              }
-            };
+          public Long getDefaultValue() {
+            return 1000L;
           }
         }));
 
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //request a geo location
-    Future<Coordinates> geo = ModelJobs.schedule(new Callable<Future<Coordinates>>() {
-      @Override
-      public Future<Coordinates> call() throws Exception {
-        return IDesktop.CURRENT.get().requestGeolocation();
-      }
-    }, ModelJobs
+    Future<Coordinates> geo = ModelJobs.schedule(() -> IDesktop.CURRENT.get().requestGeolocation(), ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)))
@@ -238,12 +191,7 @@ public class ClientSessionTest {
     assertFalse(geo.isDone());
 
     //close from ui
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        session.getDesktop().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs
+    ModelJobs.schedule(() -> session.getDesktop().getUIFacade().closeFromUI(true), ModelJobs
         .newInput(ClientRunContexts
             .empty()
             .withSession(session, true)))

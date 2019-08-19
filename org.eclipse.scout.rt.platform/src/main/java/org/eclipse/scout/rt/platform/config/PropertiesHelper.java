@@ -119,7 +119,7 @@ public class PropertiesHelper {
       if (properties != null) {
         m_isInitialized = parse(properties);
         if (m_isInitialized) {
-          importSystemImports(new HashSet<String>(), null);
+          importSystemImports(new HashSet<>(), null);
           resolveAll(PLACEHOLDER_PATTERN);
 
           // remove internal properties

@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.ExecutionException;
 
@@ -42,12 +40,8 @@ public class JobExceptionTranslationTest {
   public void testWithImplicitExceptionTranslator() {
     final Exception error = new Exception("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw error;
-      }
+    IFuture<Void> future = Jobs.schedule((IRunnable) () -> {
+      throw error;
     }, Jobs.newInput());
 
     try {
@@ -63,12 +57,8 @@ public class JobExceptionTranslationTest {
   public void testWithExplicitExceptionTranslator() {
     final Exception error = new Exception("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw error;
-      }
+    IFuture<Void> future = Jobs.schedule((IRunnable) () -> {
+      throw error;
     }, Jobs.newInput());
 
     try {
@@ -92,12 +82,8 @@ public class JobExceptionTranslationTest {
   public void testWithNullExceptionTranslator() throws Throwable {
     final FutureCancelledError cancellationException = new FutureCancelledError("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw cancellationException;
-      }
+    IFuture<Void> future = Jobs.schedule((IRunnable) () -> {
+      throw cancellationException;
     }, Jobs.newInput());
 
     try {

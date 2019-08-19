@@ -10,14 +10,8 @@
  */
 package org.eclipse.scout.rt.server.jaxws.handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +22,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.platform.context.RunContexts;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,12 +65,7 @@ public class WsConsumerCorrelationIdHandlerTest {
   protected void testHandleOutboundMessage(final String cid) {
     RunContexts.copyCurrent()
         .withCorrelationId(cid)
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            assertHandleOutboundMessage(cid);
-          }
-        });
+        .run(() -> assertHandleOutboundMessage(cid));
   }
 
   protected void assertHandleOutboundMessage(String expectedCid) {

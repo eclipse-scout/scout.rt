@@ -357,7 +357,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   protected void handleValidationFailed(ProcessingException e, VALUE rawValue) {
-    addErrorStatus(new ValidationFailedStatus<VALUE>(e, rawValue));
+    addErrorStatus(new ValidationFailedStatus<>(e, rawValue));
     updateDisplayText(rawValue);
   }
 

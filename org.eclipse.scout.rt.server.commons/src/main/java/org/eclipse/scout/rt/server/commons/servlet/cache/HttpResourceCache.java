@@ -26,7 +26,7 @@ public class HttpResourceCache implements IHttpResourceCache {
 
   private static final Logger LOG = LoggerFactory.getLogger(HttpResourceCache.class);
 
-  private final Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<HttpCacheKey, HttpCacheObject>());
+  private final Map<HttpCacheKey, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<>());
 
   @Override
   public boolean put(HttpCacheObject obj) {

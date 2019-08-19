@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,19 +39,15 @@ public class PermitAcquisitionOrderTest {
   public void testOrderIfStartingInSequence() {
     int regressionCount = 100; // regression
 
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     // Schedule 100 jobs to start at the same time
     for (int i = 0; i < regressionCount; i++) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        }
+      Jobs.schedule(() -> {
+        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
       }, Jobs.newInput()
           .withName("job-{}", i)
           .withExecutionSemaphore(semaphore)
@@ -79,7 +73,7 @@ public class PermitAcquisitionOrderTest {
   public void testOrderIfStartingAtSameTime() {
     int regressionCount = 100; // regression
 
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
 
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
@@ -88,12 +82,8 @@ public class PermitAcquisitionOrderTest {
 
     // Schedule 100 jobs to start at the same time
     for (int i = 0; i < regressionCount; i++) {
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          protocol.add(IFuture.CURRENT.get().getJobInput().getName());
-        }
+      Jobs.schedule(() -> {
+        protocol.add(IFuture.CURRENT.get().getJobInput().getName());
       }, Jobs.newInput()
           .withName("job-{}", i)
           .withExecutionSemaphore(semaphore)
@@ -120,33 +110,25 @@ public class PermitAcquisitionOrderTest {
   public void testOrderWithinFixedDelayRepetitiveJob() {
     int regressionCount = 100; // regression
 
-    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
     final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     final AtomicInteger counter = new AtomicInteger();
 
     // Schedule repetitive semaphore aware job
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      final int a = counter.incrementAndGet();
+      final int b = counter.incrementAndGet();
 
-      @Override
-      public void run() throws Exception {
-        final int a = counter.incrementAndGet();
-        final int b = counter.incrementAndGet();
+      protocol.add(a);
 
-        protocol.add(a);
-
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            protocol.add(b);
-          }
-        }, Jobs.newInput()
-            .withName("inner")
-            .withExecutionSemaphore(semaphore)
-            .withExecutionHint(jobIdentifier));
-      }
+      Jobs.schedule(() -> {
+        protocol.add(b);
+      }, Jobs.newInput()
+          .withName("inner")
+          .withExecutionSemaphore(semaphore)
+          .withExecutionHint(jobIdentifier));
     }, Jobs.newInput()
         .withName("outer")
         .withExecutionSemaphore(semaphore)
@@ -172,32 +154,24 @@ public class PermitAcquisitionOrderTest {
   public void testOrderWithinFixedRateRepetitiveJob() {
     int regressionCount = 100; // regression
 
-    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final String jobIdentifier = UUID.randomUUID().toString();
     final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
     final AtomicInteger counter = new AtomicInteger();
 
     // Schedule repetitive semaphore aware job
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      final int a = counter.incrementAndGet();
+      final int b = counter.incrementAndGet();
 
-      @Override
-      public void run() throws Exception {
-        final int a = counter.incrementAndGet();
-        final int b = counter.incrementAndGet();
+      protocol.add(a);
 
-        protocol.add(a);
-
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            protocol.add(b);
-          }
-        }, Jobs.newInput()
-            .withExecutionSemaphore(semaphore)
-            .withExecutionHint(jobIdentifier));
-      }
+      Jobs.schedule(() -> {
+        protocol.add(b);
+      }, Jobs.newInput()
+          .withExecutionSemaphore(semaphore)
+          .withExecutionHint(jobIdentifier));
     }, Jobs.newInput()
         .withExecutionSemaphore(semaphore)
         .withExecutionHint(jobIdentifier)

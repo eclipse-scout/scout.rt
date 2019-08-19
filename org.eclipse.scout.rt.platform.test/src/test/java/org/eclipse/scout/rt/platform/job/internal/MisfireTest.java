@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
@@ -44,21 +40,17 @@ public class MisfireTest {
     final int endsIn = 20;
     final int schedulingInterval = 1;
 
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final AtomicInteger roundCounter = new AtomicInteger();
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.schedule(() -> {
+      int round = roundCounter.incrementAndGet();
+      writeProtocol("BEFORE-SLEEP", (JobFutureTask<?>) IFuture.CURRENT.get(), round, protocol);
 
-      @Override
-      public void run() throws Exception {
-        int round = roundCounter.incrementAndGet();
-        writeProtocol("BEFORE-SLEEP", (JobFutureTask<?>) IFuture.CURRENT.get(), round, protocol);
-
-        if (round == 1) {
-          SleepUtil.sleepSafe(endsIn + 50, TimeUnit.MILLISECONDS);
-        }
-        writeProtocol("AFTER-SLEEP", (JobFutureTask<?>) IFuture.CURRENT.get(), round, protocol);
+      if (round == 1) {
+        SleepUtil.sleepSafe(endsIn + 50, TimeUnit.MILLISECONDS);
       }
+      writeProtocol("AFTER-SLEEP", (JobFutureTask<?>) IFuture.CURRENT.get(), round, protocol);
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withEndIn(endsIn, TimeUnit.MILLISECONDS)

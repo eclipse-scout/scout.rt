@@ -10,15 +10,12 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -35,26 +32,18 @@ public class BlockingConditionTest {
     final IBlockingCondition blockingCondition = Jobs.newBlockingCondition(true);
     final P_ExceptionCapturer exceptionCapturer = new P_ExceptionCapturer();
 
-    final IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        blockingCondition.waitFor("hint-blocking");
-        assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
-      }
+    final IFuture<Void> future1 = Jobs.schedule(() -> {
+      blockingCondition.waitFor("hint-blocking");
+      assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
     }, Jobs.newInput()
         .withName("job-1")
         .withExceptionHandling(exceptionCapturer, true)
         .withExecutionSemaphore(semaphore));
 
-    final IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        assertTrue("hint not set", future1.containsExecutionHint("hint-blocking"));
-        blockingCondition.setBlocking(false);
-        assertFalse("hint not unset (immediately)", future1.containsExecutionHint("hint-blocking"));
-      }
+    final IFuture<Void> future2 = Jobs.schedule(() -> {
+      assertTrue("hint not set", future1.containsExecutionHint("hint-blocking"));
+      blockingCondition.setBlocking(false);
+      assertFalse("hint not unset (immediately)", future1.containsExecutionHint("hint-blocking"));
     }, Jobs.newInput()
         .withName("job-2")
         .withExceptionHandling(exceptionCapturer, true)
@@ -72,17 +61,13 @@ public class BlockingConditionTest {
     final IBlockingCondition blockingCondition = Jobs.newBlockingCondition(true);
     final P_ExceptionCapturer exceptionCapturer = new P_ExceptionCapturer();
 
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          blockingCondition.waitFor(1, TimeUnit.NANOSECONDS, "hint-blocking");
-          fail("TimedOutError expected");
-        }
-        catch (TimedOutError e) {
-          assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
-        }
+    Jobs.schedule(() -> {
+      try {
+        blockingCondition.waitFor(1, TimeUnit.NANOSECONDS, "hint-blocking");
+        fail("TimedOutError expected");
+      }
+      catch (TimedOutError e) {
+        assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
       }
     }, Jobs.newInput()
         .withExceptionHandling(exceptionCapturer, true))
@@ -97,19 +82,15 @@ public class BlockingConditionTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final P_ExceptionCapturer exceptionCapturer = new P_ExceptionCapturer();
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.schedule(() -> {
+      setupLatch.countDown();
 
-      @Override
-      public void run() throws Exception {
-        setupLatch.countDown();
-
-        try {
-          blockingCondition.waitFor(10, TimeUnit.SECONDS, "hint-blocking");
-          fail("ThreadInterruptedError expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
-        }
+      try {
+        blockingCondition.waitFor(10, TimeUnit.SECONDS, "hint-blocking");
+        fail("ThreadInterruptedError expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertFalse("hint not unset", IFuture.CURRENT.get().containsExecutionHint("hint-blocking"));
       }
     }, Jobs.newInput()
         .withExceptionHandling(exceptionCapturer, true));

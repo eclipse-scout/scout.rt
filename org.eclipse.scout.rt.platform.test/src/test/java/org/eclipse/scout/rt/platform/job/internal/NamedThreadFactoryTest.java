@@ -32,12 +32,9 @@ public class NamedThreadFactoryTest {
 
     final AtomicReference<String> childThreadMdcValue = new AtomicReference<>();
     final CountDownLatch latch = new CountDownLatch(1);
-    new NamedThreadFactory("mdc-test-thread").newThread(new Runnable() {
-      @Override
-      public void run() {
-        childThreadMdcValue.set(MDC.get(MDC_KEY));
-        latch.countDown();
-      }
+    new NamedThreadFactory("mdc-test-thread").newThread(() -> {
+      childThreadMdcValue.set(MDC.get(MDC_KEY));
+      latch.countDown();
     }).start();
 
     latch.await(1, TimeUnit.SECONDS);

@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.rt.server.job.filter.future;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.function.Predicate;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IExecutionSemaphore;
@@ -227,36 +223,12 @@ public class ServerRunContextFutureFilterTest {
   @Test
   public void testCustomFilter() {
     // False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return false;
-      }
-    }).toFilter().test(m_serverJobFuture));
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(future -> false).toFilter().test(m_serverJobFuture));
 
     // True Filter
-    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return true;
-      }
-    }).toFilter().test(m_serverJobFuture));
+    assertTrue(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(future -> true).toFilter().test(m_serverJobFuture));
 
     // True/False Filter
-    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return true;
-      }
-    }).andMatch(new Predicate<IFuture<?>>() {
-
-      @Override
-      public boolean test(IFuture<?> future) {
-        return false;
-      }
-    }).toFilter().test(m_serverJobFuture));
+    assertFalse(Jobs.newFutureFilterBuilder().andMatchRunContext(ServerRunContext.class).andMatch(future -> true).andMatch(future -> false).toFilter().test(m_serverJobFuture));
   }
 }

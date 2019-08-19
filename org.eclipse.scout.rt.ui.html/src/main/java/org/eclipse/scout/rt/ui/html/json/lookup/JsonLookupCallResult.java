@@ -102,7 +102,7 @@ public class JsonLookupCallResult<T> implements IJsonObject {
     if (result == null) {
       return null;
     }
-    return new JsonLookupCallResult<T>(result, multipleColumns, keyMapper).toJson();
+    return new JsonLookupCallResult<>(result, multipleColumns, keyMapper).toJson();
   }
 
 }

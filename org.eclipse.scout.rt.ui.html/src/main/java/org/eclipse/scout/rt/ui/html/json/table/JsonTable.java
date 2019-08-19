@@ -1218,7 +1218,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void preprocessBufferedEvents() {
     List<TableEvent> bufferInternal = m_eventBuffer.getBufferInternal();
-    Map<ITableRow, Integer> rowsContainedInActualInsertEvents = new HashMap<ITableRow, Integer>();
+    Map<ITableRow, Integer> rowsContainedInActualInsertEvents = new HashMap<>();
     for (int i = 0; i < bufferInternal.size(); i++) {
       TableEvent event = bufferInternal.get(i);
       if (event.getType() != TableEvent.TYPE_ROWS_INSERTED) {
@@ -1488,7 +1488,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       // Append missing rows to the end, otherwise the UI cannot not update the order.
       // This may happen if rows are deleted after a row order change.
       // In that case rows are deleted anyway so it is fine if they are not ordered correctly
-      List<String> missingRowIds = new ArrayList<String>(m_tableRows.keySet());
+      List<String> missingRowIds = new ArrayList<>(m_tableRows.keySet());
       missingRowIds.removeAll(rowIds);
       for (String id : missingRowIds) {
         jsonRowIds.put(id);

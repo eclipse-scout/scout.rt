@@ -1,9 +1,6 @@
 package org.eclipse.scout.rt.ui.html;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,10 +27,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
-import org.eclipse.scout.rt.testing.platform.job.JobTestUtil.ICondition;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -54,7 +49,7 @@ import org.junit.runner.RunWith;
 public class UiSessionInitAndDisposeTest {
   private List<IBean<?>> m_beans;
 
-  private List<String> m_protocol = Collections.synchronizedList(new ArrayList<String>());
+  private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
 
   @Before
   public void before() {
@@ -74,31 +69,16 @@ public class UiSessionInitAndDisposeTest {
           }
         }),
 
-        new BeanMetaData(HttpSessionHelper.class).withProducer(new IBeanInstanceProducer<HttpSessionHelper>() {
+        new BeanMetaData(HttpSessionHelper.class).withProducer((IBeanInstanceProducer<HttpSessionHelper>) bean -> new HttpSessionHelper() {
           @Override
-          public HttpSessionHelper produce(IBean<HttpSessionHelper> bean) {
-            return new HttpSessionHelper() {
-              @Override
-              protected ISessionStore createSessionStore(HttpSession httpSession) {
-                return new FixtureSessionStore(httpSession);
-              }
-            };
+          protected ISessionStore createSessionStore(HttpSession httpSession) {
+            return new FixtureSessionStore(httpSession);
           }
         }),
 
-        new BeanMetaData(FixtureUiSession.class).withProducer(new IBeanInstanceProducer<FixtureUiSession>() {
-          @Override
-          public FixtureUiSession produce(IBean<FixtureUiSession> bean) {
-            return new FixtureUiSession();
-          }
-        }),
+        new BeanMetaData(FixtureUiSession.class).withProducer((IBeanInstanceProducer<FixtureUiSession>) bean -> new FixtureUiSession()),
 
-        new BeanMetaData(FixtureClientSession.class).withProducer(new IBeanInstanceProducer<FixtureClientSession>() {
-          @Override
-          public FixtureClientSession produce(IBean<FixtureClientSession> bean) {
-            return new FixtureClientSession();
-          }
-        }));
+        new BeanMetaData(FixtureClientSession.class).withProducer((IBeanInstanceProducer<FixtureClientSession>) bean -> new FixtureClientSession()));
   }
 
   @After
@@ -145,20 +125,10 @@ public class UiSessionInitAndDisposeTest {
     m_protocol.clear();
 
     //model stop
-    ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        IDesktop.CURRENT.get().getUIFacade().closeFromUI(true);
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(store.getClientSessionMap().get(clientSessionId), true)))
+    ModelJobs.schedule(() -> IDesktop.CURRENT.get().getUIFacade().closeFromUI(true), ModelJobs.newInput(ClientRunContexts.empty().withSession(store.getClientSessionMap().get(clientSessionId), true)))
         .awaitDone();
 
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && !store.isHttpSessionValid());
 
     assertEquals(
         Arrays.asList(
@@ -217,12 +187,7 @@ public class UiSessionInitAndDisposeTest {
       unloadHandler.handlePost(req, resp);
     }
 
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped());
 
     assertEquals(
         Arrays.asList(
@@ -313,12 +278,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return clientSession.isStopped();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
 
     assertEquals(
         Arrays.asList(
@@ -409,12 +369,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return clientSession.isStopped();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
 
     //two calls UiSession.dispose; remove them from the protocol since they can occor any time in the list
     for (int i = 1; i <= 2; i++) {
@@ -512,16 +467,13 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        int n = Jobs.getJobManager()
-            .getFutures(Jobs.newFutureFilterBuilder()
-                .andMatchExecutionSemaphore(clientSessionA.getModelJobSemaphore())
-                .toFilter())
-            .size();
-        return n == 0;
-      }
+    JobTestUtil.waitForCondition(() -> {
+      int n = Jobs.getJobManager()
+          .getFutures(Jobs.newFutureFilterBuilder()
+              .andMatchExecutionSemaphore(clientSessionA.getModelJobSemaphore())
+              .toFilter())
+          .size();
+      return n == 0;
     });
 
     assertEquals(
@@ -540,12 +492,7 @@ public class UiSessionInitAndDisposeTest {
       final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
       unloadHandler.handlePost(req, resp);
     }
-    JobTestUtil.waitForCondition(new ICondition() {
-      @Override
-      public boolean isFulfilled() {
-        return clientSession.isStopped();
-      }
-    });
+    JobTestUtil.waitForCondition(() -> clientSession.isStopped());
 
     assertEquals(
         Arrays.asList(

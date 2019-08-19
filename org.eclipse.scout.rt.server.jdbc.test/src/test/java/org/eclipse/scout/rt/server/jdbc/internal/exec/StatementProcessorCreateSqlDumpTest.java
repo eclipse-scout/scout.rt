@@ -44,12 +44,12 @@ public class StatementProcessorCreateSqlDumpTest {
     runSimpleSelectPlainText(Collections.singletonList("23"), "Select :myKey from dual");
     runSimpleSelectPlainText(Collections.singletonList("'lorem'"), "Select :myText from dual");
 
-    ArrayList<String> vals1 = new ArrayList<String>();
+    ArrayList<String> vals1 = new ArrayList<>();
     vals1.add("1");
     vals1.add("'ipsum'");
     runSimpleSelectPlainText(vals1, "select 1, 'ipsum' from dual");
 
-    ArrayList<String> vals2 = new ArrayList<String>();
+    ArrayList<String> vals2 = new ArrayList<>();
     vals2.add("23");
     vals2.add("'lorem'");
     runSimpleSelectPlainText(vals2, "select :myKey, :myText from dual");
@@ -60,7 +60,7 @@ public class StatementProcessorCreateSqlDumpTest {
    */
   @Test
   public void testSelectPlainText() throws Exception {
-    ArrayList<String> vals = new ArrayList<String>();
+    ArrayList<String> vals = new ArrayList<>();
     vals.add("'?'");
     vals.add("'lorem'");
     runSimpleSelectPlainText(vals, "select '?', :myText from dual");
@@ -77,15 +77,15 @@ public class StatementProcessorCreateSqlDumpTest {
     runSimpleSelectWithBinds(Collections.singletonList(":myKey"), Collections.singletonList(":myKey => ? [INTEGER 23]"), "Select :myKey from dual");
     runSimpleSelectWithBinds(Collections.singletonList(":myText"), Collections.singletonList(":myText => ? [CHAR lorem]"), "Select :myText from dual");
 
-    ArrayList<String> vals1 = new ArrayList<String>();
+    ArrayList<String> vals1 = new ArrayList<>();
     vals1.add("1");
     vals1.add("'ipsum'");
     runSimpleSelectWithBinds(vals1, Collections.<String> emptyList(), "select 1, 'ipsum' from dual");
 
-    ArrayList<String> selectValues = new ArrayList<String>();
+    ArrayList<String> selectValues = new ArrayList<>();
     selectValues.add(":myKey");
     selectValues.add(":myText");
-    ArrayList<String> bindsValues = new ArrayList<String>();
+    ArrayList<String> bindsValues = new ArrayList<>();
     bindsValues.add(":myKey => ? [INTEGER 23]");
     bindsValues.add(":myText => ? [CHAR lorem]");
     runSimpleSelectWithBinds(selectValues, bindsValues, "select :myKey, :myText from dual");

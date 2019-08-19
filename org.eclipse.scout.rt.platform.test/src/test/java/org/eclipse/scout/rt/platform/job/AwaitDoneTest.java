@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -40,14 +36,10 @@ public class AwaitDoneTest {
 
   @Test
   public void testAwaitAllDone() {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("run-1");
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      protocol.add("run-1");
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     future.awaitDone(10, TimeUnit.SECONDS);
@@ -57,14 +49,10 @@ public class AwaitDoneTest {
 
   @Test
   public void testAwaitFutureDone1() {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
-    final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("run-1");
-      }
+    final IFuture<Void> future1 = Jobs.getJobManager().schedule(() -> {
+      protocol.add("run-1");
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
@@ -81,27 +69,19 @@ public class AwaitDoneTest {
 
   @Test
   public void testAwaitFutureDone2() {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latchJob2 = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("run-1");
-      }
+    final IFuture<Void> future1 = Jobs.getJobManager().schedule(() -> {
+      protocol.add("run-1");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionHint(JOB_IDENTIFIER));
 
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latchJob2.await();
-        protocol.add("run-2");
-      }
+    Jobs.getJobManager().schedule(() -> {
+      latchJob2.await();
+      protocol.add("run-2");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionHint(JOB_IDENTIFIER)
@@ -139,18 +119,14 @@ public class AwaitDoneTest {
 
   @Test
   public void testAwaitDoneOrWaiting() {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("before-1");
-        condition.waitFor();
-        protocol.add("after-2");
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      protocol.add("before-1");
+      condition.waitFor();
+      protocol.add("after-2");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -188,30 +164,22 @@ public class AwaitDoneTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
-          continueRunningLatch.countDownAndBlock(); // continue running
-        }
+    final IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
+        continueRunningLatch.countDownAndBlock(); // continue running
       }
     }, Jobs.newInput());
 
     assertTrue(setupLatch.await());
 
     // cancel the Future in 1 second
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // run the test.
-        future.cancel(true);
-      }
+    Jobs.schedule(() -> {
+      // run the test.
+      future.cancel(true);
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()

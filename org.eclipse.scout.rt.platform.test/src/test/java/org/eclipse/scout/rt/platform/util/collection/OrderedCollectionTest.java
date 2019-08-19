@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util.collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +34,7 @@ public class OrderedCollectionTest {
 
   @Before
   public void before() {
-    c = new OrderedCollection<IOrdered>();
+    c = new OrderedCollection<>();
     m_ordered10 = new Ordered(10);
     m_ordered20 = new OtherOrdered(20);
     m_ordered30 = new Ordered(30);

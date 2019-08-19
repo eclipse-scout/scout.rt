@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.services.common.prefs;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +110,7 @@ public class PreferencesTest {
   @Test(expected = IllegalArgumentException.class)
   public void testListNullKey() {
     Preferences prefs = new Preferences("X", null);
-    prefs.putList(null, new ArrayList<String>());
+    prefs.putList(null, new ArrayList<>());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -126,10 +122,10 @@ public class PreferencesTest {
   @Test
   public void testList() {
     Preferences prefs = new Preferences("X", null);
-    ArrayList<String> defaultList = new ArrayList<String>();
+    ArrayList<String> defaultList = new ArrayList<>();
     defaultList.add("default");
 
-    ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<>();
     list.add("eins");
     list.add("zwei");
     list.add("drei");
@@ -154,10 +150,10 @@ public class PreferencesTest {
   @Test
   public void testListDelimInValue() {
     Preferences prefs = new Preferences("X", null);
-    ArrayList<String> defaultList = new ArrayList<String>();
+    ArrayList<String> defaultList = new ArrayList<>();
     defaultList.add("default");
 
-    ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<>();
     list.add("aaa");
 
     prefs.putList("l1", list);

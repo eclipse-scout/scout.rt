@@ -76,7 +76,7 @@ public class DefaultSearchFilterServiceTest {
     AbstractListBox<Long> listBox = new MyListBox();
     listBox.init();
     runBasicAsserts(listBox);
-    listBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
+    listBox.setValue(new HashSet<>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(listBox, m_searchFilter, false);
     Assert.assertEquals(LABEL + " " + TEXTS.get("LogicIn") + " " + listBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
@@ -86,7 +86,7 @@ public class DefaultSearchFilterServiceTest {
     AbstractTreeBox<Long> treeBox = new MyTreeBox();
     treeBox.init();
     runBasicAsserts(treeBox);
-    treeBox.setValue(new HashSet<Long>(Arrays.asList(2L)));
+    treeBox.setValue(new HashSet<>(Arrays.asList(2L)));
     m_searchFilterService.applySearchDelegate(treeBox, m_searchFilter, false);
     Assert.assertEquals(LABEL + " " + TEXTS.get("LogicIn") + " " + treeBox.getDisplayText(), m_searchFilter.getDisplayTextsPlain());
   }
@@ -259,7 +259,7 @@ public class DefaultSearchFilterServiceTest {
         carEntity,
         true,
         Collections.emptyList(),
-        new ArrayList<String>());
+        new ArrayList<>());
 
     composer.addAttributeNode(carNode,
         carEntity.new ColorAttribute(),
@@ -285,7 +285,7 @@ public class DefaultSearchFilterServiceTest {
     @SuppressWarnings("unchecked")
     @Override
     protected List<? extends ILookupRow<Long>> execLoadTableData() {
-      List<ILookupRow<Long>> data = new LinkedList<ILookupRow<Long>>();
+      List<ILookupRow<Long>> data = new LinkedList<>();
       data.add(new LookupRow(1L, "Element 1"));
       data.add(new LookupRow(2L, "Element 2"));
       data.add(new LookupRow(3L, "Element 3"));
@@ -299,7 +299,7 @@ public class DefaultSearchFilterServiceTest {
     @SuppressWarnings("unchecked")
     @Override
     protected void execLoadChildNodes(ITreeNode parentNode) {
-      List<ILookupRow<Long>> data = new LinkedList<ILookupRow<Long>>();
+      List<ILookupRow<Long>> data = new LinkedList<>();
       data.add(new LookupRow(1L, "Element 1"));
       data.add(new LookupRow(2L, "Element 1a").withParentKey(1L));
       data.add(new LookupRow(3L, "Element 1b").withParentKey(1L));

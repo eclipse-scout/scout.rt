@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -25,7 +22,6 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.SimpleBeanDecorationFactory;
 import org.eclipse.scout.rt.platform.interceptor.IBeanDecorator;
-import org.eclipse.scout.rt.platform.interceptor.IBeanInvocationContext;
 import org.eclipse.scout.rt.platform.internal.BeanManagerImplementor;
 import org.eclipse.scout.rt.platform.inventory.IClassInfo;
 import org.eclipse.scout.rt.platform.inventory.IClassInventory;
@@ -176,12 +172,9 @@ public class RegisterTunnelToServerPlatformListenerTest {
   private static final class FixtureClientBeanDecorationFactory extends SimpleBeanDecorationFactory {
     @Override
     public <T> IBeanDecorator<T> decorate(final IBean<T> bean, Class<? extends T> queryType) {
-      return new IBeanDecorator<T>() {
-        @Override
-        public Object invoke(IBeanInvocationContext<T> context) {
-          Method method = context.getTargetMethod();
-          return "return " + bean.getBeanClazz().getSimpleName() + "#" + method.getName();
-        }
+      return context -> {
+        Method method = context.getTargetMethod();
+        return "return " + bean.getBeanClazz().getSimpleName() + "#" + method.getName();
       };
     }
   }

@@ -62,7 +62,7 @@ public final class DataObjectVisitors {
    * Note: this operation might fail if data object contains unmodifiable collections or maps.
    */
   public static <T> void replaceEach(IDataObject root, Class<? extends T> elementType, UnaryOperator<T> operator) {
-    new P_ReplaceDataObjectVisitor<T>(elementType, operator).visit(root);
+    new P_ReplaceDataObjectVisitor<>(elementType, operator).visit(root);
   }
 
   private static final class P_DataObjectVisitor extends AbstractDataObjectVisitor {

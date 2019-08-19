@@ -136,13 +136,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   }
 
   protected ICacheValueResolver<K, PermissionCollection> createCacheValueResolver() {
-    return new ICacheValueResolver<K, PermissionCollection>() {
-
-      @Override
-      public PermissionCollection resolve(K key) {
-        return execLoadPermissions(key);
-      }
-    };
+    return key -> execLoadPermissions(key);
   }
 
   protected ICache<K, PermissionCollection> getCache() {

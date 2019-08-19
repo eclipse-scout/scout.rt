@@ -80,7 +80,7 @@ public class PageWithTable6Test {
   }
 
   private static void assertMenus(PageWithTable.Table table, String[] expectedMenus) {
-    List<String> actualMenus = new ArrayList<String>();
+    List<String> actualMenus = new ArrayList<>();
     for (IMenu m : ActionUtility.normalizedActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(table.getContextMenu().getCurrentMenuTypes(), true))) {
       if (m.isEnabledIncludingParents()) {
         actualMenus.add(m.getText());

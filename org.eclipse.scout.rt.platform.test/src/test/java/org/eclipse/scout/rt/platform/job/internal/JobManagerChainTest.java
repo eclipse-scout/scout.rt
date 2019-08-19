@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.Iterator;
@@ -35,7 +33,7 @@ public class JobManagerChainTest {
 
   @Test
   public void testCallableChain() throws Exception {
-    CallableChain<Object> chain = new CallableChain<Object>();
+    CallableChain<Object> chain = new CallableChain<>();
 
     new JobManager().interceptCallableChain(chain, mock(JobFutureTask.class), mock(RunMonitor.class), mock(JobInput.class));
 

@@ -10,14 +10,10 @@
  */
 package org.eclipse.scout.rt.client;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -127,25 +123,15 @@ public class ClientJobCancelTest {
     final RunMonitor runMonitor = BEANS.get(RunMonitor.class);
     runContext.withRunMonitor(runMonitor);
 
-    IFuture<String> pingFuture = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return runContext.call(new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).withInitialInstance(new PingService()).withApplicationScoped(true));
-            try {
-              return ServiceTunnelUtility.createProxy(IPingService.class).ping(pingRequest);
-            }
-            finally {
-              TestingUtility.unregisterBeans(Arrays.asList(bean));
-            }
-          }
-        });
+    IFuture<String> pingFuture = Jobs.schedule(() -> runContext.call(() -> {
+      IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).withInitialInstance(new PingService()).withApplicationScoped(true));
+      try {
+        return ServiceTunnelUtility.createProxy(IPingService.class).ping(pingRequest);
       }
-    }, Jobs.newInput()
+      finally {
+        TestingUtility.unregisterBeans(Arrays.asList(bean));
+      }
+    }), Jobs.newInput()
         .withExceptionHandling(null, false));
 
     // Wait for the ping request to enter service implementation.

@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.chain.callable.CallableChain.Chain;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Assert;
@@ -34,8 +33,8 @@ import org.junit.runner.RunWith;
 @RunWith(PlatformTestRunner.class)
 public class RunContextChainInterceptorTest {
 
-  private static final ThreadLocal<String> TL_NOT_IN_RUNCONTEXT = new ThreadLocal<String>();
-  private static final ThreadLocal<String> COLOR_TL = new ThreadLocal<String>();
+  private static final ThreadLocal<String> TL_NOT_IN_RUNCONTEXT = new ThreadLocal<>();
+  private static final ThreadLocal<String> COLOR_TL = new ThreadLocal<>();
   private List<IBean<?>> m_registeredBeans = new ArrayList<>();
   private final List<Integer> m_activityLog = new ArrayList<>();
 
@@ -67,13 +66,7 @@ public class RunContextChainInterceptorTest {
   @Test
   public void testInterception() {
 
-    BEANS.get(RunContext.class).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        m_activityLog.add(2);
-      }
-    });
+    BEANS.get(RunContext.class).run(() -> m_activityLog.add(2));
     Assert.assertEquals("1,2,3", CollectionUtility.format(m_activityLog, ","));
   }
 
@@ -84,13 +77,9 @@ public class RunContextChainInterceptorTest {
     try {
       TL_NOT_IN_RUNCONTEXT.set("red");
       COLOR_TL.set("blue");
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          Assert.assertNull(TL_NOT_IN_RUNCONTEXT.get());
-          Assert.assertEquals("blue", COLOR_TL.get());
-        }
+      Jobs.schedule(() -> {
+        Assert.assertNull(TL_NOT_IN_RUNCONTEXT.get());
+        Assert.assertEquals("blue", COLOR_TL.get());
       }, Jobs.newInput().withRunContext(RunContexts.copyCurrent())).awaitDone();
     }
     finally {
@@ -98,14 +87,7 @@ public class RunContextChainInterceptorTest {
       TL_NOT_IN_RUNCONTEXT.set(backupNotInRunctontext);
     }
 
-    BEANS.get(RunContext.class).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-
-        m_activityLog.add(2);
-      }
-    });
+    BEANS.get(RunContext.class).run(() -> m_activityLog.add(2));
   }
 
   @Test
@@ -113,13 +95,7 @@ public class RunContextChainInterceptorTest {
     String backup = COLOR_TL.get();
     try {
       COLOR_TL.set("blue");
-      Jobs.schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          Assert.assertEquals(null, COLOR_TL.get());
-        }
-      }, Jobs.newInput().withRunContext(RunContexts.empty())).awaitDone();
+      Jobs.schedule(() -> Assert.assertEquals(null, COLOR_TL.get()), Jobs.newInput().withRunContext(RunContexts.empty())).awaitDone();
     }
     finally {
       COLOR_TL.set(backup);
@@ -156,7 +132,7 @@ public class RunContextChainInterceptorTest {
   private class ThreadLocalColorInterceptorProducer implements IRunContextChainInterceptorProducer<RunContext> {
     @Override
     public <R> IRunContextChainInterceptor<R> create() {
-      return new P_ColorThreadLocalInterceptor<R>();
+      return new P_ColorThreadLocalInterceptor<>();
     }
   }
 

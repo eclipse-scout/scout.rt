@@ -66,7 +66,7 @@ public class CalendarComponent implements Comparable<CalendarComponent> {
     m_toDate = d;
 
     // cache covered days
-    m_coveredDaysRange = new Range<Date>(DateUtility.truncDate(m_fromDate), DateUtility.truncDate(m_toDate));
+    m_coveredDaysRange = new Range<>(DateUtility.truncDate(m_fromDate), DateUtility.truncDate(m_toDate));
 
     // cache full day flag
     if (m_item instanceof ICalendarAppointment) {

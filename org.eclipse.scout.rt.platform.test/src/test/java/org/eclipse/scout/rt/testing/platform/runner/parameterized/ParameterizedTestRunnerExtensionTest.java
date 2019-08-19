@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.runner.parameterized;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -60,7 +57,7 @@ public class ParameterizedTestRunnerExtensionTest {
 
   @Test
   public void testCreateParameterizedTestMethods() {
-    List<FrameworkMethod> testMethodLists = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> testMethodLists = new LinkedList<>();
     testMethodLists.add(m_parameterizedTestMethod);
 
     List<FrameworkMethod> createdTestMethods = ParameterizedTestRunnerExtension.createTestMethods(testMethodLists, 2);
@@ -70,7 +67,7 @@ public class ParameterizedTestRunnerExtensionTest {
 
   @Test
   public void testCreateNonParameterizedTestMethod() {
-    List<FrameworkMethod> testMethodLists = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> testMethodLists = new LinkedList<>();
     testMethodLists.add(m_nonParameterizedTestMethod);
 
     List<FrameworkMethod> createdTestMethods = ParameterizedTestRunnerExtension.createTestMethods(testMethodLists, 2);
@@ -82,19 +79,19 @@ public class ParameterizedTestRunnerExtensionTest {
   public void testValidateOneParametersMethod() throws NoSuchMethodException, SecurityException {
     List<Throwable> errors;
 
-    errors = new LinkedList<Throwable>();
+    errors = new LinkedList<>();
     ParameterizedTestRunnerExtension.validateOneParametersMethod(m_testClass, errors);
     assertTrue(errors.isEmpty());
 
-    errors = new LinkedList<Throwable>();
+    errors = new LinkedList<>();
     ParameterizedTestRunnerExtension.validateOneParametersMethod(new TestClass(ParameterizedTestClassWithMissingParametersMethod.class), errors);
     assertFalse(errors.isEmpty());
 
-    errors = new LinkedList<Throwable>();
+    errors = new LinkedList<>();
     ParameterizedTestRunnerExtension.validateOneParametersMethod(new TestClass(ParameterizedTestClassWithIncorrectParametersMethod1.class), errors);
     assertFalse(errors.isEmpty());
 
-    errors = new LinkedList<Throwable>();
+    errors = new LinkedList<>();
     ParameterizedTestRunnerExtension.validateOneParametersMethod(new TestClass(ParameterizedTestClassWithIncorrectParametersMethod2.class), errors);
     assertFalse(errors.isEmpty());
   }
@@ -117,7 +114,7 @@ public class ParameterizedTestRunnerExtensionTest {
   public static class ParameterizedTestClassWithIncorrectParametersMethod1 {
     @Parameters
     private static List<IScoutTestParameter> getParameters() {
-      return new LinkedList<IScoutTestParameter>();
+      return new LinkedList<>();
     }
   }
 
@@ -125,7 +122,7 @@ public class ParameterizedTestRunnerExtensionTest {
   public static class ParameterizedTestClassWithIncorrectParametersMethod2 {
     @Parameters
     private static Set<IScoutTestParameter> getParameters() {
-      return new HashSet<IScoutTestParameter>();
+      return new HashSet<>();
     }
   }
 

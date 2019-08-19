@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -48,7 +47,7 @@ public class FormBasicTest {
   }
 
   protected void testStartAndWaitImpl(final boolean modal, final int displayHint, final String viewId) throws Exception {
-    final ArrayList<Integer> testSequence = new ArrayList<Integer>();
+    final ArrayList<Integer> testSequence = new ArrayList<>();
     DynamicGroupBox mainBox = new DynamicGroupBox(
         new DynamicStringField("f1", "First Name"),
         new DynamicStringField("f2", "Last Name"),
@@ -62,14 +61,11 @@ public class FormBasicTest {
     testSequence.add(0);
     testSequence.add(1);
     //emulate that gui clicks on ok button
-    IFuture<Void> future = ModelJobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        testSequence.add(2);
-        f.getButton("ok").getUIFacade().fireButtonClickFromUI();
-        Thread.sleep(200L);
-        testSequence.add(3);
-      }
+    IFuture<Void> future = ModelJobs.schedule(() -> {
+      testSequence.add(2);
+      f.getButton("ok").getUIFacade().fireButtonClickFromUI();
+      Thread.sleep(200L);
+      testSequence.add(3);
     }, ModelJobs.newInput(ClientRunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(200, TimeUnit.MILLISECONDS)));

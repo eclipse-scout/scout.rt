@@ -138,11 +138,11 @@ public class JsonPlannerTest {
   }
 
   private Resource<Integer> createResource(int id) {
-    return new Resource<Integer>(id, "resource" + id);
+    return new Resource<>(id, "resource" + id);
   }
 
   private Activity<Resource<Integer>, Integer> createActivity(Resource<Integer> resource, int id) {
-    return new Activity<Resource<Integer>, Integer>(resource, id);
+    return new Activity<>(resource, id);
   }
 
   class CapturingPlannerAdapter extends PlannerAdapter {

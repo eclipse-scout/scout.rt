@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table.organizer;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +63,7 @@ public class OrganizeColumnsFormTest {
   @Test
   public void testNoNPEInExecDrop() {
     ITable table = mock(ITable.class);
-    List<ITableRow> list = new LinkedList<ITableRow>();
+    List<ITableRow> list = new LinkedList<>();
     list.add(mock(ITableRow.class));
     JavaTransferObject transfer = mock(JavaTransferObject.class);
     when(transfer.getLocalObjectAsList(ITableRow.class)).thenReturn(list);

@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.mom.api.marshaller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class BytesMarshallerTest {
 
   @Test(expected = AssertionException.class)
   public void testObject() {
-    BEANS.get(BytesMarshaller.class).marshall(new Object(), new HashMap<String, String>());
+    BEANS.get(BytesMarshaller.class).marshall(new Object(), new HashMap<>());
   }
 
   @Test

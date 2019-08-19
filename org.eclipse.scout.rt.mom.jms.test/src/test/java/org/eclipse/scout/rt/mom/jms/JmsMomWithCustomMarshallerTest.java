@@ -18,8 +18,6 @@ import java.util.Objects;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
-import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.marshaller.IMarshaller;
@@ -50,18 +48,8 @@ public class JmsMomWithCustomMarshallerTest extends AbstractJmsMomTest {
 
     MOM.publish(FixtureMom.class, queueString, "Hello MOM!");
     MOM.publish(FixtureMom.class, queueObject, new StringHolder("Hello MOM! (holder)"));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queueString, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer1.set(message.getTransferObject());
-      }
-    }));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queueObject, new IMessageListener<Object>() {
-      @Override
-      public void onMessage(IMessage<Object> message) {
-        capturer2.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queueString, message -> capturer1.set(message.getTransferObject())));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queueObject, message -> capturer2.set(message.getTransferObject())));
 
     // Verify
     String received1 = capturer1.get();
@@ -78,12 +66,7 @@ public class JmsMomWithCustomMarshallerTest extends AbstractJmsMomTest {
     IDestination<String> queueString = MOM.newDestination("test/mom/testPublishStringData", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
 
     MOM.publish(FixtureMom.class, queueString, "Hello MOM!");
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queueString, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queueString, message -> capturer.set(message.getTransferObject())));
 
     // Verify
     String received = capturer.get();

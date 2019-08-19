@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -281,25 +278,21 @@ public class ClientNotificationRegistryTest {
       ServerRunContexts.copyCurrent()
           .withClientNodeId(currentNode)
           .withClientNotificationCollector(collector)
-          .run(new IRunnable() {
+          .run(() -> {
+            ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+            reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+            reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
 
-            @Override
-            public void run() throws Exception {
-              ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-              reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
-              reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
-
-              reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
-              commit();
-              //collected for request
-              List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
-              assertSingleTestNotification(notifications);
-              //no notification for current node
-              List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
-              assertTrue(ownRegNotifications.isEmpty());
-              //notifications for other nodes
-              assertSingleTestNotification(consumeNoWait(reg, otherNode));
-            }
+            reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+            commit();
+            //collected for request
+            List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
+            assertSingleTestNotification(notifications);
+            //no notification for current node
+            List<ClientNotificationMessage> ownRegNotifications = consumeNoWait(reg, currentNode);
+            assertTrue(ownRegNotifications.isEmpty());
+            //notifications for other nodes
+            assertSingleTestNotification(consumeNoWait(reg, otherNode));
           });
 
     }
@@ -318,23 +311,19 @@ public class ClientNotificationRegistryTest {
 
     ClientNotificationCollector collector = new ClientNotificationCollector();
     collector.consume();
-    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withClientNotificationCollector(collector).run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
-        reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
-        reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
-        reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
-        commit();
-        //no notifications for current request (piggy back)
-        List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
-        assertTrue(notifications.isEmpty());
-        //notifications for current nodes
-        assertSingleTestNotification(consumeNoWait(reg, currentNode));
-        //notifications for other nodes
-        assertSingleTestNotification(consumeNoWait(reg, otherNode));
-      }
+    ServerRunContexts.copyCurrent().withClientNodeId(currentNode).withClientNotificationCollector(collector).run(() -> {
+      ClientNotificationRegistry reg = new ClientNotificationRegistry(TEST_QUEUE_EXPIRE_TIMEOUT);
+      reg.registerSession(currentNode, TEST_SESSION, TEST_USER);
+      reg.registerSession(otherNode, TEST_SESSION, TEST_USER);
+      reg.putTransactionalForUser(TEST_USER, TEST_NOTIFICATION);
+      commit();
+      //no notifications for current request (piggy back)
+      List<ClientNotificationMessage> notifications = ClientNotificationCollector.CURRENT.get().consume();
+      assertTrue(notifications.isEmpty());
+      //notifications for current nodes
+      assertSingleTestNotification(consumeNoWait(reg, currentNode));
+      //notifications for other nodes
+      assertSingleTestNotification(consumeNoWait(reg, otherNode));
     });
   }
 

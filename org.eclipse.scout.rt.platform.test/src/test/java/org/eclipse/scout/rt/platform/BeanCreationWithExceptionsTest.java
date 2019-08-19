@@ -10,13 +10,8 @@
  */
 package org.eclipse.scout.rt.platform;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
 import javax.annotation.PostConstruct;
@@ -321,12 +316,9 @@ public class BeanCreationWithExceptionsTest {
 
   private static IFuture<TestBean> scheduleGetBean() {
     final CountDownLatch runningLatch = new CountDownLatch(1);
-    IFuture<TestBean> future = Jobs.schedule(new Callable<TestBean>() {
-      @Override
-      public TestBean call() throws Exception {
-        runningLatch.countDown();
-        return BEANS.get(TestBean.class);
-      }
+    IFuture<TestBean> future = Jobs.schedule(() -> {
+      runningLatch.countDown();
+      return BEANS.get(TestBean.class);
     }, Jobs.newInput());
     await(runningLatch);
     return future;

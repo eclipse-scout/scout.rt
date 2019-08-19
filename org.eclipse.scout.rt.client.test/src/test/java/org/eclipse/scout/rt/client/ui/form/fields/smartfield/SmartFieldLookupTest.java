@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -26,9 +24,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.fixture.ITestLookupService;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.fixture.TestLookupCall;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
-import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IBlockingCondition;
-import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.TriState;
@@ -160,13 +156,7 @@ public class SmartFieldLookupTest {
    */
   private <T> T awaitDoneAndGet(IFuture<T> futureRows) {
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
-    futureRows.whenDone(new IDoneHandler<T>() {
-
-      @Override
-      public void onDone(DoneEvent<T> event) {
-        bc.setBlocking(false);
-      }
-    }, ClientRunContexts.copyCurrent());
+    futureRows.whenDone(event -> bc.setBlocking(false), ClientRunContexts.copyCurrent());
     bc.waitFor();
     return futureRows.awaitDoneAndGet();
   }
@@ -202,14 +192,10 @@ public class SmartFieldLookupTest {
 
     IFuture<List<ILookupRow<Long>>> rows = m_field.callSubTreeLookupInBackground(1L, TriState.TRUE, false);
 
-    rows.whenDone(new IDoneHandler<List<ILookupRow<Long>>>() {
-
-      @Override
-      public void onDone(DoneEvent<List<ILookupRow<Long>>> event) {
-        assertTrue(event.getException() instanceof RuntimeException);
-        assertEquals("lookup error", event.getException().getMessage());
-        bc.setBlocking(false);
-      }
+    rows.whenDone(event -> {
+      assertTrue(event.getException() instanceof RuntimeException);
+      assertEquals("lookup error", event.getException().getMessage());
+      bc.setBlocking(false);
     }, ClientRunContexts.copyCurrent());
     bc.waitFor();
   }
@@ -294,16 +280,12 @@ public class SmartFieldLookupTest {
    * Creates a {@link ArgumentMatcher} checking for equal {@link ILookupCall#getRec()} values
    */
   private static ArgumentMatcher<ILookupCall<Long>> hasRec(final Long rec) {
-    return new ArgumentMatcher<ILookupCall<Long>>() {
-
-      @Override
-      public boolean matches(ILookupCall<Long> argument) {
-        if (argument == null) {
-          return false;
-        }
-        Object parent = argument.getRec();
-        return parent instanceof Long && rec.equals(parent);
+    return argument -> {
+      if (argument == null) {
+        return false;
       }
+      Object parent = argument.getRec();
+      return parent instanceof Long && rec.equals(parent);
     };
   }
 
@@ -315,42 +297,30 @@ public class SmartFieldLookupTest {
    * Creates a {@link ArgumentMatcher} checking for inactive values using {@link ILookupCall#getActive()}
    */
   private static ArgumentMatcher<ILookupCall<Long>> isInactive() {
-    return new ArgumentMatcher<ILookupCall<Long>>() {
-
-      @Override
-      public boolean matches(ILookupCall<Long> argument) {
-        if (argument == null) {
-          return false;
-        }
-        TriState active = argument.getActive();
-        return active.isFalse();
+    return argument -> {
+      if (argument == null) {
+        return false;
       }
+      TriState active = argument.getActive();
+      return active.isFalse();
     };
   }
 
   private static ArgumentMatcher<ILookupCall<Long>> hasMaxRowCount(final int maxRowCount) {
-    return new ArgumentMatcher<ILookupCall<Long>>() {
-
-      @Override
-      public boolean matches(ILookupCall<Long> argument) {
-        if (argument == null) {
-          return false;
-        }
-        return argument.getMaxRowCount() == maxRowCount;
+    return argument -> {
+      if (argument == null) {
+        return false;
       }
+      return argument.getMaxRowCount() == maxRowCount;
     };
   }
 
   private static ArgumentMatcher<ILookupCall<Long>> hasMaster(final Long masterValue) {
-    return new ArgumentMatcher<ILookupCall<Long>>() {
-
-      @Override
-      public boolean matches(ILookupCall<Long> argument) {
-        if (argument == null) {
-          return false;
-        }
-        return masterValue.equals(argument.getMaster());
+    return argument -> {
+      if (argument == null) {
+        return false;
       }
+      return masterValue.equals(argument.getMaster());
     };
   }
 

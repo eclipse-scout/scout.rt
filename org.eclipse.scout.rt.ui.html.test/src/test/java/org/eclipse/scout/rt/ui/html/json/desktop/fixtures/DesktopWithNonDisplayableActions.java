@@ -24,7 +24,7 @@ public class DesktopWithNonDisplayableActions extends AbstractDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    List<Class<? extends IOutline>> outlines = new ArrayList<Class<? extends IOutline>>();
+    List<Class<? extends IOutline>> outlines = new ArrayList<>();
     outlines.add(OutlineWithOneNode.class);
     return outlines;
   }

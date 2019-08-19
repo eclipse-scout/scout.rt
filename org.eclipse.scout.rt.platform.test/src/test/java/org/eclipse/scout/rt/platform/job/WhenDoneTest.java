@@ -10,17 +10,11 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,7 +22,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.junit.Test;
@@ -39,36 +32,28 @@ public class WhenDoneTest {
 
   @Test
   public void testSuccess() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.SECONDS)));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("2");
-        if (future.isDone()) {
-          protocol.add("done");
-        }
-        if (future.isCancelled()) {
-          protocol.add("cancelled");
-        }
-        eventHolder.setValue(event);
-        verifyLatch.countDown();
+    future.whenDone(event -> {
+      protocol.add("2");
+      if (future.isDone()) {
+        protocol.add("done");
       }
+      if (future.isCancelled()) {
+        protocol.add("cancelled");
+      }
+      eventHolder.setValue(event);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
@@ -81,35 +66,27 @@ public class WhenDoneTest {
 
   @Test
   public void testSuccessWithJobAlreadyCompleted() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
     future.awaitDoneAndGet();
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("2");
-        if (future.isDone()) {
-          protocol.add("done");
-        }
-        if (future.isCancelled()) {
-          protocol.add("cancelled");
-        }
-        eventHolder.setValue(event);
-        verifyLatch.countDown();
+    future.whenDone(event -> {
+      protocol.add("2");
+      if (future.isDone()) {
+        protocol.add("done");
       }
+      if (future.isCancelled()) {
+        protocol.add("cancelled");
+      }
+      eventHolder.setValue(event);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
@@ -122,37 +99,29 @@ public class WhenDoneTest {
 
   @Test
   public void testError() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final ProcessingException pe = new ProcessingException("expected JUnit test exception");
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        throw pe;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      throw pe;
     }, Jobs.newInput()
         .withExceptionHandling(null, false)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.SECONDS)));
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("2");
-        if (future.isDone()) {
-          protocol.add("done");
-        }
-        if (future.isCancelled()) {
-          protocol.add("cancelled");
-        }
-        eventHolder.setValue(event);
-        verifyLatch.countDown();
+    future.whenDone(event -> {
+      protocol.add("2");
+      if (future.isDone()) {
+        protocol.add("done");
       }
+      if (future.isCancelled()) {
+        protocol.add("cancelled");
+      }
+      eventHolder.setValue(event);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
@@ -165,17 +134,13 @@ public class WhenDoneTest {
 
   @Test
   public void testErrorWithJobAlreadyCompleted() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
     final Exception error = new ProcessingException("expected JUnit test exception");
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        throw error;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      throw error;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
     try {
@@ -184,20 +149,16 @@ public class WhenDoneTest {
     }
     catch (ProcessingException e) {
       final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-      future.whenDone(new IDoneHandler<String>() {
-
-        @Override
-        public void onDone(DoneEvent<String> event) {
-          protocol.add("2");
-          if (future.isDone()) {
-            protocol.add("done");
-          }
-          if (future.isCancelled()) {
-            protocol.add("cancelled");
-          }
-          eventHolder.setValue(event);
-          verifyLatch.countDown();
+      future.whenDone(event -> {
+        protocol.add("2");
+        if (future.isDone()) {
+          protocol.add("done");
         }
+        if (future.isCancelled()) {
+          protocol.add("cancelled");
+        }
+        eventHolder.setValue(event);
+        verifyLatch.countDown();
       }, RunContexts.copyCurrent());
 
       assertTrue(verifyLatch.await());
@@ -211,16 +172,12 @@ public class WhenDoneTest {
 
   @Test
   public void testCancel() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -229,20 +186,16 @@ public class WhenDoneTest {
     future.cancel(true);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("2");
-        if (future.isDone()) {
-          protocol.add("done");
-        }
-        if (future.isCancelled()) {
-          protocol.add("cancelled");
-        }
-        eventHolder.setValue(event);
-        verifyLatch.countDown();
+    future.whenDone(event -> {
+      protocol.add("2");
+      if (future.isDone()) {
+        protocol.add("done");
       }
+      if (future.isCancelled()) {
+        protocol.add("cancelled");
+      }
+      eventHolder.setValue(event);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
@@ -261,17 +214,13 @@ public class WhenDoneTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch continueRunningLatch = new BlockingCountDownLatch(1);
 
-    final IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
-          continueRunningLatch.countDownAndBlock(); // continue running
-        }
+    final IFuture<Void> future = Jobs.schedule(() -> {
+      try {
+        setupLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
+        continueRunningLatch.countDownAndBlock(); // continue running
       }
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
@@ -285,13 +234,9 @@ public class WhenDoneTest {
     final AtomicBoolean onDone = new AtomicBoolean(false);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<Void>() {
-
-      @Override
-      public void onDone(DoneEvent<Void> event) {
-        onDone.set(true);
-        verifyLatch.countDown();
-      }
+    future.whenDone(event -> {
+      onDone.set(true);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 
@@ -301,16 +246,12 @@ public class WhenDoneTest {
 
   @Test
   public void testCancelWithJobAlreadyCompleted() throws InterruptedException {
-    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
     final Holder<DoneEvent<String>> eventHolder = new Holder<>();
 
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        protocol.add("1");
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      protocol.add("1");
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -318,20 +259,16 @@ public class WhenDoneTest {
     future.cancel(true);
 
     final BlockingCountDownLatch verifyLatch = new BlockingCountDownLatch(1);
-    future.whenDone(new IDoneHandler<String>() {
-
-      @Override
-      public void onDone(DoneEvent<String> event) {
-        protocol.add("2");
-        if (future.isDone()) {
-          protocol.add("done");
-        }
-        if (future.isCancelled()) {
-          protocol.add("cancelled");
-        }
-        eventHolder.setValue(event);
-        verifyLatch.countDown();
+    future.whenDone(event -> {
+      protocol.add("2");
+      if (future.isDone()) {
+        protocol.add("done");
       }
+      if (future.isCancelled()) {
+        protocol.add("cancelled");
+      }
+      eventHolder.setValue(event);
+      verifyLatch.countDown();
     }, RunContexts.copyCurrent());
     assertTrue(verifyLatch.await());
 

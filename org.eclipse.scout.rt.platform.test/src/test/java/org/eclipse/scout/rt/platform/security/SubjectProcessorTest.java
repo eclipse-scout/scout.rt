@@ -10,13 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.security.AccessController;
-import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
 
@@ -33,14 +29,10 @@ public class SubjectProcessorTest {
     final Holder<Subject> actualSubject = new Holder<>();
 
     CallableChain<String> callableChain = new CallableChain<>();
-    callableChain.add(new SubjectProcessor<String>(m_subject));
-    String result = callableChain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-        return "result";
-      }
+    callableChain.add(new SubjectProcessor<>(m_subject));
+    String result = callableChain.call(() -> {
+      actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+      return "result";
     });
 
     // VERIFY
@@ -53,14 +45,10 @@ public class SubjectProcessorTest {
     final Holder<Subject> actualSubject = new Holder<>();
 
     CallableChain<String> callableChain = new CallableChain<>();
-    callableChain.add(new SubjectProcessor<String>(null));
-    String result = callableChain.call(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-        return "result";
-      }
+    callableChain.add(new SubjectProcessor<>(null));
+    String result = callableChain.call(() -> {
+      actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+      return "result";
     });
 
     // VERIFY
@@ -75,15 +63,11 @@ public class SubjectProcessorTest {
     final Exception exception = new Exception("expected JUnit test exception");
 
     CallableChain<String> callableChain = new CallableChain<>();
-    callableChain.add(new SubjectProcessor<String>(m_subject));
+    callableChain.add(new SubjectProcessor<>(m_subject));
     try {
-      callableChain.call(new Callable<String>() {
-
-        @Override
-        public String call() throws Exception {
-          actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-          throw exception;
-        }
+      callableChain.call(() -> {
+        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+        throw exception;
       });
       fail();
     }
@@ -102,15 +86,11 @@ public class SubjectProcessorTest {
 
     // RUN THE TEST
     CallableChain<String> callableChain = new CallableChain<>();
-    callableChain.add(new SubjectProcessor<String>(m_subject));
+    callableChain.add(new SubjectProcessor<>(m_subject));
     try {
-      callableChain.call(new Callable<String>() {
-
-        @Override
-        public String call() throws Exception {
-          actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
-          throw runtimeException;
-        }
+      callableChain.call(() -> {
+        actualSubject.setValue(Subject.getSubject(AccessController.getContext()));
+        throw runtimeException;
       });
       fail();
     }

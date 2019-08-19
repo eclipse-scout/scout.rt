@@ -25,7 +25,7 @@ public class SimpleConfigPropertyProvider implements IPropertyProvider {
   }
 
   public SimpleConfigPropertyProvider withProperty(String key, String value) {
-    m_properties.add(new AbstractMap.SimpleEntry<String, String>(key, value));
+    m_properties.add(new AbstractMap.SimpleEntry<>(key, value));
     return this;
   }
 

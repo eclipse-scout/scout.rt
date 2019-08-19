@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.data.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -409,11 +407,11 @@ public class DataModelAttributeTest {
 
     @Override
     protected List<ILookupRow<Long>> execCreateLookupRows() {
-      List<ILookupRow<Long>> result = new ArrayList<ILookupRow<Long>>();
-      result.add(new LookupRow<Long>(1L, "a"));
-      result.add(new LookupRow<Long>(2L, "b"));
-      result.add(new LookupRow<Long>(3L, "c"));
-      result.add(new LookupRow<Long>(4L, "d"));
+      List<ILookupRow<Long>> result = new ArrayList<>();
+      result.add(new LookupRow<>(1L, "a"));
+      result.add(new LookupRow<>(2L, "b"));
+      result.add(new LookupRow<>(3L, "c"));
+      result.add(new LookupRow<>(4L, "d"));
       return result;
     }
   }
@@ -428,7 +426,7 @@ public class DataModelAttributeTest {
 
     @Override
     protected AbstractCode<Long> execCreateCode(ICodeRow<Long> newRow) {
-      return new MutableCode<Long>(newRow);
+      return new MutableCode<>(newRow);
     }
 
     @Order(10)

@@ -10,16 +10,8 @@
  */
 package org.eclipse.scout.rt.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.security.AccessController;
@@ -66,7 +58,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -159,7 +150,7 @@ public class ServiceTunnelServletTest {
 
     List<IFuture<?>> futures = scheduleAndJoinJobs(jobs);
 
-    Set<IServerSession> serverSessions = new HashSet<IServerSession>();
+    Set<IServerSession> serverSessions = new HashSet<>();
     for (IFuture<?> future : futures) {
       serverSessions.add((IServerSession) future.awaitDoneAndGet());
     }
@@ -183,36 +174,27 @@ public class ServiceTunnelServletTest {
   }
 
   private Answer<IServerSession> slowCreateTestsession(final TestServerSession testSession) {
-    return new Answer<IServerSession>() {
-      @Override
-      public IServerSession answer(InvocationOnMock invocation) throws Throwable {
-        Thread.sleep(2000); // simulate long running task
-        return testSession;
-      }
+    return invocation -> {
+      Thread.sleep(2000); // simulate long running task
+      return testSession;
     };
   }
 
   private Answer<Object> putValueInCache(final Map<String, IServerSession> cache) {
-    return new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        String key = (String) args[0];
-        IServerSession value = (IServerSession) args[1];
-        cache.put(key, value);
-        return null;
-      }
+    return invocation -> {
+      Object[] args = invocation.getArguments();
+      String key = (String) args[0];
+      IServerSession value = (IServerSession) args[1];
+      cache.put(key, value);
+      return null;
     };
   }
 
   private Answer<Object> getCachedValue(final Map<String, IServerSession> cache) {
-    return new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        String key = (String) args[0];
-        return cache.get(key);
-      }
+    return invocation -> {
+      Object[] args = invocation.getArguments();
+      String key = (String) args[0];
+      return cache.get(key);
     };
   }
 

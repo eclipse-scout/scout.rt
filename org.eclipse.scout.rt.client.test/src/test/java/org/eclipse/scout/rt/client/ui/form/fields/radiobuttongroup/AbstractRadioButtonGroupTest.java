@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.beans.PropertyChangeListener;
@@ -368,11 +363,11 @@ public class AbstractRadioButtonGroupTest {
 
     @Override
     protected List<ILookupRow<Long>> execCreateLookupRows() {
-      ArrayList<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
-      rows.add(new LookupRow<Long>(1L, "Business Systems Integration AG"));
-      rows.add(new LookupRow<Long>(2L, "Eclipse"));
-      rows.add(new LookupRow<Long>(3L, "Google"));
-      rows.add(new LookupRow<Long>(null, "null value"));
+      ArrayList<ILookupRow<Long>> rows = new ArrayList<>();
+      rows.add(new LookupRow<>(1L, "Business Systems Integration AG"));
+      rows.add(new LookupRow<>(2L, "Eclipse"));
+      rows.add(new LookupRow<>(3L, "Google"));
+      rows.add(new LookupRow<>(null, "null value"));
       return rows;
     }
   }

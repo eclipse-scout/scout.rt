@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
@@ -146,7 +145,7 @@ public class DevelopmentScriptfileCache {
       try {
           Set<HttpCacheKey> keys;
           synchronized (m_scriptLock) {
-            keys = new HashSet<HttpCacheKey>(m_scriptCache.keySet());
+          keys = new HashSet<>(m_scriptCache.keySet());
           }
           BEANS.get(DevelopmentScriptFileCacheInitialLoader.class).storeInitialScriptfiles(keys);
       }
@@ -182,22 +181,19 @@ public class DevelopmentScriptfileCache {
         m_rebuildJsFuture.cancel(false);
         m_rebuildJsFuture = null;
       }
-      m_rebuildJsFuture = Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            synchronized (m_scriptLock) {
-              if (IFuture.CURRENT.get().isCancelled()) {
-                return;
-              }
+      m_rebuildJsFuture = Jobs.schedule(() -> {
+        try {
+          synchronized (m_scriptLock) {
+            if (IFuture.CURRENT.get().isCancelled()) {
+              return;
             }
-            rebuildScripts(m_jsMatcher);
           }
-          finally {
-            synchronized (m_scriptLock) {
-              if (IFuture.CURRENT.get() == m_rebuildJsFuture) {
-                m_rebuildJsFuture = null;
-              }
+          rebuildScripts(m_jsMatcher);
+        }
+        finally {
+          synchronized (m_scriptLock) {
+            if (IFuture.CURRENT.get() == m_rebuildJsFuture) {
+              m_rebuildJsFuture = null;
             }
           }
         }
@@ -215,22 +211,19 @@ public class DevelopmentScriptfileCache {
         m_rebuildStylesheetFuture.cancel(false);
         m_rebuildStylesheetFuture = null;
       }
-      m_rebuildStylesheetFuture = Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          try {
-            synchronized (m_rebuildStylesheetLock) {
-              if (IFuture.CURRENT.get().isCancelled()) {
-                return;
-              }
+      m_rebuildStylesheetFuture = Jobs.schedule(() -> {
+        try {
+          synchronized (m_rebuildStylesheetLock) {
+            if (IFuture.CURRENT.get().isCancelled()) {
+              return;
             }
-            rebuildScripts(m_cssMatcher);
           }
-          finally {
-            synchronized (m_rebuildStylesheetLock) {
-              if (IFuture.CURRENT.get() == m_rebuildStylesheetFuture) {
-                m_rebuildStylesheetFuture = null;
-              }
+          rebuildScripts(m_cssMatcher);
+        }
+        finally {
+          synchronized (m_rebuildStylesheetLock) {
+            if (IFuture.CURRENT.get() == m_rebuildStylesheetFuture) {
+              m_rebuildStylesheetFuture = null;
             }
           }
         }

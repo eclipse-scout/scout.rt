@@ -10,16 +10,12 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -35,29 +31,21 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-        try {
-          future.awaitDone();
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
+      try {
+        future.awaitDone();
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
     controller.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -70,13 +58,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -101,12 +85,8 @@ public class FutureAwaitTest {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw computationException;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      throw computationException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -133,29 +113,21 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-        try {
-          future.awaitDone(10, TimeUnit.SECONDS);
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
+      try {
+        future.awaitDone(10, TimeUnit.SECONDS);
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
     controller.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -168,13 +140,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -192,13 +160,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -221,12 +185,8 @@ public class FutureAwaitTest {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw computationException;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      throw computationException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -248,29 +208,21 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-        try {
-          future.awaitDoneAndGet();
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
+      try {
+        future.awaitDoneAndGet();
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
     controller.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -283,13 +235,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -313,12 +261,8 @@ public class FutureAwaitTest {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw computationException;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      throw computationException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -337,29 +281,21 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-        try {
-          future.awaitDoneAndGet(10, TimeUnit.SECONDS);
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
+      try {
+        future.awaitDoneAndGet(10, TimeUnit.SECONDS);
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
     controller.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -372,13 +308,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -403,12 +335,8 @@ public class FutureAwaitTest {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw computationException;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      throw computationException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -430,13 +358,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -464,31 +388,23 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-        try {
-          Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
-              .andMatchFuture(future)
-              .toFilter(), 10, TimeUnit.SECONDS);
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
+      try {
+        Jobs.getJobManager().awaitDone(Jobs.newFutureFilterBuilder()
+            .andMatchFuture(future)
+            .toFilter(), 10, TimeUnit.SECONDS);
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
     controller.awaitDoneAndGet(10, TimeUnit.SECONDS);
@@ -501,13 +417,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -529,13 +441,9 @@ public class FutureAwaitTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "result";
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "result";
     }, Jobs.newInput().withRunContext(RunContexts.copyCurrent()));
 
     // Wait until ready
@@ -564,12 +472,8 @@ public class FutureAwaitTest {
     final RuntimeException computationException = new RuntimeException("expected JUnit test exception");
 
     // Init
-    final IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw computationException;
-      }
+    final IFuture<String> future = Jobs.schedule(() -> {
+      throw computationException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false));
 
@@ -584,19 +488,15 @@ public class FutureAwaitTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     // Run the test in a separate thread
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      Thread.currentThread().interrupt();
 
-      @Override
-      public void run() throws Exception {
-        Thread.currentThread().interrupt();
-
-        try {
-          condition.waitFor();
-          fail("interruption expected");
-        }
-        catch (ThreadInterruptedError e) {
-          assertTrue(Thread.currentThread().isInterrupted());
-        }
+      try {
+        condition.waitFor();
+        fail("interruption expected");
+      }
+      catch (ThreadInterruptedError e) {
+        assertTrue(Thread.currentThread().isInterrupted());
       }
     }, Jobs.newInput());
 

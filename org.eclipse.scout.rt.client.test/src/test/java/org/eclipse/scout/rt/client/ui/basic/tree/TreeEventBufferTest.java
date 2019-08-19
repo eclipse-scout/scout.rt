@@ -10,15 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +30,6 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -520,7 +512,7 @@ public class TreeEventBufferTest {
     installChildNodes(nodeB, nodeE);
     installChildNodes(nodeE, nodeF);
     installChildNodes(nodeC, nodeG);
-    Collection<ITreeNode> allNodes = new ArrayList<ITreeNode>();
+    Collection<ITreeNode> allNodes = new ArrayList<>();
     allNodes.add(nodeA);
     allNodes.add(nodeB);
     allNodes.add(nodeC);
@@ -1093,21 +1085,17 @@ public class TreeEventBufferTest {
     final List<ITreeNode> childNodeList = Arrays.asList(childNodes);
     when(node.getChildNodes()).thenReturn(childNodeList);
     when(node.getChildNodeCount()).thenReturn(childNodeList.size());
-    doAnswer(new Answer<Void>() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public Void answer(InvocationOnMock invocation) throws Throwable {
-        Set collector = invocation.getArgument(0);
-        collector.addAll(childNodeList);
-        Boolean argument = invocation.getArgument(1);
-        boolean recursive = Boolean.valueOf(argument);
-        if (recursive) {
-          for (ITreeNode childNode : childNodeList) {
-            childNode.collectChildNodes(collector, recursive);
-          }
+    doAnswer((Answer<Void>) invocation -> {
+      Set collector = invocation.getArgument(0);
+      collector.addAll(childNodeList);
+      Boolean argument = invocation.getArgument(1);
+      boolean recursive = Boolean.valueOf(argument);
+      if (recursive) {
+        for (ITreeNode childNode : childNodeList) {
+          childNode.collectChildNodes(collector, recursive);
         }
-        return null;
       }
+      return null;
     }).when(node).collectChildNodes(ArgumentMatchers.<ITreeNode> anySet(), ArgumentMatchers.anyBoolean());
     for (ITreeNode childNode : childNodeList) {
       when(childNode.getParentNode()).thenReturn(node);

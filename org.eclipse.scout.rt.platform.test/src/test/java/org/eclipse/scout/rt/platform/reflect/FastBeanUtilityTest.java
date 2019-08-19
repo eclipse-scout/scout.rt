@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.reflect;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -121,7 +118,7 @@ public class FastBeanUtilityTest {
     Method[] methods = FastBeanUtility.getDeclaredPublicMethods(MyBean.class);
     assertEquals("length", 2, methods.length);
 
-    ArrayList<String> methodNames = new ArrayList<String>();
+    ArrayList<String> methodNames = new ArrayList<>();
     for (Method method : methods) {
       methodNames.add(method.getName());
     }
@@ -140,7 +137,7 @@ public class FastBeanUtilityTest {
     assertEquals(0, methods2.length);
     //try all permutations
     for (Method[] m1 : perm2(methods1)) {
-      HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
+      HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<>();
       FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
       assertEquals(1, contributeMap.size());
       assertNotNull(contributeMap.get("id"));
@@ -162,7 +159,7 @@ public class FastBeanUtilityTest {
     //try all permutations
     for (Method[] m1 : perm3(methods1)) {
       for (Method[] m2 : perm1(methods2)) {
-        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
+        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
         assertEquals(1, contributeMap.size());
@@ -186,7 +183,7 @@ public class FastBeanUtilityTest {
     //try all permutations
     for (Method[] m1 : perm3(methods1)) {
       for (Method[] m2 : perm1(methods2)) {
-        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
+        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
         assertEquals(1, contributeMap.size());
@@ -210,7 +207,7 @@ public class FastBeanUtilityTest {
     //try all permutations
     for (Method[] m1 : perm4(methods1)) {
       for (Method[] m2 : perm2(methods2)) {
-        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<String, FastPropertyDescriptor>();
+        HashMap<String, FastPropertyDescriptor> contributeMap = new HashMap<>();
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz1, m1, contributeMap);
         FastBeanUtility.contributePropertyDescriptors(clazz1, clazz2, m2, contributeMap);
         assertEquals(1, contributeMap.size());
@@ -237,13 +234,13 @@ public class FastBeanUtilityTest {
   }
 
   private ArrayList<Method[]> perm1(Method[] m) {
-    ArrayList<Method[]> list = new ArrayList<Method[]>();
+    ArrayList<Method[]> list = new ArrayList<>();
     list.add(m);
     return list;
   }
 
   private ArrayList<Method[]> perm2(Method[] m) {
-    ArrayList<Method[]> list = new ArrayList<Method[]>();
+    ArrayList<Method[]> list = new ArrayList<>();
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 2; j++) {
         if (j == i) {
@@ -256,7 +253,7 @@ public class FastBeanUtilityTest {
   }
 
   private ArrayList<Method[]> perm3(Method[] m) {
-    ArrayList<Method[]> list = new ArrayList<Method[]>();
+    ArrayList<Method[]> list = new ArrayList<>();
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
         if (j == i) {
@@ -274,7 +271,7 @@ public class FastBeanUtilityTest {
   }
 
   private ArrayList<Method[]> perm4(Method[] m) {
-    ArrayList<Method[]> list = new ArrayList<Method[]>();
+    ArrayList<Method[]> list = new ArrayList<>();
     for (int i = 0; i < 4; i++) {
       for (int j = 0; j < 4; j++) {
         if (j == i) {

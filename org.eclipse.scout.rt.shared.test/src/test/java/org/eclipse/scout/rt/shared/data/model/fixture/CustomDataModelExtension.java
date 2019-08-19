@@ -116,7 +116,7 @@ public final class CustomDataModelExtension {
      */
     @Override
     public Map<String, String> getMetaDataOfEntity() {
-      HashMap<String, String> map = new HashMap<String, String>(1);
+      HashMap<String, String> map = new HashMap<>(1);
       map.put("id", "" + getId());
       return map;
     }
@@ -170,7 +170,7 @@ public final class CustomDataModelExtension {
      */
     @Override
     public Map<String, String> getMetaDataOfAttribute() {
-      HashMap<String, String> map = new HashMap<String, String>(1);
+      HashMap<String, String> map = new HashMap<>(1);
       map.put("id", "" + getId());
       return map;
     }

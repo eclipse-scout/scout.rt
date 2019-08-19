@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -46,15 +45,10 @@ public class BatchLookupTest {
 
   @Before
   public void setUp() throws Exception {
-    Answer answer = new Answer<List<ILookupRow<Object>>>() {
-
-      @Override
-      public List<ILookupRow<Object>> answer(InvocationOnMock invocation) throws Throwable {
-        Object[] args = invocation.getArguments();
-        ILookupCall<?> call = (ILookupCall<?>) args[0];
-        return createCallResult(call);
-      }
-
+    Answer answer = (Answer<List<ILookupRow<Object>>>) invocation -> {
+      Object[] args = invocation.getArguments();
+      ILookupCall<?> call = (ILookupCall<?>) args[0];
+      return createCallResult(call);
     };
     Mockito.doAnswer(answer).when(m_lookupService).getDataByKey(Mockito.<ILookupCall<Object>> any());
     Mockito.doAnswer(answer).when(m_lookupService).getDataByAll(Mockito.<ILookupCall<Object>> any());
@@ -145,8 +139,8 @@ public class BatchLookupTest {
   }
 
   private static List<ILookupRow<Object>> createCallResult(ILookupCall<?> call) {
-    List<ILookupRow<Object>> result = new ArrayList<ILookupRow<Object>>();
-    result.add(new LookupRow<Object>(call.getKey(), dumpCall(call)));
+    List<ILookupRow<Object>> result = new ArrayList<>();
+    result.add(new LookupRow<>(call.getKey(), dumpCall(call)));
     return result;
   }
 

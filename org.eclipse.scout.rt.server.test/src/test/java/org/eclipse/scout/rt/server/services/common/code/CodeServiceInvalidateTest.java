@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -67,13 +66,10 @@ public class CodeServiceInvalidateTest {
 
     ServerRunContexts
         .copyCurrent()
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            readCodeType(1);
-            //this will remove the codeType from the shared map upon commit
-            invalidateCodeType();
-          }
+        .run(() -> {
+          readCodeType(1);
+          //this will remove the codeType from the shared map upon commit
+          invalidateCodeType();
         });
     readCodeType(2);
     invalidateCodeType();
@@ -90,15 +86,12 @@ public class CodeServiceInvalidateTest {
 
     ServerRunContexts
         .copyCurrent()
-        .run(new IRunnable() {
-          @Override
-          public void run() throws Exception {
-            readCodeType(1);
-            //this will remove the codeType from the shared map upon commit
-            invalidateCodeType();
-            //this will re-insert the codeType into the shared map upon commit
-            readCodeType(3);
-          }
+        .run(() -> {
+          readCodeType(1);
+          //this will remove the codeType from the shared map upon commit
+          invalidateCodeType();
+          //this will re-insert the codeType into the shared map upon commit
+          readCodeType(3);
         });
 
     readCodeType(2);

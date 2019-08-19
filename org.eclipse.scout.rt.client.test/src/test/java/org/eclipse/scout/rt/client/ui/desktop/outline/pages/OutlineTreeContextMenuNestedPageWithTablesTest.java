@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -94,11 +91,11 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
   public static boolean containsAllMenus(Collection<IMenu> reference, Collection<IMenu> menus) {
     // normalize reference
-    List<IMenu> refNormalized = new ArrayList<IMenu>(reference.size());
+    List<IMenu> refNormalized = new ArrayList<>(reference.size());
     for (IMenu m : reference) {
       refNormalized.add(MenuWrapper.unwrapMenu(m));
     }
-    List<IMenu> menusNormalized = new ArrayList<IMenu>(menus.size());
+    List<IMenu> menusNormalized = new ArrayList<>(menus.size());
     for (IMenu m : menus) {
       menusNormalized.add(MenuWrapper.unwrapMenu(m));
     }
@@ -117,7 +114,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
 
   @SafeVarargs
   private static List<IMenu> resolveMenusOfPageWithTable(IPageWithTable<?> page, Class<? extends IMenu>... menuClasses) throws Exception {
-    List<IMenu> resolvedMenus = new LinkedList<IMenu>();
+    List<IMenu> resolvedMenus = new LinkedList<>();
 
     for (Class<? extends IMenu> menuClass : menuClasses) {
       IMenu menu = page.getTable().getMenuByClass(menuClass);

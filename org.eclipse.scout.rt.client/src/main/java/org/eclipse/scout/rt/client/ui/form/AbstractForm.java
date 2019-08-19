@@ -1688,19 +1688,16 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     final List<String> invalidTexts = new ArrayList<>();
     final List<String> mandatoryTexts = new ArrayList<>();
     final AtomicReference<IValidateContentDescriptor> firstProblemRef = new AtomicReference<>();
-    Consumer<IFormField> v = new Consumer<IFormField>() {
-      @Override
-      public void accept(IFormField f) {
-        IValidateContentDescriptor desc = f.validateContent();
-        if (desc != null) {
-          if (desc.getErrorStatus() != null) {
-            invalidTexts.add(desc.getDisplayText() + ": " + desc.getErrorStatus().getMessage());
-          }
-          else {
-            mandatoryTexts.add(desc.getDisplayText());
-          }
-          firstProblemRef.compareAndSet(null, desc);
+    Consumer<IFormField> v = f -> {
+      IValidateContentDescriptor desc = f.validateContent();
+      if (desc != null) {
+        if (desc.getErrorStatus() != null) {
+          invalidTexts.add(desc.getDisplayText() + ": " + desc.getErrorStatus().getMessage());
         }
+        else {
+          mandatoryTexts.add(desc.getDisplayText());
+        }
+        firstProblemRef.compareAndSet(null, desc);
       }
     };
 
@@ -1835,17 +1832,14 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   public void doReset() {
     setFormLoading(true);
     // reset values
-    Consumer<IFormField> v = new Consumer<IFormField>() {
-      @Override
-      public void accept(IFormField field) {
-        if (field instanceof IValueField) {
-          IValueField f = (IValueField) field;
-          f.resetValue();
-        }
-        else if (field instanceof IComposerField) {
-          IComposerField f = (IComposerField) field;
-          f.resetValue();
-        }
+    Consumer<IFormField> v = field -> {
+      if (field instanceof IValueField) {
+        IValueField f = (IValueField) field;
+        f.resetValue();
+      }
+      else if (field instanceof IComposerField) {
+        IComposerField f = (IComposerField) field;
+        f.resetValue();
       }
     };
     try {
@@ -1996,14 +1990,11 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   private boolean/* ok */ checkForVerifyingFields() {
     // check all fields that might be invalid
-    Function<IValueField, TreeVisitResult> v = new Function<IValueField, TreeVisitResult>() {
-      @Override
-      public TreeVisitResult apply(IValueField f) {
-        if (f.isValueChanging() || f.isValueParsing()) {
-          return TreeVisitResult.TERMINATE;
-        }
-        return TreeVisitResult.CONTINUE;
+    Function<IValueField, TreeVisitResult> v = f -> {
+      if (f.isValueChanging() || f.isValueParsing()) {
+        return TreeVisitResult.TERMINATE;
       }
+      return TreeVisitResult.CONTINUE;
     };
     return visit(v, IValueField.class) != TreeVisitResult.TERMINATE;
   }
@@ -2195,18 +2186,15 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     // add fields
     final Element xFields = root.getOwnerDocument().createElement("fields");
     root.appendChild(xFields);
-    Function<IFormField, TreeVisitResult> v = new Function<IFormField, TreeVisitResult>() {
-      @Override
-      public TreeVisitResult apply(IFormField field) {
-        if (field.getForm() != AbstractForm.this) {
-          // field is part of a wrapped form and is handled by the AbstractWrappedFormField
-          return TreeVisitResult.CONTINUE;
-        }
-        Element xField = xFields.getOwnerDocument().createElement("field");
-        field.storeToXml(xField);
-        xFields.appendChild(xField);
+    Function<IFormField, TreeVisitResult> v = field -> {
+      if (field.getForm() != AbstractForm.this) {
+        // field is part of a wrapped form and is handled by the AbstractWrappedFormField
         return TreeVisitResult.CONTINUE;
       }
+      Element xField = xFields.getOwnerDocument().createElement("field");
+      field.storeToXml(xField);
+      xFields.appendChild(xField);
+      return TreeVisitResult.CONTINUE;
     };
     visit(v, IFormField.class);
   }

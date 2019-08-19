@@ -10,12 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -204,22 +200,22 @@ public class SmartFieldTest {
 
     @PostConstruct
     protected void initializeService() {
-      List<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
+      List<ILookupRow<Long>> rows = new ArrayList<>();
       rows.add(createRedLookupRow());
       rows.add(createYellowLookupRow());
-      rows.add(new LookupRow<Long>(ID_GREEN, "Green")
+      rows.add(new LookupRow<>(ID_GREEN, "Green")
           .withIconId(ICON_FILE)
           .withTooltipText("Green tooltip")
           .withBackgroundColor("88ff88")
           .withForegroundColor("008800")
           .withFont(FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(ID_BLUE, "Blue")
+      rows.add(new LookupRow<>(ID_BLUE, "Blue")
           .withIconId(ICON_FILE)
           .withTooltipText("Blue tooltip")
           .withBackgroundColor("8888ff")
           .withForegroundColor("000088")
           .withFont(FontSpec.parse("italic")));
-      rows.add(new LookupRow<Long>(ID_EMPTY, "Empty"));
+      rows.add(new LookupRow<>(ID_EMPTY, "Empty"));
       setRows(rows);
     }
 
@@ -377,7 +373,7 @@ public class SmartFieldTest {
     StyleField f = m_styleField;
     f.getUIFacade().setLookupRowFromUI(createRedLookupRow());
     assertRedLookupRow(f);
-    f.getUIFacade().setLookupRowFromUI(new LookupRow<Long>(ID_EMPTY, "Empty"));
+    f.getUIFacade().setLookupRowFromUI(new LookupRow<>(ID_EMPTY, "Empty"));
     assertLookupRow(f, ID_EMPTY);
     f.getUIFacade().setLookupRowFromUI(createYellowLookupRow());
     assertYellowLookupRow(f);
@@ -386,7 +382,7 @@ public class SmartFieldTest {
   }
 
   private static ILookupRow<Long> createRedLookupRow() {
-    return new LookupRow<Long>(ID_RED, "Red")
+    return new LookupRow<>(ID_RED, "Red")
         .withIconId(ICON_FILE)
         .withTooltipText("Red tooltip")
         .withBackgroundColor("ff8888")
@@ -395,7 +391,7 @@ public class SmartFieldTest {
   }
 
   private static ILookupRow<Long> createYellowLookupRow() {
-    return new LookupRow<Long>(ID_YELLOW, "Yellow")
+    return new LookupRow<>(ID_YELLOW, "Yellow")
         .withIconId(ICON_FILE)
         .withTooltipText("Yellow tooltip")
         .withBackgroundColor("ffff88")
@@ -473,12 +469,9 @@ public class SmartFieldTest {
   private void waitForResult() {
     final IBlockingCondition bc = Jobs.newBlockingCondition(true);
 
-    m_styleField.getLookupRowFetcher().addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (ISmartFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-          bc.setBlocking(false);
-        }
+    m_styleField.getLookupRowFetcher().addPropertyChangeListener(evt -> {
+      if (ISmartFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
+        bc.setBlocking(false);
       }
     });
     bc.waitFor();

@@ -10,13 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,7 +101,7 @@ public class ConfigurationUtilityTest {
     List<? extends Class<? extends Object>> actual = ConfigurationUtility.removeReplacedClasses(classes);
     assertNotNull(actual);
     assertNotSame(classes, actual);
-    Set<Class<?>> expectedContents = new HashSet<Class<?>>();
+    Set<Class<?>> expectedContents = new HashSet<>();
     expectedContents.add(Replacement.class);
     expectedContents.add(OtherReplacement.class);
     assertEquals(2, actual.size());
@@ -218,7 +212,7 @@ public class ConfigurationUtilityTest {
 
   @Test
   public void getReplacementMappingMultyReplacementHierarchy() {
-    List<Class<?>> classes = new ArrayList<Class<?>>();
+    List<Class<?>> classes = new ArrayList<>();
     classes.add(Original.class);
     classes.add(Replacement.class);
     classes.add(OtherReplacement.class);
@@ -232,7 +226,7 @@ public class ConfigurationUtilityTest {
 
   @Test
   public void getReplacementMappingReplacementHierarchyNotCompletelyPartOfOriginalList() {
-    List<Class<?>> classes = new ArrayList<Class<?>>();
+    List<Class<?>> classes = new ArrayList<>();
     classes.add(Original.class);
     classes.add(String.class);
     classes.add(Replacement3.class);
@@ -284,7 +278,7 @@ public class ConfigurationUtilityTest {
   }
 
   public static List<Class<?>> classList(Class<?>... classes) {
-    ArrayList<Class<?>> list = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> list = new ArrayList<>();
     if (classes != null) {
       for (Class<?> c : classes) {
         list.add(c);

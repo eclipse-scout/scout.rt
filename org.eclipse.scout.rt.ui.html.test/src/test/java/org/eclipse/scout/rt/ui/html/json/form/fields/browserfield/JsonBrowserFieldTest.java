@@ -54,7 +54,7 @@ public class JsonBrowserFieldTest extends BaseFormFieldTest {
 
   };
 
-  private JsonBrowserField<IBrowserField> m_browserField = new JsonBrowserField<IBrowserField>(m_model, m_session, m_session.createUniqueId(), null);
+  private JsonBrowserField<IBrowserField> m_browserField = new JsonBrowserField<>(m_model, m_session, m_session.createUniqueId(), null);
 
   @Before
   public void setUp() {

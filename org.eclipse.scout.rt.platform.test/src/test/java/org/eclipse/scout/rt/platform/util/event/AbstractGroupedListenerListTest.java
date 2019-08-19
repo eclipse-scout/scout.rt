@@ -38,10 +38,7 @@ public class AbstractGroupedListenerListTest {
     int n = 10000000;
     FixtureEventListener[] data = new FixtureEventListener[n];
     for (int i = 0; i < n; i++) {
-      data[i] = new FixtureEventListener() {
-        @Override
-        public void handle(FixtureEvent event) {
-        }
+      data[i] = event -> {
       };
     }
 
@@ -116,12 +113,7 @@ public class AbstractGroupedListenerListTest {
     int n = 50000;
     ArrayList<FixtureEventListener> listeners = new ArrayList<>();
     for (int i = 0; i < n; i++) {
-      listeners.add(new FixtureEventListener() {
-        @Override
-        public void handle(FixtureEvent e) {
-          fireCount++;
-        }
-      });
+      listeners.add(e -> fireCount++);
     }
     FixtureEventListeners observer = new FixtureEventListeners();
 

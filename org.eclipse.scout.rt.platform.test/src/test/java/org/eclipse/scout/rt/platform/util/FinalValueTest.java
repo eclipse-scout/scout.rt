@@ -10,13 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,11 +66,8 @@ public class FinalValueTest {
   public void testLazySetWithException() throws Exception {
     FinalValue<String> s = new FinalValue<>();
     try {
-      s.setIfAbsent(new Callable<String>() {
-        @Override
-        public String call() throws Exception {
-          throw new Exception("expected JUnit test exception");
-        }
+      s.setIfAbsent(() -> {
+        throw new Exception("expected JUnit test exception");
       });
       fail("expecting PlatformException");
     }
@@ -87,11 +79,8 @@ public class FinalValueTest {
   public void testLazySetWithCustomException() {
     FinalValue<String> s = new FinalValue<>();
     try {
-      s.setIfAbsent(new Callable<String>() {
-        @Override
-        public String call() {
-          throw new MyRuntimeException();
-        }
+      s.setIfAbsent(() -> {
+        throw new MyRuntimeException();
       });
       fail("expecting MyRuntimeException");
     }
@@ -123,34 +112,25 @@ public class FinalValueTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
-    executor.submit(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          // wait until test thread is invoking FinalValue producer's call method
-          setup.await(5, TimeUnit.SECONDS);
-          s.setIfAbsent(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-              // release test thread
-              latch.countDown();
-              return "scheduled thread";
-            }
-          });
-        }
-        catch (InterruptedException e) {
-          // nop
-        }
+    executor.submit(() -> {
+      try {
+        // wait until test thread is invoking FinalValue producer's call method
+        setup.await(5, TimeUnit.SECONDS);
+        s.setIfAbsent(() -> {
+          // release test thread
+          latch.countDown();
+          return "scheduled thread";
+        });
+      }
+      catch (InterruptedException e) {
+        // nop
       }
     });
 
-    String value = s.setIfAbsentAndGet(new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        setup.countDown();
-        latch.await(5, TimeUnit.SECONDS);
-        return "test thread";
-      }
+    String value = s.setIfAbsentAndGet(() -> {
+      setup.countDown();
+      latch.await(5, TimeUnit.SECONDS);
+      return "test thread";
     });
 
     assertTrue(s.isSet());

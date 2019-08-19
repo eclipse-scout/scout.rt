@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.IJobManager;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -49,12 +48,8 @@ public class JobManagerTest {
 
   @Test
   public void testUnregisterWhenFinished() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput());
     future.awaitFinished(10, TimeUnit.SECONDS);
 
@@ -66,12 +61,8 @@ public class JobManagerTest {
   @Test
   public void testUnregisterWhenCancelledDuringExecution() throws InterruptedException {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput());
 
     latch.await();
@@ -86,12 +77,8 @@ public class JobManagerTest {
 
   @Test
   public void testUnregisterWhenCancelledBeforeExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.HOURS)));
@@ -104,12 +91,8 @@ public class JobManagerTest {
 
   @Test
   public void testRepetitiveJobsFinishNormally1() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(100, 1, TimeUnit.MILLISECONDS))));
@@ -123,12 +106,8 @@ public class JobManagerTest {
   @Test
 
   public void testRepetitiveJobsFinishNormally2() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // NOOP
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
@@ -143,13 +122,9 @@ public class JobManagerTest {
 
   @Test
   public void testRepetitiveJobsCancelled1() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        IFuture.CURRENT.get().cancel(true);
-        // NOOP
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      IFuture.CURRENT.get().cancel(true);
+      // NOOP
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(100, 1, TimeUnit.MILLISECONDS))));
@@ -163,12 +138,8 @@ public class JobManagerTest {
   @Test
 
   public void testRepetitiveJobsCancelled2() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        IFuture.CURRENT.get().cancel(true);
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      IFuture.CURRENT.get().cancel(true);
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()

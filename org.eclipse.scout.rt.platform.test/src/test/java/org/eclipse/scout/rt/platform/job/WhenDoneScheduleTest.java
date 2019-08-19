@@ -10,20 +10,13 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -31,7 +24,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.context.RunMonitor;
 import org.eclipse.scout.rt.platform.exception.DefaultExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -50,34 +42,10 @@ public class WhenDoneScheduleTest {
   @Test
   public void testCascading() {
     IFuture<String> future = Jobs.schedule(
-        new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            return "a";
-          }
-        }, Jobs.newInput())
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable u) {
-            return result + "b";
-          }
-        }, Jobs.newInput())
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable u) {
-            return result + "c";
-          }
-        }, Jobs.newInput())
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable u) {
-            return result + "d";
-          }
-        }, Jobs.newInput());
+        () -> "a", Jobs.newInput())
+        .whenDoneSchedule((result, u) -> result + "b", Jobs.newInput())
+        .whenDoneSchedule((result, u) -> result + "c", Jobs.newInput())
+        .whenDoneSchedule((result, u) -> result + "d", Jobs.newInput());
 
     assertEquals("abcd", future.awaitDoneAndGet());
   }
@@ -90,39 +58,23 @@ public class WhenDoneScheduleTest {
     final RuntimeException exception4 = new RuntimeException("JUnit test exception 4");
 
     IFuture<String> future = Jobs.schedule(
-        new Callable<String>() {
-
-          @Override
-          public String call() throws Exception {
-            throw exception1;
-          }
+        (Callable<String>) () -> {
+          throw exception1;
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable e) {
-            assertSame(exception1, e);
-            throw exception2;
-          }
+        .whenDoneSchedule((BiFunction<String, Throwable, String>) (result, e) -> {
+          assertSame(exception1, e);
+          throw exception2;
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable e) {
-            assertSame(exception2, e);
-            throw exception3;
-          }
+        .whenDoneSchedule((BiFunction<String, Throwable, String>) (result, e) -> {
+          assertSame(exception2, e);
+          throw exception3;
         }, Jobs.newInput()
             .withExceptionHandling(null, false))
-        .whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-          @Override
-          public String apply(String result, Throwable e) {
-            assertSame(exception3, e);
-            throw exception4;
-          }
+        .whenDoneSchedule((BiFunction<String, Throwable, String>) (result, e) -> {
+          assertSame(exception3, e);
+          throw exception4;
         }, Jobs.newInput()
             .withExceptionHandling(null, false));
 
@@ -141,26 +93,18 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch functionJobRunningLatch = new BlockingCountDownLatch(1);
 
     // Schedule future
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        jobRunningLatch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      jobRunningLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiConsumer<Void, Throwable>() {
-
-      @Override
-      public void accept(Void result, Throwable u) {
-        try {
-          functionJobRunningLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          throw new ThreadInterruptedError("interrupted", e);
-        }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, u) -> {
+      try {
+        functionJobRunningLatch.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        throw new ThreadInterruptedError("interrupted", e);
       }
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
@@ -187,21 +131,11 @@ public class WhenDoneScheduleTest {
   @Test
   public void testNotSameFuture() {
     // Schedule future
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
     }, Jobs.newInput());
 
     // Schedule function
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<Void, Throwable, Void>() {
-
-      @Override
-      public Void apply(Void t, Throwable u) {
-        return null;
-      }
-    }, Jobs.newInput());
+    IFuture<Void> functionFuture = future.whenDoneSchedule((t, u) -> null, Jobs.newInput());
 
     assertNotSame(future, functionFuture);
   }
@@ -209,21 +143,11 @@ public class WhenDoneScheduleTest {
   @Test
   public void testResult() {
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "abc";
-      }
-    }, Jobs.newInput());
+    IFuture<String> future = Jobs.schedule(() -> "abc", Jobs.newInput());
 
     // Schedule function
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
-
-      @Override
-      public Integer apply(String result, Throwable error) {
-        return result.length();
-      }
+    IFuture<Integer> functionFuture = future.whenDoneSchedule((result, error) -> {
+      return result.length();
     }, Jobs.newInput());
 
     assertEquals("abc", future.awaitDoneAndGet());
@@ -235,26 +159,18 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "abc";
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "abc";
     }, Jobs.newInput()
         .withExceptionHandling(null, true) // to not work with JUnitExceptionHandler
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
@@ -279,26 +195,18 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "abc";
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "abc";
     }, Jobs.newInput()
         .withExceptionHandling(null, true) // to not work with JUnitExceptionHandler
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
@@ -330,13 +238,9 @@ public class WhenDoneScheduleTest {
     RunMonitor runMonitor = BEANS.get(RunMonitor.class);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "abc";
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "abc";
     }, Jobs.newInput()
         .withExceptionHandling(null, true) // to not work with JUnitExceptionHandler
         .withRunContext(RunContexts.empty().withRunMonitor(runMonitor))
@@ -344,13 +248,9 @@ public class WhenDoneScheduleTest {
 
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
@@ -375,13 +275,9 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "abc";
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "abc";
     }, Jobs.newInput()
         .withExceptionHandling(null, true) // to not work with JUnitExceptionHandler
         .withExecutionHint(JOB_MARKER));
@@ -390,13 +286,9 @@ public class WhenDoneScheduleTest {
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
 
     RunMonitor functionRunMonitor = BEANS.get(RunMonitor.class);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty().withRunMonitor(functionRunMonitor))
         .withExecutionHint(JOB_MARKER));
@@ -429,13 +321,9 @@ public class WhenDoneScheduleTest {
     RunMonitor sharedRunMonitor = BEANS.get(RunMonitor.class);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        setupLatch.countDownAndBlock();
-        return "abc";
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
+      return "abc";
     }, Jobs.newInput()
         .withExceptionHandling(null, true) // to not work with JUnitExceptionHandler
         .withRunContext(RunContexts.empty().withRunMonitor(sharedRunMonitor))
@@ -444,13 +332,9 @@ public class WhenDoneScheduleTest {
     // Schedule function
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
 
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty().withRunMonitor(sharedRunMonitor))
         .withExecutionHint(JOB_MARKER));
@@ -476,28 +360,18 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "abc";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future = Jobs.schedule(() -> "abc", Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
     // Schedule function
-    IFuture<String> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, String>() {
-
-      @Override
-      public String apply(String result, Throwable error) {
-        try {
-          setupLatch.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          throw new ThreadInterruptedError("", e);
-        }
-        return result.toUpperCase();
+    IFuture<String> functionFuture = future.whenDoneSchedule((result, error) -> {
+      try {
+        setupLatch.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        throw new ThreadInterruptedError("", e);
+      }
+      return result.toUpperCase();
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
@@ -519,34 +393,20 @@ public class WhenDoneScheduleTest {
     IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1).seal();
 
     // Schedule arbitrary job with same semaphore
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        setupLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      setupLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withExecutionSemaphore(mutex));
 
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "abc";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future = Jobs.schedule(() -> "abc", Jobs.newInput()
         .withExceptionHandling(null, true)); // to not work with JUnitExceptionHandler
 
     // Schedule function with same semaphore
     final AtomicBoolean functionExecuted = new AtomicBoolean(false);
-    IFuture<Void> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Void>() {
-
-      @Override
-      public Void apply(String result, Throwable error) {
-        functionExecuted.set(true);
-        return null;
-      }
+    IFuture<Void> functionFuture = future.whenDoneSchedule((result, error) -> {
+      functionExecuted.set(true);
+      return null;
     }, Jobs.newInput()
         .withExecutionSemaphore(mutex));
 
@@ -581,23 +441,15 @@ public class WhenDoneScheduleTest {
     final AtomicReference<Throwable> actualException = new AtomicReference<>();
     final AtomicReference<Object> actualResult = new AtomicReference<>();
 
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        throw testException;
-      }
+    IFuture<String> future = Jobs.schedule(() -> {
+      throw testException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false)); // to not work with JUnitExceptionHandler
 
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
-
-      @Override
-      public Integer apply(String result, Throwable error) {
-        actualResult.set(result);
-        actualException.set(error);
-        return 123;
-      }
+    IFuture<Integer> functionFuture = future.whenDoneSchedule((result, error) -> {
+      actualResult.set(result);
+      actualException.set(error);
+      return 123;
     }, Jobs.newInput());
 
     // Wait until function future completed
@@ -625,22 +477,12 @@ public class WhenDoneScheduleTest {
     final AtomicReference<Throwable> actualException = new AtomicReference<>();
     final AtomicReference<Object> actualResult = new AtomicReference<>();
 
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
+    IFuture<String> future = Jobs.schedule(() -> "abc", Jobs.newInput());
 
-      @Override
-      public String call() throws Exception {
-        return "abc";
-      }
-    }, Jobs.newInput());
-
-    IFuture<Integer> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, Integer>() {
-
-      @Override
-      public Integer apply(String result, Throwable error) {
-        actualResult.set(result);
-        actualException.set(error);
-        throw testException;
-      }
+    IFuture<Integer> functionFuture = future.whenDoneSchedule((BiFunction<String, Throwable, Integer>) (result, error) -> {
+      actualResult.set(result);
+      actualException.set(error);
+      throw testException;
     }, Jobs.newInput()
         .withExceptionHandling(null, false)); // to not work with JUnitExceptionHandler
 
@@ -666,13 +508,7 @@ public class WhenDoneScheduleTest {
   @Test
   public void testExecutionHints() throws InterruptedException {
     // Schedule future
-    IFuture<String> future = Jobs.schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "abc";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future = Jobs.schedule(() -> "abc", Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 
     final BlockingCountDownLatch hint1AddedLatch = new BlockingCountDownLatch(1);
@@ -681,32 +517,28 @@ public class WhenDoneScheduleTest {
     final BlockingCountDownLatch hint2RemovedLatch = new BlockingCountDownLatch(1);
 
     // Schedule function
-    IFuture<String> functionFuture = future.whenDoneSchedule(new BiFunction<String, Throwable, String>() {
+    IFuture<String> functionFuture = future.whenDoneSchedule((result, error) -> {
+      assertTrue(IFuture.CURRENT.get().containsExecutionHint(JOB_MARKER));
+      try {
+        // Make hint changes to the future
+        IFuture.CURRENT.get().addExecutionHint("HINT1");
+        hint1AddedLatch.countDownAndBlock();
+        IFuture.CURRENT.get().removeExecutionHint("HINT1");
+        hint1RemovedLatch.countDownAndBlock();
 
-      @Override
-      public String apply(String result, Throwable error) {
-        assertTrue(IFuture.CURRENT.get().containsExecutionHint(JOB_MARKER));
-        try {
-          // Make hint changes to the future
-          IFuture.CURRENT.get().addExecutionHint("HINT1");
-          hint1AddedLatch.countDownAndBlock();
-          IFuture.CURRENT.get().removeExecutionHint("HINT1");
-          hint1RemovedLatch.countDownAndBlock();
+        // Verify that external hint changes are reflected
+        assertTrue(hint2AddedLach.await());
+        assertTrue(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
+        hint2AddedLach.unblock();
 
-          // Verify that external hint changes are reflected
-          assertTrue(hint2AddedLach.await());
-          assertTrue(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
-          hint2AddedLach.unblock();
-
-          assertTrue(hint2RemovedLatch.await());
-          assertFalse(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
-          hint2RemovedLatch.unblock();
-        }
-        catch (InterruptedException e) {
-          throw new ThreadInterruptedError("", e);
-        }
-        return result.toUpperCase();
+        assertTrue(hint2RemovedLatch.await());
+        assertFalse(IFuture.CURRENT.get().containsExecutionHint("HINT2"));
+        hint2RemovedLatch.unblock();
       }
+      catch (InterruptedException e) {
+        throw new ThreadInterruptedError("", e);
+      }
+      return result.toUpperCase();
     }, Jobs.newInput()
         .withExecutionHint(JOB_MARKER));
 

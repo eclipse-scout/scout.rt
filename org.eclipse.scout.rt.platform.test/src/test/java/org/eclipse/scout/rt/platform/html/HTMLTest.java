@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.html;
 
-import static org.eclipse.scout.rt.platform.html.HTML.bold;
-import static org.eclipse.scout.rt.platform.html.HTML.div;
-import static org.eclipse.scout.rt.platform.html.HTML.italic;
-import static org.eclipse.scout.rt.platform.html.HTML.link;
-import static org.eclipse.scout.rt.platform.html.HTML.td;
-import static org.eclipse.scout.rt.platform.html.HTML.tr;
+import static org.eclipse.scout.rt.platform.html.HTML.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
@@ -326,7 +321,7 @@ public class HTMLTest {
   }
 
   private String createTableString(String prefix) {
-    List<String> rows = new ArrayList<String>();
+    List<String> rows = new ArrayList<>();
     for (int i = 0; i < 1; i++) {
       rows.add(createRowString(prefix, i));
     }
@@ -339,7 +334,7 @@ public class HTMLTest {
   }
 
   private IHtmlTable createTable(String prefix) {
-    List<IHtmlTableRow> rows = new ArrayList<IHtmlTableRow>();
+    List<IHtmlTableRow> rows = new ArrayList<>();
     for (int i = 0; i < 1; i++) {
       rows.add(createRow(prefix, i));
     }

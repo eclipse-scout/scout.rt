@@ -48,12 +48,8 @@ public class JobAsyncExceptionTest {
     registerTestBeans(new P_InterceptorThrowingExceptionProducer());
     P_JobManager jobManager = new P_JobManager();
 
-    IFuture<Void> future = jobManager.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        // NOP
-      }
+    IFuture<Void> future = jobManager.schedule(() -> {
+      // NOP
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -68,11 +64,8 @@ public class JobAsyncExceptionTest {
   public void testExceptionInCallable() throws Exception {
     P_JobManager jobManager = new P_JobManager();
 
-    IFuture<Void> future = jobManager.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        throw new PlatformException("Expected test exception");
-      }
+    IFuture<Void> future = jobManager.schedule((IRunnable) () -> {
+      throw new PlatformException("Expected test exception");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 

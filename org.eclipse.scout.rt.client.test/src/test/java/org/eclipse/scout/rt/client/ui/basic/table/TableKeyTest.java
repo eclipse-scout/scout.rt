@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -169,9 +165,9 @@ public class TableKeyTest {
     table.replaceRows(rows);
     rows = table.getRows();
 
-    TreeSet<CompositeObject> oldKeys = new TreeSet<CompositeObject>(getRowByKeyMap(table).keySet());
+    TreeSet<CompositeObject> oldKeys = new TreeSet<>(getRowByKeyMap(table).keySet());
     rows.get(0).getCellForUpdate(table.getFirstColumn()).setValue("Some new text");
-    assertSameContent(oldKeys, new TreeSet<CompositeObject>(getRowByKeyMap(table).keySet()));
+    assertSameContent(oldKeys, new TreeSet<>(getRowByKeyMap(table).keySet()));
   }
 
   @Test
@@ -187,10 +183,10 @@ public class TableKeyTest {
     table.replaceRows(rows);
     rows = table.getRows();
 
-    TreeSet<CompositeObject> oldKeys = new TreeSet<CompositeObject>(getRowByKeyMap(table).keySet());
+    TreeSet<CompositeObject> oldKeys = new TreeSet<>(getRowByKeyMap(table).keySet());
     rows.get(2).getCellForUpdate(table.getPrimaryKey1Column()).setValue(33);
 
-    assertNotSameContent(oldKeys, new TreeSet<CompositeObject>(getRowByKeyMap(table).keySet()));
+    assertNotSameContent(oldKeys, new TreeSet<>(getRowByKeyMap(table).keySet()));
   }
 
   private void assertSameContent(Collection<?> a, Collection<?> b) {

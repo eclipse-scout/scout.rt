@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.testing.platform.runner.statement;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -59,28 +58,22 @@ public class ScheduledDescendantJobListenerPlatformTest {
   @BeforeClass
   public static void beforeClass() {
     // This outer job helps creating new jobs.
-    Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        while (true) {
-          ALIEN_JOB_CREATOR_BARRIER.await();
+    Jobs.schedule(() -> {
+      while (true) {
+        ALIEN_JOB_CREATOR_BARRIER.await();
 
-          if (!ALIEN_JOB_CREATOR_RUNNING.get()) {
-            break;
-          }
-
-          // create and schedule new alien job
-          Jobs.schedule(new IRunnable() {
-            @Override
-            public void run() throws Exception {
-              // just schedule an empty job without doing anything
-            }
-          }, Jobs.newInput());
-
-          ALIEN_JOB_STARTED.set(true);
-
-          ALIEN_JOB_CREATOR_BARRIER.reset();
+        if (!ALIEN_JOB_CREATOR_RUNNING.get()) {
+          break;
         }
+
+        // create and schedule new alien job
+        Jobs.schedule(() -> {
+          // just schedule an empty job without doing anything
+        }, Jobs.newInput());
+
+        ALIEN_JOB_STARTED.set(true);
+
+        ALIEN_JOB_CREATOR_BARRIER.reset();
       }
     }, Jobs.newInput());
   }
@@ -149,12 +142,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @Test
   public void testNoNestedButAlienJobStartedInNestedJob() {
-    runInNestedJob(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doTestNoNestedButAlienJob();
-      }
-    });
+    runInNestedJob(() -> doTestNoNestedButAlienJob());
   }
 
   private void doTestNoNestedButAlienJob() throws Exception {
@@ -175,12 +163,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @Test
   public void testOneNestedJobInNestedJob() {
-    runInNestedJob(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doTestOneNestedJob();
-      }
-    });
+    runInNestedJob(() -> doTestOneNestedJob());
   }
 
   private void doTestOneNestedJob() throws InterruptedException {
@@ -205,12 +188,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @Test
   public void testTwoNestedJobInNestedJobs() {
-    runInNestedJob(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doTestTwoNestedJobs();
-      }
-    });
+    runInNestedJob(() -> doTestTwoNestedJobs());
   }
 
   private void doTestTwoNestedJobs() throws InterruptedException {
@@ -236,12 +214,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @Test
   public void testOneNestedJobWithAnotherNestedJobInNestedJob() {
-    runInNestedJob(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doTestOneNestedJobWithAnotherNestedJob();
-      }
-    });
+    runInNestedJob(() -> doTestOneNestedJobWithAnotherNestedJob());
   }
 
   private void doTestOneNestedJobWithAnotherNestedJob() throws InterruptedException {
@@ -267,12 +240,7 @@ public class ScheduledDescendantJobListenerPlatformTest {
 
   @Test
   public void testOneNestedJobWithThreeLevelsInNestedJob() {
-    runInNestedJob(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        doTestOneNestedJobWithThreeLevels();
-      }
-    });
+    runInNestedJob(() -> doTestOneNestedJobWithThreeLevels());
   }
 
   private void doTestOneNestedJobWithThreeLevels() throws InterruptedException {
@@ -293,13 +261,10 @@ public class ScheduledDescendantJobListenerPlatformTest {
    * *************************************************************************************/
 
   private void runInNestedJob(final IRunnable runnable) {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        // install new scheduled job listener
-        installScheduledJobListener();
-        runnable.run();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      // install new scheduled job listener
+      installScheduledJobListener();
+      runnable.run();
     }, Jobs.newInput());
     future.awaitDone(5, TimeUnit.SECONDS);
   }
@@ -319,13 +284,10 @@ public class ScheduledDescendantJobListenerPlatformTest {
   private void scheduleJobs(final CountDownLatch creatingJobsLatch, JobSpec... jobSpecs) {
     for (final JobSpec jobSpec : jobSpecs) {
       final CountDownLatch latch = new CountDownLatch(1);
-      IFuture<Void> future = Jobs.schedule(new IRunnable() {
-        @Override
-        public void run() throws Exception {
-          JobSpec[] subJobs = jobSpec.getSubJobs();
-          scheduleJobs(creatingJobsLatch, subJobs);
-          latch.await();
-        }
+      IFuture<Void> future = Jobs.schedule(() -> {
+        JobSpec[] subJobs = jobSpec.getSubJobs();
+        scheduleJobs(creatingJobsLatch, subJobs);
+        latch.await();
       }, Jobs.newInput().withName(jobSpec.getName()));
       m_nestedJobsByName.put(jobSpec.getName(), new NestedJob(future, latch));
       creatingJobsLatch.countDown();

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.*;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.ext.RuntimeDelegate;
 
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.rest.error.ErrorDo;
 import org.eclipse.scout.rt.rest.error.ErrorResponse;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -34,7 +34,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 @RunWith(PlatformTestRunner.class)
@@ -48,44 +47,20 @@ public class DefaultExceptionMapperTest {
     final ResponseBuilder responseBuilder = mock(ResponseBuilder.class);
     when(runtimeDelegate.createResponseBuilder()).thenReturn(responseBuilder);
 
-    when((responseBuilder).status(Mockito.any(Response.Status.class))).then(new Answer<ResponseBuilder>() {
-      @Override
-      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
-        return addStatus(responseBuilder, ((Response.Status) invocation.getArgument(0)).getStatusCode());
-      }
-    });
+    when((responseBuilder).status(Mockito.any(Response.Status.class))).then((Answer<ResponseBuilder>) invocation -> addStatus(responseBuilder, ((Status) invocation.getArgument(0)).getStatusCode()));
 
-    when((responseBuilder.status(Mockito.any(StatusType.class)))).then(new Answer<ResponseBuilder>() {
-      @Override
-      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
-        return addStatus(responseBuilder, ((Response.StatusType) invocation.getArgument(0)).getStatusCode());
-      }
-    });
+    when((responseBuilder.status(Mockito.any(StatusType.class)))).then((Answer<ResponseBuilder>) invocation -> addStatus(responseBuilder, ((StatusType) invocation.getArgument(0)).getStatusCode()));
 
-    when((responseBuilder.status(Mockito.anyInt()))).then(new Answer<ResponseBuilder>() {
-      @Override
-      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
-        return addStatus(responseBuilder, ((int) invocation.getArgument(0)));
-      }
-    });
+    when((responseBuilder.status(Mockito.anyInt()))).then(invocation -> addStatus(responseBuilder, ((int) invocation.getArgument(0))));
 
-    when((responseBuilder.entity(Mockito.any(ErrorResponse.class)))).then(new Answer<ResponseBuilder>() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
-        try (Response response = responseBuilder.build()) {
-          when(response.readEntity(Mockito.any(Class.class))).thenReturn(invocation.getArgument(0));
-          return responseBuilder;
-        }
-      }
-    });
-
-    when((responseBuilder.type(Mockito.anyString()))).then(new Answer<ResponseBuilder>() {
-      @Override
-      public ResponseBuilder answer(InvocationOnMock invocation) throws Throwable {
+    when((responseBuilder.entity(Mockito.any(ErrorResponse.class)))).then((Answer<ResponseBuilder>) invocation -> {
+      try (Response response = responseBuilder.build()) {
+        when(response.readEntity(Mockito.any(Class.class))).thenReturn(invocation.getArgument(0));
         return responseBuilder;
       }
     });
+
+    when((responseBuilder.type(Mockito.anyString()))).then((Answer<ResponseBuilder>) invocation -> responseBuilder);
   }
 
   @SuppressWarnings("resource")
@@ -180,20 +155,17 @@ public class DefaultExceptionMapperTest {
 
   @Test
   public void testNotifyTransaction() {
-    RunContexts.empty().run(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        assertEquals(0, ITransaction.CURRENT.get().getFailures().length);
+    RunContexts.empty().run(() -> {
+      assertEquals(0, ITransaction.CURRENT.get().getFailures().length);
 
-        DefaultExceptionMapper mapper = new DefaultExceptionMapper();
-        Exception exception = new Exception();
-        try (Response response = mapper.toResponse(exception)) {
+      DefaultExceptionMapper mapper = new DefaultExceptionMapper();
+      Exception exception = new Exception();
+      try (Response response = mapper.toResponse(exception)) {
 
-          // expect that transaction was notified about failure due to the exception
-          assertEquals(1, ITransaction.CURRENT.get().getFailures().length);
-          assertEquals(exception, ITransaction.CURRENT.get().getFailures()[0]);
-          assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
-        }
+        // expect that transaction was notified about failure due to the exception
+        assertEquals(1, ITransaction.CURRENT.get().getFailures().length);
+        assertEquals(exception, ITransaction.CURRENT.get().getFailures()[0]);
+        assertEquals(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), response.getStatus());
       }
     });
   }

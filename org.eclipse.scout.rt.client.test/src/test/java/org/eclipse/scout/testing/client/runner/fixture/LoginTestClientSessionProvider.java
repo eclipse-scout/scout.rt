@@ -24,8 +24,8 @@ import org.eclipse.scout.testing.client.ClientSessionProviderWithCache;
 public class LoginTestClientSessionProvider extends ClientSessionProviderWithCache {
 
   private static IClientSession s_currentSession;
-  private static final List<String> s_beforeStartRunAs = new ArrayList<String>();
-  private static final List<String> s_afterStartRunAs = new ArrayList<String>();
+  private static final List<String> s_beforeStartRunAs = new ArrayList<>();
+  private static final List<String> s_afterStartRunAs = new ArrayList<>();
 
   public LoginTestClientSessionProvider() {
     clearProtocol();

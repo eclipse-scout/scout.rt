@@ -11,12 +11,7 @@
 package org.eclipse.scout.rt.platform.util;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertListEquals;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -295,7 +290,7 @@ public class IOUtilityTest {
       pw.close();
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
-      List<String> expectedLines = new ArrayList<String>();
+      List<String> expectedLines = new ArrayList<>();
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
       assertListEquals(expectedLines, readLines);
@@ -320,7 +315,7 @@ public class IOUtilityTest {
       pw.close();
 
       List<String> readLines = IOUtility.readLines(tempFile, StandardCharsets.UTF_8.name());
-      List<String> expectedLines = new ArrayList<String>();
+      List<String> expectedLines = new ArrayList<>();
       expectedLines.addAll(Arrays.asList(LINES));
       assertListEquals(expectedLines, readLines);
     }
@@ -364,7 +359,7 @@ public class IOUtilityTest {
       IOUtility.appendFile(pw, tempFile);
       IOUtility.appendFile(pw, tempFile);
       pw.flush();
-      List<String> expectedLines = new ArrayList<String>();
+      List<String> expectedLines = new ArrayList<>();
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
       expectedLines.addAll(Arrays.asList(LINES));
@@ -398,7 +393,7 @@ public class IOUtilityTest {
     final byte[] UTF32BE_BOM = new byte[]{(byte) 0x00, (byte) 0x00, (byte) 0xfe, (byte) 0xff};
     final byte[] UTF32LE_BOM = new byte[]{(byte) 0xff, (byte) 0xfe, (byte) 0x00, (byte) 0x00};
 
-    List<byte[]> bomsToTest = new LinkedList<byte[]>();
+    List<byte[]> bomsToTest = new LinkedList<>();
     bomsToTest.add(UTF8_BOM);
     bomsToTest.add(UTF16BE_BOM);
     bomsToTest.add(UTF16LE_BOM);

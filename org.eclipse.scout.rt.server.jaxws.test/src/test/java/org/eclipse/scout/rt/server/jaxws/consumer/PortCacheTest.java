@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -32,12 +31,7 @@ public class PortCacheTest {
 
   @Before
   public void before() {
-    m_portProvider = new IPortProvider<Object>() {
-      @Override
-      public Object provide() {
-        return new Object();
-      }
-    };
+    m_portProvider = () -> new Object();
   }
 
   @Test

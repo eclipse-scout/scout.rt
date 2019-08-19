@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -31,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
@@ -49,14 +47,9 @@ public class PiggyBackClientNotificationTest {
   @Before
   public void before() {
     BEANS.get(IClientNotificationService.class).registerSession("test", "test", "test");
-    when(m_pingSvc.ping(any(String.class))).thenAnswer(new Answer<String>() {
-
-      @Override
-      public String answer(InvocationOnMock invocation) throws Throwable {
-        BEANS.get(ClientNotificationRegistry.class).putTransactionalForAllSessions("testNotification");
-        return "pong";
-      }
-
+    when(m_pingSvc.ping(any(String.class))).thenAnswer((Answer<String>) invocation -> {
+      BEANS.get(ClientNotificationRegistry.class).putTransactionalForAllSessions("testNotification");
+      return "pong";
     });
   }
 

@@ -34,17 +34,17 @@ public class CodeTypeWithAddRemoveCodeTest {
     TestCodeType ct = new TestCodeType();
     assertEquals("{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]}", dumpCodeType(ct));
 
-    ct.addRootCodeInternal(-1, new MutableCode<Long>(new CodeRow<Long>(20L, "Root20")));
+    ct.addRootCodeInternal(-1, new MutableCode<>(new CodeRow<>(20L, "Root20")));
     assertEquals("{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]},{id:20,text:Root20}", dumpCodeType(ct));
 
-    ct.addRootCodeInternal(0, new MutableCode<Long>(new CodeRow<Long>(5L, "Root5")));
+    ct.addRootCodeInternal(0, new MutableCode<>(new CodeRow<>(5L, "Root5")));
     assertEquals("{id:5,text:Root5},{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]},{id:20,text:Root20}", dumpCodeType(ct));
 
-    ct.addRootCodeInternal(100, new MutableCode<Long>(new CodeRow<Long>(30L, "Root30")));
+    ct.addRootCodeInternal(100, new MutableCode<>(new CodeRow<>(30L, "Root30")));
     assertEquals("{id:5,text:Root5},{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12}]},{id:20,text:Root20},{id:30,text:Root30}", dumpCodeType(ct));
 
     //replace
-    ct.addRootCodeInternal(-1, new MutableCode<Long>(new CodeRow<Long>(10L, "Root10b")));
+    ct.addRootCodeInternal(-1, new MutableCode<>(new CodeRow<>(10L, "Root10b")));
     assertEquals("{id:5,text:Root5},{id:10,text:Root10b},{id:20,text:Root20},{id:30,text:Root30}", dumpCodeType(ct));
 
     //not part of it
@@ -71,17 +71,17 @@ public class CodeTypeWithAddRemoveCodeTest {
 
     ICode<Long> root = ct.getCode(10L);
 
-    root.addChildCodeInternal(-1, new MutableCode<Long>(new CodeRow<Long>(20L, "Child20")));
+    root.addChildCodeInternal(-1, new MutableCode<>(new CodeRow<>(20L, "Child20")));
     assertEquals("{id:10,text:Root10,children:[{id:11,text:Test11},{id:12,text:Test12},{id:20,text:Child20}]}", dumpCodeType(ct));
 
-    root.addChildCodeInternal(0, new MutableCode<Long>(new CodeRow<Long>(5L, "Child5")));
+    root.addChildCodeInternal(0, new MutableCode<>(new CodeRow<>(5L, "Child5")));
     assertEquals("{id:10,text:Root10,children:[{id:5,text:Child5},{id:11,text:Test11},{id:12,text:Test12},{id:20,text:Child20}]}", dumpCodeType(ct));
 
-    root.addChildCodeInternal(100, new MutableCode<Long>(new CodeRow<Long>(30L, "Child30")));
+    root.addChildCodeInternal(100, new MutableCode<>(new CodeRow<>(30L, "Child30")));
     assertEquals("{id:10,text:Root10,children:[{id:5,text:Child5},{id:11,text:Test11},{id:12,text:Test12},{id:20,text:Child20},{id:30,text:Child30}]}", dumpCodeType(ct));
 
     //replace
-    root.addChildCodeInternal(-1, new MutableCode<Long>(new CodeRow<Long>(11L, "Test11b")));
+    root.addChildCodeInternal(-1, new MutableCode<>(new CodeRow<>(11L, "Test11b")));
     assertEquals("{id:10,text:Root10,children:[{id:5,text:Child5},{id:11,text:Test11b},{id:12,text:Test12},{id:20,text:Child20},{id:30,text:Child30}]}", dumpCodeType(ct));
 
     //not part of it

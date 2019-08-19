@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.stringfield;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,13 +40,10 @@ public class AbstractStringFieldTest extends AbstractStringField {
   public void setup() {
     m_displayTextChangedCounter = new AtomicInteger();
     m_displayTextChangedHistory = new ArrayList<>();
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IValueField.PROP_DISPLAY_TEXT.equals(evt.getPropertyName())) {
-          m_displayTextChangedCounter.incrementAndGet();
-          m_displayTextChangedHistory.add((String) evt.getNewValue());
-        }
+    addPropertyChangeListener(evt -> {
+      if (IValueField.PROP_DISPLAY_TEXT.equals(evt.getPropertyName())) {
+        m_displayTextChangedCounter.incrementAndGet();
+        m_displayTextChangedHistory.add((String) evt.getNewValue());
       }
     });
   }

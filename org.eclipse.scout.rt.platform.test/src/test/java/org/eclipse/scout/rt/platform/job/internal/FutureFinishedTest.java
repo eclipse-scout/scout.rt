@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 import java.util.UUID;
@@ -36,12 +34,8 @@ public class FutureFinishedTest {
   public void testCancelRunningJob() throws InterruptedException {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput());
 
     // Job still running
@@ -67,12 +61,8 @@ public class FutureFinishedTest {
   public void testNormalCompletion() throws InterruptedException {
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      latch.countDownAndBlock();
     }, Jobs.newInput());
 
     // Job still running
@@ -93,13 +83,7 @@ public class FutureFinishedTest {
   public void testCancelledBeforeRunning() throws InterruptedException {
     final AtomicBoolean run = new AtomicBoolean(false);
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        run.set(true);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> run.set(true), Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(2, TimeUnit.SECONDS)));
     future.cancel(false);
@@ -114,20 +98,16 @@ public class FutureFinishedTest {
     final String jobIdentifier = UUID.randomUUID().toString();
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
-    IFuture<Void> controller = Jobs.schedule(new IRunnable() {
+    IFuture<Void> controller = Jobs.schedule(() -> {
+      setupLatch.countDown();
 
-      @Override
-      public void run() throws Exception {
-        setupLatch.countDown();
-
-        try {
-          Jobs.getJobManager().awaitFinished(Jobs.newFutureFilterBuilder()
-              .andMatchExecutionHint(jobIdentifier)
-              .toFilter(), 10, TimeUnit.SECONDS);
-        }
-        catch (TimedOutError e) {
-          fail("no timeout expected");
-        }
+      try {
+        Jobs.getJobManager().awaitFinished(Jobs.newFutureFilterBuilder()
+            .andMatchExecutionHint(jobIdentifier)
+            .toFilter(), 10, TimeUnit.SECONDS);
+      }
+      catch (TimedOutError e) {
+        fail("no timeout expected");
       }
     }, Jobs.newInput());
 

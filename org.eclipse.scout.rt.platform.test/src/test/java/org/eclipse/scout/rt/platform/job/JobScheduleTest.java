@@ -10,13 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,13 +42,7 @@ public class JobScheduleTest {
 
   @Test
   public void testWithCallable() {
-    IFuture<String> future = Jobs.getJobManager().schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "running";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future = Jobs.getJobManager().schedule(() -> "running", Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
     // VERIFY
@@ -65,13 +52,9 @@ public class JobScheduleTest {
 
   @Test
   public void testWithRunnable() {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("running");
-      }
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> {
+      protocol.add("running");
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()));
 
@@ -85,12 +68,8 @@ public class JobScheduleTest {
   public void testProcessingExceptionWithRunnable() {
     final ProcessingException exception = new ProcessingException("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -109,12 +88,8 @@ public class JobScheduleTest {
   public void testProcessingExceptionWithCallable() {
     final ProcessingException exception = new ProcessingException("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -133,12 +108,8 @@ public class JobScheduleTest {
   public void testRuntimeExceptionWithRunnable() {
     final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -157,12 +128,8 @@ public class JobScheduleTest {
   public void testRuntimeExceptionWithCallable() {
     final RuntimeException exception = new RuntimeException("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -181,12 +148,8 @@ public class JobScheduleTest {
   public void testExceptionExceptionWithRunnable() {
     final Exception exception = new Exception("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -205,12 +168,8 @@ public class JobScheduleTest {
   public void testExceptionExceptionWithCallable() {
     final Exception exception = new Exception("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw exception;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw exception;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -229,12 +188,8 @@ public class JobScheduleTest {
   public void testErrorWithRunnable() {
     final Error error = new Error("expected JUnit test exception");
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        throw error;
-      }
+    IFuture<Void> future = Jobs.getJobManager().schedule((IRunnable) () -> {
+      throw error;
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -251,24 +206,16 @@ public class JobScheduleTest {
 
   @Test
   public void testWorkerThread() {
-    final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
+    final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
-    Jobs.getJobManager().schedule(new IRunnable() {
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(Thread.currentThread());
 
-      @Override
-      public void run() throws Exception {
+      Jobs.getJobManager().schedule(() -> {
         protocol.add(Thread.currentThread());
-
-        Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            protocol.add(Thread.currentThread());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent()))
-            .awaitDoneAndGet();
-      }
+      }, Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent()))
+          .awaitDoneAndGet();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent()))
         .awaitDoneAndGet();
@@ -287,23 +234,13 @@ public class JobScheduleTest {
 
     IFuture.CURRENT.remove();
 
-    expectedFuture1.setValue(Jobs.getJobManager().schedule(new IRunnable() {
+    expectedFuture1.setValue(Jobs.getJobManager().schedule(() -> {
+      actualFuture1.setValue(IFuture.CURRENT.get());
 
-      @Override
-      public void run() throws Exception {
-        actualFuture1.setValue(IFuture.CURRENT.get());
+      expectedFuture2.setValue(Jobs.getJobManager().schedule(() -> actualFuture2.setValue(IFuture.CURRENT.get()), Jobs.newInput()
+          .withRunContext(RunContexts.copyCurrent())));
 
-        expectedFuture2.setValue(Jobs.getJobManager().schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            actualFuture2.setValue(IFuture.CURRENT.get());
-          }
-        }, Jobs.newInput()
-            .withRunContext(RunContexts.copyCurrent())));
-
-        expectedFuture2.getValue().awaitDoneAndGet(); // wait for the job to complete
-      }
+      expectedFuture2.getValue().awaitDoneAndGet(); // wait for the job to complete
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())));
 
@@ -320,14 +257,10 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleAndGet() {
-    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
-    Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add(1);
-      }
+    Jobs.getJobManager().schedule(() -> {
+      protocol.add(1);
     }, Jobs.newInput()).awaitDoneAndGet();
     protocol.add(2);
 
@@ -338,32 +271,20 @@ public class JobScheduleTest {
   public void testParallelExecution() throws Exception {
     final BlockingCountDownLatch barrier = new BlockingCountDownLatch(3);
 
-    IFuture<Void> future1 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        barrier.countDownAndBlock();
-      }
+    IFuture<Void> future1 = Jobs.getJobManager().schedule(() -> {
+      barrier.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    IFuture<Void> future2 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        barrier.countDownAndBlock();
-      }
+    IFuture<Void> future2 = Jobs.getJobManager().schedule(() -> {
+      barrier.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
 
-    IFuture<Void> future3 = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        barrier.countDownAndBlock();
-      }
+    IFuture<Void> future3 = Jobs.getJobManager().schedule(() -> {
+      barrier.countDownAndBlock();
     }, Jobs.newInput()
         .withRunContext(RunContexts.copyCurrent())
         .withExceptionHandling(null, false));
@@ -381,13 +302,7 @@ public class JobScheduleTest {
   public void testExpired() {
     final AtomicBoolean executed = new AtomicBoolean(false);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        executed.set(true);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> executed.set(true), Jobs.newInput()
         .withExpirationTime(500, TimeUnit.MILLISECONDS)
         .withRunContext(RunContexts.empty())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -402,13 +317,7 @@ public class JobScheduleTest {
   public void testExpireNever() {
     final AtomicBoolean executed = new AtomicBoolean(false);
 
-    IFuture<Void> future = Jobs.getJobManager().schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        executed.set(true);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.getJobManager().schedule(() -> executed.set(true), Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withExpirationTime(JobInput.EXPIRE_NEVER, TimeUnit.MILLISECONDS)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -424,13 +333,9 @@ public class JobScheduleTest {
     final AtomicLong tRunning = new AtomicLong();
 
     long tScheduled = System.currentTimeMillis();
-    String result = Jobs.getJobManager().schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        tRunning.set(System.currentTimeMillis());
-        return "executed";
-      }
+    String result = Jobs.getJobManager().schedule(() -> {
+      tRunning.set(System.currentTimeMillis());
+      return "executed";
     }, Jobs.newInput()
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(2, TimeUnit.SECONDS)))
@@ -445,21 +350,9 @@ public class JobScheduleTest {
   public void testScheduleDelayedWithMutex() {
     final IExecutionSemaphore mutex = Jobs.newExecutionSemaphore(1);
 
-    IFuture<String> future1 = Jobs.getJobManager().schedule(new Callable<String>() {
+    IFuture<String> future1 = Jobs.getJobManager().schedule(() -> "job-1", Jobs.newInput().withExecutionSemaphore(mutex));
 
-      @Override
-      public String call() throws Exception {
-        return "job-1";
-      }
-    }, Jobs.newInput().withExecutionSemaphore(mutex));
-
-    IFuture<String> future2 = Jobs.getJobManager().schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "job-2";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future2 = Jobs.getJobManager().schedule(() -> "job-2", Jobs.newInput()
         .withExecutionSemaphore(mutex)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(500, TimeUnit.MILLISECONDS)));
@@ -474,25 +367,15 @@ public class JobScheduleTest {
 
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
-    IFuture<String> future1 = Jobs.getJobManager().schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        latch.countDownAndBlock();
-        return "job-1";
-      }
+    IFuture<String> future1 = Jobs.getJobManager().schedule(() -> {
+      latch.countDownAndBlock();
+      return "job-1";
     }, Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withExecutionSemaphore(mutex)
         .withExceptionHandling(null, false));
 
-    IFuture<String> future2 = Jobs.getJobManager().schedule(new Callable<String>() {
-
-      @Override
-      public String call() throws Exception {
-        return "job-2";
-      }
-    }, Jobs.newInput()
+    IFuture<String> future2 = Jobs.getJobManager().schedule(() -> "job-2", Jobs.newInput()
         .withRunContext(RunContexts.empty())
         .withExecutionSemaphore(mutex));
 
@@ -514,17 +397,11 @@ public class JobScheduleTest {
 
   @Test
   public void testMissingJobInput() {
-    final AtomicReference<Boolean> running = new AtomicReference<Boolean>(false);
+    final AtomicReference<Boolean> running = new AtomicReference<>(false);
 
     IFuture<Void> future = null;
     try {
-      future = Jobs.getJobManager().schedule(new IRunnable() {
-
-        @Override
-        public void run() throws Exception {
-          running.set(true);
-        }
-      }, null);
+      future = Jobs.getJobManager().schedule(() -> running.set(true), null);
       fail();
     }
     catch (AssertionException e) {
@@ -540,12 +417,7 @@ public class JobScheduleTest {
     runContext.getRunMonitor().cancel(true);
 
     // schedule job
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        fail("job must not be executed");
-      }
-    }, Jobs.newInput().withRunContext(runContext));
+    IFuture<Void> future = Jobs.schedule(() -> fail("job must not be executed"), Jobs.newInput().withRunContext(runContext));
     future.awaitDone();
 
     assertTrue(future.isCancelled());

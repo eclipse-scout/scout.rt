@@ -11,12 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.numberfield;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertComparableEquals;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -54,13 +49,10 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
   public void setup() {
     m_displayTextChangedCounter = new AtomicInteger();
     m_displayTextChangedHistory = new ArrayList<>();
-    addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (IValueField.PROP_DISPLAY_TEXT.equals(evt.getPropertyName())) {
-          m_displayTextChangedCounter.incrementAndGet();
-          m_displayTextChangedHistory.add((String) evt.getNewValue());
-        }
+    addPropertyChangeListener(evt -> {
+      if (IValueField.PROP_DISPLAY_TEXT.equals(evt.getPropertyName())) {
+        m_displayTextChangedCounter.incrementAndGet();
+        m_displayTextChangedHistory.add((String) evt.getNewValue());
       }
     });
   }

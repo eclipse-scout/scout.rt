@@ -11,15 +11,7 @@
 package org.eclipse.scout.rt.mom.jms;
 
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.reset;
 
 import java.io.Serializable;
@@ -55,7 +47,6 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.IDisposable;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.runner.parameterized.NonParameterized;
@@ -118,13 +109,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     IDestination<Person> queue = MOM.newDestination("test/mom/testPublishObject", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     ObjectMarshaller marshaller = BEANS.get(ObjectMarshaller.class);
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, marshaller));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Person>() {
-
-      @Override
-      public void onMessage(IMessage<Person> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
     MOM.publish(FixtureMom.class, queue, person);
 
     // Verify
@@ -143,13 +128,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     IDestination<byte[]> queue = MOM.newDestination("test/mom/testPublishBytes", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     BytesMarshaller marshaller = BEANS.get(BytesMarshaller.class);
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, marshaller));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<byte[]>() {
-
-      @Override
-      public void onMessage(IMessage<byte[]> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
     byte[] bytes = "hello world".getBytes(StandardCharsets.UTF_8);
     MOM.publish(FixtureMom.class, queue, bytes);
 
@@ -169,13 +148,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     TextMarshaller marshaller = BEANS.get(TextMarshaller.class);
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, marshaller));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
     String string = "hello world";
     MOM.publish(FixtureMom.class, queue, string);
 
@@ -218,29 +191,20 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     IDestination<String> queue = MOM.newDestination("test/mom/testPublishText", DestinationType.QUEUE, ResolveMethod.DEFINE, null);
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, BEANS.get(TextMarshaller.class)));
 
-    final ISubscription subscription = MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set(message.getTransferObject());
-        try {
-          latch.await();
-        }
-        catch (InterruptedException e) {
-          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-        }
+    final ISubscription subscription = MOM.subscribe(FixtureMom.class, queue, message -> {
+      capturer.set(message.getTransferObject());
+      try {
+        latch.await();
+      }
+      catch (InterruptedException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
       }
     }, subscribeInput);
     MOM.publish(FixtureMom.class, queue, "hello world");
 
     assertEquals("hello world", capturer.get());
 
-    IFuture<Void> disposeFuture = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        subscription.dispose();
-      }
-    }, Jobs.newInput()
+    IFuture<Void> disposeFuture = Jobs.schedule(() -> subscription.dispose(), Jobs.newInput()
         .withName("dispose subscription")
         .withExecutionHint(FixtureJobInput.EXPLICIT_HINT)
         .withExceptionHandling(null, false));
@@ -299,13 +263,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     person.setFirstname("anna");
     person.setLastname("smith");
 
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Person>() {
-
-      @Override
-      public void onMessage(IMessage<Person> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
     MOM.publish(FixtureMom.class, queue, person);
 
     // Verify
@@ -324,13 +282,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final Capturer<String> capturer = new Capturer<>();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> capturer.set(message.getTransferObject())));
 
     // Publish a message
     MOM.publish(FixtureMom.class, topic, "hello world");
@@ -347,22 +299,10 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final CountDownLatch latch = new CountDownLatch(2);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        latch.countDown();
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> latch.countDown()));
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        latch.countDown();
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> latch.countDown()));
 
     // Publish a message
     MOM.publish(FixtureMom.class, topic, "hello world");
@@ -382,13 +322,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     // Subscribe too late for the destination
     final CountDownLatch latch = new CountDownLatch(1);
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        latch.countDown();
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> latch.countDown()));
 
     // Verify
     assertFalse(latch.await(200, TimeUnit.MILLISECONDS));
@@ -402,13 +336,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final Capturer<String> capturer = new Capturer<>();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
 
     // Publish a message
     MOM.publish(FixtureMom.class, queue, "hello world");
@@ -427,23 +355,15 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        msgCounter.incrementAndGet();
-        latch.countDown();
-      }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> {
+      msgCounter.incrementAndGet();
+      latch.countDown();
     }));
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        msgCounter.incrementAndGet();
-        latch.countDown();
-      }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> {
+      msgCounter.incrementAndGet();
+      latch.countDown();
     }));
 
     // Publish a message
@@ -466,13 +386,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     // Subscribe for the destination
     final CountDownLatch latch = new CountDownLatch(1);
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        latch.countDown();
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> latch.countDown()));
 
     // Verify
     assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
@@ -500,12 +414,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final Capturer<String> capturer1 = new Capturer<>();
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-      @Override
-      public void onMessage(IMessage<String> message) {
-        capturer1.set(message.getProperty("prop"));
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> capturer1.set(message.getProperty("prop"))));
 
     // Publish a message
     MOM.publish(FixtureMom.class, topic, "hello world", MOM.newPublishInput()
@@ -530,13 +439,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     Thread.sleep(100);
 
     // Subscribe for the destination
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        latch.countDown();
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> latch.countDown()));
 
     // Verify
     assertFalse(latch.await(50, TimeUnit.MILLISECONDS)); // expect the message not to be received
@@ -545,25 +448,13 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
   private void testPublishSubscribeCorrelationIdInternal(final IDestination<String> destination) throws InterruptedException {
     final Capturer<String> cid = new Capturer<>();
 
-    m_disposables.add(MOM.subscribe(FixtureMom.class, destination, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        cid.set(CorrelationId.CURRENT.get());
-      }
-    }, MOM.newSubscribeInput()
+    m_disposables.add(MOM.subscribe(FixtureMom.class, destination, message -> cid.set(CorrelationId.CURRENT.get()), MOM.newSubscribeInput()
         .withRunContext(RunContexts.copyCurrent()
             .withCorrelationId("cid:xyz"))));
 
     RunContexts.copyCurrent()
         .withCorrelationId("cid:abc")
-        .run(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            MOM.publish(FixtureMom.class, destination, "hello world");
-          }
-        });
+        .run(() -> MOM.publish(FixtureMom.class, destination, "hello world"));
 
     assertEquals("cid:abc", cid.get());
   }
@@ -658,13 +549,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     person.setLastname("smith");
 
     MOM.publish(FixtureMom.class, queue, person);
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Person>() {
-
-      @Override
-      public void onMessage(IMessage<Person> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
 
     // Verify
     Person testee = capturer.get();
@@ -688,13 +573,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
       m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
       MOM.publish(FixtureMom.class, queue, person);
-      m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Person>() {
-
-        @Override
-        public void onMessage(IMessage<Person> message) {
-          capturer.set(IMessage.CURRENT.get());
-        }
-      }));
+      m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(IMessage.CURRENT.get())));
 
       // Verify
       IMessage<Person> testee = (IMessage<Person>) capturer.get();
@@ -724,13 +603,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     m_disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, BEANS.get(ObjectMarshaller.class)));
 
     MOM.publish(FixtureMom.class, queue, person, MOM.newPublishInput().withTransactional(true));
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Person>() {
-
-      @Override
-      public void onMessage(IMessage<Person> message) {
-        capturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> capturer.set(message.getTransferObject())));
 
     try {
       capturer.get(2, TimeUnit.SECONDS);
@@ -773,29 +646,25 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     final BlockingCountDownLatch message1Latch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch message2Latch = new BlockingCountDownLatch(1);
 
-    IMessageListener<String> listener = new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        switch (message.getTransferObject()) {
-          case "message-1":
-            switch (messageCounter.incrementAndGet()) {
-              case 1:
-              case 2:
-              case 3:
-                ITransaction.CURRENT.get().rollback();
-                break;
-              default:
-                message1Latch.countDown();
-                break;
-            }
-            return;
-          case "message-2":
-            message2Latch.countDown();
-            break;
-          default:
-            throw new IllegalArgumentException("illegal message");
-        }
+    IMessageListener<String> listener = message -> {
+      switch (message.getTransferObject()) {
+        case "message-1":
+          switch (messageCounter.incrementAndGet()) {
+            case 1:
+            case 2:
+            case 3:
+              ITransaction.CURRENT.get().rollback();
+              break;
+            default:
+              message1Latch.countDown();
+              break;
+          }
+          return;
+        case "message-2":
+          message2Latch.countDown();
+          break;
+        default:
+          throw new IllegalArgumentException("illegal message");
       }
     };
 
@@ -826,16 +695,12 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     // 1. Publish some messages
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(msgCount, 3, TimeUnit.SECONDS);
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Object>() {
-
-      @Override
-      public void onMessage(IMessage<Object> message) {
-        try {
-          latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
-        }
-        catch (InterruptedException e) {
-          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-        }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> {
+      try {
+        latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
+      }
+      catch (InterruptedException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
       }
     }));
 
@@ -860,16 +725,12 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     // 2. Consume the messages
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(msgCount, 3, TimeUnit.SECONDS);
-    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Object>() {
-
-      @Override
-      public void onMessage(IMessage<Object> message) {
-        try {
-          latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
-        }
-        catch (InterruptedException e) {
-          throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
-        }
+    m_disposables.add(MOM.subscribe(FixtureMom.class, queue, message -> {
+      try {
+        latch.countDownAndBlock(1, TimeUnit.MINUTES); // timeout must be greater than the default latch timeout
+      }
+      catch (InterruptedException e) {
+        throw BEANS.get(DefaultRuntimeExceptionTranslator.class).translate(e);
       }
     }, MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
 
@@ -891,30 +752,12 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
 
     IDestination<String> topic = MOM.newDestination("test/mom/testMessageSelector", DestinationType.TOPIC, ResolveMethod.DEFINE, null);
     // register subscriber without selector
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        allCapturer.set(message.getTransferObject());
-      }
-    }));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> allCapturer.set(message.getTransferObject())));
     // register subscriber with selector user = 'john'
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        johnCapturer.set(message.getTransferObject());
-      }
-    }, MOM.newSubscribeInput().withSelector("user = 'john'")));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> johnCapturer.set(message.getTransferObject()), MOM.newSubscribeInput().withSelector("user = 'john'")));
 
     // register subscriber with selector user = 'anna'
-    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, new IMessageListener<String>() {
-
-      @Override
-      public void onMessage(IMessage<String> message) {
-        annaCapturer.set(message.getTransferObject());
-      }
-    }, MOM.newSubscribeInput().withSelector("user = 'anna'")));
+    m_disposables.add(MOM.subscribe(FixtureMom.class, topic, message -> annaCapturer.set(message.getTransferObject()), MOM.newSubscribeInput().withSelector("user = 'anna'")));
 
     // Publish the message for anna
     MOM.publish(FixtureMom.class, topic, "message-for-anna", MOM.newPublishInput().withProperty("user", "anna"));
@@ -943,12 +786,7 @@ public class JmsMomPubSubTest extends AbstractJmsMomTest {
     if (marshaller != null) {
       disposables.add(MOM.registerMarshaller(FixtureMom.class, queue, marshaller));
     }
-    disposables.add(MOM.subscribe(FixtureMom.class, queue, new IMessageListener<Object>() {
-      @Override
-      public void onMessage(IMessage<Object> msg) {
-        capturer.set(msg.getTransferObject());
-      }
-    }, MOM.newSubscribeInput()
+    disposables.add(MOM.subscribe(FixtureMom.class, queue, msg -> capturer.set(msg.getTransferObject()), MOM.newSubscribeInput()
         // use single threaded in order to block dispose until subscription is completely released
         .withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO_SINGLE_THREADED)));
     MOM.publish(FixtureMom.class, queue, transferObject);

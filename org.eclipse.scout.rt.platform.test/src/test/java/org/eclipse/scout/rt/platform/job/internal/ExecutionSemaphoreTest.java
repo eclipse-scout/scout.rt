@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.job.internal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,7 +29,6 @@ import org.eclipse.scout.rt.platform.job.internal.ExecutionSemaphore.QueuePositi
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
@@ -48,14 +44,10 @@ public class ExecutionSemaphoreTest {
   public void testZeroPermits() {
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(0);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-running");
-      }
+    IFuture<Void> future = Jobs.schedule(() -> {
+      protocol.add("job-running");
     }, Jobs.newInput()
         .withName("job")
         .withExecutionSemaphore(semaphore));
@@ -79,104 +71,72 @@ public class ExecutionSemaphoreTest {
   public void testThreePermits() throws InterruptedException {
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latchGroup1 = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch latchGroup2 = new BlockingCountDownLatch(3);
     final BlockingCountDownLatch latchGroup3 = new BlockingCountDownLatch(2);
 
     // job-1
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
-        latchGroup1.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-1-running");
+      latchGroup1.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionSemaphore(semaphore));
 
     // job-2
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running");
-        latchGroup1.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-2-running");
+      latchGroup1.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-2")
         .withExecutionSemaphore(semaphore));
 
     // job-3
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-3-running");
-        latchGroup1.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-3-running");
+      latchGroup1.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-3")
         .withExecutionSemaphore(semaphore));
 
     // job-4
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-4-running");
-        latchGroup2.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-4-running");
+      latchGroup2.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-4")
         .withExecutionSemaphore(semaphore));
 
     // job-5
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-5-running");
-        latchGroup2.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-5-running");
+      latchGroup2.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-5")
         .withExecutionSemaphore(semaphore));
 
     // job-6
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-6-running");
-        latchGroup2.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-6-running");
+      latchGroup2.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-6")
         .withExecutionSemaphore(semaphore));
 
     // job-7
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-7-running");
-        latchGroup3.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-7-running");
+      latchGroup3.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-7")
         .withExecutionSemaphore(semaphore));
 
     // job-8
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-8-running");
-        latchGroup3.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-8-running");
+      latchGroup3.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-8")
         .withExecutionSemaphore(semaphore));
@@ -206,12 +166,8 @@ public class ExecutionSemaphoreTest {
         "job-8-running"), protocol);
 
     // job-9
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-9-running");
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-9-running");
     }, Jobs.newInput()
         .withName("job-9")
         .withExecutionSemaphore(semaphore))
@@ -241,7 +197,7 @@ public class ExecutionSemaphoreTest {
   public void testThreePermitsAndBlocking() throws InterruptedException {
     final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
@@ -253,95 +209,67 @@ public class ExecutionSemaphoreTest {
     final BlockingCountDownLatch latchJob7 = new BlockingCountDownLatch(1);
 
     // job-1
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
-        setupLatch.countDownAndBlock();
-        finishLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-1-running");
+      setupLatch.countDownAndBlock();
+      finishLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionSemaphore(semaphore));
 
     // job-2
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running (a)");
-        condition.waitFor(30, TimeUnit.SECONDS);
-        protocol.add("job-2-running (b)");
-        latchJob2.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-2-running (a)");
+      condition.waitFor(30, TimeUnit.SECONDS);
+      protocol.add("job-2-running (b)");
+      latchJob2.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-2")
         .withExecutionSemaphore(semaphore));
 
     // job-3
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-3-running");
-        setupLatch.countDownAndBlock();
-        finishLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-3-running");
+      setupLatch.countDownAndBlock();
+      finishLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-3")
         .withExecutionSemaphore(semaphore));
 
     // job-4
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-4-running");
-        setupLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-4-running");
+      setupLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-4")
         .withExecutionSemaphore(semaphore));
 
     // job-5
-    Jobs.schedule(new IRunnable() {
+    Jobs.schedule(() -> {
+      protocol.add("job-5-running");
+      condition.setBlocking(false);
 
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-5-running");
-        condition.setBlocking(false);
+      // Wait until job-2 is competing for a permit anew.
+      // Otherwise, job-6 might get the permit before job-2.
+      JobTestUtil.waitForPermitCompetitors(semaphore, 6); // permit-owners: job-1, job-3, job-5, queue: job-2 (RE-ACQUIRE), job-6, job-7
 
-        // Wait until job-2 is competing for a permit anew.
-        // Otherwise, job-6 might get the permit before job-2.
-        JobTestUtil.waitForPermitCompetitors(semaphore, 6); // permit-owners: job-1, job-3, job-5, queue: job-2 (RE-ACQUIRE), job-6, job-7
-
-        latchJob5.countDownAndBlock();
-      }
+      latchJob5.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-5")
         .withExecutionSemaphore(semaphore));
 
     // job-6
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-6-running");
-        latchJob6.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-6-running");
+      latchJob6.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-6")
         .withExecutionSemaphore(semaphore));
 
     // job-7
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-7-running");
-        latchJob7.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-7-running");
+      latchJob7.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-7")
         .withExecutionSemaphore(semaphore));
@@ -401,31 +329,23 @@ public class ExecutionSemaphoreTest {
   public void testChangePermits1() {
     final IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(1);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final String executionHint = UUID.randomUUID().toString();
 
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future = Jobs.schedule(() -> {
+      protocol.add("job-1-running");
 
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
+      Jobs.schedule(() -> {
+        protocol.add("job-2-running");
+      }, Jobs.newInput()
+          .withName("job-2")
+          .withExecutionHint(executionHint)
+          .withExceptionHandling(null, false)
+          .withExecutionSemaphore(semaphore));
 
-        Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            protocol.add("job-2-running");
-          }
-        }, Jobs.newInput()
-            .withName("job-2")
-            .withExecutionHint(executionHint)
-            .withExceptionHandling(null, false)
-            .withExecutionSemaphore(semaphore));
-
-        // Change the permits to 0
-        semaphore.withPermits(0);
-      }
+      // Change the permits to 0
+      semaphore.withPermits(0);
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionHint(executionHint)
@@ -460,17 +380,13 @@ public class ExecutionSemaphoreTest {
   public void testChangePermits2() throws InterruptedException {
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(10);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
 
     // job-1
-    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
-        latch.countDownAndBlock();
-      }
+    IFuture<Void> future1 = Jobs.schedule(() -> {
+      protocol.add("job-1-running");
+      latch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExceptionHandling(null, true)
@@ -487,12 +403,8 @@ public class ExecutionSemaphoreTest {
     future1.awaitDone();
 
     // job-2
-    IFuture<Void> future2 = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running");
-      }
+    IFuture<Void> future2 = Jobs.schedule(() -> {
+      protocol.add("job-2-running");
     }, Jobs.newInput()
         .withName("job-2")
         .withExecutionSemaphore(semaphore));
@@ -515,43 +427,31 @@ public class ExecutionSemaphoreTest {
   public void testChangePermits3() throws InterruptedException {
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(0);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(3);
 
     // job-1
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
-        finishLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-1-running");
+      finishLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExceptionHandling(null, true)
         .withExecutionSemaphore(semaphore));
 
     // job-2
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running");
-        finishLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-2-running");
+      finishLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-2")
         .withExceptionHandling(null, true)
         .withExecutionSemaphore(semaphore));
 
     // job-3
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-3-running");
-        finishLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-3-running");
+      finishLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-3")
         .withExceptionHandling(null, true)
@@ -576,80 +476,56 @@ public class ExecutionSemaphoreTest {
   public void testChangePermits4() throws InterruptedException {
     IExecutionSemaphore semaphore = Jobs.newExecutionSemaphore(3);
 
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(3);
 
     // job-1
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
-        setupLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-1-running");
+      setupLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionSemaphore(semaphore));
 
     // job-2
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running");
-        setupLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-2-running");
+      setupLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-2")
         .withExecutionSemaphore(semaphore));
 
     // job-3
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-3-running");
-        setupLatch.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-3-running");
+      setupLatch.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-3")
         .withExecutionSemaphore(semaphore));
 
     // job-4
     final BlockingCountDownLatch latchJob4 = new BlockingCountDownLatch(1);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-4-running");
-        latchJob4.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-4-running");
+      latchJob4.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-4")
         .withExecutionSemaphore(semaphore));
 
     // job-5
     final BlockingCountDownLatch latchJob5 = new BlockingCountDownLatch(1);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-5-running");
-        latchJob5.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-5-running");
+      latchJob5.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-5")
         .withExecutionSemaphore(semaphore));
 
     // job-6
     final BlockingCountDownLatch latchJob6 = new BlockingCountDownLatch(1);
-    Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-6-running");
-        latchJob6.countDownAndBlock();
-      }
+    Jobs.schedule(() -> {
+      protocol.add("job-6-running");
+      latchJob6.countDownAndBlock();
     }, Jobs.newInput()
         .withName("job-6")
         .withExecutionSemaphore(semaphore));
@@ -697,22 +573,12 @@ public class ExecutionSemaphoreTest {
     final IBlockingCondition condition = Jobs.newBlockingCondition(true);
 
     final AtomicReference<IFuture<?>> future2Ref = new AtomicReference<>();
-    IFuture<Void> future1 = Jobs.schedule(new IRunnable() {
+    IFuture<Void> future1 = Jobs.schedule(() -> {
+      future2Ref.set(Jobs.schedule(() -> condition.setBlocking(false), Jobs.newInput()
+          .withName("job-2")
+          .withExecutionSemaphore(semaphore)));
 
-      @Override
-      public void run() throws Exception {
-        future2Ref.set(Jobs.schedule(new IRunnable() {
-
-          @Override
-          public void run() throws Exception {
-            condition.setBlocking(false);
-          }
-        }, Jobs.newInput()
-            .withName("job-2")
-            .withExecutionSemaphore(semaphore)));
-
-        condition.waitFor();
-      }
+      condition.waitFor();
     }, Jobs.newInput()
         .withName("job-1")
         .withExecutionSemaphore(semaphore));

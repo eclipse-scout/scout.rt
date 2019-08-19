@@ -34,7 +34,7 @@ public class SampleParameterizedServerTest {
 
   @Parameters
   public static List<IScoutTestParameter> getParameters() {
-    List<IScoutTestParameter> parametersList = new LinkedList<IScoutTestParameter>();
+    List<IScoutTestParameter> parametersList = new LinkedList<>();
     parametersList.add(new MathTestParameter("Scenario 1", 2));
     parametersList.add(new MathTestParameter("Scenario 2", 5));
     return parametersList;

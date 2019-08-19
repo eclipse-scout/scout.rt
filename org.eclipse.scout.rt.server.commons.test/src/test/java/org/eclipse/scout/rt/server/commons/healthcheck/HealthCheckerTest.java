@@ -11,9 +11,7 @@
 package org.eclipse.scout.rt.server.commons.healthcheck;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +26,6 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 
@@ -81,12 +78,9 @@ public class HealthCheckerTest {
   }
 
   protected Stubber doSleep(final long millis) {
-    return Mockito.doAnswer(new Answer<Object>() {
-      @Override
-      public Object answer(InvocationOnMock invocation) throws Throwable {
-        TimeUnit.MILLISECONDS.sleep(millis);
-        return null;
-      }
+    return Mockito.doAnswer((Answer<Object>) invocation -> {
+      TimeUnit.MILLISECONDS.sleep(millis);
+      return null;
     });
   }
 
@@ -95,16 +89,13 @@ public class HealthCheckerTest {
     final AtomicBoolean flag = new AtomicBoolean(false);
     final Object sync = new Object();
 
-    IHealthChecker checker = createDummyHealthChecker(true, TimeUnit.DAYS.toMillis(1), 1, new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        synchronized (sync) {
-          flag.set(true);
-          sync.notify();
-          sync.wait();
-          flag.set(false);
-          sync.notify();
-        }
+    IHealthChecker checker = createDummyHealthChecker(true, TimeUnit.DAYS.toMillis(1), 1, () -> {
+      synchronized (sync) {
+        flag.set(true);
+        sync.notify();
+        sync.wait();
+        flag.set(false);
+        sync.notify();
       }
     });
 
@@ -123,12 +114,9 @@ public class HealthCheckerTest {
   public void testTimeout() throws Exception {
     final AtomicBoolean sleep = new AtomicBoolean(false);
 
-    AbstractHealthChecker checker = createDummyHealthChecker(true, 0, TimeUnit.SECONDS.toMillis(1), new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        if (sleep.get()) {
-          TimeUnit.SECONDS.sleep(10);
-        }
+    AbstractHealthChecker checker = createDummyHealthChecker(true, 0, TimeUnit.SECONDS.toMillis(1), () -> {
+      if (sleep.get()) {
+        TimeUnit.SECONDS.sleep(10);
       }
     });
 

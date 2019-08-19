@@ -10,19 +10,9 @@
  */
 package org.eclipse.scout.rt.platform.transaction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,12 +51,7 @@ public class TransactionProcessorTest {
     m_transaction = Mockito.spy(BEANS.get(ITransaction.class));
 
     m_beans.add(BEANS.getBeanManager().registerBean(
-        new BeanMetaData(ITransaction.class).withOrder(-1000).withProducer(new IBeanInstanceProducer<ITransaction>() {
-          @Override
-          public ITransaction produce(IBean<ITransaction> bean) {
-            return m_transaction;
-          }
-        })));
+        new BeanMetaData(ITransaction.class).withOrder(-1000).withProducer((IBeanInstanceProducer<ITransaction>) bean -> m_transaction)));
   }
 
   @After
@@ -80,18 +65,12 @@ public class TransactionProcessorTest {
   @Test
   public void testMandatoryWithoutExistingTransaction() throws Exception {
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.MANDATORY));
 
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          return "result";
-        }
-      });
+      chain.call(() -> "result");
       fail();
     }
     catch (TransactionRequiredException e) {
@@ -105,16 +84,12 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.MANDATORY));
-    Object result = chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        actualTransaction.setValue(ITransaction.CURRENT.get());
-        return "result";
-      }
+    Object result = chain.call(() -> {
+      actualTransaction.setValue(ITransaction.CURRENT.get());
+      return "result";
     });
 
     assertEquals("result", result);
@@ -131,17 +106,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.MANDATORY));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          throw exception;
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        throw exception;
       });
       fail();
     }
@@ -163,16 +134,12 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
-    Object result = chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        actualTransaction.setValue(ITransaction.CURRENT.get());
-        return "result";
-      }
+    Object result = chain.call(() -> {
+      actualTransaction.setValue(ITransaction.CURRENT.get());
+      return "result";
     });
 
     // verify
@@ -195,17 +162,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          throw exception;
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        throw exception;
       });
       fail();
     }
@@ -232,17 +195,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          return "result";
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
       });
       fail();
     }
@@ -266,16 +225,12 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
-    Object result = chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        actualTransaction.setValue(ITransaction.CURRENT.get());
-        return "result";
-      }
+    Object result = chain.call(() -> {
+      actualTransaction.setValue(ITransaction.CURRENT.get());
+      return "result";
     });
 
     // verify
@@ -300,17 +255,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          throw exception;
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        throw exception;
       });
       fail();
     }
@@ -336,16 +287,12 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRED));
-    Object result = chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        actualTransaction.setValue(ITransaction.CURRENT.get());
-        return "result";
-      }
+    Object result = chain.call(() -> {
+      actualTransaction.setValue(ITransaction.CURRENT.get());
+      return "result";
     });
 
     // verify
@@ -368,17 +315,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          throw exception;
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        throw exception;
       });
       fail();
     }
@@ -407,17 +350,13 @@ public class TransactionProcessorTest {
 
     final Holder<ITransaction> actualTransaction = new Holder<>();
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          return "result";
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        return "result";
       });
       fail();
     }
@@ -445,16 +384,12 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.REQUIRED));
-    Object result = chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        actualTransaction.setValue(ITransaction.CURRENT.get());
-        return "result";
-      }
+    Object result = chain.call(() -> {
+      actualTransaction.setValue(ITransaction.CURRENT.get());
+      return "result";
     });
 
     // verify
@@ -474,17 +409,13 @@ public class TransactionProcessorTest {
     final Holder<ITransaction> actualTransaction = new Holder<>();
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(callingTransaction)
         .withTransactionScope(TransactionScope.REQUIRED));
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          actualTransaction.setValue(ITransaction.CURRENT.get());
-          throw exception;
-        }
+      chain.call(() -> {
+        actualTransaction.setValue(ITransaction.CURRENT.get());
+        throw exception;
       });
       fail();
     }
@@ -509,18 +440,14 @@ public class TransactionProcessorTest {
     when(txMember.commitPhase1()).thenReturn(true);
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW)
         .withTransactionMembers(Arrays.asList(txMember)));
 
-    chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
-        return null;
-      }
+    chain.call(() -> {
+      assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+      return null;
     });
 
     InOrder inOrder = Mockito.inOrder(txMember);
@@ -538,19 +465,15 @@ public class TransactionProcessorTest {
     when(txMember.commitPhase1()).thenReturn(true);
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRES_NEW)
         .withTransactionMembers(Arrays.asList(txMember)));
 
     try {
-      chain.call(new Callable<Object>() {
-
-        @Override
-        public Object call() throws Exception {
-          assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
-          throw new RuntimeException("JUnit exception");
-        }
+      chain.call(() -> {
+        assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+        throw new RuntimeException("JUnit exception");
       });
       fail("exception expected");
     }
@@ -571,7 +494,7 @@ public class TransactionProcessorTest {
     final ITransactionMember txMember = mock(ITransactionMember.class);
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(mock(ITransaction.class))
         .withTransactionScope(TransactionScope.REQUIRED)
         .withTransactionMembers(Arrays.asList(txMember)));
@@ -587,18 +510,14 @@ public class TransactionProcessorTest {
     when(txMember.commitPhase1()).thenReturn(true);
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(null)
         .withTransactionScope(TransactionScope.REQUIRED)
         .withTransactionMembers(Arrays.asList(txMember)));
 
-    chain.call(new Callable<Object>() {
-
-      @Override
-      public Object call() throws Exception {
-        assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
-        return null;
-      }
+    chain.call(() -> {
+      assertSame(txMember, ITransaction.CURRENT.get().getMember("abc"));
+      return null;
     });
 
     InOrder inOrder = Mockito.inOrder(txMember);
@@ -614,7 +533,7 @@ public class TransactionProcessorTest {
     final ITransactionMember txMember = mock(ITransactionMember.class);
 
     CallableChain<Object> chain = new CallableChain<>();
-    chain.add(new TransactionProcessor<Object>()
+    chain.add(new TransactionProcessor<>()
         .withCallerTransaction(mock(ITransaction.class))
         .withTransactionScope(TransactionScope.MANDATORY)
         .withTransactionMembers(Arrays.asList(txMember)));
@@ -626,14 +545,7 @@ public class TransactionProcessorTest {
   public void testRegisterMemberIfAbsentAndNotCancelled() {
     BasicTransaction t = new BasicTransaction();
     assertNotNull("expected non null transaction member object",
-        t.registerMemberIfAbsentAndNotCancelled("123", new Function<String, TestTransactionMember>() {
-
-          @Override
-          public TestTransactionMember apply(String memberId) {
-            return new TestTransactionMember(null);
-          }
-
-        }));
+        t.registerMemberIfAbsentAndNotCancelled("123", memberId -> new TestTransactionMember(null)));
   }
 
   @Test
@@ -641,14 +553,9 @@ public class TransactionProcessorTest {
     BasicTransaction t = new BasicTransaction();
     t.cancel(false);
     assertNull("expected null transaction member object",
-        t.registerMemberIfAbsentAndNotCancelled("123", new Function<String, TestTransactionMember>() {
-
-          @Override
-          public TestTransactionMember apply(String memberId) {
-            fail("apply function must not be invoked; transaction was cancelled");
-            return null;
-          }
-
+        t.registerMemberIfAbsentAndNotCancelled("123", (Function<String, TestTransactionMember>) memberId -> {
+          fail("apply function must not be invoked; transaction was cancelled");
+          return null;
         }));
   }
 
@@ -656,28 +563,14 @@ public class TransactionProcessorTest {
   public void testRegisterMemberIfAbsent() {
     BasicTransaction t = new BasicTransaction();
     assertNotNull("expected non null transaction member object",
-        t.registerMemberIfAbsent("123", new Function<String, TestTransactionMember>() {
-
-          @Override
-          public TestTransactionMember apply(String memberId) {
-            return new TestTransactionMember(null);
-          }
-
-        }));
+        t.registerMemberIfAbsent("123", memberId -> new TestTransactionMember(null)));
   }
 
   @Test(expected = FutureCancelledError.class)
   public void testRegisterMemberIfAbsentOnCancelledTransaction() {
     BasicTransaction t = new BasicTransaction();
     t.cancel(false);
-    t.registerMemberIfAbsent("123", new Function<String, TestTransactionMember>() {
-
-      @Override
-      public TestTransactionMember apply(String memberId) {
-        return new TestTransactionMember(null);
-      }
-
-    });
+    t.registerMemberIfAbsent("123", memberId -> new TestTransactionMember(null));
   }
 
   public static class TestTransactionMember implements ITransactionMember {

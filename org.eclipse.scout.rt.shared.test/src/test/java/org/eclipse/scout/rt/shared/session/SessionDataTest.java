@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.shared.session;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -68,12 +65,9 @@ public class SessionDataTest {
   @Test
   public void testComputeIfAbsent() {
     final BooleanHolder computedHolder = new BooleanHolder();
-    Object value = m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        computedHolder.setValue(true);
-        return TEST_DATA;
-      }
+    Object value = m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      computedHolder.setValue(true);
+      return TEST_DATA;
     });
     assertSame(TEST_DATA, value);
     assertSame(TEST_DATA, m_sessionData.get(TEST_KEY));
@@ -82,12 +76,7 @@ public class SessionDataTest {
 
   @Test(expected = AssertionException.class)
   public void testComputeIfAbsentNullKey() {
-    m_sessionData.computeIfAbsent(null, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        return null;
-      }
-    });
+    m_sessionData.computeIfAbsent(null, () -> null);
   }
 
   @Test(expected = AssertionException.class)
@@ -97,23 +86,17 @@ public class SessionDataTest {
 
   @Test(expected = PlatformException.class)
   public void testComputeIfAbsentProducerThrowsException() {
-    m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        throw new IOException();
-      }
+    m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      throw new IOException();
     });
   }
 
   @Test
   public void testComputeIfAbsentValueAlreadySet() {
     m_sessionData.set(TEST_KEY, TEST_DATA);
-    Object value = m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        fail("Value is already set");
-        return null;
-      }
+    Object value = m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      fail("Value is already set");
+      return null;
     });
     assertSame(TEST_DATA, value);
   }
@@ -122,42 +105,26 @@ public class SessionDataTest {
   public void testComputeIfAbsentConcurrentProducers() {
     final CountDownLatch phase1 = new CountDownLatch(1);
     final CountDownLatch phase2 = new CountDownLatch(1);
-    IFuture<Object> firstProducerFuture = Jobs.schedule(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        return m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-          @Override
-          public Object call() throws Exception {
-            // release the second producer
-            phase1.countDown();
-            // wait until the second producer has returned its value
-            phase2.await();
-            // since the second producer has already provided its value, this return value is not used
-            return new Object();
-          }
-        });
-      }
-    }, Jobs
+    IFuture<Object> firstProducerFuture = Jobs.schedule(() -> m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      // release the second producer
+      phase1.countDown();
+      // wait until the second producer has returned its value
+      phase2.await();
+      // since the second producer has already provided its value, this return value is not used
+      return new Object();
+    }), Jobs
         .newInput()
         .withRunContext(RunContexts.empty()));
 
-    IFuture<Object> secondProducerFuture = Jobs.schedule(new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        // wait until the first producer is creating a new value
-        phase1.await();
-        try {
-          return m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-              return TEST_DATA;
-            }
-          });
-        }
-        finally {
-          // release first producer
-          phase2.countDown();
-        }
+    IFuture<Object> secondProducerFuture = Jobs.schedule(() -> {
+      // wait until the first producer is creating a new value
+      phase1.await();
+      try {
+        return m_sessionData.computeIfAbsent(TEST_KEY, () -> TEST_DATA);
+      }
+      finally {
+        // release first producer
+        phase2.countDown();
       }
     }, Jobs
         .newInput()
@@ -172,24 +139,18 @@ public class SessionDataTest {
   public void testComputeIfAbsentReturningNull() {
     final BooleanHolder computedHolder = new BooleanHolder();
     // 1. compute null value
-    Object value = m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        computedHolder.setValue(true);
-        return null;
-      }
+    Object value = m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      computedHolder.setValue(true);
+      return null;
     });
     assertNull(value);
     assertTrue(computedHolder.getValue());
 
     // 2. compute non-null value
     computedHolder.setValue(false);
-    value = m_sessionData.computeIfAbsent(TEST_KEY, new Callable<Object>() {
-      @Override
-      public Object call() throws Exception {
-        computedHolder.setValue(true);
-        return TEST_DATA;
-      }
+    value = m_sessionData.computeIfAbsent(TEST_KEY, () -> {
+      computedHolder.setValue(true);
+      return TEST_DATA;
     });
     assertSame(TEST_DATA, value);
     assertTrue(computedHolder.getValue());
@@ -198,12 +159,7 @@ public class SessionDataTest {
   @Test
   public void testComputeIfAbsentDataWithOtherTypeAlreadySet() {
     m_sessionData.set(TEST_KEY, TEST_DATA);
-    Object value = m_sessionData.computeIfAbsent(TEST_KEY, new Callable<String>() {
-      @Override
-      public String call() throws Exception {
-        return "test";
-      }
-    });
+    Object value = m_sessionData.computeIfAbsent(TEST_KEY, (Callable<String>) () -> "test");
     assertSame(TEST_DATA, value);
   }
 }

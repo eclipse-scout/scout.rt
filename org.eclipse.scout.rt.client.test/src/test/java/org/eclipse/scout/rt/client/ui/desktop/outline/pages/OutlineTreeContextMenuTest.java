@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -102,7 +99,7 @@ public class OutlineTreeContextMenuTest {
 
   @SafeVarargs
   private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {
-    List<IMenu> resolvedMenus = new LinkedList<IMenu>();
+    List<IMenu> resolvedMenus = new LinkedList<>();
     IPageWithTable<?> activePage = (IPageWithTable<?>) outline.getActivePage();
 
     for (Class<? extends IMenu> menuClass : menuClasses) {

@@ -10,14 +10,7 @@
  */
 package org.eclipse.scout.rt.dataobject;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -34,12 +27,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.rt.dataobject.DoEntity;
-import org.eclipse.scout.rt.dataobject.DoList;
-import org.eclipse.scout.rt.dataobject.DoNode;
-import org.eclipse.scout.rt.dataobject.DoValue;
-import org.eclipse.scout.rt.dataobject.IDoEntity;
-import org.eclipse.scout.rt.dataobject.IValueFormatConstants;
 import org.eclipse.scout.rt.dataobject.fixture.EntityFixtureDo;
 import org.eclipse.scout.rt.dataobject.fixture.OtherEntityFixtureDo;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -533,12 +520,7 @@ public class DoEntityTest {
     return list;
   }
 
-  protected Function<Object, String> mapper = new Function<Object, String>() {
-    @Override
-    public String apply(Object value) {
-      return value.toString();
-    }
-  };
+  protected Function<Object, String> mapper = value -> value.toString();
 
   @Test
   public void testGetMapper() {

@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +60,7 @@ public class ClientNotificationClusterNotificationTest {
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
     m_beans.add(TestingUtility.registerBean(new BeanMetaData(TestClusterMom.class)));
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer(new IBeanInstanceProducer<IMomImplementor>() {
-
-      @Override
-      public IMomImplementor produce(IBean<IMomImplementor> bean) {
-        return m_nullMomImplementorSpy;
-      }
-    })));
+    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));
     // verify that replacement works
     assertSame("NullMomImplementor-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
 
@@ -95,7 +86,7 @@ public class ClientNotificationClusterNotificationTest {
 
     ClientNotificationAddress address = ClientNotificationAddress.createAllNodesAddress();
     ClientNotificationMessage message = new ClientNotificationMessage(address, "test", true, "cid");
-    ArrayList<ClientNotificationMessage> messages = new ArrayList<ClientNotificationMessage>();
+    ArrayList<ClientNotificationMessage> messages = new ArrayList<>();
     messages.add(message);
     when(momMsg.getTransferObject()).thenReturn(new ClusterNotificationMessage(new ClientNotificationClusterNotification(messages), m_testProps));
 

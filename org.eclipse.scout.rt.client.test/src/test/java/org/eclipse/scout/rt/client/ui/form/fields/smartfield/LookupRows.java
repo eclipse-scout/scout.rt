@@ -20,13 +20,13 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 class LookupRows {
 
-  static final LookupRow<Long> ROW_1 = new LookupRow<Long>(1L, "aName");
+  static final LookupRow<Long> ROW_1 = new LookupRow<>(1L, "aName");
 
-  static final LookupRow<Long> ROW_2 = new LookupRow<Long>(2L, "bName1");
+  static final LookupRow<Long> ROW_2 = new LookupRow<>(2L, "bName1");
 
-  static final LookupRow<Long> ROW_3 = new LookupRow<Long>(3L, "bName2");
+  static final LookupRow<Long> ROW_3 = new LookupRow<>(3L, "bName2");
 
-  static final LookupRow<Long> ROW_MULTI_LINE = new LookupRow<Long>(4L, "Line1\nLine2");
+  static final LookupRow<Long> ROW_MULTI_LINE = new LookupRow<>(4L, "Line1\nLine2");
 
   static final List<LookupRow<Long>> lookupRows = Arrays.asList(ROW_1, ROW_2, ROW_3, ROW_MULTI_LINE);
 
@@ -35,7 +35,7 @@ class LookupRows {
   }
 
   static final List<? extends ILookupRow<Long>> getRowsByText(String searchText) {
-    List<LookupRow<Long>> results = new ArrayList<LookupRow<Long>>();
+    List<LookupRow<Long>> results = new ArrayList<>();
     searchText = searchText.replace("*", ".*");
     for (LookupRow<Long> lookupRow : lookupRows) {
       if (lookupRow.getText().toLowerCase().matches(searchText)) {
@@ -46,7 +46,7 @@ class LookupRows {
   }
 
   static final List<? extends ILookupRow<Long>> getRowsByKey(Long key) {
-    List<LookupRow<Long>> results = new ArrayList<LookupRow<Long>>();
+    List<LookupRow<Long>> results = new ArrayList<>();
     for (LookupRow<Long> lookupRow : lookupRows) {
       if (lookupRow.getKey().equals(key)) {
         results.add(lookupRow);

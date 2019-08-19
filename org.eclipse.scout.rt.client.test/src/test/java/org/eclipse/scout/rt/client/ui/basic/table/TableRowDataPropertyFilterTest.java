@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class TableRowDataPropertyFilterTest {
   public void testTableRowDataPropertyFilter() throws Exception {
     TableRowDataPropertyFilter propertyFilter = new TableRowDataPropertyFilter();
     FastPropertyDescriptor[] props = BeanUtility.getFastPropertyDescriptors(P_TableRowData.class, AbstractTableRowData.class, propertyFilter);
-    Map<String, FastPropertyDescriptor> propertyDescriptorsByName = new HashMap<String, FastPropertyDescriptor>();
+    Map<String, FastPropertyDescriptor> propertyDescriptorsByName = new HashMap<>();
     for (FastPropertyDescriptor prop : props) {
       propertyDescriptorsByName.put(prop.getName(), prop);
     }

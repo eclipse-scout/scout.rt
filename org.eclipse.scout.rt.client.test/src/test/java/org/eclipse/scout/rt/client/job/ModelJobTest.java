@@ -10,11 +10,8 @@
  */
 package org.eclipse.scout.rt.client.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,13 +49,7 @@ public class ModelJobTest {
 
   @Test(expected = AssertionException.class)
   public void testNoSession() {
-    ClientRunContexts.empty().run(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent()));
-      }
-    });
+    ClientRunContexts.empty().run(() -> ModelJobs.schedule(mock(IRunnable.class), ModelJobs.newInput(ClientRunContexts.copyCurrent())));
   }
 
   @Test
@@ -67,13 +58,7 @@ public class ModelJobTest {
 
     assertFalse(ModelJobs.isModelThread());
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        modelThread.set(ModelJobs.isModelThread());
-      }
-    }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))).awaitDoneAndGet();
+    ModelJobs.schedule(() -> modelThread.set(ModelJobs.isModelThread()), ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))).awaitDoneAndGet();
 
     assertFalse(ModelJobs.isModelThread());
     assertTrue(modelThread.get());
@@ -91,36 +76,28 @@ public class ModelJobTest {
    */
   @Test
   public void testYield() throws InterruptedException {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
     final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
     final BlockingCountDownLatch finishLatch = new BlockingCountDownLatch(1);
 
     final ClientRunContext runContext = ClientRunContexts.empty().withSession(m_clientSession1, true);
 
     // Schedule first model job
-    ModelJobs.schedule(new IRunnable() {
+    ModelJobs.schedule(() -> {
+      protocol.add("job-1-running");
 
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-1-running");
+      setupLatch.await();
+      protocol.add("job-1-before-yield");
+      ModelJobs.yield();
+      protocol.add("job-1-after-yield");
 
-        setupLatch.await();
-        protocol.add("job-1-before-yield");
-        ModelJobs.yield();
-        protocol.add("job-1-after-yield");
-
-        finishLatch.countDown();
-      }
+      finishLatch.countDown();
     }, ModelJobs.newInput(runContext.copy())
         .withName("job-1"));
 
     // Schedule second model job
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job-2-running");
-      }
+    ModelJobs.schedule(() -> {
+      protocol.add("job-2-running");
     }, ModelJobs.newInput(runContext.copy())
         .withName("job-2"));
 

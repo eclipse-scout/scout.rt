@@ -10,20 +10,12 @@
  */
 package org.eclipse.scout.rt.server.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -183,20 +175,8 @@ public class ServerSessionCacheTest {
       }
 
     };
-    IFuture<IServerSession> f1 = Jobs.schedule(new Callable<IServerSession>() {
-
-      @Override
-      public IServerSession call() throws Exception {
-        return cache.getOrCreate(handler1, httpSession1);
-      }
-    }, Jobs.newInput());
-    IFuture<IServerSession> f2 = Jobs.schedule(new Callable<IServerSession>() {
-
-      @Override
-      public IServerSession call() throws Exception {
-        return cache.getOrCreate(handler2, httpSession2);
-      }
-    }, Jobs.newInput());
+    IFuture<IServerSession> f1 = Jobs.schedule(() -> cache.getOrCreate(handler1, httpSession1), Jobs.newInput());
+    IFuture<IServerSession> f2 = Jobs.schedule(() -> cache.getOrCreate(handler2, httpSession2), Jobs.newInput());
 
     IServerSession session2 = f2.awaitDoneAndGet();
     IServerSession session1 = f1.awaitDoneAndGet();
@@ -335,20 +315,8 @@ public class ServerSessionCacheTest {
         return "id1";
       }
     };
-    IFuture<IServerSession> f1 = Jobs.schedule(new Callable<IServerSession>() {
-
-      @Override
-      public IServerSession call() throws Exception {
-        return cache.getOrCreate(sessionSupplier1, httpSession1);
-      }
-    }, Jobs.newInput());
-    IFuture<IServerSession> f2 = Jobs.schedule(new Callable<IServerSession>() {
-
-      @Override
-      public IServerSession call() throws Exception {
-        return cache.getOrCreate(sessionSupplier2, httpSession2);
-      }
-    }, Jobs.newInput());
+    IFuture<IServerSession> f1 = Jobs.schedule(() -> cache.getOrCreate(sessionSupplier1, httpSession1), Jobs.newInput());
+    IFuture<IServerSession> f2 = Jobs.schedule(() -> cache.getOrCreate(sessionSupplier2, httpSession2), Jobs.newInput());
 
     IServerSession session2 = f2.awaitDoneAndGet();
     IServerSession session1 = f1.awaitDoneAndGet();

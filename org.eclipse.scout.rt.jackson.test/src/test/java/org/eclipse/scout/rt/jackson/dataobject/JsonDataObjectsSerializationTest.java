@@ -10,13 +10,8 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
-import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -1730,7 +1725,7 @@ public class JsonDataObjectsSerializationTest {
     doubleAttribute.withGenericAttribute(789.123);
     genericDo.withGenericDoubleAttribute(doubleAttribute);
 
-    TestGenericDo<String> stringAttribute = new TestGenericDo<String>();
+    TestGenericDo<String> stringAttribute = new TestGenericDo<>();
     stringAttribute.withGenericAttribute("bar");
     genericDo.withGenericStringAttribute(stringAttribute);
 
@@ -2163,7 +2158,7 @@ public class JsonDataObjectsSerializationTest {
     testPoJo.setUuidAttribute(UUID.fromString("298d64f9-821d-49fe-91fb-6fb9860d4950"));
     testPoJo.setLocaleAttribute(Locale.forLanguageTag("de-CH"));
 
-    testPoJo.setItemsAttribute(new ArrayList<TestItemPojo>());
+    testPoJo.setItemsAttribute(new ArrayList<>());
     TestItemPojo testItemPoJo1 = new TestItemPojo();
     testItemPoJo1.setId("1234-1");
     testPoJo.getItemsAttribute().add(testItemPoJo1);

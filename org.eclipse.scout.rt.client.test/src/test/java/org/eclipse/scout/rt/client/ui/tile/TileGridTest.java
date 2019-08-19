@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.tile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -233,7 +232,7 @@ public class TileGridTest {
     P_Tile tile2 = createTestTile();
     tileGrid.addTiles(Arrays.asList(tile0, tile1, tile2));
 
-    final List<ITile> newSelection = new ArrayList<ITile>();
+    final List<ITile> newSelection = new ArrayList<>();
     tileGrid.addPropertyChangeListener(event -> {
       newSelection.addAll((List<ITile>) event.getNewValue());
     });
@@ -306,7 +305,7 @@ public class TileGridTest {
     assertEquals(1, tileGrid.getSelectedTiles().size());
     assertEquals(tile0, tileGrid.getSelectedTile());
 
-    final List<ITile> newSelection = new ArrayList<ITile>();
+    final List<ITile> newSelection = new ArrayList<>();
     BooleanHolder eventFired = new BooleanHolder(false);
     tileGrid.addPropertyChangeListener(event -> {
       newSelection.addAll((List<ITile>) event.getNewValue());

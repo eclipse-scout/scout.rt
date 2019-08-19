@@ -84,7 +84,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
   @Override
   protected void initConfig() {
     super.initConfig();
-    setGroupManager(new DefaultGroupManager<T>());
+    setGroupManager(new DefaultGroupManager<>());
     setComparator(new DefaultComparator());
 
     // Copy properties from default grid to accordion
@@ -246,7 +246,7 @@ public abstract class AbstractTileAccordion<T extends ITile> extends AbstractAcc
     // when a group manager is active and one or more tile could not be put into a matching group
     // thus this group acts as a "catch-all" for tiles without a group.
     GroupTemplate defaultGroup = createDefaultGroupTemplate();
-    List<GroupTemplate> requiredGroups = new ArrayList<GroupTemplate>();
+    List<GroupTemplate> requiredGroups = new ArrayList<>();
     List<GroupTemplate> groupTemplates = m_groupManager.createGroups();
     requiredGroups.addAll(groupTemplates);
     requiredGroups.add(defaultGroup);

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -178,34 +176,25 @@ public class FormFieldEnabledTest {
   public void testWrappedFormField() {
     P_OuterForm frm = new P_OuterForm();
     final AtomicReference<P_String> ref = new AtomicReference<>();
-    frm.visit(new Function<IFormField, TreeVisitResult>() {
-      @Override
-      public TreeVisitResult apply(IFormField field) {
-        if (field instanceof P_String) {
-          ref.set((P_String) field);
-        }
-        return ref.get() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
+    frm.visit(field -> {
+      if (field instanceof P_String) {
+        ref.set((P_String) field);
       }
+      return ref.get() == null ? TreeVisitResult.CONTINUE : TreeVisitResult.TERMINATE;
     }, IFormField.class);
     P_String stringField = ref.get();
     Assert.assertNotNull(stringField);
 
     final AtomicInteger counter = new AtomicInteger(0);
-    stringField.visitParents(new Consumer<IFormField>() {
-      @Override
-      public void accept(IFormField field) {
-        counter.incrementAndGet();
-      }
+    stringField.visitParents(field -> {
+      counter.incrementAndGet();
     }, IFormField.class);
     Assert.assertEquals(7, counter.intValue());
 
     MainBox innerMainBox = frm.getFieldByClass(Wrapped.class).getInnerForm().getFieldByClass(MainBox.class);
     final AtomicInteger counter2 = new AtomicInteger(0);
-    innerMainBox.visitParents(new Consumer<IFormField>() {
-      @Override
-      public void accept(IFormField field) {
-        counter2.incrementAndGet();
-      }
+    innerMainBox.visitParents(field -> {
+      counter2.incrementAndGet();
     }, IFormField.class);
     Assert.assertEquals(2, counter2.intValue());
   }

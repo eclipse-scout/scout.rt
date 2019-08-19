@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.client.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,7 +23,6 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
@@ -51,54 +48,38 @@ public class MultipleSessionTest {
 
   @Test
   public void testMutalExclusion() throws InterruptedException {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch latch1 = new BlockingCountDownLatch(2);
     final BlockingCountDownLatch latch2 = new BlockingCountDownLatch(2);
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job1-S1");
-        latch1.countDownAndBlock();
-      }
+    ModelJobs.schedule(() -> {
+      protocol.add("job1-S1");
+      latch1.countDownAndBlock();
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-1-S1")
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job2-S1");
-        latch2.countDownAndBlock();
-      }
+    ModelJobs.schedule(() -> {
+      protocol.add("job2-S1");
+      latch2.countDownAndBlock();
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-2-S1")
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job1-S2");
-        latch1.countDownAndBlock();
-      }
+    ModelJobs.schedule(() -> {
+      protocol.add("job1-S2");
+      latch1.countDownAndBlock();
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-1-S2")
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job2-S2");
-        latch2.countDownAndBlock();
-      }
+    ModelJobs.schedule(() -> {
+      protocol.add("job2-S2");
+      latch2.countDownAndBlock();
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-2-S2")
         .withExecutionHint(JOB_IDENTIFIER)
@@ -120,7 +101,7 @@ public class MultipleSessionTest {
 
   @Test
   public void testCancel() throws InterruptedException {
-    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<>()); // synchronized because modified/read by different threads.
 
     final BlockingCountDownLatch setupLatch1 = new BlockingCountDownLatch(2);
     final BlockingCountDownLatch setupLatch2 = new BlockingCountDownLatch(1);
@@ -128,41 +109,33 @@ public class MultipleSessionTest {
     final BlockingCountDownLatch awaitAllCancelledLatch = new BlockingCountDownLatch(1);
 
     // Session 1 (job1)
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job1-S1");
-        try {
-          setupLatch1.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job1-S1-interrupted");
-        }
-        finally {
-          interruptedJob1_S1_Latch.countDown();
-        }
-
-        Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
-        awaitAllCancelledLatch.await();
+    ModelJobs.schedule(() -> {
+      protocol.add("job1-S1");
+      try {
+        setupLatch1.countDownAndBlock();
       }
+      catch (InterruptedException e) {
+        protocol.add("job1-S1-interrupted");
+      }
+      finally {
+        interruptedJob1_S1_Latch.countDown();
+      }
+
+      Thread.interrupted(); // ensure the thread's interrupted status to be cleared in order to continue the test.
+      awaitAllCancelledLatch.await();
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-1-S1")
         .withExecutionHint(JOB_IDENTIFIER)
         .withExceptionHandling(null, false));
 
     // Session 1 (job2) --> never starts running because cancelled while job1 is mutex-owner
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job2-S1");
-        try {
-          setupLatch2.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job2-S1-interrupted");
-        }
+    ModelJobs.schedule(() -> {
+      protocol.add("job2-S1");
+      try {
+        setupLatch2.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("job2-S1-interrupted");
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession1, true))
         .withName("job-2-S1")
@@ -170,17 +143,13 @@ public class MultipleSessionTest {
         .withExceptionHandling(null, false));
 
     // Session 2 (job1)
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job1-S2");
-        try {
-          setupLatch1.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job1-S2-interrupted");
-        }
+    ModelJobs.schedule(() -> {
+      protocol.add("job1-S2");
+      try {
+        setupLatch1.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("job1-S2-interrupted");
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-1-S2")
@@ -188,17 +157,13 @@ public class MultipleSessionTest {
         .withExceptionHandling(null, false));
 
     // Session 2 (job2)
-    ModelJobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocol.add("job2-S2");
-        try {
-          setupLatch2.countDownAndBlock();
-        }
-        catch (InterruptedException e) {
-          protocol.add("job2-S2-interrupted");
-        }
+    ModelJobs.schedule(() -> {
+      protocol.add("job2-S2");
+      try {
+        setupLatch2.countDownAndBlock();
+      }
+      catch (InterruptedException e) {
+        protocol.add("job2-S2-interrupted");
       }
     }, ModelJobs.newInput(ClientRunContexts.empty().withSession(m_clientSession2, true))
         .withName("job-2-S2")

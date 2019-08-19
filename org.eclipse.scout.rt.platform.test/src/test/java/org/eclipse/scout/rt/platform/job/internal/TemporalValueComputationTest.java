@@ -23,10 +23,7 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.platform.job.listener.IJobListener;
-import org.eclipse.scout.rt.platform.job.listener.JobEvent;
 import org.eclipse.scout.rt.platform.util.IRegistrationHandle;
-import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -45,43 +42,25 @@ public class TemporalValueComputationTest {
   public void before() {
     m_jobIdentifier = UUID.randomUUID().toString();
     m_listeners = new ArrayList<>();
-    m_protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+    m_protocol = Collections.synchronizedList(new ArrayList<>()); // synchronized because modified/read by different threads.
 
     // scheduled listener
     m_listeners.add(Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchState(JobState.SCHEDULED)
         .andMatchExecutionHint(m_jobIdentifier)
-        .toFilter(), new IJobListener() {
-
-          @Override
-          public void changed(JobEvent event) {
-            protocolCurrentState("SCHEDULED", (JobFutureTask<?>) event.getData().getFuture(), m_protocol);
-          }
-        }));
+        .toFilter(), event -> protocolCurrentState("SCHEDULED", (JobFutureTask<?>) event.getData().getFuture(), m_protocol)));
 
     // pending listener
     m_listeners.add(Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchState(JobState.PENDING)
         .andMatchExecutionHint(m_jobIdentifier)
-        .toFilter(), new IJobListener() {
-
-          @Override
-          public void changed(JobEvent event) {
-            protocolCurrentState("PENDING", (JobFutureTask<?>) event.getData().getFuture(), m_protocol);
-          }
-        }));
+        .toFilter(), event -> protocolCurrentState("PENDING", (JobFutureTask<?>) event.getData().getFuture(), m_protocol)));
 
     // done listener
     m_listeners.add(Jobs.getJobManager().addListener(Jobs.newEventFilterBuilder()
         .andMatchState(JobState.DONE)
         .andMatchExecutionHint(m_jobIdentifier)
-        .toFilter(), new IJobListener() {
-
-          @Override
-          public void changed(JobEvent event) {
-            protocolCurrentState("DONE", (JobFutureTask<?>) event.getData().getFuture(), m_protocol);
-          }
-        }));
+        .toFilter(), event -> protocolCurrentState("DONE", (JobFutureTask<?>) event.getData().getFuture(), m_protocol)));
   }
 
   @After
@@ -93,13 +72,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testSingleExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier));
     future.awaitDone(10, TimeUnit.SECONDS);
 
@@ -113,13 +86,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testSingleExecutionWithDelay() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)));
@@ -141,13 +108,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testSingleExecutionWithFutureExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(System.currentTimeMillis() + 1))));
@@ -169,13 +130,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testSingleExecutionWithPastExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(0))));
@@ -191,13 +146,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedDelayExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(FixedDelayScheduleBuilder.repeatForTotalCount(3, 1, TimeUnit.MILLISECONDS))));
@@ -225,13 +174,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedDelayExecutionWithDelay() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)
@@ -271,13 +214,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedDelayExecutionWithFutureExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(System.currentTimeMillis() + 1))
@@ -317,13 +254,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedDelayExecutionWithPastExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(0))
@@ -353,13 +284,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedRateExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
@@ -389,13 +314,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedRateExecutionWithDelay() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartIn(1, TimeUnit.MILLISECONDS)
@@ -437,13 +356,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedRateExecutionWithFutureExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(System.currentTimeMillis() + 1))
@@ -485,13 +398,7 @@ public class TemporalValueComputationTest {
 
   @Test
   public void testFixedRateExecutionWithPastExecution() {
-    IFuture<Void> future = Jobs.schedule(new IRunnable() {
-
-      @Override
-      public void run() throws Exception {
-        protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol);
-      }
-    }, Jobs.newInput()
+    IFuture<Void> future = Jobs.schedule(() -> protocolCurrentState("JOB", (JobFutureTask<?>) IFuture.CURRENT.get(), m_protocol), Jobs.newInput()
         .withExecutionHint(m_jobIdentifier)
         .withExecutionTrigger(Jobs.newExecutionTrigger()
             .withStartAt(new Date(0))

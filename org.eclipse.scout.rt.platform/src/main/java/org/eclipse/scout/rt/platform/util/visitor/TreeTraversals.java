@@ -57,7 +57,7 @@ public final class TreeTraversals {
    * @see ITreeTraversal
    */
   public static <T> ITreeTraversal<T> create(IBreadthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
-    return new BreadthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
+    return new BreadthFirstTraversal<>(assertNotNull(visitor), assertNotNull(childrenSupplier));
   }
 
   /**
@@ -77,6 +77,6 @@ public final class TreeTraversals {
    * @see ITreeTraversal
    */
   public static <T> ITreeTraversal<T> create(IDepthFirstTreeVisitor<T> visitor, Function<T, Collection<? extends T>> childrenSupplier) {
-    return new DepthFirstTraversal<T>(assertNotNull(visitor), assertNotNull(childrenSupplier));
+    return new DepthFirstTraversal<>(assertNotNull(visitor), assertNotNull(childrenSupplier));
   }
 }

@@ -28,8 +28,6 @@ import org.eclipse.scout.rt.mom.api.AbstractMomTransport;
 import org.eclipse.scout.rt.mom.api.IDestination;
 import org.eclipse.scout.rt.mom.api.IDestination.DestinationType;
 import org.eclipse.scout.rt.mom.api.IDestination.ResolveMethod;
-import org.eclipse.scout.rt.mom.api.IMessage;
-import org.eclipse.scout.rt.mom.api.IMessageListener;
 import org.eclipse.scout.rt.mom.api.IMomImplementor;
 import org.eclipse.scout.rt.mom.api.MOM;
 import org.eclipse.scout.rt.mom.api.SubscribeInput;
@@ -108,31 +106,23 @@ public class JmsMomManualTest {
 
     // Register subscriber
     m_disposables.add(MOM.subscribe(FixtureMomWithManualEnvironment.class, queue,
-        new IMessageListener<String>() {
-          @Override
-          public void onMessage(IMessage<String> message) {
-            System.out.println("RECEIVED " + message.getTransferObject());
-          }
-        },
+        message -> System.out.println("RECEIVED " + message.getTransferObject()),
         MOM.newSubscribeInput().withAcknowledgementMode(SubscribeInput.ACKNOWLEDGE_AUTO)));
 
     // Publish messages
-    IFuture<?> publishJob = Jobs.schedule(new IRunnable() {
-      @Override
-      public void run() throws Exception {
-        int i = 0;
-        while (true) {
-          i++;
-          try {
-            MOM.publish(FixtureMomWithManualEnvironment.class, queue, "message-" + i, MOM.newPublishInput());
-            System.out.println("SEND " + i + " OK");
-          }
-          catch (Exception | ThreadInterruptedError e) {
-            System.out.println("SEND " + i + " FAILED");
-          }
-          SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
-          Thread.interrupted();
+    IFuture<?> publishJob = Jobs.schedule((IRunnable) () -> {
+      int i = 0;
+      while (true) {
+        i++;
+        try {
+          MOM.publish(FixtureMomWithManualEnvironment.class, queue, "message-" + i, MOM.newPublishInput());
+          System.out.println("SEND " + i + " OK");
         }
+        catch (Exception | ThreadInterruptedError e) {
+          System.out.println("SEND " + i + " FAILED");
+        }
+        SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
+        Thread.interrupted();
       }
     }, Jobs.newInput());
 

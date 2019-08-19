@@ -10,12 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.tree;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -26,11 +21,9 @@ import java.util.List;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
@@ -182,7 +175,7 @@ public class JsonTreeTest {
     ITree tree = new TreeWith3Levels();
     tree.init();
     JsonTree<ITree> object = UiSessionTestUtility.newJsonAdapter(m_uiSession, tree, null);
-    WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
+    WeakReference<JsonTree> ref = new WeakReference<>(object);
 
     object.dispose();
     m_uiSession = null;
@@ -260,7 +253,7 @@ public class JsonTreeTest {
    */
   @Test
   public void testNodesDeletedEvent() throws JSONException {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -281,7 +274,7 @@ public class JsonTreeTest {
    */
   @Test
   public void testNodeDisposal() throws JSONException {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -303,7 +296,7 @@ public class JsonTreeTest {
 
   @Test
   public void testChildNodeDisposal() throws JSONException {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -333,7 +326,7 @@ public class JsonTreeTest {
   public void testNodeFilter() throws JSONException {
     TreeNode nodeToFilter = new TreeNode();
     nodeToFilter.setEnabled(false);
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(nodeToFilter);
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -345,13 +338,7 @@ public class JsonTreeTest {
     assertNotNull(node0Id);
     assertNotNull(jsonTree.optTreeNodeForNodeId(node0Id));
 
-    tree.addNodeFilter(new ITreeNodeFilter() {
-
-      @Override
-      public boolean accept(ITreeNode node, int level) {
-        return node.isEnabled();
-      }
-    });
+    tree.addNodeFilter((node, level) -> node.isEnabled());
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertNull(jsonTree.optNodeId(nodes.get(0)));
@@ -360,7 +347,7 @@ public class JsonTreeTest {
 
   @Test
   public void testGetVsOpt() {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -398,7 +385,7 @@ public class JsonTreeTest {
   public void testNodeFilter_events() throws JSONException {
     TreeNode nodeToFilter = new TreeNode();
     nodeToFilter.setEnabled(false);
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(nodeToFilter);
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -411,13 +398,7 @@ public class JsonTreeTest {
     assertNotNull(node0Id);
     assertNotNull(jsonTree.optTreeNodeForNodeId(node0Id));
 
-    tree.addNodeFilter(new ITreeNodeFilter() {
-
-      @Override
-      public boolean accept(ITreeNode node, int level) {
-        return node.isEnabled();
-      }
-    });
+    tree.addNodeFilter((node, level) -> node.isEnabled());
 
     JsonTestUtility.processBufferedEvents(m_uiSession);
     assertNull(jsonTree.optNodeId(nodes.get(0)));
@@ -475,7 +456,7 @@ public class JsonTreeTest {
     tree.init();
 
     List<ITreeNode> allNodes = getAllTreeNodes(tree);
-    List<String> allNodeIds = new LinkedList<String>();
+    List<String> allNodeIds = new LinkedList<>();
 
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
 
@@ -506,7 +487,7 @@ public class JsonTreeTest {
    */
   @Test
   public void testAllNodesDeletedEvent() throws JSONException {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -560,7 +541,7 @@ public class JsonTreeTest {
     //   +-(node)
     //   |   +-(node)
     //   +-(node)
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -621,7 +602,7 @@ public class JsonTreeTest {
     //   +-(node)
     //   |   +-(node)
     //   +-(node)
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -646,13 +627,7 @@ public class JsonTreeTest {
     // 3 events: filterChanged, nodeChanged, filterChanged
     // filterChanged events are converted to nodesDeleted event in JsonTree.
     // Because of coalesce the nodeChanged event will be removed (it is obsolete, because nodes are deleted and re-inserted later).
-    tree.addNodeFilter(new ITreeNodeFilter() {
-
-      @Override
-      public boolean accept(ITreeNode node, int level) {
-        return node.isEnabled();
-      }
-    });
+    tree.addNodeFilter((node, level) -> node.isEnabled());
     node0000.getCellForUpdate().setText("Test-Text");
     tree.applyNodeFilters();
 
@@ -669,7 +644,7 @@ public class JsonTreeTest {
    */
   @Test
   public void testWrongEventOrder() throws JSONException {
-    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    List<ITreeNode> nodes = new ArrayList<>();
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
     nodes.add(new TreeNode());
@@ -772,7 +747,7 @@ public class JsonTreeTest {
 
   @Test
   public void testDeletionOfAllChildrenOfUnknownNode() throws Exception {
-    IOutline outline = new Outline(new ArrayList<IPage<?>>());
+    IOutline outline = new Outline(new ArrayList<>());
 
     ITreeNode parent = new TablePage(0);
     ITreeNode node1 = new TablePage(0);
@@ -890,7 +865,7 @@ public class JsonTreeTest {
   }
 
   public static List<ITreeNode> getAllTreeNodes(final ITree tree) {
-    final List<ITreeNode> nodes = new LinkedList<ITreeNode>();
+    final List<ITreeNode> nodes = new LinkedList<>();
     IDepthFirstTreeVisitor<ITreeNode> v = new DepthFirstTreeVisitor<ITreeNode>() {
       @Override
       public TreeVisitResult preVisit(ITreeNode node, int level, int index) {

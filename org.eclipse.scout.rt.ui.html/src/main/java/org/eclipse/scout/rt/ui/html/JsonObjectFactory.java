@@ -338,7 +338,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonFormMenu((IFormMenu<?>) model, session, id, parent);
     }
     if (model instanceof IFormFieldMenu) {
-      return new JsonFormFieldMenu<IFormFieldMenu>((IFormFieldMenu) model, session, id, parent);
+      return new JsonFormFieldMenu<>((IFormFieldMenu) model, session, id, parent);
     }
     if (model instanceof IMenu) {
       return new JsonMenu<>((IMenu) model, session, id, parent);
