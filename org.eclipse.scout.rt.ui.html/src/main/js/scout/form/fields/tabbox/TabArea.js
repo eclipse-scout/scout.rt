@@ -111,7 +111,7 @@ scout.TabArea.prototype._setSelectedTab = function(tab) {
 
 scout.TabArea.prototype._renderSelectedTab = function() {
   // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
-  if (this.selectedTab && this.selectedTab.tabOverflown) {
+  if (this.selectedTab && this.selectedTab.overflown) {
     this.invalidateLayoutTree();
   }
 };
@@ -250,7 +250,7 @@ scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focu
   }
 
   tabItems.forEach(function(item, index) {
-    if (selectNext && item.visible && !item.tabOverflown) {
+    if (selectNext && item.visible && !item.overflown) {
       this.setSelectedTab(item);
       this._setTabbableItem(item);
       if (focusTab) {

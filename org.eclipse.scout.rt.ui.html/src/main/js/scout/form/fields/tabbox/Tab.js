@@ -14,7 +14,7 @@ scout.Tab = function() {
   this.label = null;
   this.subLabel = null;
   this.selected = false;
-  this.tabOverflown = false;
+  this.overflown = false;
   this._preventTabSelection = false;
 
   this.$label = null;
@@ -77,7 +77,7 @@ scout.Tab.prototype._renderProperties = function() {
   this._renderTabbable();
   this._renderSelected();
   this._renderMarked();
-  this._renderTabOverflown();
+  this._renderOverflown();
   this._renderTooltipText();
   this._renderErrorStatus();
 };
@@ -153,7 +153,7 @@ scout.Tab.prototype._updateStatus = function() {
 };
 
 scout.Tab.prototype._computeVisible = function() {
-  return this.visible && !this.tabOverflown && (this.errorStatus || scout.strings.hasText(this.tooltipText));
+  return this.visible && !this.overflown && (this.errorStatus || scout.strings.hasText(this.tooltipText));
 };
 
 scout.Tab.prototype.setTabbable = function(tabbable) {
@@ -185,12 +185,12 @@ scout.Tab.prototype._renderMarked = function(marked) {
   this.$container.toggleClass('marked', this.marked);
 };
 
-scout.Tab.prototype.setTabOverflown = function(tabOverflown) {
-  this.setProperty('tabOverflown', tabOverflown);
+scout.Tab.prototype.setOverflown = function(overflown) {
+  this.setProperty('overflown', overflown);
 };
 
-scout.Tab.prototype._renderTabOverflown = function() {
-  this.$container.toggleClass('overflown', this.tabOverflown);
+scout.Tab.prototype._renderOverflown = function() {
+  this.$container.toggleClass('overflown', this.overflown);
   this._updateStatus();
 };
 

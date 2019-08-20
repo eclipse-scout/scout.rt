@@ -38,11 +38,11 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   }
 
   this.visibleTabs.forEach(function(tabItem) {
-    tabItem.setTabOverflown(false);
+    tabItem.setOverflown(false);
   });
 
   this.overflowTabs.forEach(function(tabItem) {
-    tabItem.setTabOverflown(true);
+    tabItem.setOverflown(true);
   });
 
   if (this.overflowTabs.length === 0) {
