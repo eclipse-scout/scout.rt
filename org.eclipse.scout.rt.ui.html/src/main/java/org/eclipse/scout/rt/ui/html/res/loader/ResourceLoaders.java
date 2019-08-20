@@ -40,6 +40,12 @@ public class ResourceLoaders {
     if (DYNAMIC_RESOURCES_PATTERN.matcher(resourcePath).matches()) {
       return new DynamicResourceLoader(req);
     }
+    if (resourcePath.endsWith(".html")) {
+      String theme = UiThemeHelper.get().getTheme(req);
+      boolean cacheEnabled = UrlHints.isCacheHint(req);
+      boolean minify = UrlHints.isMinifyHint(req);
+      return new HtmlFileLoader(theme, minify, cacheEnabled);
+    }
     boolean newMode = isNewMode();
     if (newMode) {
       boolean minify = UrlHints.isMinifyHint(req);
@@ -59,12 +65,6 @@ public class ResourceLoaders {
     }
     if (DEFAULT_VALUES_PATTERN.matcher(resourcePath).matches()) {
       return new DefaultValuesLoader();
-    }
-    if (resourcePath.endsWith(".html")) {
-      String theme = UiThemeHelper.get().getTheme(req);
-      boolean cacheEnabled = UrlHints.isCacheHint(req);
-      boolean minify = UrlHints.isMinifyHint(req);
-      return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
     if (resourcePath.endsWith("/locales.json")) {
       return new LocalesLoader();
