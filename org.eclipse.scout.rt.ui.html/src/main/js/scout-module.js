@@ -541,6 +541,8 @@
   __include("scout/form/fields/wizard/WizardProgressFieldLayout.js");
   __include("scout/form/fields/wrappedform/WrappedFormField.js");
   __include("scout/form/fields/wrappedform/WrappedFormFieldAdapter.js");
+  // Switch
+  __include("scout/switch/Switch.js");
   // TagBar
   __include("scout/tagbar/TagBar.js");
   __include("scout/tagbar/TagBarLayout.js");
