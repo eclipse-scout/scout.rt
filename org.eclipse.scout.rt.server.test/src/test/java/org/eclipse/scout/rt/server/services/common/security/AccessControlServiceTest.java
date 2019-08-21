@@ -11,10 +11,15 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.security.PermissionCollection;
 import java.security.Permissions;
+import java.security.Principal;
+import java.security.PrivilegedAction;
 import java.util.List;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -22,6 +27,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
+import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
@@ -48,6 +54,7 @@ import org.junit.runner.RunWith;
 @RunWithServerSession(TestServerSession.class)
 @RunWithSubject("john")
 public class AccessControlServiceTest {
+
   private TestAccessControlService m_accessControlService;
   private List<IBean<?>> m_registerServices;
 
@@ -69,6 +76,40 @@ public class AccessControlServiceTest {
   @After
   public void after() {
     TestingUtility.unregisterBeans(m_registerServices);
+  }
+
+  @Test
+  public void testGetUserId() {
+    assertNull(m_accessControlService.getUserId(null));
+
+    Subject s = new Subject();
+    assertNull(m_accessControlService.getUserId(s));
+
+    s.getPrincipals().add(new DummyPrincipal());
+    assertEquals("dummy", m_accessControlService.getUserId(s));
+
+    // first principal wins
+    s.getPrincipals().add(new SimplePrincipal("simple"));
+    assertEquals("dummy", m_accessControlService.getUserId(s));
+
+    s = new Subject();
+    s.getPrincipals().add(new SimplePrincipal("simple"));
+    s.getPrincipals().add(new SimplePrincipal("other"));
+    s.getPrincipals().add(new DummyPrincipal());
+    assertEquals("simple", m_accessControlService.getUserId(s));
+  }
+
+  @Test
+  public void testGetUserIdOfCurrentSubjectNoSubject() {
+    assertNull(Subject.doAs(null, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
+  }
+
+  @Test
+  public void testGetUserIdOfCurrentSubject() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("username"));
+
+    assertEquals("username", Subject.doAs(subject, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
   }
 
   /**
@@ -129,10 +170,18 @@ public class AccessControlServiceTest {
     }
   }
 
-  class TestBlockingProperty extends MaxNotificationBlockingTimeOut {
+  @IgnoreBean
+  private static class TestBlockingProperty extends MaxNotificationBlockingTimeOut {
     @Override
     public Integer getDefaultValue() {
       return 1;
+    }
+  }
+
+  private static class DummyPrincipal implements Principal {
+    @Override
+    public String getName() {
+      return "dummy";
     }
   }
 }

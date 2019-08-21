@@ -1,0 +1,8 @@
+autoEnabled=true
+eclipse.preferences.version=1
+extraProperties=
+fileExclusions=
+idePrefixKey=
+projectKey=org.eclipse.scout.rt\:org.eclipse.scout.rt\:releases_10.0
+serverId=Scout
+sqPrefixKey=org.eclipse.scout.rt.security
