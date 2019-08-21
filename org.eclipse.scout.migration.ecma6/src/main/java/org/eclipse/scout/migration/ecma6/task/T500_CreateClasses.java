@@ -1,11 +1,9 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
@@ -15,10 +13,10 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
-import org.eclipse.scout.migration.ecma6.model.old.JsImport;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+
 
 @Order(500)
 public class T500_CreateClasses extends AbstractTask {
@@ -81,12 +79,12 @@ public class T500_CreateClasses extends AbstractTask {
     if (clzz.getSuperCall() != null) {
 
       String alias = clzz.getSuperCall().getName();
-      if(alias.equalsIgnoreCase(clzz.getName())){
-        alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace())+clzz.getSuperCall().getName();
+      if (alias.equalsIgnoreCase(clzz.getName())) {
+        alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace()) + clzz.getSuperCall().getName();
       }
       classBuilder.append("extends ")
-        .append(jsFile.getOrCreateImport(context.getJsClass(clzz.getSuperCall().getFullyQuallifiedName())).getReferenceName())
-        .append(" ");
+          .append(jsFile.getOrCreateImport(context.getJsClass(clzz.getSuperCall().getFullyQuallifiedName())).getReferenceName())
+          .append(" ");
 
     }
     classBuilder.append("{").append(workingCopy.getLineSeparator());
@@ -107,12 +105,56 @@ public class T500_CreateClasses extends AbstractTask {
     workingCopy.setSource(source);
   }
 
-  private String updateConstructor(JsFunction function, JsFile jsFile, String source) {
+  protected String updateFunction(JsFunction function, JsFile jsFile, String source) {
     StringBuilder patternBuilder = new StringBuilder();
     patternBuilder.append(function.getJsClass().getNamespace())
       .append("\\.")
-      .append(function.getJsClass().getName())
-      .append("\\ \\=\\s*function");
+      .append(function.getJsClass().getName());
+    if (!function.isStatic()) {
+      patternBuilder.append("\\.prototype");
+    }
+    patternBuilder.append("\\.").append(Pattern.quote(function.getName()));
+    patternBuilder.append("\\ \\=\\s*function");
+
+    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    Matcher matcher = pattern.matcher(source);
+    if (matcher.find()) {
+      StringBuilder replacement = new StringBuilder();
+      if (function.isStatic()) {
+        replacement.append("static ");
+      }
+      replacement.append(function.getName().replace("$","\\$"));
+      source = matcher.replaceFirst(replacement.toString());
+    }
+    // super call
+
+    // group 1 function name
+    // group 2 (optional) arguments with leading semicolumn
+    // group 3 (inner optional) agruments to use
+    patternBuilder = new StringBuilder();
+    patternBuilder.append(Pattern.quote(function.getJsClass().getFullyQuallifiedName()))
+      .append("\\.parent\\.prototype\\.(").append(Pattern.quote(function.getName())).append(")\\.call\\(\\s*this\\s*(\\,\\s*([^\\)]))?");
+    pattern = Pattern.compile(patternBuilder.toString());
+    matcher = pattern.matcher(source);
+    if (matcher.find()) {
+      StringBuilder replacement = new StringBuilder();
+      replacement.append("super.").append(matcher.group(1)).append("(");
+      if(matcher.group(2) != null){
+        replacement.append(matcher.group(3));
+
+      }
+      source = matcher.replaceFirst(replacement.toString());
+    }
+
+    return source;
+  }
+
+  protected String updateConstructor(JsFunction function, JsFile jsFile, String source) {
+    StringBuilder patternBuilder = new StringBuilder();
+    patternBuilder.append(function.getJsClass().getNamespace())
+        .append("\\.")
+        .append(function.getJsClass().getName())
+        .append("\\ \\=\\s*function");
 
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
@@ -127,48 +169,20 @@ public class T500_CreateClasses extends AbstractTask {
 
       patternBuilder = new StringBuilder();
       patternBuilder.append(function.getJsClass().getNamespace())
-        .append("\\.")
-        .append(function.getJsClass().getName())
-        .append("\\.parent\\.call\\(this(\\,\\s*[^\\)]+)?\\)\\;");
+          .append("\\.")
+          .append(function.getJsClass().getName())
+          .append("\\.parent\\.call\\(this(\\,\\s*[^\\)]+)?\\)\\;");
       pattern = Pattern.compile(patternBuilder.toString());
       matcher = pattern.matcher(source);
       if (matcher.find()) {
         StringBuilder replacement = new StringBuilder();
         replacement.append("super(");
         if (matcher.group(1) != null) {
-          replacement.append(matcher.group(1).replace("$","\\$"));
+          replacement.append(matcher.group(1).replace("$", "\\$"));
         }
         replacement.append(");");
-        try {
-          source = matcher.replaceFirst(replacement.toString());
-        }catch (RuntimeException e){
-          e.printStackTrace();
-        }
+        source = matcher.replaceFirst(replacement.toString());
       }
-    }
-    return source;
-  }
-
-  protected String updateFunction(JsFunction function, JsFile jsFile, String source) {
-    StringBuilder patternBuilder = new StringBuilder();
-    patternBuilder.append(function.getJsClass().getNamespace())
-      .append("\\.")
-      .append(function.getJsClass().getName());
-    if (!function.isStatic()) {
-      patternBuilder.append("\\.prototype");
-    }
-    patternBuilder.append("\\.").append(function.getName());
-    patternBuilder.append("\\ \\=\\s*function");
-
-    Pattern pattern = Pattern.compile(patternBuilder.toString());
-    Matcher matcher = pattern.matcher(source);
-    if (matcher.find()) {
-      StringBuilder replacement = new StringBuilder();
-      if (function.isStatic()) {
-        replacement.append("static ");
-      }
-      replacement.append(function.getName());
-      source = matcher.replaceFirst(replacement.toString());
     }
     return source;
   }

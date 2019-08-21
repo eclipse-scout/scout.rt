@@ -17,6 +17,7 @@ import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.rt.platform.Order;
 
 /**
  * example strings.js:
@@ -38,6 +39,7 @@ import org.eclipse.scout.migration.ecma6.context.Context;
  * };
  * </pre>
  */
+@Order(800)
 public class T800_Utilities extends AbstractTask {
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isUtility());
 

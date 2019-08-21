@@ -4,9 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -43,6 +47,38 @@ public final class FileUtility {
         .forEach(File::delete);
     return true;
   }
+  public static boolean moveDirectory(Path srcDir, Path targetDir) throws IOException {
+    Files.createDirectories(targetDir);
+    Files.walkFileTree(srcDir, new SimpleFileVisitor<Path>() {
+
+      @Override
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        Path rel = srcDir.relativize(dir);
+        Path target = targetDir.resolve(rel);
+        if(!Files.exists(target)) {
+          Files.createDirectory(target);
+        }
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Path rel = srcDir.relativize(file);
+        Path target = targetDir.resolve(rel);
+        Files.move(file, target);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        Files.delete(dir);
+        return FileVisitResult.CONTINUE;
+      }
+    });
+
+    return true;
+  }
+
 
   public static String lineSeparator(Path path) {
     InputStream in = null;

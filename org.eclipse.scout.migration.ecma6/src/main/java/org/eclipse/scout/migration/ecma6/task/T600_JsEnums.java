@@ -7,12 +7,14 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.rt.platform.Order;
 
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Order(600)
 public class T600_JsEnums extends AbstractTask{
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 

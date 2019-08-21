@@ -6,11 +6,13 @@ import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsImport;
+import org.eclipse.scout.rt.platform.Order;
 
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+@Order(2900)
 public class T29000_JsCreateImports extends AbstractTask{
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 

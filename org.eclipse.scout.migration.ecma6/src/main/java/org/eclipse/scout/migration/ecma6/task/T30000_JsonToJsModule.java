@@ -18,9 +18,11 @@ import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.task.json.IConstPlaceholderMapper;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
+@Order(30000)
 public class T30000_JsonToJsModule extends AbstractTask {
 
   private static final Pattern KEY_PAT = Pattern.compile("\"(\\w+)\":");

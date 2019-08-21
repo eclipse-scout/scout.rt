@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationPathFilter;
@@ -34,6 +33,10 @@ public class Migration {
   private static String NAMESPACE = "scout";
   private static boolean CLEAN_TARGET = true;
 
+  // write module api
+  private static String LIBRARY_NAME = "eclipse-scout";
+  private static Path LIBRARY_API_STORE_FILE = Paths.get("C:/tmp/max24h/migEcma6/api/eclipse-scout-api.json");
+
   private List<ITask> m_tasks ;
   private Context m_context;
 
@@ -57,6 +60,8 @@ public class Migration {
     }
     Files.createDirectories(TARGET_ROOT_DIR);
     m_context = new Context(SOURCE_ROOT_DIRECTORY, TARGET_ROOT_DIR, NAMESPACE);
+    m_context.setLibraryStoreFile(LIBRARY_API_STORE_FILE);
+    m_context.setLibraryName(LIBRARY_NAME);
     m_context.setup();
 
     m_tasks = BEANS.all(ITask.class);
@@ -84,7 +89,7 @@ public class Migration {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        PathInfo info = new PathInfo(file, m_context.getCurrentModuleDirectory());
+        PathInfo info = new PathInfo(file, m_context.getModuleDirectory());
         if(pathFilter == null || pathFilter.test(info)){
           processFile(info, m_context);
         }
@@ -107,17 +112,9 @@ public class Migration {
           return FileVisitResult.SKIP_SUBTREE;
         }
         if(Files.exists(dir.resolve(".classpath"))){
-          m_context.setCurrentModuleDirectory(dir);
+          m_context.setModuleDirectory(dir);
         }
         return FileVisitResult.CONTINUE;
-      }
-
-      @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-        if(Files.exists(dir.resolve(".classpath"))){
-          m_context.setCurrentModuleDirectory(null);
-        }
-        return super.postVisitDirectory(dir, exc);
       }
     });
 

@@ -82,21 +82,6 @@ public class JsFile extends AbstractJsElement {
       .computeAliasIfAbsent(jsClass);
   }
 
-//  public JsImport resolveReference(String namespace, String classname){
-//
-//    String fqn = namespace+"."+classname;
-//    JsImport imp = m_imports.get(fqn);
-//    if(imp == null){
-//      String alias = classname;
-//      if(m_jsClasses.stream().filter(c -> c.getName().equalsIgnoreCase(classname)).findFirst().isPresent()){
-//        alias = StringUtility.uppercaseFirst(namespace)+classname;
-//      }
-//      imp = new JsImport(namespace,classname, alias);
-//      m_imports.put(fqn, imp);
-//    }
-//    return imp;
-//  }
-
   public Collection<JsImport> getImports(){
     return Collections.unmodifiableCollection(m_imports.values());
   }

@@ -8,13 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
-import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -27,17 +27,19 @@ public class Context {
   private final Path m_sourceRootDirectory;
   private final Path m_targetRootDirectory;
   private final String m_namespace;
-  private Path m_currentModuleDirectory;
+  private Path m_moduleDirectory;
 
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
+  private Path m_libraryStoreFile;
+  private String m_libraryName;
+
 
   public Context(Path sourceRootDirectory, Path targetRootDirectory, String namespace){
     m_sourceRootDirectory = sourceRootDirectory;
     m_targetRootDirectory = targetRootDirectory;
     m_namespace = namespace;
-
   }
 
   public void setup(){
@@ -85,17 +87,36 @@ public class Context {
     return m_jsClasses.get(fullyQuallifiedName);
   }
 
-  public Path getCurrentModuleDirectory() {
-    return m_currentModuleDirectory;
+  public Path getModuleDirectory() {
+    return m_moduleDirectory;
   }
 
-  public void setCurrentModuleDirectory(Path currentModuleDirectory) {
-    m_currentModuleDirectory = currentModuleDirectory;
+  public void setModuleDirectory(Path moduleDirectory) {
+    m_moduleDirectory = moduleDirectory;
+  }
+
+
+  public void setLibraryName(String libraryName) {
+    m_libraryName = libraryName;
+  }
+
+  public String getLibraryName() {
+    return m_libraryName;
   }
 
   public Path relativeToModule(Path path){
-    Assertions.assertNotNull(getCurrentModuleDirectory());
-    return path.relativize(getCurrentModuleDirectory());
+    Assertions.assertNotNull(getModuleDirectory());
+    return path.relativize(getModuleDirectory());
+  }
+
+  public void setLibraryStoreFile(Path libraryStoreFile) {
+    m_libraryStoreFile = libraryStoreFile;
+  }
+
+
+
+  public Path getLibraryStoreFile() {
+    return m_libraryStoreFile;
   }
 
   public JsFile ensureJsFile(WorkingCopy workingCopy){
@@ -133,7 +154,12 @@ public class Context {
         return FileVisitResult.CONTINUE;
       }
     });
+
     m_jsClasses.values().stream().map(f -> f.getFullyQuallifiedName()).forEach(s -> System.out.println(s));
   }
 
+
+  public Collection<JsClass> getAllJsClasses(){
+    return Collections.unmodifiableCollection(m_jsClasses.values());
+  }
 }
