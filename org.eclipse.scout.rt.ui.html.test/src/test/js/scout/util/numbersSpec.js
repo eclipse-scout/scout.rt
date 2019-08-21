@@ -186,6 +186,7 @@ describe("scout.numbers", function() {
       expect(scout.numbers.shiftDecimalPoint(1234500, -1)).toBe(123450.0);
       expect(scout.numbers.shiftDecimalPoint(1234500, -2)).toBe(12345.00);
       expect(scout.numbers.shiftDecimalPoint(1234500, -10)).toBe(0.0001234500);
+      expect(scout.numbers.shiftDecimalPoint(1e10, -10)).toBe(1);
       expect(scout.numbers.shiftDecimalPoint(25, -1)).toBe(2.5);
       expect(scout.numbers.shiftDecimalPoint(25, -2)).toBe(0.25);
       expect(scout.numbers.shiftDecimalPoint(25, -3)).toBe(0.025);
@@ -199,6 +200,7 @@ describe("scout.numbers", function() {
       expect(scout.numbers.shiftDecimalPoint(0.1, -4)).toBe(0.00001);
       expect(scout.numbers.shiftDecimalPoint(-0.555e3, -3)).toBe(-0.555);
       expect(scout.numbers.shiftDecimalPoint(0.555e-3, -3)).toBe(0.000000555);
+      expect(scout.numbers.shiftDecimalPoint(1e-8, -3)).toBe(0.00000000001);
 
       // to right
       expect(scout.numbers.shiftDecimalPoint(1234500, 1)).toBe(12345000);

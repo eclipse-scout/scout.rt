@@ -166,6 +166,9 @@ scout.numbers = {
 
     number = Math.abs(number);
     var s = scout.strings.asString(number);
+    if (s.indexOf('e') !== -1) {
+      s = number.toFixed(20);
+    }
     var a;
     if (move < 0) {
       // move to left
