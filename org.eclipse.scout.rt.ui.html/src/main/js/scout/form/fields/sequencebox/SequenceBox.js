@@ -156,7 +156,7 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
     this._isErrorStatusOverwritten = false;
   }
 
-  if (this._lastVisibleField.tooltipText) {
+  if (this._lastVisibleField.hasStatusTooltip()) {
     this.setTooltipText(this._lastVisibleField.tooltipText);
     this._isTooltipTextOverwritten = true;
   } else {

@@ -301,6 +301,12 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.TEXT)
+  @Order(55)
+  protected String getConfiguredTooltipAnchor() {
+    return TOOLTIP_ANCHOR_DEFAULT;
+  }
+
   @ConfigProperty(ConfigProperty.COLOR)
   @Order(60)
   protected String getConfiguredForegroundColor() {
@@ -830,6 +836,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     setMandatory(getConfiguredMandatory());
     setOrder(calculateViewOrder());
     setTooltipText(getConfiguredTooltipText());
+    setTooltipAnchor(getConfiguredTooltipAnchor());
     setInitialLabel(getConfiguredLabel());
     setLabel(getConfiguredLabel());
     setLabelPosition(getConfiguredLabelPosition());
@@ -1765,6 +1772,16 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   @Override
   public String getTooltipText() {
     return propertySupport.getPropertyString(PROP_TOOLTIP_TEXT);
+  }
+
+  @Override
+  public void setTooltipAnchor(String tooltipAnchor) {
+    propertySupport.setPropertyString(PROP_TOOLTIP_ANCHOR, tooltipAnchor);
+  }
+
+  @Override
+  public String getTooltipAnchor() {
+    return propertySupport.getPropertyString(PROP_TOOLTIP_ANCHOR);
   }
 
   @Override

@@ -26,6 +26,7 @@
       "mandatory": false,
       "statusVisible": true,
       "statusPosition": "default",
+      "tooltipAnchor": "default",
       "menus": [],
       "menusVisible": false,
       "preventInitialFocus": false,

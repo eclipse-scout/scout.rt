@@ -82,6 +82,12 @@ public abstract class JsonFormField<FORM_FIELD extends IFormField> extends Abstr
         return getModel().getTooltipText();
       }
     });
+    putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_TOOLTIP_ANCHOR, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTooltipAnchor();
+      }
+    });
     putJsonProperty(new JsonProperty<FORM_FIELD>(IFormField.PROP_STATUS_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {

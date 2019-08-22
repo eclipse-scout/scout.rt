@@ -176,6 +176,42 @@ describe('FormField', function() {
 
   });
 
+  describe('property tooltipAnchor', function() {
+    var formField, model;
+
+    beforeEach(function() {
+      model = helper.createFieldModel();
+      formField = createFormField(model);
+    });
+
+    it('hasStatusTooltip / hasOnFieldTooltip', function() {
+      expect(formField.tooltipText).toBeFalsy();
+      expect(formField.hasStatusTooltip()).toBe(false);
+      expect(formField.hasOnFieldTooltip()).toBe(false);
+
+      formField.setTooltipText('foo');
+      expect(formField.hasStatusTooltip()).toBe(true);
+      expect(formField.hasOnFieldTooltip()).toBe(false);
+
+      formField.setTooltipAnchor(scout.FormField.TooltipAnchor.ON_FIELD);
+      expect(formField.hasStatusTooltip()).toBe(false);
+      expect(formField.hasOnFieldTooltip()).toBe(true);
+    });
+
+    it('show tooltip on status-icon click or on on-field hover', function() {
+      formField.render();
+      formField.setTooltipText('foo');
+
+      // expect a status-icon
+      expect(formField.$field.hasClass('has-tooltip')).toBe(true);
+
+      // expect status-icon to become invisible
+      formField.setTooltipAnchor(scout.FormField.TooltipAnchor.ON_FIELD);
+      expect(formField.$field.hasClass('has-tooltip')).toBe(false);
+    });
+
+  });
+
   describe('property menus', function() {
     var formField, model;
 

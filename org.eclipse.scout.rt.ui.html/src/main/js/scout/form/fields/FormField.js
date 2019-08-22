@@ -38,6 +38,7 @@ scout.FormField = function() {
   this.statusVisible = true;
   this.touched = false;
   this.tooltipText = null;
+  this.tooltipAnchor = scout.FormField.TooltipAnchor.DEFAULT;
 
   this.$label = null;
   /**
@@ -66,7 +67,9 @@ scout.FormField = function() {
   this.$disabledCopyOverlay = null;
 
   this._addWidgetProperties(['keyStrokes', 'menus', 'statusMenuMappings']);
-  this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition', 'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings', 'tooltipText']);
+  this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
+                            'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
+                            'tooltipText', 'tooltipAnchor']);
 };
 scout.inherits(scout.FormField, scout.Widget);
 
@@ -89,6 +92,11 @@ scout.FormField.LabelPosition = {
   ON_FIELD: 2,
   RIGHT: 3,
   TOP: 4
+};
+
+scout.FormField.TooltipAnchor = {
+  DEFAULT: 'default',
+  ON_FIELD: 'onField'
 };
 
 scout.FormField.LabelWidth = {
@@ -291,13 +299,46 @@ scout.FormField.prototype.setTooltipText = function(tooltipText) {
 };
 
 scout.FormField.prototype._renderTooltipText = function() {
-  var tooltipText = this.tooltipText;
-  var hasTooltipText = scout.strings.hasText(tooltipText);
+  this._updateTooltip();
+};
+
+scout.FormField.prototype.setTooltipAnchor = function(tooltipAnchor) {
+  this.setProperty('tooltipAnchor', tooltipAnchor);
+};
+
+scout.FormField.prototype._renderTooltipAnchor = function() {
+  this._updateTooltip();
+};
+
+scout.FormField.prototype._updateTooltip = function() {
+  var hasTooltipText = this.hasStatusTooltip();
   this.$container.toggleClass('has-tooltip', hasTooltipText);
   if (this.$field) {
     this.$field.toggleClass('has-tooltip', hasTooltipText);
   }
   this._updateFieldStatus();
+
+  if (this.$fieldContainer) {
+    if (this.hasOnFieldTooltip()) {
+      scout.tooltips.install(this.$fieldContainer, {
+        parent: this,
+        text: this.tooltipText,
+        arrowPosition: 50
+      });
+    } else {
+      scout.tooltips.uninstall(this.$fieldContainer);
+    }
+  }
+};
+
+scout.FormField.prototype.hasStatusTooltip = function() {
+  return this.tooltipAnchor === scout.FormField.TooltipAnchor.DEFAULT &&
+    scout.strings.hasText(this.tooltipText);
+};
+
+scout.FormField.prototype.hasOnFieldTooltip = function() {
+  return this.tooltipAnchor === scout.FormField.TooltipAnchor.ON_FIELD &&
+    scout.strings.hasText(this.tooltipText);
 };
 
 /**
@@ -437,7 +478,7 @@ scout.FormField.prototype._updateFieldStatus = function() {
     status = errorStatus;
     autoRemove = !status.isError();
     menus = this._getMenusForStatus(errorStatus);
-  } else if (!scout.strings.empty(this.tooltipText)) {
+  } else if (this.hasStatusTooltip()) {
     status = scout.create('Status', {
       message: this.tooltipText,
       severity: scout.Status.Severity.OK
@@ -467,7 +508,7 @@ scout.FormField.prototype._computeStatusVisible = function() {
   var status = this._errorStatus(),
     statusVisible = this.statusVisible,
     hasStatus = !!status,
-    hasTooltip = !!this.tooltipText;
+    hasTooltip = this.hasStatusTooltip();
 
   return !this.suppressStatus && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
 };

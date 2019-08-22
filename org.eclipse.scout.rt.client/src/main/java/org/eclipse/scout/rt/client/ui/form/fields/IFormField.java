@@ -72,6 +72,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String PROP_ORDER = "order";
   String PROP_ERROR_STATUS = "errorStatus";
   String PROP_TOOLTIP_TEXT = "tooltipText";
+  String PROP_TOOLTIP_ANCHOR = "tooltipAnchor";
   String PROP_FOREGROUND_COLOR = "foregroundColor";
   String PROP_BACKGROUND_COLOR = "backgroundColor";
   String PROP_FONT = "font";
@@ -177,6 +178,16 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
 
   int DISABLED_STYLE_DEFAULT = 0;
   int DISABLED_STYLE_READ_ONLY = 1;
+
+  /**
+   * Tooltip anchor is automatically determined by the form field. In most cases the tooltip will be shown on the status
+   * icon.
+   */
+  String TOOLTIP_ANCHOR_DEFAULT = "default";
+  /**
+   * Tooltip anchor is the center on the form field.
+   */
+  String TOOLTIP_ANCHOR_ON_FIELD = "onField";
 
   IForm getForm();
 
@@ -416,6 +427,10 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
   String getTooltipText();
 
   void setTooltipText(String text);
+
+  void setTooltipAnchor(String tooltipAnchor);
+
+  String getTooltipAnchor();
 
   /**
    * Rebuild the {@link IFormField#PROP_KEY_STROKES} property using the internal set of properties and by calling
