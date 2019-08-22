@@ -638,6 +638,11 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void removeAddOn(Object addOn) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public Collection<Object> getAddOns() {
     throw createUnsupportedOperationException();
   }

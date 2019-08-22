@@ -3105,6 +3105,13 @@ scout.Table.prototype._rowsToIds = function(rows) {
 };
 
 /**
+ * Checks whether the given row is contained in the table. Uses the id of the row for the lookup.
+ */
+scout.Table.prototype.hasRow = function(row) {
+  return !!this.rowsMap[row.id];
+};
+
+/**
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */

@@ -2257,6 +2257,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   }
 
   @Override
+  public void removeAddOn(Object addOn) {
+    m_addOns.remove(addOn);
+  }
+
+  @Override
   public IDesktopUIFacade getUIFacade() {
     return m_uiFacade;
   }

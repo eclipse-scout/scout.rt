@@ -771,6 +771,11 @@ public interface IDesktop extends IWidget, IDisplayParent, IStyleable, IContextM
   void addAddOn(Object addOn);
 
   /**
+   * Removes an add-on. Does not have an effect when the Desktop is already rendered.
+   */
+  void removeAddOn(Object addOn);
+
+  /**
    * Returns true while outline is changing, which happens when <code>setOutline(IOutline)</code> is called.
    *
    * @return whether or not outline is changing

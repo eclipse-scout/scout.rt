@@ -3024,6 +3024,9 @@ scout.Tree.prototype._nodeById = function(id) {
   return this.nodesMap[id];
 };
 
+/**
+ * Checks whether the given node is contained in the tree. Uses the id of the node for the lookup.
+ */
 scout.Tree.prototype.hasNode = function(node) {
   return !!this._nodeById(node.id);
 };
