@@ -413,6 +413,13 @@ scout.Device.prototype.supportsDownloadInSameWindow = function() {
   return scout.Device.Browser.FIREFOX !== this.browser;
 };
 
+scout.Device.prototype.supportsWebcam = function() {
+  return this.supportsFeature('_webcam', function check(property) {
+    var getUserMedia = scout.objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
+    return scout.objects.isFunction(getUserMedia);
+  });
+};
+
 scout.Device.prototype.hasPrettyScrollbars = function() {
   return this.supportsFeature('_prettyScrollbars', function check(property) {
     return this.scrollbarWidth === 0;
