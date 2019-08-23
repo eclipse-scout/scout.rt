@@ -55,7 +55,7 @@ scout.LookupBox.prototype._render = function() {
   this.addFieldContainer(this.$parent.makeDiv());
 
   var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(this._createLayout());
+  htmlComp.setLayout(this._createFieldContainerLayout());
 
   this._ensureLookupCallExecuted();
   this._renderStructure();

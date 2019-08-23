@@ -189,7 +189,7 @@ scout.GroupBox.prototype._keyStrokeBindTarget = function() {
 };
 
 scout.GroupBox.prototype._render = function() {
-  this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box', this._createLayout());
+  this.addContainer(this.$parent, this.mainBox ? 'root-group-box' : 'group-box');
 
   this.$title = this.$container.appendDiv('group-box-title');
   this.addLabel();

@@ -36,7 +36,7 @@ scout.ListBox.prototype._render = function() {
   this.$container.addClass('list-box');
 };
 
-scout.ListBox.prototype._createLayout = function() {
+scout.ListBox.prototype._createFieldContainerLayout = function() {
   return new scout.ListBoxLayout(this, this.table, this.filterBox);
 };
 

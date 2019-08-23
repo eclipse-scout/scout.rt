@@ -39,7 +39,7 @@ scout.TreeBox.prototype._render = function() {
   this.$container.addClass('tree-box');
 };
 
-scout.TreeBox.prototype._createLayout = function() {
+scout.TreeBox.prototype._createFieldContainerLayout = function() {
   return new scout.TreeBoxLayout(this, this.tree, this.filterBox);
 };
 
