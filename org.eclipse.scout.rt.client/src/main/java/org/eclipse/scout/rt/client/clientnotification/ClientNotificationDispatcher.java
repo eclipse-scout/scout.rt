@@ -76,7 +76,7 @@ public class ClientNotificationDispatcher {
               for (String sessionId : address.getSessionIds()) {
                 IClientSession session = notificationService.getClientSession(sessionId);
                 if (session == null) {
-                  LOG.warn("received notification for invalid session '{}'.", sessionId);
+                  LOG.info("received notification for invalid session '{}'.", sessionId);
                 }
                 else {
                   dispatchForSession(session, notification, address);
