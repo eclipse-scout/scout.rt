@@ -26,7 +26,7 @@ public class DuplicateRequestException extends PlatformException {
     super(message, args);
   }
 
-  public static DuplicateRequestException create(String sessionId, long requestSeq) {
-    return new DuplicateRequestException("request {} of session '{}' was already sent, this is a duplicate or retry submission; check if some proxy or agents have retry-post enabled.", requestSeq, sessionId);
+  public static DuplicateRequestException create(String context, long requestSeq) {
+    return new DuplicateRequestException("request {} of {} was already sent, this is a duplicate or retry submission; check if some proxy or agents have retry-post enabled.", requestSeq, context);
   }
 }
