@@ -11,7 +11,6 @@
 scout.TabAreaLayout = function(tabArea) {
   scout.TabAreaLayout.parent.call(this);
   this.tabArea = tabArea;
-  this.$ellipsis;
   this.overflowTabs = [];
   this.visibleTabs = [];
   this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
@@ -51,7 +50,6 @@ scout.TabAreaLayout.prototype.layout = function($container) {
 
   ellipsis.setText(this.overflowTabs.length + '');
 
-  // set childActions to empty array to prevent the menuItems from calling remove.
   ellipsis.setChildActions(this.overflowTabs.map(function(tab) {
     var menu = scout.create('Menu', {
       parent: ellipsis,

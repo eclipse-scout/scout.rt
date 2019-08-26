@@ -43,7 +43,7 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
  * Returns viewport sensitive information containing the first and last visible row in the viewport.
  */
 scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
-  var x, y, viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
+  var viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
     table = this.field,
     viewport = {},
     rows = table.visibleRows;
@@ -62,10 +62,6 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
     viewportBounds.y -= Math.abs(dataMarginTop);
     viewportBounds.height += Math.abs(dataMarginTop);
   }
-
-  // get first element at the top of the viewport
-  x = viewportBounds.x + 1;
-  y = viewportBounds.y + 1;
 
   firstRow = this._findFirstRowInViewport(table, viewportBounds);
   lastRow = this._findLastRowInViewport(table, rows.indexOf(firstRow), viewportBounds);

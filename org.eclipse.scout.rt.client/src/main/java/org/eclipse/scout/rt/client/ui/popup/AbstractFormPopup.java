@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IWidget;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
+import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
@@ -22,7 +23,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
  * @since 9.0
  */
 @ClassId("5930294f-05ea-4fd3-be84-963aac6ee4f8")
-public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
+public abstract class AbstractFormPopup<T extends IForm> extends AbstractWidgetPopup<T> {
 
   public AbstractFormPopup() {
     this(true);
@@ -33,20 +34,14 @@ public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
   }
 
   /**
-   * Uses {@link #createForm()} to create a new form instance and starts that form afterwards.
+   * Uses {@link #createForm()} to create a new form instance.
    *
-   * @return the newly created and started form.
+   * @return the newly created form.
    */
   @Override
-  protected IForm createWidget() {
-    IForm form = createForm();
+  protected T createWidget() {
+    T form = createForm();
     decorateForm(form);
-    form.start();
-    form.addFormListener(e -> {
-      if (e.getType() == FormEvent.TYPE_CLOSED) {
-        close();
-      }
-    });
     return form;
   }
 
@@ -56,8 +51,8 @@ public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
    *
    * @return a new form instance.
    */
-  protected IForm createForm() {
-    Class<IForm> configuredWidget = getConfiguredWidget();
+  protected T createForm() {
+    Class<T> configuredWidget = getConfiguredWidget();
     if (configuredWidget != null) {
       return ConfigurationUtility.newInnerInstance(this, configuredWidget);
     }
@@ -75,6 +70,12 @@ public abstract class AbstractFormPopup extends AbstractWidgetPopup<IForm> {
       return;
     }
     startForm();
+    FormListener listener = e -> {
+      if (e.getType() == FormEvent.TYPE_CLOSED) {
+        close();
+      }
+    };
+    getWidget().addFormListener(listener);
   }
 
   /**
