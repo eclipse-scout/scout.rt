@@ -11,7 +11,7 @@
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.FocusManager', function() {
-  var session, formHelper, focusHelper, form, focusManager;
+  var session, formHelper, focusHelper, focusManager;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -49,8 +49,6 @@ describe('scout.FocusManager', function() {
   });
 
   describe('Focus fixes for Internet Explorer (IE)', function() {
-
-    var $sandbox = $('#sandbox');
 
     beforeEach(function() {
       // simulate we are an IE
@@ -204,4 +202,81 @@ describe('scout.FocusManager', function() {
 
   });
 
+  describe('requestFocus', function() {
+    it('focuses the given element', function() {
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+
+      focusManager.requestFocus($container1.children('.input1'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+
+      focusManager.uninstallFocusContext($container1);
+    });
+
+    it('activates the context of the element if the element to focus is not in the active context', function() {
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+      focusManager.installFocusContext($container2);
+
+      focusManager.requestFocus($container1.children('.input1'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
+
+      focusManager.requestFocus($container2.children('.input2'));
+      expect(document.activeElement).toBe($container2.children('.input2')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container2[0]);
+
+      focusManager.uninstallFocusContext($container1);
+      focusManager.uninstallFocusContext($container2);
+    });
+
+    it('does nothing if the element cannot be focused', function() {
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+      focusManager.installFocusContext($container2);
+
+      focusManager.requestFocus($container1.children('.input1'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
+
+      // Container2 is covered by a glass pane -> requesting focus on a covered element should do nothing
+      var glassPane = scout.create('GlassPane', {
+        parent: session.desktop
+      });
+      glassPane.render($container2);
+      focusManager.requestFocus($container2.children('.input2'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
+
+      focusManager.uninstallFocusContext($container1);
+      focusManager.uninstallFocusContext($container2);
+    });
+
+    it('activates the correct context', function() {
+      var $input0 = session.$entryPoint.appendElement('<input type="text" class="input0">');
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      var $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+      focusManager.installFocusContext($container2);
+
+      focusManager.requestFocus($input0);
+      expect(document.activeElement).toBe($input0[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe(session.$entryPoint[0]);
+
+      focusManager.requestFocus($container1.children('.input1'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
+
+      focusManager.requestFocus($container2.children('.input2'));
+      expect(document.activeElement).toBe($container2.children('.input2')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container2[0]);
+
+      focusManager.uninstallFocusContext(session.$entryPoint);
+      focusManager.uninstallFocusContext($container1);
+      focusManager.uninstallFocusContext($container2);
+    });
+  });
 });

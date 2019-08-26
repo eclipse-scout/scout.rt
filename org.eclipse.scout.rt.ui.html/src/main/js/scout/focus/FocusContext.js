@@ -179,10 +179,16 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   if (!this.focusManager.active) {
     return;
   }
+  var blur = !elementToFocus;
 
   // Check whether the element is covert by a glasspane
   if (this.focusManager.isElementCovertByGlassPane(elementToFocus)) {
     elementToFocus = null;
+    if (!blur) {
+      // If focus should be removed (blur), don't break here and try to focus the root element
+      // Otherwise, if desired element cannot be focused then break and leave the focus where it is
+      return false;
+    }
   }
 
   // Focus $entryPoint if current focus is to be blured.

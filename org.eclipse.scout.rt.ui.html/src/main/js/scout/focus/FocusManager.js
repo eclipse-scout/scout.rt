@@ -267,7 +267,7 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
 /**
  * Requests the focus for the given element, but only if being a valid focus location.
  *
- * @return true if focus was gained, or false otherwise.
+ * @return {boolean} true if focus was gained, false otherwise.
  */
 scout.FocusManager.prototype.requestFocus = function(element, filter) {
   element = element instanceof $ ? element[0] : element;
@@ -275,9 +275,9 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
     return false;
   }
 
-  var activeContext = this._findActiveContext();
-  if (activeContext) {
-    activeContext.validateAndSetFocus(element, filter);
+  var context = this._findFocusContextFor(element);
+  if (context) {
+    context.validateAndSetFocus(element, filter);
   }
 
   return scout.focusUtils.isActiveElement(element);
@@ -360,6 +360,23 @@ scout.FocusManager.prototype._findFocusContext = function($container) {
   return scout.arrays.find(this._focusContexts, function(focusContext) {
     return focusContext.$container === $container;
   });
+};
+
+scout.FocusManager.prototype._findFocusContextFor = function($element) {
+  $element = $.ensure($element);
+  var context = null;
+  var distance = Number.MAX_VALUE;
+  this._focusContexts.forEach(function(focusContext) {
+    if (!focusContext.$container.isOrHas($element)) {
+      return;
+    }
+    // Return the context which is closest to the element
+    var length = $element.parentsUntil(focusContext.$container).length;
+    if (length < distance) {
+      context = focusContext;
+    }
+  });
+  return context;
 };
 
 /**
