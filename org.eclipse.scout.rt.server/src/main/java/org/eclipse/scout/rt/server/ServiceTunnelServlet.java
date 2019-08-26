@@ -197,7 +197,13 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
       SequenceNumberDuplicateDetector duplicateRequestDetector = (SequenceNumberDuplicateDetector) session
           .computeDataIfAbsent(DUPLICATE_REQUEST_DETECTOR_SESSION_KEY, SequenceNumberDuplicateDetector::new);
       if (!duplicateRequestDetector.accept(serviceRequest.getRequestSequence())) {
-        throw DuplicateRequestException.create(serviceRequest.getSessionId(), serviceRequest.getRequestSequence());
+        StringBuilder buf = new StringBuilder()
+            .append("clientNodeId: ").append(serviceRequest.getClientNodeId())
+            .append(", ")
+            .append("sessionId: ").append(serviceRequest.getSessionId())
+            .append(", ")
+            .append("operation: ").append(serviceRequest.getServiceInterfaceClassName()).append(".").append(serviceRequest.getOperation());
+        throw DuplicateRequestException.create(buf.toString(), serviceRequest.getRequestSequence());
       }
     }
     return serverRunContext;
