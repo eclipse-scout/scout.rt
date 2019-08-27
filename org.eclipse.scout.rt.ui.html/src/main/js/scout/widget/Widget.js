@@ -76,6 +76,9 @@ scout.Widget = function() {
   this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
   this._scrollHandler = this._onScroll.bind(this);
   this.events = this._createEventSupport();
+  this.events.registerSubTypePredicate('propertyChange', function(event, propertyName) {
+    return event.propertyName === propertyName;
+  });
   this.loadingSupport = this._createLoadingSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
   // Widgets using scout.LogicalGridLayout may have a grid to calculate the grid data of the children
@@ -168,7 +171,7 @@ scout.Widget.prototype._jsonModel = function() {};
 
 /**
  * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
- * @returns an array of created widgets if models was an array. Or the created widget if models is not an array.
+ * @returns {scout.Widget[]|scout.Widget}an array of created widgets if models was an array. Or the created widget if models is not an array.
  */
 scout.Widget.prototype._createChildren = function(models) {
   if (!models) {
@@ -583,7 +586,7 @@ scout.Widget.prototype._removeChild = function(child) {
 };
 
 /**
- * @returns a list of all ancestors
+ * @returns {scout.Widget[]} a list of all ancestors
  */
 scout.Widget.prototype.ancestors = function() {
   var ancestors = [];
@@ -596,7 +599,7 @@ scout.Widget.prototype.ancestors = function() {
 };
 
 /**
- * @returns true if the given widget is the same as this or a descendant
+ * @returns {boolean} true if the given widget is the same as this or a descendant
  */
 scout.Widget.prototype.isOrHas = function(widget) {
   if (widget === this) {
@@ -606,7 +609,7 @@ scout.Widget.prototype.isOrHas = function(widget) {
 };
 
 /**
- * @returns true if the given widget is a descendant
+ * @returns {boolean} true if the given widget is a descendant
  */
 scout.Widget.prototype.has = function(widget) {
   while (widget) {
@@ -627,7 +630,7 @@ scout.Widget.prototype.getForm = function() {
 };
 
 /**
- * @returns the first form which is not an inner form of a wrapped form field
+ * @returns {scout.Form} the first form which is not an inner form of a wrapped form field
  */
 scout.Widget.prototype.findNonWrappedForm = function() {
   return scout.Form.findNonWrappedForm(this);
@@ -649,12 +652,12 @@ scout.Widget.prototype.findDesktop = function() {
 /**
  * Changes the enabled property of this form field to the given value.
  *
- * @param enabled
+ * @param {boolean} enabled
  *          Required. The new enabled value
- * @param updateParents
+ * @param {boolean} [updateParents]
  *          (optional) If true, the enabled property of all parent form fields are
  *          updated to same value as well. Default is false.
- * @param updateChildren
+ * @param {boolean} [updateChildren]
  *          (optional) If true the enabled property of all child form fields (recursive)
  *          are updated to same value as well. Default is false.
  */
@@ -773,7 +776,7 @@ scout.Widget.prototype._renderVisible = function() {
 };
 
 /**
- * @returns true if every parent within the hierarchy is visible.
+ * @returns {boolean} true if every parent within the hierarchy is visible.
  */
 scout.Widget.prototype.isEveryParentVisible = function() {
   var parent = this.parent;
@@ -1791,7 +1794,7 @@ scout.Widget.prototype.callSetter = function(propertyName, value) {
  * Returns the widget with the requested ID or null if no widget has been found.
  *
  * @param widgetId
- * @returns the found widget for the given id
+ * @returns {scout.Widget} the found widget for the given id
  */
 scout.Widget.prototype.widget = function(widgetId) {
   if (predicate(this)) {
@@ -1821,7 +1824,7 @@ scout.Widget.prototype.findParent = function(predicate) {
 };
 
 /**
- * @returns the first child for which the given function returns true.
+ * @returns {scout.Widget} the first child for which the given function returns true.
  */
 scout.Widget.prototype.findChild = function(predicate) {
   var foundChild = null;
@@ -1876,7 +1879,7 @@ scout.Widget.prototype._onFocusIn = function(event) {
  * Tries to set the focus on the widget.
  * <p>
  * By default the focus is set on the container but this may vary from widget to widget.
- * @returns true if the element could be focused, false if not
+ * @returns {boolean} true if the element could be focused, false if not
  */
 scout.Widget.prototype.focus = function() {
   if (!this.rendered) {
@@ -1908,7 +1911,7 @@ scout.Widget.prototype.isFocused = function() {
 };
 
 /**
- * @return true if the element is focusable, false if not.
+ * @return {boolean} true if the element is focusable, false if not.
  */
 scout.Widget.prototype.isFocusable = function() {
   if (!this.rendered || !this.visible) {

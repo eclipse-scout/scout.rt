@@ -897,6 +897,261 @@ describe('Widget', function() {
 
   });
 
+  describe('on', function() {
+    it('supports propertyChange:propertyName', function() {
+      var type1ExecCount = 0;
+      var type1Type = null;
+      var type2ExecCount = 0;
+      var type2Type = null;
+      var noTypeExecCount = 0;
+      var noTypeType = null;
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.on('propertyChange:type1', function(event) {
+        type1ExecCount++;
+        type1Type = event.propertyName;
+      });
+      widget.on('propertyChange:type2', function(event) {
+        type2ExecCount++;
+        type2Type = event.propertyName;
+      });
+      widget.on('propertyChange', function(event) {
+        noTypeExecCount++;
+        noTypeType = event.propertyName;
+      });
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type1Type).toBe('type1');
+      expect(type2ExecCount).toBe(0);
+      expect(noTypeExecCount).toBe(1);
+      expect(noTypeType).toBe('type1');
+
+      type1ExecCount = 0;
+      type1Type = null;
+      type2ExecCount = 0;
+      type2Type = null;
+      noTypeExecCount = 0;
+      noTypeType = null;
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(0);
+      expect(type2ExecCount).toBe(1);
+      expect(type2Type).toBe('type2');
+      expect(noTypeExecCount).toBe(1);
+      expect(noTypeType).toBe('type2');
+
+      type1ExecCount = 0;
+      type1Type = null;
+      type2ExecCount = 0;
+      type2Type = null;
+      noTypeExecCount = 0;
+      noTypeType = null;
+      widget.triggerPropertyChange('abc', 'old', 'new');
+      expect(type1ExecCount).toBe(0);
+      expect(type2ExecCount).toBe(0);
+      expect(noTypeExecCount).toBe(1);
+      expect(noTypeType).toBe('abc');
+    });
+  });
+
+  describe('one', function() {
+    it('supports propertyChange:propertyName', function() {
+      var type1ExecCount = 0;
+      var type1Type = null;
+      var type2ExecCount = 0;
+      var type2Type = null;
+      var noTypeExecCount = 0;
+      var noTypeType = null;
+      var widget = createWidget({
+        parent: parent
+      });
+      widget.one('propertyChange:type1', function(event) {
+        type1ExecCount++;
+        type1Type = event.propertyName;
+      });
+      widget.one('propertyChange:type2', function(event) {
+        type2ExecCount++;
+        type2Type = event.propertyName;
+
+      });
+      widget.one('propertyChange', function(event) {
+        noTypeExecCount++;
+        noTypeType = event.propertyName;
+      });
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type1Type).toBe('type1');
+      expect(type2ExecCount).toBe(0);
+      expect(noTypeExecCount).toBe(1);
+      expect(noTypeType).toBe('type1');
+
+      // Do the same -> no handler must be executed
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(0);
+      expect(noTypeExecCount).toBe(1);
+
+      // Trigger type2 -> since it was not executed yet it will be executed now
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(1);
+      expect(noTypeExecCount).toBe(1);
+    });
+  });
+
+  describe('off', function() {
+    it('supports propertyChange:propertyName', function() {
+      var type1ExecCount = 0;
+      var type2ExecCount = 0;
+      var noTypeExecCount = 0;
+      var widget = createWidget({
+        parent: parent
+      });
+      var func1 = function(event) {
+        type1ExecCount++;
+      };
+      widget.on('propertyChange:type1', func1);
+      var func2 = function(event) {
+        type2ExecCount++;
+      };
+      widget.on('propertyChange:type2', func2);
+      var noFunc = function(event) {
+        noTypeExecCount++;
+      };
+      widget.on('propertyChange', noFunc);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(1);
+      expect(noTypeExecCount).toBe(2);
+
+      widget.off('propertyChange:type1', func1);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(2);
+      expect(noTypeExecCount).toBe(4);
+
+      widget.off('propertyChange', noFunc);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(3);
+      expect(noTypeExecCount).toBe(4);
+
+      widget.off('propertyChange:type2', func2);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(3);
+      expect(noTypeExecCount).toBe(4);
+    });
+
+    it('supports propertyChange:propertyName also when only using type to detach', function() {
+      var type1ExecCount = 0;
+      var type2ExecCount = 0;
+      var noTypeExecCount = 0;
+      var widget = createWidget({
+        parent: parent
+      });
+      var func1 = function(event) {
+        type1ExecCount++;
+      };
+      var func2 = function(event) {
+        type2ExecCount++;
+      };
+      var noFunc = function(event) {
+        noTypeExecCount++;
+      };
+      widget.on('propertyChange:type1', func1);
+      widget.on('propertyChange:type2', func2);
+      widget.on('propertyChange:type2a', func2);
+      widget.on('propertyChange', noFunc);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(2);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off('propertyChange');
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(4);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off('propertyChange:type1');
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(6);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off('propertyChange:type2');
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(7);
+      expect(noTypeExecCount).toBe(3);
+    });
+
+    it('supports propertyChange:propertyName also when only using func to detach', function() {
+      var type1ExecCount = 0;
+      var type2ExecCount = 0;
+      var noTypeExecCount = 0;
+      var widget = createWidget({
+        parent: parent
+      });
+      var func1 = function(event) {
+        type1ExecCount++;
+      };
+      var func2 = function(event) {
+        type2ExecCount++;
+      };
+      var noFunc = function(event) {
+        noTypeExecCount++;
+      };
+      widget.on('propertyChange:type1', func1);
+      widget.on('propertyChange:type2', func2);
+      widget.on('propertyChange:type2a', func2);
+      widget.on('propertyChange', noFunc);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(1);
+      expect(type2ExecCount).toBe(2);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off(null, noFunc);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(4);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off(null, func1);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(6);
+      expect(noTypeExecCount).toBe(3);
+
+      widget.off(null, func2);
+      widget.triggerPropertyChange('type1', 'old', 'new');
+      widget.triggerPropertyChange('type2', 'old', 'new');
+      widget.triggerPropertyChange('type2a', 'old', 'new');
+      expect(type1ExecCount).toBe(2);
+      expect(type2ExecCount).toBe(6);
+      expect(noTypeExecCount).toBe(3);
+    });
+  });
+
   describe("property css class", function() {
 
     it("adds or removes custom css class", function() {
