@@ -14,9 +14,9 @@
   <artifactId>eclipse-scout-cli</artifactId>
 
   <properties>
-    <scout.skip.pnpm.install.dev>true</scout.skip.pnpm.install.dev>
-    <scout.skip.pnpm.install.prod>true</scout.skip.pnpm.install.prod>
-    <scout.skip.karma>true</scout.skip.karma>
+    <master_skip_pnpm_install_dev>true</master_skip_pnpm_install_dev>
+    <master_skip_pnpm_install_prod>true</master_skip_pnpm_install_prod>
+    <master_webTest_skip>true</master_webTest_skip>
   </properties>
 
   <build>
