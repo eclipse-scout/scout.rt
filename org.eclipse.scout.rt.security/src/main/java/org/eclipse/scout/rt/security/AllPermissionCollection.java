@@ -22,10 +22,12 @@ public class AllPermissionCollection extends AbstractPermissionCollection {
 
   @Override
   public void add(Permission permission) {
+    // ignore explicit add operation
   }
 
   @Override
   public void add(IPermission permission) {
+    // ignore explicit add operation
   }
 
   @Override
