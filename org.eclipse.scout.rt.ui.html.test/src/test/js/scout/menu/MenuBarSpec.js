@@ -176,6 +176,29 @@ describe("MenuBar", function() {
 
   });
 
+  describe('focus', function() {
+    it('MenuBar must update tabbable when a menu item is focused', function() {
+      // otherwise the menu item can not have the focus, because the DOM element is not focusable without a tabindex.
+      var menuModel = helper.createModel();
+      menuModel.menuTypes = ['Table.EmptySpace'];
+
+      var menu1 = helper.createMenu($.extend({}, menuModel, { id: 'menu1', text: 'Menu 1' }));
+      var menu2 = helper.createMenu($.extend({}, menuModel, { id: 'menu2', text: 'Menu 2' }));
+
+      var menuBar = createMenuBar();
+      menuBar.render();
+      menuBar.setMenuItems([menu1, menu2]);
+
+      menu1.focus();
+      expect(menu1.$container.attr('tabindex')).toBe('0');
+      expect(menu2.$container.attr('tabindex')).toBe(undefined);
+
+      menu2.focus();
+      expect(menu1.$container.attr('tabindex')).toBe(undefined);
+      expect(menu2.$container.attr('tabindex')).toBe('0');
+    });
+  });
+
   describe('propertyChange', function() {
     var menu, menuBar;
 
@@ -197,11 +220,11 @@ describe("MenuBar", function() {
     });
 
     // Note: the menu alone has already an event listener
-    it('must remove property change listeners on destroy', function() {
+    it('must remove property-change and focus listeners on destroy', function() {
       expect(menu.events.count()).toBe(1);
 
       menuBar.setMenuItems([menu]);
-      expect(menu.events.count()).toBe(2);
+      expect(menu.events.count()).toBe(3);
 
       menuBar.destroy();
       expect(menu.events.count()).toBe(1);

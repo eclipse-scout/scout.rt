@@ -27,6 +27,7 @@ scout.MenuBar = function() {
   this.visible = false;
   this.ellipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
+  this._focusHandler = this._onMenuItemFocus.bind(this);
   this._addWidgetProperties('menuItems');
 };
 scout.inherits(scout.MenuBar, scout.Widget);
@@ -144,12 +145,16 @@ scout.MenuBar.prototype._attachMenuHandlers = function() {
     if (item.events.count('propertyChange', this._menuItemPropertyChangeHandler) === 0) {
       item.on('propertyChange', this._menuItemPropertyChangeHandler);
     }
+    if (item.events.count('focus', this._focusHandler) === 0) {
+      item.on('focus', this._focusHandler);
+    }
   }, this);
 };
 
 scout.MenuBar.prototype._detachMenuHandlers = function() {
   this.orderedMenuItems.all.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
+    item.off('focus', this._focusHandler);
   }.bind(this));
 };
 
@@ -414,6 +419,10 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
     this.updateDefaultMenu();
   }
+};
+
+scout.MenuBar.prototype._onMenuItemFocus = function(event) {
+  this.setTabbableMenu(event.source);
 };
 
 scout.MenuBar.prototype.reorderMenus = function(rightFirst) {
