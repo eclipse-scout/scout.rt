@@ -36,6 +36,7 @@
   __include("scout/util/events.js");
   __include("scout/util/Device.js");
   __include("scout/util/DoubleClickSupport.js");
+  __include("scout/util/DragAndDropHandler.js");
   __include("scout/util/dragAndDrop.js");
   __include("scout/util/Event.js");
   __include("scout/util/EventSupport.js");
@@ -50,6 +51,7 @@
   __include("scout/util/numbers.js");
   __include("scout/util/objects.js");
   __include("scout/util/polyfills.js");
+  __include("scout/util/PromiseCreator.js");
   __include("scout/util/promises.js");
   __include("scout/util/Range.js");
   __include("scout/util/Status.js");
@@ -89,6 +91,10 @@
   __include("scout/session/UserAgent.js");
   __include("scout/session/WidgetEventTypeFilter.js");
   // Basic layout
+  __include("scout/layout/Dimension.js");
+  __include("scout/layout/Insets.js");
+  __include("scout/layout/Point.js");
+  __include("scout/layout/Rectangle.js");
   __include("scout/layout/graphics.js");
   __include("scout/layout/HtmlEnvironment.js");
   __include("scout/layout/AbstractLayout.js");
@@ -161,6 +167,7 @@
   __include("scout/text/TextMap.js");
   __include("scout/text/texts.js");
   __include("scout/tooltip/Tooltip.js");
+  __include("scout/tooltip/TooltipSupport.js");
   __include("scout/tooltip/tooltips.js");
   __include("scout/tooltip/WidgetTooltip.js");
   __include("scout/action/Action.js");
@@ -207,6 +214,12 @@
   __include("scout/menu/MenuItemsOrder.js");
   __include("scout/menu/ContextMenuPopup.js");
   __include("scout/menu/ContextMenuPopupLayout.js");
+  __include("scout/menu/MenuNavigationKeyStroke.js");
+  __include("scout/menu/MenuNavigationExecKeyStroke.js");
+  __include("scout/menu/MenuExecByNumberKeyStroke.js");
+  __include("scout/menu/MenuNavigationDownKeyStroke.js");
+  __include("scout/menu/MenuNavigationUpKeyStroke.js");
+  __include("scout/menu/SubCloseKeyStroke.js");
   __include("scout/menu/menuNavigationKeyStrokes.js");
   __include("scout/menu/ButtonAdapterMenu.js");
   __include("scout/menu/form/field/FormFieldMenu.js");
