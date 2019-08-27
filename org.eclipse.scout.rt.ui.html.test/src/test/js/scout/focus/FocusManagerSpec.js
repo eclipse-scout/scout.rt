@@ -279,4 +279,28 @@ describe('scout.FocusManager', function() {
       focusManager.uninstallFocusContext($container2);
     });
   });
+
+  describe('registerGlassPaneTarget', function() {
+    it('removes the focus if the active element will be covered by the glass pane', function() {
+      var $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
+      focusManager.installFocusContext($container1);
+
+      focusManager.requestFocus($container1.children('.input1'));
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+      expect(focusManager._findActiveContext().$container[0]).toBe($container1[0]);
+
+      // GlassPane will cover the active element -> blur it and focus desktop
+      var glassPane = scout.create('GlassPane', {
+        parent: session.desktop
+      });
+      glassPane.render($container1);
+      expect(document.activeElement).toBe(session.$entryPoint[0]);
+
+      // Destroy glass pane -> restore focus
+      glassPane.destroy();
+      expect(document.activeElement).toBe($container1.children('.input1')[0]);
+
+      focusManager.uninstallFocusContext($container1);
+    });
+  });
 });
