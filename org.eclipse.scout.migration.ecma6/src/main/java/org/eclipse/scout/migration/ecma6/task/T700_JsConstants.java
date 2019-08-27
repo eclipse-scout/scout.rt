@@ -62,7 +62,6 @@ public class T700_JsConstants extends AbstractTask {
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
-      System.out.println("FOUND: " + matcher.group());
       StringBuilder replacement = new StringBuilder();
       replacement.append(matcher.group(1));
 

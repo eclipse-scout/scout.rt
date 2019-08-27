@@ -11,12 +11,16 @@
 package org.eclipse.scout.migration.ecma6.model.api;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public interface INamedElement {
   enum Type {
+    AllLibraries,
     Library,
     Class,
     Utility,
+    Constructor,
+    StaticFunction,
     Function,
     Enum,
     Constant
@@ -26,7 +30,18 @@ public interface INamedElement {
 
   String getName();
 
+  String getFullyQuallifiedName();
+
   INamedElement getParent();
+  INamedElement getAncestor(Predicate<INamedElement> filter);
+
+  void setParent(INamedElement parent);
 
   List<INamedElement> getChildren();
+
+  void visit(INamedElementVisitor visitor);
+
+  List<INamedElement> getElements(INamedElement.Type type);
+
+  List<INamedElement> getElements(INamedElement.Type type, Predicate<INamedElement> filter);
 }

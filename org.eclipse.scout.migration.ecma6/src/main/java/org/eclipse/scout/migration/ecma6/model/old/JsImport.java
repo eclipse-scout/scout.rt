@@ -72,7 +72,7 @@ public class JsImport extends AbstractJsElement {
       sourceBuilder.append(" }");
     }
     sourceBuilder.append(" from")
-      .append("'").append(getTargetFile().getPath().getParent().relativize(getFileToImport().getPath())).append("';");
+      .append(" '").append(getTargetFile().getPath().getParent().relativize(getFileToImport().getPath())).append("';");
     return sourceBuilder.toString();
   }
 }

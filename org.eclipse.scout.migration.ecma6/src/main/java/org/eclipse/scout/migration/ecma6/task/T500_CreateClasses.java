@@ -16,11 +16,14 @@ import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Order(500)
 public class T500_CreateClasses extends AbstractTask {
 
+  private static final Logger LOG = LoggerFactory.getLogger(T500_CreateClasses.class);
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 
   @Override
@@ -37,7 +40,7 @@ public class T500_CreateClasses extends AbstractTask {
     }
     catch (VetoException e) {
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
-      System.out.println("ERROR [" + pathInfo.getPath().getFileName() + "]: " + e.getMessage());
+      LOG.error("Could not create class ["+pathInfo.getPath().getFileName()+"]. Appended TODO for manual migration.");
     }
 
   }

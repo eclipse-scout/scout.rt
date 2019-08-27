@@ -35,24 +35,41 @@ public class ApiWriter {
   }
 
   public void writeLibrary(Path libraryFile, String libName, Context context) throws IOException {
-    NamedElement lib = new NamedElement(Type.Library, libName);
-    lib.setChildren(context.getAllJsClasses()
-        .stream()
-        .map(jsClass -> createClazz(jsClass, lib))
-        .collect(Collectors.toList()));
+
 
     ObjectMapper defaultJacksonObjectMapper = new ObjectMapper()
         .setSerializationInclusion(Include.NON_DEFAULT)
         .enable(SerializationFeature.INDENT_OUTPUT)
         .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-    defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), lib);
+    defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context));
 
+  }
+
+  public INamedElement createLibraryFromCurrentModule(String libName, Context context){
+    NamedElement lib = new NamedElement(Type.Library, libName);
+    lib.setChildren(context.getAllJsClasses()
+      .stream()
+      .map(jsClass -> createClazz(jsClass, lib))
+      .collect(Collectors.toList()));
+    return lib;
   }
 
   protected INamedElement createClazz(JsClass jsClass, INamedElement library) {
     NamedElement cz = new NamedElement(Type.Class, jsClass.getName(), library);
     cz.addChildren(jsClass.getFunctions()
+      .stream()
+      .filter(jsFun -> jsFun.isConstructor())
+      .map(jsFun -> createConstructor(jsFun, cz))
+      .collect(Collectors.toList()));
+    cz.addChildren(jsClass.getFunctions()
         .stream()
+      .filter(jsFun -> !jsFun.isConstructor() && jsFun.isStatic())
+      .map(jsFun -> createStaticFunction(jsFun, cz))
+      .collect(Collectors.toList()));
+
+      cz.addChildren(jsClass.getFunctions()
+        .stream()
+        .filter(jsFun -> !jsFun.isConstructor() && !jsFun.isStatic())
         .map(jsFun -> createFunction(jsFun, cz))
         .collect(Collectors.toList()));
     cz.addChildren(jsClass.getConstants()
@@ -64,6 +81,14 @@ public class ApiWriter {
         .map(en -> createEnum(en, cz))
         .collect(Collectors.toList()));
     return cz;
+  }
+
+  protected INamedElement createConstructor(JsFunction jsFun, INamedElement cz) {
+    return new NamedElement(Type.Constructor, jsFun.getName(), cz);
+  }
+
+  protected INamedElement createStaticFunction(JsFunction jsFun, INamedElement cz) {
+    return new NamedElement(Type.StaticFunction, jsFun.getName(), cz);
   }
 
   protected INamedElement createFunction(JsFunction jsFun, INamedElement cz) {

@@ -19,6 +19,10 @@ public class JsConstant extends AbstractJsElement {
     return m_name;
   }
 
+  public String getFqn(){
+    return getJsClass().getFullyQuallifiedName()+"."+getName();
+  }
+
   public String getBody() {
     return m_body;
   }

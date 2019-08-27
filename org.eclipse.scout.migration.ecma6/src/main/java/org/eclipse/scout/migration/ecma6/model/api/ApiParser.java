@@ -36,19 +36,29 @@ public class ApiParser {
       .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
       .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
   }
-  protected List<INamedElement> parse() throws IOException {
+  public Libraries parse() throws IOException {
+    Libraries allLibs = new Libraries();
     List<INamedElement> libs = new ArrayList<>();
     Files.newDirectoryStream(m_directory).forEach(lib -> libs.add(parseLibrary(lib)));
-    return libs;
+    allLibs.addChildren(libs);
+    return allLibs;
   }
 
   protected NamedElement parseLibrary(Path lib) {
     try {
-      return m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
+      NamedElement library = m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
+      setParents(library, null);
+      return library;
+
     }
     catch (IOException e) {
       throw new ProcessingException("Could parse Api of '"+lib+"'.",e);
     }
+  }
+
+  private void setParents(INamedElement element, INamedElement parent) {
+    element.setParent(parent);
+    element.getChildren().forEach(child -> setParents(child, element));
   }
 
 
