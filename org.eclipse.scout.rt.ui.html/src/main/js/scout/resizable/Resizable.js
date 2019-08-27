@@ -39,7 +39,7 @@ scout.Resizable.prototype._appendResizeHandles = function() {
   this.$resizableE = this.$container.appendDiv('resizable-handle resizable-e')
     .data('edge', 'e')
     .on('mousedown.resizable', this._mouseDownHandler);
-  this.$resizableSE = this.$container.appendDiv('resizable-handle resizable-se resizable-gripsmall-se')
+  this.$resizableSE = this.$container.appendDiv('resizable-handle resizable-se')
     .data('edge', 'se')
     .on('mousedown.resizable', this._mouseDownHandler);
   this.$resizableW = this.$container.appendDiv('resizable-handle resizable-w')
