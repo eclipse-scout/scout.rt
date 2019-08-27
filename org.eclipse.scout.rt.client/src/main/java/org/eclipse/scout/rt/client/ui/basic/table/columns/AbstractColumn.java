@@ -201,6 +201,20 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
+   * Configures, if HTML rendering is enabled for the header tooltip.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}. Make sure that any user input (or other insecure
+   * input) is encoded (security), if this property is enabled.
+   *
+   * @return {@code true}, if HTML rendering is enabled for this header tooltip, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(35)
+  protected boolean getConfiguredHeaderTooltipHtmlEnabled() {
+    return false;
+  }
+
+  /**
    * Configures the header icon of this column.
    *
    * @return the ID (name) of the icon
@@ -931,6 +945,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (getConfiguredHeaderTooltipText() != null) {
       m_headerCell.setTooltipText(getConfiguredHeaderTooltipText());
     }
+    m_headerCell.setTooltipHtmlEnabled(getConfiguredHeaderTooltipHtmlEnabled());
     m_headerCell.setIconId(getConfiguredHeaderIconId());
     m_headerCell.setCssClass(getConfiguredHeaderCssClass());
     m_headerCell.setHtmlEnabled(getConfiguredHeaderHtmlEnabled());

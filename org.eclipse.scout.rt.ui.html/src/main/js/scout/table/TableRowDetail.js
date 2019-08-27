@@ -56,7 +56,11 @@ scout.TableRowDetail.prototype._renderCell = function(column) {
   }
 
   if (scout.strings.empty(headerText)) {
-    headerText = column.headerTooltipText;
+    if (column.headerTooltipHtmlEnabled) {
+      headerText = scout.strings.plainText(column.headerTooltipText);
+    } else {
+      headerText = column.headerTooltipText;
+    }
   }
 
   var cellText = column.cellTextForRowDetail(this.row);

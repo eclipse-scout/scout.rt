@@ -96,6 +96,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     json.put("headerForegroundColor", getColumn().getHeaderCell().getForegroundColor());
     json.put("headerFont", getColumn().getHeaderCell().getFont() != null ? getColumn().getHeaderCell().getFont().toPattern() : null);
     json.put("headerTooltipText", getColumn().getHeaderCell().getTooltipText());
+    json.put("headerTooltipHtmlEnabled", getColumn().getHeaderCell().isTooltipHtmlEnabled());
     json.put("headerIconId", BinaryResourceUrlUtility.createIconUrl(getColumn().getHeaderCell().getIconId()));
     BEANS.get(InspectorInfo.class).put(getUiSession(), json, getColumn());
     json.put(IColumn.PROP_UI_SORT_POSSIBLE, getColumn().isUiSortPossible());

@@ -4860,6 +4860,7 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
     oldColumnState = $.extend(oldColumnState, column);
     column.text = columns[i].text;
     column.headerTooltipText = columns[i].headerTooltipText;
+    column.headerTooltipHtmlEnabled = columns[i].headerTooltipHtmlEnabled;
     column.headerCssClass = columns[i].headerCssClass;
     column.headerHtmlEnabled = columns[i].headerHtmlEnabled;
     column.headerBackgroundColor = columns[i].headerBackgroundColor;

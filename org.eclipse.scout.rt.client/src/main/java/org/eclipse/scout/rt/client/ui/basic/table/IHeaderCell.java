@@ -39,6 +39,8 @@ public interface IHeaderCell {
 
   String getTooltipText();
 
+  boolean isTooltipHtmlEnabled();
+
   int getHorizontalAlignment();
 
   String getCssClass();

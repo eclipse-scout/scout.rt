@@ -28,6 +28,7 @@ public class HeaderCell implements IHeaderCell, IStyleable {
   private String m_iconId;
   private String m_text;
   private String m_tooltip;
+  private boolean m_tooltipHtmlEnabled;
   private int m_horizontalAlignment = -1;
   private String m_cssClass;
   private boolean m_htmlEnabled;
@@ -145,6 +146,15 @@ public class HeaderCell implements IHeaderCell, IStyleable {
 
   public void setTooltipText(String s) {
     m_tooltip = s;
+  }
+
+  @Override
+  public boolean isTooltipHtmlEnabled() {
+    return m_tooltipHtmlEnabled;
+  }
+
+  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    m_tooltipHtmlEnabled = tooltipHtmlEnabled;
   }
 
   @Override

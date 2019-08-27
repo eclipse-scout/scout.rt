@@ -262,7 +262,8 @@ scout.TableHeader.prototype._installHeaderItemTooltip = function(column) {
     text: this._headerItemTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
+    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible(),
+    htmlEnabled: column.headerTooltipHtmlEnabled
   });
 };
 
