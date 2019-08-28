@@ -146,7 +146,7 @@ public class T500_CreateClasses extends AbstractTask {
         replacement.append(matcher.group(3));
 
       }
-      source = matcher.replaceFirst(replacement.toString());
+      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
     }
 
     return source;
