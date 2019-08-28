@@ -230,7 +230,7 @@ public class SunSecurityProvider implements ISecurityProvider {
     try {
       KeyPairGenerator keyGen = KeyPairGenerator.getInstance(getKeyPairGenerationAlgorithm(), getSignatureProvider());
       ECGenParameterSpec spec = new ECGenParameterSpec(getEllipticCurveName());
-      keyGen.initialize(spec, SecureRandom.getInstanceStrong()); // use strong random number generator for long living keys
+      keyGen.initialize(spec, createSecureRandom());
       KeyPair keyPair = keyGen.generateKeyPair();
 
       X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
