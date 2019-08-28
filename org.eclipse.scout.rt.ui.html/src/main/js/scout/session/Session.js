@@ -1517,7 +1517,7 @@ scout.Session.prototype._onWindowUnload = function() {
   this.unloaded = true;
 
   // Close popup windows
-  if (this.desktop) {
+  if (this.desktop && this.desktop.formController) {
     this.desktop.formController.closePopupWindows();
   }
 
