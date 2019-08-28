@@ -9,7 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 .radio-button > .field {
-  display: inline-block;
   position: relative;
   padding: 6px 0;
   margin-left: @mandatory-indicator-width;
@@ -45,6 +44,8 @@
   & > .radio-button-circle {
     width: @radio-button-circle-size;
     height: @radio-button-circle-size;
+    min-width: @radio-button-circle-size;
+    min-height: @radio-button-circle-size;
     background-color: @control-background-color;
     border: @radio-button-border-width solid @radio-button-border-color;
     border-radius: 50%;
