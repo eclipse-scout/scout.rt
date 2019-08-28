@@ -86,7 +86,7 @@ public class T500_CreateClasses extends AbstractTask {
         alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace()) + clzz.getSuperCall().getName();
       }
       classBuilder.append("extends ")
-          .append(jsFile.getOrCreateImport(context.getJsClass(clzz.getSuperCall().getFullyQuallifiedName())).getReferenceName())
+          .append(jsFile.getOrCreateImport(clzz.getSuperCall().getFullyQuallifiedName(), context).getReferenceName())
           .append(" ");
 
     }

@@ -41,13 +41,14 @@ public class ApiParser {
     List<INamedElement> libs = new ArrayList<>();
     Files.newDirectoryStream(m_directory).forEach(lib -> libs.add(parseLibrary(lib)));
     allLibs.addChildren(libs);
+    allLibs.ensureParents();
     return allLibs;
   }
 
   protected NamedElement parseLibrary(Path lib) {
     try {
       NamedElement library = m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
-      setParents(library, null);
+
       return library;
 
     }
@@ -56,10 +57,7 @@ public class ApiParser {
     }
   }
 
-  private void setParents(INamedElement element, INamedElement parent) {
-    element.setParent(parent);
-    element.getChildren().forEach(child -> setParents(child, element));
-  }
+
 
 
 }

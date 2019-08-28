@@ -10,10 +10,28 @@
  */
 package org.eclipse.scout.migration.ecma6.model.api;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Libraries extends NamedElement {
+
+  Map<String /*fqn*/, INamedElement> m_allElements = new HashMap<>();
 
   public Libraries(){
     super(Type.AllLibraries, null);
   }
 
+  public void ensureParents() {
+    setParents(this, null);
+  }
+
+  private void setParents(INamedElement element, INamedElement parent) {
+    m_allElements.put(element.getName(), element);
+    element.setParent(parent);
+    element.getChildren().forEach(child -> setParents(child, element));
+  }
+
+  public INamedElement getElement(String fqn){
+    return m_allElements.get(fqn);
+  }
 }

@@ -1,24 +1,35 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-import org.eclipse.scout.rt.platform.exception.VetoException;
-import org.eclipse.scout.rt.platform.util.Assertions;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.MigrationUtility;
+import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
+import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
+import org.eclipse.scout.migration.ecma6.model.references.AbstractImport;
+import org.eclipse.scout.migration.ecma6.model.references.AliasedMember;
+import org.eclipse.scout.migration.ecma6.model.references.LibraryImport;
+import org.eclipse.scout.migration.ecma6.model.references.RelativeImport;
+import org.eclipse.scout.migration.ecma6.model.references.UnresolvedImport;
+import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JsFile extends AbstractJsElement {
+  private static final Logger LOG = LoggerFactory.getLogger(JsFile.class);
 
   private final Path m_path;
   private JsCommentBlock m_copyRight;
   private List<JsClass> m_jsClasses = new ArrayList<>();
-  private final Map<JsFile, JsImport> m_imports = new HashMap<>();
-
+  private HashMap<String /*key of import*/, AbstractImport<?>> m_imports = new HashMap<>();
 
   public JsFile(Path path) {
     Assertions.assertNotNull(path);
@@ -29,7 +40,6 @@ public class JsFile extends AbstractJsElement {
     return m_path;
   }
 
-
   public void setCopyRight(JsCommentBlock copyRight) {
     m_copyRight = copyRight;
   }
@@ -38,7 +48,7 @@ public class JsFile extends AbstractJsElement {
     return m_copyRight;
   }
 
-  public void addJsClass(JsClass jsClass){
+  public void addJsClass(JsClass jsClass) {
     m_jsClasses.add(jsClass);
   }
 
@@ -46,43 +56,118 @@ public class JsFile extends AbstractJsElement {
     return Collections.unmodifiableList(m_jsClasses);
   }
 
-  public JsClass getJsClass(String fqn){
+  public JsClass getJsClass(String fqn) {
     return m_jsClasses.stream()
-      .filter(cz -> cz.getFullyQuallifiedName().equalsIgnoreCase(fqn))
-      .findFirst().orElse(null);
+        .filter(cz -> cz.getFullyQuallifiedName().equalsIgnoreCase(fqn))
+        .findFirst().orElse(null);
   }
 
-  public boolean hasJsClasses(){
+  public boolean hasJsClasses() {
     return !m_jsClasses.isEmpty();
   }
 
-
-  public JsClass getLastOrAppend(String fqn){
-    JsClass jsClass, lastJsClass = null;
-    if(m_jsClasses.isEmpty()){
+  public JsClass getLastOrAppend(String fqn) {
+    JsClass jsClass, lastJsClass ;
+    if (m_jsClasses.isEmpty()) {
       jsClass = new JsClass(fqn, this);
       m_jsClasses.add(jsClass);
       return jsClass;
     }
     lastJsClass = m_jsClasses.get(m_jsClasses.size() - 1);
-    if(lastJsClass.getFullyQuallifiedName().equals(fqn)){
+    if (lastJsClass.getFullyQuallifiedName().equals(fqn)) {
       return lastJsClass;
     }
     jsClass = m_jsClasses.stream().filter(c -> c.getFullyQuallifiedName().equals(fqn)).findFirst().orElse(null);
-    if(jsClass != null){
-      throw new VetoException("Tried to access last class '"+fqn+"' in file '"+getPath().getFileName()+"', but is not last one (last:'"+lastJsClass.getFullyQuallifiedName()+"')!");
+    if (jsClass != null) {
+      throw new VetoException("Tried to access last class '" + fqn + "' in file '" + getPath().getFileName() + "', but is not last one (last:'" + lastJsClass.getFullyQuallifiedName() + "')!");
     }
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;
   }
 
-  public AliasedJsClass getOrCreateImport(JsClass jsClass){
-    return m_imports.computeIfAbsent(jsClass.getJsFile(), c -> new JsImport(c, this))
-      .computeAliasIfAbsent(jsClass);
+  /**
+   *
+   * @param fullyQualifiedName e.g. scout.FormField
+   * @return
+   */
+  public AliasedMember getOrCreateImport(String fullyQualifiedName, Context context){
+    // if already unresolved return
+    AbstractImport<?> imp =  m_imports.get(fullyQualifiedName);
+    if(imp != null){
+      return imp.getDefaultMember();
+    }
+    // try to find JsClass
+    JsClass clazz = context.getJsClass(fullyQualifiedName);
+    if(clazz != null){
+      return getOrCreateImport(clazz);
+    }
+    // try to find in libraries
+    INamedElement element = context.getLibraries().getElement(fullyQualifiedName);
+    if(element == null){
+      LOG.error("Could not resolve import for '"+fullyQualifiedName+"'. Probably a library is missing.");
+      // TODO create fake import
+      imp = new UnresolvedImport(fullyQualifiedName);
+      imp.withDefaultMember(new AliasedMember(MigrationUtility.parseMemberName(fullyQualifiedName)));
+      m_imports.put(fullyQualifiedName, imp);
+      return imp.getDefaultMember();
+    }
+    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getName(), MigrationUtility.parseMemberName(fullyQualifiedName));
+
   }
 
-  public Collection<JsImport> getImports(){
+  public AliasedMember getOrCreateImport(JsClass jsClass) {
+    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(),jsClass.isDefault());
+  }
+
+  public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible){
+    Assertions.assertNotNull(fileToImport);
+    Assertions.assertNotNull(memberName);
+    String key = fileToImport.toString();
+    AbstractImport<?> libImport = m_imports.get(key);
+
+    if (libImport == null) {
+      libImport = new RelativeImport(this.getPath().getParent().relativize(fileToImport).toString());
+      m_imports.put(key, libImport);
+    }
+    AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
+    if (aliasedMember == null) {
+      aliasedMember = ensureUniqueAlias(new AliasedMember(memberName), 1);
+      if (defaultIfPossible && libImport.getDefaultMember() == null) {
+        libImport.withDefaultMember(aliasedMember);
+      }
+      else {
+        libImport.withMember(aliasedMember);
+      }
+    }
+    return aliasedMember;
+  }
+
+  protected AliasedMember getOrCreateImport(String moduleName, String memberName) {
+    AbstractImport<?> libImport = m_imports.get(moduleName);
+
+    if (libImport == null) {
+      libImport = new LibraryImport(moduleName);
+      m_imports.put(moduleName, libImport);
+    }
+    AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
+    if (aliasedMember == null) {
+      aliasedMember = ensureUniqueAlias(new AliasedMember(memberName), 1);
+      libImport.addMember(aliasedMember);
+    }
+    return aliasedMember;
+  }
+
+  private AliasedMember ensureUniqueAlias(AliasedMember member, int index) {
+    String alias = Optional.ofNullable(member.getAlias()).orElse(member.getName());
+    if (getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias))) {
+      member.setAlias(member.getName() + "_" + index);
+      return ensureUniqueAlias(member, index+1);
+    }
+    return member;
+  }
+
+  public Collection<AbstractImport<?>> getImports() {
     return Collections.unmodifiableCollection(m_imports.values());
   }
 
@@ -91,11 +176,11 @@ public class JsFile extends AbstractJsElement {
     return toString("");
   }
 
-  public String toString(String indent){
+  public String toString(String indent) {
     StringBuilder builder = new StringBuilder();
     builder.append(indent).append(getPath().getFileName())
-      .append(" [hasCopyRight:").append(getCopyRight() !=null).append("]").append(System.lineSeparator())
-    .append(m_jsClasses.stream().map(c -> indent+"- "+c.toString(indent+"  ")).collect(Collectors.joining(System.lineSeparator())));
+        .append(" [hasCopyRight:").append(getCopyRight() != null).append("]").append(System.lineSeparator())
+        .append(m_jsClasses.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
     return builder.toString();
   }
 }

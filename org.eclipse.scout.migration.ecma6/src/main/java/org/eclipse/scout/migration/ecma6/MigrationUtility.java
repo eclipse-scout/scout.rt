@@ -3,6 +3,7 @@ package org.eclipse.scout.migration.ecma6;
 import org.eclipse.scout.migration.ecma6.model.old.ISourceRange;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsImport;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 import java.util.regex.Pattern;
 
@@ -19,5 +20,21 @@ public final class MigrationUtility {
   public static String prependTodo(String source, String todoText, String lineSeparator) {
     source = "// TODO MIG: " + todoText + lineSeparator + source;
     return source;
+  }
+
+  public static String parseMemberName(String fullyQualifiedName){
+    if(StringUtility.isNullOrEmpty(fullyQualifiedName)){
+      return null;
+    }
+    String[] segments = fullyQualifiedName.split("\\.");
+    return segments[segments.length-1];
+  }
+
+  public static String parseNamespace(String fullyQualifiedName){
+    if(StringUtility.isNullOrEmpty(fullyQualifiedName)){
+      return null;
+    }
+    String[] segments = fullyQualifiedName.split("\\.");
+    return segments[0];
   }
 }

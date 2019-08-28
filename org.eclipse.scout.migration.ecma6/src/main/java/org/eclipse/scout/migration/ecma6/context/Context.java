@@ -162,6 +162,10 @@ public class Context {
     return m_api;
   }
 
+  public Libraries getLibraries() {
+    return m_libraries;
+  }
+
   public void setLibraryApiDirectory(Path libraryApiDirectory) {
     m_libraryApiDirectory = libraryApiDirectory;
   }
