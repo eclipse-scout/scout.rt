@@ -91,11 +91,21 @@ scout.graphics = {
     var newWidth = (options.useCssSize ? '' : scout.nvl(options.widthHint, 'auto'));
     var newHeight = (options.useCssSize ? '' : scout.nvl(options.heightHint, 'auto'));
 
-    // modify properties which prevent reading the preferred size
-    $elem.css({
+    var cssProperties = {
       'width': newWidth,
       'height': newHeight
-    });
+    };
+
+    // In order to measure the correct size for all elements we must temporarily change the
+    // position property because with absolute or relative positioning the size of the element
+    // maybe influenced or limited by the parent element which makes it impossible to determine
+    // the preferred size.
+    if (options.useCssSize) {
+      cssProperties.position = 'fixed';
+    }
+
+    // modify properties which prevent reading the preferred size
+    $elem.css(cssProperties);
 
     // measure
     var bcr = $elem[0].getBoundingClientRect();
