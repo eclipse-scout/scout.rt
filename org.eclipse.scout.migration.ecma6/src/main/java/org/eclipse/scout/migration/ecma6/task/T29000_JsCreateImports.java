@@ -1,18 +1,16 @@
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
-import org.eclipse.scout.migration.ecma6.model.old.JsImport;
 import org.eclipse.scout.migration.ecma6.model.references.AbstractImport;
-import org.eclipse.scout.migration.ecma6.model.target.IImport;
 import org.eclipse.scout.rt.platform.Order;
-
-import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Order(29000)
 public class T29000_JsCreateImports extends AbstractTask {
