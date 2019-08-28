@@ -166,7 +166,9 @@ scout.Session.prototype.init = function(model) {
     session: this,
     active: options.focusManagerActive
   });
-  this.keyStrokeManager = new scout.KeyStrokeManager(this);
+  this.keyStrokeManager = scout.create('KeyStrokeManager', {
+    session: this
+  });
 
   this.showTreeIcons = scout.nvl(options.showTreeIcons, true); // TODO [awe] 8.0 remove this flag
 };

@@ -8,15 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.KeyStrokeManager = function(session) {
-  var $mainEntryPoint = session.$entryPoint;
-  this.session = session;
+scout.KeyStrokeManager = function() {
+  this.session = null;
+  this.helpKeyStroke = scout.KeyStroke.parseKeyStroke('F1');
+  this.swallowF1 = true;
   this._helpRendered = false;
   this._renderedKeys = [];
   this.events = this._createEventSupport();
   this.filters = [];
+};
 
-  this.installTopLevelKeyStrokeHandlers($mainEntryPoint);
+scout.KeyStrokeManager.prototype.init = function(model) {
+  this.session = model.session;
+  this.installTopLevelKeyStrokeHandlers(this.session.$entryPoint);
 };
 
 scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
@@ -24,16 +28,18 @@ scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($co
     myWindow = $container.window(true),
     // Swallow F1 (online help) key stroke
     helpHandler = function(event) {
-      return !this._isHelpKeyStroke(event);
+      return event.which !== scout.keys.F1;
     }.bind(this),
     // Swallow Backspace (browser navigation) key stroke
     backspaceHandler = function(event) {
       return event.which !== scout.keys.BACKSPACE;
     }.bind(this);
 
-  $container
-    .keydown(helpHandler)
-    .keyup(helpHandler);
+  if (this.swallowF1) {
+    $container
+      .keydown(helpHandler)
+      .keyup(helpHandler);
+  }
   $container
     .keydown(backspaceHandler)
     .keyup(backspaceHandler);
@@ -200,7 +206,7 @@ scout.KeyStrokeManager.prototype.invokeAcceptInputOnActiveValueField = function(
 };
 
 scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
-  return event.which === scout.keys.F1;
+  return scout.KeyStroke.acceptEvent(this.helpKeyStroke, event);
 };
 
 scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {

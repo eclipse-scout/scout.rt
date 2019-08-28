@@ -146,15 +146,7 @@ scout.KeyStroke.prototype._isEnabled = function() {
  * Method invoked in the context of accepting a keystroke, and returns true if the event matches this keystroke.
  */
 scout.KeyStroke.prototype._accept = function(event) {
-  //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
-  return this._acceptModifer(this.ctrl, (event.ctrlKey || event.metaKey)) &&
-    this._acceptModifer(this.alt, event.altKey) &&
-    this._acceptModifer(this.shift, event.shiftKey) &&
-    scout.isOneOf(event.which, this.which);
-};
-
-scout.KeyStroke.prototype._acceptModifer = function(modifier, eventModifier) {
-  return modifier === undefined || modifier === eventModifier;
+  return scout.KeyStroke.acceptEvent(this, event);
 };
 
 /**
@@ -298,4 +290,19 @@ scout.KeyStroke.parseKeyStroke = function(keyStrokeName) {
   });
 
   return keyStrokeObj;
+};
+
+scout.KeyStroke.acceptEvent = function(keyStroke, event) {
+  if (!keyStroke) {
+    return false;
+  }
+  //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+  return scout.KeyStroke._acceptModifier(keyStroke.ctrl, (event.ctrlKey || event.metaKey)) &&
+    scout.KeyStroke._acceptModifier(keyStroke.alt, event.altKey) &&
+    scout.KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey) &&
+    scout.isOneOf(event.which, keyStroke.which);
+};
+
+scout.KeyStroke._acceptModifier = function(modifier, eventModifier) {
+  return modifier === undefined || modifier === eventModifier;
 };
