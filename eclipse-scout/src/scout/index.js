@@ -12,10 +12,13 @@
 // The modules exported here will be available when someone imports from 'eclipse-scout'
 import * as scout from './scout';
 import * as models from './util/models';
+import * as strings from './util/strings';
 
-export { scout as default };
+export default scout;
 export { models };
-export { default as App } from './App';
+export { strings };
+
+export { default as App} from './App';
 export { default as Session } from './session/Session';
 export { default as Desktop } from './desktop/Desktop';
 export { default as NullWidget } from './widget/NullWidget';
