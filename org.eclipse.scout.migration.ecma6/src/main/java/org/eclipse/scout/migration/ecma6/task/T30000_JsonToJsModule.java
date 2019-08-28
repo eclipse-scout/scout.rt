@@ -70,7 +70,9 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step6 = "export default function(" + MODEL_OWNER_PARAM_NAME + ") {\n" +
         "  return " + step5 + ";\n}\n";
 
-    String step7 = migratePlaceholders(step6, pathInfo.getPath(), context);
+    Set<String> importsToAdd = new HashSet<>();
+    String step7 = T30010_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context, importsToAdd));
+    String step8 = getImports(importsToAdd) + step7;
 
     // change file name from Xyz.json to XyzModel.js
     Path jsonRelPath = context.getSourceRootDirectory().relativize(pathInfo.getPath());
@@ -81,39 +83,27 @@ public class T30000_JsonToJsModule extends AbstractTask {
     Assertions.assertFalse(Files.exists(newFileNameInSourceFolder),
         "The migration of file '{}' would be stored in '{}' but this file already exists in the source folder!", pathInfo.getPath(), newRelPath);
 
-    workingCopy.setSource(step7);
+    workingCopy.setSource(step8);
     workingCopy.setRelativeTargetPath(newRelPath);
   }
 
-  protected String migratePlaceholders(String newSource, Path file, Context context) {
-    Matcher matcher = PLACEHOLDER_PAT.matcher(newSource);
-    StringBuilder result = new StringBuilder(newSource.length() * 2);
-    int lastPos = 0;
-    Set<String> importsToAdd = new HashSet<>();
-    while (matcher.find()) {
-      result.append(newSource, lastPos, matcher.start());
-      String key = matcher.group(1);
-      String type = matcher.group(2);
-      String value = matcher.group(3);
-      result.append(key).append(": ");
-      if ("textKey".equals(type)) {
-        result.append(migratePlaceholderTextKey(value, file, importsToAdd));
-      }
-      else if ("const".equals(type)) {
-        result.append(migratePlaceholderConst(value, key, file, context, importsToAdd));
-      }
-      else if ("iconId".equals(type)) {
-        result.append(migratePlaceholderIconId(value, file, importsToAdd));
-      }
-      else {
-        Assertions.fail("unknown json placeholder: '{}' in file '{}'.", type, file);
-      }
-      lastPos = matcher.end();
+  protected void migratePlaceholders(Matcher matcher, StringBuilder result, Path file, Context context, Set<String> importsToAdd) {
+    String key = matcher.group(1);
+    String type = matcher.group(2);
+    String value = matcher.group(3);
+    result.append(key).append(": ");
+    if ("textKey".equals(type)) {
+      result.append(migratePlaceholderTextKey(value, file, importsToAdd));
     }
-    result.append(newSource, lastPos, newSource.length());
-
-    result.insert(0, getImports(importsToAdd));
-    return result.toString();
+    else if ("const".equals(type)) {
+      result.append(migratePlaceholderConst(value, key, file, context, importsToAdd));
+    }
+    else if ("iconId".equals(type)) {
+      result.append(migratePlaceholderIconId(value, file, importsToAdd));
+    }
+    else {
+      Assertions.fail("unknown json placeholder: '{}' in file '{}'.", type, file);
+    }
   }
 
   protected String getImports(Collection<String> imports) {
