@@ -23,8 +23,8 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.rt.platform.Order;
 
-@Order(30010)
-public class T30010_ModelsGetModelToImport extends AbstractTask {
+@Order(25000)
+public class T25000_ModelsGetModelToImport extends AbstractTask {
 
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
@@ -85,12 +85,12 @@ public class T30010_ModelsGetModelToImport extends AbstractTask {
   }
 
   protected String createImportFor(Path jsModelFile, JsFile jsFile) {
-    // TODO create real import here using jsFile
-
     String fileName = jsModelFile.getFileName().toString();
     if (fileName.endsWith(".js")) {
       fileName = fileName.substring(0, fileName.length() - 3);
     }
-    return Character.toLowerCase(fileName.charAt(0)) + fileName.substring(1);
+    String memberName = Character.toLowerCase(fileName.charAt(0)) + fileName.substring(1);
+
+    return jsFile.getOrCreateImport(memberName, jsModelFile, true).getReferenceName();
   }
 }

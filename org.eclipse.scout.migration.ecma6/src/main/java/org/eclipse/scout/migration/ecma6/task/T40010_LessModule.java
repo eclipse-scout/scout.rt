@@ -35,7 +35,7 @@ public class T40010_LessModule extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
 
-    String newContent = T30010_ModelsGetModelToImport.replace(IMPORT_PAT, workingCopy.getSource(), this::removeFirstPathSegment);
+    String newContent = T25000_ModelsGetModelToImport.replace(IMPORT_PAT, workingCopy.getSource(), this::removeFirstPathSegment);
     workingCopy.setSource(newContent);
 
     workingCopy.setRelativeTargetPath(getNewTargetPath(pathInfo.getPath(), context));

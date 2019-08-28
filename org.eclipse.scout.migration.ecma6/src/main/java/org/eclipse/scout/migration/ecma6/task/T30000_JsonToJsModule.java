@@ -70,7 +70,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
         "  return " + step5 + ";\n}\n";
 
     Set<String> importsToAdd = new HashSet<>();
-    String step7 = T30010_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context, importsToAdd));
+    String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context, importsToAdd));
     String step8 = getImports(importsToAdd) + step7;
 
     // change file name from Xyz.json to XyzModel.js
