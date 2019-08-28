@@ -134,7 +134,7 @@ scout.EventSupport.prototype.trigger = function(type, event) {
         return true;
       }
       if (this._subTypeMatches(event, types[i])) {
-        return true
+        return true;
       }
     }
     return false;
