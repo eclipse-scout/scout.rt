@@ -42,7 +42,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-
     if (!m_fileFilter.test(pathInfo)) {
       return false;
     }
