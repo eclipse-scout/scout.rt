@@ -40,7 +40,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
     menuBarMargins = menuBar.htmlComp.margins(),
     menuBarMinumumSize,
     $status = this.tabBoxHeader.tabBox.$status,
-    statusSizeGross = new scout.Dimension(),
+    statusSizeLarge = new scout.Dimension(),
     insets = htmlContainer.insets(),
     containerSize = htmlContainer.availableSize({
       exact: true
@@ -53,12 +53,13 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
   });
 
   if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
-    statusSizeGross.height = $status.outerHeight(true);
-    statusSizeGross.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeLarge.height = $status.outerHeight(true);
+    statusSizeLarge.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
   }
 
   tabAreaPrefSize = tabArea.htmlComp.prefSize({
-    widthHint: clientArea.width - menuBarMinumumSize.width - menuBarMargins.horizontal() - statusSizeGross.width
+    widthHint: clientArea.width - menuBarMinumumSize.width - menuBarMargins.horizontal() - statusSizeLarge.width,
+    exact: false
   });
 
   // layout tabItemsBar
@@ -74,7 +75,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
   menuBar.htmlComp.setBounds(new scout.Rectangle(
     left + tabAreaPrefSize.width + tabAreaMargins.horizontal() + menuBarMargins.left,
     insets.top + menuBarMargins.top,
-    clientArea.width - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeGross.width,
+    clientArea.width - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width,
     clientArea.height - menuBarMargins.vertical()
   ));
 
@@ -94,7 +95,7 @@ scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, op
     wHint = (options.widthHint || htmlContainer.availableSize().width) - htmlContainer.insets().horizontal(),
     prefSize = new scout.Dimension(),
     $status = this.tabBoxHeader.tabBox.$status,
-    statusSizeGross = new scout.Dimension(),
+    statusSizeLarge = new scout.Dimension(),
     tabArea = this.tabBoxHeader.tabArea,
     tabAreaMargins = tabArea.htmlComp.margins(),
     tabAreaPrefSize,
@@ -108,22 +109,22 @@ scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, op
   });
 
   if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
-    statusSizeGross.height = $status.outerHeight(true);
-    statusSizeGross.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeLarge.height = $status.outerHeight(true);
+    statusSizeLarge.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
 
-    prefSize.width += statusSizeGross.width;
-    prefSize.height = Math.max(prefSize.height, statusSizeGross.height);
+    prefSize.width += statusSizeLarge.width;
+    prefSize.height = Math.max(prefSize.height, statusSizeLarge.height);
   }
 
   tabAreaPrefSize = tabArea.htmlComp.prefSize({
-    widthHint: wHint - menuBarMinumumSize.width - menuBarMargins.horizontal() - tabAreaMargins.horizontal() - statusSizeGross.width
+    widthHint: wHint - menuBarMinumumSize.width - menuBarMargins.horizontal() - tabAreaMargins.horizontal() - statusSizeLarge.width
   });
 
   prefSize.width += tabAreaPrefSize.width + tabAreaMargins.horizontal();
   prefSize.height = Math.max(prefSize.height, tabAreaPrefSize.height + tabAreaMargins.vertical());
 
   menuBarPrefSize = menuBar.htmlComp.prefSize({
-    widthHint: wHint - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeGross.width
+    widthHint: wHint - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width
   });
 
   prefSize.width += menuBarPrefSize.width + menuBarMargins.horizontal();
