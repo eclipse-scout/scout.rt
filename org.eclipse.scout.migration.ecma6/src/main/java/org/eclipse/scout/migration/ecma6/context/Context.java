@@ -10,16 +10,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
 import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
-import org.eclipse.scout.migration.ecma6.model.api.LibraryApis;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
@@ -30,33 +29,21 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 
 public class Context {
 
-  private final Path m_sourceRootDirectory;
-  private final Path m_targetRootDirectory;
-  private final String m_namespace;
   private Path m_moduleDirectory;
 
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
-  private Path m_libraryStoreFile;
-  private String m_libraryName;
-  private Path m_libraryApiDirectory;
   private Libraries m_libraries;
   private INamedElement m_api;
 
-
-  public Context(Path sourceRootDirectory, Path targetRootDirectory, String namespace) {
-    m_sourceRootDirectory = sourceRootDirectory;
-    m_targetRootDirectory = targetRootDirectory;
-    m_namespace = namespace;
-  }
 
   public void setup() {
     try {
       readLibraryApis();
     }
     catch (IOException e) {
-      throw new ProcessingException("Could not parse Library APIs in '" + getLibraryApiDirectory() + "'.", e);
+      throw new ProcessingException("Could not parse Library APIs in '" + Configuration.get().getLibraryApiDirectory() + "'.", e);
     }
     try {
       parseJsFiles();
@@ -71,28 +58,18 @@ public class Context {
 
   private void setupCurrentApi() {
     ApiWriter writer = new ApiWriter();
-    m_api = writer.createLibraryFromCurrentModule(getNamespace(), this);
+    m_api = writer.createLibraryFromCurrentModule(BEANS.get(Configuration.class).getNamespace(), this);
   }
 
   protected void readLibraryApis() throws IOException {
-    if (getLibraryApiDirectory() != null && Files.isDirectory(getLibraryApiDirectory())) {
-      ApiParser parser = new ApiParser(getLibraryApiDirectory());
+    Path libraryApiDirectory = Configuration.get().getLibraryApiDirectory();
+    if(libraryApiDirectory != null){
+      ApiParser parser = new ApiParser(libraryApiDirectory);
       m_libraries = parser.parse();
-    }else{
+    }
+    else {
       m_libraries = new Libraries();
     }
-  }
-
-  public Path getSourceRootDirectory() {
-    return m_sourceRootDirectory;
-  }
-
-  public Path getTargetRootDirectory() {
-    return m_targetRootDirectory;
-  }
-
-  public String getNamespace() {
-    return m_namespace;
   }
 
   public WorkingCopy getWorkingCopy(Path file) {
@@ -123,26 +100,12 @@ public class Context {
     m_moduleDirectory = moduleDirectory;
   }
 
-  public void setLibraryName(String libraryName) {
-    m_libraryName = libraryName;
-  }
-
-  public String getLibraryName() {
-    return m_libraryName;
-  }
 
   public Path relativeToModule(Path path) {
     Assertions.assertNotNull(getModuleDirectory());
     return path.relativize(getModuleDirectory());
   }
 
-  public void setLibraryStoreFile(Path libraryStoreFile) {
-    m_libraryStoreFile = libraryStoreFile;
-  }
-
-  public Path getLibraryStoreFile() {
-    return m_libraryStoreFile;
-  }
 
   public JsFile ensureJsFile(WorkingCopy workingCopy) {
     JsFile file = m_jsFiles.get(workingCopy);
@@ -166,17 +129,9 @@ public class Context {
     return m_libraries;
   }
 
-  public void setLibraryApiDirectory(Path libraryApiDirectory) {
-    m_libraryApiDirectory = libraryApiDirectory;
-  }
-
-  public Path getLibraryApiDirectory() {
-    return m_libraryApiDirectory;
-  }
-
   protected void parseJsFiles() throws IOException {
 
-    final Path src = getSourceRootDirectory().resolve("src/main/js");
+    final Path src = BEANS.get(Configuration.class).getSourceModuleDirectory().resolve("src/main/js");
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {

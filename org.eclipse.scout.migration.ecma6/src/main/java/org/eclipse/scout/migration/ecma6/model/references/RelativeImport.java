@@ -10,6 +10,10 @@
  */
 package org.eclipse.scout.migration.ecma6.model.references;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 
 /**
@@ -34,4 +38,12 @@ public class RelativeImport extends AbstractImport<RelativeImport>{
     return fileToImport.getPath().toString();
   }
 
+
+  public static String computeRelativePath(Path targetFile, Path modulePath){
+    if(!Files.isDirectory(targetFile)){
+      targetFile = targetFile.getParent();
+    }
+    Path relPath = FileUtility.removeFileExtensionJs(targetFile.relativize(modulePath));
+    return relPath.toString();
+  }
 }

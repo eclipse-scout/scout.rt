@@ -30,6 +30,22 @@ public final class FileUtility {
         .orElse(null);
   }
 
+  public static Path removeFileExtension(Path path){
+    String fileExtension = getFileExtension(path);
+    if(fileExtension == null){
+      return path;
+    }
+    String pathName = path.toString();
+    return Paths.get(pathName.substring(0,pathName.length() - (fileExtension.length()+1)));
+  }
+
+  public static Path removeFileExtensionJs(Path path){
+    if("js".equalsIgnoreCase(getFileExtension(path))){
+      return removeFileExtension(path);
+    }
+    return path;
+  }
+
   public static boolean hasExtension(Path path, String extension) {
     if (extension == null) {
       return false;

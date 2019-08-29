@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
@@ -35,9 +36,9 @@ public class T20000_RemoveNamespaceFolder  implements IPostMigrationTask{
   }
 
   protected  void moveSrcNamespaceDiretory(Context context) throws IOException {
-    Path srcNamespaceDirectory = context.getTargetRootDirectory().resolve(Paths.get("src","main", "js", context.getNamespace()));
+    Path srcNamespaceDirectory = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src","main", "js", Configuration.get().getNamespace()));
     if(Files.isDirectory(srcNamespaceDirectory)){
-      FileUtility.moveDirectory(srcNamespaceDirectory, context.getTargetRootDirectory().resolve(Paths.get("src", "main", "js")));
+      FileUtility.moveDirectory(srcNamespaceDirectory, Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js")));
     }
   }
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public class AppNameContextProperty implements IContextProperty<String> {
 
   @Override
   public void setup(Context context) {
-    Path indexHtml = context.getSourceRootDirectory().resolve(Paths.get("src/main/resources/WebContent/index.html"));
+    Path indexHtml = Configuration.get().getSourceModuleDirectory().resolve(Paths.get("src/main/resources/WebContent/index.html"));
     if(Files.exists(indexHtml)){
       String appName = null;
       Set<String> potentialAppNames = new HashSet<>();

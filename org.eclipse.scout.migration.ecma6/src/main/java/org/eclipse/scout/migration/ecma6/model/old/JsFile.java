@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
@@ -129,7 +130,7 @@ public class JsFile extends AbstractJsElement {
     AbstractImport<?> libImport = m_imports.get(key);
 
     if (libImport == null) {
-      libImport = new RelativeImport(this.getPath().getParent().relativize(fileToImport).toString());
+      libImport = new RelativeImport(RelativeImport.computeRelativePath(this.getPath().getParent(),fileToImport).toString());
       m_imports.put(key, libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);

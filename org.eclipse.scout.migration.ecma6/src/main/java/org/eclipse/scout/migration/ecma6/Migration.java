@@ -15,27 +15,12 @@ import org.eclipse.scout.migration.ecma6.task.ITask;
 import org.eclipse.scout.migration.ecma6.task.post.IPostMigrationTask;
 import org.eclipse.scout.migration.ecma6.task.pre.IPreMigrationTask;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Migration {
-
-  public static String TODO_PREFIX = "TODO MIG: ";
   private static final Logger LOG = LoggerFactory.getLogger(Migration.class);
 
-
-//  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsiagbsicrm\\com.bsiag.bsicrm.ui.html");
-//  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\bsistudio\\com.bsiag.bsistudio.lab.ui.html");
-  private static Path PERSIST_CONSTANTS = Paths.get("");
-  private static Path SOURCE_ROOT_DIRECTORY = Paths.get("C:\\dev\\ideWorkspaces\\scout-10_0-crm-16_2\\org.eclipse.scout.rt\\org.eclipse.scout.rt.ui.html");
-  private static Path TARGET_ROOT_DIR = Paths.get("C:/tmp/max24h/migEcma6/org.eclipse.scout.rt.ui.html");
-  private static String NAMESPACE = "scout";
-  private static boolean CLEAN_TARGET = true;
-
-  // write module api
-  private static String LIBRARY_NAME = "eclipse-scout";
-  private static Path LIBRARY_API_STORE_FILE = Paths.get("C:/tmp/max24h/migEcma6/api/eclipse-scout-api.json");
 
   private List<ITask> m_tasks ;
   private Context m_context;
@@ -52,16 +37,12 @@ public class Migration {
   }
 
   private Migration() {
+
   }
 
   public void init() throws IOException {
-    if (!Files.exists(SOURCE_ROOT_DIRECTORY)) {
-      throw new VetoException("Source DIR '" + SOURCE_ROOT_DIRECTORY + "' does not exist. Exit migration.");
-    }
-    Files.createDirectories(TARGET_ROOT_DIR);
-    m_context = new Context(SOURCE_ROOT_DIRECTORY, TARGET_ROOT_DIR, NAMESPACE);
-    m_context.setLibraryStoreFile(LIBRARY_API_STORE_FILE);
-    m_context.setLibraryName(LIBRARY_NAME);
+    Files.createDirectories(BEANS.get(Configuration.class).getTargetModuleDirectory());
+    m_context = new Context();
     m_context.setup();
 
     m_tasks = BEANS.all(ITask.class);
@@ -85,7 +66,7 @@ public class Migration {
   private void visitFiles() throws IOException {
 
     IMigrationPathFilter pathFilter = BEANS.opt(IMigrationPathFilter.class);
-    Files.walkFileTree(m_context.getSourceRootDirectory(), new SimpleFileVisitor<Path>() {
+    Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -129,9 +110,9 @@ public class Migration {
   }
 
   private void writeWorkingCopies() {
-    if (CLEAN_TARGET) {
+    if (Configuration.get().cleanTargetBeforeWriteFiles()) {
       try {
-        FileUtility.deleteDirectory(m_context.getTargetRootDirectory());
+        FileUtility.deleteDirectory(Configuration.get().getTargetModuleDirectory());
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -141,15 +122,17 @@ public class Migration {
   }
 
   private void writeWorkingCopy(WorkingCopy workingCopy) {
+    final Path sourceModule = Configuration.get().getSourceModuleDirectory();
+    final Path targetModule = Configuration.get().getTargetModuleDirectory();
     try {
 
       final Path destination;
       if (workingCopy.getRelativeTargetPath() != null) {
-        destination = TARGET_ROOT_DIR.resolve(workingCopy.getRelativeTargetPath());
+        destination = targetModule.resolve(workingCopy.getRelativeTargetPath());
       }
       else {
-        Path relativePath = SOURCE_ROOT_DIRECTORY.relativize(workingCopy.getPath());
-        destination = TARGET_ROOT_DIR.resolve(relativePath);
+        Path relativePath = sourceModule.relativize(workingCopy.getPath());
+        destination = targetModule.resolve(relativePath);
       }
       workingCopy.persist(destination);
     }

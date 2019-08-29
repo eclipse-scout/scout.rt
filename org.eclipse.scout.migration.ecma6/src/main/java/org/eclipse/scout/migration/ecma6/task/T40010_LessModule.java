@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -42,7 +43,7 @@ public class T40010_LessModule extends AbstractTask {
   }
 
   protected Path getNewTargetPath(Path origPath, Context context) {
-    Path relPath = context.getSourceRootDirectory().relativize(origPath);
+    Path relPath = Configuration.get().getSourceModuleDirectory().relativize(origPath);
     String oldFileName = relPath.getFileName().toString();
     return relPath.getParent().resolve(toNewFileName(oldFileName));
   }

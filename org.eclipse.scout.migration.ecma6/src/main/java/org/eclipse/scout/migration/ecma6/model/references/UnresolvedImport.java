@@ -22,6 +22,6 @@ public class UnresolvedImport extends AbstractImport<UnresolvedImport> {
 
   @Override
   public String getModuleName() {
-    return "TODO (mig could not determ library)";
+    return "TODO (mig could not determ library for '"+m_fullyQualifiedName+"')";
   }
 }

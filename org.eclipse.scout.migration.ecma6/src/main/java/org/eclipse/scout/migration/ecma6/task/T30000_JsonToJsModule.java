@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -74,7 +75,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step8 = getImports(importsToAdd) + step7;
 
     // change file name from Xyz.json to XyzModel.js
-    Path jsonRelPath = context.getSourceRootDirectory().relativize(pathInfo.getPath());
+    Path jsonRelPath = Configuration.get().getSourceModuleDirectory().relativize(pathInfo.getPath());
     String jsonFileName = jsonRelPath.getFileName().toString();
     String jsFileName = jsonFileName.substring(0, jsonFileName.length() - JSON_EXTENSION.length() - 1) + JSON_MODEL_NAME_SUFFIX + '.' + JS_EXTENSION;
     Path newRelPath = jsonRelPath.getParent().resolve(jsFileName);
