@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -42,8 +41,9 @@ public class JsFileParser {
    *  2 name
    *  3 allocation (opt)
    *  4 delimiter semicolumn (opt)
+   *  special example: scout.CalendarComponent.MONTH_COMPACT_THRESHOLD
    */
-  private static Pattern CONSTANT_START = Pattern.compile("^([^\\.\\ ]+\\.[^\\.]+)\\.([A-Z0-9\\_]+)(\\s*\\=\\s*.*)?(\\;)$");
+  private static Pattern CONSTANT_START = Pattern.compile("^([^. ]+\\.[^.]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)$");
 
   private WorkingCopy m_workingCopy;
   private final JsFile m_jsFile;

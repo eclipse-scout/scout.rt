@@ -144,7 +144,6 @@ public class T500_CreateClasses extends AbstractTask {
       replacement.append("super.").append(matcher.group(1)).append("(");
       if(matcher.group(2) != null){
         replacement.append(matcher.group(3));
-
       }
       source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
     }
