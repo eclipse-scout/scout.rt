@@ -308,6 +308,57 @@ describe('Widget', function() {
     });
   });
 
+  describe('nearestWidget', function() {
+    it('finds the nearest widget when multiple widgets have the same id', function() {
+      // p           parent
+      // + w1        child1
+      //   + w2      grandChild1         same ID
+      // + w2        child2              same ID
+      //   + w3      grandChild2
+      //   + w2      grandChild3         same ID
+      var child1 = new TestWidget();
+      child1.init({
+        id: 'w1',
+        session: session,
+        parent: parent
+      });
+      var child2 = new TestWidget();
+      child2.init({
+        id: 'w2',
+        session: session,
+        parent: parent
+      });
+      var grandChild1 = new TestWidget();
+      grandChild1.init({
+        id: 'w2',
+        session: session,
+        parent: child1
+      });
+      var grandChild2 = new TestWidget();
+      grandChild2.init({
+        id: 'w3',
+        session: session,
+        parent: child2
+      });
+      var grandChild3 = new TestWidget();
+      grandChild3.init({
+        id: 'w2',
+        session: session,
+        parent: child2
+      });
+      expect(parent.widget('w1')).toBe(child1);
+      expect(parent.widget('w2')).toBe(grandChild1); // does not find "child2"
+      expect(parent.widget('w3')).toBe(grandChild2);
+      expect(parent.nearestWidget('w1')).toBe(child1); // same result as widget()
+      expect(parent.nearestWidget('w2')).toBe(child2); // unlike widget(), this does find child2
+      expect(parent.nearestWidget('w3')).toBe(null); // only checks one level by default
+      expect(parent.nearestWidget('w3', true)).toBe(grandChild2); // "deep = true" searches the whole tree
+      expect(child2.widget('w2')).toBe(child2); // finds itself
+      expect(child2.nearestWidget('w2')).toBe(child2); // finds itself
+      expect(child2.nearestWidget('w2', true)).toBe(child2); // finds itself
+    });
+  });
+
   describe('enabled', function() {
     it('should be propagated correctly', function() {
       widget.init({

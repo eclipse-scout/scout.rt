@@ -1810,6 +1810,67 @@ scout.Widget.prototype.widget = function(widgetId) {
 };
 
 /**
+ * Similar to widget(), but uses "breadth-first" strategy, i.e. it checks all children of the
+ * same depth (level) before it advances to the next level. If multiple widgets with the same
+ * ID exist, the one with the smallest distance to this widget is returned.
+ *
+ * Example:
+ *
+ *    Widget ['MyWidget']                     #1
+ *    +- GroupBox ['LeftBox']                 #2
+ *       +- StringField ['NameField']         #3
+ *       +- StringField ['CityField']         #4
+ *       +- GroupBox ['InnerBox']             #5
+ *          +- GroupBox ['LeftBox']           #6
+ *             +- DateField ['StartDate']     #7
+ *          +- GroupBox ['RightBox']          #8
+ *             +- DateField ['EndDate']       #9
+ *    +- GroupBox ['RightBox']                #10
+ *       +- StringField ['NameField']         #11
+ *       +- DateField ['StartDate']           #12
+ *
+ *   CALL:                                    RESULT:
+ *   ---------------------------------------------------------------------------------------------
+ *   this.widget('RightBox')                  #8               (might not be the expected result)
+ *   this.nearestWidget('RightBox')           #10
+ *
+ *   this.widget('NameField')                 #3
+ *   this.nearestWidget('NameField')          null             (because no direct child has the requested id)
+ *   this.nearestWidget('NameField', true)    #3               (because #3 and #11 have the same distance)
+ *
+ *   this.widget('StartDate')                 #7
+ *   this.nearestWidget('StartDate', true)    #12              (#12 has smaller distance than #7)
+ *
+ * @param widgetId
+ *          The ID of the widget to find.
+ * @param deep
+ *          If false, only this widget and the next level are checked. This is the default.
+ *          If true, the entire tree is traversed.
+ * @return the first found widget, or null if no widget was found.
+ */
+scout.Widget.prototype.nearestWidget = function(widgetId, deep) {
+  if (this.id === widgetId) {
+    return this;
+  }
+  var widgets = this.children.slice(); // list of widgets to check
+  while (widgets.length) {
+    var widget = widgets.shift();
+    if (widget.id === widgetId) {
+      return widget; // found
+    }
+    if (deep) {
+      for (var i = 0; i < widget.children.length; i++) {
+        var child = widget.children[i];
+        if (child.parent === widget) { // same check as in visitChildren()
+          widgets.push(child);
+        }
+      }
+    }
+  }
+  return null;
+};
+
+/**
  * @returns the first parent for which the given function returns true.
  */
 scout.Widget.prototype.findParent = function(predicate) {
