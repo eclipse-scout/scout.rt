@@ -20,9 +20,7 @@
 }
 
 .desktop-tool-box-item.menu-item {
-  position: relative;
   height: @desktop-header-height - 1px;
-  color: @text-color;
   #scout.font-text-plus();
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
@@ -31,31 +29,6 @@
 
   &.last {
     margin-right: 0;
-  }
-
-  &:hover {
-    color: @hover-color;
-
-    & > .font-icon {
-      color: @hover-color;
-    }
-  }
-
-  &:active {
-    color: @active-color;
-
-    & > .font-icon {
-      color: @active-color;
-    }
-  }
-
-  &.disabled {
-    color: @disabled-color;
-    cursor: default;
-
-    & > .font-icon {
-      color: @disabled-color;
-    }
   }
 
   &.compact {
@@ -72,7 +45,6 @@
   }
 
   & > .font-icon {
-    color: @icon-color;
     font-size: 17px;
   }
 
