@@ -31,6 +31,10 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
+  <properties>
+    <master_test_timeout>600</master_test_timeout> <!-- TODO rst For some unknown reason, tests on ci.eclipse last longer (2x) since version 9.0 -->
+  </properties>
+
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
