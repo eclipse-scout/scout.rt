@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.Order;
 public class T40010_LessModule extends AbstractTask {
 
   private final Pattern IMPORT_PAT = Pattern.compile("@import\\s+\"([\\w/.]+)\";");
-  private static final String FILE_SUFFIX = "-module.less";
+  public static final String FILE_SUFFIX = "-module.less";
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {

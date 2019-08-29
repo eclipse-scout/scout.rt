@@ -23,9 +23,10 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 @ApplicationScoped
 public class Configuration {
 
-  public static Configuration get(){
+  public static Configuration get() {
     return BEANS.get(Configuration.class);
   }
+
   /**
    * @return the source directory to be migrated. must exist. Usually something like '.../[com.bsiag.bsicrm.]ui.html'
    */
@@ -56,10 +57,8 @@ public class Configuration {
   }
 
   /**
-   * The folder where all library api's used for this migration are located. In this folder might be several *.json
-   * files from previous migrations.
-   * 
-   * @return
+   * @return The folder where all library api's used for this migration are located. In this folder might be several
+   *         *.json * files from previous migrations.
    */
   public Path getLibraryApiDirectory() {
     return null;
@@ -68,7 +67,7 @@ public class Configuration {
   /**
    * In case the persist library file is set the API of the migrated module is written in JSON format to this file. If
    * the persistLibraryFile is set the persistLibraryName must also be set.
-   * 
+   *
    * @return a file to persist the api.
    */
   public Path getPersistLibraryFile() {
@@ -78,11 +77,11 @@ public class Configuration {
   /**
    * The library name under which the migrated API is stored in the JSON format. The library API can be used as input
    * for a dependent module migration. If the persistLibraryFile is set the persistLibraryName must also be set.
-   * 
+   *
    * @return the library name (npm name) of the library which is optionally written.
    */
   public String getPersistLibraryName() {
-    return null;
+    return "@eclipse-scout/eclipse-scout-core";
   }
 
   /**
@@ -104,7 +103,7 @@ public class Configuration {
       throw new VetoException(configurationErrorMessage("In case the persistLibraryFile is set the persistLibraryName must also be set."));
     }
     if (getLibraryApiDirectory() != null) {
-      if (!Files.exists(getLibraryApiDirectory()) || Files.isDirectory(getLibraryApiDirectory())) {
+      if (!Files.exists(getLibraryApiDirectory()) || !Files.isDirectory(getLibraryApiDirectory())) {
         throw new VetoException(configurationErrorMessage("In case a libraryApiDirectory is set '" + getLibraryApiDirectory() + "' it must exist and be a directory"));
       }
     }

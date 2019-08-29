@@ -19,6 +19,7 @@ import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
 import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
+import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
@@ -36,7 +37,7 @@ public class Context {
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
   private Libraries m_libraries;
   private INamedElement m_api;
-
+  private LessApiParser m_lessApi;
 
   public void setup() {
     try {
@@ -44,6 +45,12 @@ public class Context {
     }
     catch (IOException e) {
       throw new ProcessingException("Could not parse Library APIs in '" + Configuration.get().getLibraryApiDirectory() + "'.", e);
+    }
+    try {
+      m_lessApi = readLessApiOfLibrariesAndCurrentModule();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Could not parse less Files.", e);
     }
     try {
       parseJsFiles();
@@ -56,6 +63,16 @@ public class Context {
     BEANS.all(IContextProperty.class).forEach(p -> p.setup(this));
   }
 
+  protected LessApiParser readLessApiOfLibrariesAndCurrentModule() throws IOException {
+    Configuration config = Configuration.get();
+    LessApiParser lessApi = new LessApiParser();
+    lessApi.setName(config.getPersistLibraryName());
+    lessApi.parseFromApiFiles(config.getLibraryApiDirectory());
+    lessApi.parseFromSourceDir(config.getSourceModuleDirectory());
+    lessApi.writeApiFile(config.getLibraryApiDirectory());
+    return lessApi;
+  }
+
   private void setupCurrentApi() {
     ApiWriter writer = new ApiWriter();
     m_api = writer.createLibraryFromCurrentModule(BEANS.get(Configuration.class).getNamespace(), this);
@@ -63,7 +80,7 @@ public class Context {
 
   protected void readLibraryApis() throws IOException {
     Path libraryApiDirectory = Configuration.get().getLibraryApiDirectory();
-    if(libraryApiDirectory != null){
+    if (libraryApiDirectory != null) {
       ApiParser parser = new ApiParser(libraryApiDirectory);
       m_libraries = parser.parse();
     }
@@ -100,12 +117,10 @@ public class Context {
     m_moduleDirectory = moduleDirectory;
   }
 
-
   public Path relativeToModule(Path path) {
     Assertions.assertNotNull(getModuleDirectory());
     return path.relativize(getModuleDirectory());
   }
-
 
   public JsFile ensureJsFile(WorkingCopy workingCopy) {
     JsFile file = m_jsFiles.get(workingCopy);
@@ -121,6 +136,10 @@ public class Context {
     return file;
   }
 
+  public LessApiParser getLessApi() {
+    return m_lessApi;
+  }
+
   public INamedElement getApi() {
     return m_api;
   }
@@ -134,7 +153,7 @@ public class Context {
     final Path src = BEANS.get(Configuration.class).getSourceModuleDirectory().resolve("src/main/js");
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
-      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         if (dir.endsWith(Paths.get("src/main/js/jquery"))) {
           return FileVisitResult.SKIP_SUBTREE;
         }
@@ -142,7 +161,7 @@ public class Context {
       }
 
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         if (FileUtility.hasExtension(file, "js")) {
           JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
           jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQuallifiedName(), jsClazz));

@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -28,18 +29,22 @@ public class ApiParser {
   private final ObjectMapper m_defaultJacksonObjectMapper;
   private Path m_directory;
 
-  public ApiParser(Path directory){
+  public ApiParser(Path directory) {
     m_directory = directory;
     m_defaultJacksonObjectMapper = new ObjectMapper()
-      .setSerializationInclusion(Include.NON_DEFAULT)
-      .enable(SerializationFeature.INDENT_OUTPUT)
-      .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-      .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        .setSerializationInclusion(Include.NON_DEFAULT)
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+        .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
   }
+
   public Libraries parse() throws IOException {
     Libraries allLibs = new Libraries();
     List<INamedElement> libs = new ArrayList<>();
-    Files.newDirectoryStream(m_directory).forEach(lib -> libs.add(parseLibrary(lib)));
+    //noinspection resource
+    Files.list(m_directory)
+        .filter(file -> !file.getFileName().toString().endsWith(LessApiParser.API_FILE_SUFFIX))
+        .forEach(lib -> libs.add(parseLibrary(lib)));
     allLibs.addChildren(libs);
     allLibs.ensureParents();
     return allLibs;
@@ -47,17 +52,11 @@ public class ApiParser {
 
   protected NamedElement parseLibrary(Path lib) {
     try {
-      NamedElement library = m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
-
-      return library;
-
+      return m_defaultJacksonObjectMapper.readValue(Files.newInputStream(lib), NamedElement.class);
     }
     catch (IOException e) {
-      throw new ProcessingException("Could parse Api of '"+lib+"'.",e);
+      throw new ProcessingException("Could parse Api of '" + lib + "'.", e);
     }
   }
-
-
-
 
 }
