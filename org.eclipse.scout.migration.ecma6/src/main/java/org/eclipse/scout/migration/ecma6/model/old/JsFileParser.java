@@ -17,8 +17,8 @@ public class JsFileParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsFileParser.class);
 
-  private static Pattern START_COPY_RIGHT = Pattern.compile("^/\\*{5,}$");
-  private static Pattern END_COPY_RIGHT = Pattern.compile("^ \\*{5,}/$");
+  private static Pattern START_COPY_RIGHT = Pattern.compile("^/\\*{1}$");
+  private static Pattern END_COPY_RIGHT = Pattern.compile("^ \\*{1}/$");
 
   private static Pattern START_FUNCTION_COMMENT = Pattern.compile("^/\\*\\*$");
   private static Pattern FUNCTION_COMMENT = Pattern.compile("^ \\*");
@@ -148,14 +148,18 @@ public class JsFileParser {
   }
 
   public JsFile parse() throws IOException {
+    Matcher matcher = null;
     try {
       nextLine();
       JsCommentBlock comment = null;
       while (m_currentLine != null) {
-        Matcher matcher = START_COPY_RIGHT.matcher(m_currentLine);
-        if (matcher.find()) {
-          readCopyRight();
-          continue;
+
+        if(m_currentLineNumber == 1) {
+          matcher = START_COPY_RIGHT.matcher(m_currentLine);
+          if (matcher.find()) {
+            readCopyRight();
+            continue;
+          }
         }
         matcher = START_FUNCTION_COMMENT.matcher(m_currentLine);
         if (matcher.find()) {
