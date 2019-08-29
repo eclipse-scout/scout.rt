@@ -12,8 +12,10 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 @SuppressWarnings("squid:S2160")
 public class DataModelAttributeOperatorProvider implements IDataModelAttributeOperatorProvider, DataModelConstants {
@@ -1157,22 +1159,10 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
       m_shortText = shortText;
       m_text = text;
       m_explanationText = explanationText;
-
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      if (valueTexts != null && !valueTexts.isEmpty()) {
-        String text1 = "";
-        int offset = Integer.decode(valueTexts.get(0));
-        if (offset > 0) {
-          text1 = " + " + offset;
-        }
-        else if (offset < 0) {
-          text1 = " - " + (-offset);
-        }
-        return buildText(aggregationType, attributeText, getText(), text1);
-      }
       return buildText(aggregationType, attributeText, getText(), valueTexts);
     }
 
@@ -1193,7 +1183,12 @@ public class DataModelAttributeOperatorProvider implements IDataModelAttributeOp
 
     @Override
     public int getType() {
-      return IDataModelAttribute.TYPE_INTEGER;
+      return IDataModelAttribute.TYPE_SMART;
+    }
+
+    @Override
+    public ILookupCall<?> getLookupCall() {
+      return BEANS.get(YearToDateCodeTypeLookupCall.class);
     }
   }
 

@@ -867,7 +867,10 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     @Override
     public void setSelectionContext(IDataModelAttribute attribute, int dataType, IDataModelAttributeOp op, List values) {
       setActiveFilterEnabled(attribute.isActiveFilterEnabled());
-      ILookupCall<Object> newCall = attribute.getLookupCall();
+      ILookupCall<Object> newCall = (ILookupCall<Object>) op.getLookupCall();
+      if (newCall == null) {
+        newCall = attribute.getLookupCall();
+      }
       if (getLookupCall() != newCall) {
         setLookupCall(newCall);
       }

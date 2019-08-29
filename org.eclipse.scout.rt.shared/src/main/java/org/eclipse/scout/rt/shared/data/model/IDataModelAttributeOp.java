@@ -12,17 +12,19 @@ package org.eclipse.scout.rt.shared.data.model;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+
 public interface IDataModelAttributeOp {
 
   String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts);
 
   /**
-   * example: "is bewteen {0} and {1}"
+   * example: "is between {0} and {1}"
    */
   String getText();
 
   /**
-   * example: "bewteen"
+   * example: "between"
    */
   String getShortText();
 
@@ -32,7 +34,7 @@ public interface IDataModelAttributeOp {
   String getExplanationText();
 
   /**
-   * @return the field type to display to select a value for usiong this operation, use
+   * @return the field type to display to select a value for using this operation, use
    *         {@link IComposerAttribute#TYPE_INHERITED} when the type of the attribute should be used see
    *         {@link IComposerAttribute}.TYPE_* values
    */
@@ -42,4 +44,13 @@ public interface IDataModelAttributeOp {
    * @return the unique operator type see {@link ComposerConstants#OPERATOR_*} values
    */
   int getOperator();
+
+  /**
+   * @since 10.0
+   * @return the lookupCall to be used when of type {@link IComposerAttribute#TYPE_SMART} and another lookupCall than
+   *         that of the attribute is needed.
+   */
+  default ILookupCall<?> getLookupCall() {
+    return null;
+  }
 }
