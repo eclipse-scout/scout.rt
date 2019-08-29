@@ -69,6 +69,7 @@ public class JsFile extends AbstractJsElement {
   public JsClass getLastOrAppend(String fqn) {
     JsClass jsClass, lastJsClass ;
     if (m_jsClasses.isEmpty()) {
+      Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
       jsClass = new JsClass(fqn, this);
       m_jsClasses.add(jsClass);
       return jsClass;
@@ -81,6 +82,7 @@ public class JsFile extends AbstractJsElement {
     if (jsClass != null) {
       throw new VetoException("Tried to access last class '" + fqn + "' in file '" + getPath().getFileName() + "', but is not last one (last:'" + lastJsClass.getFullyQuallifiedName() + "')!");
     }
+    Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;

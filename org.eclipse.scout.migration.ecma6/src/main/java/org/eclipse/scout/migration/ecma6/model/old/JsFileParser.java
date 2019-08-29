@@ -17,33 +17,119 @@ public class JsFileParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsFileParser.class);
 
-  private static Pattern START_COPY_RIGHT = Pattern.compile("^\\/\\*{5,}$");
-  private static Pattern END_COPY_RIGHT = Pattern.compile("^\\ \\*{5,}\\/$");
-  private static Pattern START_FUNCITON_COMMENT = Pattern.compile("^\\/\\*\\*$");
-  private static Pattern FUNCITON_COMMENT = Pattern.compile("^\\ \\*");
-  private static Pattern END_FUNCITON_COMMENT = Pattern.compile("^\\ \\*(\\s*\\*)?\\/");
-  private static Pattern START_CONSTRUCTOR = Pattern.compile("^([^\\.]+\\.[^\\ \\.]+)()\\s*\\=\\s*function\\(([^\\)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
-  private static Pattern START_FUNCTION = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.prototype\\.([^\\ ]+)\\ \\=\\s*function\\(([^\\)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
-  private static Pattern START_STATIC_FUNCTION = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\ \\=\\s*function\\(([^\\)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
-  private static Pattern END_BLOCK = Pattern.compile("^\\}\\;");
-  private static Pattern SUPER_BLOCK = Pattern.compile("scout\\.inherits\\(([^\\,]+)\\,\\s*([^\\,]+)\\)\\;");
+  private static Pattern START_COPY_RIGHT = Pattern.compile("^/\\*{5,}$");
+  private static Pattern END_COPY_RIGHT = Pattern.compile("^ \\*{5,}/$");
+
+  private static Pattern START_FUNCTION_COMMENT = Pattern.compile("^/\\*\\*$");
+  private static Pattern FUNCTION_COMMENT = Pattern.compile("^ \\*");
+  private static Pattern END_FUNCTION_COMMENT = Pattern.compile("^ \\*(\\s*\\*)?/");
+
   /**
-   * Groups:
-   *  1 namespace
-   *  2 name
-   *  3 open bracket
-   *  4 closing bracket (opt)
+   * <pre>
+    * scout.Device = function(model) {
+    * Groups:
+    *  1 indent (empty)
+   *  2 namespace = scope.class
+   *  3 field name (empty)
+    *  4 params
+    *  5 open bracket
+    *  6 closing bracket (opt)
+   * </pre>
    */
-  private static Pattern ENUM_START = Pattern.compile("^([^\\.]+\\.[^\\.]+)\\.([^\\ ]+)\\s*\\=\\s*(\\{)\\s*(\\}\\;)?");
+  private static Pattern START_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[^ .]+)()\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
+
   /**
+   * <pre>
+   * scout.strings = {
+   * AND:
+   * scout.HtmlEnvironment = {
+   * AND global enum:
+   * scout.KeyStrokeMode = {
    * Groups:
-   *  1 namespace
-   *  2 name
+   *  1 indent (empty)
+   *  2 namespace = scope.class
+   *  3 field name (empty)
+   *  4 params (empty)
+   *  5 open bracket
+   *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_UTILITY_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[^ .]+)()\\s*=\\s*()(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+   * scout.KeyStroke.Mode = {
+   * Groups:
+   *  1 indent
+   *  2 namespace = scope.class
+   *  3 field name
+   *  4 open bracket
+   *  5 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_ENUM = Pattern.compile("^(\\s*)([^ .]+\\.[^ .]+)\\.([A-Z][^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+    * Groups:
+    *  1 indent (empty)
+   *  2 namespace = scope.class
+    *  3 name
+    *  4 params
+    *  5 open bracket
+    *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_FUNCTION = Pattern.compile("^()([^ .]+\\.[^ .]+)\\.prototype\\.([^ .]+)\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+    * Groups:
+    *  1 indent (empty)
+   *  2 namespace = scope.class
+   *  3 field name
+    *  4 params
+    *  5 open bracket
+    *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_STATIC_FUNCTION = Pattern.compile("^()([^ .]+\\.[^ .]+)\\.([^ .]+)\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+    * SPACE SPACE insertAt: function(text, insertText, position) {
+    * Groups:
+    *  1 indent (non-empty)
+    *  2 namespace = scope.class (empty)
+   *  3 field name
+    *  4 params
+    *  5 open bracket
+    *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^(\\s*)()([a-z_][^ .]+)\\s*:\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\,?)?");
+
+  /**
+   * <pre>
+   * Groups:
+   *  1 namespace = scope.class
+   *  2 field name
    *  3 allocation (opt)
    *  4 delimiter semicolumn (opt)
-   *  special example: scout.CalendarComponent.MONTH_COMPACT_THRESHOLD
+   * </pre>
    */
-  private static Pattern CONSTANT_START = Pattern.compile("^([^. ]+\\.[^.]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)$");
+  private static Pattern START_CONSTANT = Pattern.compile("^([^. ]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)$");
+
+  /**
+   * <pre>
+    * Groups:
+    * 1 indent
+    * 2 termination character ';' or ','
+   * </pre>
+   */
+  private static Pattern END_BLOCK = Pattern.compile("^(\\s*)\\}\\s*([;,])");
+
+  private static Pattern SUPER_BLOCK = Pattern.compile("scout\\.inherits\\(([^,]+),\\s*([^,]+)\\);");
 
   private WorkingCopy m_workingCopy;
   private final JsFile m_jsFile;
@@ -71,13 +157,24 @@ public class JsFileParser {
           readCopyRight();
           continue;
         }
-        matcher = START_FUNCITON_COMMENT.matcher(m_currentLine);
+        matcher = START_FUNCTION_COMMENT.matcher(m_currentLine);
         if (matcher.find()) {
           comment = readFunctionComment();
           continue;
         }
         matcher = START_CONSTRUCTOR.matcher(m_currentLine);
         if (matcher.find()) {
+          readFunction(matcher, comment, true, false);
+          comment = null;
+          continue;
+        }
+        matcher = START_ENUM.matcher(m_currentLine);
+        if (matcher.find()) {
+          readEnum(matcher);
+          continue;
+        }
+        matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
+        if (matcher.find() && isUtilityConstructor(matcher)) {
           readFunction(matcher, comment, true, false);
           comment = null;
           continue;
@@ -94,13 +191,14 @@ public class JsFileParser {
           comment = null;
           continue;
         }
-        matcher = ENUM_START.matcher(m_currentLine);
-        if(matcher.find()){
-          readEnum(matcher);
+        matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
+        if (matcher.find() && isUtilityFunction(matcher)) {
+          readFunction(matcher, comment, false, true);
+          comment = null;
           continue;
         }
-        matcher= CONSTANT_START.matcher(m_currentLine);
-        if(matcher.find()){
+        matcher = START_CONSTANT.matcher(m_currentLine);
+        if (matcher.find()) {
           readConstant(matcher);
           continue;
         }
@@ -114,12 +212,12 @@ public class JsFileParser {
       }
     }
     catch (VetoException e) {
-      LOG.error("Could not parse file '"+m_jsFile.getPath().getFileName()+":"+m_currentLineNumber+"'.",e);
+      LOG.error("Could not parse file '" + m_jsFile.getPath().getFileName() + ":" + m_currentLineNumber + "'.", e);
       throw e;
     }
 
     List<JsClass> jsClasses = m_jsFile.getJsClasses();
-    if(jsClasses.size() == 1){
+    if (jsClasses.size() == 1) {
       jsClasses.get(0).setDefault(true);
     }
     // log
@@ -132,7 +230,27 @@ public class JsFileParser {
     return m_jsFile;
   }
 
+  @Exemption
+  protected boolean isUtilityConstructor(Matcher matcher) {
+    //scout.strings
+    /*
+    if (matcher.group(2).matches("[^.]+\\.[a-z].*")) {
+      return true;
+    }
+    //scout.HtmlEnvironment
+    if (matcher.group(2).equals("scout.HtmlEnvironment")) {
+      //FIXME imo add todo
+      return true;
+    }
+    */
+    return false;
+  }
 
+  @Exemption
+  protected boolean isUtilityFunction(Matcher matcher) {
+    //FIXME imo add todo
+    return false;
+  }
 
   private void readCopyRight() throws IOException {
     JsCommentBlock comment = new JsCommentBlock();
@@ -145,7 +263,7 @@ public class JsFileParser {
         commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
         break;
       }
-      else if (FUNCITON_COMMENT.matcher(m_currentLine).find()) {
+      else if (FUNCTION_COMMENT.matcher(m_currentLine).find()) {
         commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
       }
       else {
@@ -167,11 +285,11 @@ public class JsFileParser {
     nextLine();
 
     while (m_currentLine != null) {
-      if (END_FUNCITON_COMMENT.matcher(m_currentLine).find()) {
+      if (END_FUNCTION_COMMENT.matcher(m_currentLine).find()) {
         commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
         break;
       }
-      else if (FUNCITON_COMMENT.matcher(m_currentLine).find()) {
+      else if (FUNCTION_COMMENT.matcher(m_currentLine).find()) {
         commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
       }
       else {
@@ -187,16 +305,17 @@ public class JsFileParser {
   }
 
   private JsFunction readFunction(Matcher matcher, JsCommentBlock comment, boolean constructor, boolean isStatic) throws IOException {
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
-    JsFunction function = new JsFunction(clazz, matcher.group(2));
+    String indent = matcher.group(1);
+    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
+    JsFunction function = new JsFunction(clazz, matcher.group(3));
     function.setComment(comment);
     function.setStartOffset(m_offsetStartLine);
     function.setConstructor(constructor);
     function.setStatic(isStatic);
-    function.setArgs(matcher.group(3));
-    StringBuilder functionBody = new StringBuilder(matcher.group(4));
-    if (StringUtility.hasText(matcher.group(5))) {
-      functionBody.append(matcher.group(5));
+    function.setArgs(matcher.group(4));
+    StringBuilder functionBody = new StringBuilder(matcher.group(5));
+    if (StringUtility.hasText(matcher.group(6))) {
+      functionBody.append(matcher.group(6));
       function.setBody(functionBody.toString());
       clazz.addFunction(function);
       nextLine();
@@ -204,10 +323,12 @@ public class JsFileParser {
     }
     nextLine();
     while (m_currentLine != null) {
-      functionBody.append(m_currentLine);
-      if (END_BLOCK.matcher(m_currentLine).find()) {
+      Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
+      if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
+        functionBody.append("}");
         break;
       }
+      functionBody.append(m_currentLine);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
         throw new VetoException("Could not parse function body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
       }
@@ -221,13 +342,14 @@ public class JsFileParser {
   }
 
   protected JsEnum readEnum(Matcher matcher) throws IOException {
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
-    JsEnum jsEnum = new JsEnum(clazz, matcher.group(2));
+    String indent = matcher.group(1);
+    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
+    JsEnum jsEnum = new JsEnum(clazz, matcher.group(3));
     jsEnum.setStartOffset(m_offsetStartLine);
-    StringBuilder bodyBuilder = new StringBuilder(matcher.group(3));
-    if (StringUtility.hasText(matcher.group(4))) {
+    StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
+    if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
-      LOG.warn("Dynamic enum '"+jsEnum.getName()+"' found in "+m_workingCopy.getPath().getFileName()+":"+m_currentLineNumber);
+      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber);
       jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand.");
       clazz.addEnum(jsEnum);
       nextLine();
@@ -235,10 +357,12 @@ public class JsFileParser {
     }
     nextLine();
     while (m_currentLine != null) {
-      bodyBuilder.append(m_currentLine);
-      if (END_BLOCK.matcher(m_currentLine).find()) {
+      Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
+      if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
+        bodyBuilder.append("}");
         break;
       }
+      bodyBuilder.append(m_currentLine);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
         throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
       }
@@ -249,7 +373,6 @@ public class JsFileParser {
 
     clazz.addEnum(jsEnum);
     return jsEnum;
-
   }
 
   protected JsConstant readConstant(Matcher matcher) throws IOException {

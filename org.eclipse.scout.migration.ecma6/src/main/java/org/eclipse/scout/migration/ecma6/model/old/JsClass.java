@@ -1,11 +1,11 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-import org.eclipse.scout.rt.platform.exception.VetoException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.eclipse.scout.rt.platform.exception.VetoException;
 
 public class JsClass extends AbstractJsElement{
 
