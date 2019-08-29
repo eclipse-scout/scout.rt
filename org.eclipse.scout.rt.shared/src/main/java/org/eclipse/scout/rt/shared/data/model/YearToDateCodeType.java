@@ -36,7 +36,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
   @Override
   protected String getConfiguredText() {
-    return TEXTS.get("YearToDate"); // XXX
+    return TEXTS.get("YearToDate");
   }
 
   @Order(-3)
@@ -47,7 +47,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("ThreeYearsBefore");
+      return TEXTS.get("YearToDateThreeYearsBefore");
     }
 
     @Override
@@ -64,7 +64,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("TwoYearsBefore");
+      return TEXTS.get("YearToDateTwoYearsBefore");
     }
 
     @Override
@@ -81,7 +81,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("LastYear");
+      return TEXTS.get("YearToDateLastYear");
     }
 
     @Override
@@ -98,7 +98,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("ThisYear");
+      return TEXTS.get("YearToDateThisYear");
     }
 
     @Override
@@ -115,7 +115,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
 
     @Override
     protected String getConfiguredText() {
-      return TEXTS.get("NextYear");
+      return TEXTS.get("YearToDateNextYear");
     }
 
     @Override
