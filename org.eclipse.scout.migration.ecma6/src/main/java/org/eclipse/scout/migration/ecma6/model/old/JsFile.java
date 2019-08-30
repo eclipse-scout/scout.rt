@@ -13,10 +13,8 @@ import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
-import org.eclipse.scout.migration.ecma6.model.references.AbstractImport;
+import org.eclipse.scout.migration.ecma6.model.references.JsImport;
 import org.eclipse.scout.migration.ecma6.model.references.AliasedMember;
-import org.eclipse.scout.migration.ecma6.model.references.LibraryImport;
-import org.eclipse.scout.migration.ecma6.model.references.RelativeImport;
 import org.eclipse.scout.migration.ecma6.model.references.UnresolvedImport;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -29,7 +27,7 @@ public class JsFile extends AbstractJsElement {
   private final Path m_path;
   private JsCommentBlock m_copyRight;
   private List<JsClass> m_jsClasses = new ArrayList<>();
-  private HashMap<String /*key of import*/, AbstractImport<?>> m_imports = new HashMap<>();
+  private HashMap<String /*module name*/, JsImport> m_imports = new HashMap<>();
 
   public JsFile(Path path) {
     Assertions.assertNotNull(path);
@@ -95,7 +93,7 @@ public class JsFile extends AbstractJsElement {
    */
   public AliasedMember getOrCreateImport(String fullyQualifiedName, Context context){
     // if already unresolved return
-    AbstractImport<?> imp =  m_imports.get(fullyQualifiedName);
+    JsImport imp =  m_imports.get(fullyQualifiedName);
     if(imp != null){
       return imp.getDefaultMember();
     }
@@ -114,7 +112,7 @@ public class JsFile extends AbstractJsElement {
       m_imports.put(fullyQualifiedName, imp);
       return imp.getDefaultMember();
     }
-    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getName(), MigrationUtility.parseMemberName(fullyQualifiedName));
+    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getName(), MigrationUtility.parseMemberName(fullyQualifiedName), false);
 
   }
 
@@ -125,39 +123,36 @@ public class JsFile extends AbstractJsElement {
   public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible){
     Assertions.assertNotNull(fileToImport);
     Assertions.assertNotNull(memberName);
-    String key = fileToImport.toString();
-    AbstractImport<?> libImport = m_imports.get(key);
-
-    if (libImport == null) {
-      libImport = new RelativeImport(RelativeImport.computeRelativePath(this.getPath().getParent(),fileToImport).toString());
-      m_imports.put(key, libImport);
-    }
-    AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
-    if (aliasedMember == null) {
-      aliasedMember = ensureUniqueAlias(new AliasedMember(memberName), 1);
-      if (defaultIfPossible && libImport.getDefaultMember() == null) {
-        libImport.withDefaultMember(aliasedMember);
-      }
-      else {
-        libImport.withMember(aliasedMember);
-      }
-    }
-    return aliasedMember;
+    String moduleName = JsImport.computeRelativePath(this.getPath().getParent(),fileToImport);
+    return getOrCreateImport(moduleName,memberName,defaultIfPossible);
   }
 
-  protected AliasedMember getOrCreateImport(String moduleName, String memberName) {
-    AbstractImport<?> libImport = m_imports.get(moduleName);
 
+
+  protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean defaultIfPossible) {
+    JsImport libImport = m_imports.get(moduleName);
     if (libImport == null) {
-      libImport = new LibraryImport(moduleName);
+      libImport = new JsImport(moduleName);
       m_imports.put(moduleName, libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
     if (aliasedMember == null) {
       aliasedMember = ensureUniqueAlias(new AliasedMember(memberName), 1);
+      if(defaultIfPossible && libImport.getDefaultMember() == null){
+        libImport.setDefaultMember(aliasedMember);
+      }else{
       libImport.addMember(aliasedMember);
+      }
     }
     return aliasedMember;
+  }
+
+  public JsImport getImport(String moduleName){
+    return m_imports.get(moduleName);
+  }
+
+  public void addImport(JsImport jsImport                        ){
+    m_imports.put(jsImport.getModuleName(), jsImport);
   }
 
   private AliasedMember ensureUniqueAlias(AliasedMember member, int index) {
@@ -169,7 +164,9 @@ public class JsFile extends AbstractJsElement {
     return member;
   }
 
-  public Collection<AbstractImport<?>> getImports() {
+
+
+  public Collection<JsImport> getImports() {
     return Collections.unmodifiableCollection(m_imports.values());
   }
 

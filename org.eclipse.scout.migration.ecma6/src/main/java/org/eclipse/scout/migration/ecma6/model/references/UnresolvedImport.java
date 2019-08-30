@@ -10,18 +10,9 @@
  */
 package org.eclipse.scout.migration.ecma6.model.references;
 
-import org.eclipse.scout.migration.ecma6.context.Context;
-
-public class UnresolvedImport extends AbstractImport<UnresolvedImport> {
-  private String m_fullyQualifiedName;
+public class UnresolvedImport extends JsImport {
 
   public UnresolvedImport(String fullyQualifiedName){
-    m_fullyQualifiedName = fullyQualifiedName;
-  }
-
-
-  @Override
-  public String getModuleName() {
-    return "TODO (mig could not determ library for '"+m_fullyQualifiedName+"')";
+    super("TODO (mig could not determ library for '"+fullyQualifiedName+"')");
   }
 }

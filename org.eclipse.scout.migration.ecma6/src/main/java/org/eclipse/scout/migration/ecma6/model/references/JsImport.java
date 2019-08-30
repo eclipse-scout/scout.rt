@@ -10,23 +10,30 @@
  */
 package org.eclipse.scout.migration.ecma6.model.references;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 
-public abstract class AbstractImport<T extends AbstractImport> implements IImport {
+public class JsImport implements IImport {
 
+  private final String m_moduleName;
   private AliasedMember m_defaultMember;
   private List<AliasedMember> m_members = new ArrayList<>();
 
+  public JsImport(String moduleName){
+    m_moduleName = moduleName;
+  }
 
-  public T withMember(AliasedMember member){
+  public JsImport withMember(AliasedMember member){
     m_members.add(member);
-    return (T) this;
+    return this;
   }
 
   public void addMember(AliasedMember member){
@@ -37,9 +44,9 @@ public abstract class AbstractImport<T extends AbstractImport> implements IImpor
     return Collections.unmodifiableList(m_members);
   }
 
-  public T withDefaultMember(AliasedMember defaultMember){
+  public JsImport withDefaultMember(AliasedMember defaultMember){
     m_defaultMember = defaultMember;
-    return (T) this;
+    return  this;
   }
 
   public AliasedMember getDefaultMember() {
@@ -57,7 +64,10 @@ public abstract class AbstractImport<T extends AbstractImport> implements IImpor
   public void setDefaultMember(AliasedMember defaultMember){
     m_defaultMember = defaultMember;
   }
-  public abstract  String getModuleName();
+
+  public String getModuleName(){
+    return m_moduleName;
+  }
 
   @Override
   public String toSource(Context context) {
@@ -86,5 +96,13 @@ public abstract class AbstractImport<T extends AbstractImport> implements IImpor
       .append(getModuleName())
       .append("';");
     return sourceBuilder.toString();
+  }
+
+  public static String computeRelativePath(Path targetFile, Path modulePath){
+    if(!Files.isDirectory(targetFile)){
+      targetFile = targetFile.getParent();
+    }
+    Path relPath = FileUtility.removeFileExtensionJs(targetFile.relativize(modulePath));
+    return relPath.toString();
   }
 }

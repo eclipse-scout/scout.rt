@@ -9,7 +9,7 @@ import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
-import org.eclipse.scout.migration.ecma6.model.references.AbstractImport;
+import org.eclipse.scout.migration.ecma6.model.references.JsImport;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(29000)
@@ -26,7 +26,7 @@ public class T29000_JsCreateImports extends AbstractTask {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     JsFile jsFile = context.ensureJsFile(workingCopy);
     // create imports
-    Collection<AbstractImport<?>> imports = jsFile.getImports();
+    Collection<JsImport> imports = jsFile.getImports();
     if (imports.isEmpty()) {
       return;
     }
