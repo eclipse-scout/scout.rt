@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -43,7 +42,6 @@ public class ApiParser {
     List<INamedElement> libs = new ArrayList<>();
     //noinspection resource
     Files.list(m_directory)
-        .filter(file -> !file.getFileName().toString().endsWith(LessApiParser.API_FILE_SUFFIX))
         .forEach(lib -> libs.add(parseLibrary(lib)));
     allLibs.addChildren(libs);
     allLibs.ensureParents();

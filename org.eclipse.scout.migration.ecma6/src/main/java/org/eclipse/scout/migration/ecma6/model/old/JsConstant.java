@@ -20,7 +20,7 @@ public class JsConstant extends AbstractJsElement {
   }
 
   public String getFqn(){
-    return getJsClass().getFullyQuallifiedName()+"."+getName();
+    return getJsClass().getFullyQualifiedName() + "." + getName();
   }
 
   public String getBody() {

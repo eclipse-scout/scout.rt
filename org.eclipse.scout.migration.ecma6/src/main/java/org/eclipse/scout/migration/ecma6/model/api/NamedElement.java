@@ -12,7 +12,9 @@ package org.eclipse.scout.migration.ecma6.model.api;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +24,7 @@ public class NamedElement implements INamedElement {
   private Type m_type;
   private String m_name;
   private INamedElement m_parent;
+  private Map<String, String> m_customAttributes = new HashMap<>();
   private List<INamedElement> m_children = new ArrayList<>();
 
   public NamedElement() {
@@ -57,18 +60,22 @@ public class NamedElement implements INamedElement {
   }
 
   @Override
-  public String getFullyQuallifiedName() {
+  public String getFullyQualifiedName() {
     if (getType() == Type.Constructor) {
-      return getParent().getFullyQuallifiedName();
+      return getParent().getFullyQualifiedName();
     }
     StringBuilder nameBuilder = new StringBuilder();
     if (getParent() != null) {
-      nameBuilder.append(getParent().getFullyQuallifiedName())
+      nameBuilder.append(getParent().getFullyQualifiedName())
           .append(".");
 
     }
     nameBuilder.append(getName());
     return nameBuilder.toString();
+  }
+
+  public void setFullyQualifiedName(String fqn) {
+    // nop
   }
 
   @JsonIgnore
@@ -86,6 +93,7 @@ public class NamedElement implements INamedElement {
     return getParent().getAncestor(filter);
   }
 
+  @Override
   public void setParent(INamedElement parent) {
     m_parent = parent;
   }
@@ -103,6 +111,7 @@ public class NamedElement implements INamedElement {
     m_children.addAll(children);
   }
 
+  @Override
   public List<INamedElement> getElements(INamedElement.Type type) {
     return getElements(type, null);
   }
@@ -110,12 +119,9 @@ public class NamedElement implements INamedElement {
   @Override
   public List<INamedElement> getElements(Type type, Predicate<INamedElement> filter) {
     List<INamedElement> result = new ArrayList<>();
-    this.visit(new INamedElementVisitor() {
-      @Override
-      public void visit(INamedElement element) {
-        if (element.getType() == type && (filter == null || filter.test(element))) {
-          result.add(element);
-        }
+    this.visit(element -> {
+      if (element.getType() == type && (filter == null || filter.test(element))) {
+        result.add(element);
       }
     });
     return result;
@@ -125,5 +131,14 @@ public class NamedElement implements INamedElement {
   public void visit(INamedElementVisitor visitor) {
     visitor.visit(this);
     m_children.forEach(child -> child.visit(visitor));
+  }
+
+  @Override
+  public Map<String, String> getCustomAttributes() {
+    return m_customAttributes;
+  }
+
+  public void setCustomAttributes(Map<String, String> customAttributes) {
+    m_customAttributes = customAttributes;
   }
 }

@@ -29,11 +29,11 @@ import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @Order(5100)
 public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T5100_ResolveReferencesAndCreateImports.class);
 
+  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
   @Override
@@ -52,44 +52,44 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(c -> c.getFullyQuallifiedName()).collect(Collectors.toSet());
+    Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> staticFunctions = context.getApi().getElements(Type.StaticFunction, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQuallifiedName()));
-    List<INamedElement> constants = context.getApi().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQuallifiedName()));
-    List<INamedElement> enums = context.getApi().getElements(Type.Enum, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQuallifiedName()));
-    List<INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQuallifiedName()));
-
+    List<? extends INamedElement> staticFunctions = context.getApi().getElements(Type.StaticFunction, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
+    List<? extends INamedElement> constants = context.getApi().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
+    List<? extends INamedElement> enums = context.getApi().getElements(Type.Enum, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
+    List<? extends INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
 
     for (INamedElement function : staticFunctions) {
-      source = createImportForReferences(function, Pattern.quote(function.getFullyQuallifiedName()),function.getParent().getName()+"."+function.getName(), source, jsFile,context);
+      source = createImportForReferences(function, Pattern.quote(function.getFullyQualifiedName()), function.getParent().getName() + "." + function.getName(), source, jsFile, context);
     }
 
     for (INamedElement constant : constants) {
-      source = createImportForReferences(constant, Pattern.quote(constant.getFullyQuallifiedName()),constant.getParent().getName()+"."+constant.getName(), source, jsFile,context);
+      source = createImportForReferences(constant, Pattern.quote(constant.getFullyQualifiedName()), constant.getParent().getName() + "." + constant.getName(), source, jsFile, context);
     }
 
     for (INamedElement anEnum : enums) {
-      source = createImportForReferences(anEnum, Pattern.quote(anEnum.getFullyQuallifiedName()),anEnum.getParent().getName()+"."+anEnum.getName(), source, jsFile,context);
+      source = createImportForReferences(anEnum, Pattern.quote(anEnum.getFullyQualifiedName()), anEnum.getParent().getName() + "." + anEnum.getName(), source, jsFile, context);
     }
     // constructor must be last in order to not replace static calls with constructor prefix
     for (INamedElement constructor : constructors) {
+      //noinspection StringBufferReplaceableByString
       StringBuilder patternBuilder = new StringBuilder();
       patternBuilder.append("new\\s*")
-        .append(Pattern.quote(constructor.getFullyQuallifiedName()))
-        .append("\\(");
-      source = createImportForReferences(constructor, patternBuilder.toString(), "new "+constructor.getParent().getName()+"(", source, jsFile,context);
+          .append(Pattern.quote(constructor.getFullyQualifiedName()))
+          .append("\\(");
+      source = createImportForReferences(constructor, patternBuilder.toString(), "new " + constructor.getParent().getName() + "(", source, jsFile, context);
     }
     workingCopy.setSource(source);
   }
 
-  private String createImportForReferences(INamedElement element,String pattern,String replacement,  String source, JsFile jsFile, Context context) {
+  private String createImportForReferences(INamedElement element, String pattern, String replacement, String source, JsFile jsFile, Context context) {
 
     Matcher matcher = Pattern.compile(pattern).matcher(source);
 
     boolean result = matcher.find();
     if (result) {
       String filename = jsFile.getPath().getFileName().toString();
-      JsClass definingClass = context.getJsClass(element.getAncestor(ne -> ne.getType() == Type.Class).getFullyQuallifiedName());
+      JsClass definingClass = context.getJsClass(element.getAncestor(ne -> ne.getType() == Type.Class).getFullyQualifiedName());
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
@@ -99,7 +99,7 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
       }
       while (result);
       // create import
-      LOG.debug("[" + filename + "] Create import for '" + definingClass.getFullyQuallifiedName() + "'.");
+      LOG.debug("[" + filename + "] Create import for '" + definingClass.getFullyQualifiedName() + "'.");
       jsFile.getOrCreateImport(definingClass);
 
       matcher.appendTail(sb);

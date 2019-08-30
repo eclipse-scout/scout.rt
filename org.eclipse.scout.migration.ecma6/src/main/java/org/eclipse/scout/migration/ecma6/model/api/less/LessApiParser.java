@@ -28,62 +28,54 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
+import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
+import org.eclipse.scout.migration.ecma6.model.api.Libraries;
+import org.eclipse.scout.migration.ecma6.model.api.NamedElement;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
-import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class LessApiParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(LessApiParser.class);
   private static final String LESS_FILE_SUFFIX = ".less";
-  public static final String API_FILE_SUFFIX = "-less-api.json";
   private static final String DEFAULT_THEME_NAME = "default-theme";
-  private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("//.*?\r\n");
-  private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("//.*?\n");
-  private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)/\\*.*?\\*/");
-
+  private static final String PROP_PATH = "path";
+  private static final String PROP_THEME = "theme";
   private static final Pattern MIXIN_FUNCTION_PAT = Pattern.compile("\\n\\s\\s\\.([\\w-]+)");
   private static final Pattern LESS_VAR_PAT = Pattern.compile("\\n@([\\w-]+):");
   private static final Pattern LESS_MIXIN_PAT = Pattern.compile("#(\\w+)\\s*\\{");
 
-  private Map<String /* mixin namespace (e.g. #scout.vendor) */, String /* rel path */> m_mixins;
-  private Map<String /* variable name*/, Map<String /* theme name */, String /* rel path */>> m_vars;
-  private final Map<String /* lib name */, LessApiParser> m_libraries;
+  private Map<String /* mixin name (e.g. #scout.animation) */, INamedElement> m_mixins;
+  private Map<String /* variable name*/, Map<String /* theme name */, INamedElement>> m_vars;
+  private Map<String /* lib name */, LessApiParser> m_libraries;
   private String m_name;
-  private final ObjectMapper m_defaultJacksonObjectMapper;
 
   public LessApiParser() {
     m_vars = new HashMap<>();
     m_mixins = new HashMap<>();
     m_libraries = new LinkedHashMap<>();
-    m_defaultJacksonObjectMapper = new ObjectMapper()
-        .setSerializationInclusion(Include.NON_DEFAULT)
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-        .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
   }
 
-  public void parseFromSourceDir(Path sourceRoot) throws IOException {
+  public void parseFromSourceDir(Path sourceRoot, Context context) throws IOException {
     m_vars.clear();
     m_mixins.clear();
     Files.walkFileTree(sourceRoot, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (file.getFileName().toString().endsWith(LESS_FILE_SUFFIX)) {
-          parseLessFile(file, sourceRoot);
+          parseLessFile(file, sourceRoot, context);
         }
         return FileVisitResult.CONTINUE;
       }
@@ -105,23 +97,36 @@ public class LessApiParser {
     });
   }
 
-  public void parseFromApiFiles(Path apiFileDir) throws IOException {
-    if (apiFileDir == null || !Files.exists(apiFileDir)) {
-      return;
-    }
-    //noinspection resource
-    Files
-        .list(apiFileDir)
-        .filter(file -> file.getFileName().toString().endsWith(API_FILE_SUFFIX))
-        .map(this::importApiFile)
+  public void parseFromLibraries(Libraries libs) {
+    m_libraries = libs.getChildren().stream()
+        .map(this::parseLib)
         .filter(Objects::nonNull)
         .sorted(new LibrarySortOrderComparator())
-        .forEach(lib -> {
-          LessApiParser previous = m_libraries.put(lib.getName(), lib);
-          if (previous != null) {
-            LOG.warn("Duplicate Less API definition with name '{}'.", lib.getName());
-          }
-        });
+        .collect(Collectors.toMap(LessApiParser::getName, Function.identity(), (u, v) -> {
+          throw new IllegalStateException(String.format("Duplicate Less API definition with name '%s'.", u));
+        }, LinkedHashMap::new));
+  }
+
+  protected LessApiParser parseLib(INamedElement lib) {
+    if (lib.getName().equals(getName())) {
+      LOG.warn("Skip Less API definition with name '{}' because it has the same name as the current module.", getName());
+      return null;
+    }
+    LessApiParser nested = new LessApiParser();
+    nested.setName(lib.getName());
+    List<INamedElement> mixins = lib.getElements(Type.LessMixin);
+    List<INamedElement> variables = lib.getElements(Type.LessVariable);
+
+    Map<String, INamedElement> mixinMap = mixins.stream().collect(Collectors.toMap(INamedElement::getName, Function.identity()));
+    nested.setMixins(mixinMap);
+
+    Map<String, Map<String, INamedElement>> map = new HashMap<>();
+    for (INamedElement var : variables) {
+      map.computeIfAbsent(var.getName(), k -> new HashMap<>()).put(var.getCustomAttributes().get(PROP_THEME), var);
+    }
+    nested.setGlobalVariables(map);
+
+    return nested;
   }
 
   public List<String> getRequiredImportsFor(WorkingCopy less, Context context) {
@@ -142,22 +147,22 @@ public class LessApiParser {
     String lessSrc = less.getSource();
     String theme = parseTheme(less.getPath());
     String libImportPrefix = getExternalLibPrefix(lib);
-    for (Entry<String, Map<String, String>> variable : lib.m_vars.entrySet()) {
+    for (Entry<String, Map<String, INamedElement>> variable : lib.m_vars.entrySet()) {
       String var = variable.getKey();
       if (lessSrc.contains(var)) {
-        Map<String, String> filesDefiningVariable = variable.getValue();
-        String fileDeclaringVariable = filesDefiningVariable.get(theme);
-        if (fileDeclaringVariable == null) {
-          fileDeclaringVariable = filesDefiningVariable.get(DEFAULT_THEME_NAME);
+        Map<String, INamedElement> filesDefiningVariable = variable.getValue();
+        INamedElement lessVariable = filesDefiningVariable.get(theme);
+        if (lessVariable == null) {
+          lessVariable = filesDefiningVariable.get(DEFAULT_THEME_NAME);
         }
-        if (fileDeclaringVariable == null) {
+        if (lessVariable == null) {
           throw new ProcessingException("Cannot find less import for variable '{}'.", var);
         }
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, fileDeclaringVariable));
+          requiredImports.add(toExternalImport(libImportPrefix, lessVariable.getCustomAttributes().get(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, fileDeclaringVariable));
+          requiredImports.add(toInternalImport(less, lessVariable.getCustomAttributes().get(PROP_PATH)));
         }
       }
     }
@@ -170,14 +175,14 @@ public class LessApiParser {
   protected static void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Set<String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String libImportPrefix = getExternalLibPrefix(lib);
-    for (Entry<String, String> mixin : lib.m_mixins.entrySet()) {
+    for (Entry<String, INamedElement> mixin : lib.m_mixins.entrySet()) {
       String mixinFqn = mixin.getKey();
       if (lessSrc.contains(mixinFqn)) {
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, mixin.getValue()));
+          requiredImports.add(toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributes().get(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, mixin.getValue()));
+          requiredImports.add(toInternalImport(less, mixin.getValue().getCustomAttributes().get(PROP_PATH)));
         }
       }
     }
@@ -228,35 +233,6 @@ public class LessApiParser {
     }
   }
 
-  protected LessApiParser importApiFile(Path apiFile) {
-    try {
-      LessApiParser api = m_defaultJacksonObjectMapper.readValue(Files.newInputStream(apiFile), LessApiParser.class);
-      if (api.getName().equals(getName())) {
-        LOG.warn("Skip Less API definition from file '{}' with name '{}' because it has the same name as the current module.", apiFile, getName());
-      }
-      else {
-        return api;
-      }
-    }
-    catch (IOException e) {
-      throw new ProcessingException("Unable to read less api {}.", apiFile, e);
-    }
-    return null;
-  }
-
-  public void writeApiFile(Path apiFileDir) throws IOException {
-    String fileName = getName().replace('\\', '-').replace("@", "").replace('/', '-');
-    Path outFile = apiFileDir.resolve(fileName + API_FILE_SUFFIX);
-    if (Files.exists(outFile)) {
-      Files.delete(outFile);
-    }
-    else {
-      Files.createDirectories(apiFileDir);
-    }
-    Files.createFile(outFile);
-    m_defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(outFile), this);
-  }
-
   public void setName(String newName) {
     m_name = newName;
   }
@@ -265,28 +241,28 @@ public class LessApiParser {
     return m_name;
   }
 
-  public void setGlobalVariables(Map<String, Map<String, String>> newVariables) {
+  public void setGlobalVariables(Map<String, Map<String, INamedElement>> newVariables) {
     m_vars = newVariables;
   }
 
-  public Map<String, Map<String, String>> getGlobalVariables() {
+  public Map<String, Map<String, INamedElement>> getGlobalVariables() {
     return Collections.unmodifiableMap(m_vars);
   }
 
-  public void setMixins(Map<String, String> mix) {
+  public void setMixins(Map<String, INamedElement> mix) {
     m_mixins = mix;
   }
 
-  public Map<String, String> getMixins() {
+  public Map<String, INamedElement> getMixins() {
     return Collections.unmodifiableMap(m_mixins);
   }
 
-  protected void parseLessFile(Path file, Path sourceRoot) throws IOException {
-    String fileContent = removeComments(new String(Files.readAllBytes(file)));
+  protected void parseLessFile(Path file, Path sourceRoot, Context context) throws IOException {
+    String fileContent = MigrationUtility.removeComments(new String(Files.readAllBytes(file)));
     String relPath = sourceRoot.relativize(file).toString().replace('\\', '/');
     String theme = parseTheme(file);
-    parseMixins(fileContent, relPath);
-    parseGlobalVariables(fileContent, theme, relPath);
+    parseMixins(fileContent, relPath, context);
+    parseGlobalVariables(fileContent, theme, relPath, context);
   }
 
   protected static String parseTheme(Path lessFile) {
@@ -300,49 +276,41 @@ public class LessApiParser {
     return fileName.substring(firstDelimiterPos + 1);
   }
 
-  protected void parseMixins(String content, String relPath) {
+  protected void parseMixins(String content, String relPath, Context context) {
     Matcher matcher = LESS_MIXIN_PAT.matcher(content);
     while (matcher.find()) {
       int endOfMixinStartDeclaration = matcher.end(1);
       int endOfMixinEndDeclaration = content.indexOf("\n}\n", endOfMixinStartDeclaration);
       String mixin = '#' + matcher.group(1);
-      parseMixinContent(content.substring(endOfMixinStartDeclaration, endOfMixinEndDeclaration), mixin, relPath);
+      parseMixinContent(content.substring(endOfMixinStartDeclaration, endOfMixinEndDeclaration), mixin, relPath, context);
     }
   }
 
-  protected void parseMixinContent(String source, String prefix, String relPath) {
+  protected void parseMixinContent(String source, String prefix, String relPath, Context context) {
     Matcher matcher = MIXIN_FUNCTION_PAT.matcher(source);
     while (matcher.find()) {
       String functionName = matcher.group(1);
       String mixinFqn = prefix + '.' + functionName;
-      String previous = m_mixins.put(mixinFqn, relPath);
-      if (previous != null && !previous.equals(relPath)) {
+      INamedElement mixin = new NamedElement(Type.LessMixin, mixinFqn, context.getApi());
+      mixin.getCustomAttributes().put(PROP_PATH, relPath);
+      INamedElement previous = m_mixins.put(mixinFqn, mixin);
+      if (previous != null && !previous.getCustomAttributes().get(PROP_PATH).equals(relPath)) {
         LOG.warn("Duplicate less mixin: '{}'.", mixinFqn);
       }
     }
   }
 
-  protected void parseGlobalVariables(String content, String theme, String relPath) {
+  protected void parseGlobalVariables(String content, String theme, String relPath, Context context) {
     Matcher matcher = LESS_VAR_PAT.matcher(content);
     while (matcher.find()) {
       String variable = '@' + matcher.group(1);
-      String previousPath = m_vars.computeIfAbsent(variable, k -> new HashMap<>()).put(theme, relPath);
-      if (previousPath != null && !previousPath.equals(relPath)) {
+      INamedElement varDeclaration = new NamedElement(Type.LessVariable, variable, context.getApi());
+      varDeclaration.getCustomAttributes().put(PROP_PATH, relPath);
+      varDeclaration.getCustomAttributes().put(PROP_THEME, theme);
+      INamedElement previousPath = m_vars.computeIfAbsent(variable, k -> new HashMap<>()).put(theme, varDeclaration);
+      if (previousPath != null && !previousPath.getCustomAttributes().get(PROP_PATH).equals(relPath)) {
         LOG.warn("Duplicate global less variable on location '{}' and '{}'.", relPath, previousPath);
       }
     }
-  }
-
-  public static String removeComments(CharSequence methodBody) {
-    if (methodBody == null) {
-      return null;
-    }
-    if (!StringUtility.hasText(methodBody)) {
-      return methodBody.toString();
-    }
-    String retVal = REGEX_COMMENT_REMOVE_1.matcher(methodBody).replaceAll("");
-    retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
-    retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
-    return retVal;
   }
 }

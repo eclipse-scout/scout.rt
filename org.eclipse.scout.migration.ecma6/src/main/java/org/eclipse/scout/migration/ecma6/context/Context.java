@@ -47,35 +47,29 @@ public class Context {
       throw new ProcessingException("Could not parse Library APIs in '" + Configuration.get().getLibraryApiDirectory() + "'.", e);
     }
     try {
-      m_lessApi = readLessApiOfLibrariesAndCurrentModule();
-    }
-    catch (IOException e) {
-      throw new ProcessingException("Could not parse less Files.", e);
-    }
-    try {
       parseJsFiles();
       setupCurrentApi();
+      parseLessFiles();
     }
     catch (IOException e) {
-      throw new ProcessingException("Could not parse JS Files.", e);
+      throw new ProcessingException("Could not parse Files.", e);
     }
     // setup context properties
     BEANS.all(IContextProperty.class).forEach(p -> p.setup(this));
   }
 
-  protected LessApiParser readLessApiOfLibrariesAndCurrentModule() throws IOException {
+  protected void parseLessFiles() throws IOException {
     Configuration config = Configuration.get();
     LessApiParser lessApi = new LessApiParser();
     lessApi.setName(config.getPersistLibraryName());
-    lessApi.parseFromApiFiles(config.getLibraryApiDirectory());
-    lessApi.parseFromSourceDir(config.getSourceModuleDirectory());
-    lessApi.writeApiFile(config.getLibraryApiDirectory());
-    return lessApi;
+    lessApi.parseFromSourceDir(config.getSourceModuleDirectory(), this);
+    lessApi.parseFromLibraries(m_libraries);
+    m_lessApi = lessApi;
   }
 
-  private void setupCurrentApi() {
+  protected void setupCurrentApi() {
     ApiWriter writer = new ApiWriter();
-    m_api = writer.createLibraryFromCurrentModule(BEANS.get(Configuration.class).getNamespace(), this);
+    m_api = writer.createLibraryFromCurrentModule(Configuration.get().getNamespace(), this, false);
   }
 
   protected void readLibraryApis() throws IOException {
@@ -105,8 +99,8 @@ public class Context {
     return BEANS.get(propertyClass).getValue();
   }
 
-  public JsClass getJsClass(String fullyQuallifiedName) {
-    return m_jsClasses.get(fullyQuallifiedName);
+  public JsClass getJsClass(String fullyQualifiedName) {
+    return m_jsClasses.get(fullyQualifiedName);
   }
 
   public Path getModuleDirectory() {
@@ -164,7 +158,7 @@ public class Context {
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         if (FileUtility.hasExtension(file, "js")) {
           JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
-          jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQuallifiedName(), jsClazz));
+          jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
         }
         return FileVisitResult.CONTINUE;
       }

@@ -62,7 +62,7 @@ public class T500_CreateClasses extends AbstractTask {
     //      constructor() {
     List<JsFunction> functions = clzz.getFunctions();
     if (functions.size() == 0) {
-      throw new VetoException("Clazz without functions '" + clzz.getFullyQuallifiedName() + "' !");
+      throw new VetoException("Clazz without functions '" + clzz.getFullyQualifiedName() + "' !");
     }
     // close classblock after last function
     functions.get(functions.size() - 1).getEndOffset();
@@ -86,7 +86,7 @@ public class T500_CreateClasses extends AbstractTask {
         alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace()) + clzz.getSuperCall().getName();
       }
       classBuilder.append("extends ")
-          .append(jsFile.getOrCreateImport(clzz.getSuperCall().getFullyQuallifiedName(), context).getReferenceName())
+          .append(jsFile.getOrCreateImport(clzz.getSuperCall().getFullyQualifiedName(), context).getReferenceName())
           .append(" ");
 
     }
@@ -135,7 +135,7 @@ public class T500_CreateClasses extends AbstractTask {
     // group 2 (optional) arguments with leading semicolumn
     // group 3 (inner optional) agruments to use
     patternBuilder = new StringBuilder();
-    patternBuilder.append(Pattern.quote(function.getJsClass().getFullyQuallifiedName()))
+    patternBuilder.append(Pattern.quote(function.getJsClass().getFullyQualifiedName()))
       .append("\\.parent\\.prototype\\.(").append(Pattern.quote(function.getName())).append(")\\.call\\(\\s*this\\s*(\\,\\s*([^\\)]))?");
     pattern = Pattern.compile(patternBuilder.toString());
     matcher = pattern.matcher(source);

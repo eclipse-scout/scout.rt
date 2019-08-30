@@ -11,8 +11,12 @@
 package org.eclipse.scout.migration.ecma6.model.api;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(as = NamedElement.class)
 public interface INamedElement {
   enum Type {
     AllLibraries,
@@ -23,16 +27,19 @@ public interface INamedElement {
     StaticFunction,
     Function,
     Enum,
-    Constant
-  };
+    Constant,
+    LessMixin,
+    LessVariable
+  }
 
   Type getType();
 
   String getName();
 
-  String getFullyQuallifiedName();
+  String getFullyQualifiedName();
 
   INamedElement getParent();
+
   INamedElement getAncestor(Predicate<INamedElement> filter);
 
   void setParent(INamedElement parent);
@@ -44,4 +51,6 @@ public interface INamedElement {
   List<INamedElement> getElements(INamedElement.Type type);
 
   List<INamedElement> getElements(INamedElement.Type type, Predicate<INamedElement> filter);
+
+  Map<String, String> getCustomAttributes();
 }

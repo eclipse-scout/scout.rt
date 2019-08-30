@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 
 public class JsClass extends AbstractJsElement{
 
-  private final String m_fullyQuallifiedName;
+  private final String m_fullyQualifiedName;
   private final JsFile m_jsFile;
   private boolean m_default = false;
   private final String m_namespace;
@@ -20,18 +20,18 @@ public class JsClass extends AbstractJsElement{
   private final List<JsConstant> m_constants = new ArrayList<>();
 
   public JsClass(String fqn, JsFile jsFile) {
-    m_fullyQuallifiedName = fqn;
+    m_fullyQualifiedName = fqn;
     m_jsFile = jsFile;
-    String[] split = m_fullyQuallifiedName.split("\\.");
+    String[] split = m_fullyQualifiedName.split("\\.");
     if (split.length != 2) {
-      throw new VetoException("Could not separate fqn('" + m_fullyQuallifiedName + "') in namespace and name!");
+      throw new VetoException("Could not separate fqn('" + m_fullyQualifiedName + "') in namespace and name!");
     }
     m_namespace = split[0];
     m_name = split[1];
   }
 
-  public String getFullyQuallifiedName() {
-    return m_fullyQuallifiedName;
+  public String getFullyQualifiedName() {
+    return m_fullyQualifiedName;
   }
 
   public String getNamespace() {
@@ -117,7 +117,7 @@ public class JsClass extends AbstractJsElement{
 
   public String toString(String indent) {
     StringBuilder builder = new StringBuilder();
-    builder.append(getFullyQuallifiedName()).append(" [hasConstructor:").append(getConstructor() != null).append(", #functions:").append(m_functions.size()).append("]");
+    builder.append(getFullyQualifiedName()).append(" [hasConstructor:").append(getConstructor() != null).append(", #functions:").append(m_functions.size()).append("]");
     if (m_functions.size() > 0) {
       builder.append(System.lineSeparator()).append(indent).append("FUNCTIONS:").append(System.lineSeparator())
           .append(m_functions.stream().filter(f -> !f.isConstructor()).map(f -> indent + "- " + f.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));

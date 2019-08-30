@@ -19,12 +19,17 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(40020)
-public class T_40020_LessImport extends AbstractTask {
+public class T40020_LessImport extends AbstractTask {
 
   private static final Pattern LESS_IMPORT_PAT = Pattern.compile("@import\\s+\"[\\w/.-]+\";\\n");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
+    if (pathInfo.getPath().toString().replace('\\', '/').contains("src/main/js/froala")) {
+      // skip froala less migration. it does not follow our code style. migrate by hand
+      return false;
+    }
+
     String fileName = pathInfo.getPath().getFileName().toString();
     return fileName.endsWith(".less") && !fileName.endsWith(T40010_LessModule.FILE_SUFFIX);
   }

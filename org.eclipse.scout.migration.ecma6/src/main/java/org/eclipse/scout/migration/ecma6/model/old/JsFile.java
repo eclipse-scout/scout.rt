@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
@@ -59,7 +58,7 @@ public class JsFile extends AbstractJsElement {
 
   public JsClass getJsClass(String fqn) {
     return m_jsClasses.stream()
-        .filter(cz -> cz.getFullyQuallifiedName().equalsIgnoreCase(fqn))
+        .filter(cz -> cz.getFullyQualifiedName().equalsIgnoreCase(fqn))
         .findFirst().orElse(null);
   }
 
@@ -76,12 +75,12 @@ public class JsFile extends AbstractJsElement {
       return jsClass;
     }
     lastJsClass = m_jsClasses.get(m_jsClasses.size() - 1);
-    if (lastJsClass.getFullyQuallifiedName().equals(fqn)) {
+    if (lastJsClass.getFullyQualifiedName().equals(fqn)) {
       return lastJsClass;
     }
-    jsClass = m_jsClasses.stream().filter(c -> c.getFullyQuallifiedName().equals(fqn)).findFirst().orElse(null);
+    jsClass = m_jsClasses.stream().filter(c -> c.getFullyQualifiedName().equals(fqn)).findFirst().orElse(null);
     if (jsClass != null) {
-      throw new VetoException("Tried to access last class '" + fqn + "' in file '" + getPath().getFileName() + "', but is not last one (last:'" + lastJsClass.getFullyQuallifiedName() + "')!");
+      throw new VetoException("Tried to access last class '" + fqn + "' in file '" + getPath().getFileName() + "', but is not last one (last:'" + lastJsClass.getFullyQualifiedName() + "')!");
     }
     Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
     jsClass = new JsClass(fqn, this);
