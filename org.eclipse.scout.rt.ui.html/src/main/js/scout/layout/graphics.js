@@ -124,7 +124,7 @@ scout.graphics = {
       scout.scrollbars.restoreScrollPositions($elem);
     }
 
-    return this.exactPrefSize(prefSize, options);
+    return scout.graphics.exactPrefSize(prefSize, options);
   },
 
   /**
