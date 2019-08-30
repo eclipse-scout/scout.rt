@@ -420,7 +420,7 @@ scout.DateField.prototype._ensureValue = function(value) {
 };
 
 /**
- * @param {Date} the date to validate
+ * @param {Date} value the date to validate
  * @return {Date} the validated date
  * @override
  */

@@ -57,7 +57,7 @@ scout.ErrorHandler.prototype._onWindowError = function(errorMessage, fileName, l
  *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
  *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
  *
- * @return the analyzed errorInfo
+ * @return {object} the analyzed errorInfo
  */
 scout.ErrorHandler.prototype.handle = function() {
   var args = arguments;

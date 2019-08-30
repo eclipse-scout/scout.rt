@@ -145,6 +145,9 @@ scout.VirtualScrolling.prototype.rowHeight = function(row) {
   throw new Error('Function has to be provided by widget');
 };
 
+/**
+ * @returns {number}
+ */
 scout.VirtualScrolling.prototype.rowCount = function() {
   throw new Error('Function has to be provided by widget');
 };

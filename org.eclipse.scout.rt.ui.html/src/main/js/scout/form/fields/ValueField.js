@@ -441,7 +441,7 @@ scout.ValueField.prototype.validateValue = function(value) {
 };
 
 /**
- * @returns the validated value
+ * @returns {*} the validated value
  * @throws a message, a scout.Status or an error if the validation fails
  */
 scout.ValueField.prototype._validateValue = function(value) {
@@ -531,7 +531,7 @@ scout.ValueField.prototype._setFormatter = function(formatter) {
 };
 
 /**
- * @returns the formatted display text
+ * @returns {string|Promise} the formatted display text
  */
 scout.ValueField.prototype.formatValue = function(value) {
   var defaultFormatter = this._formatValue.bind(this);
@@ -539,7 +539,7 @@ scout.ValueField.prototype.formatValue = function(value) {
 };
 
 /**
- * @returns the formatted string or a promise
+ * @returns {string|Promise} the formatted string or a promise
  */
 scout.ValueField.prototype._formatValue = function(value) {
   return scout.nvl(value, '') + '';

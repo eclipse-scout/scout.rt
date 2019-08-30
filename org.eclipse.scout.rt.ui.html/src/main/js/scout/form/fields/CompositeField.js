@@ -14,13 +14,17 @@ scout.CompositeField = function() {
 scout.inherits(scout.CompositeField, scout.FormField);
 
 /**
- * Returns an array of child-fields.
+ * @returns {scout.FormField[]} an array of child-fields.
  */
 scout.CompositeField.prototype.getFields = function() {
   throw new Error('Not implemented');
 };
 
-scout.CompositeField.prototype.setFields = function() {
+/**
+ *
+ * @param {scout.FormField[]} fields
+ */
+scout.CompositeField.prototype.setFields = function(fields) {
   throw new Error('Not implemented');
 };
 

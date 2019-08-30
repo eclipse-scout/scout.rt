@@ -556,11 +556,14 @@ scout.Menu.prototype.clone = function(model, options) {
   return clone;
 };
 
-// @override Widget.js
+/**
+ * @override
+ */
 scout.Menu.prototype.focus = function() {
   var event = new scout.Event({source: this});
   this.trigger('focus', event);
   if (!event.defaultPrevented) {
-    scout.Menu.parent.prototype.focus.call(this);
+    return scout.Menu.parent.prototype.focus.call(this);
   }
+  return false;
 };

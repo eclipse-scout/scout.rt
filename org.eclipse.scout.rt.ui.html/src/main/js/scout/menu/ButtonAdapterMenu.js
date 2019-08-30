@@ -73,10 +73,10 @@ scout.ButtonAdapterMenu.prototype._onButtonDestroy = function(event) {
 /**
  * @override Action.js
  */
-scout.ButtonAdapterMenu.prototype.doAction = function(srcEvent) {
+scout.ButtonAdapterMenu.prototype.doAction = function() {
   if (this.childActions.length > 0) {
     // Popup menu is handled by this menu itself
-    return scout.ButtonAdapterMenu.parent.prototype.doAction.call(this, srcEvent);
+    return scout.ButtonAdapterMenu.parent.prototype.doAction.call(this);
   }
 
   // Everything else is delegated to the button

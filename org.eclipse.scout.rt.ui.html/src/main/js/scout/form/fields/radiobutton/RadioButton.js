@@ -114,7 +114,7 @@ scout.RadioButton.prototype._renderIconId = function() {
 /**
  * @override Button.js
  */
-scout.RadioButton.prototype.doAction = function(event) {
+scout.RadioButton.prototype.doAction = function() {
   if (!this.enabledComputed || !this.visible) {
     return false;
   }

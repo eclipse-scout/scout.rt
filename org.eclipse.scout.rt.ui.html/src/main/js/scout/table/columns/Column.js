@@ -445,7 +445,7 @@ scout.Column.prototype._preprocessTextForCalculation = function(text, htmlEnable
 };
 
 /**
- * @returns the cell text to be used for table grouping
+ * @returns {string} the cell text to be used for table grouping
  */
 scout.Column.prototype.cellTextForGrouping = function(row) {
   var cell = this.cell(row);
@@ -460,7 +460,7 @@ scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) 
 };
 
 /**
- * @returns the cell text to be used for the text filter
+ * @returns {string} the cell text to be used for the text filter
  */
 scout.Column.prototype.cellTextForTextFilter = function(row) {
   var cell = this.cell(row);
@@ -474,7 +474,7 @@ scout.Column.prototype._preprocessTextForTextFilter = function(text, htmlEnabled
 };
 
 /**
- * @returns the cell text to be used for the table row detail.
+ * @returns {string} the cell text to be used for the table row detail.
  */
 scout.Column.prototype.cellTextForRowDetail = function(row) {
   var cell = this.cell(row);

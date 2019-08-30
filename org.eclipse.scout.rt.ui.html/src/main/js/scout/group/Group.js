@@ -379,6 +379,7 @@ scout.Group.prototype.resizeBody = function() {
 };
 
 /**
+ * @param {object} [options]
  * @returns {Promise}
  */
 scout.Group.prototype.animateToggleCollapse = function(options) {

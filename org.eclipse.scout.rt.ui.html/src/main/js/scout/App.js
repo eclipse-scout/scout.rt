@@ -252,7 +252,7 @@ scout.App.prototype._createErrorHandler = function() {
 };
 
 /**
- * Uses the object returned by {@link #ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
+ * Uses the object returned by {@link #_ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
  */
 scout.App.prototype._ajaxSetup = function() {
   var ajaxDefaults = this._ajaxDefaults();

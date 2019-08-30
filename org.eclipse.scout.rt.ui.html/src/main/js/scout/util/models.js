@@ -41,7 +41,7 @@ scout.models = {
    *
    * @param {string} modelId
    *          The id of the model.
-   * @param {Object} parent
+   * @param {Object} [parent]
    *          Optional parent that is set on the returned object.
    * @returns {Object}
    */

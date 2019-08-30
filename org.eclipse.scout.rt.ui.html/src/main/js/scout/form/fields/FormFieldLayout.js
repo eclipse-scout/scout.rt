@@ -155,7 +155,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (formField.$fieldContainer) {
     // Icons are placed inside the field (as overlay)
-    var $iconInput = this._$elementForIconLayout(formField);
+    var $iconInput = this._$elementForIconLayout();
     var fieldBorder = scout.graphics.borders($iconInput);
     var inputBounds = scout.graphics.offsetBounds($iconInput);
     top += fieldBorder.top;
@@ -332,7 +332,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
 };
 
 /**
- * @returns the input element used to position the icon. May be overridden if another element than $field should be used.
+ * @returns {$} the input element used to position the icon. May be overridden if another element than $field should be used.
  */
 scout.FormFieldLayout.prototype._$elementForIconLayout = function() {
   return this.formField.$field;
