@@ -40,6 +40,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   }
 
   @Order(-3)
+  @ClassId("5767462c-fc9c-43b3-bb01-0f9ef708bab4")
   public static class ThreeYearsBeforeCode extends AbstractCode<Integer> {
 
     private static final long serialVersionUID = 1L;
@@ -57,6 +58,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   }
 
   @Order(-2)
+  @ClassId("eba3b867-9036-4963-9209-24ca9d77be7e")
   public static class TwoYearsBeforeCode extends AbstractCode<Integer> {
 
     private static final long serialVersionUID = 1L;
@@ -74,6 +76,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   }
 
   @Order(-1)
+  @ClassId("abd8f2d8-b1ad-4850-91e6-0633274825f6")
   public static class OneYearBeforeCode extends AbstractCode<Integer> {
 
     private static final long serialVersionUID = 1L;
@@ -91,6 +94,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   }
 
   @Order(0)
+  @ClassId("74b3ca8b-d33a-4668-95f3-168456d61bf5")
   public static class ThisYearCode extends AbstractCode<Integer> {
 
     private static final long serialVersionUID = 1L;
@@ -108,6 +112,7 @@ public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
   }
 
   @Order(1)
+  @ClassId("3058dc55-c1dc-42fe-8ed0-287f4dc5f171")
   public static class NextYearCode extends AbstractCode<Integer> {
 
     private static final long serialVersionUID = 1L;

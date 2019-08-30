@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.shared.data.model;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallVisitor;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("23001b0f-e866-42c8-9ef6-a7065408f441")
 public class YearToDateCodeTypeLookupCall extends CodeLookupCall<Integer> {
   private static final long serialVersionUID = 1L;
 
