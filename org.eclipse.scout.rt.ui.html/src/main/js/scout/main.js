@@ -245,6 +245,7 @@ scout.getSession = function(partId) {
   }
   for (var i = 0; i < scout.sessions.length; i++) {
     var session = scout.sessions[i];
+    // noinspection EqualityComparisonWithCoercionJS
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
     }

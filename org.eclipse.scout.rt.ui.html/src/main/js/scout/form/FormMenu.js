@@ -144,25 +144,3 @@ scout.FormMenu.prototype._handleSelectedInEllipsis = function() {
 scout.FormMenu.prototype._createActionKeyStroke = function() {
   return new scout.FormMenuActionKeyStroke(this);
 };
-
-/**
- * FormMenuActionKeyStroke
- */
-scout.FormMenuActionKeyStroke = function(action) {
-  scout.FormMenuActionKeyStroke.parent.call(this, action);
-};
-scout.inherits(scout.FormMenuActionKeyStroke, scout.ActionKeyStroke);
-
-scout.FormMenuActionKeyStroke.prototype.handle = function(event) {
-  this.field.toggle();
-};
-
-scout.FormMenuActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
-  if (this.field.iconId) {
-    var wIcon = $drawingArea.find('.icon').width();
-    var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var containerPadding = $drawingArea.cssPaddingLeft();
-    var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
-    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
-  }
-};

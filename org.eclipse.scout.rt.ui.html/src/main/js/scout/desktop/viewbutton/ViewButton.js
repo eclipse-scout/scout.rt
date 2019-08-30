@@ -74,28 +74,3 @@ scout.ViewButton.prototype._onMouseEvent = function(event) {
 scout.ViewButton.prototype._createActionKeyStroke = function() {
   return new scout.ViewButtonActionKeyStroke(this);
 };
-
-/**
- * ViewButtonActionKeyStroke
- */
-scout.ViewButtonActionKeyStroke = function(action) {
-  scout.ViewButtonActionKeyStroke.parent.call(this, action);
-
-};
-scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
-
-scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
-  if (this.field.iconId && !this.field._isMenuItem) {
-    var width = $drawingArea.outerWidth();
-    var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var leftKeyBox = width / 2 - wKeybox / 2;
-    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
-  }
-};
-
-scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
-  if (this.field._isMenuItem) {
-    this.renderingHints.hAlign = scout.hAlign.RIGHT;
-  }
-  return scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
-};

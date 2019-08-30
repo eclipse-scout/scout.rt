@@ -267,6 +267,7 @@
   __include("scout/form/FormAdapter.js");
   __include("scout/form/FormGrid.js");
   __include("scout/form/FormLayout.js");
+  __include("scout/form/FormMenuActionKeyStroke.js");
   __include("scout/form/FormMenu.js");
   __include("scout/form/FormMenuAdapter.js");
   __include("scout/form/FormMenuPopup.js");
@@ -319,6 +320,7 @@
   __include("scout/table/columns/IconColumn.js"); //requires Column.js
   __include("scout/table/columns/NumberColumn.js"); //requires Column.js
   __include("scout/table/columns/SmartColumn.js"); // requires Column.js
+  __include("scout/table/controls/TableControlActionKeyStroke.js");
   __include("scout/table/controls/TableControl.js");
   __include("scout/table/controls/TableControlAdapter.js");
   __include("scout/table/controls/TableControlAdapterMenu.js"); // requires FormMenu and TableControl
@@ -619,6 +621,7 @@
   __include("scout/desktop/popupblocker/PopupBlockerHandler.js");
   __include("scout/desktop/popupblocker/PopupBlockerDesktopNotification.js");
   __include("scout/desktop/toolbox/DesktopToolBox.js");
+  __include("scout/desktop/viewbutton/ViewButtonActionKeyStroke.js");
   __include("scout/desktop/viewbutton/ViewButton.js");
   __include("scout/desktop/viewbutton/ViewButtonAdapter.js");
   __include("scout/desktop/viewbutton/ViewButtonBox.js");
