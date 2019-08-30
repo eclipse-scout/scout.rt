@@ -124,22 +124,27 @@ scout.graphics = {
       scout.scrollbars.restoreScrollPositions($elem);
     }
 
-    // Ensure resulting numbers are integers. getBoundingClientRect() might correctly return fractional values
-    // (because of the browser's sub-pixel rendering). However, if we use those numbers to set the size
-    // of an element using CSS, it gets rounded or cut off. The behavior is not defined amongst different
-    // browser engines.
-    // Example:
-    // - Measured size from this method:      h = 345.239990234375
-    // - Set the size to an element:          $elem.css('height', h + 'px')
-    // - Results:
-    //     IE                   <div id="elem" style="height: 345.23px">     [Fractional part cut off after two digits]
-    //     Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
+    return this.exactPrefSize(prefSize, options);
+  },
+
+  /**
+   * Ensure resulting numbers are integers. getBoundingClientRect() might correctly return fractional values
+   * (because of the browser's sub-pixel rendering). However, if we use those numbers to set the size
+   * of an element using CSS, it gets rounded or cut off. The behavior is not defined amongst different
+   * browser engines.
+   * Example:
+   * - Measured size from this method:      h = 345.239990234375
+   * - Set the size to an element:          $elem.css('height', h + 'px')
+   * - Results:
+   *    IE                   <div id="elem" style="height: 345.23px">     [Fractional part cut off after two digits]
+   *    Firefox & Chrome     <div id="elem" style="height: 345.24px">     [Fractional part rounded to three digits]
+   */
+  exactPrefSize: function(prefSize, options) {
     var exact = scout.nvl(options.exact, false);
     if (!exact) {
       prefSize.width = Math.ceil(prefSize.width);
       prefSize.height = Math.ceil(prefSize.height);
     }
-
     return prefSize;
   },
 

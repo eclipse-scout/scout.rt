@@ -131,7 +131,7 @@ scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options
     return scout.graphics.prefSize($container, options);
   }
 
-  return prefSize.add(htmlComp.insets());
+  return scout.graphics.exactPrefSize(prefSize.add(htmlComp.insets()), options);
 };
 
 scout.TabAreaLayout.prototype._minSize = function(tabItems) {
