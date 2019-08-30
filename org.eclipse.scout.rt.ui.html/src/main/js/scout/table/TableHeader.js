@@ -132,7 +132,6 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
 
   this._installHeaderItemTooltip(column);
   this._decorateHeader(column);
-  $header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 
   var showSeparator = column.showSeparator;
   if (isLastColumn && !this.enabled) {
@@ -350,6 +349,7 @@ scout.TableHeader.prototype.findHeaderItems = function() {
 
 /**
  * Updates the column headers visualization of the text, sorting and styling state
+ * @param [oldColumnState] only necessary when the css class was updated
  */
 scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
   this._decorateHeader(column, oldColumnState);
@@ -362,6 +362,7 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   this._renderColumnState(column);
   this._renderColumnLegacyStyle(column);
   this._renderColumnHeaderMenuEnabled(column);
+  this._renderColumnHorizontalAlignment(column);
 };
 
 scout.TableHeader.prototype._renderColumnCssClass = function(column, oldColumnState) {
@@ -388,6 +389,11 @@ scout.TableHeader.prototype._renderColumnText = function(column) {
 scout.TableHeader.prototype._renderColumnIconId = function(column) {
   column.$header.icon(column.headerIconId);
   this._updateColumnIconAndTextStyle(column);
+};
+
+scout.TableHeader.prototype._renderColumnHorizontalAlignment = function(column) {
+  column.$header.removeClass('halign-left halign-center halign-right');
+  column.$header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
 };
 
 scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {

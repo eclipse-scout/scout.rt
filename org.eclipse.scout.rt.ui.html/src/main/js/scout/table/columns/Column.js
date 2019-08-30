@@ -19,7 +19,10 @@ scout.Column = function() {
   this.fixedWidth = false;
   this.fixedPosition = false;
   this.grouped = false;
+  this.headerCssClass = null;
+  this.headerIconId = null;
   this.headerHtmlEnabled = false;
+  this.headerTooltipText = null;
   this.horizontalAlignment = -1;
   this.htmlEnabled = false;
   this.index = -1;
@@ -39,6 +42,7 @@ scout.Column = function() {
   this.table = null;
   this.tableNodeColumn = false;
   this.maxLength = 4000;
+  this.text = null;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
   this.comparator = scout.comparators.TEXT;
@@ -569,6 +573,10 @@ scout.Column.prototype.setHorizontalAlignment = function(hAlign) {
   }.bind(this));
 
   this.table.updateRows(this.table.rows);
+
+  if (this.table.header) {
+    this.table.header.updateHeader(this);
+  }
 };
 
 scout.Column.prototype.setEditable = function(editable) {
@@ -756,6 +764,55 @@ scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
 
 scout.Column.prototype.setMaxLength = function(maxLength) {
   this.maxLength = maxLength;
+};
+
+scout.Column.prototype.setText = function(text) {
+  if (this.text === text) {
+    return;
+  }
+  this.text = text;
+  if (this.table.header) {
+    this.table.header.updateHeader(this);
+  }
+};
+
+scout.Column.prototype.setHeaderIconId = function(headerIconId) {
+  if (this.headerIconId === headerIconId) {
+    return;
+  }
+  this.headerIconId = headerIconId;
+  if (this.table.header) {
+    this.table.header.updateHeader(this);
+  }
+};
+
+scout.Column.prototype.setHeaderCssClass = function(headerCssClass) {
+  if (this.headerCssClass === headerCssClass) {
+    return;
+  }
+  var oldState = $.extend({}, this);
+  this.headerCssClass = headerCssClass;
+  if (this.table.header) {
+    this.table.header.updateHeader(this, oldState);
+  }
+};
+
+scout.Column.prototype.setHeaderHtmlEnabled = function(headerHtmlEnabled) {
+  if (this.headerHtmlEnabled === headerHtmlEnabled) {
+    return;
+  }
+  this.headerHtmlEnabled = headerHtmlEnabled;
+  if (this.table.header) {
+    this.table.header.updateHeader(this);
+  }
+};
+
+scout.Column.prototype.setHeaderTooltipText = function(headerTooltipText) {
+  this.headerTooltipText = headerTooltipText;
+};
+
+scout.Column.prototype.setHeaderTooltipHtmlEnabled = function(headerTooltipHtmlEnabled) {
+  this.headerTooltipHtmlEnabled = headerTooltipHtmlEnabled;
 };
 
 scout.Column.prototype.setTextWrap = function(textWrap) {
