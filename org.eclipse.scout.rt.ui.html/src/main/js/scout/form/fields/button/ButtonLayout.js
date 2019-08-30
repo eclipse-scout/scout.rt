@@ -23,6 +23,7 @@ scout.ButtonLayout.prototype.layout = function($container) {
     $fieldContainer = this.button.$fieldContainer;
 
   // Set max width to make it possible to set text-overflow: ellipsis using CSS
+  $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
   var submenuIconWidth = $submenuIcon ? scout.graphics.size($submenuIcon, {
     includeMargin: true,
     exact: true
