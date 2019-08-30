@@ -53,12 +53,12 @@ scout.MenuBar.prototype._init = function(options) {
   this.menuboxLeft = scout.create('MenubarBox', {
     parent: this,
     cssClass: 'left',
-    position: this.position
+    tooltipPosition: this._oppositePosition()
   });
   this.menuboxRight = scout.create('MenubarBox', {
     parent: this,
     cssClass: 'right',
-    position: this.position
+    tooltipPosition: this._oppositePosition()
   });
 
   this._setMenuItems(scout.arrays.ensure(this.menuItems));
@@ -116,14 +116,22 @@ scout.MenuBar.prototype._renderProperties = function() {
 
 scout.MenuBar.prototype.bottom = function() {
   this.position = 'bottom';
+  this.menuboxLeft.setTooltipPosition(this._oppositePosition());
+  this.menuboxRight.setTooltipPosition(this._oppositePosition());
 };
 
 scout.MenuBar.prototype.top = function() {
   this.position = 'top';
+  this.menuboxLeft.setTooltipPosition(this._oppositePosition());
+  this.menuboxRight.setTooltipPosition(this._oppositePosition());
 };
 
 scout.MenuBar.prototype.large = function() {
   this.size = 'large';
+};
+
+scout.MenuBar.prototype._oppositePosition = function() {
+  return this.position === 'top' ? 'bottom' : 'top';
 };
 
 scout.MenuBar.prototype.ellipsisRight = function() {

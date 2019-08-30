@@ -209,6 +209,10 @@ scout.Action.prototype._renderCompact = function() {
   this.invalidateLayoutTree();
 };
 
+scout.Action.prototype.setTooltipPosition = function(position) {
+  this.setProperty('tooltipPosition', position);
+};
+
 scout.Action.prototype._configureTooltip = function() {
   return {
     parent: this,

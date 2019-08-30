@@ -11,14 +11,11 @@
 scout.MenubarBox = function() {
   scout.MenubarBox.parent.call(this);
   this.menuItems = [];
+  this.tooltipPosition = 'top';
   this._addWidgetProperties('menuItems');
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
 };
 scout.inherits(scout.MenubarBox, scout.Widget);
-
-scout.MenubarBox.prototype._init = function(options) {
-  scout.MenubarBox.parent.prototype._init.call(this, options);
-};
 
 scout.MenubarBox.prototype._destroy = function() {
   scout.MenubarBox.parent.prototype._destroy.call(this);
@@ -51,6 +48,7 @@ scout.MenubarBox.prototype._setMenuItems = function(menuItems) {
   this._setProperty('menuItems', menuItems);
   // add property listener of new menus
   this._addMenuHandlers();
+  this._updateTooltipPosition();
 };
 
 /**
@@ -70,10 +68,7 @@ scout.MenubarBox.prototype._removeMenuItems = function() {
 };
 
 scout.MenubarBox.prototype._renderMenuItems = function() {
-  var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
-
   this.menuItems.forEach(function(item) {
-    item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
     item.$container.addClass('menubar-item');
   }.bind(this));
@@ -106,4 +101,19 @@ scout.MenubarBox.prototype._onMenuItemPropertyChange = function(event) {
       return m.visible && !m.ellipsis;
     }));
   }
+};
+
+scout.MenubarBox.prototype.setTooltipPosition = function(position) {
+  this.setProperty('tooltipPosition', position);
+};
+
+scout.MenubarBox.prototype._setTooltipPosition = function(position) {
+  this._setProperty('tooltipPosition', position);
+  this._updateTooltipPosition();
+};
+
+scout.MenubarBox.prototype._updateTooltipPosition = function() {
+  this.menuItems.forEach(function(item) {
+    item.setTooltipPosition(this.tooltipPosition);
+  }, this);
 };
