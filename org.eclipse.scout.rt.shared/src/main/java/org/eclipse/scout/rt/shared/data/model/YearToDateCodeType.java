@@ -12,8 +12,9 @@ import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
 /**
  * CodeType to define the values available in the SmartField of the extended search attribute
- * {@link org.eclipse.scout.rt.shared.data.model.DataModelAttributeOperatorProvider.YearToDate}. Not a CoreCode to avoid
- * mapping trivial values to unneeded UIDs.
+ * {@link org.eclipse.scout.rt.shared.data.model.DataModelAttributeOperatorProvider.YearToDate}. Projects in need of
+ * more values can implement their own CodeType extending this one an adding the
+ * {@link org.eclipse.scout.rt.platform.Replace} annotation.
  */
 @ClassId("343e6146-7bc0-49c7-9da2-cdd56dbd1676")
 public class YearToDateCodeType extends AbstractCodeType<Long, Integer> {
