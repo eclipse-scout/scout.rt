@@ -46,13 +46,15 @@ import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class LessApiParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(LessApiParser.class);
-  private static final String LESS_FILE_SUFFIX = ".less";
-  private static final String DEFAULT_THEME_NAME = "default-theme";
-  private static final String PROP_PATH = "path";
-  private static final String PROP_THEME = "theme";
+  public static final String LESS_FILE_SUFFIX = ".less";
+  public static final String DEFAULT_THEME_NAME = "default-theme";
+  public static final String PROP_PATH = "path";
+  public static final String PROP_THEME = "theme";
   private static final Pattern MIXIN_FUNCTION_PAT = Pattern.compile("\\n\\s\\s\\.([\\w-]+)");
   private static final Pattern LESS_VAR_PAT = Pattern.compile("\\n@([\\w-]+):");
   private static final Pattern LESS_MIXIN_PAT = Pattern.compile("#(\\w+)\\s*\\{");
@@ -60,17 +62,20 @@ public class LessApiParser {
   private Map<String /* mixin name (e.g. #scout.animation) */, INamedElement> m_mixins;
   private Map<String /* variable name*/, Map<String /* theme name */, INamedElement>> m_vars;
   private Map<String /* lib name */, LessApiParser> m_libraries;
+  private final Set<String> m_lessFilesOfCurrentModule;
   private String m_name;
 
   public LessApiParser() {
     m_vars = new HashMap<>();
     m_mixins = new HashMap<>();
     m_libraries = new LinkedHashMap<>();
+    m_lessFilesOfCurrentModule = new HashSet<>();
   }
 
   public void parseFromSourceDir(Path sourceRoot, Context context) throws IOException {
     m_vars.clear();
     m_mixins.clear();
+    m_lessFilesOfCurrentModule.clear();
     Files.walkFileTree(sourceRoot, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -103,7 +108,7 @@ public class LessApiParser {
         .filter(Objects::nonNull)
         .sorted(new LibrarySortOrderComparator())
         .collect(Collectors.toMap(LessApiParser::getName, Function.identity(), (u, v) -> {
-          throw new IllegalStateException(String.format("Duplicate Less API definition with name '%s'.", u));
+          throw new IllegalStateException(String.format("Duplicate Less API definition with name '%s'.", u.getName()));
         }, LinkedHashMap::new));
   }
 
@@ -189,8 +194,13 @@ public class LessApiParser {
   }
 
   protected static String toExternalImport(String libImportPrefix, String relPath) {
-    Path path = Paths.get(relPath);
-    return removeLessFileExtension(libImportPrefix + path.subpath(4, path.getNameCount()).toString().replace('\\', '/'));
+    return removeLessFileExtension(libImportPrefix + removeFirstSegments(relPath, 4));
+  }
+
+  public static String removeFirstSegments(String path, int numSegments) {
+    Path p = Paths.get(path);
+    int existingSegmentsCount = p.getNameCount();
+    return p.subpath(Math.min(existingSegmentsCount - 1, numSegments), existingSegmentsCount).toString().replace('\\', '/');
   }
 
   protected static String toInternalImport(WorkingCopy less, String relPath) {
@@ -199,7 +209,7 @@ public class LessApiParser {
     return removeLessFileExtension(relPathToImport.toString().replace('\\', '/'));
   }
 
-  protected static String removeLessFileExtension(String path) {
+  public static String removeLessFileExtension(String path) {
     if (path.endsWith(LESS_FILE_SUFFIX)) {
       return path.substring(0, path.length() - LESS_FILE_SUFFIX.length());
     }
@@ -253,6 +263,11 @@ public class LessApiParser {
     m_mixins = mix;
   }
 
+  @JsonIgnore
+  public Set<String> getLessFilesOfCurrentModule() {
+    return Collections.unmodifiableSet(m_lessFilesOfCurrentModule);
+  }
+
   public Map<String, INamedElement> getMixins() {
     return Collections.unmodifiableMap(m_mixins);
   }
@@ -261,6 +276,7 @@ public class LessApiParser {
     String fileContent = MigrationUtility.removeComments(new String(Files.readAllBytes(file)));
     String relPath = sourceRoot.relativize(file).toString().replace('\\', '/');
     String theme = parseTheme(file);
+    m_lessFilesOfCurrentModule.add(removeFirstSegments(relPath, 4));
     parseMixins(fileContent, relPath, context);
     parseGlobalVariables(fileContent, theme, relPath, context);
   }

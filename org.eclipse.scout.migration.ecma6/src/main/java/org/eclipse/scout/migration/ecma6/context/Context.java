@@ -87,8 +87,18 @@ public class Context {
     return m_workingCopies.get(file);
   }
 
+  public WorkingCopy newFile(Path file) {
+    WorkingCopy wc = createWorkingCopy(file, "\n");
+    wc.setSource("");
+    return wc;
+  }
+
   public WorkingCopy ensureWorkingCopy(Path file) {
-    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p, FileUtility.lineSeparator(p)));
+    return createWorkingCopy(file, FileUtility.lineSeparator(file));
+  }
+
+  protected WorkingCopy createWorkingCopy(Path file, String nl) {
+    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p, nl));
   }
 
   public Collection<WorkingCopy> getWorkingCopies() {

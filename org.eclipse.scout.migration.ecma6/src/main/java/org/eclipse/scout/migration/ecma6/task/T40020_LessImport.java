@@ -31,7 +31,7 @@ public class T40020_LessImport extends AbstractTask {
     }
 
     String fileName = pathInfo.getPath().getFileName().toString();
-    return fileName.endsWith(".less") && !fileName.endsWith(T40010_LessModule.FILE_SUFFIX);
+    return fileName.endsWith(".less") && !fileName.endsWith(T40010_LessModule.OLD_FILE_SUFFIX);
   }
 
   @Override
@@ -46,13 +46,19 @@ public class T40020_LessImport extends AbstractTask {
       }
       importClauses.append(workingCopy.getLineSeparator());
       StringBuilder newSource = new StringBuilder(workingCopy.getSource());
-      int fileCommentEndPos = newSource.indexOf("*/");
-      if (fileCommentEndPos < 0) {
-        fileCommentEndPos = 0;
+
+      int fileCommentEndPos = 0;
+      if (newSource.length() > 2 && newSource.charAt(0) == '/' && newSource.charAt(1) == '*') {
+        // file starts with file header comment
+        fileCommentEndPos = newSource.indexOf("*/");
+        if (fileCommentEndPos < 0) {
+          fileCommentEndPos = 0;
+        }
+        else {
+          fileCommentEndPos += 3;
+        }
       }
-      else {
-        fileCommentEndPos += 3;
-      }
+
       newSource.insert(fileCommentEndPos, importClauses);
 
       workingCopy.setSource(newSource.toString());
