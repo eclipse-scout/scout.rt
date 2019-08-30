@@ -115,6 +115,12 @@ scout.MenuBar.prototype.setPosition = function(position) {
   this.setProperty('position', position);
 };
 
+scout.MenuBar.prototype._setPosition = function(position) {
+  this._setProperty('position', position);
+  this.menuboxLeft.setTooltipPosition(this._oppositePosition());
+  this.menuboxRight.setTooltipPosition(this._oppositePosition());
+};
+
 scout.MenuBar.prototype._renderPosition = function() {
   this.$container.toggleClass('bottom', this.position === scout.MenuBar.Position.BOTTOM);
 };
