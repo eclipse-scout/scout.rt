@@ -15,4 +15,7 @@ export function extractConstructorName(constructorStr) {
   }
 }
 
-export default {constructorName, extractConstructorName }
+export default {
+  constructorName,
+  extractConstructorName
+};
