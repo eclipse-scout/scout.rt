@@ -116,6 +116,18 @@ scout.scrollbars = {
     $container.css('-webkit-overflow-scrolling', 'touch');
   },
 
+  isHybridScrolling: function($scrollable) {
+    return $scrollable.hasClass('hybrid-scrollable');
+  },
+
+  isNativeScrolling: function($scrollable) {
+    return scout.isOneOf('auto', $scrollable.css('overflow'), $scrollable.css('overflow-x'), $scrollable.css('overflow-y'));
+  },
+
+  isJsScrolling: function($scrollable) {
+    return !!$scrollable.data('scrollbars');
+  },
+
   _installJs: function($container, options) {
     $.log.isTraceEnabled() && $.log.trace('installing JS-scrollbars for container ' + scout.graphics.debugOutput($container));
     var scrollbars = scout.arrays.ensure($container.data('scrollbars'));

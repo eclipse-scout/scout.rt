@@ -131,7 +131,7 @@
     &.disabled > @{className},
     &.disabled > .field > @{className},
     &.compact > @{className},
-    &.compact > .field > @{className}  {
+    &.compact > .field > @{className} {
       display: none;
     }
 
@@ -144,7 +144,7 @@
   .status {
     text-align: center;
 
-    &::before  {
+    &::before {
       #scout.font-icon();
       font-size: @status-font-icon-size;
     }
@@ -174,7 +174,7 @@
     visibility: visible;
     cursor: pointer;
 
-    &::before  {
+    &::before {
       content: @icon-info;
       color: @status-info-color;
       font-size: @status-font-icon-size;
@@ -193,7 +193,7 @@
     visibility: visible;
     cursor: pointer;
 
-    &::before  {
+    &::before {
       content: @icon-error;
       color: @status-warning-color;
       font-size: @status-font-icon-size;
@@ -212,7 +212,7 @@
     visibility: visible;
     cursor: pointer;
 
-    &::before  {
+    &::before {
       content: @icon-error;
       color: @status-error-color;
       font-size: @status-font-icon-size;
@@ -486,5 +486,31 @@
       display: none;
     }
     -ms-overflow-style: none;
+  }
+
+  /**
+   * Uses the inverted colors of the scrollbars. Use this mixin in a widget that requires inverted scrollbars (e.g. a widget with white background in dark mode).
+   */
+
+  .inverted-scrollbars {
+    & > .scrollbar > .scrollbar-thumb {
+      & > .scrollbar-thumb-handle {
+        background-color: @scrollbar-thumb-inverted-color;
+      }
+
+      &.scrollbar-thumb-move > .scrollbar-thumb-handle,
+      &:hover > .scrollbar-thumb-handle {
+        background-color: @scrollbar-thumb-inverted-hover-color;
+      }
+
+      &.container-too-small-for-thumb > .scrollbar-thumb-handle {
+        background-color: @scrollbar-thumb-inverted-small-color;
+      }
+
+      &.container-too-small-for-thumb.scrollbar-thumb-move > .scrollbar-thumb-handle,
+      &.container-too-small-for-thumb.scrollbar-thumb:hover > .scrollbar-thumb-handle {
+        background-color: @scrollbar-thumb-inverted-small-hover-color;
+      }
+    }
   }
 }
