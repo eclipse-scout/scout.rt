@@ -262,7 +262,7 @@ scout.TableHeader.prototype._installHeaderItemTooltip = function(column) {
     arrowPosition: 50,
     arrowPositionUnit: '%',
     nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible(),
-    htmlEnabled: column.headerTooltipHtmlEnabled
+    htmlEnabled: this._headerItemTooltipHtmlEnabled.bind(this)
   });
 };
 
@@ -293,6 +293,11 @@ scout.TableHeader.prototype._headerItemTooltipText = function($col) {
     }
   }
   return null;
+};
+
+scout.TableHeader.prototype._headerItemTooltipHtmlEnabled = function($col) {
+  var column = $col.data('column');
+  return column.headerTooltipHtmlEnabled;
 };
 
 scout.TableHeader.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {
