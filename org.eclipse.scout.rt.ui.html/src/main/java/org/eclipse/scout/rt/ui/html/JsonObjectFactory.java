@@ -98,6 +98,7 @@ import org.eclipse.scout.rt.client.ui.notification.INotification;
 import org.eclipse.scout.rt.client.ui.popup.IPopup;
 import org.eclipse.scout.rt.client.ui.popup.IWidgetPopup;
 import org.eclipse.scout.rt.client.ui.popup.PopupManager;
+import org.eclipse.scout.rt.client.ui.tile.IBeanTile;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.IHtmlTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
@@ -197,6 +198,7 @@ import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonDateColumnUserFilt
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonNumberColumnUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableTextUserFilter;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTextColumnUserFilter;
+import org.eclipse.scout.rt.ui.html.json.tile.JsonBeanTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonFormFieldTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonHtmlTile;
 import org.eclipse.scout.rt.ui.html.json.tile.JsonTile;
@@ -419,6 +421,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IHtmlTile) {
       return new JsonHtmlTile<>((IHtmlTile) model, session, id, parent);
+    }
+    if (model instanceof IBeanTile) {
+      return new JsonBeanTile<>((IBeanTile) model, session, id, parent);
     }
     if (model instanceof IFormFieldTile) {
       return new JsonFormFieldTile<>((IFormFieldTile) model, session, id, parent);

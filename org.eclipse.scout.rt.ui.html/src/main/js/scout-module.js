@@ -573,6 +573,8 @@
   __include("scout/tile/TileGridSelectionHandler.js");
   __include("scout/tile/HtmlTile.js");
   __include("scout/tile/HtmlTileAdapter.js");
+  __include("scout/tile/BeanTile.js");
+  __include("scout/tile/BeanTileAdapter.js");
   __include("scout/tile/accordion/TileAccordion.js");
   __include("scout/tile/accordion/TileAccordionAdapter.js");
   __include("scout/tile/accordion/TileAccordionSelectionHandler.js");
