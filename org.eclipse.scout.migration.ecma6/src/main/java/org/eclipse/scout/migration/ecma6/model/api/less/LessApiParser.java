@@ -75,7 +75,8 @@ public class LessApiParser {
     m_vars.clear();
     m_mixins.clear();
     m_lessFilesOfCurrentModule.clear();
-    Files.walkFileTree(sourceRoot, new SimpleFileVisitor<>() {
+    //noinspection Convert2Diamond
+    Files.walkFileTree(sourceRoot, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (file.getFileName().toString().endsWith(LESS_FILE_SUFFIX)) {
