@@ -324,7 +324,6 @@ scout.Tree.prototype._render = function() {
   var layout = new scout.TreeLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
-  this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('tree-data')
     .on('contextmenu', this._onContextMenu.bind(this))

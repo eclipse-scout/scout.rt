@@ -193,7 +193,6 @@ scout.Calendar.prototype._render = function() {
   var layout = new scout.CalendarLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
-  this.htmlComp.pixelBasedSizing = false;
 
   // main elements
   this.$header = this.$container.appendDiv('calendar-header');

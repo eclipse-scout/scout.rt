@@ -344,7 +344,6 @@ scout.FormController.prototype.detachDialogs = function() {
 
 scout.FormController.prototype._layoutDialog = function(dialog) {
   var cacheBounds, position;
-  dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.validateLayout();
 
   cacheBounds = dialog.readCacheBounds();

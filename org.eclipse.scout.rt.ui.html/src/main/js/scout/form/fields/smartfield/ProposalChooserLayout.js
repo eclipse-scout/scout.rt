@@ -40,14 +40,6 @@ scout.ProposalChooserLayout.prototype.layout = function($container) {
     filterPrefSize = filter.htmlComp.prefSize();
     size.height -= filterPrefSize.height;
   }
-
-  // when status or active-filter is available we must explicitly set the
-  // height of the model (table or tree) in pixel. Otherwise we'd rely on
-  // the CSS height which is set to 100%.
-  if (hasStatus || filter) {
-    htmlComp.pixelBasedSizing = true;
-  }
-
   htmlComp.setSize(size);
 
   if (filter) {

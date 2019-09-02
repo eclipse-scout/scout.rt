@@ -35,7 +35,6 @@ scout.FormMenuPopup.prototype._render = function() {
 
   this.form.renderInitialFocusEnabled = false;
   this.form.render(this.$body);
-  this.form.htmlComp.pixelBasedSizing = true;
 
   // We add this here for symmetry reasons (because _removeHead is not called on remove())
   if (this._headVisible) {

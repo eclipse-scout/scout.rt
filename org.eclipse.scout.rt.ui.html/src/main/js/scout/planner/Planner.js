@@ -138,7 +138,6 @@ scout.Planner.prototype._render = function() {
   var layout = new scout.PlannerLayout(this);
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
-  this.htmlComp.pixelBasedSizing = false;
 
   // main elements
   this._header.render();

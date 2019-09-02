@@ -409,7 +409,6 @@ scout.Table.prototype._render = function() {
   this.$container = this.$parent.appendDiv('table');
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.TableLayout(this));
-  this.htmlComp.pixelBasedSizing = false;
 
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);

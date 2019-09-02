@@ -131,7 +131,6 @@ scout.MessageBox.prototype._render = function() {
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(new scout.MessageBoxLayout(this));
-  this.htmlComp.pixelBasedSizing = true;
   this.htmlComp.validateLayout();
 
   this.$container.addClassForAnimation('animate-open');

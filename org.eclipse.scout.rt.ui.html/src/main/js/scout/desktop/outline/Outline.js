@@ -649,7 +649,6 @@ scout.Outline.prototype._renderDetailContent = function() {
   this.detailContent.render(page.$node);
   if (this.detailContent.htmlComp) {
     this.detailContent.htmlComp.validateRoot = false;
-    this.detailContent.htmlComp.pixelBasedSizing = true;
   }
   this._ensurePageLayout(page);
   this.$data.addClass('detail-content-visible');

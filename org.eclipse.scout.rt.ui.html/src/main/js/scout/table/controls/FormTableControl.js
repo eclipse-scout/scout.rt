@@ -37,7 +37,6 @@ scout.FormTableControl.prototype._renderContent = function($parent) {
 
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
-  this.form.htmlComp.pixelBasedSizing = true;
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.validateLayout();
 };

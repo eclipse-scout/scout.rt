@@ -400,11 +400,13 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
   }
-  var oldBounds = this.offsetBounds();
-  if (!oldBounds.dimension().equals(bounds.dimension())) {
+  var oldSize = this.sizeCached;
+  if (!bounds.dimension().equals(oldSize)) {
     this.invalidateLayout();
   }
-  scout.graphics.setBounds(this.$comp, bounds);
+  if (this.pixelBasedSizing) {
+    scout.graphics.setBounds(this.$comp, bounds);
+  }
   this.validateLayout();
 };
 

@@ -162,7 +162,6 @@ scout.Form.prototype._renderForm = function() {
   }
 
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.pixelBasedSizing = false;
   if (this.isDialog()) {
     layout = new scout.DialogLayout(this);
     this.htmlComp.validateRoot = true;

@@ -213,7 +213,6 @@ describe('TreeNodePosition', function() {
       tree.insertNodes([n5_1], tree.nodes[4]);
 
       tree.render();
-      tree.htmlComp.pixelBasedSizing = true;
       tree.htmlComp.setSize(new scout.Dimension(190, 190));
       tree.viewRangeSize = 14;
 
@@ -327,7 +326,6 @@ describe('TreeNodePosition', function() {
       tree.insertNodes([n3_1], tree.nodes[0].childNodes[2]);
 
       tree.render();
-      tree.htmlComp.pixelBasedSizing = true;
       tree.htmlComp.setSize(new scout.Dimension(190, 190));
       tree.viewRangeSize = 14;
 

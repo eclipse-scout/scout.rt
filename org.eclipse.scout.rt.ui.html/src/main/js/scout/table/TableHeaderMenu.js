@@ -755,7 +755,6 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   }, this);
   this.filterTable.insertRows(tableRows);
   this.filterTable.render(this.$filterTableGroup);
-  this.filterTable.htmlComp.pixelBasedSizing = true;
 
   // must do this in a setTimeout, since table/popup is not visible yet (same as Table#revealSelection).
   setTimeout(this.filterTable.revealChecked.bind(this.filterTable));

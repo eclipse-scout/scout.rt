@@ -63,7 +63,6 @@ scout.MobilePopup.prototype._renderWidget = function() {
     return;
   }
   this.widget.render();
-  this.widget.htmlComp.pixelBasedSizing = true;
   this.widget.$container.addClass('mobile-popup-widget');
   this.invalidateLayoutTree();
 };
