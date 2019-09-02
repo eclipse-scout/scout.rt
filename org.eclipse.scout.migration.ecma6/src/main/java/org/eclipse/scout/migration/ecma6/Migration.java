@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -65,25 +67,21 @@ public class Migration {
     List<IPostMigrationTask> postMigrationTasks = BEANS.all(IPostMigrationTask.class);
     LOG.info("Execute post migration tasks (#: " + postMigrationTasks.size() + ")");
     postMigrationTasks.forEach(task -> task.execute(m_context));
-
   }
 
   private void visitFiles() throws IOException {
     IMigrationIncludePathFilter pathFilter = BEANS.opt(IMigrationIncludePathFilter.class);
-
+    List<IMigrationExcludePathFilter> excludeFilters = BEANS.all(IMigrationExcludePathFilter.class);
     visitMigrationFiles(file -> {
-      PathInfo info = new PathInfo(file, m_context.getModuleDirectory());
-      if(pathFilter != null && !pathFilter.test(info)){
-        return FileVisitResult.CONTINUE;
-
+      PathInfo info = new PathInfo(file);
+      if (pathFilter != null && !pathFilter.test(info)) {
+        return;
       }
-      if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
-        return FileVisitResult.CONTINUE;
+      if (excludeFilters.stream().anyMatch(filter -> filter.test(info))) {
+        return;
       }
 
-
-        processFile(info, m_context);
-
+      processFile(info, m_context);
     });
   }
 
@@ -135,9 +133,11 @@ public class Migration {
     final Path targetModule = Configuration.get().getTargetModuleDirectory();
     final Path sourceModule = Configuration.get().getSourceModuleDirectory();
 
+    Set<WorkingCopy> allWorkingCopies = new HashSet<>(m_context.getWorkingCopies());
     visitMigrationFiles(file -> {
       WorkingCopy workingCopy = m_context.getWorkingCopy(file);
       if (workingCopy != null) {
+        allWorkingCopies.remove(workingCopy);
         writeWorkingCopy(workingCopy);
       }
       else {
@@ -153,6 +153,9 @@ public class Migration {
         }
       }
     });
+
+    // writes the remaining working copies which have no corresponding source file (working copies newly created during the migration).
+    allWorkingCopies.forEach(this::writeWorkingCopy);
   }
 
   private void writeWorkingCopy(WorkingCopy workingCopy) {

@@ -156,6 +156,7 @@ public class Context {
       LOG.info("Could not find '" + src + "' to parse js files.");
       return;
     }
+    //noinspection Convert2Diamond
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -170,7 +171,7 @@ public class Context {
         if (!FileUtility.hasExtension(file, "js")) {
           return FileVisitResult.CONTINUE;
         }
-        PathInfo info = new PathInfo(file, Configuration.get().getSourceModuleDirectory());
+        PathInfo info = new PathInfo(file);
         if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
           return FileVisitResult.CONTINUE;
         }

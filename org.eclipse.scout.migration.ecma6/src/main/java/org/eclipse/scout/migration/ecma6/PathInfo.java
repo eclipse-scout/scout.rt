@@ -8,9 +8,9 @@ public class PathInfo {
   private final Path m_modulePath;
   private final Path m_moduleRelativePath;
 
-  public PathInfo(Path path, Path modulePath){
+  public PathInfo(Path path) {
     m_path = path;
-    m_modulePath = modulePath;
+    m_modulePath = Configuration.get().getSourceModuleDirectory();
     if(m_modulePath != null) {
       m_moduleRelativePath = m_modulePath.relativize(m_path);
     }else{
@@ -32,6 +32,7 @@ public class PathInfo {
 
   @Override
   public String toString() {
+    //noinspection StringBufferReplaceableByString
     StringBuilder builder = new StringBuilder();
     builder.append(getPath()).append(" - ").append(getModuleRelativePath());
     return builder.toString();
