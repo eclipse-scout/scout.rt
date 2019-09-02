@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -195,13 +194,7 @@ public class LessApiParser {
   }
 
   protected static String toExternalImport(String libImportPrefix, String relPath) {
-    return removeLessFileExtension(libImportPrefix + removeFirstSegments(relPath, 4));
-  }
-
-  public static String removeFirstSegments(String path, int numSegments) {
-    Path p = Paths.get(path);
-    int existingSegmentsCount = p.getNameCount();
-    return p.subpath(Math.min(existingSegmentsCount - 1, numSegments), existingSegmentsCount).toString().replace('\\', '/');
+    return removeLessFileExtension(libImportPrefix + MigrationUtility.removeFirstSegments(relPath, 4));
   }
 
   protected static String toInternalImport(WorkingCopy less, String relPath) {
@@ -277,7 +270,7 @@ public class LessApiParser {
     String fileContent = MigrationUtility.removeComments(new String(Files.readAllBytes(file)));
     String relPath = sourceRoot.relativize(file).toString().replace('\\', '/');
     String theme = parseTheme(file);
-    m_lessFilesOfCurrentModule.add(removeFirstSegments(relPath, 4));
+    m_lessFilesOfCurrentModule.add(MigrationUtility.removeFirstSegments(relPath, 4));
     parseMixins(fileContent, relPath, context);
     parseGlobalVariables(fileContent, theme, relPath, context);
   }

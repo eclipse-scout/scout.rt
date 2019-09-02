@@ -1,5 +1,7 @@
 package org.eclipse.scout.migration.ecma6;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -38,6 +40,15 @@ public final class MigrationUtility {
     }
     String[] segments = fullyQualifiedName.split("\\.");
     return segments[0];
+  }
+
+  public static String removeFirstSegments(Path p, int numSegments) {
+    int existingSegmentsCount = p.getNameCount();
+    return p.subpath(Math.min(existingSegmentsCount - 1, numSegments), existingSegmentsCount).toString().replace('\\', '/');
+  }
+
+  public static String removeFirstSegments(String path, int numSegments) {
+    return removeFirstSegments(Paths.get(path), numSegments);
   }
 
   public static String removeComments(CharSequence methodBody) {
