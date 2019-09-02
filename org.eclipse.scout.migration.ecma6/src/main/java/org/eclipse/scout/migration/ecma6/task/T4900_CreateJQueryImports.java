@@ -27,8 +27,9 @@ import org.slf4j.LoggerFactory;
 
 @Order(4900)
 public class T4900_CreateJQueryImports extends AbstractTask {
-  private static final String JQUERY_MODULE_NAME = "jquery";
   private static final Logger LOG = LoggerFactory.getLogger(T4900_CreateJQueryImports.class);
+
+  private static final String JQUERY_MODULE_NAME = "jquery";
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 

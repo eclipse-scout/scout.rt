@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
+import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
 import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
@@ -23,14 +24,17 @@ import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Context {
+  private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
-  private Path m_moduleDirectory;
 
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
@@ -113,17 +117,10 @@ public class Context {
     return m_jsClasses.get(fullyQualifiedName);
   }
 
-  public Path getModuleDirectory() {
-    return m_moduleDirectory;
-  }
-
-  public void setModuleDirectory(Path moduleDirectory) {
-    m_moduleDirectory = moduleDirectory;
-  }
 
   public Path relativeToModule(Path path) {
-    Assertions.assertNotNull(getModuleDirectory());
-    return path.relativize(getModuleDirectory());
+    Assertions.assertNotNull(Configuration.get().getSourceModuleDirectory());
+    return path.relativize(Configuration.get().getSourceModuleDirectory());
   }
 
   public JsFile ensureJsFile(WorkingCopy workingCopy) {
@@ -155,6 +152,10 @@ public class Context {
   protected void parseJsFiles() throws IOException {
 
     final Path src = BEANS.get(Configuration.class).getSourceModuleDirectory().resolve("src/main/js");
+    if (!Files.exists(src) || !Files.isDirectory(src)) {
+      LOG.info("Could not find '" + src + "' to parse js files.");
+      return;
+    }
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -166,10 +167,16 @@ public class Context {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        if (FileUtility.hasExtension(file, "js")) {
-          JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
-          jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
+        if (!FileUtility.hasExtension(file, "js")) {
+          return FileVisitResult.CONTINUE;
         }
+        PathInfo info = new PathInfo(file, Configuration.get().getSourceModuleDirectory());
+        if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
+          return FileVisitResult.CONTINUE;
+        }
+        JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
+        jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
+
         return FileVisitResult.CONTINUE;
       }
     });

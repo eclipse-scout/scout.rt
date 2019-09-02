@@ -12,6 +12,7 @@ package org.eclipse.scout.migration.ecma6;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.PostConstruct;
 
@@ -61,7 +62,7 @@ public class Configuration {
    *         *.json * files from previous migrations.
    */
   public Path getLibraryApiDirectory() {
-    return null;
+    return Paths.get("./org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis");
   }
 
   /**

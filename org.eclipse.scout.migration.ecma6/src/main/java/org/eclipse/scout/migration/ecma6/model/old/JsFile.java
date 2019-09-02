@@ -106,7 +106,6 @@ public class JsFile extends AbstractJsElement {
     INamedElement element = context.getLibraries().getElement(fullyQualifiedName);
     if(element == null){
       LOG.error("Could not resolve import for '"+fullyQualifiedName+"'. Probably a library is missing.");
-      // TODO create fake import
       imp = new UnresolvedImport(fullyQualifiedName);
       imp.withDefaultMember(new AliasedMember(MigrationUtility.parseMemberName(fullyQualifiedName)));
       m_imports.put(fullyQualifiedName, imp);

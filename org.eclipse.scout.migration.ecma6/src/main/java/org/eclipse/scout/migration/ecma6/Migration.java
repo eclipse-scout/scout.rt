@@ -10,7 +10,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationPathFilter;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
+import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationIncludePathFilter;
 import org.eclipse.scout.migration.ecma6.task.ITask;
 import org.eclipse.scout.migration.ecma6.task.post.IPostMigrationTask;
 import org.eclipse.scout.migration.ecma6.task.pre.IPreMigrationTask;
@@ -65,15 +66,20 @@ public class Migration {
 
   private void visitFiles() throws IOException {
 
-    IMigrationPathFilter pathFilter = BEANS.opt(IMigrationPathFilter.class);
+    IMigrationIncludePathFilter pathFilter = BEANS.opt(IMigrationIncludePathFilter.class);
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        PathInfo info = new PathInfo(file, m_context.getModuleDirectory());
-        if(pathFilter == null || pathFilter.test(info)){
-          processFile(info, m_context);
+        PathInfo info = new PathInfo(file, Configuration.get().getSourceModuleDirectory());
+        if(pathFilter != null && !pathFilter.test(info)){
+          return FileVisitResult.CONTINUE;
+
         }
+        if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
+          return FileVisitResult.CONTINUE;
+        }
+        processFile(info, m_context);
         return FileVisitResult.CONTINUE;
       }
 
@@ -92,9 +98,7 @@ public class Migration {
         if ("node_modules".equals(dirName)) {
           return FileVisitResult.SKIP_SUBTREE;
         }
-        if(Files.exists(dir.resolve(".classpath"))){
-          m_context.setModuleDirectory(dir);
-        }
+
         return FileVisitResult.CONTINUE;
       }
     });
