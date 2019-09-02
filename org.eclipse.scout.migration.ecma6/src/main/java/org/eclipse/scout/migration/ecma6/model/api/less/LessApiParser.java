@@ -41,7 +41,6 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
 import org.eclipse.scout.migration.ecma6.model.api.NamedElement;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,7 @@ public class LessApiParser {
     m_vars.clear();
     m_mixins.clear();
     m_lessFilesOfCurrentModule.clear();
-    Files.walkFileTree(sourceRoot, new SimpleFileVisitor<Path>() {
+    Files.walkFileTree(sourceRoot, new SimpleFileVisitor<>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (file.getFileName().toString().endsWith(LESS_FILE_SUFFIX)) {
@@ -161,7 +160,8 @@ public class LessApiParser {
           lessVariable = filesDefiningVariable.get(DEFAULT_THEME_NAME);
         }
         if (lessVariable == null) {
-          throw new ProcessingException("Cannot find less import for variable '{}'.", var);
+          LOG.error("Cannot find less import for variable '{}' and theme '{}'.", var, theme);
+          continue;
         }
         if (isExternal) {
           requiredImports.add(toExternalImport(libImportPrefix, lessVariable.getCustomAttributes().get(PROP_PATH)));
