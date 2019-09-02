@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class WorkingCopy {
@@ -102,13 +103,14 @@ public class WorkingCopy {
         Files.copy(getPath(), destination, REPLACE_EXISTING);
       }
       catch (IOException e) {
-        e.printStackTrace();
+        throw new ProcessingException("Unable to copy file '{}'.", getPath(), e);
       }
     }
   }
 
   @Override
   public String toString() {
+    //noinspection StringBufferReplaceableByString
     StringBuilder builder = new StringBuilder();
     builder.append(m_path)
         .append(" [dirty:").append(isDirty())
