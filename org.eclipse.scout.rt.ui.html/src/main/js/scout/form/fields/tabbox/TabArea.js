@@ -147,7 +147,11 @@ scout.TabArea.prototype._setTabs = function(tabItems) {
       return tab;
     }, this);
 
-  this._removeTabs(tabsToRemove);
+  // un-register model listeners
+  tabsToRemove.forEach(function(tab) {
+    tab.tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
+    tab.off('select', this._tabSelectionHandler);
+  }, this);
 
   this._setProperty('tabs', tabs);
 };
@@ -157,10 +161,12 @@ scout.TabArea.prototype._renderTabs = function() {
     if (!tab.rendered) {
       tab.render();
     }
-    tab.$container.on('blur', this._onTabItemBlur.bind(this))
+    tab.$container
+      .on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
     tab.$container.prependTo(this.$container);
-    tab.$container.on('blur', this._onTabItemBlur.bind(this))
+    tab.$container
+      .on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
   }, this);
 };
@@ -168,10 +174,8 @@ scout.TabArea.prototype._renderTabs = function() {
 scout.TabArea.prototype._removeTabs = function(tabs) {
   tabs = tabs || this.tabs;
   tabs.forEach(function(tab) {
-    tab.tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
-    tab.off('select', this._tabSelectionHandler);
     tab.remove();
-  }, this);
+  });
 };
 
 scout.TabArea.prototype.setDisplayStyle = function(displayStyle) {
