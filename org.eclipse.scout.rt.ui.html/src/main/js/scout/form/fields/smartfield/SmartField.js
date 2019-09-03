@@ -661,12 +661,19 @@ scout.SmartField.prototype._hasUiError = function(codes) {
 };
 
 /**
+ * @param browse [boolean] optional, whether to perform a lookupByAll (=browse) or a lookupByText.
+ *        By default the param is set to <code>true</code> if the search-text is not empty
+ * @param searchText [String] optional, when not set the search-text from the smart-field is used
+ * @param searchAlways [boolean] optional, only used when browse=false. When set to true the search
+ *        is always performed, event when the search-text has not changed. By default the param is
+ *        set to <code>false</code>.
  * @returns {Promise}
  */
-scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
+scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, searchAlways) {
   // default values
   searchText = scout.nvl(searchText, this._readDisplayText());
   browse = scout.nvl(browse, scout.strings.empty(searchText));
+  searchAlways = scout.nvl(searchAlways, false);
 
   // never do a text-lookup if field has dropdown style
   if (this.isDropdown()) {
@@ -675,7 +682,7 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText) {
 
   // this avoids unnecessary lookup-calls when a keyboard event has triggered
   // the lookupByTextOrAll function but the search-text has not changed #226643.
-  if (!browse) {
+  if (!browse && !searchAlways) {
     var lastSearchText = null;
     if (this._lastSearchText) {
       lastSearchText = this._lastSearchText;
@@ -1203,9 +1210,23 @@ scout.SmartField.prototype._onLookupRowSelected = function(event) {
   this.closePopup();
 };
 
+/**
+ * When the user changes the active-filter we must always perform a new search. When the user has typed a searchText
+ * we must perform a lookupByText. When the searchText is empty or different from the text of the selected lookup-row
+ * we are in browse mode where we use the default given by the 'searchRequired' property. See: #237229.
+ */
 scout.SmartField.prototype._onActiveFilterSelected = function(event) {
   this.setActiveFilter(event.activeFilter);
-  this._lookupByTextOrAll(!this.searchRequired);
+  var browse = !this.searchRequired;
+  var searchText = this._readSearchText();
+  if (this.lookupRow) {
+    if (this.lookupRow.text !== searchText) {
+      browse = false;
+    }
+  } else if (scout.strings.hasText(searchText)) {
+    browse = false;
+  }
+  this._lookupByTextOrAll(browse, searchText, true);
 };
 
 scout.SmartField.prototype.setBrowseMaxRowCount = function(browseMaxRowCount) {
