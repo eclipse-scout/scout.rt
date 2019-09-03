@@ -18,6 +18,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonDeserialize(as = NamedElement.class)
 public interface INamedElement {
+
+  String LIBRARY_MODULE_NAME = "lib-moduleName";
+
   enum Type {
     AllLibraries,
     Library,
@@ -38,6 +41,10 @@ public interface INamedElement {
 
   String getFullyQualifiedName();
 
+  Map<String, String> getCustomAttributes();
+
+  String getCustomAttribute(String key);
+
   INamedElement getParent();
 
   INamedElement getAncestor(Predicate<INamedElement> filter);
@@ -52,5 +59,4 @@ public interface INamedElement {
 
   List<INamedElement> getElements(INamedElement.Type type, Predicate<INamedElement> filter);
 
-  Map<String, String> getCustomAttributes();
 }

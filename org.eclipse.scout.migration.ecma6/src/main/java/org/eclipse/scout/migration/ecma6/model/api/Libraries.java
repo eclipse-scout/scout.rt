@@ -26,9 +26,9 @@ public class Libraries extends NamedElement {
   }
 
   private void setParents(INamedElement element, INamedElement parent) {
-    m_allElements.put(element.getName(), element);
     element.setParent(parent);
     element.getChildren().forEach(child -> setParents(child, element));
+    m_allElements.put(element.getFullyQualifiedName(), element);
   }
 
   public INamedElement getElement(String fqn){

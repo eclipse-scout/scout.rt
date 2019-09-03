@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -63,7 +64,7 @@ public final class FileUtility {
         .forEach(File::delete);
     return true;
   }
-  public static boolean moveDirectory(Path srcDir, Path targetDir) throws IOException {
+  public static boolean moveDirectory(Path srcDir, Path targetDir, Predicate<Path> filter) throws IOException {
     Files.createDirectories(targetDir);
     Files.walkFileTree(srcDir, new SimpleFileVisitor<Path>() {
 

@@ -64,8 +64,10 @@ public class NamedElement implements INamedElement {
     if (getType() == Type.Constructor) {
       return getParent().getFullyQualifiedName();
     }
+
+
     StringBuilder nameBuilder = new StringBuilder();
-    if (getParent() != null) {
+    if (getType() != Type.Library && getParent() != null) {
       nameBuilder.append(getParent().getFullyQualifiedName())
           .append(".");
 
@@ -76,6 +78,25 @@ public class NamedElement implements INamedElement {
 
   public void setFullyQualifiedName(String fqn) {
     // nop
+  }
+  @Override
+  public Map<String, String> getCustomAttributes() {
+    return m_customAttributes;
+  }
+
+
+
+  public void setCustomAttributes(Map<String, String> customAttributes) {
+    m_customAttributes = customAttributes;
+  }
+
+  public void addCustomAttribute(String key, String value){
+    m_customAttributes.put(key,value);
+  }
+
+  @Override
+  public String getCustomAttribute(String key){
+    return m_customAttributes.get(key);
   }
 
   @JsonIgnore
@@ -133,12 +154,5 @@ public class NamedElement implements INamedElement {
     m_children.forEach(child -> child.visit(visitor));
   }
 
-  @Override
-  public Map<String, String> getCustomAttributes() {
-    return m_customAttributes;
-  }
 
-  public void setCustomAttributes(Map<String, String> customAttributes) {
-    m_customAttributes = customAttributes;
-  }
 }

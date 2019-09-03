@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
@@ -40,7 +41,8 @@ public class ApiWriter {
   }
 
   public INamedElement createLibraryFromCurrentModule(String libName, Context context, boolean includeLess) {
-    NamedElement lib = new NamedElement(Type.Library, libName);
+    NamedElement lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
+    lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
     List<INamedElement> children = context.getAllJsClasses()
         .stream()
         .map(jsClass -> createClazz(jsClass, lib))

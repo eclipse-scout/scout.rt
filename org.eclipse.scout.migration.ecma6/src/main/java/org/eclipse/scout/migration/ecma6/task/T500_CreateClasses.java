@@ -78,7 +78,7 @@ public class T500_CreateClasses extends AbstractTask {
     if (onlyOneClazz) {
       classBuilder.append("default ");
     }
-    classBuilder.append(clzz.getName()).append(" ");
+    classBuilder.append("class ").append(clzz.getName()).append(" ");
     if (clzz.getSuperCall() != null) {
 
       String alias = clzz.getSuperCall().getName();

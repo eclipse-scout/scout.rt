@@ -111,7 +111,7 @@ public class JsFile extends AbstractJsElement {
       m_imports.put(fullyQualifiedName, imp);
       return imp.getDefaultMember();
     }
-    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getName(), MigrationUtility.parseMemberName(fullyQualifiedName), false);
+    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getCustomAttribute(INamedElement.LIBRARY_MODULE_NAME), MigrationUtility.parseMemberName(fullyQualifiedName), false);
 
   }
 
