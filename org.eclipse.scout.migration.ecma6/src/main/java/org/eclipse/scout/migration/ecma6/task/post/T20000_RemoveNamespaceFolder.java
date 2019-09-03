@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 
 @Order(20000)
-public class T20000_RemoveNamespaceFolder  implements IPostMigrationTask{
+public class T20000_RemoveNamespaceFolder implements IPostMigrationTask {
 
   @Override
   public void execute(Context context) {
@@ -33,15 +33,15 @@ public class T20000_RemoveNamespaceFolder  implements IPostMigrationTask{
       moveSrcNamespaceDiretory(context);
     }
     catch (IOException e) {
-      throw new VetoException("Could not move namespace folders 'src/main/js/[namespace] -> src/main/js'",e );
+      throw new VetoException("Could not move namespace folders 'src/main/js/[namespace] -> src/main/js'", e);
     }
   }
 
-  protected  void moveSrcNamespaceDiretory(Context context) throws IOException {
-    Path srcNamespaceDirectory = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src","main", "js", Configuration.get().getNamespace()));
-    if(Files.isDirectory(srcNamespaceDirectory)){
+  protected void moveSrcNamespaceDiretory(Context context) throws IOException {
+    Path srcNamespaceDirectory = Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js", Configuration.get().getNamespace()));
+    if (Files.isDirectory(srcNamespaceDirectory)) {
       FileUtility.moveDirectory(srcNamespaceDirectory, Configuration.get().getTargetModuleDirectory().resolve(Paths.get("src", "main", "js")),
-      path -> !BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(new PathInfo(path, Configuration.get().getTargetModuleDirectory())))      );
+          path -> BEANS.all(IMigrationExcludePathFilter.class).stream().noneMatch(filter -> filter.test(new PathInfo(path))));
     }
   }
 }
