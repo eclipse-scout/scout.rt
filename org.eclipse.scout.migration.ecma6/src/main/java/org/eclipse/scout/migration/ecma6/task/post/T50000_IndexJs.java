@@ -64,7 +64,9 @@ public class T50000_IndexJs implements IPostMigrationTask {
     utilities.sort(Comparator.comparing(WorkingCopy::getPath));
     classes.sort(Comparator.comparing(WorkingCopy::getPath));
 
-    src.append("import * as ").append(config.getNamespace()).append(" from './").append(getSourceFolderRelPath(config, root)).append("';\n");
+    if (root != null) {
+      src.append("import * as ").append(config.getNamespace()).append(" from './").append(getSourceFolderRelPath(config, root)).append("';\n");
+    }
     for (WorkingCopy util : utilities) {
       String rel = getSourceFolderRelPath(config, util);
       String name = nameWithoutJsExtension(util);
@@ -107,21 +109,7 @@ public class T50000_IndexJs implements IPostMigrationTask {
     if (index != null) {
       return index;
     }
-    WorkingCopy main = findWithName(candidates, "main.js");
-    if (main != null) {
-      return main;
-    }
-
-    WorkingCopy result = null;
-    int len = Integer.MAX_VALUE;
-    for (WorkingCopy wc : candidates) {
-      int curLen = wc.getPath().toString().length();
-      if (curLen < len) {
-        result = wc;
-        len = curLen;
-      }
-    }
-    return result;
+    return findWithName(candidates, "main.js");
   }
 
   protected WorkingCopy findWithName(List<WorkingCopy> candidates, String fileName) {
