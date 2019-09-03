@@ -3062,7 +3062,11 @@ scout.Table.prototype._renderScrollTop = function() {
  * @override
  */
 scout.Table.prototype.get$Scrollable = function() {
-  return this.$data;
+  if (this.$data) {
+    return this.$data;
+  } else {
+    return this.$container;
+  }
 };
 
 scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {

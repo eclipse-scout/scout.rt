@@ -69,15 +69,17 @@ scout.TableLayout.prototype.layout = function($container) {
     tileTableHeader.htmlComp.setSize(groupBoxSize);
     tileTableHeight = groupBoxSize.height;
   }
-  var dataHeight = containerSize.height - (dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight);
+  var controlsHeight = dataMarginsHeight + menuBarHeight + controlContainerHeight + footerHeight + headerHeight + tileTableHeight;
+  var dataHeight = containerSize.height - controlsHeight;
   if ($data) {
-    $data.css('height', dataHeight);
+    $data.css('height', 'calc(100% - ' + controlsHeight + 'px)');
+    this._dataHeightPositive = $data.height() > 0;
   } else {
     if (tileAccordion && tileAccordion.htmlComp) {
       tileAccordion.htmlComp.setSize(new scout.Dimension(containerSize.width, dataHeight));
+      this._dataHeightPositive = dataHeight > 0;
     }
   }
-  this._dataHeightPositive = dataHeight > 0;
 
   if (!this.table.tileMode) {
 
