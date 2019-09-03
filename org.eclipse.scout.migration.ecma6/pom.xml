@@ -25,19 +25,6 @@
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>11</source>
-          <target>11</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
@@ -63,7 +50,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
     </dependency>
-
 
   </dependencies>
 </project>
