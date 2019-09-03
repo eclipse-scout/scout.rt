@@ -51,12 +51,16 @@ public class JsonBeanTile<BEAN_TILE extends IBeanTile<?>> extends JsonTile<BEAN_
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        IJsonObject jsonObject = MainJsonObjectFactory.get().createJsonObject(value);
-        JsonBean jsonBean = (JsonBean) jsonObject;
-        jsonBean.setBinaryResourceMediator(m_binaryResourceMediator);
-        return jsonObject.toJson();
+        return beanToJson(value);
       }
     });
+  }
+
+  protected Object beanToJson(Object value) {
+    IJsonObject jsonObject = MainJsonObjectFactory.get().createJsonObject(value);
+    JsonBean jsonBean = (JsonBean) jsonObject;
+    jsonBean.setBinaryResourceMediator(m_binaryResourceMediator);
+    return jsonObject.toJson();
   }
 
   @Override
