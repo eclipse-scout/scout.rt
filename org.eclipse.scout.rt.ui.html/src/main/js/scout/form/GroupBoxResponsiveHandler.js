@@ -34,7 +34,7 @@ scout.GroupBoxResponsiveHandler.TransformationType = {
 };
 
 scout.GroupBoxResponsiveHandler.prototype._initDefaults = function() {
-  this.compactThreshold = scout.HtmlEnvironment.formColumnWidth;
+  this.compactThreshold = scout.htmlEnvironment.formColumnWidth;
 };
 
 scout.GroupBoxResponsiveHandler.prototype._onHtmlEnvironmenPropertyChange = function() {
@@ -74,9 +74,9 @@ scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
   this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
   this.widget.one('remove', function() {
-    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 
   this.widget.visitFields(function(field) {
@@ -86,7 +86,7 @@ scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
     }
   }.bind(this));
 
-  scout.HtmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
+  scout.htmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
 };
 
 /**
@@ -99,7 +99,7 @@ scout.GroupBoxResponsiveHandler.prototype.destroy = function() {
     compositeField.off('propertyChange', this._formFieldAddedHandler);
   }.bind(this));
 
-  scout.HtmlEnvironment.off('propertyChange', this._htmlPropertyChangeHandler);
+  scout.htmlEnvironment.off('propertyChange', this._htmlPropertyChangeHandler);
 };
 
 /**

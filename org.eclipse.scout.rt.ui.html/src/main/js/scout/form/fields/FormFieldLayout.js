@@ -20,9 +20,9 @@ scout.FormFieldLayout = function(formField) {
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
   this.formField.one('remove', function() {
-    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
@@ -31,9 +31,9 @@ scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 scout.FormFieldLayout.MIN_FIELD_WIDTH = 61;
 
 scout.FormFieldLayout.prototype._initDefaults = function() {
-  this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
-  this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
-  this.rowHeight = scout.HtmlEnvironment.formRowHeight;
+  this.mandatoryIndicatorWidth = scout.htmlEnvironment.fieldMandatoryIndicatorWidth;
+  this.statusWidth = scout.htmlEnvironment.fieldStatusWidth;
+  this.rowHeight = scout.htmlEnvironment.formRowHeight;
 };
 
 scout.FormFieldLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
@@ -377,7 +377,7 @@ scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBoun
 scout.FormFieldLayout.prototype.labelWidth = function() {
   // use configured label width in pixel or default label width
   if (scout.FormField.LabelWidth.DEFAULT === this.formField.labelWidthInPixel) {
-    return scout.HtmlEnvironment.fieldLabelWidth;
+    return scout.htmlEnvironment.fieldLabelWidth;
   }
   return this.formField.labelWidthInPixel;
 };

@@ -27,16 +27,16 @@ scout.LogicalGridLayout = function(widget, layoutConfig) {
   this.layoutConfig.applyToLayout(this);
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
   this.widget.one('remove', function() {
-    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
 scout.LogicalGridLayout.prototype._initDefaults = function() {
-  var env = scout.HtmlEnvironment;
+  var env = scout.htmlEnvironment;
   this.hgap = env.formColumnGap;
   this.vgap = env.formRowGap;
   this.columnWidth = env.formColumnWidth;

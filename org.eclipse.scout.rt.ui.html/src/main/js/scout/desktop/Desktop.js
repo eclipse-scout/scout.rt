@@ -229,7 +229,7 @@ scout.Desktop.prototype._setDense = function(dense) {
   this._setProperty('dense', dense);
 
   scout.styles.clearCache();
-  scout.HtmlEnvironment.init(this.dense ? 'dense' : null);
+  scout.htmlEnvironment.init(this.dense ? 'dense' : null);
 };
 
 scout.Desktop.prototype._renderDense = function() {

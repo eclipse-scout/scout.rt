@@ -18,5 +18,5 @@ scout.inherits(scout.SequenceBoxLayout, scout.LogicalGridLayout);
  */
 scout.SequenceBoxLayout.prototype._initDefaults = function() {
   scout.SequenceBoxLayout.parent.prototype._initDefaults.call(this);
-  this.hgap = scout.HtmlEnvironment.smallColumnGap;
+  this.hgap = scout.htmlEnvironment.smallColumnGap;
 };

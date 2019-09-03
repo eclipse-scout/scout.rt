@@ -153,7 +153,7 @@ scout.SplitBox.prototype._render = function() {
         var maxSplitterPositionLeft;
 
         // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
-        var splitterOffset = Math.floor((splitterSize.width + scout.HtmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
+        var splitterOffset = Math.floor((splitterSize.width + scout.htmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
 
         if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
           minSplitterPositionLeft = scout.nvl(this.minSplitterPosition, 0);

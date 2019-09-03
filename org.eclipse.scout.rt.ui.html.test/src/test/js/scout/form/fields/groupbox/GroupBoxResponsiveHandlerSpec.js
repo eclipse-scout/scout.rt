@@ -47,9 +47,9 @@ describe("GroupBoxResponsiveHandler", function() {
     return groupBox;
   }
 
-  var normalWidth = scout.HtmlEnvironment.formColumnWidth * 2 + 10;
-  var condensedWidth = scout.HtmlEnvironment.formColumnWidth  + 10;
-  var compactWidth = scout.HtmlEnvironment.formColumnWidth - 10;
+  var normalWidth = scout.htmlEnvironment.formColumnWidth * 2 + 10;
+  var condensedWidth = scout.htmlEnvironment.formColumnWidth + 10;
+  var compactWidth = scout.htmlEnvironment.formColumnWidth - 10;
 
   function expectNormal(groupBox) {
     expect(groupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);

@@ -64,10 +64,10 @@ describe('FormFieldLayout', function() {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new scout.FormSpecHelper(session);
-    rowHeight = scout.HtmlEnvironment.formRowHeight;
-    mandatoryWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
-    statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
-    labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+    rowHeight = scout.htmlEnvironment.formRowHeight;
+    mandatoryWidth = scout.htmlEnvironment.fieldMandatoryIndicatorWidth;
+    statusWidth = scout.htmlEnvironment.fieldStatusWidth;
+    labelWidth = scout.htmlEnvironment.fieldLabelWidth;
     // Label is always as height as a row if label position is set to LEFT
     labelHeight = rowHeight;
 

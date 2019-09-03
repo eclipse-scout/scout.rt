@@ -14,12 +14,12 @@ scout.GroupBoxLayout = function(groupBox) {
 
   this._initDefaults();
 
-  scout.HtmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+  scout.htmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
 };
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype._initDefaults = function() {
-  this._statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+  this._statusWidth = scout.htmlEnvironment.fieldStatusWidth;
 };
 
 scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {

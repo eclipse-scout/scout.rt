@@ -63,7 +63,7 @@ scout.Tab.prototype._render = function() {
   });
 
   this.fieldStatus.render();
-  this.fieldStatus.$container.cssWidth(scout.HtmlEnvironment.fieldStatusWidth);
+  this.fieldStatus.$container.cssWidth(scout.htmlEnvironment.fieldStatusWidth);
 
   this.$container.on('mousedown', this._onTabMouseDown.bind(this));
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);

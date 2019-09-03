@@ -18,5 +18,5 @@ scout.inherits(scout.RadioButtonGroupLayout, scout.LogicalGridLayout);
  */
 scout.RadioButtonGroupLayout.prototype._initDefaults = function() {
   scout.RadioButtonGroupLayout.parent.prototype._initDefaults.call(this);
-  this.hgap = scout.HtmlEnvironment.smallColumnGap;
+  this.hgap = scout.htmlEnvironment.smallColumnGap;
 };

@@ -15,15 +15,15 @@ scout.TabBoxHeaderLayout = function(tabBoxHeader) {
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.HtmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
   this.tabBoxHeader.one('remove', function() {
-    scout.HtmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 };
 scout.inherits(scout.TabBoxHeaderLayout, scout.AbstractLayout);
 
 scout.TabBoxHeaderLayout.prototype._initDefaults = function() {
-  this.fieldStatusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+  this.fieldStatusWidth = scout.htmlEnvironment.fieldStatusWidth;
 };
 
 scout.TabBoxHeaderLayout.prototype._onHtmlEnvironmenPropertyChange = function() {

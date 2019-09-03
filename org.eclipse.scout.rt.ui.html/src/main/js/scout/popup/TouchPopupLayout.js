@@ -34,8 +34,8 @@ scout.TouchPopupLayout.prototype.layout = function($container) {
  * @override AbstractLayout.js
  */
 scout.TouchPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var popupWidth = scout.HtmlEnvironment.formColumnWidth,
-    popupHeight = scout.HtmlEnvironment.formRowHeight * 15;
+  var popupWidth = scout.htmlEnvironment.formColumnWidth,
+    popupHeight = scout.htmlEnvironment.formRowHeight * 15;
 
   return new scout.Dimension(popupWidth, popupHeight);
 };

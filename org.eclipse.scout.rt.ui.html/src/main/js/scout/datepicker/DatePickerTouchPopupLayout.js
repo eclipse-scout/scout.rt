@@ -17,7 +17,7 @@ scout.inherits(scout.DatePickerTouchPopupLayout, scout.TouchPopupLayout);
  * @override
  */
 scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
-  var popupWidth = scout.HtmlEnvironment.formColumnWidth,
+  var popupWidth = scout.htmlEnvironment.formColumnWidth,
     containerInsets = this.popup.htmlComp.insets(),
     fieldHtmlComp = this.popup._field.htmlComp,
     widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,

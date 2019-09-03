@@ -42,14 +42,14 @@ scout.LookupBoxLayout.prototype.preferredLayoutSize = function($container, optio
   var prefSizeStructure, prefSizeFilterBox, structureContainer, filterContainer,
     width = 0,
     htmlContainer = scout.HtmlComponent.get($container),
-    height = scout.HtmlEnvironment.formRowHeight,
+    height = scout.htmlEnvironment.formRowHeight,
     box = this.box;
 
   // HeightHint not supported
   options.heightHint = null;
 
   if (box.$label && box.labelVisible) {
-    width += scout.HtmlEnvironment.fieldLabelWidth;
+    width += scout.htmlEnvironment.fieldLabelWidth;
   }
   if (box.$mandatory && box.$mandatory.isVisible()) {
     width += box.$mandatory.outerWidth(true);

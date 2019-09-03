@@ -44,7 +44,7 @@ describe('ButtonLayout', function() {
     var fieldSize, statusMargins;
 
     beforeEach(function() {
-      statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
+      statusWidth = scout.htmlEnvironment.fieldStatusWidth;
 
       button = new CustomButton();
       button.init({

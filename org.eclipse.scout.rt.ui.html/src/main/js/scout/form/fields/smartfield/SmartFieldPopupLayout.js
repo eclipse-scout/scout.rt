@@ -87,8 +87,8 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container,
     prefSize = prefSize.add(this.popup.htmlComp.insets());
   } else {
     prefSize = new scout.Dimension(
-      scout.HtmlEnvironment.formColumnWidth,
-      scout.HtmlEnvironment.formRowHeight * 2);
+      scout.htmlEnvironment.formColumnWidth,
+      scout.htmlEnvironment.formRowHeight * 2);
   }
 
   prefSize.width = Math.max(fieldBounds.width, prefSize.width);
