@@ -289,8 +289,10 @@ public final class SeleniumExpectedConditions {
    * @param parentElement
    *          if not null, findElement below the given parent, if null, findElements in document
    * @param rowText
-   *          text of element table-row, compared with 'contains'
+   *          optional text of element table-row, compared with 'contains'. When rowText is null no text comparison is
+   *          done and only the number of rows is checked.
    * @param numRows
+   *          expected number of rows the table must have
    * @return The table-rows found by the expected condition
    */
   public static ExpectedCondition<List<WebElement>> tableToHaveNumberOfRows(final WebElement parentElement, final String rowText, final int numRows) {
@@ -305,9 +307,11 @@ public final class SeleniumExpectedConditions {
             return null;
           }
           // and each one of these rows must contain the given text
-          for (WebElement tableRow : tableRows) {
-            if (!tableRow.getText().contains(rowText)) {
-              return null;
+          if (rowText != null) {
+            for (WebElement tableRow : tableRows) {
+              if (!tableRow.getText().contains(rowText)) {
+                return null;
+              }
             }
           }
           return tableRows;
