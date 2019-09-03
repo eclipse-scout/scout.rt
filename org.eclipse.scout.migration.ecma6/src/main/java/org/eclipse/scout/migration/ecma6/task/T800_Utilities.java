@@ -10,13 +10,19 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.slf4j.Logger;
@@ -58,157 +64,62 @@ public class T800_Utilities extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     try {
-      //XXX  createFunctions(workingCopy, context);
+      rewriteSource(workingCopy, context);
     }
     catch (VetoException e) {
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
       LOG.error("Could not create utility [" + pathInfo.getPath().getFileName() + "]. Appended TODO for manual migration.");
     }
   }
-/*
-protected void createFunctions(WorkingCopy workingCopy, Context context) {
-JsFile jsFile = context.ensureJsFile(workingCopy);
 
-List<JsClass> jsClasses = jsFile.getJsFuncClasses();
-// reverse
-for (int i = jsClasses.size() - 1; i > -1; i--) {
+  protected void rewriteSource(WorkingCopy workingCopy, Context context) {
+    String source = workingCopy.getSource();
 
-JsClass jsClazz = jsClasses.get(i);
-createClazzBlock(jsClazz, jsClasses.size() == 1, jsFile, workingCopy, context);
-updateFunctions(jsClazz, jsFile, workingCopy);
-}
-}
+    Matcher m = Pattern.compile("(?m)^([a-z]\\w+)\\.([a-z]\\w+)\\s*=\\s*\\{").matcher(source);
+    if (!m.find()) throw new VetoException("This is no utility class");
+    String namespace = m.group(1);
+    String utilityName = m.group(2);
+    if (m.find()) throw new VetoException("There are multiple utility classes in one file");
 
-protected void createClazzBlock(JsClass clzz, boolean onlyOneClazz, JsFile jsFile, WorkingCopy workingCopy, Context context) {
-//    export default class Menu extends Action {
-//      constructor() {
-List<JsFunction> functions = clzz.getFunctions();
-if (functions.size() == 0) {
-throw new VetoException("Clazz without functions '" + clzz.getFullyQualifiedName() + "' !");
-}
-// close classblock after last function
-functions.get(functions.size() - 1).getEndOffset();
-StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
-sourceBuilder.insert(functions.get(functions.size() - 1).getEndOffset() + 1, workingCopy.getLineSeparator() + "};");
-// remove scout inherits
-if (clzz.getSuperCall() != null) {
-sourceBuilder.replace(clzz.getSuperCall().getStartOffset(), clzz.getSuperCall().getEndOffset(), "");
-}
-// open class block
-StringBuilder classBuilder = new StringBuilder();
-classBuilder.append("export ");
-if (onlyOneClazz) {
-classBuilder.append("default ");
-}
-classBuilder.append(clzz.getName()).append(" ");
-if (clzz.getSuperCall() != null) {
+    JsFile jsFile = context.ensureJsFile(workingCopy);
 
-String alias = clzz.getSuperCall().getName();
-if (alias.equalsIgnoreCase(clzz.getName())) {
-alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace()) + clzz.getSuperCall().getName();
-}
-classBuilder.append("extends ")
-.append(jsFile.getOrCreateImport(clzz.getSuperCall().getFullyQualifiedName(), context).getReferenceName())
-.append(" ");
+    //remove wrapper block and replace by an import
+    //XXX source = source.replaceAll("(?m)^([a-z]\\w+)\\.[a-z]\\w+\\s*=\\s*\\{", "import * as $1 from '../$1';");
+    source = source.replaceAll("(?m)^([a-z]\\w+)\\.[a-z]\\w+\\s*=\\s*\\{", "");
+    source = source.substring(0, source.lastIndexOf("}"));
 
-}
-classBuilder.append("{").append(workingCopy.getLineSeparator());
-sourceBuilder.insert(functions.get(0).getStartOffset(), classBuilder.toString());
-workingCopy.setSource(sourceBuilder.toString());
-}
+    //change and export public functions
+    source = source.replaceAll("(?m)^[ ]*([a-z]\\w*)\\s*:\\s*function", "export function $1");
 
-protected void updateFunctions(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
-String source = workingCopy.getSource();
-for (JsFunction f : clazz.getFunctions()) {
-if (!f.isConstructor()) {
-source = updateFunction(f, jsFile, source);
-}
-else {
-source = updateConstructor(f, jsFile, source);
-}
-}
-workingCopy.setSource(source);
-}
+    //change and annotate private functions
+    source = source.replaceAll("(?m)^[ ]*([_]\\w*)\\s*:\\s*function", "//private\nfunction $1");
 
-protected String updateFunction(JsFunction function, JsFile jsFile, String source) {
-StringBuilder patternBuilder = new StringBuilder();
-patternBuilder.append(function.getJsClass().getNamespace())
-.append("\\.")
-.append(function.getJsClass().getName());
-if (!function.isStatic()) {
-patternBuilder.append("\\.prototype");
-}
-patternBuilder.append("\\.").append(Pattern.quote(function.getName()));
-patternBuilder.append("\\ \\=\\s*function");
+    //remove all ',' after function body '}'
+    source = source.replaceAll("(?m)^  \\},", "\\}");
 
-Pattern pattern = Pattern.compile(patternBuilder.toString());
-Matcher matcher = pattern.matcher(source);
-if (matcher.find()) {
-StringBuilder replacement = new StringBuilder();
-if (function.isStatic()) {
-replacement.append("static ");
-}
-replacement.append(function.getName().replace("$", "\\$"));
-source = matcher.replaceFirst(replacement.toString());
-}
-// super call
+    //change state variables
+    source = source.replaceAll("(?m)^[ ]*([_\\w]+)\\s*:\\s*([^,]+),?$", "let $1 = $2;");
 
-// group 1 function name
-// group 2 (optional) arguments with leading semicolumn
-// group 3 (inner optional) agruments to use
-patternBuilder = new StringBuilder();
-patternBuilder.append(Pattern.quote(function.getJsClass().getFullyQualifiedName()))
-.append("\\.parent\\.prototype\\.(").append(Pattern.quote(function.getName())).append(")\\.call\\(\\s*this\\s*(\\,\\s*([^\\)]))?");
-pattern = Pattern.compile(patternBuilder.toString());
-matcher = pattern.matcher(source);
-if (matcher.find()) {
-StringBuilder replacement = new StringBuilder();
-replacement.append("super.").append(matcher.group(1)).append("(");
-if (matcher.group(2) != null) {
-replacement.append(matcher.group(3));
-}
-source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
-}
+    //clean all references to utility functions
+    source = source.replace(namespace + "." + utilityName + ".", "");
+    source = source.replaceAll("(?<!\\w)this\\.", "");
 
-return source;
-}
+    //reduce indent by 2
+    source = source.replaceAll("(?m)^  ", "");
 
-protected String updateConstructor(JsFunction function, JsFile jsFile, String source) {
-StringBuilder patternBuilder = new StringBuilder();
-patternBuilder.append(function.getJsClass().getNamespace())
-.append("\\.")
-.append(function.getJsClass().getName())
-.append("\\ \\=\\s*function");
+    //create default export
+    Set<String> names = new TreeSet<>();
+    m = Pattern.compile("export function (\\w+)").matcher(source);
+    while (m.find()) {
+      names.add(m.group(1));
+    }
+    source += workingCopy.getLineSeparator();
+    source += "export default {";
+    source += "\n";
+    source += names.stream().map(s -> "  " + s).collect(Collectors.joining(",\n"));
+    source += "\n";
+    source += "};";
 
-Pattern pattern = Pattern.compile(patternBuilder.toString());
-Matcher matcher = pattern.matcher(source);
-if (matcher.find()) {
-StringBuilder replacement = new StringBuilder();
-replacement.append("constructor");
-replacement.append(function.getName());
-source = matcher.replaceFirst(replacement.toString());
-}
-// super call
-if (function.getJsClass().getSuperCall() != null) {
-
-patternBuilder = new StringBuilder();
-patternBuilder.append(function.getJsClass().getNamespace())
-.append("\\.")
-.append(function.getJsClass().getName())
-.append("\\.parent\\.call\\(this(\\,\\s*[^\\)]+)?\\)\\;");
-pattern = Pattern.compile(patternBuilder.toString());
-matcher = pattern.matcher(source);
-if (matcher.find()) {
-StringBuilder replacement = new StringBuilder();
-replacement.append("super(");
-if (matcher.group(1) != null) {
-replacement.append(matcher.group(1).replace("$", "\\$"));
-}
-replacement.append(");");
-source = matcher.replaceFirst(replacement.toString());
-}
-}
-return source;
-}
-*/
+    workingCopy.setSource(source);
+  }
 }

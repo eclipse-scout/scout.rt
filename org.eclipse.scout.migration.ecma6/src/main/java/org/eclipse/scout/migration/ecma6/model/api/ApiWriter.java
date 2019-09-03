@@ -48,6 +48,8 @@ public class ApiWriter {
         .map(jsClass -> createClazz(jsClass, lib))
         .collect(Collectors.toList());
 
+    //FIXME imo: and where should i add the utility functions. The easiest way to add is in Task.process, there all info is freely available. At parse time it is not!
+
     if (includeLess) {
       LessApiParser lessApi = context.getLessApi();
       List<INamedElement> lessMixins = new ArrayList<>(lessApi.getMixins().values());
@@ -56,7 +58,7 @@ public class ApiWriter {
           .stream()
           .flatMap(entry -> entry.values().stream())
           .collect(Collectors.toList());
-      children.addAll(lessMixins);
+      children.addAll(lessMixins);//FIXME imo: is it safe to use addAll on a stream-created List? I thought that this will throw because of unmodifiableList
       children.addAll(lessVariables);
     }
     lib.setChildren(children);

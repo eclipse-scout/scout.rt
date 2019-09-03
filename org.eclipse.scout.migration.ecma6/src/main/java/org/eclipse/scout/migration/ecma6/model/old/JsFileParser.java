@@ -40,24 +40,6 @@ public class JsFileParser {
 
   /**
    * <pre>
-   * scout.strings = {
-   * AND:
-   * scout.HtmlEnvironment = {
-   * AND global enum:
-   * scout.KeyStrokeMode = {
-   * Groups:
-   *  1 indent (empty)
-   *  2 namespace = scope.class
-   *  3 field name (empty)
-   *  4 params (empty)
-   *  5 open bracket
-   *  6 closing bracket (opt)
-   * </pre>
-   */
-  private static Pattern START_UTILITY_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[^ .]+)()\\s*=\\s*()(\\{)\\s*(\\}\\;)?");
-
-  /**
-   * <pre>
    * scout.KeyStroke.Mode = {
    * Groups:
    *  1 indent
@@ -94,20 +76,6 @@ public class JsFileParser {
    * </pre>
    */
   private static Pattern START_STATIC_FUNCTION = Pattern.compile("^()([^ .]+\\.[^ .]+)\\.([^ .]+)\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
-
-  /**
-   * <pre>
-    * SPACE SPACE insertAt: function(text, insertText, position) {
-    * Groups:
-    *  1 indent (non-empty)
-    *  2 namespace = scope.class (empty)
-   *  3 field name
-    *  4 params
-    *  5 open bracket
-    *  6 closing bracket (opt)
-   * </pre>
-   */
-  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^(\\s*)()([a-z_][^ .]+)\\s*:\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\,?)?");
 
   /**
    * <pre>
@@ -177,12 +145,6 @@ public class JsFileParser {
           readEnum(matcher);
           continue;
         }
-        matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
-        if (matcher.find() && isUtilityConstructor(matcher)) {
-          readFunction(matcher, comment, true, false);
-          comment = null;
-          continue;
-        }
         matcher = START_FUNCTION.matcher(m_currentLine);
         if (matcher.find()) {
           readFunction(matcher, comment, false, false);
@@ -191,12 +153,6 @@ public class JsFileParser {
         }
         matcher = START_STATIC_FUNCTION.matcher(m_currentLine);
         if (matcher.find()) {
-          readFunction(matcher, comment, false, true);
-          comment = null;
-          continue;
-        }
-        matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
-        if (matcher.find() && isUtilityFunction(matcher)) {
           readFunction(matcher, comment, false, true);
           comment = null;
           continue;
@@ -226,7 +182,8 @@ public class JsFileParser {
     }
     // log
     if (jsClasses.size() == 0) {
-      LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
+      //FIXME imo why was that an error? the task T4900_CreateJQueryImports scans ALL *.js files regardless of class or not...
+      //LOG.info("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
     }
     else if (jsClasses.size() > 1) {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
