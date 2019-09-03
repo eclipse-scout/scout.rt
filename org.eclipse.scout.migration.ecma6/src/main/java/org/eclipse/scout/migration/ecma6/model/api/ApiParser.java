@@ -15,8 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -39,11 +42,12 @@ public class ApiParser {
 
   public Libraries parse() throws IOException {
     Libraries allLibs = new Libraries();
-    List<INamedElement> libs = new ArrayList<>();
     //noinspection resource
-    Files.list(m_directory)
-        .forEach(lib -> libs.add(parseLibrary(lib)));
-    allLibs.addChildren(libs);
+    allLibs.addChildren(Files.list(m_directory)
+        .map(libJson -> parseLibrary(libJson))
+      // do not include current migration source as library
+        .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttribute(INamedElement.LIBRARY_MODULE_NAME)))
+        .collect(Collectors.toList()));
     allLibs.ensureParents();
     return allLibs;
   }
