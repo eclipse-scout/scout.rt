@@ -1,12 +1,12 @@
 package org.eclipse.scout.migration.ecma6;
 
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class PathFilters {
   private static Path SRC_MAIN_JS = Paths.get("src/main/js");
@@ -50,7 +50,8 @@ public final class PathFilters {
   }
 
   public static Predicate<PathInfo> isUtility(){
-    return info -> info.getPath().getFileName().toString().matches("^[a-z]{1}.*$");
+    return info -> info.getPath().getFileName().toString().matches("^[a-z]{1}.*$")
+        && !info.getPath().getFileName().toString().equals("keys.js");
   }
 
 }

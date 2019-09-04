@@ -24,6 +24,7 @@ import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
+import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -35,10 +36,10 @@ import org.slf4j.LoggerFactory;
 public class Context {
   private static final Logger LOG = LoggerFactory.getLogger(Context.class);
 
-
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
+  private final Map<String /*fqn*/, JsTopLevelEnum> m_jsTopLevelEnums = new HashMap<>();
   private Libraries m_libraries;
   private INamedElement m_api;
   private LessApiParser m_lessApi;
@@ -117,7 +118,6 @@ public class Context {
     return m_jsClasses.get(fullyQualifiedName);
   }
 
-
   public Path relativeToModule(Path path) {
     Assertions.assertNotNull(Configuration.get().getSourceModuleDirectory());
     return path.relativize(Configuration.get().getSourceModuleDirectory());
@@ -175,8 +175,9 @@ public class Context {
         if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
           return FileVisitResult.CONTINUE;
         }
-        JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));
-        jsClasses.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
+        JsFile jsFile = ensureJsFile(ensureWorkingCopy(file));
+        jsFile.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
+        jsFile.getJsTopLevelEnums().forEach(jsEnum -> m_jsTopLevelEnums.put(jsEnum.getFqn(), jsEnum));
 
         return FileVisitResult.CONTINUE;
       }
@@ -185,5 +186,13 @@ public class Context {
 
   public Collection<JsClass> getAllJsClasses() {
     return Collections.unmodifiableCollection(m_jsClasses.values());
+  }
+
+  public Collection<JsTopLevelEnum> getAllTopLevelEnums() {
+    return Collections.unmodifiableCollection(m_jsTopLevelEnums.values());
+  }
+
+  public JsTopLevelEnum getJsTopLevelEnum(String fullyQualifiedName) {
+    return m_jsTopLevelEnums.get(fullyQualifiedName);
   }
 }

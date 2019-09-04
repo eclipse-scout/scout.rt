@@ -30,6 +30,7 @@ public interface INamedElement {
     StaticFunction,
     Function,
     Enum,
+    TopLevelEnum,
     Constant,
     LessMixin,
     LessVariable

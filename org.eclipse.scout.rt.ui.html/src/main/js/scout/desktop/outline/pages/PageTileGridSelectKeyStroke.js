@@ -41,7 +41,7 @@ scout.PageTileGridSelectKeyStroke.prototype._accept = function(event) {
     return false;
   }
 
-  var index = scout.codesToKeys[event.which] - 1;
+  var index = scout.keys.codesToKeys[event.which] - 1;
   var tiles = this._tiles();
 
   if (index < tiles.length && tiles[index].tileWidget instanceof scout.TileButton) {

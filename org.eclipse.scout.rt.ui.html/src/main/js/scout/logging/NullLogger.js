@@ -18,84 +18,96 @@
 scout.NullLogger = function() {
 };
 
-scout.NullLogger.prototype = {
-  trace: function() {
-    // NOP - don't log trace, we don't want to spam the browser console
-  },
-  debug: function() {
-    // NOP - don't log debug, we don't want to spam the browser console
-  },
-  info: function() {
-    this._log('info', scout.objects.argumentsToArray(arguments));
-  },
-  warn: function() {
-    this._log('warn', scout.objects.argumentsToArray(arguments));
-  },
-  error: function(logArgs) {
-    this._log('error', scout.objects.argumentsToArray(arguments));
-  },
-  fatal: function(logArgs) {
-    this._log('fatal', scout.objects.argumentsToArray(arguments));
-  },
-  isEnabledFor: function() {
-    return false;
-  },
-  isTraceEnabled: function() {
-    return false;
-  },
-  isDebugEnabled: function() {
-    return false;
-  },
-  isInfoEnabled: function() {
-    return false;
-  },
-  isWarnEnabled: function() {
-    return false;
-  },
-  isErrorEnabled: function() {
-    return false;
-  },
-  isFatalEnabled: function() {
-    return false;
-  },
-  _log: function(level, logArgs) {
-    // check if console is available
-    var myConsole = scout.objects.optProperty(window, 'console');
-    if (!myConsole) {
-      return;
-    }
+scout.NullLogger.prototype.trace = function() {
+  // NOP - don't log trace, we don't want to spam the browser console
+};
 
-    // map level to log function
-    var funcName;
-    if ('fatal' === level) {
-      funcName = 'error';
-    } else {
-      funcName = level;
-    }
+scout.NullLogger.prototype.debug = function() {
+  // NOP - don't log debug, we don't want to spam the browser console
+};
 
-    // check if log function exists on console
-    var logFunc = myConsole[funcName];
-    if (!logFunc) {
-      return;
-    }
+scout.NullLogger.prototype.info = function() {
+  this._log('info', scout.objects.argumentsToArray(arguments));
+};
 
-    // log the message
-    if (logArgs.length > 0) {
-      logArgs[0] = this._formatTime() + ' [' + level.toUpperCase() + '] ' + logArgs[0];
-    }
-    try {
-      logFunc.apply(myConsole, logArgs);
-    } catch (e) {
-      // NOP - this seems a bit paranoid, because we've already checked that the error function exists,
-      // but some restrictive security settings in Internet Explorer may cause an Error when the function
-      // is called. Our logger should not produce additional errors #249626.
-    }
-  },
-  _formatTime: function() {
-    var date = new Date();
-    return scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
-      scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
-      scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
-      scout.strings.padZeroLeft(date.getMilliseconds(), 3);
+scout.NullLogger.prototype.warn = function() {
+  this._log('warn', scout.objects.argumentsToArray(arguments));
+};
+
+scout.NullLogger.prototype.error = function(logArgs) {
+  this._log('error', scout.objects.argumentsToArray(arguments));
+};
+
+scout.NullLogger.prototype.fatal = function(logArgs) {
+  this._log('fatal', scout.objects.argumentsToArray(arguments));
+};
+
+scout.NullLogger.prototype.isEnabledFor = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isTraceEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isDebugEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isInfoEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isWarnEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isErrorEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype.isFatalEnabled = function() {
+  return false;
+};
+
+scout.NullLogger.prototype._log = function(level, logArgs) {
+  // check if console is available
+  var myConsole = scout.objects.optProperty(window, 'console');
+  if (!myConsole) {
+    return;
   }
+
+  // map level to log function
+  var funcName;
+  if ('fatal' === level) {
+    funcName = 'error';
+  } else {
+    funcName = level;
+  }
+
+  // check if log function exists on console
+  var logFunc = myConsole[funcName];
+  if (!logFunc) {
+    return;
+  }
+
+  // log the message
+  if (logArgs.length > 0) {
+    logArgs[0] = this._formatTime() + ' [' + level.toUpperCase() + '] ' + logArgs[0];
+  }
+  try {
+    logFunc.apply(myConsole, logArgs);
+  } catch (e) {
+    // NOP - this seems a bit paranoid, because we've already checked that the error function exists,
+    // but some restrictive security settings in Internet Explorer may cause an Error when the function
+    // is called. Our logger should not produce additional errors #249626.
+  }
+};
+
+scout.NullLogger.prototype._formatTime = function() {
+  var date = new Date();
+  return scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
+    scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
+    scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
+    scout.strings.padZeroLeft(date.getMilliseconds(), 3);
 };

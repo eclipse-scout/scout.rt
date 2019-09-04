@@ -1,7 +1,6 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
-
+//TODO imo: remove?
 public class AliasedJsClass {
 
   private final JsClass m_jsClass;

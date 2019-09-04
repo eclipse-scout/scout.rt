@@ -25,6 +25,7 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,7 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
     boolean result = matcher.find();
     if (result) {
       String filename = jsFile.getPath().getFileName().toString();
-      JsClass definingClass = context.getJsClass(element.getAncestor(ne -> ne.getType() == Type.Class).getFullyQualifiedName());
+      String fqn = element.getAncestor(ne -> ne.getType() == Type.Class || ne.getType() == Type.TopLevelEnum).getFullyQualifiedName();
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
@@ -99,8 +100,15 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
       }
       while (result);
       // create import
-      LOG.debug("[" + filename + "] Create import for '" + definingClass.getFullyQualifiedName() + "'.");
-      jsFile.getOrCreateImport(definingClass);
+      LOG.debug("[" + filename + "] Create import for '" + fqn + "'.");
+      JsTopLevelEnum definingEnum = context.getJsTopLevelEnum(fqn);
+      JsClass definingClass = context.getJsClass(fqn);
+      if (definingEnum != null) {
+        jsFile.getOrCreateImport(definingEnum.getName(), definingEnum.getJsFile().getPath(), true);
+      }
+      else {
+        jsFile.getOrCreateImport(definingClass);
+      }
 
       matcher.appendTail(sb);
       source = sb.toString();

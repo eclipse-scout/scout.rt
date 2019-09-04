@@ -8,7 +8,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-scout.keys = {
+export const keys = {
   BACKSPACE: 8,
   TAB: 9,
   ENTER: 13,
@@ -115,7 +115,7 @@ scout.keys = {
   ANGULAR_BRACKET: 226
 };
 
-scout.keys.codesToKeys = {
+export let codesToKeys = {
   8: 'Backspace',
   9: 'Tab',
   13: 'Enter',

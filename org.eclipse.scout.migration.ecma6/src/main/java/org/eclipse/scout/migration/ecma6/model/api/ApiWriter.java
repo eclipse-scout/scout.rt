@@ -25,6 +25,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
+import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,25 +44,30 @@ public class ApiWriter {
   public INamedElement createLibraryFromCurrentModule(String libName, Context context, boolean includeLess) {
     NamedElement lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
     lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
-    List<INamedElement> children = context.getAllJsClasses()
+
+    List<INamedElement> allElements = new ArrayList<>();
+    allElements.addAll(context
+        .getAllJsClasses()
         .stream()
         .map(jsClass -> createClazz(jsClass, lib))
-        .collect(Collectors.toList());
+        .collect(Collectors.toList()));
 
-    //FIXME imo: and where should i add the utility functions. The easiest way to add is in Task.process, there all info is freely available. At parse time it is not!
+    allElements.addAll(context
+        .getAllTopLevelEnums()
+        .stream()
+        .map(jsEnum -> createTopLevelEnum(jsEnum, lib))
+        .collect(Collectors.toList()));
 
     if (includeLess) {
       LessApiParser lessApi = context.getLessApi();
-      List<INamedElement> lessMixins = new ArrayList<>(lessApi.getMixins().values());
-      List<INamedElement> lessVariables = lessApi
+      allElements.addAll(lessApi.getMixins().values());
+      allElements.addAll(lessApi
           .getGlobalVariables().values()
           .stream()
           .flatMap(entry -> entry.values().stream())
-          .collect(Collectors.toList());
-      children.addAll(lessMixins);//FIXME imo: is it safe to use addAll on a stream-created List? I thought that this will throw because of unmodifiableList
-      children.addAll(lessVariables);
+          .collect(Collectors.toList()));
     }
-    lib.setChildren(children);
+    lib.setChildren(allElements);
     return lib;
   }
 
@@ -112,5 +118,9 @@ public class ApiWriter {
 
   private INamedElement createEnum(JsEnum en, NamedElement cz) {
     return new NamedElement(Type.Enum, en.getName(), cz);
+  }
+
+  private INamedElement createTopLevelEnum(JsTopLevelEnum en, INamedElement lib) {
+    return new NamedElement(Type.TopLevelEnum, en.getName(), lib);
   }
 }

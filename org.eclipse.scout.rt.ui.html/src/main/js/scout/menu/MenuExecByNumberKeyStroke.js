@@ -27,7 +27,7 @@ scout.MenuExecByNumberKeyStroke.prototype._accept = function(event) {
   }
 
   var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-  var index = scout.codesToKeys[event.which];
+  var index = scout.keys.codesToKeys[event.which];
   event.$menuItem = menuItems.$allVisible.eq(index - 1);
   if (event.$menuItem.length > 0) {
     return true;

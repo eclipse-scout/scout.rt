@@ -67,6 +67,19 @@ public class JsFileParser {
 
   /**
    * <pre>
+   * scout.TreeVisitResult = {
+   * Groups:
+   *  1 indent (empty)
+   *  2 namespace = scope
+   *  3 field name
+   *  4 open bracket
+   *  5 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_TOP_LEVEL_ENUM = Pattern.compile("^()([^ .]+)\\.([^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
     * Groups:
     *  1 indent (empty)
    *  2 namespace = scope.class
@@ -174,6 +187,11 @@ public class JsFileParser {
           readEnum(matcher);
           continue;
         }
+        matcher = START_TOP_LEVEL_ENUM.matcher(m_currentLine);
+        if (matcher.find() && isTopLevelEnum(matcher)) {
+          readTopLevelEnum(matcher);
+          continue;
+        }
         matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
         if (matcher.find() && isUtilityConstructor(matcher)) {
           readUtilityFunction(matcher, comment, true);
@@ -221,13 +239,16 @@ public class JsFileParser {
     if (jsClasses.size() == 1) {
       jsClasses.get(0).setDefault(true);
     }
+    List<JsTopLevelEnum> jsTopLevelEnums = m_jsFile.getJsTopLevelEnums();
     // log
-    if (jsClasses.size() == 0) {
-      //FIXME imo why was that an error? the task T4900_CreateJQueryImports scans ALL *.js files regardless of class or not...
-      //LOG.info("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
+    if (jsClasses.size() == 0 && jsTopLevelEnums.size() == 0) {
+      LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
     }
     else if (jsClasses.size() > 1) {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
+    }
+    else if (jsTopLevelEnums.size() > 1) {
+      LOG.warn("More than 1 top level enum found in file '" + m_jsFile.getPath().getFileName() + "'. Every top level enum should be defined in its own file.");
     }
     return m_jsFile;
   }
@@ -390,6 +411,49 @@ public class JsFileParser {
     jsEnum.setEndOffset(m_offsetStartLine + m_currentLine.length());
 
     clazz.addEnum(jsEnum);
+    return jsEnum;
+  }
+
+  private boolean isTopLevelEnum(Matcher matcher) {
+    switch (m_jsFile.getPath().getFileName().toString()) {
+      case "TreeVisitResult.js":
+      case "LayoutConstants.js":
+      case "keys.js":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  protected JsTopLevelEnum readTopLevelEnum(Matcher matcher) throws IOException {
+    String indent = "";
+    JsTopLevelEnum jsEnum = new JsTopLevelEnum(matcher.group(2), matcher.group(3), m_jsFile);
+    jsEnum.setStartOffset(m_offsetStartLine);
+    StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
+    if (StringUtility.hasText(matcher.group(5))) {
+      // take care dynamic values can not be implemented as cons
+      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber);
+      jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand.");
+      m_jsFile.addJsTopLevelEnum(jsEnum);
+      nextLine();
+      return jsEnum;
+    }
+    nextLine();
+    while (m_currentLine != null) {
+      Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
+      if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
+        bodyBuilder.append("}");
+        break;
+      }
+      bodyBuilder.append(m_currentLine);
+      if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
+        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+      }
+      nextLine();
+    }
+    jsEnum.setBody(bodyBuilder.toString());
+    jsEnum.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    m_jsFile.addJsTopLevelEnum(jsEnum);
     return jsEnum;
   }
 

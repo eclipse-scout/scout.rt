@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,8 @@ import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
-import org.eclipse.scout.migration.ecma6.model.references.JsImport;
 import org.eclipse.scout.migration.ecma6.model.references.AliasedMember;
+import org.eclipse.scout.migration.ecma6.model.references.JsImport;
 import org.eclipse.scout.migration.ecma6.model.references.UnresolvedImport;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
@@ -26,8 +27,9 @@ public class JsFile extends AbstractJsElement {
 
   private final Path m_path;
   private JsCommentBlock m_copyRight;
-  private List<JsClass> m_jsClasses = new ArrayList<>();
-  private HashMap<String /*module name*/, JsImport> m_imports = new HashMap<>();
+  private final List<JsClass> m_jsClasses = new ArrayList<>();
+  private final List<JsTopLevelEnum> m_jsTopLevelEnums = new ArrayList<>();
+  private final Map<String /*module name*/, JsImport> m_imports = new HashMap<>();
 
   public JsFile(Path path) {
     Assertions.assertNotNull(path);
@@ -84,6 +86,14 @@ public class JsFile extends AbstractJsElement {
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;
+  }
+
+  public void addJsTopLevelEnum(JsTopLevelEnum jsEnum) {
+    m_jsTopLevelEnums.add(jsEnum);
+  }
+
+  public List<JsTopLevelEnum> getJsTopLevelEnums() {
+    return Collections.unmodifiableList(m_jsTopLevelEnums);
   }
 
   /**

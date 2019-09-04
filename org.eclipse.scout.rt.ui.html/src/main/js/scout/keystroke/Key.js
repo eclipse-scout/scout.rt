@@ -40,7 +40,7 @@ scout.Key.prototype.toKeyStrokeString = function() {
   if (this.shift) {
     keyStroke += 'Shift-';
   }
-  var key = scout.codesToKeys[this.which];
+  var key = scout.keys.codesToKeys[this.which];
   if (key === undefined) {
     key = this.which;
   }
