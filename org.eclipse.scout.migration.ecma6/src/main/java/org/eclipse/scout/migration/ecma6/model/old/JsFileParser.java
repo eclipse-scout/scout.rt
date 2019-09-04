@@ -29,7 +29,7 @@ public class JsFileParser {
     * scout.Device = function(model) {
     * Groups:
     *  1 indent (empty)
-   *  2 namespace = scope.class
+   *  2 namespace = scope.Device
    *  3 field name (empty)
     *  4 params
     *  5 open bracket
@@ -37,6 +37,20 @@ public class JsFileParser {
    * </pre>
    */
   private static Pattern START_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[^ .]+)()\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+   * scout.strings = {
+   * Groups:
+   *  1 indent (empty)
+   *  2 namespace = scope.class
+   *  3 field name (empty)
+   *  4 params (empty)
+   *  5 open bracket
+   *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_UTILITY_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[a-z][^ .]+)()\\s*=\\s*()(\\{)\\s*(\\}\\;)?");
 
   /**
    * <pre>
@@ -79,6 +93,20 @@ public class JsFileParser {
 
   /**
    * <pre>
+    * SPACE SPACE insertAt: function(text, insertText, position) {
+    * Groups:
+    *  1 indent (non-empty)
+    *  2 namespace = scope.class (empty)
+   *  3 field name
+    *  4 params
+    *  5 open bracket
+    *  6 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^(\\s*)()([_a-z][^ .]+)\\s*:\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\,?)?");
+
+  /**
+   * <pre>
    * Groups:
    *  1 namespace = scope.class
    *  2 field name
@@ -106,6 +134,7 @@ public class JsFileParser {
   private int m_currentLineNumber = 0;
   private int m_offsetStartLine = 0;
   private final String m_lineSeparator;
+  private String m_utilityFunctionNamespace;
 
   public JsFileParser(WorkingCopy workingCopy) {
     m_workingCopy = workingCopy;
@@ -122,7 +151,7 @@ public class JsFileParser {
       JsCommentBlock comment = null;
       while (m_currentLine != null) {
 
-        if(m_currentLineNumber == 1) {
+        if (m_currentLineNumber == 1) {
           matcher = START_COPY_RIGHT.matcher(m_currentLine);
           if (matcher.find()) {
             readCopyRight();
@@ -145,6 +174,12 @@ public class JsFileParser {
           readEnum(matcher);
           continue;
         }
+        matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
+        if (matcher.find() && isUtilityConstructor(matcher)) {
+          readUtilityFunction(matcher, comment, true);
+          comment = null;
+          continue;
+        }
         matcher = START_FUNCTION.matcher(m_currentLine);
         if (matcher.find()) {
           readFunction(matcher, comment, false, false);
@@ -154,6 +189,12 @@ public class JsFileParser {
         matcher = START_STATIC_FUNCTION.matcher(m_currentLine);
         if (matcher.find()) {
           readFunction(matcher, comment, false, true);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
+        if (matcher.find() && isUtilityFunction(matcher)) {
+          readUtilityFunction(matcher, comment, false);
           comment = null;
           continue;
         }
@@ -189,28 +230,6 @@ public class JsFileParser {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
     }
     return m_jsFile;
-  }
-
-  @Exemption
-  protected boolean isUtilityConstructor(Matcher matcher) {
-    //scout.strings
-    /*
-    if (matcher.group(2).matches("[^.]+\\.[a-z].*")) {
-      return true;
-    }
-    //scout.HtmlEnvironment
-    if (matcher.group(2).equals("scout.HtmlEnvironment")) {
-      //FIXME imo add todo
-      return true;
-    }
-    */
-    return false;
-  }
-
-  @Exemption
-  protected boolean isUtilityFunction(Matcher matcher) {
-    //FIXME imo add todo
-    return false;
   }
 
   private void readCopyRight() throws IOException {
@@ -299,6 +318,44 @@ public class JsFileParser {
     function.setEndOffset(m_offsetStartLine + m_currentLine.length());
 
     clazz.addFunction(function);
+    return function;
+  }
+
+  @Exemption
+  private boolean isUtilityConstructor(Matcher matcher) {
+    return true;
+  }
+
+  @Exemption
+  private boolean isUtilityFunction(Matcher matcher) {
+    return true;
+  }
+
+  private JsFunction readUtilityFunction(Matcher matcher, JsCommentBlock comment, boolean constructor) throws IOException {
+    String namespace = matcher.group(2);
+    if (constructor) {
+      m_utilityFunctionNamespace = namespace;
+    }
+    else if (m_utilityFunctionNamespace == null) {
+      LOG.warn("wrong utility-style function detected. {}: {}", m_workingCopy.getPath(), matcher.group(3));
+      nextLine();
+      return null;
+    }
+    else {
+      namespace = m_utilityFunctionNamespace;
+    }
+    String indent = matcher.group(1);
+    JsClass clazz = m_jsFile.getLastOrAppend(namespace);
+    JsFunction function = new JsFunction(clazz, matcher.group(3));
+    function.setComment(comment);
+    function.setStartOffset(m_offsetStartLine);
+    function.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    function.setConstructor(constructor);
+    function.setStatic(true);
+    function.setArgs(matcher.group(4));
+    function.setBody("{}");
+    clazz.addFunction(function);
+    nextLine();
     return function;
   }
 

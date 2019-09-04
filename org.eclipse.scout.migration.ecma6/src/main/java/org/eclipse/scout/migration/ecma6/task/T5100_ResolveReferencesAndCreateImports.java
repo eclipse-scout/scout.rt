@@ -93,7 +93,7 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
-        matcher.appendReplacement(sb, "TODO:" + replacement);
+        matcher.appendReplacement(sb, replacement);
         LOG.debug("Reference replacement[" + filename + "]: '" + matcher.group() + "' -> '" + replacement + "'");
         result = matcher.find();
       }

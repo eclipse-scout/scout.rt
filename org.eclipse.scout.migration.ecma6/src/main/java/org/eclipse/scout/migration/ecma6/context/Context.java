@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.FileUtility;
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
@@ -174,9 +173,6 @@ public class Context {
         }
         PathInfo info = new PathInfo(file);
         if (BEANS.all(IMigrationExcludePathFilter.class).stream().anyMatch(filter -> filter.test(info))) {
-          return FileVisitResult.CONTINUE;
-        }
-        if (PathFilters.isUtility().test(info)) {
           return FileVisitResult.CONTINUE;
         }
         JsFile jsClasses = ensureJsFile(ensureWorkingCopy(file));

@@ -11,19 +11,15 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
-import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
@@ -63,14 +59,14 @@ public class T5000_ReplaceLocalReferences extends AbstractTask {
     JsClass jsClass = jsClasses.get(0);
     String source = workingCopy.getSource();
     for (JsConstant constant : jsClass.getConstants()) {
-      String pattern = Pattern.quote(constant.getFqn())+"([^a-zA-Z0-9]{1})";
-      String replacement = constant.getName()+"$1";
-      source = replaceReferences1(pattern,replacement,source,pathInfo.getPath().getFileName().toString());
+      String pattern = Pattern.quote(constant.getFqn()) + "([^a-zA-Z0-9]{1})";
+      String replacement = constant.getName() + "$1";
+      source = replaceReferences1(pattern, replacement, source, pathInfo.getPath().getFileName().toString());
     }
     for (JsEnum jsEnum : jsClass.getEnums()) {
-      String pattern = Pattern.quote(jsEnum.getFqn())+"([^a-zA-Z0-9]{1})";
-      String replacement = jsEnum.getName()+"$1";
-      source = replaceReferences1(pattern,replacement,source,pathInfo.getPath().getFileName().toString());
+      String pattern = Pattern.quote(jsEnum.getFqn()) + "([^a-zA-Z0-9]{1})";
+      String replacement = jsEnum.getName() + "$1";
+      source = replaceReferences1(pattern, replacement, source, pathInfo.getPath().getFileName().toString());
     }
     workingCopy.setSource(source);
   }
@@ -82,8 +78,8 @@ public class T5000_ReplaceLocalReferences extends AbstractTask {
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
-        matcher.appendReplacement(sb, "TODO:" + replacement);
-        LOG.debug("Local reference replacement["+fileName+"]: '" + matcher.group() + "' -> '" + replacement + "'");
+        matcher.appendReplacement(sb, replacement);
+        LOG.debug("Local reference replacement[" + fileName + "]: '" + matcher.group() + "' -> '" + replacement + "'");
         result = matcher.find();
       }
       while (result);

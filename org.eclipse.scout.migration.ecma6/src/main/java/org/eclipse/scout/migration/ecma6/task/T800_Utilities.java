@@ -100,7 +100,7 @@ public class T800_Utilities extends AbstractTask {
     //change state variables
     source = source.replaceAll("(?m)^[ ]*([_\\w]+)\\s*:\\s*([^,]+),?$", "let $1 = $2;");
 
-    //clean all references to utility functions
+    //clean all references to local utility functions
     source = source.replace(namespace + "." + utilityName + ".", "");
     source = source.replaceAll("(?<!\\w)this\\.", "");
 
