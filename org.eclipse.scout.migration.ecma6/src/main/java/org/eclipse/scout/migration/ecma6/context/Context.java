@@ -93,17 +93,17 @@ public class Context {
   }
 
   public WorkingCopy newFile(Path file) {
-    WorkingCopy wc = createWorkingCopy(file, "\n");
+    WorkingCopy wc = createWorkingCopy(file);
     wc.setSource("");
     return wc;
   }
 
   public WorkingCopy ensureWorkingCopy(Path file) {
-    return createWorkingCopy(file, FileUtility.lineSeparator(file));
+    return createWorkingCopy(file);
   }
 
-  protected WorkingCopy createWorkingCopy(Path file, String nl) {
-    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p, nl));
+  protected WorkingCopy createWorkingCopy(Path file) {
+    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p));
   }
 
   public Collection<WorkingCopy> getWorkingCopies() {

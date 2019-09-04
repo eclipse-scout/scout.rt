@@ -5,6 +5,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -12,15 +13,15 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 public class WorkingCopy {
 
   private final Path m_path;
-  private final String m_lineSeparator;
+  private String m_lineSeparator;
   private Path m_relativeTargetPath;
   private String m_initialSource;
   private String m_source;
   private boolean m_deleted;
 
-  public WorkingCopy(Path path, String lineSeparator) {
+
+  public WorkingCopy(Path path) {
     m_path = path;
-    m_lineSeparator = lineSeparator;
   }
 
   public Path getPath() {
@@ -28,6 +29,13 @@ public class WorkingCopy {
   }
 
   public String getLineSeparator() {
+    if(m_lineSeparator == null){
+      if(getPath() != null && Files.exists(getPath())){
+        m_lineSeparator =     FileUtility.lineSeparator(getPath());
+      }else {
+        m_lineSeparator = "\n";
+      }
+    }
     return m_lineSeparator;
   }
 
@@ -82,6 +90,20 @@ public class WorkingCopy {
 
   public void setDeleted(boolean deleted) {
     m_deleted = deleted;
+  }
+
+  public void storeSource()  {
+    if(isDirty()){
+      try {
+        Files.write(getPath(), getSource().getBytes());
+      }
+      catch (IOException e) {
+        throw new ProcessingException("could not write working copy '"+toString()+"'.",e);
+      }
+    }
+    // undirty
+    m_source = null;
+    m_initialSource = null;
   }
 
   public void persist(Path destination) throws IOException {

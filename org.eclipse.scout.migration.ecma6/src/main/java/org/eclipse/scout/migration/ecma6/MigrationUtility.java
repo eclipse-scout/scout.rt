@@ -2,6 +2,7 @@ package org.eclipse.scout.migration.ecma6;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -62,5 +63,12 @@ public final class MigrationUtility {
     retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
     retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
     return retVal;
+  }
+
+  public static boolean waitForUserConfirmation(){
+    Scanner inScanner = new Scanner(System.in);  // Create a Scanner object
+    System.out.println("Type 'yes' or 'y' to continue, 'no' or 'n' to aboard.");
+    String answer = inScanner.nextLine();  // Read user input
+    return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
 }

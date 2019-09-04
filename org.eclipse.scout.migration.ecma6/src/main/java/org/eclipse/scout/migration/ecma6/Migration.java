@@ -120,14 +120,16 @@ public class Migration {
         .forEach(task -> task.process(info, context));
   }
 
-  private void writeFiles() throws IOException {
-    if (Configuration.get().cleanTargetBeforeWriteFiles()) {
-      try {
-        FileUtility.deleteDirectory(Configuration.get().getTargetModuleDirectory());
+  protected void writeFiles() throws IOException {
+    cleanTarget();
+    if(Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())){
+      // write dirty working copies first
+      writeDirtyWorkingCopies();
+      // wait for user input (used to keep git history, commit in
+      if(!MigrationUtility.waitForUserConfirmation()){
+        return;
       }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
+
     }
 
     final Path targetModule = Configuration.get().getTargetModuleDirectory();
@@ -158,20 +160,44 @@ public class Migration {
     allWorkingCopies.forEach(this::writeWorkingCopy);
   }
 
+  protected void writeDirtyWorkingCopies() {
+    m_context.getWorkingCopies().stream().filter(wc -> wc.isDirty()).forEach(wc -> wc.storeSource());
+  }
+
+  protected void cleanTarget() {
+    if (Configuration.get().cleanTargetBeforeWriteFiles()) {
+      if(Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())){
+        LOG.warn("Configuration 'cleanTargetBeforeWriteFiles' is ignored if source and target directory are same.");
+        return;
+      }
+      try {
+        FileUtility.deleteDirectory(Configuration.get().getTargetModuleDirectory());
+      }
+      catch (IOException e) {
+        throw new ProcessingException("Could not delete target directory!",e);
+      }
+    }
+
+  }
+
   private void writeWorkingCopy(WorkingCopy workingCopy) {
     final Path sourceModule = Configuration.get().getSourceModuleDirectory();
     final Path targetModule = Configuration.get().getTargetModuleDirectory();
+    final Path relativeSourcePath = sourceModule.relativize(workingCopy.getPath());
+    final Path relativeTargetPath;
     try {
 
       final Path destination;
       if (workingCopy.getRelativeTargetPath() != null) {
-        destination = targetModule.resolve(workingCopy.getRelativeTargetPath());
+        relativeTargetPath = workingCopy.getRelativeTargetPath();
       }
       else {
-        Path relativePath = sourceModule.relativize(workingCopy.getPath());
-        destination = targetModule.resolve(relativePath);
+        relativeTargetPath = relativeSourcePath;
       }
-      workingCopy.persist(destination);
+      workingCopy.persist(targetModule.resolve(relativeTargetPath));
+      if(sourceModule.equals(targetModule) && relativeTargetPath != relativeSourcePath){
+        Files.delete(workingCopy.getPath());
+      }
     }
     catch (IOException e) {
       e.printStackTrace();

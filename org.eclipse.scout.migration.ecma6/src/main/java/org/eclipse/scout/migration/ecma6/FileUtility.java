@@ -80,6 +80,9 @@ public final class FileUtility {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        if(!filter.test(file)){
+          return FileVisitResult.CONTINUE;
+        }
         Path rel = srcDir.relativize(file);
         Path target = targetDir.resolve(rel);
         Files.move(file, target);
