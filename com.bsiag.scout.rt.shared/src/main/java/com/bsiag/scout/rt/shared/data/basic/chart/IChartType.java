@@ -25,11 +25,14 @@ public interface IChartType {
   int VENN = 9;
   int DONUT = 10;
 
+  int SPEEDO_GREEN_AREA_POSITION_LEFT = 1;
+  int SPEEDO_GREEN_AREA_POSITION_CENTER = 2;
+  int SPEEDO_GREEN_AREA_POSITION_RIGHT = 3;
+
   /**
-   * PossibleValues see SpeedoChartRenderer.js:<br/>
-   * scout.SpeedoChartRenderer.GREEN_AREA_POSITION_LEFT = 1;<br/>
-   * scout.SpeedoChartRenderer.GREEN_AREA_POSITION_CENTER = 2;<br/>
-   * scout.SpeedoChartRenderer.GREEN_AREA_POSITION_RIGHT = 3;<br/>
+   * Possible values see <code>SPEEDO_GREEN_AREA_*</code> constants.
+   *
+   * @see SpeedoChartRenderer.js
    */
   String PROP_SPEEDO_CHART_GREEN_AREA_POSITION = "greenAreaPosition";
 

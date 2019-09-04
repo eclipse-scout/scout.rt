@@ -160,12 +160,6 @@ public abstract class AbstractChart extends AbstractWidget implements IChart, IE
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
-  @Order(40)
-  protected boolean getConfiguredModelHandelsClick() {
-    return false;
-  }
-
-  @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(50)
   protected boolean getConfiguredClickable() {
     return false;
