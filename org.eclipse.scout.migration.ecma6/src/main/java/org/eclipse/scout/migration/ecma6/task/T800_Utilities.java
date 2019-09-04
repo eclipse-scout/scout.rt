@@ -100,23 +100,40 @@ public class T800_Utilities extends AbstractTask {
     //change state variables
     source = source.replaceAll("(?m)^[ ]*([_\\w]+)\\s*:\\s*([^,]+),?$", "let $1 = $2;");
 
+    //references to state variables
+    Set<String> stateVarNames = new TreeSet<>();
+    m = Pattern.compile("(?m)^let ([_\\w]+)").matcher(source);
+    while (m.find()) {
+      stateVarNames.add(m.group(1));
+    }
+    for (String name : stateVarNames) {
+      source = source.replace(namespace + "." + utilityName + "." + name, name);
+    }
+
     //clean all references to local utility functions
-    source = source.replace(namespace + "." + utilityName + ".", "");
+    Set<String> allNames = new TreeSet<>();
+    m = Pattern.compile("function (\\w+)(?!\\w)").matcher(source);
+    while (m.find()) {
+      allNames.add(m.group(1));
+    }
     source = source.replaceAll("(?<!\\w)this\\.", "");
+    for (String name : allNames) {
+      source = source.replace(namespace + "." + utilityName + "." + name, name);
+    }
 
     //reduce indent by 2
     source = source.replaceAll("(?m)^  ", "");
 
     //create default export
-    Set<String> names = new TreeSet<>();
-    m = Pattern.compile("export function (\\w+)").matcher(source);
+    Set<String> exportedNames = new TreeSet<>();
+    m = Pattern.compile("export function (\\w+)(?!\\w)").matcher(source);
     while (m.find()) {
-      names.add(m.group(1));
+      exportedNames.add(m.group(1));
     }
     source += workingCopy.getLineSeparator();
     source += "export default {";
     source += "\n";
-    source += names.stream().map(s -> "  " + s).collect(Collectors.joining(",\n"));
+    source += exportedNames.stream().map(s -> "  " + s).collect(Collectors.joining(",\n"));
     source += "\n";
     source += "};";
 
