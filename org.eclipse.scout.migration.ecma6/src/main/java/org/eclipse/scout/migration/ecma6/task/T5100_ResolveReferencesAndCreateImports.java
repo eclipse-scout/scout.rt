@@ -61,15 +61,15 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
     List<? extends INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
 
     for (INamedElement function : staticFunctions) {
-      source = createImportForReferences(function, Pattern.quote(function.getFullyQualifiedName()), function.getParent().getName() + "." + function.getName(), source, jsFile, context);
+      source = createImportForReferences(function, Pattern.quote(function.getFullyQualifiedName())+"([^\\']{1})", function.getParent().getName() + "." + function.getName()+"$1", source, jsFile, context);
     }
 
     for (INamedElement constant : constants) {
-      source = createImportForReferences(constant, Pattern.quote(constant.getFullyQualifiedName()), constant.getParent().getName() + "." + constant.getName(), source, jsFile, context);
+      source = createImportForReferences(constant, Pattern.quote(constant.getFullyQualifiedName())+"([^\\']{1})", constant.getParent().getName() + "." + constant.getName()+"$1", source, jsFile, context);
     }
 
     for (INamedElement anEnum : enums) {
-      source = createImportForReferences(anEnum, Pattern.quote(anEnum.getFullyQualifiedName()), anEnum.getParent().getName() + "." + anEnum.getName(), source, jsFile, context);
+      source = createImportForReferences(anEnum, Pattern.quote(anEnum.getFullyQualifiedName())+"([^\\']{1})", anEnum.getParent().getName() + "." + anEnum.getName()+"$1", source, jsFile, context);
     }
     // constructor must be last in order to not replace static calls with constructor prefix
     for (INamedElement constructor : constructors) {

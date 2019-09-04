@@ -70,13 +70,7 @@ public class T700_JsConstants extends AbstractTask {
         replacement.append(matcher.group());
       }
       else {
-        replacement.append("export");
-        if (hasOtherAssignments(source, constant, matcher.start(2), matcher.end(2), matcher.group(3))) {
-          replacement.append(" let");
-        }
-        else {
-          replacement.append(" const");
-        }
+        replacement.append("static");
         replacement.append(" ").append(constant.getName())
             .append(matcher.group(3).replace("\\", "\\\\").replace("$", "\\$"));
 

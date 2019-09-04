@@ -30,6 +30,7 @@ public class JsFile extends AbstractJsElement {
   private final List<JsClass> m_jsClasses = new ArrayList<>();
   private final List<JsTopLevelEnum> m_jsTopLevelEnums = new ArrayList<>();
   private final Map<String /*module name*/, JsImport> m_imports = new HashMap<>();
+  private List<JsAppListener> m_appListeners = new ArrayList<>();
 
   public JsFile(Path path) {
     Assertions.assertNotNull(path);
@@ -56,6 +57,12 @@ public class JsFile extends AbstractJsElement {
     return Collections.unmodifiableList(m_jsClasses);
   }
 
+
+
+  public JsClass firstJsClass() {
+    return m_jsClasses.stream().findFirst().orElse(null);
+  }
+
   public JsClass getJsClass(String fqn) {
     return m_jsClasses.stream()
         .filter(cz -> cz.getFullyQualifiedName().equalsIgnoreCase(fqn))
@@ -67,7 +74,7 @@ public class JsFile extends AbstractJsElement {
   }
 
   public JsClass getLastOrAppend(String fqn) {
-    JsClass jsClass, lastJsClass ;
+    JsClass jsClass, lastJsClass;
     if (m_jsClasses.isEmpty()) {
       Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
       jsClass = new JsClass(fqn, this);
@@ -96,29 +103,35 @@ public class JsFile extends AbstractJsElement {
     return Collections.unmodifiableList(m_jsTopLevelEnums);
   }
 
+  public List<JsAppListener> getAppListeners(){
+    return Collections.unmodifiableList(m_appListeners);
+  }
+  public void addAppListener(JsAppListener appListener){
+    m_appListeners.add(appListener);
+  }
   /**
-   *
-   * @param fullyQualifiedName e.g. scout.FormField
+   * @param fullyQualifiedName
+   *          e.g. scout.FormField
    * @return
    */
-  public AliasedMember getOrCreateImport(String fullyQualifiedName, Context context){
+  public AliasedMember getOrCreateImport(String fullyQualifiedName, Context context) {
     // if already unresolved return
-    JsImport imp =  m_imports.get(fullyQualifiedName);
-    if(imp != null){
+    JsImport imp = m_imports.get(fullyQualifiedName);
+    if (imp != null) {
       return imp.getDefaultMember();
     }
     // try to find JsClass
     JsClass clazz = context.getJsClass(fullyQualifiedName);
-    if(clazz != null){
+    if (clazz != null) {
       return getOrCreateImport(clazz);
     }
     // try to find in libraries
     INamedElement element = context.getLibraries().getElement(fullyQualifiedName);
-    if(element == null){
-      LOG.error("Could not resolve import for '"+fullyQualifiedName+"'. Probably a library is missing.");
+    if (element == null) {
+      LOG.error("Could not resolve import for '" + fullyQualifiedName + "'. Probably a library is missing.");
       imp = new UnresolvedImport(fullyQualifiedName);
       imp.withDefaultMember(new AliasedMember(MigrationUtility.parseMemberName(fullyQualifiedName)));
-      m_imports.put(fullyQualifiedName, imp);
+      addImport(imp);
       return imp.getDefaultMember();
     }
     return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getCustomAttribute(INamedElement.LIBRARY_MODULE_NAME), MigrationUtility.parseMemberName(fullyQualifiedName), false);
@@ -126,41 +139,40 @@ public class JsFile extends AbstractJsElement {
   }
 
   public AliasedMember getOrCreateImport(JsClass jsClass) {
-    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(),jsClass.isDefault());
+    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), jsClass.isDefault());
   }
 
-  public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible){
+  public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible) {
     Assertions.assertNotNull(fileToImport);
     Assertions.assertNotNull(memberName);
-    String moduleName = JsImport.computeRelativePath(this.getPath().getParent(),fileToImport);
-    return getOrCreateImport(moduleName,memberName,defaultIfPossible);
+    String moduleName = JsImport.computeRelativePath(this.getPath().getParent(), fileToImport);
+    return getOrCreateImport(moduleName, memberName, defaultIfPossible);
   }
-
-
 
   protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean defaultIfPossible) {
     JsImport libImport = m_imports.get(moduleName);
     if (libImport == null) {
       libImport = new JsImport(moduleName);
-      m_imports.put(moduleName, libImport);
+      addImport(libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
     if (aliasedMember == null) {
       aliasedMember = ensureUniqueAlias(new AliasedMember(memberName), 1);
-      if(defaultIfPossible && libImport.getDefaultMember() == null){
+      if (defaultIfPossible && libImport.getDefaultMember() == null) {
         libImport.setDefaultMember(aliasedMember);
-      }else{
-      libImport.addMember(aliasedMember);
+      }
+      else {
+        libImport.addMember(aliasedMember);
       }
     }
     return aliasedMember;
   }
 
-  public JsImport getImport(String moduleName){
+  public JsImport getImport(String moduleName) {
     return m_imports.get(moduleName);
   }
 
-  public void addImport(JsImport jsImport                        ){
+  public void addImport(JsImport jsImport) {
     m_imports.put(jsImport.getModuleName(), jsImport);
   }
 
@@ -168,12 +180,10 @@ public class JsFile extends AbstractJsElement {
     String alias = Optional.ofNullable(member.getAlias()).orElse(member.getName());
     if (getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias))) {
       member.setAlias(member.getName() + "_" + index);
-      return ensureUniqueAlias(member, index+1);
+      return ensureUniqueAlias(member, index + 1);
     }
     return member;
   }
-
-
 
   public Collection<JsImport> getImports() {
     return Collections.unmodifiableCollection(m_imports.values());
@@ -188,7 +198,8 @@ public class JsFile extends AbstractJsElement {
     StringBuilder builder = new StringBuilder();
     builder.append(indent).append(getPath().getFileName())
         .append(" [hasCopyRight:").append(getCopyRight() != null).append("]").append(System.lineSeparator())
-        .append(m_jsClasses.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
+        .append(m_jsClasses.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())))
+      .append(m_appListeners.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
     return builder.toString();
   }
 }

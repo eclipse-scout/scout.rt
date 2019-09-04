@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -131,6 +132,16 @@ public class JsFileParser {
 
   /**
    * <pre>
+   * Groups:
+   *  none
+   * </pre>
+   */
+  private static Pattern START_APP_LISTENER = Pattern.compile("^"+Pattern.quote("scout.addAppListener('")+"(bootstrap|prepare)"+Pattern.quote("', function() {")+"$");
+
+  private static Pattern END_APP_LISTENER = Pattern.compile("\\}\\)\\;");
+
+  /**
+   * <pre>
     * Groups:
     * 1 indent
     * 2 termination character ';' or ','
@@ -225,6 +236,11 @@ public class JsFileParser {
         if (matcher.find()) {
           JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
           clazz.setSuperCall(readSuperCall(matcher));
+          continue;
+        }
+        matcher = START_APP_LISTENER.matcher(m_currentLine);
+        if(matcher.find()){
+          readAppListener();
           continue;
         }
         nextLine();
@@ -465,6 +481,45 @@ public class JsFileParser {
     nextLine();
     clazz.addConstant(constant);
     return constant;
+
+  }
+
+  protected JsAppListener readAppListener() throws IOException {
+    JsAppListener appListener = new JsAppListener(m_jsFile);
+    appListener.setStartOffset(m_offsetStartLine);
+    StringBuilder functionBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
+    Pattern namePattern = Pattern.compile("("+Configuration.get().getNamespace()+"\\.[^ \\=]*)\\s*\\=\\s*scout\\.create\\(");
+
+    nextLine();
+    while (m_currentLine != null) {
+      Matcher endMatcher = END_APP_LISTENER.matcher(m_currentLine);
+      if (endMatcher.matches()) {
+        functionBody.append(m_currentLine);
+        break;
+      }
+      Matcher nameMatcher = namePattern.matcher(m_currentLine);
+      if(nameMatcher.find()){
+        if(appListener.getInstanceName() != null){
+          LOG.error("Found more than one assignments in appListener of '"+m_jsFile.getPath()+"'.");
+          appListener.addParseError("Found more than one assignments in appListener - hand migration required!");
+        }
+        appListener.setInstanceFqn(nameMatcher.group(1));
+      }
+      functionBody.append(m_currentLine).append(m_lineSeparator);
+      if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
+        throw new VetoException("Could not parse appListener body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+      }
+      nextLine();
+    }
+    // skip when no assignment has been found.
+    if(appListener.getInstanceName() == null){
+      return null;
+    }
+    appListener.setBody(functionBody.toString());
+    appListener.setEndOffset(m_offsetStartLine + m_currentLine.length());
+
+    m_jsFile.addAppListener(appListener);
+    return appListener;
 
   }
 

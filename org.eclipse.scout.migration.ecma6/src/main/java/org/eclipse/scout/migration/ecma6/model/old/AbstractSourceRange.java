@@ -19,4 +19,5 @@ public abstract class AbstractSourceRange implements ISourceRange{
   public int getEndOffset() {
     return m_endOffset;
   }
+
 }

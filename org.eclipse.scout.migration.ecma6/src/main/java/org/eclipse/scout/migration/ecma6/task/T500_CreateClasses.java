@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 public class T500_CreateClasses extends AbstractTask {
 
   private static final Logger LOG = LoggerFactory.getLogger(T500_CreateClasses.class);
+
+  public static String END_CLASS_MARKER = "//MARKER_CLASS_END";
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 
   @Override
@@ -67,7 +69,8 @@ public class T500_CreateClasses extends AbstractTask {
     // close classblock after last function
     functions.get(functions.size() - 1).getEndOffset();
     StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
-    sourceBuilder.insert(functions.get(functions.size() - 1).getEndOffset() + 1, workingCopy.getLineSeparator() + "};");
+    // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
+    sourceBuilder.insert(functions.get(functions.size() - 1).getEndOffset() + 1, workingCopy.getLineSeparator() + "}"+END_CLASS_MARKER);
     // remove scout inherits
     if (clzz.getSuperCall() != null) {
       sourceBuilder.replace(clzz.getSuperCall().getStartOffset(), clzz.getSuperCall().getEndOffset(), "");

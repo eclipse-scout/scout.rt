@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.migration.ecma6.model.references;
 
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class JsImport implements IImport {
   }
 
   public void addMember(AliasedMember member){
-    m_members.add(member);
+    withMember(member);
   }
 
   public List<AliasedMember> getMembers() {
@@ -62,7 +64,7 @@ public class JsImport implements IImport {
   }
 
   public void setDefaultMember(AliasedMember defaultMember){
-    m_defaultMember = defaultMember;
+    withDefaultMember(defaultMember);
   }
 
   public String getModuleName(){
@@ -74,9 +76,10 @@ public class JsImport implements IImport {
     StringBuilder sourceBuilder = new StringBuilder();
     sourceBuilder.append("import");
     if(m_defaultMember != null){
-      sourceBuilder.append(" ").append(
-        Optional.ofNullable(getDefaultMember().getAlias())
-          .orElse(getDefaultMember().getName()));
+      sourceBuilder.append(" ").append(getDefaultMember().getName());
+      if(getDefaultMember().getAlias() != null){
+        sourceBuilder.append(" as ").append(getDefaultMember().getAlias());
+      }
     }
     if(m_members.size() > 0){
       sourceBuilder.append(" {");
@@ -103,6 +106,11 @@ public class JsImport implements IImport {
       targetFile = targetFile.getParent();
     }
     Path relPath = FileUtility.removeFileExtensionJs(targetFile.relativize(modulePath));
-    return relPath.toString();
+    List<Path> segments = new ArrayList<>(relPath.getNameCount());
+    for (Path path : relPath) {
+      segments.add(path);
+    }
+    return segments.stream().map(p -> p.toString()).collect(Collectors.joining("/"));
+
   }
 }

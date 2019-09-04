@@ -387,7 +387,7 @@ export default class App {
     this.events.removeListener(listener);
   }
 
-  static addListener(type, func) {
+  static  addListener(type, func) {
     var listener = {
       type: type,
       func: func

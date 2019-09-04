@@ -1,17 +1,22 @@
 {
   "name" : "widgets",
   "type" : "Library",
+  "fullyQualifiedName" : "widgets",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/widgets"
+  },
   "children" : [ {
     "name" : "ChartFieldAdapter",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.ChartFieldAdapter",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.ChartFieldAdapter"
-    } ],
-    "fullyQualifiedName" : "widgets.ChartFieldAdapter"
+    } ]
   }, {
     "name" : "CustomTile",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.CustomTile",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.CustomTile"
@@ -27,11 +32,11 @@
       "name" : "_renderLabel",
       "type" : "Function",
       "fullyQualifiedName" : "widgets.CustomTile._renderLabel"
-    } ],
-    "fullyQualifiedName" : "widgets.CustomTile"
+    } ]
   }, {
     "name" : "ExampleBeanColumn",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.ExampleBeanColumn",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.ExampleBeanColumn"
@@ -43,11 +48,11 @@
       "name" : "compare",
       "type" : "Function",
       "fullyQualifiedName" : "widgets.ExampleBeanColumn.compare"
-    } ],
-    "fullyQualifiedName" : "widgets.ExampleBeanColumn"
+    } ]
   }, {
     "name" : "ChartField",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.ChartField",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.ChartField"
@@ -83,11 +88,11 @@
       "name" : "_renderChartConfig",
       "type" : "Function",
       "fullyQualifiedName" : "widgets.ChartField._renderChartConfig"
-    } ],
-    "fullyQualifiedName" : "widgets.ChartField"
+    } ]
   }, {
     "name" : "ExampleBeanField",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.ExampleBeanField",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.ExampleBeanField"
@@ -99,16 +104,15 @@
       "name" : "_renderValue",
       "type" : "Function",
       "fullyQualifiedName" : "widgets.ExampleBeanField._renderValue"
-    } ],
-    "fullyQualifiedName" : "widgets.ExampleBeanField"
+    } ]
   }, {
     "name" : "CustomTileAdapter",
     "type" : "Class",
+    "fullyQualifiedName" : "widgets.CustomTileAdapter",
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "widgets.CustomTileAdapter"
-    } ],
-    "fullyQualifiedName" : "widgets.CustomTileAdapter"
+    } ]
   }, {
     "name" : "@highlight-button-active-background-color",
     "type" : "LessVariable",
@@ -157,9 +161,5 @@
       "path" : "src/main/js/widgets/forms/ButtonForm-dark.less",
       "theme" : "dark"
     }
-  } ],
-  "fullyQualifiedName" : "widgets",
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/widgets"
-  }
+  } ]
 }

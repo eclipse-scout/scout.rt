@@ -65,7 +65,7 @@ public class T600_JsEnums extends AbstractTask{
         replacement.append(jsEnum.toTodoText(lineDelimiter)).append(lineDelimiter);
         replacement.append(matcher.group());
       }else{
-        replacement.append("export const ").append(jsEnum.getName())
+        replacement.append("static ").append(jsEnum.getName())
           .append(matcher.group(1));
       }
       source = matcher.replaceFirst(replacement.toString());

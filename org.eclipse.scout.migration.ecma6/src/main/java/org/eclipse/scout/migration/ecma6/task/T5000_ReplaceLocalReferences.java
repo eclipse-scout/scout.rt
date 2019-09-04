@@ -59,12 +59,12 @@ public class T5000_ReplaceLocalReferences extends AbstractTask {
     JsClass jsClass = jsClasses.get(0);
     String source = workingCopy.getSource();
     for (JsConstant constant : jsClass.getConstants()) {
-      String pattern = Pattern.quote(constant.getFqn()) + "([^a-zA-Z0-9]{1})";
+      String pattern = Pattern.quote(constant.getFqn()) + "([^a-zA-Z0-9\\']{1})";
       String replacement = constant.getName() + "$1";
       source = replaceReferences1(pattern, replacement, source, pathInfo.getPath().getFileName().toString());
     }
     for (JsEnum jsEnum : jsClass.getEnums()) {
-      String pattern = Pattern.quote(jsEnum.getFqn()) + "([^a-zA-Z0-9]{1})";
+      String pattern = Pattern.quote(jsEnum.getFqn()) + "([^a-zA-Z0-9\\']{1})";
       String replacement = jsEnum.getName() + "$1";
       source = replaceReferences1(pattern, replacement, source, pathInfo.getPath().getFileName().toString());
     }

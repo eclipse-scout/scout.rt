@@ -13,6 +13,7 @@
 *.log
 
 # DebugClasses 
+*_gitignore.js
 *_gitignore.java
 
 # Eclipse #
