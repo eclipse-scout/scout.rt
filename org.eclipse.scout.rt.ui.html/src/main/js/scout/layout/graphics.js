@@ -96,11 +96,11 @@ scout.graphics = {
       'height': newHeight
     };
 
-    // In order to measure the correct size for all elements we must temporarily change the
-    // position property because with absolute or relative positioning the size of the element
-    // maybe influenced or limited by the parent element which makes it impossible to determine
-    // the preferred size.
-    if (options.useCssSize) {
+    // IE: In order to measure the correct size for elements with flex-layout we must temporarily
+    // change the position property because with absolute or relative positioning the size of the
+    // element maybe influenced or limited by the parent element which makes it impossible to
+    // determine the preferred size.
+    if (scout.device.isInternetExplorer() && $elem.css('display') === 'flex') {
       cssProperties.position = 'fixed';
     }
 
