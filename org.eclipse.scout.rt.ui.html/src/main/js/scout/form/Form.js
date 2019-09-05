@@ -183,6 +183,7 @@ scout.Form.prototype._renderForm = function() {
 
   if (this.isDialog()) {
     this.$container.addClassForAnimation('animate-open');
+    this.$container.addDeviceClass();
   }
 };
 

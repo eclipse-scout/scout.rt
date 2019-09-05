@@ -39,6 +39,11 @@
   &.animate-open {
     #scout.animation(fade-in ease-in 1);
     #scout.animation-duration(0.15s);
+
+    &.ie {
+      /* IE sometimes doesn't complete the animation so that dialog is nearly invisible */
+      #scout.animation-duration(0);
+    }
   }
 
   &.animate-modality-highlight {
