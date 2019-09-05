@@ -28,8 +28,10 @@ public class T25000_ModelsGetModelToImport extends AbstractTask {
 
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
-  private final Pattern GET_MODEL_PAT = Pattern.compile("scout\\.models\\.getModel\\('([\\w.]+)'\\)");
-  private final Pattern EXTEND_MODEL_PAT = Pattern.compile("scout\\.models\\.extend\\('([\\w.]+)',");
+
+  // use the "new" pattern (without scout) because the utility migration has already changed the static utility from scout.models to models.
+  private final Pattern GET_MODEL_PAT = Pattern.compile("models\\.getModel\\('([\\w.]+)'");
+  private final Pattern EXTEND_MODEL_PAT = Pattern.compile("models\\.extend\\('([\\w.]+)',");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -50,12 +52,12 @@ public class T25000_ModelsGetModelToImport extends AbstractTask {
 
   protected void insertModelFunctionCall(Matcher matcher, StringBuilder result, PathInfo pathInfo, JsFile jsFile) {
     String importRef = createImportFor(getJsModelPath(matcher.group(1), pathInfo), jsFile);
-    result.append(importRef).append("(this)");
+    result.append("models.getModel(this, ").append(importRef);
   }
 
   protected void insertExtendFunctionCall(Matcher matcher, StringBuilder result, PathInfo pathInfo, JsFile jsFile) {
     String importRef = createImportFor(getJsModelPath(matcher.group(1), pathInfo), jsFile);
-    result.append("scout.models.extend(").append(importRef).append("(this),");
+    result.append("models.extend(").append(importRef).append("(this),");
   }
 
   protected Path getJsModelPath(String modelKey, PathInfo pathInfo) {
