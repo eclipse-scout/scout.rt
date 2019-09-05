@@ -145,10 +145,11 @@ public class JsFileParser {
    * <pre>
     * Groups:
     * 1 indent
-    * 2 termination character ';' or ','
+    * 2 closing bracket
+    * 3 termination character ';' or ','
    * </pre>
    */
-  private static Pattern END_BLOCK = Pattern.compile("^(\\s*)\\}\\s*([;,])");
+  private static Pattern END_BLOCK = Pattern.compile("^(\\s*)(\\}\\s*)([;,])");
 
   private static Pattern SUPER_BLOCK = Pattern.compile("scout\\.inherits\\(([^,]+),\\s*([^,]+)\\);");
 
@@ -241,7 +242,7 @@ public class JsFileParser {
           continue;
         }
         matcher = START_APP_LISTENER.matcher(m_currentLine);
-        if(matcher.find()){
+        if (matcher.find()) {
           instanceGetter = readAppListener();
           continue;
         }
@@ -258,11 +259,12 @@ public class JsFileParser {
       jsClasses.get(0).setDefault(true);
     }
     List<JsTopLevelEnum> jsTopLevelEnums = m_jsFile.getJsTopLevelEnums();
-    if(instanceGetter != null ){
-      if(jsClasses.size() == 1){
+    if (instanceGetter != null) {
+      if (jsClasses.size() == 1) {
         instanceGetter.setJsClass(jsClasses.get(0));
         jsClasses.get(0).addFunction(instanceGetter);
-      }else {
+      }
+      else {
         LOG.error("Could not create instance getter of singleton '" + m_jsFile.getPath() + "'");
       }
     }
@@ -343,7 +345,7 @@ public class JsFileParser {
     while (m_currentLine != null) {
       Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
       if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
-        functionBody.append(m_currentLine).append(m_lineSeparator);
+        functionBody.append(endMatcher.group(1)+endMatcher.group(2));
         break;
       }
 
@@ -494,12 +496,13 @@ public class JsFileParser {
     // create instance getter function
     StringBuilder instanceGetterBuilder = new StringBuilder();
     instanceGetterBuilder.append("static get() {").append(m_lineSeparator)
-      .append("  return instance;").append(m_lineSeparator)
-      .append("}").append(m_lineSeparator);
+        .append("  return instance;").append(m_lineSeparator)
+        .append("}").append(m_lineSeparator);
 
     JsFunction instanceGetter = new JsFunction(null, "get");
+    instanceGetter.setMemoryOnly(true);
     instanceGetter.setStatic(true);
-    instanceGetter.addSingletonReference(appListener.getInstanceNamespace()+"."+appListener.getInstanceName());
+    instanceGetter.addSingletonReference(appListener.getInstanceNamespace() + "." + appListener.getInstanceName());
     instanceGetter.setSource(instanceGetterBuilder.toString());
 
     return instanceGetter;

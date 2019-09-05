@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.platform.status.Status;
 public class AbstractJsElement extends AbstractSourceElement {
 
 
-  MultiStatus m_parseStatus = new MultiStatus();
+  private MultiStatus m_parseStatus = new MultiStatus();
 
 
 

@@ -1,5 +1,6 @@
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -15,6 +16,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +71,19 @@ public class T500_CreateClasses extends AbstractTask {
     // close classblock after last function
 
     String source = workingCopy.getSource();
-    JsFunction lastFunction = functions.get(functions.size() - 1);
-    Matcher matcher = Pattern.compile(Pattern.quote(lastFunction.getSource())).matcher(source);
     StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
+    JsFunction lastFunction = null;
+    for(int i = functions.size() -1; i > -1; i--){
+      lastFunction = functions.get(i);
+      if(lastFunction.isMemoryOnly()){
+        lastFunction = null;
+      }else{
+        break;
+      }
+    }
+    Assertions.assertNotNull(lastFunction,"Class must have at least one function check '"+clzz.getFullyQualifiedName()+"'.");
+
+    Matcher matcher = Pattern.compile(Pattern.quote(lastFunction.getSource())).matcher(source);
     if(matcher.find()){
       // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
       sourceBuilder.insert(matcher.end(),workingCopy.getLineSeparator() + "}"+END_CLASS_MARKER);

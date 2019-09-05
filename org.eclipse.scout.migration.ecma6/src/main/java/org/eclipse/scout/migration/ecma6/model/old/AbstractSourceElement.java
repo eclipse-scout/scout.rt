@@ -1,8 +1,8 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
 public abstract class AbstractSourceElement implements ISourceElement {
+  private boolean m_memoryOnly;
   private String m_source;
-
 
   public String getSource() {
     return m_source;
@@ -10,5 +10,13 @@ public abstract class AbstractSourceElement implements ISourceElement {
 
   public void setSource(String source) {
     m_source = source;
+  }
+
+  public boolean isMemoryOnly() {
+    return m_memoryOnly;
+  }
+
+  public void setMemoryOnly(boolean memoryOnly) {
+    m_memoryOnly = memoryOnly;
   }
 }

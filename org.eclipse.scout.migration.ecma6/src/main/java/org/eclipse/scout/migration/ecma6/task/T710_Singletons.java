@@ -96,7 +96,7 @@ public class T710_Singletons extends AbstractTask {
     else {
       Matcher matcher = Pattern.compile(Pattern.quote(jsFile.getCopyRight().getSource())).matcher(sourceBuilder.toString());
       if(matcher.find()){
-        sourceBuilder.insert(matcher.end()+lineDelimiter.length(), "let instance;" + lineDelimiter);
+        sourceBuilder.insert(matcher.end(), "let instance;" + lineDelimiter);
       }else{
         LOG.warn("Could not find end of copyright in file '"+jsFile.getPath()+"'");
         sourceBuilder.insert(0,MigrationUtility.prependTodo("","insert 'var instance;' manual.",lineDelimiter));
@@ -135,7 +135,7 @@ public class T710_Singletons extends AbstractTask {
 
     Matcher matcher = Pattern.compile("\\}" + Pattern.quote(T500_CreateClasses.END_CLASS_MARKER)).matcher(source);
     if (matcher.find()) {
-      source = matcher.replaceAll(instanceGetter.getSource() + "}");
+      source = matcher.replaceAll(lineDelimiter+instanceGetter.getSource() + "}");
     }
     else {
       source = MigrationUtility.prependTodo(source, "Manually create instance static instance getter.", lineDelimiter);
