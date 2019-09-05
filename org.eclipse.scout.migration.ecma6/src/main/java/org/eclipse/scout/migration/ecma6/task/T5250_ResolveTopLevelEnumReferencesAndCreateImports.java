@@ -46,11 +46,13 @@ public class T5250_ResolveTopLevelEnumReferencesAndCreateImports extends Abstrac
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    List<? extends INamedElement> enums = context.getApi().getElements(Type.TopLevelEnum);
+    List<INamedElement> enums = context.getApi().getElements(Type.TopLevelEnum);
+    enums.addAll(context.getLibraries().getElements(Type.TopLevelEnum));
 
     for (INamedElement topEnum : enums) {
       source = createImportForReferences(topEnum, Pattern.quote(topEnum.getFullyQualifiedName()) + "([^\\']{1})", topEnum.getName() + "$1", source, jsFile, context);
     }
+
     workingCopy.setSource(source);
   }
 
