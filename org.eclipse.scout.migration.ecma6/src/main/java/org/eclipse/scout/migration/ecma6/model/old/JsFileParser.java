@@ -435,10 +435,10 @@ public class JsFileParser {
     while (m_currentLine != null) {
       Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
       if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
-        bodyBuilder.append("}");
+        bodyBuilder.append(endMatcher.group(1)+endMatcher.group(2));
         break;
       }
-      bodyBuilder.append(m_currentLine);
+      bodyBuilder.append(m_currentLine).append(m_lineSeparator);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
         throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
       }

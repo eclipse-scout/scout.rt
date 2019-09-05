@@ -132,6 +132,10 @@ public class JsFile extends AbstractJsElement {
     if (clazz != null) {
       return getOrCreateImport(clazz);
     }
+    JsTopLevelEnum topLevelEnum = context.getJsTopLevelEnum(fullyQualifiedName);
+    if(topLevelEnum != null){
+      return getOrCreateImport(topLevelEnum);
+    }
     // try to find in libraries
     INamedElement element = context.getLibraries().getElement(fullyQualifiedName);
     if (element == null) {
@@ -147,6 +151,10 @@ public class JsFile extends AbstractJsElement {
 
   public AliasedMember getOrCreateImport(JsClass jsClass) {
     return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), jsClass.isDefault());
+  }
+
+  public AliasedMember getOrCreateImport(JsTopLevelEnum topLevelEnum) {
+    return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), true);
   }
 
   public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible) {
