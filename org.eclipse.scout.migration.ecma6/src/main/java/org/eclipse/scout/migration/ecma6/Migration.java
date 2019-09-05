@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.migration.ecma6;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -70,27 +80,25 @@ public class Migration {
   }
 
   private void visitFiles() throws IOException {
-    IMigrationIncludePathFilter pathFilter = BEANS.opt(IMigrationIncludePathFilter.class);
-    List<IMigrationExcludePathFilter> excludeFilters = BEANS.all(IMigrationExcludePathFilter.class);
-    visitMigrationFiles(file -> {
-      PathInfo info = new PathInfo(file);
-      if (pathFilter != null && !pathFilter.test(info)) {
-        return;
-      }
-      if (excludeFilters.stream().anyMatch(filter -> filter.test(info))) {
-        return;
-      }
-
-      processFile(info, m_context);
-    });
+    visitMigrationFiles(info -> processFile(info, m_context));
   }
 
-  protected void visitMigrationFiles(Consumer<Path> migrationFileConsumer) throws IOException {
-    //noinspection Convert2Diamond
+  protected void visitMigrationFiles(Consumer<PathInfo> migrationFileConsumer) throws IOException {
+    IMigrationIncludePathFilter pathFilter = BEANS.opt(IMigrationIncludePathFilter.class);
+    List<IMigrationExcludePathFilter> excludeFilters = BEANS.all(IMigrationExcludePathFilter.class);
+
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-        migrationFileConsumer.accept(file);
+        PathInfo info = new PathInfo(file);
+        if (pathFilter != null && !pathFilter.test(info)) {
+          return FileVisitResult.CONTINUE;
+        }
+        if (excludeFilters.stream().anyMatch(filter -> filter.test(info))) {
+          return FileVisitResult.CONTINUE;
+        }
+
+        migrationFileConsumer.accept(info);
         return FileVisitResult.CONTINUE;
       }
 
@@ -122,11 +130,11 @@ public class Migration {
 
   protected void writeFiles() throws IOException {
     cleanTarget();
-    if(Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())){
+    if (Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())) {
       // write dirty working copies first
       writeDirtyWorkingCopies();
       // wait for user input (used to keep git history, commit in
-      if(!MigrationUtility.waitForUserConfirmation()){
+      if (!MigrationUtility.waitForUserConfirmation()) {
         return;
       }
 
@@ -136,7 +144,8 @@ public class Migration {
     final Path sourceModule = Configuration.get().getSourceModuleDirectory();
 
     Set<WorkingCopy> allWorkingCopies = new HashSet<>(m_context.getWorkingCopies());
-    visitMigrationFiles(file -> {
+    visitMigrationFiles(info -> {
+      Path file = info.getPath();
       WorkingCopy workingCopy = m_context.getWorkingCopy(file);
       if (workingCopy != null) {
         allWorkingCopies.remove(workingCopy);
@@ -161,12 +170,12 @@ public class Migration {
   }
 
   protected void writeDirtyWorkingCopies() {
-    m_context.getWorkingCopies().stream().filter(wc -> wc.isDirty()).forEach(wc -> wc.storeSource());
+    m_context.getWorkingCopies().stream().filter(WorkingCopy::isDirty).forEach(WorkingCopy::storeSource);
   }
 
   protected void cleanTarget() {
     if (Configuration.get().cleanTargetBeforeWriteFiles()) {
-      if(Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())){
+      if (Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())) {
         LOG.warn("Configuration 'cleanTargetBeforeWriteFiles' is ignored if source and target directory are same.");
         return;
       }
@@ -174,7 +183,7 @@ public class Migration {
         FileUtility.deleteDirectory(Configuration.get().getTargetModuleDirectory());
       }
       catch (IOException e) {
-        throw new ProcessingException("Could not delete target directory!",e);
+        throw new ProcessingException("Could not delete target directory!", e);
       }
     }
 
@@ -195,7 +204,7 @@ public class Migration {
         relativeTargetPath = relativeSourcePath;
       }
       workingCopy.persist(targetModule.resolve(relativeTargetPath));
-      if(sourceModule.equals(targetModule) && relativeTargetPath != relativeSourcePath){
+      if (sourceModule.equals(targetModule) && relativeTargetPath != relativeSourcePath) {
         Files.delete(workingCopy.getPath());
       }
     }
