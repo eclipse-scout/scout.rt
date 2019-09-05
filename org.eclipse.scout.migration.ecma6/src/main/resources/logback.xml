@@ -32,7 +32,7 @@
 
   <logger name="org.eclipse.scout.rt.persistence.query.IQuery" level="INFO" />
   <logger name="org.eclipse.scout.migration" level="DEBUG" />
-  <logger name="org.eclipse.scout.migration.ecma6.task" level="INFO"/>
+  <logger name="org.eclipse.scout.migration.ecma6.task" level="DEBUG"/>
 
 
 </configuration>

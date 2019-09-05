@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.platform.Order;
 
 @Order(610)
 public class T610_JsTopLevelEnums extends AbstractTask {
-  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
+  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isTopLevelEnum());
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {

@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
+import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
@@ -26,6 +27,7 @@ public class JsFile extends AbstractJsElement {
   private static final Logger LOG = LoggerFactory.getLogger(JsFile.class);
 
   private final Path m_path;
+  private final PathInfo m_pathInfo;
   private JsCommentBlock m_copyRight;
   private final List<JsClass> m_jsClasses = new ArrayList<>();
   private final List<JsTopLevelEnum> m_jsTopLevelEnums = new ArrayList<>();
@@ -35,10 +37,15 @@ public class JsFile extends AbstractJsElement {
   public JsFile(Path path) {
     Assertions.assertNotNull(path);
     m_path = path;
+    m_pathInfo = new PathInfo(path);
   }
 
   public Path getPath() {
     return m_path;
+  }
+
+  public PathInfo getPathInfo() {
+    return m_pathInfo;
   }
 
   public void setCopyRight(JsCommentBlock copyRight) {
@@ -56,8 +63,6 @@ public class JsFile extends AbstractJsElement {
   public List<JsClass> getJsClasses() {
     return Collections.unmodifiableList(m_jsClasses);
   }
-
-
 
   public JsClass firstJsClass() {
     return m_jsClasses.stream().findFirst().orElse(null);
@@ -103,12 +108,14 @@ public class JsFile extends AbstractJsElement {
     return Collections.unmodifiableList(m_jsTopLevelEnums);
   }
 
-  public List<JsAppListener> getAppListeners(){
+  public List<JsAppListener> getAppListeners() {
     return Collections.unmodifiableList(m_appListeners);
   }
-  public void addAppListener(JsAppListener appListener){
+
+  public void addAppListener(JsAppListener appListener) {
     m_appListeners.add(appListener);
   }
+
   /**
    * @param fullyQualifiedName
    *          e.g. scout.FormField
@@ -199,7 +206,7 @@ public class JsFile extends AbstractJsElement {
     builder.append(indent).append(getPath().getFileName())
         .append(" [hasCopyRight:").append(getCopyRight() != null).append("]").append(System.lineSeparator())
         .append(m_jsClasses.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())))
-      .append(m_appListeners.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
+        .append(m_appListeners.stream().map(c -> indent + "- " + c.toString(indent + "  ")).collect(Collectors.joining(System.lineSeparator())));
     return builder.toString();
   }
 }

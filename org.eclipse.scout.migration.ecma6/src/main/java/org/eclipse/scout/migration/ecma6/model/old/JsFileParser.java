@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -136,7 +137,7 @@ public class JsFileParser {
    *  none
    * </pre>
    */
-  private static Pattern START_APP_LISTENER = Pattern.compile("^"+Pattern.quote("scout.addAppListener('")+"(bootstrap|prepare)"+Pattern.quote("', function() {")+"$");
+  private static Pattern START_APP_LISTENER = Pattern.compile("^" + Pattern.quote("scout.addAppListener('") + "(bootstrap|prepare)" + Pattern.quote("', function() {") + "$");
 
   private static Pattern END_APP_LISTENER = Pattern.compile("\\}\\)\\;");
 
@@ -189,7 +190,7 @@ public class JsFileParser {
           continue;
         }
         matcher = START_CONSTRUCTOR.matcher(m_currentLine);
-        if (matcher.find()) {
+        if (matcher.find() && PathFilters.isClass().test(m_jsFile.getPathInfo())) {
           readFunction(matcher, comment, true, false);
           comment = null;
           continue;
@@ -200,12 +201,12 @@ public class JsFileParser {
           continue;
         }
         matcher = START_TOP_LEVEL_ENUM.matcher(m_currentLine);
-        if (matcher.find() && isTopLevelEnum(matcher)) {
+        if (matcher.find() && PathFilters.isTopLevelEnum().test(m_jsFile.getPathInfo())) {
           readTopLevelEnum(matcher);
           continue;
         }
         matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
-        if (matcher.find() && isUtilityConstructor(matcher)) {
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
           readUtilityFunction(matcher, comment, true);
           comment = null;
           continue;
@@ -223,7 +224,7 @@ public class JsFileParser {
           continue;
         }
         matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
-        if (matcher.find() && isUtilityFunction(matcher)) {
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
           readUtilityFunction(matcher, comment, false);
           comment = null;
           continue;
@@ -271,9 +272,6 @@ public class JsFileParser {
     }
     else if (jsClasses.size() > 1) {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
-    }
-    else if (jsTopLevelEnums.size() > 1) {
-      LOG.warn("More than 1 top level enum found in file '" + m_jsFile.getPath().getFileName() + "'. Every top level enum should be defined in its own file.");
     }
     return m_jsFile;
   }
@@ -361,16 +359,6 @@ public class JsFileParser {
     return function;
   }
 
-  @Exemption
-  private boolean isUtilityConstructor(Matcher matcher) {
-    return true;
-  }
-
-  @Exemption
-  private boolean isUtilityFunction(Matcher matcher) {
-    return true;
-  }
-
   private JsFunction readUtilityFunction(Matcher matcher, JsCommentBlock comment, boolean constructor) throws IOException {
     String namespace = matcher.group(2);
     if (constructor) {
@@ -429,17 +417,6 @@ public class JsFileParser {
     return jsEnum;
   }
 
-  private boolean isTopLevelEnum(Matcher matcher) {
-    switch (m_jsFile.getPath().getFileName().toString()) {
-      case "TreeVisitResult.js":
-      case "LayoutConstants.js":
-      case "keys.js":
-        return true;
-      default:
-        return false;
-    }
-  }
-
   protected JsTopLevelEnum readTopLevelEnum(Matcher matcher) throws IOException {
     String indent = "";
     JsTopLevelEnum jsEnum = new JsTopLevelEnum(matcher.group(2), matcher.group(3), m_jsFile);
@@ -483,7 +460,7 @@ public class JsFileParser {
   protected JsFunction readAppListener() throws IOException {
     JsAppListener appListener = new JsAppListener(m_jsFile);
     StringBuilder functionBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
-    Pattern namePattern = Pattern.compile("("+Configuration.get().getNamespace()+"\\.[^ \\=]*)\\s*\\=\\s*scout\\.create\\(");
+    Pattern namePattern = Pattern.compile("(" + Configuration.get().getNamespace() + "\\.[^ \\=]*)\\s*\\=\\s*scout\\.create\\(");
 
     nextLine();
     while (m_currentLine != null) {
@@ -493,9 +470,9 @@ public class JsFileParser {
         break;
       }
       Matcher nameMatcher = namePattern.matcher(m_currentLine);
-      if(nameMatcher.find()){
-        if(appListener.getInstanceName() != null){
-          LOG.error("Found more than one assignments in appListener of '"+m_jsFile.getPath()+"'.");
+      if (nameMatcher.find()) {
+        if (appListener.getInstanceName() != null) {
+          LOG.error("Found more than one assignments in appListener of '" + m_jsFile.getPath() + "'.");
           appListener.addParseError("Found more than one assignments in appListener - hand migration required!");
         }
         appListener.setInstanceFqn(nameMatcher.group(1));
@@ -507,7 +484,7 @@ public class JsFileParser {
       nextLine();
     }
     // skip when no assignment has been found.
-    if(appListener.getInstanceName() == null){
+    if (appListener.getInstanceName() == null) {
       return null;
     }
     appListener.setSource(functionBody.toString());
