@@ -10,11 +10,12 @@
  */
 package org.eclipse.scout.migration.ecma6.model.api.less;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class LessApiParser {
       return null;
     }
     LessApiParser nested = new LessApiParser();
-    nested.setName(lib.getName());
+    nested.setName(lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME));
     List<INamedElement> mixins = lib.getElements(Type.LessMixin);
     List<INamedElement> variables = lib.getElements(Type.LessVariable);
 
@@ -239,7 +240,7 @@ public class LessApiParser {
   }
 
   public void setName(String newName) {
-    m_name = newName;
+    m_name = assertNotNullOrEmpty(newName);
   }
 
   public String getName() {
