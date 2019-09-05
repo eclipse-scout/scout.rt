@@ -169,6 +169,7 @@ public class JsFileParser {
   }
 
   public JsFile parse() throws IOException {
+    JsFunction instanceGetter = null;
     Matcher matcher = null;
     try {
       nextLine();
@@ -240,7 +241,7 @@ public class JsFileParser {
         }
         matcher = START_APP_LISTENER.matcher(m_currentLine);
         if(matcher.find()){
-          readAppListener();
+          instanceGetter = readAppListener();
           continue;
         }
         nextLine();
@@ -256,6 +257,14 @@ public class JsFileParser {
       jsClasses.get(0).setDefault(true);
     }
     List<JsTopLevelEnum> jsTopLevelEnums = m_jsFile.getJsTopLevelEnums();
+    if(instanceGetter != null ){
+      if(jsClasses.size() == 1){
+        instanceGetter.setJsClass(jsClasses.get(0));
+        jsClasses.get(0).addFunction(instanceGetter);
+      }else {
+        LOG.error("Could not create instance getter of singleton '" + m_jsFile.getPath() + "'");
+      }
+    }
     // log
     if (jsClasses.size() == 0 && jsTopLevelEnums.size() == 0) {
       LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
@@ -271,17 +280,16 @@ public class JsFileParser {
 
   private void readCopyRight() throws IOException {
     JsCommentBlock comment = new JsCommentBlock();
-    comment.setStartOffset(m_offsetStartLine);
-    StringBuilder commentBody = new StringBuilder(m_currentLine);
+    StringBuilder commentBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
     nextLine();
 
     while (m_currentLine != null) {
       if (END_COPY_RIGHT.matcher(m_currentLine).find()) {
-        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
+        commentBody.append(m_currentLine).append(m_lineSeparator);
         break;
       }
       else if (FUNCTION_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
+        commentBody.append(m_currentLine).append(m_lineSeparator);
       }
       else {
         // no comment
@@ -290,24 +298,22 @@ public class JsFileParser {
       nextLine();
     }
     comment.setSource(commentBody.toString());
-    comment.setEndOffset(m_offsetStartLine + m_currentLine.length());
     m_jsFile.setCopyRight(comment);
     nextLine();
   }
 
   private JsCommentBlock readFunctionComment() throws IOException {
     JsCommentBlock comment = new JsCommentBlock();
-    comment.setStartOffset(m_offsetStartLine);
-    StringBuilder commentBody = new StringBuilder(m_currentLine);
+    StringBuilder commentBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
     nextLine();
 
     while (m_currentLine != null) {
       if (END_FUNCTION_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
+        commentBody.append(m_currentLine).append(m_lineSeparator);
         break;
       }
       else if (FUNCTION_COMMENT.matcher(m_currentLine).find()) {
-        commentBody.append(m_workingCopy.getLineSeparator()).append(m_currentLine);
+        commentBody.append(m_currentLine).append(m_lineSeparator);
       }
       else {
         // no comment
@@ -316,7 +322,6 @@ public class JsFileParser {
       nextLine();
     }
     comment.setSource(commentBody.toString());
-    comment.setEndOffset(m_offsetStartLine + m_currentLine.length());
     nextLine();
     return comment;
   }
@@ -326,14 +331,12 @@ public class JsFileParser {
     JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
     JsFunction function = new JsFunction(clazz, matcher.group(3));
     function.setComment(comment);
-    function.setStartOffset(m_offsetStartLine);
     function.setConstructor(constructor);
     function.setStatic(isStatic);
     function.setArgs(matcher.group(4));
-    StringBuilder functionBody = new StringBuilder(matcher.group(5));
+    StringBuilder functionBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
     if (StringUtility.hasText(matcher.group(6))) {
-      functionBody.append(matcher.group(6));
-      function.setBody(functionBody.toString());
+      function.setSource(functionBody.toString());
       clazz.addFunction(function);
       nextLine();
       return function;
@@ -342,17 +345,17 @@ public class JsFileParser {
     while (m_currentLine != null) {
       Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
       if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
-        functionBody.append("}");
+        functionBody.append(m_currentLine).append(m_lineSeparator);
         break;
       }
-      functionBody.append(m_currentLine);
+
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
         throw new VetoException("Could not parse function body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
       }
+      functionBody.append(m_currentLine).append(m_lineSeparator);
       nextLine();
     }
-    function.setBody(functionBody.toString());
-    function.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    function.setSource(functionBody.toString());
 
     clazz.addFunction(function);
     return function;
@@ -385,12 +388,10 @@ public class JsFileParser {
     JsClass clazz = m_jsFile.getLastOrAppend(namespace);
     JsFunction function = new JsFunction(clazz, matcher.group(3));
     function.setComment(comment);
-    function.setStartOffset(m_offsetStartLine);
-    function.setEndOffset(m_offsetStartLine + m_currentLine.length());
     function.setConstructor(constructor);
     function.setStatic(true);
     function.setArgs(matcher.group(4));
-    function.setBody("{}");
+    function.setSource("{}");
     clazz.addFunction(function);
     nextLine();
     return function;
@@ -400,7 +401,6 @@ public class JsFileParser {
     String indent = matcher.group(1);
     JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
     JsEnum jsEnum = new JsEnum(clazz, matcher.group(3));
-    jsEnum.setStartOffset(m_offsetStartLine);
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
     if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
@@ -423,8 +423,7 @@ public class JsFileParser {
       }
       nextLine();
     }
-    jsEnum.setBody(bodyBuilder.toString());
-    jsEnum.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    jsEnum.setSource(bodyBuilder.toString());
 
     clazz.addEnum(jsEnum);
     return jsEnum;
@@ -444,7 +443,6 @@ public class JsFileParser {
   protected JsTopLevelEnum readTopLevelEnum(Matcher matcher) throws IOException {
     String indent = "";
     JsTopLevelEnum jsEnum = new JsTopLevelEnum(matcher.group(2), matcher.group(3), m_jsFile);
-    jsEnum.setStartOffset(m_offsetStartLine);
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
     if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
@@ -467,8 +465,7 @@ public class JsFileParser {
       }
       nextLine();
     }
-    jsEnum.setBody(bodyBuilder.toString());
-    jsEnum.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    jsEnum.setSource(bodyBuilder.toString());
     m_jsFile.addJsTopLevelEnum(jsEnum);
     return jsEnum;
   }
@@ -476,17 +473,15 @@ public class JsFileParser {
   protected JsConstant readConstant(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
     JsConstant constant = new JsConstant(clazz, matcher.group(2));
-    constant.setStartOffset(m_offsetStartLine);
-    constant.setBody(matcher.group(3));
+    constant.setSource(matcher.group(3));
     nextLine();
     clazz.addConstant(constant);
     return constant;
 
   }
 
-  protected JsAppListener readAppListener() throws IOException {
+  protected JsFunction readAppListener() throws IOException {
     JsAppListener appListener = new JsAppListener(m_jsFile);
-    appListener.setStartOffset(m_offsetStartLine);
     StringBuilder functionBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
     Pattern namePattern = Pattern.compile("("+Configuration.get().getNamespace()+"\\.[^ \\=]*)\\s*\\=\\s*scout\\.create\\(");
 
@@ -515,18 +510,28 @@ public class JsFileParser {
     if(appListener.getInstanceName() == null){
       return null;
     }
-    appListener.setBody(functionBody.toString());
-    appListener.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    appListener.setSource(functionBody.toString());
 
     m_jsFile.addAppListener(appListener);
-    return appListener;
+
+    // create instance getter function
+    StringBuilder instanceGetterBuilder = new StringBuilder();
+    instanceGetterBuilder.append("static get() {").append(m_lineSeparator)
+      .append("  return instance;").append(m_lineSeparator)
+      .append("}").append(m_lineSeparator);
+
+    JsFunction instanceGetter = new JsFunction(null, "get");
+    instanceGetter.setStatic(true);
+    instanceGetter.addSingletonReference(appListener.getInstanceNamespace()+"."+appListener.getInstanceName());
+    instanceGetter.setSource(instanceGetterBuilder.toString());
+
+    return instanceGetter;
 
   }
 
   protected JsSuperCall readSuperCall(Matcher matcher) throws IOException {
     JsSuperCall superCall = new JsSuperCall(matcher.group(2));
-    superCall.setStartOffset(m_offsetStartLine);
-    superCall.setEndOffset(m_offsetStartLine + m_currentLine.length());
+    superCall.setSource(matcher.group());
     nextLine();
     return superCall;
   }

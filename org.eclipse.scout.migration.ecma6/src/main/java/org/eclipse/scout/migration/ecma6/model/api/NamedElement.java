@@ -24,7 +24,7 @@ public class NamedElement implements INamedElement {
   private Type m_type;
   private String m_name;
   private INamedElement m_parent;
-  private Map<String, String> m_customAttributes = new HashMap<>();
+  private Map<String, Object> m_customAttributes = new HashMap<>();
   private List<INamedElement> m_children = new ArrayList<>();
 
   public NamedElement() {
@@ -80,23 +80,27 @@ public class NamedElement implements INamedElement {
     // nop
   }
   @Override
-  public Map<String, String> getCustomAttributes() {
+  public Map<String, Object> getCustomAttributes() {
     return m_customAttributes;
   }
 
 
 
-  public void setCustomAttributes(Map<String, String> customAttributes) {
-    m_customAttributes = customAttributes;
+  public void setCustomAttributes(Map<String, ?> customAttributes) {
+    m_customAttributes.putAll(customAttributes);
   }
 
-  public void addCustomAttribute(String key, String value){
+  public void addCustomAttribute(String key, Object value){
     m_customAttributes.put(key,value);
   }
 
   @Override
-  public String getCustomAttribute(String key){
+  public Object getCustomAttribute(String key){
     return m_customAttributes.get(key);
+  }
+
+  public String getCustomAttributeString(String key){
+    return (String) getCustomAttribute(key);
   }
 
   @JsonIgnore

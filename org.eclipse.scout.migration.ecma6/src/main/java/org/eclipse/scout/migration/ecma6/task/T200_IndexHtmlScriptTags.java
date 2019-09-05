@@ -20,24 +20,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Order(200)
-public class T200_IndexHtmlScriptTags extends AbstractTask{
+public class T200_IndexHtmlScriptTags extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T200_IndexHtmlScriptTags.class);
 
   private static Pattern END_BODY_REGEX = Pattern.compile("(\\s*)\\<\\/body\\>");
-  private static Pattern APP_NAME_REGEX = Pattern.compile("res\\/([^\\-]*)\\-all\\-macro\\.js");
 
   private Predicate<PathInfo> m_indexJsFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
 
   private Set<String> m_scriptSourcesToRemove = CollectionUtility.hashSet(
-    "res/jquery-all-macro.js",
-    "res/libs-all-macro.js",
-    "res/index.js"
-  ) ;
+      "res/jquery-all-macro.js",
+      "res/libs-all-macro.js",
+      "res/index.js");
 
-  private String m_newLineAndIndet ;
+  private String m_newLineAndIndet;
   private List<String> m_scriptsMoveToBody = new ArrayList<>();
-
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -47,12 +47,12 @@ public class T200_IndexHtmlScriptTags extends AbstractTask{
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    m_newLineAndIndet = workingCopy.getLineSeparator()+"    ";
+    m_newLineAndIndet = workingCopy.getLineSeparator() + "    ";
     removeScriptElements(workingCopy);
-    addScriptElements(workingCopy,context);
+    addScriptElements(workingCopy, context);
   }
 
-  private void removeScriptElements(WorkingCopy workingCopy){
+  private void removeScriptElements(WorkingCopy workingCopy) {
     String source = workingCopy.getSource();
     Document doc = Jsoup.parse(source);
     Elements scoutScriptElements = doc.getElementsByTag("scout:script");
@@ -65,7 +65,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask{
     Elements scriptElements = doc.getElementsByTag("script");
     for (Element element : scriptElements) {
       String attrSource = element.attr("src");
-      if(attrSource != null && attrSource.toLowerCase().endsWith(".js")){
+      if (attrSource != null && attrSource.toLowerCase().endsWith(".js")) {
         m_scriptsMoveToBody.add(element.outerHtml());
         source = removeElement(element, source, workingCopy);
       }
@@ -73,45 +73,47 @@ public class T200_IndexHtmlScriptTags extends AbstractTask{
     workingCopy.setSource(source);
   }
 
-  private String removeElement(Element element, String source, WorkingCopy workingCopy){
-    Pattern p = Pattern.compile("(\\s*)"+Pattern.quote(element.outerHtml()));
+  private String removeElement(Element element, String source, WorkingCopy workingCopy) {
+    Pattern p = Pattern.compile("(\\s*)" + Pattern.quote(element.outerHtml()));
     Matcher removeTagMatcher = p.matcher(source);
-    if(removeTagMatcher.find()){
+    if (removeTagMatcher.find()) {
       m_newLineAndIndet = removeTagMatcher.group(1);
       source = removeTagMatcher.replaceAll("");
-    }else{
-      source = MigrationUtility.prependTodo(source, "remove script tag: '"+element.outerHtml()+"'", workingCopy.getLineSeparator());
+    }
+    else {
+      source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineSeparator());
+      LOG.warn("Could not remove script tag '" + element.outerHtml() + "' in file '" + workingCopy.getPath() + "'.");
     }
     return source;
   }
 
-
-  private void addScriptElements(WorkingCopy workingCopy, Context context){
+  private void addScriptElements(WorkingCopy workingCopy, Context context) {
     String source = workingCopy.getSource();
     Matcher matcher = END_BODY_REGEX.matcher(source);
-    if(matcher.find()){
+    if (matcher.find()) {
       String bodyIndent = matcher.group(1);
       StringBuilder scriptBuilder = new StringBuilder();
       scriptBuilder
-        .append(m_newLineAndIndet)
-        .append("<scout:script src=\"jquery.js\" />")
-        .append(m_newLineAndIndet)
-        .append("<scout:script src=\"eclipse-scout.js\" />")
-        .append(m_newLineAndIndet)
-        .append("<scout:script src=\"").append(context.getProperty(AppNameContextProperty.class)).append(".js\" />");
-      for(String scriptElement : m_scriptsMoveToBody){
+          .append(m_newLineAndIndet)
+          .append("<scout:script src=\"jquery.js\" />")
+          .append(m_newLineAndIndet)
+          .append("<scout:script src=\"eclipse-scout.js\" />")
+          .append(m_newLineAndIndet)
+          .append("<scout:script src=\"").append(context.getProperty(AppNameContextProperty.class)).append(".js\" />");
+      for (String scriptElement : m_scriptsMoveToBody) {
         scriptBuilder.append(m_newLineAndIndet)
-          .append(scriptElement);
+            .append(scriptElement);
       }
 
       scriptBuilder.append(bodyIndent)
-        .append("</body>");
+          .append("</body>");
       source = matcher.replaceAll(scriptBuilder.toString());
       workingCopy.setSource(source);
-    }else{
+    }
+    else {
       MigrationUtility.prependTodo(workingCopy, "add script imports: <scout:script src=\"jquery.js\" /> " +
-        "<scout:script src=\"eclipse-scout.js\" /> " +
-        "<scout:script src=\"jswidgets.js\" />");
+          "<scout:script src=\"eclipse-scout.js\" /> " +
+          "<scout:script src=\"jswidgets.js\" />");
     }
   }
 }

@@ -101,15 +101,30 @@ public class ApiWriter {
   }
 
   protected INamedElement createConstructor(JsFunction jsFun, INamedElement cz) {
-    return new NamedElement(Type.Constructor, jsFun.getName(), cz);
+    NamedElement fun = new NamedElement(Type.Constructor, jsFun.getName(), cz);
+    List<String> singletonReferences = jsFun.getSingletonReferences();
+    if(singletonReferences.size() > 0) {
+      fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
+    }
+    return fun;
   }
 
   protected INamedElement createStaticFunction(JsFunction jsFun, INamedElement cz) {
-    return new NamedElement(Type.StaticFunction, jsFun.getName(), cz);
+    NamedElement fun = new NamedElement(Type.StaticFunction, jsFun.getName(), cz);
+    List<String> singletonReferences = jsFun.getSingletonReferences();
+    if(singletonReferences.size() > 0) {
+      fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
+    }
+    return fun;
   }
 
   protected INamedElement createFunction(JsFunction jsFun, INamedElement cz) {
-    return new NamedElement(Type.Function, jsFun.getName(), cz);
+    NamedElement fun = new NamedElement(Type.Function, jsFun.getName(), cz);
+    List<String> singletonReferences = jsFun.getSingletonReferences();
+    if(singletonReferences.size() > 0) {
+      fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
+    }
+    return fun;
   }
 
   private INamedElement createConstant(JsConstant cons, NamedElement cz) {

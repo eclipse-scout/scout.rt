@@ -15,7 +15,6 @@ public class JsTopLevelEnum extends AbstractJsElement {
   private final JsFile m_jsFile;
   private String m_namespace;
   private String m_name;
-  private String m_body;
 
   public JsTopLevelEnum(String namespace, String name, JsFile jsFile) {
     m_namespace = namespace;
@@ -35,13 +34,6 @@ public class JsTopLevelEnum extends AbstractJsElement {
     return m_namespace + "." + m_name;
   }
 
-  public String getBody() {
-    return m_body;
-  }
-
-  public void setBody(String body) {
-    m_body = body;
-  }
 
   public JsFile getJsFile() {
     return m_jsFile;

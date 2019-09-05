@@ -53,7 +53,7 @@ public class Context {
     }
     try {
       parseJsFiles();
-      setupCurrentApi();
+      rebuildLocalApi();
       parseLessFiles();
     }
     catch (IOException e) {
@@ -72,7 +72,7 @@ public class Context {
     m_lessApi = lessApi;
   }
 
-  protected void setupCurrentApi() {
+  public void rebuildLocalApi() {
     ApiWriter writer = new ApiWriter();
     m_api = writer.createLibraryFromCurrentModule(Configuration.get().getNamespace(), this, false);
   }

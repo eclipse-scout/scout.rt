@@ -1,14 +1,18 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class JsFunction extends AbstractJsElement {
 
-  private final JsClass m_jsClass;
+  private JsClass m_jsClass;
   private final String m_name;
   private String m_args;
-  private String m_body;
   private boolean m_constructor;
   private boolean m_static;
   private JsCommentBlock m_comment;
+  private List<String> m_singletonReferences = new ArrayList<>();
 
   public JsFunction(JsClass jsClass, String name) {
     m_jsClass = jsClass;
@@ -17,6 +21,10 @@ public class JsFunction extends AbstractJsElement {
 
   public JsClass getJsClass() {
     return m_jsClass;
+  }
+
+  public void setJsClass(JsClass jsClass) {
+    m_jsClass = jsClass;
   }
 
   public String getName() {
@@ -47,13 +55,6 @@ public class JsFunction extends AbstractJsElement {
     return m_args;
   }
 
-  public void setBody(String body) {
-    m_body = body;
-  }
-
-  public String getBody() {
-    return m_body;
-  }
 
   public void setComment(JsCommentBlock comment) {
     m_comment = comment;
@@ -61,6 +62,13 @@ public class JsFunction extends AbstractJsElement {
 
   public JsCommentBlock getComment() {
     return m_comment;
+  }
+
+  public void addSingletonReference(String fqn){
+    m_singletonReferences.add(fqn);
+  }
+  public List<String> getSingletonReferences() {
+    return Collections.unmodifiableList(m_singletonReferences);
   }
 
   @Override

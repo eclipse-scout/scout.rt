@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 public interface INamedElement {
 
   String LIBRARY_MODULE_NAME = "lib-moduleName";
+  String SINGLETON_REFERENCES = "singletonReferences";
 
   enum Type {
     AllLibraries,
@@ -42,9 +43,11 @@ public interface INamedElement {
 
   String getFullyQualifiedName();
 
-  Map<String, String> getCustomAttributes();
+  Map<String, Object> getCustomAttributes();
 
-  String getCustomAttribute(String key);
+  Object getCustomAttribute(String key);
+
+  String getCustomAttributeString(String key);
 
   INamedElement getParent();
 

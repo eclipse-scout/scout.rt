@@ -4,7 +4,6 @@ public class JsConstant extends AbstractJsElement {
 
   private final JsClass m_jsClass;
   private final String m_name;
-  private String m_body;
 
   public JsConstant(JsClass jsClass, String name){
     m_jsClass = jsClass;
@@ -23,13 +22,6 @@ public class JsConstant extends AbstractJsElement {
     return getJsClass().getFullyQualifiedName() + "." + getName();
   }
 
-  public String getBody() {
-    return m_body;
-  }
-
-  public void setBody(String body) {
-    m_body = body;
-  }
 
   @Override
   public String toString() {

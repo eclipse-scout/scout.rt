@@ -127,7 +127,7 @@ public class LessApiParser {
 
     Map<String, Map<String, INamedElement>> map = new HashMap<>();
     for (INamedElement var : variables) {
-      map.computeIfAbsent(var.getName(), k -> new HashMap<>()).put(var.getCustomAttributes().get(PROP_THEME), var);
+      map.computeIfAbsent(var.getName(), k -> new HashMap<>()).put(var.getCustomAttributeString(PROP_THEME), var);
     }
     nested.setGlobalVariables(map);
 
@@ -165,10 +165,10 @@ public class LessApiParser {
           continue;
         }
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, lessVariable.getCustomAttributes().get(PROP_PATH)));
+          requiredImports.add(toExternalImport(libImportPrefix, lessVariable.getCustomAttributeString(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, lessVariable.getCustomAttributes().get(PROP_PATH)));
+          requiredImports.add(toInternalImport(less, lessVariable.getCustomAttributeString(PROP_PATH)));
         }
       }
     }
@@ -185,10 +185,10 @@ public class LessApiParser {
       String mixinFqn = mixin.getKey();
       if (lessSrc.contains(mixinFqn)) {
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributes().get(PROP_PATH)));
+          requiredImports.add(toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributeString(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, mixin.getValue().getCustomAttributes().get(PROP_PATH)));
+          requiredImports.add(toInternalImport(less, mixin.getValue().getCustomAttributeString(PROP_PATH)));
         }
       }
     }

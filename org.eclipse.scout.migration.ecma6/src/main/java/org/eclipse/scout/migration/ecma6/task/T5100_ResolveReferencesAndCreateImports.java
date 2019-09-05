@@ -37,9 +37,6 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
-  @Override
-  public void setup(Context context) {
-  }
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -62,6 +59,12 @@ public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
 
     for (INamedElement function : staticFunctions) {
       source = createImportForReferences(function, Pattern.quote(function.getFullyQualifiedName())+"([^\\']{1})", function.getParent().getName() + "." + function.getName()+"$1", source, jsFile, context);
+      List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
+      if(singletonRefs != null && singletonRefs.size() > 0){
+        for (String singletonRef : singletonRefs) {
+          source = createImportForReferences(function, Pattern.quote(singletonRef)+"([^\\']{1})", function.getParent().getName() + "." + function.getName()+"()$1", source, jsFile, context);
+        }
+      }
     }
 
     for (INamedElement constant : constants) {

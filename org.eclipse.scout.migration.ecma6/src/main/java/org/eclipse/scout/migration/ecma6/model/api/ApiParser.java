@@ -46,7 +46,7 @@ public class ApiParser {
     allLibs.addChildren(Files.list(m_directory)
         .map(libJson -> parseLibrary(libJson))
       // do not include current migration source as library
-        .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttribute(INamedElement.LIBRARY_MODULE_NAME)))
+        .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
         .collect(Collectors.toList()));
     allLibs.ensureParents();
     return allLibs;

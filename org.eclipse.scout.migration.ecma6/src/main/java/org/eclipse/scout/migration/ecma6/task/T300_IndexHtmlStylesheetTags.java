@@ -12,6 +12,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 import java.util.Set;
@@ -21,6 +23,7 @@ import java.util.regex.Pattern;
 
 @Order(300)
 public class T300_IndexHtmlStylesheetTags extends AbstractTask{
+  private static final Logger LOG = LoggerFactory.getLogger(T300_IndexHtmlStylesheetTags.class);
 
   private Predicate<PathInfo> m_fileFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
   private String m_newLineAndIndet;
@@ -61,6 +64,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
       source = removeTagMatcher.replaceAll("");
     }else{
       source = MigrationUtility.prependTodo(source, "remove script tag: '"+element.outerHtml()+"'", workingCopy.getLineSeparator());
+      LOG.warn("Could not remove script tag '"+element.outerHtml()+"' in '"+workingCopy.getPath()+"'");
     }
     return source;
   }
@@ -86,6 +90,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
         source = matcher.replaceAll(createSource(matcher.group(1)+"  ", context)+ matcher.group(1)+matcher.group(2));
       }else{
         source = MigrationUtility.prependTodo(source, "add stylesheet (<scout:stylesheet src=\""+context.getProperty(AppNameContextProperty.class)+"-theme.css\" />" ,workingCopy.getLineSeparator());
+        LOG.warn("Could not add stylesheet (<scout:stylesheet src=\\\"\"+context.getProperty(AppNameContextProperty.class)+\"-theme.css\\\" /> in '"+workingCopy.getPath()+"'");
       }
     }
     workingCopy.setSource(source);

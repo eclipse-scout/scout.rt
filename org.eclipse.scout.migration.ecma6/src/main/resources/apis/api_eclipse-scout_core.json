@@ -2,6 +2,9 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/core"
+  },
   "children" : [ {
     "name" : "reloadPage",
     "type" : "Class",
@@ -853,6 +856,13 @@
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.HtmlEnvironment"
+    }, {
+      "name" : "get",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "scout.HtmlEnvironment.get",
+      "customAttributes" : {
+        "singletonReferences" : [ "scout.htmlEnvironment" ]
+      }
     }, {
       "name" : "init",
       "type" : "Function",
@@ -6802,6 +6812,18 @@
       "type" : "StaticFunction",
       "fullyQualifiedName" : "scout.scrollbars._installNativeInternal"
     }, {
+      "name" : "isHybridScrolling",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isHybridScrolling"
+    }, {
+      "name" : "isNativeScrolling",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isNativeScrolling"
+    }, {
+      "name" : "isJsScrolling",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isJsScrolling"
+    }, {
       "name" : "_installJs",
       "type" : "StaticFunction",
       "fullyQualifiedName" : "scout.scrollbars._installJs"
@@ -7833,14 +7855,6 @@
       "name" : "PROPERTIES_ORDER",
       "type" : "Constant",
       "fullyQualifiedName" : "scout.DateFieldAdapter.PROPERTIES_ORDER"
-    } ]
-  }, {
-    "name" : "keys",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.keys",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.keys"
     } ]
   }, {
     "name" : "DateRange",
@@ -18831,14 +18845,6 @@
       "fullyQualifiedName" : "scout.WidgetField.get$Scrollable"
     } ]
   }, {
-    "name" : "codesToKeys",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.codesToKeys",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.codesToKeys"
-    } ]
-  }, {
     "name" : "locales",
     "type" : "Class",
     "fullyQualifiedName" : "scout.locales",
@@ -23529,6 +23535,13 @@
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.Device"
+    }, {
+      "name" : "get",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "scout.Device.get",
+      "customAttributes" : {
+        "singletonReferences" : [ "scout.device" ]
+      }
     }, {
       "name" : "bootstrap",
       "type" : "Function",
@@ -32101,6 +32114,66 @@
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.NullLogger"
+    }, {
+      "name" : "trace",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.trace"
+    }, {
+      "name" : "debug",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.debug"
+    }, {
+      "name" : "info",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.info"
+    }, {
+      "name" : "warn",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.warn"
+    }, {
+      "name" : "error",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.error"
+    }, {
+      "name" : "fatal",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.fatal"
+    }, {
+      "name" : "isEnabledFor",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isEnabledFor"
+    }, {
+      "name" : "isTraceEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isTraceEnabled"
+    }, {
+      "name" : "isDebugEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isDebugEnabled"
+    }, {
+      "name" : "isInfoEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isInfoEnabled"
+    }, {
+      "name" : "isWarnEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isWarnEnabled"
+    }, {
+      "name" : "isErrorEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isErrorEnabled"
+    }, {
+      "name" : "isFatalEnabled",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger.isFatalEnabled"
+    }, {
+      "name" : "_log",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger._log"
+    }, {
+      "name" : "_formatTime",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.NullLogger._formatTime"
     } ]
   }, {
     "name" : "TableLayoutResetter",
@@ -33283,6 +33356,18 @@
       "fullyQualifiedName" : "scout.BusyIndicator.cancelled"
     } ]
   }, {
+    "name" : "keys",
+    "type" : "TopLevelEnum",
+    "fullyQualifiedName" : "scout.keys"
+  }, {
+    "name" : "LayoutConstants",
+    "type" : "TopLevelEnum",
+    "fullyQualifiedName" : "scout.LayoutConstants"
+  }, {
+    "name" : "TreeVisitResult",
+    "type" : "TopLevelEnum",
+    "fullyQualifiedName" : "scout.TreeVisitResult"
+  }, {
     "name" : "#scout.keyframes-pulsate-in-out",
     "type" : "LessMixin",
     "fullyQualifiedName" : "scout.#scout.keyframes-pulsate-in-out",
@@ -33834,6 +33919,13 @@
     "fullyQualifiedName" : "scout.#scout.animation-flash-gray",
     "customAttributes" : {
       "path" : "src/main/js/scout/style/animations.less"
+    }
+  }, {
+    "name" : "#scout.inverted-scrollbars",
+    "type" : "LessMixin",
+    "fullyQualifiedName" : "scout.#scout.inverted-scrollbars",
+    "customAttributes" : {
+      "path" : "src/main/js/scout/style/mixins.less"
     }
   }, {
     "name" : "#scout.placeholder",
@@ -34926,6 +35018,14 @@
     "customAttributes" : {
       "path" : "src/main/js/scout/style/colors.less",
       "theme" : "default-theme"
+    }
+  }, {
+    "name" : "@scrollbar-thumb-inverted-main-color",
+    "type" : "LessVariable",
+    "fullyQualifiedName" : "scout.@scrollbar-thumb-inverted-main-color",
+    "customAttributes" : {
+      "path" : "src/main/js/scout/style/colors-dark.less",
+      "theme" : "dark"
     }
   }, {
     "name" : "@icon-angle-double-down-bold",
@@ -41112,6 +41212,14 @@
       "theme" : "default-theme"
     }
   }, {
+    "name" : "@date-picker-header-background-color",
+    "type" : "LessVariable",
+    "fullyQualifiedName" : "scout.@date-picker-header-background-color",
+    "customAttributes" : {
+      "path" : "src/main/js/scout/style/colors.less",
+      "theme" : "default-theme"
+    }
+  }, {
     "name" : "@scrollbar-thumb-main-color",
     "type" : "LessVariable",
     "fullyQualifiedName" : "scout.@scrollbar-thumb-main-color",
@@ -41120,12 +41228,12 @@
       "theme" : "default-theme"
     }
   }, {
-    "name" : "@date-picker-header-background-color",
+    "name" : "@scrollbar-thumb-main-color",
     "type" : "LessVariable",
-    "fullyQualifiedName" : "scout.@date-picker-header-background-color",
+    "fullyQualifiedName" : "scout.@scrollbar-thumb-main-color",
     "customAttributes" : {
-      "path" : "src/main/js/scout/style/colors.less",
-      "theme" : "default-theme"
+      "path" : "src/main/js/scout/style/colors-dark.less",
+      "theme" : "dark"
     }
   }, {
     "name" : "@wizard-step-after-active-step-color",
@@ -41863,8 +41971,5 @@
       "path" : "src/main/js/scout/style/colors.less",
       "theme" : "default-theme"
     }
-  } ],
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/core"
-  }
+  } ]
 }

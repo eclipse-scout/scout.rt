@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * FROM:
+ * 
  * <pre>
  *   scout.addAppListener('prepare', function() {
  *   if (scout.device) {
@@ -56,12 +57,12 @@ import org.slf4j.LoggerFactory;
  *   });
  * });
  * </pre>
- *
  */
 @Order(710)
 public class T710_Singletons extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T710_Singletons.class);
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
+
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
     return m_filter.test(pathInfo);
@@ -72,57 +73,74 @@ public class T710_Singletons extends AbstractTask {
     WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
     JsFile jsFile = context.ensureJsFile(wc);
 
-
     String source = wc.getSource();
     String lineDelimiter = wc.getLineSeparator();
     for (JsAppListener appListener : jsFile.getAppListeners()) {
-      source = processAppListener(appListener,jsFile,source,lineDelimiter);
+      source = processAppListener(appListener, jsFile, source, lineDelimiter, context);
 
     }
     wc.setSource(source);
   }
 
-  protected String processAppListener(JsAppListener appListener, JsFile jsFile,String source, String lineDelimiter){
+  protected String processAppListener(JsAppListener appListener, JsFile jsFile, String source, String lineDelimiter, Context context) {
 
     if (appListener.hasParseErrors()) {
-      source = source.replace(appListener.getBody(), appListener.toTodoText(lineDelimiter)+lineDelimiter+ appListener.getBody());
+      source = source.replace(appListener.getSource(), appListener.toTodoText(lineDelimiter) + lineDelimiter + appListener.getSource());
       return source;
     }
     // let instance
     StringBuilder sourceBuilder = new StringBuilder(source);
     if (jsFile.getCopyRight() == null) {
-      sourceBuilder.insert(0, "let instance;"+lineDelimiter);
+      sourceBuilder.insert(0, "let instance;" + lineDelimiter);
     }
     else {
-      sourceBuilder.insert(jsFile.getCopyRight().getEndOffset() + lineDelimiter.length(), "let instance;" + lineDelimiter);
+      Matcher matcher = Pattern.compile(Pattern.quote(jsFile.getCopyRight().getSource())).matcher(sourceBuilder.toString());
+      if(matcher.find()){
+        sourceBuilder.insert(matcher.end()+lineDelimiter.length(), "let instance;" + lineDelimiter);
+      }else{
+        LOG.warn("Could not find end of copyright in file '"+jsFile.getPath()+"'");
+        sourceBuilder.insert(0,MigrationUtility.prependTodo("","insert 'var instance;' manual.",lineDelimiter));
+      }
     }
 
-    source  =sourceBuilder.toString();
+    source = sourceBuilder.toString();
+
+    source = createInstanceGetter(jsFile,source,lineDelimiter);
+
+
+    String body = appListener.getSource();
+    String newBody = body.replaceAll(Pattern.quote(appListener.getInstanceNamespace() + "." + appListener.getInstanceName()), "instance");
+    source = source.replace(body, newBody);
+
+    return source;
+  }
+
+  protected String createInstanceGetter(JsFile jsFile, String source, String lineDelimiter){
     // static get
-    StringBuilder instanceGetterBuilder = new StringBuilder();
-    instanceGetterBuilder.append("static get() {").append(lineDelimiter)
-      .append("  return instance;").append(lineDelimiter)
-      .append("}").append(lineDelimiter);
+    JsClass jsClass = jsFile.firstJsClass();
+    if(jsClass == null){
+      source = MigrationUtility.prependTodo(source, "Manually create instance static instance getter.", lineDelimiter);
+      LOG.warn("Could not create static instance getter in '"+jsFile.getPath()+"'");
+      return source;
+    }
+    JsFunction instanceGetter = jsClass.getFunctions().stream()
+      .filter(fun -> fun.isStatic())
+      .filter(fun -> "get".equals(fun.getName()))
+      .findFirst().orElse(null);
+    if(instanceGetter == null){
+      source = MigrationUtility.prependTodo(source, "Manually create instance static instance getter.", lineDelimiter);
+      return source;
+    }
+
+
     Matcher matcher = Pattern.compile("\\}" + Pattern.quote(T500_CreateClasses.END_CLASS_MARKER)).matcher(source);
-    if(matcher.find()){
-      source = matcher.replaceAll(instanceGetterBuilder.toString()+"}");
-      JsClass jsClass = jsFile.firstJsClass();
-      Assertions.assertNotNull(jsClass);
-      JsFunction staticGetter = new JsFunction(jsFile.firstJsClass(),"get");
-      staticGetter.setStatic(true);
-      staticGetter.setBody(instanceGetterBuilder.toString());
-      // TODO AHO staticGetter.setAlternaiveReference("scout.device");
-      jsClass.addFunction(staticGetter);
+    if (matcher.find()) {
+      source = matcher.replaceAll(instanceGetter.getSource() + "}");
     }
-    else{
-      source = MigrationUtility.prependTodo(source,"Manually create instance static instance getter.",lineDelimiter);
+    else {
+      source = MigrationUtility.prependTodo(source, "Manually create instance static instance getter.", lineDelimiter);
+      LOG.warn("Could not create static instance getter in '"+jsFile.getPath()+"'");
     }
-
-
-    String body = appListener.getBody();
-    String newBody = body.replaceAll(Pattern.quote(appListener.getInstanceNamespace()+"."+appListener.getInstanceName()), "instance");
-    source = source.replace(body,newBody);
-
     return source;
   }
 }

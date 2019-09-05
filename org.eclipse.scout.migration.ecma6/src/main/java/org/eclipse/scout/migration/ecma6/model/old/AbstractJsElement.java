@@ -4,13 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
-import org.eclipse.scout.migration.ecma6.Migration;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.MultiStatus;
 import org.eclipse.scout.rt.platform.status.Status;
 
-public class AbstractJsElement extends AbstractSourceRange{
+public class AbstractJsElement extends AbstractSourceElement {
+
+
   MultiStatus m_parseStatus = new MultiStatus();
+
 
 
   public void addParseStatus(IStatus status){

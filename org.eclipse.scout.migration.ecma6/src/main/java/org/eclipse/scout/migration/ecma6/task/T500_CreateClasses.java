@@ -67,13 +67,29 @@ public class T500_CreateClasses extends AbstractTask {
       throw new VetoException("Clazz without functions '" + clzz.getFullyQualifiedName() + "' !");
     }
     // close classblock after last function
-    functions.get(functions.size() - 1).getEndOffset();
+
+    String source = workingCopy.getSource();
+    JsFunction lastFunction = functions.get(functions.size() - 1);
+    Matcher matcher = Pattern.compile(Pattern.quote(lastFunction.getSource())).matcher(source);
     StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
-    // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
-    sourceBuilder.insert(functions.get(functions.size() - 1).getEndOffset() + 1, workingCopy.getLineSeparator() + "}"+END_CLASS_MARKER);
+    if(matcher.find()){
+      // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
+      sourceBuilder.insert(matcher.end(),workingCopy.getLineSeparator() + "}"+END_CLASS_MARKER);
+    }else{
+      sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Close class body with '}'  manual.", workingCopy.getLineSeparator()));
+      LOG.warn("Could not close class body in '"+clzz.getFullyQualifiedName()+"'");
+    }
+
     // remove scout inherits
     if (clzz.getSuperCall() != null) {
-      sourceBuilder.replace(clzz.getSuperCall().getStartOffset(), clzz.getSuperCall().getEndOffset(), "");
+      matcher = Pattern.compile(Pattern.quote(clzz.getSuperCall().getSource())).matcher(sourceBuilder.toString());
+      if(matcher.find()){
+        sourceBuilder.replace(matcher.start(), matcher.end(),"");
+      }else{
+        sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Remove 'scout.inhertits(...' manual", workingCopy.getLineSeparator()));
+        LOG.warn("Could not remove 'scout.inhertits(...'  in '"+clzz.getFullyQualifiedName()+"'");
+
+      }
     }
     // open class block
     StringBuilder classBuilder = new StringBuilder();
@@ -94,7 +110,14 @@ public class T500_CreateClasses extends AbstractTask {
 
     }
     classBuilder.append("{").append(workingCopy.getLineSeparator());
-    sourceBuilder.insert(functions.get(0).getStartOffset(), classBuilder.toString());
+
+    matcher = Pattern.compile(Pattern.quote(functions.get(0).getSource())).matcher(sourceBuilder.toString());
+    if(matcher.find()){
+      sourceBuilder.insert(matcher.start(),classBuilder.toString());
+    }else{
+      sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Create class declaration manual (like: 'export default class FormField')", workingCopy.getLineSeparator()));
+      LOG.warn("Could not create class declaration like (like: 'export default class FormField')  in '"+clzz.getFullyQualifiedName()+"'");
+    }
     workingCopy.setSource(sourceBuilder.toString());
   }
 

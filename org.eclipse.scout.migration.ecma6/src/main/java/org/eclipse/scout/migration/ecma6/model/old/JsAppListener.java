@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 
 public class JsAppListener extends AbstractJsElement {
   private final JsFile m_jsFile;
-  private String m_body;
   private String m_instanceNamespace;
   private String m_instanceName;
 
@@ -43,13 +42,6 @@ public class JsAppListener extends AbstractJsElement {
     return m_instanceNamespace;
   }
 
-  public void setBody(String body) {
-    m_body = body;
-  }
-
-  public String getBody() {
-    return m_body;
-  }
 
   @Override
   public String toString() {
