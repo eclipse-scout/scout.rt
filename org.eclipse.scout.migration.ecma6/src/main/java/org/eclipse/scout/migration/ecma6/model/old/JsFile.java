@@ -30,6 +30,7 @@ public class JsFile extends AbstractJsElement {
   private final PathInfo m_pathInfo;
   private JsCommentBlock m_copyRight;
   private final List<JsClass> m_jsClasses = new ArrayList<>();
+  private final List<JsUtility> m_jsUtilities = new ArrayList<>();
   private final List<JsTopLevelEnum> m_jsTopLevelEnums = new ArrayList<>();
   private final Map<String /*module name*/, JsImport> m_imports = new HashMap<>();
   private List<JsAppListener> m_appListeners = new ArrayList<>();
@@ -78,7 +79,7 @@ public class JsFile extends AbstractJsElement {
     return !m_jsClasses.isEmpty();
   }
 
-  public JsClass getLastOrAppend(String fqn) {
+  public JsClass getLastClassOrAppend(String fqn) {
     JsClass jsClass, lastJsClass;
     if (m_jsClasses.isEmpty()) {
       Assertions.assertNotNullOrEmpty(fqn, "fqn is empty");
@@ -98,6 +99,14 @@ public class JsFile extends AbstractJsElement {
     jsClass = new JsClass(fqn, this);
     m_jsClasses.add(jsClass);
     return jsClass;
+  }
+
+  public void addJsUtility(JsUtility u) {
+    m_jsUtilities.add(u);
+  }
+
+  public List<JsUtility> getJsUtilities() {
+    return Collections.unmodifiableList(m_jsUtilities);
   }
 
   public void addJsTopLevelEnum(JsTopLevelEnum jsEnum) {
@@ -132,8 +141,14 @@ public class JsFile extends AbstractJsElement {
     if (clazz != null) {
       return getOrCreateImport(clazz);
     }
+    // try to find JsUtility
+    JsUtility util = context.getJsUtility(fullyQualifiedName);
+    if (util != null) {
+      return getOrCreateImport(util);
+    }
+    // try to find top level enum
     JsTopLevelEnum topLevelEnum = context.getJsTopLevelEnum(fullyQualifiedName);
-    if(topLevelEnum != null){
+    if (topLevelEnum != null) {
       return getOrCreateImport(topLevelEnum);
     }
     // try to find in libraries
@@ -155,6 +170,10 @@ public class JsFile extends AbstractJsElement {
 
   public AliasedMember getOrCreateImport(JsTopLevelEnum topLevelEnum) {
     return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), true);
+  }
+
+  public AliasedMember getOrCreateImport(JsUtility u) {
+    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true);
   }
 
   public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible) {

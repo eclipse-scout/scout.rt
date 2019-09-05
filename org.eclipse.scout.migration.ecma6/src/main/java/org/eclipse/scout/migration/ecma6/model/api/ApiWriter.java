@@ -26,6 +26,9 @@ import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,6 +53,12 @@ public class ApiWriter {
         .getAllJsClasses()
         .stream()
         .map(jsClass -> createClazz(jsClass, lib))
+        .collect(Collectors.toList()));
+
+    allElements.addAll(context
+        .getAllJsUtilities()
+        .stream()
+        .map(jsUtil -> createUtility(jsUtil, lib))
         .collect(Collectors.toList()));
 
     allElements.addAll(context
@@ -133,6 +142,29 @@ public class ApiWriter {
 
   private INamedElement createEnum(JsEnum en, NamedElement cz) {
     return new NamedElement(Type.Enum, en.getName(), cz);
+  }
+
+  protected INamedElement createUtility(JsUtility jsUtility, INamedElement library) {
+    NamedElement u = new NamedElement(Type.Utility, jsUtility.getName(), library);
+    u.addChildren(jsUtility.getFunctions()
+        .stream()
+        .map(jsFun -> createUtilityFunction(jsFun, u))
+        .collect(Collectors.toList()));
+    u.addChildren(jsUtility.getVariables()
+        .stream()
+        .map(jsVar -> createUtilityVariable(jsVar, u))
+        .collect(Collectors.toList()));
+    return u;
+  }
+
+  protected INamedElement createUtilityFunction(JsUtilityFunction jsFun, INamedElement u) {
+    NamedElement fun = new NamedElement(Type.UtilityFunction, jsFun.getName(), u);
+    return fun;
+  }
+
+  protected INamedElement createUtilityVariable(JsUtilityVariable jsVar, INamedElement u) {
+    NamedElement fun = new NamedElement(Type.UtilityVariable, jsVar.getName(), u);
+    return fun;
   }
 
   private INamedElement createTopLevelEnum(JsTopLevelEnum en, INamedElement lib) {

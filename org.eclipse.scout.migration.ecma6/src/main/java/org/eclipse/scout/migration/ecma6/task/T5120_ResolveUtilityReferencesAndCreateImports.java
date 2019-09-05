@@ -26,13 +26,12 @@ import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Order(5250)
-public class T5250_ResolveTopLevelEnumReferencesAndCreateImports extends AbstractTask{
-  private static final Logger LOG = LoggerFactory.getLogger(T5250_ResolveTopLevelEnumReferencesAndCreateImports.class);
+@Order(5120)
+public class T5120_ResolveUtilityReferencesAndCreateImports extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T5120_ResolveUtilityReferencesAndCreateImports.class);
 
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
-
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -46,23 +45,23 @@ public class T5250_ResolveTopLevelEnumReferencesAndCreateImports extends Abstrac
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    List<INamedElement> enums = context.getApi().getElements(Type.TopLevelEnum);
-    enums.addAll(context.getLibraries().getElements(Type.TopLevelEnum));
+    List<INamedElement> elems = context.getApi().getElements(Type.Utility);
+    elems.addAll(context.getLibraries().getElements(Type.Utility));
 
-    for (INamedElement topEnum : enums) {
-      source = createImportForReferences(topEnum, Pattern.quote(topEnum.getFullyQualifiedName()) + "([^\\']{1})", topEnum.getName() + "$1", source, jsFile, context);
+    for (INamedElement e : elems) {
+      //TODO imo what is the \\' suffix for? --> ( of functions, but this may match a substring. query for 'foo' will match the location foobar() !! use non-capturing look-ahead?!
+      source = createImportForReferences(e, Pattern.quote(e.getFullyQualifiedName()) + "([^\\']{1})", e.getName() + "$1", source, jsFile, context);
     }
-
     workingCopy.setSource(source);
   }
 
-  private String createImportForReferences(INamedElement topEnum, String pattern, String replacement, String source, JsFile jsFile, Context context) {
+  private String createImportForReferences(INamedElement e, String pattern, String replacement, String source, JsFile jsFile, Context context) {
     Matcher matcher = Pattern.compile(pattern).matcher(source);
 
     boolean result = matcher.find();
     if (result) {
       String filename = jsFile.getPath().getFileName().toString();
-      String fqn = topEnum.getFullyQualifiedName();
+      String fqn = e.getFullyQualifiedName();
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
@@ -73,7 +72,7 @@ public class T5250_ResolveTopLevelEnumReferencesAndCreateImports extends Abstrac
       while (result);
       // create import
       LOG.debug("[" + filename + "] Create import for '" + fqn + "'.");
-      jsFile.getOrCreateImport(fqn,context);
+      jsFile.getOrCreateImport(fqn, context);
 
       matcher.appendTail(sb);
       source = sb.toString();

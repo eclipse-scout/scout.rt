@@ -27,6 +27,8 @@ public interface INamedElement {
     Library,
     Class,
     Utility,
+    UtilityFunction,
+    UtilityVariable,
     Constructor,
     StaticFunction,
     Function,
@@ -34,7 +36,7 @@ public interface INamedElement {
     TopLevelEnum,
     Constant,
     LessMixin,
-    LessVariable
+    LessVariable;
   }
 
   Type getType();

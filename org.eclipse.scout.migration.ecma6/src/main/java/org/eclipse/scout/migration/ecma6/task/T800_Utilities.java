@@ -10,12 +10,9 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
@@ -23,6 +20,9 @@ import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.slf4j.Logger;
@@ -64,7 +64,8 @@ public class T800_Utilities extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     try {
-      rewriteSource(workingCopy, context);
+      String r = rewriteSource(workingCopy, context);
+      workingCopy.setSource(r);
     }
     catch (VetoException e) {
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
@@ -72,71 +73,75 @@ public class T800_Utilities extends AbstractTask {
     }
   }
 
-  protected void rewriteSource(WorkingCopy workingCopy, Context context) {
+  /**
+   * <pre>
+   *   scout.string = {
+   *     foo: function... ,
+   *     bar: function...,
+   *     var1 : 1,
+   *   }
+   * </pre>
+   */
+  protected String rewriteSource(WorkingCopy workingCopy, Context context) {
     String source = workingCopy.getSource();
-
-    Matcher m = Pattern.compile("(?m)^([a-z]\\w+)\\.([a-z]\\w+)\\s*=\\s*\\{").matcher(source);
-    if (!m.find()) throw new VetoException("This is no utility class");
-    String namespace = m.group(1);
-    String utilityName = m.group(2);
-    if (m.find()) throw new VetoException("There are multiple utility classes in one file");
-
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    //remove wrapper block and replace by an import
-    //XXX source = source.replaceAll("(?m)^([a-z]\\w+)\\.[a-z]\\w+\\s*=\\s*\\{", "import * as $1 from '../$1';");
-    source = source.replaceAll("(?m)^([a-z]\\w+)\\.[a-z]\\w+\\s*=\\s*\\{", "");
-    source = source.substring(0, source.lastIndexOf("}"));
+    for (JsUtility util : jsFile.getJsUtilities()) {
+      String s = util.getSource();
+      s = s.replace(util.getStartTag(), "");
+      s = s.substring(0, s.lastIndexOf("}"));
 
-    //change and export public functions
-    source = source.replaceAll("(?m)^[ ]*([a-z]\\w*)\\s*:\\s*function", "export function $1");
+      for (JsUtilityFunction f : util.getFunctions()) {
+        if (f.isExported()) {
+          s = s.replace(f.getTag(), "export function " + f.getName());
+        }
+        else {
+          //change and annotate private functions
+          s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
+        }
+      }
 
-    //change and annotate private functions
-    source = source.replaceAll("(?m)^[ ]*([_]\\w*)\\s*:\\s*function", "//private\nfunction $1");
+      for (JsUtilityVariable v : util.getVariables()) {
+        if (v.isExported()) {
+          s = s.replace(v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        }
+        else {
+          s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        }
+      }
 
-    //remove all ',' after function body '}'
-    source = source.replaceAll("(?m)^  \\},", "\\}");
+      //remove all ',' after function body '}'
+      s = s.replaceAll("(?m)^  \\},", "\\}");
 
-    //change state variables
-    source = source.replaceAll("(?m)^[ ]*([_\\w]+)\\s*:\\s*([^,]+),?$", "let $1 = $2;");
+      //remove all 'this.'
+      s = s.replaceAll("(?<!\\w)this\\.", "");
 
-    //references to state variables
-    Set<String> stateVarNames = new TreeSet<>();
-    m = Pattern.compile("(?m)^let ([_\\w]+)").matcher(source);
-    while (m.find()) {
-      stateVarNames.add(m.group(1));
+      //remove all self-references
+      s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", "");
+
+      //reduce indent by 2
+      s = s.replaceAll("(?m)^  ", "");
+
+      //create default export
+      String exportedNames = Stream.concat(
+          util.getFunctions().stream().filter(f -> f.isExported()).map(f -> "  " + f.getName()),
+          util.getVariables().stream().filter(v -> v.isExported()).map(v -> "  " + v.getName()))
+          .sorted()
+          .collect(Collectors.joining(",\n"));
+      s += "\n";
+      s += "export default {";
+      s += "\n";
+      s += exportedNames;
+      s += "\n";
+      s += "};";
+
+      //apply
+      source = source.replace(util.getSource(), s);
     }
-    for (String name : stateVarNames) {
-      source = source.replace(namespace + "." + utilityName + "." + name, name);
-    }
 
-    //clean all references to local utility functions
-    Set<String> allNames = new TreeSet<>();
-    m = Pattern.compile("function (\\w+)(?!\\w)").matcher(source);
-    while (m.find()) {
-      allNames.add(m.group(1));
-    }
-    source = source.replaceAll("(?<!\\w)this\\.", "");
-    for (String name : allNames) {
-      source = source.replace(namespace + "." + utilityName + "." + name, name);
-    }
+    //remove duplicate ';;'
+    source = source.replace(";;", ";");
 
-    //reduce indent by 2
-    source = source.replaceAll("(?m)^  ", "");
-
-    //create default export
-    Set<String> exportedNames = new TreeSet<>();
-    m = Pattern.compile("export function (\\w+)(?!\\w)").matcher(source);
-    while (m.find()) {
-      exportedNames.add(m.group(1));
-    }
-    source += workingCopy.getLineSeparator();
-    source += "export default {";
-    source += "\n";
-    source += exportedNames.stream().map(s -> "  " + s).collect(Collectors.joining(",\n"));
-    source += "\n";
-    source += "};";
-
-    workingCopy.setSource(source);
+    return source;
   }
 }

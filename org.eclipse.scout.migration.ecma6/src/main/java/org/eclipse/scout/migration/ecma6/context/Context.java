@@ -25,6 +25,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -39,6 +40,7 @@ public class Context {
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
+  private final Map<String /*fqn*/, JsUtility> m_jsUtilities = new HashMap<>();
   private final Map<String /*fqn*/, JsTopLevelEnum> m_jsTopLevelEnums = new HashMap<>();
   private Libraries m_libraries;
   private INamedElement m_api;
@@ -177,6 +179,7 @@ public class Context {
         }
         JsFile jsFile = ensureJsFile(ensureWorkingCopy(file));
         jsFile.getJsClasses().forEach(jsClazz -> m_jsClasses.put(jsClazz.getFullyQualifiedName(), jsClazz));
+        jsFile.getJsUtilities().forEach(jsUtil -> m_jsUtilities.put(jsUtil.getFullyQualifiedName(), jsUtil));
         jsFile.getJsTopLevelEnums().forEach(jsEnum -> m_jsTopLevelEnums.put(jsEnum.getFqn(), jsEnum));
 
         return FileVisitResult.CONTINUE;
@@ -186,6 +189,14 @@ public class Context {
 
   public Collection<JsClass> getAllJsClasses() {
     return Collections.unmodifiableCollection(m_jsClasses.values());
+  }
+
+  public Collection<JsUtility> getAllJsUtilities() {
+    return Collections.unmodifiableCollection(m_jsUtilities.values());
+  }
+
+  public JsUtility getJsUtility(String fullyQualifiedName) {
+    return m_jsUtilities.get(fullyQualifiedName);
   }
 
   public Collection<JsTopLevelEnum> getAllTopLevelEnums() {

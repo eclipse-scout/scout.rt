@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(5100)
-public class T5100_ResolveReferencesAndCreateImports extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5100_ResolveReferencesAndCreateImports.class);
+public class T5100_ResolveClassReferencesAndCreateImports extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T5100_ResolveClassReferencesAndCreateImports.class);
 
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));

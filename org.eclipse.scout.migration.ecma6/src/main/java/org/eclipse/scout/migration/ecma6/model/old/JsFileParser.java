@@ -11,6 +11,7 @@ import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.rt.platform.exception.VetoException;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,20 +40,6 @@ public class JsFileParser {
    * </pre>
    */
   private static Pattern START_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[^ .]+)()\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
-
-  /**
-   * <pre>
-   * scout.strings = {
-   * Groups:
-   *  1 indent (empty)
-   *  2 namespace = scope.class
-   *  3 field name (empty)
-   *  4 params (empty)
-   *  5 open bracket
-   *  6 closing bracket (opt)
-   * </pre>
-   */
-  private static Pattern START_UTILITY_CONSTRUCTOR = Pattern.compile("^()([^ .]+\\.[a-z][^ .]+)()\\s*=\\s*()(\\{)\\s*(\\}\\;)?");
 
   /**
    * <pre>
@@ -108,17 +95,36 @@ public class JsFileParser {
 
   /**
    * <pre>
-    * SPACE SPACE insertAt: function(text, insertText, position) {
-    * Groups:
-    *  1 indent (non-empty)
-    *  2 namespace = scope.class (empty)
-   *  3 field name
-    *  4 params
-    *  5 open bracket
-    *  6 closing bracket (opt)
+   * scout.strings = {
+   * Groups:
+   *  1 namespace = 'scout' or empty for the utility scout.js
+   *  2 name 'strings' or 'scout' for the utility scout.js
    * </pre>
    */
-  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^(\\s*)()([_a-z][^ .]+)\\s*:\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\,?)?");
+  private static Pattern START_UTILITY_BLOCK = Pattern.compile("^(?:([a-z][^ .]+)\\.)?([a-z][^ .]+)\\s*=\\s*\\{");
+
+  /**
+   * <pre>
+   * SPACE SPACE insertAt: function(text, insertText, position) {
+   * Groups:
+   *  1 name
+   * </pre>
+   */
+  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^  ([_a-z][^ .]+)\\s*:\\s*function");
+
+  /**
+   * <pre>
+   *    sessions : [],
+   *    appListeners : [],
+   *    $activeElements : null,
+   * Groups:
+   *  1 name
+   *  2 value or first line
+   * </pre>
+   */
+  private static Pattern START_UTILITY_VARIABLE = Pattern.compile("^  ([_$a-z][^ .]+)\\s*:\\s*([^f,]+)[,]?");
+
+  private static Pattern END_UTILITY_BLOCK = Pattern.compile("^\\}");
 
   /**
    * <pre>
@@ -160,7 +166,7 @@ public class JsFileParser {
   private int m_currentLineNumber = 0;
   private int m_offsetStartLine = 0;
   private final String m_lineSeparator;
-  private String m_utilityFunctionNamespace;
+  private JsUtility m_curUtility;
 
   public JsFileParser(WorkingCopy workingCopy) {
     m_workingCopy = workingCopy;
@@ -206,9 +212,27 @@ public class JsFileParser {
           readTopLevelEnum(matcher);
           continue;
         }
-        matcher = START_UTILITY_CONSTRUCTOR.matcher(m_currentLine);
+        matcher = START_UTILITY_BLOCK.matcher(m_currentLine);
         if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
-          readUtilityFunction(matcher, comment, true);
+          beginUtility(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityFunction(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_VARIABLE.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityVariable(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = END_UTILITY_BLOCK.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo()) && m_curUtility != null) {
+          endUtility(matcher);
           comment = null;
           continue;
         }
@@ -224,12 +248,6 @@ public class JsFileParser {
           comment = null;
           continue;
         }
-        matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
-          readUtilityFunction(matcher, comment, false);
-          comment = null;
-          continue;
-        }
         matcher = START_CONSTANT.matcher(m_currentLine);
         if (matcher.find()) {
           readConstant(matcher);
@@ -237,7 +255,7 @@ public class JsFileParser {
         }
         matcher = SUPER_BLOCK.matcher(m_currentLine);
         if (matcher.find()) {
-          JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
+          JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
           clazz.setSuperCall(readSuperCall(matcher));
           continue;
         }
@@ -258,6 +276,7 @@ public class JsFileParser {
     if (jsClasses.size() == 1) {
       jsClasses.get(0).setDefault(true);
     }
+    List<JsUtility> jsUtilities = m_jsFile.getJsUtilities();
     List<JsTopLevelEnum> jsTopLevelEnums = m_jsFile.getJsTopLevelEnums();
     if (instanceGetter != null) {
       if (jsClasses.size() == 1) {
@@ -269,7 +288,7 @@ public class JsFileParser {
       }
     }
     // log
-    if (jsClasses.size() == 0 && jsTopLevelEnums.size() == 0) {
+    if (jsClasses.isEmpty() && jsTopLevelEnums.isEmpty() && jsUtilities.isEmpty()) {
       LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
     }
     else if (jsClasses.size() > 1) {
@@ -328,7 +347,7 @@ public class JsFileParser {
 
   private JsFunction readFunction(Matcher matcher, JsCommentBlock comment, boolean constructor, boolean isStatic) throws IOException {
     String indent = matcher.group(1);
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
+    JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(2));
     JsFunction function = new JsFunction(clazz, matcher.group(3));
     function.setComment(comment);
     function.setConstructor(constructor);
@@ -345,7 +364,7 @@ public class JsFileParser {
     while (m_currentLine != null) {
       Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
       if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
-        functionBody.append(endMatcher.group(1)+endMatcher.group(2));
+        functionBody.append(endMatcher.group(1) + endMatcher.group(2));
         break;
       }
 
@@ -361,35 +380,52 @@ public class JsFileParser {
     return function;
   }
 
-  private JsFunction readUtilityFunction(Matcher matcher, JsCommentBlock comment, boolean constructor) throws IOException {
-    String namespace = matcher.group(2);
-    if (constructor) {
-      m_utilityFunctionNamespace = namespace;
-    }
-    else if (m_utilityFunctionNamespace == null) {
-      LOG.warn("wrong utility-style function detected. {}: {}", m_workingCopy.getPath(), matcher.group(3));
+  private JsUtility beginUtility(Matcher matcher) throws IOException {
+    String namespace = matcher.group(1);
+    String name = matcher.group(2);
+    Assertions.assertNull(m_curUtility);
+    m_curUtility = new JsUtility(m_jsFile, namespace, name, matcher.group());
+    m_jsFile.addJsUtility(m_curUtility);
+    nextLine();
+    return m_curUtility;
+  }
+
+  private JsUtilityFunction readUtilityFunction(Matcher matcher) throws IOException {
+    String name = matcher.group(1);
+    if (m_curUtility == null) {
+      LOG.warn("wrong utility-style function detected. {}: {}", m_workingCopy.getPath(), matcher.group());
       nextLine();
       return null;
     }
-    else {
-      namespace = m_utilityFunctionNamespace;
-    }
-    String indent = matcher.group(1);
-    JsClass clazz = m_jsFile.getLastOrAppend(namespace);
-    JsFunction function = new JsFunction(clazz, matcher.group(3));
-    function.setComment(comment);
-    function.setConstructor(constructor);
-    function.setStatic(true);
-    function.setArgs(matcher.group(4));
-    function.setSource("{}");
-    clazz.addFunction(function);
+    JsUtilityFunction f = m_curUtility.addFunction(name, !name.startsWith("_"), matcher.group());
     nextLine();
-    return function;
+    return f;
+  }
+
+  private JsUtilityVariable readUtilityVariable(Matcher matcher) throws IOException {
+    String name = matcher.group(1);
+    String value = matcher.group(2);
+    if (m_curUtility == null) {
+      LOG.warn("wrong utility-style variable detected. {}: {}", m_workingCopy.getPath(), matcher.group());
+      nextLine();
+      return null;
+    }
+    JsUtilityVariable v = m_curUtility.addVariable(name, value, !name.startsWith("_"), matcher.group());
+    nextLine();
+    return v;
+  }
+
+  private void endUtility(Matcher matcher) throws IOException {
+    Assertions.assertNotNull(m_curUtility);
+    String source = m_workingCopy.getInitialSource();
+    m_curUtility.setSource(source.substring(source.indexOf(m_curUtility.getStartTag()), m_offsetStartLine + matcher.end()));
+    m_curUtility = null;
+    nextLine();
   }
 
   protected JsEnum readEnum(Matcher matcher) throws IOException {
     String indent = matcher.group(1);
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(2));
+    JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(2));
     JsEnum jsEnum = new JsEnum(clazz, matcher.group(3));
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
     if (StringUtility.hasText(matcher.group(5))) {
@@ -435,7 +471,7 @@ public class JsFileParser {
     while (m_currentLine != null) {
       Matcher endMatcher = END_BLOCK.matcher(m_currentLine);
       if (endMatcher.matches() && endMatcher.group(1).equals(indent)) {
-        bodyBuilder.append(endMatcher.group(1)+endMatcher.group(2));
+        bodyBuilder.append(endMatcher.group(1) + endMatcher.group(2));
         break;
       }
       bodyBuilder.append(m_currentLine).append(m_lineSeparator);
@@ -450,7 +486,7 @@ public class JsFileParser {
   }
 
   protected JsConstant readConstant(Matcher matcher) throws IOException {
-    JsClass clazz = m_jsFile.getLastOrAppend(matcher.group(1));
+    JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
     JsConstant constant = new JsConstant(clazz, matcher.group(2));
     constant.setSource(matcher.group(3));
     nextLine();
