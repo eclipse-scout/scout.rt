@@ -49,8 +49,7 @@ public class T5120_ResolveUtilityReferencesAndCreateImports extends AbstractTask
     elems.addAll(context.getLibraries().getElements(Type.Utility));
 
     for (INamedElement e : elems) {
-      //TODO imo what is the \\' suffix for? --> ( of functions, but this may match a substring. query for 'foo' will match the location foobar() !! use non-capturing look-ahead?!
-      source = createImportForReferences(e, Pattern.quote(e.getFullyQualifiedName()) + "([^\\']{1})", e.getName() + "$1", source, jsFile, context);
+      source = createImportForReferences(e, "(?<!\\w)" + Pattern.quote(e.getFullyQualifiedName()) + "(?!\\w)", e.getName(), source, jsFile, context);
     }
     workingCopy.setSource(source);
   }
