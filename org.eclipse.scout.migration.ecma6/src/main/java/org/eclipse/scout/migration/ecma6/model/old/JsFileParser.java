@@ -164,7 +164,7 @@ public class JsFileParser {
    *  4 delimiter semicolumn (opt)
    * </pre>
    */
-  private static Pattern START_CONSTANT = Pattern.compile("^([^. ]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)$");
+  private static Pattern START_CONSTANT = Pattern.compile("^([^. ]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)");
 
   /**
    * <pre>
