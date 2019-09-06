@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.migration.ecma6.context;
 
 import java.nio.file.Files;
@@ -26,29 +36,31 @@ public class AppNameContextProperty implements IContextProperty<String> {
   @Override
   public void setup(Context context) {
     Path indexHtml = Configuration.get().getSourceModuleDirectory().resolve(Paths.get("src/main/resources/WebContent/index.html"));
-    if(Files.exists(indexHtml)){
+    if (Files.exists(indexHtml)) {
       String appName = null;
       Set<String> potentialAppNames = new HashSet<>();
       Matcher matcherJs = APP_NAME_JS_REGEX.matcher(context.ensureWorkingCopy(indexHtml).getSource());
-      while (matcherJs.find()){
-       potentialAppNames.add(matcherJs.group(1));
+      while (matcherJs.find()) {
+        potentialAppNames.add(matcherJs.group(1));
       }
 
       Matcher matcherLess = APP_NAME_LESS_REGEX.matcher(context.ensureWorkingCopy(indexHtml).getSource());
-      while (matcherLess.find()){
-        if(potentialAppNames.contains(matcherLess.group(1))){
+      while (matcherLess.find()) {
+        if (potentialAppNames.contains(matcherLess.group(1))) {
           appName = matcherLess.group(1);
           break;
         }
       }
-      if(appName != null){
-        LOG.debug("Found property "+getClass().getSimpleName()+" : "+appName);
+      if (appName != null) {
+        LOG.debug("Found property " + getClass().getSimpleName() + " : " + appName);
         m_value = appName;
-      }else{
-        LOG.warn("Could not resolve appname in file'"+indexHtml+"'");
       }
-    }else{
-      LOG.warn("Could not resolve file to extract appname '"+indexHtml+"'");
+      else {
+        LOG.warn("Could not resolve appname in file'" + indexHtml + "'");
+      }
+    }
+    else {
+      LOG.debug("Could not resolve index.html file to extract appname '" + indexHtml + "'");
     }
   }
 
