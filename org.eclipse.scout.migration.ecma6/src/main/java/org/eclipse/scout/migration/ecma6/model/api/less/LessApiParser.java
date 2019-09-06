@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -136,7 +135,7 @@ public class LessApiParser {
   }
 
   public List<String> getRequiredImportsFor(WorkingCopy less, Context context) {
-    Set<String> requiredImports = new HashSet<>();
+    Map<String, String> requiredImports = new HashMap<>();
     for (LessApiParser lib : m_libraries.values()) {
       collectRequiredImportsForMixin(less, context, lib, requiredImports, true);
       collectRequiredImportsForVariables(less, context, lib, requiredImports, true);
@@ -144,12 +143,13 @@ public class LessApiParser {
     collectRequiredImportsForMixin(less, context, this, requiredImports, false);
     collectRequiredImportsForVariables(less, context, this, requiredImports, false);
 
-    List<String> imports = new ArrayList<>(requiredImports);
-    Collections.sort(imports);
-    return imports;
+    return requiredImports.values().stream()
+        .distinct()
+        .sorted()
+        .collect(Collectors.toList());
   }
 
-  protected static void collectRequiredImportsForVariables(WorkingCopy less, Context ctx, LessApiParser lib, Set<String> requiredImports, boolean isExternal) {
+  protected static void collectRequiredImportsForVariables(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String theme = parseTheme(less.getPath());
     String libImportPrefix = getExternalLibPrefix(lib);
@@ -166,10 +166,10 @@ public class LessApiParser {
           continue;
         }
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, lessVariable.getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(var, toExternalImport(libImportPrefix, lessVariable.getCustomAttributeString(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, lessVariable.getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(var, toInternalImport(less, lessVariable.getCustomAttributeString(PROP_PATH)));
         }
       }
     }
@@ -179,17 +179,17 @@ public class LessApiParser {
     return '~' + lib.getName() + "/src/";
   }
 
-  protected static void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Set<String> requiredImports, boolean isExternal) {
+  protected static void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String libImportPrefix = getExternalLibPrefix(lib);
     for (Entry<String, INamedElement> mixin : lib.m_mixins.entrySet()) {
       String mixinFqn = mixin.getKey();
       if (lessSrc.contains(mixinFqn)) {
         if (isExternal) {
-          requiredImports.add(toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(mixinFqn, toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributeString(PROP_PATH)));
         }
         else {
-          requiredImports.add(toInternalImport(less, mixin.getValue().getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(mixinFqn, toInternalImport(less, mixin.getValue().getCustomAttributeString(PROP_PATH)));
         }
       }
     }
