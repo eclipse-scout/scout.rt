@@ -40,8 +40,8 @@ public abstract class AbstractResolveReferencesAndCreateImportTask extends Abstr
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
-        matcher.appendReplacement(sb, replacement);
         LOG.debug("Reference replacement[" + filename + "]: '" + matcher.group() + "' -> '" + replacement + "'");
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         result = matcher.find();
       }
       while (result);

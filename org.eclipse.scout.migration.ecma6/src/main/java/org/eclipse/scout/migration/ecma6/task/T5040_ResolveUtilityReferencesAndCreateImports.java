@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 public class T5040_ResolveUtilityReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
   private static final Logger LOG = LoggerFactory.getLogger(T5040_ResolveUtilityReferencesAndCreateImports.class);
 
-
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
@@ -34,28 +33,17 @@ public class T5040_ResolveUtilityReferencesAndCreateImports extends AbstractReso
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    /*
-    */
-    List<INamedElement> elems = context.getApi().getElements(Type.Utility);
-    elems.addAll(context.getLibraries().getElements(Type.Utility));
-
-    for (INamedElement e : elems) {
-      source = createImportForReferences(e.getFullyQualifiedName(), e.getFullyQualifiedName(), e.getName(), source,jsFile,context);
-    }
-
-    /*TODO imo why error?
     List<INamedElement> elems = context.getApi().getElements(Type.UtilityFunction);
     elems.addAll(context.getLibraries().getElements(Type.UtilityFunction));
     for (INamedElement e : elems) {
-      source = createImportForReferences(e.getFullyQualifiedName(), e.getParent().getFullyQualifiedName(), e.getName(), source,jsFile,context);
+      source = createImportForReferences(e.getFullyQualifiedName(), e.getParent().getFullyQualifiedName(), e.getParent().getName() + "." + e.getName(), source, jsFile, context);
     }
-    
+
     elems = context.getApi().getElements(Type.UtilityVariable);
     elems.addAll(context.getLibraries().getElements(Type.UtilityVariable));
     for (INamedElement e : elems) {
-      source = createImportForReferences(e.getFullyQualifiedName(), e.getParent().getFullyQualifiedName(), e.getName(), source,jsFile,context);
+      source = createImportForReferences(e.getFullyQualifiedName(), e.getParent().getFullyQualifiedName(), e.getParent().getName() + "." + e.getName(), source, jsFile, context);
     }
-    */
 
     workingCopy.setSource(source);
   }

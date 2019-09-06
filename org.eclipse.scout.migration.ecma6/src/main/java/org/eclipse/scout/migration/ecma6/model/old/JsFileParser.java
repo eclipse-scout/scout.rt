@@ -119,7 +119,7 @@ public class JsFileParser {
    *  1 name
    * </pre>
    */
-  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^  ([_a-z][^ .]+)\\s*:\\s*function");
+  private static Pattern START_UTILITY_FUNCTION = Pattern.compile("^  ([_$a-z][^ .]+)\\s*:\\s*function");
 
   /**
    * <pre>
@@ -143,7 +143,7 @@ public class JsFileParser {
    *  2 name
    * </pre>
    */
-  private static Pattern START_UTILITY_FUNCTION_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_a-z][^ .]+)\\s*=\\s*function");
+  private static Pattern START_UTILITY_FUNCTION_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*function");
 
   /**
    * <pre>

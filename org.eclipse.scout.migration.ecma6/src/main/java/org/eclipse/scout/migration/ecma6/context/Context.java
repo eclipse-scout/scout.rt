@@ -26,6 +26,8 @@ import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
 import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
+import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -197,6 +199,22 @@ public class Context {
 
   public JsUtility getJsUtility(String fullyQualifiedName) {
     return m_jsUtilities.get(fullyQualifiedName);
+  }
+
+  public JsUtilityFunction getJsUtilityFunction(String fullyQualifiedName) {
+    int i = fullyQualifiedName.lastIndexOf('.');
+    if (i < 0) return null;
+    JsUtility u = m_jsUtilities.get(fullyQualifiedName.substring(0, i));
+    if (u == null) return null;
+    return u.getFunction(fullyQualifiedName.substring(i + 1));
+  }
+
+  public JsUtilityVariable getJsUtilityVariable(String fullyQualifiedName) {
+    int i = fullyQualifiedName.lastIndexOf('.');
+    if (i < 0) return null;
+    JsUtility u = m_jsUtilities.get(fullyQualifiedName.substring(0, i));
+    if (u == null) return null;
+    return u.getVariable(fullyQualifiedName.substring(i + 1));
   }
 
   public Collection<JsTopLevelEnum> getAllTopLevelEnums() {

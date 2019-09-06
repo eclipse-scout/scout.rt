@@ -146,6 +146,16 @@ public class JsFile extends AbstractJsElement {
     if (util != null) {
       return getOrCreateImport(util);
     }
+    // try to find JsUtilityFunction
+    JsUtilityFunction utilFun = context.getJsUtilityFunction(fullyQualifiedName);
+    if (utilFun != null) {
+      return getOrCreateImport(utilFun.getJsUtility());
+    }
+    // try to find JsUtilityVariable
+    JsUtilityVariable utilVar = context.getJsUtilityVariable(fullyQualifiedName);
+    if (utilVar != null) {
+      return getOrCreateImport(utilVar.getJsUtility());
+    }
     // try to find top level enum
     JsTopLevelEnum topLevelEnum = context.getJsTopLevelEnum(fullyQualifiedName);
     if (topLevelEnum != null) {

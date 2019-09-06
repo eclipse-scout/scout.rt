@@ -11,6 +11,8 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -134,20 +136,20 @@ public class T800_Utilities extends AbstractTask {
 
     for (JsUtilityFunction f : util.getFunctions()) {
       if (f.isExported()) {
-        s = s.replace(f.getTag(), "export function " + f.getName());
+        s = replaceFirstNoRegex(s, f.getTag(), "export function " + f.getName());
       }
       else {
         //change and annotate private functions
-        s = s.replace(f.getTag(), "//private\"+ln+\"function " + f.getName());
+        s = replaceFirstNoRegex(s, f.getTag(), "//private\"+ln+\"function " + f.getName());
       }
     }
 
     for (JsUtilityVariable v : util.getVariables()) {
       if (v.isExported()) {
-        s = s.replace(v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        s = replaceFirstNoRegex(s, v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
       }
       else {
-        s = s.replace(v.getTag(), "//private" + ln + "let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        s = replaceFirstNoRegex(s, v.getTag(), "//private" + ln + "let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
       }
     }
 
@@ -163,22 +165,26 @@ public class T800_Utilities extends AbstractTask {
   private String rewritePartStyleUtility(JsUtility util, String s, String ln) {
     for (JsUtilityFunction f : util.getFunctions()) {
       if (f.isExported()) {
-        s = s.replace(f.getTag(), "export function " + f.getName());
+        s = replaceFirstNoRegex(s, f.getTag(), "export function " + f.getName());
       }
       else {
         //change and annotate private functions
-        s = s.replace(f.getTag(), "//private" + ln + "function " + f.getName());
+        s = replaceFirstNoRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
       }
     }
 
     for (JsUtilityVariable v : util.getVariables()) {
       if (v.isExported()) {
-        s = s.replace(v.getTag(), "export let " + v.getName() + " =");
+        s = replaceFirstNoRegex(s, v.getTag(), "export let " + v.getName() + " =");
       }
       else {
-        s = s.replace(v.getTag(), "//private" + ln + "let " + v.getName() + " =");
+        s = replaceFirstNoRegex(s, v.getTag(), "//private" + ln + "let " + v.getName() + " =");
       }
     }
     return s;
+  }
+
+  private static String replaceFirstNoRegex(String s, String oldValue, String newValue) {
+    return s.replaceFirst(Pattern.quote(oldValue), Matcher.quoteReplacement(newValue));
   }
 }
