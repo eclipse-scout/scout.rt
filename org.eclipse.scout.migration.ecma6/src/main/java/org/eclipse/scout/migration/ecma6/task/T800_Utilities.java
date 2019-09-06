@@ -85,17 +85,18 @@ public class T800_Utilities extends AbstractTask {
   protected String rewriteSource(WorkingCopy workingCopy, Context context) {
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
+    String ln = workingCopy.getLineSeparator();
 
     for (JsUtility util : jsFile.getJsUtilities()) {
       String sourceBefore;
       String s;
       if (util.getStartTag() != null) {
         sourceBefore = util.getSource();
-        s = rewriteBlockStyleUtility(util, sourceBefore);
+        s = rewriteBlockStyleUtility(util, sourceBefore, ln);
       }
       else {
         sourceBefore = source;
-        s = rewritePartStyleUtility(util, sourceBefore);
+        s = rewritePartStyleUtility(util, sourceBefore, ln);
       }
 
       //remove all 'this.'
@@ -109,12 +110,12 @@ public class T800_Utilities extends AbstractTask {
           util.getFunctions().stream().filter(f -> f.isExported()).map(f -> "  " + f.getName()),
           util.getVariables().stream().filter(v -> v.isExported()).map(v -> "  " + v.getName()))
           .sorted()
-          .collect(Collectors.joining(",\n"));
-      s += "\n";
+          .collect(Collectors.joining("," + ln));
+      s += ln;
       s += "export default {";
-      s += "\n";
+      s += ln;
       s += exportedNames;
-      s += "\n";
+      s += ln;
       s += "};";
 
       //apply
@@ -127,7 +128,7 @@ public class T800_Utilities extends AbstractTask {
     return source;
   }
 
-  private String rewriteBlockStyleUtility(JsUtility util, String s) {
+  private String rewriteBlockStyleUtility(JsUtility util, String s, String ln) {
     s = s.replace(util.getStartTag(), "");
     s = s.substring(0, s.lastIndexOf("}"));
 
@@ -137,7 +138,7 @@ public class T800_Utilities extends AbstractTask {
       }
       else {
         //change and annotate private functions
-        s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
+        s = s.replace(f.getTag(), "//private\"+ln+\"function " + f.getName());
       }
     }
 
@@ -146,7 +147,7 @@ public class T800_Utilities extends AbstractTask {
         s = s.replace(v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
       }
       else {
-        s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        s = s.replace(v.getTag(), "//private" + ln + "let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
       }
     }
 
@@ -159,14 +160,14 @@ public class T800_Utilities extends AbstractTask {
     return s;
   }
 
-  private String rewritePartStyleUtility(JsUtility util, String s) {
+  private String rewritePartStyleUtility(JsUtility util, String s, String ln) {
     for (JsUtilityFunction f : util.getFunctions()) {
       if (f.isExported()) {
         s = s.replace(f.getTag(), "export function " + f.getName());
       }
       else {
         //change and annotate private functions
-        s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
+        s = s.replace(f.getTag(), "//private" + ln + "function " + f.getName());
       }
     }
 
@@ -175,7 +176,7 @@ public class T800_Utilities extends AbstractTask {
         s = s.replace(v.getTag(), "export let " + v.getName() + " =");
       }
       else {
-        s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " =");
+        s = s.replace(v.getTag(), "//private" + ln + "let " + v.getName() + " =");
       }
     }
     return s;

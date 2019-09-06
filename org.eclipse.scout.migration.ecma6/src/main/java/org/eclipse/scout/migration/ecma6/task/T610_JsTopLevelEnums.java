@@ -10,9 +10,12 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
@@ -34,17 +37,32 @@ public class T610_JsTopLevelEnums extends AbstractTask {
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    String source = workingCopy.getSource();
+    String s = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
+    String ln = workingCopy.getLineSeparator();
 
+    List<String> exportCollector = new ArrayList<>();
     for (JsTopLevelEnum e : jsFile.getJsTopLevelEnums()) {
-      source = createEnum(source, e, workingCopy.getLineSeparator());
+      s = createEnum(s, e, ln, exportCollector);
     }
 
-    workingCopy.setSource(source);
+    //create default export
+    String exportedNames = exportCollector
+        .stream()
+        .map(name -> "  " + name)
+        .sorted()
+        .collect(Collectors.joining("," + ln));
+    s += ln;
+    s += "export default {";
+    s += ln;
+    s += exportedNames;
+    s += ln;
+    s += "};";
+
+    workingCopy.setSource(s);
   }
 
-  protected String createEnum(String source, JsTopLevelEnum jsEnum, String lineDelimiter) {
+  protected String createEnum(String source, JsTopLevelEnum jsEnum, String ln, List<String> exportCollector) {
     StringBuilder patternBuilder = new StringBuilder();
     patternBuilder.append(jsEnum.getNamespace());
 
@@ -57,20 +75,20 @@ public class T610_JsTopLevelEnums extends AbstractTask {
 
       StringBuilder replacement = new StringBuilder();
       if (jsEnum.hasParseErrors()) {
-        replacement.append(jsEnum.toTodoText(lineDelimiter)).append(lineDelimiter);
-        replacement.append(matcher.group());
+        replacement
+            .append(jsEnum.toTodoText(ln))
+            .append(ln)
+            .append(matcher.group());
       }
       else {
-        replacement.append("export const ").append(jsEnum.getName())
+        replacement
+            .append("const ")
+            .append(jsEnum.getName())
             .append(matcher.group(1));
+        exportCollector.add(jsEnum.getName());
       }
       source = matcher.replaceFirst(replacement.toString());
     }
-
-    //replace all state variables
-    // scout.keys.codesToKeys = {
-    // export let codesToKeys = {
-    source = source.replaceAll("" + Pattern.quote(jsEnum.getFqn()) + "\\.(\\w+)(\\s*=)", "export let $1$2");
 
     return source;
   }
