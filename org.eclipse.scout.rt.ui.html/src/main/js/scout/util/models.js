@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,17 +36,25 @@ scout.models = {
     this.modelMap = data;
   },
 
+  getModel: function(modelId, parent) {
+    var model = this._get(modelId, 'model');
+    if (parent) {
+      model.parent = parent;
+    }
+    return model;
+  },
+
   /**
-   * Returns a new instance of a model from the global modelMap.
+   * Returns a new instance of a model supplied by the given model func
    *
-   * @param {string} modelId
-   *          The id of the model.
+   * @param {Object} modelOwner The owner of the model. This instance is passed to the given modelFunc as the only argument.
+   * @param {Function} modelFunc A function that returns the model instance. The given modelOwner is passed to the function.
    * @param {Object} [parent]
    *          Optional parent that is set on the returned object.
    * @returns {Object}
    */
-  getModel: function(modelId, parent) {
-    var model = this._get(modelId, 'model');
+  get: function(modelOwner, modelFunc, parent) {
+    var model = modelFunc(modelOwner);
     if (parent) {
       model.parent = parent;
     }
