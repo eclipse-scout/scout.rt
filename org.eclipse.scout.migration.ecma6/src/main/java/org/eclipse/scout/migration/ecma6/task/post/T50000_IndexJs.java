@@ -86,6 +86,8 @@ public class T50000_IndexJs implements IPostMigrationTask {
       src.append("export { default as ").append(name).append(" } from './").append(rel).append("';\n");
     }
 
+    src.append("\n").append("import * as self from './index.js';\nwindow.").append(config.getNamespace()).append(" = Object.assign(window.").append(config.getNamespace()).append(" || {}, self);\n");
+
     return src.toString();
   }
 
