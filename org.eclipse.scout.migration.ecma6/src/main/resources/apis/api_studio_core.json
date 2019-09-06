@@ -2,9 +2,6 @@
   "name" : "studio",
   "type" : "Library",
   "fullyQualifiedName" : "studio",
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/studio"
-  },
   "children" : [ {
     "name" : "BrainEditorField",
     "type" : "Class",
@@ -108,30 +105,6 @@
       "name" : "toString",
       "type" : "Function",
       "fullyQualifiedName" : "studio.BlockType.toString"
-    } ]
-  }, {
-    "name" : "pickerBoxUtil",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.pickerBoxUtil",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.pickerBoxUtil"
-    }, {
-      "name" : "createFunction",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.pickerBoxUtil.createFunction"
-    }, {
-      "name" : "addArgument",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.pickerBoxUtil.addArgument"
-    }, {
-      "name" : "unshiftArgument",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.pickerBoxUtil.unshiftArgument"
-    }, {
-      "name" : "createFunctionArgument",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.pickerBoxUtil.createFunctionArgument"
     } ]
   }, {
     "name" : "AnalyticsItemDetailPopup",
@@ -372,202 +345,6 @@
       "name" : "preferredLayoutSize",
       "type" : "Function",
       "fullyQualifiedName" : "studio.BlockLayout.preferredLayoutSize"
-    } ]
-  }, {
-    "name" : "picker",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.picker",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.picker"
-    }, {
-      "name" : "resolveRelationPath",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.resolveRelationPath"
-    }, {
-      "name" : "findRelation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.findRelation"
-    }, {
-      "name" : "findEntity",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.findEntity"
-    }, {
-      "name" : "_findRelationConstraint",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._findRelationConstraint"
-    }, {
-      "name" : "exportIteratorSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.exportIteratorSelection"
-    }, {
-      "name" : "_findRelationSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._findRelationSelection"
-    }, {
-      "name" : "importIteratorSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.importIteratorSelection"
-    }, {
-      "name" : "importIteratorSelectionToPickerFields",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.importIteratorSelectionToPickerFields"
-    }, {
-      "name" : "createRelationSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.createRelationSelection"
-    }, {
-      "name" : "_loadAttributeField",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._loadAttributeField"
-    }, {
-      "name" : "getCodeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.getCodeType"
-    }, {
-      "name" : "getRelationTargetEntityId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.getRelationTargetEntityId"
-    }, {
-      "name" : "isToManyRelation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.isToManyRelation"
-    }, {
-      "name" : "getFirstToManyRelationPath",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.getFirstToManyRelationPath"
-    }, {
-      "name" : "relationTypeToEntityId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.relationTypeToEntityId"
-    }, {
-      "name" : "isFilteringMode",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.isFilteringMode"
-    }, {
-      "name" : "isPickingMode",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.isPickingMode"
-    }, {
-      "name" : "createAttributeSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.createAttributeSelection"
-    }, {
-      "name" : "applyFormat",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.applyFormat"
-    }, {
-      "name" : "_isSameSelectionRegardlessConstraintAndAggregation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._isSameSelectionRegardlessConstraintAndAggregation"
-    }, {
-      "name" : "applyAggregation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.applyAggregation"
-    }, {
-      "name" : "applyImplicitTransformation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.applyImplicitTransformation"
-    }, {
-      "name" : "loadAttributeSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.loadAttributeSelection"
-    }, {
-      "name" : "_loadFixValueAttributeLiteralValueType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._loadFixValueAttributeLiteralValueType"
-    }, {
-      "name" : "_createAttribute",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._createAttribute"
-    }, {
-      "name" : "_resolveSelectionAttributeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveSelectionAttributeType"
-    }, {
-      "name" : "extractStoryPropertyId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.extractStoryPropertyId"
-    }, {
-      "name" : "resolveLabel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.resolveLabel"
-    }, {
-      "name" : "_resolveAttributeSelections",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveAttributeSelections"
-    }, {
-      "name" : "_resolveLabel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabel"
-    }, {
-      "name" : "_newLabelResult",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._newLabelResult"
-    }, {
-      "name" : "getText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.getText"
-    }, {
-      "name" : "_resolveLabelForAttributeSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabelForAttributeSelection"
-    }, {
-      "name" : "_resolveLabelWithLookupCall",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabelWithLookupCall"
-    }, {
-      "name" : "_resolveLabelForMedia",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabelForMedia"
-    }, {
-      "name" : "_resolveLabelForEntityKey",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabelForEntityKey"
-    }, {
-      "name" : "_resolveLabelForVariable",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveLabelForVariable"
-    }, {
-      "name" : "_resolveAttributeName",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveAttributeName"
-    }, {
-      "name" : "_resolveRelationName",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._resolveRelationName"
-    }, {
-      "name" : "_findRelation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker._findRelation"
-    }, {
-      "name" : "deprecatedLabel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.deprecatedLabel"
-    }, {
-      "name" : "optViewHint",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.optViewHint"
-    }, {
-      "name" : "optViewHintArray",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.optViewHintArray"
-    }, {
-      "name" : "isViewHint",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.isViewHint"
-    }, {
-      "name" : "getReduceFunctions",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.getReduceFunctions"
-    }, {
-      "name" : "setPickerMetaInfo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.setPickerMetaInfo"
-    }, {
-      "name" : "optPickerMetaInfo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.picker.optPickerMetaInfo"
     } ]
   }, {
     "name" : "PickerTileTextFilter",
@@ -952,50 +729,6 @@
       "name" : "_storeFilter",
       "type" : "Function",
       "fullyQualifiedName" : "studio.BooleanFilterBox._storeFilter"
-    } ]
-  }, {
-    "name" : "cortexes",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.cortexes",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.cortexes"
-    }, {
-      "name" : "editCortex",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes.editCortex"
-    }, {
-      "name" : "_initEditCortexContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes._initEditCortexContext"
-    }, {
-      "name" : "editBrainInput",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes.editBrainInput"
-    }, {
-      "name" : "editBrainOutput",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes.editBrainOutput"
-    }, {
-      "name" : "_initEditInputOutputCortexContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes._initEditInputOutputCortexContext"
-    }, {
-      "name" : "_editCortex",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes._editCortex"
-    }, {
-      "name" : "loadCortexStatisticsRenderer",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes.loadCortexStatisticsRenderer"
-    }, {
-      "name" : "_initLoadCortexStatisticsContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes._initLoadCortexStatisticsContext"
-    }, {
-      "name" : "_installCortexStatisticsRenderer",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.cortexes._installCortexStatisticsRenderer"
     } ]
   }, {
     "name" : "UuidPoolAdapter",
@@ -4348,106 +4081,6 @@
       "name" : "_sortSegments",
       "type" : "Function",
       "fullyQualifiedName" : "studio.BrainTilePieChartRenderer._sortSegments"
-    } ]
-  }, {
-    "name" : "util",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.util",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.util"
-    }, {
-      "name" : "loadIcon",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.loadIcon"
-    }, {
-      "name" : "_loadNextIcon",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util._loadNextIcon"
-    }, {
-      "name" : "_loadIconImpl",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util._loadIconImpl"
-    }, {
-      "name" : "_prepareSvg",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util._prepareSvg"
-    }, {
-      "name" : "findFlowDesigner",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.findFlowDesigner"
-    }, {
-      "name" : "findFlowGrid",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.findFlowGrid"
-    }, {
-      "name" : "scaleCss",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.scaleCss"
-    }, {
-      "name" : "cssClassForStepTypeKind",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.cssClassForStepTypeKind"
-    }, {
-      "name" : "getAnalyticsValueForType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.getAnalyticsValueForType"
-    }, {
-      "name" : "cleanCustomConfig",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.cleanCustomConfig"
-    }, {
-      "name" : "isUndefinedNullOrEmptyCollection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.isUndefinedNullOrEmptyCollection"
-    }, {
-      "name" : "compareRanges",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.compareRanges"
-    }, {
-      "name" : "validateRanges",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.validateRanges"
-    }, {
-      "name" : "isHistoricalAnalyticsType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.isHistoricalAnalyticsType"
-    }, {
-      "name" : "installMoveTableRowMenus",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.installMoveTableRowMenus"
-    }, {
-      "name" : "svg2Html",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.svg2Html"
-    }, {
-      "name" : "addHelpBubble",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.util.addHelpBubble"
-    } ]
-  }, {
-    "name" : "brainUtil",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.brainUtil",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.brainUtil"
-    }, {
-      "name" : "typeSymbol",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.brainUtil.typeSymbol"
-    }, {
-      "name" : "baseTypeSymbol",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.brainUtil.baseTypeSymbol"
-    }, {
-      "name" : "rankSymbol",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.brainUtil.rankSymbol"
-    }, {
-      "name" : "computeFeatureTargetRank",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.brainUtil.computeFeatureTargetRank"
     } ]
   }, {
     "name" : "ZoomSlider",
@@ -8054,30 +7687,6 @@
       "fullyQualifiedName" : "studio.CodePickerBox.CODE_TYPE_ID"
     } ]
   }, {
-    "name" : "api",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.api",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.api"
-    }, {
-      "name" : "loadSetting",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.api.loadSetting"
-    }, {
-      "name" : "loadSettingValue",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.api.loadSettingValue"
-    }, {
-      "name" : "loadLocaleLabels",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.api.loadLocaleLabels"
-    }, {
-      "name" : "loadStoryProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.api.loadStoryProperties"
-    } ]
-  }, {
     "name" : "CortexType",
     "type" : "Class",
     "fullyQualifiedName" : "studio.CortexType",
@@ -8816,78 +8425,6 @@
       "name" : "_setDraggable",
       "type" : "Function",
       "fullyQualifiedName" : "studio.ContentEditorElementTile._setDraggable"
-    } ]
-  }, {
-    "name" : "types",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.types",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.types"
-    }, {
-      "name" : "entityType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.entityType"
-    }, {
-      "name" : "entityCodeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.entityCodeType"
-    }, {
-      "name" : "entityKeyType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.entityKeyType"
-    }, {
-      "name" : "entityKeyCodeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.entityKeyCodeType"
-    }, {
-      "name" : "createType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.createType"
-    }, {
-      "name" : "isTextDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isTextDataModelType"
-    }, {
-      "name" : "isScalarDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isScalarDataModelType"
-    }, {
-      "name" : "isNumericDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isNumericDataModelType"
-    }, {
-      "name" : "isListDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isListDataModelType"
-    }, {
-      "name" : "isKeyDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isKeyDataModelType"
-    }, {
-      "name" : "isCodeDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.isCodeDataModelType"
-    }, {
-      "name" : "asEntityDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.asEntityDataModelType"
-    }, {
-      "name" : "asListDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.asListDataModelType"
-    }, {
-      "name" : "getWrappedDataModelType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.getWrappedDataModelType"
-    }, {
-      "name" : "getCodeTypeId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.getCodeTypeId"
-    }, {
-      "name" : "lastElementOfType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.types.lastElementOfType"
     } ]
   }, {
     "name" : "MindsetControls",
@@ -10806,46 +10343,6 @@
       "fullyQualifiedName" : "studio.PickerTileGrid._initKeyStrokeContext"
     } ]
   }, {
-    "name" : "properties",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.properties",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.properties"
-    }, {
-      "name" : "descriptorToProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.descriptorToProperty"
-    }, {
-      "name" : "applyDescriptors",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.applyDescriptors"
-    }, {
-      "name" : "applyDescriptorToStory",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.applyDescriptorToStory"
-    }, {
-      "name" : "applyDescriptorToStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.applyDescriptorToStep"
-    }, {
-      "name" : "applyDescriptorToProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.applyDescriptorToProperties"
-    }, {
-      "name" : "createStoryProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.createStoryProperty"
-    }, {
-      "name" : "createStepProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.createStepProperty"
-    }, {
-      "name" : "createNestedProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.properties.createNestedProperty"
-    } ]
-  }, {
     "name" : "StepLibraryLayout",
     "type" : "Class",
     "fullyQualifiedName" : "studio.StepLibraryLayout",
@@ -12690,50 +12187,6 @@
       "fullyQualifiedName" : "studio.AuthenticationVerifierConfigBox._onDeleteRowMenuAction"
     } ]
   }, {
-    "name" : "steps",
-    "type" : "Class",
-    "fullyQualifiedName" : "studio.steps",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "studio.steps"
-    }, {
-      "name" : "editStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps.editStep"
-    }, {
-      "name" : "_initEditStepContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._initEditStepContext"
-    }, {
-      "name" : "_editStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._editStep"
-    }, {
-      "name" : "openFeedbackForm",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps.openFeedbackForm"
-    }, {
-      "name" : "_initFeedbackFormContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._initFeedbackFormContext"
-    }, {
-      "name" : "_openFeedbackForm",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._openFeedbackForm"
-    }, {
-      "name" : "loadTileRenderer",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps.loadTileRenderer"
-    }, {
-      "name" : "_initLoadTileRendererContext",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._initLoadTileRendererContext"
-    }, {
-      "name" : "_installTileRenderer",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "studio.steps._installTileRenderer"
-    } ]
-  }, {
     "name" : "PickerBox",
     "type" : "Class",
     "fullyQualifiedName" : "studio.PickerBox",
@@ -13060,6 +12513,551 @@
       "name" : "_updateUseDemoData",
       "type" : "Function",
       "fullyQualifiedName" : "studio.StorySidebarTabSettings._updateUseDemoData"
+    } ]
+  }, {
+    "name" : "properties",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.properties",
+    "children" : [ {
+      "name" : "descriptorToProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.descriptorToProperty"
+    }, {
+      "name" : "applyDescriptors",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.applyDescriptors"
+    }, {
+      "name" : "applyDescriptorToStory",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.applyDescriptorToStory"
+    }, {
+      "name" : "applyDescriptorToStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.applyDescriptorToStep"
+    }, {
+      "name" : "applyDescriptorToProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.applyDescriptorToProperties"
+    }, {
+      "name" : "createStoryProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.createStoryProperty"
+    }, {
+      "name" : "createStepProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.createStepProperty"
+    }, {
+      "name" : "createNestedProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.properties.createNestedProperty"
+    } ]
+  }, {
+    "name" : "types",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.types",
+    "children" : [ {
+      "name" : "entityType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.entityType"
+    }, {
+      "name" : "entityCodeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.entityCodeType"
+    }, {
+      "name" : "entityKeyType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.entityKeyType"
+    }, {
+      "name" : "entityKeyCodeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.entityKeyCodeType"
+    }, {
+      "name" : "createType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.createType"
+    }, {
+      "name" : "isTextDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isTextDataModelType"
+    }, {
+      "name" : "isScalarDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isScalarDataModelType"
+    }, {
+      "name" : "isNumericDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isNumericDataModelType"
+    }, {
+      "name" : "isListDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isListDataModelType"
+    }, {
+      "name" : "isKeyDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isKeyDataModelType"
+    }, {
+      "name" : "isCodeDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.isCodeDataModelType"
+    }, {
+      "name" : "asEntityDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.asEntityDataModelType"
+    }, {
+      "name" : "asListDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.asListDataModelType"
+    }, {
+      "name" : "getWrappedDataModelType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.getWrappedDataModelType"
+    }, {
+      "name" : "getCodeTypeId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.getCodeTypeId"
+    }, {
+      "name" : "lastElementOfType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.types.lastElementOfType"
+    } ]
+  }, {
+    "name" : "pickerBoxUtil",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.pickerBoxUtil",
+    "children" : [ {
+      "name" : "createFunction",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.pickerBoxUtil.createFunction"
+    }, {
+      "name" : "createFunctionArgument",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.pickerBoxUtil.createFunctionArgument"
+    } ]
+  }, {
+    "name" : "api",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.api",
+    "children" : [ {
+      "name" : "loadSetting",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.api.loadSetting"
+    }, {
+      "name" : "loadSettingValue",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.api.loadSettingValue"
+    }, {
+      "name" : "loadLocaleLabels",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.api.loadLocaleLabels"
+    }, {
+      "name" : "loadStoryProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.api.loadStoryProperties"
+    }, {
+      "name" : "smtpServerSettingDescriptorId",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.api.smtpServerSettingDescriptorId"
+    }, {
+      "name" : "fileRepositoryDirectorySettingDescriptorId",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.api.fileRepositoryDirectorySettingDescriptorId"
+    }, {
+      "name" : "applicationLocaleSettingDescriptorId",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.api.applicationLocaleSettingDescriptorId"
+    } ]
+  }, {
+    "name" : "steps",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.steps",
+    "children" : [ {
+      "name" : "editStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps.editStep"
+    }, {
+      "name" : "_initEditStepContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._initEditStepContext"
+    }, {
+      "name" : "_editStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._editStep"
+    }, {
+      "name" : "openFeedbackForm",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps.openFeedbackForm"
+    }, {
+      "name" : "_initFeedbackFormContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._initFeedbackFormContext"
+    }, {
+      "name" : "_openFeedbackForm",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._openFeedbackForm"
+    }, {
+      "name" : "loadTileRenderer",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps.loadTileRenderer"
+    }, {
+      "name" : "_initLoadTileRendererContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._initLoadTileRendererContext"
+    }, {
+      "name" : "_installTileRenderer",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.steps._installTileRenderer"
+    }, {
+      "name" : "editors",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.steps.editors"
+    }, {
+      "name" : "feedbackForms",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.steps.feedbackForms"
+    }, {
+      "name" : "tileRenderers",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.steps.tileRenderers"
+    } ]
+  }, {
+    "name" : "cortexes",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.cortexes",
+    "children" : [ {
+      "name" : "editCortex",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes.editCortex"
+    }, {
+      "name" : "_initEditCortexContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes._initEditCortexContext"
+    }, {
+      "name" : "editBrainInput",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes.editBrainInput"
+    }, {
+      "name" : "editBrainOutput",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes.editBrainOutput"
+    }, {
+      "name" : "_initEditInputOutputCortexContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes._initEditInputOutputCortexContext"
+    }, {
+      "name" : "_editCortex",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes._editCortex"
+    }, {
+      "name" : "loadCortexStatisticsRenderer",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes.loadCortexStatisticsRenderer"
+    }, {
+      "name" : "_initLoadCortexStatisticsContext",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes._initLoadCortexStatisticsContext"
+    }, {
+      "name" : "_installCortexStatisticsRenderer",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.cortexes._installCortexStatisticsRenderer"
+    }, {
+      "name" : "editors",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.cortexes.editors"
+    }, {
+      "name" : "cortexStatisticsRenderers",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.cortexes.cortexStatisticsRenderers"
+    } ]
+  }, {
+    "name" : "util",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.util",
+    "children" : [ {
+      "name" : "loadIcon",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.loadIcon"
+    }, {
+      "name" : "_loadNextIcon",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util._loadNextIcon"
+    }, {
+      "name" : "_loadIconImpl",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util._loadIconImpl"
+    }, {
+      "name" : "_prepareSvg",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util._prepareSvg"
+    }, {
+      "name" : "findFlowDesigner",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.findFlowDesigner"
+    }, {
+      "name" : "findFlowGrid",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.findFlowGrid"
+    }, {
+      "name" : "scaleCss",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.scaleCss"
+    }, {
+      "name" : "cssClassForStepTypeKind",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.cssClassForStepTypeKind"
+    }, {
+      "name" : "getAnalyticsValueForType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.getAnalyticsValueForType"
+    }, {
+      "name" : "cleanCustomConfig",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.cleanCustomConfig"
+    }, {
+      "name" : "isUndefinedNullOrEmptyCollection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.isUndefinedNullOrEmptyCollection"
+    }, {
+      "name" : "compareRanges",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.compareRanges"
+    }, {
+      "name" : "validateRanges",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.validateRanges"
+    }, {
+      "name" : "isHistoricalAnalyticsType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.isHistoricalAnalyticsType"
+    }, {
+      "name" : "installMoveTableRowMenus",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.installMoveTableRowMenus"
+    }, {
+      "name" : "svg2Html",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.svg2Html"
+    }, {
+      "name" : "addHelpBubble",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.util.addHelpBubble"
+    }, {
+      "name" : "_iconLoaderQueue",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.util._iconLoaderQueue"
+    }, {
+      "name" : "_iconCache",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "studio.util._iconCache"
+    } ]
+  }, {
+    "name" : "picker",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.picker",
+    "children" : [ {
+      "name" : "resolveRelationPath",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.resolveRelationPath"
+    }, {
+      "name" : "findRelation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.findRelation"
+    }, {
+      "name" : "findEntity",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.findEntity"
+    }, {
+      "name" : "_findRelationConstraint",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._findRelationConstraint"
+    }, {
+      "name" : "exportIteratorSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.exportIteratorSelection"
+    }, {
+      "name" : "_findRelationSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._findRelationSelection"
+    }, {
+      "name" : "importIteratorSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.importIteratorSelection"
+    }, {
+      "name" : "importIteratorSelectionToPickerFields",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.importIteratorSelectionToPickerFields"
+    }, {
+      "name" : "createRelationSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.createRelationSelection"
+    }, {
+      "name" : "_loadAttributeField",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._loadAttributeField"
+    }, {
+      "name" : "getCodeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.getCodeType"
+    }, {
+      "name" : "getRelationTargetEntityId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.getRelationTargetEntityId"
+    }, {
+      "name" : "isToManyRelation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.isToManyRelation"
+    }, {
+      "name" : "getFirstToManyRelationPath",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.getFirstToManyRelationPath"
+    }, {
+      "name" : "relationTypeToEntityId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.relationTypeToEntityId"
+    }, {
+      "name" : "isFilteringMode",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.isFilteringMode"
+    }, {
+      "name" : "isPickingMode",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.isPickingMode"
+    }, {
+      "name" : "createAttributeSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.createAttributeSelection"
+    }, {
+      "name" : "applyFormat",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.applyFormat"
+    }, {
+      "name" : "_isSameSelectionRegardlessConstraintAndAggregation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._isSameSelectionRegardlessConstraintAndAggregation"
+    }, {
+      "name" : "applyAggregation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.applyAggregation"
+    }, {
+      "name" : "applyImplicitTransformation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.applyImplicitTransformation"
+    }, {
+      "name" : "loadAttributeSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.loadAttributeSelection"
+    }, {
+      "name" : "_loadFixValueAttributeLiteralValueType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._loadFixValueAttributeLiteralValueType"
+    }, {
+      "name" : "_createAttribute",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._createAttribute"
+    }, {
+      "name" : "_resolveSelectionAttributeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveSelectionAttributeType"
+    }, {
+      "name" : "extractStoryPropertyId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.extractStoryPropertyId"
+    }, {
+      "name" : "resolveLabel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.resolveLabel"
+    }, {
+      "name" : "_resolveAttributeSelections",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveAttributeSelections"
+    }, {
+      "name" : "_resolveLabel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabel"
+    }, {
+      "name" : "_newLabelResult",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._newLabelResult"
+    }, {
+      "name" : "_resolveLabelForAttributeSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabelForAttributeSelection"
+    }, {
+      "name" : "_resolveLabelWithLookupCall",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabelWithLookupCall"
+    }, {
+      "name" : "_resolveLabelForMedia",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabelForMedia"
+    }, {
+      "name" : "_resolveLabelForEntityKey",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabelForEntityKey"
+    }, {
+      "name" : "_resolveLabelForVariable",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveLabelForVariable"
+    }, {
+      "name" : "_resolveAttributeName",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveAttributeName"
+    }, {
+      "name" : "_resolveRelationName",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._resolveRelationName"
+    }, {
+      "name" : "_findRelation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker._findRelation"
+    }, {
+      "name" : "deprecatedLabel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.deprecatedLabel"
+    }, {
+      "name" : "optViewHint",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.optViewHint"
+    }, {
+      "name" : "optViewHintArray",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.optViewHintArray"
+    }, {
+      "name" : "isViewHint",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.isViewHint"
+    }, {
+      "name" : "getReduceFunctions",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.getReduceFunctions"
+    }, {
+      "name" : "setPickerMetaInfo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.setPickerMetaInfo"
+    }, {
+      "name" : "optPickerMetaInfo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.picker.optPickerMetaInfo"
+    } ]
+  }, {
+    "name" : "brainUtil",
+    "type" : "Utility",
+    "fullyQualifiedName" : "studio.brainUtil",
+    "children" : [ {
+      "name" : "typeSymbol",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.brainUtil.typeSymbol"
+    }, {
+      "name" : "baseTypeSymbol",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.brainUtil.baseTypeSymbol"
+    }, {
+      "name" : "rankSymbol",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.brainUtil.rankSymbol"
+    }, {
+      "name" : "computeFeatureTargetRank",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "studio.brainUtil.computeFeatureTargetRank"
     } ]
   }, {
     "name" : "PeriodicityType",
@@ -15888,5 +15886,8 @@
       "path" : "src/main/js/studio/style/colors.less",
       "theme" : "default-theme"
     }
-  } ]
+  } ],
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/studio"
+  }
 }

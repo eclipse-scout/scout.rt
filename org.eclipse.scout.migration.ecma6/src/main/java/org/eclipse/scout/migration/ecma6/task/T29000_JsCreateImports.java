@@ -44,16 +44,17 @@ public class T29000_JsCreateImports extends AbstractTask {
 
     StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
     if (jsFile.getCopyRight() == null) {
-      sourceBuilder.insert(0, importsSource + lineDelimiter);
+      sourceBuilder.insert(0, importsSource + lineDelimiter + lineDelimiter);
     }
     else {
 
       Matcher matcher = Pattern.compile(Pattern.quote(jsFile.getCopyRight().getSource())).matcher(sourceBuilder.toString());
-      if(matcher.find()){
-        sourceBuilder.insert(matcher.end(), importsSource+ lineDelimiter);
-      }else{
-        sourceBuilder.insert(0, MigrationUtility.prependTodo("","insert 'var instance;' manual.",lineDelimiter));
-        LOG.warn("Could not find end of copyright in file '"+jsFile.getPath()+"'");
+      if (matcher.find()) {
+        sourceBuilder.insert(matcher.end(), importsSource + lineDelimiter + lineDelimiter);
+      }
+      else {
+        sourceBuilder.insert(0, MigrationUtility.prependTodo("", "insert 'var instance;' manual.", lineDelimiter));
+        LOG.warn("Could not find end of copyright in file '" + jsFile.getPath() + "'");
       }
     }
     workingCopy.setSource(sourceBuilder.toString());

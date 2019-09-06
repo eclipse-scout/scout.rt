@@ -32,8 +32,8 @@ public abstract class AbstractResolveReferencesAndCreateImportTask extends Abstr
     return m_filter.test(pathInfo);
   }
 
-  protected String createImportForReferences(Pattern pattern, String toImport, String replacement, String source, JsFile jsFile, Context context) {
-    Matcher matcher = pattern.matcher(source);
+  protected String createImportForReferences(String sourceFqn, String toImport, String replacement, String source, JsFile jsFile, Context context) {
+    Matcher matcher = Pattern.compile("(?<!\\w)" + Pattern.quote(sourceFqn) + "(?!\\w)").matcher(source);
     boolean result = matcher.find();
     if (result) {
       String filename = jsFile.getPath().getFileName().toString();

@@ -121,7 +121,7 @@ public class T500_CreateClasses extends AbstractTask {
           .append(" ");
 
     }
-    classBuilder.append("{").append(workingCopy.getLineSeparator());
+    classBuilder.append("{").append(workingCopy.getLineSeparator()).append(workingCopy.getLineSeparator());
 
     matcher = Pattern.compile(Pattern.quote(functions.get(0).getSource())).matcher(sourceBuilder.toString());
     if(matcher.find()){

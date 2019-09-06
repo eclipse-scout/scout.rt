@@ -29,9 +29,9 @@ import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Order(5080)
-public class T5080_ResolveStaticFunctionReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5080_ResolveStaticFunctionReferencesAndCreateImports.class);
+@Order(5000)
+public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T5000_ResolveStaticFunctionReferencesAndCreateImports.class);
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
@@ -64,7 +64,7 @@ public class T5080_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
       // check if any of the local static methods is used
       Matcher matcher = Pattern.compile(staticFunctions
           .stream()
-          .map(f -> Pattern.quote(f.getJsClass().getFullyQualifiedName() + "." + f.getName()))
+          .map(f -> Pattern.quote(f.getFqn()))
           .collect(Collectors.joining("|"))).matcher(source);
       if (matcher.find()) {
         source = MigrationUtility.prependTodo(source, "Replace local references (static function).", lineDelimiter);
@@ -74,11 +74,11 @@ public class T5080_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     }
 
     for (JsFunction fun : staticFunctions) {
-      source = createImportForReferences(Pattern.compile(Pattern.quote(fun.getJsClass().getFullyQualifiedName()+"."+fun.getName()) + "([^\\']{1})"), null, fun.getName() + "$1", source, jsFile, context);
+      source = createImportForReferences(fun.getFqn(), null, fun.getName() , source, jsFile, context);
       List<String> singletonRefs = fun.getSingletonReferences();
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {
-          source = createImportForReferences(Pattern.compile(Pattern.quote(singletonRef)+ "([^\\']{1})"), fun.getJsClass().getFullyQualifiedName(), fun.getName()+ "()$1", source, jsFile, context);
+          source = createImportForReferences(singletonRef, fun.getJsClass().getFullyQualifiedName(), fun.getName()+ "()", source, jsFile, context);
         }
       }
     }
@@ -93,11 +93,11 @@ public class T5080_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
 
     for (INamedElement function : staticFunctions) {
       String replacement = function.getParent().getName() + "." + function.getName();
-      source = createImportForReferences(Pattern.compile(Pattern.quote(function.getFullyQualifiedName()) + "([^\\']{1})"), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement + "$1", source, jsFile, context);
+      source = createImportForReferences(function.getFullyQualifiedName(), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
       List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {
-          source = createImportForReferences(Pattern.compile(Pattern.quote(singletonRef)+ "([^\\']{1})"), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement + "()$1", source, jsFile, context);
+          source = createImportForReferences(singletonRef, function.getAncestor(Type.Class).getFullyQualifiedName(), replacement + "()", source, jsFile, context);
         }
       }
     }

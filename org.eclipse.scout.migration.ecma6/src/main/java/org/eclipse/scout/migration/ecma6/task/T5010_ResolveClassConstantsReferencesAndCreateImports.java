@@ -25,14 +25,13 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
-import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Order(5081)
-public class T5081_ResolveConstantsReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5081_ResolveConstantsReferencesAndCreateImports.class);
+@Order(5010)
+public class T5010_ResolveClassConstantsReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T5010_ResolveClassConstantsReferencesAndCreateImports.class);
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
@@ -74,7 +73,7 @@ public class T5081_ResolveConstantsReferencesAndCreateImports extends AbstractRe
     }
 
     for (JsConstant constant : constants) {
-      source = createImportForReferences(Pattern.compile(Pattern.quote(constant.getJsClass().getFullyQualifiedName()+"."+constant.getName())+"([^a-zA-Z0-9\\']{1})"), null, constant.getName() + "$1", source, jsFile, context);
+      source = createImportForReferences(constant.getJsClass().getFullyQualifiedName()+"."+constant.getName(), null, constant.getName() , source, jsFile, context);
     }
     return source;
   }
@@ -87,7 +86,7 @@ public class T5081_ResolveConstantsReferencesAndCreateImports extends AbstractRe
 
     for (INamedElement constant : constants) {
       String replacement = constant.getParent().getName() + "." + constant.getName();
-      source = createImportForReferences(Pattern.compile(Pattern.quote(constant.getFullyQualifiedName())+"([^a-zA-Z0-9\\']{1})"), constant.getAncestor(Type.Class).getFullyQualifiedName(), replacement + "$1", source, jsFile, context);
+      source = createImportForReferences(constant.getFullyQualifiedName(), constant.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
     }
     return source;
   }

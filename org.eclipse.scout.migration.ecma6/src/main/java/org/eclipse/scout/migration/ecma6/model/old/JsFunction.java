@@ -31,6 +31,13 @@ public class JsFunction extends AbstractJsElement {
     return m_name;
   }
 
+  public String getFqn(){
+    if(isConstructor()){
+      return getJsClass().getFullyQualifiedName();
+    }
+    return getJsClass().getFullyQualifiedName()+"."+getName();
+  }
+
   public void setConstructor(boolean b) {
     m_constructor = b;
   }
