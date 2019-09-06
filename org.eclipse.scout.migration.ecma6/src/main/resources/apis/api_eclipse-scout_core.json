@@ -2,15 +2,10 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/core"
+  },
   "children" : [ {
-    "name" : "reloadPage",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.reloadPage",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.reloadPage"
-    } ]
-  }, {
     "name" : "Column",
     "type" : "Class",
     "fullyQualifiedName" : "scout.Column",
@@ -898,34 +893,6 @@
       "fullyQualifiedName" : "scout.NullWidgetAdapter"
     } ]
   }, {
-    "name" : "keyStrokeModifier",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.keyStrokeModifier",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.keyStrokeModifier"
-    }, {
-      "name" : "isCtrl",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.keyStrokeModifier.isCtrl"
-    }, {
-      "name" : "isShift",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.keyStrokeModifier.isShift"
-    }, {
-      "name" : "isAlt",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.keyStrokeModifier.isAlt"
-    }, {
-      "name" : "_eval",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.keyStrokeModifier._eval"
-    }, {
-      "name" : "toModifierBitMask",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.keyStrokeModifier.toModifierBitMask"
-    } ]
-  }, {
     "name" : "TreeNavigationDownKeyStroke",
     "type" : "Class",
     "fullyQualifiedName" : "scout.TreeNavigationDownKeyStroke",
@@ -1112,26 +1079,6 @@
       "name" : "_onAnimationEnd",
       "type" : "Function",
       "fullyQualifiedName" : "scout.SmartFieldPopup._onAnimationEnd"
-    } ]
-  }, {
-    "name" : "polyfills",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.polyfills",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.polyfills"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.polyfills.install"
-    }, {
-      "name" : "_installPolyfillMath",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.polyfills._installPolyfillMath"
-    }, {
-      "name" : "_installPolyfillFormData",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.polyfills._installPolyfillFormData"
     } ]
   }, {
     "name" : "CollapseHandle",
@@ -2506,54 +2453,6 @@
       "fullyQualifiedName" : "scout.SimpleTabBox.getViews"
     } ]
   }, {
-    "name" : "fonts",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.fonts",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.fonts"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.bootstrap"
-    }, {
-      "name" : "onComplete",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.onComplete"
-    }, {
-      "name" : "preloader",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.preloader"
-    }, {
-      "name" : "preload",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.preload"
-    }, {
-      "name" : "measureSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.measureSize"
-    }, {
-      "name" : "autoDetectFonts",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fonts.autoDetectFonts"
-    } ]
-  }, {
-    "name" : "mimeTypes",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.mimeTypes",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.mimeTypes"
-    }, {
-      "name" : "isTextMimeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.mimeTypes.isTextMimeType"
-    }, {
-      "name" : "isJavaScript",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.mimeTypes.isJavaScript"
-    } ]
-  }, {
     "name" : "CalendarLayout",
     "type" : "Class",
     "fullyQualifiedName" : "scout.CalendarLayout",
@@ -2616,62 +2515,6 @@
       "name" : "layout",
       "type" : "Function",
       "fullyQualifiedName" : "scout.SmartFieldMultilineLayout.layout"
-    } ]
-  }, {
-    "name" : "aggregation",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.aggregation",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.aggregation"
-    }, {
-      "name" : "sumStart",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.sumStart"
-    }, {
-      "name" : "sumStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.sumStep"
-    }, {
-      "name" : "sumFinish",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.sumFinish"
-    }, {
-      "name" : "avgStart",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.avgStart"
-    }, {
-      "name" : "avgStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.avgStep"
-    }, {
-      "name" : "avgFinish",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.avgFinish"
-    }, {
-      "name" : "minStart",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.minStart"
-    }, {
-      "name" : "minStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.minStep"
-    }, {
-      "name" : "minFinish",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.minFinish"
-    }, {
-      "name" : "maxStart",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.maxStart"
-    }, {
-      "name" : "maxStep",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.maxStep"
-    }, {
-      "name" : "maxFinish",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.aggregation.maxFinish"
     } ]
   }, {
     "name" : "TileTableField",
@@ -2882,50 +2725,6 @@
       "fullyQualifiedName" : "scout.TileGridGridConfig.getGridWidgets"
     } ]
   }, {
-    "name" : "fields",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.fields",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.fields"
-    }, {
-      "name" : "makeTextField",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.makeTextField"
-    }, {
-      "name" : "appendIcon",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.appendIcon"
-    }, {
-      "name" : "initTouch",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.initTouch"
-    }, {
-      "name" : "valOrText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.valOrText"
-    }, {
-      "name" : "makeInputOrDiv",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.makeInputOrDiv"
-    }, {
-      "name" : "makeInputDiv",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.makeInputDiv"
-    }, {
-      "name" : "handleOnClick",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.handleOnClick"
-    }, {
-      "name" : "activateFirstField",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.activateFirstField"
-    }, {
-      "name" : "linkElementWithLabel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.fields.linkElementWithLabel"
-    } ]
-  }, {
     "name" : "Switch",
     "type" : "Class",
     "fullyQualifiedName" : "scout.Switch",
@@ -3020,38 +2819,6 @@
       "name" : "widthHintForGridData",
       "type" : "Function",
       "fullyQualifiedName" : "scout.LogicalGridLayoutInfo.widthHintForGridData"
-    } ]
-  }, {
-    "name" : "clipboard",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.clipboard",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.clipboard"
-    }, {
-      "name" : "copyText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard.copyText"
-    }, {
-      "name" : "_copyText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard._copyText"
-    }, {
-      "name" : "_showNotification",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard._showNotification"
-    }, {
-      "name" : "_successStatus",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard._successStatus"
-    }, {
-      "name" : "_failedStatus",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard._failedStatus"
-    }, {
-      "name" : "showNotification",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.clipboard.showNotification"
     } ]
   }, {
     "name" : "KeyStrokeManager",
@@ -3240,14 +3007,6 @@
       "name" : "_renderOnAttach",
       "type" : "Function",
       "fullyQualifiedName" : "scout.BrowserField._renderOnAttach"
-    } ]
-  }, {
-    "name" : "assertProperty",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.assertProperty",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.assertProperty"
     } ]
   }, {
     "name" : "SequenceBoxLayout",
@@ -3520,30 +3279,6 @@
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.TreeBoxAdapter"
-    } ]
-  }, {
-    "name" : "adapter",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.adapter",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.adapter"
-    } ]
-  }, {
-    "name" : "getSession",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.getSession",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.getSession"
-    } ]
-  }, {
-    "name" : "nvl",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.nvl",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.nvl"
     } ]
   }, {
     "name" : "TouchPopup",
@@ -4386,14 +4121,6 @@
       "fullyQualifiedName" : "scout.ClipboardField._onPaste"
     } ]
   }, {
-    "name" : "exportAdapter",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.exportAdapter",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.exportAdapter"
-    } ]
-  }, {
     "name" : "TabAreaLeftKeyStroke",
     "type" : "Class",
     "fullyQualifiedName" : "scout.TabAreaLeftKeyStroke",
@@ -4484,38 +4211,6 @@
       "name" : "handle",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TagFieldCancelKeyStroke.handle"
-    } ]
-  }, {
-    "name" : "router",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.router",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.router"
-    }, {
-      "name" : "setDefaultLocation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.setDefaultLocation"
-    }, {
-      "name" : "prepare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.prepare"
-    }, {
-      "name" : "activate",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.activate"
-    }, {
-      "name" : "register",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.register"
-    }, {
-      "name" : "on",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.on"
-    }, {
-      "name" : "updateLocation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.router.updateLocation"
     } ]
   }, {
     "name" : "TableFooterLayout",
@@ -4648,138 +4343,6 @@
       "name" : "isFormMenuOpen",
       "type" : "Function",
       "fullyQualifiedName" : "scout.OutlineKeyStrokeContext.isFormMenuOpen"
-    } ]
-  }, {
-    "name" : "dates",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.dates",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.dates"
-    }, {
-      "name" : "shift",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shift"
-    }, {
-      "name" : "shiftTime",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shiftTime"
-    }, {
-      "name" : "shiftToNextDayOfType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shiftToNextDayOfType"
-    }, {
-      "name" : "shiftToPreviousDayOfType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shiftToPreviousDayOfType"
-    }, {
-      "name" : "shiftToNextOrPrevDayOfType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shiftToNextOrPrevDayOfType"
-    }, {
-      "name" : "shiftToNextOrPrevMonday",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.shiftToNextOrPrevMonday"
-    }, {
-      "name" : "ensure",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.ensure"
-    }, {
-      "name" : "ensureMonday",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.ensureMonday"
-    }, {
-      "name" : "isSameTime",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.isSameTime"
-    }, {
-      "name" : "isSameDay",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.isSameDay"
-    }, {
-      "name" : "isSameMonth",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.isSameMonth"
-    }, {
-      "name" : "compareMonths",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.compareMonths"
-    }, {
-      "name" : "compareDays",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.compareDays"
-    }, {
-      "name" : "timestamp",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.timestamp"
-    }, {
-      "name" : "orderWeekdays",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.orderWeekdays"
-    }, {
-      "name" : "weekInYear",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.weekInYear"
-    }, {
-      "name" : "_thursdayOfWeek",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates._thursdayOfWeek"
-    }, {
-      "name" : "firstDayOfWeek",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.firstDayOfWeek"
-    }, {
-      "name" : "parseJsonDate",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.parseJsonDate"
-    }, {
-      "name" : "toJsonDate",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.toJsonDate"
-    }, {
-      "name" : "toJsonDateRange",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.toJsonDateRange"
-    }, {
-      "name" : "create",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.create"
-    }, {
-      "name" : "newDate",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.newDate"
-    }, {
-      "name" : "format",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.format"
-    }, {
-      "name" : "formatDateTime",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.formatDateTime"
-    }, {
-      "name" : "compare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.compare"
-    }, {
-      "name" : "equals",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.equals"
-    }, {
-      "name" : "combineDateTime",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.combineDateTime"
-    }, {
-      "name" : "isLeapYear",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.isLeapYear"
-    }, {
-      "name" : "trunc",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.trunc"
-    }, {
-      "name" : "ceil",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dates.ceil"
     } ]
   }, {
     "name" : "SmartFieldMultilineAdapter",
@@ -5290,54 +4853,6 @@
       "fullyQualifiedName" : "scout.SequenceBoxGridConfig.getGridWidgets"
     } ]
   }, {
-    "name" : "events",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.events",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.events"
-    }, {
-      "name" : "pageX",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.pageX"
-    }, {
-      "name" : "pageY",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.pageY"
-    }, {
-      "name" : "touchdown",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.touchdown"
-    }, {
-      "name" : "touchmove",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.touchmove"
-    }, {
-      "name" : "touchendcancel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.touchendcancel"
-    }, {
-      "name" : "touchOrMouse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.touchOrMouse"
-    }, {
-      "name" : "isTouchEvent",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.isTouchEvent"
-    }, {
-      "name" : "fixTouchEvent",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.fixTouchEvent"
-    }, {
-      "name" : "passiveOptions",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.passiveOptions"
-    }, {
-      "name" : "onScrollStartEndDuringTouch",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.events.onScrollStartEndDuringTouch"
-    } ]
-  }, {
     "name" : "BrowserFieldAdapter",
     "type" : "Class",
     "fullyQualifiedName" : "scout.BrowserFieldAdapter",
@@ -5480,14 +4995,6 @@
       "name" : "preferredLayoutSize",
       "type" : "Function",
       "fullyQualifiedName" : "scout.DatePickerTouchPopupLayout.preferredLayoutSize"
-    } ]
-  }, {
-    "name" : "objectFactories",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.objectFactories",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.objectFactories"
     } ]
   }, {
     "name" : "RadioButtonLayout",
@@ -5798,34 +5305,6 @@
       "fullyQualifiedName" : "scout.SearchOutline.validateFocus"
     } ]
   }, {
-    "name" : "filters",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.filters",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.filters"
-    }, {
-      "name" : "ensure",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.filters.ensure"
-    }, {
-      "name" : "returnTrue",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.filters.returnTrue"
-    }, {
-      "name" : "returnFalse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.filters.returnFalse"
-    }, {
-      "name" : "outsideFilter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.filters.outsideFilter"
-    }, {
-      "name" : "notSameFilter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.filters.notSameFilter"
-    } ]
-  }, {
     "name" : "TileButton",
     "type" : "Class",
     "fullyQualifiedName" : "scout.TileButton",
@@ -5994,14 +5473,6 @@
       "fullyQualifiedName" : "scout.PropertyChangeEventFilter.reset"
     } ]
   }, {
-    "name" : "assertParameter",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.assertParameter",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.assertParameter"
-    } ]
-  }, {
     "name" : "UnsavedFormsLookupCall",
     "type" : "Class",
     "fullyQualifiedName" : "scout.UnsavedFormsLookupCall",
@@ -6104,54 +5575,6 @@
       "name" : "_removeLoadingIndicator",
       "type" : "Function",
       "fullyQualifiedName" : "scout.SimpleLoadingSupport._removeLoadingIndicator"
-    } ]
-  }, {
-    "name" : "ajax",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.ajax",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.ajax"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.get"
-    }, {
-      "name" : "post",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.post"
-    }, {
-      "name" : "put",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.put"
-    }, {
-      "name" : "remove",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.remove"
-    }, {
-      "name" : "getJson",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.getJson"
-    }, {
-      "name" : "postJson",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.postJson"
-    }, {
-      "name" : "putJson",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.putJson"
-    }, {
-      "name" : "removeJson",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.removeJson"
-    }, {
-      "name" : "callJson",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.callJson"
-    }, {
-      "name" : "call",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.ajax.call"
     } ]
   }, {
     "name" : "Calendar",
@@ -6776,158 +6199,6 @@
       "name" : "process",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableUpdateBuffer.process"
-    } ]
-  }, {
-    "name" : "scrollbars",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.scrollbars",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.scrollbars"
-    }, {
-      "name" : "getScrollables",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.getScrollables"
-    }, {
-      "name" : "pushScrollable",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.pushScrollable"
-    }, {
-      "name" : "removeScrollable",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.removeScrollable"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.install"
-    }, {
-      "name" : "_installNative",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._installNative"
-    }, {
-      "name" : "_installNativeInternal",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._installNativeInternal"
-    }, {
-      "name" : "isHybridScrolling",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.isHybridScrolling"
-    }, {
-      "name" : "isNativeScrolling",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.isNativeScrolling"
-    }, {
-      "name" : "isJsScrolling",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.isJsScrolling"
-    }, {
-      "name" : "_installJs",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._installJs"
-    }, {
-      "name" : "uninstall",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.uninstall"
-    }, {
-      "name" : "update",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.update"
-    }, {
-      "name" : "_update",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._update"
-    }, {
-      "name" : "_handleIosPaintBug",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._handleIosPaintBug"
-    }, {
-      "name" : "reset",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.reset"
-    }, {
-      "name" : "scrollTo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollTo"
-    }, {
-      "name" : "_createDefaultScrollToOptions",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._createDefaultScrollToOptions"
-    }, {
-      "name" : "scrollHorizontalTo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollHorizontalTo"
-    }, {
-      "name" : "scrollTop",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollTop"
-    }, {
-      "name" : "scrollLeft",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollLeft"
-    }, {
-      "name" : "animateScrollTop",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.animateScrollTop"
-    }, {
-      "name" : "animateScrollLeft",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.animateScrollLeft"
-    }, {
-      "name" : "scrollbar",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollbar"
-    }, {
-      "name" : "scrollToBottom",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.scrollToBottom"
-    }, {
-      "name" : "isLocationInView",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.isLocationInView"
-    }, {
-      "name" : "onScroll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.onScroll"
-    }, {
-      "name" : "offScroll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.offScroll"
-    }, {
-      "name" : "fix",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.fix"
-    }, {
-      "name" : "unfix",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.unfix"
-    }, {
-      "name" : "_unfix",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._unfix"
-    }, {
-      "name" : "storeScrollPositions",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.storeScrollPositions"
-    }, {
-      "name" : "restoreScrollPositions",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.restoreScrollPositions"
-    }, {
-      "name" : "setVisible",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.setVisible"
-    }, {
-      "name" : "opacity",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.opacity"
-    }, {
-      "name" : "_getCompleteChildRowsHeightRecursive",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars._getCompleteChildRowsHeightRecursive"
-    }, {
-      "name" : "ensureExpansionVisible",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.scrollbars.ensureExpansionVisible"
     } ]
   }, {
     "name" : "FileChooserFieldBrowseKeyStroke",
@@ -7874,46 +7145,6 @@
       "fullyQualifiedName" : "scout.DateRange.toString"
     } ]
   }, {
-    "name" : "tooltips",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.tooltips",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.tooltips"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.install"
-    }, {
-      "name" : "uninstall",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.uninstall"
-    }, {
-      "name" : "update",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.update"
-    }, {
-      "name" : "close",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.close"
-    }, {
-      "name" : "cancel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.cancel"
-    }, {
-      "name" : "installForEllipsis",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.installForEllipsis"
-    }, {
-      "name" : "text",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.text"
-    }, {
-      "name" : "find",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.tooltips.find"
-    } ]
-  }, {
     "name" : "WizardProgressFieldAdapter",
     "type" : "Class",
     "fullyQualifiedName" : "scout.WizardProgressFieldAdapter",
@@ -8328,14 +7559,6 @@
       "name" : "_transformTableRowData",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableProposalChooser._transformTableRowData"
-    } ]
-  }, {
-    "name" : "installSyntheticActiveStateHandler",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.installSyntheticActiveStateHandler",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.installSyntheticActiveStateHandler"
     } ]
   }, {
     "name" : "DatePicker",
@@ -9026,18 +8249,6 @@
       "fullyQualifiedName" : "scout.DesktopFormController.dispose"
     } ]
   }, {
-    "name" : "inspector",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.inspector",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.inspector"
-    }, {
-      "name" : "applyInfo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.inspector.applyInfo"
-    } ]
-  }, {
     "name" : "DateFormat",
     "type" : "Class",
     "fullyQualifiedName" : "scout.DateFormat",
@@ -9104,30 +8315,6 @@
       "name" : "doAction",
       "type" : "Function",
       "fullyQualifiedName" : "scout.CalendarModeMenu.doAction"
-    } ]
-  }, {
-    "name" : "logging",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.logging",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.logging"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.logging.bootstrap"
-    }, {
-      "name" : "initLog4Javascript",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.logging.initLog4Javascript"
-    }, {
-      "name" : "parseLevel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.logging.parseLevel"
-    }, {
-      "name" : "addAppender",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.logging.addAppender"
     } ]
   }, {
     "name" : "FormFieldLayout",
@@ -10450,14 +9637,6 @@
       "fullyQualifiedName" : "scout.RadioButtonGroupLeftKeyStroke.handle"
     } ]
   }, {
-    "name" : "hAlign",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.hAlign",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.hAlign"
-    } ]
-  }, {
     "name" : "FileInput",
     "type" : "Class",
     "fullyQualifiedName" : "scout.FileInput",
@@ -10944,14 +10123,6 @@
       "name" : "removeKeyBox",
       "type" : "Function",
       "fullyQualifiedName" : "scout.KeyStroke.removeKeyBox"
-    } ]
-  }, {
-    "name" : "prepareDOM",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.prepareDOM",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.prepareDOM"
     } ]
   }, {
     "name" : "Menu",
@@ -11888,30 +11059,6 @@
       "name" : "CONSOLE_OUTPUT",
       "type" : "Constant",
       "fullyQualifiedName" : "scout.ErrorHandler.CONSOLE_OUTPUT"
-    } ]
-  }, {
-    "name" : "webstorage",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.webstorage",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.webstorage"
-    }, {
-      "name" : "getItem",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.webstorage.getItem"
-    }, {
-      "name" : "setItem",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.webstorage.setItem"
-    }, {
-      "name" : "removeItem",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.webstorage.removeItem"
-    }, {
-      "name" : "clear",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.webstorage.clear"
     } ]
   }, {
     "name" : "SliderField",
@@ -15030,66 +14177,6 @@
       "fullyQualifiedName" : "scout.TableHeader._onTableAddFilterRemoved"
     } ]
   }, {
-    "name" : "texts",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.texts",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.texts"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.bootstrap"
-    }, {
-      "name" : "_preInit",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts._preInit"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.init"
-    }, {
-      "name" : "link",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.link"
-    }, {
-      "name" : "createOrderedLanguageTags",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.createOrderedLanguageTags"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.get"
-    }, {
-      "name" : "_get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts._get"
-    }, {
-      "name" : "put",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.put"
-    }, {
-      "name" : "readFromDOM",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.readFromDOM"
-    }, {
-      "name" : "buildKey",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.buildKey"
-    }, {
-      "name" : "resolveKey",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.resolveKey"
-    }, {
-      "name" : "resolveText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.resolveText"
-    }, {
-      "name" : "resolveTextProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.texts.resolveTextProperty"
-    } ]
-  }, {
     "name" : "Calculator",
     "type" : "Class",
     "fullyQualifiedName" : "scout.Calculator",
@@ -15174,166 +14261,6 @@
       "fullyQualifiedName" : "scout.Notification._renderMessage"
     } ]
   }, {
-    "name" : "arrays",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.arrays",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.arrays"
-    }, {
-      "name" : "ensure",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.ensure"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.init"
-    }, {
-      "name" : "remove",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.remove"
-    }, {
-      "name" : "removeAll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.removeAll"
-    }, {
-      "name" : "replace",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.replace"
-    }, {
-      "name" : "insert",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.insert"
-    }, {
-      "name" : "insertAll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.insertAll"
-    }, {
-      "name" : "insertArray",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.insertArray"
-    }, {
-      "name" : "insertSorted",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.insertSorted"
-    }, {
-      "name" : "move",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.move"
-    }, {
-      "name" : "containsAny",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.containsAny"
-    }, {
-      "name" : "containsAll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.containsAll"
-    }, {
-      "name" : "first",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.first"
-    }, {
-      "name" : "last",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.last"
-    }, {
-      "name" : "hasElements",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.hasElements"
-    }, {
-      "name" : "empty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.empty"
-    }, {
-      "name" : "pushAll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.pushAll"
-    }, {
-      "name" : "union",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.union"
-    }, {
-      "name" : "equalsIgnoreOrder",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.equalsIgnoreOrder"
-    }, {
-      "name" : "equals",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.equals"
-    }, {
-      "name" : "greater",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.greater"
-    }, {
-      "name" : "eachSibling",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.eachSibling"
-    }, {
-      "name" : "findIndex",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findIndex"
-    }, {
-      "name" : "find",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.find"
-    }, {
-      "name" : "findFrom",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findFrom"
-    }, {
-      "name" : "findIndexFrom",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findIndexFrom"
-    }, {
-      "name" : "findFromForward",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findFromForward"
-    }, {
-      "name" : "findIndexFromForward",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findIndexFromForward"
-    }, {
-      "name" : "findFromReverse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findFromReverse"
-    }, {
-      "name" : "findIndexFromReverse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.findIndexFromReverse"
-    }, {
-      "name" : "pushIfDefined",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.pushIfDefined"
-    }, {
-      "name" : "pushSet",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.pushSet"
-    }, {
-      "name" : "format",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.format"
-    }, {
-      "name" : "formatEncoded",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.formatEncoded"
-    }, {
-      "name" : "max",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.max"
-    }, {
-      "name" : "min",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.min"
-    }, {
-      "name" : "diff",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.diff"
-    }, {
-      "name" : "flatMap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.arrays.flatMap"
-    } ]
-  }, {
     "name" : "BooleanColumn",
     "type" : "Class",
     "fullyQualifiedName" : "scout.BooleanColumn",
@@ -15388,26 +14315,6 @@
       "name" : "_syncDisplayText",
       "type" : "Function",
       "fullyQualifiedName" : "scout.FileChooserButtonAdapter._syncDisplayText"
-    } ]
-  }, {
-    "name" : "menuNavigationKeyStrokes",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.menuNavigationKeyStrokes",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes"
-    }, {
-      "name" : "registerKeyStrokes",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes.registerKeyStrokes"
-    }, {
-      "name" : "_findMenuItems",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes._findMenuItems"
-    }, {
-      "name" : "_changeSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes._changeSelection"
     } ]
   }, {
     "name" : "OutlineTileFieldAdapter",
@@ -15852,58 +14759,6 @@
       "name" : "_doAction",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ResetMenu._doAction"
-    } ]
-  }, {
-    "name" : "codes",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.codes",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.codes"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.bootstrap"
-    }, {
-      "name" : "_preInit",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes._preInit"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.init"
-    }, {
-      "name" : "add",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.add"
-    }, {
-      "name" : "remove",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.remove"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.get"
-    }, {
-      "name" : "optGet",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.optGet"
-    }, {
-      "name" : "_get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes._get"
-    }, {
-      "name" : "codeType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.codeType"
-    }, {
-      "name" : "generateTextKey",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.generateTextKey"
-    }, {
-      "name" : "registerTexts",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.codes.registerTexts"
     } ]
   }, {
     "name" : "PopupManagerAdapter",
@@ -16370,106 +15225,6 @@
       "fullyQualifiedName" : "scout.SimpleTabBoxController.getTabs"
     } ]
   }, {
-    "name" : "graphics",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.graphics",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.graphics"
-    }, {
-      "name" : "prefSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.prefSize"
-    }, {
-      "name" : "exactPrefSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.exactPrefSize"
-    }, {
-      "name" : "prefSizeWithoutAnimation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.prefSizeWithoutAnimation"
-    }, {
-      "name" : "size",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.size"
-    }, {
-      "name" : "cssSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.cssSize"
-    }, {
-      "name" : "cssMaxSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.cssMaxSize"
-    }, {
-      "name" : "cssMinSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.cssMinSize"
-    }, {
-      "name" : "setSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.setSize"
-    }, {
-      "name" : "insets",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.insets"
-    }, {
-      "name" : "margins",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.margins"
-    }, {
-      "name" : "setMargins",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.setMargins"
-    }, {
-      "name" : "paddings",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.paddings"
-    }, {
-      "name" : "borders",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.borders"
-    }, {
-      "name" : "setLocation",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.setLocation"
-    }, {
-      "name" : "location",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.location"
-    }, {
-      "name" : "bounds",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.bounds"
-    }, {
-      "name" : "position",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.position"
-    }, {
-      "name" : "offsetBounds",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.offsetBounds"
-    }, {
-      "name" : "offset",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.offset"
-    }, {
-      "name" : "_bounds",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics._bounds"
-    }, {
-      "name" : "setBounds",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.setBounds"
-    }, {
-      "name" : "cssBounds",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.cssBounds"
-    }, {
-      "name" : "debugOutput",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.graphics.debugOutput"
-    } ]
-  }, {
     "name" : "TabAreaRightKeyStroke",
     "type" : "Class",
     "fullyQualifiedName" : "scout.TabAreaRightKeyStroke",
@@ -16860,22 +15615,6 @@
       "name" : "VIEW_AREA_COLUMN_INDEX",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.DesktopBench.VIEW_AREA_COLUMN_INDEX"
-    } ]
-  }, {
-    "name" : "cookies",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.cookies",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.cookies"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.cookies.get"
-    }, {
-      "name" : "set",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.cookies.set"
     } ]
   }, {
     "name" : "CompactTreeLeftKeyStroke",
@@ -17822,14 +16561,6 @@
       "fullyQualifiedName" : "scout.InputFieldKeyStrokeContext._isLetterKeyStroke"
     } ]
   }, {
-    "name" : "focusRule",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.focusRule",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.focusRule"
-    } ]
-  }, {
     "name" : "BenchRowLayoutData",
     "type" : "Class",
     "fullyQualifiedName" : "scout.BenchRowLayoutData",
@@ -18590,38 +17321,6 @@
       "fullyQualifiedName" : "scout.Slider.setValue"
     } ]
   }, {
-    "name" : "dragAndDrop",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.dragAndDrop",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.dragAndDrop"
-    }, {
-      "name" : "scoutTypeToDragTypeMapping",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.scoutTypeToDragTypeMapping"
-    }, {
-      "name" : "verifyDataTransferTypesScoutTypes",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.verifyDataTransferTypesScoutTypes"
-    }, {
-      "name" : "verifyDataTransferTypes",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.verifyDataTransferTypes"
-    }, {
-      "name" : "dataTransferTypesContainsScoutTypes",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.dataTransferTypesContainsScoutTypes"
-    }, {
-      "name" : "dataTransferTypesContains",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.dataTransferTypesContains"
-    }, {
-      "name" : "handler",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.dragAndDrop.handler"
-    } ]
-  }, {
     "name" : "Box",
     "type" : "Class",
     "fullyQualifiedName" : "scout.Box",
@@ -18840,62 +17539,6 @@
       "name" : "get$Scrollable",
       "type" : "Function",
       "fullyQualifiedName" : "scout.WidgetField.get$Scrollable"
-    } ]
-  }, {
-    "name" : "locales",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.locales",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.locales"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.bootstrap"
-    }, {
-      "name" : "_preInit",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales._preInit"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.init"
-    }, {
-      "name" : "_get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales._get"
-    }, {
-      "name" : "has",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.has"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.get"
-    }, {
-      "name" : "getNavigatorLanguage",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.getNavigatorLanguage"
-    }, {
-      "name" : "getNavigatorLocale",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.getNavigatorLocale"
-    }, {
-      "name" : "getAll",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.getAll"
-    }, {
-      "name" : "getAllLanguageTags",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.getAllLanguageTags"
-    }, {
-      "name" : "findFirstForLanguage",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.findFirstForLanguage"
-    }, {
-      "name" : "splitLanguageTag",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.locales.splitLanguageTag"
     } ]
   }, {
     "name" : "TabItemAdapter",
@@ -20630,14 +19273,6 @@
       "fullyQualifiedName" : "scout.TreeNavigationUpKeyStroke._computeNewSelection"
     } ]
   }, {
-    "name" : "create",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.create",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.create"
-    } ]
-  }, {
     "name" : "Group",
     "type" : "Class",
     "fullyQualifiedName" : "scout.Group",
@@ -21134,37 +19769,6 @@
     "type" : "Class",
     "fullyQualifiedName" : "scout.numbers",
     "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.numbers"
-    }, {
-      "name" : "toBase62",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.toBase62"
-    }, {
-      "name" : "randomId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.randomId"
-    }, {
-      "name" : "correlationId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.correlationId"
-    }, {
-      "name" : "round",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.round"
-    }, {
-      "name" : "shiftDecimalPoint",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.shiftDecimalPoint"
-    }, {
-      "name" : "ensure",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.ensure"
-    }, {
-      "name" : "isNumber",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.numbers.isNumber"
-    }, {
       "name" : "RoundingMode",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.numbers.RoundingMode"
@@ -24397,126 +23001,6 @@
       "fullyQualifiedName" : "scout.TagChooserPopup.selectedRow"
     } ]
   }, {
-    "name" : "strings",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.strings",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.strings"
-    }, {
-      "name" : "nl2br",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.nl2br"
-    }, {
-      "name" : "insertAt",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.insertAt"
-    }, {
-      "name" : "hasText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.hasText"
-    }, {
-      "name" : "empty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.empty"
-    }, {
-      "name" : "repeat",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.repeat"
-    }, {
-      "name" : "padZeroLeft",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.padZeroLeft"
-    }, {
-      "name" : "contains",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.contains"
-    }, {
-      "name" : "startsWith",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.startsWith"
-    }, {
-      "name" : "endsWith",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.endsWith"
-    }, {
-      "name" : "count",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.count"
-    }, {
-      "name" : "encode",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.encode"
-    }, {
-      "name" : "plainText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.plainText"
-    }, {
-      "name" : "join",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.join"
-    }, {
-      "name" : "box",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.box"
-    }, {
-      "name" : "lowercaseFirstLetter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.lowercaseFirstLetter"
-    }, {
-      "name" : "uppercaseFirstLetter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.uppercaseFirstLetter"
-    }, {
-      "name" : "_changeFirstLetter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings._changeFirstLetter"
-    }, {
-      "name" : "quote",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.quote"
-    }, {
-      "name" : "asString",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.asString"
-    }, {
-      "name" : "nvl",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.nvl"
-    }, {
-      "name" : "toUpperCaseFirstLetter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.toUpperCaseFirstLetter"
-    }, {
-      "name" : "countCodePoints",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.countCodePoints"
-    }, {
-      "name" : "splitMax",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.splitMax"
-    }, {
-      "name" : "nullIfEmpty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.nullIfEmpty"
-    }, {
-      "name" : "equals",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.equals"
-    }, {
-      "name" : "equalsIgnoreCase",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.equalsIgnoreCase"
-    }, {
-      "name" : "removePrefix",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.removePrefix"
-    }, {
-      "name" : "removeSuffix",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.strings.removeSuffix"
-    } ]
-  }, {
     "name" : "DateColumnUserFilter",
     "type" : "Class",
     "fullyQualifiedName" : "scout.DateColumnUserFilter",
@@ -24887,38 +23371,6 @@
     "children" : [ {
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.PlaceholderFieldAdapter"
-    } ]
-  }, {
-    "name" : "isOneOf",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.isOneOf",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.isOneOf"
-    } ]
-  }, {
-    "name" : "widgets",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.widgets",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.widgets"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.widgets.get"
-    }, {
-      "name" : "createUniqueId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.widgets.createUniqueId"
-    }, {
-      "name" : "updateFirstLastMarker",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.widgets.updateFirstLastMarker"
-    }, {
-      "name" : "findFirstFocusableWidget",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.widgets.findFirstFocusableWidget"
     } ]
   }, {
     "name" : "LoadingSupport",
@@ -25793,14 +24245,6 @@
       "fullyQualifiedName" : "scout.GroupToggleCollapseKeyStroke.handle"
     } ]
   }, {
-    "name" : "inherits",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.inherits",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.inherits"
-    } ]
-  }, {
     "name" : "MenubarBox",
     "type" : "Class",
     "fullyQualifiedName" : "scout.MenubarBox",
@@ -26585,70 +25029,6 @@
       "fullyQualifiedName" : "scout.ClipboardFieldAdapter"
     } ]
   }, {
-    "name" : "styles",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.styles",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.styles"
-    }, {
-      "name" : "get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.get"
-    }, {
-      "name" : "getSize",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.getSize"
-    }, {
-      "name" : "put",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.put"
-    }, {
-      "name" : "clearCache",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.clearCache"
-    }, {
-      "name" : "rgb",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.rgb"
-    }, {
-      "name" : "darkerColor",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.darkerColor"
-    }, {
-      "name" : "lighterColor",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.lighterColor"
-    }, {
-      "name" : "mergeRgbColors",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.mergeRgbColors"
-    }, {
-      "name" : "parseFontSpec",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.parseFontSpec"
-    }, {
-      "name" : "modelToCssColor",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.modelToCssColor"
-    }, {
-      "name" : "legacyStyle",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.legacyStyle"
-    }, {
-      "name" : "legacyForegroundColor",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.legacyForegroundColor"
-    }, {
-      "name" : "legacyBackgroundColor",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.legacyBackgroundColor"
-    }, {
-      "name" : "legacyFont",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.styles.legacyFont"
-    } ]
-  }, {
     "name" : "DetailTableTreeFilter",
     "type" : "Class",
     "fullyQualifiedName" : "scout.DetailTableTreeFilter",
@@ -26819,58 +25199,6 @@
       "name" : "buildAndOpen",
       "type" : "Function",
       "fullyQualifiedName" : "scout.MessageBoxes.buildAndOpen"
-    } ]
-  }, {
-    "name" : "addAppListener",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.addAppListener",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.addAppListener"
-    } ]
-  }, {
-    "name" : "models",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.models",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.models"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models.bootstrap"
-    }, {
-      "name" : "_preInit",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models._preInit"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models.init"
-    }, {
-      "name" : "getModel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models.getModel"
-    }, {
-      "name" : "getExtension",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models.getExtension"
-    }, {
-      "name" : "_get",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models._get"
-    }, {
-      "name" : "extend",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models.extend"
-    }, {
-      "name" : "_findExtensionIndex",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models._findExtensionIndex"
-    }, {
-      "name" : "_bindExtensionsToBeforeOrAfter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.models._bindExtensionsToBeforeOrAfter"
     } ]
   }, {
     "name" : "KeyStrokeContext",
@@ -27959,38 +26287,6 @@
       "name" : "_onImageLoadOrError",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ColumnOptimalWidthMeasurer._onImageLoadOrError"
-    } ]
-  }, {
-    "name" : "defaultValues",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.defaultValues",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.defaultValues"
-    }, {
-      "name" : "bootstrap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues.bootstrap"
-    }, {
-      "name" : "init",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues.init"
-    }, {
-      "name" : "_generateObjectTypeHierarchyRec",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues._generateObjectTypeHierarchyRec"
-    }, {
-      "name" : "applyTo",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues.applyTo"
-    }, {
-      "name" : "_applyToInternal",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues._applyToInternal"
-    }, {
-      "name" : "_extendWithDefaults",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.defaultValues._extendWithDefaults"
     } ]
   }, {
     "name" : "MenuBoxLayout",
@@ -30477,70 +28773,6 @@
       "fullyQualifiedName" : "scout.VirtualKeyStrokeEvent.isAnyPropagationStopped"
     } ]
   }, {
-    "name" : "comparators",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.comparators",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.comparators"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.install"
-    }, {
-      "name" : "compare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.compare"
-    }, {
-      "name" : "compareIgnoreCase",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.compareIgnoreCase"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.install"
-    }, {
-      "name" : "compare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.compare"
-    }, {
-      "name" : "install",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.install"
-    }, {
-      "name" : "compare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.compare"
-    }, {
-      "name" : "compareIgnoreCase",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators.compareIgnoreCase"
-    }, {
-      "name" : "_compare",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.comparators._compare"
-    } ]
-  }, {
-    "name" : "icons",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.icons",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.icons"
-    }, {
-      "name" : "parseIconId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.icons.parseIconId"
-    }, {
-      "name" : "resolveIconId",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.icons.resolveIconId"
-    }, {
-      "name" : "resolveIconProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.icons.resolveIconProperty"
-    } ]
-  }, {
     "name" : "StringFieldEnterKeyStroke",
     "type" : "Class",
     "fullyQualifiedName" : "scout.StringFieldEnterKeyStroke",
@@ -30583,22 +28815,6 @@
       "name" : "_computeNewSelection",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TreeNavigationEndKeyStroke._computeNewSelection"
-    } ]
-  }, {
-    "name" : "lookupField",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.lookupField",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.lookupField"
-    }, {
-      "name" : "createTableRow",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.lookupField.createTableRow"
-    }, {
-      "name" : "createTableCell",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.lookupField.createTableCell"
     } ]
   }, {
     "name" : "SearchOutlineAdapter",
@@ -30975,26 +29191,6 @@
       "name" : "modifyAggregateTableControlPrototype",
       "type" : "StaticFunction",
       "fullyQualifiedName" : "scout.AggregateTableControlAdapter.modifyAggregateTableControlPrototype"
-    } ]
-  }, {
-    "name" : "promises",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.promises",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.promises"
-    }, {
-      "name" : "oneByOne",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.promises.oneByOne"
-    }, {
-      "name" : "groupwise",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.promises.groupwise"
-    }, {
-      "name" : "parallel",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.promises.parallel"
     } ]
   }, {
     "name" : "MenuBar",
@@ -31661,50 +29857,6 @@
       "fullyQualifiedName" : "scout.DateField.ErrorCode"
     } ]
   }, {
-    "name" : "menus",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.menus",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.menus"
-    }, {
-      "name" : "filterAccordingToSelection",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.filterAccordingToSelection"
-    }, {
-      "name" : "filter",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.filter"
-    }, {
-      "name" : "updateSeparatorVisibility",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.updateSeparatorVisibility"
-    }, {
-      "name" : "checkType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.checkType"
-    }, {
-      "name" : "_enableDisableMenuKeyStroke",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus._enableDisableMenuKeyStroke"
-    }, {
-      "name" : "_checkType",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus._checkType"
-    }, {
-      "name" : "createEllipsisMenu",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.createEllipsisMenu"
-    }, {
-      "name" : "moveMenuIntoEllipsis",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.moveMenuIntoEllipsis"
-    }, {
-      "name" : "removeMenuFromEllipsis",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.menus.removeMenuFromEllipsis"
-    } ]
-  }, {
     "name" : "CalendarComponent",
     "type" : "Class",
     "fullyQualifiedName" : "scout.CalendarComponent",
@@ -31799,38 +29951,6 @@
       "name" : "MONTH_COMPACT_THRESHOLD",
       "type" : "Constant",
       "fullyQualifiedName" : "scout.CalendarComponent.MONTH_COMPACT_THRESHOLD"
-    } ]
-  }, {
-    "name" : "focusUtils",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.focusUtils",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.focusUtils"
-    }, {
-      "name" : "isFocusableByMouse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.focusUtils.isFocusableByMouse"
-    }, {
-      "name" : "containsParentFocusableByMouse",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.focusUtils.containsParentFocusableByMouse"
-    }, {
-      "name" : "isSelectableText",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.focusUtils.isSelectableText"
-    }, {
-      "name" : "isActiveElement",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.focusUtils.isActiveElement"
-    } ]
-  }, {
-    "name" : "installGlobalMouseDownInterceptor",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.installGlobalMouseDownInterceptor",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.installGlobalMouseDownInterceptor"
     } ]
   }, {
     "name" : "AbstractLayout",
@@ -33085,126 +31205,6 @@
       "fullyQualifiedName" : "scout.IFrame._renderSandboxPermissions"
     } ]
   }, {
-    "name" : "objects",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.objects",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.objects"
-    }, {
-      "name" : "createMap",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.createMap"
-    }, {
-      "name" : "copyProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.copyProperties"
-    }, {
-      "name" : "copyOwnProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.copyOwnProperties"
-    }, {
-      "name" : "countOwnProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.countOwnProperties"
-    }, {
-      "name" : "extractProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.extractProperties"
-    }, {
-      "name" : "someOwnProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.someOwnProperties"
-    }, {
-      "name" : "someProperties",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.someProperties"
-    }, {
-      "name" : "valueCopy",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.valueCopy"
-    }, {
-      "name" : "findChildObjectByKey",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.findChildObjectByKey"
-    }, {
-      "name" : "isPlainObject",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isPlainObject"
-    }, {
-      "name" : "optProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.optProperty"
-    }, {
-      "name" : "isNumber",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isNumber"
-    }, {
-      "name" : "isString",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isString"
-    }, {
-      "name" : "isNullOrUndefined",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isNullOrUndefined"
-    }, {
-      "name" : "isFunction",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isFunction"
-    }, {
-      "name" : "isArray",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.isArray"
-    }, {
-      "name" : "values",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.values"
-    }, {
-      "name" : "keyByValue",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.keyByValue"
-    }, {
-      "name" : "equals",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.equals"
-    }, {
-      "name" : "equalsRecursive",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.equalsRecursive"
-    }, {
-      "name" : "propertiesEquals",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.propertiesEquals"
-    }, {
-      "name" : "mandatoryFunction",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.mandatoryFunction"
-    }, {
-      "name" : "replacePrototypeFunction",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.replacePrototypeFunction"
-    }, {
-      "name" : "argumentsToArray",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.argumentsToArray"
-    }, {
-      "name" : "forEachArgument",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.forEachArgument"
-    }, {
-      "name" : "checkFunctionOverrides",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.checkFunctionOverrides"
-    }, {
-      "name" : "resolveConst",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.resolveConst"
-    }, {
-      "name" : "resolveConstProperty",
-      "type" : "StaticFunction",
-      "fullyQualifiedName" : "scout.objects.resolveConstProperty"
-    } ]
-  }, {
     "name" : "ColumnLayout",
     "type" : "Class",
     "fullyQualifiedName" : "scout.ColumnLayout",
@@ -33277,14 +31277,6 @@
       "fullyQualifiedName" : "scout.LogicalGridData.isValidateRoot"
     } ]
   }, {
-    "name" : "widget",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.widget",
-    "children" : [ {
-      "type" : "Constructor",
-      "fullyQualifiedName" : "scout.widget"
-    } ]
-  }, {
     "name" : "BusyIndicator",
     "type" : "Class",
     "fullyQualifiedName" : "scout.BusyIndicator",
@@ -33352,6 +31344,1843 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.BusyIndicator.cancelled"
     } ]
+  }, {
+    "name" : "scrollbars",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.scrollbars",
+    "children" : [ {
+      "name" : "getScrollables",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.getScrollables"
+    }, {
+      "name" : "pushScrollable",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.pushScrollable"
+    }, {
+      "name" : "removeScrollable",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.removeScrollable"
+    }, {
+      "name" : "install",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.install"
+    }, {
+      "name" : "_installNative",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._installNative"
+    }, {
+      "name" : "_installNativeInternal",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._installNativeInternal"
+    }, {
+      "name" : "isHybridScrolling",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isHybridScrolling"
+    }, {
+      "name" : "isNativeScrolling",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isNativeScrolling"
+    }, {
+      "name" : "isJsScrolling",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isJsScrolling"
+    }, {
+      "name" : "_installJs",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._installJs"
+    }, {
+      "name" : "uninstall",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.uninstall"
+    }, {
+      "name" : "update",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.update"
+    }, {
+      "name" : "_update",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._update"
+    }, {
+      "name" : "_handleIosPaintBug",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._handleIosPaintBug"
+    }, {
+      "name" : "reset",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.reset"
+    }, {
+      "name" : "scrollTo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollTo"
+    }, {
+      "name" : "_createDefaultScrollToOptions",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._createDefaultScrollToOptions"
+    }, {
+      "name" : "scrollHorizontalTo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollHorizontalTo"
+    }, {
+      "name" : "scrollTop",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollTop"
+    }, {
+      "name" : "scrollLeft",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollLeft"
+    }, {
+      "name" : "animateScrollTop",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.animateScrollTop"
+    }, {
+      "name" : "animateScrollLeft",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.animateScrollLeft"
+    }, {
+      "name" : "scrollbar",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollbar"
+    }, {
+      "name" : "scrollToBottom",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.scrollToBottom"
+    }, {
+      "name" : "isLocationInView",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.isLocationInView"
+    }, {
+      "name" : "onScroll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.onScroll"
+    }, {
+      "name" : "offScroll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.offScroll"
+    }, {
+      "name" : "fix",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.fix"
+    }, {
+      "name" : "unfix",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.unfix"
+    }, {
+      "name" : "_unfix",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._unfix"
+    }, {
+      "name" : "storeScrollPositions",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.storeScrollPositions"
+    }, {
+      "name" : "restoreScrollPositions",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.restoreScrollPositions"
+    }, {
+      "name" : "setVisible",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.setVisible"
+    }, {
+      "name" : "opacity",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.opacity"
+    }, {
+      "name" : "_getCompleteChildRowsHeightRecursive",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars._getCompleteChildRowsHeightRecursive"
+    }, {
+      "name" : "ensureExpansionVisible",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.scrollbars.ensureExpansionVisible"
+    }, {
+      "name" : "_$scrollables",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.scrollbars._$scrollables"
+    } ]
+  }, {
+    "name" : "inspector",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.inspector",
+    "children" : [ {
+      "name" : "applyInfo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.inspector.applyInfo"
+    } ]
+  }, {
+    "name" : "locales",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.locales",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.bootstrap"
+    }, {
+      "name" : "_preInit",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales._preInit"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.init"
+    }, {
+      "name" : "_get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales._get"
+    }, {
+      "name" : "has",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.has"
+    }, {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.get"
+    }, {
+      "name" : "getNavigatorLanguage",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.getNavigatorLanguage"
+    }, {
+      "name" : "getNavigatorLocale",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.getNavigatorLocale"
+    }, {
+      "name" : "getAll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.getAll"
+    }, {
+      "name" : "getAllLanguageTags",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.getAllLanguageTags"
+    }, {
+      "name" : "findFirstForLanguage",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.findFirstForLanguage"
+    }, {
+      "name" : "splitLanguageTag",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.locales.splitLanguageTag"
+    }, {
+      "name" : "localesMap",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.locales.localesMap"
+    } ]
+  }, {
+    "name" : "events",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.events",
+    "children" : [ {
+      "name" : "pageX",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.pageX"
+    }, {
+      "name" : "pageY",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.pageY"
+    }, {
+      "name" : "touchdown",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.touchdown"
+    }, {
+      "name" : "touchmove",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.touchmove"
+    }, {
+      "name" : "touchendcancel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.touchendcancel"
+    }, {
+      "name" : "touchOrMouse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.touchOrMouse"
+    }, {
+      "name" : "isTouchEvent",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.isTouchEvent"
+    }, {
+      "name" : "fixTouchEvent",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.fixTouchEvent"
+    }, {
+      "name" : "passiveOptions",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.passiveOptions"
+    }, {
+      "name" : "onScrollStartEndDuringTouch",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.events.onScrollStartEndDuringTouch"
+    } ]
+  }, {
+    "name" : "codes",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.codes",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.bootstrap"
+    }, {
+      "name" : "_preInit",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes._preInit"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.init"
+    }, {
+      "name" : "add",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.add"
+    }, {
+      "name" : "remove",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.remove"
+    }, {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.get"
+    }, {
+      "name" : "optGet",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.optGet"
+    }, {
+      "name" : "_get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes._get"
+    }, {
+      "name" : "codeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.codeType"
+    }, {
+      "name" : "generateTextKey",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.generateTextKey"
+    }, {
+      "name" : "registerTexts",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.codes.registerTexts"
+    }, {
+      "name" : "defaultLanguage",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.codes.defaultLanguage"
+    }, {
+      "name" : "registry",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.codes.registry"
+    } ]
+  }, {
+    "name" : "logging",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.logging",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.logging.bootstrap"
+    }, {
+      "name" : "initLog4Javascript",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.logging.initLog4Javascript"
+    }, {
+      "name" : "parseLevel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.logging.parseLevel"
+    }, {
+      "name" : "addAppender",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.logging.addAppender"
+    }, {
+      "name" : "initialized",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.logging.initialized"
+    }, {
+      "name" : "_appendersToAdd",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.logging._appendersToAdd"
+    }, {
+      "name" : "showStackTraces",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.logging.showStackTraces"
+    } ]
+  }, {
+    "name" : "strings",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.strings",
+    "children" : [ {
+      "name" : "nl2br",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.nl2br"
+    }, {
+      "name" : "insertAt",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.insertAt"
+    }, {
+      "name" : "hasText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.hasText"
+    }, {
+      "name" : "empty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.empty"
+    }, {
+      "name" : "repeat",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.repeat"
+    }, {
+      "name" : "padZeroLeft",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.padZeroLeft"
+    }, {
+      "name" : "contains",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.contains"
+    }, {
+      "name" : "startsWith",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.startsWith"
+    }, {
+      "name" : "endsWith",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.endsWith"
+    }, {
+      "name" : "count",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.count"
+    }, {
+      "name" : "encode",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.encode"
+    }, {
+      "name" : "plainText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.plainText"
+    }, {
+      "name" : "join",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.join"
+    }, {
+      "name" : "box",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.box"
+    }, {
+      "name" : "lowercaseFirstLetter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.lowercaseFirstLetter"
+    }, {
+      "name" : "uppercaseFirstLetter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.uppercaseFirstLetter"
+    }, {
+      "name" : "_changeFirstLetter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings._changeFirstLetter"
+    }, {
+      "name" : "quote",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.quote"
+    }, {
+      "name" : "asString",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.asString"
+    }, {
+      "name" : "nvl",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.nvl"
+    }, {
+      "name" : "toUpperCaseFirstLetter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.toUpperCaseFirstLetter"
+    }, {
+      "name" : "countCodePoints",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.countCodePoints"
+    }, {
+      "name" : "splitMax",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.splitMax"
+    }, {
+      "name" : "nullIfEmpty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.nullIfEmpty"
+    }, {
+      "name" : "equals",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.equals"
+    }, {
+      "name" : "equalsIgnoreCase",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.equalsIgnoreCase"
+    }, {
+      "name" : "removePrefix",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.removePrefix"
+    }, {
+      "name" : "removeSuffix",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.strings.removeSuffix"
+    }, {
+      "name" : "_encodeElement",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.strings._encodeElement"
+    } ]
+  }, {
+    "name" : "focusUtils",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.focusUtils",
+    "children" : [ {
+      "name" : "isFocusableByMouse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.focusUtils.isFocusableByMouse"
+    }, {
+      "name" : "containsParentFocusableByMouse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.focusUtils.containsParentFocusableByMouse"
+    }, {
+      "name" : "isSelectableText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.focusUtils.isSelectableText"
+    }, {
+      "name" : "isActiveElement",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.focusUtils.isActiveElement"
+    } ]
+  }, {
+    "name" : "objectFactories",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.objectFactories"
+  }, {
+    "name" : "styles",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.styles",
+    "children" : [ {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.get"
+    }, {
+      "name" : "getSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.getSize"
+    }, {
+      "name" : "put",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.put"
+    }, {
+      "name" : "clearCache",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.clearCache"
+    }, {
+      "name" : "rgb",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.rgb"
+    }, {
+      "name" : "darkerColor",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.darkerColor"
+    }, {
+      "name" : "lighterColor",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.lighterColor"
+    }, {
+      "name" : "mergeRgbColors",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.mergeRgbColors"
+    }, {
+      "name" : "parseFontSpec",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.parseFontSpec"
+    }, {
+      "name" : "modelToCssColor",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.modelToCssColor"
+    }, {
+      "name" : "legacyStyle",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.legacyStyle"
+    }, {
+      "name" : "legacyForegroundColor",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.legacyForegroundColor"
+    }, {
+      "name" : "legacyBackgroundColor",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.legacyBackgroundColor"
+    }, {
+      "name" : "legacyFont",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.styles.legacyFont"
+    }, {
+      "name" : "styleMap",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.styles.styleMap"
+    } ]
+  }, {
+    "name" : "fonts",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.fonts",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fonts.bootstrap"
+    }, {
+      "name" : "preloader",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fonts.preloader"
+    }, {
+      "name" : "preload",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fonts.preload"
+    }, {
+      "name" : "measureSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fonts.measureSize"
+    }, {
+      "name" : "autoDetectFonts",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fonts.autoDetectFonts"
+    }, {
+      "name" : "_deferred",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.fonts._deferred"
+    }, {
+      "name" : "loadingComplete",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.fonts.loadingComplete"
+    } ]
+  }, {
+    "name" : "mimeTypes",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.mimeTypes",
+    "children" : [ {
+      "name" : "isTextMimeType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.mimeTypes.isTextMimeType"
+    }, {
+      "name" : "isJavaScript",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.mimeTypes.isJavaScript"
+    } ]
+  }, {
+    "name" : "models",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.models",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.bootstrap"
+    }, {
+      "name" : "_preInit",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models._preInit"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.init"
+    }, {
+      "name" : "getModel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.getModel"
+    }, {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.get"
+    }, {
+      "name" : "getExtension",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.getExtension"
+    }, {
+      "name" : "_get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models._get"
+    }, {
+      "name" : "extend",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models.extend"
+    }, {
+      "name" : "_findExtensionIndex",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models._findExtensionIndex"
+    }, {
+      "name" : "_bindExtensionsToBeforeOrAfter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.models._bindExtensionsToBeforeOrAfter"
+    }, {
+      "name" : "modelMap",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.models.modelMap"
+    } ]
+  }, {
+    "name" : "graphics",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.graphics",
+    "children" : [ {
+      "name" : "prefSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.prefSize"
+    }, {
+      "name" : "exactPrefSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.exactPrefSize"
+    }, {
+      "name" : "prefSizeWithoutAnimation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.prefSizeWithoutAnimation"
+    }, {
+      "name" : "size",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.size"
+    }, {
+      "name" : "cssSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.cssSize"
+    }, {
+      "name" : "cssMaxSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.cssMaxSize"
+    }, {
+      "name" : "cssMinSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.cssMinSize"
+    }, {
+      "name" : "setSize",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.setSize"
+    }, {
+      "name" : "insets",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.insets"
+    }, {
+      "name" : "margins",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.margins"
+    }, {
+      "name" : "setMargins",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.setMargins"
+    }, {
+      "name" : "paddings",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.paddings"
+    }, {
+      "name" : "borders",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.borders"
+    }, {
+      "name" : "setLocation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.setLocation"
+    }, {
+      "name" : "location",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.location"
+    }, {
+      "name" : "bounds",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.bounds"
+    }, {
+      "name" : "position",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.position"
+    }, {
+      "name" : "offsetBounds",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.offsetBounds"
+    }, {
+      "name" : "offset",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.offset"
+    }, {
+      "name" : "_bounds",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics._bounds"
+    }, {
+      "name" : "setBounds",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.setBounds"
+    }, {
+      "name" : "cssBounds",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.cssBounds"
+    }, {
+      "name" : "debugOutput",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.graphics.debugOutput"
+    } ]
+  }, {
+    "name" : "aggregation",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.aggregation",
+    "children" : [ {
+      "name" : "sumStart",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.sumStart"
+    }, {
+      "name" : "sumStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.sumStep"
+    }, {
+      "name" : "sumFinish",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.sumFinish"
+    }, {
+      "name" : "avgStart",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.avgStart"
+    }, {
+      "name" : "avgStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.avgStep"
+    }, {
+      "name" : "avgFinish",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.avgFinish"
+    }, {
+      "name" : "minStart",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.minStart"
+    }, {
+      "name" : "minStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.minStep"
+    }, {
+      "name" : "minFinish",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.minFinish"
+    }, {
+      "name" : "maxStart",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.maxStart"
+    }, {
+      "name" : "maxStep",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.maxStep"
+    }, {
+      "name" : "maxFinish",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.aggregation.maxFinish"
+    }, {
+      "name" : "sumSymbol",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.aggregation.sumSymbol"
+    }, {
+      "name" : "avgSymbol",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.aggregation.avgSymbol"
+    }, {
+      "name" : "minSymbol",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.aggregation.minSymbol"
+    }, {
+      "name" : "maxSymbol",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.aggregation.maxSymbol"
+    } ]
+  }, {
+    "name" : "filters",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.filters",
+    "children" : [ {
+      "name" : "ensure",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.filters.ensure"
+    }, {
+      "name" : "returnTrue",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.filters.returnTrue"
+    }, {
+      "name" : "returnFalse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.filters.returnFalse"
+    }, {
+      "name" : "outsideFilter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.filters.outsideFilter"
+    }, {
+      "name" : "notSameFilter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.filters.notSameFilter"
+    } ]
+  }, {
+    "name" : "numbers",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.numbers",
+    "children" : [ {
+      "name" : "toBase62",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.toBase62"
+    }, {
+      "name" : "randomId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.randomId"
+    }, {
+      "name" : "correlationId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.correlationId"
+    }, {
+      "name" : "round",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.round"
+    }, {
+      "name" : "shiftDecimalPoint",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.shiftDecimalPoint"
+    }, {
+      "name" : "ensure",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.ensure"
+    }, {
+      "name" : "isNumber",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.numbers.isNumber"
+    }, {
+      "name" : "_correlationCounter",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.numbers._correlationCounter"
+    } ]
+  }, {
+    "name" : "tooltips",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.tooltips",
+    "children" : [ {
+      "name" : "install",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.install"
+    }, {
+      "name" : "uninstall",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.uninstall"
+    }, {
+      "name" : "update",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.update"
+    }, {
+      "name" : "close",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.close"
+    }, {
+      "name" : "cancel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.cancel"
+    }, {
+      "name" : "installForEllipsis",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.installForEllipsis"
+    }, {
+      "name" : "find",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.tooltips.find"
+    } ]
+  }, {
+    "name" : "widgets",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.widgets",
+    "children" : [ {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.widgets.get"
+    }, {
+      "name" : "createUniqueId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.widgets.createUniqueId"
+    }, {
+      "name" : "updateFirstLastMarker",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.widgets.updateFirstLastMarker"
+    }, {
+      "name" : "findFirstFocusableWidget",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.widgets.findFirstFocusableWidget"
+    }, {
+      "name" : "uniqueIdSeqNo",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.widgets.uniqueIdSeqNo"
+    } ]
+  }, {
+    "name" : "webstorage",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.webstorage",
+    "children" : [ {
+      "name" : "getItem",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.webstorage.getItem"
+    }, {
+      "name" : "setItem",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.webstorage.setItem"
+    }, {
+      "name" : "removeItem",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.webstorage.removeItem"
+    }, {
+      "name" : "clear",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.webstorage.clear"
+    } ]
+  }, {
+    "name" : "cookies",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.cookies",
+    "children" : [ {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.cookies.get"
+    }, {
+      "name" : "set",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.cookies.set"
+    } ]
+  }, {
+    "name" : "fields",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.fields",
+    "children" : [ {
+      "name" : "makeTextField",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.makeTextField"
+    }, {
+      "name" : "appendIcon",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.appendIcon"
+    }, {
+      "name" : "initTouch",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.initTouch"
+    }, {
+      "name" : "valOrText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.valOrText"
+    }, {
+      "name" : "makeInputOrDiv",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.makeInputOrDiv"
+    }, {
+      "name" : "makeInputDiv",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.makeInputDiv"
+    }, {
+      "name" : "handleOnClick",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.handleOnClick"
+    }, {
+      "name" : "activateFirstField",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.activateFirstField"
+    }, {
+      "name" : "linkElementWithLabel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.fields.linkElementWithLabel"
+    } ]
+  }, {
+    "name" : "keyStrokeModifier",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.keyStrokeModifier",
+    "children" : [ {
+      "name" : "isCtrl",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.keyStrokeModifier.isCtrl"
+    }, {
+      "name" : "isShift",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.keyStrokeModifier.isShift"
+    }, {
+      "name" : "isAlt",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.keyStrokeModifier.isAlt"
+    }, {
+      "name" : "_eval",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.keyStrokeModifier._eval"
+    }, {
+      "name" : "toModifierBitMask",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.keyStrokeModifier.toModifierBitMask"
+    } ]
+  }, {
+    "name" : "clipboard",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.clipboard",
+    "children" : [ {
+      "name" : "copyText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard.copyText"
+    }, {
+      "name" : "_copyText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard._copyText"
+    }, {
+      "name" : "_showNotification",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard._showNotification"
+    }, {
+      "name" : "_successStatus",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard._successStatus"
+    }, {
+      "name" : "_failedStatus",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard._failedStatus"
+    }, {
+      "name" : "showNotification",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.clipboard.showNotification"
+    } ]
+  }, {
+    "name" : "router",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.router",
+    "children" : [ {
+      "name" : "setDefaultLocation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.setDefaultLocation"
+    }, {
+      "name" : "prepare",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.prepare"
+    }, {
+      "name" : "activate",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.activate"
+    }, {
+      "name" : "register",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.register"
+    }, {
+      "name" : "on",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.on"
+    }, {
+      "name" : "updateLocation",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.router.updateLocation"
+    }, {
+      "name" : "routes",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.router.routes"
+    }, {
+      "name" : "events",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.router.events"
+    }, {
+      "name" : "currentRoute",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.router.currentRoute"
+    }, {
+      "name" : "defaultLocation",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.router.defaultLocation"
+    } ]
+  }, {
+    "name" : "ajax",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.ajax",
+    "children" : [ {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.get"
+    }, {
+      "name" : "post",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.post"
+    }, {
+      "name" : "put",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.put"
+    }, {
+      "name" : "remove",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.remove"
+    }, {
+      "name" : "getJson",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.getJson"
+    }, {
+      "name" : "postJson",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.postJson"
+    }, {
+      "name" : "putJson",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.putJson"
+    }, {
+      "name" : "removeJson",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.removeJson"
+    }, {
+      "name" : "callJson",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.callJson"
+    }, {
+      "name" : "call",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.ajax.call"
+    } ]
+  }, {
+    "name" : "comparators",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.comparators"
+  }, {
+    "name" : "texts",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.texts",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.bootstrap"
+    }, {
+      "name" : "_preInit",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts._preInit"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.init"
+    }, {
+      "name" : "link",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.link"
+    }, {
+      "name" : "createOrderedLanguageTags",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.createOrderedLanguageTags"
+    }, {
+      "name" : "get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.get"
+    }, {
+      "name" : "_get",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts._get"
+    }, {
+      "name" : "put",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.put"
+    }, {
+      "name" : "readFromDOM",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.readFromDOM"
+    }, {
+      "name" : "buildKey",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.buildKey"
+    }, {
+      "name" : "resolveKey",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.resolveKey"
+    }, {
+      "name" : "resolveText",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.resolveText"
+    }, {
+      "name" : "resolveTextProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.texts.resolveTextProperty"
+    }, {
+      "name" : "textsByLocale",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.texts.textsByLocale"
+    } ]
+  }, {
+    "name" : "icons",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.icons",
+    "children" : [ {
+      "name" : "parseIconId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.icons.parseIconId"
+    }, {
+      "name" : "resolveIconId",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.icons.resolveIconId"
+    }, {
+      "name" : "resolveIconProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.icons.resolveIconProperty"
+    } ]
+  }, {
+    "name" : "arrays",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.arrays",
+    "children" : [ {
+      "name" : "ensure",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.ensure"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.init"
+    }, {
+      "name" : "remove",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.remove"
+    }, {
+      "name" : "removeAll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.removeAll"
+    }, {
+      "name" : "replace",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.replace"
+    }, {
+      "name" : "insert",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.insert"
+    }, {
+      "name" : "insertAll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.insertAll"
+    }, {
+      "name" : "insertArray",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.insertArray"
+    }, {
+      "name" : "insertSorted",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.insertSorted"
+    }, {
+      "name" : "move",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.move"
+    }, {
+      "name" : "containsAny",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.containsAny"
+    }, {
+      "name" : "containsAll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.containsAll"
+    }, {
+      "name" : "first",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.first"
+    }, {
+      "name" : "last",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.last"
+    }, {
+      "name" : "hasElements",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.hasElements"
+    }, {
+      "name" : "empty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.empty"
+    }, {
+      "name" : "pushAll",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.pushAll"
+    }, {
+      "name" : "union",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.union"
+    }, {
+      "name" : "equalsIgnoreOrder",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.equalsIgnoreOrder"
+    }, {
+      "name" : "equals",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.equals"
+    }, {
+      "name" : "greater",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.greater"
+    }, {
+      "name" : "eachSibling",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.eachSibling"
+    }, {
+      "name" : "findIndex",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findIndex"
+    }, {
+      "name" : "find",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.find"
+    }, {
+      "name" : "findFrom",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findFrom"
+    }, {
+      "name" : "findIndexFrom",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findIndexFrom"
+    }, {
+      "name" : "findFromForward",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findFromForward"
+    }, {
+      "name" : "findIndexFromForward",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findIndexFromForward"
+    }, {
+      "name" : "findFromReverse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findFromReverse"
+    }, {
+      "name" : "findIndexFromReverse",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.findIndexFromReverse"
+    }, {
+      "name" : "pushIfDefined",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.pushIfDefined"
+    }, {
+      "name" : "pushSet",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.pushSet"
+    }, {
+      "name" : "format",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.format"
+    }, {
+      "name" : "formatEncoded",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.formatEncoded"
+    }, {
+      "name" : "max",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.max"
+    }, {
+      "name" : "min",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.min"
+    }, {
+      "name" : "diff",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.diff"
+    }, {
+      "name" : "flatMap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.arrays.flatMap"
+    }, {
+      "name" : "$indexOf",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.arrays.$indexOf"
+    }, {
+      "name" : "$remove",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.arrays.$remove"
+    } ]
+  }, {
+    "name" : "dates",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.dates",
+    "children" : [ {
+      "name" : "shift",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shift"
+    }, {
+      "name" : "shiftTime",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shiftTime"
+    }, {
+      "name" : "shiftToNextDayOfType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shiftToNextDayOfType"
+    }, {
+      "name" : "shiftToPreviousDayOfType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shiftToPreviousDayOfType"
+    }, {
+      "name" : "shiftToNextOrPrevDayOfType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shiftToNextOrPrevDayOfType"
+    }, {
+      "name" : "shiftToNextOrPrevMonday",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.shiftToNextOrPrevMonday"
+    }, {
+      "name" : "ensure",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.ensure"
+    }, {
+      "name" : "ensureMonday",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.ensureMonday"
+    }, {
+      "name" : "isSameTime",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.isSameTime"
+    }, {
+      "name" : "isSameDay",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.isSameDay"
+    }, {
+      "name" : "isSameMonth",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.isSameMonth"
+    }, {
+      "name" : "compareMonths",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.compareMonths"
+    }, {
+      "name" : "compareDays",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.compareDays"
+    }, {
+      "name" : "timestamp",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.timestamp"
+    }, {
+      "name" : "orderWeekdays",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.orderWeekdays"
+    }, {
+      "name" : "weekInYear",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.weekInYear"
+    }, {
+      "name" : "_thursdayOfWeek",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates._thursdayOfWeek"
+    }, {
+      "name" : "firstDayOfWeek",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.firstDayOfWeek"
+    }, {
+      "name" : "parseJsonDate",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.parseJsonDate"
+    }, {
+      "name" : "toJsonDate",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.toJsonDate"
+    }, {
+      "name" : "toJsonDateRange",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.toJsonDateRange"
+    }, {
+      "name" : "create",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.create"
+    }, {
+      "name" : "newDate",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.newDate"
+    }, {
+      "name" : "format",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.format"
+    }, {
+      "name" : "formatDateTime",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.formatDateTime"
+    }, {
+      "name" : "compare",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.compare"
+    }, {
+      "name" : "equals",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.equals"
+    }, {
+      "name" : "combineDateTime",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.combineDateTime"
+    }, {
+      "name" : "isLeapYear",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.isLeapYear"
+    }, {
+      "name" : "trunc",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.trunc"
+    }, {
+      "name" : "ceil",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dates.ceil"
+    } ]
+  }, {
+    "name" : "hAlign",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.hAlign"
+  }, {
+    "name" : "menuNavigationKeyStrokes",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.menuNavigationKeyStrokes",
+    "children" : [ {
+      "name" : "registerKeyStrokes",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes.registerKeyStrokes"
+    }, {
+      "name" : "_findMenuItems",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes._findMenuItems"
+    }, {
+      "name" : "_changeSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menuNavigationKeyStrokes._changeSelection"
+    } ]
+  }, {
+    "name" : "objects",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.objects",
+    "children" : [ {
+      "name" : "createMap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.createMap"
+    }, {
+      "name" : "copyProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.copyProperties"
+    }, {
+      "name" : "copyOwnProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.copyOwnProperties"
+    }, {
+      "name" : "countOwnProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.countOwnProperties"
+    }, {
+      "name" : "extractProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.extractProperties"
+    }, {
+      "name" : "someOwnProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.someOwnProperties"
+    }, {
+      "name" : "someProperties",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.someProperties"
+    }, {
+      "name" : "valueCopy",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.valueCopy"
+    }, {
+      "name" : "findChildObjectByKey",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.findChildObjectByKey"
+    }, {
+      "name" : "isPlainObject",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isPlainObject"
+    }, {
+      "name" : "optProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.optProperty"
+    }, {
+      "name" : "isNumber",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isNumber"
+    }, {
+      "name" : "isString",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isString"
+    }, {
+      "name" : "isNullOrUndefined",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isNullOrUndefined"
+    }, {
+      "name" : "isFunction",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isFunction"
+    }, {
+      "name" : "isArray",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.isArray"
+    }, {
+      "name" : "values",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.values"
+    }, {
+      "name" : "keyByValue",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.keyByValue"
+    }, {
+      "name" : "equals",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.equals"
+    }, {
+      "name" : "equalsRecursive",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.equalsRecursive"
+    }, {
+      "name" : "propertiesEquals",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.propertiesEquals"
+    }, {
+      "name" : "mandatoryFunction",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.mandatoryFunction"
+    }, {
+      "name" : "replacePrototypeFunction",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.replacePrototypeFunction"
+    }, {
+      "name" : "argumentsToArray",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.argumentsToArray"
+    }, {
+      "name" : "forEachArgument",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.forEachArgument"
+    }, {
+      "name" : "checkFunctionOverrides",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.checkFunctionOverrides"
+    }, {
+      "name" : "resolveConst",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.resolveConst"
+    }, {
+      "name" : "resolveConstProperty",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.objects.resolveConstProperty"
+    } ]
+  }, {
+    "name" : "polyfills",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.polyfills",
+    "children" : [ {
+      "name" : "install",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.polyfills.install"
+    }, {
+      "name" : "_installPolyfillMath",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.polyfills._installPolyfillMath"
+    }, {
+      "name" : "_installPolyfillFormData",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.polyfills._installPolyfillFormData"
+    } ]
+  }, {
+    "name" : "lookupField",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.lookupField",
+    "children" : [ {
+      "name" : "createTableRow",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.lookupField.createTableRow"
+    }, {
+      "name" : "createTableCell",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.lookupField.createTableCell"
+    } ]
+  }, {
+    "name" : "defaultValues",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.defaultValues",
+    "children" : [ {
+      "name" : "bootstrap",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues.bootstrap"
+    }, {
+      "name" : "init",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues.init"
+    }, {
+      "name" : "_generateObjectTypeHierarchyRec",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues._generateObjectTypeHierarchyRec"
+    }, {
+      "name" : "applyTo",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues.applyTo"
+    }, {
+      "name" : "_applyToInternal",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues._applyToInternal"
+    }, {
+      "name" : "_extendWithDefaults",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.defaultValues._extendWithDefaults"
+    }, {
+      "name" : "_defaults",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.defaultValues._defaults"
+    }, {
+      "name" : "_objectTypeHierarchyFlat",
+      "type" : "UtilityVariable",
+      "fullyQualifiedName" : "scout.defaultValues._objectTypeHierarchyFlat"
+    } ]
+  }, {
+    "name" : "promises",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.promises",
+    "children" : [ {
+      "name" : "oneByOne",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.promises.oneByOne"
+    }, {
+      "name" : "groupwise",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.promises.groupwise"
+    }, {
+      "name" : "parallel",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.promises.parallel"
+    } ]
+  }, {
+    "name" : "dragAndDrop",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.dragAndDrop",
+    "children" : [ {
+      "name" : "scoutTypeToDragTypeMapping",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.scoutTypeToDragTypeMapping"
+    }, {
+      "name" : "verifyDataTransferTypesScoutTypes",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.verifyDataTransferTypesScoutTypes"
+    }, {
+      "name" : "verifyDataTransferTypes",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.verifyDataTransferTypes"
+    }, {
+      "name" : "dataTransferTypesContainsScoutTypes",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.dataTransferTypesContainsScoutTypes"
+    }, {
+      "name" : "dataTransferTypesContains",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.dataTransferTypesContains"
+    }, {
+      "name" : "handler",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.dragAndDrop.handler"
+    } ]
+  }, {
+    "name" : "menus",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.menus",
+    "children" : [ {
+      "name" : "filterAccordingToSelection",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.filterAccordingToSelection"
+    }, {
+      "name" : "filter",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.filter"
+    }, {
+      "name" : "updateSeparatorVisibility",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.updateSeparatorVisibility"
+    }, {
+      "name" : "checkType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.checkType"
+    }, {
+      "name" : "_enableDisableMenuKeyStroke",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus._enableDisableMenuKeyStroke"
+    }, {
+      "name" : "_checkType",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus._checkType"
+    }, {
+      "name" : "createEllipsisMenu",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.createEllipsisMenu"
+    }, {
+      "name" : "moveMenuIntoEllipsis",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.moveMenuIntoEllipsis"
+    }, {
+      "name" : "removeMenuFromEllipsis",
+      "type" : "UtilityFunction",
+      "fullyQualifiedName" : "scout.menus.removeMenuFromEllipsis"
+    } ]
+  }, {
+    "name" : "focusRule",
+    "type" : "Utility",
+    "fullyQualifiedName" : "scout.focusRule"
   }, {
     "name" : "keys",
     "type" : "TopLevelEnum",
@@ -41968,8 +41797,5 @@
       "path" : "src/main/js/scout/style/colors.less",
       "theme" : "default-theme"
     }
-  } ],
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/core"
-  }
+  } ]
 }
