@@ -49,28 +49,29 @@ public class T5030_ResolveClassConstucorReferencesAndCreateImports extends Abstr
 
   protected String updateLocalReferences(JsFile jsFile, String source, Context context, String lineDelimiter) {
     List<JsClass> jsClasses = jsFile.getJsClasses();
-    List<JsFunction> constuctors = jsClasses
+    List<JsFunction> constructors = jsClasses
         .stream()
+        .filter(jsClass -> jsClass.getConstructor() != null)
         .map(jsClass -> jsClass.getConstructor())
         .collect(Collectors.toList());
-    if (constuctors.size() == 0) {
+    if (constructors.size() == 0) {
       return source;
     }
     if (jsClasses.size() != 1) {
       // check if any of the local static methods is used
-      Matcher matcher = Pattern.compile(constuctors
+      Matcher matcher = Pattern.compile(constructors
           .stream()
           .map(con -> Pattern.quote(con.getFqn()))
           .collect(Collectors.joining("|"))).matcher(source);
       if (matcher.find()) {
-        source = MigrationUtility.prependTodo(source, "Replace local references (constuctors).", lineDelimiter);
-        LOG.warn("Could not replace local references for constuctors in '"+jsFile.getPath()+"',.");
+        source = MigrationUtility.prependTodo(source, "Replace local references (constructors).", lineDelimiter);
+        LOG.warn("Could not replace local references for constructors in '" + jsFile.getPath() + "',.");
       }
       return source;
     }
 
-    for (JsFunction constuctor : constuctors) {
-      source = createImportForReferences(constuctor.getJsClass().getFullyQualifiedName(), null, constuctor.getJsClass().getName() , source, jsFile, context);
+    for (JsFunction constructor : constructors) {
+      source = createImportForReferences(constructor.getJsClass().getFullyQualifiedName(), null, constructor.getJsClass().getName(), source, jsFile, context);
     }
     return source;
   }
@@ -83,7 +84,7 @@ public class T5030_ResolveClassConstucorReferencesAndCreateImports extends Abstr
 
     for (INamedElement constructor : constuctors) {
       String replacement = constructor.getAncestor(Type.Class).getName();
-      source = createImportForReferences(constructor.getAncestor(Type.Class).getFullyQualifiedName(), constructor.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
+      source = createImportForReferences(constructor.getAncestor(Type.Class).getFullyQualifiedName(), constructor.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
     }
     return source;
   }

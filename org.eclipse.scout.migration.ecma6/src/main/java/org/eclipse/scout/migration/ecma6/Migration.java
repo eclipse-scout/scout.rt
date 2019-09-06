@@ -70,7 +70,7 @@ public class Migration {
     LOG.info("Execute pre migration tasks (#: " + preMigrationTasks.size() + ")");
     preMigrationTasks.forEach(task -> task.execute(m_context));
 
-    LOG.debug("Execute migration tasks (#: " + m_tasks.size() + ")");
+    LOG.info("Execute migration tasks (#: " + m_tasks.size() + ")");
     visitFiles();
     writeFiles();
 
