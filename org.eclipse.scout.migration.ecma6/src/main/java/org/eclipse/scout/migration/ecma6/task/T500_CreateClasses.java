@@ -194,7 +194,8 @@ public class T500_CreateClasses extends AbstractTask {
     patternBuilder.append(function.getJsClass().getNamespace())
         .append("\\.")
         .append(function.getJsClass().getName())
-        .append("\\ \\=\\s*function");
+        .append("\\s*\\=\\s*function");
+
 
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
@@ -211,17 +212,20 @@ public class T500_CreateClasses extends AbstractTask {
       patternBuilder.append(function.getJsClass().getNamespace())
           .append("\\.")
           .append(function.getJsClass().getName())
-          .append("\\.parent\\.call\\(this(\\,\\s*[^\\)]+)?\\)\\;");
+          .append("\\.parent\\.call\\(this(\\,\\s*([^\\)]+))?\\)\\;");
+
+      // group 1 arguments with leading ','
+      // group 2 arguments to use for mig
       pattern = Pattern.compile(patternBuilder.toString());
       matcher = pattern.matcher(source);
       if (matcher.find()) {
         StringBuilder replacement = new StringBuilder();
         replacement.append("super(");
         if (matcher.group(1) != null) {
-          replacement.append(matcher.group(1).replace("$", "\\$"));
+          replacement.append(matcher.group(2));
         }
         replacement.append(");");
-        source = matcher.replaceFirst(replacement.toString());
+        source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
       }
     }
     return source;

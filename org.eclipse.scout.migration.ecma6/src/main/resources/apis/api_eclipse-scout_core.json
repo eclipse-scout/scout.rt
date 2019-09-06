@@ -2,9 +2,6 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/core"
-  },
   "children" : [ {
     "name" : "Column",
     "type" : "Class",
@@ -41797,5 +41794,8 @@
       "path" : "src/main/js/scout/style/colors.less",
       "theme" : "default-theme"
     }
-  } ]
+  } ],
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/core"
+  }
 }
