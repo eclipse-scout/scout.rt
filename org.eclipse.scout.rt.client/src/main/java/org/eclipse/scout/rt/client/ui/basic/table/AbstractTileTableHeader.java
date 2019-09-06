@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -272,7 +273,10 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
           .withFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0)));
 
       for (IColumn col : getTable().getColumns()) {
-        lookupRows.add(new LookupRow<>(col, col.getHeaderCell().getText()));
+        if (col.isVisible()) {
+          String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
+          lookupRows.add(new LookupRow<>(col, colLabel));
+        }
       }
 
       return lookupRows;
@@ -287,12 +291,17 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
     protected List<? extends ILookupRow<ImmutablePair<IColumn, Boolean>>> execCreateLookupRows() {
       final List<LookupRow<ImmutablePair<IColumn, Boolean>>> lookupRows = new ArrayList<>();
 
-      lookupRows.add(new LookupRow<>(null, TEXTS.get("NoSorting")));
+      lookupRows.add(new LookupRow<ImmutablePair<IColumn, Boolean>>(null, TEXTS.get("NoSorting"))
+          .withFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0)));
+
       for (IColumn col : getTable().getColumns()) {
-        lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), col.getHeaderCell().getText() + " (" + TEXTS.get("Ascending") + ")")
-            .withIconId(AbstractIcons.LongArrowUpBold));
-        lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), col.getHeaderCell().getText() + " (" + TEXTS.get("Descending") + ")")
-            .withIconId(AbstractIcons.LongArrowDownBold));
+        if (col.isVisible()) {
+          String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " (" + TEXTS.get("Ascending") + ")")
+              .withIconId(AbstractIcons.LongArrowUpBold));
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " (" + TEXTS.get("Descending") + ")")
+              .withIconId(AbstractIcons.LongArrowDownBold));
+        }
       }
 
       return lookupRows;

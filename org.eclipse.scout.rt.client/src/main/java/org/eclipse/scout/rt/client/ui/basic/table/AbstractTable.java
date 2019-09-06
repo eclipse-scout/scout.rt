@@ -996,7 +996,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
     setTruncatedCellTooltipEnabled(getConfiguredTruncatedCellTooltipEnabled());
-    setTileMode(getConfiguredTileModeEnabled());
     setClientUiPreferencesEnabled(getConfiguredClientUiPreferencesEnabled());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
@@ -1033,6 +1032,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     setKeyStrokes(ksList);
 
     m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
+
+    // setTileMode creates the mediator and tileTableHeader lazy if set to true. Do this here to already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
+    setTileMode(getConfiguredTileModeEnabled());
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {

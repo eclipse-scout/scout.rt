@@ -138,8 +138,10 @@ scout.TableTileGridMediator.prototype.setTiles = function(tiles) {
 };
 
 scout.TableTileGridMediator.prototype._setTiles = function(tiles) {
+  this._isUpdatingTiles = true;
   this.reset();
   this._setTilesInternal(tiles);
+  this._isUpdatingTiles = false;
 };
 
 scout.TableTileGridMediator.prototype._setTilesInternal = function(tiles) {
@@ -480,12 +482,14 @@ scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function()
 };
 
 scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = function(selectedTiles) {
-  var selectedRows = selectedTiles.map(function(tile) {
-    return this.table.rowsMap[tile.rowId];
-  }, this).filter(function(t) {
-    return !!t;
-  });
-  this.table.selectRows(selectedRows);
+  if (!this._isUpdatingTiles) {
+    var selectedRows = selectedTiles.map(function(tile) {
+      return this.table.rowsMap[tile.rowId];
+    }, this).filter(function(t) {
+      return !!t;
+    });
+    this.table.selectRows(selectedRows);
+  }
 };
 
 scout.TableTileGridMediator.prototype._updateGroupVisibility = function() {

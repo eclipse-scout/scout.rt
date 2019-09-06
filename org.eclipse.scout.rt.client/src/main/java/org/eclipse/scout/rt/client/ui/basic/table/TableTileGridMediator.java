@@ -68,6 +68,11 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
     if (m_table.isTileMode()) {
       List<ITableRowTileMapping> tileMappings = new ArrayList<>(getTileMappings());
       switch (e.getType()) {
+        case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
+          // when the column structure changes rows are not reloaded but retransmitted to the ui. Force a property change event for the tileMappings to ensure that the mapping is recreated on the clientside.
+          setTileMappings(new ArrayList<>());
+          setTileMappings(tileMappings);
+          break;
         case TableEvent.TYPE_ROWS_INSERTED:
           tileMappings.addAll(m_table.createTiles(e.getRows()));
           setTileMappings(tileMappings);
