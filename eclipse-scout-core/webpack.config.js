@@ -15,7 +15,8 @@ module.exports = (env, args) => {
 
   config.entry = {
     'eclipse-scout-core': './index.js',
-    'scout-theme': './src/scout/theme.less'
+    'scout-theme': './src/theme.less',
+    'scout-theme-dark': './src/theme-dark.less'
   };
   config.externals = {
     // The value of this property (jQuery) is the name of the global variable (window scope)

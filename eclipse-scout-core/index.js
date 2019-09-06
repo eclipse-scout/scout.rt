@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-let scout = require('./src/scout/index');
+let scout = require('./src/scout');
 
 // This is used for the ES6 build stack, where this module is exported and
 // consumed by other modules. When this piece of code is executed in a browser
