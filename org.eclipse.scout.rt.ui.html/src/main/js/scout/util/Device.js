@@ -47,7 +47,8 @@ scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE = {
   string: ''
 };
 
-scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
+
+scout.Device.VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
 scout.Device.Browser = {
   UNKNOWN: 'Unknown',
@@ -452,8 +453,8 @@ scout.Device.prototype.supportsCssProperty = function(property) {
     }
 
     property = property.charAt(0).toUpperCase() + property.slice(1);
-    for (var i = 0; i < scout.Device.vendorPrefixes.length; i++) {
-      if (document.body.style[scout.Device.vendorPrefixes[i] + property] !== undefined) {
+    for (var i = 0; i < scout.Device.VENDOR_PREFIXES.length; i++) {
+      if (document.body.style[scout.Device.VENDOR_PREFIXES[i] + property] !== undefined) {
         return true;
       }
     }
@@ -510,8 +511,8 @@ scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
   }
 
   property = property.charAt(0).toUpperCase() + property.slice(1);
-  for (var i = 0; i < scout.Device.vendorPrefixes.length; i++) {
-    var vendorProperty = scout.Device.vendorPrefixes[i] + property;
+  for (var i = 0; i < scout.Device.VENDOR_PREFIXES.length; i++) {
+    var vendorProperty = scout.Device.VENDOR_PREFIXES[i] + property;
     if (document.body.style[vendorProperty] !== undefined) {
       div.style[vendorProperty] = value;
       if (checkFunc(div.style[vendorProperty])) {

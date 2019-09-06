@@ -20,9 +20,9 @@ scout.DesktopNavigation = function() {
 };
 scout.inherits(scout.DesktopNavigation, scout.Widget);
 
-scout.DesktopNavigation.DEFAULT_STYLE_WIDTH; // Configured in sizes.css
-scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH; // Configured in sizes.css
-scout.DesktopNavigation.MIN_WIDTH; // Configured in sizes.css
+scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = null; // Configured in sizes.css
+scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
+scout.DesktopNavigation.MIN_WIDTH = null; // Configured in sizes.css
 
 scout.DesktopNavigation.prototype._init = function(model) {
   scout.DesktopNavigation.parent.prototype._init.call(this, model);

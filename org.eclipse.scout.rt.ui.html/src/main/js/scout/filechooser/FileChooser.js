@@ -149,7 +149,7 @@ scout.FileChooser.prototype._remove = function() {
 };
 
 scout.FileChooser.prototype._installFocusContext = function() {
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
 };
 
 scout.FileChooser.prototype._uninstallFocusContext = function() {

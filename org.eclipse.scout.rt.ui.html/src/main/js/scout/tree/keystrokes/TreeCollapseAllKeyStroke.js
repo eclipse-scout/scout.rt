@@ -11,7 +11,7 @@
 scout.TreeCollapseAllKeyStroke = function(tree, keyStrokeModifier) {
   scout.TreeCollapseAllKeyStroke.parent.call(this, tree, keyStrokeModifier);
   this.which = [scout.keys.HOME];
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     if (this.field.visibleNodesFlat.length > 0) {
       return this.field.visibleNodesFlat[0].$node;

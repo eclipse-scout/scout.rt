@@ -99,11 +99,15 @@ scout.TagChooserPopup.prototype.delegateKeyEvent = function(event) {
   this.table.$container.trigger(event);
 };
 
-/**
- * Since we don't have multiple inheritance with scout.inherits, instead of inherit from ProposalChooser
- * we simply point to the function on the prototype.
- */
-scout.TagChooserPopup.prototype.triggerLookupRowSelected = scout.ProposalChooser.prototype.triggerLookupRowSelected;
+scout.TagChooserPopup.prototype.triggerLookupRowSelected = function(row) {
+  row = row || this.selectedRow();
+  if (!row || !row.enabled) {
+    return;
+  }
+  this.trigger('lookupRowSelected', {
+    lookupRow: row.lookupRow
+  });
+};
 
 scout.TagChooserPopup.prototype.selectedRow = function() {
   return this.table.selectedRow();

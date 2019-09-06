@@ -10,7 +10,7 @@
  */
 scout.ColumnUserFilter = function() {
   scout.ColumnUserFilter.parent.call(this);
-  this.filterType = scout.ColumnUserFilter.Type;
+  this.filterType = scout.ColumnUserFilter.TYPE;
   this.events = new scout.EventSupport();
 
   /**
@@ -31,7 +31,7 @@ scout.ColumnUserFilter = function() {
 };
 scout.inherits(scout.ColumnUserFilter, scout.TableUserFilter);
 
-scout.ColumnUserFilter.Type = 'column';
+scout.ColumnUserFilter.TYPE = 'column';
 
 scout.ColumnUserFilter.prototype.axisGroup = function() {
   return scout.TableMatrix.NumberGroup.COUNT;

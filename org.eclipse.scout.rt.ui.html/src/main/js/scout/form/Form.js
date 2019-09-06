@@ -899,7 +899,7 @@ scout.Form.prototype._initialFocusElement = function() {
 
 scout.Form.prototype._installFocusContext = function() {
   if (this.isDialog() || this.isPopupWindow()) {
-    this.session.focusManager.installFocusContext(this.$container, scout.focusRule.NONE);
+    this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.NONE);
   }
 };
 

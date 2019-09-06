@@ -13,7 +13,7 @@ scout.MenuExecByNumberKeyStroke = function(popup, menuItemClass) {
   this._menuItemClass = menuItemClass;
   this.which = [scout.keys[1], scout.keys[2], scout.keys[3], scout.keys[4], scout.keys[5], scout.keys[6], scout.keys[7], scout.keys[8], scout.keys[9]];
   this.renderingHints.render = true;
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return event.$menuItem;
   }.bind(this);

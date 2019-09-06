@@ -104,7 +104,7 @@ scout.BusyIndicator.prototype._render = function() {
 
 scout.BusyIndicator.prototype._postRender = function() {
   scout.BusyIndicator.parent.prototype._postRender.call(this);
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
 };
 
 scout.BusyIndicator.prototype._remove = function() {

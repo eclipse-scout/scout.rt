@@ -14,7 +14,7 @@ scout.AbstractTableNavigationKeyStroke = function(table) {
   this.field = table;
   this.shift = !table.multiSelect ? false : undefined;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
 };
 scout.inherits(scout.AbstractTableNavigationKeyStroke, scout.KeyStroke);
 

@@ -27,7 +27,7 @@ scout.BrowserField = function() {
 };
 scout.inherits(scout.BrowserField, scout.ValueField);
 
-scout.BrowserField.windowStates = {
+scout.BrowserField.WindowStates = {
   WINDOW_OPEN: 'true',
   WINDOW_CLOSED: 'false'
 };
@@ -238,7 +238,7 @@ scout.BrowserField.prototype._popupWindowOpen = function(popup) {
   this._popupWindow = popup;
   if (this._popupWindow && !this._popupWindow.closed) {
     this.trigger('externalWindowStateChange', {
-      windowState: scout.BrowserField.windowStates.WINDOW_OPEN
+      windowState: scout.BrowserField.WindowStates.WINDOW_OPEN
     });
     var popupInterval = window.setInterval(function() {
       var popupWindowClosed = false;
@@ -252,7 +252,7 @@ scout.BrowserField.prototype._popupWindowOpen = function(popup) {
       if (popupWindowClosed) {
         window.clearInterval(popupInterval);
         this.trigger('externalWindowStateChange', {
-          windowState: scout.BrowserField.windowStates.WINDOW_CLOSED
+          windowState: scout.BrowserField.WindowStates.WINDOW_CLOSED
         });
       }
     }.bind(this), 500);

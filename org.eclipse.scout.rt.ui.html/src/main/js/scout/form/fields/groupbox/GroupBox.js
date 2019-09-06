@@ -156,7 +156,7 @@ scout.GroupBox.prototype._setKeyStrokes = function(keyStrokes) {
       return true;
     },
     offset: 0,
-    hAlign: scout.hAlign.RIGHT,
+    hAlign: scout.HAlign.RIGHT,
     $drawingArea: function($drawingArea, event) {
       if (this.labelVisible) {
         return this.$title;

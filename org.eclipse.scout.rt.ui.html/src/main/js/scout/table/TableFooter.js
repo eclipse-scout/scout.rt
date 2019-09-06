@@ -65,7 +65,7 @@ scout.TableFooter.prototype._render = function() {
     .on('input', '', this._createOnFilterFieldInputFunction().bind(this))
     .placeholder(this.session.text('ui.FilterBy_'));
 
-  filter = this.table.getFilter(scout.TableTextUserFilter.Type);
+  filter = this.table.getFilter(scout.TableTextUserFilter.TYPE);
   if (filter) {
     this._$textFilter.val(filter.text);
   }
@@ -701,7 +701,7 @@ scout.TableFooter.prototype._applyFilter = function(event) {
       filter.text = filterText;
       this.table.addFilter(filter);
     } else {
-      this.table.removeFilterByKey(scout.TableTextUserFilter.Type);
+      this.table.removeFilterByKey(scout.TableTextUserFilter.TYPE);
     }
 
     this.table.filter();
@@ -755,7 +755,7 @@ scout.TableFooter.prototype._onTableFilter = function(event) {
 scout.TableFooter.prototype._onTableFilterAdded = function(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
-  if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+  if (event.filter.filterType === scout.TableTextUserFilter.TYPE) {
     // Do not update the content when the value does not change. This is the case when typing text in
     // the UI. If we would call val() unconditionally, the current cursor position will get lost.
     var currentText = this._$textFilter.val();
@@ -770,7 +770,7 @@ scout.TableFooter.prototype._onTableFilterAdded = function(event) {
 scout.TableFooter.prototype._onTableFilterRemoved = function(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
-  if (event.filter.filterType === scout.TableTextUserFilter.Type) {
+  if (event.filter.filterType === scout.TableTextUserFilter.TYPE) {
     this._$textFilter.val('');
     this._updateHasFilterText();
     this._applyFilter();

@@ -26,7 +26,7 @@ scout.Popup = function() {
   this.withGlassPane = false;
   this.withFocusContext = true;
   this.initialFocus = function() {
-    return scout.focusRule.AUTO;
+    return scout.FocusRule.AUTO;
   };
   this.focusableContainer = false;
 
@@ -108,7 +108,7 @@ scout.Popup.SwitchRule = {};
 
 /**
  * @param options:
- *          initialFocus: a function that returns the element to be focused or a <code>scout.focusRule</code>. Default returns <code>scout.focusRule.AUTO</code>
+ *          initialFocus: a function that returns the element to be focused or a <code>scout.FocusRule</code>. Default returns <code>scout.FocusRule.AUTO</code>
  *          focusableContainer: a boolean whether or not the container of the Popup is focusable
  */
 scout.Popup.prototype._init = function(options) {

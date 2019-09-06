@@ -15,7 +15,7 @@ scout.FileChooserFieldDeleteKeyStroke = function(field) {
   this.stopPropagation = true;
 
   this.renderingHints.offset = 25;
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);

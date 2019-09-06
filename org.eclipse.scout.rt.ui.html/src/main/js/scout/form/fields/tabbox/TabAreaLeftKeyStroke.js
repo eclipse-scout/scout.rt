@@ -14,7 +14,7 @@ scout.TabAreaLeftKeyStroke = function(tabArea) {
   this.which = [scout.keys.LEFT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
 };
 scout.inherits(scout.TabAreaLeftKeyStroke, scout.KeyStroke);
 

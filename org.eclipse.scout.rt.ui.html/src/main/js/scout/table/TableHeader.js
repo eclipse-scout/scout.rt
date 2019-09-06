@@ -827,7 +827,7 @@ scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {
 scout.TableHeader.prototype._onTableAddFilterRemoved = function(event) {
   var column = event.filter.column;
   // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
-  if (event.filter.filterType === scout.ColumnUserFilter.Type && column.$header) {
+  if (event.filter.filterType === scout.ColumnUserFilter.TYPE && column.$header) {
     this._renderColumnState(column);
   }
 };

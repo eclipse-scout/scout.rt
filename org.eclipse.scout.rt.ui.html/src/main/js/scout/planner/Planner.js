@@ -59,10 +59,14 @@ scout.Planner.Direction = {
  * Enum providing display-modes for planner (extends calendar).
  * @see IPlannerDisplayMode.java
  */
-scout.Planner.DisplayMode = $.extend({
+scout.Planner.DisplayMode = {
+  DAY: 1,
+  WEEK: 2,
+  MONTH: 3,
+  WORK_WEEK: 4,
   CALENDAR_WEEK: 5,
   YEAR: 6
-}, scout.Calendar.DisplayMode);
+};
 
 scout.Planner.SelectionMode = {
   NONE: 0,

@@ -153,7 +153,7 @@ scout.MessageBox.prototype._remove = function() {
 };
 
 scout.MessageBox.prototype._installFocusContext = function() {
-  this.session.focusManager.installFocusContext(this.$container, scout.focusRule.AUTO);
+  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
 };
 
 scout.MessageBox.prototype._uninstallFocusContext = function() {

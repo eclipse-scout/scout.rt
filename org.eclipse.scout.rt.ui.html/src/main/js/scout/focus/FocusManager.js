@@ -44,7 +44,7 @@ scout.FocusManager = function(options) {
   if (this.restrictedFocusGain) {
     this.installTopLevelMouseHandlers($mainEntryPoint);
   }
-  this.installFocusContext($mainEntryPoint, scout.focusRule.AUTO);
+  this.installFocusContext($mainEntryPoint, scout.FocusRule.AUTO);
 };
 
 scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container) {
@@ -138,9 +138,9 @@ scout.FocusManager.prototype.activate = function(activate) {
  */
 scout.FocusManager.prototype.installFocusContext = function($container, focusRuleOrElement) {
   var elementToFocus;
-  if (!focusRuleOrElement || focusRuleOrElement === scout.focusRule.AUTO) {
+  if (!focusRuleOrElement || focusRuleOrElement === scout.FocusRule.AUTO) {
     elementToFocus = this.findFirstFocusableElement($container);
-  } else if (focusRuleOrElement === scout.focusRule.NONE) {
+  } else if (focusRuleOrElement === scout.FocusRule.NONE) {
     elementToFocus = null;
   } else {
     elementToFocus = focusRuleOrElement;

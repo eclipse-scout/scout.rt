@@ -74,7 +74,7 @@ scout.clipboard = {
     doc.body.appendChild(f);
     // Preserve focus
     var $f = $(f);
-    options.session.focusManager.installFocusContext($f, scout.focusRule.AUTO);
+    options.session.focusManager.installFocusContext($f, scout.FocusRule.AUTO);
     f.select(); // cannot use jquery select(), because that is overridden by jquery-scout
 
     var deferred = $.Deferred();

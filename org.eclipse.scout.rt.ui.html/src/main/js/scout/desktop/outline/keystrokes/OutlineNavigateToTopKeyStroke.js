@@ -11,7 +11,7 @@
 scout.OutlineNavigateToTopKeyStroke = function(tree, modifierBitMask) {
   scout.OutlineNavigateToTopKeyStroke.parent.call(this, tree, modifierBitMask);
   this.which = [scout.keys.HOME];
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$title || this.field.$data;

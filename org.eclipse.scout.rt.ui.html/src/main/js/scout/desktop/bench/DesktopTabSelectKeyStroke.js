@@ -27,7 +27,7 @@ scout.DesktopTabSelectKeyStroke = function(desktop) {
   );
 
   // rendering hints
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var viewIndex = event.which - scout.keys['1'];
     return this._viewTabs()[viewIndex].$container;

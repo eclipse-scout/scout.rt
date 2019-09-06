@@ -35,8 +35,9 @@ scout.DesktopBench = function() {
 };
 scout.inherits(scout.DesktopBench, scout.Widget);
 
-scout.DesktopBench.VIEW_MIN_HEIGHT; // Configured in sizes.css
-scout.DesktopBench.VIEW_MIN_WIDTH; // Configured in sizes.css
+scout.DesktopBench.VIEW_MIN_HEIGHT = null; // Configured in sizes.css
+scout.DesktopBench.VIEW_MIN_WIDTH = null; // Configured in sizes.css
+
 scout.DesktopBench.VIEW_AREA_COLUMN_INDEX = {
   LEFT: 0,
   CENTER: 1,

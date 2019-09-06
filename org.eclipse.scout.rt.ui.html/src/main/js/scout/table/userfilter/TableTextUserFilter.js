@@ -10,11 +10,11 @@
  */
 scout.TableTextUserFilter = function() {
   scout.TableTextUserFilter.parent.call(this);
-  this.filterType = scout.TableTextUserFilter.Type;
+  this.filterType = scout.TableTextUserFilter.TYPE;
 };
 scout.inherits(scout.TableTextUserFilter, scout.TableUserFilter);
 
-scout.TableTextUserFilter.Type = 'text';
+scout.TableTextUserFilter.TYPE = 'text';
 
 /**
  * @override TableUserFilter.js

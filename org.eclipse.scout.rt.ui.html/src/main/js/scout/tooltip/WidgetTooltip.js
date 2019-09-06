@@ -27,7 +27,7 @@ scout.WidgetTooltip = function() {
 
   this.withFocusContext = true;
   this.initialFocus = function() {
-    return scout.focusRule.AUTO;
+    return scout.FocusRule.AUTO;
   };
   this.focusableContainer = false;
 };

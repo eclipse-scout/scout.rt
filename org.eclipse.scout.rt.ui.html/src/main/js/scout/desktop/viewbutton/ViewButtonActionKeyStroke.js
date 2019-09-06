@@ -25,7 +25,7 @@ scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingA
 
 scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
   if (this.field._isMenuItem) {
-    this.renderingHints.hAlign = scout.hAlign.RIGHT;
+    this.renderingHints.hAlign = scout.HAlign.RIGHT;
   }
   return scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
 };

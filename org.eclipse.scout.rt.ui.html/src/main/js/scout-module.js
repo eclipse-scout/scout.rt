@@ -60,7 +60,7 @@
   __include("scout/util/TreeSet.js");
   __include("scout/util/URL.js");
   __include("scout/util/filters.js");
-  __include("scout/util/hAlign.js");
+  __include("scout/util/HAlign.js");
   __include("scout/util/aggregation.js");
   __include("scout/util/webstorage.js");
   __include("scout/util/cookies.js");
@@ -153,7 +153,7 @@
   __include("scout/focus/FocusManager.js");
   __include("scout/focus/FocusContext.js");
   __include("scout/focus/focusUtils.js");
-  __include("scout/focus/focusRule.js");
+  __include("scout/focus/FocusRule.js");
   __include("scout/glasspane/GlassPane.js");
   __include("scout/glasspane/DeferredGlassPaneTarget.js");
   __include("scout/glasspane/GlassPaneRenderer.js");

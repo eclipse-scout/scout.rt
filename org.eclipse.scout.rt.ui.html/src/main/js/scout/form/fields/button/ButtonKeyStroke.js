@@ -15,7 +15,7 @@ scout.ButtonKeyStroke = function(button, keyStroke) {
   this.stopPropagation = true;
   this.stopImmediatePropagation = true;
 
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$container;
   }.bind(this);

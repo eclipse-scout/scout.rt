@@ -30,7 +30,7 @@ scout.BenchColumn.TAB_BOX_INDEX = {
   BOTTOM: 2
 };
 
-scout.DesktopBench.TAB_BOX_CLASSES = [
+scout.BenchColumn.TAB_BOX_CLASSES = [
   'north',
   'center',
   'south'
@@ -159,7 +159,7 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
   for (var i = 0; i < 3; i++) {
     var tabBox = scout.create('SimpleTabBox', {
       parent: this,
-      cssClass: scout.strings.join(' ', 'view-tab-box', scout.DesktopBench.TAB_BOX_CLASSES[i]),
+      cssClass: scout.strings.join(' ', 'view-tab-box', scout.BenchColumn.TAB_BOX_CLASSES[i]),
       controller: scout.create('DesktopTabBoxController')
     });
     tabBox.setLayoutData(rowLayoutDatas[i]);

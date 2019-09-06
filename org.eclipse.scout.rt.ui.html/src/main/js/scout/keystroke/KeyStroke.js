@@ -18,7 +18,7 @@ scout.KeyStroke = function() {
   this.preventDefault = true;
   this.stopPropagation = false;
   this.stopImmediatePropagation = false;
-  this.keyStrokeMode = scout.KeyStrokeMode.DOWN;
+  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
   this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
   this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
   this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
@@ -35,7 +35,7 @@ scout.KeyStroke = function() {
     }.bind(this),
     gap: 4,
     offset: 4,
-    hAlign: scout.hAlign.LEFT,
+    hAlign: scout.HAlign.LEFT,
     text: null,
     $drawingArea: function($drawingArea, event) {
       return $drawingArea;
@@ -104,7 +104,7 @@ scout.KeyStroke.prototype.invokeHandle = function(event) {
   if (!this._handleExecuted) {
     this.handle(event);
 
-    if (event.type === scout.KeyStrokeMode.DOWN) {
+    if (event.type === scout.KeyStroke.Mode.DOWN) {
       this._handleExecuted = true;
 
       // Reset handleExecuted on the next key up event
@@ -192,7 +192,7 @@ scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
 scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   var $existingKeyBoxes = $('.key-box', $parent);
   var text = this.renderingHints.text || scout.keys.codesToKeys[keyCode];
-  var align = this.renderingHints.hAlign === scout.hAlign.RIGHT ? 'right' : 'left';
+  var align = this.renderingHints.hAlign === scout.HAlign.RIGHT ? 'right' : 'left';
   var offset = this.renderingHints.offset;
   $existingKeyBoxes = $existingKeyBoxes.filter(function() {
     if (align === 'right') {
@@ -202,7 +202,7 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   });
   if ($existingKeyBoxes.length > 0) {
     var $boxLastAdded = $existingKeyBoxes.first();
-    if (this.renderingHints.hAlign === scout.hAlign.RIGHT) {
+    if (this.renderingHints.hAlign === scout.HAlign.RIGHT) {
       offset = $parent.outerWidth() - $boxLastAdded.position().left + this.renderingHints.gap;
     } else {
       offset = $boxLastAdded.position().left + this.renderingHints.gap + $boxLastAdded.outerWidth();
@@ -250,7 +250,7 @@ scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
   }
 };
 
-scout.KeyStrokeMode = {
+scout.KeyStroke.Mode = {
   UP: 'keyup',
   DOWN: 'keydown'
 };

@@ -14,7 +14,7 @@ scout.TabItemKeyStroke = function(keyStroke, field) {
   this.parseAndSetKeyStroke(keyStroke);
 
   this.renderingHints.offset = 16;
-  this.renderingHints.hAlign = scout.hAlign.RIGHT;
+  this.renderingHints.hAlign = scout.HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$tabContainer;
   }.bind(this);
