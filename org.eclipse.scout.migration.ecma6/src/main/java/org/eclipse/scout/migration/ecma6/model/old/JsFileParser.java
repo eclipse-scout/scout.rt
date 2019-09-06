@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.migration.ecma6.model.old;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
@@ -138,6 +137,26 @@ public class JsFileParser {
 
   /**
    * <pre>
+   * scout.addAppListener = function(type, func) {
+   * Groups:
+   *  1 namespace
+   *  2 name
+   * </pre>
+   */
+  private static Pattern START_UTILITY_FUNCTION_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_a-z][^ .]+)\\s*=\\s*function");
+
+  /**
+   * <pre>
+   * scout.sessions = [];
+   * Groups:
+   *  1 namespace
+   *  2 name
+   * </pre>
+   */
+  private static Pattern START_UTILITY_VARIABLE_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!f)");
+
+  /**
+   * <pre>
    * Groups:
    *  1 namespace = scope.class
    *  2 field name
@@ -171,10 +190,9 @@ public class JsFileParser {
 
   private WorkingCopy m_workingCopy;
   private final JsFile m_jsFile;
-  private BufferedReader m_sourceReader;
+  private LineReaderWithPositionTracking m_sourceReader;
   private String m_currentLine;
   private int m_currentLineNumber = 0;
-  private int m_offsetStartLine = 0;
   private final String m_lineSeparator;
   private JsUtility m_curUtility;
 
@@ -182,7 +200,7 @@ public class JsFileParser {
     m_workingCopy = workingCopy;
     String source = workingCopy.getInitialSource();
     m_lineSeparator = workingCopy.getLineSeparator();
-    m_sourceReader = new BufferedReader(new StringReader(source));
+    m_sourceReader = new LineReaderWithPositionTracking(new StringReader(source));
     m_jsFile = new JsFile(workingCopy.getPath());
   }
 
@@ -243,6 +261,18 @@ public class JsFileParser {
         matcher = END_UTILITY_BLOCK.matcher(m_currentLine);
         if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo()) && m_curUtility != null) {
           endUtility(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_FUNCTION_STANDALONE.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityFunctionStandalone(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_VARIABLE_STANDALONE.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityVariableStandalone(matcher);
           comment = null;
           continue;
         }
@@ -407,7 +437,20 @@ public class JsFileParser {
       nextLine();
       return null;
     }
-    JsUtilityFunction f = m_curUtility.addFunction(name, !name.startsWith("_"), matcher.group());
+    JsUtilityFunction f = m_curUtility.addFunction(name, !name.startsWith("_"), false, matcher.group());
+    nextLine();
+    return f;
+  }
+
+  private JsUtilityFunction readUtilityFunctionStandalone(Matcher matcher) throws IOException {
+    String namespace = matcher.group(1);
+    String name = matcher.group(2);
+    JsUtility util = m_jsFile.getJsUtilities().stream().filter(u -> u.getFullyQualifiedName().equals(namespace)).findFirst().orElse(null);
+    if (util == null) {
+      util = new JsUtility(m_jsFile, null, namespace, null);
+      m_jsFile.addJsUtility(util);
+    }
+    JsUtilityFunction f = util.addFunction(name, !name.startsWith("_"), true, matcher.group());
     nextLine();
     return f;
   }
@@ -420,7 +463,20 @@ public class JsFileParser {
       nextLine();
       return null;
     }
-    JsUtilityVariable v = m_curUtility.addVariable(name, value, !name.startsWith("_"), matcher.group());
+    JsUtilityVariable v = m_curUtility.addVariable(name, value, !name.startsWith("_"), false, matcher.group());
+    nextLine();
+    return v;
+  }
+
+  private JsUtilityVariable readUtilityVariableStandalone(Matcher matcher) throws IOException {
+    String namespace = matcher.group(1);
+    String name = matcher.group(2);
+    JsUtility util = m_jsFile.getJsUtilities().stream().filter(u -> u.getFullyQualifiedName().equals(namespace)).findFirst().orElse(null);
+    if (util == null) {
+      util = new JsUtility(m_jsFile, null, namespace, null);
+      m_jsFile.addJsUtility(util);
+    }
+    JsUtilityVariable v = util.addVariable(name, null, !name.startsWith("_"), true, matcher.group());
     nextLine();
     return v;
   }
@@ -428,7 +484,9 @@ public class JsFileParser {
   private void endUtility(Matcher matcher) throws IOException {
     Assertions.assertNotNull(m_curUtility);
     String source = m_workingCopy.getInitialSource();
-    m_curUtility.setSource(source.substring(source.indexOf(m_curUtility.getStartTag()), m_offsetStartLine + matcher.end()));
+    int a = source.indexOf(m_curUtility.getStartTag());
+    int b = m_sourceReader.getStartOfLine() + matcher.end();
+    m_curUtility.setSource(source.substring(a, b));
     m_curUtility = null;
     nextLine();
   }
@@ -563,9 +621,6 @@ public class JsFileParser {
   }
 
   private void nextLine() throws IOException {
-    if (m_currentLine != null) {
-      m_offsetStartLine += (m_currentLine.length() + m_lineSeparator.length());
-    }
     m_currentLine = m_sourceReader.readLine();
     m_currentLineNumber++;
   }

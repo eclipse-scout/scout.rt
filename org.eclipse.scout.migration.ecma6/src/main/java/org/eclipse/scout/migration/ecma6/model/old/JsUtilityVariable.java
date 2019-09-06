@@ -15,13 +15,15 @@ public class JsUtilityVariable extends AbstractJsElement {
   private final String m_name;
   private final String m_valueOrFirstLine;
   private final boolean m_exported;
+  private final boolean m_standalone;
   private final String m_tag;
 
-  public JsUtilityVariable(JsUtility jsUtility, String name, String valueOrFirstLine, boolean exported, String tag) {
+  public JsUtilityVariable(JsUtility jsUtility, String name, String valueOrFirstLine, boolean exported, boolean standalone, String tag) {
     m_jsUtility = jsUtility;
     m_name = name;
     m_valueOrFirstLine = valueOrFirstLine;
     m_exported = exported;
+    m_standalone = standalone;
     m_tag = tag;
   }
 
@@ -39,6 +41,10 @@ public class JsUtilityVariable extends AbstractJsElement {
 
   public boolean isExported() {
     return m_exported;
+  }
+
+  public boolean isStandalone() {
+    return m_standalone;
   }
 
   public String getTag() {

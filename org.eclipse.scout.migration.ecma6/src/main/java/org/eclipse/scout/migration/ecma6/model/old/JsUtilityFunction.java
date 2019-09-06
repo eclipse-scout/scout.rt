@@ -14,12 +14,14 @@ public class JsUtilityFunction extends AbstractJsElement {
   private final JsUtility m_jsUtility;
   private final String m_name;
   private final boolean m_exported;
+  private final boolean m_standalone;
   private final String m_tag;
 
-  public JsUtilityFunction(JsUtility jsUtility, String name, boolean exported, String tag) {
+  public JsUtilityFunction(JsUtility jsUtility, String name, boolean exported, boolean standalone, String tag) {
     m_jsUtility = jsUtility;
     m_name = name;
     m_exported = exported;
+    m_standalone = standalone;
     m_tag = tag;
   }
 
@@ -33,6 +35,10 @@ public class JsUtilityFunction extends AbstractJsElement {
 
   public boolean isExported() {
     return m_exported;
+  }
+
+  public boolean isStandalone() {
+    return m_standalone;
   }
 
   public String getTag() {

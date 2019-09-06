@@ -49,8 +49,8 @@ public class JsUtility extends AbstractJsElement {
     return m_startTag;
   }
 
-  public JsUtilityFunction addFunction(String name, boolean exported, String tag) {
-    JsUtilityFunction f = new JsUtilityFunction(this, name, exported, tag);
+  public JsUtilityFunction addFunction(String name, boolean exported, boolean standalone, String tag) {
+    JsUtilityFunction f = new JsUtilityFunction(this, name, exported, standalone, tag);
     m_functions.add(f);
     return f;
   }
@@ -63,8 +63,8 @@ public class JsUtility extends AbstractJsElement {
     return m_functions.stream().filter(fun -> name.equals(fun.getName())).findFirst().orElse(null);
   }
 
-  public JsUtilityVariable addVariable(String name, String valueOrFirstLine, boolean exported, String tag) {
-    JsUtilityVariable v = new JsUtilityVariable(this, name, valueOrFirstLine, exported, tag);
+  public JsUtilityVariable addVariable(String name, String valueOrFirstLine, boolean exported, boolean standalone, String tag) {
+    JsUtilityVariable v = new JsUtilityVariable(this, name, valueOrFirstLine, exported, standalone, tag);
     m_variables.add(v);
     return v;
   }

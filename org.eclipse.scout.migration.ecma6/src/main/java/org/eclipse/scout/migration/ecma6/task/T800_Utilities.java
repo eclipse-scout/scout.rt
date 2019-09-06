@@ -87,40 +87,22 @@ public class T800_Utilities extends AbstractTask {
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
     for (JsUtility util : jsFile.getJsUtilities()) {
-      String s = util.getSource();
-      s = s.replace(util.getStartTag(), "");
-      s = s.substring(0, s.lastIndexOf("}"));
-
-      for (JsUtilityFunction f : util.getFunctions()) {
-        if (f.isExported()) {
-          s = s.replace(f.getTag(), "export function " + f.getName());
-        }
-        else {
-          //change and annotate private functions
-          s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
-        }
+      String sourceBefore;
+      String s;
+      if (util.getStartTag() != null) {
+        sourceBefore = util.getSource();
+        s = rewriteBlockStyleUtility(util, sourceBefore);
       }
-
-      for (JsUtilityVariable v : util.getVariables()) {
-        if (v.isExported()) {
-          s = s.replace(v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
-        }
-        else {
-          s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
-        }
+      else {
+        sourceBefore = source;
+        s = rewritePartStyleUtility(util, sourceBefore);
       }
-
-      //remove all ',' after function body '}'
-      s = s.replaceAll("(?m)^  \\},", "\\}");
 
       //remove all 'this.'
       s = s.replaceAll("(?<!\\w)this\\.", "");
 
       //remove all self-references
       s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", "");
-
-      //reduce indent by 2
-      s = s.replaceAll("(?m)^  ", "");
 
       //create default export
       String exportedNames = Stream.concat(
@@ -136,12 +118,66 @@ public class T800_Utilities extends AbstractTask {
       s += "};";
 
       //apply
-      source = source.replace(util.getSource(), s);
+      source = source.replace(sourceBefore, s);
     }
 
     //remove duplicate ';;'
     source = source.replace(";;", ";");
 
     return source;
+  }
+
+  private String rewriteBlockStyleUtility(JsUtility util, String s) {
+    s = s.replace(util.getStartTag(), "");
+    s = s.substring(0, s.lastIndexOf("}"));
+
+    for (JsUtilityFunction f : util.getFunctions()) {
+      if (f.isExported()) {
+        s = s.replace(f.getTag(), "export function " + f.getName());
+      }
+      else {
+        //change and annotate private functions
+        s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
+      }
+    }
+
+    for (JsUtilityVariable v : util.getVariables()) {
+      if (v.isExported()) {
+        s = s.replace(v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+      }
+      else {
+        s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+      }
+    }
+
+    //remove all ',' after function body '}'
+    s = s.replaceAll("(?m)^  \\},", "\\}");
+
+    //reduce indent by 2
+    s = s.replaceAll("(?m)^  ", "");
+
+    return s;
+  }
+
+  private String rewritePartStyleUtility(JsUtility util, String s) {
+    for (JsUtilityFunction f : util.getFunctions()) {
+      if (f.isExported()) {
+        s = s.replace(f.getTag(), "export function " + f.getName());
+      }
+      else {
+        //change and annotate private functions
+        s = s.replace(f.getTag(), "//private\nfunction " + f.getName());
+      }
+    }
+
+    for (JsUtilityVariable v : util.getVariables()) {
+      if (v.isExported()) {
+        s = s.replace(v.getTag(), "export let " + v.getName() + " =");
+      }
+      else {
+        s = s.replace(v.getTag(), "//private\nlet " + v.getName() + " =");
+      }
+    }
+    return s;
   }
 }
