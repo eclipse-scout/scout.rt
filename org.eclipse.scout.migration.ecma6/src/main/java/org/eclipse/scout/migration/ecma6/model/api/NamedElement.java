@@ -118,6 +118,12 @@ public class NamedElement implements INamedElement {
     return getParent().getAncestor(filter);
   }
 
+  @JsonIgnore
+  @Override
+  public INamedElement getAncestor(Type type) {
+    return getAncestor(ne -> ne.getType() == type);
+  }
+
   @Override
   public void setParent(INamedElement parent) {
     m_parent = parent;

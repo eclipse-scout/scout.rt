@@ -55,6 +55,8 @@ public interface INamedElement {
 
   INamedElement getAncestor(Predicate<INamedElement> filter);
 
+  INamedElement getAncestor(Type type);
+
   void setParent(INamedElement parent);
 
   List<INamedElement> getChildren();

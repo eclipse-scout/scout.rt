@@ -11,12 +11,19 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractResolveReferencesAndCreateImportTask extends AbstractTask {
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractResolveReferencesAndCreateImportTask.class);
   @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
@@ -25,5 +32,29 @@ public abstract class AbstractResolveReferencesAndCreateImportTask extends Abstr
     return m_filter.test(pathInfo);
   }
 
+  protected String createImportForReferences(Pattern pattern, String toImport, String replacement, String source, JsFile jsFile, Context context) {
+    Matcher matcher = pattern.matcher(source);
+    boolean result = matcher.find();
+    if (result) {
+      String filename = jsFile.getPath().getFileName().toString();
+      StringBuffer sb = new StringBuffer();
+      // loop over all because of logging reasons
+      do {
+        matcher.appendReplacement(sb, replacement);
+        LOG.debug("Reference replacement[" + filename + "]: '" + matcher.group() + "' -> '" + replacement + "'");
+        result = matcher.find();
+      }
+      while (result);
+      // create import
+      if (StringUtility.hasText(toImport)) {
+        LOG.debug("[" + filename + "] Create import for '" + toImport + "'.");
+        jsFile.getOrCreateImport(toImport, context);
+      }
+      matcher.appendTail(sb);
+      source = sb.toString();
+    }
+
+    return source;
+  }
 
 }

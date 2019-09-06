@@ -2,6 +2,9 @@
   "name" : "studio",
   "type" : "Library",
   "fullyQualifiedName" : "studio",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/studio"
+  },
   "children" : [ {
     "name" : "BrainEditorField",
     "type" : "Class",
@@ -15885,8 +15888,5 @@
       "path" : "src/main/js/studio/style/colors.less",
       "theme" : "default-theme"
     }
-  } ],
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/studio"
-  }
+  } ]
 }

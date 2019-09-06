@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -55,6 +56,8 @@ public class T5200_ResolveLibraryReferencesAndCreateImports extends AbstractTask
     List<? extends INamedElement> enums = context.getLibraries().getElements(Type.Enum, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
     List<? extends INamedElement> constructors = context.getLibraries().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
 
+    staticFunctions = new ArrayList<>();
+
     for (INamedElement function : staticFunctions) {
       source = createImportForReferences(function, Pattern.quote(function.getFullyQualifiedName()) + "([^\\']{1})", function.getParent().getName() + "." + function.getName() + "$1", source, jsFile, context);
       List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
@@ -65,6 +68,7 @@ public class T5200_ResolveLibraryReferencesAndCreateImports extends AbstractTask
       }
     }
 
+    constants = new ArrayList<>();
     for (INamedElement constant : constants) {
       source = createImportForReferences(constant, Pattern.quote(constant.getFullyQualifiedName()) + "([^\\']{1})", constant.getParent().getName() + "." + constant.getName() + "$1", source, jsFile, context);
     }
