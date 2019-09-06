@@ -47,17 +47,28 @@ public class T610_JsTopLevelEnums extends AbstractTask {
     }
 
     //create default export
-    String exportedNames = exportCollector
-        .stream()
-        .map(name -> "  " + name)
-        .sorted()
-        .collect(Collectors.joining("," + ln));
-    s += ln;
-    s += "export default {";
-    s += ln;
-    s += exportedNames;
-    s += ln;
-    s += "};";
+    if (exportCollector.size() == 1) {
+      String exportedNames = exportCollector
+          .stream()
+          .collect(Collectors.joining("," + ln));
+      s += ln;
+      s += "export default ";
+      s += exportedNames;
+      s += ";";
+    }
+    else if (exportCollector.size() > 1) {
+      String exportedNames = exportCollector
+          .stream()
+          .map(name -> "  " + name)
+          .sorted()
+          .collect(Collectors.joining("," + ln));
+      s += ln;
+      s += "export default {";
+      s += ln;
+      s += exportedNames;
+      s += ln;
+      s += "};";
+    }
 
     workingCopy.setSource(s);
   }
