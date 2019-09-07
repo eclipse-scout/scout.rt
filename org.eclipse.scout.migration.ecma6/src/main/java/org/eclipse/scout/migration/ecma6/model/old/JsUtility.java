@@ -63,8 +63,8 @@ public class JsUtility extends AbstractJsElement {
     return m_functions.stream().filter(fun -> name.equals(fun.getName())).findFirst().orElse(null);
   }
 
-  public JsUtilityVariable addVariable(String name, String valueOrFirstLine, boolean exported, boolean standalone, String tag) {
-    JsUtilityVariable v = new JsUtilityVariable(this, name, valueOrFirstLine, exported, standalone, tag);
+  public JsUtilityVariable addVariable(String name, String valueOrFirstLine, boolean exported, boolean standalone, boolean isConst, String tag) {
+    JsUtilityVariable v = new JsUtilityVariable(this, name, valueOrFirstLine, exported, standalone, isConst, tag);
     m_variables.add(v);
     return v;
   }

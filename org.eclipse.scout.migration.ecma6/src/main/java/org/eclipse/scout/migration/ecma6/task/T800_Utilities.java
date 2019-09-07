@@ -145,12 +145,20 @@ public class T800_Utilities extends AbstractTask {
     }
 
     for (JsUtilityVariable v : util.getVariables()) {
+      String prefix;
       if (v.isExported()) {
-        s = replaceFirstNoRegex(s, v.getTag(), "export let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        prefix = "export ";
       }
       else {
-        s = replaceFirstNoRegex(s, v.getTag(), "//private" + ln + "let " + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+        prefix = "//private" + ln;
       }
+      if (v.isConst()) {
+        prefix += "const ";
+      }
+      else {
+        prefix += "let ";
+      }
+      s = replaceFirstNoRegex(s, v.getTag(), prefix + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
     }
 
     //remove all ',' after function body '}'
@@ -174,12 +182,20 @@ public class T800_Utilities extends AbstractTask {
     }
 
     for (JsUtilityVariable v : util.getVariables()) {
+      String prefix;
       if (v.isExported()) {
-        s = replaceFirstNoRegex(s, v.getTag(), "export let " + v.getName() + " =");
+        prefix = "export ";
       }
       else {
-        s = replaceFirstNoRegex(s, v.getTag(), "//private" + ln + "let " + v.getName() + " =");
+        prefix = "//private" + ln;
       }
+      if (v.isConst()) {
+        prefix += "const ";
+      }
+      else {
+        prefix += "let ";
+      }
+      s = replaceFirstNoRegex(s, v.getTag(), prefix + v.getName() + " =");
     }
     return s;
   }

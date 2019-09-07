@@ -133,6 +133,8 @@ public class JsFileParser {
    */
   private static Pattern START_UTILITY_VARIABLE = Pattern.compile("^  ([_$a-z][^ .]+)\\s*:\\s*([^f,]+)[,]?");
 
+  private static Pattern START_UTILITY_CONST = Pattern.compile("^  ([_$A-Z][^ .]+)\\s*:\\s*([^f,]+)[,]?");
+
   private static Pattern END_UTILITY_BLOCK = Pattern.compile("^\\}");
 
   /**
@@ -154,6 +156,8 @@ public class JsFileParser {
    * </pre>
    */
   private static Pattern START_UTILITY_VARIABLE_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!f)");
+
+  private static Pattern START_UTILITY_CONST_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$A-Z][^ .]+)\\s*=\\s*(?!f)");
 
   /**
    * <pre>
@@ -254,7 +258,13 @@ public class JsFileParser {
         }
         matcher = START_UTILITY_VARIABLE.matcher(m_currentLine);
         if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
-          readUtilityVariable(matcher);
+          readUtilityVariable(matcher, false);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_CONST.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityVariable(matcher, true);
           comment = null;
           continue;
         }
@@ -272,7 +282,13 @@ public class JsFileParser {
         }
         matcher = START_UTILITY_VARIABLE_STANDALONE.matcher(m_currentLine);
         if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
-          readUtilityVariableStandalone(matcher);
+          readUtilityVariableStandalone(matcher, false);
+          comment = null;
+          continue;
+        }
+        matcher = START_UTILITY_CONST_STANDALONE.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+          readUtilityVariableStandalone(matcher, true);
           comment = null;
           continue;
         }
@@ -455,7 +471,7 @@ public class JsFileParser {
     return f;
   }
 
-  private JsUtilityVariable readUtilityVariable(Matcher matcher) throws IOException {
+  private JsUtilityVariable readUtilityVariable(Matcher matcher, boolean isConst) throws IOException {
     String name = matcher.group(1);
     String value = matcher.group(2);
     if (m_curUtility == null) {
@@ -463,12 +479,12 @@ public class JsFileParser {
       nextLine();
       return null;
     }
-    JsUtilityVariable v = m_curUtility.addVariable(name, value, !name.startsWith("_"), false, matcher.group());
+    JsUtilityVariable v = m_curUtility.addVariable(name, value, !name.startsWith("_"), false, isConst, matcher.group());
     nextLine();
     return v;
   }
 
-  private JsUtilityVariable readUtilityVariableStandalone(Matcher matcher) throws IOException {
+  private JsUtilityVariable readUtilityVariableStandalone(Matcher matcher, boolean isConst) throws IOException {
     String namespace = matcher.group(1);
     String name = matcher.group(2);
     JsUtility util = m_jsFile.getJsUtilities().stream().filter(u -> u.getFullyQualifiedName().equals(namespace)).findFirst().orElse(null);
@@ -476,7 +492,7 @@ public class JsFileParser {
       util = new JsUtility(m_jsFile, null, namespace, null);
       m_jsFile.addJsUtility(util);
     }
-    JsUtilityVariable v = util.addVariable(name, null, !name.startsWith("_"), true, matcher.group());
+    JsUtilityVariable v = util.addVariable(name, null, !name.startsWith("_"), true, isConst, matcher.group());
     nextLine();
     return v;
   }
