@@ -10,14 +10,11 @@
  */
 package org.eclipse.scout.migration.ecma6.model.references;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.FileUtility;
@@ -29,16 +26,17 @@ public class JsImport implements IImport {
   private AliasedMember m_defaultMember;
   private List<AliasedMember> m_members = new ArrayList<>();
 
-  public JsImport(String moduleName){
+  public JsImport(String moduleName) {
     m_moduleName = moduleName;
   }
 
-  public JsImport withMember(AliasedMember member){
+  public JsImport withMember(AliasedMember member) {
     m_members.add(member);
     return this;
   }
 
-  public void addMember(AliasedMember member){
+  @Override
+  public void addMember(AliasedMember member) {
     withMember(member);
   }
 
@@ -46,28 +44,30 @@ public class JsImport implements IImport {
     return Collections.unmodifiableList(m_members);
   }
 
-  public JsImport withDefaultMember(AliasedMember defaultMember){
+  public JsImport withDefaultMember(AliasedMember defaultMember) {
     m_defaultMember = defaultMember;
-    return  this;
+    return this;
   }
 
+  @Override
   public AliasedMember getDefaultMember() {
     return m_defaultMember;
   }
 
-  public AliasedMember findAliasedMember(String member){
-    if(m_defaultMember != null && m_defaultMember.getName().equals(member)){
+  @Override
+  public AliasedMember findAliasedMember(String member) {
+    if (m_defaultMember != null && m_defaultMember.getName().equals(member)) {
       return m_defaultMember;
     }
     return m_members.stream().filter(am -> am.getName().equals(member))
-      .findFirst().orElse(null);
+        .findFirst().orElse(null);
   }
 
-  public void setDefaultMember(AliasedMember defaultMember){
+  public void setDefaultMember(AliasedMember defaultMember) {
     withDefaultMember(defaultMember);
   }
 
-  public String getModuleName(){
+  public String getModuleName() {
     return m_moduleName;
   }
 
@@ -75,18 +75,18 @@ public class JsImport implements IImport {
   public String toSource(Context context) {
     StringBuilder sourceBuilder = new StringBuilder();
     sourceBuilder.append("import");
-    if(m_defaultMember != null){
+    if (m_defaultMember != null) {
       sourceBuilder.append(" ").append(getDefaultMember().getName());
-      if(getDefaultMember().getAlias() != null){
+      if (getDefaultMember().getAlias() != null) {
         sourceBuilder.append(" as ").append(getDefaultMember().getAlias());
       }
     }
-    if(m_members.size() > 0){
+    if (m_members.size() > 0) {
       sourceBuilder.append(" {");
       sourceBuilder.append(m_members.stream().map(m -> {
         StringBuilder b = new StringBuilder();
         b.append(m.getName());
-        if(m.getAlias() != null){
+        if (m.getAlias() != null) {
           b.append(" as ").append(m.getAlias());
         }
         return b.toString();
@@ -94,23 +94,21 @@ public class JsImport implements IImport {
       sourceBuilder.append("}");
     }
     sourceBuilder.append(" from")
-
-      .append(" '")
-      .append(getModuleName())
-      .append("';");
+        .append(" '")
+        .append(getModuleName())
+        .append("';");
     return sourceBuilder.toString();
   }
 
-  public static String computeRelativePath(Path targetFile, Path modulePath){
-    if(!Files.isDirectory(targetFile)){
+  public static String computeRelativePath(Path targetFile, Path modulePath) {
+    if (!Files.isDirectory(targetFile)) {
       targetFile = targetFile.getParent();
     }
     Path relPath = FileUtility.removeFileExtensionJs(targetFile.relativize(modulePath));
-    List<Path> segments = new ArrayList<>(relPath.getNameCount());
-    for (Path path : relPath) {
-      segments.add(path);
+    String imp = relPath.toString().replace('\\', '/');
+    if (imp.startsWith("../")) {
+      return imp;
     }
-    return segments.stream().map(p -> p.toString()).collect(Collectors.joining("/"));
-
+    return "./" + imp;
   }
 }
