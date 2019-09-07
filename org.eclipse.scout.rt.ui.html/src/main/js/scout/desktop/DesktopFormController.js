@@ -20,8 +20,6 @@ scout.DesktopFormController = function(model) {
 };
 scout.inherits(scout.DesktopFormController, scout.FormController);
 
-scout.DesktopFormController.instanceCounter = 0;
-
 scout.DesktopFormController.prototype.render = function() {
   scout.DesktopFormController.parent.prototype.render.call(this);
   var activeForm = this.desktop.activeForm;
