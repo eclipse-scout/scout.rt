@@ -21,6 +21,7 @@ import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  */
 @Order(800)
+@FrameworkExtensionMarker
 public class T800_Utilities extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T800_Utilities.class);
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isUtility());

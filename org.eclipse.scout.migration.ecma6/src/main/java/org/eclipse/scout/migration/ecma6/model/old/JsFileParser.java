@@ -198,6 +198,7 @@ public class JsFileParser {
   private String m_currentLine;
   private int m_currentLineNumber = 0;
   private final String m_lineSeparator;
+  @FrameworkExtensionMarker
   private JsUtility m_curUtility;
 
   public JsFileParser(WorkingCopy workingCopy) {
@@ -208,6 +209,7 @@ public class JsFileParser {
     m_jsFile = new JsFile(workingCopy.getPath());
   }
 
+  @FrameworkExtensionMarker
   public JsFile parse() throws IOException {
     JsFunction instanceGetter = null;
     Matcher matcher = null;
@@ -332,6 +334,7 @@ public class JsFileParser {
     if (jsClasses.size() == 1) {
       jsClasses.get(0).setDefault(true);
     }
+    @FrameworkExtensionMarker
     List<JsUtility> jsUtilities = m_jsFile.getJsUtilities();
     List<JsTopLevelEnum> jsTopLevelEnums = m_jsFile.getJsTopLevelEnums();
     if (instanceGetter != null) {
@@ -436,6 +439,7 @@ public class JsFileParser {
     return function;
   }
 
+  @FrameworkExtensionMarker
   private JsUtility beginUtility(Matcher matcher) throws IOException {
     String namespace = matcher.group(1);
     String name = matcher.group(2);
@@ -446,6 +450,7 @@ public class JsFileParser {
     return m_curUtility;
   }
 
+  @FrameworkExtensionMarker
   private JsUtilityFunction readUtilityFunction(Matcher matcher) throws IOException {
     String name = matcher.group(1);
     if (m_curUtility == null) {
@@ -458,6 +463,7 @@ public class JsFileParser {
     return f;
   }
 
+  @FrameworkExtensionMarker
   private JsUtilityFunction readUtilityFunctionStandalone(Matcher matcher) throws IOException {
     String namespace = matcher.group(1);
     String name = matcher.group(2);
@@ -471,6 +477,7 @@ public class JsFileParser {
     return f;
   }
 
+  @FrameworkExtensionMarker
   private JsUtilityVariable readUtilityVariable(Matcher matcher, boolean isConst) throws IOException {
     String name = matcher.group(1);
     String value = matcher.group(2);
@@ -487,6 +494,7 @@ public class JsFileParser {
     return v;
   }
 
+  @FrameworkExtensionMarker
   private JsUtilityVariable readUtilityVariableStandalone(Matcher matcher, boolean isConst) throws IOException {
     String namespace = matcher.group(1);
     String name = matcher.group(2);
@@ -500,6 +508,7 @@ public class JsFileParser {
     return v;
   }
 
+  @FrameworkExtensionMarker
   private void endUtility(Matcher matcher) throws IOException {
     Assertions.assertNotNull(m_curUtility);
     String source = m_workingCopy.getInitialSource();

@@ -17,10 +17,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * All migrator code with this annotation does some manual or specific decisions
+ * When adding a new framework object like JsClass, JsUtility, JsEnum etc. this annotation helps finding all locations
+ * in the code that have potentially to be touched and modified/appended
+ * <p>
+ * This annotation is placed on all locations of the JsUtility contribution to the migration
+ * </p>
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER})
 @Inherited
-public @interface Exemption {
+public @interface FrameworkExtensionMarker {
 }

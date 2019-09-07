@@ -90,6 +90,22 @@
       "fullyQualifiedName" : "widgets.ChartField._renderChartConfig"
     } ]
   }, {
+    "name": "WidgetsOutline",
+    "type": "Class",
+    "fullyQualifiedName": "widgets.WidgetsOutline",
+    "children": [
+      {
+        "type": "Constructor",
+        "fullyQualifiedName": "widgets.WidgetsOutline"
+      },
+      {
+        "name": "_createOutlineOverview",
+        "type": "Function",
+        "fullyQualifiedName": "widgets.WidgetsOutline._createOutlineOverview"
+      }
+    ]
+  },
+    {
     "name" : "ExampleBeanField",
     "type" : "Class",
     "fullyQualifiedName" : "widgets.ExampleBeanField",
@@ -114,6 +130,38 @@
       "fullyQualifiedName" : "widgets.CustomTileAdapter"
     } ]
   }, {
+      "name": "WidgetsOutlineAdapter",
+      "type": "Class",
+      "fullyQualifiedName": "widgets.WidgetsOutlineAdapter",
+      "children": [
+        {
+          "type": "Constructor",
+          "fullyQualifiedName": "widgets.WidgetsOutlineAdapter"
+        }
+      ]
+    },
+    {
+      "name": "WidgetsTileOutlineOverview",
+      "type": "Class",
+      "fullyQualifiedName": "widgets.WidgetsTileOutlineOverview",
+      "children": [
+        {
+          "type": "Constructor",
+          "fullyQualifiedName": "widgets.WidgetsTileOutlineOverview"
+        },
+        {
+          "name": "_render",
+          "type": "Function",
+          "fullyQualifiedName": "widgets.WidgetsTileOutlineOverview._render"
+        },
+        {
+          "name": "_createPageTileGrid",
+          "type": "Function",
+          "fullyQualifiedName": "widgets.WidgetsTileOutlineOverview._createPageTileGrid"
+        }
+      ]
+    },
+    {
     "name" : "@highlight-button-active-background-color",
     "type" : "LessVariable",
     "fullyQualifiedName" : "widgets.@highlight-button-active-background-color",

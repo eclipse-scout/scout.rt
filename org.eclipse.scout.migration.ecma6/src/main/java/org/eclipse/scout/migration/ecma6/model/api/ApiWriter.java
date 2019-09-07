@@ -21,6 +21,7 @@ import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
+import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
@@ -44,6 +45,7 @@ public class ApiWriter {
     defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context, true));
   }
 
+  @FrameworkExtensionMarker
   public INamedElement createLibraryFromCurrentModule(String libName, Context context, boolean includeLess) {
     NamedElement lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
     lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
@@ -144,6 +146,7 @@ public class ApiWriter {
     return new NamedElement(Type.Enum, en.getName(), cz);
   }
 
+  @FrameworkExtensionMarker
   protected INamedElement createUtility(JsUtility jsUtility, INamedElement library) {
     NamedElement u = new NamedElement(Type.Utility, jsUtility.getName(), library);
     u.addChildren(jsUtility.getFunctions()

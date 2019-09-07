@@ -21,6 +21,7 @@ import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
 import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
+import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFileParser;
@@ -42,6 +43,7 @@ public class Context {
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
+  @FrameworkExtensionMarker
   private final Map<String /*fqn*/, JsUtility> m_jsUtilities = new HashMap<>();
   private final Map<String /*fqn*/, JsTopLevelEnum> m_jsTopLevelEnums = new HashMap<>();
   private Libraries m_libraries;
@@ -193,10 +195,12 @@ public class Context {
     return Collections.unmodifiableCollection(m_jsClasses.values());
   }
 
+  @FrameworkExtensionMarker
   public Collection<JsUtility> getAllJsUtilities() {
     return Collections.unmodifiableCollection(m_jsUtilities.values());
   }
 
+  @FrameworkExtensionMarker
   public JsUtility getJsUtility(String fullyQualifiedName) {
     return m_jsUtilities.get(fullyQualifiedName);
   }

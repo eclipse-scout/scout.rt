@@ -348,6 +348,16 @@
       "name" : "preferredLayoutSize",
       "type" : "Function",
       "fullyQualifiedName" : "studio.BlockLayout.preferredLayoutSize"
+    },
+      {
+        "name": "ANALYTICS_ITEM_DISTANCE_OUTLET",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.BlockLayout.ANALYTICS_ITEM_DISTANCE_OUTLET"
+      },
+      {
+        "name": "ANALYTICS_ITEM_DISTANCE_STEP",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.BlockLayout.ANALYTICS_ITEM_DISTANCE_STEP"
     } ]
   }, {
     "name" : "PickerTileTextFilter",
@@ -3489,6 +3499,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "studio.Connector.scale"
     }, {
+      "name": "LINE_WIDTH_DEFAULT",
+      "type": "Constant",
+      "fullyQualifiedName": "studio.Connector.LINE_WIDTH_DEFAULT"
+    },
+      {
       "name" : "DIRECTION_UP",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.Connector.DIRECTION_UP"
@@ -4717,6 +4732,26 @@
       "type" : "Function",
       "fullyQualifiedName" : "studio.FlowGrid._setSelectionInProgress"
     }, {
+      "name": "DEFAULT_GRID_UNIT_X",
+      "type": "Constant",
+      "fullyQualifiedName": "studio.FlowGrid.DEFAULT_GRID_UNIT_X"
+    },
+      {
+        "name": "DEFAULT_GRID_UNIT_Y",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowGrid.DEFAULT_GRID_UNIT_Y"
+      },
+      {
+        "name": "ADDITIONAL_MARGIN_RIGHT",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowGrid.ADDITIONAL_MARGIN_RIGHT"
+      },
+      {
+        "name": "ADDITIONAL_MARGIN_BOTTOM",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowGrid.ADDITIONAL_MARGIN_BOTTOM"
+      },
+      {
       "name" : "MAX_POSITION",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowGrid.MAX_POSITION"
@@ -4728,6 +4763,11 @@
       "name" : "VIEW_FILTER_OVERVIEW",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowGrid.VIEW_FILTER_OVERVIEW"
+      },
+      {
+        "name": "TOOLTIP_DELAY",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowGrid.TOOLTIP_DELAY"
     } ]
   }, {
     "name" : "JsHostFormAdapter",
@@ -6337,10 +6377,25 @@
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowDesigner.ACTION_OPERATION"
     }, {
+      "name": "MIN_LARGE_CONTAINER_SIZE",
+      "type": "Constant",
+      "fullyQualifiedName": "studio.FlowDesigner.MIN_LARGE_CONTAINER_SIZE"
+    },
+      {
       "name" : "GRID_MIN_SIZE",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowDesigner.GRID_MIN_SIZE"
     }, {
+        "name": "SIDEBAR_BORDER",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowDesigner.SIDEBAR_BORDER"
+      },
+      {
+        "name": "SIDEBAR_STEP_SIZE",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowDesigner.SIDEBAR_STEP_SIZE"
+      },
+      {
       "name" : "SIDEBAR_STEP_MARGIN",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowDesigner.SIDEBAR_STEP_MARGIN"
@@ -6348,6 +6403,11 @@
       "name" : "SIDEBAR_PADDING",
       "type" : "Constant",
       "fullyQualifiedName" : "studio.FlowDesigner.SIDEBAR_PADDING"
+      },
+      {
+        "name": "SIDEBAR_ADDITIONAL_PADDING",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowDesigner.SIDEBAR_ADDITIONAL_PADDING"
     } ]
   }, {
     "name" : "GroupEditorLayout",
@@ -8304,6 +8364,16 @@
       "name" : "_positionChartTooltip",
       "type" : "Function",
       "fullyQualifiedName" : "studio.StorySummaryTile._positionChartTooltip"
+    },
+      {
+        "name": "CHART_TOOLTIP_DELAY_SHOW",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.StorySummaryTile.CHART_TOOLTIP_DELAY_SHOW"
+      },
+      {
+        "name": "CHART_TOOLTIP_DELAY_HIDE",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.StorySummaryTile.CHART_TOOLTIP_DELAY_HIDE"
     } ]
   }, {
     "name" : "BlockTypeGroup",
@@ -12622,6 +12692,11 @@
       "name" : "lastElementOfType",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "studio.types.lastElementOfType"
+    },
+      {
+        "name": "SEPARATOR",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "studio.types.SEPARATOR"
     } ]
   }, {
     "name" : "pickerBoxUtil",
@@ -13040,6 +13115,11 @@
       "name" : "optPickerMetaInfo",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "studio.picker.optPickerMetaInfo"
+    },
+      {
+        "name": "MAX_ENTITY_LEVEL",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "studio.picker.MAX_ENTITY_LEVEL"
     } ]
   }, {
     "name" : "brainUtil",

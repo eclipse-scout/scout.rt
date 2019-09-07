@@ -30,6 +30,7 @@ public class JsFile extends AbstractJsElement {
   private final PathInfo m_pathInfo;
   private JsCommentBlock m_copyRight;
   private final List<JsClass> m_jsClasses = new ArrayList<>();
+  @FrameworkExtensionMarker
   private final List<JsUtility> m_jsUtilities = new ArrayList<>();
   private final List<JsTopLevelEnum> m_jsTopLevelEnums = new ArrayList<>();
   private final Map<String /*module name*/, JsImport> m_imports = new HashMap<>();
@@ -101,10 +102,12 @@ public class JsFile extends AbstractJsElement {
     return jsClass;
   }
 
+  @FrameworkExtensionMarker
   public void addJsUtility(JsUtility u) {
     m_jsUtilities.add(u);
   }
 
+  @FrameworkExtensionMarker
   public List<JsUtility> getJsUtilities() {
     return Collections.unmodifiableList(m_jsUtilities);
   }
@@ -130,6 +133,7 @@ public class JsFile extends AbstractJsElement {
    *          e.g. scout.FormField
    * @return
    */
+  @FrameworkExtensionMarker
   public AliasedMember getOrCreateImport(String fullyQualifiedName, Context context) {
     // if already unresolved return
     JsImport imp = m_imports.get(fullyQualifiedName);
@@ -142,6 +146,7 @@ public class JsFile extends AbstractJsElement {
       return getOrCreateImport(clazz);
     }
     // try to find JsUtility
+    @FrameworkExtensionMarker
     JsUtility util = context.getJsUtility(fullyQualifiedName);
     if (util != null) {
       return getOrCreateImport(util);
@@ -182,6 +187,7 @@ public class JsFile extends AbstractJsElement {
     return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), true);
   }
 
+  @FrameworkExtensionMarker
   public AliasedMember getOrCreateImport(JsUtility u) {
     return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true);
   }
