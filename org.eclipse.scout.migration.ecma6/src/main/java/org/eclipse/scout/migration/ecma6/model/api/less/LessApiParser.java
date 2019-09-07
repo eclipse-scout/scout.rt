@@ -162,7 +162,7 @@ public class LessApiParser {
           lessVariable = filesDefiningVariable.get(DEFAULT_THEME_NAME);
         }
         if (lessVariable == null) {
-          LOG.error("Cannot find less import for variable '{}' and theme '{}'.", var, theme);
+          LOG.debug("Cannot find less import for variable '{}' and theme '{}' in lib '{}'.", var, theme, lib.getName());
           continue;
         }
         if (isExternal) {
