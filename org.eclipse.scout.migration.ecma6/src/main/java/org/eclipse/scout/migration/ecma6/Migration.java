@@ -22,6 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -80,7 +81,19 @@ public class Migration {
   }
 
   private void visitFiles() throws IOException {
-    visitMigrationFiles(info -> processFile(info, m_context));
+    AtomicInteger totalWork = new AtomicInteger();
+    visitMigrationFiles(info -> totalWork.incrementAndGet());
+
+    AtomicInteger worked = new AtomicInteger();
+    AtomicInteger pctReport = new AtomicInteger();
+    visitMigrationFiles(info -> {
+      processFile(info, m_context);
+      int pct10 = (10 * worked.incrementAndGet() / totalWork.get()) * 10;
+      if (pctReport.compareAndSet(pct10 - 10, pct10)) {
+        System.out.println("visited " + pct10 + "%");
+      }
+    });
+
   }
 
   protected void visitMigrationFiles(Consumer<PathInfo> migrationFileConsumer) throws IOException {

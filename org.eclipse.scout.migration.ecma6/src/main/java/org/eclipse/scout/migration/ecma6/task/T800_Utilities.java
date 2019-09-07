@@ -136,11 +136,11 @@ public class T800_Utilities extends AbstractTask {
 
     for (JsUtilityFunction f : util.getFunctions()) {
       if (f.isExported()) {
-        s = replaceFirstNoRegex(s, f.getTag(), "export function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "export function " + f.getName());
       }
       else {
         //change and annotate private functions
-        s = replaceFirstNoRegex(s, f.getTag(), "//private\"+ln+\"function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "//private\"+ln+\"function " + f.getName());
       }
     }
 
@@ -158,7 +158,7 @@ public class T800_Utilities extends AbstractTask {
       else {
         prefix += "let ";
       }
-      s = replaceFirstNoRegex(s, v.getTag(), prefix + v.getName() + " = " + v.getValueOrFirstLine() + (v.getTag().endsWith(",") ? ";" : ""));
+      s = replaceFirstWithoutRegex(s, v.getTag(), prefix + v.getName() + " = " + v.getValueOrFirstLineOfValue() + (v.getTag().endsWith(",") ? ";" : ""));
     }
 
     //remove all ',' after function body '}'
@@ -173,11 +173,11 @@ public class T800_Utilities extends AbstractTask {
   private String rewritePartStyleUtility(JsUtility util, String s, String ln) {
     for (JsUtilityFunction f : util.getFunctions()) {
       if (f.isExported()) {
-        s = replaceFirstNoRegex(s, f.getTag(), "export function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "export function " + f.getName());
       }
       else {
         //change and annotate private functions
-        s = replaceFirstNoRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
       }
     }
 
@@ -195,12 +195,12 @@ public class T800_Utilities extends AbstractTask {
       else {
         prefix += "let ";
       }
-      s = replaceFirstNoRegex(s, v.getTag(), prefix + v.getName() + " =");
+      s = replaceFirstWithoutRegex(s, v.getTag(), prefix + v.getName() + " =");
     }
     return s;
   }
 
-  private static String replaceFirstNoRegex(String s, String oldValue, String newValue) {
+  private static String replaceFirstWithoutRegex(String s, String oldValue, String newValue) {
     return s.replaceFirst(Pattern.quote(oldValue), Matcher.quoteReplacement(newValue));
   }
 }

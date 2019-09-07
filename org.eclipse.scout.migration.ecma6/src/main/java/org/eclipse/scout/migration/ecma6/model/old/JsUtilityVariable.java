@@ -13,16 +13,16 @@ package org.eclipse.scout.migration.ecma6.model.old;
 public class JsUtilityVariable extends AbstractJsElement {
   private final JsUtility m_jsUtility;
   private final String m_name;
-  private final String m_valueOrFirstLine;
+  private final String m_valueOrFirstLineOfValue;
   private final boolean m_exported;
   private final boolean m_standalone;
   private final boolean m_isConst;
   private final String m_tag;
 
-  public JsUtilityVariable(JsUtility jsUtility, String name, String valueOrFirstLine, boolean exported, boolean standalone, boolean isConst, String tag) {
+  public JsUtilityVariable(JsUtility jsUtility, String name, String valueOrFirstLineOfValue, boolean exported, boolean standalone, boolean isConst, String tag) {
     m_jsUtility = jsUtility;
     m_name = name;
-    m_valueOrFirstLine = valueOrFirstLine;
+    m_valueOrFirstLineOfValue = valueOrFirstLineOfValue;
     m_exported = exported;
     m_standalone = standalone;
     m_isConst = isConst;
@@ -37,8 +37,8 @@ public class JsUtilityVariable extends AbstractJsElement {
     return m_name;
   }
 
-  public String getValueOrFirstLine() {
-    return m_valueOrFirstLine;
+  public String getValueOrFirstLineOfValue() {
+    return m_valueOrFirstLineOfValue;
   }
 
   public boolean isExported() {

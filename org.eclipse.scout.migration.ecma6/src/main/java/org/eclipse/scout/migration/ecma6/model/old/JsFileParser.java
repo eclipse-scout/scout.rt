@@ -131,9 +131,9 @@ public class JsFileParser {
    *  2 value or first line
    * </pre>
    */
-  private static Pattern START_UTILITY_VARIABLE = Pattern.compile("^  ([_$a-z][^ .]+)\\s*:\\s*([^f,]+)[,]?");
+  private static Pattern START_UTILITY_VARIABLE = Pattern.compile("^  ([_$a-z][^ .]+)\\s*:\\s*(?!\\s)(?!(?:function))(.*)$"); //FULL MATCH
 
-  private static Pattern START_UTILITY_CONST = Pattern.compile("^  ([_$A-Z][^ .]+)\\s*:\\s*([^f,]+)[,]?");
+  private static Pattern START_UTILITY_CONST = Pattern.compile("^  ([_$A-Z][^ .]+)\\s*:\\s*(?!\\s)(?!(?:function))(.*)$"); //FULL MATCH
 
   private static Pattern END_UTILITY_BLOCK = Pattern.compile("^\\}");
 
@@ -155,9 +155,9 @@ public class JsFileParser {
    *  2 name
    * </pre>
    */
-  private static Pattern START_UTILITY_VARIABLE_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!f)");
+  private static Pattern START_UTILITY_VARIABLE_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!\\s)(?!(?:function))");
 
-  private static Pattern START_UTILITY_CONST_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$A-Z][^ .]+)\\s*=\\s*(?!f)");
+  private static Pattern START_UTILITY_CONST_STANDALONE = Pattern.compile("^([A-Z][^ .]+)\\.([_$A-Z][^ .]+)\\s*=\\s*(?!\\s)(?!(?:function))");
 
   /**
    * <pre>
@@ -257,13 +257,13 @@ public class JsFileParser {
           continue;
         }
         matcher = START_UTILITY_VARIABLE.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.matches() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {//uses matcher.MATCHES() instead of find()
           readUtilityVariable(matcher, false);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_CONST.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.matches() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {//uses matcher.MATCHES() instead of find()
           readUtilityVariable(matcher, true);
           comment = null;
           continue;
@@ -474,6 +474,9 @@ public class JsFileParser {
   private JsUtilityVariable readUtilityVariable(Matcher matcher, boolean isConst) throws IOException {
     String name = matcher.group(1);
     String value = matcher.group(2);
+    if (value.endsWith(",")) {
+      value = value.substring(0, value.length() - 1);
+    }
     if (m_curUtility == null) {
       LOG.warn("wrong utility-style variable detected. {}: {}", m_workingCopy.getPath(), matcher.group());
       nextLine();
