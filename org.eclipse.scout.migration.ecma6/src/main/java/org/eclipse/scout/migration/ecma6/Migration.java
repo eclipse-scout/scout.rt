@@ -90,7 +90,7 @@ public class Migration {
       processFile(info, m_context);
       int pct10 = (10 * worked.incrementAndGet() / totalWork.get()) * 10;
       if (pctReport.compareAndSet(pct10 - 10, pct10)) {
-        System.out.println("visited " + pct10 + "%");
+        LOG.info("visited {}%", pct10);
       }
     });
 
@@ -208,8 +208,6 @@ public class Migration {
     final Path relativeSourcePath = sourceModule.relativize(workingCopy.getPath());
     final Path relativeTargetPath;
     try {
-
-      final Path destination;
       if (workingCopy.getRelativeTargetPath() != null) {
         relativeTargetPath = workingCopy.getRelativeTargetPath();
       }

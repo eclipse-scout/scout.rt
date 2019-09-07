@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
+import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
@@ -122,6 +123,6 @@ public class T50000_IndexJs implements IPostMigrationTask {
   }
 
   protected boolean isUtilityClass(WorkingCopy wc) {
-    return Character.isLowerCase(wc.getPath().getFileName().toString().charAt(0));
+    return PathFilters.isTopLevelEnum(wc.getPath()) || PathFilters.isUtility(wc.getPath());
   }
 }
