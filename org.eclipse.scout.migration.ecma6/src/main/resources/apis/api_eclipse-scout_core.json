@@ -329,6 +329,11 @@
       "name" : "DEFAULT_MIN_WIDTH",
       "type" : "Constant",
       "fullyQualifiedName" : "scout.Column.DEFAULT_MIN_WIDTH"
+    },
+      {
+        "name": "NARROW_MIN_WIDTH",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.Column.NARROW_MIN_WIDTH"
     } ]
   }, {
     "name" : "PageTileGrid",
@@ -2189,6 +2194,11 @@
       "type" : "Enum",
       "fullyQualifiedName" : "scout.Planner.Direction"
     }, {
+      "name": "DisplayMode",
+      "type": "Enum",
+      "fullyQualifiedName": "scout.Planner.DisplayMode"
+    },
+      {
       "name" : "SelectionMode",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.Planner.SelectionMode"
@@ -3004,6 +3014,11 @@
       "name" : "_renderOnAttach",
       "type" : "Function",
       "fullyQualifiedName" : "scout.BrowserField._renderOnAttach"
+    },
+      {
+        "name": "WindowStates",
+        "type": "Enum",
+        "fullyQualifiedName": "scout.BrowserField.WindowStates"
     } ]
   }, {
     "name" : "SequenceBoxLayout",
@@ -4476,6 +4491,21 @@
       "name" : "_onHandleAction",
       "type" : "Function",
       "fullyQualifiedName" : "scout.DesktopNavigation._onHandleAction"
+    },
+      {
+        "name": "DEFAULT_STYLE_WIDTH",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopNavigation.DEFAULT_STYLE_WIDTH"
+      },
+      {
+        "name": "BREADCRUMB_STYLE_WIDTH",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH"
+      },
+      {
+        "name": "MIN_WIDTH",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopNavigation.MIN_WIDTH"
     } ]
   }, {
     "name" : "CalendarFieldAdapter",
@@ -9736,6 +9766,11 @@
       "name" : "validateMaximumUploadSize",
       "type" : "Function",
       "fullyQualifiedName" : "scout.FileInput.validateMaximumUploadSize"
+    },
+      {
+        "name": "DEFAULT_MAXIMUM_UPLOAD_SIZE",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE"
     } ]
   }, {
     "name" : "TabBoxHeaderLayout",
@@ -10120,6 +10155,11 @@
       "name" : "removeKeyBox",
       "type" : "Function",
       "fullyQualifiedName" : "scout.KeyStroke.removeKeyBox"
+    },
+      {
+        "name": "Mode",
+        "type": "Enum",
+        "fullyQualifiedName": "scout.KeyStroke.Mode"
     } ]
   }, {
     "name" : "Menu",
@@ -15609,6 +15649,16 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.DesktopBench.activeViews"
     }, {
+      "name": "VIEW_MIN_HEIGHT",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.DesktopBench.VIEW_MIN_HEIGHT"
+    },
+      {
+        "name": "VIEW_MIN_WIDTH",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopBench.VIEW_MIN_WIDTH"
+      },
+      {
       "name" : "VIEW_AREA_COLUMN_INDEX",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.DesktopBench.VIEW_AREA_COLUMN_INDEX"
@@ -16912,6 +16962,11 @@
       "name" : "createComparator",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ColumnUserFilter.createComparator"
+    },
+      {
+        "name": "TYPE",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.ColumnUserFilter.TYPE"
     } ]
   }, {
     "name" : "AccordionFieldAdapter",
@@ -17100,6 +17155,11 @@
       "name" : "accept",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableTextUserFilter.accept"
+    },
+      {
+        "name": "TYPE",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.TableTextUserFilter.TYPE"
     } ]
   }, {
     "name" : "SplitBoxFirstCollapseKeyStroke",
@@ -19137,6 +19197,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableControl.getTable"
     }, {
+      "name": "CONTAINER_SIZE",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.TableControl.CONTAINER_SIZE"
+    },
+      {
       "name" : "CONTAINER_ANIMATE_DURATION",
       "type" : "Constant",
       "fullyQualifiedName" : "scout.TableControl.CONTAINER_ANIMATE_DURATION"
@@ -22333,6 +22398,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.Device.toString"
     }, {
+      "name": "VENDOR_PREFIXES",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.Device.VENDOR_PREFIXES"
+    },
+      {
       "name" : "DEFAULT_UNSELECTABLE_ATTRIBUTE",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE"
@@ -22993,6 +23063,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.TagChooserPopup.delegateKeyEvent"
     }, {
+      "name": "triggerLookupRowSelected",
+      "type": "Function",
+      "fullyQualifiedName": "scout.TagChooserPopup.triggerLookupRowSelected"
+    },
+      {
       "name" : "selectedRow",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TagChooserPopup.selectedRow"
@@ -23316,6 +23391,11 @@
       "name" : "prepareHttpRequest",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ResponseQueue.prepareHttpRequest"
+    },
+      {
+        "name": "FORCE_TIMEOUT",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.ResponseQueue.FORCE_TIMEOUT"
     } ]
   }, {
     "name" : "LogicalGrid",
@@ -31683,6 +31763,11 @@
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.logging.addAppender"
     }, {
+      "name": "DEFAULT_LEVEL",
+      "type": "UtilityVariable",
+      "fullyQualifiedName": "scout.logging.DEFAULT_LEVEL"
+    },
+      {
       "name" : "initialized",
       "type" : "UtilityVariable",
       "fullyQualifiedName" : "scout.logging.initialized"
@@ -31905,6 +31990,16 @@
       "name" : "styleMap",
       "type" : "UtilityVariable",
       "fullyQualifiedName" : "scout.styles.styleMap"
+    },
+      {
+        "name": "RGB_BLACK",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.styles.RGB_BLACK"
+      },
+      {
+        "name": "RGB_WHITE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.styles.RGB_WHITE"
     } ]
   }, {
     "name" : "fonts",
@@ -31938,6 +32033,21 @@
       "name" : "loadingComplete",
       "type" : "UtilityVariable",
       "fullyQualifiedName" : "scout.fonts.loadingComplete"
+    },
+      {
+        "name": "TEST_FONTS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.fonts.TEST_FONTS"
+      },
+      {
+        "name": "TEST_STRING",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.fonts.TEST_STRING"
+      },
+      {
+        "name": "TEST_TIMEOUT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.fonts.TEST_TIMEOUT"
     } ]
   }, {
     "name" : "mimeTypes",
@@ -31951,6 +32061,76 @@
       "name" : "isJavaScript",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.mimeTypes.isJavaScript"
+    },
+      {
+        "name": "TEXT_PLAIN",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.TEXT_PLAIN"
+      },
+      {
+        "name": "TEXT_HTML",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.TEXT_HTML"
+      },
+      {
+        "name": "TEXT_CSS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.TEXT_CSS"
+      },
+      {
+        "name": "TEXT_JAVASCRIPT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.TEXT_JAVASCRIPT"
+      },
+      {
+        "name": "IMAGE_PNG",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.IMAGE_PNG"
+      },
+      {
+        "name": "IMAGE_JPG",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.IMAGE_JPG"
+      },
+      {
+        "name": "IMAGE_JPEG",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.IMAGE_JPEG"
+      },
+      {
+        "name": "IMAGE_GIF",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.IMAGE_GIF"
+      },
+      {
+        "name": "APPLICATION_JSON",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.APPLICATION_JSON"
+      },
+      {
+        "name": "APPLICATION_JAVASCRIPT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.APPLICATION_JAVASCRIPT"
+      },
+      {
+        "name": "APPLICATION_ZIP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.APPLICATION_ZIP"
+      },
+      {
+        "name": "JSON",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.JSON"
+      },
+      {
+        "name": "JAVASCRIPT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.JAVASCRIPT"
+      },
+      {
+        "name": "ZIP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.mimeTypes.ZIP"
     } ]
   }, {
     "name" : "models",
@@ -32261,6 +32441,16 @@
       "name" : "find",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.tooltips.find"
+    },
+      {
+        "name": "DEFAULT_TOOLTIP_DELAY",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.tooltips.DEFAULT_TOOLTIP_DELAY"
+      },
+      {
+        "name": "LONG_TOOLTIP_DELAY",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.tooltips.LONG_TOOLTIP_DELAY"
     } ]
   }, {
     "name" : "widgets",
@@ -32386,6 +32576,41 @@
       "name" : "toModifierBitMask",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.keyStrokeModifier.toModifierBitMask"
+    },
+      {
+        "name": "NONE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.NONE"
+      },
+      {
+        "name": "CTRL",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.CTRL"
+      },
+      {
+        "name": "CTRL_UNDEFINED",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.CTRL_UNDEFINED"
+      },
+      {
+        "name": "SHIFT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.SHIFT"
+      },
+      {
+        "name": "SHIFT_UNDEFINED",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.SHIFT_UNDEFINED"
+      },
+      {
+        "name": "ALT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.ALT"
+      },
+      {
+        "name": "ALT_UNDEFINED",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.keyStrokeModifier.ALT_UNDEFINED"
     } ]
   }, {
     "name" : "clipboard",
@@ -32509,7 +32734,24 @@
   }, {
     "name" : "comparators",
     "type" : "Utility",
-    "fullyQualifiedName" : "scout.comparators"
+    "fullyQualifiedName": "scout.comparators",
+    "children": [
+      {
+        "name": "TEXT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.comparators.TEXT"
+      },
+      {
+        "name": "NUMERIC",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.comparators.NUMERIC"
+      },
+      {
+        "name": "ALPHANUMERIC",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.comparators.ALPHANUMERIC"
+      }
+    ]
   }, {
     "name" : "texts",
     "type" : "Utility",
@@ -32567,6 +32809,11 @@
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.texts.resolveTextProperty"
     }, {
+      "name": "TEXT_KEY_REGEX",
+      "type": "UtilityVariable",
+      "fullyQualifiedName": "scout.texts.TEXT_KEY_REGEX"
+    },
+      {
       "name" : "textsByLocale",
       "type" : "UtilityVariable",
       "fullyQualifiedName" : "scout.texts.textsByLocale"
@@ -32587,6 +32834,491 @@
       "name" : "resolveIconProperty",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.icons.resolveIconProperty"
+    },
+      {
+        "name": "TABLE_SORT_ASC",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.TABLE_SORT_ASC"
+      },
+      {
+        "name": "TABLE_SORT_DESC",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.TABLE_SORT_DESC"
+      },
+      {
+        "name": "EXCLAMATION_MARK",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.EXCLAMATION_MARK"
+      },
+      {
+        "name": "EXCLAMATION_MARK_CIRLCE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.EXCLAMATION_MARK_CIRLCE"
+      },
+      {
+        "name": "INFO",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.INFO"
+      },
+      {
+        "name": "CALENDAR",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CALENDAR"
+      },
+      {
+        "name": "CALENDAR_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CALENDAR_BOLD"
+      },
+      {
+        "name": "CLOCK_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CLOCK_BOLD"
+      },
+      {
+        "name": "CHECKED_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHECKED_BOLD"
+      },
+      {
+        "name": "GROUP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.GROUP"
+      },
+      {
+        "name": "GROUP_PLUS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.GROUP_PLUS"
+      },
+      {
+        "name": "ANGLE_DOUBLE_LEFT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_LEFT"
+      },
+      {
+        "name": "ANGLE_DOUBLE_RIGHT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_RIGHT"
+      },
+      {
+        "name": "ANGLE_LEFT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_LEFT"
+      },
+      {
+        "name": "ANGLE_RIGHT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_RIGHT"
+      },
+      {
+        "name": "ANGLE_DOWN",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOWN"
+      },
+      {
+        "name": "ANGLE_UP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_UP"
+      },
+      {
+        "name": "LONG_ARROW_DOWN",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_DOWN"
+      },
+      {
+        "name": "LONG_ARROW_UP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_UP"
+      },
+      {
+        "name": "LONG_ARROW_DOWN_PLUS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_DOWN_PLUS"
+      },
+      {
+        "name": "LONG_ARROW_UP_PLUS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_UP_PLUS"
+      },
+      {
+        "name": "MINUS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MINUS"
+      },
+      {
+        "name": "PLUS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PLUS"
+      },
+      {
+        "name": "LIST",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIST"
+      },
+      {
+        "name": "TARGET",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.TARGET"
+      },
+      {
+        "name": "WORLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.WORLD"
+      },
+      {
+        "name": "CHART",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHART"
+      },
+      {
+        "name": "GRAPH_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.GRAPH_SOLID"
+      },
+      {
+        "name": "CATEGORY",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CATEGORY"
+      },
+      {
+        "name": "CATEGORY_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CATEGORY_SOLID"
+      },
+      {
+        "name": "GEAR",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.GEAR"
+      },
+      {
+        "name": "STAR",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.STAR"
+      },
+      {
+        "name": "STAR_MARKED",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.STAR_MARKED"
+      },
+      {
+        "name": "STAR_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.STAR_BOLD"
+      },
+      {
+        "name": "STAR_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.STAR_SOLID"
+      },
+      {
+        "name": "PERSON_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PERSON_SOLID"
+      },
+      {
+        "name": "VERTICAL_DOTS",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.VERTICAL_DOTS"
+      },
+      {
+        "name": "SEARCH",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.SEARCH"
+      },
+      {
+        "name": "SEARCH_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.SEARCH_BOLD"
+      },
+      {
+        "name": "FOLDER",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.FOLDER"
+      },
+      {
+        "name": "FOLDER_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.FOLDER_BOLD"
+      },
+      {
+        "name": "SUM",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.SUM"
+      },
+      {
+        "name": "SUM_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.SUM_BOLD"
+      },
+      {
+        "name": "AVG",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.AVG"
+      },
+      {
+        "name": "AVG_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.AVG_BOLD"
+      },
+      {
+        "name": "MAX",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MAX"
+      },
+      {
+        "name": "MAX_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MAX_BOLD"
+      },
+      {
+        "name": "MIN",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MIN"
+      },
+      {
+        "name": "MIN_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MIN_BOLD"
+      },
+      {
+        "name": "COLLAPSE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.COLLAPSE"
+      },
+      {
+        "name": "ELLIPSIS_V_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ELLIPSIS_V_BOLD"
+      },
+      {
+        "name": "ELLIPSIS_V",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ELLIPSIS_V"
+      },
+      {
+        "name": "REMOVE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.REMOVE"
+      },
+      {
+        "name": "REMOVE_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.REMOVE_BOLD"
+      },
+      {
+        "name": "PENCIL",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PENCIL"
+      },
+      {
+        "name": "PENCIL_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PENCIL_BOLD"
+      },
+      {
+        "name": "PENCIL_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PENCIL_SOLID"
+      },
+      {
+        "name": "BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.BOLD"
+      },
+      {
+        "name": "ITALIC",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ITALIC"
+      },
+      {
+        "name": "UNDERLINE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.UNDERLINE"
+      },
+      {
+        "name": "STRIKETHROUGH",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.STRIKETHROUGH"
+      },
+      {
+        "name": "LIST_UL",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIST_UL"
+      },
+      {
+        "name": "LIST_OL",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIST_OL"
+      },
+      {
+        "name": "LIGHTBULB_OFF",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIGHTBULB_OFF"
+      },
+      {
+        "name": "LIGHTBULB_ON",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIGHTBULB_ON"
+      },
+      {
+        "name": "ROTATE_LEFT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ROTATE_LEFT_BOLD"
+      },
+      {
+        "name": "ROTATE_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ROTATE_RIGHT_BOLD"
+      },
+      {
+        "name": "CHEVRON_LEFT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHEVRON_LEFT_BOLD"
+      },
+      {
+        "name": "CHEVRON_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHEVRON_RIGHT_BOLD"
+      },
+      {
+        "name": "CHEVRON_UP_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHEVRON_UP_BOLD"
+      },
+      {
+        "name": "CHEVRON_DOWN_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CHEVRON_DOWN_BOLD"
+      },
+      {
+        "name": "ARROW_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ARROW_RIGHT_BOLD"
+      },
+      {
+        "name": "PLUS_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.PLUS_BOLD"
+      },
+      {
+        "name": "MINUS_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MINUS_BOLD"
+      },
+      {
+        "name": "SQUARE_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.SQUARE_BOLD"
+      },
+      {
+        "name": "MENU_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.MENU_BOLD"
+      },
+      {
+        "name": "LIST_UL_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIST_UL_BOLD"
+      },
+      {
+        "name": "LIST_OL_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LIST_OL_BOLD"
+      },
+      {
+        "name": "CARET_DOWN",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CARET_DOWN"
+      },
+      {
+        "name": "CARET_UP",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CARET_UP"
+      },
+      {
+        "name": "CARET_LEFT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CARET_LEFT"
+      },
+      {
+        "name": "CARET_RIGHT",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CARET_RIGHT"
+      },
+      {
+        "name": "ANGLE_DOUBLE_LEFT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_LEFT_BOLD"
+      },
+      {
+        "name": "ANGLE_DOUBLE_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_RIGHT_BOLD"
+      },
+      {
+        "name": "ANGLE_DOUBLE_UP_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_UP_BOLD"
+      },
+      {
+        "name": "ANGLE_DOUBLE_DOWN_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOUBLE_DOWN_BOLD"
+      },
+      {
+        "name": "ANGLE_LEFT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_LEFT_BOLD"
+      },
+      {
+        "name": "ANGLE_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_RIGHT_BOLD"
+      },
+      {
+        "name": "ANGLE_UP_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_UP_BOLD"
+      },
+      {
+        "name": "ANGLE_DOWN_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ANGLE_DOWN_BOLD"
+      },
+      {
+        "name": "CIRCLE_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.CIRCLE_BOLD"
+      },
+      {
+        "name": "FILE_SOLID",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.FILE_SOLID"
+      },
+      {
+        "name": "LONG_ARROW_DOWN_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_DOWN_BOLD"
+      },
+      {
+        "name": "LONG_ARROW_UP_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_UP_BOLD"
+      },
+      {
+        "name": "LONG_ARROW_LEFT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_LEFT_BOLD"
+      },
+      {
+        "name": "LONG_ARROW_RIGHT_BOLD",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.LONG_ARROW_RIGHT_BOLD"
+      },
+      {
+        "name": "ICON_ID_REGEX",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.icons.ICON_ID_REGEX"
     } ]
   }, {
     "name" : "arrays",
@@ -32746,11 +33478,11 @@
       "fullyQualifiedName" : "scout.arrays.flatMap"
     }, {
       "name" : "$indexOf",
-      "type" : "UtilityVariable",
+      "type": "UtilityFunction",
       "fullyQualifiedName" : "scout.arrays.$indexOf"
     }, {
       "name" : "$remove",
-      "type" : "UtilityVariable",
+      "type": "UtilityFunction",
       "fullyQualifiedName" : "scout.arrays.$remove"
     } ]
   }, {
@@ -32882,10 +33614,6 @@
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.dates.ceil"
     } ]
-  }, {
-    "name" : "hAlign",
-    "type" : "Utility",
-    "fullyQualifiedName" : "scout.hAlign"
   }, {
     "name" : "menuNavigationKeyStrokes",
     "type" : "Utility",
@@ -33019,6 +33747,11 @@
       "name" : "resolveConstProperty",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.objects.resolveConstProperty"
+    },
+      {
+        "name": "CONST_REGEX",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.objects.CONST_REGEX"
     } ]
   }, {
     "name" : "polyfills",
@@ -33105,6 +33838,103 @@
       "fullyQualifiedName" : "scout.promises.parallel"
     } ]
   }, {
+    "name": "scout",
+    "type": "Utility",
+    "fullyQualifiedName": "scout.scout",
+    "children": [
+      {
+        "name": "addAppListener",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.addAppListener"
+      },
+      {
+        "name": "inherits",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.inherits"
+      },
+      {
+        "name": "nvl",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.nvl"
+      },
+      {
+        "name": "assertParameter",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.assertParameter"
+      },
+      {
+        "name": "assertProperty",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.assertProperty"
+      },
+      {
+        "name": "isOneOf",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.isOneOf"
+      },
+      {
+        "name": "create",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.create"
+      },
+      {
+        "name": "prepareDOM",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.prepareDOM"
+      },
+      {
+        "name": "installGlobalMouseDownInterceptor",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.installGlobalMouseDownInterceptor"
+      },
+      {
+        "name": "installSyntheticActiveStateHandler",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.installSyntheticActiveStateHandler"
+      },
+      {
+        "name": "widget",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.widget"
+      },
+      {
+        "name": "adapter",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.adapter"
+      },
+      {
+        "name": "getSession",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.getSession"
+      },
+      {
+        "name": "exportAdapter",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.exportAdapter"
+      },
+      {
+        "name": "reloadPage",
+        "type": "UtilityFunction",
+        "fullyQualifiedName": "scout.scout.reloadPage"
+      },
+      {
+        "name": "sessions",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.scout.sessions"
+      },
+      {
+        "name": "appListeners",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.scout.appListeners"
+      },
+      {
+        "name": "$activeElements",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.scout.$activeElements"
+      }
+    ]
+  },
+    {
     "name" : "dragAndDrop",
     "type" : "Utility",
     "fullyQualifiedName" : "scout.dragAndDrop",
@@ -33132,6 +33962,16 @@
       "name" : "handler",
       "type" : "UtilityFunction",
       "fullyQualifiedName" : "scout.dragAndDrop.handler"
+    },
+      {
+        "name": "SCOUT_TYPES",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.dragAndDrop.SCOUT_TYPES"
+      },
+      {
+        "name": "DEFAULT_DROP_MAXIMUM_SIZE",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE"
     } ]
   }, {
     "name" : "menus",
@@ -33175,18 +34015,28 @@
       "fullyQualifiedName" : "scout.menus.removeMenuFromEllipsis"
     } ]
   }, {
-    "name" : "focusRule",
-    "type" : "Utility",
-    "fullyQualifiedName" : "scout.focusRule"
+      "name": "MenuDestinations",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.MenuDestinations"
   }, {
     "name" : "keys",
     "type" : "TopLevelEnum",
     "fullyQualifiedName" : "scout.keys"
   }, {
+      "name": "FocusRule",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.FocusRule"
+    },
+    {
     "name" : "LayoutConstants",
     "type" : "TopLevelEnum",
     "fullyQualifiedName" : "scout.LayoutConstants"
   }, {
+      "name": "HAlign",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.HAlign"
+    },
+    {
     "name" : "TreeVisitResult",
     "type" : "TopLevelEnum",
     "fullyQualifiedName" : "scout.TreeVisitResult"
