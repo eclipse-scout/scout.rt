@@ -206,6 +206,7 @@
   __include("scout/notification/Notification.js");
   __include("scout/notification/NotificationAdapter.js");
   __include("scout/menu/menus.js");
+  __include("scout/menu/MenuDestinations.js");
   __include("scout/menu/Menu.js");
   __include("scout/menu/EllipsisMenu.js");
   __include("scout/menu/MenuAdapter.js");

@@ -478,7 +478,7 @@ public class JsFileParser {
       value = value.substring(0, value.length() - 1);
     }
     if (m_curUtility == null) {
-      LOG.warn("wrong utility-style variable detected. {}: {}", m_workingCopy.getPath(), matcher.group());
+      LOG.warn("wrong utility-style variable detected. {}:{} {}", m_workingCopy.getPath(), m_currentLineNumber, matcher.group());
       nextLine();
       return null;
     }

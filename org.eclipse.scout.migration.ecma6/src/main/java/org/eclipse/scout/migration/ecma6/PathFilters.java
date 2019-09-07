@@ -66,6 +66,9 @@ public final class PathFilters {
       if (path.endsWith("scout/form/fields/TreeVisitResult.js") ||
           path.endsWith("scout/layout/LayoutConstants.js") ||
           path.endsWith("scout/keystroke/keys.js") ||
+          path.endsWith("scout/menu/MenuDestinations.js") ||
+          path.endsWith("scout/focus/FocusRule.js") ||
+          path.endsWith("scout/util/HAlign.js") ||
           path.endsWith("studio/util/enums.js")) {
         return true;
       }

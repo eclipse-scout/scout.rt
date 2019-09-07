@@ -187,9 +187,3 @@ scout.menus = {
     }
   }
 };
-
-scout.MenuDestinations = {
-  MENU_BAR: 1,
-  CONTEXT_MENU: 2,
-  HEADER: 3
-};
