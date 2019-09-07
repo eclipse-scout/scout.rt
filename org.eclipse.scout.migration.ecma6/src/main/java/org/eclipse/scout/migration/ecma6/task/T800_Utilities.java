@@ -142,7 +142,7 @@ public class T800_Utilities extends AbstractTask {
       }
       else {
         //change and annotate private functions
-        s = replaceFirstWithoutRegex(s, f.getTag(), "//private\"+ln+\"function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
       }
     }
 
