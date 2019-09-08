@@ -61,7 +61,7 @@ public class T800_Utilities extends AbstractTask {
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    return m_filter.test(pathInfo);
+    return m_filter.test(pathInfo) && !T1100_ObjectFactories.isObjectFactories(pathInfo.getPath(), context.ensureWorkingCopy(pathInfo.getPath()));
   }
 
   @Override

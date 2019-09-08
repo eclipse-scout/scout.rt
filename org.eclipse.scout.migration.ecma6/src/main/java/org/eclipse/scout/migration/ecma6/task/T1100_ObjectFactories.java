@@ -10,29 +10,32 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.function.Predicate;
+import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(1100)
 public class T1100_ObjectFactories extends AbstractTask {
   private static final Pattern FACTORY_PAT = Pattern.compile("scout\\.objectFactories\\s*=\\s*\\$\\.extend\\(\\s*scout\\.objectFactories,\\s*\\{");
+
   @SuppressWarnings("unchecked")
-  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
+
+  public static boolean isObjectFactories(Path path, WorkingCopy workingCopy) {
+    if (!path.toString().endsWith(".js")) {
+      return false;
+    }
+    return FACTORY_PAT.matcher(workingCopy.getSource()).find();
+  }
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    if (!m_filter.test(pathInfo)) {
-      return false;
-    }
-    WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    return FACTORY_PAT.matcher(workingCopy.getSource()).find();
+    return isObjectFactories(pathInfo.getPath(), context.ensureWorkingCopy(pathInfo.getPath()));
   }
 
   @Override
@@ -44,5 +47,7 @@ public class T1100_ObjectFactories extends AbstractTask {
     String newSource = FACTORY_PAT.matcher(workingCopy.getSource()).replaceAll(refName + ".addObjectFactories({");
 
     workingCopy.setSource(newSource);
+
+    BEANS.get(T5030_ResolveClassConstructorReferencesAndCreateImports.class).process(pathInfo, context);
   }
 }
