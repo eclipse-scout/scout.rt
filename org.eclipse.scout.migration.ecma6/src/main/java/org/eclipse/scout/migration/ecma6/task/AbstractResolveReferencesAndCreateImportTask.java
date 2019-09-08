@@ -32,24 +32,42 @@ public abstract class AbstractResolveReferencesAndCreateImportTask extends Abstr
     return m_filter.test(pathInfo);
   }
 
+  private String createImport(String toImport, String replacement, JsFile jsFile, Context context) {
+    if (!StringUtility.hasText(toImport)) {
+      return replacement;
+    }
+
+    // create import
+    LOG.debug("[{}] Create import for '{}'.", jsFile.getPath(), toImport);
+    String ref = jsFile.getOrCreateImport(toImport, context).getReferenceName();
+
+    int firstDot = replacement.indexOf('.');
+    String suffix = "";
+    if (firstDot > 0) {
+      suffix = replacement.substring(firstDot);
+    }
+    String importRef = ref + suffix;
+    if (!importRef.equals(replacement)) {
+      LOG.debug("modified import replacement from '{}' to '{}' because of import name clash.", replacement, importRef);
+    }
+    return importRef;
+  }
+
   protected String createImportForReferences(String sourceFqn, String toImport, String replacement, String source, JsFile jsFile, Context context) {
     Matcher matcher = Pattern.compile("(?<!\\w)" + Pattern.quote(sourceFqn) + "(?!\\w)").matcher(source);
     boolean result = matcher.find();
     if (result) {
       String filename = jsFile.getPath().getFileName().toString();
+      String importRef = createImport(toImport, replacement, jsFile, context);
       StringBuffer sb = new StringBuffer();
       // loop over all because of logging reasons
       do {
-        LOG.debug("Reference replacement[" + filename + "]: '" + matcher.group() + "' -> '" + replacement + "'");
-        matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+        LOG.debug("Reference replacement[{}]: '{}' -> '{}'", filename, matcher.group(), importRef);
+        matcher.appendReplacement(sb, Matcher.quoteReplacement(importRef));
         result = matcher.find();
       }
       while (result);
-      // create import
-      if (StringUtility.hasText(toImport)) {
-        LOG.debug("[" + filename + "] Create import for '" + toImport + "'.");
-        jsFile.getOrCreateImport(toImport, context);
-      }
+
       matcher.appendTail(sb);
       source = sb.toString();
     }
