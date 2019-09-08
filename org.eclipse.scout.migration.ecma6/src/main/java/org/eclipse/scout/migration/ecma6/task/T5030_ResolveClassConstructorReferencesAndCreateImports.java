@@ -30,8 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(5030)
-public class T5030_ResolveClassConstucorReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5030_ResolveClassConstucorReferencesAndCreateImports.class);
+public class T5030_ResolveClassConstructorReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
+  private static final Logger LOG = LoggerFactory.getLogger(T5030_ResolveClassConstructorReferencesAndCreateImports.class);
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
@@ -52,7 +52,7 @@ public class T5030_ResolveClassConstucorReferencesAndCreateImports extends Abstr
     List<JsFunction> constructors = jsClasses
         .stream()
         .filter(jsClass -> jsClass.getConstructor() != null)
-        .map(jsClass -> jsClass.getConstructor())
+        .map(JsClass::getConstructor)
         .collect(Collectors.toList());
     if (constructors.size() == 0) {
       return source;
@@ -79,10 +79,10 @@ public class T5030_ResolveClassConstucorReferencesAndCreateImports extends Abstr
   protected String updateForeignReferences(JsFile jsFile, String source, Context context) {
     Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> constuctors = context.getLibraries().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getAncestor(Type.Class).getFullyQualifiedName()));
-    constuctors.addAll(context.getLibraries().getElements(Type.Constructor));
+    List<INamedElement> constructors = context.getApi().getElements(Type.Constructor, fun -> !currentClassesFqn.contains(fun.getAncestor(Type.Class).getFullyQualifiedName()));
+    constructors.addAll(context.getLibraries().getElements(Type.Constructor));
 
-    for (INamedElement constructor : constuctors) {
+    for (INamedElement constructor : constructors) {
       String replacement = constructor.getAncestor(Type.Class).getName();
       source = createImportForReferences(constructor.getAncestor(Type.Class).getFullyQualifiedName(), constructor.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
     }
