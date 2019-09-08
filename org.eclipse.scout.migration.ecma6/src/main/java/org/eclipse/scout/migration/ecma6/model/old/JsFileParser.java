@@ -169,7 +169,7 @@ public class JsFileParser {
    *  4 delimiter semicolumn (opt)
    * </pre>
    */
-  private static Pattern START_CONSTANT = Pattern.compile("^([^. ]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*)?(;)");
+  private static Pattern START_CONSTANT_MULTI_LINE = Pattern.compile("(?s)\\n([^. \\n]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*?)?(;)", Pattern.DOTALL);
 
   /**
    * <pre>
@@ -312,11 +312,6 @@ public class JsFileParser {
           comment = null;
           continue;
         }
-        matcher = START_CONSTANT.matcher(m_currentLine);
-        if (matcher.find()) {
-          readConstant(matcher);
-          continue;
-        }
         matcher = SUPER_BLOCK.matcher(m_currentLine);
         if (matcher.find()) {
           JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
@@ -334,6 +329,11 @@ public class JsFileParser {
     catch (VetoException e) {
       LOG.error("Could not parse file '" + m_jsFile.getPath().getFileName() + ":" + m_currentLineNumber + "'.", e);
       throw e;
+    }
+
+    Matcher constMatcher = START_CONSTANT_MULTI_LINE.matcher(m_workingCopy.getSource());
+    while (constMatcher.find()) {
+      readConstant(constMatcher);
     }
 
     List<JsClass> jsClasses = m_jsFile.getJsClasses();
@@ -592,10 +592,8 @@ public class JsFileParser {
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
     JsConstant constant = new JsConstant(clazz, matcher.group(2));
     constant.setSource(matcher.group(3));
-    nextLine();
     clazz.addConstant(constant);
     return constant;
-
   }
 
   protected JsFunction readAppListener() throws IOException {
