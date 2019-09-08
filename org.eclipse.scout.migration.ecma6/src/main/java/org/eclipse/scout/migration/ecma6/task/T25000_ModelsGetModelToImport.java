@@ -91,8 +91,7 @@ public class T25000_ModelsGetModelToImport extends AbstractTask {
     if (fileName.endsWith(".js")) {
       fileName = fileName.substring(0, fileName.length() - 3);
     }
-    String memberName = Character.toLowerCase(fileName.charAt(0)) + fileName.substring(1);
 
-    return jsFile.getOrCreateImport(memberName, jsModelFile, true).getReferenceName();
+    return jsFile.getOrCreateImport(fileName, jsModelFile, true).getReferenceName();
   }
 }
