@@ -60,7 +60,6 @@ public class T50000_IndexJs implements IPostMigrationTask {
         });
 
     WorkingCopy root = findRootWorkingCopy(utilities);
-    utilities.remove(root);
 
     utilities.sort(Comparator.comparing(WorkingCopy::getPath));
     classes.sort(Comparator.comparing(WorkingCopy::getPath));
