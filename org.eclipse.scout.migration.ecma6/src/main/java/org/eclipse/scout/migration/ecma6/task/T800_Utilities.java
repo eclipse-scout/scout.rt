@@ -148,19 +148,27 @@ public class T800_Utilities extends AbstractTask {
 
     for (JsUtilityVariable v : util.getVariables()) {
       String prefix;
-      if (v.isExported()) {
-        prefix = "export ";
-      }
-      else {
-        prefix = "//private" + ln;
-      }
       if (v.isConst()) {
-        prefix += "const ";
+        prefix = "const ";
       }
       else {
-        prefix += "let ";
+        prefix = "let ";
       }
-      s = replaceFirstWithoutRegex(s, v.getTag(), prefix + v.getName() + " = " + v.getValueOrFirstLineOfValue() + (v.getTag().endsWith(",") ? ";" : ""));
+
+      String value = v.getValueOrFirstLineOfValue();
+      if (v.getTag().trim().endsWith(",")) {
+        value += ";";
+      }
+      else {
+        String pureCode = MigrationUtility.removeComments(v.getValueOrFirstLineOfValue() + "\n").trim();
+        if (pureCode.endsWith(",")) {
+          String codeWithSemicolon = pureCode.substring(0, pureCode.length() - 1) + ";";
+          value = v.getValueOrFirstLineOfValue().replace(pureCode, codeWithSemicolon);
+        }
+      }
+      String newCode = prefix + v.getName() + " = " + value;
+
+      s = replaceFirstWithoutRegex(s, v.getTag(), newCode);
     }
 
     //remove all ',' after function body '}'
