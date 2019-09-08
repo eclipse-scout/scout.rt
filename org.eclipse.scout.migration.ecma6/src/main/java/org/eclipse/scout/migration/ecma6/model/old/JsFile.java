@@ -228,7 +228,9 @@ public class JsFile extends AbstractJsElement {
 
   private AliasedMember ensureUniqueAlias(AliasedMember member, int index) {
     String alias = Optional.ofNullable(member.getAlias()).orElse(member.getName());
-    if (getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias))) {
+    boolean aliasUsedInClassesOfCurrentModule = getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias));
+    boolean aliasUsedInOtherImport = getImports().stream().anyMatch(i -> i.findAliasedMember(alias) != null);
+    if (aliasUsedInClassesOfCurrentModule || aliasUsedInOtherImport) {
       member.setAlias(member.getName() + "_" + index);
       return ensureUniqueAlias(member, index + 1);
     }
