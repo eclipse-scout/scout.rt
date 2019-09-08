@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.task.T1100_ObjectFactories;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -211,6 +212,11 @@ public class JsFileParser {
 
   @FrameworkExtensionMarker
   public JsFile parse() throws IOException {
+    if (T1100_ObjectFactories.isObjectFactories(m_jsFile.getPath(), m_workingCopy)) {
+      //  do not parse objectFactories.js it is a special file and handled in T1100_ObjectFactories
+      return m_jsFile;
+    }
+
     JsFunction instanceGetter = null;
     Matcher matcher = null;
     try {
@@ -347,8 +353,9 @@ public class JsFileParser {
       }
     }
     // log
-    if (jsClasses.isEmpty() && jsTopLevelEnums.isEmpty() && jsUtilities.isEmpty() && !m_jsFile.getPath().getFileName().toString().endsWith("-module.js")) {
-      LOG.error("No classes found in file '" + m_jsFile.getPath().getFileName() + "'.");
+    String fileName = m_jsFile.getPath().getFileName().toString();
+    if (jsClasses.isEmpty() && jsTopLevelEnums.isEmpty() && jsUtilities.isEmpty() && fileName.endsWith(".js") && !fileName.endsWith("-module.js")) {
+      LOG.error("No content found in file '" + m_jsFile.getPath().getFileName() + "'.");
     }
     else if (jsClasses.size() > 1) {
       LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
