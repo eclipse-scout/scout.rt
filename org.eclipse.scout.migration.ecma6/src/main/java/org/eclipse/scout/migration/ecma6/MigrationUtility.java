@@ -31,16 +31,11 @@ public final class MigrationUtility {
     if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
       return null;
     }
-    String[] segments = fullyQualifiedName.split("\\.");
-    return segments[segments.length - 1];
-  }
-
-  public static String parseNamespace(String fullyQualifiedName) {
-    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
-      return null;
+    int lastDot = fullyQualifiedName.lastIndexOf('.');
+    if (lastDot < 0) {
+      return fullyQualifiedName;
     }
-    String[] segments = fullyQualifiedName.split("\\.");
-    return segments[0];
+    return fullyQualifiedName.substring(lastDot + 1);
   }
 
   public static String removeFirstSegments(Path p, int numSegments) {
@@ -65,10 +60,11 @@ public final class MigrationUtility {
     return retVal;
   }
 
-  public static boolean waitForUserConfirmation(){
-    Scanner inScanner = new Scanner(System.in);  // Create a Scanner object
+  public static boolean waitForUserConfirmation() {
+    //noinspection resource
+    Scanner inScanner = new Scanner(System.in); // Create a Scanner object
     System.out.println("Type 'yes' or 'y' to continue, 'no' or 'n' to aboard.");
-    String answer = inScanner.nextLine();  // Read user input
+    String answer = inScanner.nextLine(); // Read user input
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
 }
