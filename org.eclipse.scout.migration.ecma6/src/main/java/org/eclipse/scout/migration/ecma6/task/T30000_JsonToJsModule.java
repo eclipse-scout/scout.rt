@@ -2,10 +2,7 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +29,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
   private static final String JS_EXTENSION = "js";
   private static final String ESCAPED_REPLACEMENT = "@@@_@@@escaped@@@_@@@";
   public static final String JSON_MODEL_NAME_SUFFIX = "Model";
-  public static final String SCOUT_IMPORT = "scout";
   public static final String MODEL_OWNER_PARAM_NAME = "modelOwner";
 
   private static final Pattern PLACEHOLDER_PAT = Pattern.compile("(\\w+):\\s*'\\$\\{(\\w+):([^}]+)}'");
@@ -70,9 +66,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step6 = "export default function(" + MODEL_OWNER_PARAM_NAME + ") {\n" +
         "  return " + step5 + ";\n}\n";
 
-    Set<String> importsToAdd = new HashSet<>();
-    String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context, importsToAdd));
-    String step8 = getImports(importsToAdd) + step7;
+    String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context));
 
     // change file name from Xyz.json to XyzModel.js
     Path jsonRelPath = Configuration.get().getSourceModuleDirectory().relativize(pathInfo.getPath());
@@ -83,58 +77,39 @@ public class T30000_JsonToJsModule extends AbstractTask {
     Assertions.assertFalse(Files.exists(newFileNameInSourceFolder),
         "The migration of file '{}' would be stored in '{}' but this file already exists in the source folder!", pathInfo.getPath(), newRelPath);
 
-    workingCopy.setSource(step8);
+    workingCopy.setSource(step7);
     workingCopy.setRelativeTargetPath(newRelPath);
+
+    BEANS.get(T5020_ResolveClassEnumReferencesAndCreateImports.class).process(pathInfo, context);
+    BEANS.get(T5040_ResolveUtilityReferencesAndCreateImports.class).process(pathInfo, context);
+    BEANS.get(T29000_JsCreateImports.class).process(pathInfo, context);
   }
 
-  protected void migratePlaceholders(Matcher matcher, StringBuilder result, Path file, Context context, Set<String> importsToAdd) {
+  protected void migratePlaceholders(Matcher matcher, StringBuilder result, Path file, Context context) {
     String key = matcher.group(1);
     String type = matcher.group(2);
     String value = matcher.group(3);
     result.append(key).append(": ");
     if ("textKey".equals(type)) {
-      result.append(migratePlaceholderTextKey(value, file, importsToAdd));
+      result.append(migratePlaceholderTextKey(value, file));
     }
     else if ("const".equals(type)) {
-      result.append(migratePlaceholderConst(value, key, file, context, importsToAdd));
+      result.append(migratePlaceholderConst(value, key, file, context));
     }
     else if ("iconId".equals(type)) {
-      result.append(migratePlaceholderIconId(value, file, importsToAdd));
+      result.append(migratePlaceholderIconId(value, file));
     }
     else {
       Assertions.fail("unknown json placeholder: '{}' in file '{}'.", type, file);
     }
   }
 
-  protected String getImports(Collection<String> imports) {
-    if (imports.isEmpty()) {
-      return "";
-    }
-
-    boolean hasScoutRef = imports.remove(SCOUT_IMPORT);
-    StringBuilder sb = new StringBuilder("import ");
-    if (hasScoutRef) {
-      sb.append(SCOUT_IMPORT);
-      if (!imports.isEmpty()) {
-        sb.append(',');
-      }
-      sb.append(' ');
-    }
-    if (!imports.isEmpty()) {
-      sb.append("{ ").append(String.join(", ", imports)).append(" } ");
-    }
-    sb.append("from '@eclipse-scout/eclipse-scout';\n\n");
-    return sb.toString();
-  }
-
-  protected String migratePlaceholderTextKey(String key, Path file, Set<String> importsToAdd) {
+  protected String migratePlaceholderTextKey(String key, Path file) {
     Assertions.assertTrue(StringUtility.hasText(key), "Empty textKey placeholder in json model '{}'.", file);
-    // TODO: improve nls lookup?
-    importsToAdd.add(SCOUT_IMPORT);
     return "scout.texts.resolveText('" + key + "', " + MODEL_OWNER_PARAM_NAME + ".session.locale.languageTag)";
   }
 
-  protected String migratePlaceholderIconId(String iconId, Path file, Set<String> importsToAdd) {
+  protected String migratePlaceholderIconId(String iconId, Path file) {
     Assertions.assertTrue(StringUtility.hasText(iconId), "Empty iconId placeholder in json model '{}'.", file);
 
     int lastDotPos = iconId.lastIndexOf('.');
@@ -143,20 +118,18 @@ public class T30000_JsonToJsModule extends AbstractTask {
       return iconId.substring(0, lastDotPos) + ".icons" + iconId.substring(lastDotPos);
     }
 
-    importsToAdd.add(SCOUT_IMPORT);
     return "scout.icons." + iconId;
   }
 
-  protected String migratePlaceholderConst(String constValue, String key, Path file, Context context, Set<String> importsToAdd) {
+  protected String migratePlaceholderConst(String constValue, String key, Path file, Context context) {
     Assertions.assertTrue(StringUtility.hasText(key), "Empty key in json model '{}'.", key, file);
     Assertions.assertTrue(StringUtility.hasText(constValue), "Empty const placeholder for attribute '{}' in json model '{}'.", key, file);
     for (IConstPlaceholderMapper mapper : m_placeholderMappers) {
-      String migrated = mapper.migrate(key, constValue, file, context, importsToAdd);
+      String migrated = mapper.migrate(key, constValue, file, context);
       if (migrated != null) {
         return migrated;
       }
     }
-    importsToAdd.add(SCOUT_IMPORT);
     return "scout.objects.resolveConst('" + constValue + "')"; // default migration
   }
 }

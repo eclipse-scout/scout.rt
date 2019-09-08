@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class MenuBarPositionConstMapper implements IConstPlaceholderMapper {
   @Override
-  public String migrate(String key, String value, Path file, Context context, Set<String> importsToAdd) {
+  public String migrate(String key, String value, Path file, Context context) {
     if (!"menuBarPosition".equals(key)) {
       return null;
     }
@@ -16,7 +16,6 @@ public class MenuBarPositionConstMapper implements IConstPlaceholderMapper {
       // cannot resolve to the enum
       return null;
     }
-    importsToAdd.add("GroupBox");
-    return "GroupBox.MenuBarPosition." + value;
+    return "scout.GroupBox.MenuBarPosition." + value;
   }
 }

@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class ActionStyleConstMapper implements IConstPlaceholderMapper {
   @Override
-  public String migrate(String key, String value, Path file, Context context, Set<String> importsToAdd) {
+  public String migrate(String key, String value, Path file, Context context) {
     if (!"actionStyle".equals(key)) {
       return null;
     }
@@ -16,7 +16,6 @@ public class ActionStyleConstMapper implements IConstPlaceholderMapper {
       // cannot resolve to the enum
       return null;
     }
-    importsToAdd.add("Action");
-    return "Action.ActionStyle." + value;
+    return "scout.Action.ActionStyle." + value;
   }
 }

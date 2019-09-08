@@ -8,5 +8,5 @@ import java.util.Set;
 
 @ApplicationScoped
 public interface IConstPlaceholderMapper {
-  String migrate(String key, String value, Path file, Context context, Set<String> importsToAdd);
+  String migrate(String key, String value, Path file, Context context);
 }

@@ -1,14 +1,13 @@
 package org.eclipse.scout.migration.ecma6.task.json;
 
 import java.nio.file.Path;
-import java.util.Set;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
 public class LabelPositionConstMapper implements IConstPlaceholderMapper {
   @Override
-  public String migrate(String key, String value, Path file, Context context, Set<String> importsToAdd) {
+  public String migrate(String key, String value, Path file, Context context) {
     if (!"labelPosition".equals(key)) {
       return null;
     }
@@ -16,7 +15,6 @@ public class LabelPositionConstMapper implements IConstPlaceholderMapper {
       // cannot resolve to the enum
       return null;
     }
-    importsToAdd.add("FormField");
-    return "FormField.LabelPosition." + value;
+    return "scout.FormField.LabelPosition." + value;
   }
 }
