@@ -18,8 +18,7 @@ import org.eclipse.scout.rt.platform.Order;
 public class T40000_DeleteMacroAndModule extends AbstractTask {
 
   private static final String[] TO_DELETE_FILE_SUFFIXES = {
-      "-module.js",
-      "-module.json", // module.less is renamed to theme.less and must therefore not be deleted
+      "-module.json", // module.less is renamed to theme.less and must therefore not be deleted, module.js is renamed to index.js and must therefore not be deleted
       "-macro.json",
       "-macro.less",
       "-macro.js"

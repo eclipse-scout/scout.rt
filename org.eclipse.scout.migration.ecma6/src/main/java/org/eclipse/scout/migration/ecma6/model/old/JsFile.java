@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class JsFile extends AbstractJsElement {
   private static final Logger LOG = LoggerFactory.getLogger(JsFile.class);
+  private static final Path INDEX = Configuration.get().getSourceModuleDirectory().resolve("src/main/js/index.js");
 
   private final Path m_path;
   private final PathInfo m_pathInfo;
@@ -180,16 +182,16 @@ public class JsFile extends AbstractJsElement {
   }
 
   public AliasedMember getOrCreateImport(JsClass jsClass) {
-    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), jsClass.isDefault());
+    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), false/*jsClass.isDefault()*/);
   }
 
   public AliasedMember getOrCreateImport(JsTopLevelEnum topLevelEnum) {
-    return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), true);
+    return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), false);
   }
 
   @FrameworkExtensionMarker
   public AliasedMember getOrCreateImport(JsUtility u) {
-    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true);
+    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), false);
   }
 
   public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible) {
@@ -202,7 +204,7 @@ public class JsFile extends AbstractJsElement {
   protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean defaultIfPossible) {
     JsImport libImport = m_imports.get(moduleName);
     if (libImport == null) {
-      libImport = new JsImport(moduleName);
+      libImport = new JsImport(moduleName, m_path.getParent().getParent().relativize(INDEX));
       addImport(libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);

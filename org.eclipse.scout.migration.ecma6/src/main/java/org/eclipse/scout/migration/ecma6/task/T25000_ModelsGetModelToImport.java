@@ -92,6 +92,6 @@ public class T25000_ModelsGetModelToImport extends AbstractTask {
       fileName = fileName.substring(0, fileName.length() - 3);
     }
 
-    return jsFile.getOrCreateImport(fileName, jsModelFile, true).getReferenceName();
+    return jsFile.getOrCreateImport(fileName, jsModelFile, false).getReferenceName();
   }
 }

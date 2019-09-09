@@ -19,15 +19,22 @@ import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.task.T40030_IndexJs;
 
 public class JsImport implements IImport {
 
   private final String m_moduleName;
+  private final Path m_pathToIndex;
   private AliasedMember m_defaultMember;
   private List<AliasedMember> m_members = new ArrayList<>();
 
   public JsImport(String moduleName) {
+    this(moduleName, null);
+  }
+
+  public JsImport(String moduleName, Path pathToIndex) {
     m_moduleName = moduleName;
+    m_pathToIndex = pathToIndex;
   }
 
   public JsImport withMember(AliasedMember member) {
@@ -94,9 +101,15 @@ public class JsImport implements IImport {
       sourceBuilder.append("}");
     }
     sourceBuilder.append(" from")
-        .append(" '")
-        .append(getModuleName())
-        .append("';");
+        .append(" '");
+    if (m_pathToIndex != null) {
+      String relPathToIndex = T40030_IndexJs.nameWithoutJsExtension(m_pathToIndex.toString().replace('\\', '/'));
+      sourceBuilder.append(ensureIsRelativePath(relPathToIndex));
+    }
+    else {
+      sourceBuilder.append(getModuleName());
+    }
+    sourceBuilder.append("';");
     return sourceBuilder.toString();
   }
 
@@ -105,10 +118,13 @@ public class JsImport implements IImport {
       targetFile = targetFile.getParent();
     }
     Path relPath = FileUtility.removeFileExtensionJs(targetFile.relativize(modulePath));
-    String imp = relPath.toString().replace('\\', '/');
-    if (imp.startsWith("../")) {
-      return imp;
+    return ensureIsRelativePath(relPath.toString().replace('\\', '/'));
+  }
+
+  private static String ensureIsRelativePath(String p) {
+    if (p.startsWith("../")) {
+      return p;
     }
-    return "./" + imp;
+    return "./" + p;
   }
 }
