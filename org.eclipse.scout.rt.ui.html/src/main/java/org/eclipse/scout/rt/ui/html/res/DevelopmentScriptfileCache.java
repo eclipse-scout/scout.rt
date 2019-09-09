@@ -39,6 +39,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
+import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaders;
 import org.eclipse.scout.rt.ui.html.res.loader.ScriptFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -68,7 +69,12 @@ public class DevelopmentScriptfileCache {
 
   @PostConstruct
   public void init() {
-    m_active = Platform.get().inDevelopmentMode() && !CONFIG.getPropertyValue(ScriptfileBuildProperty.class);
+    if(ResourceLoaders.isNewMode()) {
+      m_active = false;
+    }
+    else {
+      m_active = Platform.get().inDevelopmentMode() && !CONFIG.getPropertyValue(ScriptfileBuildProperty.class);
+    }
     if (!m_active) {
       return;
     }
