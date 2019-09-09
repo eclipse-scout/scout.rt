@@ -286,7 +286,7 @@ public class T500_CreateClasses extends AbstractTask {
           replacement.append("static ");
         }
         else {
-          replacement.append("let ");
+          replacement.append("static ");
         }
         replacement
             .append(v.getName())
