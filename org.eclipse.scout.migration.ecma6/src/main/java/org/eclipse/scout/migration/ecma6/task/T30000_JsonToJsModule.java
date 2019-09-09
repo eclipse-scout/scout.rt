@@ -27,7 +27,8 @@ public class T30000_JsonToJsModule extends AbstractTask {
   private static final Pattern TRAILING_WHITESPACE_CHARS_PAT = Pattern.compile("\\s$");
   private static final String JSON_EXTENSION = "json";
   private static final String JS_EXTENSION = "js";
-  private static final String ESCAPED_REPLACEMENT = "@@@_@@@escaped@@@_@@@";
+  private static final String ESCAPED_REPLACEMENT1 = "@@@_@@@escaped1@@@_@@@";
+  private static final String ESCAPED_REPLACEMENT2 = "@@@_@@@escaped2@@@_@@@";
   public static final String JSON_MODEL_NAME_SUFFIX = "Model";
   public static final String MODEL_OWNER_PARAM_NAME = "modelOwner";
 
@@ -59,9 +60,9 @@ public class T30000_JsonToJsModule extends AbstractTask {
 
     // migrate scout json model file to js file
     String step1 = KEY_PAT.matcher(originalSource).replaceAll("$1:");
-    String step2 = step1.replace("\\\"", ESCAPED_REPLACEMENT);
+    String step2 = step1.replace("\\\"", ESCAPED_REPLACEMENT1).replace("'", ESCAPED_REPLACEMENT2);
     String step3 = step2.replace('"', '\'');
-    String step4 = step3.replace(ESCAPED_REPLACEMENT, "\\'");
+    String step4 = step3.replace(ESCAPED_REPLACEMENT1, "\"").replace(ESCAPED_REPLACEMENT2, "\\'");
     String step5 = TRAILING_WHITESPACE_CHARS_PAT.matcher(step4).replaceAll("");
     String step6 = "export default function(" + MODEL_OWNER_PARAM_NAME + ") {\n" +
         "  return " + step5 + ";\n}\n";
