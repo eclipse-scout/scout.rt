@@ -24,6 +24,7 @@ public class NamedElement implements INamedElement {
   private Type m_type;
   private String m_name;
   private INamedElement m_parent;
+  private String m_fullyQualifiedName;
   private Map<String, Object> m_customAttributes = new HashMap<>();
   private List<INamedElement> m_children = new ArrayList<>();
 
@@ -38,6 +39,13 @@ public class NamedElement implements INamedElement {
   public NamedElement(Type type, String name, INamedElement parent) {
     m_type = type;
     m_name = name;
+    m_parent = parent;
+  }
+
+  public NamedElement(Type type, String name, String fullyQualifiedName, INamedElement parent) {
+    m_type = type;
+    m_name = name;
+    m_fullyQualifiedName = fullyQualifiedName;
     m_parent = parent;
   }
 
@@ -65,41 +73,43 @@ public class NamedElement implements INamedElement {
       return getParent().getFullyQualifiedName();
     }
 
+    if (m_fullyQualifiedName != null) {
+      return m_fullyQualifiedName;
+    }
 
     StringBuilder nameBuilder = new StringBuilder();
     if (getType() != Type.Library && getParent() != null) {
-      nameBuilder.append(getParent().getFullyQualifiedName())
+      nameBuilder
+          .append(getParent().getFullyQualifiedName())
           .append(".");
-
     }
     nameBuilder.append(getName());
     return nameBuilder.toString();
   }
 
   public void setFullyQualifiedName(String fqn) {
-    // nop
+    m_fullyQualifiedName = fqn;
   }
+
   @Override
   public Map<String, Object> getCustomAttributes() {
     return m_customAttributes;
   }
 
-
-
   public void setCustomAttributes(Map<String, ?> customAttributes) {
     m_customAttributes.putAll(customAttributes);
   }
 
-  public void addCustomAttribute(String key, Object value){
-    m_customAttributes.put(key,value);
+  public void addCustomAttribute(String key, Object value) {
+    m_customAttributes.put(key, value);
   }
 
   @Override
-  public Object getCustomAttribute(String key){
+  public Object getCustomAttribute(String key) {
     return m_customAttributes.get(key);
   }
 
-  public String getCustomAttributeString(String key){
+  public String getCustomAttributeString(String key) {
     return (String) getCustomAttribute(key);
   }
 
@@ -163,6 +173,5 @@ public class NamedElement implements INamedElement {
     visitor.visit(this);
     m_children.forEach(child -> child.visit(visitor));
   }
-
 
 }

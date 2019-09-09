@@ -17,8 +17,8 @@ public class Libraries extends NamedElement {
 
   Map<String /*fqn*/, INamedElement> m_allElements = new HashMap<>();
 
-  public Libraries(){
-    super(Type.AllLibraries, null);
+  public Libraries() {
+    super(Type.AllLibraries, null, (INamedElement) null);
   }
 
   public void ensureParents() {
@@ -31,7 +31,7 @@ public class Libraries extends NamedElement {
     m_allElements.put(element.getFullyQualifiedName(), element);
   }
 
-  public INamedElement getElement(String fqn){
+  public INamedElement getElement(String fqn) {
     return m_allElements.get(fqn);
   }
 }

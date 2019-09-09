@@ -2,9 +2,6 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
-  "customAttributes": {
-    "lib-moduleName": "@eclipse-scout/core"
-  },
   "children" : [ {
     "name" : "Column",
     "type" : "Class",
@@ -33884,97 +33881,97 @@
   }, {
     "name": "scout",
     "type": "Utility",
-    "fullyQualifiedName": "scout.scout",
+    "fullyQualifiedName": "scout",
     "children": [
       {
         "name": "addAppListener",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.addAppListener"
+        "fullyQualifiedName": "scout.addAppListener"
       },
       {
         "name": "inherits",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.inherits"
+        "fullyQualifiedName": "scout.inherits"
       },
       {
         "name": "nvl",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.nvl"
+        "fullyQualifiedName": "scout.nvl"
       },
       {
         "name": "assertParameter",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.assertParameter"
+        "fullyQualifiedName": "scout.assertParameter"
       },
       {
         "name": "assertProperty",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.assertProperty"
+        "fullyQualifiedName": "scout.assertProperty"
       },
       {
         "name": "isOneOf",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.isOneOf"
+        "fullyQualifiedName": "scout.isOneOf"
       },
       {
         "name": "create",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.create"
+        "fullyQualifiedName": "scout.create"
       },
       {
         "name": "prepareDOM",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.prepareDOM"
+        "fullyQualifiedName": "scout.prepareDOM"
       },
       {
         "name": "installGlobalMouseDownInterceptor",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.installGlobalMouseDownInterceptor"
+        "fullyQualifiedName": "scout.installGlobalMouseDownInterceptor"
       },
       {
         "name": "installSyntheticActiveStateHandler",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.installSyntheticActiveStateHandler"
+        "fullyQualifiedName": "scout.installSyntheticActiveStateHandler"
       },
       {
         "name": "widget",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.widget"
+        "fullyQualifiedName": "scout.widget"
       },
       {
         "name": "adapter",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.adapter"
+        "fullyQualifiedName": "scout.adapter"
       },
       {
         "name": "getSession",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.getSession"
+        "fullyQualifiedName": "scout.getSession"
       },
       {
         "name": "exportAdapter",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.exportAdapter"
+        "fullyQualifiedName": "scout.exportAdapter"
       },
       {
         "name": "reloadPage",
         "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.scout.reloadPage"
+        "fullyQualifiedName": "scout.reloadPage"
       },
       {
         "name": "sessions",
         "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.scout.sessions"
+        "fullyQualifiedName": "scout.sessions"
       },
       {
         "name": "appListeners",
         "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.scout.appListeners"
+        "fullyQualifiedName": "scout.appListeners"
       },
       {
         "name": "$activeElements",
         "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.scout.$activeElements"
+        "fullyQualifiedName": "scout.$activeElements"
       }
     ]
   },
@@ -34061,7 +34058,7 @@
   }, {
       "name": "RoundingMode",
       "type": "TopLevelEnum",
-      "fullyQualifiedName": "scout.RoundingMode"
+      "fullyQualifiedName": "scout.numbers.RoundingMode"
     },
     {
       "name": "MenuDestinations",
@@ -42709,5 +42706,8 @@
       "theme" : "default-theme"
     }
     }
-  ]
+  ],
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/core"
+  }
 }

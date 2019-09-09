@@ -83,7 +83,7 @@ public class ApiWriter {
   }
 
   protected INamedElement createClazz(JsClass jsClass, INamedElement library) {
-    NamedElement cz = new NamedElement(Type.Class, jsClass.getName(), library);
+    NamedElement cz = new NamedElement(Type.Class, jsClass.getName(), jsClass.getFullyQualifiedName(), library);
     cz.addChildren(jsClass.getFunctions()
         .stream()
         .filter(JsFunction::isConstructor)
@@ -149,7 +149,7 @@ public class ApiWriter {
 
   @FrameworkExtensionMarker
   protected INamedElement createUtility(JsUtility jsUtility, INamedElement library) {
-    NamedElement u = new NamedElement(Type.Utility, jsUtility.getName(), library);
+    NamedElement u = new NamedElement(Type.Utility, jsUtility.getName(), jsUtility.getFullyQualifiedName(), library);
     u.addChildren(jsUtility.getFunctions()
         .stream()
         .map(jsFun -> createUtilityFunction(jsFun, u))
@@ -172,6 +172,6 @@ public class ApiWriter {
   }
 
   private INamedElement createTopLevelEnum(JsTopLevelEnum en, INamedElement lib) {
-    return new NamedElement(Type.TopLevelEnum, en.getName(), lib);
+    return new NamedElement(Type.TopLevelEnum, en.getName(), en.getFqn(), lib);
   }
 }

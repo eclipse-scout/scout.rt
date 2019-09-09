@@ -78,6 +78,7 @@ public final class PathFilters {
         || path.endsWith("BackgroundJobPollingStatus.js")
         || path.endsWith("DateFormatPatternType.js")
         || path.endsWith("RoundingMode.js")
-        || path.endsWith("HAlign.js"); //studio
+        || path.endsWith("HAlign.js") //studio
+        || path.endsWith("enums.js"); //studio
   }
 }
