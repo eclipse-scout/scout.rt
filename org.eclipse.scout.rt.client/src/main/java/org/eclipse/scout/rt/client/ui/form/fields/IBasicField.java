@@ -18,16 +18,24 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 public interface IBasicField<T> extends IValueField<T> {
 
   String PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY = "updateDisplayTextOnModify";
+  String PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY = "updateDisplayTextOnModifyDelay";
+
+  int DEFAULT_DELAY = 250; // [ms]
 
   IBasicFieldUIFacade getUIFacade();
 
   /**
    * @see AbstractBasicField#getConfiguredUpdateDisplayTextOnModify()
    */
-  void setUpdateDisplayTextOnModify(boolean b);
+  void setUpdateDisplayTextOnModify(boolean update);
 
   /**
    * @see AbstractBasicField#getConfiguredUpdateDisplayTextOnModify()
    */
   boolean isUpdateDisplayTextOnModify();
+
+  void setUpdateDisplayTextOnModifyDelay(int delay);
+
+  int getUpdateDisplayTextOnModifyDelay();
+
 }

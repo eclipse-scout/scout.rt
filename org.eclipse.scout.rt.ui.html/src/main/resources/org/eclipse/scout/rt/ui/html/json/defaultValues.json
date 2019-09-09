@@ -48,7 +48,8 @@
       }
     },
     "BasicField": {
-      "updateDisplayTextOnModify": false
+      "updateDisplayTextOnModify": false,
+      "updateDisplayTextOnModifyDelay": 250
     },
     "ValueField": {
       "clearable": "focused",

@@ -38,6 +38,10 @@ scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplay
   this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
 };
 
+scout.BasicField.prototype.setUpdateDisplayTextOnModifyDelay = function(delay) {
+  this.setProperty('updateDisplayTextOnModifyDelay', delay);
+};
+
 scout.BasicField.prototype._clear = function() {
   this.$field.val('');
 };

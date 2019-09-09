@@ -76,6 +76,7 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
   protected void initConfig() {
     super.initConfig();
     setUpdateDisplayTextOnModify(getConfiguredUpdateDisplayTextOnModify());
+    setUpdateDisplayTextOnModifyDelay(getConfiguredUpdateDisplayTextOnModifyDelay());
   }
 
   @Override
@@ -105,14 +106,35 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
     return false;
   }
 
+  /**
+   * Returns delay milliseconds which is used when property <code>updateDisplayTextOnModify</code> is set to true. The
+   * delay is used for the debounce timeout of the BasicField, from the moment the user stops typing until
+   * <code>acceptInput</code> is called. Default value is <code>250</code> [ms].
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(320)
+  protected int getConfiguredUpdateDisplayTextOnModifyDelay() {
+    return 250;
+  }
+
   @Override
-  public void setUpdateDisplayTextOnModify(boolean b) {
-    propertySupport.setPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, b);
+  public void setUpdateDisplayTextOnModify(boolean update) {
+    propertySupport.setPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, update);
   }
 
   @Override
   public boolean isUpdateDisplayTextOnModify() {
     return propertySupport.getPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY);
+  }
+
+  @Override
+  public void setUpdateDisplayTextOnModifyDelay(int delay) {
+    propertySupport.setPropertyInt(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY, delay);
+  }
+
+  @Override
+  public int getUpdateDisplayTextOnModifyDelay() {
+    return propertySupport.getPropertyInt(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY);
   }
 
   protected final void interceptExecChangedDisplayText() {

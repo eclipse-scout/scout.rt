@@ -30,5 +30,11 @@ public class JsonBasicField<T extends IBasicField<?>> extends JsonValueField<T> 
         return getModel().isUpdateDisplayTextOnModify();
       }
     });
+    putJsonProperty(new JsonProperty<IBasicField>(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getUpdateDisplayTextOnModifyDelay();
+      }
+    });
   }
 }
