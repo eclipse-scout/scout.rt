@@ -2,6 +2,9 @@
   "name": "jswidgets",
   "type": "Library",
   "fullyQualifiedName": "jswidgets",
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/jswidgets"
+  },
   "children": [
     {
       "name": "CheckableTreeStyleLookupCall",
@@ -5105,8 +5108,5 @@
         "theme": "dark"
       }
     }
-  ],
-  "customAttributes": {
-    "lib-moduleName": "@eclipse-scout/jswidgets"
-  }
+  ]
 }

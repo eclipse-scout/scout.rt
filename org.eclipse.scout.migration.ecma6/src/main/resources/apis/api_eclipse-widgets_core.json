@@ -2,9 +2,6 @@
   "name" : "widgets",
   "type" : "Library",
   "fullyQualifiedName" : "widgets",
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/widgets"
-  },
   "children" : [ {
     "name" : "ChartFieldAdapter",
     "type" : "Class",
@@ -209,5 +206,9 @@
       "path" : "src/main/js/widgets/forms/ButtonForm-dark.less",
       "theme" : "dark"
     }
-  } ]
+    }
+  ],
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/widgets"
+  }
 }
