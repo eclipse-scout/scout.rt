@@ -66,7 +66,7 @@ scout.Tile.prototype._postRender = function() {
   this.$container.addClass('tile');
   // Make sure prefSize returns the size the tile has after the animation even if it is called while the animation runs
   // Otherwise the tile may have the wrong size after making a tile with useUiHeight = true visible
-  this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible'];
+  this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible', 'animate-insert', 'animate-remove'];
 };
 
 scout.Tile.prototype._renderDisplayStyle = function() {
@@ -180,30 +180,25 @@ scout.Tile.prototype._renderVisible = function() {
     // Remove animate-visible first to show correct animation even if tile is made invisible while visible animation is still in progress
     // It is also necessary if the container is made invisible before the animation is finished because animationEnd won't fire in that case
     // which means that animate-invisible is still on the element and will trigger the (wrong) animation when container is made visible again
-    this._beforeAnimateVisible();
-    this.$container.removeClass('animate-visible');
+    this.$container.removeClass('invisible animate-visible');
     this.$container.addClassForAnimation('animate-invisible');
     this.$container.oneAnimationEnd(function() {
       // Make the element invisible after the animation (but only if visibility has not changed again in the meantime)
       this.$container.setVisible(this.isVisible());
     }.bind(this));
   } else {
+    this.$container.addClass('invisible'); // Don't show it until it has the correct size and position to prevent flickering (Scout JS, non virtual)
     this.$container.setVisible(true);
-    this._beforeAnimateVisible();
-    this.$container.removeClass('animate-invisible');
-    this.$container.addClassForAnimation('animate-visible');
+    // Wait until the tile is layouted before trying to animate it to make sure the layout does not read the size while the animation runs (because it will be the wrong one)
+    this.session.layoutValidator.schedulePostValidateFunction(function() {
+      if (!this.rendered || !this.isVisible()) {
+        return;
+      }
+      this.$container.removeClass('invisible animate-invisible');
+      this.$container.addClassForAnimation('animate-visible');
+    }.bind(this));
   }
   this.invalidateParentLogicalGrid();
-};
-
-/**
- * Override this function to do something before the visibility animation starts.
- * Check the isVisible() function if you must distinct between visible/invisible.
- * You can use this function if your tile uses a programmed layout and you need
- * the size of the tile, without the effects from the animation.
- */
-scout.Tile.prototype._beforeAnimateVisible = function() {
-  // NOP
 };
 
 /**

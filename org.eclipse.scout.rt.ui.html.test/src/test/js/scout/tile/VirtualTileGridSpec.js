@@ -568,6 +568,7 @@ describe("VirtualTileGrid", function() {
 
       tileGrid.removeFilter(filter1);
       tileGrid.filter();
+      tileGrid.validateLayoutTree();
       expect(tileGrid.filteredTiles.length).toBe(2);
       expect(tileGrid.filteredTiles[0]).toBe(tileGrid.tiles[0]);
       expect(tileGrid.filteredTiles[1]).toBe(tileGrid.tiles[1]);

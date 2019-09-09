@@ -192,16 +192,13 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
   // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
   tile.$container.stop();
 
-  if (tile.$container.hasClass('animate-visible')) {
-    // Don't animate tiles which are fading in (due to filtering), they should appear at the correct position.
-    // Already visible tiles which were in the view port before will be moved from the old position. Tiles which were not in the view port before will fly in from the top left corner (same happens when sorting).
-    // Reason: When sorting, if some tiles are in the viewport and some not, it is confusing if some tiles just appear and others are moved, even though all actually change position.
-    return;
-  }
-
   if (tile.$container.hasClass('invisible')) {
     // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
     // the animation here is to animate the position change -> don't animate inserted tiles here
+
+    // Also: don't animate tiles which are fading in (due to filtering), they should appear at the correct position.
+    // Already visible tiles which were in the view port before will be moved from the old position. Tiles which were not in the view port before will fly in from the top left corner (same happens when sorting).
+    // Reason: When sorting, if some tiles are in the viewport and some not, it is confusing if some tiles just appear and others are moved, even though all actually change position.
     return;
   }
 
