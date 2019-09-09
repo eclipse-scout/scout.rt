@@ -32,7 +32,7 @@ public class T29000_JsCreateImports extends AbstractTask {
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     JsFile jsFile = context.ensureJsFile(workingCopy);
-    String lineDelimiter = workingCopy.getLineSeparator();
+    String lineDelimiter = workingCopy.getLineDelimiter();
     // create imports
     Collection<JsImport> imports = jsFile.getImports();
     if (imports.isEmpty()) {

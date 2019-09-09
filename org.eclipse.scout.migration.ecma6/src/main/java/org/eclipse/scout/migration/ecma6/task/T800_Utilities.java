@@ -89,7 +89,7 @@ public class T800_Utilities extends AbstractTask {
   protected String rewriteSource(WorkingCopy workingCopy, Context context) {
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
-    String ln = workingCopy.getLineSeparator();
+    String ln = workingCopy.getLineDelimiter();
 
     for (JsUtility util : jsFile.getJsUtilities()) {
       String sourceBefore;

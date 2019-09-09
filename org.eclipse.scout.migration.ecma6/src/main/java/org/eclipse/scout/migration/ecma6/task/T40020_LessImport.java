@@ -40,11 +40,11 @@ public class T40020_LessImport extends AbstractTask {
     removeExistingImports(workingCopy);
     List<String> requiredImports = context.getLessApi().getRequiredImportsFor(workingCopy, context);
     if (!requiredImports.isEmpty()) {
-      StringBuilder importClauses = new StringBuilder(workingCopy.getLineSeparator());
+      StringBuilder importClauses = new StringBuilder(workingCopy.getLineDelimiter());
       for (String imp : requiredImports) {
-        importClauses.append("@import \"").append(imp).append("\";").append(workingCopy.getLineSeparator());
+        importClauses.append("@import \"").append(imp).append("\";").append(workingCopy.getLineDelimiter());
       }
-      importClauses.append(workingCopy.getLineSeparator());
+      importClauses.append(workingCopy.getLineDelimiter());
       StringBuilder newSource = new StringBuilder(workingCopy.getSource());
 
       int fileCommentEndPos = 0;

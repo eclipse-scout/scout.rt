@@ -205,7 +205,7 @@ public class JsFileParser {
   public JsFileParser(WorkingCopy workingCopy) {
     m_workingCopy = workingCopy;
     String source = workingCopy.getInitialSource();
-    m_lineSeparator = workingCopy.getLineSeparator();
+    m_lineSeparator = workingCopy.getLineDelimiter();
     m_sourceReader = new LineReaderWithPositionTracking(new StringReader(source));
     m_jsFile = new JsFile(workingCopy.getPath());
   }
@@ -591,7 +591,7 @@ public class JsFileParser {
   protected JsConstant readConstant(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
     JsConstant constant = new JsConstant(clazz, matcher.group(2));
-    constant.setSource(matcher.group(3));
+    constant.setSource(matcher.group());
     clazz.addConstant(constant);
     return constant;
   }

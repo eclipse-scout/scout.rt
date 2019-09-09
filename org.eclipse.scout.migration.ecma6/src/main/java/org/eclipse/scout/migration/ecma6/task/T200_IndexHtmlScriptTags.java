@@ -47,7 +47,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    m_newLineAndIndet = workingCopy.getLineSeparator() + "    ";
+    m_newLineAndIndet = workingCopy.getLineDelimiter() + "    ";
     removeScriptElements(workingCopy);
     addScriptElements(workingCopy, context);
   }
@@ -81,7 +81,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
       source = removeTagMatcher.replaceAll("");
     }
     else {
-      source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineSeparator());
+      source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineDelimiter());
       LOG.warn("Could not remove script tag '" + element.outerHtml() + "' in file '" + workingCopy.getPath() + "'.");
     }
     return source;

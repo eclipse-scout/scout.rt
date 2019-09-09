@@ -1,10 +1,15 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import org.eclipse.scout.migration.ecma6.PathInfo;
-import org.eclipse.scout.migration.ecma6.PathFilters;
-import org.eclipse.scout.migration.ecma6.context.Context;
+import java.nio.file.Paths;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
+import org.eclipse.scout.migration.ecma6.PathFilters;
+import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
+import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,12 +17,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Order(400)
 public class T400_IndexHtmlIncludeHead extends AbstractTask{
@@ -50,11 +49,11 @@ public class T400_IndexHtmlIncludeHead extends AbstractTask{
       if(matcher.find()){
         source = matcher.replaceAll(matcher.group(1)+"<scout:include template=\"includes/head.html\" />");
       }else{
-        source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.",workingCopy.getLineSeparator());
+        source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
         LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '"+workingCopy.getPath()+"'");
       }
     }else{
-      source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.",workingCopy.getLineSeparator());
+      source = MigrationUtility.prependTodo(source, "Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />'.", workingCopy.getLineDelimiter());
       LOG.warn("Could not find '<scout:include template=\"head.html\" />' to replace with '<scout:include template=\"includes/head.html\" />' in '"+workingCopy.getPath()+"'");
     }
     workingCopy.setSource(source);

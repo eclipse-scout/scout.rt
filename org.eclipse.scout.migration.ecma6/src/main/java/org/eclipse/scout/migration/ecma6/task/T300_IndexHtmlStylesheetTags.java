@@ -1,11 +1,17 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import org.eclipse.scout.migration.ecma6.PathInfo;
-import org.eclipse.scout.migration.ecma6.PathFilters;
-import org.eclipse.scout.migration.ecma6.context.Context;
+import java.nio.file.Paths;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
+import org.eclipse.scout.migration.ecma6.PathFilters;
+import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
+import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.jsoup.Jsoup;
@@ -14,12 +20,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Paths;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Order(300)
 public class T300_IndexHtmlStylesheetTags extends AbstractTask{
@@ -38,7 +38,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
   public void process(PathInfo pathInfo, Context context) {
     m_stylesheetsToRemove.add("res/"+context.getProperty(AppNameContextProperty.class)+"-all-macro.less");
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    m_newLineAndIndet = workingCopy.getLineSeparator()+"    ";
+    m_newLineAndIndet = workingCopy.getLineDelimiter() + "    ";
     removeStylesheetElements(workingCopy);
     addStylesheetElements(workingCopy, context);
   }
@@ -63,7 +63,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
       m_newLineAndIndet = removeTagMatcher.group(1);
       source = removeTagMatcher.replaceAll("");
     }else{
-      source = MigrationUtility.prependTodo(source, "remove script tag: '"+element.outerHtml()+"'", workingCopy.getLineSeparator());
+      source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineDelimiter());
       LOG.warn("Could not remove script tag '"+element.outerHtml()+"' in '"+workingCopy.getPath()+"'");
     }
     return source;
@@ -71,7 +71,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
 
   private void addStylesheetElements(WorkingCopy workingCopy, Context context){
     String source = workingCopy.getSource();
-    String newLineAndIndent = workingCopy.getLineSeparator()+"    ";
+    String newLineAndIndent = workingCopy.getLineDelimiter() + "    ";
 
     Document doc = Jsoup.parse(source);
     Elements scoutStylesheetElements = doc.getElementsByTag("scout:stylesheet");
@@ -89,7 +89,7 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
       if(matcher.find()){
         source = matcher.replaceAll(createSource(matcher.group(1)+"  ", context)+ matcher.group(1)+matcher.group(2));
       }else{
-        source = MigrationUtility.prependTodo(source, "add stylesheet (<scout:stylesheet src=\""+context.getProperty(AppNameContextProperty.class)+"-theme.css\" />" ,workingCopy.getLineSeparator());
+        source = MigrationUtility.prependTodo(source, "add stylesheet (<scout:stylesheet src=\"" + context.getProperty(AppNameContextProperty.class) + "-theme.css\" />", workingCopy.getLineDelimiter());
         LOG.warn("Could not add stylesheet (<scout:stylesheet src=\\\"\"+context.getProperty(AppNameContextProperty.class)+\"-theme.css\\\" /> in '"+workingCopy.getPath()+"'");
       }
     }

@@ -24,7 +24,6 @@ import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +73,7 @@ public class T710_Singletons extends AbstractTask {
     JsFile jsFile = context.ensureJsFile(wc);
 
     String source = wc.getSource();
-    String lineDelimiter = wc.getLineSeparator();
+    String lineDelimiter = wc.getLineDelimiter();
     for (JsAppListener appListener : jsFile.getAppListeners()) {
       source = processAppListener(appListener, jsFile, source, lineDelimiter, context);
 

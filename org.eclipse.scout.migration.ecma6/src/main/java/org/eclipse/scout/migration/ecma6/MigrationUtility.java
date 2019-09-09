@@ -18,7 +18,7 @@ public final class MigrationUtility {
 
   public static void prependTodo(WorkingCopy workingCopy, String todoText) {
     String source = workingCopy.getSource();
-    source = prependTodo(source, todoText, workingCopy.getLineSeparator());
+    source = prependTodo(source, todoText, workingCopy.getLineDelimiter());
     workingCopy.setSource(source);
   }
 

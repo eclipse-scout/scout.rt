@@ -5,7 +5,6 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -28,7 +27,7 @@ public class WorkingCopy {
     return m_path;
   }
 
-  public String getLineSeparator() {
+  public String getLineDelimiter() {
     if(m_lineSeparator == null){
       if(getPath() != null && Files.exists(getPath())){
         m_lineSeparator =     FileUtility.lineSeparator(getPath());

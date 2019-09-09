@@ -4,6 +4,7 @@ public abstract class AbstractSourceElement implements ISourceElement {
   private boolean m_memoryOnly;
   private String m_source;
 
+  @Override
   public String getSource() {
     return m_source;
   }
@@ -12,6 +13,7 @@ public abstract class AbstractSourceElement implements ISourceElement {
     m_source = source;
   }
 
+  @Override
   public boolean isMemoryOnly() {
     return m_memoryOnly;
   }

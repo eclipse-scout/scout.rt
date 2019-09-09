@@ -39,7 +39,7 @@ public class T610_JsTopLevelEnums extends AbstractTask {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     String s = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
-    String ln = workingCopy.getLineSeparator();
+    String ln = workingCopy.getLineDelimiter();
 
     List<String> exportCollector = new ArrayList<>();
     for (JsTopLevelEnum e : jsFile.getJsTopLevelEnums()) {

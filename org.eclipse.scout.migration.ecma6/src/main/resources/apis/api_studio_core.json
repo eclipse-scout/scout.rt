@@ -2,9 +2,6 @@
   "name" : "studio",
   "type" : "Library",
   "fullyQualifiedName" : "studio",
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/studio"
-  },
   "children" : [ {
     "name" : "BrainEditorField",
     "type" : "Class",
@@ -6408,6 +6405,11 @@
         "name": "SIDEBAR_ADDITIONAL_PADDING",
         "type": "Constant",
         "fullyQualifiedName": "studio.FlowDesigner.SIDEBAR_ADDITIONAL_PADDING"
+      },
+      {
+        "name": "SIDEBAR_BASE_SIZE",
+        "type": "Constant",
+        "fullyQualifiedName": "studio.FlowDesigner.SIDEBAR_BASE_SIZE"
     } ]
   }, {
     "name" : "GroupEditorLayout",
@@ -15969,5 +15971,9 @@
       "path" : "src/main/js/studio/style/colors.less",
       "theme" : "default-theme"
     }
-  } ]
+  }
+  ],
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/studio"
+  }
 }

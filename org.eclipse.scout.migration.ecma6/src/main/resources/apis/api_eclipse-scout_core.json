@@ -4131,6 +4131,16 @@
       "name" : "_onPaste",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ClipboardField._onPaste"
+    },
+      {
+        "name": "NON_DESTRUCTIVE_KEYS",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.ClipboardField.NON_DESTRUCTIVE_KEYS"
+      },
+      {
+        "name": "ALWAYS_DESTRUCTIVE_KEYS",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS"
     } ]
   }, {
     "name" : "TabAreaLeftKeyStroke",
@@ -5251,6 +5261,11 @@
       "type" : "StaticFunction",
       "fullyQualifiedName" : "scout.Locale.ensure"
     }, {
+      "name": "DEFAULT",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.Locale.DEFAULT"
+    },
+      {
       "name" : "DEFAULT",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.Locale.DEFAULT"
@@ -15659,6 +15674,16 @@
         "fullyQualifiedName": "scout.DesktopBench.VIEW_MIN_WIDTH"
       },
       {
+        "name": "VIEW_AREA_COLUMN_INDEX",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopBench.VIEW_AREA_COLUMN_INDEX"
+      },
+      {
+        "name": "VIEW_AREA_COLUMN_CLASSES",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES"
+      },
+      {
       "name" : "VIEW_AREA_COLUMN_INDEX",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.DesktopBench.VIEW_AREA_COLUMN_INDEX"
@@ -19318,6 +19343,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.DecimalFormat.normalize"
     }, {
+      "name": "PATTERN_SYMBOLS",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.DecimalFormat.PATTERN_SYMBOLS"
+    },
+      {
       "name" : "PATTERN_SYMBOLS",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.DecimalFormat.PATTERN_SYMBOLS"
@@ -22398,10 +22428,15 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.Device.toString"
     }, {
-      "name": "VENDOR_PREFIXES",
+      "name": "DEFAULT_UNSELECTABLE_ATTRIBUTE",
       "type": "Constant",
-      "fullyQualifiedName": "scout.Device.VENDOR_PREFIXES"
+      "fullyQualifiedName": "scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE"
     },
+      {
+        "name": "VENDOR_PREFIXES",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.Device.VENDOR_PREFIXES"
+      },
       {
       "name" : "DEFAULT_UNSELECTABLE_ATTRIBUTE",
       "type" : "Enum",
@@ -27673,6 +27708,16 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.BenchColumn.updateFirstLastMarker"
     }, {
+      "name": "TAB_BOX_INDEX",
+      "type": "Constant",
+      "fullyQualifiedName": "scout.BenchColumn.TAB_BOX_INDEX"
+    },
+      {
+        "name": "TAB_BOX_CLASSES",
+        "type": "Constant",
+        "fullyQualifiedName": "scout.BenchColumn.TAB_BOX_CLASSES"
+      },
+      {
       "name" : "TAB_BOX_INDEX",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.BenchColumn.TAB_BOX_INDEX"

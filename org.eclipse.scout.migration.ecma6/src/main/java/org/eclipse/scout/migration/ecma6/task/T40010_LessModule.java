@@ -53,7 +53,7 @@ public class T40010_LessModule extends AbstractTask {
     String newDefaultThemeFileName = toNewFileName(oldFileName);
     workingCopy.setRelativeTargetPath(relPath.getParent().resolve(newDefaultThemeFileName));
 
-    flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, workingCopy.getLineSeparator());
+    flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, workingCopy.getLineDelimiter());
   }
 
   protected void flushNonDefaultThemes(PathInfo pathInfo, Context context, String newDefaultThemeFileName, String nl) {

@@ -40,7 +40,7 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
-    source = updateLocalReferences(jsFile, source, context, workingCopy.getLineSeparator());
+    source = updateLocalReferences(jsFile, source, context, workingCopy.getLineDelimiter());
 
     source = updateForeignReferences(jsFile, source, context);
 

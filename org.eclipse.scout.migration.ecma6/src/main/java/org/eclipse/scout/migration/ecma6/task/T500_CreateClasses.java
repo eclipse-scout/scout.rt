@@ -1,6 +1,6 @@
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -11,7 +11,10 @@ import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.ISourceElement;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
+import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
+import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
@@ -20,7 +23,6 @@ import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 @Order(500)
 public class T500_CreateClasses extends AbstractTask {
@@ -40,11 +42,10 @@ public class T500_CreateClasses extends AbstractTask {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
     try {
       createClasses(workingCopy, context);
-
     }
     catch (VetoException e) {
       MigrationUtility.prependTodo(workingCopy, e.getMessage());
-      LOG.error("Could not create class ["+pathInfo.getPath().getFileName()+"]. Appended TODO for manual migration.");
+      LOG.error("Could not create class [" + pathInfo.getPath().getFileName() + "]. Appended TODO for manual migration.");
     }
 
   }
@@ -54,52 +55,72 @@ public class T500_CreateClasses extends AbstractTask {
     List<JsClass> jsClasses = jsFile.getJsClasses();
     // reverse
     for (int i = jsClasses.size() - 1; i > -1; i--) {
-
       JsClass jsClazz = jsClasses.get(i);
       createClazzBlock(jsClazz, jsClasses.size() == 1, jsFile, workingCopy, context);
       updateFunctions(jsClazz, jsFile, workingCopy);
+      updateConstants(jsClazz, jsFile, workingCopy);
+      updateEnums(jsClazz, jsFile, workingCopy);
     }
   }
 
-  protected void createClazzBlock(JsClass clzz, boolean onlyOneClazz, JsFile jsFile, WorkingCopy workingCopy, Context context) {
+  protected void createClazzBlock(JsClass clazz, boolean onlyOneClazz, JsFile jsFile, WorkingCopy workingCopy, Context context) {
     //    export default class Menu extends Action {
     //      constructor() {
-    List<JsFunction> functions = clzz.getFunctions();
-    if (functions.size() == 0) {
-      throw new VetoException("Clazz without functions '" + clzz.getFullyQualifiedName() + "' !");
-    }
-    // close classblock after last function
-
+    // close classblock after last element
     String source = workingCopy.getSource();
     StringBuilder sourceBuilder = new StringBuilder(workingCopy.getSource());
-    JsFunction lastFunction = null;
-    for(int i = functions.size() -1; i > -1; i--){
-      lastFunction = functions.get(i);
-      if(lastFunction.isMemoryOnly()){
-        lastFunction = null;
-      }else{
-        break;
-      }
-    }
-    Assertions.assertNotNull(lastFunction,"Class must have at least one function check '"+clzz.getFullyQualifiedName()+"'.");
 
-    Matcher matcher = Pattern.compile(Pattern.quote(lastFunction.getSource())).matcher(source);
-    if(matcher.find()){
-      // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
-      sourceBuilder.insert(matcher.end(),workingCopy.getLineSeparator() + "}"+END_CLASS_MARKER);
-    }else{
-      sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Close class body with '}'  manual.", workingCopy.getLineSeparator()));
-      LOG.warn("Could not close class body in '"+clzz.getFullyQualifiedName()+"'");
+    List<ISourceElement> elements = new ArrayList<>();
+    elements.addAll(clazz.getFunctions());
+    elements.add(clazz.getConstructor());
+    elements.add(clazz.getSuperCall());
+    elements.addAll(clazz.getConstants());
+    elements.addAll(clazz.getEnums());
+    if (elements.isEmpty()) {
+      return;
     }
+
+    //find first element start position
+    int startPos = elements
+        .stream()
+        .filter(e -> e != null)
+        .filter(e -> e.getSource() != null)
+        .mapToInt(e -> {
+          int i = source.indexOf(e.getSource());
+          return i;
+        })
+        .filter(i -> i >= 0)
+        .min()
+        .orElse(-1);
+    Assertions.assertTrue(startPos >= 0, "Class must have at least one element. Check '" + clazz.getFullyQualifiedName() + "'.");
+
+    //find last element end position
+    int endPos = elements
+        .stream()
+        .filter(e -> e != null)
+        .filter(e -> e.getSource() != null)
+        .mapToInt(e -> {
+          int i = source.indexOf(e.getSource());
+          if (i < 0) return -1;
+          return i + e.getSource().length();
+        })
+        .filter(i -> i >= 0)
+        .max()
+        .orElse(-1);
+    Assertions.assertTrue(endPos >= 0, "Class must have at least one element. Check '" + clazz.getFullyQualifiedName() + "'.");
+
+    // end class marker is used to find the end of a class and will be removed in T70000_RemoveEndClassMarkers.
+    sourceBuilder.insert(endPos, workingCopy.getLineDelimiter() + "}" + END_CLASS_MARKER);
 
     // remove scout inherits
-    if (clzz.getSuperCall() != null) {
-      matcher = Pattern.compile(Pattern.quote(clzz.getSuperCall().getSource())).matcher(sourceBuilder.toString());
-      if(matcher.find()){
-        sourceBuilder.replace(matcher.start(), matcher.end(),"");
-      }else{
-        sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Remove 'scout.inhertits(...' manual", workingCopy.getLineSeparator()));
-        LOG.warn("Could not remove 'scout.inhertits(...'  in '"+clzz.getFullyQualifiedName()+"'");
+    if (clazz.getSuperCall() != null) {
+      Matcher matcher = Pattern.compile(Pattern.quote(clazz.getSuperCall().getSource())).matcher(sourceBuilder.toString());
+      if (matcher.find()) {
+        sourceBuilder.replace(matcher.start(), matcher.end(), "");
+      }
+      else {
+        sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Remove 'scout.inhertits(...' manual", workingCopy.getLineDelimiter()));
+        LOG.warn("Could not remove 'scout.inhertits(...'  in '" + clazz.getFullyQualifiedName() + "'");
 
       }
     }
@@ -109,26 +130,23 @@ public class T500_CreateClasses extends AbstractTask {
     if (onlyOneClazz) {
       classBuilder.append("default ");
     }
-    classBuilder.append("class ").append(clzz.getName()).append(" ");
-    if (clzz.getSuperCall() != null) {
+    classBuilder.append("class ").append(clazz.getName()).append(" ");
+    if (clazz.getSuperCall() != null) {
 
-      String alias = clzz.getSuperCall().getName();
-      if (alias.equalsIgnoreCase(clzz.getName())) {
-        alias = StringUtility.uppercaseFirst(clzz.getSuperCall().getNamespace()) + clzz.getSuperCall().getName();
+      String alias = clazz.getSuperCall().getName();
+      if (alias.equalsIgnoreCase(clazz.getName())) {
+        alias = StringUtility.uppercaseFirst(clazz.getSuperCall().getNamespace()) + clazz.getSuperCall().getName();
       }
       classBuilder.append("extends ")
-          .append(jsFile.getOrCreateImport(clzz.getSuperCall().getFullyQualifiedName(), context).getReferenceName())
+          .append(jsFile.getOrCreateImport(clazz.getSuperCall().getFullyQualifiedName(), context).getReferenceName())
           .append(" ");
 
     }
-    classBuilder.append("{").append(workingCopy.getLineSeparator()).append(workingCopy.getLineSeparator());
+    classBuilder.append("{").append(workingCopy.getLineDelimiter()).append(workingCopy.getLineDelimiter());
 
-    matcher = Pattern.compile(Pattern.quote(functions.get(0).getSource())).matcher(sourceBuilder.toString());
-    if(matcher.find()){
-      sourceBuilder.insert(matcher.start(),classBuilder.toString());
-    }else{
-      sourceBuilder.insert(0, MigrationUtility.prependTodo("", "Create class declaration manual (like: 'export default class FormField')", workingCopy.getLineSeparator()));
-      LOG.warn("Could not create class declaration like (like: 'export default class FormField')  in '"+clzz.getFullyQualifiedName()+"'");
+    sourceBuilder.insert(startPos, classBuilder.toString());
+    if (!sourceBuilder.toString().endsWith(workingCopy.getLineDelimiter())) {
+      sourceBuilder.append(workingCopy.getLineDelimiter());
     }
     workingCopy.setSource(sourceBuilder.toString());
   }
@@ -149,8 +167,8 @@ public class T500_CreateClasses extends AbstractTask {
   protected String updateFunction(JsFunction function, JsFile jsFile, String source) {
     StringBuilder patternBuilder = new StringBuilder();
     patternBuilder.append(function.getJsClass().getNamespace())
-      .append("\\.")
-      .append(function.getJsClass().getName());
+        .append("\\.")
+        .append(function.getJsClass().getName());
     if (!function.isStatic()) {
       patternBuilder.append("\\.prototype");
     }
@@ -164,7 +182,7 @@ public class T500_CreateClasses extends AbstractTask {
       if (function.isStatic()) {
         replacement.append("static ");
       }
-      replacement.append(function.getName().replace("$","\\$"));
+      replacement.append(function.getName().replace("$", "\\$"));
       source = matcher.replaceFirst(replacement.toString());
     }
     // super call
@@ -174,13 +192,13 @@ public class T500_CreateClasses extends AbstractTask {
     // group 3 (inner optional) agruments to use
     patternBuilder = new StringBuilder();
     patternBuilder.append(Pattern.quote(function.getJsClass().getFullyQualifiedName()))
-      .append("\\.parent\\.prototype\\.(").append(Pattern.quote(function.getName())).append(")\\.call\\(\\s*this\\s*(\\,\\s*([^\\)]))?");
+        .append("\\.parent\\.prototype\\.(").append(Pattern.quote(function.getName())).append(")\\.call\\(\\s*this\\s*(\\,\\s*([^\\)]))?");
     pattern = Pattern.compile(patternBuilder.toString());
     matcher = pattern.matcher(source);
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
       replacement.append("super.").append(matcher.group(1)).append("(");
-      if(matcher.group(2) != null){
+      if (matcher.group(2) != null) {
         replacement.append(matcher.group(3));
       }
       source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
@@ -195,7 +213,6 @@ public class T500_CreateClasses extends AbstractTask {
         .append("\\.")
         .append(function.getJsClass().getName())
         .append("\\s*\\=\\s*function");
-
 
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
@@ -231,6 +248,89 @@ public class T500_CreateClasses extends AbstractTask {
     return source;
   }
 
+  protected void updateConstants(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
+    String source = workingCopy.getSource();
+    String lineDelimiter = workingCopy.getLineDelimiter();
+    List<JsConstant> constants = clazz.getConstants();
+    if (constants.size() == 0) {
+      return;
+    }
+    for (JsConstant constant : constants) {
+      source = updateConstant(source, constant, lineDelimiter);
+    }
+    workingCopy.setSource(source);
+  }
 
+  protected String updateConstant(String source, JsConstant constant, String lineDelimiter) {
+    StringBuilder patternBuilder = new StringBuilder();
+    patternBuilder
+        .append("([\\r\\n]{1})(")
+        .append(constant.getJsClass().getNamespace())
+        .append("\\.")
+        .append(constant.getJsClass().getName());
+
+    patternBuilder.append("\\.").append(constant.getName())
+        .append(")");
+    patternBuilder.append("((\\s*\\=\\s*[^\\;]*)?\\;)");
+    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    Matcher matcher = pattern.matcher(source);
+    if (matcher.find()) {
+      StringBuilder replacement = new StringBuilder();
+      replacement.append(matcher.group(1));
+
+      if (constant.hasParseErrors()) {
+        replacement.append(constant.toTodoText(lineDelimiter)).append(lineDelimiter);
+        replacement.append(matcher.group());
+      }
+      else {
+        replacement.append("static");
+        replacement.append(" ").append(constant.getName())
+            .append(matcher.group(3).replace("\\", "\\\\").replace("$", "\\$"));
+
+      }
+      source = matcher.replaceFirst(replacement.toString());
+    }
+    return source;
+  }
+
+  protected void updateEnums(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
+    String source = workingCopy.getSource();
+    String lineDelimiter = workingCopy.getLineDelimiter();
+    List<JsEnum> jsEnums = clazz.getEnums();
+    if (jsEnums.size() == 0) {
+      return;
+    }
+    for (JsEnum jsEnum : jsEnums) {
+      source = updateEnum(source, jsEnum, lineDelimiter);
+    }
+    workingCopy.setSource(source);
+  }
+
+  protected String updateEnum(String source, JsEnum jsEnum, String lineDelimiter) {
+    StringBuilder patternBuilder = new StringBuilder();
+    patternBuilder.append(jsEnum.getJsClass().getNamespace())
+        .append("\\.")
+        .append(jsEnum.getJsClass().getName());
+
+    patternBuilder.append("\\.").append(jsEnum.getName());
+    patternBuilder.append("(\\ \\=\\s*\\{)");
+
+    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    Matcher matcher = pattern.matcher(source);
+    if (matcher.find()) {
+
+      StringBuilder replacement = new StringBuilder();
+      if (jsEnum.hasParseErrors()) {
+        replacement.append(jsEnum.toTodoText(lineDelimiter)).append(lineDelimiter);
+        replacement.append(matcher.group());
+      }
+      else {
+        replacement.append("static ").append(jsEnum.getName())
+            .append(matcher.group(1));
+      }
+      source = matcher.replaceFirst(replacement.toString());
+    }
+    return source;
+  }
 
 }
