@@ -62,7 +62,7 @@ public class JsFileParser {
    *  5 closing bracket (opt)
    * </pre>
    */
-  private static Pattern START_ENUM = Pattern.compile("^(\\s*)([^ .]+\\.[^ .]+)\\.([A-Z][^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
+  private static Pattern START_CLASS_ENUM = Pattern.compile("^(\\s*)([^ .]+\\.[A-Z][^ .]+)\\.([A-Z][^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
 
   /**
    * <pre>
@@ -75,7 +75,20 @@ public class JsFileParser {
    *  5 closing bracket (opt)
    * </pre>
    */
-  private static Pattern START_TOP_LEVEL_ENUM = Pattern.compile("^()([^ .]+)\\.([^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
+  private static Pattern START_TOP_LEVEL_ENUM1 = Pattern.compile("^()([^ .]+)\\.([^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+   * scout.numbers.RoundingMode = {
+   * Groups:
+   *  1 indent (empty)
+   *  2 namespace = scope
+   *  3 field name
+   *  4 open bracket
+   *  5 closing bracket (opt)
+   * </pre>
+   */
+  private static Pattern START_TOP_LEVEL_ENUM2 = Pattern.compile("^()([^ .]+\\.[^ .]+)\\.([^ .]+)\\s*=\\s*(\\{)\\s*(\\}\\;)?");
 
   /**
    * <pre>
@@ -102,6 +115,28 @@ public class JsFileParser {
    * </pre>
    */
   private static Pattern START_STATIC_FUNCTION = Pattern.compile("^()([^ .]+\\.[^ .]+)\\.([^ .]+)\\s*=\\s*function\\(([^)]*)\\)\\s*(\\{)\\s*(\\}\\;)?");
+
+  /**
+   * <pre>
+   *    scout.Status._warnDeprecationLogged = false;
+   * Groups:
+   *  1 namespace
+   *  2 field name
+   *  3 allocation
+   * </pre>
+   */
+  private static Pattern START_CLASS_VARIABLE = Pattern.compile("^([^ .]+\\.[^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!\\s)(?!(?:function))(.*);?$"); //FULL MATCH
+
+  /**
+   * <pre>
+   * Groups:
+   *  1 namespace = scope.class
+   *  2 field name
+   *  3 allocation (opt)
+   *  4 delimiter semicolumn (opt)
+   * </pre>
+   */
+  private static Pattern START_CLASS_CONSTANT_MULTI_LINE = Pattern.compile("(?s)\\n([^. \\n]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*?)?(;)", Pattern.DOTALL);
 
   /**
    * <pre>
@@ -159,17 +194,6 @@ public class JsFileParser {
   private static Pattern START_UTILITY_VARIABLE_STANDALONE = Pattern.compile("^([a-z][^ .]+)\\.([_$a-z][^ .]+)\\s*=\\s*(?!\\s)(?!(?:function))");
 
   private static Pattern START_UTILITY_CONST_STANDALONE = Pattern.compile("^([A-Z][^ .]+)\\.([_$A-Z][^ .]+)\\s*=\\s*(?!\\s)(?!(?:function))");
-
-  /**
-   * <pre>
-   * Groups:
-   *  1 namespace = scope.class
-   *  2 field name
-   *  3 allocation (opt)
-   *  4 delimiter semicolumn (opt)
-   * </pre>
-   */
-  private static Pattern START_CONSTANT_MULTI_LINE = Pattern.compile("(?s)\\n([^. \\n]+\\.[^ .]+)\\.([A-Z0-9_]+)(\\s*=\\s*.*?)?(;)", Pattern.DOTALL);
 
   /**
    * <pre>
@@ -242,60 +266,85 @@ public class JsFileParser {
           comment = null;
           continue;
         }
-        matcher = START_ENUM.matcher(m_currentLine);
+        matcher = START_CLASS_VARIABLE.matcher(m_currentLine);
+        if (matcher.matches() && PathFilters.isClass().test(m_jsFile.getPathInfo())) {//uses matcher.MATCHES() instead of find()
+          readClassVariable(matcher);
+          comment = null;
+          continue;
+        }
+        matcher = START_CLASS_ENUM.matcher(m_currentLine);
         if (matcher.find()) {
           readEnum(matcher);
           continue;
         }
-        matcher = START_TOP_LEVEL_ENUM.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isTopLevelEnum().test(m_jsFile.getPathInfo())) {
+        matcher = START_TOP_LEVEL_ENUM1.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isTopLevelEnum(m_jsFile.getPath())) {
           readTopLevelEnum(matcher);
           continue;
         }
+        else {
+          //detect top level enums in other files
+          matcher = START_TOP_LEVEL_ENUM1.matcher(m_currentLine);
+          if (matcher.find() && Character.isUpperCase(matcher.group(3).charAt(0))) {
+            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath().getFileName(), m_currentLineNumber, matcher.group());
+          }
+        }
+        matcher = START_TOP_LEVEL_ENUM2.matcher(m_currentLine);
+        if (matcher.find() && PathFilters.isTopLevelEnum(m_jsFile.getPath())) {
+          readTopLevelEnum(matcher);
+          continue;
+        }
+        else {
+          //detect top level enums in other files
+          matcher = START_TOP_LEVEL_ENUM2.matcher(m_currentLine);
+          if (matcher.find() && Character.isUpperCase(matcher.group(3).charAt(0))) {
+            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath().getFileName(), m_currentLineNumber, matcher.group());
+          }
+        }
         matcher = START_UTILITY_BLOCK.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath())) {
           beginUtility(matcher);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_FUNCTION.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath())) {
           readUtilityFunction(matcher);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_VARIABLE.matcher(m_currentLine);
-        if (matcher.matches() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {//uses matcher.MATCHES() instead of find()
+        if (matcher.matches() && PathFilters.isUtility(m_jsFile.getPath())) {//uses matcher.MATCHES() instead of find()
           readUtilityVariable(matcher, false);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_CONST.matcher(m_currentLine);
-        if (matcher.matches() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {//uses matcher.MATCHES() instead of find()
+        if (matcher.matches() && PathFilters.isUtility(m_jsFile.getPath())) {//uses matcher.MATCHES() instead of find()
           readUtilityVariable(matcher, true);
           comment = null;
           continue;
         }
         matcher = END_UTILITY_BLOCK.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo()) && m_curUtility != null) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath()) && m_curUtility != null) {
           endUtility(matcher);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_FUNCTION_STANDALONE.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath())) {
           readUtilityFunctionStandalone(matcher);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_VARIABLE_STANDALONE.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath())) {
           readUtilityVariableStandalone(matcher, false);
           comment = null;
           continue;
         }
         matcher = START_UTILITY_CONST_STANDALONE.matcher(m_currentLine);
-        if (matcher.find() && PathFilters.isUtility().test(m_jsFile.getPathInfo())) {
+        if (matcher.find() && PathFilters.isUtility(m_jsFile.getPath())) {
           readUtilityVariableStandalone(matcher, true);
           comment = null;
           continue;
@@ -331,9 +380,9 @@ public class JsFileParser {
       throw e;
     }
 
-    Matcher constMatcher = START_CONSTANT_MULTI_LINE.matcher(m_workingCopy.getSource());
+    Matcher constMatcher = START_CLASS_CONSTANT_MULTI_LINE.matcher(m_workingCopy.getSource());
     while (constMatcher.find()) {
-      readConstant(constMatcher);
+      readClassConstant(constMatcher);
     }
 
     List<JsClass> jsClasses = m_jsFile.getJsClasses();
@@ -588,12 +637,22 @@ public class JsFileParser {
     return jsEnum;
   }
 
-  protected JsConstant readConstant(Matcher matcher) throws IOException {
+  protected JsClassVariable readClassVariable(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
-    JsConstant constant = new JsConstant(clazz, matcher.group(2));
-    constant.setSource(matcher.group());
-    clazz.addConstant(constant);
-    return constant;
+    JsClassVariable v = new JsClassVariable(clazz, matcher.group(2), false);
+    v.setSource(matcher.group());
+    clazz.addVariable(v);
+    nextLine();
+    return v;
+  }
+
+  protected JsClassVariable readClassConstant(Matcher matcher) throws IOException {
+    JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
+    JsClassVariable v = new JsClassVariable(clazz, matcher.group(2), true);
+    v.setSource(matcher.group());
+    clazz.addVariable(v);
+    //no call to nextLine(), this method is called outside line loop
+    return v;
   }
 
   protected JsFunction readAppListener() throws IOException {

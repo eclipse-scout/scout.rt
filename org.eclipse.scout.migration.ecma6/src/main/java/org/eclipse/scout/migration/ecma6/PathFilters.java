@@ -51,13 +51,8 @@ public final class PathFilters {
     return info -> info.getPath().getFileName().toString().matches("^[A-Z].*$");
   }
 
-  @Exemption
   public static Predicate<PathInfo> isUtility() {
     return info -> isUtility(info.getPath());
-  }
-
-  public static Predicate<PathInfo> isTopLevelEnum() {
-    return info -> isTopLevelEnum(info.getPath());
   }
 
   @Exemption
@@ -68,14 +63,21 @@ public final class PathFilters {
     return path.getFileName().toString().matches("^[a-z].*$");
   }
 
+  public static Predicate<PathInfo> isTopLevelEnum() {
+    return info -> isTopLevelEnum(info.getPath());
+  }
+
   @Exemption
   public static boolean isTopLevelEnum(Path path) {
-    return path.endsWith("scout/form/fields/TreeVisitResult.js")
-        || path.endsWith("scout/layout/LayoutConstants.js")
-        || path.endsWith("scout/keystroke/keys.js")
-        || path.endsWith("scout/menu/MenuDestinations.js")
-        || path.endsWith("scout/focus/FocusRule.js")
-        || path.endsWith("scout/util/HAlign.js")
-        || path.endsWith("studio/util/enums.js");
+    return path.endsWith("TreeVisitResult.js")
+        || path.endsWith("LayoutConstants.js")
+        || path.endsWith("keys.js")
+        || path.endsWith("MenuDestinations.js")
+        || path.endsWith("FocusRule.js")
+        || path.endsWith("QueryBy.js")
+        || path.endsWith("BackgroundJobPollingStatus.js")
+        || path.endsWith("DateFormatPatternType.js")
+        || path.endsWith("RoundingMode.js")
+        || path.endsWith("HAlign.js"); //studio
   }
 }

@@ -29,21 +29,6 @@
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-scout.DateFormatPatternType = {
-  YEAR: 'year',
-  MONTH: 'month',
-  WEEK_IN_YEAR: 'week_in_year',
-  DAY_IN_MONTH: 'day_in_month',
-  WEEKDAY: 'weekday',
-  HOUR_24: 'hour_24',
-  HOUR_12: 'hour_12',
-  AM_PM: 'am_pm',
-  MINUTE: 'minute',
-  SECOND: 'second',
-  MILLISECOND: 'millisecond',
-  TIMEZONE: 'timezone'
-};
-
 scout.DateFormat = function(locale, pattern, options) { // NOSONAR
   options = options || {};
 

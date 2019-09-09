@@ -23,7 +23,7 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
-import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
+import org.eclipse.scout.migration.ecma6.model.old.JsClassVariable;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsTopLevelEnum;
@@ -100,9 +100,10 @@ public class ApiWriter {
         .filter(jsFun -> !jsFun.isConstructor() && !jsFun.isStatic())
         .map(jsFun -> createFunction(jsFun, cz))
         .collect(Collectors.toList()));
-    cz.addChildren(jsClass.getConstants()
+    cz.addChildren(jsClass.getVariables()
         .stream()
-        .map(cons -> createConstant(cons, cz))
+        .filter(v -> v.isConst())
+        .map(v -> createConstant(v, cz))
         .collect(Collectors.toList()));
     cz.addChildren(jsClass.getEnums()
         .stream()
@@ -114,7 +115,7 @@ public class ApiWriter {
   protected INamedElement createConstructor(JsFunction jsFun, INamedElement cz) {
     NamedElement fun = new NamedElement(Type.Constructor, jsFun.getName(), cz);
     List<String> singletonReferences = jsFun.getSingletonReferences();
-    if(singletonReferences.size() > 0) {
+    if (singletonReferences.size() > 0) {
       fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
     }
     return fun;
@@ -123,7 +124,7 @@ public class ApiWriter {
   protected INamedElement createStaticFunction(JsFunction jsFun, INamedElement cz) {
     NamedElement fun = new NamedElement(Type.StaticFunction, jsFun.getName(), cz);
     List<String> singletonReferences = jsFun.getSingletonReferences();
-    if(singletonReferences.size() > 0) {
+    if (singletonReferences.size() > 0) {
       fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
     }
     return fun;
@@ -132,14 +133,14 @@ public class ApiWriter {
   protected INamedElement createFunction(JsFunction jsFun, INamedElement cz) {
     NamedElement fun = new NamedElement(Type.Function, jsFun.getName(), cz);
     List<String> singletonReferences = jsFun.getSingletonReferences();
-    if(singletonReferences.size() > 0) {
+    if (singletonReferences.size() > 0) {
       fun.addCustomAttribute(INamedElement.SINGLETON_REFERENCES, singletonReferences);
     }
     return fun;
   }
 
-  private INamedElement createConstant(JsConstant cons, NamedElement cz) {
-    return new NamedElement(Type.Constant, cons.getName(), cz);
+  private INamedElement createConstant(JsClassVariable v, NamedElement cz) {
+    return new NamedElement(Type.Constant, v.getName(), cz);
   }
 
   private INamedElement createEnum(JsEnum en, NamedElement cz) {

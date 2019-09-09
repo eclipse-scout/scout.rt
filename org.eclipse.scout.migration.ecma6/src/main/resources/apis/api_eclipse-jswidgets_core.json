@@ -4055,11 +4055,6 @@
           "name": "_onNewLanguageMenuAction",
           "type": "Function",
           "fullyQualifiedName": "jswidgets.SmartFieldForm._onNewLanguageMenuAction"
-        },
-        {
-          "name": "_onNewLanguageMenuAction",
-          "type": "Function",
-          "fullyQualifiedName": "jswidgets.SmartFieldForm._onNewLanguageMenuAction"
         }
       ]
     },

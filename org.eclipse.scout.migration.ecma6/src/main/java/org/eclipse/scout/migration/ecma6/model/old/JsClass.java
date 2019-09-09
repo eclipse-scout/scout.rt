@@ -17,7 +17,7 @@ public class JsClass extends AbstractJsElement{
   private JsSuperCall m_superCall;
   private final List<JsFunction> m_functions = new ArrayList<>();
   private final List<JsEnum> m_enums = new ArrayList<>();
-  private final List<JsConstant> m_constants = new ArrayList<>();
+  private final List<JsClassVariable> m_vars = new ArrayList<>();
 
   public JsClass(String fqn, JsFile jsFile) {
     m_fullyQualifiedName = fqn;
@@ -95,16 +95,16 @@ public class JsClass extends AbstractJsElement{
         .orElse(null);
   }
 
-  public void addConstant(JsConstant constant){
-    m_constants.add(constant);
+  public void addVariable(JsClassVariable v) {
+    m_vars.add(v);
   }
 
-  public List<JsConstant> getConstants() {
-    return Collections.unmodifiableList(m_constants);
+  public List<JsClassVariable> getVariables() {
+    return Collections.unmodifiableList(m_vars);
   }
 
-  public JsConstant getConstant(String name) {
-    return m_constants.stream()
+  public JsClassVariable getVariable(String name) {
+    return m_vars.stream()
       .filter(c -> name.equals(c.getName()))
       .findFirst()
       .orElse(null);
@@ -128,9 +128,9 @@ public class JsClass extends AbstractJsElement{
               .map(c -> indent + "- " + c.toString(indent + "  "))
               .collect(Collectors.joining(System.lineSeparator())));
     }
-    if (m_constants.size() > 0) {
-      builder.append(System.lineSeparator()).append(indent).append("CONSTANTS:").append(System.lineSeparator())
-        .append(m_constants.stream()
+    if (m_vars.size() > 0) {
+      builder.append(System.lineSeparator()).append(indent).append("VARIABLES:").append(System.lineSeparator())
+          .append(m_vars.stream()
           .map(c -> indent + "- " + c.toString(indent + "  "))
           .collect(Collectors.joining(System.lineSeparator())));
     }

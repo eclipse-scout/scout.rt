@@ -8,12 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BackgroundJobPollingStatus = {
-  STOPPED: 'stopped',
-  RUNNING: 'running',
-  FAILURE: 'failure'
-};
-
 scout.BackgroundJobPollingSupport = function(enabled) {
   this.enabled = !!enabled;
   this.status = scout.BackgroundJobPollingStatus.STOPPED;

@@ -33,13 +33,3 @@ scout.RemoteLookupRequest.prototype.equals = function(o) {
   }
   return scout.objects.propertiesEquals(this, o, ['requestType', 'requestData']);
 };
-
-/**
- * @see: org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy
- */
-scout.QueryBy = {
-  ALL: 'ALL',
-  TEXT: 'TEXT',
-  KEY: 'KEY',
-  REC: 'REC'
-};

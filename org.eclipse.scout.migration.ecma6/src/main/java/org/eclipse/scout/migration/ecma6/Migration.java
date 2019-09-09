@@ -88,12 +88,12 @@ public class Migration {
     AtomicInteger pctReport = new AtomicInteger();
     visitMigrationFiles(info -> {
       processFile(info, m_context);
-      int pct10 = (10 * worked.incrementAndGet() / totalWork.get()) * 10;
-      if (pctReport.compareAndSet(pct10 - 10, pct10)) {
-        LOG.info("visited {}%", pct10);
+      int pct = 100 * worked.incrementAndGet() / totalWork.get();
+      if (pctReport.compareAndSet(pct - 1, pct)) {
+        System.out.print("visited " + pct + "%   \r");
       }
     });
-
+    System.out.println();
   }
 
   protected void visitMigrationFiles(Consumer<PathInfo> migrationFileConsumer) throws IOException {

@@ -23,7 +23,7 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
-import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
+import org.eclipse.scout.migration.ecma6.model.old.JsClassVariable;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
@@ -49,19 +49,19 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
 
   protected String updateLocalReferences(JsFile jsFile, String source, Context context, String lineDelimiter) {
     List<JsClass> jsClasses = jsFile.getJsClasses();
-    List<JsConstant> constants = jsClasses
+    List<JsClassVariable> vars = jsClasses
         .stream()
-        .map(jsClass -> jsClass.getConstants()
+        .map(jsClass -> jsClass.getVariables()
             .stream()
             .collect(Collectors.toList()))
         .flatMap(List::stream)
         .collect(Collectors.toList());
-    if (constants.size() == 0) {
+    if (vars.size() == 0) {
       return source;
     }
     if (jsClasses.size() != 1) {
       // check if any of the local static methods is used
-      Matcher matcher = Pattern.compile(constants
+      Matcher matcher = Pattern.compile(vars
           .stream()
           .map(c -> Pattern.quote(c.getJsClass().getFullyQualifiedName() + "." + c.getName()))
           .collect(Collectors.joining("|"))).matcher(source);
@@ -72,8 +72,8 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
       return source;
     }
 
-    for (JsConstant constant : constants) {
-      source = createImportForReferences(constant.getJsClass().getFullyQualifiedName()+"."+constant.getName(), null, constant.getName() , source, jsFile, context);
+    for (JsClassVariable v : vars) {
+      source = createImportForReferences(v.getJsClass().getFullyQualifiedName() + "." + v.getName(), null, v.getName(), source, jsFile, context);
     }
     return source;
   }

@@ -2,6 +2,9 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/core"
+  },
   "children" : [ {
     "name" : "Column",
     "type" : "Class",
@@ -19857,15 +19860,6 @@
       "fullyQualifiedName" : "scout.GlassPaneRenderer._onGlassPaneRemove"
     } ]
   }, {
-    "name" : "numbers",
-    "type" : "Class",
-    "fullyQualifiedName" : "scout.numbers",
-    "children" : [ {
-      "name" : "RoundingMode",
-      "type" : "Enum",
-      "fullyQualifiedName" : "scout.numbers.RoundingMode"
-    } ]
-  }, {
     "name" : "ProposalChooser",
     "type" : "Class",
     "fullyQualifiedName" : "scout.ProposalChooser",
@@ -23247,6 +23241,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.BasicField.setUpdateDisplayTextOnModify"
     }, {
+      "name": "setUpdateDisplayTextOnModifyDelay",
+      "type": "Function",
+      "fullyQualifiedName": "scout.BasicField.setUpdateDisplayTextOnModifyDelay"
+    },
+      {
       "name" : "_clear",
       "type" : "Function",
       "fullyQualifiedName" : "scout.BasicField._clear"
@@ -34060,10 +34059,20 @@
       "fullyQualifiedName" : "scout.menus.removeMenuFromEllipsis"
     } ]
   }, {
+      "name": "RoundingMode",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.RoundingMode"
+    },
+    {
       "name": "MenuDestinations",
       "type": "TopLevelEnum",
       "fullyQualifiedName": "scout.MenuDestinations"
   }, {
+      "name": "BackgroundJobPollingStatus",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.BackgroundJobPollingStatus"
+    },
+    {
     "name" : "keys",
     "type" : "TopLevelEnum",
     "fullyQualifiedName" : "scout.keys"
@@ -34077,9 +34086,19 @@
     "type" : "TopLevelEnum",
     "fullyQualifiedName" : "scout.LayoutConstants"
   }, {
+      "name": "QueryBy",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.QueryBy"
+    },
+    {
       "name": "HAlign",
       "type": "TopLevelEnum",
       "fullyQualifiedName": "scout.HAlign"
+    },
+    {
+      "name": "DateFormatPatternType",
+      "type": "TopLevelEnum",
+      "fullyQualifiedName": "scout.DateFormatPatternType"
     },
     {
     "name" : "TreeVisitResult",
@@ -42689,8 +42708,6 @@
       "path" : "src/main/js/scout/style/colors.less",
       "theme" : "default-theme"
     }
-  } ],
-  "customAttributes" : {
-    "lib-moduleName" : "@eclipse-scout/core"
-  }
+    }
+  ]
 }

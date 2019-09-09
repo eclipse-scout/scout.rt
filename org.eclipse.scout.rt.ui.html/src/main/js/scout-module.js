@@ -49,6 +49,7 @@
   __include("scout/util/mimeTypes.js");
   __include("scout/util/models.js");
   __include("scout/util/numbers.js");
+  __include("scout/util/RoundingMode.js");
   __include("scout/util/objects.js");
   __include("scout/util/polyfills.js");
   __include("scout/util/PromiseCreator.js");
@@ -72,6 +73,7 @@
   __include("scout/lookup/LookupRow.js");
   __include("scout/lookup/RemoteLookupCall.js");
   __include("scout/lookup/RemoteLookupRequest.js");
+  __include("scout/lookup/QueryBy.js");
   __include("scout/lookup/StaticLookupCall.js");
   __include("scout/lookup/HierarchicalLookupResultBuilder.js");
   // Code
@@ -80,6 +82,7 @@
   __include("scout/code/codes.js");
   __include("scout/code/CodeLookupCall.js"); // requires LookupCall.js
   // Session related
+  __include("scout/session/BackgroundJobPollingStatus.js");
   __include("scout/session/BackgroundJobPollingSupport.js");
   __include("scout/session/BusyIndicator.js");
   __include("scout/session/RemoteEvent.js");
@@ -162,6 +165,7 @@
   __include("scout/scrollbar/scrollbars.js");
   __include("scout/scrollbar/VirtualScrolling.js");
   __include("scout/splitter/Splitter.js");
+  __include("scout/text/DateFormatPatternType.js");
   __include("scout/text/DateFormat.js");
   __include("scout/text/DecimalFormat.js");
   __include("scout/text/TextMap.js");

@@ -13,7 +13,7 @@ import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.ISourceElement;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
-import org.eclipse.scout.migration.ecma6.model.old.JsConstant;
+import org.eclipse.scout.migration.ecma6.model.old.JsClassVariable;
 import org.eclipse.scout.migration.ecma6.model.old.JsEnum;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
@@ -58,7 +58,7 @@ public class T500_CreateClasses extends AbstractTask {
       JsClass jsClazz = jsClasses.get(i);
       createClazzBlock(jsClazz, jsClasses.size() == 1, jsFile, workingCopy, context);
       updateFunctions(jsClazz, jsFile, workingCopy);
-      updateConstants(jsClazz, jsFile, workingCopy);
+      updateVariables(jsClazz, jsFile, workingCopy);
       updateEnums(jsClazz, jsFile, workingCopy);
     }
   }
@@ -74,7 +74,7 @@ public class T500_CreateClasses extends AbstractTask {
     elements.addAll(clazz.getFunctions());
     elements.add(clazz.getConstructor());
     elements.add(clazz.getSuperCall());
-    elements.addAll(clazz.getConstants());
+    elements.addAll(clazz.getVariables());
     elements.addAll(clazz.getEnums());
     if (elements.isEmpty()) {
       return;
@@ -248,43 +248,48 @@ public class T500_CreateClasses extends AbstractTask {
     return source;
   }
 
-  protected void updateConstants(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
+  protected void updateVariables(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
     String source = workingCopy.getSource();
     String lineDelimiter = workingCopy.getLineDelimiter();
-    List<JsConstant> constants = clazz.getConstants();
-    if (constants.size() == 0) {
+    List<JsClassVariable> vars = clazz.getVariables();
+    if (vars.size() == 0) {
       return;
     }
-    for (JsConstant constant : constants) {
-      source = updateConstant(source, constant, lineDelimiter);
+    for (JsClassVariable v : vars) {
+      source = updateVariable(source, v, lineDelimiter);
     }
     workingCopy.setSource(source);
   }
 
-  protected String updateConstant(String source, JsConstant constant, String lineDelimiter) {
+  protected String updateVariable(String source, JsClassVariable v, String lineDelimiter) {
     StringBuilder patternBuilder = new StringBuilder();
     patternBuilder
         .append("([\\r\\n]{1})(")
-        .append(constant.getJsClass().getNamespace())
+        .append(v.getJsClass().getNamespace())
         .append("\\.")
-        .append(constant.getJsClass().getName());
-
-    patternBuilder.append("\\.").append(constant.getName())
-        .append(")");
-    patternBuilder.append("((\\s*\\=\\s*[^\\;]*)?\\;)");
-    Pattern pattern = Pattern.compile(patternBuilder.toString());
+        .append(v.getJsClass().getName())
+        .append("\\.").append(v.getName())
+        .append(")")
+        .append("((\\s*\\=\\s*[^\\;]*)?\\;)");
+    Pattern pattern = Pattern.compile(patternBuilder.toString(), Pattern.DOTALL);
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
       replacement.append(matcher.group(1));
 
-      if (constant.hasParseErrors()) {
-        replacement.append(constant.toTodoText(lineDelimiter)).append(lineDelimiter);
+      if (v.hasParseErrors()) {
+        replacement.append(v.toTodoText(lineDelimiter)).append(lineDelimiter);
         replacement.append(matcher.group());
       }
       else {
-        replacement.append("static");
-        replacement.append(" ").append(constant.getName())
+        if (v.isConst()) {
+          replacement.append("static ");
+        }
+        else {
+          replacement.append("let ");
+        }
+        replacement
+            .append(v.getName())
             .append(matcher.group(3).replace("\\", "\\\\").replace("$", "\\$"));
 
       }
