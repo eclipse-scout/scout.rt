@@ -13,5 +13,7 @@
 
 import * as scout from './scout/dummy-scout';
 
-export {scout as default};
-export {default as DummyApp} from './scout/DummyApp';
+export { scout as default };
+export { default as DummyApp } from './scout/DummyApp';
+
+window.scout = Object.assign({}, scout);

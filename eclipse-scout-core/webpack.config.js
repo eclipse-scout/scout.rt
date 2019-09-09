@@ -14,7 +14,7 @@ module.exports = (env, args) => {
   const config = baseConfig(env, args);
 
   config.entry = {
-    'eclipse-scout-core': './index.js',
+    'eclipse-scout-core': './src/index.js',
     'scout-theme': './src/theme.less',
     'scout-theme-dark': './src/theme-dark.less'
   };
