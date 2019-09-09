@@ -385,7 +385,8 @@ scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
 };
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete) {
-  if ($info.isVisible() === visible && !(visible && $info.data('hiding'))) {
+  var currentlyVisible = !$info.hasClass('hidden'); // check for 'hidden' class, because isVisible() returns the wrong result while element is not attached to the DOM
+  if (currentlyVisible === visible && !(visible && $info.data('hiding'))) {
     if (complete) {
       complete();
     }
