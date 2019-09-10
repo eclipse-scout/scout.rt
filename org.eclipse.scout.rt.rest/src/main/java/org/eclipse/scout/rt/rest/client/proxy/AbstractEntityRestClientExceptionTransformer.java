@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 
 /**
  * Base implementation for reading the entity of an unsuccessful REST {@link Response}.
@@ -25,6 +26,9 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
   @Override
   public RuntimeException transform(RuntimeException e, Response response) {
     if (response == null) {
+      if (e instanceof javax.ws.rs.ProcessingException) {
+        return transformJaxRsProcessingException((javax.ws.rs.ProcessingException) e);
+      }
       return e;
     }
 
@@ -33,6 +37,17 @@ public abstract class AbstractEntityRestClientExceptionTransformer implements IR
       result = transformByResponseStatusFamily(response.getStatusInfo().getFamily(), e, response);
     }
     return result != null ? result : defaultTransform(e, response);
+  }
+
+  /**
+   * Transforms {@link javax.ws.rs.ProcessingException} into a {@link RemoteSystemUnavailableException}.
+   * <p>
+   * In case there is no response at all, a {@link javax.ws.rs.ProcessingException} indicates that something went wrong
+   * while trying to reach the remote system, like the remote system host is down or configuration parameters are wrong.
+   */
+  protected RuntimeException transformJaxRsProcessingException(javax.ws.rs.ProcessingException e) {
+    Throwable cause = e.getCause();
+    return new RemoteSystemUnavailableException(cause.getMessage(), cause);
   }
 
   /**
