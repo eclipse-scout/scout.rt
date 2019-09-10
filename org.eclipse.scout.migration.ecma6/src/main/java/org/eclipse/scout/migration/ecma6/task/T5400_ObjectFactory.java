@@ -11,6 +11,7 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathFilters;
@@ -20,30 +21,26 @@ import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.rt.platform.Order;
 
-@Order(5300)
-public class T5300_AppListener extends AbstractTask {
+@Order(5400)
+public class T5400_ObjectFactory extends AbstractTask {
 
-  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
-  private static final Pattern APP_LISTENER_PAT = Pattern.compile("scout\\.objectFactory\\('(\\w+)',");
+  private static final Pattern OBJECT_FACTORY_PAT = Pattern.compile("scout\\.objectFactory([.;])");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    if (!m_filter.test(pathInfo)) {
-      return false;
-    }
-    WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    return APP_LISTENER_PAT.matcher(workingCopy.getSource()).find();
+    return m_filter.test(pathInfo);
   }
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-
-    JsFile js = context.ensureJsFile(workingCopy);
-    String refName = js.getOrCreateImport("scout.App", context).getReferenceName();
-    String newSource = APP_LISTENER_PAT.matcher(workingCopy.getSource()).replaceAll(refName + ".addListener('$1',");
-
-    workingCopy.setSource(newSource);
+    Matcher matcher = OBJECT_FACTORY_PAT.matcher(workingCopy.getSource());
+    if (matcher.find()) {
+      JsFile js = context.ensureJsFile(workingCopy);
+      String refName = js.getOrCreateImport("scout.ObjectFactory", context).getReferenceName();
+      String newSource = matcher.replaceAll(refName + ".get()$1");
+      workingCopy.setSource(newSource);
+    }
   }
 }
