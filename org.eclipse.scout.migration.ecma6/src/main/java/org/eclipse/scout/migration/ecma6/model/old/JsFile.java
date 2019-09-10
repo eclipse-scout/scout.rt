@@ -177,34 +177,34 @@ public class JsFile extends AbstractJsElement {
       addImport(imp);
       return imp.getDefaultMember();
     }
-    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME), MigrationUtility.parseMemberName(fullyQualifiedName), false);
+    return getOrCreateImport(element.getAncestor(e -> e.getType() == Type.Library).getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME), MigrationUtility.parseMemberName(fullyQualifiedName), false, false);
 
   }
 
   public AliasedMember getOrCreateImport(JsClass jsClass) {
-    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), false/*jsClass.isDefault()*/);
+    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), true, false);
   }
 
   public AliasedMember getOrCreateImport(JsTopLevelEnum topLevelEnum) {
-    return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), false);
+    return getOrCreateImport(topLevelEnum.getName(), topLevelEnum.getJsFile().getPath(), true, false);
   }
 
   @FrameworkExtensionMarker
   public AliasedMember getOrCreateImport(JsUtility u) {
-    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), false);
+    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true, false);
   }
 
-  public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean defaultIfPossible) {
+  public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean pointToIndex, boolean defaultIfPossible) {
     Assertions.assertNotNull(fileToImport);
     Assertions.assertNotNull(memberName);
     String moduleName = JsImport.computeRelativePath(this.getPath().getParent(), fileToImport);
-    return getOrCreateImport(moduleName, memberName, defaultIfPossible);
+    return getOrCreateImport(moduleName, memberName, pointToIndex, defaultIfPossible);
   }
 
-  protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean defaultIfPossible) {
+  protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean pointToIndex, boolean defaultIfPossible) {
     JsImport libImport = m_imports.get(moduleName);
     if (libImport == null) {
-      libImport = new JsImport(moduleName, m_path.getParent().getParent().relativize(INDEX));
+      libImport = new JsImport(moduleName, pointToIndex ? m_path.getParent().getParent().relativize(INDEX) : null);
       addImport(libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);
