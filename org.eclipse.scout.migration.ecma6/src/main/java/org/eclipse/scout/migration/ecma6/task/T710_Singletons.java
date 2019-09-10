@@ -42,12 +42,6 @@ import org.slf4j.LoggerFactory;
  * });
  * </pre>
  *
- * oder
- * 
- * <pre>
- *   scout.addAppListener('bootstrap', scout.ModelAdapter.modifyWidgetPrototype);
- * </pre>
- *
  * TO:
  *
  * <pre>
@@ -93,6 +87,9 @@ public class T710_Singletons extends AbstractTask {
       source = source.replace(appListener.getSource(), appListener.toTodoText(lineDelimiter) + lineDelimiter + appListener.getSource());
       return source;
     }
+
+    source = source.replace("scout.responsiveManager = new scout.ResponsiveManager();", "");
+
     // let instance
     StringBuilder sourceBuilder = new StringBuilder(source);
     if (jsFile.getCopyRight() == null) {

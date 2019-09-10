@@ -22075,6 +22075,16 @@
       "type" : "Constructor",
       "fullyQualifiedName" : "scout.ResponsiveManager"
     }, {
+      "name": "get",
+      "type": "StaticFunction",
+      "fullyQualifiedName": "scout.ResponsiveManager.get",
+      "customAttributes": {
+        "singletonReferences": [
+          "scout.responsiveManager"
+        ]
+      }
+    },
+      {
       "name" : "init",
       "type" : "Function",
       "fullyQualifiedName" : "scout.ResponsiveManager.init"
@@ -32891,9 +32901,9 @@
         "fullyQualifiedName": "scout.icons.EXCLAMATION_MARK"
       },
       {
-        "name": "EXCLAMATION_MARK_CIRLCE",
+        "name": "EXCLAMATION_MARK_CIRCLE",
         "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.icons.EXCLAMATION_MARK_CIRLCE"
+        "fullyQualifiedName": "scout.icons.EXCLAMATION_MARK_CIRCLE"
       },
       {
         "name": "INFO",

@@ -105,3 +105,12 @@ scout.ResponsiveManager.prototype.unregisterHandler = function(target) {
 };
 
 scout.responsiveManager = new scout.ResponsiveManager();
+
+scout.addAppListener('prepare', function() {
+  if (scout.responsiveManager) {
+    // if it was created before the app itself, use it instead of creating a new one
+    return;
+  }
+  scout.responsiveManager = scout.create('ResponsiveManager');
+  scout.responsiveManager.init();
+});
