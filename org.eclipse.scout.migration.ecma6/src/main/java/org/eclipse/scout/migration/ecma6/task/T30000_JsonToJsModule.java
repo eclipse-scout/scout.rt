@@ -30,7 +30,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
   private static final String ESCAPED_REPLACEMENT1 = "@@@_@@@escaped1@@@_@@@";
   private static final String ESCAPED_REPLACEMENT2 = "@@@_@@@escaped2@@@_@@@";
   public static final String JSON_MODEL_NAME_SUFFIX = "Model";
-  public static final String MODEL_OWNER_PARAM_NAME = "modelOwner";
 
   private static final Pattern PLACEHOLDER_PAT = Pattern.compile("(\\w+):\\s*'\\$\\{(\\w+):([^}]+)}'");
 
@@ -64,7 +63,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String step3 = step2.replace('"', '\'');
     String step4 = step3.replace(ESCAPED_REPLACEMENT1, "\"").replace(ESCAPED_REPLACEMENT2, "\\'");
     String step5 = TRAILING_WHITESPACE_CHARS_PAT.matcher(step4).replaceAll("");
-    String step6 = "export default function(" + MODEL_OWNER_PARAM_NAME + ") {\n" +
+    String step6 = "export default function() {\n" +
         "  return " + step5 + ";\n}\n";
 
     String step7 = T25000_ModelsGetModelToImport.replace(PLACEHOLDER_PAT, step6, (m, r) -> migratePlaceholders(m, r, pathInfo.getPath(), context));
@@ -91,8 +90,9 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String type = matcher.group(2);
     String value = matcher.group(3);
     result.append(key).append(": ");
-    if ("textKey".equals(type)) {
-      result.append(migratePlaceholderTextKey(value, file));
+    if("textKey".equals(type)) {
+      // no migration for the moment. Keep as it was
+      result.append("'${textKey:").append(value).append("}'");
     }
     else if ("const".equals(type)) {
       result.append(migratePlaceholderConst(value, key, file, context));
@@ -103,11 +103,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
     else {
       Assertions.fail("unknown json placeholder: '{}' in file '{}'.", type, file);
     }
-  }
-
-  protected String migratePlaceholderTextKey(String key, Path file) {
-    Assertions.assertTrue(StringUtility.hasText(key), "Empty textKey placeholder in json model '{}'.", file);
-    return "scout.texts.resolveText('" + key + "', " + MODEL_OWNER_PARAM_NAME + ".session.locale.languageTag)";
   }
 
   protected String migratePlaceholderIconId(String iconId, Path file) {

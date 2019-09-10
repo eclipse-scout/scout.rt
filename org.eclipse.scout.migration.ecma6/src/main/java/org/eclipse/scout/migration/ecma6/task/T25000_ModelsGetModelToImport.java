@@ -52,7 +52,7 @@ public class T25000_ModelsGetModelToImport extends AbstractTask {
 
   protected void insertModelFunctionCall(Matcher matcher, StringBuilder result, PathInfo pathInfo, JsFile jsFile) {
     String importRef = createImportFor(getJsModelPath(matcher.group(1), pathInfo), jsFile);
-    result.append("models.get(this, ").append(importRef);
+    result.append("models.get(").append(importRef);
   }
 
   protected void insertExtendFunctionCall(Matcher matcher, StringBuilder result, PathInfo pathInfo, JsFile jsFile) {

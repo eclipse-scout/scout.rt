@@ -53,8 +53,8 @@ scout.models = {
    *          Optional parent that is set on the returned object.
    * @returns {Object}
    */
-  get: function(modelOwner, modelFunc, parent) {
-    var model = modelFunc(modelOwner);
+  get: function(modelFunc, parent) {
+    var model = modelFunc();
     if (parent) {
       model.parent = parent;
     }
