@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -51,9 +52,7 @@ public class T5020_ResolveClassEnumReferencesAndCreateImports extends AbstractRe
     List<JsClass> jsClasses = jsFile.getJsClasses();
     List<JsEnum> enums = jsClasses
         .stream()
-        .map(jsClass -> jsClass.getEnums()
-            .stream()
-            .collect(Collectors.toList()))
+        .map(jsClass -> new ArrayList<>(jsClass.getEnums()))
         .flatMap(List::stream)
         .collect(Collectors.toList());
     if (enums.size() == 0) {
@@ -67,13 +66,14 @@ public class T5020_ResolveClassEnumReferencesAndCreateImports extends AbstractRe
           .collect(Collectors.joining("|"))).matcher(source);
       if (matcher.find()) {
         source = MigrationUtility.prependTodo(source, "Replace local references (enums).", lineDelimiter);
-        LOG.warn("Could not replace local references for enums in '"+jsFile.getPath()+"',.");
+        LOG.warn("Could not replace local references for enums in '" + jsFile.getPath() + "',.");
       }
       return source;
     }
 
     for (JsEnum en : enums) {
-      source = createImportForReferences(en.getFqn(), null, en.getName() , source, jsFile, context);
+      JsClass clazz = en.getJsClass();
+      source = createImportForReferences(en.getFqn(), null, clazz.getName() + "." + en.getName(), source, jsFile, context);
     }
     return source;
   }
@@ -81,12 +81,13 @@ public class T5020_ResolveClassEnumReferencesAndCreateImports extends AbstractRe
   protected String updateForeignReferences(JsFile jsFile, String source, Context context) {
     Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> enums = context.getLibraries().getElements(Type.Enum, en -> !currentClassesFqn.contains(en.getAncestor(Type.Class).getFullyQualifiedName()));
+    List<INamedElement> enums = context.getApi().getElements(Type.Enum, en -> !currentClassesFqn.contains(en.getAncestor(Type.Class).getFullyQualifiedName()));
     enums.addAll(context.getLibraries().getElements(Type.Enum));
 
     for (INamedElement en : enums) {
-      String replacement = en.getAncestor(Type.Class).getName() + "." + en.getName();
-      source = createImportForReferences(en.getFullyQualifiedName(), en.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
+      INamedElement clazz = en.getAncestor(Type.Class);
+      String replacement = clazz.getName() + "." + en.getName();
+      source = createImportForReferences(en.getFullyQualifiedName(), clazz.getFullyQualifiedName(), replacement, source, jsFile, context);
     }
     return source;
   }

@@ -53,7 +53,7 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
         .stream()
         .map(jsClass -> jsClass.getFunctions()
             .stream()
-            .filter(f -> f.isStatic())
+            .filter(JsFunction::isStatic)
             .collect(Collectors.toList()))
         .flatMap(List::stream)
         .collect(Collectors.toList());
@@ -68,17 +68,18 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
           .collect(Collectors.joining("|"))).matcher(source);
       if (matcher.find()) {
         source = MigrationUtility.prependTodo(source, "Replace local references (static function).", lineDelimiter);
-        LOG.warn("Could not replace local references for static functions in '"+jsFile.getPath()+"',.");
+        LOG.warn("Could not replace local references for static functions in '" + jsFile.getPath() + "',.");
       }
       return source;
     }
 
     for (JsFunction fun : staticFunctions) {
-      source = createImportForReferences(fun.getFqn(), null, fun.getName() , source, jsFile, context);
+      source = createImportForReferences(fun.getFqn(), null, fun.getName(), source, jsFile, context);
       List<String> singletonRefs = fun.getSingletonReferences();
+      JsClass jsClass = fun.getJsClass();
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {
-          source = createImportForReferences(singletonRef, fun.getJsClass().getFullyQualifiedName(), fun.getName()+ "()", source, jsFile, context);
+          source = createImportForReferences(singletonRef, jsClass.getFullyQualifiedName(), jsClass.getName() + "." + fun.getName() + "()", source, jsFile, context);
         }
       }
     }
@@ -93,7 +94,8 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
 
     for (INamedElement function : staticFunctions) {
       String replacement = function.getParent().getName() + "." + function.getName();
-      source = createImportForReferences(function.getFullyQualifiedName(), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
+      source = createImportForReferences(function.getFullyQualifiedName(), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
+      //noinspection unchecked
       List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {

@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -51,9 +52,7 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
     List<JsClass> jsClasses = jsFile.getJsClasses();
     List<JsClassVariable> vars = jsClasses
         .stream()
-        .map(jsClass -> jsClass.getVariables()
-            .stream()
-            .collect(Collectors.toList()))
+        .map(jsClass -> new ArrayList<>(jsClass.getVariables()))
         .flatMap(List::stream)
         .collect(Collectors.toList());
     if (vars.size() == 0) {
@@ -67,13 +66,14 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
           .collect(Collectors.joining("|"))).matcher(source);
       if (matcher.find()) {
         source = MigrationUtility.prependTodo(source, "Replace local references (constants).", lineDelimiter);
-        LOG.warn("Could not replace local references for constants in '"+jsFile.getPath()+"',.");
+        LOG.warn("Could not replace local references for constants in '" + jsFile.getPath() + "',.");
       }
       return source;
     }
 
     for (JsClassVariable v : vars) {
-      source = createImportForReferences(v.getJsClass().getFullyQualifiedName() + "." + v.getName(), null, v.getName(), source, jsFile, context);
+      JsClass jsClass = v.getJsClass();
+      source = createImportForReferences(jsClass.getFullyQualifiedName() + "." + v.getName(), null, jsClass.getName() + "." + v.getName(), source, jsFile, context);
     }
     return source;
   }
@@ -81,12 +81,12 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
   protected String updateForeignReferences(JsFile jsFile, String source, Context context) {
     Set<String> currentClassesFqn = jsFile.getJsClasses().stream().map(JsClass::getFullyQualifiedName).collect(Collectors.toSet());
 
-    List<INamedElement> constants = context.getLibraries().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
+    List<INamedElement> constants = context.getApi().getElements(Type.Constant, fun -> !currentClassesFqn.contains(fun.getParent().getFullyQualifiedName()));
     constants.addAll(context.getLibraries().getElements(Type.Constant));
 
     for (INamedElement constant : constants) {
       String replacement = constant.getParent().getName() + "." + constant.getName();
-      source = createImportForReferences(constant.getFullyQualifiedName(), constant.getAncestor(Type.Class).getFullyQualifiedName(), replacement , source, jsFile, context);
+      source = createImportForReferences(constant.getFullyQualifiedName(), constant.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
     }
     return source;
   }

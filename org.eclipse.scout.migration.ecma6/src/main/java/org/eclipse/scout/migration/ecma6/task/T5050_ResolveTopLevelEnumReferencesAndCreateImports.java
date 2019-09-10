@@ -19,13 +19,9 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.rt.platform.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Order(5050)
 public class T5050_ResolveTopLevelEnumReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5050_ResolveTopLevelEnumReferencesAndCreateImports.class);
-
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
@@ -38,7 +34,7 @@ public class T5050_ResolveTopLevelEnumReferencesAndCreateImports extends Abstrac
     enums.addAll(context.getLibraries().getElements(Type.TopLevelEnum));
 
     for (INamedElement topEnum : enums) {
-      source = createImportForReferences(topEnum.getFullyQualifiedName(),topEnum.getFullyQualifiedName(),topEnum.getName(),source,jsFile,context);
+      source = createImportForReferences(topEnum.getFullyQualifiedName(), topEnum.getFullyQualifiedName(), topEnum.getName(), source, jsFile, context);
     }
 
     workingCopy.setSource(source);
