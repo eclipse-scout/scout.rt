@@ -136,9 +136,15 @@ public class Migration {
     });
   }
 
-  private void processFile(PathInfo info, Context context) {
-    m_tasks.stream().filter(task -> task.accept(info, context))
-        .forEach(task -> task.process(info, context));
+  private void processFile(PathInfo pathInfo, Context context) {
+    m_tasks
+        .stream()
+        .filter(task -> task.accept(pathInfo, context))
+        .forEach(task -> processFileWithTask(task, pathInfo, context));
+  }
+
+  private void processFileWithTask(ITask task, PathInfo pathInfo, Context context) {
+    task.process(pathInfo, context);
   }
 
   protected void writeFiles() throws IOException {

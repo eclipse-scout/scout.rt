@@ -575,7 +575,7 @@ public class JsFileParser {
     nextLine();
   }
 
-  protected JsEnum readEnum(Matcher matcher) throws IOException {
+  private JsEnum readEnum(Matcher matcher) throws IOException {
     String indent = matcher.group(1);
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(2));
     JsEnum jsEnum = new JsEnum(clazz, matcher.group(3));
@@ -607,7 +607,7 @@ public class JsFileParser {
     return jsEnum;
   }
 
-  protected JsTopLevelEnum readTopLevelEnum(Matcher matcher) throws IOException {
+  private JsTopLevelEnum readTopLevelEnum(Matcher matcher) throws IOException {
     String indent = "";
     JsTopLevelEnum jsEnum = new JsTopLevelEnum(matcher.group(2), matcher.group(3), m_jsFile);
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
@@ -637,7 +637,7 @@ public class JsFileParser {
     return jsEnum;
   }
 
-  protected JsClassVariable readClassVariable(Matcher matcher) throws IOException {
+  private JsClassVariable readClassVariable(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
     JsClassVariable v = new JsClassVariable(clazz, matcher.group(2), false);
     v.setSource(matcher.group());
@@ -646,7 +646,7 @@ public class JsFileParser {
     return v;
   }
 
-  protected JsClassVariable readClassConstant(Matcher matcher) throws IOException {
+  private JsClassVariable readClassConstant(Matcher matcher) throws IOException {
     JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
     JsClassVariable v = new JsClassVariable(clazz, matcher.group(2), true);
     v.setSource(matcher.group());
@@ -655,7 +655,7 @@ public class JsFileParser {
     return v;
   }
 
-  protected JsFunction readAppListener() throws IOException {
+  private JsFunction readAppListener() throws IOException {
     JsAppListener appListener = new JsAppListener(m_jsFile);
     StringBuilder functionBody = new StringBuilder(m_currentLine).append(m_lineSeparator);
     Pattern namePattern = Pattern.compile("(" + Configuration.get().getNamespace() + "\\.[^ \\=]*)\\s*\\=\\s*scout\\.create\\(");
@@ -705,7 +705,7 @@ public class JsFileParser {
 
   }
 
-  protected JsSuperCall readSuperCall(Matcher matcher) throws IOException {
+  private JsSuperCall readSuperCall(Matcher matcher) throws IOException {
     JsSuperCall superCall = new JsSuperCall(matcher.group(2));
     superCall.setSource(matcher.group());
     nextLine();

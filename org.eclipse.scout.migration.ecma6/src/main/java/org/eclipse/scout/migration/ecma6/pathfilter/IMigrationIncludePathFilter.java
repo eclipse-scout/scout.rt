@@ -11,5 +11,4 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
  */
 @ApplicationScoped
 public interface IMigrationIncludePathFilter extends Predicate<PathInfo> {
-
 }
