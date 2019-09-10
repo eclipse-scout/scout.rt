@@ -12,11 +12,8 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -41,7 +38,6 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     JsFile jsFile = context.ensureJsFile(workingCopy);
 
     source = updateLocalReferences(jsFile, source, context, workingCopy.getLineDelimiter());
-
     source = updateForeignReferences(jsFile, source, context);
 
     workingCopy.setSource(source);
@@ -51,32 +47,18 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     List<JsClass> jsClasses = jsFile.getJsClasses();
     List<JsFunction> staticFunctions = jsClasses
         .stream()
-        .map(jsClass -> jsClass.getFunctions()
+        .flatMap(jsClass -> jsClass.getFunctions()
             .stream()
-            .filter(JsFunction::isStatic)
-            .collect(Collectors.toList()))
-        .flatMap(List::stream)
+            .filter(f -> f.isStatic()))
         .collect(Collectors.toList());
     if (staticFunctions.size() == 0) {
       return source;
     }
-    if (jsClasses.size() != 1) {
-      // check if any of the local static methods is used
-      Matcher matcher = Pattern.compile(staticFunctions
-          .stream()
-          .map(f -> Pattern.quote(f.getFqn()))
-          .collect(Collectors.joining("|"))).matcher(source);
-      if (matcher.find()) {
-        source = MigrationUtility.prependTodo(source, "Replace local references (static function).", lineDelimiter);
-        LOG.warn("Could not replace local references for static functions in '" + jsFile.getPath() + "',.");
-      }
-      return source;
-    }
 
     for (JsFunction fun : staticFunctions) {
-      source = createImportForReferences(fun.getFqn(), null, fun.getName(), source, jsFile, context);
-      List<String> singletonRefs = fun.getSingletonReferences();
       JsClass jsClass = fun.getJsClass();
+      source = createImportForReferences(fun.getFqn(), null, jsClass.getName() + "." + fun.getName(), source, jsFile, context);
+      List<String> singletonRefs = fun.getSingletonReferences();
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {
           source = createImportForReferences(singletonRef, jsClass.getFullyQualifiedName(), jsClass.getName() + "." + fun.getName() + "()", source, jsFile, context);
@@ -95,7 +77,6 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     for (INamedElement function : staticFunctions) {
       String replacement = function.getParent().getName() + "." + function.getName();
       source = createImportForReferences(function.getFullyQualifiedName(), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
-      //noinspection unchecked
       List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {

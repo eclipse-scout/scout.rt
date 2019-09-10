@@ -2,6 +2,9 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/core"
+  },
   "children" : [ {
     "name" : "Column",
     "type" : "Class",
@@ -2346,10 +2349,6 @@
       "name" : "_renderVisible",
       "type" : "Function",
       "fullyQualifiedName" : "scout.Tile._renderVisible"
-    }, {
-      "name" : "_beforeAnimateVisible",
-      "type" : "Function",
-      "fullyQualifiedName" : "scout.Tile._beforeAnimateVisible"
     }, {
       "name" : "isVisible",
       "type" : "Function",
@@ -41906,6 +41905,15 @@
       "theme" : "default-theme"
     }
   }, {
+      "name": "@tile-grid-loading-transition",
+      "type": "LessVariable",
+      "fullyQualifiedName": "scout.@tile-grid-loading-transition",
+      "customAttributes": {
+        "path": "src/main/js/scout/tile/TileGrid.less",
+        "theme": "default-theme"
+      }
+    },
+    {
     "name" : "@table-header-padding-y",
     "type" : "LessVariable",
     "fullyQualifiedName" : "scout.@table-header-padding-y",
@@ -42706,8 +42714,5 @@
       "theme" : "default-theme"
     }
     }
-  ],
-  "customAttributes": {
-    "lib-moduleName": "@eclipse-scout/core"
-  }
+  ]
 }

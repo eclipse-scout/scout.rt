@@ -10,14 +10,10 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -52,22 +48,9 @@ public class T5010_ResolveClassConstantsReferencesAndCreateImports extends Abstr
     List<JsClass> jsClasses = jsFile.getJsClasses();
     List<JsClassVariable> vars = jsClasses
         .stream()
-        .map(jsClass -> new ArrayList<>(jsClass.getVariables()))
-        .flatMap(List::stream)
+        .flatMap(jsClass -> jsClass.getVariables().stream())
         .collect(Collectors.toList());
     if (vars.size() == 0) {
-      return source;
-    }
-    if (jsClasses.size() != 1) {
-      // check if any of the local static methods is used
-      Matcher matcher = Pattern.compile(vars
-          .stream()
-          .map(c -> Pattern.quote(c.getJsClass().getFullyQualifiedName() + "." + c.getName()))
-          .collect(Collectors.joining("|"))).matcher(source);
-      if (matcher.find()) {
-        source = MigrationUtility.prependTodo(source, "Replace local references (constants).", lineDelimiter);
-        LOG.warn("Could not replace local references for constants in '" + jsFile.getPath() + "',.");
-      }
       return source;
     }
 

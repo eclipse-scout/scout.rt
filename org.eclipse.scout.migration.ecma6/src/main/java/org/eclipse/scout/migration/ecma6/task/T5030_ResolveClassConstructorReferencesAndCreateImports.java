@@ -12,11 +12,8 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -55,18 +52,6 @@ public class T5030_ResolveClassConstructorReferencesAndCreateImports extends Abs
         .map(JsClass::getConstructor)
         .collect(Collectors.toList());
     if (constructors.size() == 0) {
-      return source;
-    }
-    if (jsClasses.size() != 1) {
-      // check if any of the local static methods is used
-      Matcher matcher = Pattern.compile(constructors
-          .stream()
-          .map(con -> Pattern.quote(con.getFqn()))
-          .collect(Collectors.joining("|"))).matcher(source);
-      if (matcher.find()) {
-        source = MigrationUtility.prependTodo(source, "Replace local references (constructors).", lineDelimiter);
-        LOG.warn("Could not replace local references for constructors in '" + jsFile.getPath() + "',.");
-      }
       return source;
     }
 

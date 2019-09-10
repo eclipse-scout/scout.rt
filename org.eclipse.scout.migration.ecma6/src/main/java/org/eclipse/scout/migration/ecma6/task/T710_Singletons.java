@@ -42,6 +42,12 @@ import org.slf4j.LoggerFactory;
  * });
  * </pre>
  *
+ * oder
+ * 
+ * <pre>
+ *   scout.addAppListener('bootstrap', scout.ModelAdapter.modifyWidgetPrototype);
+ * </pre>
+ *
  * TO:
  *
  * <pre>
