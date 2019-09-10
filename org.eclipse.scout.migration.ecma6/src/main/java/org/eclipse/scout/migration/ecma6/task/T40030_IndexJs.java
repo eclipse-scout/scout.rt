@@ -60,6 +60,11 @@ public class T40030_IndexJs extends AbstractTask {
         path = path.subpath(1, path.getNameCount());
       }
       String name = nameWithoutJsExtension(path);
+      if ("main".equals(name) && "scout".equals(config.getNamespace())) {
+        // 'main' export must be renamed to 'scout'
+        name = "scout";
+        path = Paths.get("scout");
+      }
       if (name.indexOf('-') < 0 && !"objectFactories".equals(name)) {
         // objectFactories file does not export anything. therefore do not import it.
         String pathStr = nameWithoutJsExtension(path.toString().replace('\\', '/'));
