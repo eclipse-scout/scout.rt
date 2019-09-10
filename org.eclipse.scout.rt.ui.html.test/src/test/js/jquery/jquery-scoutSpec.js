@@ -42,14 +42,19 @@ describe('jquery-scout', function() {
 
     it('returns true when display != none and visiblity != hidden', function() {
       expect($e.isVisible()).toBe(true);
+      expect($e.isDisplayNone()).toBe(false);
       $e.css('display', 'none');
-      expect($e.isVisible()).toBe(false);
+      expect($e.isVisible()).toBe(true);
+      expect($e.isDisplayNone()).toBe(true);
       $e.css('display', '');
       expect($e.isVisible()).toBe(true);
+      expect($e.isDisplayNone()).toBe(false);
       $e.css('visibility', 'hidden');
       expect($e.isVisible()).toBe(true);
+      expect($e.isDisplayNone()).toBe(false);
       $e.css('visibility', '');
       expect($e.isVisible()).toBe(true);
+      expect($e.isDisplayNone()).toBe(false);
     });
 
   });

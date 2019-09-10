@@ -30,27 +30,6 @@
  * invisible to the user ('visibility: hidden', 'opacity: 0', off-screen position etc.) are _not_
  * considered.
  */
-function elemVisible(elem) {
-  // Check if element itself is hidden by its own style attribute
-  if (!elem || isHidden(elem.style)) {
-    return false;
-  }
-  // Must use correct window for element / computedStyle
-  var myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
-  // Check if element itself is hidden by external style-sheet
-  if (isHidden(myWindow.getComputedStyle(elem))) {
-    return false;
-  }
-  // Else visible
-  return true;
-
-  // ----- Helper functions -----
-
-  function isHidden(style) {
-    return style.display === 'none';
-  }
-}
-
 function explodeShorthandProperties(properties) {
   var newProperties = [];
   properties.forEach(function(prop) {
@@ -916,7 +895,7 @@ $.fn.placeholder = function(placeholder) {
 };
 
 $.fn.isVisible = function() {
-  return elemVisible(this[0]);
+  return !this.hasClass('hidden');
 };
 
 $.fn.isEveryParentVisible = function() {
