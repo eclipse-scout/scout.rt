@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuilderDevCacheKey;
+import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,12 @@ public class DevelopmentScriptFileCacheInitialLoader implements IPlatformListene
 
   @PostConstruct
   public synchronized void init() {
-    m_active = Platform.get().inDevelopmentMode() && !CONFIG.getPropertyValue(ScriptfileBuildProperty.class);
+    if (ResourceLoaders.isNewMode()) {
+      m_active = false;
+    }
+    else {
+      m_active = Platform.get().inDevelopmentMode() && !CONFIG.getPropertyValue(ScriptfileBuildProperty.class);
+    }
     if (!m_active) {
       return;
     }
