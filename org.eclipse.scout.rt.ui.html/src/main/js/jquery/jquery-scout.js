@@ -19,17 +19,6 @@
 
 // === internal methods ===
 
-/**
- * Returns false when the component display is 'none', otherwise true.
- *
- * Note: this gives other results than $.is(':visible'), since that method will also return false
- * when a component has absolute positioning and no width and height is defined (well, you cannot
- * see a component with a style like this, but technically it is not set to 'not visible').
- *
- * Also note that this function _only_ checks the 'display' property! Other methods to make an element
- * invisible to the user ('visibility: hidden', 'opacity: 0', off-screen position etc.) are _not_
- * considered.
- */
 function explodeShorthandProperties(properties) {
   var newProperties = [];
   properties.forEach(function(prop) {
