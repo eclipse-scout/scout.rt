@@ -655,7 +655,7 @@ scout.Table.prototype.showContextMenu = function(options) {
 
 scout.Table.prototype._showContextMenu = function(options) {
   options = options || {};
-  if (!this._isDataRendered() || !this.attached) { // check needed because function is called asynchronously
+  if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
     return;
   }
   if (this.selectedRows.length === 0) {

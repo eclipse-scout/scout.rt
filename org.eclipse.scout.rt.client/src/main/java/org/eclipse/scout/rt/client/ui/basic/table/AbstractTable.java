@@ -1188,7 +1188,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   protected ITableTileGridMediator createTableTileGridMediator() {
-    return new TableTileGridMediator(this);
+    return BEANS.get(ITableTileGridMediatorProvider.class).createTableTileGridMediator(this);
   }
 
   @Override

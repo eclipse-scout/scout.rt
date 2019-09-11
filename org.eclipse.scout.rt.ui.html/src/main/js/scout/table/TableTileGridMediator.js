@@ -223,10 +223,18 @@ scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
     var group = this.tileAccordion.getGroupById(groupId);
     if (!group) {
       group = this._createTileGroup(groupId, htmlEnabled);
+      this._adaptTileGrid(group.body);
       this.tileAccordion.insertGroup(group);
     }
     tile.parent = group;
   }, this);
+};
+
+scout.TableTileGridMediator.prototype._adaptTileGrid = function(tileGrid) {
+  // we want to use the table's context menu, redirect request to show the context menu. The selection is already synchronized.
+  tileGrid.showContextMenu = function(options) {
+    this.session.onRequestsDone(this.table._showContextMenu.bind(this.table, options));
+  }.bind(this);
 };
 
 scout.TableTileGridMediator.prototype._createTileAccordion = function() {
@@ -414,7 +422,8 @@ scout.TableTileGridMediator.prototype._onTableAllRowsDeleted = function(event) {
 };
 
 scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(event) {
-  if (!this.table.tileMode) {
+  // ignore event when not in tileMode or when this.tilesMap is not (yet) initialized correctly
+  if (!this.table.tileMode || $.isEmptyObject(this.tilesMap)) {
     return;
   }
   this.tiles = this.table.rows.map(function(row) {

@@ -11,14 +11,13 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.tile.TileGridLayoutConfig;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 
-public class TableTileGridMediator extends AbstractPropertyObserver implements ITableTileGridMediator, PropertyChangeListener, TableListener {
+public class TableTileGridMediator extends AbstractPropertyObserver implements ITableTileGridMediator, TableListener {
 
   protected ITable m_table;
 
@@ -38,7 +37,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
   }
 
   protected void initConfig() {
-    m_table.addPropertyChangeListener(ITable.PROP_TILE_MODE, this);
+    m_table.addPropertyChangeListener(ITable.PROP_TILE_MODE, this::onTileModeChange);
     m_table.addTableListener(this);
 
     setExclusiveExpand(getConfiguredExclusiveExpand());
@@ -88,8 +87,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
     }
   }
 
-  @Override
-  public void propertyChange(PropertyChangeEvent evt) {
+  public void onTileModeChange(PropertyChangeEvent evt) {
     if (m_table.isTileMode()) {
       loadTiles(m_table.getRows());
     }

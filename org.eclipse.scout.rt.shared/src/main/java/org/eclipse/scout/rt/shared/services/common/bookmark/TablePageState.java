@@ -35,6 +35,8 @@ public class TablePageState extends AbstractPageState {
    */
   private List<TableColumnState> m_availableColumns;
 
+  private boolean m_tileMode;
+
   public TablePageState() {
     super();
   }
@@ -62,6 +64,7 @@ public class TablePageState extends AbstractPageState {
         this.m_availableColumns.add(new TableColumnState(col));
       }
     }
+    this.m_tileMode = state.m_tileMode;
   }
 
   public List<CompositeObject> getSelectedChildrenPrimaryKeys() {
@@ -161,5 +164,13 @@ public class TablePageState extends AbstractPageState {
   @Override
   public TablePageState copy() {
     return new TablePageState(this);
+  }
+
+  public boolean isTileMode() {
+    return m_tileMode;
+  }
+
+  public void setTileMode(boolean tileMode) {
+    m_tileMode = tileMode;
   }
 }

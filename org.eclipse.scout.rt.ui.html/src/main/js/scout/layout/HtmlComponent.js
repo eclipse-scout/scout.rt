@@ -288,7 +288,6 @@ scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
   return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1') + 'wOnly' + scout.nvl(options.widthOnly, '-1');
 };
 
-
 /**
  * Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it.
  * Also makes sure the hints consider the min and max size set by CSS.
@@ -338,6 +337,10 @@ scout.HtmlComponent.prototype.insets = function(options) {
 
 scout.HtmlComponent.prototype.margins = function() {
   return scout.graphics.margins(this.$comp);
+};
+
+scout.HtmlComponent.prototype.borders = function() {
+  return scout.graphics.borders(this.$comp);
 };
 
 /**

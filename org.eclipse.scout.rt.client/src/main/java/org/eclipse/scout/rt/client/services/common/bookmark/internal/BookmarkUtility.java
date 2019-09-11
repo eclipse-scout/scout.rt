@@ -751,6 +751,9 @@ public final class BookmarkUtility {
         }
       }
     }
+
+    table.setTileMode(tablePageState.isTileMode());
+
     // load selections
     if (leafState) {
       if (!tablePageState.getSelectedChildrenPrimaryKeys().isEmpty()) {
@@ -861,6 +864,7 @@ public final class BookmarkUtility {
         }
       }
     }
+    state.setTileMode(table.isTileMode());
     return state;
   }
 
