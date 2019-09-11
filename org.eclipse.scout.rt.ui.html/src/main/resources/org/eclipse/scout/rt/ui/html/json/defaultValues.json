@@ -70,6 +70,7 @@
       "outlineMenuWrapper": false,
       "stackable": true,
       "shrinkable": false,
+      "subMenuVisibility": "default",
       "childActions": [],
       "menuTypes": ["Table.EmptySpace"],
       "preventDoubleClick": false

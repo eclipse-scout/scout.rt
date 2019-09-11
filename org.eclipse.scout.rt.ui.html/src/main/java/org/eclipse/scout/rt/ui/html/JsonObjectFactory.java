@@ -16,6 +16,7 @@ import java.util.Date;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.accordion.IAccordion;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.menu.IComboMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.form.fields.IFormFieldMenu;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
@@ -171,6 +172,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.wizard.JsonWizardProgressFi
 import org.eclipse.scout.rt.ui.html.json.form.fields.wrappedform.JsonWrappedFormField;
 import org.eclipse.scout.rt.ui.html.json.group.JsonGroup;
 import org.eclipse.scout.rt.ui.html.json.label.JsonLabel;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonComboMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.form.field.JsonFormFieldMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
@@ -341,6 +343,9 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof IFormFieldMenu) {
       return new JsonFormFieldMenu<>((IFormFieldMenu) model, session, id, parent);
+    }
+    if (model instanceof IComboMenu) {
+      return new JsonComboMenu<>((IComboMenu) model, session, id, parent);
     }
     if (model instanceof IMenu) {
       return new JsonMenu<>((IMenu) model, session, id, parent);

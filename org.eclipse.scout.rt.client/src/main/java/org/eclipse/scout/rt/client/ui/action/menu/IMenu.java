@@ -26,6 +26,20 @@ public interface IMenu extends IActionNode<IMenu> {
   String PROP_PREVENT_DOUBLE_CLICK = "preventDoubleClick";
   String PROP_STACKABLE = "stackable";
   String PROP_SHRINKABLE = "shrinkable";
+  String PROP_SUB_MENU_VISIBILITY = "subMenuVisibility";
+
+  /**
+   * Sub-menu icon is only visible when the menu has child-actions and a text.
+   */
+  String SUB_MENU_VISIBILITY_DEFAULT = "default";
+  /**
+   * Sub-menu icon is only visible when the menu has child-actions and a text or an icon.
+   */
+  String SUB_MENU_VISIBILITY_TEXT_OR_ICON = "textOrIcon";
+  /**
+   * Sub-menu icon is visible when the menu has child-actions.
+   */
+  String SUB_MENU_VISIBILITY_ALWAYS = "always";
 
   /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
@@ -55,10 +69,15 @@ public interface IMenu extends IActionNode<IMenu> {
    */
   void setShrinkable(boolean shrinkable);
 
+  String getSubMenuVisibility();
+
+  void setSubMenuVisibility(String subMenuVisibility);
+
   Object getOwnerValue();
 
   /**
    * @param newValue
    */
   void handleOwnerValueChanged(Object newValue);
+
 }

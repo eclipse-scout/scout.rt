@@ -108,6 +108,17 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     return false;
   }
 
+  /**
+   * Configures the behavior when the sub-menu icon is visible. A menu must always have child-actions in order to
+   * display the sub-menu icon. By default the sub-menu icon is shown only when the menu has text. You may change that
+   * behavior by configuring another visibility.
+   */
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(59)
+  protected String getConfiguredSubMenuVisibility() {
+    return SUB_MENU_VISIBILITY_DEFAULT;
+  }
+
   @Override
   public Object getOwnerValue() {
     return m_ownerValue;
@@ -199,6 +210,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     setPreventDoubleClick(getConfiguredPreventDoubleClick());
     setStackable(getConfiguredStackable());
     setShrinkable(getConfiguredShrinkable());
+    setSubMenuVisibility(getConfiguredSubMenuVisibility());
   }
 
   @Override
@@ -273,6 +285,16 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   public void setShrinkable(boolean shrinkable) {
     propertySupport.setPropertyBool(PROP_SHRINKABLE, shrinkable);
+  }
+
+  @Override
+  public String getSubMenuVisibility() {
+    return propertySupport.getPropertyString(PROP_SUB_MENU_VISIBILITY);
+  }
+
+  @Override
+  public void setSubMenuVisibility(String subMenuVisibility) {
+    propertySupport.setProperty(PROP_SUB_MENU_VISIBILITY, subMenuVisibility);
   }
 
   protected final void interceptOwnerValueChanged(Object newOwnerValue) {

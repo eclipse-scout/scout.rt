@@ -85,5 +85,11 @@ public class JsonMenu<MENU extends IMenu> extends JsonAction<MENU> {
         return getModel().isShrinkable();
       }
     });
+    putJsonProperty(new JsonProperty<MENU>(IMenu.PROP_SUB_MENU_VISIBILITY, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getSubMenuVisibility();
+      }
+    });
   }
 }

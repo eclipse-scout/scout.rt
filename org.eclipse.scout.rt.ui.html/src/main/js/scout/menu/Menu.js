@@ -31,6 +31,7 @@ scout.Menu = function() {
   this.stackable = true;
   this.separator = false;
   this.shrinkable = false;
+  this.subMenuVisibility = scout.Menu.SubMenuVisibility.DEFAULT;
 
   this.menuFilter = null;
 
@@ -47,6 +48,21 @@ scout.Menu.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
 scout.Menu.MenuStyle = {
   NONE: 0,
   DEFAULT: 1
+};
+
+scout.Menu.SubMenuVisibility = {
+  /**
+   * Default: sub-menu icon is only visible when menu has text.
+   */
+  DEFAULT: 'default',
+  /**
+   * Text or icon: sub-menu icon is only visible when menu has text or an icon.
+   */
+  TEXT_OR_ICON: 'textOrIcon',
+  /**
+   * Always: sub-menu icon is always visible when menu has child-actions.
+   */
+  ALWAYS: 'always'
 };
 
 scout.Menu.prototype._init = function(options) {
@@ -171,8 +187,26 @@ scout.Menu.prototype._renderSubMenuItems = function(parentMenu, menus) {
   }
 };
 
+/**
+ * Override this method to control the toggles sub-menu behavior when this menu instance is used as parent.
+ * Some menu sub-classes like the ComboMenu need to show the popup menu instead.
+ * @see: #_doActionTogglesSubMenu
+ */
+scout.Menu.prototype._togglesSubMenu = function() {
+  return true;
+};
+
 scout.Menu.prototype._doActionTogglesSubMenu = function() {
-  return this.childActions.length > 0 && (this.parent instanceof scout.ContextMenuPopup || this.parent instanceof scout.Menu);
+  if (!this.childActions.length) {
+    return false;
+  }
+  if (this.parent instanceof scout.ContextMenuPopup) {
+    return true;
+  }
+  if (this.parent instanceof scout.Menu) {
+    return this.parent._togglesSubMenu();
+  }
+  return false;
 };
 
 scout.Menu.prototype._getSubMenuLevel = function() {
@@ -223,9 +257,24 @@ scout.Menu.prototype._renderChildActions = function() {
 };
 
 scout.Menu.prototype._renderSubMenuIcon = function() {
-  var shouldBeVisible = this.childActions.length > 0 && this.text;
+  var visible = false;
 
-  if (shouldBeVisible) {
+  // calculate visibility of sub-menu icon
+  if (this.childActions.length > 0) {
+    switch (this.subMenuVisibility) {
+      case scout.Menu.SubMenuVisibility.DEFAULT:
+        visible = this._hasText();
+        break;
+      case scout.Menu.SubMenuVisibility.TEXT_OR_ICON:
+        visible = this._hasText() || this.iconId;
+        break;
+      case scout.Menu.SubMenuVisibility.ALWAYS:
+        visible = true;
+        break;
+    }
+  }
+
+  if (visible) {
     if (!this.$submenuIcon) {
       var icon = scout.icons.parseIconId(scout.Menu.SUBMENU_ICON);
       this.$submenuIcon = this.$container
@@ -366,8 +415,12 @@ scout.Menu.prototype.visitChildMenus = function(visitor) {
   }
 };
 
+scout.Menu.prototype._hasText = function() {
+  return scout.strings.hasText(this.text) && this.textVisible;
+};
+
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  var hasText = scout.strings.hasText(this.text) && this.textVisible;
+  var hasText = this._hasText();
   var hasTextAndIcon = !!(hasText && this.iconId);
   this.$container.toggleClass('menu-textandicon', hasTextAndIcon);
   this.$container.toggleClass('menu-icononly', !hasText);

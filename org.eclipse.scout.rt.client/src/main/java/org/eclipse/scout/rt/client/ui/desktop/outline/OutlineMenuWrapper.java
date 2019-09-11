@@ -481,6 +481,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
+  public String getSubMenuVisibility() {
+    return m_wrappedMenu.getSubMenuVisibility();
+  }
+
+  @Override
+  public void setSubMenuVisibility(String subMenuVisibility) {
+    unsupported();
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(getClass().getSimpleName());
     sb.append("[wrappedMenu=").append(m_wrappedMenu.getClass().getSimpleName());
