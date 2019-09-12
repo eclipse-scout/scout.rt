@@ -277,6 +277,11 @@ public class JsFileParser {
           readEnum(matcher);
           continue;
         }
+        matcher = START_APP_LISTENER.matcher(m_currentLine);
+        if (matcher.find()) {
+          instanceGetter = readAppListener();
+          continue;
+        }
         matcher = START_TOP_LEVEL_ENUM1.matcher(m_currentLine);
         if (matcher.find() && PathFilters.isTopLevelEnum(m_jsFile.getPath())) {
           readTopLevelEnum(matcher);
@@ -365,11 +370,6 @@ public class JsFileParser {
         if (matcher.find()) {
           JsClass clazz = m_jsFile.getLastClassOrAppend(matcher.group(1));
           clazz.setSuperCall(readSuperCall(matcher));
-          continue;
-        }
-        matcher = START_APP_LISTENER.matcher(m_currentLine);
-        if (matcher.find()) {
-          instanceGetter = readAppListener();
           continue;
         }
         nextLine();

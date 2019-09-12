@@ -1968,8 +1968,8 @@ scout.Table.prototype._find$AppLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+scout.Table.prototype._filterMenus = function(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
 };
 
 scout.Table.prototype.setStaticMenus = function(staticMenus) {
