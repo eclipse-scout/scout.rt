@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
@@ -500,18 +499,16 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   }
 
   protected void handleModelOpenUri(BinaryResource res, IOpenUriAction openUriAction) {
-    String filename = ObjectUtility.nvl(res.getFilename(), "binaryData");
-    String filenameEncoded = IOUtility.urlEncode(filename);
     // add another path segment to filename to distinguish between different resources
     // with the same filename (also makes hash collisions irrelevant).
     long counter = RESOURCE_COUNTER.getAndIncrement();
-    filenameEncoded = counter + "/" + filenameEncoded;
+    String filenameWithCounter = counter + "/" + ObjectUtility.nvl(res.getFilename(), "binaryData");
     BinaryResourceHolder holder = new BinaryResourceHolder(res);
     if (openUriAction == OpenUriAction.DOWNLOAD) {
       holder.addHttpResponseInterceptor(new DownloadHttpResponseInterceptor(res.getFilename()));
     }
-    m_downloads.put(filenameEncoded, holder, openUriAction);
-    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filenameEncoded);
+    m_downloads.put(filenameWithCounter, holder, openUriAction);
+    String downloadUrl = BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, filenameWithCounter);
     handleModelOpenUri(downloadUrl, openUriAction);
   }
 
