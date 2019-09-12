@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
-import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -51,8 +50,6 @@ public final class BinaryResourceUrlUtility {
    * <li>2. Icon name, in the example <b>some_res</b>
    */
   public static final Pattern BINARY_RESOURCE_REGEX_PATTERN = Pattern.compile("([\"'])binaryResource:([^\"']+)\\1", Pattern.CASE_INSENSITIVE);
-
-  private static final Pattern REGEX_FINGERPRINT_PATTERN = Pattern.compile("^(([0-9]+)\\/)?(.*)$");
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
@@ -87,7 +84,7 @@ public final class BinaryResourceUrlUtility {
     if (str == null) {
       return null;
     }
-    Matcher m = ICON_REGEX_PATTERN.matcher(String.valueOf(str));
+    Matcher m = ICON_REGEX_PATTERN.matcher(str);
     @SuppressWarnings("squid:S1149")
     StringBuffer ret = new StringBuffer();
     while (m.find()) {
@@ -98,7 +95,7 @@ public final class BinaryResourceUrlUtility {
   }
 
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, BinaryResource binaryResource) {
-    if (!checkCreateDynamicAdapterResourceUrlArguments(jsonAdapter, binaryResource)) {
+    if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, binaryResource)) {
       return null;
     }
     return new DynamicResourceInfo(jsonAdapter, getFilenameWithFingerprint(binaryResource)).toPath();
@@ -110,32 +107,28 @@ public final class BinaryResourceUrlUtility {
    *         The calling adapter must implement {@link IBinaryResourceProvider}.
    */
   public static String createDynamicAdapterResourceUrl(IJsonAdapter<?> jsonAdapter, String filename) {
-    if (!checkCreateDynamicAdapterResourceUrlArguments(jsonAdapter, filename)) {
+    if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, filename)) {
       return null;
     }
     return new DynamicResourceInfo(jsonAdapter, filename).toPath();
+  }
+
+  public static String getFilenameWithFingerprint(IJsonAdapter<?> jsonAdapter, String path) {
+    if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, path)) {
+      return null;
+    }
+    DynamicResourceInfo info = DynamicResourceInfo.fromPath(jsonAdapter, path);
+    if (info == null) {
+      return null;
+    }
+    return info.getFileName();
   }
 
   public static String getFilenameWithFingerprint(BinaryResource binaryResource) {
     return BinaryResourceUtility.createFilename(binaryResource);
   }
 
-  public static Pair<String, Long> extractFilenameWithFingerprint(String filenameWithFingerprint) {
-    Matcher m = REGEX_FINGERPRINT_PATTERN.matcher(filenameWithFingerprint);
-    m.find();
-
-    String fingerprintString = m.group(2);
-    String filename = m.group(3);
-
-    Long fingerprint = 0L;
-    if (StringUtility.hasText(fingerprintString)) {
-      fingerprint = Long.valueOf(fingerprintString);
-    }
-
-    return new ImmutablePair<>(filename, fingerprint);
-  }
-
-  private static boolean checkCreateDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
+  private static boolean checkDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {
     if (jsonAdapter == null) {
       return false;
     }
@@ -183,7 +176,7 @@ public final class BinaryResourceUrlUtility {
    * is a callback to retrieve the right binary resource from the model.
    */
   public static BinaryResourceHolder provideBinaryResource(String filenameWithFingerprint, Function<String, BinaryResource> attachmentProvider) {
-    Pair<String, Long> filenameAndFingerprint = extractFilenameWithFingerprint(filenameWithFingerprint);
+    Pair<String, Long> filenameAndFingerprint = BinaryResourceUtility.extractFilenameWithFingerprint(filenameWithFingerprint);
     String filename = filenameAndFingerprint.getLeft();
     BinaryResource attachment = attachmentProvider.apply(filename);
     return attachment == null ? null : new BinaryResourceHolder(attachment);

@@ -24,9 +24,9 @@ public class DynamicResourceInfo {
 
   public static final String PATH_PREFIX = "dynamic";
   /**
-   * Pattern to determine if the provided url path is a dynamic resource path.
+   * Pattern to determine if the provided url path is a dynamic resource path. Allow an additional / at the start.
    */
-  public static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/" + PATH_PREFIX + "/([^/]*)/([^/]*)/(.*)$");
+  public static final Pattern PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH = Pattern.compile("^/?" + PATH_PREFIX + "/([^/]*)/([^/]*)/(.*)$");
 
   private final String m_adapterId;
   private final String m_fileName;
@@ -48,6 +48,7 @@ public class DynamicResourceInfo {
     // Example for filesnames containing a /:
     // - relative reference from a unzipped zip file
     // - another path segment was explicitly added to distinguish between same filenames
+    // Note that / is ignored while decoding, there is no need to revert this replacement before decoding
     encodedFilename = encodedFilename.replace("%2F", "/");
     return PATH_PREFIX + '/' + getUiSession().getUiSessionId() + '/' + getJsonAdapterId() + '/' + encodedFilename;
   }
@@ -64,7 +65,14 @@ public class DynamicResourceInfo {
     return m_fileName;
   }
 
-  public static DynamicResourceInfo fromPath(HttpServletRequest req, String path) {
+  /**
+   * Private, as one of the other methods that checks the session and adapter ids should be called instead
+   *
+   * @return array of the matched groups of PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH
+   * @see #fromPath(HttpServletRequest, String)
+   * @see #fromPath(IJsonAdapter, String)
+   */
+  private static String[] splitPath(String path) {
     if (path == null) {
       return null;
     }
@@ -77,14 +85,37 @@ public class DynamicResourceInfo {
     String uiSessionId = m.group(1);
     String adapterId = m.group(2);
     String filename = m.group(3);
+    return new String[]{uiSessionId, adapterId, filename};
+  }
 
+  public static DynamicResourceInfo fromPath(IJsonAdapter<?> jsonAdapter, String path) {
+    String[] parts = splitPath(path);
+    if (parts == null) {
+      return null;
+    }
+    // compare the session and adapter id with the one from the passed in adapter to ensure that
+    // the resource path matches the passed in adapter and session
+    if (!jsonAdapter.getUiSession().getUiSessionId().equals(parts[0])) {
+      return null;
+    }
+    if (!jsonAdapter.getId().equals(parts[1])) {
+      return null;
+    }
+    return new DynamicResourceInfo(jsonAdapter, IOUtility.urlDecode(parts[2]));
+  }
+
+  public static DynamicResourceInfo fromPath(HttpServletRequest req, String path) {
+    String[] parts = splitPath(path);
+    if (parts == null) {
+      return null;
+    }
     // lookup the UiSession on the current HttpSession to ensure the requested dynamic resource
     // is from one of the UiSessions of the currently authenticated user!
-    IUiSession uiSession = UiSession.get(req, uiSessionId);
+    IUiSession uiSession = UiSession.get(req, parts[0]);
     if (uiSession == null) {
       return null;
     }
 
-    return new DynamicResourceInfo(uiSession, adapterId, filename);
+    return new DynamicResourceInfo(uiSession, parts[1], IOUtility.urlDecode(parts[2]));
   }
 }
