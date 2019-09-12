@@ -40,21 +40,24 @@ describe('jquery-scout', function() {
 
   describe('isVisible', function() {
 
-    it('returns true when display != none and visiblity != hidden', function() {
+    it('returns false if class hidden is set', function() {
       expect($e.isVisible()).toBe(true);
-      expect($e.isDisplayNone()).toBe(false);
+      $e.addClass('hidden');
+      expect($e.isVisible()).toBe(false);
+      $e.removeClass('hidden');
+      expect($e.isVisible()).toBe(true);
+    });
+
+    it('returns true if display != none', function() {
+      expect($e.isVisible()).toBe(true);
       $e.css('display', 'none');
-      expect($e.isVisible()).toBe(true);
-      expect($e.isDisplayNone()).toBe(true);
+      expect($e.isVisible()).toBe(false);
       $e.css('display', '');
       expect($e.isVisible()).toBe(true);
-      expect($e.isDisplayNone()).toBe(false);
       $e.css('visibility', 'hidden');
       expect($e.isVisible()).toBe(true);
-      expect($e.isDisplayNone()).toBe(false);
       $e.css('visibility', '');
       expect($e.isVisible()).toBe(true);
-      expect($e.isDisplayNone()).toBe(false);
     });
 
   });

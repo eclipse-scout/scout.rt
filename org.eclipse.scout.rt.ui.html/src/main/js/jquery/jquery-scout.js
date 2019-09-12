@@ -19,6 +19,38 @@
 
 // === internal methods ===
 
+/**
+ * Returns false when the component display is 'none', otherwise true.
+ *
+ * Note: this gives other results than $.is(':visible'), since that method will also return false
+ * when a component has absolute positioning and no width and height is defined (well, you cannot
+ * see a component with a style like this, but technically it is not set to 'not visible').
+ *
+ * Also note that this function _only_ checks the 'display' property! Other methods to make an element
+ * invisible to the user ('visibility: hidden', 'opacity: 0', off-screen position etc.) are _not_
+ * considered.
+ */
+function elemVisible(elem) {
+  // Check if element itself is hidden by its own style attribute
+  if (!elem || isHidden(elem.style)) {
+    return false;
+  }
+  // Must use correct window for element / computedStyle
+  var myWindow = (elem instanceof Document ? elem : elem.ownerDocument).defaultView;
+  // Check if element itself is hidden by external style-sheet
+  if (isHidden(myWindow.getComputedStyle(elem))) {
+    return false;
+  }
+  // Else visible
+  return true;
+
+  // ----- Helper functions -----
+
+  function isHidden(style) {
+    return style.display === 'none';
+  }
+}
+
 function explodeShorthandProperties(properties) {
   var newProperties = [];
   properties.forEach(function(prop) {
@@ -812,6 +844,24 @@ $.fn.setVisible = function(visible) {
   return this;
 };
 
+$.fn.isVisible = function() {
+  if (this.hasClass('hidden')) {
+    return false;
+  }
+  return elemVisible(this[0]);
+};
+
+$.fn.isEveryParentVisible = function() {
+  var everyParentVisible = true;
+  this.parents().each(function() {
+    if (!$(this).isVisible()) {
+      everyParentVisible = false;
+      return false;
+    }
+  });
+  return everyParentVisible;
+};
+
 $.fn.isDisplayNone = function() {
   return this.css('display') === 'none';
 };
@@ -881,21 +931,6 @@ $.fn.icon = function(iconId, addToDomFunc) {
 
 $.fn.placeholder = function(placeholder) {
   return this.toggleAttr('placeholder', !!placeholder, placeholder);
-};
-
-$.fn.isVisible = function() {
-  return !this.hasClass('hidden');
-};
-
-$.fn.isEveryParentVisible = function() {
-  var everyParentVisible = true;
-  this.parents().each(function() {
-    if (!$(this).isVisible()) {
-      everyParentVisible = false;
-      return false;
-    }
-  });
-  return everyParentVisible;
 };
 
 /**
