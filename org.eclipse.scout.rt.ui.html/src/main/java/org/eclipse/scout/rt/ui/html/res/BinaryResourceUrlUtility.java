@@ -125,7 +125,7 @@ public final class BinaryResourceUrlUtility {
   }
 
   public static String getFilenameWithFingerprint(BinaryResource binaryResource) {
-    return BinaryResourceUtility.createFilename(binaryResource);
+    return BinaryResourceUtility.createFilenameWithFingerprint(binaryResource);
   }
 
   private static boolean checkDynamicAdapterResourceUrlArguments(IJsonAdapter<?> jsonAdapter, Object arg) {

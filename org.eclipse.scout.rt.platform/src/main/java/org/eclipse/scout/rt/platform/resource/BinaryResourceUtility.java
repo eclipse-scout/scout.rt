@@ -27,14 +27,15 @@ public final class BinaryResourceUtility {
   public static final String URL_PREFIX = "binaryResource:";
 
   private static final Pattern REGEX_FINGERPRINT_PATTERN = Pattern.compile("^(([0-9]+)\\/)?(.*)$");
+  private static final Pattern REGEX_URL_FILENAME_PATTERN = Pattern.compile(".*\\/(.*)$");
 
   private BinaryResourceUtility() {
   }
 
   /**
-   * Creates a unique filename for the given binary resource, if the resource provides a fingerprint.
+   * Creates a unique fingerprint/filename path for the given binary resource, if the resource provides a fingerprint.
    */
-  public static String createFilename(BinaryResource binaryResource) {
+  public static String createFilenameWithFingerprint(BinaryResource binaryResource) {
     if (binaryResource == null || !binaryResource.hasFilename()) {
       return null;
     }
@@ -49,7 +50,7 @@ public final class BinaryResourceUtility {
    * fingerprint, the filename in the URL will have a fingerprint too.
    */
   public static String createUrl(BinaryResource binaryResource) {
-    return createUrl(createFilename(binaryResource));
+    return createUrl(createFilenameWithFingerprint(binaryResource));
   }
 
   /**
@@ -60,29 +61,41 @@ public final class BinaryResourceUtility {
    * {@link #createUrl(BinaryResource)} instead of this method. The fingerprint helps to avoid multiple state and
    * caching problems.
    */
-  public static String createUrl(String filename) {
-    if (filename == null) {
+  public static String createUrl(String path) {
+    if (path == null) {
       return null;
     }
-    return URL_PREFIX + filename;
+    return URL_PREFIX + path;
   }
 
-  public static String getFilenameFromUrl(String url) {
+  /**
+   * Get the path part of a binaryResource: URL.
+   */
+  public static String getPathFromUrl(String url) {
     if (url == null) {
       return null;
     }
     if (!url.startsWith(URL_PREFIX)) {
       return null;
     }
-    return getFilenameFromUrlWithoutPrefix(url.substring(URL_PREFIX.length()));
+    return url.substring(URL_PREFIX.length());
   }
 
-  public static String getFilenameFromUrlWithoutPrefix(String urlWithoutPrefix) {
-    Pair<String, Long> urlFilenameAndFingerprint = extractFilenameWithFingerprint(urlWithoutPrefix);
-    if (urlFilenameAndFingerprint == null) {
+  /**
+   * Get the filename part of a binaryResource:fingerprint/filename URL
+   */
+  public static String getFilenameFromUrl(String url) {
+    String path = getPathFromUrl(url);
+    if (path == null) {
       return null;
     }
-    return urlFilenameAndFingerprint.getLeft();
+    Matcher m = REGEX_URL_FILENAME_PATTERN.matcher(path);
+    if (m.find()) {
+      // last path segment
+      return m.group(1);
+    }
+    // no segments
+    return path;
   }
 
   /**
@@ -90,11 +103,11 @@ public final class BinaryResourceUtility {
    *
    * @return non-null Pair
    */
-  public static Pair<String, Long> extractFilenameWithFingerprint(String filenameWithFingerprint) {
-    if (filenameWithFingerprint == null) {
+  public static Pair<String, Long> extractFilenameWithFingerprint(String path) {
+    if (path == null) {
       return null;
     }
-    Matcher m = REGEX_FINGERPRINT_PATTERN.matcher(filenameWithFingerprint);
+    Matcher m = REGEX_FINGERPRINT_PATTERN.matcher(path);
     String fingerprintString = null;
     String filename = null;
     if (m.find()) {
