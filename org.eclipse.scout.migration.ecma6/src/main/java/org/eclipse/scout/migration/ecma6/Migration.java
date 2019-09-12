@@ -103,6 +103,9 @@ public class Migration {
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+
+        //if(!file.endsWith("popup/Popup.js")) return FileVisitResult.CONTINUE;
+
         PathInfo info = new PathInfo(file);
         if (pathFilter != null && !pathFilter.test(info)) {
           return FileVisitResult.CONTINUE;

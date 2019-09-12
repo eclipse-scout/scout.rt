@@ -42,16 +42,20 @@ public class T70010_ManualFixes extends AbstractTask {
     return pathInfo.getModuleRelativePath().startsWith(m_relativeNamespaceDirectory);
   }
 
+  private static boolean pathEndsWith(PathInfo pathInfo, String suffix) {
+    return pathInfo.getPath().toString().replace('\\', '/').endsWith(suffix.replace('\\', '/'));
+  }
+
   @Override
   public void process(PathInfo pathInfo, Context context) {
-    if (pathInfo.getPath().endsWith("org.eclipse.scout.jswidgets.ui.html/src/main/js/App.js")) {
+    if (pathEndsWith(pathInfo, "/App.js")) {
       WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
       String source = wc.getSource();
       source = source.replace("import DesktopModel from './DesktopModel';", "import DesktopModel from './desktop/DesktopModel';");
       wc.setSource(source);
     }
 
-    if (pathInfo.getPath().endsWith("org.eclipse.scout.rt.ui.html/src/main/js/popup/Popup.js")) {
+    if (pathEndsWith(pathInfo, "/popup/Popup.js")) {
       WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
       String source = wc.getSource();
       String ln = wc.getLineDelimiter();
@@ -60,13 +64,14 @@ public class T70010_ManualFixes extends AbstractTask {
       int c = source.indexOf("}());", b + 1);
       if (a >= 0 && b >= 0 && c >= 0) {
         c += 5;
+        String iife = source.substring(b, c);
         source = source.replace(source.substring(a, c), "static SwitchRule = {};");
-        source += ln + source.substring(b, c) + ln;
+        source += ln + iife + ln;
         wc.setSource(source);
       }
     }
 
-    if (pathInfo.getPath().endsWith("org.eclipse.scout.rt.ui.html/src/main/js/util/styles.js")) {
+    if (pathEndsWith(pathInfo, "/util/styles.js")) {
       WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
       String source = wc.getSource();
       String ln = wc.getLineDelimiter();
@@ -77,19 +82,5 @@ public class T70010_ManualFixes extends AbstractTask {
         wc.setSource(source);
       }
     }
-
-    if (pathInfo.getPath().endsWith("org.eclipse.scout.rt.ui.html/src/main/js/table/Table.js")) {
-      WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
-      String source = wc.getSource();
-      source = source.replace("_filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {", "_filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {");
-      wc.setSource(source);
-    }
-
-    /*
-    _filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-    return menus.filterAccordingToSelection('Table', this.selectedRows.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
-    }
-     */
-
   }
 }
