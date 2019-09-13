@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 
-public class JsonFormMenu<FORM_MENU extends IFormMenu<IForm>> extends JsonMenu<FORM_MENU> {
+public class JsonFormMenu<FORM_MENU extends IFormMenu<? extends IForm>> extends JsonMenu<FORM_MENU> {
 
   public JsonFormMenu(FORM_MENU model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -34,7 +34,7 @@ public class JsonFormMenu<FORM_MENU extends IFormMenu<IForm>> extends JsonMenu<F
   protected void initJsonProperties(FORM_MENU model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<IFormMenu<IForm>>(IFormMenu.PROP_FORM, model, getUiSession()) {
+    putJsonProperty(new JsonAdapterProperty<IFormMenu<? extends IForm>>(IFormMenu.PROP_FORM, model, getUiSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getForm();
