@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
+import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
@@ -30,6 +31,7 @@ public class JsFile extends AbstractJsElement {
 
   private final Path m_path;
   private final PathInfo m_pathInfo;
+  private final WorkingCopy m_workingCopy;
   private JsCommentBlock m_copyRight;
   private final List<JsClass> m_jsClasses = new ArrayList<>();
   @FrameworkExtensionMarker
@@ -38,10 +40,11 @@ public class JsFile extends AbstractJsElement {
   private final Map<String /*module name*/, JsImport> m_imports = new HashMap<>();
   private List<JsAppListener> m_appListeners = new ArrayList<>();
 
-  public JsFile(Path path) {
-    Assertions.assertNotNull(path);
-    m_path = path;
-    m_pathInfo = new PathInfo(path);
+  public JsFile(WorkingCopy workingCopy) {
+    m_workingCopy = workingCopy;
+    Assertions.assertNotNull(workingCopy);
+    m_path = workingCopy.getPath();
+    m_pathInfo = new PathInfo(m_path);
   }
 
   public Path getPath() {
@@ -230,9 +233,17 @@ public class JsFile extends AbstractJsElement {
 
   private AliasedMember ensureUniqueAlias(AliasedMember member, int index) {
     String alias = Optional.ofNullable(member.getAlias()).orElse(member.getName());
-    boolean aliasUsedInClassesOfCurrentModule = getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias));
-    boolean aliasUsedInOtherImport = getImports().stream().anyMatch(i -> i.findAliasedMember(alias) != null);
-    if (aliasUsedInClassesOfCurrentModule || aliasUsedInOtherImport) {
+    boolean aliasUsed = getJsClasses().stream().anyMatch(c -> c.getName().equalsIgnoreCase(alias)); // 1. check: classes in current module
+    if (!aliasUsed) {
+      aliasUsed = getImports().stream().anyMatch(i -> i.findAliasedMember(alias) != null); // 2. check: other imports
+      if (!aliasUsed) {
+        aliasUsed = m_workingCopy.getSource().contains("this." + alias); // 3. check: local fields
+        if (aliasUsed) {
+          LOG.info("Import alias name clash with local field '{}' of file '{}'. Creating indexed alias for the import.", alias, m_path);
+        }
+      }
+    }
+    if (aliasUsed) {
       member.setAlias(member.getName() + "_" + index);
       return ensureUniqueAlias(member, index + 1);
     }

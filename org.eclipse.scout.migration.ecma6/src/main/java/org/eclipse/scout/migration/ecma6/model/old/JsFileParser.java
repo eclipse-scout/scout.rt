@@ -231,7 +231,7 @@ public class JsFileParser {
     String source = workingCopy.getInitialSource();
     m_lineSeparator = workingCopy.getLineDelimiter();
     m_sourceReader = new LineReaderWithPositionTracking(new StringReader(source));
-    m_jsFile = new JsFile(workingCopy.getPath());
+    m_jsFile = new JsFile(workingCopy);
   }
 
   @FrameworkExtensionMarker
