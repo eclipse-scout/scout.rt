@@ -149,14 +149,34 @@ public class LessApiParser {
         .collect(Collectors.toList());
   }
 
-  protected static void collectRequiredImportsForVariables(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
+  protected boolean isVariableDefinedIn(String var, String path) {
+    Map<String, INamedElement> filesDefiningVariable = m_vars.get(var);
+    if (filesDefiningVariable == null) {
+      return false;
+    }
+    for (INamedElement lessVariable : filesDefiningVariable.values()) {
+      String p = lessVariable.getCustomAttributeString(PROP_PATH);
+      if (p.equals(path)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected boolean isMixinDefinedIn(String mixin, String path) {
+    INamedElement element = m_mixins.get(mixin);
+    String p = element.getCustomAttributeString(PROP_PATH);
+    return p.equals(path);
+  }
+
+  protected void collectRequiredImportsForVariables(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String theme = parseTheme(less.getPath());
     String libImportPrefix = getExternalLibPrefix(lib);
-    Path moduleDir = Configuration.get().getSourceModuleDirectory();
+    String moduleRelPath = Configuration.get().getSourceModuleDirectory().relativize(less.getPath()).toString().replace('\\', '/');
     for (Entry<String, Map<String, INamedElement>> variable : lib.m_vars.entrySet()) {
       String var = variable.getKey();
-      if (lessSrc.contains(var)) {
+      if (lessSrc.contains(var) && !isVariableDefinedIn(var, moduleRelPath) /* do not create import if the variable is defined in the same file */) {
         Map<String, INamedElement> filesDefiningVariable = variable.getValue();
         INamedElement lessVariable = filesDefiningVariable.get(theme);
         if (lessVariable == null) {
@@ -170,7 +190,7 @@ public class LessApiParser {
         if (isExternal) {
           requiredImports.put(var, toExternalImport(libImportPrefix, path));
         }
-        else if (!moduleDir.resolve(path).equals(less.getPath())) { // no import on myself
+        else {
           requiredImports.put(var, toInternalImport(less, path));
         }
       }
@@ -181,18 +201,18 @@ public class LessApiParser {
     return '~' + lib.getName() + "/src/";
   }
 
-  protected static void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
+  protected void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String libImportPrefix = getExternalLibPrefix(lib);
-    Path moduleDir = Configuration.get().getSourceModuleDirectory();
+    String moduleRelPath = Configuration.get().getSourceModuleDirectory().relativize(less.getPath()).toString().replace('\\', '/');
     for (Entry<String, INamedElement> mixin : lib.m_mixins.entrySet()) {
       String mixinFqn = mixin.getKey();
-      if (lessSrc.contains(mixinFqn)) {
+      if (lessSrc.contains(mixinFqn) && !isMixinDefinedIn(mixinFqn, moduleRelPath) /* do not create an import if the mixin is defined in the same file*/) {
         String path = mixin.getValue().getCustomAttributeString(PROP_PATH);
         if (isExternal) {
           requiredImports.put(mixinFqn, toExternalImport(libImportPrefix, path));
         }
-        else if (!moduleDir.resolve(path).equals(less.getPath())) { // no import on myself
+        else {
           requiredImports.put(mixinFqn, toInternalImport(less, path));
         }
       }
