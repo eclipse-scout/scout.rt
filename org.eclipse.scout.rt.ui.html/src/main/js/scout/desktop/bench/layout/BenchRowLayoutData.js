@@ -9,9 +9,8 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 scout.BenchRowLayoutData = function(model) {
-  this.rows = [null, null, null];
   scout.BenchRowLayoutData.parent.call(this, model);
-
+  this.rows = [null, null, null];
   this._ensureRows();
 };
 
