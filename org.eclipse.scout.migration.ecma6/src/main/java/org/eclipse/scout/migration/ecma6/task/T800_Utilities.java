@@ -103,11 +103,17 @@ public class T800_Utilities extends AbstractTask {
         s = rewritePartStyleUtility(util, sourceBefore, ln);
       }
 
-      //remove all 'this.'
-      s = s.replaceAll("(?<!\\w)this\\.", "");
+      //remove all 'this.' self-references
+      s = s.replaceAll("(?<!\\w)this\\.", Matcher.quoteReplacement(util.getName() + "."));
 
-      //remove all self-references
-      s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", "");
+      //remove all self-references except 'scout.numbers.RoundingMode' in numbers.js
+      if (jsFile.getPath().getFileName().toString().equals("numbers.js")) {
+        s = s.replace("scout.numbers.RoundingMode", "scout_numbers_RoundingMode");
+      }
+      s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", Matcher.quoteReplacement(util.getName() + "."));
+      if (jsFile.getPath().getFileName().toString().equals("numbers.js")) {
+        s = s.replace("scout_numbers_RoundingMode", "scout.numbers.RoundingMode");
+      }
 
       //create default export
       String exportedNames = Stream.concat(

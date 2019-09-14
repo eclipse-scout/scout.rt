@@ -583,7 +583,7 @@ public class JsFileParser {
     if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
       LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber);
-      jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand.");
+      jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand or added to T70010_ManualFixes.");
       clazz.addEnum(jsEnum);
       nextLine();
       return jsEnum;

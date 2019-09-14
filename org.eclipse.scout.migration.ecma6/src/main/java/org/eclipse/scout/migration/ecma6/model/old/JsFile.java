@@ -239,7 +239,7 @@ public class JsFile extends AbstractJsElement {
       if (!aliasUsed) {
         aliasUsed = m_workingCopy.getSource().contains("this." + alias); // 3. check: local fields
         if (aliasUsed) {
-          LOG.info("Import alias name clash with local field '{}' of file '{}'. Creating indexed alias for the import.", alias, m_path);
+          LOG.debug("Import alias name clash with local field '{}' of file '{}'. Creating indexed alias for the import.", alias, m_path);
         }
       }
     }

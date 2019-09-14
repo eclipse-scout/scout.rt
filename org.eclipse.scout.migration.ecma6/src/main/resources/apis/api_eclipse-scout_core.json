@@ -7222,6 +7222,17 @@
       "fullyQualifiedName" : "scout.LogoutBox._loginAgain"
     } ]
   }, {
+    "name": "ComboMenuAdapter",
+    "type": "Class",
+    "fullyQualifiedName": "scout.ComboMenuAdapter",
+    "children": [
+      {
+        "type": "Constructor",
+        "fullyQualifiedName": "scout.ComboMenuAdapter"
+      }
+    ]
+  },
+    {
     "name" : "DesktopTabSelectKeyStroke",
     "type" : "Class",
     "fullyQualifiedName" : "scout.DesktopTabSelectKeyStroke",
@@ -7849,6 +7860,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableTileGridMediator._initGroups"
     }, {
+      "name": "_adaptTileGrid",
+      "type": "Function",
+      "fullyQualifiedName": "scout.TableTileGridMediator._adaptTileGrid"
+    },
+      {
       "name" : "_createTileAccordion",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TableTileGridMediator._createTileAccordion"
@@ -10231,6 +10247,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.Menu._renderSubMenuItems"
     }, {
+      "name": "_togglesSubMenu",
+      "type": "Function",
+      "fullyQualifiedName": "scout.Menu._togglesSubMenu"
+    },
+      {
       "name" : "_doActionTogglesSubMenu",
       "type" : "Function",
       "fullyQualifiedName" : "scout.Menu._doActionTogglesSubMenu"
@@ -10287,6 +10308,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.Menu.visitChildMenus"
     }, {
+        "name": "_hasText",
+        "type": "Function",
+        "fullyQualifiedName": "scout.Menu._hasText"
+      },
+      {
       "name" : "_updateIconAndTextStyle",
       "type" : "Function",
       "fullyQualifiedName" : "scout.Menu._updateIconAndTextStyle"
@@ -10394,6 +10420,11 @@
       "name" : "MenuStyle",
       "type" : "Enum",
       "fullyQualifiedName" : "scout.Menu.MenuStyle"
+      },
+      {
+        "name": "SubMenuVisibility",
+        "type": "Enum",
+        "fullyQualifiedName": "scout.Menu.SubMenuVisibility"
     } ]
   }, {
     "name" : "DesktopNotification",
@@ -19069,6 +19100,11 @@
       "type" : "Function",
       "fullyQualifiedName" : "scout.HtmlComponent.margins"
     }, {
+      "name": "borders",
+      "type": "Function",
+      "fullyQualifiedName": "scout.HtmlComponent.borders"
+    },
+      {
       "name" : "size",
       "type" : "Function",
       "fullyQualifiedName" : "scout.HtmlComponent.size"
@@ -19696,6 +19732,27 @@
       "fullyQualifiedName" : "scout.TagField._createFieldAdapter"
     } ]
   }, {
+      "name": "ComboMenu",
+      "type": "Class",
+      "fullyQualifiedName": "scout.ComboMenu",
+      "children": [
+        {
+          "type": "Constructor",
+          "fullyQualifiedName": "scout.ComboMenu"
+        },
+        {
+          "name": "_render",
+          "type": "Function",
+          "fullyQualifiedName": "scout.ComboMenu._render"
+        },
+        {
+          "name": "_togglesSubMenu",
+          "type": "Function",
+          "fullyQualifiedName": "scout.ComboMenu._togglesSubMenu"
+        }
+      ]
+    },
+    {
     "name" : "CellEditorPopupLayout",
     "type" : "Class",
     "fullyQualifiedName" : "scout.CellEditorPopupLayout",
@@ -32784,24 +32841,24 @@
   }, {
     "name" : "comparators",
     "type" : "Utility",
-    "fullyQualifiedName": "scout.comparators",
-    "children": [
-      {
-        "name": "TEXT",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.comparators.TEXT"
-      },
-      {
-        "name": "NUMERIC",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.comparators.NUMERIC"
-      },
-      {
-        "name": "ALPHANUMERIC",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.comparators.ALPHANUMERIC"
-      }
-    ]
+      "fullyQualifiedName": "scout.comparators",
+      "children": [
+        {
+          "name": "TEXT",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.comparators.TEXT"
+        },
+        {
+          "name": "NUMERIC",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.comparators.NUMERIC"
+        },
+        {
+          "name": "ALPHANUMERIC",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.comparators.ALPHANUMERIC"
+        }
+      ]
   }, {
     "name" : "texts",
     "type" : "Utility",
@@ -33888,102 +33945,107 @@
       "fullyQualifiedName" : "scout.promises.parallel"
     } ]
   }, {
-    "name": "scout",
-    "type": "Utility",
-    "fullyQualifiedName": "scout",
-    "children": [
-      {
-        "name": "addAppListener",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.addAppListener"
-      },
-      {
-        "name": "inherits",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.inherits"
-      },
-      {
-        "name": "nvl",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.nvl"
-      },
-      {
-        "name": "assertParameter",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.assertParameter"
-      },
-      {
-        "name": "assertProperty",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.assertProperty"
-      },
-      {
-        "name": "isOneOf",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.isOneOf"
-      },
-      {
-        "name": "create",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.create"
-      },
-      {
-        "name": "prepareDOM",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.prepareDOM"
-      },
-      {
-        "name": "installGlobalMouseDownInterceptor",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.installGlobalMouseDownInterceptor"
-      },
-      {
-        "name": "installSyntheticActiveStateHandler",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.installSyntheticActiveStateHandler"
-      },
-      {
-        "name": "widget",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.widget"
-      },
-      {
-        "name": "adapter",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.adapter"
-      },
-      {
-        "name": "getSession",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.getSession"
-      },
-      {
-        "name": "exportAdapter",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.exportAdapter"
-      },
-      {
-        "name": "reloadPage",
-        "type": "UtilityFunction",
-        "fullyQualifiedName": "scout.reloadPage"
-      },
-      {
-        "name": "sessions",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.sessions"
-      },
-      {
-        "name": "appListeners",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.appListeners"
-      },
-      {
-        "name": "$activeElements",
-        "type": "UtilityVariable",
-        "fullyQualifiedName": "scout.$activeElements"
-      }
-    ]
-  },
+      "name": "scout",
+      "type": "Utility",
+      "fullyQualifiedName": "scout",
+      "children": [
+        {
+          "name": "addAppListener",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.addAppListener"
+        },
+        {
+          "name": "inherits",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.inherits"
+        },
+        {
+          "name": "nvl",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.nvl"
+        },
+        {
+          "name": "assertParameter",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.assertParameter"
+        },
+        {
+          "name": "assertProperty",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.assertProperty"
+        },
+        {
+          "name": "isOneOf",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.isOneOf"
+        },
+        {
+          "name": "create",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.create"
+        },
+        {
+          "name": "prepareDOM",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.prepareDOM"
+        },
+        {
+          "name": "installGlobalMouseDownInterceptor",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.installGlobalMouseDownInterceptor"
+        },
+        {
+          "name": "installSyntheticActiveStateHandler",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.installSyntheticActiveStateHandler"
+        },
+        {
+          "name": "widget",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.widget"
+        },
+        {
+          "name": "adapter",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.adapter"
+        },
+        {
+          "name": "cloneShallow",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.cloneShallow"
+        },
+        {
+          "name": "getSession",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.getSession"
+        },
+        {
+          "name": "exportAdapter",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.exportAdapter"
+        },
+        {
+          "name": "reloadPage",
+          "type": "UtilityFunction",
+          "fullyQualifiedName": "scout.reloadPage"
+        },
+        {
+          "name": "sessions",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.sessions"
+        },
+        {
+          "name": "appListeners",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.appListeners"
+        },
+        {
+          "name": "$activeElements",
+          "type": "UtilityVariable",
+          "fullyQualifiedName": "scout.$activeElements"
+        }
+      ]
+    },
     {
     "name" : "dragAndDrop",
     "type" : "Utility",
