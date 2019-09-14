@@ -22,7 +22,8 @@ const scoutBuildConstants = require('./constants');
 module.exports = (env, args) => {
   const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
-  const resDir = args.resDir || 'res';
+  const webContentDir = args.resDir || '';
+  const resDir = webContentDir + '/res';
   console.log(`Webpack mode: ${args.mode}`);
 
   return {
@@ -115,7 +116,7 @@ module.exports = (env, args) => {
       new CopyPlugin([{
         // # Copy static web-resources
         from: resDir,
-        to: '../'
+        to: '../res/'
       }]),
       // Shows progress information in the console
       new webpack.ProgressPlugin()
