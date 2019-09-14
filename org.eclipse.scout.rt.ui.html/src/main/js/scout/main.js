@@ -236,6 +236,27 @@ scout.adapter = function(adapterId, partId) {
   return null;
 };
 
+scout.cloneShallow = function(template, properties, createUniqueId) {
+  scout.assertParameter('template', template);
+  var clone = Object.create(Object.getPrototypeOf(template));
+  Object.getOwnPropertyNames(template)
+    .forEach(function(key) {
+      clone[key] = template[key];
+    });
+  if (properties) {
+    for (var key in properties) {
+      clone[key] = properties[key];
+    }
+  }
+  if (scout.nvl(createUniqueId, true)) {
+    clone.id = scout.objectFactory.createUniqueId();
+  }
+  if (clone.cloneOf === undefined) {
+    clone.cloneOf = template;
+  }
+  return clone;
+};
+
 scout.getSession = function(partId) {
   if (!scout.sessions) {
     return null;

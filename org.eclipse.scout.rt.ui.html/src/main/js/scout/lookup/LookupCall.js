@@ -174,9 +174,7 @@ scout.LookupCall.prototype.execute = function() {
 scout.LookupCall.prototype.clone = function(properties) {
   // Warning: This is _not_ a deep clone! (Because otherwise the entire session would be duplicated.)
   // Non-primitive properties must _only_ be added to the resulting clone during the 'prepareLookupCall' event!
-  return $.extend({}, this, properties, {
-    id: scout.objectFactory.createUniqueId()
-  });
+  return scout.cloneShallow(this, properties, true);
 };
 
 scout.LookupCall.prototype.cloneForAll = function() {
