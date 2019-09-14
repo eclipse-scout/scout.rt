@@ -153,6 +153,7 @@ public class LessApiParser {
     String lessSrc = less.getSource();
     String theme = parseTheme(less.getPath());
     String libImportPrefix = getExternalLibPrefix(lib);
+    Path moduleDir = Configuration.get().getSourceModuleDirectory();
     for (Entry<String, Map<String, INamedElement>> variable : lib.m_vars.entrySet()) {
       String var = variable.getKey();
       if (lessSrc.contains(var)) {
@@ -165,11 +166,12 @@ public class LessApiParser {
           LOG.debug("Cannot find less import for variable '{}' and theme '{}' in lib '{}'.", var, theme, lib.getName());
           continue;
         }
+        String path = lessVariable.getCustomAttributeString(PROP_PATH);
         if (isExternal) {
-          requiredImports.put(var, toExternalImport(libImportPrefix, lessVariable.getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(var, toExternalImport(libImportPrefix, path));
         }
-        else {
-          requiredImports.put(var, toInternalImport(less, lessVariable.getCustomAttributeString(PROP_PATH)));
+        else if (!moduleDir.resolve(path).equals(less.getPath())) { // no import on myself
+          requiredImports.put(var, toInternalImport(less, path));
         }
       }
     }
@@ -182,14 +184,16 @@ public class LessApiParser {
   protected static void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
     String lessSrc = less.getSource();
     String libImportPrefix = getExternalLibPrefix(lib);
+    Path moduleDir = Configuration.get().getSourceModuleDirectory();
     for (Entry<String, INamedElement> mixin : lib.m_mixins.entrySet()) {
       String mixinFqn = mixin.getKey();
       if (lessSrc.contains(mixinFqn)) {
+        String path = mixin.getValue().getCustomAttributeString(PROP_PATH);
         if (isExternal) {
-          requiredImports.put(mixinFqn, toExternalImport(libImportPrefix, mixin.getValue().getCustomAttributeString(PROP_PATH)));
+          requiredImports.put(mixinFqn, toExternalImport(libImportPrefix, path));
         }
-        else {
-          requiredImports.put(mixinFqn, toInternalImport(less, mixin.getValue().getCustomAttributeString(PROP_PATH)));
+        else if (!moduleDir.resolve(path).equals(less.getPath())) { // no import on myself
+          requiredImports.put(mixinFqn, toInternalImport(less, path));
         }
       }
     }
