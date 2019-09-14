@@ -45,7 +45,13 @@ public class T40010_LessModule extends AbstractTask {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
 
     m_importsInCurrentFile.clear();
+    String nl = workingCopy.getLineDelimiter();
     String newContent = T25000_ModelsGetModelToImport.replace(IMPORT_PAT, workingCopy.getSource(), this::removeFirstPathSegmentAndFileSuffix);
+    if (!"scout".equals(Configuration.get().getNamespace())) {
+      String scoutImport = "@import \"~@eclipse-scout/core/src/theme\";" + nl + nl;
+      int insertPos = newContent.indexOf("@import");
+      newContent = newContent.substring(0, insertPos) + scoutImport + newContent.substring(insertPos);
+    }
     workingCopy.setSource(newContent);
 
     Path relPath = Configuration.get().getSourceModuleDirectory().relativize(pathInfo.getPath());
@@ -53,7 +59,7 @@ public class T40010_LessModule extends AbstractTask {
     String newDefaultThemeFileName = toNewFileName(oldFileName);
     workingCopy.setRelativeTargetPath(relPath.getParent().resolve(newDefaultThemeFileName));
 
-    flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, workingCopy.getLineDelimiter());
+    flushNonDefaultThemes(pathInfo, context, newDefaultThemeFileName, nl);
   }
 
   protected void flushNonDefaultThemes(PathInfo pathInfo, Context context, String newDefaultThemeFileName, String nl) {
@@ -80,6 +86,11 @@ public class T40010_LessModule extends AbstractTask {
   protected String buildNonDefaultThemeSource(Context context, String newDefaultThemeFileName, String nl, String theme) {
     List<String> imports = new ArrayList<>();
     String mainImport = "@import \"" + LessApiParser.removeLessFileExtension(newDefaultThemeFileName) + "\";" + nl + nl;
+    String scoutImport = "";
+    if (!"scout".equals(Configuration.get().getNamespace()) && "dark".equals(theme) /*scout only provides an additional dark theme*/) {
+      scoutImport = "@import \"~@eclipse-scout/core/src/theme-dark\";" + nl + nl;
+    }
+
     for (String importInDefaultTheme : m_importsInCurrentFile) {
       String themeFileName = toThemeFileName(importInDefaultTheme, theme);
       if (existsFile(context, themeFileName)) {
@@ -87,7 +98,7 @@ public class T40010_LessModule extends AbstractTask {
       }
     }
     imports.sort(Collections.reverseOrder()); // short paths first
-    return mainImport + String.join(nl, imports);
+    return mainImport + scoutImport + String.join(nl, imports);
   }
 
   protected boolean existsFile(Context context, String path) {
