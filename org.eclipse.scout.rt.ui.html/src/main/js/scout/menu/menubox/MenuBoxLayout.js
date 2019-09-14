@@ -78,7 +78,7 @@ scout.MenuBoxLayout.prototype.preferredLayoutSize = function($container) {
   return this.actualPrefSize();
 };
 
-scout.MenuBoxLayout.prototype.compact = function(menus) {
+scout.MenuBoxLayout.prototype.compact = function(argMenus) {
   if (this.menuBox.compactOrig === undefined) {
     this.menuBox.compactOrig = this.menuBox.compact;
     this.menuBox.htmlComp.suppressInvalidate = true;
@@ -86,10 +86,10 @@ scout.MenuBoxLayout.prototype.compact = function(menus) {
     this.menuBox.htmlComp.suppressInvalidate = false;
   }
 
-  this.compactMenus(menus);
+  this.compactMenus(argMenus);
 };
 
-scout.MenuBoxLayout.prototype.undoCompact = function(menus) {
+scout.MenuBoxLayout.prototype.undoCompact = function(argMenus) {
   if (this.menuBox.compactOrig !== undefined) {
     this.menuBox.htmlComp.suppressInvalidate = true;
     this.menuBox.setCompact(this.menuBox.compactOrig);
@@ -97,15 +97,15 @@ scout.MenuBoxLayout.prototype.undoCompact = function(menus) {
     this.menuBox.compactOrig = undefined;
   }
 
-  this.undoCompactMenus(menus);
+  this.undoCompactMenus(argMenus);
 };
 
 /**
  * Sets all menus into compact mode.
  */
-scout.MenuBoxLayout.prototype.compactMenus = function(menus) {
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+scout.MenuBoxLayout.prototype.compactMenus = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     if (menu.compactOrig !== undefined) {
       // already done
       return;
@@ -124,9 +124,9 @@ scout.MenuBoxLayout.prototype.compactMenus = function(menus) {
 /**
  * Restores to the previous state of the compact property.
  */
-scout.MenuBoxLayout.prototype.undoCompactMenus = function(menus) {
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+scout.MenuBoxLayout.prototype.undoCompactMenus = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     if (menu.compactOrig === undefined) {
       return;
     }
@@ -142,16 +142,16 @@ scout.MenuBoxLayout.prototype.undoCompactMenus = function(menus) {
   }
 };
 
-scout.MenuBoxLayout.prototype.shrink = function(menus) {
-  this.shrinkMenus(menus);
+scout.MenuBoxLayout.prototype.shrink = function(argMenus) {
+  this.shrinkMenus(argMenus);
 };
 
 /**
  * Makes the text invisible of all menus with an icon.
  */
-scout.MenuBoxLayout.prototype.shrinkMenus = function(menus) {
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+scout.MenuBoxLayout.prototype.shrinkMenus = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     if (menu.textVisibleOrig !== undefined) {
       // already done
       return;
@@ -165,13 +165,13 @@ scout.MenuBoxLayout.prototype.shrinkMenus = function(menus) {
   }, this);
 };
 
-scout.MenuBoxLayout.prototype.undoShrink = function(menus) {
-  this.undoShrinkMenus(menus);
+scout.MenuBoxLayout.prototype.undoShrink = function(argMenus) {
+  this.undoShrinkMenus(argMenus);
 };
 
-scout.MenuBoxLayout.prototype.undoShrinkMenus = function(menus) {
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+scout.MenuBoxLayout.prototype.undoShrinkMenus = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     if (menu.textVisibleOrig === undefined) {
       return;
     }
@@ -183,7 +183,7 @@ scout.MenuBoxLayout.prototype.undoShrinkMenus = function(menus) {
   }, this);
 };
 
-scout.MenuBoxLayout.prototype.collapse = function(menus, containerSize, menusWidth) {
+scout.MenuBoxLayout.prototype.collapse = function(argMenus, containerSize, menusWidth) {
   this._createAndRenderEllipsis(this.menuBox.$container);
   var collapsedMenus = this._moveOverflowMenusIntoEllipsis(containerSize, menusWidth);
   this.updateFirstAndLastMenuMarker(collapsedMenus);
@@ -192,10 +192,10 @@ scout.MenuBoxLayout.prototype.collapse = function(menus, containerSize, menusWid
 /**
  * Undoes the collapsing by removing ellipsis and rendering non rendered menus.
  */
-scout.MenuBoxLayout.prototype.undoCollapse = function(menus) {
-  menus = menus || this.visibleMenus();
+scout.MenuBoxLayout.prototype.undoCollapse = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
   this._destroyEllipsis();
-  this._removeMenusFromEllipsis(menus);
+  this._removeMenusFromEllipsis(argMenus);
 };
 
 scout.MenuBoxLayout.prototype._createAndRenderEllipsis = function($container) {
@@ -238,18 +238,18 @@ scout.MenuBoxLayout.prototype._moveOverflowMenusIntoEllipsis = function(containe
   return collapsedMenus;
 };
 
-scout.MenuBoxLayout.prototype._removeMenusFromEllipsis = function(menus) {
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+scout.MenuBoxLayout.prototype._removeMenusFromEllipsis = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     scout.menus.removeMenuFromEllipsis(menu, this.menuBox.$container);
   }, this);
 };
 
-scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
+scout.MenuBoxLayout.prototype.actualPrefSize = function(argMenus) {
   var menusWidth, prefSize;
 
-  menus = menus || this.visibleMenus();
-  menusWidth = this._menusWidth(menus);
+  argMenus = argMenus || this.visibleMenus();
+  menusWidth = this._menusWidth(argMenus);
   prefSize = scout.graphics.prefSize(this.menuBox.$container, {
     includeMargin: true,
     useCssSize: true
@@ -262,10 +262,10 @@ scout.MenuBoxLayout.prototype.actualPrefSize = function(menus) {
 /**
  * @return the current width of all menus incl. the ellipsis
  */
-scout.MenuBoxLayout.prototype._menusWidth = function(menus) {
+scout.MenuBoxLayout.prototype._menusWidth = function(argMenus) {
   var menusWidth = 0;
-  menus = menus || this.visibleMenus();
-  menus.forEach(function(menu) {
+  argMenus = argMenus || this.visibleMenus();
+  argMenus.forEach(function(menu) {
     if (menu.rendered) {
       menusWidth += menu.$container.outerWidth(true);
     }
@@ -276,24 +276,24 @@ scout.MenuBoxLayout.prototype._menusWidth = function(menus) {
   return menusWidth;
 };
 
-scout.MenuBoxLayout.prototype.compactPrefSize = function(menus) {
-  menus = menus || this.visibleMenus();
+scout.MenuBoxLayout.prototype.compactPrefSize = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
 
-  this.updateFirstAndLastMenuMarker(menus);
-  this.undoCollapse(menus);
-  this.undoShrink(menus);
-  this.compact(menus);
+  this.updateFirstAndLastMenuMarker(argMenus);
+  this.undoCollapse(argMenus);
+  this.undoShrink(argMenus);
+  this.compact(argMenus);
 
   return this.actualPrefSize();
 };
 
-scout.MenuBoxLayout.prototype.shrinkPrefSize = function(menus) {
-  menus = menus || this.visibleMenus();
+scout.MenuBoxLayout.prototype.shrinkPrefSize = function(argMenus) {
+  argMenus = argMenus || this.visibleMenus();
 
-  this.updateFirstAndLastMenuMarker(menus);
-  this.undoCollapse(menus);
-  this.compact(menus);
-  this.shrink(menus);
+  this.updateFirstAndLastMenuMarker(argMenus);
+  this.undoCollapse(argMenus);
+  this.compact(argMenus);
+  this.shrink(argMenus);
 
   return this.actualPrefSize();
 };
@@ -304,11 +304,11 @@ scout.MenuBoxLayout.prototype.visibleMenus = function() {
   }, this);
 };
 
-scout.MenuBoxLayout.prototype.updateFirstAndLastMenuMarker = function(menus) {
+scout.MenuBoxLayout.prototype.updateFirstAndLastMenuMarker = function(argMenus) {
   // Find first and last rendered menu
   var firstMenu = null;
   var lastMenu = null;
-  (menus || []).forEach(function(menu) {
+  (argMenus || []).forEach(function(menu) {
     if (menu.rendered) {
       if (!firstMenu) {
         firstMenu = menu;

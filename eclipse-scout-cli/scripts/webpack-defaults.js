@@ -65,7 +65,9 @@ module.exports = (env, args) => {
           // see: https://webpack.js.org/loaders/less-loader/
           loader: require.resolve('less-loader'),
           options: {
-            sourceMap: devMode
+            sourceMap: devMode,
+            relativeUrls: false,//deprecated in future rewriteUrls is used
+            rewriteUrls: 'off'
           }
         }]
       }, {
@@ -113,7 +115,7 @@ module.exports = (env, args) => {
       new CopyPlugin([{
         // # Copy static web-resources
         from: resDir,
-        to: '../res/'
+        to: '../'
       }]),
       // Shows progress information in the console
       new webpack.ProgressPlugin()

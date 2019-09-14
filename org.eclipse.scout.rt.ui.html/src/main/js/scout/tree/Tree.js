@@ -197,9 +197,9 @@ scout.Tree.prototype._initTreeKeyStrokeContext = function() {
   });
 };
 
-scout.Tree.prototype._setMenus = function(menus) {
-  this.updateKeyStrokes(menus, this.menus);
-  this._setProperty('menus', menus);
+scout.Tree.prototype._setMenus = function(argMenus) {
+  this.updateKeyStrokes(argMenus, this.menus);
+  this._setProperty('menus', argMenus);
   this._updateMenuBar();
 };
 
@@ -917,8 +917,8 @@ scout.Tree.prototype._removeMenus = function() {
   // menubar takes care about removal
 };
 
-scout.Tree.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-  return scout.menus.filterAccordingToSelection('Tree', this.selectedNodes.length, menus, destination, onlyVisible, enableDisableKeyStroke);
+scout.Tree.prototype._filterMenus = function(argMenus, destination, onlyVisible, enableDisableKeyStroke) {
+  return scout.menus.filterAccordingToSelection('Tree', this.selectedNodes.length, argMenus, destination, onlyVisible, enableDisableKeyStroke);
 };
 
 /**

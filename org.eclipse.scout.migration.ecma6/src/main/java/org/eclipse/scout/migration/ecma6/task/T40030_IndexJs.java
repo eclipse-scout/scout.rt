@@ -74,7 +74,7 @@ public class T40030_IndexJs extends AbstractTask {
 
     if ("scout".equals(config.getNamespace())) {
       newSource.append(nl)
-          .append("export { default as JQueryScout } from './jquery/jquery-scout';").append(nl)
+          .append("export { default as JQueryUtils } from './jquery/jquery-scout';").append(nl)
           .append("export { default as JQuerySelectors } from './jquery/jquery-scout-selectors';").append(nl);
     }
 
