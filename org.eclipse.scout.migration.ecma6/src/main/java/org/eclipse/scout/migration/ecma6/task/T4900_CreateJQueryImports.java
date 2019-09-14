@@ -33,7 +33,8 @@ public class T4900_CreateJQueryImports extends AbstractTask {
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
-  private static Pattern JQUERY_PATTNER = Pattern.compile("\\$\\.[^\\(]*");
+  private static Pattern JQUERY_MEMBER_PAT = Pattern.compile("\\$\\.[^(]*");
+  private static Pattern JQUERY_FUNCTION_PAT = Pattern.compile("\\$\\(");
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
@@ -46,9 +47,19 @@ public class T4900_CreateJQueryImports extends AbstractTask {
     JsFile jsFile = context.ensureJsFile(workingCopy);
     String source = workingCopy.getSource();
 
-    Matcher matcher = JQUERY_PATTNER.matcher(source);
-    if (matcher.find()) {
-      LOG.debug("JQuery usage found in [" + jsFile.getPath().getFileName() + "]: '" + matcher.group() + "'.");
+    Matcher matcher = JQUERY_MEMBER_PAT.matcher(source);
+    boolean jqueryImportNecessary = matcher.find();
+    if (jqueryImportNecessary) {
+      LOG.debug("JQuery usage found in '{}'.", jsFile.getPath());
+    }
+    else {
+      matcher = JQUERY_FUNCTION_PAT.matcher(source);
+      jqueryImportNecessary = matcher.find();
+      if (jqueryImportNecessary) {
+        LOG.debug("JQuery function call found in '{}'.", jsFile.getPath());
+      }
+    }
+    if (jqueryImportNecessary) {
       JsImport jqueryImport = jsFile.getImport(JQUERY_MODULE_NAME);
       if (jqueryImport == null) {
         jqueryImport = new JsImport(JQUERY_MODULE_NAME);
@@ -56,7 +67,5 @@ public class T4900_CreateJQueryImports extends AbstractTask {
         jsFile.addImport(jqueryImport);
       }
     }
-
   }
-
 }
