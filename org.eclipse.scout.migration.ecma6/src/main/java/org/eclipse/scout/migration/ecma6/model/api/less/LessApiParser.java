@@ -165,6 +165,9 @@ public class LessApiParser {
 
   protected boolean isMixinDefinedIn(String mixin, String path) {
     INamedElement element = m_mixins.get(mixin);
+    if (element == null) {
+      return false;
+    }
     String p = element.getCustomAttributeString(PROP_PATH);
     return p.equals(path);
   }
