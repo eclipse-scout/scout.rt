@@ -59,7 +59,7 @@ public class T70010_ManualFixes extends AbstractTask {
       WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
       String source = wc.getSource();
       String ln = wc.getLineDelimiter();
-      int a = source.indexOf("// TODO MIG:  Looks like a dynamic jsEnum. Must be migrated by hand.");
+      int a = source.indexOf("// TODO MIG:  Looks like a dynamic jsEnum. Must be migrated by hand or added to T70010_ManualFixes.");
       int b = source.indexOf("(function() {", a + 1);
       int c = source.indexOf("}());", b + 1);
       if (a >= 0 && b >= 0 && c >= 0) {
