@@ -412,8 +412,8 @@ scout.graphics = {
   },
 
   _bounds: function($elem, pos, options) {
-    var size = scout.graphics.size($elem, options);
-    return new scout.Rectangle(pos.left, pos.top, size.width, size.height);
+    var s = scout.graphics.size($elem, options);
+    return new scout.Rectangle(pos.left, pos.top, s.width, s.height);
   },
 
   setBounds: function($comp, vararg, y, width, height) {

@@ -380,9 +380,9 @@ scout.scrollbars = {
 
   scrollTop: function($scrollable, scrollTop, options) {
     options = this._createDefaultScrollToOptions(options);
-    var scrollbar = scout.scrollbars.scrollbar($scrollable, 'y');
-    if (scrollbar) {
-      scrollbar.notifyBeforeScroll();
+    var scrollbarElement = scout.scrollbars.scrollbar($scrollable, 'y');
+    if (scrollbarElement) {
+      scrollbarElement.notifyBeforeScroll();
     }
 
     // Not animated
@@ -391,8 +391,8 @@ scout.scrollbars = {
         $scrollable.stop('scroll');
       }
       $scrollable.scrollTop(scrollTop);
-      if (scrollbar) {
-        scrollbar.notifyAfterScroll();
+      if (scrollbarElement) {
+        scrollbarElement.notifyAfterScroll();
       }
       return;
     }
@@ -400,17 +400,17 @@ scout.scrollbars = {
     // Animated
     this.animateScrollTop($scrollable, scrollTop, options);
     $scrollable.promise('scroll').always(function() {
-      if (scrollbar) {
-        scrollbar.notifyAfterScroll();
+      if (scrollbarElement) {
+        scrollbarElement.notifyAfterScroll();
       }
     });
   },
 
   scrollLeft: function($scrollable, scrollLeft, options) {
     options = this._createDefaultScrollToOptions(options);
-    var scrollbar = scout.scrollbars.scrollbar($scrollable, 'x');
-    if (scrollbar) {
-      scrollbar.notifyBeforeScroll();
+    var scrollbarElement = scout.scrollbars.scrollbar($scrollable, 'x');
+    if (scrollbarElement) {
+      scrollbarElement.notifyBeforeScroll();
     }
 
     // Not animated
@@ -419,8 +419,8 @@ scout.scrollbars = {
         $scrollable.stop('scroll');
       }
       $scrollable.scrollLeft(scrollLeft);
-      if (scrollbar) {
-        scrollbar.notifyAfterScroll();
+      if (scrollbarElement) {
+        scrollbarElement.notifyAfterScroll();
       }
       return;
     }
@@ -428,8 +428,8 @@ scout.scrollbars = {
     // Animated
     this.animateScrollLeft($scrollable, scrollLeft, options);
     $scrollable.promise('scroll').always(function() {
-      if (scrollbar) {
-        scrollbar.notifyAfterScroll();
+      if (scrollbarElement) {
+        scrollbarElement.notifyAfterScroll();
       }
     });
   },
@@ -657,13 +657,13 @@ scout.scrollbars = {
     var children = parent.getChildren(parent.element);
     var parentPositionTop = parent.$element.position().top;
     var parentHeight = parent.element.height;
-    var scrollTop = parent.$scrollable.scrollTop();
+    var scrollTopPos = parent.$scrollable.scrollTop();
 
     // vertical scrolling
     if (!isParentExpanded) {
       // parent is not expanded, make sure that at least one node above the parent is visible
       if (parentPositionTop < parentHeight) {
-        var minScrollTop = Math.max(scrollTop - (parentHeight - parentPositionTop), 0);
+        var minScrollTop = Math.max(scrollTopPos - (parentHeight - parentPositionTop), 0);
         this.scrollTop(parent.$scrollable, minScrollTop, {
           animate: true
         });
@@ -679,9 +679,9 @@ scout.scrollbars = {
       var additionalHeight = childRowsHeight + (1.5 * parentHeight);
       var scrollTo = parentPositionTop + additionalHeight;
       // scroll as much as needed to show the expansion but make sure that the parent row (plus one more) is still visible
-      var newScrollTop = scrollTop + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
+      var newScrollTop = scrollTopPos + Math.min(scrollTo - fullDataHeight, parentPositionTop - parentHeight);
       // only scroll down
-      if (newScrollTop > scrollTop) {
+      if (newScrollTop > scrollTopPos) {
         this.scrollTop(parent.$scrollable, newScrollTop, {
           animate: true,
           stop: false
