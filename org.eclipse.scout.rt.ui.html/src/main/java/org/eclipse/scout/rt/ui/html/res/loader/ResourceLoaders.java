@@ -47,10 +47,11 @@ public class ResourceLoaders {
       return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
     boolean newMode = isNewMode();
+    String theme = UiThemeHelper.get().getTheme(req);
+    boolean minify = UrlHints.isMinifyHint(req);
     if (newMode) {
-      boolean minify = UrlHints.isMinifyHint(req);
       boolean cacheEnabled = UrlHints.isCacheHint(req);
-      WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled);
+      WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled, theme);
       if (loader.acceptFile(resourcePath)) {
         return loader;
       }
@@ -58,8 +59,6 @@ public class ResourceLoaders {
     else {
       // TODO [mvi]: remove old (legacy loader)
       if (ScriptFileLoader.acceptFile(resourcePath)) {
-        String theme = UiThemeHelper.get().getTheme(req);
-        boolean minify = UrlHints.isMinifyHint(req);
         return new ScriptFileLoader(theme, minify);
       }
     }
@@ -72,18 +71,16 @@ public class ResourceLoaders {
     if (resourcePath.endsWith("/texts.json")) {
       return new TextsLoader();
     }
+
+    if (newMode) {
+      return null;
+    }
     if (resourcePath.endsWith(".json")) {
       if (JsonModelsLoader.acceptFile(resourcePath)) {
         return new JsonModelsLoader();
       }
       return new JsonFileLoader();
     }
-
-    if (newMode) {
-      return null;
-    }
-    else {
-      return new BinaryFileLoader();
-    }
+    return new BinaryFileLoader();
   }
 }
