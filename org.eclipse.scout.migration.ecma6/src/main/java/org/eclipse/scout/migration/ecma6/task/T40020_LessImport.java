@@ -31,7 +31,7 @@ public class T40020_LessImport extends AbstractTask {
     }
 
     String fileName = pathInfo.getPath().getFileName().toString();
-    return fileName.endsWith(".less") && !fileName.endsWith(T40010_LessModule.OLD_FILE_SUFFIX);
+    return fileName.endsWith(".less") && !fileName.endsWith(T40010_LessModule.OLD_FILE_SUFFIX) && !fileName.endsWith(T40010_LessModule.NEW_FILE_SUFFIX);
   }
 
   @Override
