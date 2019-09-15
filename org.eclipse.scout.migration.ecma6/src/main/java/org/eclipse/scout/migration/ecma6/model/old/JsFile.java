@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
@@ -237,7 +238,8 @@ public class JsFile extends AbstractJsElement {
     if (!aliasUsed) {
       aliasUsed = getImports().stream().anyMatch(i -> i.findAliasedMember(alias) != null); // 2. check: other imports
       if (!aliasUsed) {
-        aliasUsed = m_workingCopy.getSource().contains("this." + alias); // 3. check: local fields
+        Pattern aliasUsedPat = Pattern.compile("this\\." + Pattern.quote(alias) + "[^\\w]");
+        aliasUsed = aliasUsedPat.matcher(m_workingCopy.getSource()).find(); // 3. check: local fields
         if (aliasUsed) {
           LOG.debug("Import alias name clash with local field '{}' of file '{}'. Creating indexed alias for the import.", alias, m_path);
         }
