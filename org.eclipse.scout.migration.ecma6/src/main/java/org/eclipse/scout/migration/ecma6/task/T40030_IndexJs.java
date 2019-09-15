@@ -65,9 +65,12 @@ public class T40030_IndexJs extends AbstractTask {
         name = "scout";
         path = Paths.get("scout");
       }
-      if (name.indexOf('-') < 0 && !"objectFactories".equals(name)) {
-        // objectFactories file does not export anything. therefore do not import it.
-        String pathStr = nameWithoutJsExtension(path.toString().replace('\\', '/'));
+      String pathStr = nameWithoutJsExtension(path.toString().replace('\\', '/'));
+      if ("objectFactories".equals(name)) {
+        // object factories file does not export anything. therefore import using wildcard
+        newSource.append("export * from './").append(pathStr).append("';").append(nl);
+      }
+      else if (name.indexOf('-') < 0) {
         newSource.append("export { default as ").append(name).append(" } from './").append(pathStr).append("';").append(nl);
       }
     }
