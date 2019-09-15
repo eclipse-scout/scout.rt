@@ -104,14 +104,14 @@ public class T800_Utilities extends AbstractTask {
       }
 
       //remove all 'this.' self-references
-      s = s.replaceAll("(?<!\\w)this\\.", Matcher.quoteReplacement(util.getName() + "."));
-
+      s = s.replaceAll("(?<!\\w)this\\.", "");
       //remove all self-references except 'scout.numbers.RoundingMode' in numbers.js
-      if (jsFile.getPath().getFileName().toString().equals("numbers.js")) {
+      boolean isNumbersJs = jsFile.getPath().getFileName().toString().equals("numbers.js");
+      if (isNumbersJs) {
         s = s.replace("scout.numbers.RoundingMode", "scout_numbers_RoundingMode");
       }
-      s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", Matcher.quoteReplacement(util.getName() + "."));
-      if (jsFile.getPath().getFileName().toString().equals("numbers.js")) {
+      s = s.replaceAll("(?<!\\w)" + util.getFullyQualifiedName() + "\\.", "");
+      if (isNumbersJs) {
         s = s.replace("scout_numbers_RoundingMode", "scout.numbers.RoundingMode");
       }
 
