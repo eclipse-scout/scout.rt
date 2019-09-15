@@ -23,7 +23,7 @@ module.exports = (env, args) => {
   const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
   const webContentDir = args.resDir || '';
-  const resDir = webContentDir + '/res';
+  const resDir = path.resolve(webContentDir, 'res');
   console.log(`Webpack mode: ${args.mode}`);
 
   return {
