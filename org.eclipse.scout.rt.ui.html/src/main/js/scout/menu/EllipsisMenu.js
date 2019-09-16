@@ -52,5 +52,5 @@ scout.EllipsisMenu.prototype._renderHidden = function() {
 };
 
 scout.EllipsisMenu.prototype.isTabTarget = function() {
-  return scout.EllipsisMenu.parent.prototype.isTabTarget.call(this) && !this.hidden;
+  return scout.Menu.prototype.isTabTarget.call(this) && !this.hidden;
 };

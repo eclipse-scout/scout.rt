@@ -20,7 +20,7 @@ scout.TableTextUserFilter.TYPE = 'text';
  * @override TableUserFilter.js
  */
 scout.TableTextUserFilter.prototype.createFilterAddedEventData = function() {
-  var data = scout.TableTextUserFilter.parent.prototype.createFilterAddedEventData.call(this);
+  var data = scout.ColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
   data.text = this.text;
   return data;
 };
