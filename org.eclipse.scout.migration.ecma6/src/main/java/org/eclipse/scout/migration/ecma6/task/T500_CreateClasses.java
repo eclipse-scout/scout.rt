@@ -223,7 +223,7 @@ public class T500_CreateClasses extends AbstractTask {
         replacement.append("static ");
       }
       replacement.append(function.getName());
-      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
     }
 
     // super call variant 1
@@ -239,7 +239,7 @@ public class T500_CreateClasses extends AbstractTask {
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
       replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
     }
 
     // super call variant 2
@@ -254,7 +254,7 @@ public class T500_CreateClasses extends AbstractTask {
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
       replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
     }
 
     return source;
@@ -295,7 +295,7 @@ public class T500_CreateClasses extends AbstractTask {
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
       replacement.append("super.").append(matcher.group(1)).append("(");
-      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      source = matcher.replaceAll(Matcher.quoteReplacement(replacement.toString()));
     }
 
     return source;

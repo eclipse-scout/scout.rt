@@ -17024,6 +17024,32 @@
         "fullyQualifiedName": "scout.ColumnUserFilter.TYPE"
     } ]
   }, {
+      "name": "DateFormatPatternDefinition",
+      "type": "Class",
+      "fullyQualifiedName": "scout.DateFormatPatternDefinition",
+      "children": [
+        {
+          "type": "Constructor",
+          "fullyQualifiedName": "scout.DateFormatPatternDefinition"
+        },
+        {
+          "name": "createFormatFunction",
+          "type": "Function",
+          "fullyQualifiedName": "scout.DateFormatPatternDefinition.createFormatFunction"
+        },
+        {
+          "name": "createParseFunction",
+          "type": "Function",
+          "fullyQualifiedName": "scout.DateFormatPatternDefinition.createParseFunction"
+        },
+        {
+          "name": "accept",
+          "type": "Function",
+          "fullyQualifiedName": "scout.DateFormatPatternDefinition.accept"
+        }
+      ]
+    },
+    {
     "name" : "AccordionFieldAdapter",
     "type" : "Class",
     "fullyQualifiedName" : "scout.AccordionFieldAdapter",
