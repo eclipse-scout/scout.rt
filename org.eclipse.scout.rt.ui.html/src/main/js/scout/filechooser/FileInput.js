@@ -36,7 +36,7 @@ scout.FileInput.prototype._init = function(model) {
 scout.FileInput.prototype._initKeyStrokeContext = function() {
   // Need to create keystroke context here because this.legacy is not set at the time the constructor is executed
   this.keyStrokeContext = this._createKeyStrokeContext();
-  scout.Widget.prototype._initKeyStrokeContext.call(this);
+  scout.FileInput.parent.prototype._initKeyStrokeContext.call(this);
 };
 
 scout.FileInput.prototype._createKeyStrokeContext = function() {

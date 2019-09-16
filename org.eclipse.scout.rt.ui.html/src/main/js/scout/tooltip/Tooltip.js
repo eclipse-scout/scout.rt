@@ -143,7 +143,7 @@ scout.Tooltip.prototype._onAttach = function() {
 scout.Tooltip.prototype._renderOnDetach = function() {
   this._openLater = true;
   this.remove();
-  scout.FieldStatus.parent.prototype._onDetach.call(this);
+  scout.Tooltip.parent.prototype._onDetach.call(this);
 };
 
 scout.Tooltip.prototype._isRemovalPrevented = function() {

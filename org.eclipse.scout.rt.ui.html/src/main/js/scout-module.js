@@ -166,6 +166,7 @@
   __include("scout/scrollbar/VirtualScrolling.js");
   __include("scout/splitter/Splitter.js");
   __include("scout/text/DateFormatPatternType.js");
+  __include("scout/text/DateFormatPatternDefinition.js");
   __include("scout/text/DateFormat.js");
   __include("scout/text/DecimalFormat.js");
   __include("scout/text/TextMap.js");
