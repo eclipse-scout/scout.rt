@@ -12,8 +12,9 @@
 // The modules exported here will be available when someone imports from 'eclipse-scout'
 
 import * as scout from './scout/dummy-scout';
+import * as self from './index.js';
 
 export { scout as default };
 export { default as DummyApp } from './scout/DummyApp';
 
-window.scout = Object.assign({}, scout);
+window.scout = Object.assign(window.scout || {}, self);

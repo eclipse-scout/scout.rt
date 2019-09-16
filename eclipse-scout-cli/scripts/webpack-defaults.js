@@ -22,9 +22,17 @@ const scoutBuildConstants = require('./constants');
 module.exports = (env, args) => {
   const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
-  const webContentDir = args.resDir || '';
-  const resDir = path.resolve(webContentDir, 'res');
+  const resDirArray = args.resDirArray || ['res'];
   console.log(`Webpack mode: ${args.mode}`);
+
+  // # Copy static web-resources delivered by the modules
+  const copyPluginConfig = [];
+  for (const resDir of resDirArray) {
+    copyPluginConfig.push(
+      { from: resDir,
+        to: '../res'
+      });
+  }
 
   return {
     target: 'web',
@@ -67,7 +75,7 @@ module.exports = (env, args) => {
           loader: require.resolve('less-loader'),
           options: {
             sourceMap: devMode,
-            relativeUrls: false,//deprecated in future rewriteUrls is used
+            relativeUrls: false, // deprecated in future rewriteUrls is used
             rewriteUrls: 'off'
           }
         }]
@@ -113,11 +121,7 @@ module.exports = (env, args) => {
         outDir: outDir
       }),
       // # Copy resources
-      new CopyPlugin([{
-        // # Copy static web-resources
-        from: resDir,
-        to: '../res/'
-      }]),
+      new CopyPlugin(copyPluginConfig),
       // Shows progress information in the console
       new webpack.ProgressPlugin()
     ],

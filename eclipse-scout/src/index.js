@@ -22,4 +22,4 @@ export { default as OutlineViewButton } from './scout/outline/OutlineViewButton'
 export { default as Device } from './scout/util/Device';
 export { default as Menu } from './scout/menu/Menu';
 
-window.scout = Object.assign({}, self);
+window.scout = Object.assign(window.scout || {}, self);
