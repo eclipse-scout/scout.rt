@@ -45,7 +45,7 @@ public class DynamicResourceInfo {
   public String toPath() {
     String encodedFilename = IOUtility.urlEncode(getFileName());
     // / was encoded by %2F, revert this encoding otherwise filename doesn't look nice in browser download
-    // Example for filesnames containing a /:
+    // Example for filenames containing a /:
     // - relative reference from a unzipped zip file
     // - another path segment was explicitly added to distinguish between same filenames
     // Note that / is ignored while decoding, there is no need to revert this replacement before decoding

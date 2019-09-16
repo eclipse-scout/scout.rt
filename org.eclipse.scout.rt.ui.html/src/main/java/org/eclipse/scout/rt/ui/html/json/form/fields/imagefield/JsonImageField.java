@@ -169,7 +169,7 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
       // The client will request the image in a separate http request. See: ResourceRequestHandler
       BinaryResource imageResource = extractBinaryResource(getModel().getImage());
       if (imageResource != null) {
-        return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource.getFilename());
+        return BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(this, imageResource);
       }
     }
     if (getModel().getImageUrl() != null) {
@@ -209,11 +209,17 @@ public class JsonImageField<IMAGE_FIELD extends IImageField> extends JsonFormFie
   // When an adapter has multiple images, it must deal itself with that case. For instance it could
   // add a sequence-number to the contentId to distinct between different images.
   @Override
-  public BinaryResourceHolder provideBinaryResource(String filename) {
-    BinaryResource res = extractBinaryResource(getModel().getImage());
-    if (res != null && filename.equals(res.getFilename())) {
-      return new BinaryResourceHolder(res);
+  public BinaryResourceHolder provideBinaryResource(String requestFilename) {
+    BinaryResource image = extractBinaryResource(getModel().getImage());
+    if (image == null) {
+      return null;
     }
+
+    String imageFilenameWithFingerprint = BinaryResourceUrlUtility.getFilenameWithFingerprint(image);
+    if (imageFilenameWithFingerprint.equals(requestFilename)) {
+      return new BinaryResourceHolder(image);
+    }
+
     return null;
   }
 
