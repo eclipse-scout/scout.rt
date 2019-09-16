@@ -32,6 +32,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
   public static final String JSON_MODEL_NAME_SUFFIX = "Model";
 
   private static final Pattern PLACEHOLDER_PAT = Pattern.compile("(\\w+):\\s*'\\$\\{(\\w+):([^}]+)}'");
+  private static final Pattern URL_RES_PAT = Pattern.compile("Url\":\\s*\"res/");
 
   private Predicate<PathInfo> m_fileFilter = PathFilters.withExtension(JSON_EXTENSION);
 
@@ -58,7 +59,8 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String originalSource = workingCopy.getSource();
 
     // migrate scout json model file to js file
-    String step1 = KEY_PAT.matcher(originalSource).replaceAll("$1:");
+    String step0 = URL_RES_PAT.matcher(originalSource).replaceAll("Url\": \"");
+    String step1 = KEY_PAT.matcher(step0).replaceAll("$1:");
     String step2 = step1.replace("\\\"", ESCAPED_REPLACEMENT1).replace("'", ESCAPED_REPLACEMENT2);
     String step3 = step2.replace('"', '\'');
     String step4 = step3.replace(ESCAPED_REPLACEMENT1, "\"").replace(ESCAPED_REPLACEMENT2, "\\'");

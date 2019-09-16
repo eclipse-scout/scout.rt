@@ -48,6 +48,7 @@ public class T70010_ManualFixes extends AbstractTask {
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
+    String namespace = Configuration.get().getNamespace();
     if (pathEndsWith(pathInfo, "/App.js")) {
       WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
       String source = wc.getSource();
@@ -81,6 +82,14 @@ public class T70010_ManualFixes extends AbstractTask {
         source = source.replace(aText, aText + ln + ln + "let element = null;");
         wc.setSource(source);
       }
+    }
+
+    if ("jswidgets".equals(namespace) && pathEndsWith(pathInfo, "/desktop/Desktop.json")) {
+      // the scout logo is moved into the img sub folder
+      WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+      String source = wc.getSource();
+      String newSource = source.replace("logoUrl: 'scout-logo.png'", "logoUrl: 'img/scout-logo.png'");
+      wc.setSource(newSource);
     }
   }
 }
