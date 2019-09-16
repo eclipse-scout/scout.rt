@@ -1,0 +1,324 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <title>log4javascript</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- Make IE8 behave like IE7, having gone to all the trouble of making IE work -->
+    <meta http-equiv="X-UA-Compatible" content="IE=7" />
+
+    <style type="text/css">
+      body {
+        background-color: white;
+        color: black;
+        padding: 0;
+        margin: 0;
+        font-family: tahoma, verdana, arial, helvetica, sans-serif;
+        overflow: hidden;
+      }
+
+      div#switchesContainer input {
+        margin-bottom: 0;
+      }
+
+      div.toolbar {
+        border-top: solid #ffffff 1px;
+        border-bottom: solid #aca899 1px;
+        background-color: #f1efe7;
+        padding: 3px 5px;
+        font-size: 68.75%;
+      }
+
+      div.toolbar, div#search input {
+        font-family: tahoma, verdana, arial, helvetica, sans-serif;
+      }
+
+      div.toolbar input.button {
+        padding: 0 5px;
+        font-size: 100%;
+      }
+
+      div.toolbar input.hidden {
+        display: none;
+      }
+
+      div#switches input#clearButton {
+        margin-left: 20px;
+      }
+
+      div#levels label {
+        font-weight: bold;
+      }
+
+      div#levels label, div#options label {
+        margin-right: 5px;
+      }
+
+      div#levels label#wrapLabel {
+        font-weight: normal;
+      }
+
+      div#search label {
+        margin-right: 10px;
+      }
+
+      div#search label.searchboxlabel {
+        margin-right: 0;
+      }
+
+      div#search input {
+        font-size: 100%;
+      }
+
+      div#search input.validregex {
+        color: green;
+      }
+
+      div#search input.invalidregex {
+        color: red;
+      }
+
+      div#search input.nomatches {
+        color: white;
+        background-color: #ff6666;
+      }
+
+      div#search input.nomatches {
+        color: white;
+        background-color: #ff6666;
+      }
+
+      div#searchNav {
+        display: none;
+      }
+
+      div#commandLine {
+        display: none;
+      }
+
+      div#commandLine input#command {
+        font-size: 100%;
+        font-family: Courier New, Courier;
+      }
+
+      div#commandLine input#evaluateButton {
+      }
+
+      *.greyedout {
+        color: gray !important;
+        border-color: gray !important;
+      }
+
+      *.greyedout *.alwaysenabled { color: black; }
+
+      *.unselectable {
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      div#log {
+        font-family: Courier New, Courier;
+        font-size: 75%;
+        width: 100%;
+        overflow: auto;
+        clear: both;
+        position: relative;
+      }
+
+      div.group {
+        border-color: #cccccc;
+        border-style: solid;
+        border-width: 1px 0 1px 1px;
+        overflow: visible;
+      }
+
+      div.oldIe div.group, div.oldIe div.group *, div.oldIe *.logentry {
+        height: 1%;
+      }
+
+      div.group div.groupheading span.expander {
+        border: solid black 1px;
+        font-family: Courier New, Courier;
+        font-size: 0.833em;
+        background-color: #eeeeee;
+        position: relative;
+        top: -1px;
+        color: black;
+        padding: 0 2px;
+        cursor: pointer;
+        cursor: hand;
+        height: 1%;
+      }
+
+      div.group div.groupcontent {
+        margin-left: 10px;
+        padding-bottom: 2px;
+        overflow: visible;
+      }
+
+      div.group div.expanded {
+        display: block;
+      }
+
+      div.group div.collapsed {
+        display: none;
+      }
+
+      *.logentry {
+        overflow: visible;
+        display: none;
+        white-space: pre;
+      }
+
+      span.pre {
+        white-space: pre;
+      }
+
+      pre.unwrapped {
+        display: inline !important;
+      }
+
+      pre.unwrapped pre.pre, div.wrapped pre.pre {
+        display: inline;
+      }
+
+      div.wrapped pre.pre {
+        white-space: normal;
+      }
+
+      div.wrapped {
+        display: none;
+      }
+
+      body.searching *.logentry span.currentmatch {
+        color: white !important;
+        background-color: green !important;
+      }
+
+      body.searching div.searchhighlight *.logentry span.searchterm {
+        color: black;
+        background-color: yellow;
+      }
+
+      div.wrap *.logentry {
+        white-space: normal !important;
+        border-width: 0 0 1px 0;
+        border-color: #dddddd;
+        border-style: dotted;
+      }
+
+      div.wrap #log_wrapped, #log_unwrapped {
+        display: block;
+      }
+
+      div.wrap #log_unwrapped, #log_wrapped {
+        display: none;
+      }
+
+      div.wrap *.logentry span.pre {
+        overflow: visible;
+        white-space: normal;
+      }
+
+      div.wrap *.logentry pre.unwrapped {
+        display: none;
+      }
+
+      div.wrap *.logentry span.wrapped {
+        display: inline;
+      }
+
+      div.searchfilter *.searchnonmatch {
+        display: none !important;
+      }
+
+      div#log *.TRACE, label#label_TRACE {
+        color: #666666;
+      }
+
+      div#log *.DEBUG, label#label_DEBUG {
+        color: green;
+      }
+
+      div#log *.INFO, label#label_INFO {
+        color: #000099;
+      }
+
+      div#log *.WARN, label#label_WARN {
+        color: #999900;
+      }
+
+      div#log *.ERROR, label#label_ERROR {
+        color: red;
+      }
+
+      div#log *.FATAL, label#label_FATAL {
+        color: #660066;
+      }
+
+      div.TRACE#log *.TRACE,
+      div.DEBUG#log *.DEBUG,
+      div.INFO#log *.INFO,
+      div.WARN#log *.WARN,
+      div.ERROR#log *.ERROR,
+      div.FATAL#log *.FATAL {
+        display: block;
+      }
+
+      div#log div.separator {
+        background-color: #cccccc;
+        margin: 5px 0;
+        line-height: 1px;
+      }
+    </style>
+  </head>
+
+  <body id="body">
+    <div id="switchesContainer">
+      <div id="switches">
+        <div id="levels" class="toolbar">
+          Filters:
+          <input type="checkbox" id="switch_TRACE" checked="checked" title="Show/hide trace messages" /><label for="switch_TRACE" id="label_TRACE">trace</label>
+          <input type="checkbox" id="switch_DEBUG" checked="checked" title="Show/hide debug messages" /><label for="switch_DEBUG" id="label_DEBUG">debug</label>
+          <input type="checkbox" id="switch_INFO" checked="checked" title="Show/hide info messages" /><label for="switch_INFO" id="label_INFO">info</label>
+          <input type="checkbox" id="switch_WARN" checked="checked" title="Show/hide warn messages" /><label for="switch_WARN" id="label_WARN">warn</label>
+          <input type="checkbox" id="switch_ERROR" checked="checked" title="Show/hide error messages" /><label for="switch_ERROR" id="label_ERROR">error</label>
+          <input type="checkbox" id="switch_FATAL" checked="checked" title="Show/hide fatal messages" /><label for="switch_FATAL" id="label_FATAL">fatal</label>
+          <input type="checkbox" id="switch_ALL" checked="checked" title="Show/hide all messages" /><label for="switch_ALL" id="label_ALL">all</label>
+        </div>
+        <div id="search" class="toolbar">
+          <label for="searchBox" class="searchboxlabel">Search:</label> <input type="text" id="searchBox" size="20" />
+          <input type="button" id="searchReset" disabled="disabled" value="Reset" class="button" title="Reset the search" />
+          <input type="checkbox" id="searchRegex" title="If checked, search is treated as a regular expression" /><label for="searchRegex">Regex</label>
+          <input type="checkbox" id="searchCaseSensitive" title="If checked, search is case sensitive" /><label for="searchCaseSensitive">Match case</label>
+          <input type="checkbox" id="searchDisable" title="Enable/disable search" /><label for="searchDisable" class="alwaysenabled">Disable</label>
+          <div id="searchNav">
+            <input type="button" id="searchNext" disabled="disabled" value="Next" class="button" title="Go to the next matching log entry" />
+            <input type="button" id="searchPrevious" disabled="disabled" value="Previous" class="button" title="Go to the previous matching log entry" />
+            <input type="checkbox" id="searchFilter" title="If checked, non-matching log entries are filtered out" /><label for="searchFilter">Filter</label>
+            <input type="checkbox" id="searchHighlight" title="Highlight matched search terms" /><label for="searchHighlight" class="alwaysenabled">Highlight all</label>
+          </div>
+        </div>
+        <div id="options" class="toolbar">
+          Options:
+          <input type="checkbox" id="enableLogging" checked="checked" title="Enable/disable logging" /><label for="enableLogging" id="enableLoggingLabel">Log</label>
+          <input type="checkbox" id="wrap" title="Enable / disable word wrap" /><label for="wrap" id="wrapLabel">Wrap</label>
+          <input type="checkbox" id="newestAtTop" title="If checked, causes newest messages to appear at the top" /><label for="newestAtTop" id="newestAtTopLabel">Newest at the top</label>
+          <input type="checkbox" id="scrollToLatest" checked="checked" title="If checked, window automatically scrolls to a new message when it is added" /><label for="scrollToLatest" id="scrollToLatestLabel">Scroll to latest</label>
+          <input type="button" id="clearButton" value="Clear" class="button" title="Clear all log messages" />
+          <input type="button" id="hideButton" value="Hide" class="hidden button" title="Hide the console" />
+          <input type="button" id="closeButton" value="Close" class="hidden button" title="Close the window" />
+        </div>
+      </div>
+    </div>
+    <div id="log" class="TRACE DEBUG INFO WARN ERROR FATAL"></div>
+    <div id="commandLine" class="toolbar">
+      <div id="commandLineContainer">
+        <input type="text" id="command" title="Enter a JavaScript command here and hit return or press 'Evaluate'" />
+        <input type="button" id="evaluateButton" value="Evaluate" class="button" title="Evaluate the command" />
+      </div>
+    </div>
+
+    <script type="text/javascript" src="console_uncompressed.js"></script>
+  </body>
+</html>
