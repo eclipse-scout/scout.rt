@@ -58,6 +58,7 @@ public class T500_CreateClasses extends AbstractTask {
       JsClass jsClazz = jsClasses.get(i);
       createClazzBlock(jsClazz, jsClasses.size() == 1, jsFile, workingCopy, context);
       updateFunctions(jsClazz, jsFile, workingCopy);
+      replaceInheritedFunctions(context, jsClazz, jsFile, workingCopy);
       updateVariables(jsClazz, jsFile, workingCopy);
       updateEnums(jsClazz, jsFile, workingCopy);
     }
@@ -151,6 +152,44 @@ public class T500_CreateClasses extends AbstractTask {
     workingCopy.setSource(sourceBuilder.toString());
   }
 
+  protected String updateConstructor(JsFunction function, JsFile jsFile, String source) {
+    StringBuilder patternBuilder = new StringBuilder();
+    patternBuilder
+        .append(Pattern.quote(function.getJsClass().getNamespace()))
+        .append("\\.")
+        .append(Pattern.quote(function.getJsClass().getName()))
+        .append("\\s*\\=\\s*function");
+
+    Pattern pattern = Pattern.compile(patternBuilder.toString());
+    Matcher matcher = pattern.matcher(source);
+    if (matcher.find()) {
+      StringBuilder replacement = new StringBuilder();
+      replacement.append("constructor");
+      replacement.append(function.getName());
+      source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+    }
+
+    // super call variant 1
+    //   scout.ValueField.parent.call(this);
+    //   scout.ValueField.parent.call(this, foo, bar);
+    if (function.getJsClass().getSuperCall() != null) {
+      patternBuilder = new StringBuilder();
+      patternBuilder.append(Pattern.quote(function.getJsClass().getNamespace()))
+          .append("\\.")
+          .append(Pattern.quote(function.getJsClass().getName()))
+          .append("\\.parent\\.call\\s*\\(\\s*this\\s*,?");
+      pattern = Pattern.compile(patternBuilder.toString());
+      matcher = pattern.matcher(source);
+      if (matcher.find()) {
+        StringBuilder replacement = new StringBuilder();
+        replacement.append("super(");
+        source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
+      }
+    }
+
+    return source;
+  }
+
   protected void updateFunctions(JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
     String source = workingCopy.getSource();
     for (JsFunction f : clazz.getFunctions()) {
@@ -221,39 +260,42 @@ public class T500_CreateClasses extends AbstractTask {
     return source;
   }
 
-  protected String updateConstructor(JsFunction function, JsFile jsFile, String source) {
+  protected void replaceInheritedFunctions(Context context, JsClass clazz, JsFile jsFile, WorkingCopy workingCopy) {
+    String source = workingCopy.getSource();
+    JsClass tmp = clazz;
+    while (true) {
+      if (tmp.getSuperCall() == null) break;
+      tmp = context.getJsClass(tmp.getSuperCall().getFullyQualifiedName());
+      if (tmp == null) break;
+
+      for (JsFunction f : tmp.getFunctions()) {
+        if (!f.isConstructor()) {
+          source = replaceInheritedFunction(clazz, f, jsFile, source);
+        }
+      }
+    }
+    workingCopy.setSource(source);
+  }
+
+  protected String replaceInheritedFunction(JsClass thisClazz, JsFunction inheritedFunction, JsFile jsFile, String source) {
+    // super call variant 1
+    //    scout.StringField.parent.prototype._clear.call(this);
+    //    scout.StringField.parent.prototype._clear.call(this, foo, bar);
+    // group 1 function name
     StringBuilder patternBuilder = new StringBuilder();
     patternBuilder
-        .append(Pattern.quote(function.getJsClass().getNamespace()))
-        .append("\\.")
-        .append(Pattern.quote(function.getJsClass().getName()))
-        .append("\\s*\\=\\s*function");
-
+        .append("(?:")
+        .append(Pattern.quote(thisClazz.getFullyQualifiedName()))
+        .append("|")
+        .append(Pattern.quote(inheritedFunction.getJsClass().getFullyQualifiedName()))
+        .append(")")
+        .append("\\.parent\\.prototype\\.(").append(Pattern.quote(inheritedFunction.getName())).append(")\\.call\\s*\\(\\s*this\\s*,?");
     Pattern pattern = Pattern.compile(patternBuilder.toString());
     Matcher matcher = pattern.matcher(source);
     if (matcher.find()) {
       StringBuilder replacement = new StringBuilder();
-      replacement.append("constructor");
-      replacement.append(function.getName());
+      replacement.append("super.").append(matcher.group(1)).append("(");
       source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
-    }
-
-    // super call variant 1
-    //   scout.ValueField.parent.call(this);
-    //   scout.ValueField.parent.call(this, foo, bar);
-    if (function.getJsClass().getSuperCall() != null) {
-      patternBuilder = new StringBuilder();
-      patternBuilder.append(Pattern.quote(function.getJsClass().getNamespace()))
-          .append("\\.")
-          .append(Pattern.quote(function.getJsClass().getName()))
-          .append("\\.parent\\.call\\s*\\(\\s*this\\s*,?");
-      pattern = Pattern.compile(patternBuilder.toString());
-      matcher = pattern.matcher(source);
-      if (matcher.find()) {
-        StringBuilder replacement = new StringBuilder();
-        replacement.append("super(");
-        source = matcher.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
-      }
     }
 
     return source;
