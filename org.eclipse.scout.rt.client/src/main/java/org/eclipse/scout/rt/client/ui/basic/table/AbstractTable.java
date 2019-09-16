@@ -74,11 +74,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
-import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizerProvider;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.TableUserFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.userfilter.IColumnAwareUserFilterState;
@@ -1031,7 +1029,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
     ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
 
-    m_tableOrganizer = BEANS.get(ITableOrganizerProvider.class).createTableOrganizer(this);
+    m_tableOrganizer = createTableOrganizer();
 
     // setTileMode creates the mediator and tileTableHeader lazy if set to true. Do this here to already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
     setTileMode(getConfiguredTileModeEnabled());
@@ -2080,12 +2078,23 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
   }
 
   /**
-   * factory to manage custom columns
+   * Factory method to return an instance of <code>ITableCustomizer</code> to manage columns.
    * <p>
-   * default creates null
+   * The default implementation returns null, override this method if you need another type.
    */
   protected ITableCustomizer createTableCustomizer() {
-    return BEANS.get(ITableCustomizerProvider.class).createTableCustomizer(this);
+    return null;
+  }
+
+  /**
+   * Factory method to create an instance of <code>ITableOrganizer</code> which provides the state for the add/remove
+   * and modify buttons in the table-header-menu.
+   * <p>
+   * The default implementation returns an instance of <code>TableOrganizer</code>, override this method if you need
+   * another type.
+   */
+  protected ITableOrganizer createTableOrganizer() {
+    return new TableOrganizer(this);
   }
 
   /*
