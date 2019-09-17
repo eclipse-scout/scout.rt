@@ -16,7 +16,6 @@ scout.TabArea = function() {
 
   this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
-  this._tabSelectionHandler = this._onTabSelect.bind(this);
   this.ellipsis = null;
 
   this.$selectionMarker = null;
@@ -150,9 +149,9 @@ scout.TabArea.prototype._setTabs = function(tabItems) {
   // un-register model listeners
   tabsToRemove.forEach(function(tab) {
     tab.tabItem.off('propertyChange', this._tabItemPropertyChangeHandler);
-    tab.off('select', this._tabSelectionHandler);
   }, this);
 
+  this._removeTabs(tabsToRemove);
   this._setProperty('tabs', tabs);
 };
 
@@ -286,13 +285,6 @@ scout.TabArea.prototype._setTabbableItem = function(tabItem) {
     });
     tabItem.setTabbable(true);
   }
-};
-
-scout.TabArea.prototype._onTabSelect = function(event) {
-  // translate tab into tabItem
-  this.trigger('tabItemSelect', {
-    tabItem: event.tab.tabItem
-  });
 };
 
 scout.TabArea.prototype._onTabPropertyChange = function(event) {
