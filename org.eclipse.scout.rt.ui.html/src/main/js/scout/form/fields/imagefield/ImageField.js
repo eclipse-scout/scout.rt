@@ -187,7 +187,13 @@ scout.ImageField.prototype._onImageError = function(event) {
   this._onIconUpdated();
 };
 
-// FIXME [awe] CGU: must update instance variable when Icon.js renders a new image.
+/**
+ * This function is called whenever the icon has updated its $container. Since the $field
+ * variable from ImageField.js references the $container of the icon directly, we must update
+ * that variable now.
+ * <p>
+ * Override this method if a sub-class of ImageField.js needs to update its DOM too.
+ */
 scout.ImageField.prototype._onIconUpdated = function() {
   scout.scrollbars.update(this.$fieldContainer);
   this.$field = this.icon.$container;
