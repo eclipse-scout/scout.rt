@@ -153,6 +153,8 @@ scout.strings = {
     return elem.innerHTML;
   },
 
+  plainTextElement: null,
+
   /**
    * Returns the plain text of the given html string using simple tag replacement.<p>
    * Tries to preserve the new lines. Since it does not consider the style, it won't be right in any cases.
