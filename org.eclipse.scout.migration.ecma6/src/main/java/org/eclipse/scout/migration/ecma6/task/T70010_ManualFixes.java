@@ -106,9 +106,13 @@ public class T70010_ManualFixes extends AbstractTask {
         wc.setSource(wc.getSource().replace("logoUrl: 'scout-logo.png'", "logoUrl: 'img/scout-logo.png'"));
       }
       if (pathEndsWith(pathInfo, "/custom/chart/Chart.js")) {
-        // the chart refers to the one on the window object because the chartjs lib is added as normal script tag to the html file
+        // Import the chart.js module and use it in the instance creation
+        String importName = "ChartJs";
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
-        wc.setSource(wc.getSource().replace("this.chart = new Chart(this.$container[0]", "this.chart = new window.Chart(this.$container[0]"));
+        String newSource = wc.getSource().replace("this.chart = new Chart(this.$container[0]", "this.chart = new " + importName + "(this.$container[0]");
+        int importInsertPos = newSource.indexOf("import * as $ from 'jquery';");
+        newSource = newSource.substring(0, importInsertPos) + "import {Chart as " + importName + "} from 'chart.js';" + wc.getLineDelimiter() + newSource.substring(importInsertPos);
+        wc.setSource(newSource);
       }
     }
   }
