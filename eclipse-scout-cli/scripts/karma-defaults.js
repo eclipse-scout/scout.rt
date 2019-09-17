@@ -11,6 +11,18 @@
 const path = require('path');
 const scoutBuild = require('./constants');
 const specIndex = path.resolve('test', 'test-index.js');
+const jquery = require.resolve('jquery');
+
+// load webpack config from module under test
+var webpackConfigProvider = require(path.resolve('webpack.config.js'));
+const webpackConfig = webpackConfigProvider(null, {mode: scoutBuild.mode.development});
+
+// remove all non-js entry points (webpack build performance)
+var nonJsEntries = [];
+Object.keys(webpackConfig.entry)
+  .filter(e => !webpackConfig.entry[e].endsWith(".js"))
+  .forEach(e => nonJsEntries.push(e));
+nonJsEntries.forEach(e => delete webpackConfig.entry[e]);
 
 const preprocessorObj = {};
 preprocessorObj[specIndex] = ['webpack'];
@@ -18,10 +30,14 @@ preprocessorObj[specIndex] = ['webpack'];
 module.exports = function(config) {
   config.set({
     browsers: ['Chrome'],
-    files: [{
-      pattern: specIndex,
-      watched: false
-    }],
+    files: [
+      {
+        pattern: jquery,
+        watched: false
+      }, {
+        pattern: specIndex,
+        watched: false
+      }],
     frameworks: ['jasmine'],
     // Reporter for "Jasmine Spec Runner" results in browser
     // https://www.npmjs.com/package/karma-jasmine-html-reporter
@@ -46,9 +62,7 @@ module.exports = function(config) {
     // depending on whether all tests passed or any tests failed.
     singleRun: false,
     // Webpack
-    webpack: {
-      mode: scoutBuild.mode.development
-    },
+    webpack: webpackConfig,
     webpackServer: {
       noInfo: true
     }
