@@ -11,12 +11,8 @@
 package org.eclipse.scout.rt.security;
 
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertThrows;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.security.AllPermission;
 import java.security.Permission;
@@ -26,10 +22,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.security.fixture.AFixturePermission;
@@ -42,7 +38,6 @@ import org.eclipse.scout.rt.security.fixture.UFixturePermission;
 import org.eclipse.scout.rt.security.fixture.UJFixturePermission;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -295,10 +290,10 @@ public class PermissionsTest {
     m_support.checkAndThrow(new AFixturePermission());
     m_support.checkAndThrow(new JFixturePermission());
 
-    ScoutAssert.assertThrows(VetoException.class, () -> m_support.checkAndThrow(null));
-    ScoutAssert.assertThrows(VetoException.class, () -> m_support.checkAndThrow(new NFixturePermission()));
-    ScoutAssert.assertThrows(VetoException.class, () -> m_support.checkAndThrow(new DFixturePermission()));
-    ScoutAssert.assertThrows(VetoException.class, () -> m_support.checkAndThrow(new UJFixturePermission()));
+    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(null));
+    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new NFixturePermission()));
+    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new DFixturePermission()));
+    assertThrows(AccessForbiddenException.class, () -> m_support.checkAndThrow(new UJFixturePermission()));
   }
 
   @Test

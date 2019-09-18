@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 
 @ApplicationScoped
@@ -71,7 +70,7 @@ public class AccessSupport {
     });
   }
 
-  public VetoException getAccessCheckFailedException(Permission p) {
+  public AccessForbiddenException getAccessCheckFailedException(Permission p) {
     if (p instanceof IPermission) {
       return getAccessCheckFailedException((IPermission) p);
     }
@@ -79,12 +78,12 @@ public class AccessSupport {
         .withContextInfo("permission", "{}", p);
   }
 
-  public VetoException getAccessCheckFailedException(IPermission p) {
+  public AccessForbiddenException getAccessCheckFailedException(IPermission p) {
     return new AccessForbiddenException(p.getAccessCheckFailedMessage())
         .withContextInfo("permission", "{}", p);
   }
 
-  public VetoException getDefaultAccessCheckFailedException() {
+  public AccessForbiddenException getDefaultAccessCheckFailedException() {
     return new AccessForbiddenException(TEXTS.get("YouAreNotAuthorizedToPerformThisAction"));
   }
 
