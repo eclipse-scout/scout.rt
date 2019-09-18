@@ -2,9 +2,6 @@
   "name" : "scout",
   "type" : "Library",
   "fullyQualifiedName" : "scout",
-  "customAttributes": {
-    "lib-moduleName": "@eclipse-scout/core"
-  },
   "children" : [ {
     "name" : "Column",
     "type" : "Class",
@@ -14037,10 +14034,6 @@
       "name" : "_setTabbableItem",
       "type" : "Function",
       "fullyQualifiedName" : "scout.TabArea._setTabbableItem"
-    }, {
-      "name" : "_onTabSelect",
-      "type" : "Function",
-      "fullyQualifiedName" : "scout.TabArea._onTabSelect"
     }, {
       "name" : "_onTabPropertyChange",
       "type" : "Function",
@@ -32033,6 +32026,11 @@
       "name" : "_encodeElement",
       "type" : "UtilityVariable",
       "fullyQualifiedName" : "scout.strings._encodeElement"
+    },
+      {
+        "name": "plainTextElement",
+        "type": "UtilityVariable",
+        "fullyQualifiedName": "scout.strings.plainTextElement"
     } ]
   }, {
     "name" : "focusUtils",
@@ -42812,5 +42810,8 @@
       "theme" : "default-theme"
     }
     }
-  ]
+  ],
+  "customAttributes": {
+    "lib-moduleName": "@eclipse-scout/core"
+  }
 }
