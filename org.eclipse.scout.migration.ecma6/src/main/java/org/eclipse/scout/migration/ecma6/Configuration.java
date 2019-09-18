@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
@@ -28,11 +29,85 @@ public class Configuration {
     return BEANS.get(Configuration.class);
   }
 
+  private String m_sourceModuleDirectory;
+  private String m_targetModuleDirectory;
+  private String m_namespace;
+  private String m_persistLibraryName;
+  private String m_persistLibraryFile;
+
+  /**
+   * Paths and names based on Taskliste-IntelliJ-Ecma.xlsx
+   */
+  protected Configuration() {
+    String sourceBase = getConfiguredSourceBase();
+    String targetBase = getConfiguredTargetBase();
+    String moduleName = getConfiguredModule();
+    if (moduleName == null) {
+      return;
+    }
+
+    switch (moduleName) {
+      case "org.eclipse.scout.rt.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
+        setNamespace("scout");
+        setPersistLibraryName("@eclipse-scout/core");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-scout_core.json");
+        break;
+      case "org.eclipse.scout.jswidgets.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setNamespace("jswidgets");
+        setPersistLibraryName("@eclipse-scout/demo-jswidgets");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-jswidgets.json");
+        break;
+      case "org.eclipse.scout.widgets.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setNamespace("widgets");
+        setPersistLibraryName("@eclipse-scout/widgets");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-widgets_core.json");
+        break;
+      case "com.bsiag.scout.rt.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setNamespace("bsiscout");
+        setPersistLibraryName("@eclipse-scout/bsi");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_bsi_scout_core.json");
+        break;
+      case "com.bsiag.studio.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setPersistLibraryName("@eclipse-scout/studio");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_bsi_studio.json");
+        break;
+      default:
+        throw new ProcessingException("unknown module " + moduleName);
+    }
+  }
+
+  protected String getConfiguredSourceBase() {
+    return null;
+  }
+
+  protected String getConfiguredTargetBase() {
+    return null;
+  }
+
+  protected String getConfiguredModule() {
+    return null;
+  }
+
   /**
    * @return the source directory to be migrated. must exist. Usually something like '.../[com.bsiag.bsicrm.]ui.html'
    */
   public Path getSourceModuleDirectory() {
-    return null;
+    return Paths.get(m_sourceModuleDirectory);
+  }
+
+  public void setSourceModuleDirectory(String sourceModuleDirectory) {
+    m_sourceModuleDirectory = sourceModuleDirectory;
   }
 
   /**
@@ -40,7 +115,11 @@ public class Configuration {
    *         created if it or one of its parents does not exist.
    */
   public Path getTargetModuleDirectory() {
-    return null;
+    return Paths.get(m_targetModuleDirectory);
+  }
+
+  public void setTargetModuleDirectory(String targetModuleDirectory) {
+    m_targetModuleDirectory = targetModuleDirectory;
   }
 
   /**
@@ -54,25 +133,11 @@ public class Configuration {
    * @return (e.g. scout | bsicrm | amag) look at the js files in the module to migrate for the correct namespace.
    */
   public String getNamespace() {
-    return null;
+    return m_namespace;
   }
 
-  /**
-   * @return The folder where all library api's used for this migration are located. In this folder might be several
-   *         *.json * files from previous migrations.
-   */
-  public Path getLibraryApiDirectory() {
-    return Paths.get("./org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis");
-  }
-
-  /**
-   * In case the persist library file is set the API of the migrated module is written in JSON format to this file. If
-   * the persistLibraryFile is set the persistLibraryName must also be set.
-   *
-   * @return a file to persist the api.
-   */
-  public Path getPersistLibraryFile() {
-    return null;
+  public void setNamespace(String namespace) {
+    m_namespace = namespace;
   }
 
   /**
@@ -82,7 +147,33 @@ public class Configuration {
    * @return the library name (npm name) of the library which is optionally written.
    */
   public String getPersistLibraryName() {
-    return "@eclipse-scout/eclipse-scout-core";
+    return m_persistLibraryName;
+  }
+
+  public void setPersistLibraryName(String persistLibraryName) {
+    m_persistLibraryName = persistLibraryName;
+  }
+
+  /**
+   * In case the persist library file is set the API of the migrated module is written in JSON format to this file. If
+   * the persistLibraryFile is set the persistLibraryName must also be set.
+   *
+   * @return a file to persist the api.
+   */
+  public Path getPersistLibraryFile() {
+    return Paths.get(m_persistLibraryFile);
+  }
+
+  public void setPersistLibraryFile(String persistLibraryFile) {
+    m_persistLibraryFile = persistLibraryFile;
+  }
+
+  /**
+   * @return The folder where all library api's used for this migration are located. In this folder might be several
+   *         *.json * files from previous migrations.
+   */
+  public Path getLibraryApiDirectory() {
+    return Paths.get("./org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis");
   }
 
   /**
