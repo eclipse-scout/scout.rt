@@ -32,4 +32,34 @@ public class AccessForbiddenException extends VetoException {
   public AccessForbiddenException(IProcessingStatus status) {
     super(status);
   }
+
+  @Override
+  public AccessForbiddenException withContextInfo(final String name, final Object value, final Object... valueArgs) {
+    super.withContextInfo(name, value, valueArgs);
+    return this;
+  }
+
+  @Override
+  public AccessForbiddenException withTitle(final String title, final Object... args) {
+    super.withTitle(title, args);
+    return this;
+  }
+
+  @Override
+  public AccessForbiddenException withCode(final int code) {
+    super.withCode(code);
+    return this;
+  }
+
+  @Override
+  public AccessForbiddenException withSeverity(final int severity) {
+    super.withSeverity(severity);
+    return this;
+  }
+
+  @Override
+  public AccessForbiddenException withStatus(final IProcessingStatus status) {
+    super.withStatus(status);
+    return this;
+  }
 }
