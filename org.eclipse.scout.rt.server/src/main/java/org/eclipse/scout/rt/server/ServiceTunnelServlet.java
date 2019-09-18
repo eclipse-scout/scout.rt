@@ -140,7 +140,12 @@ public class ServiceTunnelServlet extends AbstractHttpServlet {
           }, DefaultExceptionTranslator.class);
     }
     catch (DuplicateRequestException e) {
-      LOG.warn("Duplicate Request", e);
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug("Duplicate Request", e);
+      }
+      else {
+        LOG.warn("Duplicate Request", e);
+      }
       servletResponse.sendError(HttpServletResponse.SC_CONFLICT, "Request is a duplicate");
     }
     catch (Throwable e) {//NOSONAR
