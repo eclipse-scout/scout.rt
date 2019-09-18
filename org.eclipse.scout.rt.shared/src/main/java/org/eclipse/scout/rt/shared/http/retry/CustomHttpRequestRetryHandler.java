@@ -117,11 +117,23 @@ public class CustomHttpRequestRetryHandler extends DefaultHttpRequestRetryHandle
   protected boolean detectStaleSocketChannel(IOException exception, HttpContext context) {
     boolean retry;
     if (m_retryOnNoHttpResponseException && exception instanceof org.apache.http.NoHttpResponseException) {
-      LOG.warn("detected a 'NoHttpResponseException', assuming a stale socket channel; retry non-idempotent request");
+      String message = "detected a 'NoHttpResponseException', assuming a stale socket channel; retry non-idempotent request";
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug(message);
+      }
+      else {
+        LOG.warn(message);
+      }
       retry = true;
     }
     else if (m_retryOnSocketExceptionByConnectionReset && exception instanceof java.net.SocketException && "Connection reset".equals(exception.getMessage())) {
-      LOG.warn("detected a 'SocketException: Connection reset', assuming a stale socket channel; retry non-idempotent request");
+      String message = "detected a 'SocketException: Connection reset', assuming a stale socket channel; retry non-idempotent request";
+      if (Thread.currentThread().isInterrupted()) {
+        LOG.debug(message);
+      }
+      else {
+        LOG.warn(message);
+      }
       retry = true;
     }
     else {
