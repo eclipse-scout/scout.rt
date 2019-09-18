@@ -21,9 +21,12 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class Configuration {
+  private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
   public static Configuration get() {
     return BEANS.get(Configuration.class);
@@ -59,15 +62,31 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("jswidgets");
         setPersistLibraryName("@eclipse-scout/demo-jswidgets");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-jswidgets.json");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-jswidgets.json");
+        break;
+
+      case "org.eclipse.scout.widgets.heatmap.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setNamespace("scout");
+        setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets-heatmap.json");
         break;
       case "org.eclipse.scout.widgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setNamespace("widgets");
-        setPersistLibraryName("@eclipse-scout/widgets");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-widgets_core.json");
+        setNamespace("scout");
+        setPersistLibraryName("@eclipse-scout/demo-widgets");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets.json");
         break;
+      case "org.eclipse.scout.widgets.ui.html.app":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
+        setNamespace("scout");
+        setPersistLibraryName("@eclipse-scout/demo-widgets-app");
+        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets-app.json");
+        break;
+
       case "com.bsiag.scout.rt.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
@@ -85,6 +104,11 @@ public class Configuration {
       default:
         throw new ProcessingException("unknown module " + moduleName);
     }
+    LOG.info("SourceModuleDirectory: " + getSourceModuleDirectory());
+    LOG.info("TargetModuleDirectory: " + getTargetModuleDirectory());
+    LOG.info("Namespace: " + getNamespace());
+    LOG.info("PersistLibraryName: " + getPersistLibraryName());
+    LOG.info("PersistLibraryFile: " + getPersistLibraryFile());
   }
 
   protected String getConfiguredSourceBase() {
