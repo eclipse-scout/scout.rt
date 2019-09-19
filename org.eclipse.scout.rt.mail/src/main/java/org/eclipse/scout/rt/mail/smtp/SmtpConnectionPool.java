@@ -263,11 +263,11 @@ public class SmtpConnectionPool {
 
   protected P_ReuseCheckResult isReuseAllowed(SmtpConnectionPoolEntry smtpConnectionPoolEntry) {
     IDateProvider dateProvider = BEANS.get(IDateProvider.class);
-    if (dateProvider.currentMillis().getTime() - smtpConnectionPoolEntry.getCreateTime() < m_maxConnectionLifetime) {
+    if (dateProvider.currentMillis().getTime() - smtpConnectionPoolEntry.getCreateTime() >= m_maxConnectionLifetime) {
       return new P_ReuseCheckResult(false, "pooled connection reached max lifetime of {}s", m_maxConnectionLifetime / 1000d);
     }
     int maxMessagesPerConnection = smtpConnectionPoolEntry.getSmtpServerConfig().getMaxMessagesPerConnection();
-    if (maxMessagesPerConnection > 0 && smtpConnectionPoolEntry.getMessagesSent() < maxMessagesPerConnection) {
+    if (maxMessagesPerConnection > 0 && smtpConnectionPoolEntry.getMessagesSent() >= maxMessagesPerConnection) {
       return new P_ReuseCheckResult(false, "pooled connection reached max messages sent of {}", maxMessagesPerConnection);
     }
     return new P_ReuseCheckResult(true, null);
