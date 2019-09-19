@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.mail.smtp;
 
 import java.util.Properties;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
@@ -71,9 +71,9 @@ public class SmtpHelper {
     Assertions.assertNotNull(message, "Message must be set");
 
     if (config.getPoolSize() > 0) {
-      sendMessageInternal(message, (msg, addresses) -> {
-        try (LeasedSmtpConnection connection = BEANS.get(SmtpConnectionPool.class).leaseConnection(config)) {
-          connection.sendMessage(msg, addresses);
+      sendMessageInternal(message, (addresses) -> {
+        try {
+          BEANS.get(SmtpConnectionPool.class).sendMessage(config, message, addresses);
         }
         catch (MessagingException e) {
           handleMessagingException(e);
@@ -101,10 +101,10 @@ public class SmtpHelper {
     Assertions.assertNotNull(message, "Message must be set");
     Assertions.assertNotNull(session, "Session must be set");
 
-    sendMessageInternal(message, (msg, addresses) -> {
+    sendMessageInternal(message, (addresses) -> {
       try (Transport transport = session.getTransport()) {
         connect(session, transport, password);
-        transport.sendMessage(msg, addresses);
+        transport.sendMessage(message, addresses);
       }
       catch (MessagingException e) {
         handleMessagingException(e);
@@ -112,7 +112,7 @@ public class SmtpHelper {
     });
   }
 
-  protected void sendMessageInternal(MimeMessage message, BiConsumer<MimeMessage, Address[]> messageSender) {
+  protected void sendMessageInternal(MimeMessage message, Consumer<Address[]> messageSender) {
     Assertions.assertNotNull(message, "Message must be set");
 
     try {
@@ -126,7 +126,7 @@ public class SmtpHelper {
       message.setSentDate(BEANS.get(IDateProvider.class).currentMillis());
       message.saveChanges();
 
-      messageSender.accept(message, allRecipients);
+      messageSender.accept(allRecipients);
 
       LOG.debug("Sent email with message id {}", BEANS.get(MailHelper.class).getMessageIdSafely(message));
     }
