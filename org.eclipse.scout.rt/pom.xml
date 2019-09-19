@@ -90,6 +90,8 @@
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout</module>
     <module>../eclipse-scout-core</module>
+    <module>../eclipse-scout-testing</module>
+    <module>../karma-jasmine-scout</module>
   </modules>
 
   <properties>

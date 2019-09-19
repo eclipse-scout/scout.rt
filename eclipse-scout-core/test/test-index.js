@@ -8,7 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// Name this file 'test-index.js' because it makes searching for 'index.js'
-// easier in a workspace with lots of different Scout web-projects.
+// Name this file 'test-index.js' because it makes searching for 'index.js' easier in a workspace with lots of different Scout web-projects.
+import {JasmineScout} from '@eclipse-scout/testing';
+
 let context = require.context('./', true, /[sS]pec\.js$/);
-context.keys().forEach(context);
+JasmineScout.runTestSuite(context);

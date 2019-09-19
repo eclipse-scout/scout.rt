@@ -1,0 +1,30 @@
+{
+  "name": "@eclipse-scout/testing",
+  "version": "10.0.0",
+  "description": "Eclipse Scout",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git"
+  },
+  "license": "EPL-1.0",
+  "publishConfig": {
+    "registry": "https://scout.bsiag.com/repository/api/npm/org.eclipse.scout-npm-local/"
+  },
+  "engines": {
+    "node": ">=12.1.0",
+    "npm": ">=6.9.0"
+  },
+  "main": "./src/index.js",
+  "files": [
+    "src"
+  ],
+  "devDependencies": {
+    "jquery": "^3.4.1",
+    "@eclipse-scout/core": "10.0.0"
+  },
+  "peerDependencies": {
+    "jquery": "^3.4.1"
+  }
+}

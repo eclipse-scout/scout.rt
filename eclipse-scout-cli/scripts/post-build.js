@@ -32,19 +32,23 @@ module.exports = {
   createFileList: dir => {
     const scoutBuild = require('./constants');
     let content = '';
-    fs.readdirSync(dir, { withFileTypes: true })
+    fs.readdirSync(dir, {withFileTypes: true})
       .filter(dirent => dirent.isFile())
       .map(dirent => dirent.name)
       .filter(fileName => fileName !== scoutBuild.fileListName)
       .filter(fileName => !THEME_JS_OUT_FILTER(fileName))
       .map(fileName => `${fileName}\n`)
       .forEach(line => content += line);
-    fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, { flag: 'w' });
+    fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
     console.log(`created ${scoutBuild.fileListName}:\n${content}`);
   },
   cleanOutDir: dir => {
+    if (!fs.existsSync(dir)) {
+      return;
+    }
     fs.readdirSync(dir)
       .filter(THEME_JS_OUT_FILTER)
       .forEach(f => deleteFile(path.join(dir, f)));
+
   }
 };
