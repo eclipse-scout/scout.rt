@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.security;
 
 import java.security.Permission;
 import java.security.PermissionCollection;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -55,6 +56,17 @@ public interface IPermissionCollection {
    * @return non null {@link PermissionLevel}
    */
   PermissionLevel getGrantedPermissionLevel(IPermission permission);
+
+  /**
+   * @return stream with all assigned {@link IPermission}
+   */
+  Stream<IPermission> stream();
+
+  /**
+   * @param permission
+   * @return stream with {@link IPermission} for which holds {@link IPermission#matches(IPermission)}
+   */
+  Stream<IPermission> stream(IPermission permission);
 
   /**
    * @see PermissionCollection#add(Permission)

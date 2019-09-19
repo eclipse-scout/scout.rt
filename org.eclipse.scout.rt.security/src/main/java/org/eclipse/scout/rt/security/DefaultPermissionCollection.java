@@ -56,6 +56,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
 
   @Override
   public void add(IPermission permission) {
+    assertNotReadOnly();
     m_permissions.computeIfAbsent(permission.getName(), k -> new ArrayList<>()).add((IPermission) permission);
   }
 
@@ -102,8 +103,7 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
       return PermissionLevel.UNDEFINED;
     }
 
-    Set<PermissionLevel> grantedLevels = m_permissions.getOrDefault(permission.getName(), Collections.emptyList()).stream()
-        .filter(def -> def.matches(permission))
+    Set<PermissionLevel> grantedLevels = stream(permission)
         .map(IPermission::getLevel)
         .collect(Collectors.toSet());
 
@@ -118,8 +118,22 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   }
 
   @Override
+  public Stream<IPermission> stream() {
+    return m_permissions.values().stream().flatMap(Collection::stream);
+  }
+
+  @Override
+  public Stream<IPermission> stream(IPermission permission) {
+    if (permission == null) {
+      return Stream.empty();
+    }
+    return m_permissions.getOrDefault(permission.getName(), Collections.emptyList()).stream()
+        .filter(def -> def.matches(permission));
+  }
+
+  @Override
   public Enumeration<Permission> elements() {
     return EnumerationUtility.asEnumeration(
-        Stream.concat(m_permissions.values().stream().flatMap(Collection::stream).map(Permission.class::cast), m_javaPermissions.stream()).iterator());
+        Stream.concat(stream().map(Permission.class::cast), m_javaPermissions.stream()).iterator());
   }
 }

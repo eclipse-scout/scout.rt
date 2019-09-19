@@ -14,6 +14,7 @@ import java.security.AllPermission;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.stream.Stream;
 
 public class AllPermissionCollection extends AbstractPermissionCollection {
   private static final long serialVersionUID = 1L;
@@ -48,5 +49,15 @@ public class AllPermissionCollection extends AbstractPermissionCollection {
   @Override
   public Enumeration<Permission> elements() {
     return Collections.enumeration(Collections.singletonList(m_allPermission));
+  }
+
+  @Override
+  public Stream<IPermission> stream() {
+    return Stream.empty();
+  }
+
+  @Override
+  public Stream<IPermission> stream(IPermission permission) {
+    return Stream.empty();
   }
 }

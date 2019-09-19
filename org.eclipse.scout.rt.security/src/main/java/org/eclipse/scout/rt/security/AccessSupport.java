@@ -78,7 +78,7 @@ public class AccessSupport {
         .withContextInfo("permission", "{}", p);
   }
 
-  public AccessForbiddenException getAccessCheckFailedException(IPermission p) {
+  protected AccessForbiddenException getAccessCheckFailedException(IPermission p) {
     return new AccessForbiddenException(p.getAccessCheckFailedMessage())
         .withContextInfo("permission", "{}", p);
   }
