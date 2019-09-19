@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.security;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.stream.Stream;
 
 public class NonePermissionCollection extends AbstractPermissionCollection {
   private static final long serialVersionUID = 1L;
@@ -45,5 +46,15 @@ public class NonePermissionCollection extends AbstractPermissionCollection {
   @Override
   public Enumeration<Permission> elements() {
     return Collections.enumeration(Collections.emptyList());
+  }
+
+  @Override
+  public Stream<IPermission> stream() {
+    return Stream.empty();
+  }
+
+  @Override
+  public Stream<IPermission> stream(IPermission permission) {
+    return Stream.empty();
   }
 }

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -348,6 +350,23 @@ public class PermissionsTest {
 
     assertSame(TestPermissionLevels.GRANTED, permissions.getGrantedPermissionLevel(new GFixturePermission()));
     assertSame(PermissionLevel.UNDEFINED, permissions.getGrantedPermissionLevel(new DFixturePermission()));
+  }
+
+  @Test
+  public void testStream() {
+    assertEquals(Collections.emptySet(), BEANS.get(AllPermissionCollection.class).stream().collect(Collectors.toSet()));
+    assertEquals(Collections.emptySet(), BEANS.get(NonePermissionCollection.class).stream().collect(Collectors.toSet()));
+
+    IPermissionCollection permissions = createDefaultPermissionCollection();
+    assertEquals(4, permissions.stream().collect(Collectors.toSet()).size());
+    assertTrue(permissions.stream().anyMatch(p -> p.getClass() == AFixturePermission.class));
+    assertTrue(permissions.stream().anyMatch(p -> p.getClass() == GFixturePermission.class));
+    assertTrue(permissions.stream().anyMatch(p -> p.getClass() == DFixturePermission.class));
+    assertTrue(permissions.stream().anyMatch(p -> p.getClass() == NFixturePermission.class));
+
+    Set<IPermission> set = permissions.stream(new GFixturePermission()).collect(Collectors.toSet());
+    assertEquals(1, set.size());
+    assertTrue(set.iterator().next().getClass() == GFixturePermission.class);
   }
 
   @Test

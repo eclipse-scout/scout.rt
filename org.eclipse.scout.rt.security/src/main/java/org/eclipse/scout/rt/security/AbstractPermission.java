@@ -102,7 +102,7 @@ public abstract class AbstractPermission extends Permission implements IPermissi
   }
 
   protected void validateLevel() {
-    Assertions.assertNotNull(m_level, "Granted level is not set");
+    Assertions.assertNotNull(m_level, "Granted level is not set on {}", this);
   }
 
   @Override
