@@ -14,13 +14,20 @@ public class LeasedSmtpConnection implements AutoCloseable {
   protected SmtpConnectionPool m_connectionPool;
   protected SmtpConnectionPoolEntry m_connectionPoolEntry;
   protected Transport m_transport;
+  protected boolean m_failed;
 
   private boolean m_closed;
 
   public void sendMessage(MimeMessage message, Address[] recipients) throws MessagingException {
     Assertions.assertFalse(m_closed, "{} must not be used after it has been closed.", LeasedSmtpConnection.class.getSimpleName());
-    m_transport.sendMessage(message, recipients);
-    m_connectionPoolEntry.incrementMessagesSent();
+    try {
+      m_transport.sendMessage(message, recipients);
+      m_connectionPoolEntry.incrementMessagesSent();
+    }
+    catch (MessagingException e) {
+      m_failed = true;
+      throw e;
+    }
   }
 
   @Override
@@ -46,5 +53,9 @@ public class LeasedSmtpConnection implements AutoCloseable {
 
   protected Transport getTransport() {
     return m_transport;
+  }
+
+  public boolean isFailed() {
+    return m_failed;
   }
 }
