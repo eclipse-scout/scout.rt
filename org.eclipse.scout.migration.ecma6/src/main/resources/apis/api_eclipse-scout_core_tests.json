@@ -1,0 +1,590 @@
+{
+  "name" : "scout",
+  "type" : "Library",
+  "fullyQualifiedName" : "scout",
+  "customAttributes" : {
+    "lib-moduleName" : "@eclipse-scout/testing"
+  },
+  "children" : [ {
+    "name" : "TabBoxSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.TabBoxSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.TabBoxSpecHelper"
+    }, {
+      "name" : "createTabBoxWith2Tabs",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TabBoxSpecHelper.createTabBoxWith2Tabs"
+    }, {
+      "name" : "createTabBoxWith",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TabBoxSpecHelper.createTabBoxWith"
+    }, {
+      "name" : "createTabBox",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TabBoxSpecHelper.createTabBox"
+    }, {
+      "name" : "createTabItem",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TabBoxSpecHelper.createTabItem"
+    } ]
+  }, {
+    "name" : "fn",
+    "type" : "Class",
+    "fullyQualifiedName" : "$.fn",
+    "children" : [ {
+      "name" : "triggerBlur",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerBlur"
+    }, {
+      "name" : "triggerRightClick",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerRightClick"
+    }, {
+      "name" : "triggerKeyUp",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyUp"
+    }, {
+      "name" : "triggerKeyDown",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyDown"
+    }, {
+      "name" : "triggerMouseEnter",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseEnter"
+    }, {
+      "name" : "triggerMouseLeave",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseLeave"
+    }, {
+      "name" : "triggerMouseDown",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseDown"
+    }, {
+      "name" : "triggerMouseDownCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseDownCapture"
+    }, {
+      "name" : "triggerKeyDownCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyDownCapture"
+    }, {
+      "name" : "triggerKeyUpCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyUpCapture"
+    }, {
+      "name" : "triggerKeyInputCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyInputCapture"
+    }, {
+      "name" : "triggerKeyCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerKeyCapture"
+    }, {
+      "name" : "triggerMouseUp",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseUp"
+    }, {
+      "name" : "triggerMouseMove",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseMove"
+    }, {
+      "name" : "triggerMouseAction",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerMouseAction"
+    }, {
+      "name" : "triggerWithPosition",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerWithPosition"
+    }, {
+      "name" : "triggerContextMenu",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerContextMenu"
+    }, {
+      "name" : "triggerClick",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerClick"
+    }, {
+      "name" : "triggerDoubleClick",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerDoubleClick"
+    }, {
+      "name" : "triggerImageLoadCapture",
+      "type" : "StaticFunction",
+      "fullyQualifiedName" : "$.fn.triggerImageLoadCapture"
+    } ]
+  }, {
+    "name" : "TableSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.TableSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.TableSpecHelper"
+    }, {
+      "name" : "createModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModel"
+    }, {
+      "name" : "createModelRow",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelRow"
+    }, {
+      "name" : "createModelRowByTexts",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelRowByTexts"
+    }, {
+      "name" : "createModelRowByValues",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelRowByValues"
+    }, {
+      "name" : "createModelColumn",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelColumn"
+    }, {
+      "name" : "createModelCell",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelCell"
+    }, {
+      "name" : "createMenuModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createMenuModel"
+    }, {
+      "name" : "createMenuModelWithSingleAndHeader",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createMenuModelWithSingleAndHeader"
+    }, {
+      "name" : "createModelColumns",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelColumns"
+    }, {
+      "name" : "createModelCells",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelCells"
+    }, {
+      "name" : "createModelRows",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelRows"
+    }, {
+      "name" : "createModelSingleColumnByTexts",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelSingleColumnByTexts"
+    }, {
+      "name" : "createModelSingleColumnByValues",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelSingleColumnByValues"
+    }, {
+      "name" : "createModelFixture",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelFixture"
+    }, {
+      "name" : "createTableWithOneColumn",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createTableWithOneColumn"
+    }, {
+      "name" : "createModelSingleConfiguredCheckableColumn",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createModelSingleConfiguredCheckableColumn"
+    }, {
+      "name" : "createTable",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createTable"
+    }, {
+      "name" : "createTableAdapter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createTableAdapter"
+    }, {
+      "name" : "createColumnFilter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createColumnFilter"
+    }, {
+      "name" : "createAndRegisterColumnFilter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.createAndRegisterColumnFilter"
+    }, {
+      "name" : "applyDisplayStyle",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.applyDisplayStyle"
+    }, {
+      "name" : "getRowIds",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.getRowIds"
+    }, {
+      "name" : "selectRowsAndAssert",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.selectRowsAndAssert"
+    }, {
+      "name" : "assertSelection",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.assertSelection"
+    }, {
+      "name" : "assertTextsInCells",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.assertTextsInCells"
+    }, {
+      "name" : "assertValuesInCells",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.assertValuesInCells"
+    }, {
+      "name" : "assertDatesInCells",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.assertDatesInCells"
+    }, {
+      "name" : "assertSelectionEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.assertSelectionEvent"
+    }, {
+      "name" : "getDisplayingContextMenu",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.getDisplayingContextMenu"
+    }, {
+      "name" : "resetIntlCollator",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TableSpecHelper.resetIntlCollator"
+    } ]
+  }, {
+    "name" : "OutlineSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.OutlineSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper"
+    }, {
+      "name" : "createModelFixture",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createModelFixture"
+    }, {
+      "name" : "createModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createModel"
+    }, {
+      "name" : "createModelNode",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createModelNode"
+    }, {
+      "name" : "createModelNodes",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createModelNodes"
+    }, {
+      "name" : "createModelNodesInternal",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createModelNodesInternal"
+    }, {
+      "name" : "createOutline",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createOutline"
+    }, {
+      "name" : "createOutlineAdapter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createOutlineAdapter"
+    }, {
+      "name" : "createOutlineWithOneDetailForm",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createOutlineWithOneDetailForm"
+    }, {
+      "name" : "createOutlineWithOneDetailTable",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.OutlineSpecHelper.createOutlineWithOneDetailTable"
+    } ]
+  }, {
+    "name" : "ActiveDummyLookupCall",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.ActiveDummyLookupCall",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.ActiveDummyLookupCall"
+    }, {
+      "name" : "_data",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.ActiveDummyLookupCall._data"
+    }, {
+      "name" : "_dataToLookupRow",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.ActiveDummyLookupCall._dataToLookupRow"
+    } ]
+  }, {
+    "name" : "DummyLookupCall",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.DummyLookupCall",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.DummyLookupCall"
+    }, {
+      "name" : "_data",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.DummyLookupCall._data"
+    }, {
+      "name" : "_dataToLookupRow",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.DummyLookupCall._dataToLookupRow"
+    } ]
+  }, {
+    "name" : "LanguageDummyLookupCall",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.LanguageDummyLookupCall",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.LanguageDummyLookupCall"
+    }, {
+      "name" : "_data",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LanguageDummyLookupCall._data"
+    } ]
+  }, {
+    "name" : "FormSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.FormSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.FormSpecHelper"
+    }, {
+      "name" : "createViewWithOneField",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createViewWithOneField"
+    }, {
+      "name" : "createFormWithOneField",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createFormWithOneField"
+    }, {
+      "name" : "createGroupBoxWithOneField",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createGroupBoxWithOneField"
+    }, {
+      "name" : "createGroupBoxWithFields",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createGroupBoxWithFields"
+    }, {
+      "name" : "createRadioButtonGroup",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createRadioButtonGroup"
+    }, {
+      "name" : "createFormWithFields",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createFormWithFields"
+    }, {
+      "name" : "createFieldModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createFieldModel"
+    }, {
+      "name" : "createField",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createField"
+    }, {
+      "name" : "createModeSelector",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.FormSpecHelper.createModeSelector"
+    } ]
+  }, {
+    "name" : "TestBeanField",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.TestBeanField",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.TestBeanField"
+    }, {
+      "name" : "_render",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TestBeanField._render"
+    }, {
+      "name" : "_renderValue",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TestBeanField._renderValue"
+    } ]
+  }, {
+    "name" : "CloneSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.CloneSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.CloneSpecHelper"
+    }, {
+      "name" : "validateClone",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.CloneSpecHelper.validateClone"
+    }, {
+      "name" : "CUSTOM_MATCHER",
+      "type" : "Constant",
+      "fullyQualifiedName" : "scout.CloneSpecHelper.CUSTOM_MATCHER"
+    }, {
+      "name" : "CUSTOM_MATCHER",
+      "type" : "Enum",
+      "fullyQualifiedName" : "scout.CloneSpecHelper.CUSTOM_MATCHER"
+    } ]
+  }, {
+    "name" : "LocaleSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.LocaleSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper"
+    }, {
+      "name" : "createModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.createModel"
+    }, {
+      "name" : "createLocale",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.createLocale"
+    }, {
+      "name" : "createDecimalFormatSymbolsForDeCH",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.createDecimalFormatSymbolsForDeCH"
+    }, {
+      "name" : "createDecimalFormatSymbolsForDeDE",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.createDecimalFormatSymbolsForDeDE"
+    }, {
+      "name" : "_initDateFormatSymbols",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper._initDateFormatSymbols"
+    }, {
+      "name" : "_initDateFormatDefaultPatterns",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper._initDateFormatDefaultPatterns"
+    }, {
+      "name" : "createDateFormatSymbolsForDe",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.createDateFormatSymbolsForDe"
+    }, {
+      "name" : "DEFAULT_LOCALE",
+      "type" : "Constant",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.DEFAULT_LOCALE"
+    }, {
+      "name" : "GERMAN_LOCALE",
+      "type" : "Constant",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.GERMAN_LOCALE"
+    }, {
+      "name" : "DEFAULT_DATE_FORMAT_PATTERN",
+      "type" : "Constant",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.DEFAULT_DATE_FORMAT_PATTERN"
+    }, {
+      "name" : "DEFAULT_TIME_FORMAT_PATTERN",
+      "type" : "Constant",
+      "fullyQualifiedName" : "scout.LocaleSpecHelper.DEFAULT_TIME_FORMAT_PATTERN"
+    } ]
+  }, {
+    "name" : "MenuSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.MenuSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.MenuSpecHelper"
+    }, {
+      "name" : "createModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.MenuSpecHelper.createModel"
+    }, {
+      "name" : "createMenu",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.MenuSpecHelper.createMenu"
+    } ]
+  }, {
+    "name" : "TreeSpecHelper",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.TreeSpecHelper",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.TreeSpecHelper"
+    }, {
+      "name" : "createModel",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createModel"
+    }, {
+      "name" : "createModelFixture",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createModelFixture"
+    }, {
+      "name" : "createModelNode",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createModelNode"
+    }, {
+      "name" : "createModelNodes",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createModelNodes"
+    }, {
+      "name" : "createModelNodesInternal",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createModelNodesInternal"
+    }, {
+      "name" : "createTree",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createTree"
+    }, {
+      "name" : "createTreeAdapter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createTreeAdapter"
+    }, {
+      "name" : "createCompactTree",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createCompactTree"
+    }, {
+      "name" : "createCompactTreeAdapter",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createCompactTreeAdapter"
+    }, {
+      "name" : "findAllNodes",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.findAllNodes"
+    }, {
+      "name" : "createNodeExpandedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodeExpandedEvent"
+    }, {
+      "name" : "selectNodesAndAssert",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.selectNodesAndAssert"
+    }, {
+      "name" : "assertSelection",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.assertSelection"
+    }, {
+      "name" : "createNodesSelectedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodesSelectedEvent"
+    }, {
+      "name" : "createNodesInsertedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodesInsertedEvent"
+    }, {
+      "name" : "createNodesInsertedEventTopNode",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodesInsertedEventTopNode"
+    }, {
+      "name" : "createNodesDeletedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodesDeletedEvent"
+    }, {
+      "name" : "createAllChildNodesDeletedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createAllChildNodesDeletedEvent"
+    }, {
+      "name" : "createNodeChangedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodeChangedEvent"
+    }, {
+      "name" : "createNodesUpdatedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createNodesUpdatedEvent"
+    }, {
+      "name" : "createChildNodeOrderChangedEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createChildNodeOrderChangedEvent"
+    }, {
+      "name" : "createTreeEnabledEvent",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.TreeSpecHelper.createTreeEnabledEvent"
+    } ]
+  }, {
+    "name" : "ColumnDescriptorDummyLookupCall",
+    "type" : "Class",
+    "fullyQualifiedName" : "scout.ColumnDescriptorDummyLookupCall",
+    "children" : [ {
+      "type" : "Constructor",
+      "fullyQualifiedName" : "scout.ColumnDescriptorDummyLookupCall"
+    }, {
+      "name" : "_dataToLookupRow",
+      "type" : "Function",
+      "fullyQualifiedName" : "scout.ColumnDescriptorDummyLookupCall._dataToLookupRow"
+    } ]
+  } ]
+}

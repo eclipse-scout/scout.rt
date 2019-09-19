@@ -11,6 +11,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 public final class PathFilters {
   private static Path SRC_MAIN_JS = Paths.get("src/main/js");
+  private static Path SRC_TEST_JS = Paths.get("src/test/js");
 
   private PathFilters() {
   }
@@ -29,6 +30,10 @@ public final class PathFilters {
 
   public static Predicate<PathInfo> inSrcMainJs() {
     return info -> info.getModuleRelativePath() != null && info.getModuleRelativePath().startsWith(SRC_MAIN_JS);
+  }
+
+  public static Predicate<PathInfo> inSrcTestJs() {
+    return info -> info.getModuleRelativePath() != null && info.getModuleRelativePath().startsWith(SRC_TEST_JS);
   }
 
   public static Predicate<PathInfo> notOneOf(Path... notAcceptedRelativeToModule) {

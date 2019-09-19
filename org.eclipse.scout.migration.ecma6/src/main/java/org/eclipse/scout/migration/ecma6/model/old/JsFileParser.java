@@ -240,6 +240,10 @@ public class JsFileParser {
       //  do not parse objectFactories.js it is a special file and handled in T1100_ObjectFactories
       return m_jsFile;
     }
+    if(PathFilters.inSrcTestJs().test(m_jsFile.getPathInfo())) {
+      // do not parse specs. these files cannot be handled by this parser anyway.
+      return m_jsFile;
+    }
 
     JsFunction instanceGetter = null;
     Matcher matcher = null;
