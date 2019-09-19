@@ -20,7 +20,11 @@
   "files": [
     "src"
   ],
+  "scripts": {
+    "snapshot-version": "scout-scripts snapshot-version"
+  },
   "devDependencies": {
+    "@eclipse-scout/cli": "^10.0.0",
     "jquery": "^3.4.1",
     "@eclipse-scout/core": "10.0.0"
   },

@@ -17,6 +17,15 @@
     "npm": ">=6.9.0"
   },
   "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "snapshot-version": "scout-scripts snapshot-version"
+  },
+  "devDependencies": {
+    "@eclipse-scout/cli": "^10.0.0"
+  },
   "keywords": [
     "karma",
     "jasmine",
