@@ -36,7 +36,7 @@ public class Configuration {
   private String m_targetModuleDirectory;
   private String m_namespace;
   private String m_persistLibraryName;
-  private String m_persistLibraryFile;
+  private String m_persistLibraryFileName;
 
   /**
    * Paths and names based on Taskliste-IntelliJ-Ecma.xlsx
@@ -55,36 +55,29 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
         setNamespace("scout");
         setPersistLibraryName("@eclipse-scout/core");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_eclipse-scout_core.json");
+        setPersistLibraryFileName("api_eclipse-scout_core.json");
         break;
       case "org.eclipse.scout.jswidgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("jswidgets");
         setPersistLibraryName("@eclipse-scout/demo-jswidgets");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-jswidgets.json");
+        setPersistLibraryFileName("api_demo-jswidgets.json");
         break;
 
       case "org.eclipse.scout.widgets.heatmap.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setNamespace("scout");
+        setNamespace("heatmap");
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets-heatmap.json");
+        setPersistLibraryFileName("api_demo-widgets-heatmap.json");
         break;
       case "org.eclipse.scout.widgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setNamespace("scout");
+        setNamespace("widgets");
         setPersistLibraryName("@eclipse-scout/demo-widgets");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets.json");
-        break;
-      case "org.eclipse.scout.widgets.ui.html.app":
-        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setNamespace("scout");
-        setPersistLibraryName("@eclipse-scout/demo-widgets-app");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_demo-widgets-app.json");
+        setPersistLibraryFileName("api_demo-widgets.json");
         break;
 
       case "com.bsiag.scout.rt.ui.html":
@@ -92,14 +85,14 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
         setNamespace("bsiscout");
         setPersistLibraryName("@eclipse-scout/bsi");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_bsi_scout_core.json");
+        setPersistLibraryFileName("api_bsi_scout_core.json");
         break;
       case "com.bsiag.studio.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
         setNamespace("studio");
         setPersistLibraryName("@eclipse-scout/studio");
-        setPersistLibraryFile(sourceBase + "/org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis/api_bsi_studio.json");
+        setPersistLibraryFileName("api_bsi_studio.json");
         break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
@@ -108,7 +101,8 @@ public class Configuration {
     LOG.info("TargetModuleDirectory: " + getTargetModuleDirectory());
     LOG.info("Namespace: " + getNamespace());
     LOG.info("PersistLibraryName: " + getPersistLibraryName());
-    LOG.info("PersistLibraryFile: " + getPersistLibraryFile());
+    LOG.info("PersistLibraryFileName: " + getPersistLibraryFileName());
+    LOG.info("LibraryApiDirectory: " + getLibraryApiDirectory());
   }
 
   protected String getConfiguredSourceBase() {
@@ -184,12 +178,16 @@ public class Configuration {
    *
    * @return a file to persist the api.
    */
-  public Path getPersistLibraryFile() {
-    return Paths.get(m_persistLibraryFile);
+  public String getPersistLibraryFileName() {
+    return m_persistLibraryFileName;
   }
 
-  public void setPersistLibraryFile(String persistLibraryFile) {
-    m_persistLibraryFile = persistLibraryFile;
+  public void setPersistLibraryFileName(String persistLibraryFileName) {
+    m_persistLibraryFileName = persistLibraryFileName;
+  }
+
+  public Path getPersistLibraryFile() {
+    return Paths.get(getLibraryApiDirectory().toString(), getPersistLibraryFileName());
   }
 
   /**
@@ -197,7 +195,7 @@ public class Configuration {
    *         *.json * files from previous migrations.
    */
   public Path getLibraryApiDirectory() {
-    return Paths.get("./org.eclipse.scout.rt/org.eclipse.scout.migration.ecma6/src/main/resources/apis");
+    return Paths.get(getConfiguredSourceBase() + "/ecma6-mig-apis");
   }
 
   /**
@@ -215,8 +213,8 @@ public class Configuration {
     if (StringUtility.isNullOrEmpty(getNamespace())) {
       throw new VetoException(configurationErrorMessage("'namespace' with value: '" + getNamespace() + "' is not set."));
     }
-    if (getPersistLibraryFile() != null && StringUtility.isNullOrEmpty(getPersistLibraryName())) {
-      throw new VetoException(configurationErrorMessage("In case the persistLibraryFile is set the persistLibraryName must also be set."));
+    if (getPersistLibraryFileName() != null && StringUtility.isNullOrEmpty(getPersistLibraryName())) {
+      throw new VetoException(configurationErrorMessage("In case the persistLibraryFileName is set the persistLibraryName must also be set."));
     }
     if (getLibraryApiDirectory() != null) {
       if (!Files.exists(getLibraryApiDirectory()) || !Files.isDirectory(getLibraryApiDirectory())) {

@@ -76,9 +76,21 @@ public class T40030_IndexJs extends AbstractTask {
     }
 
     if ("scout".equals(config.getNamespace())) {
-      newSource.append(nl)
-          .append("export { default as JQueryUtils } from './jquery/jquery-scout';").append(nl)
-          .append("export { default as JQuerySelectors } from './jquery/jquery-scout-selectors';").append(nl);
+      newSource
+          .append(nl)
+          .append("export { default as JQueryUtils } from './jquery/jquery-scout';")
+          .append(nl)
+          .append("export { default as JQuerySelectors } from './jquery/jquery-scout-selectors';")
+          .append(nl)
+          .append(nl)
+          .append("export { default as LoginApp } from './login/LoginApp';")
+          .append(nl)
+          .append("export { default as LoginBox } from './login/LoginBox';")
+          .append(nl)
+          .append("export { default as LogoutApp } from './login/LogoutApp';")
+          .append(nl)
+          .append("export { default as LogoutBox } from './login/LogoutBox';")
+          .append(nl);
     }
 
     newSource.append(nl)
