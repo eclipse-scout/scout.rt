@@ -529,13 +529,18 @@ scout.StringField.prototype.acceptInput = function(whileTyping) {
  */
 scout.StringField.prototype._onFieldFocus = function(event) {
   scout.StringField.parent.prototype._onFieldFocus.call(this, event);
+
   if (this.inputObfuscated) {
     this.$field.val('');
 
     // Without properly setting selection start and end, cursor is not visible in IE and Firefox.
     setTimeout(function() {
-      this.$field[0].selectionStart = 0;
-      this.$field[0].selectionEnd = 0;
+      if (!this.rendered) {
+        return;
+      }
+      var $field = this.$field[0];
+      $field.selectionStart = 0;
+      $field.selectionEnd = 0;
     }.bind(this));
   }
 };
