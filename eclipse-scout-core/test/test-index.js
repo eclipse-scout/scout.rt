@@ -11,9 +11,5 @@
 // Name this file 'test-index.js' because it makes searching for 'index.js' easier in a workspace with lots of different Scout web-projects.
 
 
-let context = require.context('./', true, /Dummy.*[sS]pec\.js$/);
+let context = require.context('./', true, /[sS]pec\.js$/);
 context.keys().forEach(context);
-// TODO: remove lines above this comment and uncomment lines below as soon as the scout core code is available.
-//import {JasmineScout} from '@eclipse-scout/testing';
-//let context = require.context('./', true, /[sS]pec\.js$/);
-//JasmineScout.runTestSuite(context);
