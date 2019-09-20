@@ -45,7 +45,7 @@ module.exports = function(config) {
       require('karma-jasmine'),
       require('karma-jasmine-jquery'),
       require('karma-jasmine-ajax'),
-      require('karma-jasmine-scout'),
+      require('@eclipse-scout/karma-jasmine-scout'),
       require('karma-webpack'),
       require('karma-chrome-launcher')
     ],

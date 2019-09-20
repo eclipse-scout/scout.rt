@@ -1,5 +1,5 @@
 {
-  "name": "karma-jasmine-scout",
+  "name": "@eclipse-scout/karma-jasmine-scout",
   "version": "10.0.0",
   "description": "Scout plugin for Jasmine in Karma",
   "author": "BSI Business Systems Integration AG",
