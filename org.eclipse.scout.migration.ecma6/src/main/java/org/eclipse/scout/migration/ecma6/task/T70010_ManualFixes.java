@@ -19,6 +19,7 @@ import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.Exemption;
 import org.eclipse.scout.rt.platform.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ public class T70010_ManualFixes extends AbstractTask {
     return pathInfo.getPath().toString().replace('\\', '/').endsWith(suffix.replace('\\', '/'));
   }
 
+  @Exemption
   @Override
   public void process(PathInfo pathInfo, Context context) {
     String namespace = Configuration.get().getNamespace();
@@ -90,6 +92,15 @@ public class T70010_ManualFixes extends AbstractTask {
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("(options.resourceUrl, 'res/');", "(options.resourceUrl, '');"));
       }
+
+      if (pathEndsWith(pathInfo, "/LoginBox.js")
+          || pathEndsWith(pathInfo, "/LogoutBox.js")
+          || pathEndsWith(pathInfo, "/LoginApp.js")
+          || pathEndsWith(pathInfo, "/LogoutApp.js")) {
+        // there is no longer a "res" folder for resources. therefore the log4javascript lib folder can be found on top level now.
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        wc.setSource(wc.getSource().replace("'res/logo.png'", "'img/logo.png'"));
+      }
     }
 
     if ("jswidgets".equals(namespace)) {
@@ -115,5 +126,17 @@ public class T70010_ManualFixes extends AbstractTask {
         wc.setSource(newSource);
       }
     }
+
+    if ("widgets".equals(namespace)) {
+      if (pathEndsWith(pathInfo, "/ChartField.js")) {
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        String ln = wc.getLineDelimiter();
+        String source = wc.getSource();
+        String marker = "export default class ChartField";
+        source = source.replace(marker, "import {Chart} from 'chart.js';" + ln + ln + marker);
+        wc.setSource(source);
+      }
+    }
+
   }
 }
