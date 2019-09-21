@@ -15,6 +15,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
@@ -27,6 +28,18 @@ public class T99999_DeleteEmptyDirectories implements IPostMigrationTask {
     Path dir = Configuration.get().getTargetModuleDirectory();
     try {
       Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          String name = dir.getFileName().toString();
+          if (name.startsWith(".")
+              || name.equals("node_modules") ||
+              name.equals("target")) {
+            return FileVisitResult.SKIP_SUBTREE;
+          }
+          return super.preVisitDirectory(dir, attrs);
+        }
+
         @Override
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
           //noinspection resource
