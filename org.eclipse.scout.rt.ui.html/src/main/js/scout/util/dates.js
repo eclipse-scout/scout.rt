@@ -184,10 +184,10 @@ scout.dates = {
       scout.strings.padZeroLeft(d.getMilliseconds(), 3);
   },
 
-  orderWeekdays: function(weekdays, firstDayOfWeek) {
+  orderWeekdays: function(weekdays, firstDayOfWeekArg) {
     var weekdaysOrdered = [];
     for (var i = 0; i < 7; i++) {
-      weekdaysOrdered[i] = weekdays[(i + firstDayOfWeek) % 7];
+      weekdaysOrdered[i] = weekdays[(i + firstDayOfWeekArg) % 7];
     }
     return weekdaysOrdered;
   },
@@ -207,48 +207,48 @@ scout.dates = {
     if (!date) {
       return undefined;
     }
-    var firstDayOfWeek = 1;
+    var firstDayOfWeekArg = 1;
     if (typeof option === 'object') {
       // scout.DateFormat
       if (option.symbols !== undefined && option.symbols.firstDayOfWeek !== undefined) {
-        firstDayOfWeek = option.symbols.firstDayOfWeek;
+        firstDayOfWeekArg = option.symbols.firstDayOfWeek;
       }
       // scout.Locale
       else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
-        firstDayOfWeek = option.decimalFormatSymbols.firstDayOfWeek;
+        firstDayOfWeekArg = option.decimalFormatSymbols.firstDayOfWeek;
       }
     } else if (typeof option === 'number') {
-      firstDayOfWeek = option;
+      firstDayOfWeekArg = option;
     }
 
     // Thursday of current week decides the year
-    var thursday = this._thursdayOfWeek(date, firstDayOfWeek);
+    var thursday = this._thursdayOfWeek(date, firstDayOfWeekArg);
 
     // In ISO format, the week with January 4th is the first week
     var jan4 = new Date(thursday.getFullYear(), 0, 4);
 
     // If the date is before the beginning of the year, it belongs to the year before
-    var startJan4 = this.firstDayOfWeek(jan4, firstDayOfWeek);
+    var startJan4 = this.firstDayOfWeek(jan4, firstDayOfWeekArg);
     if (date.getTime() < startJan4.getTime()) {
       jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
     }
 
     // Get the Thursday of the first week, to be able to compare it to 'thursday'
-    var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeek);
+    var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeekArg);
 
     var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
 
     return 1 + Math.round(diffInDays / 7);
   },
 
-  _thursdayOfWeek: function(date, firstDayOfWeek) {
-    if (!date || typeof firstDayOfWeek !== 'number') {
+  _thursdayOfWeek: function(date, firstDayOfWeekArg) {
+    if (!date || typeof firstDayOfWeekArg !== 'number') {
       return undefined;
     }
 
     var thursday = new Date(date.valueOf());
     if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
-      if (thursday.getDay() < firstDayOfWeek) {
+      if (thursday.getDay() < firstDayOfWeekArg) {
         // go 1 week backward
         thursday.setDate(thursday.getDate() - 7);
       }
@@ -257,13 +257,13 @@ scout.dates = {
     return thursday;
   },
 
-  firstDayOfWeek: function(date, firstDayOfWeek) {
-    if (!date || typeof firstDayOfWeek !== 'number') {
+  firstDayOfWeek: function(date, firstDayOfWeekArg) {
+    if (!date || typeof firstDayOfWeekArg !== 'number') {
       return undefined;
     }
     var firstDay = new Date(date.valueOf());
-    if (firstDay.getDay() !== firstDayOfWeek) {
-      firstDay.setDate(firstDay.getDate() - ((firstDay.getDay() + 7 - firstDayOfWeek) % 7));
+    if (firstDay.getDay() !== firstDayOfWeekArg) {
+      firstDay.setDate(firstDay.getDate() - ((firstDay.getDay() + 7 - firstDayOfWeekArg) % 7));
     }
     return firstDay;
   },

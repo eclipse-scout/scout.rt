@@ -136,6 +136,14 @@ public class T70010_ManualFixes extends AbstractTask {
         source = source.replace(marker, "import {Chart} from 'chart.js';" + ln + ln + marker);
         wc.setSource(source);
       }
+      if (pathEndsWith(pathInfo, "/HeatmapField.js")) {
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        String ln = wc.getLineDelimiter();
+        String source = wc.getSource();
+        String marker = "export default class HeatmapField";
+        source = source.replace(marker, "import * as L from 'leaflet';" + ln + ln + marker);
+        wc.setSource(source);
+      }
     }
 
   }

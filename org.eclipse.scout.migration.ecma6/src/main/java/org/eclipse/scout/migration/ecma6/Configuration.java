@@ -68,7 +68,7 @@ public class Configuration {
       case "org.eclipse.scout.widgets.heatmap.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
-        setNamespace("heatmap");
+        setNamespace("scout");
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
         setPersistLibraryFileName("api_demo-widgets-heatmap.json");
         break;
