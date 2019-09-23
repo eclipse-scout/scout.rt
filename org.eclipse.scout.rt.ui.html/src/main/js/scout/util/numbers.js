@@ -131,9 +131,9 @@ scout.numbers = {
           number = -Math.round(-number);
         }
         break;
-        // case scout.numbers.RoundingMode.HALF_EVEN:
-        // case scout.numbers.RoundingMode.UNNECESSARY:
-        // not implemented, default is used.
+      // case scout.numbers.RoundingMode.HALF_EVEN:
+      // case scout.numbers.RoundingMode.UNNECESSARY:
+      // not implemented, default is used.
       default:
         // scout.numbers.RoundingMode.HALF_UP is used as default
         if (number < 0) {
@@ -212,6 +212,10 @@ scout.numbers = {
    */
   isNumber: function(number) {
     return typeof number === 'number' && !isNaN(number);
+  },
+
+  _setCorrelationCounter: function(val) {
+    this._correlationCounter = val;
   }
 
 };

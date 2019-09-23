@@ -28,7 +28,7 @@ scout.styles = {
       return {
         name: prop,
         // replace property names like 'max-width' in 'maxWidth'
-        nameCamelCase: prop.replace(/\-(.)/g,
+        nameCamelCase: prop.replace(/-(.)/g,
           function(match, p1) {
             return p1.toUpperCase();
           })
@@ -106,15 +106,15 @@ scout.styles = {
     if (!rgbString) {
       return undefined;
     }
-    var rgb = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?(\d+(\.\d+)?)?/i);
-    if (rgb === null) {
+    var rgbVal = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?(\d+(\.\d+)?)?/i);
+    if (rgbVal === null) {
       return undefined;
     }
     return {
-      red: parseInt(rgb[1], 10),
-      green: parseInt(rgb[2], 10),
-      blue: parseInt(rgb[3], 10),
-      alpha: parseFloat(scout.nvl(rgb[4], 1))
+      red: parseInt(rgbVal[1], 10),
+      green: parseInt(rgbVal[2], 10),
+      blue: parseInt(rgbVal[3], 10),
+      alpha: parseFloat(scout.nvl(rgbVal[4], 1))
     };
   },
 
@@ -130,12 +130,12 @@ scout.styles = {
    *          Default is 0.2.
    */
   darkerColor: function(color, ratio) {
-    var rgb = this.rgb(color);
-    if (!rgb) {
+    var rgbVal = this.rgb(color);
+    if (!rgbVal) {
       return undefined;
     }
     ratio = scout.nvl(ratio, 0.2);
-    return this.mergeRgbColors(this.RGB_BLACK, ratio, rgb, 1 - ratio);
+    return this.mergeRgbColors(this.RGB_BLACK, ratio, rgbVal, 1 - ratio);
   },
 
   /**
@@ -150,12 +150,12 @@ scout.styles = {
    *          Default is 0.2.
    */
   lighterColor: function(color, ratio) {
-    var rgb = this.rgb(color);
-    if (!rgb) {
+    var rgbVal = this.rgb(color);
+    if (!rgbVal) {
       return undefined;
     }
     ratio = scout.nvl(ratio, 0.2);
-    return this.mergeRgbColors(this.RGB_WHITE, ratio, rgb, 1 - ratio);
+    return this.mergeRgbColors(this.RGB_WHITE, ratio, rgbVal, 1 - ratio);
   },
 
   /**

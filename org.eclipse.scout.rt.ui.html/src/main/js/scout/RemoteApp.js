@@ -19,8 +19,12 @@ scout.inherits(scout.RemoteApp, scout.App);
  */
 scout.RemoteApp.prototype._doBootstrap = function(options) {
   return scout.RemoteApp.parent.prototype._doBootstrap.call(this, options).concat([
-    scout.defaultValues.bootstrap()
+    this._doBootstrapDefaultValues()
   ]);
+};
+
+scout.RemoteApp.prototype._doBootstrapDefaultValues = function() {
+  scout.defaultValues.bootstrap();
 };
 
 scout.RemoteApp.prototype._createErrorHandler = function() {

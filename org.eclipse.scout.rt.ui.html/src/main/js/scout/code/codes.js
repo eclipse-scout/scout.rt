@@ -143,17 +143,17 @@ scout.codes = {
    * The texts for the default locale specified by scout.codes.defaultLanguage are used as default texts.
    *
    * @param code the code to register the text for
-   * @param texts an object with the languageTag as key and the translated text as value
+   * @param textsArg an object with the languageTag as key and the translated text as value
    * @return the generated text key
    */
-  registerTexts: function(code, texts) {
+  registerTexts: function(code, textsArg) {
     var key = scout.codes.generateTextKey(code);
 
     // In case of changed defaultLanguage clear the 'default' entry
     scout.texts.get('default').remove(key);
 
-    for (var languageTag in texts) { // NOSONAR
-      var text = texts[languageTag];
+    for (var languageTag in textsArg) { // NOSONAR
+      var text = textsArg[languageTag];
       // Use defaultLanguage as default, if specified (may be changed or set to null by the app).
       if (languageTag && languageTag === this.defaultLanguage) {
         languageTag = 'default';

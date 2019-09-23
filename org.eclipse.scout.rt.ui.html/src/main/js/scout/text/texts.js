@@ -19,6 +19,10 @@ scout.texts = {
     return promise.then(this._preInit.bind(this, url));
   },
 
+  _setTextsByLocale: function (val) {
+    this.textsByLocale = val;
+  },
+
   _preInit: function(url, data) {
     if (data && data.error) {
       // The result may contain a json error (e.g. session timeout) -> abort processing

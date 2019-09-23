@@ -332,7 +332,7 @@ scout.strings = {
    */
   countCodePoints: function(string) {
     return string
-      // Replace every surrogate pair with a BMP symbol.
+    // Replace every surrogate pair with a BMP symbol.
       .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_')
       // and then get the length.
       .length;
@@ -409,6 +409,22 @@ scout.strings = {
       s = string.substring(0, string.length - suffix.length);
     }
     return s;
+  },
+
+  _setPlainTextElement: function(el) {
+    this.plainTextElement = el;
+  },
+
+  _getPlainTextElement: function() {
+    return this.plainTextElement;
+  },
+
+  _setEncodeElement: function(el) {
+    this._encodeElement = el;
+  },
+
+  _getEncodeElement: function() {
+    return this._encodeElement;
   }
 
 };

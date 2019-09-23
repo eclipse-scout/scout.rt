@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableUserFilter = function() {};
+scout.TableUserFilter = function() {
+  scout.TableUserFilter.parent.call(this);
+};
 scout.inherits(scout.TableUserFilter, scout.TableFilter);
 
 scout.TableUserFilter.prototype.init = function(model) {
