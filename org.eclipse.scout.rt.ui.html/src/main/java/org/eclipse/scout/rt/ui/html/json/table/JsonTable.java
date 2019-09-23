@@ -447,7 +447,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       getModel().getUIFacade().cancelCellEditFromUI();
     }
     else {
-      final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent().withSession(getUiSession().getClientSession(), true);
+      final ClientRunContext clientRunContext = ClientRunContexts.copyCurrent(true).withSession(getUiSession().getClientSession(), true);
       ModelJobs.schedule(getModel().getUIFacade()::cancelCellEditFromUI, ModelJobs.newInput(clientRunContext)
           .withName("Cancelling cell editor")
           .withExceptionHandling(null, false)); // Propagate exception to caller (UIServlet)
