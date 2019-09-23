@@ -24,9 +24,9 @@
     "snapshot-version": "scout-scripts snapshot-version"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "^10.0.0",
+    "@eclipse-scout/cli": "^10.0.0-snapshot",
     "jquery": "^3.4.1",
-    "@eclipse-scout/core": "10.0.0"
+    "@eclipse-scout/core": "^10.0.0-snapshot"
   },
   "peerDependencies": {
     "jquery": "^3.4.1"
