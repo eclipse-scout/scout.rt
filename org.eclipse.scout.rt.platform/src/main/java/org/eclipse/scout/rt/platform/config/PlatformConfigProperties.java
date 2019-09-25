@@ -76,6 +76,23 @@ public final class PlatformConfigProperties {
   }
 
   /**
+   * Specifies if jandex indexes should be refreshed when class files change, this scans for changes using a file system
+   * scan and rebuilds affected indexes.
+   */
+  public static class JandexRefreshProperty extends AbstractBooleanConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.jandex.refresh";
+    }
+
+    @Override
+    public Boolean getDefaultValue() {
+      return Boolean.FALSE;
+    }
+  }
+
+  /**
    * The number of threads to keep in the pool, even if they are idle.
    */
   public static class JobManagerCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {

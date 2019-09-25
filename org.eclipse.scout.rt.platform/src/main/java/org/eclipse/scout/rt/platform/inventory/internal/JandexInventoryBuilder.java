@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
+import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRefreshProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
@@ -79,9 +80,11 @@ public class JandexInventoryBuilder {
     this(
         new JandexRebuildProperty().getValue()
             ? RebuildStrategy.ALWAYS
-            : new PlatformDevModeProperty().getValue()
+            : (new JandexRefreshProperty().getValue()
                 ? RebuildStrategy.IF_MODIFIED
-                : RebuildStrategy.IF_MISSING);
+                : (new PlatformDevModeProperty().getValue()
+                    ? RebuildStrategy.IF_MODIFIED
+                    : RebuildStrategy.IF_MISSING)));
   }
 
   public JandexInventoryBuilder(RebuildStrategy rebuildStrategy) {
