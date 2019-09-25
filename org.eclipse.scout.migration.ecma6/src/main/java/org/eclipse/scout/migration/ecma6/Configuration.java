@@ -91,7 +91,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
         setNamespace("bsiscout");
-        setPersistLibraryName("@eclipse-scout/bsi");
+        setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
       case "com.bsiag.studio.ui.html":
