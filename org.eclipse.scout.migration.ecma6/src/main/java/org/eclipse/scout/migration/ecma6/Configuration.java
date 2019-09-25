@@ -94,6 +94,13 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
+      case "com.bsiag.widgets.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setNamespace("scout");
+        setPersistLibraryName("@bsi-scout/demo-widgets");
+        setPersistLibraryFileName("80-api_bsi_demo_widgets.json");
+        break;
       case "com.bsiag.studio.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
