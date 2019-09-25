@@ -13,8 +13,6 @@ package org.eclipse.scout.migration.ecma6.model.api;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
@@ -44,8 +42,9 @@ public class ApiParser {
     Libraries allLibs = new Libraries();
     //noinspection resource
     allLibs.addChildren(Files.list(m_directory)
+        .sorted((a, b) -> a.compareTo(b))
         .map(libJson -> parseLibrary(libJson))
-      // do not include current migration source as library
+        // do not include current migration source as library
         .filter(lib -> ObjectUtility.notEquals(Configuration.get().getPersistLibraryName(), lib.getCustomAttributeString(INamedElement.LIBRARY_MODULE_NAME)))
         .collect(Collectors.toList()));
     allLibs.ensureParents();

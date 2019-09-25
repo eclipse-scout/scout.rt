@@ -148,6 +148,11 @@ public class Migration {
 
   private void processFileWithTask(ITask task, PathInfo pathInfo, Context context) {
     task.process(pathInfo, context);
+    /*
+    if(pathInfo.getPath().endsWith("objectFactories.js")){
+      System.out.println("=================\n"+task.getClass().getSimpleName()+"\n"+context.ensureWorkingCopy(pathInfo.getPath()).getSource());
+    }
+    */
   }
 
   protected void writeFiles() throws IOException {

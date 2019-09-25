@@ -55,21 +55,21 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
         setNamespace("scout");
         setPersistLibraryName("@eclipse-scout/core");
-        setPersistLibraryFileName("api_eclipse-scout_core.json");
+        setPersistLibraryFileName("01-api_eclipse-scout_core.json");
         break;
       case "org.eclipse.scout.rt.svg.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
         setNamespace("scout");
         setPersistLibraryName("@eclipse-scout/svg");
-        setPersistLibraryFileName("api_eclipse-scout_svg.json");
+        setPersistLibraryFileName("02-api_eclipse-scout_svg.json");
         break;
       case "org.eclipse.scout.jswidgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("jswidgets");
         setPersistLibraryName("@eclipse-scout/demo-jswidgets");
-        setPersistLibraryFileName("api_demo-jswidgets.json");
+        setPersistLibraryFileName("10-api_demo-jswidgets.json");
         break;
 
       case "org.eclipse.scout.widgets.heatmap.ui.html":
@@ -77,14 +77,14 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("scout");
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
-        setPersistLibraryFileName("api_demo-widgets-heatmap.json");
+        setPersistLibraryFileName("40-api_demo-widgets-heatmap.json");
         break;
       case "org.eclipse.scout.widgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("widgets");
         setPersistLibraryName("@eclipse-scout/demo-widgets");
-        setPersistLibraryFileName("api_demo-widgets.json");
+        setPersistLibraryFileName("41-api_demo-widgets.json");
         break;
 
       case "com.bsiag.scout.rt.ui.html":
@@ -92,14 +92,14 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
         setNamespace("bsiscout");
         setPersistLibraryName("@eclipse-scout/bsi");
-        setPersistLibraryFileName("api_bsi_scout_core.json");
+        setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
       case "com.bsiag.studio.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
         setNamespace("studio");
         setPersistLibraryName("@eclipse-scout/studio");
-        setPersistLibraryFileName("api_bsi_studio.json");
+        setPersistLibraryFileName("99-api_bsi_studio.json");
         break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
