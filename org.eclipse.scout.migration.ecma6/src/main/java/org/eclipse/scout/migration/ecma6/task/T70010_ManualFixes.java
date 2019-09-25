@@ -93,11 +93,6 @@ public class T70010_ManualFixes extends AbstractTask {
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("'res/logo.png'", "'img/logo.png'"));
       }
-
-      if (pathEndsWith(pathInfo, "/table/columns/comparators.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
-        wc.setSource(wc.getSource().replace("return _compare(valueA, ", "return this._compare(valueA, "));
-      }
     }
 
     if ("jswidgets".equals(namespace)) {
