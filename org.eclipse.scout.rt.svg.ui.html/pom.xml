@@ -28,6 +28,10 @@
   <properties>
     <scout.script.version>5.0.0</scout.script.version>
     <sonar.sources>src/main,pom.xml</sonar.sources>
+
+    <master_skip_pnpm_install_dev>true</master_skip_pnpm_install_dev>
+    <master_skip_pnpm_install_prod>true</master_skip_pnpm_install_prod>
+    <master_webTest_skip>true</master_webTest_skip>
   </properties>
 
   <dependencies>

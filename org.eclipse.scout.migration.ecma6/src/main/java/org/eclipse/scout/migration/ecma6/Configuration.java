@@ -57,6 +57,13 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/core");
         setPersistLibraryFileName("api_eclipse-scout_core.json");
         break;
+      case "org.eclipse.scout.rt.svg.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
+        setNamespace("scout");
+        setPersistLibraryName("@eclipse-scout/svg");
+        setPersistLibraryFileName("api_eclipse-scout_svg.json");
+        break;
       case "org.eclipse.scout.jswidgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
