@@ -11,7 +11,6 @@
 package org.eclipse.scout.migration.ecma6.model.api.less;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
-
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -19,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -41,7 +39,6 @@ import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
 import org.eclipse.scout.migration.ecma6.model.api.NamedElement;
-import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +103,6 @@ public class LessApiParser {
     m_libraries = libs.getChildren().stream()
         .map(this::parseLib)
         .filter(Objects::nonNull)
-        .sorted(new LibrarySortOrderComparator())
         .collect(Collectors.toMap(LessApiParser::getName, Function.identity(), (u, v) -> {
           throw new IllegalStateException(String.format("Duplicate Less API definition with name '%s'.", u.getName()));
         }, LinkedHashMap::new));
@@ -237,33 +233,6 @@ public class LessApiParser {
       return path.substring(0, path.length() - LESS_FILE_SUFFIX.length());
     }
     return path;
-  }
-
-  private static class LibrarySortOrderComparator implements Comparator<LessApiParser> {
-    @Override
-    public int compare(LessApiParser o1, LessApiParser o2) {
-      return getOrder(o1).compareTo(getOrder(o2));
-    }
-
-    private CompositeObject getOrder(LessApiParser parser) {
-      return new CompositeObject(getScore(parser), parser.getName(), parser);
-    }
-
-    private int getScore(LessApiParser parser) {
-      switch (parser.getName()) {
-        case "eclipse-scout":
-          return 10;
-        case "bsi-scout":
-          return 20;
-        case "bsi-crm":
-        case "bsi-briefcase":
-        case "bsi-portal":
-        case "bsi-studio":
-          return 30;
-        default:
-          return 100;
-      }
-    }
   }
 
   public void setName(String newName) {

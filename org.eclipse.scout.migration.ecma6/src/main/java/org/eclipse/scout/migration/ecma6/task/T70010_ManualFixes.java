@@ -27,7 +27,7 @@ public class T70010_ManualFixes extends AbstractTask {
 
   @Override
   public void setup(Context context) {
-    m_relativeNamespaceDirectory = Paths.get("src", "main", "js", Configuration.get().getNamespace());
+    m_relativeNamespaceDirectory = Paths.get("src", "main", "js");
   }
 
   @Override
@@ -132,6 +132,15 @@ public class T70010_ManualFixes extends AbstractTask {
         String source = wc.getSource();
         String marker = "export default class HeatmapField";
         source = source.replace(marker, "import * as L from 'leaflet';" + ln + ln + marker);
+        wc.setSource(source);
+      }
+
+      if (pathEndsWith(pathInfo, "/index.js")) {
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        String ln = wc.getLineDelimiter();
+        String source = wc.getSource();
+        String marker = "export { default as HeatmapFieldLayout } from './heatmap/HeatmapFieldLayout';";
+        source = source.replace(marker, marker+ln+"export { default as simpleheat } from './heatmap/leaflet-heat';");
         wc.setSource(source);
       }
     }
