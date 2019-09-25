@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -91,10 +87,10 @@ public class PropertiesHelperTest {
   @Test
   public void testGetPropertiesFileUrl() throws IOException {
     PropertiesHelper h = new PropertiesHelper(null);
-    assertFalse(h.isInitialized());
+    assertFalse(h.hasProviderProperties());
 
     PropertiesHelper h2 = new PropertiesHelper(new ConfigPropertyProvider("classpath:not-existing.properties"));
-    assertFalse(h2.isInitialized());
+    assertFalse(h2.hasProviderProperties());
 
     try {
       new PropertiesHelper(new ConfigPropertyProvider("http://www.whatever-not-existing-scout-domain.org/config.properties"));
@@ -105,14 +101,14 @@ public class PropertiesHelperTest {
     }
 
     PropertiesHelper file4 = new PropertiesHelper(new ConfigPropertyProvider("classpath:" + TEST_CONFIG_PROPS));
-    assertTrue(file4.isInitialized());
+    assertTrue(file4.hasProviderProperties());
     assertEquals(2, file4.getAllPropertyNames().size());
 
     String key = "myconfig.properties";
     try {
       System.setProperty(key, "classpath:" + TEST_CONFIG_PROPS);
       PropertiesHelper file5 = new PropertiesHelper(new ConfigPropertyProvider(key));
-      assertTrue(file5.isInitialized());
+      assertTrue(file5.hasProviderProperties());
       assertEquals(2, file5.getAllPropertyNames().size());
     }
     finally {
@@ -120,10 +116,10 @@ public class PropertiesHelperTest {
     }
 
     PropertiesHelper file6 = new PropertiesHelper(null);
-    assertFalse(file6.isInitialized());
+    assertFalse(file6.hasProviderProperties());
 
     PropertiesHelper file7 = new PropertiesHelper(new ConfigPropertyProvider("classpath:"));
-    assertFalse(file7.isInitialized());
+    assertFalse(file7.hasProviderProperties());
 
     try {
       new PropertiesHelper(new ConfigPropertyProvider("blubi:test"));
@@ -305,7 +301,7 @@ public class PropertiesHelperTest {
   @Test
   public void testImportWithPlaceholder() {
     PropertiesHelper h = new PropertiesHelper(new ConfigPropertyProvider(PLACEHOLDER_IMPORT_PROPS));
-    assertTrue(h.isInitialized());
+    assertTrue(h.hasProviderProperties());
     assertEquals(5, h.getPropertyMap(MAP_KEY).size());
     try {
       h.getPropertyMap(MAP_KEY, "namespace");

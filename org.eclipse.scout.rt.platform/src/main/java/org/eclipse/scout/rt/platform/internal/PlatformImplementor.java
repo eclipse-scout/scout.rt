@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.platform.internal;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -180,7 +180,7 @@ public class PlatformImplementor implements IPlatform {
   }
 
   protected void validateConfiguration() {
-    if (!ConfigUtility.isInitialized()) {
+    if (!ConfigUtility.hasProviderProperties()) {
       LOG.info("No {} found. Running with empty configuration.", ConfigUtility.CONFIG_FILE_NAME);
       return;
     }

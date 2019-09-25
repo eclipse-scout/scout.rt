@@ -241,9 +241,9 @@ public final class ConfigUtility {
   }
 
   /**
-   * @see PropertiesHelper#isInitialized()
+   * @see PropertiesHelper#hasProviderProperties()
    */
-  public static boolean isInitialized() {
-    return INSTANCE.isInitialized();
+  public static boolean hasProviderProperties() {
+    return INSTANCE.hasProviderProperties();
   }
 }

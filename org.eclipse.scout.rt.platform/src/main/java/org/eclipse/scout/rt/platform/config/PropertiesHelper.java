@@ -100,7 +100,7 @@ public class PropertiesHelper {
   private static final Logger LOG = LoggerFactory.getLogger(PropertiesHelper.class);
 
   private Map<String, String> m_configProperties = new HashMap<>();
-  private boolean m_isInitialized = false;
+  private boolean m_hasProviderProperties = false;
   private final Set<Object> m_parsedFiles = new HashSet<>();
   private final Set<Object> m_referencedKeys = new HashSet<>();
   private final Set<String> m_resolvedKeys = new HashSet<>();
@@ -117,35 +117,32 @@ public class PropertiesHelper {
     try {
       m_initializing = true;
       if (properties != null) {
-        m_isInitialized = parse(properties);
-        if (m_isInitialized) {
-          importSystemImports(new HashSet<>(), null);
-          resolveAll(PLACEHOLDER_PATTERN);
+        m_hasProviderProperties = parse(properties);
+        importSystemImports(new HashSet<>(), null);
+        resolveAll(PLACEHOLDER_PATTERN);
 
-          // remove internal properties
-          m_configProperties = m_configProperties.entrySet().stream()
-              .filter(e -> {
-                if (e.getKey().startsWith("_")) {
-                  if (!m_referencedKeys.contains(e.getKey())) {
-                    LOG.warn("The internal key '{}' is never referenced and should be removed from config property file. [{}:{}]", e.getKey(), e.getKey(), e.getValue());
-                  }
-                  return false;
+        // remove internal properties
+        m_configProperties = m_configProperties.entrySet().stream()
+            .filter(e -> {
+              if (e.getKey().startsWith("_")) {
+                if (!m_referencedKeys.contains(e.getKey())) {
+                  LOG.warn("The internal key '{}' is never referenced and should be removed from config property file. [{}:{}]", e.getKey(), e.getKey(), e.getValue());
                 }
-                return true;
-              })
-              .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
-        }
+                return false;
+              }
+              return true;
+            })
+            .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
       }
-
     }
     finally {
       m_initializing = false;
     }
   }
 
-  protected boolean parse(IPropertyProvider proptertyProvider) {
-    m_parsedFiles.add(proptertyProvider.getPropertiesIdentifier());
-    List<Entry<String, String>> properties = proptertyProvider.readProperties();
+  protected boolean parse(IPropertyProvider propertyProvider) {
+    m_parsedFiles.add(propertyProvider.getPropertiesIdentifier());
+    List<Entry<String, String>> properties = propertyProvider.readProperties();
     if (properties == null) {
       return false;
     }
@@ -828,8 +825,8 @@ public class PropertiesHelper {
    *
    * @return <code>true</code> if a properties file has been loaded, <code>false</code> otherwise.
    */
-  public boolean isInitialized() {
-    return m_isInitialized;
+  public boolean hasProviderProperties() {
+    return m_hasProviderProperties;
   }
 
   protected void collectMapEntriesWith(String keyPrefix, Set<?> keySet, Map<String, String> collector) {
