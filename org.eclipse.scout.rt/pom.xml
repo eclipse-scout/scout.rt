@@ -112,9 +112,14 @@
     <!-- Sonar properties -->
     <sonar.branch>releases_10.0</sonar.branch>
     <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
-    <sonar.exclusions>**/resources/WebContent/**</sonar.exclusions>
-    <sonar.coverage.exclusions>*.test/**,
-      **/resources/WebContent/**
+    <sonar.exclusions>
+      **/resources/WebContent/**,
+      **/node_modules/**
+    </sonar.exclusions>
+    <sonar.coverage.exclusions>
+      *.test/**,
+      **/resources/WebContent/**,
+      **/node_modules/**
     </sonar.coverage.exclusions>
   </properties>
 
