@@ -117,8 +117,12 @@ public class T800_Utilities extends AbstractTask {
 
       //create default export
       String exportedNames = Stream.concat(
-          util.getFunctions().stream().filter(f -> f.isExported()).map(f -> "  " + f.getName()),
-          util.getVariables().stream().filter(v -> v.isExported()).map(v -> "  " + v.getName()))
+          util.getFunctions().stream()
+            .filter(JsUtilityFunction::isExported)
+            .map(f -> "  " + f.getName()),
+          util.getVariables().stream()
+            .filter(JsUtilityVariable::isExported)
+            .map(v -> "  " + v.getName()))
           .sorted()
           .collect(Collectors.joining("," + ln));
       s += ln;
@@ -148,7 +152,7 @@ public class T800_Utilities extends AbstractTask {
       }
       else {
         //change and annotate private functions
-        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + " export function " + f.getName());
       }
     }
 
@@ -193,7 +197,7 @@ public class T800_Utilities extends AbstractTask {
       }
       else {
         //change and annotate private functions
-        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + "function " + f.getName());
+        s = replaceFirstWithoutRegex(s, f.getTag(), "//private" + ln + "export function " + f.getName());
       }
     }
 
