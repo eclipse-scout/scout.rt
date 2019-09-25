@@ -208,7 +208,17 @@ public class JsFile extends AbstractJsElement {
   protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean pointToIndex, boolean defaultIfPossible) {
     JsImport libImport = m_imports.get(moduleName);
     if (libImport == null) {
-      libImport = new JsImport(moduleName, pointToIndex ? m_path.getParent().getParent().relativize(INDEX) : null);
+      Path rel = null;
+      if (pointToIndex) {
+        //check if the file is in a namespace folder /scout/form/Form.js (with namespace='scout')
+        //or just in a normal folder /heatmap/HeatmapField.js (with namespace='scout')
+        Path p = m_path.getParent();
+        if (p.getParent().getFileName().toString().equals(Configuration.get().getNamespace())) {
+          p = p.getParent();
+        }
+        rel = p.relativize(INDEX);
+      }
+      libImport = new JsImport(moduleName, rel);
       addImport(libImport);
     }
     AliasedMember aliasedMember = libImport.findAliasedMember(memberName);

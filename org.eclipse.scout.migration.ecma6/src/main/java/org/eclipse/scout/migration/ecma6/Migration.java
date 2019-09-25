@@ -21,9 +21,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
@@ -171,29 +173,38 @@ public class Migration {
     final Path sourceModule = Configuration.get().getSourceModuleDirectory();
 
     Set<WorkingCopy> allWorkingCopies = new HashSet<>(m_context.getWorkingCopies());
+    Map<Path, Path> skipCopyRelativePaths = m_context.getWorkingCopies()
+        .stream()
+        .filter(w -> w.getRelativeTargetPath() != null)
+        .collect(Collectors.toMap(w -> w.getRelativeTargetPath(), w -> w.getPath()));
     visitMigrationFiles(info -> {
       Path file = info.getPath();
       WorkingCopy workingCopy = m_context.getWorkingCopy(file);
       if (workingCopy != null) {
         allWorkingCopies.remove(workingCopy);
-        writeWorkingCopy(workingCopy);
+        writeWorkingCopy(workingCopy, skipCopyRelativePaths);
       }
       else {
         // file has not been changed or touched -> copy
-        try {
-          Path rel = sourceModule.relativize(file);
-          Path dest = targetModule.resolve(rel);
-          Files.createDirectories(dest.getParent());
-          Files.copy(file, dest, REPLACE_EXISTING);
+        Path rel = sourceModule.relativize(file);
+        if (skipCopyRelativePaths.containsKey(rel)) {
+          LOG.info("Skip copying {}, the file is already written by the working copy {}", rel, skipCopyRelativePaths.get(rel));
         }
-        catch (IOException e) {
-          throw new ProcessingException("Unable to copy file '{}'.", file, e);
+        else {
+          try {
+            Path dest = targetModule.resolve(rel);
+            Files.createDirectories(dest.getParent());
+            Files.copy(file, dest, REPLACE_EXISTING);
+          }
+          catch (IOException e) {
+            throw new ProcessingException("Unable to copy file '{}'.", file, e);
+          }
         }
       }
     });
 
     // writes the remaining working copies which have no corresponding source file (working copies newly created during the migration).
-    allWorkingCopies.forEach(this::writeWorkingCopy);
+    allWorkingCopies.forEach(w -> writeWorkingCopy(w, skipCopyRelativePaths));
   }
 
   protected void writeDirtyWorkingCopies() {
@@ -216,7 +227,7 @@ public class Migration {
 
   }
 
-  private void writeWorkingCopy(WorkingCopy workingCopy) {
+  private void writeWorkingCopy(WorkingCopy workingCopy, Map<Path, Path> skipCopyRelativePaths) {
     final Path sourceModule = Configuration.get().getSourceModuleDirectory();
     final Path targetModule = Configuration.get().getTargetModuleDirectory();
     final Path relativeSourcePath = sourceModule.relativize(workingCopy.getPath());
@@ -227,6 +238,10 @@ public class Migration {
       }
       else {
         relativeTargetPath = relativeSourcePath;
+        if (skipCopyRelativePaths.containsKey(relativeSourcePath)) {
+          LOG.info("Skip copying {}, the file is already written by the working copy {}", relativeSourcePath, skipCopyRelativePaths.get(relativeSourcePath));
+          return;
+        }
       }
       workingCopy.persist(targetModule.resolve(relativeTargetPath));
       if (sourceModule.equals(targetModule) && relativeTargetPath != relativeSourcePath) {

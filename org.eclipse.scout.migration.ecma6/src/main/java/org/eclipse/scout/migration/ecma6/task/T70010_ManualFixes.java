@@ -130,7 +130,7 @@ public class T70010_ManualFixes extends AbstractTask {
         wc.setSource(source);
       }
 
-      if (pathEndsWith(pathInfo, "/index.js")) {
+      if (pathEndsWith(pathInfo, "/heatmap-module.js")) {//will be saved as index.js
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String ln = wc.getLineDelimiter();
         String source = wc.getSource();
