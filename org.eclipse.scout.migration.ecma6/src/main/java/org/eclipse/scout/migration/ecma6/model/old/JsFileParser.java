@@ -240,7 +240,7 @@ public class JsFileParser {
       //  do not parse objectFactories.js it is a special file and handled in T1100_ObjectFactories
       return m_jsFile;
     }
-    if(PathFilters.inSrcTestJs().test(m_jsFile.getPathInfo())) {
+    if (PathFilters.inSrcTestJs().test(m_jsFile.getPathInfo())) {
       // do not parse specs. these files cannot be handled by this parser anyway.
       return m_jsFile;
     }
@@ -295,7 +295,7 @@ public class JsFileParser {
           //detect top level enums in other files
           matcher = START_TOP_LEVEL_ENUM1.matcher(m_currentLine);
           if (matcher.find() && Character.isUpperCase(matcher.group(3).charAt(0))) {
-            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath().getFileName(), m_currentLineNumber, matcher.group());
+            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath(), m_currentLineNumber, matcher.group());
           }
         }
         matcher = START_TOP_LEVEL_ENUM2.matcher(m_currentLine);
@@ -307,7 +307,7 @@ public class JsFileParser {
           //detect top level enums in other files
           matcher = START_TOP_LEVEL_ENUM2.matcher(m_currentLine);
           if (matcher.find() && Character.isUpperCase(matcher.group(3).charAt(0))) {
-            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath().getFileName(), m_currentLineNumber, matcher.group());
+            LOG.warn("Potential top-level enum found. Every top-level enum should be defined in its own file and added to PathFilters.isTopLevelEnum(). {}:{} {}", m_jsFile.getPath(), m_currentLineNumber, matcher.group());
           }
         }
         matcher = START_UTILITY_BLOCK.matcher(m_currentLine);
@@ -380,7 +380,7 @@ public class JsFileParser {
       }
     }
     catch (VetoException e) {
-      LOG.error("Could not parse file '" + m_jsFile.getPath().getFileName() + ":" + m_currentLineNumber + "'.", e);
+      LOG.error("Could not parse file '" + m_jsFile.getPath() + ":" + m_currentLineNumber + "'.", e);
       throw e;
     }
 
@@ -408,10 +408,10 @@ public class JsFileParser {
     // log
     String fileName = m_jsFile.getPath().getFileName().toString();
     if (jsClasses.isEmpty() && jsTopLevelEnums.isEmpty() && jsUtilities.isEmpty() && fileName.endsWith(".js") && !fileName.endsWith("-module.js")) {
-      LOG.error("No content found in file '" + m_jsFile.getPath().getFileName() + "'.");
+      LOG.error("No content found in file '" + m_jsFile.getPath() + "'.");
     }
     else if (jsClasses.size() > 1) {
-      LOG.warn("More than 1 class found in file '" + m_jsFile.getPath().getFileName() + "'. Every classfile should be defined in its own file.");
+      LOG.warn("More than 1 class found in file '" + m_jsFile.getPath() + "'. Every classfile should be defined in its own file.");
     }
     return m_jsFile;
   }
@@ -431,7 +431,7 @@ public class JsFileParser {
       }
       else {
         // no comment
-        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
+        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
       }
       nextLine();
     }
@@ -455,7 +455,7 @@ public class JsFileParser {
       }
       else {
         // no comment
-        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
+        throw new VetoException("Function commentblock could not be parsed (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ") [line: '" + m_currentLine + "']! ");
       }
       nextLine();
     }
@@ -488,7 +488,7 @@ public class JsFileParser {
       }
 
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
-        throw new VetoException("Could not parse function body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+        throw new VetoException("Could not parse function body (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ")");
       }
       functionBody.append(m_currentLine).append(m_lineSeparator);
       nextLine();
@@ -586,7 +586,7 @@ public class JsFileParser {
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
     if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
-      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber);
+      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath() + ":" + m_currentLineNumber);
       jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand or added to T70010_ManualFixes.");
       clazz.addEnum(jsEnum);
       nextLine();
@@ -601,7 +601,7 @@ public class JsFileParser {
       }
       bodyBuilder.append(m_currentLine);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
-        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ")");
       }
       nextLine();
     }
@@ -617,7 +617,7 @@ public class JsFileParser {
     StringBuilder bodyBuilder = new StringBuilder(matcher.group(4));
     if (StringUtility.hasText(matcher.group(5))) {
       // take care dynamic values can not be implemented as cons
-      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber);
+      LOG.warn("Dynamic enum '" + jsEnum.getName() + "' found in " + m_workingCopy.getPath() + ":" + m_currentLineNumber);
       jsEnum.addParseError("Looks like a dynamic jsEnum. Must be migrated by hand or added to T70010_ManualFixes.");
       m_jsFile.addJsTopLevelEnum(jsEnum);
       nextLine();
@@ -632,7 +632,7 @@ public class JsFileParser {
       }
       bodyBuilder.append(m_currentLine).append(m_lineSeparator);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
-        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+        throw new VetoException("Could not parse enum body (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ")");
       }
       nextLine();
     }
@@ -681,7 +681,7 @@ public class JsFileParser {
       }
       functionBody.append(m_currentLine).append(m_lineSeparator);
       if (StringUtility.hasText(m_currentLine) && !m_currentLine.startsWith(" ")) {
-        throw new VetoException("Could not parse appListener body (" + m_workingCopy.getPath().getFileName() + ":" + m_currentLineNumber + ")");
+        throw new VetoException("Could not parse appListener body (" + m_workingCopy.getPath() + ":" + m_currentLineNumber + ")");
       }
       nextLine();
     }

@@ -35,6 +35,7 @@ public class Configuration {
   private String m_sourceModuleDirectory;
   private String m_targetModuleDirectory;
   private String m_namespace;
+  private String m_jsFolderName;
   private String m_persistLibraryName;
   private String m_persistLibraryFileName;
 
@@ -54,6 +55,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
         setNamespace("scout");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/core");
         setPersistLibraryFileName("01-api_eclipse-scout_core.json");
         break;
@@ -61,6 +63,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.rt/" + moduleName);
         setNamespace("scout");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/svg");
         setPersistLibraryFileName("02-api_eclipse-scout_svg.json");
         break;
@@ -68,6 +71,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("jswidgets");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-jswidgets");
         setPersistLibraryFileName("10-api_demo-jswidgets.json");
         break;
@@ -76,6 +80,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("scout");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-widgets-heatmap");
         setPersistLibraryFileName("40-api_demo-widgets-heatmap.json");
         break;
@@ -83,6 +88,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/widgets/" + moduleName);
         setNamespace("widgets");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/demo-widgets");
         setPersistLibraryFileName("41-api_demo-widgets.json");
         break;
@@ -91,6 +97,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
         setNamespace("bsiscout");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
@@ -98,6 +105,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
         setNamespace("scout");
+        setJsFolderName("bsiwidgets");
         setPersistLibraryName("@bsi-scout/demo-widgets");
         setPersistLibraryFileName("80-api_bsi_demo_widgets.json");
         break;
@@ -105,6 +113,7 @@ public class Configuration {
         setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
         setNamespace("studio");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@eclipse-scout/studio");
         setPersistLibraryFileName("99-api_bsi_studio.json");
         break;
@@ -170,6 +179,14 @@ public class Configuration {
 
   public void setNamespace(String namespace) {
     m_namespace = namespace;
+  }
+
+  public String getJsFolderName() {
+    return m_jsFolderName;
+  }
+
+  public void setJsFolderName(String jsFolderName) {
+    m_jsFolderName = jsFolderName;
   }
 
   /**

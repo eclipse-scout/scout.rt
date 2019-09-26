@@ -135,7 +135,7 @@ public class T70010_ManualFixes extends AbstractTask {
         String ln = wc.getLineDelimiter();
         String source = wc.getSource();
         String marker = "export { default as HeatmapFieldLayout } from './heatmap/HeatmapFieldLayout';";
-        source = source.replace(marker, marker+ln+"export { default as simpleheat } from './heatmap/leaflet-heat';");
+        source = source.replace(marker, marker + ln + "export { default as simpleheat } from './heatmap/leaflet-heat';");
         wc.setSource(source);
       }
     }
@@ -147,6 +147,17 @@ public class T70010_ManualFixes extends AbstractTask {
         String source = wc.getSource();
         String marker = "export default class ChartField";
         source = source.replace(marker, "import {Chart} from 'chart.js';" + ln + ln + marker);
+        wc.setSource(source);
+      }
+    }
+
+    // map control
+    if ("bsiscout".equals(namespace)) {
+      if (pathEndsWith(pathInfo, "/mapTableControl.js")) {
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        String source = wc.getSource();
+        String marker = "url: 'res/maps/' + mapId + '.json'";
+        source = source.replace(marker, "url: 'maps/' + mapId + '.json'");
         wc.setSource(source);
       }
     }
