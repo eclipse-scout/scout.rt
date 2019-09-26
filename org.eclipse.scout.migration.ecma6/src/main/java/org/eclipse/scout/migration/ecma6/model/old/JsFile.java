@@ -214,7 +214,7 @@ public class JsFile extends AbstractJsElement {
       if (pointToIndex) {
         //check if the file is in a namespace folder /scout/form/Form.js (with namespace='scout')
         //or just in a normal folder /heatmap/HeatmapField.js (with namespace='scout')
-        Path p = FileUtility.replaceSegment(m_path, Paths.get("src", "main", "js", Configuration.get().getJsFolderName()), Paths.get("src", "main", "js"));
+        Path p = FileUtility.replaceSegment(m_path.getParent(), Paths.get("src", "main", "js", Configuration.get().getJsFolderName()), Paths.get("src", "main", "js"));
         rel = p.relativize(INDEX);
       }
       libImport = new JsImport(moduleName, rel);
