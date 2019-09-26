@@ -96,8 +96,8 @@ public class Configuration {
       case "com.bsiag.scout.rt.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
-        setNamespace("bsiscout");
-        setJsFolderName(getNamespace());
+        setNamespace("scout");
+        setJsFolderName("bsiscout");
         setPersistLibraryName("@bsi-scout/core");
         setPersistLibraryFileName("50-api_bsi_scout_core.json");
         break;
