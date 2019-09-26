@@ -1,7 +1,7 @@
-module.exports = function(config) {
+module.exports = function(config, specEntryPoint) {
   const baseConfig = require('./karma-defaults');
 
-  baseConfig(config);
+  baseConfig(config, specEntryPoint);
 
   config.set({
     singleRun: true,

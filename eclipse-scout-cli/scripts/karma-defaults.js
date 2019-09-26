@@ -10,17 +10,27 @@
  */
 const path = require('path');
 const scoutBuild = require('./constants');
-const specIndex = path.resolve('test', 'test-index.js');
+
 const jquery = require.resolve('jquery');
+const fs = require('fs');
 
-var webpackConfigProvider = require(path.resolve('webpack.config.js'));
-const webpackConfig = webpackConfigProvider(null, {mode: scoutBuild.mode.development});
-delete webpackConfig.entry;
+module.exports = function(config, specEntryPoint) {
 
-const preprocessorObj = {};
-preprocessorObj[specIndex] = ['webpack'];
+  const webpackConfigFilePath = path.resolve('webpack.config.js');
+  if (!fs.existsSync(webpackConfigFilePath)) {
+    const message = 'Karma requires a webpack config file at location "' + webpackConfigFilePath + '" but it could not be found.';
+    console.error(message);
+    throw new Error(message);
+  }
+  var webpackConfigProvider = require(webpackConfigFilePath);
 
-module.exports = function(config) {
+  const webpackConfig = webpackConfigProvider(null, {mode: scoutBuild.mode.development});
+  delete webpackConfig.entry;
+
+  const specIndex = specEntryPoint ? path.resolve(specEntryPoint) : path.resolve('test', 'test-index.js');
+  const preprocessorObj = {};
+  preprocessorObj[specIndex] = ['webpack'];
+
   config.set({
     browsers: ['Chrome'],
     files: [
