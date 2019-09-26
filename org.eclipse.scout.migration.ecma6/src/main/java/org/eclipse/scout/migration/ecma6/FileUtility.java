@@ -31,17 +31,17 @@ public final class FileUtility {
         .orElse(null);
   }
 
-  public static Path removeFileExtension(Path path){
+  public static Path removeFileExtension(Path path) {
     String fileExtension = getFileExtension(path);
-    if(fileExtension == null){
+    if (fileExtension == null) {
       return path;
     }
     String pathName = path.toString();
-    return Paths.get(pathName.substring(0,pathName.length() - (fileExtension.length()+1)));
+    return Paths.get(pathName.substring(0, pathName.length() - (fileExtension.length() + 1)));
   }
 
-  public static Path removeFileExtensionJs(Path path){
-    if("js".equalsIgnoreCase(getFileExtension(path))){
+  public static Path removeFileExtensionJs(Path path) {
+    if ("js".equalsIgnoreCase(getFileExtension(path))) {
       return removeFileExtension(path);
     }
     return path;
@@ -64,6 +64,7 @@ public final class FileUtility {
         .forEach(File::delete);
     return true;
   }
+
   public static boolean moveDirectory(Path srcDir, Path targetDir, Predicate<Path> filter) throws IOException {
     Files.createDirectories(targetDir);
     Files.walkFileTree(srcDir, new SimpleFileVisitor<Path>() {
@@ -72,7 +73,7 @@ public final class FileUtility {
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         Path rel = srcDir.relativize(dir);
         Path target = targetDir.resolve(rel);
-        if(!Files.exists(target)) {
+        if (!Files.exists(target)) {
           Files.createDirectory(target);
         }
         return FileVisitResult.CONTINUE;
@@ -80,7 +81,7 @@ public final class FileUtility {
 
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if(!filter.test(file)){
+        if (!filter.test(file)) {
           return FileVisitResult.CONTINUE;
         }
         Path rel = srcDir.relativize(file);
@@ -99,6 +100,12 @@ public final class FileUtility {
     return true;
   }
 
+  public static Path replaceSegment(Path path, Path segments, Path replacement) {
+    String p = path.toString().replace("\\", "/");
+    String seg = segments.toString().replace("\\", "/");
+    String rep = replacement.toString().replace("\\", "/");
+    return Paths.get(p.replace(seg, rep));
+  }
 
   public static String lineSeparator(Path path) {
     InputStream in = null;
@@ -131,7 +138,7 @@ public final class FileUtility {
       switch ((char) c) {
         case '\n':
         case '\r':
-          lineSeparator.append((char)c);
+          lineSeparator.append((char) c);
           break;
         default:
           if (lineSeparator.length() > 0) {
@@ -151,8 +158,9 @@ public final class FileUtility {
     }
     catch (IOException e) {
       throw new VetoException("Could not read line separator of source.", e);
-    }finally{
-      if(in != null){
+    }
+    finally {
+      if (in != null) {
         try {
           in.close();
         }

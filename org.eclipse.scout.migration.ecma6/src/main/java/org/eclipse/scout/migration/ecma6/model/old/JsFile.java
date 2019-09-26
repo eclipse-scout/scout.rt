@@ -1,6 +1,7 @@
 package org.eclipse.scout.migration.ecma6.model.old;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.FileUtility;
 import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -212,10 +214,7 @@ public class JsFile extends AbstractJsElement {
       if (pointToIndex) {
         //check if the file is in a namespace folder /scout/form/Form.js (with namespace='scout')
         //or just in a normal folder /heatmap/HeatmapField.js (with namespace='scout')
-        Path p = m_path.getParent();
-        if (p.getParent().getFileName().toString().equals(Configuration.get().getNamespace())) {
-          p = p.getParent();
-        }
+        Path p = FileUtility.replaceSegment(m_path, Paths.get("src", "main", "js", Configuration.get().getJsFolderName()), Paths.get("src", "main", "js"));
         rel = p.relativize(INDEX);
       }
       libImport = new JsImport(moduleName, rel);
