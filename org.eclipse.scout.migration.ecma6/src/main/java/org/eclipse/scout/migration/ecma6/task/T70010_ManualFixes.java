@@ -153,7 +153,7 @@ public class T70010_ManualFixes extends AbstractTask {
 
     // map control
     if ("bsiscout".equals(namespace)) {
-      if (pathEndsWith(pathInfo, "/mapTableControl.js")) {
+      if (pathEndsWith(pathInfo, "/MapTableControl.js")) {
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String source = wc.getSource();
         String marker = "url: 'res/maps/' + mapId + '.json'";
