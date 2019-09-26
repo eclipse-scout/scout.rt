@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.shared.http.DefaultHttpTransportManager;
+import org.eclipse.scout.rt.shared.http.IHttpTransportManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +58,13 @@ import com.google.api.client.http.InputStreamContent;
 public class HttpProxy {
   private static final Logger LOG = LoggerFactory.getLogger(HttpProxy.class);
 
+  private IHttpTransportManager m_httpTransportManager;
   private String m_remoteBaseUrl;
   private final List<IHttpHeaderFilter> m_requestHeaderFilters;
   private final List<IHttpHeaderFilter> m_responseHeaderFilters;
 
   public HttpProxy() {
+    m_httpTransportManager = BEANS.get(DefaultHttpTransportManager.class);
     m_requestHeaderFilters = new ArrayList<>();
     m_responseHeaderFilters = new ArrayList<>();
   }
@@ -136,7 +139,7 @@ public class HttpProxy {
     }
 
     String url = rewriteUrl(req, options);
-    HttpRequest httpReq = BEANS.get(DefaultHttpTransportManager.class).getHttpRequestFactory().buildRequest(req.getMethod(), new GenericUrl(url), null);
+    HttpRequest httpReq = getHttpTransportManager().getHttpRequestFactory().buildRequest(req.getMethod(), new GenericUrl(url), null);
     httpReq = prepareRequest(httpReq);
 
     writeRequestHeaders(req, httpReq);
@@ -317,10 +320,24 @@ public class HttpProxy {
         .collect(Collectors.toSet());
   }
 
+  public IHttpTransportManager getHttpTransportManager() {
+    return m_httpTransportManager;
+  }
+
+  /**
+   * @param manager
+   *          the {@link IHttpTransportManager} used to execute the http requests. By default the
+   *          {@link DefaultHttpTransportManager} is used.
+   */
+  public HttpProxy withHttpTransportManager(IHttpTransportManager manager) {
+    m_httpTransportManager = manager;
+    return this;
+  }
+
   /**
    * @return the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
    *         by concatenating this URL and the requests "path info".
-   * @see {@link #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)}
+   * @see #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)
    */
   public String getRemoteBaseUrl() {
     return m_remoteBaseUrl;
@@ -330,7 +347,7 @@ public class HttpProxy {
    * @param remoteBaseUrl
    *          the base URL on the remote server (without trailing slash). All requests are forwarded to this destination
    *          by concatenating this URL and the requests "path info".
-   * @see {@link #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)}
+   * @see #rewriteUrl(HttpServletRequest, HttpProxyRequestOptions)
    */
   public HttpProxy withRemoteBaseUrl(String remoteBaseUrl) {
     m_remoteBaseUrl = remoteBaseUrl;
