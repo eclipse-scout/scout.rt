@@ -10,11 +10,14 @@
  */
 scout.BenchRowLayoutData = function(model) {
   scout.BenchRowLayoutData.parent.call(this, model);
-  this.rows = [null, null, null];
   this._ensureRows();
 };
-
 scout.inherits(scout.BenchRowLayoutData, scout.FlexboxLayoutData);
+
+scout.BenchRowLayoutData.prototype._prepare = function() {
+  scout.BenchRowLayoutData.parent.prototype._prepare.call(this);
+  this.rows = [null, null, null];
+};
 
 scout.BenchRowLayoutData.prototype.getRows = function() {
   return this.rows;

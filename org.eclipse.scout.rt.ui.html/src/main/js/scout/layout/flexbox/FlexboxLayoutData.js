@@ -9,6 +9,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 scout.FlexboxLayoutData = function(model) {
+  this._prepare();
   // inital
   this.relative = true;
   this.grow = 1;
@@ -20,6 +21,10 @@ scout.FlexboxLayoutData = function(model) {
   this.sizePx; /*current display size in pixel*/
   this.initialPx; /*initial in pixel */
   this.delta;
+};
+
+scout.FlexboxLayoutData.prototype._prepare = function() {
+  // nop. may be overridden by sub classes
 };
 
 scout.FlexboxLayoutData.prototype.withOrder = function(order) {
