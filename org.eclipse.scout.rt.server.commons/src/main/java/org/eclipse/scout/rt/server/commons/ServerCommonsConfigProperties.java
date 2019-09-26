@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.server.commons;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
@@ -22,6 +24,7 @@ import org.eclipse.scout.rt.platform.config.AbstractBooleanConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractMapConfigProperty;
 import org.eclipse.scout.rt.platform.config.AbstractStringListConfigProperty;
+import org.eclipse.scout.rt.platform.config.ConfigUtility;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.healthcheck.RemoteHealthChecker;
@@ -114,6 +117,36 @@ public final class ServerCommonsConfigProperties {
           + "The value must be provided as a Map.\n"
           + "Example: scout.cspDirective[img-src]='self' data: https: http://localhost:8086",
           ContentSecurityPolicy.class.getName());
+    }
+  }
+
+  public static class CspExclusionsProperty extends AbstractConfigProperty<List<Pattern>, List<String>> {
+
+    @Override
+    public String getKey() {
+      return "scout.cspExclusions";
+    }
+
+    @Override
+    public List<String> readFromSource(String namespace) {
+      return ConfigUtility.getPropertyList(getKey(), null, namespace);
+    }
+
+    @Override
+    protected List<Pattern> parse(List<String> value) {
+      if (value == null) {
+        return null;
+      }
+      return value.stream()
+          .filter(Objects::nonNull)
+          .map(Pattern::compile)
+          .collect(Collectors.toList());
+    }
+
+    @Override
+    public String description() {
+      return String.format("A list of regex strings. If the pathInfo of the request matches one of these strings the csp headers won't be set. This property only has an effect if csp is enabled, see '%s'.",
+          BEANS.get(CspEnabledProperty.class).getKey());
     }
   }
 

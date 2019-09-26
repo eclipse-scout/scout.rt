@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.server.commons.servlet;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServlet;
@@ -21,12 +23,13 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty;
+import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspExclusionsProperty;
 
 /**
  * Add default (security) handling to servlets
  * <p>
- * Make sure to call {@link #doDefaults(HttpServletRequest, HttpServletResponse)} in every servlet at the beginning of
- * each doGet and doPost
+ * Make sure to call {@link #doDefaults(HttpServlet, HttpServletRequest, HttpServletResponse)} in every servlet at the
+ * beginning of each doGet and doPost
  *
  * @since 5.2
  */
@@ -85,7 +88,7 @@ public class HttpServletControl implements Serializable {
     resp.setHeader(HTTP_HEADER_X_FRAME_OPTIONS, SAMEORIGIN);
     resp.setHeader(HTTP_HEADER_X_XSS_PROTECTION, XSS_MODE_BLOCK);
 
-    if (CONFIG.getPropertyValue(CspEnabledProperty.class)) {
+    if (isCspEnabled(req)) {
       if (HttpClientInfo.get(req).isMshtml()) {
         resp.setHeader(HTTP_HEADER_CSP_LEGACY, getCspToken());
       }
@@ -93,5 +96,22 @@ public class HttpServletControl implements Serializable {
         resp.setHeader(HTTP_HEADER_CSP, getCspToken());
       }
     }
+  }
+
+  protected boolean isCspEnabled(HttpServletRequest req) {
+    if (!CONFIG.getPropertyValue(CspEnabledProperty.class)) {
+      return false;
+    }
+    List<Pattern> exclusions = CONFIG.getPropertyValue(CspExclusionsProperty.class);
+    String pathInfo = req.getPathInfo();
+    if (exclusions == null || pathInfo == null) {
+      return true;
+    }
+    for (Pattern exclusion : exclusions) {
+      if (exclusion.matcher(pathInfo).matches()) {
+        return false;
+      }
+    }
+    return true;
   }
 }
