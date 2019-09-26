@@ -56,7 +56,7 @@ public class T40030_IndexJs extends AbstractTask {
     while (matcher.find()) {
       String oldPath = matcher.group(1);
       Path path = Paths.get(oldPath);
-      if (config.getNamespace().equals(path.subpath(0, 1).toString())) {
+      if (config.getJsFolderName().equals(path.subpath(0, 1).toString())) {
         path = path.subpath(1, path.getNameCount());
       }
       String name = nameWithoutJsExtension(path);
