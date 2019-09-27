@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -120,21 +120,21 @@ public class JsonDataObjectsExtensibilitySerializationTest {
     assertEquals(TestCoreDo.class, BEANS.get(DataObjectInventory.class).fromTypeName("TestCore"));
 
     List<IBean<?>> registered = new ArrayList<>();
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
     try {
       assertEquals(TestProjectTemplateDo.class, BEANS.get(DataObjectInventory.class).fromTypeName("TestCore"));
 
-      registered.add(TestingUtility.registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
+      registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
       assertEquals(TestProject1Do.class, BEANS.get(DataObjectInventory.class).fromTypeName("TestCore"));
     }
     finally {
-      TestingUtility.unregisterBeans(registered);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registered);
     }
   }
 
   @Test
   public void testMarshallUnmarshallCoreBean() {
-    IBean<?> registered = TestingUtility.registerBean(new BeanMetaData(TestCoreDo.class));
+    IBean<?> registered = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCoreDo.class));
     try {
       TestCoreDo core = new TestCoreDo();
       core.b().set(true);
@@ -144,15 +144,15 @@ public class JsonDataObjectsExtensibilitySerializationTest {
       assertEquals(TestCoreDo.class, beanMarshalled.getClass());
     }
     finally {
-      TestingUtility.unregisterBean(registered);
+      BEANS.get(BeanTestingHelper.class).unregisterBean(registered);
     }
   }
 
   @Test
   public void testMarshallUnmarshallProjectTemplateBean() {
     List<IBean<?>> registered = new ArrayList<>();
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestCoreDo.class)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCoreDo.class)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
     try {
       TestProjectTemplateDo bean = new TestProjectTemplateDo();
       bean.b().set(true);
@@ -164,16 +164,16 @@ public class JsonDataObjectsExtensibilitySerializationTest {
       assertEquals(TestProjectTemplateDo.class, beanMarshalled.getClass());
     }
     finally {
-      TestingUtility.unregisterBeans(registered);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registered);
     }
   }
 
   @Test
   public void testMarshallUnmarshallProjectBean() {
     List<IBean<?>> registered = new ArrayList<>();
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestCoreDo.class)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCoreDo.class)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
     try {
       TestProject1Do bean = new TestProject1Do();
       bean.b().set(true);
@@ -186,24 +186,24 @@ public class JsonDataObjectsExtensibilitySerializationTest {
       assertEquals(TestProject1Do.class, beanMarshalled.getClass());
     }
     finally {
-      TestingUtility.unregisterBeans(registered);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registered);
     }
   }
 
   @Test(expected = AssertionException.class)
   public void testMarshallUnmarshallProjectBeanNotUnique() {
     List<IBean<?>> registered = new ArrayList<>();
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestCoreDo.class)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
-    registered.add(TestingUtility.registerBean(new BeanMetaData(TestProject2Do.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCoreDo.class)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectTemplateDo.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProject1Do.class).withReplace(true)));
+    registered.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProject2Do.class).withReplace(true)));
     try {
       TestCoreDo core = new TestCoreDo();
       core.b().set(true);
       marshallUnmarshall(core, "TestCoreDo.json");
     }
     finally {
-      TestingUtility.unregisterBeans(registered);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registered);
     }
   }
 
@@ -272,15 +272,15 @@ public class JsonDataObjectsExtensibilitySerializationTest {
   public void testBeanInterfaceWithMultipleImplementation() {
     List<IBean<?>> registeredBeans = new ArrayList<>();
     try {
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestCustomerDo.class)));
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestProjectCustomerDo.class).withReplace(true)));
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestCustomerResponse.class)));
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestICustomerResponse.class)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCustomerDo.class)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectCustomerDo.class).withReplace(true)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCustomerResponse.class)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestICustomerResponse.class)));
 
       runTestBeanInterfaceWithMultipleImplementation();
 
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestCompanyDo.class)));
-      registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(TestProjectCompanyDo.class).withReplace(true)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestCompanyDo.class)));
+      registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestProjectCompanyDo.class).withReplace(true)));
 
       runTestBeanInterfaceWithMultipleImplementation();
 
@@ -291,7 +291,7 @@ public class JsonDataObjectsExtensibilitySerializationTest {
       marshallUnmarshall(customerResponse, "TestICustomerResponse2.json");
     }
     finally {
-      TestingUtility.unregisterBeans(registeredBeans);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registeredBeans);
     }
   }
 

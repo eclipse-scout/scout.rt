@@ -99,7 +99,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -1541,7 +1541,7 @@ public class JsonDataObjectsSerializationTest {
    */
   @Test
   public void testDeserialize_TestPersonDoWithReplacedPhysicalAddress() throws Exception {
-    IBean<?> registeredBean = TestingUtility.registerBean(new BeanMetaData(TestPhysicalAddressExDo.class).withReplace(true));
+    IBean<?> registeredBean = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(TestPhysicalAddressExDo.class).withReplace(true));
     try {
       String input = readResourceAsString("TestPersonDo.json");
       TestPersonDo personDo = s_dataObjectMapper.readValue(input, TestPersonDo.class);
@@ -1550,7 +1550,7 @@ public class JsonDataObjectsSerializationTest {
       assertEquals(personDo.getAddresses().get(2).getClass(), TestPhysicalAddressExDo.class);
     }
     finally {
-      TestingUtility.unregisterBean(registeredBean);
+      BEANS.get(BeanTestingHelper.class).unregisterBean(registeredBean);
     }
   }
 

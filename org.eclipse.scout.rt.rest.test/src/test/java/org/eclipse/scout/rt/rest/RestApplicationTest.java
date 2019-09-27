@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -30,6 +29,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ParamConverter;
 import javax.ws.rs.ext.ParamConverterProvider;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IgnoreBean;
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.rest.container.PathValidationFilter;
 import org.eclipse.scout.rt.rest.exception.DefaultExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.VetoExceptionMapper;
 import org.eclipse.scout.rt.rest.exception.WebApplicationExceptionMapper;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -140,21 +140,21 @@ public class RestApplicationTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureContextResolver.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureExceptionMapper.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureParamConverterProvider.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureRestContainerRequestFilter.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureResource.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureContextResolver.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureExceptionMapper.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureParamConverterProvider.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureRestContainerRequestFilter.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureResource.class)));
 
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureClassesContributor.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixtureSingletonsContributor.class)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixturePropertiesContributor.class).withOrder(1000)));
-    s_registeredBeans.add(TestingUtility.registerBean(new BeanMetaData(FixturePropertiesExContributor.class).withOrder(2000)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureClassesContributor.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixtureSingletonsContributor.class)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixturePropertiesContributor.class).withOrder(1000)));
+    s_registeredBeans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(FixturePropertiesExContributor.class).withOrder(2000)));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(s_registeredBeans);
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(s_registeredBeans);
   }
 
   @Test

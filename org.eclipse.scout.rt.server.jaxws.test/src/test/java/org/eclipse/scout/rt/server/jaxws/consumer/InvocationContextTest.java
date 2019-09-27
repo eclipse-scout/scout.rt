@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,12 +74,12 @@ public class InvocationContextTest {
     m_implementorSpecifics = mock(JaxWsImplementorSpecifics.class);
 
     when(m_commitListener.onCommitPhase1()).thenReturn(true);
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(BEANS.get(JaxWsImplementorSpecifics.class).getClass(), m_implementorSpecifics).withReplace(true));
+    m_beans = BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(BEANS.get(JaxWsImplementorSpecifics.class).getClass(), m_implementorSpecifics).withReplace(true));
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(m_beans);
   }
 
   @Test

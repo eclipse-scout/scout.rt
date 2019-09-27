@@ -18,10 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.server.commons.ServerCommonsConfigProperties.CspEnabledProperty;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class HttpServletControlTest {
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(s_beans);
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(s_beans);
   }
 
   @Test
@@ -69,7 +70,7 @@ public class HttpServletControlTest {
   protected void runTestSetResponseHeader(boolean mshtml, boolean cspEnabled, String method, boolean expectCspHeader) {
     CspEnabledProperty cspProperty = Mockito.mock(CspEnabledProperty.class);
     Mockito.when(cspProperty.getValue(ArgumentMatchers.<String> any())).thenReturn(cspEnabled);
-    s_beans.add(TestingUtility.registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty)));
+    s_beans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(CspEnabledProperty.class, cspProperty)));
 
     HttpClientInfo httpClientInfo = Mockito.mock(HttpClientInfo.class);
     Mockito.when(httpClientInfo.isMshtml()).thenReturn(mshtml);

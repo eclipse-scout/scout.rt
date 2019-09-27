@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.context.CorrelationId;
 import org.eclipse.scout.rt.server.jaxws.MessageContexts;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class WsProviderCorrelationIdHandlerTest {
 
   @BeforeClass
   public static void beforeClass() {
-    s_beans = TestingUtility.registerBean(new BeanMetaData(P_FixtureCorrelationId.class, new P_FixtureCorrelationId()).withApplicationScoped(true).withReplace(true));
+    s_beans = BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(P_FixtureCorrelationId.class, new P_FixtureCorrelationId()).withApplicationScoped(true).withReplace(true));
   }
 
   private static final class P_FixtureCorrelationId extends CorrelationId {
@@ -57,7 +57,7 @@ public class WsProviderCorrelationIdHandlerTest {
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBean(s_beans);
+    BEANS.get(BeanTestingHelper.class).unregisterBean(s_beans);
   }
 
   @Test

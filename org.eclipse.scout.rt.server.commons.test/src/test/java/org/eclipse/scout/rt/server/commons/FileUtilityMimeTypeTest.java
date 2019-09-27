@@ -17,10 +17,11 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.FileUtility;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +42,12 @@ public class FileUtilityMimeTypeTest {
     Mockito.when(servletContext.getMimeType("file.xml")).thenReturn("application/xml");
     Mockito.when(servletContext.getMimeType("file.XML")).thenReturn("application/xml");
     Mockito.when(servletContext.getMimeType("file.m4v")).thenReturn("video/mp4");
-    beans.add(TestingUtility.registerBean(new BeanMetaData(ServletContext.class, servletContext).withApplicationScoped(true)));
+    beans.add(BEANS.get(BeanTestingHelper.class).registerBean(new BeanMetaData(ServletContext.class, servletContext).withApplicationScoped(true)));
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(beans);
+    BEANS.get(BeanTestingHelper.class).unregisterBeans(beans);
   }
 
   @Test

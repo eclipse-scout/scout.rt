@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.CloneUtility;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,7 +131,7 @@ public class JacksonDataObjectMapperTest {
   @Test
   public void testToString() {
     // register DataObjectMapper using default (non-testing) JacksonDataObjectMapper implementation of IDataObjectMapper
-    List<IBean<?>> registeredBeans = TestingUtility.registerBeans(
+    List<IBean<?>> registeredBeans = BEANS.get(BeanTestingHelper.class).registerBeans(
         new BeanMetaData(DataObjectHelper.class).withOrder(1).withApplicationScoped(true),
         new BeanMetaData(IDataObjectMapper.class).withOrder(1).withApplicationScoped(true).withInitialInstance(new JacksonDataObjectMapper()));
     try {
@@ -142,7 +142,7 @@ public class JacksonDataObjectMapperTest {
       assertEquals("DoEntity {\"intAttribute\":42,\"listAttribute\":[1,2,3],\"stringAttribute\":\"foo\"}", entity.toString());
     }
     finally {
-      TestingUtility.unregisterBeans(registeredBeans);
+      BEANS.get(BeanTestingHelper.class).unregisterBeans(registeredBeans);
     }
   }
 

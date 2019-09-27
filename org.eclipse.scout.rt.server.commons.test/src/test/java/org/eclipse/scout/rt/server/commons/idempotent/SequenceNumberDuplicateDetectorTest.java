@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.server.commons.idempotent;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,10 +19,10 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TuningUtility;
 import org.eclipse.scout.rt.platform.util.date.IDateProvider;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.testing.platform.util.date.FixedDateProvider;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +34,7 @@ public class SequenceNumberDuplicateDetectorTest {
 
   @BeforeClass
   public static void setupClass() {
-    TestingUtility.registerBeans(new BeanMetaData(IDateProvider.class, new FixedDateProvider()));
+    BEANS.get(BeanTestingHelper.class).registerBeans(new BeanMetaData(IDateProvider.class, new FixedDateProvider()));
   }
 
   private static void setCurrentTime(long t) {
