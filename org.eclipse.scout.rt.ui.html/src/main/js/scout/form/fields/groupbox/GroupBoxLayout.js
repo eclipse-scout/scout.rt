@@ -28,7 +28,8 @@ scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
 };
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var menuBarSize, gbBodySize,
+  var gbBodySize,
+    menuBarHeight = 0,
     statusWidth = 0,
     statusPosition = this.groupBox.statusPosition,
     htmlContainer = this.groupBox.htmlComp,
@@ -57,19 +58,51 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
       // position: TITLE
       var titleSize = scout.graphics.prefSize(this.groupBox.$title);
       var titleLabelWidth = scout.graphics.prefSize(this.groupBox.$label, true).width;
-      menuBarSize = this._menuBarSize(htmlMenuBar, titleSize, statusWidth);
-      menuBarSize.width -= titleLabelWidth;
+      var menuBarSize = htmlMenuBar.prefSize({exact: true});
+      var menuBarWidth = menuBarSize.width;
+      var titleWidth = titleSize.width - statusWidth;
+
+      // Use Math.floor to avoid rounding issues with text-ellipsis
+      if ((titleLabelWidth + menuBarWidth) < titleWidth) {
+        // label and menu-bar both fit into the title
+        // let menu-bar use all the available width
+        menuBarWidth = titleWidth - titleLabelWidth;
+        menuBarSize.width = Math.floor(menuBarWidth);
+        $label.cssWidth('');
+
+      } else {
+        // label and menu-bar don't fit into the title
+        // scale down until both fit into the title, try to keep the same width-ratio (r)
+        var scaleFactor = (titleLabelWidth + menuBarWidth) / titleWidth;
+        var rLabel = (titleLabelWidth / titleWidth) / scaleFactor;
+        var rMenuBar = (menuBarWidth / titleWidth) / scaleFactor;
+
+        if (rLabel < rMenuBar) {
+          rLabel = Math.max(0.33, rLabel);
+          rMenuBar = 1.0 - rLabel;
+        } else {
+          rMenuBar = Math.max(0.33, rMenuBar);
+          rLabel = 1.0 - rMenuBar;
+        }
+
+        titleLabelWidth = rLabel * titleWidth;
+        menuBarWidth = rMenuBar * titleWidth;
+
+        menuBarSize.width = Math.floor(menuBarWidth);
+        $label.cssWidth(Math.floor(titleLabelWidth));
+      }
     } else {
       // position: TOP and BOTTOM
       menuBarSize = this._menuBarSize(htmlMenuBar, containerSize, statusWidth);
+      menuBarHeight = menuBarSize.height;
+      setWidthForStatus($label);
     }
     htmlMenuBar.setSize(menuBarSize);
   } else {
-    menuBarSize = new scout.Dimension(0, 0);
+    setWidthForStatus($label);
   }
 
   // Position of label and title
-  setWidthForStatus($label);
   setWidthForStatus($groupBoxTitle);
   if (statusPosition === scout.FormField.StatusPosition.TOP) {
     if (this.groupBox.menuBarPosition !== scout.GroupBox.MenuBarPosition.TITLE) {
@@ -82,7 +115,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   gbBodySize = containerSize.subtract(htmlGbBody.margins());
   gbBodySize.height -= this._titleHeight();
   gbBodySize.height -= this._notificationHeight();
-  gbBodySize.height -= menuBarSize.height;
+  gbBodySize.height -= menuBarHeight;
   $.log.isTraceEnabled() && $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
 
