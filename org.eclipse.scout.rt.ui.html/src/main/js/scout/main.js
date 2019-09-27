@@ -27,7 +27,7 @@ scout.addAppListener = function(type, func) {
   if (scout.app) {
     scout.app.events.addListener(listener);
   } else {
-    this.appListeners.push(listener);
+    scout.appListeners.push(listener);
   }
   return listener;
 };
