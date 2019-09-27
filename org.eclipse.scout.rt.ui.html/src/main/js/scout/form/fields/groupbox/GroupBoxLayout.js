@@ -29,6 +29,7 @@ scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var gbBodySize,
+    menuBarSize,
     menuBarHeight = 0,
     statusWidth = 0,
     statusPosition = this.groupBox.statusPosition,
@@ -40,7 +41,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     $label = this.groupBox.$label,
     $status = this.groupBox.$status,
     containerSize = htmlContainer.availableSize()
-      .subtract(htmlContainer.insets());
+    .subtract(htmlContainer.insets());
 
   // apply responsive transformations if necessary.
   if (this.groupBox.responsive) {
@@ -56,9 +57,11 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   if (htmlMenuBar) {
     if (this.groupBox.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
       // position: TITLE
+      menuBarSize = htmlMenuBar.prefSize({
+        exact: true
+      });
       var titleSize = scout.graphics.prefSize(this.groupBox.$title);
       var titleLabelWidth = scout.graphics.prefSize(this.groupBox.$label, true).width;
-      var menuBarSize = htmlMenuBar.prefSize({exact: true});
       var menuBarWidth = menuBarSize.width;
       var titleWidth = titleSize.width - statusWidth;
 
