@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.jackson.dataobject.fixture;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Generated;
 
@@ -75,6 +76,14 @@ public class TestDateDo extends DoEntity {
   @ValueFormat(pattern = "yyyyMMddHHmm")
   public DoList<Date> customDateDoList() {
     return doList("customDateDoList");
+  }
+
+  public DoValue<Set<String>> aDummySet() {
+    return doValue("aDummySet");
+  }
+
+  public DoValue<Set<String>> zDummySet() {
+    return doValue("zDummySet");
   }
 
   /* **************************************************************************
@@ -201,5 +210,27 @@ public class TestDateDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public List<Date> getCustomDateDoList() {
     return customDateDoList().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withADummySet(Set<String> aDummySet) {
+    aDummySet().set(aDummySet);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<String> getADummySet() {
+    return aDummySet().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestDateDo withZDummySet(Set<String> aDummySet) {
+    zDummySet().set(aDummySet);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Set<String> getZDummySet() {
+    return zDummySet().get();
   }
 }
