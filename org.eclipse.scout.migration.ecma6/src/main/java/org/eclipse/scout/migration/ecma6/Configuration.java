@@ -109,6 +109,22 @@ public class Configuration {
         setPersistLibraryName("@bsi-scout/pdfviewer");
         setPersistLibraryFileName("52-api_bsi_scout_pdfviewer.json");
         break;
+      case "com.bsiag.scout.rt.officeaddin.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setNamespace("scout");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-scout/officeaddin");
+        setPersistLibraryFileName("54-api_bsi_scout_officeaddin.json");
+        break;
+      case "com.bsiag.scout.rt.htmleditor.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
+        setNamespace("scout");
+        setJsFolderName("bsiscout");
+        setPersistLibraryName("@bsi-scout/htmleditor");
+        setPersistLibraryFileName("56-api_bsi_scout_htmleditor.json");
+        break;
       case "com.bsiag.widgets.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsi.scout.rt/" + moduleName);
