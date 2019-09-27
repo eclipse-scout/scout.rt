@@ -190,7 +190,7 @@ public abstract class AbstractHttpTransportManager implements IHttpTransportMana
     }
 
     @Override
-    public boolean handleIOException(HttpRequest request, boolean supportsRetry) throws IOException {
+    public boolean handleIOException(HttpRequest request, boolean supportsRetry) {
       return true;
     }
   }

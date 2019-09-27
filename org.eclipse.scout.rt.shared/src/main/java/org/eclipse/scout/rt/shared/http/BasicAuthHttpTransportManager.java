@@ -20,9 +20,14 @@ public class BasicAuthHttpTransportManager extends AbstractHttpTransportManager 
   private String m_user;
   private String m_password;
 
-  public BasicAuthHttpTransportManager(String user, String password) {
+  public BasicAuthHttpTransportManager withUser(String user) {
     m_user = user;
+    return this;
+  }
+
+  public BasicAuthHttpTransportManager withPassword(String password) {
     m_password = password;
+    return this;
   }
 
   @Override
@@ -46,7 +51,7 @@ public class BasicAuthHttpTransportManager extends AbstractHttpTransportManager 
     }
 
     @Override
-    public void intercept(HttpRequest request) throws IOException {
+    public void intercept(HttpRequest request) {
       request.getHeaders().setBasicAuthentication(m_user, m_password);
     }
   }
