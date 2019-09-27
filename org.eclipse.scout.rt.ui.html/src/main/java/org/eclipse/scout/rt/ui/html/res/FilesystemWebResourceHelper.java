@@ -43,6 +43,15 @@ public class FilesystemWebResourceHelper extends AbstractWebResourceHelper {
     if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
       return resourceRoot;
     }
+
+    if (appModuleName.endsWith(".app") || appModuleName.endsWith("-app")) {
+      appModuleName = appModuleName.substring(0, appModuleName.length() - 4);
+    }
+    resourceRoot = parentDir.resolve(appModuleName);
+    if (Files.isDirectory(resourceRoot) && Files.isReadable(resourceRoot)) {
+      return resourceRoot;
+    }
+
     return workingDir;
   }
 }
