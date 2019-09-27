@@ -2260,4 +2260,34 @@ public class JsonDataObjectsSerializationTest {
   protected String createTestComplexEntityJson(String attributeName, String value) {
     return "{\"_type\" : \"TestComplexEntity\", \"" + attributeName + "\" : " + value + "}";
   }
+
+  @Test
+  public void testSerializeDeserialize_collectionFormat01() throws Exception {
+    TestDateDo testDo = BEANS.get(TestDateDo.class);
+    testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
+        .withDateWithTimestamp(DATE)
+        .withDateOnly(DATE_TRUNCATED);
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+
+    // deserialize and check
+    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
+    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
+    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
+  }
+
+  @Test
+  public void testSerializeDeserialize_collectionFormat02() throws Exception {
+    TestDateDo testDo = BEANS.get(TestDateDo.class);
+    testDo.withZDummySet(CollectionUtility.hashSet("1", "2"))
+        .withDateWithTimestamp(DATE)
+        .withDateOnly(DATE_TRUNCATED);
+
+    String json = s_dataObjectMapper.writeValueAsString(testDo);
+
+    // deserialize and check
+    TestDateDo testDoMarshalled = s_dataObjectMapper.readValue(json, TestDateDo.class);
+    assertEquals(DATE, testDoMarshalled.getDateWithTimestamp());
+    assertEquals(DATE_TRUNCATED, testDoMarshalled.getDateOnly());
+  }
 }
