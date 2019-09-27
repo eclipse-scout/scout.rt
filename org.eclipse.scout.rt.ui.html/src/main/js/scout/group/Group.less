@@ -101,7 +101,7 @@
 }
 
 .group.collapse-bottom {
-  & > .group-header {
+  & > .group-header.custom-header-widget {
     cursor: default;
   }
 
@@ -137,6 +137,10 @@
       &.collapsed {
         #scout.transform(rotatex(180deg));
       }
+    }
+
+    &:hover > .group-collapse-icon::before {
+      color: @highlight-color;
     }
   }
 }

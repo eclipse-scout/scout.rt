@@ -252,11 +252,13 @@ scout.Group.prototype._createLoadingSupport = function() {
 scout.Group.prototype._renderHeader = function() {
   if (this.$header) {
     this.$header.remove();
+    this._removeIconId();
   }
   if (this.header) {
     this.header.render();
     this.$header = this.header.$container
       .addClass('group-header')
+      .addClass('custom-header-widget')
       .prependTo(this.$container);
     this.htmlHeader = this.header.htmlComp;
   } else {
@@ -270,6 +272,11 @@ scout.Group.prototype._renderHeader = function() {
       parent: this
     });
     this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
+    if (!this.rendering) {
+      this._renderIconId();
+      this._renderTitle();
+      this._renderTitleSuffix();
+    }
   }
   this.$header.on('mousedown', this._onHeaderMouseDown.bind(this));
   this.invalidateLayoutTree();
@@ -351,7 +358,7 @@ scout.Group.prototype._renderCollapseStyle = function() {
 };
 
 scout.Group.prototype._onHeaderMouseDown = function(event) {
-  if (this.collapsible && this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM) {
+  if (this.collapsible && (!this.header || this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM)) {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
 };
