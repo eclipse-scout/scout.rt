@@ -109,6 +109,7 @@ scout.Widget.prototype.init = function(model) {
   model = this._prepareModel(model);
   this._init(model);
   this._initKeyStrokeContext();
+  this.recomputeEnabled();
   this.initialized = true;
   this.trigger('init');
 };
@@ -153,7 +154,6 @@ scout.Widget.prototype._init = function(model) {
   this._setCssClass(this.cssClass);
   this._setLogicalGrid(this.logicalGrid);
   this._setEnabled(this.enabled);
-  this.recomputeEnabled();
 };
 
 /**

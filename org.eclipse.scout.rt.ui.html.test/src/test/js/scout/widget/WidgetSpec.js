@@ -115,7 +115,7 @@ describe('Widget', function() {
     }
 
     it('visits all descendants', function() {
-      var widget = createWidget({
+      createWidget({
         session: session,
         parent: parent
       });
@@ -467,7 +467,7 @@ describe('Widget', function() {
       expect(widget.rootGroupBox.menus[0].enabledComputed).toBe(true);
     });
 
-    it('should correctly recalculate enabled state when adding a new field', function() {
+    it('should correctly recalculate enabled state when adding a new widget', function() {
       var widget = createWidget({
         session: session,
         parent: parent
@@ -494,6 +494,33 @@ describe('Widget', function() {
       expect(additionalWidget.enabled).toBe(true);
       expect(additionalWidget.enabledComputed).toBe(false);
     });
+
+    it('should correctly recalculate enabled state when setEnabled was called during _init', function() {
+      // ExtendedWidget disables itself in _init
+      // This is commonly done in a form (e.g. if permission is not sufficient to edit the data)
+      var ExtendedWidget = function() {
+        ExtendedWidget.parent.call(this);
+      };
+      scout.inherits(ExtendedWidget, TestWidget);
+      ExtendedWidget.prototype._init = function(model) {
+        ExtendedWidget.parent.prototype._init.call(this, model);
+        this.setEnabled(false);
+      };
+
+      var widget = new ExtendedWidget();
+      widget.init({
+        parent: parent
+      });
+
+      var child = createWidget({
+        parent: widget
+      });
+
+      expect(widget.enabled).toBe(false);
+      expect(widget.enabledComputed).toBe(false);
+      expect(child.enabled).toBe(true);
+      expect(child.enabledComputed).toBe(false);
+    });
   });
 
   describe('rendering', function() {
@@ -511,7 +538,7 @@ describe('Widget', function() {
     });
 
     it('should set rendering flag to true _while_ the component is rendering', function() {
-      var rendering;
+      var rendering = null;
       var widget = createWidget();
       widget._render = function() {
         rendering = this.rendering;
@@ -876,7 +903,7 @@ describe('Widget', function() {
   describe('setProperty', function() {
 
     it('triggers a property change event if the value changes', function() {
-      var propertyChangeEvent;
+      var propertyChangeEvent = null;
       var widget = createWidget();
       widget.on('propertyChange', function(event) {
         propertyChangeEvent = event;
@@ -895,14 +922,14 @@ describe('Widget', function() {
     });
 
     it('does not trigger a property change event if the value does not change', function() {
-      var propertyChangeEvent;
+      var propertyChangeEvent = null;
       var widget = createWidget();
       widget.on('propertyChange', function(event) {
         propertyChangeEvent = event;
       });
       widget.selected = true;
       widget.setProperty('selected', true);
-      expect(propertyChangeEvent).toBe(undefined);
+      expect(propertyChangeEvent).toBe(null);
     });
 
     describe('with widget property', function() {
@@ -957,9 +984,6 @@ describe('Widget', function() {
 
       it('does not fail if new widget is null', function() {
         var widget = createWidget({
-          parent: parent
-        });
-        var another = createWidget({
           parent: parent
         });
         var child = createWidget({
