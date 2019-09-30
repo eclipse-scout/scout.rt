@@ -245,6 +245,15 @@ public class UiSessionInitAndDisposeTest {
       unloadHandler.handlePost(req, resp);
     }
 
+    // UiSession.dispose() calls detachGui() asynchronously (in a ModelJob). This is not relevant in the real world,
+    // but we force a certain order here to make the test more deterministic/reliable.
+    JobTestUtil.waitForCondition(new ICondition() {
+      @Override
+      public boolean isFulfilled() {
+        return m_protocol.contains("Desktop.execGuiDetached");
+      }
+    });
+
     //json startup with same client session
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       String jsonData = "{\"startup\":true, \"clientSessionId\":\"$clientSessionId\"}"
