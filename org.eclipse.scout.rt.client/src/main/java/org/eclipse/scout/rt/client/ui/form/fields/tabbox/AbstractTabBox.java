@@ -310,4 +310,10 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
+  @Override
+  public void addField(IFormField f) {
+    super.addField(f);
+    setSelectedTab(findNewSelectedTab(null));
+  }
+
 }
