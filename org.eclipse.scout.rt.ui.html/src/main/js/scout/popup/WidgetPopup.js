@@ -14,13 +14,13 @@ scout.WidgetPopup = function() {
   this.animateResize = true;
   this.animateRemoval = true;
   this.closable = false;
+  this.closeAction = null;
   this.movable = false;
   this.resizable = false;
   this.widget = null;
   this.windowPaddingX = 0;
   this.windowPaddingY = 0;
   this.windowResizeType = 'layoutAndPosition';
-  this.$close = null;
   this.$dragHandle = null;
   this._moveHandler = this._onMove.bind(this);
   this._resizeHandler = this._onResize.bind(this);
@@ -31,6 +31,11 @@ scout.inherits(scout.WidgetPopup, scout.Popup);
 
 scout.WidgetPopup.prototype._createLayout = function() {
   return new scout.WidgetPopupLayout(this);
+};
+
+scout.WidgetPopup.prototype._init = function(model) {
+  scout.WidgetPopup.parent.prototype._init.call(this, model);
+  this._setClosable(this.closable);
 };
 
 scout.WidgetPopup.prototype._render = function() {
@@ -47,7 +52,6 @@ scout.WidgetPopup.prototype._renderProperties = function() {
 };
 
 scout.WidgetPopup.prototype._remove = function() {
-  this.$close = null;
   this.$dragHandle = null;
   scout.WidgetPopup.parent.prototype._remove.call(this);
 };
@@ -69,24 +73,38 @@ scout.WidgetPopup.prototype.setClosable = function(closable) {
   this.setProperty('closable', closable);
 };
 
-scout.WidgetPopup.prototype._renderClosable = function() {
+scout.Widget.prototype._setClosable = function(closable) {
+  this._setProperty('closable', closable);
   if (this.closable) {
-    if (this.$close) {
+    if (this.closeAction) {
       return;
     }
-    this.$close = this.$container
-      .prependDiv('closer')
-      .on('click', this._onCloseIconClick.bind(this));
+    this.closeAction = this._createCloseAction();
+    this.closeAction.on('action', this._onCloseAction.bind(this));
   } else {
-    if (!this.$close) {
+    if (!this.closeAction) {
       return;
     }
-    this.$close.remove();
-    this.$close = null;
+    this.closeAction.destroy();
+    this.closeAction = null;
   }
 };
 
-scout.WidgetPopup.prototype._onCloseIconClick = function() {
+scout.Widget.prototype._createCloseAction = function() {
+  return scout.create('Action', {
+    parent: this,
+    cssClass: 'close-action',
+    iconId: scout.icons.REMOVE
+  });
+};
+
+scout.WidgetPopup.prototype._renderClosable = function() {
+  if (this.closeAction) {
+    this.closeAction.render();
+  }
+};
+
+scout.WidgetPopup.prototype._onCloseAction = function() {
   this.close();
 };
 
