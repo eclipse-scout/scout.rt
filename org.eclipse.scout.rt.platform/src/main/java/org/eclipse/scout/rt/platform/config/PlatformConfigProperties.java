@@ -90,6 +90,10 @@ public final class PlatformConfigProperties {
     }
   }
 
+  /**
+   * Specifies if jandex indexes should be refreshed when class files change, this scans for changes using a file system
+   * scan and rebuilds affected indexes.
+   */
   public static class JandexRefreshProperty extends AbstractBooleanConfigProperty {
 
     @Override
