@@ -11,6 +11,7 @@
 package org.eclipse.scout.migration.ecma6.model.api.less;
 
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNullOrEmpty;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -197,7 +198,11 @@ public class LessApiParser {
   }
 
   protected static String getExternalLibPrefix(LessApiParser lib) {
-    return '~' + lib.getName() + "/src/";
+    String prefix = '~' + lib.getName() + "/src/";
+    if ("@eclipse-scout/core".equals(lib.getName())) {
+      return prefix; // in scout core the files are directly below src folder
+    }
+    return prefix + "main/js/"; // in other modules (with maven structure) the files are in src/main/js folder
   }
 
   protected void collectRequiredImportsForMixin(WorkingCopy less, Context ctx, LessApiParser lib, Map<String, String> requiredImports, boolean isExternal) {
@@ -219,7 +224,12 @@ public class LessApiParser {
   }
 
   protected static String toExternalImport(String libImportPrefix, String relPath) {
-    return removeLessFileExtension(libImportPrefix + MigrationUtility.removeFirstSegments(relPath, 4));
+    int numSegments = 4;
+    if (relPath.startsWith("src/main/js/froala/")) {
+      // the froala folder is not removed. therefore keep it in the rel path.
+      numSegments = 3;
+    }
+    return removeLessFileExtension(libImportPrefix + MigrationUtility.removeFirstSegments(relPath, numSegments));
   }
 
   protected static String toInternalImport(WorkingCopy less, String relPath) {
