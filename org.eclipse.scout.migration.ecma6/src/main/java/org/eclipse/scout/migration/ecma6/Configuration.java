@@ -141,6 +141,22 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/studio");
         setPersistLibraryFileName("99-api_bsi_studio.json");
         break;
+      case "com.bsiag.crm.ui.html.graph":
+        setSourceModuleDirectory(sourceBase + "/bsicrm/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsicrm/" + moduleName);
+        setNamespace("scout");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-crm/graph");
+        setPersistLibraryFileName("100-api_bsicrm_graph.json");
+        break;
+      case "com.bsiag.crm.ui.html.core":
+        setSourceModuleDirectory(sourceBase + "/bsicrm/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsicrm/" + moduleName);
+        setNamespace("crm");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-crm/core");
+        setPersistLibraryFileName("110-api_bsicrm_core.json");
+        break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
     }
