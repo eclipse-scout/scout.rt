@@ -42,7 +42,7 @@ import com.sun.mail.smtp.SMTPSendFailedException;
  * but can also be used standalone.<br>
  * The <em>pooling</em> behavior of this class is implemented as follows:<br>
  * There are no connections created initially. Instead, whenever a call to {@link #leaseConnection(SmtpServerConfig)} is
- * made, the returned {@link LeasedSmtpConnection} is determined as follows:
+ * made, the returned {@link SmtpConnectionPoolEntry} is determined as follows:
  * <ol>
  * <li>A check is made whether there already exists an idle connection matching the provided config (the match is made
  * using the {@link SmtpServerConfig#equals(Object)} method).
@@ -58,10 +58,17 @@ import com.sun.mail.smtp.SMTPSendFailedException;
  * {@link SmtpPoolWaitForConnectionTimeoutProperty} property. If the property's value is 0, the wait time will be
  * infinite.</li>
  * </ol>
- * If a connection is released by calling {@link #releaseConnection(LeasedSmtpConnection)}, it is not closed immediately
- * but instead returned to the pool as idle connection. If however a released connection has reached the max connection
- * lifetime ({@link SmtpPoolMaxConnectionLifetimeProperty}), it is closed. Additionally all waiting threads are notified
- * which causes them to return to step 1 and recheck for idle connections or space left in the pool.<br>
+ * If a connection is released by calling {@link #releaseConnection(SmtpConnectionPoolEntry)}, it is not closed
+ * immediately but instead returned to the pool as idle connection. A connection is not returned to the pool if one of
+ * the following situations occurs:
+ * <ul>
+ * <li>The connection has reached the max connection lifetime ({@link SmtpPoolMaxConnectionLifetimeProperty}).</li>
+ * <li>The connection has reached the max messagex sent per connetion limit
+ * ({@link SmtpServerConfig#getMaxMessagesPerConnection()}).</li>
+ * <li>An exception occurred while trying to send a message using this connection.</li>
+ * </ul>
+ * In any case, all threads waiting for connections are notified which causes them to return to step 1 and recheck for
+ * idle connections or space left in the pool.<br>
  * As soon as a connection is created, a background job is started which monitors idle connections. If they reach the
  * max idle time ({@link SmtpPoolMaxIdleTimeProperty}) or max connection lifetime, they are closed and removed from the
  * pool.
@@ -92,47 +99,53 @@ public class SmtpConnectionPool {
     m_waitForConnectionTimeout = CONFIG.getPropertyValue(SmtpPoolWaitForConnectionTimeoutProperty.class) * 1000;
   }
 
-  public void sendMessage(SmtpServerConfig smtpServerConfig, MimeMessage message, Address[] recipients) throws MessagingException {
-    try (LeasedSmtpConnection leasedSmtpConnection = leaseConnection(smtpServerConfig, false)) {
-      leasedSmtpConnection.sendMessage(message, recipients);
-      return;
-    }
-    catch (MessagingException e) {
-      if (isConnectionFailure(e)) {
-        LOG.info("Sending message failed on first try due to a connection failure with the leased connection. Will retry with a new connection.", e);
-      }
-      else {
-        throw e;
-      }
-
-      // execution reaches this point in case sending the message with the first leased connection failed and this failure was classified as a connection problem.
-      try (LeasedSmtpConnection leasedSmtpConnection = leaseConnection(smtpServerConfig, true)) {
-        leasedSmtpConnection.sendMessage(message, recipients);
-      }
-    }
-  }
-
   /**
-   * Call this method in order to retrieve a {@link LeasedSmtpConnection} from the pool. Make sure to call
-   * {@link LeasedSmtpConnection#close()} in order to return the connection to the pool. The easiest way to accomplish
-   * this is by using the try-with-resources construct as follows:
-   *
-   * <pre>
-   * try (LeasedSmtpConnection connection = BEANS.get(SmtpConnectionPool.class).leaseConnection(config)) {
-   *   connection.sendMessage(message, recipients);
-   * }
-   * </pre>
+   * This method provides means of sending the provided {@link MimeMessage} via a pooled smtp connection.
    *
    * @param smtpServerConfig
    *          An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
    *          find a matching one in the pool.
-   * @param forceNew
-   *          If true, the caller will never receive a connection that is already in the pool. Instead, a new connection
-   *          will be created. Maximum pool size still applies in this case. If false and an idle connection is
-   *          available it will be returned. If no idle connection is available a new connection will be created if
-   *          possible.
+   * @param message
+   *          The {@link MimeMessage} to want to send.
+   * @param recipients
+   *          Provide a list of all the intended recipients of the message (to, cc and bcc).
    */
-  protected LeasedSmtpConnection leaseConnection(SmtpServerConfig smtpServerConfig, boolean forceNew) {
+  public void sendMessage(SmtpServerConfig smtpServerConfig, MimeMessage message, Address[] recipients) throws MessagingException {
+    SmtpConnectionPoolEntry poolEntry = leaseConnection(smtpServerConfig);
+    try {
+      poolEntry.sendMessage(message, recipients);
+    }
+    catch (MessagingException e) {
+      if (!isConnectionFailure(e)) {
+        throw e;
+      }
+      LOG.info("Sending message failed on first try due to a connection failure with the leased connection. Will retry with a new connection.", e);
+      // if sending failed caused by a connection problem, we exchange our connection for a brand new one
+      // exchangeConnection will take care of releasing the connection we provide
+      poolEntry = exchangeConnection(poolEntry);
+      // we must not close the poolEntry here as this is taken care of by the surrounding try/finally block
+      try {
+        poolEntry.sendMessage(message, recipients);
+      }
+      catch (MessagingException e1) {
+        LOG.error("Sending failed with the second try", e1);
+        throw e1;
+      }
+    }
+    finally {
+      releaseConnection(poolEntry);
+    }
+  }
+
+  /**
+   * Call this method in order to retrieve a {@link SmtpConnectionPoolEntry} from the pool. Make sure to call
+   * {@link #releaseConnection(SmtpConnectionPoolEntry)} in order to return the connection to the pool.
+   *
+   * @param smtpServerConfig
+   *          An {@link SmtpServerConfig} object containing all the necessary information to create a new connection or
+   *          find a matching one in the pool.
+   */
+  protected SmtpConnectionPoolEntry leaseConnection(SmtpServerConfig smtpServerConfig) {
     Assertions.assertGreater(smtpServerConfig.getPoolSize(), 0, "Pool size of provided SmtpServerConfig must be greater 0.");
     synchronized (m_poolLock) {
       Assertions.assertFalse(m_destroyed, "SmtpConnectionPool not available because it has already been destroyed.");
@@ -141,14 +154,14 @@ public class SmtpConnectionPool {
         // try to find an idle connection or create a new connection if poolsize has not been reached yet.
         // candidate may be null as a result
         try {
-          candidate = tryGetIdleOrCreateNew(smtpServerConfig, forceNew);
+          candidate = tryGetIdleOrCreateNewConnection(smtpServerConfig);
         }
         catch (MessagingException e) {
           throw new ProcessingException("MessagingException caught while trying to connect to smtp server.", e);
         }
 
         // if we could not find an idle connection and the pool has already reached its limit in terms of connection count,
-        // we wait until someone releases a connection (@see #releaseConnection(LeasedSmtpConnection))
+        // we wait until someone releases a connection (@see #releaseConnection(SmtpConnectionPoolEntry))
         if (candidate == null) {
           try {
             long startWaitMillis = System.currentTimeMillis();
@@ -167,23 +180,19 @@ public class SmtpConnectionPool {
           }
         }
       }
-      // we found a valid candidate. Remove it from the idle connection set, add it to the leased connection set and return a LeasedSmtpConnection
+      // we found a valid candidate. Remove it from the idle connection set, add it to the leased connection set and return it
       m_idleEntries.remove(candidate);
       m_leasedEntries.add(candidate);
       LOG.debug("Leasing pooled SMTP connection {}", candidate);
-      return BEANS.get(LeasedSmtpConnection.class)
-          .withConnectionPool(this)
-          .withConnectionPoolEntry(candidate)
-          .withTransport(candidate.getTransport());
+      return candidate;
     }
   }
 
-  protected SmtpConnectionPoolEntry tryGetIdleOrCreateNew(SmtpServerConfig smtpServerConfig, boolean forceNew) throws MessagingException {
+  protected SmtpConnectionPoolEntry tryGetIdleOrCreateNewConnection(SmtpServerConfig smtpServerConfig) throws MessagingException {
     Assertions.assertGreater(smtpServerConfig.getPoolSize(), 0, "Invalid pool size '{}'; must be greater 0", smtpServerConfig.getPoolSize());
-    Predicate<SmtpConnectionPoolEntry> poolFilter = ssc -> ssc.matchesConfig(smtpServerConfig);
-    SmtpConnectionPoolEntry candidate = null;
-    // If we are not forced to create a new connection, we try to find one amongst the idle entries
-    if (!forceNew) {
+    synchronized (m_poolLock) {
+      Predicate<SmtpConnectionPoolEntry> poolFilter = getPoolFilter(smtpServerConfig);
+      SmtpConnectionPoolEntry candidate = null;
       candidate = m_idleEntries.stream()
           .filter(poolFilter)
           .sorted((pe1, pe2) -> {
@@ -193,91 +202,124 @@ public class SmtpConnectionPool {
           })
           .findFirst()
           .orElse(null);
-    }
 
-    boolean firstConnection = m_idleEntries.isEmpty() && m_leasedEntries.isEmpty();
-    // there was no idle connection so we create a new connection if the pool size has not been reached for this config
-    long idleEntryCount = m_idleEntries.stream()
-        .filter(poolFilter)
-        .count();
-    long leasedEntryCount = m_leasedEntries.stream()
-        .filter(poolFilter)
-        .count();
-
-    if (candidate == null && idleEntryCount + leasedEntryCount < smtpServerConfig.getPoolSize()) {
-      Session session = BEANS.get(SmtpHelper.class).createSession(smtpServerConfig);
-      @SuppressWarnings("resource") // suppress warning about resource leak, we are managing transports ourselves
-      Transport transport = session.getTransport();
-      BEANS.get(SmtpHelper.class).connect(session, transport, smtpServerConfig.getPassword());
-      IDateProvider dateProvider = BEANS.get(IDateProvider.class);
-      SmtpConnectionPoolEntry poolEntry = BEANS.get(SmtpConnectionPoolEntry.class)
-          .withName(getNextPoolEntryName())
-          .withSmtpServerConfig(smtpServerConfig)
-          .withSession(session)
-          .withTransport(transport)
-          .withCreateTime(dateProvider.currentMillis().getTime())
-          .withIdleSince(dateProvider.currentMillis().getTime());
-
-      LOG.debug("Created new pooled SMTP connection {}", poolEntry);
-      m_idleEntries.add(poolEntry);
-      candidate = poolEntry;
-
-      if (firstConnection) {
-        // if there were neither idle nor leased connections before, the first connection has just been created
-        // start job for connection cleanup
-        LOG.debug("First connection created, starting close-idle-connections job.");
-        Jobs.schedule(this::closeIdleConnections, Jobs.newInput()
-            .withName(JOB_NAME_CLOSE_IDLE_CONNECTIONS)
-            .withExecutionHint(m_jobExecutionHint)
-            .withExecutionTrigger(Jobs.newExecutionTrigger()
-                .withStartIn(1, TimeUnit.MINUTES)
-                .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MINUTES))));
+      if (candidate != null) {
+        return candidate;
       }
-    }
 
-    return candidate;
+      return createNewConnection(smtpServerConfig);
+    }
+  }
+
+  protected SmtpConnectionPoolEntry createNewConnection(SmtpServerConfig smtpServerConfig) throws MessagingException {
+    synchronized (m_poolLock) {
+      Predicate<SmtpConnectionPoolEntry> poolFilter = getPoolFilter(smtpServerConfig);
+      boolean firstConnection = m_idleEntries.isEmpty() && m_leasedEntries.isEmpty();
+      // there was no idle connection so we create a new connection if the pool size has not been reached for this config
+      long idleEntryCount = m_idleEntries.stream()
+          .filter(poolFilter)
+          .count();
+      long leasedEntryCount = m_leasedEntries.stream()
+          .filter(poolFilter)
+          .count();
+      SmtpConnectionPoolEntry poolEntry = null;
+
+      if (idleEntryCount + leasedEntryCount < smtpServerConfig.getPoolSize()) {
+        Session session = BEANS.get(SmtpHelper.class).createSession(smtpServerConfig);
+        @SuppressWarnings("resource") // suppress warning about resource leak, we are managing transports ourselves
+        Transport transport = session.getTransport();
+        BEANS.get(SmtpHelper.class).connect(session, transport, smtpServerConfig.getPassword());
+        IDateProvider dateProvider = BEANS.get(IDateProvider.class);
+        poolEntry = BEANS.get(SmtpConnectionPoolEntry.class)
+            .withName(getNextPoolEntryName())
+            .withSmtpServerConfig(smtpServerConfig)
+            .withSession(session)
+            .withTransport(transport)
+            .withCreateTime(dateProvider.currentMillis().getTime())
+            .withIdleSince(dateProvider.currentMillis().getTime());
+
+        LOG.debug("Created new pooled SMTP connection {}", poolEntry);
+        m_idleEntries.add(poolEntry);
+
+        if (firstConnection) {
+          // if there were neither idle nor leased connections before, the first connection has just been created
+          // start job for connection cleanup
+          LOG.debug("First connection created, starting close-idle-connections job.");
+          startCloseIdleConnectionsJob();
+        }
+      }
+      return poolEntry;
+    }
+  }
+
+  protected Predicate<SmtpConnectionPoolEntry> getPoolFilter(SmtpServerConfig smtpServerConfig) {
+    return ssc -> ssc.matchesConfig(smtpServerConfig);
+  }
+
+  protected void startCloseIdleConnectionsJob() {
+    Jobs.schedule(this::closeIdleConnections, Jobs.newInput()
+        .withName(JOB_NAME_CLOSE_IDLE_CONNECTIONS)
+        .withExecutionHint(m_jobExecutionHint)
+        .withExecutionTrigger(Jobs.newExecutionTrigger()
+            .withStartIn(1, TimeUnit.MINUTES)
+            .withSchedule(FixedDelayScheduleBuilder.repeatForever(1, TimeUnit.MINUTES))));
   }
 
   /**
-   * This method releases the provided {@link LeasedSmtpConnection} and returns the associated {@link Transport} back to
-   * the pool as idle connection.<br>
-   * DO NOT DIRECTLY CALL THIS METHOD<br>
-   * Instead, this method should be called by {@link LeasedSmtpConnection#close()} only. For details on how to work with
-   * {@link LeasedSmtpConnection} see the comment of {@link #leaseConnection(SmtpServerConfig)}.
+   * This method releases the provided {@link SmtpConnectionPoolEntry} and returns it back to the pool as idle
+   * connection.<br>
    */
-  protected void releaseConnection(LeasedSmtpConnection leasedSmtpConnection) {
+  protected void releaseConnection(SmtpConnectionPoolEntry poolEntry) {
     synchronized (m_poolLock) {
       Assertions.assertFalse(m_destroyed, "SmtpConnectionPool not available because it has already been destroyed.");
-      SmtpConnectionPoolEntry candidate = null;
 
-      // Find matching SmtpConnectionPoolEntry for LeasedSmtpConnection
-      for (Iterator<SmtpConnectionPoolEntry> it = m_leasedEntries.iterator(); it.hasNext();) {
-        SmtpConnectionPoolEntry entry = it.next();
-        if (leasedSmtpConnection.getTransport() == entry.getTransport()) {
-          candidate = entry;
-          it.remove();
-          break;
-        }
+      m_leasedEntries.remove(poolEntry);
+
+      if (poolEntry.isFailed()) {
+        LOG.debug("Releasing pooled SMTP connection {}; transport is broken, not returning to idle pool.", poolEntry);
+        safeCloseTransport(poolEntry);
+        poolEntry = null;
       }
 
-      if (candidate != null && leasedSmtpConnection.isFailed()) {
-        LOG.debug("Releasing pooled SMTP connection {}; transport is broken, not returning to idle pool.", candidate);
-        candidate = null;
-      }
-
-      if (candidate != null) {
-        P_ReuseCheckResult reuseCheckResult = isReuseAllowed(candidate);
+      if (poolEntry != null) {
+        P_ReuseCheckResult reuseCheckResult = isReuseAllowed(poolEntry);
         if (reuseCheckResult.isReuseAllowed()) {
-          LOG.debug("Releasing pooled SMTP connection {}; returning to idle pool.", candidate);
-          candidate.withIdleSince(BEANS.get(IDateProvider.class).currentMillis().getTime());
-          m_idleEntries.add(candidate);
+          LOG.debug("Releasing pooled SMTP connection {}; returning to idle pool.", poolEntry);
+          poolEntry.withIdleSince(BEANS.get(IDateProvider.class).currentMillis().getTime());
+          m_idleEntries.add(poolEntry);
         }
         else {
-          safeCloseTransport(candidate);
-          LOG.debug("Releasing pooled SMTP connection {}; {}, not returning to idle pool.", candidate, reuseCheckResult.getReuseDeniedReason());
+          safeCloseTransport(poolEntry);
+          LOG.debug("Releasing pooled SMTP connection {}; {}, not returning to idle pool.", poolEntry, reuseCheckResult.getReuseDeniedReason());
         }
       }
       m_poolLock.notifyAll();
+    }
+  }
+
+  /**
+   * Closes the transport of the provided {@link SmtpConnectionPoolEntry} and removes it from the pool. After that, a
+   * new connection is created, integrated into the pool and returned to the caller.<br>
+   * Use this method when some sort of connection problem occurred while trying to send a message and you suspect that
+   * sending might work with a fresh connection.
+   *
+   * @param oldEntry
+   *          The {@link SmtpConnectionPoolEntry} you wish to exchange for a new one.
+   * @return Returns the just created {@link SmtpConnectionPoolEntry} using the same {@link SmtpServerConfig} as the
+   *         provided entry.
+   */
+  protected SmtpConnectionPoolEntry exchangeConnection(SmtpConnectionPoolEntry oldEntry) throws MessagingException {
+    synchronized (m_poolLock) {
+
+      m_leasedEntries.remove(oldEntry);
+      safeCloseTransport(oldEntry);
+
+      SmtpConnectionPoolEntry newEntry = createNewConnection(oldEntry.getSmtpServerConfig());
+
+      m_idleEntries.remove(newEntry);
+      m_leasedEntries.add(newEntry);
+
+      return newEntry;
     }
   }
 
@@ -294,7 +336,9 @@ public class SmtpConnectionPool {
   }
 
   protected String getNextPoolEntryName() {
-    return "pool-entry-" + ++m_lastPoolEntryNo;
+    synchronized (m_poolLock) {
+      return "pool-entry-" + ++m_lastPoolEntryNo;
+    }
   }
 
   protected boolean isConnectionFailure(MessagingException e) {
@@ -331,13 +375,13 @@ public class SmtpConnectionPool {
     }
   }
 
-  protected void safeCloseTransport(SmtpConnectionPoolEntry smtpConnectionPoolEntry) {
-    LOG.debug("Closing pooled SMTP connection {}", smtpConnectionPoolEntry);
+  protected void safeCloseTransport(SmtpConnectionPoolEntry poolEntry) {
+    LOG.debug("Closing pooled SMTP connection {}", poolEntry);
     try {
-      smtpConnectionPoolEntry.getTransport().close();
+      poolEntry.getTransport().close();
     }
     catch (MessagingException e) {
-      LOG.warn("Could not close transport for pooled SMTP connection {}; assume already closed/crashed.", smtpConnectionPoolEntry, e);
+      LOG.warn("Could not close transport for pooled SMTP connection {}; assume already closed/crashed.", poolEntry, e);
     }
   }
 
