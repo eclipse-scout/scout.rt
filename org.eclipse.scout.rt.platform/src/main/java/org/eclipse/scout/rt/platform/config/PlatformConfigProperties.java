@@ -90,27 +90,6 @@ public final class PlatformConfigProperties {
     }
   }
 
-  /**
-   * Specifies if jandex indexes should be refreshed when class files change, this scans for changes using a file system scan and rebuilds affected indexes.
-   */
-  public static class JandexRefreshProperty extends AbstractBooleanConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.jandex.refresh";
-    }
-
-    @Override
-    public String description() {
-      return "Specified if the Jandex indexer should check all cached indexes for changed class files with a file system scan and rebuild all affected indexes. Is only necessary to enable during development when the class files change often. The default value is false.";
-    }
-
-    @Override
-    public Boolean getDefaultValue() {
-      return Boolean.FALSE;
-    }
-  }
-
   public static class JobManagerCorePoolSizeProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
