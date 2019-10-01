@@ -50,6 +50,7 @@ public abstract class AbstractSeleniumTest {
   private final BrowserLogRule m_browserLogRule = new BrowserLogRule(this);
   private final SessionRule m_sessionRule = new SessionRule(this);
   private final ScreenshotRule m_screenshotRule = new ScreenshotRule(this);
+  private final RetryOnFailureRule m_retryRule = new RetryOnFailureRule(this);
 
   /**
    * Wrap screenshot rule by session rule to make sure, screenshot is taken BEFORE the session is logged out.
@@ -59,6 +60,7 @@ public abstract class AbstractSeleniumTest {
   @Rule
   public final TestRule m_mainRule = RuleChain
       .outerRule(m_ignoreTestOnMacOSRule)
+      .around(m_retryRule)
       .around(m_browserLogRule)
       .around(m_sessionRule)
       .around(m_screenshotRule);
