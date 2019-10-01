@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.config;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.inventory.internal.JandexInventoryBuilder.RebuildStrategy;
 
 public final class PlatformConfigProperties {
 
@@ -72,7 +73,7 @@ public final class PlatformConfigProperties {
     }
   }
 
-  public static class JandexRebuildProperty extends AbstractBooleanConfigProperty {
+  public static class JandexRebuildProperty extends AbstractConfigProperty<RebuildStrategy, String> {
 
     @Override
     public String getKey() {
@@ -85,8 +86,21 @@ public final class PlatformConfigProperties {
     }
 
     @Override
-    public Boolean getDefaultValue() {
-      return Boolean.FALSE;
+    public RebuildStrategy getDefaultValue() {
+      return parse(Boolean.FALSE.toString());
+    }
+
+    @Override
+    protected RebuildStrategy parse(String value) {
+      if (Boolean.TRUE.toString().equalsIgnoreCase(value)) {
+        return RebuildStrategy.ALWAYS;
+      }
+      if (Boolean.FALSE.toString().equalsIgnoreCase(value)) {
+        // do not use the CONFIG class here because the platform is not ready yet
+        return new PlatformDevModeProperty().getValue() ? RebuildStrategy.IF_MODIFIED : RebuildStrategy.IF_MISSING;
+      }
+      // throws IllegalArgumentException when missing
+      return RebuildStrategy.valueOf(value);
     }
   }
 

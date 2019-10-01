@@ -28,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.JandexRebuildProperty;
-import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.PlatformDevModeProperty;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.jboss.jandex.CompositeIndex;
@@ -75,12 +74,7 @@ public class JandexInventoryBuilder {
 
   public JandexInventoryBuilder() {
     // do not use the CONFIG class here because the platform is not ready yet
-    this(
-        new JandexRebuildProperty().getValue()
-            ? RebuildStrategy.ALWAYS
-            : new PlatformDevModeProperty().getValue()
-                ? RebuildStrategy.IF_MODIFIED
-                : RebuildStrategy.IF_MISSING);
+    this(new JandexRebuildProperty().getValue());
   }
 
   public JandexInventoryBuilder(RebuildStrategy rebuildStrategy) {
