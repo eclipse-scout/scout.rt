@@ -1,7 +1,10 @@
 package org.eclipse.scout.rt.mail.smtp;
 
+import javax.mail.Address;
+import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.MimeMessage;
 
 import org.eclipse.scout.rt.platform.Bean;
 
@@ -17,21 +20,34 @@ import org.eclipse.scout.rt.platform.Bean;
  * <li>{@link #m_createTime}</li>
  * </ul>
  * are never changed during the lifetime of this {@link SmtpConnectionPoolEntry} object.<br>
- * The {@link #m_idleSince} property is changed constantly by the {@link SmtpConnectionPool} in order to manage this
- * entry's lifecycle.
+ * The {@link #m_idleSince} and {@link #m_messagesSent} properties are changed constantly by the
+ * {@link SmtpConnectionPool} in order to manage this entry's lifecycle.<br>
+ * The {@link #m_failed} property is set to true as soon as a MessagingException occurs while trying to send a message.
  */
 @Bean
 public class SmtpConnectionPoolEntry {
 
-  private String m_name;
-  private SmtpServerConfig m_smtpServerConfig;
-  private Session m_session;
-  private Transport m_transport;
+  protected String m_name;
+  protected SmtpServerConfig m_smtpServerConfig;
+  protected Session m_session;
+  protected Transport m_transport;
   // creation time of this pool entry object in milliseconds
-  private long m_createTime;
+  protected long m_createTime;
   // number of milliseconds this pool entry has been idle
-  private long m_idleSince;
-  private int m_messagesSent;
+  protected long m_idleSince;
+  protected int m_messagesSent;
+  protected boolean m_failed;
+
+  public void sendMessage(MimeMessage message, Address[] recipients) throws MessagingException {
+    try {
+      m_transport.sendMessage(message, recipients);
+      m_messagesSent++;
+    }
+    catch (MessagingException e) {
+      m_failed = true;
+      throw e;
+    }
+  }
 
   public SmtpConnectionPoolEntry withName(String name) {
     m_name = name;
@@ -63,16 +79,8 @@ public class SmtpConnectionPoolEntry {
     return this;
   }
 
-  public String getName() {
-    return m_name;
-  }
-
   public SmtpServerConfig getSmtpServerConfig() {
     return m_smtpServerConfig;
-  }
-
-  public Session getSession() {
-    return m_session;
   }
 
   public Transport getTransport() {
@@ -87,12 +95,12 @@ public class SmtpConnectionPoolEntry {
     return m_idleSince;
   }
 
-  public void incrementMessagesSent() {
-    m_messagesSent++;
-  }
-
   public int getMessagesSent() {
     return m_messagesSent;
+  }
+
+  public boolean isFailed() {
+    return m_failed;
   }
 
   public boolean matchesConfig(SmtpServerConfig smtpServerConfig) {
@@ -106,6 +114,7 @@ public class SmtpConnectionPoolEntry {
         " transport=" + m_transport +
         " created=" + (System.currentTimeMillis() - m_createTime) / 1000d + "s ago" +
         " idle for=" + (System.currentTimeMillis() - m_idleSince) / 1000d + "s" +
-        " messages sent=" + m_messagesSent + "]";
+        " messages sent=" + m_messagesSent +
+        " failed=" + m_failed + "]";
   }
 }
