@@ -68,7 +68,7 @@ public class AntiCsrfHelper {
    * For AJAX requests from JavaScript the header is automatically included by jQuery.
    */
   public boolean isValidRequest(ContainerRequestContext requestContext) {
-    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().map(f -> f.isIgnored(requestContext)).findAny().isPresent()) {
+    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().anyMatch(f -> f.isIgnored(requestContext))) {
       return true;
     }
 
