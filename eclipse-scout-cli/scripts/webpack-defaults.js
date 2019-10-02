@@ -40,7 +40,10 @@ module.exports = (env, args) => {
     devtool: devMode ? 'inline-module-source-map' : undefined,
     output: {
       filename: jsFilename,
-      path: outDir
+      path: outDir,
+      libraryTarget: 'umd',
+      globalObject: 'this',
+      umdNamedDefine: true
     },
     performance: {
       hints: false
@@ -153,13 +156,15 @@ module.exports = (env, args) => {
             test: /([\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|.*[\\/]eclipse-scout.*[\\/].*\.js)/,
             name: 'eclipse-scout',
             priority: -5,
-            reuseExistingChunk: true
+            reuseExistingChunk: true,
+            enforce: true
           },
           jquery: {
             test: /[\\/]node_modules[\\/]jquery[\\/]/,
             name: 'jquery',
             priority: -1,
-            reuseExistingChunk: true
+            reuseExistingChunk: true,
+            enforce: true
           }
         }
       }
