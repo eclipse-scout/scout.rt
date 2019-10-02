@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.browserfield;
 
+import java.util.Set;
+
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.BrowserFieldListener;
@@ -25,8 +27,6 @@ import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.json.JSONObject;
-
-import java.util.Set;
 
 public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonFormField<BROWSER_FIELD> implements IBinaryResourceProvider {
 
@@ -181,7 +181,7 @@ public class JsonBrowserField<BROWSER_FIELD extends IBrowserField> extends JsonF
   }
 
   protected void handleUiLocationChange(JSONObject data) {
-    String location = data.getString(IBrowserField.PROP_LOCATION);
+    String location = data.optString(IBrowserField.PROP_LOCATION, null);
     addPropertyEventFilterCondition(IBrowserField.PROP_LOCATION, location);
     getModel().getUIFacade().setLocationFromUI(location);
   }
