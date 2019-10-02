@@ -117,10 +117,7 @@ scout.FormController.prototype.activateForm = function(form) {
 
 scout.FormController.prototype.acceptView = function(view, register, position, selectView) {
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
-    return false;
-  }
-  return true;
+  return this.displayParent.rendered;
 };
 
 scout.FormController.prototype._renderView = function(view, register, position, selectView) {
@@ -159,10 +156,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
 
 scout.FormController.prototype.acceptDialog = function(dialog) {
   // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
-  if (!this.displayParent.rendered) {
-    return false;
-  }
-  return true;
+  return this.displayParent.rendered;
 };
 
 scout.FormController.prototype._renderDialog = function(dialog, register) {
@@ -271,51 +265,36 @@ scout.FormController.prototype._activateDialog = function(dialog) {
     return;
   }
 
+  var siblings = dialog.$container.nextAll().toArray();
+
   // Now the approach is to move all eligible siblings that are in the DOM after the given dialog.
   // It is important not to move the given dialog itself, because this would interfere with the further handling of the
   // mousedown-DOM-event that triggerd this function.
-  var movableSiblings = dialog.$container.nextAll().toArray()
-    .filter(function(sibling) {
-      // siblings of a dialog are movable if they meet the following criteria:
-      // - they are forms (sibling forms of a dialog are always dialogs)
-      // - they are either
-      //     - not modal
-      //     - modal
-      //         - and not a descendant of the dialog to activate
-      //         - and their display parent is not the desktop
-      var siblingWidget = scout.widget(sibling);
-      return siblingWidget instanceof scout.Form &&
-        (!siblingWidget.modal ||
-          (!dialog.has(siblingWidget) && siblingWidget.displayParent !== this.session.desktop));
-    }, this);
+  var movableSiblings = siblings.filter(function(sibling) {
+    // siblings of a dialog are movable if they meet the following criteria:
+    // - they are forms (sibling forms of a dialog are always dialogs)
+    // - they are either
+    //     - not modal
+    //     - modal
+    //         - and not a descendant of the dialog to activate
+    //         - and their display parent is not the desktop
+    var siblingWidget = scout.widget(sibling);
+    return siblingWidget instanceof scout.Form &&
+      (!siblingWidget.modal ||
+        (!dialog.has(siblingWidget) && siblingWidget.displayParent !== this.session.desktop));
+  }, this);
 
-  // All descendants of the so far determined movableSiblings are moveable as well. (E.g. MessageBox, FileChooser)
-  var movableSiblingsDescendants = dialog.$container.nextAll().toArray()
-    .filter(function(sibling) {
-      return scout.arrays.find(movableSiblings, function(movableSibling) {
-        var siblingWidget = scout.widget(sibling);
-        return !(siblingWidget instanceof scout.Form) && // all movable forms are already captured by the filter above
-          scout.widget(movableSibling).has(siblingWidget);
-      });
+  // All descendants of the so far determined movableSiblings are movable as well. (E.g. MessageBox, FileChooser)
+  var movableSiblingsDescendants = siblings.filter(function(sibling) {
+    return scout.arrays.find(movableSiblings, function(movableSibling) {
+      var siblingWidget = scout.widget(sibling);
+      return !(siblingWidget instanceof scout.Form) && // all movable forms are already captured by the filter above
+        scout.widget(movableSibling).has(siblingWidget);
     });
+  });
   movableSiblings = movableSiblings.concat(movableSiblingsDescendants);
 
-  dialog.$container.nextAll().toArray()
-    .forEach(function(sibling) {
-      if (scout.arrays.containsAll(movableSiblings, [sibling])) {
-        $(sibling).insertBefore(dialog.$container);
-      }
-    }.bind(this));
-
-  // Activate the focus context of the form (will restore the previously focused field)
-  // This must not be done when the currently focused element is part of this dialog's DOM
-  // subtree, even if it has a separate focus context. Otherwise, the dialog would be
-  // (unnecessarily) activated, causing the current focus context to lose the focus.
-  // Example: editable table with a cell editor popup --> editor should keep the focus
-  // when the user clicks the clear icon ("x") inside the editor field.
-  if (!dialog.$container.isOrHas(dialog.$container.activeElement())) {
-    this.session.focusManager.activateFocusContext(dialog.$container);
-  }
+  this.session.desktop.moveOverlaysBehindAndFocus(movableSiblings, dialog.$container);
 };
 
 /**

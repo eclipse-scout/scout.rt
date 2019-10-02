@@ -43,6 +43,7 @@ scout.Desktop = function() {
   this.header = null;
   this.bench = null;
   this.splitter = null;
+  this.splitterVisible = false;
   this.formController = null;
   this.messageBoxController = null;
   this.fileChooserController = null;
@@ -52,6 +53,7 @@ scout.Desktop = function() {
   this.openUriHandler = null;
   this.theme = null;
   this.dense = false;
+  this._glassPaneTargetFilters = [];
 
   this._addWidgetProperties(['viewButtons', 'menus', 'views', 'selectedViewTabs', 'dialogs', 'outline', 'messageBoxes', 'notifications', 'fileChoosers', 'addOns', 'keyStrokes', 'activeForm']);
 
@@ -108,6 +110,12 @@ scout.Desktop.prototype._init = function(model) {
   this._setDense(this.dense);
   this.openUriHandler = scout.create('OpenUriHandler', {
     session: this.session
+  });
+  this._glassPaneTargetFilters.push(function(targetElem, element) {
+    // Exclude all child elements of the given widget
+    // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
+    var target = scout.widget(targetElem);
+    return !element.has(target);
   });
 };
 
@@ -831,12 +839,11 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     if (element.$container) {
       $glassPaneTargets = $glassPaneTargets.not(element.$container);
     }
-    // Exclude all child elements of the given widget
-    // Use case: element is a popup and has tooltip open. The tooltip is displayed in the desktop and considered as glass pane target by the selector above
     $glassPaneTargets = $glassPaneTargets.filter(function(i, targetElem) {
-      var target = scout.widget(targetElem);
-      return !element.has(target);
-    });
+      return this._glassPaneTargetFilters.every(function(filter) {
+        return filter(targetElem, element);
+      }, this);
+    }.bind(this));
   }
 
   var glassPaneTargets;
@@ -859,6 +866,20 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
   this._pushPopupWindowGlassPaneTargets(glassPaneTargets, element);
 
   return glassPaneTargets;
+};
+
+/**
+ * Adds a filter which is applied when the glass pane targets are collected.
+ * If the filter returns false, the target won't be accepted and not covered by a glass pane.
+ * @param filter a function with the parameter target and element. Target is the element which would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
+ * @see _glassPaneTargets
+ */
+scout.Desktop.prototype.addGlassPaneTargetFilter = function(filter) {
+  this._glassPaneTargetFilters.push(filter);
+};
+
+scout.Desktop.prototype.removeGlassPaneTargetFilter = function(filter) {
+  scout.arrays.remove(this._glassPaneTargetFilters, filter);
 };
 
 /**
@@ -1263,4 +1284,30 @@ scout.Desktop.prototype._switchTheme = function(theme) {
   scout.reloadPage({
     clearBody: false
   });
+};
+
+/**
+ * Moves all the given overlays (popups, dialogs, message boxes etc.) before the target overlay and activates the focus context of the target overlay.
+ *
+ * @param overlaysToMove {HTMLElement[]} the overlays which should be moved before the target overlay
+ * @param $targetOverlay {$|HTMLElement} the overlay which should eventually be on top of the movable overlays
+ */
+scout.Desktop.prototype.moveOverlaysBehindAndFocus = function(overlaysToMove, $targetOverlay) {
+  $targetOverlay = $.ensure($targetOverlay);
+  $targetOverlay.nextAll().toArray()
+    .forEach(function(overlay) {
+      if (scout.arrays.containsAll(overlaysToMove, [overlay])) {
+        $(overlay).insertBefore($targetOverlay);
+      }
+    }.bind(this));
+
+  // Activate the focus context of the form (will restore the previously focused field)
+  // This must not be done when the currently focused element is part of this dialog's DOM
+  // subtree, even if it has a separate focus context. Otherwise, the dialog would be
+  // (unnecessarily) activated, causing the current focus context to lose the focus.
+  // Example: editable table with a cell editor popup --> editor should keep the focus
+  // when the user clicks the clear icon ("x") inside the editor field.
+  if (!$targetOverlay.isOrHas($targetOverlay.activeElement())) {
+    this.session.focusManager.activateFocusContext($targetOverlay);
+  }
 };
