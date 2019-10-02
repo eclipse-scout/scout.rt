@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.migration.ecma6.task;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathInfo;
@@ -31,44 +30,18 @@ public class T40020_LessImport extends AbstractTask {
     }
 
     String fileName = pathInfo.getPath().getFileName().toString();
-    return fileName.endsWith(".less")
-      && !fileName.endsWith(T40010_LessModule.OLD_FILE_SUFFIX)
-      && !"theme.less".equals(fileName)
-      && !fileName.startsWith("theme-");
+    return fileName.endsWith(T40010_LessModule.LESS_FILE_SUFFIX)
+        && !fileName.endsWith(T40010_LessModule.OLD_FILE_SUFFIX)
+        && !"theme.less".equals(fileName)
+        && !fileName.startsWith("theme-");
   }
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    removeExistingImports(workingCopy);
-    List<String> requiredImports = context.getLessApi().getRequiredImportsFor(workingCopy, context);
-    if (!requiredImports.isEmpty()) {
-      StringBuilder importClauses = new StringBuilder(workingCopy.getLineDelimiter());
-      for (String imp : requiredImports) {
-        importClauses.append("@import \"").append(imp).append("\";").append(workingCopy.getLineDelimiter());
-      }
-      importClauses.append(workingCopy.getLineDelimiter());
-      StringBuilder newSource = new StringBuilder(workingCopy.getSource());
 
-      int fileCommentEndPos = 0;
-      if (newSource.length() > 2 && newSource.charAt(0) == '/' && newSource.charAt(1) == '*') {
-        // file starts with file header comment
-        fileCommentEndPos = newSource.indexOf("*/");
-        if (fileCommentEndPos < 0) {
-          fileCommentEndPos = 0;
-        }
-        else {
-          fileCommentEndPos += 3;
-        }
-      }
-
-      newSource.insert(fileCommentEndPos, importClauses);
-
-      workingCopy.setSource(newSource.toString());
-    }
+    // remove all existing imports
+    workingCopy.setSource(LESS_IMPORT_PAT.matcher(workingCopy.getSource()).replaceAll(""));
   }
 
-  protected void removeExistingImports(WorkingCopy less) {
-    less.setSource(LESS_IMPORT_PAT.matcher(less.getSource()).replaceAll(""));
-  }
 }

@@ -7,9 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
@@ -20,7 +22,6 @@ import org.eclipse.scout.migration.ecma6.model.api.ApiParser;
 import org.eclipse.scout.migration.ecma6.model.api.ApiWriter;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement;
 import org.eclipse.scout.migration.ecma6.model.api.Libraries;
-import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
@@ -30,6 +31,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsUtility;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityFunction;
 import org.eclipse.scout.migration.ecma6.model.old.JsUtilityVariable;
 import org.eclipse.scout.migration.ecma6.pathfilter.IMigrationExcludePathFilter;
+import org.eclipse.scout.migration.ecma6.task.T40010_LessModule;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
@@ -43,12 +45,12 @@ public class Context {
   private final Map<Path, WorkingCopy> m_workingCopies = new HashMap<>();
   private final Map<WorkingCopy, JsFile> m_jsFiles = new HashMap<>();
   private final Map<String /*fqn*/, JsClass> m_jsClasses = new HashMap<>();
+  private final List<Path> m_lessFiles = new ArrayList<>();
   @FrameworkExtensionMarker
   private final Map<String /*fqn*/, JsUtility> m_jsUtilities = new HashMap<>();
   private final Map<String /*fqn*/, JsTopLevelEnum> m_jsTopLevelEnums = new HashMap<>();
   private Libraries m_libraries;
   private INamedElement m_api;
-  private LessApiParser m_lessApi;
 
   public void setup() {
     try {
@@ -59,8 +61,8 @@ public class Context {
     }
     try {
       parseJsFiles();
-      rebuildLocalApi();
       parseLessFiles();
+      rebuildLocalApi();
     }
     catch (IOException e) {
       throw new ProcessingException("Could not parse Files.", e);
@@ -70,17 +72,35 @@ public class Context {
   }
 
   protected void parseLessFiles() throws IOException {
-    Configuration config = Configuration.get();
-    LessApiParser lessApi = new LessApiParser();
-    lessApi.setName(config.getPersistLibraryName());
-    lessApi.parseFromSourceDir(config.getSourceModuleDirectory(), this);
-    lessApi.parseFromLibraries(m_libraries);
-    m_lessApi = lessApi;
+    Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+        if (file.getFileName().toString().endsWith(T40010_LessModule.LESS_FILE_SUFFIX)) {
+          m_lessFiles.add(file);
+        }
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+        String dirName = dir.getFileName().toString();
+        if ("target".equalsIgnoreCase(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        if (".git".equals(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        if ("node_modules".equals(dirName)) {
+          return FileVisitResult.SKIP_SUBTREE;
+        }
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 
   public void rebuildLocalApi() {
     ApiWriter writer = new ApiWriter();
-    m_api = writer.createLibraryFromCurrentModule(Configuration.get().getNamespace(), this, false);
+    m_api = writer.createLibraryFromCurrentModule(Configuration.get().getNamespace(), this);
   }
 
   protected void readLibraryApis() throws IOException {
@@ -109,7 +129,7 @@ public class Context {
   }
 
   protected WorkingCopy createWorkingCopy(Path file) {
-    return m_workingCopies.computeIfAbsent(file, p -> new WorkingCopy(p));
+    return m_workingCopies.computeIfAbsent(file, WorkingCopy::new);
   }
 
   public Collection<WorkingCopy> getWorkingCopies() {
@@ -143,10 +163,6 @@ public class Context {
     return file;
   }
 
-  public LessApiParser getLessApi() {
-    return m_lessApi;
-  }
-
   public INamedElement getApi() {
     return m_api;
   }
@@ -156,13 +172,11 @@ public class Context {
   }
 
   protected void parseJsFiles() throws IOException {
-
     final Path src = BEANS.get(Configuration.class).getSourceModuleDirectory().resolve("src/main/js");
     if (!Files.exists(src) || !Files.isDirectory(src)) {
       LOG.info("Could not find '" + src + "' to parse js files.");
       return;
     }
-    //noinspection Convert2Diamond
     Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
@@ -193,6 +207,10 @@ public class Context {
 
   public Collection<JsClass> getAllJsClasses() {
     return Collections.unmodifiableCollection(m_jsClasses.values());
+  }
+
+  public List<Path> getAllLessFiles() {
+    return Collections.unmodifiableList(m_lessFiles);
   }
 
   @FrameworkExtensionMarker

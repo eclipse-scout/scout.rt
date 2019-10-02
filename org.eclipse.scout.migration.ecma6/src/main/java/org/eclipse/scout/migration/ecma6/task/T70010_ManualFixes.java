@@ -91,7 +91,7 @@ public class T70010_ManualFixes extends AbstractTask {
           || pathEndsWith(pathInfo, "/LogoutApp.js")) {
         // there is no longer a "res" folder for resources. therefore the log4javascript lib folder can be found on top level now.
         WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
-        wc.setSource(wc.getSource().replace("'res/logo.png'", "'img/logo.png'"));
+        wc.setSource(wc.getSource().replace("'res/logo.png'", "'logo.png'"));
       }
     }
 

@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.migration.ecma6.model.api.INamedElement.Type;
-import org.eclipse.scout.migration.ecma6.model.api.less.LessApiParser;
 import org.eclipse.scout.migration.ecma6.model.old.FrameworkExtensionMarker;
 import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsClassVariable;
@@ -42,11 +41,11 @@ public class ApiWriter {
         .setSerializationInclusion(Include.NON_DEFAULT)
         .enable(SerializationFeature.INDENT_OUTPUT)
         .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-    defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context, true));
+    defaultJacksonObjectMapper.writeValue(Files.newBufferedWriter(libraryFile), createLibraryFromCurrentModule(libName, context));
   }
 
   @FrameworkExtensionMarker
-  public INamedElement createLibraryFromCurrentModule(String libName, Context context, boolean includeLess) {
+  public INamedElement createLibraryFromCurrentModule(String libName, Context context) {
     NamedElement lib = new NamedElement(Type.Library, Configuration.get().getNamespace());
     lib.addCustomAttribute(INamedElement.LIBRARY_MODULE_NAME, libName);
 
@@ -68,16 +67,6 @@ public class ApiWriter {
         .stream()
         .map(jsEnum -> createTopLevelEnum(jsEnum, lib))
         .collect(Collectors.toList()));
-
-    if (includeLess) {
-      LessApiParser lessApi = context.getLessApi();
-      allElements.addAll(lessApi.getMixins().values());
-      allElements.addAll(lessApi
-          .getGlobalVariables().values()
-          .stream()
-          .flatMap(entry -> entry.values().stream())
-          .collect(Collectors.toList()));
-    }
     lib.setChildren(allElements);
     return lib;
   }
