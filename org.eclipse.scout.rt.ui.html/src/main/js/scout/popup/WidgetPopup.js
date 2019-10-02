@@ -73,7 +73,7 @@ scout.WidgetPopup.prototype.setClosable = function(closable) {
   this.setProperty('closable', closable);
 };
 
-scout.Widget.prototype._setClosable = function(closable) {
+scout.WidgetPopup.prototype._setClosable = function(closable) {
   this._setProperty('closable', closable);
   if (this.closable) {
     if (this.closeAction) {
@@ -90,7 +90,7 @@ scout.Widget.prototype._setClosable = function(closable) {
   }
 };
 
-scout.Widget.prototype._createCloseAction = function() {
+scout.WidgetPopup.prototype._createCloseAction = function() {
   return scout.create('Action', {
     parent: this,
     cssClass: 'close-action',
