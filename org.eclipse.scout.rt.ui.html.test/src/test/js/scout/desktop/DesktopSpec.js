@@ -56,7 +56,7 @@ describe('Desktop', function() {
       expect(ntfc.fadeIn).toHaveBeenCalled();
       expect(desktop.notifications.indexOf(ntfc)).toBe(0);
       expect(desktop.$container.find('.desktop-notifications').length).toBe(1);
-      expect(desktop.$notification).not.toBe(null);
+      expect(desktop.$notifications).not.toBe(null);
     });
 
     it('schedules addNotification when desktop is not rendered', function() {
@@ -596,10 +596,6 @@ describe('Desktop', function() {
 
     var desktopOverlayHtmlElements = function() {
       return desktop.$container.children('.overlay-separator').nextAll().toArray();
-    };
-
-    var formElt = function(form) {
-      return form.$container[0];
     };
 
     var widgetHtmlElements = function(forms) {
@@ -1159,6 +1155,36 @@ describe('Desktop', function() {
       expect(tabBox.currentView).toEqual(viewForm0);
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
     });
+
+    it('brings dialog on top of a top level popup upon activation', function() {
+      expect(desktop.activeForm).toBe(null);
+
+      var dialog0 = formHelper.createFormWithOneField({
+        modal: false
+      });
+      desktop.showForm(dialog0);
+
+      var popup = scout.create('WidgetPopup', {
+        closeOnMouseDownOutside: false,
+        closeOnOtherPopupOpen: false,
+        widget: {
+          objectType: 'Label'
+        },
+        parent: desktop
+      });
+      popup.open();
+
+      // expect dialogs to be in the same order as opened
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0, popup]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      desktop.activateForm(dialog0);
+      // expect dialog0 to be on top (= last in the DOM)
+      expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([popup, dialog0]));
+      expect(desktop.activeForm).toBe(dialog0);
+
+      popup.close();
+    });
   });
 
   describe('activeForm', function() {
@@ -1250,7 +1276,6 @@ describe('Desktop', function() {
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
-      var detailForm = outline.nodes[0].detailForm;
       var dialog = formHelper.createFormWithOneField({
         displayHint: 'dialog'
       });
@@ -1881,7 +1906,7 @@ describe('Desktop', function() {
 
   describe('modal form', function() {
 
-    var view1, view2, view3;
+    var view1;
 
     beforeEach(function() {
       session._renderDesktop();

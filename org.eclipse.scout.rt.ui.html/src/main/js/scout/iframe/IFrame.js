@@ -21,6 +21,7 @@ scout.IFrame = function() {
   this.wrapIframe = scout.device.isIosPlatform();
   this.$iframe = null;
   this._loadHandler = this._onLoad.bind(this);
+  this.mutationObserver = null;
 };
 scout.inherits(scout.IFrame, scout.Widget);
 
@@ -33,6 +34,25 @@ scout.IFrame.prototype._render = function() {
     this.$container = this.$iframe;
   }
   this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+
+  this.$iframe.one('remove', function() {
+    if (!this.rendered || this.removing) {
+      return;
+    }
+    this.mutationObserver = new MutationObserver(this._onDomMutation.bind(this));
+    this.mutationObserver.observe(this.$iframe.document(true), {
+      subtree: true,
+      childList: true
+    });
+  }.bind(this));
+};
+
+scout.IFrame.prototype._remove = function() {
+  if (this.mutationObserver) {
+    this.mutationObserver.disconnect();
+    this.mutationObserver = null;
+  }
+  scout.IFrame.parent.prototype._remove.call(this);
 };
 
 /**
@@ -67,6 +87,22 @@ scout.IFrame.prototype._renderTrackLocationChange = function(trackLocation) {
   } else {
     this.$iframe.off('load', this._loadHandler);
   }
+};
+
+scout.IFrame.prototype._onDomMutation = function(mutationList) {
+  mutationList.forEach(function(mutation) {
+    for (var i = 0; i < mutation.addedNodes.length; i++) {
+      var elem = mutation.addedNodes[i];
+      var $elem = $(elem);
+      if ($elem.isOrHas(this.$iframe)) {
+        this._onNodeAdded();
+      }
+    }
+  }, this);
+};
+
+scout.IFrame.prototype._onDomMutation = function() {
+  this._renderLocation();
 };
 
 scout.IFrame.prototype._onLoad = function(event) {
