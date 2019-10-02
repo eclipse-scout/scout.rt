@@ -170,9 +170,9 @@ scout.graphics = {
       .clone()
       .removeClass(animateClasses)
       .appendTo($elem.parent());
-    var prefSize = scout.graphics.prefSize($clone, options);
+    var prefSizeResult = scout.graphics.prefSize($clone, options);
     $clone.remove();
-    return prefSize;
+    return prefSizeResult;
   },
 
   /* These functions are designed to be used with box-sizing:box-model. The only reliable
