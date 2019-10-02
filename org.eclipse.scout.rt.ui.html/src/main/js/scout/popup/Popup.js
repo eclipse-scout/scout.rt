@@ -11,7 +11,7 @@
 scout.Popup = function() {
   scout.Popup.parent.call(this);
 
-  this._mouseDownHandler = null;
+  this._documentMouseDownHandler = null;
   this._anchorScrollHandler = null;
   this._anchorLocationChangeHandler = null;
   this._popupOpenHandler = null;
@@ -354,10 +354,10 @@ scout.Popup.prototype.close = function() {
  */
 scout.Popup.prototype._attachCloseHandlers = function() {
   // Install mouse close handler
-  // The listener needs to be executed in the capturing phase -> prevents that _onMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
+  // The listener needs to be executed in the capturing phase -> prevents that _onDocumentMouseDown will be executed right after the popup gets opened using mouse down, otherwise the popup would be closed immediately
   if (this.closeOnMouseDownOutside) {
-    this._mouseDownHandler = this._onMouseDown.bind(this);
-    this.$container.document(true).addEventListener('mousedown', this._mouseDownHandler, true); // true=the event handler is executed in the capturing phase
+    this._documentMouseDownHandler = this._onDocumentMouseDown.bind(this);
+    this.$container.document(true).addEventListener('mousedown', this._documentMouseDownHandler, true); // true=the event handler is executed in the capturing phase
   }
 
   // Install popup open close handler
@@ -405,13 +405,13 @@ scout.Popup.prototype._detachCloseHandlers = function() {
   }
 
   // Uninstall mouse close handler
-  if (this._mouseDownHandler) {
-    this.$container.document(true).removeEventListener('mousedown', this._mouseDownHandler, true);
-    this._mouseDownHandler = null;
+  if (this._documentMouseDownHandler) {
+    this.$container.document(true).removeEventListener('mousedown', this._documentMouseDownHandler, true);
+    this._documentMouseDownHandler = null;
   }
 };
 
-scout.Popup.prototype._onMouseDown = function(event) {
+scout.Popup.prototype._onDocumentMouseDown = function(event) {
   // in some cases the mousedown handler is executed although it has been already
   // detached on the _remove() method. However, since we're in the middle of
   // processing the mousedown event, it's too late to detach the event and we must
