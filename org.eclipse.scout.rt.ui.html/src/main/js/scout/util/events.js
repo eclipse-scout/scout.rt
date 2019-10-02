@@ -66,6 +66,7 @@ scout.events = {
         // - https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageX
         // - https://www.chromestatus.com/features/6169687914184704
         event.pageX = Math.round(touch.pageX);
+        // noinspection JSSuspiciousNameCombination
         event.pageY = Math.round(touch.pageY);
       }
     }
@@ -129,5 +130,73 @@ scout.events = {
     $elem.on('scroll', scrollHandler);
     // Make sure handler is executed and scroll listener removed if no scroll event occurs
     $elem.document().one('touchend touchcancel', touchEndHandler);
+  },
+
+  /**
+   * Forwards the event to the given target by creating a new event with the same data as the old one.
+   * Prevents default action of the original event if preventDefault was called for the forwarded event.
+   * Does not use jQuery to make sure the capture phase is executed as well.
+   *
+   * @param target {HTMLElement} the element which should receive the event
+   * @param event {Event} the original event which should be propagated
+   */
+  propagateEvent: function(target, event) {
+    var newEvent;
+    if (typeof (Event) === 'function') {
+      newEvent = new event.constructor(event.type, event);
+    } else {
+      var eventType = scout.events.mapEventNameToType(event.type);
+      newEvent = document.createEvent(eventType);
+      newEvent.initEvent(event.type, event.bubbles, event.cancelable);
+      // TODOO CGU copy important props, or maybe ignore it for now and wait for babel
+
+    }
+    if (!target.dispatchEvent(newEvent)) {
+      event.preventDefault();
+    }
+  },
+
+  /**
+   * Returns the event type (category) for the given event name according to https://developer.mozilla.org/de/docs/Web/Events.
+   * Currently only keyboard and mouse events are mapped.
+   *
+   * @param name {string} event name (e.g. keydown)
+   * @returns {string|null} event type (e.g. 'KeyboardEvent')
+   */
+  mapEventNameToType: function(name) {
+    switch (name) {
+      case 'keydown':
+      case 'keyup':
+      case 'keypress':
+        return 'KeyboardEvent';
+      case 'click':
+      case 'dblclick':
+      case 'mousedown':
+      case 'mouseenter':
+      case 'mouseleave':
+      case 'mousemove':
+      case 'mouseout':
+      case 'mouseover':
+      case 'mouseup':
+      case 'show':
+      case 'contextmenu':
+        return 'MouseEvent';
+    }
+    return null;
+  },
+
+  /**
+   * Adds an event listener for each given type to the source which propagates the events for that type to the target
+   * @param source {HTMLElement} the element for which the event listener should be added.
+   * @param target {HTMLElement} the element which should receive the event
+   * @param types {string[]} an array of event types
+   */
+  addPropagationListener: function(source, target, types) {
+    types = scout.arrays.ensure(types);
+    types.forEach(function(type) {
+      source.addEventListener(type, function(event) {
+        scout.events.propagateEvent(target, event);
+      });
+    });
   }
 };
