@@ -10,14 +10,11 @@
  */
 package org.eclipse.scout.rt.rest.csrf;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.container.ContainerRequestContext;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.client.AntiCsrfClientFilter;
 import org.eclipse.scout.rt.rest.container.AntiCsrfContainerFilter;
 
@@ -43,41 +40,8 @@ public class AntiCsrfHelper {
   public static final String REQUESTED_WITH_HEADER = "X-Requested-With";
   public static final String REQUESTED_WITH_VALUE = "";
 
-  private final Set<String> m_methodsToIgnore;
-
   public AntiCsrfHelper() {
-    Set<String> methodsToIgnore = new HashSet<>(3);
-    methodsToIgnore.add("GET");
-    methodsToIgnore.add("OPTIONS");
-    methodsToIgnore.add("HEAD");
-    adaptMethodsToIgnore(methodsToIgnore);
-    m_methodsToIgnore = Collections.unmodifiableSet(methodsToIgnore);
-  }
 
-  /**
-   * Callback to modify the live list with HTTP methods to ignore. By default 'GET', 'OPTIONS' and 'HEAD' are ignored.
-   * <p>
-   * This default list is correct as long as that
-   * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1">RFC2616, section 9.1.1</a> is not
-   * violated, by using GET requests for state changing operations. As soon as GET, OPTIONS or HEAD methods are used for
-   * state changing operations, this list must be adapted accordingly!
-   * <p>
-   * The methods must be added in upper case.
-   */
-  protected void adaptMethodsToIgnore(Set<String> methodsToIgnore) {
-    // nop
-  }
-
-  protected boolean ignoreMethod(String method) {
-    return m_methodsToIgnore.contains(method.toUpperCase());
-  }
-
-  protected boolean ignoreMethod(ClientRequestContext requestContext) {
-    return ignoreMethod(requestContext.getMethod());
-  }
-
-  protected boolean ignoreMethod(ContainerRequestContext requestContext) {
-    return ignoreMethod(requestContext.getMethod());
   }
 
   /**
@@ -87,7 +51,7 @@ public class AntiCsrfHelper {
    * {@link #isValidRequest(ContainerRequestContext)} can be used for this
    */
   public void prepareRequest(ClientRequestContext requestContext) {
-    if (ignoreMethod(requestContext)) {
+    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().map(f -> f.isIgnored(requestContext)).findAny().isPresent()) {
       return;
     }
 
@@ -104,7 +68,7 @@ public class AntiCsrfHelper {
    * For AJAX requests from JavaScript the header is automatically included by jQuery.
    */
   public boolean isValidRequest(ContainerRequestContext requestContext) {
-    if (ignoreMethod(requestContext)) {
+    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().map(f -> f.isIgnored(requestContext)).findAny().isPresent()) {
       return true;
     }
 
