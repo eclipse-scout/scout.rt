@@ -51,7 +51,7 @@ public class AntiCsrfHelper {
    * {@link #isValidRequest(ContainerRequestContext)} can be used for this
    */
   public void prepareRequest(ClientRequestContext requestContext) {
-    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().map(f -> f.isIgnored(requestContext)).findAny().isPresent()) {
+    if (BEANS.all(IAntiCsrfFilterExclusion.class).stream().anyMatch(f -> f.isIgnored(requestContext))) {
       return;
     }
 
