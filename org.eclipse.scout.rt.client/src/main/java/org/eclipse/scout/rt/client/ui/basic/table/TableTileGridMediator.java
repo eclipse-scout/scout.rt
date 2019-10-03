@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.scout.rt.client.ui.tile.TileGridLayoutConfig;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -77,10 +78,13 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
           setTileMappings(tileMappings);
           break;
         case TableEvent.TYPE_ROWS_DELETED:
-          tileMappings.removeIf(m -> e.getRows().contains(m.getTableRow()));
+          Predicate<ITableRowTileMapping> p = m -> e.getRows().contains(m.getTableRow());
+          tileMappings.stream().filter(p).forEach(m -> m.getTile().dispose());
+          tileMappings.removeIf(p);
           setTileMappings(tileMappings);
           break;
         case TableEvent.TYPE_ALL_ROWS_DELETED:
+          tileMappings.forEach(tm -> tm.getTile().dispose());
           setTileMappings(new ArrayList<>());
           break;
       }

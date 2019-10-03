@@ -283,6 +283,8 @@ scout.TableTileGridMediator.prototype.activate = function() {
     return this.tileAccordion.$container;
   }.bind(this);
 
+  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
+
   // doesn't depend upon any tile data, therefore execute on activation
   this._syncFiltersFromTableToTile();
   this._syncScrollTopFromTableToTile();
@@ -304,6 +306,7 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
   if (this.tableState.loadingSupportContainer) {
     this.table.loadingSupport.options$Container = this.tableState.loadingSupportContainer;
   }
+  this.session.keyStrokeManager.installKeyStrokeContext(this.table.keyStrokeContext);
 
   this._syncScrollTopFromTileGridToTable();
 

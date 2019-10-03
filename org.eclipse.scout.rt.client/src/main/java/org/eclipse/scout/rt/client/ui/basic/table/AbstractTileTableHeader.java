@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.LogicalGridLayoutConfig;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -26,7 +29,6 @@ import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -261,6 +263,12 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
     return new P_SortByLookupCall();
   }
 
+  protected boolean isColumnTypeAllowedForGrouping(IColumn col) {
+    return col instanceof AbstractSmartColumn
+        || col instanceof AbstractDateColumn
+        || col instanceof AbstractBooleanColumn;
+  }
+
   @ClassId("dbf260be-ee6c-4f6f-99c6-9b7bcbdf7d61")
   protected class P_GroupByLookupCall extends LocalLookupCall<IColumn> {
     private static final long serialVersionUID = 1L;
@@ -273,7 +281,9 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
           .withFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0)));
 
       for (IColumn col : getTable().getColumns()) {
-        if (col.isVisible()) {
+        if (col.isVisible() &&
+            isColumnTypeAllowedForGrouping(col) ||
+            col.isGroupingActive()) {
           String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
           lookupRows.add(new LookupRow<>(col, colLabel));
         }
@@ -291,16 +301,11 @@ public abstract class AbstractTileTableHeader extends AbstractGroupBox implement
     protected List<? extends ILookupRow<ImmutablePair<IColumn, Boolean>>> execCreateLookupRows() {
       final List<LookupRow<ImmutablePair<IColumn, Boolean>>> lookupRows = new ArrayList<>();
 
-      lookupRows.add(new LookupRow<ImmutablePair<IColumn, Boolean>>(null, TEXTS.get("NoSorting"))
-          .withFont(new FontSpec(null, FontSpec.STYLE_BOLD, 0)));
-
       for (IColumn col : getTable().getColumns()) {
         if (col.isVisible()) {
           String colLabel = ObjectUtility.nvl(col.getHeaderCell().getText(), col.getHeaderCell().getTooltipText());
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " (" + TEXTS.get("Ascending") + ")")
-              .withIconId(AbstractIcons.LongArrowUpBold));
-          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " (" + TEXTS.get("Descending") + ")")
-              .withIconId(AbstractIcons.LongArrowDownBold));
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, true), colLabel + " \u2191"));
+          lookupRows.add(new LookupRow<>(new ImmutablePair<>(col, false), colLabel + " \u2193"));
         }
       }
 
