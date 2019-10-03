@@ -979,6 +979,23 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
+  public void testSerialize_TestItemList() throws Exception {
+    List<TestItemDo> list = new ArrayList<>();
+    list.add(createTestItemDo("foo", "bar"));
+    String json = s_dataObjectMapper.writeValueAsString(list);
+    assertJsonEquals("TestItemList.json", json); // serialized without _type attribute, since no Do*Serializer is involved
+  }
+
+  @Test
+  public void testDeserialize_TestItemList() throws Exception {
+    String json = readResourceAsString("TestItemList.json");
+    DoList<TestItemDo> testDo = s_dataObjectMapper.readValue(json, new TypeReference<DoList<TestItemDo>>() { // deserialize JSON without type information using type reference hint
+    });
+    assertEquals("foo", testDo.get(0).getId());
+    assertEquals("bar", testDo.get(0).getStringAttribute());
+  }
+
+  @Test
   public void testDeserialize_TestItemDoListAsObjectList() throws Exception {
     String json = readResourceAsString("TestItemDoList.json");
     // read value as raw DoList without concrete bind type information
