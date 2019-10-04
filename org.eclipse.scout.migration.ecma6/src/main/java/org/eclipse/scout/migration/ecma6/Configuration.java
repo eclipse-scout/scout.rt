@@ -138,9 +138,18 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
         setNamespace("studio");
         setJsFolderName(getNamespace());
-        setPersistLibraryName("@eclipse-scout/studio");
-        setPersistLibraryFileName("99-api_bsi_studio.json");
+        setPersistLibraryName("@bsi-studio/core");
+        setPersistLibraryFileName("112-api_bsi_studio_core.json");
         break;
+      case "com.bsiag.studio.ui.html.test": {
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/core");
+        setPersistLibraryFileName("113-api_bsi_studio_core_test.json");
+        break;
+      }
       case "com.bsiag.crm.ui.html.graph":
         setSourceModuleDirectory(sourceBase + "/bsicrm/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsicrm/" + moduleName);
@@ -156,6 +165,14 @@ public class Configuration {
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/core");
         setPersistLibraryFileName("110-api_bsicrm_core.json");
+        break;
+      case "com.bsiag.crm.studio.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName("studiocrm");
+        setPersistLibraryName("@bsi-crm/studio");
+        setPersistLibraryFileName("120-api_bsicrm_studio.json");
         break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
