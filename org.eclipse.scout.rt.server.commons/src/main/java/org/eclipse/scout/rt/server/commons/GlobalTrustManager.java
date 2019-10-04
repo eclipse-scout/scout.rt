@@ -87,6 +87,38 @@ public class GlobalTrustManager {
     }
   }
 
+  /**
+   * Creates a new {@link X509TrustManager} instance but does not install it as default {@link SSLContext}. This
+   * instance can be used where the default {@link SSLContext} is not used.
+   * <p>
+   * The default trustmanager algorithm is specified in the java security properties, or an implementation-specific
+   * default if no such property exists.
+   *
+   * @return new {@link X509TrustManager}
+   * @see #installGlobalTrustManager()
+   */
+  public X509TrustManager createTrustManager() {
+    return createTrustManager(TrustManagerFactory.getDefaultAlgorithm());
+  }
+
+  /**
+   * Creates a new {@link X509TrustManager} instance but does not install it as default {@link SSLContext}. This
+   * instance can be used where the default {@link SSLContext} is not used.
+   *
+   * @param tmAlgorithm
+   *          {@link TrustManager} algorithm (e.g. SunX509 or IbmX509)
+   * @return new {@link X509TrustManager}
+   * @see #installGlobalTrustManager()
+   */
+  public X509TrustManager createTrustManager(String tmAlgorithm) {
+    try {
+      return createGlobalTrustManager(tmAlgorithm, getAllTrustedCertificates());
+    }
+    catch (Exception e) {
+      throw new ProcessingException("could not create trust manager.", e);
+    }
+  }
+
   protected List<X509Certificate> getAllTrustedCertificates() {
     List<X509Certificate> trustedCerts = new ArrayList<>();
     trustedCerts.addAll(getTrustedCertificatesInRemoteFiles());
