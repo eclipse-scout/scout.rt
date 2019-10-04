@@ -162,5 +162,12 @@ public class T70010_ManualFixes extends AbstractTask {
       }
     }
 
+    if ("studio".equals(namespace)) {
+      if (pathEndsWith(pathInfo, "/ContentEditor.js")) {
+        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
+        wc.setSource(wc.getSource().replace("'res/contenteditor.css'", "'contenteditor.css'"));
+      }
+    }
+
   }
 }
