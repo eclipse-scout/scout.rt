@@ -169,8 +169,8 @@ public class Configuration {
       case "com.bsiag.crm.studio.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
-        setNamespace("studio");
-        setJsFolderName("studiocrm");
+        setNamespace("studiocrm");
+        setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/studio");
         setPersistLibraryFileName("120-api_bsicrm_studio.json");
         break;
