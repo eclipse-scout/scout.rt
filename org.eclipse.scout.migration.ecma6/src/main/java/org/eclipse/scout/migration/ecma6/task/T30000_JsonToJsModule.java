@@ -92,7 +92,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
     String type = matcher.group(2);
     String value = matcher.group(3);
     result.append(key).append(": ");
-    if("textKey".equals(type)) {
+    if ("textKey".equals(type)) {
       // no migration for the moment. Keep as it was
       result.append("'${textKey:").append(value).append("}'");
     }
@@ -128,6 +128,6 @@ public class T30000_JsonToJsModule extends AbstractTask {
         return migrated;
       }
     }
-    return "scout.objects.resolveConst('" + constValue + "')"; // default migration
+    return "'${const:" + constValue + "}'"; // default: no migration
   }
 }
