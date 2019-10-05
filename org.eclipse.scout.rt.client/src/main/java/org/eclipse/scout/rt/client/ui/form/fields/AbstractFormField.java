@@ -64,6 +64,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.XmlUtility;
 import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
@@ -75,7 +76,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -1448,7 +1448,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     m_visiblePermission = p;
     boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

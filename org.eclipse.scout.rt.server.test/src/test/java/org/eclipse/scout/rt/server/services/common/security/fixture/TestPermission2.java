@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.server.services.common.security.fixture;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class TestPermission2 extends BasicPermission {
+public class TestPermission2 extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public TestPermission2() {
-    super("test.permission.2");
+    super("scout.test.permission.2");
   }
 }

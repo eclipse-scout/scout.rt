@@ -23,7 +23,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -31,10 +30,10 @@ import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.OfficialVersion;
 import org.eclipse.scout.rt.shared.security.ReadDiagnosticServletPermission;
 import org.eclipse.scout.rt.shared.security.UpdateDiagnosticServletPermission;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class DiagnosticSession {
@@ -47,7 +46,7 @@ public class DiagnosticSession {
         Object value = next.getValue();
         IDiagnostic diagnosticProvider = DiagnosticFactory.getDiagnosticProvider(action);
         if (diagnosticProvider != null && value instanceof Object[]) {
-          boolean hasUpdateDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+          boolean hasUpdateDiagnosticsServletPermission = ACCESS.check(new UpdateDiagnosticServletPermission());
           if (hasUpdateDiagnosticsServletPermission) {
             diagnosticProvider.call(action, (Object[]) value);
           }
@@ -79,8 +78,8 @@ public class DiagnosticSession {
 
   @SuppressWarnings("squid:S1215")
   private void doHtmlResponse(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    boolean hasReadDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new ReadDiagnosticServletPermission());
-    boolean hasUpdateDiagnosticsServletPermission = BEANS.get(IAccessControlService.class).checkPermission(new UpdateDiagnosticServletPermission());
+    boolean hasReadDiagnosticsServletPermission = ACCESS.check(new ReadDiagnosticServletPermission());
+    boolean hasUpdateDiagnosticsServletPermission = ACCESS.check(new UpdateDiagnosticServletPermission());
 
     String errorMsg = "";
 
@@ -91,7 +90,7 @@ public class DiagnosticSession {
       errorMsg = "<font color='blue'> System.gc() triggered.</font>";
     }
     if (!hasUpdateDiagnosticsServletPermission && !req.getParameterMap().isEmpty()) {
-      errorMsg = "<font color='red'>" + UpdateDiagnosticServletPermission.class.getSimpleName() + " required to update values.</font>";
+      errorMsg = "<font color='red'>" + new UpdateDiagnosticServletPermission().getName() + " required to update values.</font>";
     }
 
     List<List<String>> result = getDiagnosticItems();
@@ -141,7 +140,7 @@ public class DiagnosticSession {
       out.println("</form>");
     }
     else {
-      out.println("<font color='red'>" + ReadDiagnosticServletPermission.class.getSimpleName() + " required to access diagnostic data.</font>");
+      out.println("<font color='red'>" + new ReadDiagnosticServletPermission().getName() + " required to access diagnostic data.</font>");
     }
     out.print(errorMsg);
     out.println("<p class=\"copyright\">&copy; " + OfficialVersion.COPYRIGHT + "</p>");

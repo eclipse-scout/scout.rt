@@ -11,15 +11,8 @@
 package org.eclipse.scout.rt.server.services.common.security;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
-import java.security.PermissionCollection;
-import java.security.Permissions;
-import java.security.Principal;
-import java.security.PrivilegedAction;
 import java.util.List;
-
-import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.BeanMetaData;
@@ -28,16 +21,19 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
-import org.eclipse.scout.rt.platform.security.SimplePrincipal;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
+import org.eclipse.scout.rt.security.AbstractAccessControlService;
+import org.eclipse.scout.rt.security.DefaultPermissionCollection;
+import org.eclipse.scout.rt.security.IAccessControlService;
+import org.eclipse.scout.rt.security.IPermissionCollection;
+import org.eclipse.scout.rt.security.PermissionLevel;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationProperties.MaxNotificationBlockingTimeOut;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.shared.services.common.security.AbstractAccessControlService;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.session.Sessions;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
@@ -76,40 +72,6 @@ public class AccessControlServiceTest {
   @After
   public void after() {
     TestingUtility.unregisterBeans(m_registerServices);
-  }
-
-  @Test
-  public void testGetUserId() {
-    assertNull(m_accessControlService.getUserId(null));
-
-    Subject s = new Subject();
-    assertNull(m_accessControlService.getUserId(s));
-
-    s.getPrincipals().add(new DummyPrincipal());
-    assertEquals("dummy", m_accessControlService.getUserId(s));
-
-    // first principal wins
-    s.getPrincipals().add(new SimplePrincipal("simple"));
-    assertEquals("dummy", m_accessControlService.getUserId(s));
-
-    s = new Subject();
-    s.getPrincipals().add(new SimplePrincipal("simple"));
-    s.getPrincipals().add(new SimplePrincipal("other"));
-    s.getPrincipals().add(new DummyPrincipal());
-    assertEquals("simple", m_accessControlService.getUserId(s));
-  }
-
-  @Test
-  public void testGetUserIdOfCurrentSubjectNoSubject() {
-    assertNull(Subject.doAs(null, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
-  }
-
-  @Test
-  public void testGetUserIdOfCurrentSubject() {
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("username"));
-
-    assertEquals("username", Subject.doAs(subject, (PrivilegedAction<String>) () -> m_accessControlService.getUserIdOfCurrentSubject()));
   }
 
   /**
@@ -158,14 +120,15 @@ public class AccessControlServiceTest {
 
     @Override
     protected String getCurrentUserCacheKey() {
-      return getUserIdOfCurrentUser();
+      return Sessions.getCurrentUserId();
     }
 
     @Override
-    protected PermissionCollection execLoadPermissions(String userId) {
-      Permissions permissions = new Permissions();
-      permissions.add(new TestPermission1());
-      permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
+    protected IPermissionCollection execLoadPermissions(String userId) {
+      DefaultPermissionCollection permissions = BEANS.get(DefaultPermissionCollection.class);
+      permissions.add(new TestPermission1(), PermissionLevel.ALL);
+      permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"), PermissionLevel.ALL);
+      permissions.setReadOnly();
       return permissions;
     }
   }
@@ -175,13 +138,6 @@ public class AccessControlServiceTest {
     @Override
     public Integer getDefaultValue() {
       return 1;
-    }
-  }
-
-  private static class DummyPrincipal implements Principal {
-    @Override
-    public String getName() {
-      return "dummy";
     }
   }
 }

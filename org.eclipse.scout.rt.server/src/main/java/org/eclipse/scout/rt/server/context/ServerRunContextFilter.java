@@ -24,10 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * Filter which creates a {@link ServerRunContext} using the current {@link Subject} and calls the next filter inside

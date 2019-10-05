@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class CopyToClipboardPermission extends BasicPermission {
+public class CopyToClipboardPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public CopyToClipboardPermission() {
-    super("clipboard.copy");
+    super("scout.clipboard.copy");
   }
 }

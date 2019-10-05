@@ -62,10 +62,10 @@ import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -467,12 +467,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void setVisiblePermission(Permission p) {
-    boolean b;
+    boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

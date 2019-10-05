@@ -24,13 +24,13 @@ import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.status.IMultiStatus;
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.dimension.IVisibleDimension;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.w3c.dom.Element;
 
 /**
@@ -660,7 +660,7 @@ public interface IFormField extends IWidget, IOrdered, IStyleable, IVisibleDimen
    *
    * @param p
    *          The new {@link Permission} that is used to calculate the visible-granted value.
-   * @see IAccessControlService#checkPermission(Permission)
+   * @see ACCESS#check(Permission)
    * @see #setVisibleGranted(boolean)
    */
   void setVisiblePermission(Permission p);

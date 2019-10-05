@@ -10,13 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class UpdateServiceConfigurationPermission extends BasicPermission {
+public class UpdateServiceConfigurationPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public UpdateServiceConfigurationPermission() {
-    super("services.config.update");
+    super("scout.services.config.update");
   }
-
 }

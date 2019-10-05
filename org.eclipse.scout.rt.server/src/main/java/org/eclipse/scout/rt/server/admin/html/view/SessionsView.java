@@ -19,6 +19,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -28,7 +29,6 @@ import org.eclipse.scout.rt.server.admin.html.widget.table.VirtualRow;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public class SessionsView extends DefaultView {
 

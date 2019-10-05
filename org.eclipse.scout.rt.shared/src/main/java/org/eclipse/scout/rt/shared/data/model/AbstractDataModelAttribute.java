@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.date.DateFormatProvider;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
@@ -46,7 +47,6 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelAttributeChains.DataModelAttributePrepareLookupChain;
 import org.eclipse.scout.rt.shared.extension.data.model.IDataModelAttributeExtension;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.lookup.ICodeLookupCallFactoryService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -497,12 +497,9 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   @Override
   public void setVisiblePermission(Permission p) {
     setVisiblePermissionInternal(p);
-    boolean b;
+    boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

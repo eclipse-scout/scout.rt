@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 
 /**
@@ -57,11 +56,9 @@ public class DefaultPermissionCollection extends AbstractPermissionCollection {
   @Override
   public void add(IPermission permission) {
     assertNotReadOnly();
-    m_permissions.computeIfAbsent(permission.getName(), k -> new ArrayList<>()).add((IPermission) permission);
-  }
-
-  protected void assertNotReadOnly() {
-    Assertions.assertFalse(isReadOnly(), "PermissionCollection is read-only");
+    if (permission != null) {
+      m_permissions.computeIfAbsent(permission.getName(), k -> new ArrayList<>()).add(permission);
+    }
   }
 
   @Override

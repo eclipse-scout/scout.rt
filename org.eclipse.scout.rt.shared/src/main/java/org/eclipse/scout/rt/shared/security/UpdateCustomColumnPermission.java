@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class UpdateCustomColumnPermission extends BasicPermission {
+public class UpdateCustomColumnPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public UpdateCustomColumnPermission() {
-    super("custom.column.update");
+    super("scout.custom.column.update");
   }
 }

@@ -10,20 +10,25 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.Permission;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.rt.platform.util.Assertions;
+import org.eclipse.scout.rt.security.AbstractPermission;
+import org.eclipse.scout.rt.security.IPermission;
+import org.eclipse.scout.rt.security.IPermissionCollection;
+
 /**
- * Permission to grant remote access to a service interface from gui to server.
- * <p>
- * Checked at central access control location in scout server's BusinessOperationDispatcher.
- * <p>
- * Use this permission together with the application specific AccessControlService.
+ * Permission to grant remote access to a service interface. It is checked in scouts ServiceOperationInvoker.
  */
-public class RemoteServiceAccessPermission extends Permission {
+public class RemoteServiceAccessPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
+  private final String m_serviceOperation;
   private transient Pattern m_pattern;
+
+  public RemoteServiceAccessPermission() {
+    this(null);
+  }
 
   /**
    * Permission granting access to remote service call
@@ -31,43 +36,72 @@ public class RemoteServiceAccessPermission extends Permission {
    * pattern may contain multiple * as wildcards
    */
   public RemoteServiceAccessPermission(String interfaceTypeName, String methodName) {
-    super(interfaceTypeName.replace('$', '.') + "#" + methodName);
+    this(interfaceTypeName.replace('$', '.') + "#" + methodName);
+  }
+
+  protected RemoteServiceAccessPermission(String serviceOperation) {
+    super("scout.remote.service.access");
+    m_serviceOperation = serviceOperation;
+  }
+
+  public String getServiceOperation() {
+    return m_serviceOperation;
+  }
+
+  public String getServiceOperationPattern() {
+    return m_serviceOperation.replace(".", "[.]").replace("*", ".*");
   }
 
   @Override
-  public boolean implies(Permission p) {
-    if ((p == null) || (p.getClass() != getClass())) {
-      return false;
-    }
+  protected boolean evalPermission(IPermission p) {
     if (m_pattern == null) {
-      m_pattern = Pattern.compile(this.getName().replace(".", "[.]").replace("*", ".*"));
+      m_pattern = Pattern.compile(getServiceOperationPattern());
     }
     RemoteServiceAccessPermission other = (RemoteServiceAccessPermission) p;
-    return m_pattern.matcher(other.getName()).matches();
+    if (other.getServiceOperation() == null) {
+      return false;
+    }
+    return m_pattern.matcher(other.getServiceOperation()).matches();
+  }
+
+  @Override
+  protected void validate(IPermissionCollection permissionCollection) {
+    super.validate(permissionCollection);
+    validateServiceOperationPattern();
+  }
+
+  protected void validateServiceOperationPattern() {
+    Assertions.assertNotNull(getServiceOperation(), "Service operation pattern must not be null when assigned to a permission collection {}", this);
   }
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_serviceOperation == null) ? 0 : m_serviceOperation.hashCode());
+    return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == this) {
+    if (this == obj) {
       return true;
     }
-    if (obj == null) {
+    if (!super.equals(obj)) {
       return false;
     }
     if (getClass() != obj.getClass()) {
       return false;
     }
-    return ((Permission) obj).getName().equals(this.getName());
+    RemoteServiceAccessPermission other = (RemoteServiceAccessPermission) obj;
+    if (m_serviceOperation == null) {
+      if (other.m_serviceOperation != null) {
+        return false;
+      }
+    }
+    else if (!m_serviceOperation.equals(other.m_serviceOperation)) {
+      return false;
+    }
+    return true;
   }
-
-  @Override
-  public String getActions() {
-    return null;
-  }
-
 }

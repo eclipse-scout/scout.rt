@@ -18,11 +18,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.IShowInvisibleColumnsForm;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ITableOrganizer;
 import org.eclipse.scout.rt.client.ui.basic.table.organizer.ShowInvisibleColumnsForm;
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.security.CreateCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.DeleteCustomColumnPermission;
 import org.eclipse.scout.rt.shared.security.UpdateCustomColumnPermission;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * @since 5.2
@@ -115,15 +114,15 @@ public class TableOrganizer implements ITableOrganizer {
   }
 
   private boolean hasCreatePermission() {
-    return BEANS.get(IAccessControlService.class).checkPermission(new CreateCustomColumnPermission());
+    return ACCESS.check(new CreateCustomColumnPermission());
   }
 
   private boolean hasModifyPermission() {
-    return BEANS.get(IAccessControlService.class).checkPermission(new UpdateCustomColumnPermission());
+    return ACCESS.check(new UpdateCustomColumnPermission());
   }
 
   private boolean hasRemovePermission() {
-    return BEANS.get(IAccessControlService.class).checkPermission(new DeleteCustomColumnPermission());
+    return ACCESS.check(new DeleteCustomColumnPermission());
   }
 
 }

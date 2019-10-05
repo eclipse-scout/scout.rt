@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.security;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.Bean;
+import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 
 /**
  * Extension to {@link PermissionCollection}
@@ -74,9 +76,21 @@ public interface IPermissionCollection {
   void add(Permission permission);
 
   /**
-   * @see PermissionCollection#add(Permission)
+   * Prefer the method {@link #add(IPermission, PermissionLevel)} which sets the granted permission level.
+   *
+   * @see #add(IPermission, PermissionLevel)
    */
   void add(IPermission permission);
+
+  /**
+   * Adds permission to the collection and sets the grantedLevel
+   */
+  default void add(IPermission permission, PermissionLevel grantedLevel) {
+    if (permission != null) {
+      permission.setLevelInternal(grantedLevel);
+      add(permission);
+    }
+  }
 
   /**
    * @see PermissionCollection#setReadOnly()
@@ -87,5 +101,27 @@ public interface IPermissionCollection {
    * @see PermissionCollection#isReadOnly()
    */
   boolean isReadOnly();
+
+  /**
+   * @return assigned custom value if any
+   */
+  <T extends Serializable> T getValue(Class<T> valueType);
+
+  /**
+   * @return all assigned custom values
+   */
+  Stream<Object> getValues();
+
+  /**
+   * Sets custom value assigned to the permission collection
+   *
+   * @param valueType
+   *          not null
+   * @param value
+   *          may be null
+   * @throws AssertionException
+   *           if permission collection is read only
+   */
+  <T extends Serializable> void setValue(Class<T> valueType, T value);
 
 }

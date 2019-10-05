@@ -10,13 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class CreateUserBookmarkPermission extends BasicPermission {
+public class CreateUserBookmarkPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public CreateUserBookmarkPermission() {
-    super("bookmark.user.create");
+    super("scout.bookmark.user.create");
   }
-
 }

@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceWithoutAuthorization;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;

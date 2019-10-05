@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.OptimisticLock;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
@@ -43,7 +44,6 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

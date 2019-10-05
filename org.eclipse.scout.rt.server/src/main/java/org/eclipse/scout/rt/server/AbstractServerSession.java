@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.server;
 
-import static org.eclipse.scout.rt.platform.util.Assertions.assertFalse;
-import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,6 +26,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.clientnotification.IClientNodeId;
 import org.eclipse.scout.rt.server.context.RunMonitorCancelRegistry;
@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.session.IGlobalSessionListener;
 import org.eclipse.scout.rt.shared.session.ISessionListener;

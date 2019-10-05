@@ -8,18 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.services.common.security;
+package org.eclipse.scout.rt.security;
 
 import java.security.AccessController;
-import java.security.AllPermission;
-import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.Permissions;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,22 +29,18 @@ import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
 import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
-import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
-import org.eclipse.scout.rt.shared.servicetunnel.LenientPermissionsWrapper;
 
 /**
  * Common logic for an {@link IAccessControlService} implementation. An Implementation has to override
  * {@link #getCurrentUserCacheKey()} and {@link #execLoadPermissions(Object)}. For example use as generic key type
- * String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}. You may use
- * {@link #getUserIdOfCurrentUser()} for this purpose.
+ * String and simply return as cache key the current userId in {@link #getCurrentUserCacheKey()}.
  * <p>
  * <b>Note</b> that the method {@link #execLoadPermissions(Object)} must not have a valid implementation in the client,
  * as a client will always get the value from the server. Therefore consider two implementations like
  * <tt>'CustomAccessControlService'</tt> and <tt>'CustomServerAccessControlService'</tt>.
  * <p>
- * This class caches the permissions as a default transactional and with a time to live duration of one hour. To change
- * any of these properties override {@link #createCacheBuilder()}.
+ * This class caches permission collections. As default, the cache is transactional and with a time to live duration of
+ * one hour. To change any of these properties override {@link #createCacheBuilder()}.
  *
  * @param <K>
  *          the type of keys maintained the cache
@@ -60,7 +51,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
 
   // never null
   private volatile Pattern[] m_userIdSearchPatterns;
-  private volatile ICache<K, PermissionCollection> m_cache;
+  private volatile ICache<K, IPermissionCollection> m_cache;
 
   public AbstractAccessControlService() {
     m_userIdSearchPatterns = new Pattern[]{
@@ -124,9 +115,9 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
    *
    * @return {@link ICacheBuilder} for the internal cache
    */
-  protected ICacheBuilder<K, PermissionCollection> createCacheBuilder() {
+  protected ICacheBuilder<K, IPermissionCollection> createCacheBuilder() {
     @SuppressWarnings("unchecked")
-    ICacheBuilder<K, PermissionCollection> cacheBuilder = BEANS.get(ICacheBuilder.class);
+    ICacheBuilder<K, IPermissionCollection> cacheBuilder = BEANS.get(ICacheBuilder.class);
     return cacheBuilder.withCacheId(ACCESS_CONTROL_SERVICE_CACHE_ID).withValueResolver(createCacheValueResolver())
         .withShared(true)
         .withClusterEnabled(true)
@@ -135,19 +126,17 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
         .withTimeToLive(1L, TimeUnit.HOURS, false);
   }
 
-  protected ICacheValueResolver<K, PermissionCollection> createCacheValueResolver() {
+  protected ICacheValueResolver<K, IPermissionCollection> createCacheValueResolver() {
     return key -> execLoadPermissions(key);
   }
 
-  protected ICache<K, PermissionCollection> getCache() {
+  protected ICache<K, IPermissionCollection> getCache() {
     return m_cache;
   }
 
   /**
-   * Implement this method to get the cache key of the current user. Extract it from the current {@link ISession} or any
-   * other property in the current {@link RunContext}.
-   * <p>
-   * You may use the predefined method {@link #getUserIdOfCurrentUser()} if you use userId as a cache key.
+   * Implement this method to get the cache key of the current user. Extract it from the current session or any other
+   * property in the current {@link RunContext}.
    *
    * @return cache key of the current user or null it the current context has no user assigned to it.
    */
@@ -156,13 +145,10 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
   /**
    * Implement this method to load a {@link PermissionCollection} for a given cache key. This method must be valid
    * <b>only</b> in the server. Client does never call this method but loads its value directly from the server cache.
-   * <p>
-   * Note: In order to use automatically {@link LenientPermissionsWrapper} you should use {@link Permissions} as the
-   * implementation of a {@link PermissionCollection}.
    *
    * @return new PermissionCollection for the given cache key
    */
-  protected abstract PermissionCollection execLoadPermissions(K cacheKey);
+  protected abstract IPermissionCollection execLoadPermissions(K cacheKey);
 
   @Override
   public String getUserIdOfCurrentSubject() {
@@ -186,83 +172,10 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     return null;
   }
 
-  /**
-   * Tries first to get UserId from session. If no active session can be found, {@link #getUserIdOfCurrentSubject()} is
-   * called.
-   *
-   * @return current UserId or null if UserId can not be extracted from current {@link RunContext} and {@link Subject}
-   */
-  public String getUserIdOfCurrentUser() {
-    ISession session = ISession.CURRENT.get();
-    if (session != null && session.isActive()) {
-      // only an active session has a valid userId
-      return session.getUserId();
-    }
-    return getUserIdOfCurrentSubject();
-  }
-
   @Override
-  public boolean checkPermission(Permission p) {
-    if (p == null) {
-      return true;
-    }
-    PermissionCollection c = getPermissions();
-    if (c == null) {
-      return true;
-    }
-    else {
-      return c.implies(p);
-    }
-  }
-
-  @Override
-  public int getPermissionLevel(Permission p) {
-    if (p == null) {
-      return BasicHierarchyPermission.LEVEL_NONE;
-    }
-    if (!(p instanceof BasicHierarchyPermission)) {
-      if (checkPermission(p)) {
-        return BasicHierarchyPermission.LEVEL_ALL;
-      }
-      else {
-        return BasicHierarchyPermission.LEVEL_NONE;
-      }
-    }
-    BasicHierarchyPermission hp = (BasicHierarchyPermission) p;
-    PermissionCollection c = getPermissions();
-    if (c == null) {
-      List<Integer> levels = hp.getValidLevels();
-      return levels.get(levels.size() - 1);
-    }
-    else {
-      int maxLevel = BasicHierarchyPermission.LEVEL_UNDEFINED;
-      Enumeration<Permission> en = c.elements();
-      while (en.hasMoreElements()) {
-        Permission grantedPermission = en.nextElement();
-
-        // catch AllPermission
-        if (grantedPermission instanceof AllPermission) {
-          return BasicHierarchyPermission.LEVEL_ALL;
-        }
-
-        // process basic hierarchy permissions
-        if (grantedPermission instanceof BasicHierarchyPermission) {
-          BasicHierarchyPermission hgrantedPermission = (BasicHierarchyPermission) grantedPermission;
-          if (hgrantedPermission.getClass().isAssignableFrom(hp.getClass())) {
-            maxLevel = Math.max(maxLevel, hgrantedPermission.getLevel());
-            if (maxLevel >= BasicHierarchyPermission.LEVEL_ALL) {
-              break;
-            }
-          }
-        }
-      }
-      return maxLevel;
-    }
-  }
-
-  @Override
-  public PermissionCollection getPermissions() {
-    return getCache().get(getCurrentUserCacheKey());
+  public IPermissionCollection getPermissions() {
+    IPermissionCollection permissions = getCache().get(getCurrentUserCacheKey());
+    return permissions == null ? BEANS.get(NonePermissionCollection.class) : permissions;
   }
 
   @Override
@@ -279,7 +192,7 @@ public abstract class AbstractAccessControlService<K> implements IAccessControlS
     if (cacheKeys == null) {
       return;
     }
-    KeyCacheEntryFilter<K, PermissionCollection> filter = new KeyCacheEntryFilter<>(cacheKeys);
+    KeyCacheEntryFilter<K, IPermissionCollection> filter = new KeyCacheEntryFilter<>(cacheKeys);
     if (filter.getKeys().isEmpty()) {
       return;
     }

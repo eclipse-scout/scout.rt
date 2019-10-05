@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.bookmark;
 
 import java.util.Map;
 
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.security.ReadGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateGlobalBookmarkPermission;
 import org.eclipse.scout.rt.shared.security.UpdateUserBookmarkPermission;
@@ -19,7 +20,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkData;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 public abstract class AbstractBookmarkStorageService implements IBookmarkStorageService {
 

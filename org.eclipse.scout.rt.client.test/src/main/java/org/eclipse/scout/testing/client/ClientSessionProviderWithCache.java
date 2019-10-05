@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnel;
 import org.eclipse.scout.rt.testing.client.TestingClientConfigProperties.ClientSessionCacheExpirationProperty;
 import org.slf4j.Logger;

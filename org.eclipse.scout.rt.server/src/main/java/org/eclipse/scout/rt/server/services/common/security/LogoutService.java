@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

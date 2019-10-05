@@ -131,6 +131,7 @@ import org.eclipse.scout.rt.platform.util.event.FastListenerList;
 import org.eclipse.scout.rt.platform.util.event.IFastListenerList;
 import org.eclipse.scout.rt.platform.util.visitor.CollectingVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
@@ -143,7 +144,6 @@ import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.quartz.SimpleScheduleBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -758,7 +758,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
   public void setVisiblePermission(Permission p) {
     boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

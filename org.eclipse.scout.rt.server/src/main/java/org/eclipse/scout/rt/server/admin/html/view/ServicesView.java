@@ -25,13 +25,13 @@ import org.eclipse.scout.rt.platform.service.IService;
 import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ReflectServiceInventory;
 import org.eclipse.scout.rt.server.admin.inspector.ServiceInspector;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationNameProperty;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
 import org.eclipse.scout.rt.platform.util.VerboseUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
@@ -29,7 +30,6 @@ import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class GeneralView extends DefaultView {

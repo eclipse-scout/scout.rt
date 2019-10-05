@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.server.admin.html.view;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 
 @SuppressWarnings("bsiRulesDefinition:htmlInString")
 public class MessagesView extends DefaultView {

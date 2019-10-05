@@ -19,13 +19,12 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectOutputStream.PutField;
 import java.io.Serializable;
 import java.security.Permission;
-import java.security.Permissions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Wrapper for {@link Permissions} that is serialize safe. This is useful to transfer permission collections that may
+ * Wrapper for {@link Permission} that is serialize safe. This is useful to transfer permission collections that may
  * contain permissions not known by the consumer. This wrapper simply ignores those.
  */
 public class LenientPermissionWrapper implements Serializable {

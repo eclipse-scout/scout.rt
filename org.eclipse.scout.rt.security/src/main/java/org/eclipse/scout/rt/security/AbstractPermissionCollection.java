@@ -10,12 +10,46 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.security;
 
+import java.io.Serializable;
 import java.security.PermissionCollection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
-/**
- * This class is required to allow implementing booth {@code IAccessControlService} interfaces with the same class
- */
+import org.eclipse.scout.rt.platform.util.Assertions;
+
 public abstract class AbstractPermissionCollection extends PermissionCollection implements IPermissionCollection {
   private static final long serialVersionUID = 1L;
 
+  private final Map<Class<?>, Object> m_values;
+
+  public AbstractPermissionCollection() {
+    m_values = new HashMap<Class<?>, Object>();
+  }
+
+  protected void assertNotReadOnly() {
+    Assertions.assertFalse(isReadOnly(), "PermissionCollection is read-only");
+  }
+
+  @Override
+  public <T extends Serializable> T getValue(Class<T> valueType) {
+    return valueType.cast(m_values.get(valueType));
+  }
+
+  @Override
+  public Stream<Object> getValues() {
+    return m_values.values().stream();
+  }
+
+  @Override
+  public <T extends Serializable> void setValue(Class<T> valueType, T value) {
+    assertNotReadOnly();
+    Assertions.assertNotNull(valueType);
+    if (value == null) {
+      m_values.remove(valueType);
+    }
+    else {
+      m_values.put(valueType, value);
+    }
+  }
 }

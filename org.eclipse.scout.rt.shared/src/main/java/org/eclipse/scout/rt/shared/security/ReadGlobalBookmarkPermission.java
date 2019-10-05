@@ -10,13 +10,13 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class ReadGlobalBookmarkPermission extends BasicPermission {
+public class ReadGlobalBookmarkPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public ReadGlobalBookmarkPermission() {
-    super("bookmark.global.read");
+    super("scout.bookmark.global.read");
   }
 
 }

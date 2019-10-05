@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
 import org.eclipse.scout.rt.shared.extension.data.model.IDataModelEntityExtension;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -321,12 +320,9 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   @Override
   public void setVisiblePermission(Permission p) {
     setVisiblePermissionInternal(p);
-    boolean b;
+    boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

@@ -10,13 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class DeleteUserBookmarkPermission extends BasicPermission {
+public class DeleteUserBookmarkPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public DeleteUserBookmarkPermission() {
-    super("bookmark.user.delete");
+    super("scout.bookmark.user.delete");
   }
-
 }

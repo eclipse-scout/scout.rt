@@ -50,13 +50,13 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.visitor.DepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.security.PublishUserBookmarkPermission;
 import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.bookmark.BookmarkFolder;
 import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
-import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

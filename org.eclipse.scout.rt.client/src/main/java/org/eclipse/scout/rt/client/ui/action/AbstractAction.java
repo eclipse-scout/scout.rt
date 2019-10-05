@@ -37,13 +37,13 @@ import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.dimension.IDimensions;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -497,7 +497,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   public void setVisiblePermission(Permission p) {
     boolean visibleByPerm = true;
     if (p != null) {
-      visibleByPerm = BEANS.get(IAccessControlService.class).checkPermission(p);
+      visibleByPerm = ACCESS.check(p);
     }
     setVisibleGranted(visibleByPerm);
   }

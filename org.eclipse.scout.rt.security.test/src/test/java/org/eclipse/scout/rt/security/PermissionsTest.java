@@ -83,17 +83,13 @@ public class PermissionsTest {
 
     IPermission p;
     p = new AFixturePermission();
-    p.setLevelInternal(PermissionLevel.ALL);
-    permissions.add(p);
+    permissions.add(p, PermissionLevel.ALL);
     p = new GFixturePermission();
-    p.setLevelInternal(TestPermissionLevels.GRANTED);
-    permissions.add(p);
+    permissions.add(p, TestPermissionLevels.GRANTED);
     p = new DFixturePermission();
-    p.setLevelInternal(TestPermissionLevels.DENIED);
-    permissions.add(p);
+    permissions.add(p, TestPermissionLevels.DENIED);
     p = new NFixturePermission();
-    p.setLevelInternal(PermissionLevel.NONE);
-    permissions.add(p);
+    permissions.add(p, PermissionLevel.NONE);
 
     permissions.add(new JFixturePermission());
 
@@ -338,11 +334,9 @@ public class PermissionsTest {
 
     IPermission p;
     p = new GFixturePermission();
-    p.setLevelInternal(TestPermissionLevels.GRANTED);
-    permissions.add(p);
+    permissions.add(p, TestPermissionLevels.GRANTED);
     p = new DFixturePermission();
-    p.setLevelInternal(TestPermissionLevels.GRANTED);
-    permissions.add(p);
+    permissions.add(p, TestPermissionLevels.GRANTED);
 
     permissions.setReadOnly();
     List<Permission> permissionList = Collections.list(((PermissionCollection) permissions).elements());

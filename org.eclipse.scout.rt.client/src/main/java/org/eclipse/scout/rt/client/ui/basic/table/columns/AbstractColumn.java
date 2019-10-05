@@ -48,7 +48,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ValidationFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IOrdered;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.Replace;
@@ -65,6 +64,7 @@ import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
+import org.eclipse.scout.rt.security.ACCESS;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.NamedBitMaskHelper;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -74,7 +74,6 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1165,12 +1164,9 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    */
   @Override
   public void setVisiblePermission(Permission p) {
-    boolean b;
+    boolean b = true;
     if (p != null) {
-      b = BEANS.get(IAccessControlService.class).checkPermission(p);
-    }
-    else {
-      b = true;
+      b = ACCESS.check(p);
     }
     setVisibleGranted(b);
   }

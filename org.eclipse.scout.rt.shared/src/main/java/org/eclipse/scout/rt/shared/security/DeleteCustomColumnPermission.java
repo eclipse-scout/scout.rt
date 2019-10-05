@@ -10,12 +10,12 @@
  */
 package org.eclipse.scout.rt.shared.security;
 
-import java.security.BasicPermission;
+import org.eclipse.scout.rt.security.AbstractPermission;
 
-public class DeleteCustomColumnPermission extends BasicPermission {
+public class DeleteCustomColumnPermission extends AbstractPermission {
   private static final long serialVersionUID = 1L;
 
   public DeleteCustomColumnPermission() {
-    super("custom.column.delete");
+    super("scout.custom.column.delete");
   }
 }

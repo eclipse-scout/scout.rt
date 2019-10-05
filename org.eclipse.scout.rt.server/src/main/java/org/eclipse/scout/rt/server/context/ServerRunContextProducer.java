@@ -18,10 +18,10 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.context.RunContextProducer;
 import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.security.IAccessControlService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerConfigProperties.ServerSessionCacheExpirationProperty;
 import org.eclipse.scout.rt.server.session.ServerSessionProviderWithCache;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 
 /**
  * Producer for {@link ServerRunContext} objects having a userId based {@link IServerSession} cache that is <i>NOT</i>

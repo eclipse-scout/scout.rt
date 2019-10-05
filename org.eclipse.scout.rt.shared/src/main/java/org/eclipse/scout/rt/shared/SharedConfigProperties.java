@@ -227,21 +227,6 @@ public final class SharedConfigProperties {
     }
   }
 
-  public static class PermissionLevelCheckCacheTimeToLiveProperty extends AbstractPositiveLongConfigProperty {
-
-    @Override
-    public String getKey() {
-      return "scout.permissionLevelCacheTtl";
-    }
-
-    @Override
-    public String description() {
-      return "Time to live for level permission check caching in milliseconds.\n" +
-          "If calculating the permission level for a permission instance, it can be internally cached. This caching is typically useful in a client and should be relative small (few minutes). If no value is set, caching is disabled.\n" +
-          "As default, no time to live is set and therefore caching is disabled.";
-    }
-  }
-
   public static class DevTextProvidersShowKeysProperty extends AbstractBooleanConfigProperty {
 
     @Override

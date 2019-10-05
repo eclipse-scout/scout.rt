@@ -43,6 +43,8 @@ import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
+import org.eclipse.scout.rt.security.ACCESS;
+import org.eclipse.scout.rt.security.IPermission;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlDirectJdbcConnectionProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverNameProperty;
 import org.eclipse.scout.rt.server.jdbc.SqlConfigProperties.SqlJdbcDriverUnloadProperty;
@@ -66,7 +68,6 @@ import org.eclipse.scout.rt.server.jdbc.internal.pool.SqlConnectionPool;
 import org.eclipse.scout.rt.server.jdbc.oracle.OracleSqlStyle;
 import org.eclipse.scout.rt.server.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
-import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -349,8 +350,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         permissionClassName = permissionClassName.substring(0, levelDot);
       }
       Class permissionClass = loadBundleClassLenient(m_permissionNameToDescriptor, permissionClassName);
-      IAccessControlService accessControlService = BEANS.get(IAccessControlService.class);
-      Object ret = tryGetPermissionLevel(permissionClass, levelField, accessControlService);
+      Object ret = tryGetPermissionLevel(permissionClass, levelField);
       return ret != null ? ret : new LongHolder();
     }
     else if ("code".equals(functionName)) {
@@ -382,7 +382,7 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
     }
   }
 
-  private Object tryGetPermissionLevel(Class<?> permissionClass, String levelField, IAccessControlService accessControlService) {
+  private Object tryGetPermissionLevel(Class<?> permissionClass, String levelField) {
     if (permissionClass == null) {
       return null;
     }
@@ -391,8 +391,8 @@ public abstract class AbstractSqlService implements ISqlService, IServiceInvento
         return permissionClass.getField(levelField).get(null);
       }
       else {
-        Permission p = (Permission) permissionClass.getConstructor().newInstance();
-        return accessControlService.getPermissionLevel(p);
+        IPermission p = (IPermission) permissionClass.getConstructor().newInstance();
+        return ACCESS.getGrantedPermissionLevel(p);
       }
     }
     catch (Exception e) {
