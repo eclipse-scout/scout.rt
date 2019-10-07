@@ -137,56 +137,34 @@ scout.events = {
    * Prevents default action of the original event if preventDefault was called for the forwarded event.
    * Does not use jQuery to make sure the capture phase is executed as well.
    *
+   * <p>
+   * <b>Important</b>
+   * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
+   * -> It does not work for IE 11.
+   * </p>
+   *
    * @param target {HTMLElement} the element which should receive the event
    * @param event {Event} the original event which should be propagated
    */
   propagateEvent: function(target, event) {
-    var newEvent;
-    if (typeof (Event) === 'function') {
-      newEvent = new event.constructor(event.type, event);
-    } else {
-      var eventType = scout.events.mapEventNameToType(event.type);
-      newEvent = document.createEvent(eventType);
-      newEvent.initEvent(event.type, event.bubbles, event.cancelable);
-      // TODOO CGU copy important props, or maybe ignore it for now and wait for babel
-
+    if (typeof (Event) !== 'function') {
+      return;
     }
+    var newEvent = new event.constructor(event.type, event);
     if (!target.dispatchEvent(newEvent)) {
       event.preventDefault();
     }
   },
 
   /**
-   * Returns the event type (category) for the given event name according to https://developer.mozilla.org/de/docs/Web/Events.
-   * Currently only keyboard and mouse events are mapped.
+   * Adds an event listener for each given type to the source which propagates the events for that type to the target.
    *
-   * @param name {string} event name (e.g. keydown)
-   * @returns {string|null} event type (e.g. 'KeyboardEvent')
-   */
-  mapEventNameToType: function(name) {
-    switch (name) {
-      case 'keydown':
-      case 'keyup':
-      case 'keypress':
-        return 'KeyboardEvent';
-      case 'click':
-      case 'dblclick':
-      case 'mousedown':
-      case 'mouseenter':
-      case 'mouseleave':
-      case 'mousemove':
-      case 'mouseout':
-      case 'mouseover':
-      case 'mouseup':
-      case 'show':
-      case 'contextmenu':
-        return 'MouseEvent';
-    }
-    return null;
-  },
-
-  /**
-   * Adds an event listener for each given type to the source which propagates the events for that type to the target
+   * <p>
+   * <b>Important</b>
+   * This function only works in browsers supporting the Event constructor (e.g. KeyboardEvent: https://developer.mozilla.org/de/docs/Web/API/KeyboardEvent/KeyboardEvent).
+   * -> It does not work for IE 11.
+   * </p>
+   *
    * @param source {HTMLElement} the element for which the event listener should be added.
    * @param target {HTMLElement} the element which should receive the event
    * @param types {string[]} an array of event types
