@@ -113,6 +113,12 @@ public final class BinaryResourceUrlUtility {
     return new DynamicResourceInfo(jsonAdapter, filename).toPath();
   }
 
+  /**
+   * @param jsonAdapter
+   * @param path
+   *          decoded path (non URL encoded)
+   * @return
+   */
   public static String getFilenameWithFingerprint(IJsonAdapter<?> jsonAdapter, String path) {
     if (!checkDynamicAdapterResourceUrlArguments(jsonAdapter, path)) {
       return null;

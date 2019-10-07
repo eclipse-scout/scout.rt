@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -36,35 +37,37 @@ public class BinaryResourceUrlUtilityTest {
 
   @Test
   public void testCreateDynamicAdapterResourceUrl_BinaryResource() {
-    IJsonAdapter<Long> jsonAdapter = Mockito.mock(IMockJsonAdapter.class);
-    IUiSession uiSession = Mockito.mock(IUiSession.class);
-    Mockito.when(jsonAdapter.getId()).thenReturn("123");
-    Mockito.when(jsonAdapter.getUiSession()).thenReturn(uiSession);
-    Mockito.when(uiSession.getUiSessionId()).thenReturn("abc");
+    IJsonAdapter<Long> jsonAdapter = createJsonAdapterMock("123", "abc");
 
     String expectedUrl = "dynamic/abc/123/" + m_fingerprint + "/foo.txt";
     assertEquals(expectedUrl, BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(jsonAdapter, m_binaryResource));
-
-    // test roundtrip as well
-    String expectedFilename = m_fingerprint + "/foo.txt";
-    assertEquals(expectedFilename, BinaryResourceUrlUtility.getFilenameWithFingerprint(jsonAdapter, expectedUrl));
   }
 
   @Test
   public void testCreateDynamicAdapterResourceUrl_BinaryResource_NonAsciiFilename() {
-    IJsonAdapter<Long> jsonAdapter = Mockito.mock(IMockJsonAdapter.class);
-    IUiSession uiSession = Mockito.mock(IUiSession.class);
-    Mockito.when(jsonAdapter.getId()).thenReturn("123");
-    Mockito.when(jsonAdapter.getUiSession()).thenReturn(uiSession);
-    Mockito.when(uiSession.getUiSessionId()).thenReturn("abc");
+    IJsonAdapter<Long> jsonAdapter = createJsonAdapterMock("123", "abc");
 
     // URL encoded once
     String expectedUrl = "dynamic/abc/123/" + m_fingerprintSpecialFilename + "/f%C3%A4%C3%A9.txt";
     assertEquals(expectedUrl, BinaryResourceUrlUtility.createDynamicAdapterResourceUrl(jsonAdapter, m_binaryResourceSpecialFilename));
+  }
 
-    // test roundtrip as well
+  @Test
+  public void testGetFilenameWithFingerprint_DynamicAdapterResourceUrl() {
+    IJsonAdapter<Long> jsonAdapter = createJsonAdapterMock("123", "abc");
+
+    String url = "dynamic/abc/123/" + m_fingerprint + "/foo.txt";
+    String expectedFilename = m_fingerprint + "/foo.txt";
+    assertEquals(expectedFilename, BinaryResourceUrlUtility.getFilenameWithFingerprint(jsonAdapter, IOUtility.urlDecode(url)));
+  }
+
+  @Test
+  public void testGetFilenameWithFingerprint_DynamicAdapterResourceUrl_NonAsciiFilename() {
+    IJsonAdapter<Long> jsonAdapter = createJsonAdapterMock("123", "abc");
+
+    String url = "dynamic/abc/123/" + m_fingerprintSpecialFilename + "/f%C3%A4%C3%A9.txt";
     String expectedFilename = m_fingerprint + "/fäé.txt";
-    assertEquals(expectedFilename, BinaryResourceUrlUtility.getFilenameWithFingerprint(jsonAdapter, expectedUrl));
+    assertEquals(expectedFilename, BinaryResourceUrlUtility.getFilenameWithFingerprint(jsonAdapter, IOUtility.urlDecode(url)));
   }
 
   @Test
@@ -97,6 +100,15 @@ public class BinaryResourceUrlUtilityTest {
   public void testGetFilenameWithFingerprint_WithoutContent_NonAsciiFilename() {
     BinaryResource binaryResource = new BinaryResource("fäé.txt", null);
     assertEquals("fäé.txt", BinaryResourceUrlUtility.getFilenameWithFingerprint(binaryResource));
+  }
+
+  protected IJsonAdapter<Long> createJsonAdapterMock(String adapterId, String uiSessionId) {
+    IJsonAdapter<Long> jsonAdapter = Mockito.mock(IMockJsonAdapter.class);
+    IUiSession uiSession = Mockito.mock(IUiSession.class);
+    Mockito.when(jsonAdapter.getId()).thenReturn(adapterId);
+    Mockito.when(jsonAdapter.getUiSession()).thenReturn(uiSession);
+    Mockito.when(uiSession.getUiSessionId()).thenReturn(uiSessionId);
+    return jsonAdapter;
   }
 
   private void assertPairEquals(String filename, Long fingerprint, Pair<String, Long> filenameAndFingerprint) {

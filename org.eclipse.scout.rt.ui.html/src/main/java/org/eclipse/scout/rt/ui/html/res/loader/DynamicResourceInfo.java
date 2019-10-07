@@ -66,56 +66,89 @@ public class DynamicResourceInfo {
   }
 
   /**
-   * Private, as one of the other methods that checks the session and adapter ids should be called instead
-   *
-   * @return array of the matched groups of PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH
-   * @see #fromPath(HttpServletRequest, String)
-   * @see #fromPath(IJsonAdapter, String)
+   * @param jsonAdapter
+   * @param path
+   *          decoded path (non url-encoded)
    */
-  private static String[] splitPath(String path) {
-    if (path == null) {
-      return null;
-    }
-
-    Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(path);
-    if (!m.matches()) {
-      return null;
-    }
-
-    String uiSessionId = m.group(1);
-    String adapterId = m.group(2);
-    String filename = m.group(3);
-    return new String[]{uiSessionId, adapterId, filename};
-  }
-
   public static DynamicResourceInfo fromPath(IJsonAdapter<?> jsonAdapter, String path) {
-    String[] parts = splitPath(path);
+    DynamicResourcePathComponents parts = DynamicResourcePathComponents.fromPath(path);
     if (parts == null) {
       return null;
     }
     // compare the session and adapter id with the one from the passed in adapter to ensure that
     // the resource path matches the passed in adapter and session
-    if (!jsonAdapter.getUiSession().getUiSessionId().equals(parts[0])) {
+    if (!jsonAdapter.getUiSession().getUiSessionId().equals(parts.getUiSessionId())) {
       return null;
     }
-    if (!jsonAdapter.getId().equals(parts[1])) {
+    if (!jsonAdapter.getId().equals(parts.getAdapterId())) {
       return null;
     }
-    return new DynamicResourceInfo(jsonAdapter, IOUtility.urlDecode(parts[2]));
+    return new DynamicResourceInfo(jsonAdapter, parts.getFilename());
   }
 
+  /**
+   * @param req
+   * @param path
+   *          decoded path (non url-encoded)
+   */
   public static DynamicResourceInfo fromPath(HttpServletRequest req, String path) {
-    String[] parts = splitPath(path);
-    if (parts == null) {
+    DynamicResourcePathComponents components = DynamicResourcePathComponents.fromPath(path);
+    if (components == null) {
       return null;
     }
     // lookup the UiSession on the current HttpSession to ensure the requested dynamic resource
     // is from one of the UiSessions of the currently authenticated user!
-    IUiSession uiSession = UiSession.get(req, parts[0]);
+    IUiSession uiSession = UiSession.get(req, components.getUiSessionId());
     if (uiSession == null) {
       return null;
     }
 
-    return new DynamicResourceInfo(uiSession, parts[1], IOUtility.urlDecode(parts[2]));
+    return new DynamicResourceInfo(uiSession, components.getAdapterId(), components.getFilename());
+  }
+
+  protected static class DynamicResourcePathComponents {
+    String uiSessionId;
+    String adapterId;
+    String filename;
+
+    DynamicResourcePathComponents(String uiSessionId, String adapterId, String filename) {
+      this.uiSessionId = uiSessionId;
+      this.adapterId = adapterId;
+      this.filename = filename;
+    }
+
+    public String getUiSessionId() {
+      return uiSessionId;
+    }
+
+    public String getAdapterId() {
+      return adapterId;
+    }
+
+    public String getFilename() {
+      return filename;
+    }
+
+    /**
+     * @param path
+     *          decoded path (non url-encoded)
+     * @see #fromPath(HttpServletRequest, String)
+     * @see #fromPath(IJsonAdapter, String)
+     */
+    public static DynamicResourcePathComponents fromPath(String path) {
+      if (path == null) {
+        return null;
+      }
+
+      Matcher m = PATTERN_DYNAMIC_ADAPTER_RESOURCE_PATH.matcher(path);
+      if (!m.matches()) {
+        return null;
+      }
+
+      String uiSessionId = m.group(1);
+      String adapterId = m.group(2);
+      String filename = m.group(3);
+      return new DynamicResourcePathComponents(uiSessionId, adapterId, filename);
+    }
   }
 }
