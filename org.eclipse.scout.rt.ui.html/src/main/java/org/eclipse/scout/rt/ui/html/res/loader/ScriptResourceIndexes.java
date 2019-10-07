@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.FinalValue;
-import org.eclipse.scout.rt.ui.html.res.WebResourceHelpers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
 
 import java.util.Map;
 

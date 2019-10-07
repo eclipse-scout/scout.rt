@@ -37,9 +37,9 @@ import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
 import org.eclipse.scout.rt.ui.html.AbstractClasspathFileWatcher;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.ScriptfileBuildProperty;
-import org.eclipse.scout.rt.ui.html.res.loader.ResourceLoaders;
 import org.eclipse.scout.rt.ui.html.res.loader.ScriptFileLoader;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -69,7 +69,7 @@ public class DevelopmentScriptfileCache {
 
   @PostConstruct
   public void init() {
-    if(ResourceLoaders.isNewMode()) {
+    if (WebResourceHelpers.isNewMode()) {
       m_active = false;
     }
     else {
@@ -149,11 +149,11 @@ public class DevelopmentScriptfileCache {
   protected void handleCacheChanged() {
     Jobs.schedule(() -> {
       try {
-          Set<HttpCacheKey> keys;
-          synchronized (m_scriptLock) {
+        Set<HttpCacheKey> keys;
+        synchronized (m_scriptLock) {
           keys = new HashSet<>(m_scriptCache.keySet());
-          }
-          BEANS.get(DevelopmentScriptFileCacheInitialLoader.class).storeInitialScriptfiles(keys);
+        }
+        BEANS.get(DevelopmentScriptFileCacheInitialLoader.class).storeInitialScriptfiles(keys);
       }
       catch (Exception e) {
         LOG.warn("Could not store cached scriptfiles in dev mode.", e);

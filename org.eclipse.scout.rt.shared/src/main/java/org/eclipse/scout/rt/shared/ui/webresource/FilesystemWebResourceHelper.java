@@ -1,4 +1,14 @@
-package org.eclipse.scout.rt.ui.html.res;
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+package org.eclipse.scout.rt.shared.ui.webresource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -13,18 +23,22 @@ public class FilesystemWebResourceHelper extends AbstractWebResourceHelper {
   private final Path m_root;
 
   protected FilesystemWebResourceHelper() {
-    m_root = findModuleRoot().resolve("dist");
+    m_root = findModuleRoot().resolve(AbstractWebResourceHelper.OUTPUT_FOLDER_NAME);
   }
 
   @Override
   protected URL getResourceImpl(String resourcePath) {
     Path candidate = m_root.resolve(resourcePath);
-    if (Files.isReadable(candidate) && Files.isRegularFile(candidate)) {
+    return toUrl(candidate);
+  }
+
+  protected static URL toUrl(Path path) {
+    if (Files.isReadable(path) && Files.isRegularFile(path)) {
       try {
-        return candidate.toUri().toURL();
+        return path.toUri().toURL();
       }
       catch (MalformedURLException e) {
-        throw new PlatformException("Invalid URL for request '{}' resulting in '{}'.", resourcePath, candidate, e);
+        throw new PlatformException("Invalid URL for path '{}'.", path, e);
       }
     }
     return null;

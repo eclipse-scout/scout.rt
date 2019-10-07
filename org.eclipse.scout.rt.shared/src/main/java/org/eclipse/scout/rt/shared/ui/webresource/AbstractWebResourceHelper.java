@@ -1,13 +1,24 @@
-package org.eclipse.scout.rt.ui.html.res;
+/*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+package org.eclipse.scout.rt.shared.ui.webresource;
 
 import java.net.URL;
 import java.util.Optional;
 
 public abstract class AbstractWebResourceHelper implements IWebResourceHelper {
 
-  protected static final String DEV_FOLDER_NAME = "dev";
-  protected static final String MIN_FOLDER_NAME = "prod";
-  protected static final String WEB_RESOURCE_FOLDER_NAME = "res";
+  public static final String OUTPUT_FOLDER_NAME = "dist";
+  public static final String DEV_FOLDER_NAME = "dev";
+  public static final String MIN_FOLDER_NAME = "prod";
+  public static final String WEB_RESOURCE_FOLDER_NAME = "res";
 
   public static String stripLeadingSlash(String path) {
     if (path == null) {

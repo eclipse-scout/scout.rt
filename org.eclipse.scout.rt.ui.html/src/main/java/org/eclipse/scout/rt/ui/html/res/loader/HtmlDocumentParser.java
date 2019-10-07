@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.ui.html.res.WebResourceHelpers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
 import org.eclipse.scout.rt.ui.html.script.ScriptRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +105,7 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    if (ResourceLoaders.isNewMode()) {
+    if (WebResourceHelpers.isNewMode()) {
       return ScriptResourceIndexes.getExternalForm(internalPath, m_params.isMinify());
     }
     else {
@@ -230,7 +230,7 @@ public class HtmlDocumentParser {
     while (m.find()) {
       String includeName = m.group(1);
       URL includeUrl;
-      if (ResourceLoaders.isNewMode()) {
+      if (WebResourceHelpers.isNewMode()) {
         includeUrl = WebResourceHelpers.create().getWebResource(includeName).orElse(null);
       }
       else {

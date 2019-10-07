@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 
 @ApplicationScoped
@@ -25,9 +26,6 @@ public class ResourceLoaders {
   protected static final Pattern DYNAMIC_RESOURCES_PATTERN = Pattern.compile("^/" + DynamicResourceInfo.PATH_PREFIX + "/.*");
   protected static final Pattern DEFAULT_VALUES_PATTERN = Pattern.compile("^/defaultValues$");
 
-  public static boolean isNewMode() {
-    return Boolean.parseBoolean(System.getProperty("newMode")); // TODO [mvi]: remove
-  }
 
   public IResourceLoader create(HttpServletRequest req, String resourcePath) {
     if (resourcePath == null) {
@@ -40,18 +38,18 @@ public class ResourceLoaders {
     if (DYNAMIC_RESOURCES_PATTERN.matcher(resourcePath).matches()) {
       return new DynamicResourceLoader(req);
     }
+    UiThemeHelper uiThemeHelper = UiThemeHelper.get();
+    String theme = uiThemeHelper.getTheme(req);
     if (resourcePath.endsWith(".html")) {
-      String theme = UiThemeHelper.get().getTheme(req);
       boolean cacheEnabled = UrlHints.isCacheHint(req);
       boolean minify = UrlHints.isMinifyHint(req);
       return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
-    boolean newMode = isNewMode();
-    String theme = UiThemeHelper.get().getTheme(req);
+    boolean newMode = WebResourceHelpers.isNewMode();
     boolean minify = UrlHints.isMinifyHint(req);
     if (newMode) {
       boolean cacheEnabled = UrlHints.isCacheHint(req);
-      WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled, theme);
+      WebResourceLoader loader = new WebResourceLoader(minify, cacheEnabled, uiThemeHelper.isDefaultTheme(theme) ? null : theme);
       if (loader.acceptFile(resourcePath)) {
         return loader;
       }
