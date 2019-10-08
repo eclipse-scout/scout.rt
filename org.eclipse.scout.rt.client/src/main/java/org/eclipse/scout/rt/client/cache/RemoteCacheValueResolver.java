@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**

@@ -20,12 +20,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.server.TestServerSession;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.eclipse.scout.rt.shared.services.common.code.CodeService;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeCacheEntryFilter;

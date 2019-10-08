@@ -8,13 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.cache;
+package org.eclipse.scout.rt.platform.cache;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Test;

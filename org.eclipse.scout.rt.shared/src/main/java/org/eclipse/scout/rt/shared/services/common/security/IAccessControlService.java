@@ -15,8 +15,8 @@ import java.security.PermissionCollection;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.service.IService;
-import org.eclipse.scout.rt.shared.cache.ICache;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 
 /**

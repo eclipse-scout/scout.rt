@@ -14,10 +14,10 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheRegistryService;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.ICacheRegistryService;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**
@@ -54,5 +54,4 @@ public class RemoteCacheService implements IRemoteCacheService {
   protected <K, V> ICache<K, V> getCache(String cacheId) {
     return BEANS.get(ICacheRegistryService.class).get(cacheId);
   }
-
 }

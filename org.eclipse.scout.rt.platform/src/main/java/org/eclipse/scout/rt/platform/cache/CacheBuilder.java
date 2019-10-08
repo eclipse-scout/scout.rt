@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.cache;
+package org.eclipse.scout.rt.platform.cache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.platform.util.BeanUtility;
 import org.eclipse.scout.rt.platform.util.NumberUtility;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap;
 import org.eclipse.scout.rt.platform.util.collection.ConcurrentExpiringMap.ExpiringElement;
+import org.eclipse.scout.rt.platform.util.collection.ConcurrentTransactionalMap;
+import org.eclipse.scout.rt.platform.util.collection.CopyOnWriteTransactionalMap;
 
 /**
  * @since 5.2
@@ -74,20 +76,28 @@ public class CacheBuilder<K, V> implements ICacheBuilder<K, V> {
   }
 
   protected Map<K, V> createCacheMap() {
-    if (isCreateExpiringMap()) {
+    if (!isCreateExpiringMap() && isTransactional() && !isAtomicInsertion() && (isSingleton() || !isTransactionalFastForward())) {
+      return new CopyOnWriteTransactionalMap<>(getCacheId(), isTransactionalFastForward());
+    }
+    else if (isCreateExpiringMap()) {
       boolean touchOnGet = isTouchOnGet() || getSizeBound() != null;
       long timeToLive = NumberUtility.nvl(getTimeToLive(), -1L);
       int targetSize = NumberUtility.nvl(getSizeBound(), -1);
       return new ConcurrentExpiringMap<>(this.<K, ExpiringElement<V>> createConcurrentMap(), timeToLive, touchOnGet, targetSize);
     }
-    else if (isThreadSafe()) {
+    else if (isThreadSafe() || isTransactional()) {
       return createConcurrentMap();
     }
     return new HashMap<>();
   }
 
   protected <KK, VV> ConcurrentMap<KK, VV> createConcurrentMap() {
-    return new ConcurrentHashMap<>();
+    if (isTransactional()) {
+      return new ConcurrentTransactionalMap<>(getCacheId(), isTransactionalFastForward());
+    }
+    else {
+      return new ConcurrentHashMap<>();
+    }
   }
 
   protected boolean isCreateExpiringMap() {

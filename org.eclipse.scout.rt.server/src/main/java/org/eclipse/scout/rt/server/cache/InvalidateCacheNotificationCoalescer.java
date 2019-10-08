@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.server.notification.ICoalescer;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 
 /**
  * {@link ICoalescer} for {@link InvalidateCacheNotification}

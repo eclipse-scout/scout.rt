@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.server.cache;
+package org.eclipse.scout.rt.platform.util.collection;
 
 import java.util.Map;
+
+import org.eclipse.scout.rt.platform.util.collection.CopyOnWriteTransactionalMap;
 
 /**
  * @since 5.2

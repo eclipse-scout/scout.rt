@@ -14,10 +14,10 @@ import java.util.Map;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.shared.cache.BasicCache;
-import org.eclipse.scout.rt.shared.cache.CacheBuilder;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
+import org.eclipse.scout.rt.platform.cache.BasicCache;
+import org.eclipse.scout.rt.platform.cache.CacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**

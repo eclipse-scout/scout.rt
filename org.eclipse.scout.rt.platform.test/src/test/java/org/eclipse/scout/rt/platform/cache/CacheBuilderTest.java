@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.cache;
+package org.eclipse.scout.rt.platform.cache;
 
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
+import org.eclipse.scout.rt.platform.cache.BasicCache;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.junit.Test;
 
 /**

@@ -11,11 +11,11 @@
 package org.eclipse.scout.rt.server.cache;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.server.clientnotification.ClientNotificationRegistry;
-import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 
 /**
  * Cache wrapper used to notify clients about invalidate operations.

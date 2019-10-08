@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
 
 /**
  * Filter to match according code type classes.

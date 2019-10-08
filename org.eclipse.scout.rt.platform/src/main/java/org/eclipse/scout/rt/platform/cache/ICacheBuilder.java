@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.cache;
+package org.eclipse.scout.rt.platform.cache;
 
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;

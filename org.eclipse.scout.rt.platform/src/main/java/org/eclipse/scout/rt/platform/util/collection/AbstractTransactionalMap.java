@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.server.cache;
+package org.eclipse.scout.rt.platform.util.collection;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -21,9 +21,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
+import org.eclipse.scout.rt.platform.cache.ICache;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.transaction.ITransactionMember;
-import org.eclipse.scout.rt.shared.cache.ICache;
 
 /**
  * <p>

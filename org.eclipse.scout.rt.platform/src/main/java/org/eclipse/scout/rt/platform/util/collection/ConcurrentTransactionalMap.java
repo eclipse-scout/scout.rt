@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.server.cache;
+package org.eclipse.scout.rt.platform.util.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;

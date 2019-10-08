@@ -11,12 +11,12 @@
 package org.eclipse.scout.rt.server.cache;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
-import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 
 /**
  * Cache wrapper used to distribute invalidate operations within a server cluster.

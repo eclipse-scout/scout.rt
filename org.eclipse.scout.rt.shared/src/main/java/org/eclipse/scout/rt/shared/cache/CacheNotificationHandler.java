@@ -12,6 +12,10 @@ package org.eclipse.scout.rt.shared.cache;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheRegistryService;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 
 /**

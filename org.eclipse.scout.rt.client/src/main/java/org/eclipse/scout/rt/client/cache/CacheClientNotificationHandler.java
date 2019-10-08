@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.cache;
 
 import org.eclipse.scout.rt.client.clientnotification.AbstractObservableNotificationHandler;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.cache.CacheNotificationHandler;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationAddress;
 import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 

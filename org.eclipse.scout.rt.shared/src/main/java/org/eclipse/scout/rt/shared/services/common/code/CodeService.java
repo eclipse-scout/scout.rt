@@ -25,15 +25,15 @@ import javax.annotation.PostConstruct;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.CreateImmediately;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
-import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
 
 /**
  * Common logic for the {@link ICodeService} implementations. Uses {@link ICache} for caching.

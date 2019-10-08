@@ -16,20 +16,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.InvalidateCacheNotification;
+import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
-import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.InvalidateCacheNotification;
-import org.eclipse.scout.rt.shared.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 import org.junit.Test;
 
 /**
- * Tests the coalesce functionality of {@link InvalidateCacheClusterNofification}
+ * Tests the coalesce functionality of {@link InvalidateCacheNotificationCoalescer}
  *
  * @since 5.2
  */
-public class InvalidateCacheNofificationCoalescerTest {
+public class InvalidateCacheNotificationCoalescerTest {
 
   private final static String CACHE_ID_1 = "CacheTestId1";
   private final static String CACHE_ID_2 = "CacheTestId2";

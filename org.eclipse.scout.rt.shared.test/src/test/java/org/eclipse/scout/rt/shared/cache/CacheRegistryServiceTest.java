@@ -15,6 +15,10 @@ import static org.mockito.Mockito.mock;
 
 import java.util.HashMap;
 
+import org.eclipse.scout.rt.platform.cache.BasicCache;
+import org.eclipse.scout.rt.platform.cache.CacheRegistryService;
+import org.eclipse.scout.rt.platform.cache.ICacheRegistryService;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.junit.Test;
 

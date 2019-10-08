@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.cache;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.shared.cache.AbstractCacheWrapper;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.AbstractCacheWrapper;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.shared.cache.IRemoteCacheService;
 
 /**

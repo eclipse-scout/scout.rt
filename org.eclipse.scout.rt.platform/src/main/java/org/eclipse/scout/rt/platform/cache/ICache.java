@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.shared.cache;
+package org.eclipse.scout.rt.platform.cache;
 
 import java.util.Collection;
 import java.util.Map;
@@ -29,9 +29,7 @@ import org.eclipse.scout.rt.platform.util.IAdaptable;
  * Any other additional features of a cache should be implemented using {@link AbstractCacheWrapper}. This way, those
  * features can be exchanged easily.
  * <p>
- * Always use {@link ICacheBuilder} to create a cache instance. It offers many useful features like client-server or
- * cluster synchronization. Also each cache is registered as {@link Bean}. This registration is required for a correct
- * behavior of {@link IRemoteCacheService}.
+ * Use {@link ICacheBuilder} to create a cache instance. Each cache instance is registered as {@link Bean}.
  *
  * @param <K>
  *          the type of keys maintained by this cache

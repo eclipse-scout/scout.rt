@@ -28,13 +28,13 @@ import javax.annotation.PostConstruct;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.cache.AllCacheEntryFilter;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheBuilder;
+import org.eclipse.scout.rt.platform.cache.ICacheValueResolver;
+import org.eclipse.scout.rt.platform.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.shared.ISession;
-import org.eclipse.scout.rt.shared.cache.AllCacheEntryFilter;
-import org.eclipse.scout.rt.shared.cache.ICache;
-import org.eclipse.scout.rt.shared.cache.ICacheBuilder;
-import org.eclipse.scout.rt.shared.cache.ICacheValueResolver;
-import org.eclipse.scout.rt.shared.cache.KeyCacheEntryFilter;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.servicetunnel.LenientPermissionsWrapper;
 

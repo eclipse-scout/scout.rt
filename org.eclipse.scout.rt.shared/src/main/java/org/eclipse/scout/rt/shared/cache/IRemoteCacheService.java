@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.cache.ICache;
+import org.eclipse.scout.rt.platform.cache.ICacheEntryFilter;
 import org.eclipse.scout.rt.shared.TunnelToServer;
 
 /**
