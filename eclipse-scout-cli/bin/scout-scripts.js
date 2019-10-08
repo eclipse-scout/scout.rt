@@ -32,7 +32,7 @@ switch (script) {
   case 'test-server:stop': {
     // TODO default port wird angenommen
     const stopper = require('karma').stopper;
-    stopper.stop({ port: 9876 }, exitCode => {
+    stopper.stop({port: 9876}, exitCode => {
       if (exitCode === 0) {
         console.log('Server stop as initiated');
       }
@@ -45,15 +45,15 @@ switch (script) {
     break;
   }
   case 'build:dev': {
-    runWebpack({ mode: 'development' });
+    runWebpack({mode: 'development'});
     break;
   }
   case 'build:prod': {
-    runWebpack({ mode: 'production' });
+    runWebpack({mode: 'production'});
     break;
   }
   case 'build:dev:watch': {
-    runWebpackWatch({ mode: 'development' });
+    runWebpackWatch({mode: 'development'});
     break;
   }
   case 'snapshot-version': {
@@ -96,6 +96,7 @@ function runWebpack(webPackArgs) {
 
 function runWebpackWatch(webPackArgs) {
   const configFilePath = path.resolve(webpackConfigFileName);
+  webPackArgs = Object.assign(webPackArgs || {}, {watch: true});
   const compiler = createWebpackCompiler(configFilePath, webPackArgs);
   compiler.watch({}, logWebpack);
 }

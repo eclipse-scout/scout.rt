@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -20,7 +20,7 @@ const webpack = require('webpack');
 const scoutBuildConstants = require('./constants');
 
 module.exports = (env, args) => {
-  const { devMode, outSubDir, cssFilename, jsFilename } = scoutBuildConstants.getConstantsForMode(args.mode);
+  const {devMode, outSubDir, cssFilename, jsFilename} = scoutBuildConstants.getConstantsForMode(args.mode);
   const outDir = path.resolve(scoutBuildConstants.outDir, outSubDir);
   const resDirArray = args.resDirArray || ['res'];
   console.log(`Webpack mode: ${args.mode}`);
@@ -29,12 +29,13 @@ module.exports = (env, args) => {
   const copyPluginConfig = [];
   for (const resDir of resDirArray) {
     copyPluginConfig.push(
-      { from: resDir,
+      {
+        from: resDir,
         to: '../res'
       });
   }
 
-  return {
+  const config = {
     target: 'web',
     mode: args.mode,
     devtool: devMode ? 'inline-module-source-map' : undefined,
@@ -116,8 +117,6 @@ module.exports = (env, args) => {
       new MiniCssExtractPlugin({
         filename: cssFilename
       }),
-      // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
-      new CleanWebpackPlugin(),
       // run post-build script hook
       new AfterEmitWebpackPlugin({
         createFileList: !devMode,
@@ -135,7 +134,7 @@ module.exports = (env, args) => {
           assetNameRegExp: /\.min\.css$/g,
           cssProcessorPluginOptions: {
             preset: ['default', {
-              discardComments: { removeAll: true }
+              discardComments: {removeAll: true}
             }]
           }
         }),
@@ -170,4 +169,12 @@ module.exports = (env, args) => {
       }
     }
   };
+
+  const isWatchMode = args && !!args.watch;
+  if (!isWatchMode) {
+    // see: https://webpack.js.org/guides/output-management/#cleaning-up-the-dist-folder
+    config.plugins.push(new CleanWebpackPlugin());
+  }
+
+  return config;
 };
