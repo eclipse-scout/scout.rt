@@ -65,7 +65,13 @@ public class T50000_StepIndex extends AbstractTask {
   protected void migrate(P_Index index) {
     // to not touch STYLE, TEXT, RUN, DATA
 
-    P_IndexType entryPointScript = Assertions.assertNotNull(getEntryPointScript(index), "Cannot find a matching entry-point script for index '{}'.", m_current.getPath());
+    P_IndexType entryPointScript = null;
+    boolean hasScripts = index.m_entries.stream().anyMatch(type -> "SCRIPT".equals(type.m_name));
+    if (hasScripts) {
+      // if the index has no scripts the RUN entry is in the core and must not be searched in the steps
+      entryPointScript = Assertions.assertNotNull(getEntryPointScript(index), "Cannot find a matching entry-point script for index '{}'.", m_current.getPath());
+    }
+
     Iterator<P_IndexType> iterator = index.m_entries.iterator();
     while (iterator.hasNext()) {
       P_IndexType line = iterator.next();
