@@ -189,6 +189,17 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
+      case "com.bsiag.studio.step.crm":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-crm");
+        setPersistLibraryFileName("510-api_bsi_studio_steps_crm.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
     }
