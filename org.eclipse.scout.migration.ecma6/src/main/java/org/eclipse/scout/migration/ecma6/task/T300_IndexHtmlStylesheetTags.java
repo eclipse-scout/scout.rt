@@ -22,11 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Order(300)
-public class T300_IndexHtmlStylesheetTags extends AbstractTask{
+public class T300_IndexHtmlStylesheetTags extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(T300_IndexHtmlStylesheetTags.class);
 
   private Predicate<PathInfo> m_fileFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
-  private String m_newLineAndIndet;
   private Set<String> m_stylesheetsToRemove = CollectionUtility.hashSet("res/libs-all-macro.less");
 
   @Override
@@ -36,70 +35,72 @@ public class T300_IndexHtmlStylesheetTags extends AbstractTask{
 
   @Override
   public void process(PathInfo pathInfo, Context context) {
-    m_stylesheetsToRemove.add("res/"+context.getProperty(AppNameContextProperty.class)+"-all-macro.less");
+    m_stylesheetsToRemove.add("res/" + context.getProperty(AppNameContextProperty.class) + "-all-macro.less");
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    m_newLineAndIndet = workingCopy.getLineDelimiter() + "    ";
     removeStylesheetElements(workingCopy);
     addStylesheetElements(workingCopy, context);
   }
 
-  private void removeStylesheetElements(WorkingCopy workingCopy){
+  private void removeStylesheetElements(WorkingCopy workingCopy) {
     String source = workingCopy.getSource();
     Document doc = Jsoup.parse(source);
     Elements scoutStylesheetElements = doc.getElementsByTag("scout:stylesheet");
     for (Element element : scoutStylesheetElements) {
       String attrSource = element.attr("src");
-      if( m_stylesheetsToRemove.contains(attrSource)){
+      if (m_stylesheetsToRemove.contains(attrSource)) {
         source = removeElement(element, source, workingCopy);
       }
     }
     workingCopy.setSource(source);
   }
 
-  private String removeElement(Element element, String source, WorkingCopy workingCopy){
-    Pattern p = Pattern.compile("(\\s*)"+Pattern.quote(element.outerHtml()));
+  private String removeElement(Element element, String source, WorkingCopy workingCopy) {
+    Pattern p = Pattern.compile("(\\s*)" + Pattern.quote(element.outerHtml()));
     Matcher removeTagMatcher = p.matcher(source);
-    if(removeTagMatcher.find()){
-      m_newLineAndIndet = removeTagMatcher.group(1);
+    if (removeTagMatcher.find()) {
       source = removeTagMatcher.replaceAll("");
-    }else{
+    }
+    else {
       source = MigrationUtility.prependTodo(source, "remove script tag: '" + element.outerHtml() + "'", workingCopy.getLineDelimiter());
-      LOG.warn("Could not remove script tag '"+element.outerHtml()+"' in '"+workingCopy.getPath()+"'");
+      LOG.warn("Could not remove script tag '" + element.outerHtml() + "' in '" + workingCopy.getPath() + "'");
     }
     return source;
   }
 
-  private void addStylesheetElements(WorkingCopy workingCopy, Context context){
+  private void addStylesheetElements(WorkingCopy workingCopy, Context context) {
     String source = workingCopy.getSource();
-    String newLineAndIndent = workingCopy.getLineDelimiter() + "    ";
+    workingCopy.getLineDelimiter();
 
     Document doc = Jsoup.parse(source);
     Elements scoutStylesheetElements = doc.getElementsByTag("scout:stylesheet");
     Element lastStyleSheet = scoutStylesheetElements.first();
-    if(lastStyleSheet != null){
+    if (lastStyleSheet != null) {
       // append first
-      Pattern pattern = Pattern.compile("(\\s*)"+Pattern.quote(lastStyleSheet.outerHtml()));
+      Pattern pattern = Pattern.compile("(\\s*)" + Pattern.quote(lastStyleSheet.outerHtml()));
       Matcher matcher = pattern.matcher(source);
       matcher.find();
-      source = matcher.replaceAll(matcher.group(1)+lastStyleSheet.outerHtml()+createSource(matcher.group(1), context));
-    }else{
+      source = matcher.replaceAll(matcher.group(1) + lastStyleSheet.outerHtml() + createSource(matcher.group(1), context));
+    }
+    else {
       // before </head>
       Pattern pattern = Pattern.compile("(\\s*)(\\<\\/head\\>)");
       Matcher matcher = pattern.matcher(source);
-      if(matcher.find()){
-        source = matcher.replaceAll(createSource(matcher.group(1)+"  ", context)+ matcher.group(1)+matcher.group(2));
-      }else{
+      if (matcher.find()) {
+        source = matcher.replaceAll(createSource(matcher.group(1) + "  ", context) + matcher.group(1) + matcher.group(2));
+      }
+      else {
         source = MigrationUtility.prependTodo(source, "add stylesheet (<scout:stylesheet src=\"" + context.getProperty(AppNameContextProperty.class) + "-theme.css\" />", workingCopy.getLineDelimiter());
-        LOG.warn("Could not add stylesheet (<scout:stylesheet src=\\\"\"+context.getProperty(AppNameContextProperty.class)+\"-theme.css\\\" /> in '"+workingCopy.getPath()+"'");
+        LOG.warn("Could not add stylesheet (<scout:stylesheet src=\\\"\"+context.getProperty(AppNameContextProperty.class)+\"-theme.css\\\" /> in '" + workingCopy.getPath() + "'");
       }
     }
     workingCopy.setSource(source);
   }
-  private String createSource(String newLineAndIndent, Context context){
+
+  private String createSource(String newLineAndIndent, Context context) {
     StringBuilder scriptBuilder = new StringBuilder();
     scriptBuilder
-      .append(newLineAndIndent)
-      .append("<scout:stylesheet src=\""+context.getProperty(AppNameContextProperty.class)+"-theme.css\\\" />");
+        .append(newLineAndIndent)
+        .append("<scout:stylesheet src=\"" + context.getProperty(AppNameContextProperty.class) + "-theme.css\\\" />");
     return scriptBuilder.toString();
   }
 }

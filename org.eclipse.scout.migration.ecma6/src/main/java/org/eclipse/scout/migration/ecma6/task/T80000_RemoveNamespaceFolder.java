@@ -35,7 +35,7 @@ public class T80000_RemoveNamespaceFolder extends AbstractTask {
 
   @Override
   public boolean accept(PathInfo pathInfo, Context context) {
-    return pathInfo.getModuleRelativePath().startsWith(m_relativeNamespaceDirectory);
+    return Configuration.get().isRemoveJsFolder() && pathInfo.getModuleRelativePath().startsWith(m_relativeNamespaceDirectory);
   }
 
   @Override

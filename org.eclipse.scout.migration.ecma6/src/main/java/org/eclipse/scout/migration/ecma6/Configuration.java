@@ -38,6 +38,9 @@ public class Configuration {
   private String m_jsFolderName;
   private String m_persistLibraryName;
   private String m_persistLibraryFileName;
+  private boolean m_removeJsFolder = true;
+  private boolean m_useIndexJs = true;
+  private String m_stepConfigTypeName;
 
   /**
    * Paths and names based on Taskliste-IntelliJ-Ecma.xlsx
@@ -146,7 +149,7 @@ public class Configuration {
         setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
         setNamespace("studio");
         setJsFolderName(getNamespace());
-        setPersistLibraryName("@bsi-studio/core");
+        setPersistLibraryName("@bsi-studio/testing");
         setPersistLibraryFileName("113-api_bsi_studio_core_test.json");
         break;
       }
@@ -173,6 +176,18 @@ public class Configuration {
         setJsFolderName(getNamespace());
         setPersistLibraryName("@bsi-crm/studio");
         setPersistLibraryFileName("120-api_bsicrm_studio.json");
+        break;
+
+      case "com.bsiag.studio.step.base":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step");
+        setPersistLibraryFileName("500-api_bsi_studio_steps_base.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
         break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
@@ -313,5 +328,29 @@ public class Configuration {
 
   protected String configurationErrorMessage(String message) {
     return "Configuration is not valid: " + message + " Replace bean " + getClass().getName() + " and provide valid configurations.";
+  }
+
+  public boolean isRemoveJsFolder() {
+    return m_removeJsFolder;
+  }
+
+  public void setRemoveJsFolder(boolean removeJsFolder) {
+    m_removeJsFolder = removeJsFolder;
+  }
+
+  public boolean isUseIndexJs() {
+    return m_useIndexJs;
+  }
+
+  public void setUseIndexJs(boolean useIndexJs) {
+    m_useIndexJs = useIndexJs;
+  }
+
+  public String getStepConfigTypeName() {
+    return m_stepConfigTypeName;
+  }
+
+  public void setStepConfigTypeName(String stepConfigTypeName) {
+    m_stepConfigTypeName = stepConfigTypeName;
   }
 }

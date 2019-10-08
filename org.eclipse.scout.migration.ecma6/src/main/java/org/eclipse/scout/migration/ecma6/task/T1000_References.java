@@ -11,7 +11,6 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
@@ -31,12 +30,10 @@ public class T1000_References extends AbstractTask {
     return m_filter.test(pathInfo);
   }
 
-
   @Override
   public void process(PathInfo pathInfo, Context context) {
     WorkingCopy workingCopy = context.ensureWorkingCopy(pathInfo.getPath());
-    String source = workingCopy.getSource();
-
+    workingCopy.getSource();
 
   }
 }

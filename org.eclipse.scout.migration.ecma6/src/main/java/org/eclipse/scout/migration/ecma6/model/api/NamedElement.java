@@ -109,6 +109,7 @@ public class NamedElement implements INamedElement {
     return m_customAttributes.get(key);
   }
 
+  @Override
   public String getCustomAttributeString(String key) {
     return (String) getCustomAttribute(key);
   }

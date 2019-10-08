@@ -1,10 +1,9 @@
 package org.eclipse.scout.migration.ecma6.task.json;
 
+import java.nio.file.Path;
+
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-
-import java.nio.file.Path;
-import java.util.Set;
 
 @ApplicationScoped
 public interface IConstPlaceholderMapper {

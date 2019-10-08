@@ -1,7 +1,6 @@
 package org.eclipse.scout.migration.ecma6.task.json;
 
 import java.nio.file.Path;
-import java.util.Set;
 
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;

@@ -18,12 +18,9 @@ import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Order(70000)
 public class T70000_RemoveEndClassMarkers extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T70000_RemoveEndClassMarkers.class);
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 

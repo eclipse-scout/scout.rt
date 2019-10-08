@@ -12,17 +12,13 @@ package org.eclipse.scout.migration.ecma6.task;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
-import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <pre>
@@ -34,13 +30,9 @@ import org.slf4j.LoggerFactory;
  */
 @Order(5100)
 public class T5100_PrototypeApplyToES6Spread extends AbstractTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5100_PrototypeApplyToES6Spread.class);
-
-  private static final Path SRC_MAIN_JS = Paths.get("src", "main", "js");
 
   private static final Pattern PROTOYPE_APPLY_PAT = Pattern.compile("\\w+\\.prototype\\.(\\w+)\\.apply\\(([\\w.]+)\\s*,\\s*");
 
-  private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
   private Path m_relativeNamespaceDirectory;
 
   @Override

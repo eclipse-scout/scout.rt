@@ -11,7 +11,6 @@
 package org.eclipse.scout.migration.ecma6.task;
 
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.migration.ecma6.PathFilters;
@@ -24,7 +23,7 @@ import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
 
 @Order(490)
-public class T490_RemoveEndFunctionSemicolumns extends  AbstractTask {
+public class T490_RemoveEndFunctionSemicolumns extends AbstractTask {
 
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"), PathFilters.isClass());
 
@@ -39,14 +38,14 @@ public class T490_RemoveEndFunctionSemicolumns extends  AbstractTask {
     String source = workingCopy.getSource();
     JsFile jsFile = context.ensureJsFile(workingCopy);
     for (JsClass jsClass : jsFile.getJsClasses()) {
-      source = processClass(jsClass,source);
+      source = processClass(jsClass, source);
     }
     workingCopy.setSource(source);
   }
 
   private String processClass(JsClass jsClass, String source) {
     for (JsFunction function : jsClass.getFunctions()) {
-      if(!function.isMemoryOnly()){
+      if (!function.isMemoryOnly()) {
         source = processFunction(function, source);
       }
     }
@@ -54,6 +53,6 @@ public class T490_RemoveEndFunctionSemicolumns extends  AbstractTask {
   }
 
   private String processFunction(JsFunction function, String source) {
-  return    source.replaceFirst("("+Pattern.quote(function.getSource())+")\\s*\\;", "$1");
+    return source.replaceFirst("(" + Pattern.quote(function.getSource()) + ")\\s*\\;", "$1");
   }
 }

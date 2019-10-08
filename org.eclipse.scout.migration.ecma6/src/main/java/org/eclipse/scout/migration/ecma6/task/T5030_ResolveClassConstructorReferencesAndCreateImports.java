@@ -23,12 +23,9 @@ import org.eclipse.scout.migration.ecma6.model.old.JsClass;
 import org.eclipse.scout.migration.ecma6.model.old.JsFile;
 import org.eclipse.scout.migration.ecma6.model.old.JsFunction;
 import org.eclipse.scout.rt.platform.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Order(5030)
 public class T5030_ResolveClassConstructorReferencesAndCreateImports extends AbstractResolveReferencesAndCreateImportTask {
-  private static final Logger LOG = LoggerFactory.getLogger(T5030_ResolveClassConstructorReferencesAndCreateImports.class);
 
   @Override
   public void process(PathInfo pathInfo, Context context) {

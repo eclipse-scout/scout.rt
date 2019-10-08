@@ -3,7 +3,6 @@ package org.eclipse.scout.migration.ecma6.task;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,7 +14,6 @@ import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.AppNameContextProperty;
 import org.eclipse.scout.migration.ecma6.context.Context;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,11 +28,6 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
   private static Pattern END_BODY_REGEX = Pattern.compile("(\\s*)\\<\\/body\\>");
 
   private Predicate<PathInfo> m_indexJsFilter = PathFilters.oneOf(Paths.get("src/main/resources/WebContent/index.html"));
-
-  private Set<String> m_scriptSourcesToRemove = CollectionUtility.hashSet(
-      "res/jquery-all-macro.js",
-      "res/libs-all-macro.js",
-      "res/index.js");
 
   private String m_newLineAndIndet;
   private List<String> m_scriptsMoveToBody = new ArrayList<>();
@@ -57,8 +50,7 @@ public class T200_IndexHtmlScriptTags extends AbstractTask {
     Document doc = Jsoup.parse(source);
     Elements scoutScriptElements = doc.getElementsByTag("scout:script");
     for (Element element : scoutScriptElements) {
-      // try to find appname
-      String attrSource = element.attr("src");
+      element.attr("src");
       source = removeElement(element, source, workingCopy);
     }
 

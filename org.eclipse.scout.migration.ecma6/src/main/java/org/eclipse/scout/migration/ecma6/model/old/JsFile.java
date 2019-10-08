@@ -188,7 +188,7 @@ public class JsFile extends AbstractJsElement {
   }
 
   public AliasedMember getOrCreateImport(JsClass jsClass) {
-    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), true, false);
+    return getOrCreateImport(jsClass.getName(), jsClass.getJsFile().getPath(), true, jsClass.isDefault());
   }
 
   public AliasedMember getOrCreateImport(JsTopLevelEnum topLevelEnum) {
@@ -209,9 +209,14 @@ public class JsFile extends AbstractJsElement {
 
   protected AliasedMember getOrCreateImport(String moduleName, String memberName, boolean pointToIndex, boolean defaultIfPossible) {
     JsImport libImport = m_imports.get(moduleName);
+    boolean useIndexImport = pointToIndex && Configuration.get().isUseIndexJs();
+    if (useIndexImport) {
+      defaultIfPossible = false;
+    }
+
     if (libImport == null) {
       Path rel = null;
-      if (pointToIndex) {
+      if (useIndexImport) {
         //check if the file is in a namespace folder /scout/form/Form.js (with namespace='scout')
         //or just in a normal folder /heatmap/HeatmapField.js (with namespace='scout')
         Path p = FileUtility.replaceSegment(m_path.getParent(), Paths.get("src", "main", "js", Configuration.get().getJsFolderName()), Paths.get("src", "main", "js"));

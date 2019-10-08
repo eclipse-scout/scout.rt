@@ -30,23 +30,23 @@ public class T99999_DeleteEmptyDirectories implements IPostMigrationTask {
       Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          String name = dir.getFileName().toString();
+        public FileVisitResult preVisitDirectory(Path d, BasicFileAttributes attrs) throws IOException {
+          String name = d.getFileName().toString();
           if (name.startsWith(".")
               || name.equals("node_modules") ||
               name.equals("target")) {
             return FileVisitResult.SKIP_SUBTREE;
           }
-          return super.preVisitDirectory(dir, attrs);
+          return super.preVisitDirectory(d, attrs);
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        public FileVisitResult postVisitDirectory(Path d, IOException exc) throws IOException {
           //noinspection resource
-          if (Files.list(dir).count() < 1) {
-            Files.delete(dir);
+          if (Files.list(d).count() < 1) {
+            Files.delete(d);
           }
-          return super.postVisitDirectory(dir, exc);
+          return super.postVisitDirectory(d, exc);
         }
       });
     }
