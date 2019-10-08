@@ -214,7 +214,7 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
 /**
  * Considers window boundaries.
  *
- * @returns {scout.Dimension}
+ * @returns {scout.Insets}
  */
 scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
   // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins

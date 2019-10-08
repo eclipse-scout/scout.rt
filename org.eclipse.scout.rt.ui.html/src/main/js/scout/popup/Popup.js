@@ -836,7 +836,9 @@ scout.Popup.prototype.set$Anchor = function($anchor) {
   if (this.rendered) {
     this._attachAnchorHandlers();
     this.revalidateLayout();
-    this.position();
+    if (!this.animateResize) { // PopupLayout will move it -> don't break move animation
+      this.position();
+    }
   }
 };
 

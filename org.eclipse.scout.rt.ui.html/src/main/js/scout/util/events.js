@@ -66,7 +66,6 @@ scout.events = {
         // - https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/pageX
         // - https://www.chromestatus.com/features/6169687914184704
         event.pageX = Math.round(touch.pageX);
-        // noinspection JSSuspiciousNameCombination
         event.pageY = Math.round(touch.pageY);
       }
     }
