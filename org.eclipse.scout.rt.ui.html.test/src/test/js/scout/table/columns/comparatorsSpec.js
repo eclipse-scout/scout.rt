@@ -50,6 +50,26 @@ describe("scout.comparators", function() {
   it("tests 'compare' method of NUMERIC comparator", function() {
     var comparator = scout.comparators.NUMERIC;
 
+    expect(comparator.compare(undefined, undefined)).toBe(0);
+    expect(comparator.compare(undefined, '1')).toBe(-1);
+    expect(comparator.compare('1', undefined)).toBe(1);
+
+    expect(comparator.compare(null, null)).toBe(0);
+    expect(comparator.compare(null, '1')).toBe(-1);
+    expect(comparator.compare('1', null)).toBe(1);
+
+    expect(comparator.compare(null, undefined)).toBe(0);
+
+    expect(comparator.compare(null, null)).toBe(0);
+    expect(comparator.compare(null, '-1')).toBe(-1);
+    expect(comparator.compare('-1', null)).toBe(1);
+
+    expect(comparator.compare('0', '-1')).toBe(1);
+    expect(comparator.compare('-1', '0')).toBe(-1);
+
+    expect(comparator.compare('0', '1')).toBe(-1);
+    expect(comparator.compare('1', '0')).toBe(1);
+
     expect(comparator.compare('1', '1')).toBe(0);
     expect(comparator.compare('1', '2')).toBe(-1);
     expect(comparator.compare('2', '1')).toBe(1);
