@@ -49,6 +49,7 @@ scout.Session = function() {
   this.requestTimeoutPing = 5000; // ms
   this.backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(true);
   this.reconnector = new scout.Reconnector(this);
+  this.processingEvents = false;
 
   // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
   this.adapterExportEnabled = false;
@@ -1192,6 +1193,26 @@ scout.Session.prototype.onRequestsDone = function(func) {
   }
 };
 
+/**
+ * Executes the given callback when all events of the current response are processed. Executes it immediately if no events are being processed.
+ * @param func callback function
+ * @param vararg arguments to pass to the callback function
+ */
+scout.Session.prototype.onEventsProcessed = function(func) {
+  var argumentsArray = Array.prototype.slice.call(arguments);
+  argumentsArray.shift(); // remove argument func, remainder: all other arguments
+
+  if (this.processingEvents) {
+    this.one('eventsProcessed', execFunc);
+  } else {
+    execFunc();
+  }
+
+  function execFunc() {
+    func.apply(this, argumentsArray);
+  }
+};
+
 scout.Session.prototype.areEventsQueued = function() {
   return this.asyncEvents.length > 0;
 };
@@ -1400,6 +1421,7 @@ scout.Session.prototype._processEvents = function(events) {
       return '"' + msg + '"';
     }, this).join(', ') + ']');
   }
+  this.trigger('eventsProcessed');
 };
 
 scout.Session.prototype.start = function() {
@@ -1596,4 +1618,8 @@ scout.Session.prototype.addListener = function(listener) {
 
 scout.Session.prototype.removeListener = function(listener) {
   this.events.removeListener(listener);
+};
+
+scout.Session.prototype.when = function(type) {
+  return this.events.when(type);
 };
