@@ -13,18 +13,25 @@ package org.eclipse.scout.migration.ecma6.task;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
 import org.eclipse.scout.migration.ecma6.context.Context;
+import org.eclipse.scout.migration.ecma6.model.old.JsFile;
+import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
@@ -32,11 +39,12 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class T50000_StepIndex extends AbstractTask {
+@Order(26000)
+public class T26000_BlockIndex extends AbstractTask {
 
   public static final Pattern SHARED_RESOURCE_PATTERN = Pattern.compile("^@(.*?)\\{(.+)}$");
   public static final Pattern FILE_EXTENSION_PATTERN = Pattern.compile("^(.*)(\\.[^.]+)$");
-  private static final Logger LOG = LoggerFactory.getLogger(T50000_StepIndex.class);
+  private static final Logger LOG = LoggerFactory.getLogger(T26000_BlockIndex.class);
 
   private WorkingCopy m_current;
 
@@ -57,21 +65,56 @@ public class T50000_StepIndex extends AbstractTask {
     m_current = workingCopy;
     P_Index result = new P_Index();
     parse(workingCopy.getSource(), result, context);
-    migrate(result);
+
+    P_FileEntry entryPointScript = null;
+    boolean hasScripts = result.m_entries.stream().anyMatch(type -> "SCRIPT".equals(type.m_name));
+    if (hasScripts) {
+      // if the index has no scripts the RUN entry is in the core and must not be searched in the steps
+      entryPointScript = Assertions.assertNotNull(getEntryPointScript(result), "Cannot find a matching entry-point script for index '{}'.", m_current.getPath());
+    }
+    Set<P_FileEntry> removedDependencies = migrate(result, entryPointScript);
+    registerDependenciesInEntryPoint(result, entryPointScript, removedDependencies, context);
+
     write(result);
+
     m_current = null;
   }
 
-  protected void migrate(P_Index index) {
-    // to not touch STYLE, TEXT, RUN, DATA
-
-    P_IndexType entryPointScript = null;
-    boolean hasScripts = index.m_entries.stream().anyMatch(type -> "SCRIPT".equals(type.m_name));
-    if (hasScripts) {
-      // if the index has no scripts the RUN entry is in the core and must not be searched in the steps
-      entryPointScript = Assertions.assertNotNull(getEntryPointScript(index), "Cannot find a matching entry-point script for index '{}'.", m_current.getPath());
+  protected void registerDependenciesInEntryPoint(P_Index index, P_FileEntry entryPointScript, Set<P_FileEntry> dependencies, Context context) {
+    if (entryPointScript == null || dependencies.isEmpty()) {
+      return;
     }
 
+    Path srcMainJs = Configuration.get().getSourceModuleDirectory().resolve("src/main/js");
+    JsFile entryPointClass = context.getJsClass(index.m_run).getJsFile();
+    Path entryPointPath = srcMainJs.resolve(entryPointScript.m_localPath);
+    WorkingCopy workingCopy = context.ensureWorkingCopy(entryPointPath);
+    String nl = workingCopy.getLineDelimiter();
+
+    StringBuilder entryPointSuffix = new StringBuilder();
+    for (P_FileEntry dep : dependencies) {
+      Path dependencyPath = srcMainJs.resolve(dep.m_localPath);
+      String depFileName = dependencyPath.getFileName().toString();
+      if (Files.isRegularFile(dependencyPath) && Files.isReadable(dependencyPath) && depFileName.endsWith(".js")) {
+        String memberName = depFileName.substring(0, depFileName.length() - 3);
+        String ref = entryPointClass.getOrCreateImport(memberName, dependencyPath, false, true).getReferenceName();
+        entryPointSuffix.append("  ").append(ref).append(',').append(nl);
+      }
+    }
+    if (entryPointSuffix.length() < 1) {
+      return;
+    }
+
+    entryPointSuffix.delete(entryPointSuffix.length() - (1 + nl.length()), entryPointSuffix.length());
+    entryPointSuffix.insert(0, "window.studio = Object.assign(window.studio || {}, {" + nl);
+    entryPointSuffix.append(nl).append("});");
+
+    workingCopy.setSource(workingCopy.getSource() + nl + nl + entryPointSuffix);
+  }
+
+  protected Set<P_FileEntry> migrate(P_Index index, P_FileEntry entryPointScript) {
+    // to not touch STYLE, TEXT, RUN, DATA
+    Set<P_FileEntry> removedDependencies = new LinkedHashSet<>();
     Iterator<P_IndexType> iterator = index.m_entries.iterator();
     while (iterator.hasNext()) {
       P_IndexType line = iterator.next();
@@ -81,13 +124,24 @@ public class T50000_StepIndex extends AbstractTask {
       else if ("MODEL".equals(line.m_name)) {
         iterator.remove(); // references to model are imported in js
       }
-      else if ("SCRIPT".equals(line.m_name) && line != entryPointScript) {
-        iterator.remove(); // remove all secondary script references as these are imported now. only keep the run entry point
+      else if ("SCRIPT".equals(line.m_name)) {
+        Iterator<P_FileEntry> lineIt = line.m_entry.iterator();
+        while (lineIt.hasNext()) {
+          P_FileEntry curFile = lineIt.next();
+          if (curFile != entryPointScript) {
+            lineIt.remove();
+            removedDependencies.add(curFile);
+          }
+        }
+        if (line.m_entry.isEmpty()) {
+          iterator.remove();
+        }
       }
     }
+    return removedDependencies;
   }
 
-  protected P_IndexType getEntryPointScript(P_Index index) {
+  protected P_FileEntry getEntryPointScript(P_Index index) {
     String run = index.m_run;
     int lastDot = run.lastIndexOf('.');
     if (lastDot > 0) {
@@ -96,7 +150,8 @@ public class T50000_StepIndex extends AbstractTask {
     final String runClass = run;
     return index.m_entries.stream()
         .filter(type -> "SCRIPT".equals(type.m_name))
-        .filter(type -> type.m_entry.m_localPath.endsWith('/' + runClass + ".js"))
+        .flatMap(type -> type.m_entry.stream())
+        .filter(entry -> entry.m_localPath.endsWith('/' + runClass + ".js"))
         .findAny()
         .orElse(null);
   }
@@ -115,7 +170,9 @@ public class T50000_StepIndex extends AbstractTask {
         builder.append(' ');
       }
     }
-    builder.append(line.m_entry.m_raw).append(nl);
+
+    String entryLine = line.m_entry.stream().map(e -> e.m_raw).collect(Collectors.joining(" > "));
+    builder.append(entryLine).append(nl);
   }
 
   protected void parse(String content, P_Index result, Context context) {
@@ -126,7 +183,7 @@ public class T50000_StepIndex extends AbstractTask {
         line = line.trim();
         if (line.isEmpty() || line.startsWith("#") || line.startsWith("//")) {
           P_IndexType comment = new P_IndexType("COMMENT");
-          comment.m_entry = new P_FileEntry(line);
+          comment.m_entry.add(new P_FileEntry(line));
           result.m_entries.add(comment);
           continue;
         }
@@ -167,14 +224,16 @@ public class T50000_StepIndex extends AbstractTask {
     if (type.m_name.equals("RUN")) {
       Assertions.assertNull(result.m_run);
       result.m_run = value;
-      type.m_entry = new P_FileEntry(value);
+      type.m_entry.add(new P_FileEntry(value));
     }
     else if (type.m_name.equals("TEXT")) {
-      type.m_entry = new P_FileEntry(value);
+      type.m_entry.add(new P_FileEntry(value));
     }
     else {
       String[] b = value.split(">");
-      type.m_entry = new P_FileEntry(b[b.length - 1]); // only keep the last one. the former ones must be imported by the JS file
+      for (String part : b) {
+        type.m_entry.add(new P_FileEntry(part));
+      }
     }
   }
 
@@ -185,7 +244,7 @@ public class T50000_StepIndex extends AbstractTask {
 
   private class P_IndexType {
     private final String m_name;
-    private P_FileEntry m_entry;
+    private final List<P_FileEntry> m_entry = new ArrayList<>();
 
     private P_IndexType(String name) {
       m_name = name;
@@ -234,6 +293,25 @@ public class T50000_StepIndex extends AbstractTask {
         Path basePath = Configuration.get().getSourceModuleDirectory().resolve("src/main/js").relativize(m_current.getPath()).getParent();
         m_localPath = basePath.toString().replace('\\', '/') + "/" + fileBase + fileExt;
       }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) {
+        return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+        return false;
+      }
+      P_FileEntry that = (P_FileEntry) o;
+      return Objects.equals(m_file, that.m_file) &&
+          Objects.equals(m_raw, that.m_raw) &&
+          Objects.equals(m_localPath, that.m_localPath);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(m_file, m_raw, m_localPath);
     }
   }
 }

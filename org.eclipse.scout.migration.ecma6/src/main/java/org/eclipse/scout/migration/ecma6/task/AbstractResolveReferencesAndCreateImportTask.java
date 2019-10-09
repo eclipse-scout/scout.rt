@@ -33,7 +33,7 @@ public abstract class AbstractResolveReferencesAndCreateImportTask extends Abstr
   }
 
   private String createImport(String toImport, String replacement, JsFile jsFile, Context context) {
-    if (!StringUtility.hasText(toImport)) {
+    if (!StringUtility.hasText(toImport) || "window".equals(toImport)) {
       return replacement;
     }
 

@@ -197,7 +197,7 @@ public class JsFile extends AbstractJsElement {
 
   @FrameworkExtensionMarker
   public AliasedMember getOrCreateImport(JsUtility u) {
-    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true, false);
+    return getOrCreateImport(u.getName(), u.getJsFile().getPath(), true, true);
   }
 
   public AliasedMember getOrCreateImport(String memberName, Path fileToImport, boolean pointToIndex, boolean defaultIfPossible) {

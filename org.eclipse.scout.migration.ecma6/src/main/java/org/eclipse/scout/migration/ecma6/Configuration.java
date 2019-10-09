@@ -200,6 +200,73 @@ public class Configuration {
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("steps");
         break;
+      case "com.bsiag.studio.step.weather":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-weather");
+        setPersistLibraryFileName("520-api_bsi_studio_steps_weather.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
+      case "com.bsiag.studio.step.media":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-media");
+        setPersistLibraryFileName("530-api_bsi_studio_steps_media.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
+      case "com.bsiag.studio.step.example":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-example");
+        setPersistLibraryFileName("540-api_bsi_studio_steps_example.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
+      case "com.bsiag.studio.step.prototyping":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-prototyping");
+        setPersistLibraryFileName("550-api_bsi_studio_steps_prototyping.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
+      case "com.bsiag.studio.step.ml":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-studio/step-ml");
+        setPersistLibraryFileName("560-api_bsi_studio_steps_ml.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("steps");
+        break;
+
+      case "com.bsiag.ml.cortex":
+        setSourceModuleDirectory(sourceBase + "/bsiml/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsiml/" + moduleName);
+        setNamespace("studio");
+        setJsFolderName("ml");
+        setPersistLibraryName("@bsi-ml/cortex");
+        setPersistLibraryFileName("600-api_bsi_ml_cortex.json");
+        setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
+        setUseIndexJs(false); // there is no index.js for steps
+        setStepConfigTypeName("cortexes");
+        break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
     }
