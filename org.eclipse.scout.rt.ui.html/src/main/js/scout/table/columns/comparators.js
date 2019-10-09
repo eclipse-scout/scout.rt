@@ -84,13 +84,13 @@ scout.comparators = {
       return true;
     },
     compare: function(valueA, valueB) {
-      if (!valueA && !valueB) {
+      if (scout.objects.isNullOrUndefined(valueA) && scout.objects.isNullOrUndefined(valueB)) {
         return 0;
       }
-      if (!valueA) {
+      if (scout.objects.isNullOrUndefined(valueA)) {
         return -1;
       }
-      if (!valueB) {
+      if (scout.objects.isNullOrUndefined(valueB)) {
         return 1;
       }
 
