@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -34,8 +35,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfig;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterPropertyConfigBuilder;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
-import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.rt.ui.html.json.tree.IChildNodeIndexLookup;
+import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
 public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
@@ -123,7 +124,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     super.attachNode(node, attachChildren);
-    IPage<?> page = (IPage) node;
+    IPage<?> page = (IPage<?>) node;
     if (hasDetailForm(page)) {
       attachGlobalAdapter(page.getDetailForm());
     }
@@ -150,6 +151,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
   }
 
+  @SuppressWarnings("RedundantIfStatement")
   protected boolean acceptModelTreeEvent(TreeEvent event) {
     // Don't fill the event buffer with events that are currently not relevant for the UI
     if (event instanceof OutlineEvent && ObjectUtility.isOneOf(event.getType(),
@@ -166,12 +168,12 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
-  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes) {
+  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
-    IPage page = (IPage) node;
-    JSONObject json = super.treeNodeToJson(node, childIndexes);
+    IPage<?> page = (IPage<?>) node;
+    JSONObject json = super.treeNodeToJson(node, childIndexes, acceptedNodes);
     putDetailFormAndTable(json, page);
     putNodeType(json, node);
     json.put(PROP_OVERVIEW_ICON_ID, page.getOverviewIconId());
@@ -192,7 +194,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
   }
 
-  protected void putDetailFormAndTable(JSONObject json, IPage page) {
+  protected void putDetailFormAndTable(JSONObject json, IPage<?> page) {
     putProperty(json, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
     if (page.isDetailFormVisible() && hasDetailForm(page)) {
       putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
@@ -207,13 +209,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   @Override
-  protected void disposeNode(ITreeNode node, boolean disposeChildren) {
+  protected void disposeNode(ITreeNode node, boolean disposeChildren, Set<ITreeNode> disposedNodes) {
     detachDetailTable(node, false);
-    super.disposeNode(node, disposeChildren);
+    super.disposeNode(node, disposeChildren, disposedNodes);
     // No need to dispose detail form (it will be disposed automatically when it is closed)
   }
 
-  protected void attachDetailTable(IPage page) {
+  protected void attachDetailTable(IPage<?> page) {
     ITable table = page.getTable(false);
     if (table == null) {
       return;
@@ -222,7 +224,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     attachGlobalAdapter(table);
   }
 
-  protected void detachDetailTable(IPage page) {
+  protected void detachDetailTable(IPage<?> page) {
     ITable table = page.getTable(false);
     if (table != null) {
       table.setProperty(JsonOutlineTable.PROP_PAGE, null);
@@ -235,13 +237,13 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
 
   protected void detachDetailTable(ITreeNode node, boolean disposeChildren) {
     if (disposeChildren) {
-      detachDetailTables(getChildNodes(node), disposeChildren);
+      detachDetailTables(getChildNodes(node), true);
     }
 
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
-    detachDetailTable((IPage) node);
+    detachDetailTable((IPage<?>) node);
   }
 
   protected void detachDetailTables(Collection<ITreeNode> nodes, boolean disposeChildren) {
@@ -250,6 +252,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
     }
   }
 
+  @SuppressWarnings("SwitchStatementWithTooFewBranches")
   @Override
   protected void handleModelOtherTreeEvent(TreeEvent event) {
     switch (event.getType()) {
@@ -263,7 +266,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
   }
 
   protected void handleModelPageChanged(OutlineEvent event) {
-    IPage page = (IPage) event.getNode();
+    IPage<?> page = (IPage<?>) event.getNode();
 
     if (!isNodeAccepted(page)) {
       return;
@@ -285,7 +288,7 @@ public class JsonOutline<OUTLINE extends IOutline> extends JsonTree<OUTLINE> {
    * @return <code>true</code> if the page has a detail form that is not closed, <code>false</code> otherwise (closed
    *         forms should not be attached, because the close event causes the JSON adapter to be disposed)
    */
-  protected boolean hasDetailForm(IPage page) {
+  protected boolean hasDetailForm(IPage<?> page) {
     return (page.getDetailForm() != null && !page.getDetailForm().isFormClosed());
   }
 }

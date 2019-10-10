@@ -1011,7 +1011,7 @@ public class UiSession implements IUiSession {
   @Override
   public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent) {
     A jsonAdapter = newJsonAdapter(model, parent);
-
+    m_listeners.fireEvent(new UiSessionEvent(this, UiSessionEvent.TYPE_ADAPTER_CREATED, jsonAdapter));
     // because it's a new adapter we must add it to the response
     m_currentJsonResponse.addAdapter(jsonAdapter);
     return jsonAdapter;
@@ -1032,7 +1032,6 @@ public class UiSession implements IUiSession {
   @Override
   public void registerJsonAdapter(IJsonAdapter<?> jsonAdapter) {
     m_jsonAdapterRegistry.add(jsonAdapter);
-    m_listeners.fireEvent(new UiSessionEvent(this, UiSessionEvent.TYPE_ADAPTER_REGISTERED, jsonAdapter));
   }
 
   @Override

@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -77,6 +79,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.IJsonContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.IUserFilterStateFactory;
 import org.eclipse.scout.rt.ui.html.json.table.userfilter.JsonTableUserFilter;
+import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeEvent;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceMediator;
 import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
@@ -140,12 +143,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   private TableListener m_tableListener;
   private final Map<String, ITableRow> m_tableRows;
   private final Map<ITableRow, String> m_tableRowIds;
-  private final Map<String, IColumn> m_columns;
+  private final Map<String, IColumn<?>> m_columns;
   private final TableEventFilter m_tableEventFilter;
-  private final Map<IColumn, JsonColumn> m_jsonColumns;
+  private final Map<IColumn<?>, JsonColumn<?>> m_jsonColumns;
   private final AbstractEventBuffer<TableEvent> m_eventBuffer;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
   private final BinaryResourceMediator m_binaryResourceMediator;
+  private final JsonTableListeners m_listeners = new JsonTableListeners();
 
   public JsonTable(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -376,6 +380,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         return getModel().getContextColumn();
       }
 
+      @SuppressWarnings("SuspiciousMethodCalls")
       @Override
       public Object prepareValueForToJson(Object value) {
         if (value == null) {
@@ -426,8 +431,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachColumns();
+    attachRows();
     m_jsonContextMenu = new JsonContextMenu<>(getModel().getContextMenu(), this);
     m_jsonContextMenu.init();
+  }
+
+  protected void attachRows() {
+    List<ITableRow> rows = getModel().getRows();
+    for (ITableRow row : rows) {
+      if (isRowAccepted(row)) {
+        getOrCreateRowId(row);
+      }
+    }
   }
 
   protected void attachColumns() {
@@ -439,7 +454,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
         continue;
       }
       String id = getUiSession().createUniqueId();
-      JsonColumn<?> jsonColumn = (JsonColumn) MainJsonObjectFactory.get().createJsonObject(column);
+      JsonColumn<?> jsonColumn = (JsonColumn<?>) MainJsonObjectFactory.get().createJsonObject(column);
       jsonColumn.setId(id);
       jsonColumn.setColumnIndexOffset(offset);
       jsonColumn.setJsonTable(this);
@@ -458,7 +473,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void disposeColumn(IColumn<?> column) {
-    JsonColumn jsonColumn = m_jsonColumns.get(column);
+    JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
     m_jsonColumns.remove(column);
     if (jsonColumn != null) {
       m_columns.remove(jsonColumn.getId());
@@ -546,10 +561,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected JSONArray tableRowsToJson(Collection<ITableRow> rows) {
+    return tableRowsToJson(rows, new HashSet<>());
+  }
+
+  protected JSONArray tableRowsToJson(Collection<ITableRow> rows, Set<ITableRow> acceptedRows) {
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : rows) {
       if (isRowAccepted(row)) {
         jsonRows.put(tableRowToJson(row));
+        acceptedRows.add(row);
       }
     }
     return jsonRows;
@@ -632,7 +652,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiPropertyChange(String propertyName, JSONObject data) {
     if (ITable.PROP_CONTEXT_COLUMN.equals(propertyName)) {
       String contextColumnId = data.optString(propertyName);
-      IColumn column = optColumn(contextColumnId);
+      IColumn<?> column = optColumn(contextColumnId);
       addPropertyEventFilterCondition(propertyName, column);
       getModel().getUIFacade().setContextColumnFromUI(column);
     }
@@ -644,7 +664,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected void handleUiColumnOrganizeAction(JsonEvent event) {
     JSONObject data = event.getData();
     String action = data.getString("action");
-    IColumn column = extractColumn(data);
+    IColumn<?> column = extractColumn(data);
     switch (action) {
       case "add":
         getModel().getUIFacade().fireOrganizeColumnAddFromUI(column);
@@ -753,7 +773,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void fireSortFromUi(JSONObject data) {
-    IColumn column = extractColumn(data);
+    IColumn<?> column = extractColumn(data);
     boolean sortingRemoved = data.optBoolean("sortingRemoved");
 
     // TODO [7.0] cgu: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
@@ -775,7 +795,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void fireGroupFromUi(JSONObject data) {
-    IColumn column = extractColumn(data);
+    IColumn<?> column = extractColumn(data);
     boolean groupingRemoved = data.optBoolean("groupingRemoved");
 
     if (groupingRemoved) {
@@ -790,20 +810,20 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleColumnAggregationFunctionChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_AGGREGATION_CHANGED);
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     Assertions.assertInstance(column, INumberColumn.class, "Aggregation can only be specified on numeric columns");
     getModel().getUIFacade().fireAggregationFunctionChanged((INumberColumn<?>) column, event.getData().getString("aggregationFunction"));
   }
 
   protected void handleColumnBackgroundEffectChanged(JsonEvent event) {
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_BACKGROUND_EFFECT_CHANGED);
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     Assertions.assertInstance(column, INumberColumn.class, "BackgroundEffect can only be specified on numeric columns");
     getModel().getUIFacade().setColumnBackgroundEffect((INumberColumn<?>) column, event.getData().optString("backgroundEffect", null));
   }
 
   protected void handleUiColumnMoved(JsonEvent event) {
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     int viewIndex = event.getData().getInt("index");
 
     // Create column list with expected order
@@ -815,7 +835,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void handleUiColumnResized(JsonEvent event) {
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     if (column == null) {
       LOG.info("Requested column doesn't exist anymore -> skip columnResized event");
       return;
@@ -827,13 +847,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleUiRowAction(JsonEvent event) {
     ITableRow tableRow = extractTableRow(event.getData());
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
   }
 
   protected void handleUiAppLinkAction(JsonEvent event) {
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     String ref = event.getData().optString("ref", null);
     if (column != null) {
       getModel().getUIFacade().setContextColumnFromUI(column);
@@ -847,7 +867,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       LOG.info("Requested table-row doesn't exist anymore. Skip prepareCellEdit event");
       return;
     }
-    IColumn column = extractColumn(event.getData());
+    IColumn<?> column = extractColumn(event.getData());
     getModel().getUIFacade().prepareCellEditFromUI(row, column);
   }
 
@@ -901,7 +921,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     }
 
     TransferObject scoutTransferable = getModel().getUIFacade().fireRowsCopyRequestFromUI();
-    if (scoutTransferable != null && scoutTransferable instanceof TextTransferObject) {
+    if (scoutTransferable instanceof TextTransferObject) {
       try {
         BEANS.get(IClipboardService.class).setContents(scoutTransferable);
       }
@@ -937,7 +957,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected IUserFilterState getFilterState(JSONObject data) {
     String type = data.getString("filterType");
     if ("column".equals(type)) {
-      IColumn column = extractColumn(data);
+      IColumn<?> column = extractColumn(data);
       return getModel().getUserFilterManager().getFilter(column.getColumnId());
     }
 
@@ -991,7 +1011,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return jsonRow;
   }
 
-  protected Object cellToJson(final ITableRow row, final IColumn column) {
+  protected Object cellToJson(final ITableRow row, final IColumn<?> column) {
     ICell cell = row.getCell(column);
     JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
     ICellValueReader reader = new TableCellValueReader(jsonColumn, cell);
@@ -1001,7 +1021,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
     JSONArray jsonColumns = new JSONArray();
     for (IColumn<?> column : columns) {
-      JsonColumn jsonColumn = m_jsonColumns.get(column);
+      JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
       JSONObject json = jsonColumn.toJson();
       JsonObjectUtility.filterDefaultValues(json, jsonColumn.getObjectTypeVariant());
       jsonColumns.put(json);
@@ -1081,7 +1101,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return optTableRow(json.getString(PROP_ROW_ID));
   }
 
-  protected IColumn extractColumn(JSONObject json) {
+  protected IColumn<?> extractColumn(JSONObject json) {
     String columnId = json.optString(PROP_COLUMN_ID, null);
     if (columnId == null) {
       return null;
@@ -1089,40 +1109,40 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return optColumn(columnId);
   }
 
-  protected JsonColumn extractJsonColumn(JSONObject json) {
-    IColumn column = extractColumn(json);
+  protected JsonColumn<?> extractJsonColumn(JSONObject json) {
+    IColumn<?> column = extractColumn(json);
     return getJsonColumn(column);
   }
 
   protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
     JSONArray jsonColumnIds = new JSONArray();
-    for (IColumn column : columns) {
+    for (IColumn<?> column : columns) {
       jsonColumnIds.put(getColumnId(column));
     }
     return jsonColumnIds;
   }
 
-  public IColumn optColumn(String columnId) {
+  public IColumn<?> optColumn(String columnId) {
     return m_columns.get(columnId);
   }
 
-  protected IColumn getColumn(String columnId) {
-    IColumn column = m_columns.get(columnId);
+  protected IColumn<?> getColumn(String columnId) {
+    IColumn<?> column = m_columns.get(columnId);
     if (column == null) {
       throw new UiException("No column found for id " + columnId);
     }
     return column;
   }
 
-  protected JsonColumn getJsonColumn(IColumn column) {
+  protected JsonColumn<?> getJsonColumn(IColumn<?> column) {
     if (column == null) {
       return null;
     }
     return m_jsonColumns.get(column);
   }
 
-  public String getColumnId(IColumn column) {
-    JsonColumn jsonColumn = getJsonColumn(column);
+  public String getColumnId(IColumn<?> column) {
+    JsonColumn<?> jsonColumn = getJsonColumn(column);
     if (jsonColumn == null) {
       return null;
     }
@@ -1160,7 +1180,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   protected JSONArray filtersToJson(Collection<IUserFilterState> filters) {
     JSONArray jsonFilters = new JSONArray();
     for (IUserFilterState filter : filters) {
-      JsonTableUserFilter jsonFilter = (JsonTableUserFilter) MainJsonObjectFactory.get().createJsonObject(filter);
+      JsonTableUserFilter<?> jsonFilter = (JsonTableUserFilter<?>) MainJsonObjectFactory.get().createJsonObject(filter);
       jsonFilter.setJsonTable(this);
       if (jsonFilter.isValid()) {
         jsonFilters.put(jsonFilter.toJson());
@@ -1182,6 +1202,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     registerAsBufferedEventsAdapter();
   }
 
+  @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void bufferModelEvent(TableEvent event) {
     switch (event.getType()) {
       case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
@@ -1364,13 +1385,15 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
   }
 
   protected void handleModelRowsInserted(Collection<ITableRow> modelRows) {
-    JSONArray jsonRows = tableRowsToJson(modelRows);
+    Set<ITableRow> acceptedRows = new HashSet<>();
+    JSONArray jsonRows = tableRowsToJson(modelRows, acceptedRows);
     if (jsonRows.length() == 0) {
       return;
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_INSERTED, jsonEvent);
+    m_listeners.fireEvent(new JsonTableEvent(this, JsonTreeEvent.TYPE_NODES_INSERTED, acceptedRows));
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
@@ -1391,6 +1414,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       handleModelAllRowsDeleted();
       return;
     }
+    Set<ITableRow> disposedRows = new HashSet<>();
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
       String rowId = getTableRowId(row);
@@ -1399,6 +1423,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       }
       jsonRowIds.put(rowId);
       disposeRow(row);
+      disposedRows.add(row);
     }
     if (jsonRowIds.length() == 0) {
       return;
@@ -1406,6 +1431,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     JSONObject jsonEvent = new JSONObject();
     jsonEvent.put(PROP_ROW_IDS, jsonRowIds);
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
+    m_listeners.fireEvent(new JsonTableEvent(this, JsonTableEvent.TYPE_ROWS_DELETED, disposedRows));
   }
 
   /**
@@ -1428,9 +1454,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     if (m_tableRows.isEmpty()) {
       return;
     }
+    Collection<ITableRow> disposedRows = m_tableRows.values();
     m_tableRows.clear();
     m_tableRowIds.clear();
     addActionEvent(EVENT_ALL_ROWS_DELETED);
+    m_listeners.fireEvent(new JsonTableEvent(this, JsonTableEvent.TYPE_ROWS_DELETED, disposedRows));
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
@@ -1460,13 +1488,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
 
   protected void handleModelRowsExpanded(List<ITableRow> rows) {
     JSONArray jsonRows = new JSONArray();
-    rows.stream().filter(row -> isRowAccepted(row))
+    rows.stream().filter(this::isRowAccepted)
         .map(row -> {
           JSONObject jsonRow = new JSONObject();
           putProperty(jsonRow, "id", getTableRowId(row));
           putProperty(jsonRow, "expanded", row.isExpanded());
           return jsonRow;
-        }).forEach(jo -> jsonRows.put(jo));
+        }).forEach(jsonRows::put);
 
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
@@ -1563,7 +1591,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       Assertions.assertInstance(c, INumberColumn.class, "ColumnAggregation is only supported on NumberColumns");
       JSONObject eventPart = new JSONObject();
       putProperty(eventPart, "columnId", getColumnId(c));
-      putProperty(eventPart, "aggregationFunction", ((INumberColumn) c).getAggregationFunction());
+      putProperty(eventPart, "aggregationFunction", ((INumberColumn<?>) c).getAggregationFunction());
       eventParts.put(eventPart);
     }
     putProperty(jsonEvent, "eventParts", eventParts);
@@ -1577,7 +1605,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
       Assertions.assertInstance(c, INumberColumn.class, "ColumnBackgroundEffect is only supported on NumberColumns");
       JSONObject eventPart = new JSONObject();
       putProperty(eventPart, "columnId", getColumnId(c));
-      putProperty(eventPart, "backgroundEffect", ((INumberColumn) c).getBackgroundEffect());
+      putProperty(eventPart, "backgroundEffect", ((INumberColumn<?>) c).getBackgroundEffect());
       eventParts.put(eventPart);
     }
     putProperty(jsonEvent, "eventParts", eventParts);
@@ -1646,7 +1674,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     return m_tableRowIds;
   }
 
-  protected Map<IColumn, JsonColumn> jsonColumns() {
+  protected Map<IColumn<?>, JsonColumn<?>> jsonColumns() {
     return m_jsonColumns;
   }
 
@@ -1721,6 +1749,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     public List<ITableRow> getUncheckedRows() {
       return m_uncheckedRows;
     }
+  }
+
+  public JsonTableListeners listeners() {
+    return m_listeners;
+  }
+
+  public void addListener(JsonTableListener listener, Integer... eventTypes) {
+    listeners().add(listener, false, eventTypes);
+  }
+
+  public void removeListener(JsonTableListener listener, Integer... eventTypes) {
+    listeners().remove(listener, eventTypes);
   }
 
   protected class P_TableListener extends TableAdapter {

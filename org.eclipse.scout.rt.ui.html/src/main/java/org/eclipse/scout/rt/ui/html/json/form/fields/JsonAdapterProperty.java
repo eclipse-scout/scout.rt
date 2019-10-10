@@ -26,7 +26,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   private final boolean m_global;
   private final boolean m_disposeOnChange;
   private final Predicate<Object> m_filter;
-  private final Set<IJsonAdapter> m_ownedAdapters = new HashSet<>();
+  private final Set<IJsonAdapter<?>> m_ownedAdapters = new HashSet<>();
 
   public JsonAdapterProperty(String propertyName, MODEL_ELEMENT model, IUiSession session) {
     super(propertyName, model);
@@ -57,7 +57,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
     return m_filter;
   }
 
-  protected Set<IJsonAdapter> getOwnedAdapters() {
+  protected Set<IJsonAdapter<?>> getOwnedAdapters() {
     return m_ownedAdapters;
   }
 
@@ -90,7 +90,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
       return;
     }
     if (modelValue instanceof Collection) {
-      for (Object model : (Iterable) modelValue) {
+      for (Object model : (Iterable<?>) modelValue) {
         createAdapter(model);
       }
     }
@@ -123,11 +123,11 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
    * Dispose all old owned adapters.
    */
   protected void disposeAdapters(Object newModels) {
-    Set<IJsonAdapter> attachedAdapters = new HashSet<>(m_ownedAdapters);
+    Set<IJsonAdapter<?>> attachedAdapters = new HashSet<>(m_ownedAdapters);
     for (IJsonAdapter<?> adapter : attachedAdapters) {
       if (newModels instanceof Collection) {
         // Dispose adapter only if's model is not part of the new models
-        if (!((Collection) newModels).contains(adapter.getModel())) {
+        if (!((Collection<?>) newModels).contains(adapter.getModel())) {
           disposeAdapterImpl(adapter);
         }
       }
@@ -140,7 +140,7 @@ public abstract class JsonAdapterProperty<MODEL_ELEMENT> extends JsonProperty<MO
   /**
    * Disposes the given adapter and removes it from the set of owned adapters.
    */
-  protected void disposeAdapterImpl(IJsonAdapter adapter) {
+  protected void disposeAdapterImpl(IJsonAdapter<?> adapter) {
     adapter.dispose();
     m_ownedAdapters.remove(adapter);
   }

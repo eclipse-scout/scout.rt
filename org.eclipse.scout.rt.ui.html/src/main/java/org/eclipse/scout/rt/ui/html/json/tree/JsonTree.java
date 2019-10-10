@@ -104,6 +104,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   private final TreeEventFilter m_treeEventFilter;
   private final AbstractEventBuffer<TreeEvent> m_eventBuffer;
   private JsonContextMenu<IContextMenu> m_jsonContextMenu;
+  private final JsonTreeListeners m_listeners = new JsonTreeListeners();
 
   public JsonTree(TREE model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -319,9 +320,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     m_parentNodes.clear();
   }
 
-  protected void disposeNode(ITreeNode node, boolean disposeChildren) {
+  protected void disposeNode(ITreeNode node, boolean disposeChildren, Set<ITreeNode> disposedNodes) {
     if (disposeChildren) {
-      disposeNodes(getChildNodes(node), disposeChildren);
+      disposeNodes(getChildNodes(node), true, disposedNodes);
     }
     String nodeId = m_treeNodeIds.get(node);
     m_treeNodeIds.remove(node);
@@ -331,6 +332,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     // The node will be removed from its parent childNodes list later in unlinkFromParentNode
     m_childNodes.remove(node);
     m_parentNodes.remove(node);
+    disposedNodes.add(node);
   }
 
   /**
@@ -354,7 +356,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   /**
    * Removes the given node from the child list of the parent node ({@link #m_childNodes}). Does not remove it from the
    * {@link #m_parentNodes} list because it is not necessary as it will be done in
-   * {@link #disposeNode(ITreeNode, boolean)}.
+   * {@link #disposeNode(ITreeNode, boolean, Set)}.
    */
   protected void unlinkFromParentNode(ITreeNode node) {
     ITreeNode parentNode = getParentNode(node);
@@ -362,23 +364,17 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     childrenOfParent.remove(node);
   }
 
-  protected void disposeNodes(Collection<ITreeNode> nodes, boolean disposeChildren) {
+  protected void disposeNodes(Collection<ITreeNode> nodes, boolean disposeChildren, Set<ITreeNode> disposedNodes) {
     for (ITreeNode node : nodes) {
-      disposeNode(node, disposeChildren);
+      disposeNode(node, disposeChildren, disposedNodes);
     }
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JSONArray jsonNodes = new JSONArray();
     IChildNodeIndexLookup childIndexes = createChildNodeIndexLookup();
-    for (ITreeNode childNode : getTopLevelNodes()) {
-      if (!isNodeAccepted(childNode)) {
-        continue;
-      }
-      jsonNodes.put(treeNodeToJson(childNode, childIndexes));
-    }
+    JSONArray jsonNodes = treeNodesToJson(getTopLevelNodes(), childIndexes);
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODES, nodeIdsToJson(getModel().getSelectedNodes(), true, true));
     putProperty(json, PROP_MENUS, getJsonContextMenu().childActionsToJson());
@@ -403,7 +399,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
       //probe cache
       Integer indexOrNull = indexMap.get(node);
       if (indexOrNull != null) {
-        return indexOrNull.intValue();
+        return indexOrNull;
       }
       //fill cache
       int childNodeIndex = 0;
@@ -429,6 +425,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     registerAsBufferedEventsAdapter();
   }
 
+  @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void bufferModelEvent(final TreeEvent event) {
     switch (event.getType()) {
       case TreeEvent.TYPE_NODE_FILTER_CHANGED: {
@@ -587,14 +584,10 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   }
 
   protected void handleModelNodesInserted(TreeEvent event) {
-    JSONArray jsonNodes = new JSONArray();
+    Set<ITreeNode> acceptedNodes = new HashSet<>();
     attachNodes(event.getNodes(), true); // TODO [7.0] cgu: why not inside loop? attaching for rejected nodes?
     IChildNodeIndexLookup childIndexes = createChildNodeIndexLookup();
-    for (ITreeNode node : event.getNodes()) {
-      if (isNodeAccepted(node)) {
-        jsonNodes.put(treeNodeToJson(node, childIndexes));
-      }
-    }
+    JSONArray jsonNodes = treeNodesToJson(event.getNodes(), childIndexes, acceptedNodes);
     if (jsonNodes.length() == 0) {
       return;
     }
@@ -602,6 +595,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
     addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
+    m_listeners.fireEvent(new JsonTreeEvent(this, JsonTreeEvent.TYPE_NODES_INSERTED, acceptedNodes));
   }
 
   protected void handleModelNodesUpdated(TreeEvent event) {
@@ -654,7 +648,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     for (ITreeNode node : nodes) {
       unlinkFromParentNode(node);
     }
-    disposeNodes(nodes, true);
+    Set<ITreeNode> disposedNodes = new HashSet<>();
+    disposeNodes(nodes, true, disposedNodes);
+    m_listeners.fireEvent(new JsonTreeEvent(this, JsonTreeEvent.TYPE_NODES_DELETED, disposedNodes));
   }
 
   protected void handleModelAllChildNodesDeleted(TreeEvent event) {
@@ -665,7 +661,9 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     for (ITreeNode node : event.getChildNodes()) {
       unlinkFromParentNode(node);
     }
-    disposeNodes(event.getChildNodes(), true);
+    Set<ITreeNode> disposedNodes = new HashSet<>();
+    disposeNodes(event.getChildNodes(), true, disposedNodes);
+    m_listeners.fireEvent(new JsonTreeEvent(this, JsonTreeEvent.TYPE_NODES_DELETED, disposedNodes));
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
@@ -856,7 +854,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
    * @return the nodeId for the given node or <code>null</code> if the node has no nodeId assigned. Also returns
    *         <code>null</code> if the node is the invisible root node or <code>null</code> itself.
    */
-  protected String optNodeId(ITreeNode node) {
+  public String optNodeId(ITreeNode node) {
     if (node == null) {
       return null;
     }
@@ -900,7 +898,22 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     }
   }
 
-  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes) {
+  protected JSONArray treeNodesToJson(Collection<ITreeNode> nodes, IChildNodeIndexLookup childIndexes) {
+    return treeNodesToJson(nodes, childIndexes, new HashSet<>());
+  }
+
+  protected JSONArray treeNodesToJson(Collection<ITreeNode> nodes, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
+    JSONArray jsonNodes = new JSONArray();
+    for (ITreeNode node : nodes) {
+      if (isNodeAccepted(node)) {
+        jsonNodes.put(treeNodeToJson(node, childIndexes, acceptedNodes));
+        acceptedNodes.add(node);
+      }
+    }
+    return jsonNodes;
+  }
+
+  protected JSONObject treeNodeToJson(ITreeNode node, IChildNodeIndexLookup childIndexes, Set<ITreeNode> acceptedNodes) {
     JSONObject json = new JSONObject();
     putProperty(json, "id", getOrCreateNodeId(node));
     putProperty(json, "expanded", node.isExpanded());
@@ -919,7 +932,8 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
         if (!isNodeAccepted(childNode)) {
           continue;
         }
-        jsonChildNodes.put(treeNodeToJson(childNode, childIndexes));
+        acceptedNodes.add(childNode);
+        jsonChildNodes.put(treeNodeToJson(childNode, childIndexes, acceptedNodes));
       }
     }
     putProperty(json, "childNodes", jsonChildNodes);
@@ -1048,7 +1062,7 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
   /**
    * Ignore deleted or filtered nodes, because for the UI, they don't exist
    */
-  protected boolean isNodeAccepted(ITreeNode node) {
+  public boolean isNodeAccepted(ITreeNode node) {
     if (node.isStatusDeleted()) {
       return false;
     }
@@ -1128,6 +1142,18 @@ public class JsonTree<TREE extends ITree> extends AbstractJsonWidget<TREE> imple
     public List<ITreeNode> getUncheckedNodes() {
       return m_uncheckedNodes;
     }
+  }
+
+  public JsonTreeListeners listeners() {
+    return m_listeners;
+  }
+
+  public void addListener(JsonTreeListener listener, Integer... eventTypes) {
+    listeners().add(listener, false, eventTypes);
+  }
+
+  public void removeListener(JsonTreeListener listener, Integer... eventTypes) {
+    listeners().remove(listener, eventTypes);
   }
 
   protected class P_TreeListener extends TreeAdapter {

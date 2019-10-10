@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.json.tree;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,12 +17,11 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.platform.util.event.AbstractGroupedListenerList;
 
-public final class UiSessionListeners extends AbstractGroupedListenerList<UiSessionListener, UiSessionEvent, Integer> {
-  private static final Set<Integer> KNOWN_EVENT_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-      UiSessionEvent.TYPE_ADAPTER_CREATED)));
+public final class JsonTreeListeners extends AbstractGroupedListenerList<JsonTreeListener, JsonTreeEvent, Integer> {
+  private static final Set<Integer> KNOWN_EVENT_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(JsonTreeEvent.TYPE_NODES_INSERTED, JsonTreeEvent.TYPE_NODES_DELETED)));
 
   @Override
-  protected Integer eventType(UiSessionEvent event) {
+  protected Integer eventType(JsonTreeEvent event) {
     return event.getType();
   }
 
@@ -37,7 +36,7 @@ public final class UiSessionListeners extends AbstractGroupedListenerList<UiSess
   }
 
   @Override
-  protected void handleEvent(UiSessionListener listener, UiSessionEvent event) {
-    listener.sessionChanged(event);
+  protected void handleEvent(JsonTreeListener listener, JsonTreeEvent event) {
+    listener.treeChanged(event);
   }
 }

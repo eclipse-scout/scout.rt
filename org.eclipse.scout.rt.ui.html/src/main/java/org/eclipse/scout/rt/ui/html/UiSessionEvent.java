@@ -12,13 +12,12 @@ package org.eclipse.scout.rt.ui.html;
 
 import java.util.EventObject;
 
-import org.eclipse.scout.rt.client.ui.IModelEvent;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 @SuppressWarnings({"serial", "squid:S2057"})
-public class UiSessionEvent extends EventObject implements IModelEvent {
+public class UiSessionEvent extends EventObject {
 
-  public static final int TYPE_ADAPTER_REGISTERED = 100;
+  public static final int TYPE_ADAPTER_CREATED = 100;
 
   private final int m_type;
   private IJsonAdapter<?> m_jsonAdapter;
@@ -29,15 +28,15 @@ public class UiSessionEvent extends EventObject implements IModelEvent {
     m_jsonAdapter = adapter;
   }
 
-  public UiSession getUisession() {
-    return (UiSession) getSource();
+  @Override
+  public UiSession getSource() {
+    return (UiSession) super.getSource();
   }
 
   public IJsonAdapter<?> getJsonAdapter() {
     return m_jsonAdapter;
   }
 
-  @Override
   public int getType() {
     return m_type;
   }

@@ -162,7 +162,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * {@link #getObjectType()}, this method returns the object type <b>including the model variant</b> (if set). The
    * resulting string looks like this: <code>"&lt;ObjectType&gt;.&lt;ModelVariant&gt;"</code>.
    *
-   * @see {@link ModelVariant}
+   * @see ModelVariant
    */
   protected String getObjectTypeVariant() {
     return JsonAdapterUtility.getObjectType(getObjectType(), getModel());
@@ -346,8 +346,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return addActionEvent(eventName, null, eventData);
   }
 
-  protected final JsonEvent addActionEvent(String eventName, IJsonAdapter referenceAdapter, JSONObject eventData) {
-    JsonEvent event = null;
+  protected final JsonEvent addActionEvent(String eventName, IJsonAdapter<?> referenceAdapter, JSONObject eventData) {
+    JsonEvent event;
     if (referenceAdapter == null) {
       event = getUiSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
       LOG.debug("Added action event '{}' for {} with id {}. Model: {}", eventName, getObjectType(), getId(), getModel());
@@ -392,14 +392,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getObjectType());
-    sb.append("[id=").append(getId());
-    sb.append(", modelClass=");
-    sb.append(getModel() == null ? "null" : getModel().getClass().getName());
-    sb.append(", parentId=");
-    sb.append(getParent() == null ? "null" : getParent().getId());
-    sb.append("]");
-    return sb.toString();
+    return getObjectType() +
+        "[id=" + getId() +
+        ", modelClass=" +
+        (getModel() == null ? "null" : getModel().getClass().getName()) +
+        ", parentId=" +
+        (getParent() == null ? "null" : getParent().getId()) +
+        "]";
   }
 }
