@@ -11,8 +11,7 @@
 package org.eclipse.scout.rt.rest.exception;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -160,10 +159,11 @@ public class DefaultExceptionMapperTest {
   public void testToResponseRemoteSystemUnavailableException() {
     RemoteSystemUnavailableExceptionMapper mapper = new RemoteSystemUnavailableExceptionMapper();
     RemoteSystemUnavailableException exception = new RemoteSystemUnavailableException("unavailable");
-    Response response = mapper.toResponse(exception);
-    assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
-    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-    assertEquals(exception.getMessage(), error.getMessage());
+    try (Response response = mapper.toResponse(exception)) {
+      assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      assertEquals(exception.getMessage(), error.getMessage());
+    }
   }
 
   @Test

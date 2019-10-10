@@ -35,7 +35,7 @@ public class RemoteSystemUnavailableExceptionMapper extends AbstractExceptionMap
 
   protected Response createResponse(RemoteSystemUnavailableException exception) {
     return BEANS.get(ErrorResponseBuilder.class)
-        .withStatus(Response.Status.SERVICE_UNAVAILABLE)
+        .withHttpStatus(Response.Status.SERVICE_UNAVAILABLE)
         .withMessage(exception.getMessage())
         .build();
   }
