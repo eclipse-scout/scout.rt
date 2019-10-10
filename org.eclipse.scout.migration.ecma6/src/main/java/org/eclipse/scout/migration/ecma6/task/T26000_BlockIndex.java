@@ -97,8 +97,10 @@ public class T26000_BlockIndex extends AbstractTask {
       String depFileName = dependencyPath.getFileName().toString();
       if (Files.isRegularFile(dependencyPath) && Files.isReadable(dependencyPath) && depFileName.endsWith(".js")) {
         String memberName = depFileName.substring(0, depFileName.length() - 3);
-        String ref = entryPointClass.getOrCreateImport(memberName, dependencyPath, false, true).getReferenceName();
-        entryPointSuffix.append("  ").append(ref).append(',').append(nl);
+        if (!"wordcloud2".equals(memberName)) {
+          String ref = entryPointClass.getOrCreateImport(memberName, dependencyPath, false, true).getReferenceName();
+          entryPointSuffix.append("  ").append(ref).append(',').append(nl);
+        }
       }
     }
     if (entryPointSuffix.length() < 1) {
