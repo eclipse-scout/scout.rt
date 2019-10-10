@@ -184,10 +184,11 @@ public class DefaultExceptionMapperTest {
   public void testToResponseRemoteSystemUnavailableException() {
     RemoteSystemUnavailableExceptionMapper mapper = new RemoteSystemUnavailableExceptionMapper();
     RemoteSystemUnavailableException exception = new RemoteSystemUnavailableException("unavailable");
-    Response response = mapper.toResponse(exception);
-    assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
-    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
-    assertEquals(exception.getMessage(), error.getMessage());
+    try (Response response = mapper.toResponse(exception)) {
+      assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
+      ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+      assertEquals(exception.getMessage(), error.getMessage());
+    }
   }
 
   @Test
