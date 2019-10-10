@@ -24,6 +24,7 @@ import org.eclipse.scout.rt.dataobject.exception.AccessForbiddenException;
 import org.eclipse.scout.rt.dataobject.exception.ResourceNotFoundException;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.exception.RemoteSystemUnavailableException;
 import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.platform.transaction.ITransaction;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
@@ -168,6 +169,16 @@ public class DefaultExceptionMapperTest {
     assertEquals(exception.getStatus().getTitle(), error.getTitle());
     assertEquals(exception.getStatus().getBody(), error.getMessage());
     assertEquals(exception.getStatus().getCode(), error.getCodeAsInt());
+  }
+
+  @Test
+  public void testToResponseRemoteSystemUnavailableException() {
+    RemoteSystemUnavailableExceptionMapper mapper = new RemoteSystemUnavailableExceptionMapper();
+    RemoteSystemUnavailableException exception = new RemoteSystemUnavailableException("unavailable");
+    Response response = mapper.toResponse(exception);
+    assertEquals(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(), response.getStatus());
+    ErrorDo error = response.readEntity(ErrorResponse.class).getError();
+    assertEquals(exception.getMessage(), error.getMessage());
   }
 
   @Test
