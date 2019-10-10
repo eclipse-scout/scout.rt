@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.client.services.common.exceptionhandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.concurrent.CancellationException;
@@ -109,6 +111,15 @@ public class ErrorPopup {
   }
 
   /**
+   * Returns {@link Throwable} parsed out of given error
+   * 
+   * @see #ensureErrorParsed(Throwable)
+   */
+  protected Throwable getParsedError() {
+    return m_parsedError;
+  }
+
+  /**
    * If the given exception is a "wrapper exception" (as returned by {@link #isWrapperException(Throwable)}), the
    * wrapped exception is returned. Otherwise, the original exception is returned.
    */
@@ -150,9 +161,7 @@ public class ErrorPopup {
       parseVetoException((VetoException) t);
       return true;
     }
-    // RemoteSystemUnavailableException is thrown by ServiceTunnel
-    // SocketException is the parent of ConnectException (happens when server is not available) and NoRouteToHostException
-    if (t instanceof UnknownHostException || t instanceof SocketException || t instanceof RemoteSystemUnavailableException) {
+    if (isNetError(t)) {
       parseNetError(t);
       return true;
     }
@@ -164,6 +173,21 @@ public class ErrorPopup {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Checks if given {@link Throwable} indicates a network error
+   * <ul>
+   * <li>{@link RemoteSystemUnavailableException} is thrown by HTTP ServiceTunnel
+   * <li>{@link SocketException} is the parent of {@link ConnectException} and {@link NoRouteToHostException} (server is
+   * not available)
+   * <li>{@link UnknownHostException} indicates that server IP could not be resolved
+   * </ul>
+   */
+  protected boolean isNetError(Throwable t) {
+    return t instanceof RemoteSystemUnavailableException ||
+        t instanceof SocketException ||
+        t instanceof UnknownHostException;
   }
 
   /**
