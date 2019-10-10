@@ -95,6 +95,14 @@ public class Configuration {
         setPersistLibraryName("@eclipse-scout/demo-widgets");
         setPersistLibraryFileName("41-api_demo-widgets.json");
         break;
+      case "org.eclipse.scout.contacts.ui.html":
+        setSourceModuleDirectory(sourceBase + "/org.eclipse.scout.docs/code/contacts/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/org.eclipse.scout.docs/code/contacts/" + moduleName);
+        setNamespace("contacts");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@eclipse-scout/demo-contacts");
+        setPersistLibraryFileName("43-api_demo-contacts.json");
+        break;
 
       case "com.bsiag.scout.rt.ui.html":
         setSourceModuleDirectory(sourceBase + "/bsi.scout.rt/" + moduleName);
@@ -266,6 +274,24 @@ public class Configuration {
         setRemoveJsFolder(false); // folder is required for steps because loaded from classloader
         setUseIndexJs(false); // there is no index.js for steps
         setStepConfigTypeName("cortexes");
+        break;
+
+      case "com.bsiag.portal.ui":
+        setSourceModuleDirectory(sourceBase + "/bsiportal/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsiportal/" + moduleName);
+        setNamespace("portal");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-portal/core");
+        setPersistLibraryFileName("700-api_bsi_portal_core.json");
+        break;
+
+      case "com.bsiag.bsistudio.lab.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsistudio/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsistudio/" + moduleName);
+        setNamespace("crm");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-crm/bsiag-studio-lab");
+        setPersistLibraryFileName("800-api_bsi_studio_lab.json");
         break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
