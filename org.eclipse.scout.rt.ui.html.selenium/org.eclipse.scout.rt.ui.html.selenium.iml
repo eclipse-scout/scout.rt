@@ -13,6 +13,8 @@
     <orderEntry type="module" module-name="org.eclipse.scout.json" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.client" />
     <orderEntry type="module" module-name="org.eclipse.scout.rt.shared" />
+    <orderEntry type="module" module-name="org.eclipse.scout.rt.security" />
+    <orderEntry type="module" module-name="org.eclipse.scout.rt.dataobject" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.27.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.10" level="project" />
