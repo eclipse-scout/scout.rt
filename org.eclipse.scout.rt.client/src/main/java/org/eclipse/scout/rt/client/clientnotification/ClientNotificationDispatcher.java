@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.job.DoneEvent;
 import org.eclipse.scout.rt.platform.job.IDoneHandler;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.platform.transaction.TransactionScope;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
@@ -111,7 +112,8 @@ public class ClientNotificationDispatcher {
     else {
       // dispatch async
       IFuture<Void> future = Jobs.schedule(() -> dispatchSync(notification, address), Jobs.newInput()
-          .withRunContext(ClientRunContexts.copyCurrent())
+          .withRunContext(ClientRunContexts.copyCurrent()
+              .withTransactionScope(TransactionScope.REQUIRES_NEW))
           .withName("Dispatching client notification"));
 
       addPendingNotification(future);
