@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {ObjectFactory, scout, arrays} from '@eclipse-scout/core';
+import {arrays, ObjectFactory, scout} from '@eclipse-scout/core';
 import {LocaleSpecHelper, TestingApp} from './index';
 
 window.sandboxSession = function(options) {
@@ -137,22 +137,22 @@ window.createSimpleModel = function(objectType, session, id) {
   };
 };
 
-export function initTestingApp() {
+
+export function startApp(app) {
   // App initialization uses promises which are executed asynchronously
   // -> Use the clock to make sure all promise callbacks are executed before any test starts.
   jasmine.clock().install();
 
-  const app = new TestingApp();
-  app.init();
+  new app().init();
 
   jasmine.clock().tick(1000);
   jasmine.clock().uninstall();
 }
 
-
 export default {
   runTestSuite: function(context) {
-    initTestingApp();
+    startApp(TestingApp);
     context.keys().forEach(context);
-  }
+  },
+  startApp
 }
