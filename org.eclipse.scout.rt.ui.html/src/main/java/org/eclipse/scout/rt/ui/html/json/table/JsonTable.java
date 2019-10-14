@@ -1454,7 +1454,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     if (m_tableRows.isEmpty()) {
       return;
     }
-    Collection<ITableRow> disposedRows = m_tableRows.values();
+    Collection<ITableRow> disposedRows = null;
+    if (m_listeners.list(JsonTableEvent.TYPE_ROWS_DELETED).size() > 0) {
+      disposedRows = new ArrayList<>(m_tableRows.values());
+    }
     m_tableRows.clear();
     m_tableRowIds.clear();
     addActionEvent(EVENT_ALL_ROWS_DELETED);
