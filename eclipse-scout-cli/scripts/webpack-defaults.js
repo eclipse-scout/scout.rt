@@ -86,7 +86,7 @@ module.exports = (env, args) => {
       }, {
         // # Babel
         test: /\.m?js$/,
-        exclude: /node_modules/,
+        exclude: [],
         use: {
           loader: require.resolve('babel-loader'),
           options: {
