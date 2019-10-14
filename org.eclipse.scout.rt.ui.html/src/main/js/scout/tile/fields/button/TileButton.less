@@ -12,7 +12,6 @@
   padding-top: 0;
   padding-bottom: 0;
   cursor: pointer;
-  display: table;
 
   &:not(.disabled):hover > .field {
 
@@ -28,16 +27,19 @@
   }
 
   & > .field {
-    display: table-cell;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 20px;
+    padding-bottom: 20px;
 
     &.with-icon {
-      vertical-align: bottom;
-      padding-bottom: 20px;
+      padding-top: 17px;
     }
 
     &.without-icon {
-      vertical-align: middle;
+      justify-content: center;
     }
 
     /* Make IE trigger the :active state if the field is pressed */
@@ -49,8 +51,7 @@
     }
 
     & > .icon-container {
-      position: absolute;
-      top: 17px;
+      flex-grow: 1;
 
       & > .font-icon {
         font-size: 40px;
