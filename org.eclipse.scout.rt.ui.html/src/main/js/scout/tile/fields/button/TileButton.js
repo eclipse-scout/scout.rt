@@ -26,9 +26,7 @@ scout.TileButton.prototype._render = function() {
   this.addField($button);
 
   // Disable inner form field layout, because the tile button should always occupy
-  // the entire container area. This is achieved by using CSS "fixed table layout".
-  // (If we would set the size of the inner field manually, the CSS rendering would
-  // not be able to correctly determine the table's width.)
+  // the entire container area.
   this.htmlComp.setLayout(new scout.NullLayout());
 
   this.$container
