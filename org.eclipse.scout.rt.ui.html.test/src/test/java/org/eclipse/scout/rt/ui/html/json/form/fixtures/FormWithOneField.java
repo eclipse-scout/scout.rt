@@ -16,8 +16,10 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField.MainBox.StringField;
 
+@ClassId("ac06f4ad-7182-4976-9f75-2be0d3ae7fcf")
 public class FormWithOneField extends AbstractForm {
 
   public FormWithOneField() {
@@ -38,9 +40,11 @@ public class FormWithOneField extends AbstractForm {
   }
 
   @Order(10)
+  @ClassId("87629b9c-3418-4fbe-80e6-a6edf93c2bc5")
   public class MainBox extends AbstractGroupBox {
 
     @Order(10)
+    @ClassId("44537cc8-250d-4f81-96c8-bf9aaa96b080")
     public class StringField extends AbstractStringField {
     }
   }

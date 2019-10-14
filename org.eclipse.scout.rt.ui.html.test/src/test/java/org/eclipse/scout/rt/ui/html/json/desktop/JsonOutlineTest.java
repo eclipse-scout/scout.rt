@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.holders.Holder;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -310,7 +311,7 @@ public class JsonOutlineTest {
    * Other menus are never displayed, no need to send them.
    */
   @Test
-  public void testDontSendNonDisplayableMenus() throws Exception {
+  public void testDontSendNonDisplayableMenus() {
     List<IPage<?>> pages = new ArrayList<>();
     IOutline outline = new Outline(pages);
     IMenu headerMenu = new HeaderMenu();
@@ -341,10 +342,10 @@ public class JsonOutlineTest {
     JSONArray nodeIds = new JSONArray();
     nodeIds.put(JsonTreeTest.getNodeId(jsonOutline, page));
     eventData.put("nodeIds", nodeIds);
-    JsonEvent event = new JsonEvent(jsonOutline.getId(), JsonTree.EVENT_NODES_SELECTED, eventData);
-    return event;
+    return new JsonEvent(jsonOutline.getId(), JsonTree.EVENT_NODES_SELECTED, eventData);
   }
 
+  @ClassId("c2e40347-ac02-4576-a9ea-889d7f6dda2f")
   private static class HeaderMenu extends AbstractMenu {
 
     @Override
@@ -354,6 +355,7 @@ public class JsonOutlineTest {
     }
   }
 
+  @ClassId("afea6ef3-592f-4023-9968-09d5c175161c")
   private class NonHeaderMenu extends AbstractMenu {
     @Override
     protected Set<? extends IMenuType> getConfiguredMenuTypes() {

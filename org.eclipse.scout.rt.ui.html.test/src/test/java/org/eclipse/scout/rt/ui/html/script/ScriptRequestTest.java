@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.script;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Optional;
 
@@ -65,7 +63,7 @@ public class ScriptRequestTest {
   }
 
   @Test
-  public void testToMinimized() throws Exception {
+  public void testToMinimized() {
     ScriptRequest request = ScriptRequest.tryParse("chartjs/Chart-2.8.0.js").get();
     ScriptRequest minRequest = request.toMinimized(true);
     assertEquals("chartjs/Chart-2.8.0.min.js", minRequest.toString());

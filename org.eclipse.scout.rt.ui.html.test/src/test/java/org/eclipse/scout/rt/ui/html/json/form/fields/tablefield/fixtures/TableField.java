@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.fixtures;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("a30ddecf-0ce1-45eb-8ad2-47e79c7b92ef")
 public class TableField<T extends ITable> extends AbstractTableField<T> {
   private T m_table;
 

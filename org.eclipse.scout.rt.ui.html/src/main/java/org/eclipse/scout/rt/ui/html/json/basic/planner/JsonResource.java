@@ -26,7 +26,7 @@ public class JsonResource implements IJsonObject {
   private final IIdProvider<Activity<?, ?>> m_cellIdProvider;
   private final IJsonAdapter<?> m_parentAdapter;
 
-  public JsonResource(Resource resource, IJsonAdapter<?> parentAdapter, IIdProvider<Resource<?>> resourceIdProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
+  public JsonResource(Resource<?> resource, IJsonAdapter<?> parentAdapter, IIdProvider<Resource<?>> resourceIdProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
     m_resource = resource;
     m_parentAdapter = parentAdapter;
     m_resourceIdProvider = resourceIdProvider;

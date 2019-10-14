@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
@@ -74,7 +70,7 @@ public class JsonFormTest {
   }
 
   @Test
-  public void testFormOpenCloseInTwoRequests() throws Exception {
+  public void testFormOpenCloseInTwoRequests() {
     // Create adapter for client session and desktop
     UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
@@ -108,7 +104,7 @@ public class JsonFormTest {
   }
 
   @Test
-  public void testFormOpenCloseInSameRequest() throws Exception {
+  public void testFormOpenCloseInSameRequest() {
     // Create adapter for client session and desktop
     UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
@@ -127,7 +123,7 @@ public class JsonFormTest {
   }
 
   @Test
-  public void testFormOpenCloseInWrappedFormField() throws Exception {
+  public void testFormOpenCloseInWrappedFormField() {
     // Create adapter for client session and desktop
     UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);
@@ -146,7 +142,7 @@ public class JsonFormTest {
   }
 
   @Test
-  public void testFormVisibleGrantedFalse() throws Exception {
+  public void testFormVisibleGrantedFalse() {
     // Create adapter for client session and desktop
     UiSessionTestUtility.newJsonAdapter(m_uiSession, IClientSession.CURRENT.get(), null);
     JsonTestUtility.processBufferedEvents(m_uiSession);

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 /**
  * Utility methods for working with JSON data.
  */
+@SuppressWarnings("UnusedAssignment")
 public final class JsonUtility {
 
   private JsonUtility() {

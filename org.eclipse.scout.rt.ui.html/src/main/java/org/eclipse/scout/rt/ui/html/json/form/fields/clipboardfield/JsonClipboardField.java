@@ -50,7 +50,7 @@ public class JsonClipboardField<T extends IClipboardField> extends JsonValueFiel
 
       @Override
       public Object prepareValueForToJson(Object value) {
-        return new JSONArray((Collection) value); // Do NOT remove the cast! It is required to use the correct constructor.
+        return new JSONArray((Collection<?>) value); // Do NOT remove the cast! It is required to use the correct constructor.
       }
     });
     putJsonProperty(new JsonProperty<IClipboardField>(IClipboardField.PROP_MAXIMUM_SIZE, model) {

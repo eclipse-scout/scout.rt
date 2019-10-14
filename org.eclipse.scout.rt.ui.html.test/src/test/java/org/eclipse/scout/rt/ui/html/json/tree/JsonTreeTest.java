@@ -98,7 +98,7 @@ public class JsonTreeTest {
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_SELECTED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
   }
 
   /**
@@ -159,7 +159,7 @@ public class JsonTreeTest {
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
 
     //Check expanded = false
     event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), false);
@@ -167,7 +167,7 @@ public class JsonTreeTest {
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
-    assertTrue(responseEvents.size() == 0);
+    assertEquals(0, responseEvents.size());
   }
 
   @Test
@@ -265,7 +265,7 @@ public class JsonTreeTest {
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_uiSession.currentJsonResponse(), JsonTree.EVENT_NODES_DELETED);
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
     assertEventTypeAndNodeIds(responseEvents.get(0), "nodesDeleted", node1Id);
   }
 
@@ -531,7 +531,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testTreeExpandedRecursive() throws Exception {
+  public void testTreeExpandedRecursive() {
     // (root)
     //   +-(node)
     //   |   +-(node)
@@ -567,14 +567,14 @@ public class JsonTreeTest {
     List<JsonEvent> events = m_uiSession.currentJsonResponse().getEventList();
     assertEquals(3, events.size());
     assertEquals("nodeExpanded", events.get(0).getType());
-    assertEquals(true, events.get(0).getData().optBoolean("expanded"));
-    assertEquals(true, events.get(0).getData().optBoolean("recursive"));
+    assertTrue(events.get(0).getData().optBoolean("expanded"));
+    assertTrue(events.get(0).getData().optBoolean("recursive"));
     assertEquals("nodeExpanded", events.get(1).getType());
-    assertEquals(true, events.get(1).getData().optBoolean("expanded"));
-    assertEquals(true, events.get(1).getData().optBoolean("recursive"));
+    assertTrue(events.get(1).getData().optBoolean("expanded"));
+    assertTrue(events.get(1).getData().optBoolean("recursive"));
     assertEquals("nodeExpanded", events.get(2).getType());
-    assertEquals(true, events.get(2).getData().optBoolean("expanded"));
-    assertEquals(true, events.get(2).getData().optBoolean("recursive"));
+    assertTrue(events.get(2).getData().optBoolean("expanded"));
+    assertTrue(events.get(2).getData().optBoolean("recursive"));
 
     JsonTestUtility.endRequest(m_uiSession);
 
@@ -587,12 +587,12 @@ public class JsonTreeTest {
     events = m_uiSession.currentJsonResponse().getEventList();
     assertEquals(1, events.size());
     assertEquals("nodeExpanded", events.get(0).getType());
-    assertEquals(false, events.get(0).getData().optBoolean("expanded"));
-    assertEquals(true, events.get(0).getData().optBoolean("recursive"));
+    assertFalse(events.get(0).getData().optBoolean("expanded"));
+    assertTrue(events.get(0).getData().optBoolean("recursive"));
   }
 
   @Test
-  public void testMultipleFilterChanged() throws Exception {
+  public void testMultipleFilterChanged() {
     // (root)
     //   +-(node)
     //   |   +-(node)
@@ -665,28 +665,28 @@ public class JsonTreeTest {
     assertEquals(expectedType, event.getType());
 
     JSONArray nodeIds = event.getData().getJSONArray("nodeIds");
-    assertTrue(nodeIds.length() == expectedNodeIds.length);
+    assertEquals(nodeIds.length(), expectedNodeIds.length);
     for (int i = 0; i < expectedNodeIds.length; i++) {
-      assertTrue(nodeIds.get(i).equals(expectedNodeIds[i]));
+      assertEquals(nodeIds.get(i), expectedNodeIds[i]);
     }
   }
 
   @Test
-  public void testOptTreeNodeForNodeId() throws Exception {
+  public void testOptTreeNodeForNodeId() {
     ITree tree = createTree(Collections.<ITreeNode> emptyList());
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     assertNull(jsonTree.optTreeNodeForNodeId("foo"));
   }
 
   @Test(expected = UiException.class)
-  public void testGetTreeNodeForNodeId() throws Exception {
+  public void testGetTreeNodeForNodeId() {
     ITree tree = createTree(Collections.<ITreeNode> emptyList());
     JsonTree<ITree> jsonTree = m_uiSession.createJsonAdapter(tree, null);
     jsonTree.getTreeNodeForNodeId("foo");
   }
 
   @Test
-  public void testInsertAndDeleteInSameRequest() throws Exception {
+  public void testInsertAndDeleteInSameRequest() {
     // Note: A test for the same problem (but without a real tree) can be found here:
     // org.eclipse.scout.rt.client.ui.basic.tree.TreeEventBufferTest.testInsertAndRemoveInSameRequest()
 
@@ -746,7 +746,7 @@ public class JsonTreeTest {
   }
 
   @Test
-  public void testDeletionOfAllChildrenOfUnknownNode() throws Exception {
+  public void testDeletionOfAllChildrenOfUnknownNode() {
     IOutline outline = new Outline(new ArrayList<>());
 
     ITreeNode parent = new TablePage(0);
@@ -780,7 +780,7 @@ public class JsonTreeTest {
    * nodes for a given parent node.
    */
   @Test
-  public void testAllNodesUnchecked() throws Exception {
+  public void testAllNodesUnchecked() {
     ITree tree = new Tree();
     tree.setRootNode(new TreeNode("Root"));
     tree.setAutoCheckChildNodes(true);

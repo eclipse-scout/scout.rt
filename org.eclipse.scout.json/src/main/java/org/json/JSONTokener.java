@@ -231,6 +231,7 @@ public class JSONTokener {
       if (c == quote) {
         if (builder == null) {
           // a new string avoids leaking memory
+          //noinspection StringOperationCanBeSimplified
           return new String(m_in.substring(start, m_pos - 1)); // NOSONAR
         }
         else {
@@ -361,6 +362,7 @@ public class JSONTokener {
     }
 
     /* ... finally give up. We have an unquoted string */
+    //noinspection StringOperationCanBeSimplified
     return new String(literal); // a new string avoids leaking memory (NOSONAR)
   }
 

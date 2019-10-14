@@ -44,7 +44,7 @@ public class JsonListBox<LIST_BOX_KEY, LIST_BOX extends IListBox<LIST_BOX_KEY>> 
       putJsonProperty(new JsonAdapterProperty<IListBox<LIST_BOX_KEY>>("filterBox", model, getUiSession()) {
         @Override
         protected AbstractListBoxFilterBox modelValue() {
-          return ((AbstractListBox) getModel()).getListBoxFilterBox();
+          return ((AbstractListBox<?>) getModel()).getListBoxFilterBox();
         }
       });
     }

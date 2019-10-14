@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.tree.fixtures;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("fc9c957c-eac6-400a-b998-b9cf37244b6e")
 public class TreeWith3Levels extends AbstractTree {
 
   @Override

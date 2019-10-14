@@ -83,7 +83,7 @@ public class AbstractJsonPropertyObserverTest {
    * Test property change without any filters (normal case).
    */
   @Test
-  public void testPropertyChange() throws Exception {
+  public void testPropertyChange() {
     PropertyChangeEvent pce = new PropertyChangeEvent(m_model, PROP_FOOBAR, null, "baz");
     m_observer.handleModelPropertyChange(pce);
     Assert.assertTrue("handlePropertyChange must be called", m_observer.m_handled);
@@ -95,7 +95,7 @@ public class AbstractJsonPropertyObserverTest {
    * onPropertyChange must be called even though event is filtered.
    */
   @Test
-  public void testPropertyChange_WithFilter() throws Exception {
+  public void testPropertyChange_WithFilter() {
     PropertyChangeEvent pce = new PropertyChangeEvent(m_model, PROP_FOOBAR, null, "baz");
     m_observer.addPropertyEventFilterCondition(PROP_FOOBAR, "baz");
     m_observer.handleModelPropertyChange(pce);

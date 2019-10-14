@@ -19,9 +19,6 @@ import org.json.JSONObject;
  */
 public class JsonColumnData extends JsonLayoutData {
 
-  /**
-   * @param layoutData
-   */
   public JsonColumnData(BenchColumnData layoutData) {
     super(layoutData);
   }

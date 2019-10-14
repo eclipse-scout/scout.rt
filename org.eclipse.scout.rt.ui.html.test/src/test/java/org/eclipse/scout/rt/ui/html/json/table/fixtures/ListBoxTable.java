@@ -17,12 +17,14 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable.ActiveColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable.KeyColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox.DefaultListBoxTable.TextColumn;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
 /**
  * @author nbu
  */
+@ClassId("a3d2f35b-50f4-4590-9d2c-96fc16115ec9")
 public class ListBoxTable extends AbstractListBox<Long> {
 
   @Override
@@ -31,15 +33,15 @@ public class ListBoxTable extends AbstractListBox<Long> {
   }
 
   @SuppressWarnings("unchecked")
-  protected AbstractListBox<Long>.DefaultListBoxTable.KeyColumn getKeyColumnInternal() {
+  protected KeyColumn getKeyColumnInternal() {
     return getTable().getColumnSet().getColumnByClass(KeyColumn.class);
   }
 
-  protected AbstractListBox<?>.DefaultListBoxTable.TextColumn getTextColumnInternal() {
+  protected TextColumn getTextColumnInternal() {
     return getTable().getColumnSet().getColumnByClass(TextColumn.class);
   }
 
-  protected AbstractListBox<?>.DefaultListBoxTable.ActiveColumn getActiveColumnInternal() {
+  protected ActiveColumn getActiveColumnInternal() {
     return getTable().getColumnSet().getColumnByClass(ActiveColumn.class);
   }
 

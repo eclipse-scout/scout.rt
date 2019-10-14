@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,23 +52,23 @@ public class DefaultValuesFilterTest {
 
     // Checks
     assertEquals(Boolean.FALSE, ((JSONObject) adapterData.get(0)).opt("multiline"));
-    assertEquals(null, ((JSONObject) adapterData.get(1)).opt("multiline"));
-    assertEquals(null, ((JSONObject) adapterData.get(2)).opt("multiline"));
+    assertNull(((JSONObject) adapterData.get(1)).opt("multiline"));
+    assertNull(((JSONObject) adapterData.get(2)).opt("multiline"));
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(3)).opt("multiline"));
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("enabled"));
-    assertEquals(null, ((JSONObject) adapterData.get(1)).opt("enabled"));
-    assertEquals(null, ((JSONObject) adapterData.get(2)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(1)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(2)).opt("enabled"));
     assertEquals(Boolean.FALSE, ((JSONObject) adapterData.get(3)).opt("enabled"));
 
     // Special case "default object"
-    assertEquals(null, ((JSONObject) adapterData.get(0)).optJSONObject("gridData"));
-    assertEquals(null, ((JSONObject) adapterData.get(1)).optJSONObject("gridData"));
+    assertNull(((JSONObject) adapterData.get(0)).optJSONObject("gridData"));
+    assertNull(((JSONObject) adapterData.get(1)).optJSONObject("gridData"));
     JSONObject gd = ((JSONObject) adapterData.get(2)).optJSONObject("gridData");
     assertEquals(10, gd.opt("x"));
-    assertEquals(null, gd.opt("y"));
+    assertNull(gd.opt("y"));
     gd = ((JSONObject) adapterData.get(3)).optJSONObject("gridData");
-    assertEquals(null, gd.opt("x"));
+    assertNull(gd.opt("x"));
     assertEquals(2, gd.opt("y"));
 
     JSONObject table = (JSONObject) adapterData.get(4);
@@ -81,7 +79,7 @@ public class DefaultValuesFilterTest {
       filter.filter(cells.getJSONObject(i), "Cell"); // Custom type
     }
     assertEquals(Boolean.TRUE, ((JSONObject) cells.get(0)).opt("editable"));
-    assertEquals(null, ((JSONObject) cells.get(1)).opt("editable"));
+    assertNull(((JSONObject) cells.get(1)).opt("editable"));
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(5)).opt("multiline"));
     assertEquals(Boolean.FALSE, ((JSONObject) adapterData.get(5)).opt("enabled"));
@@ -91,13 +89,13 @@ public class DefaultValuesFilterTest {
     assertEquals(2, chartData.opt("value"));
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(7)).opt("enabled"));
-    assertEquals(null, ((JSONObject) adapterData.get(7)).opt("chartData"));
+    assertNull(((JSONObject) adapterData.get(7)).opt("chartData"));
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(8)).opt("enabled"));
     assertEquals("none", ((JSONObject) adapterData.get(8)).opt("chartData"));
 
-    assertEquals(null, ((JSONObject) adapterData.get(9)).opt("enabled"));
-    assertEquals(null, ((JSONObject) adapterData.get(9)).opt("chartData"));
+    assertNull(((JSONObject) adapterData.get(9)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(9)).opt("chartData"));
     JSONObject axisData = ((JSONObject) adapterData.get(9)).optJSONObject("axisData");
     assertEquals(0, axisData.optJSONObject("xAxis").length());
     JSONObject yAxis = axisData.optJSONObject("yAxis");
@@ -112,19 +110,19 @@ public class DefaultValuesFilterTest {
     assertEquals(2, axisDataArray.getJSONObject(2).length());
 
     JSONObject format = adapterData.getJSONObject(11).getJSONObject("format");
-    assertEquals(null, format.opt("lang"));
+    assertNull(format.opt("lang"));
     assertEquals(3, format.getJSONArray("localeData").length());
-    assertEquals(null, format.getJSONArray("localeData").getJSONObject(0).opt("location"));
+    assertNull(format.getJSONArray("localeData").getJSONObject(0).opt("location"));
     assertEquals("here", format.getJSONArray("localeData").getJSONObject(1).opt("location"));
-    assertEquals(null, format.getJSONArray("localeData").getJSONObject(2).opt("location"));
+    assertNull(format.getJSONArray("localeData").getJSONObject(2).opt("location"));
 
     JSONObject button = adapterData.getJSONObject(12);
     assertEquals(Boolean.TRUE, button.opt("statusVisible"));
     JSONObject buttonGridData = button.getJSONObject("gridData");
     assertEquals(-1, buttonGridData.opt("x")); // should not apply default value of "FormField", because "Button" defines another default value
-    assertEquals(null, buttonGridData.opt("y")); // default value of "FormField"
+    assertNull(buttonGridData.opt("y")); // default value of "FormField"
     assertEquals(2, buttonGridData.opt("h"));
-    assertEquals(null, buttonGridData.opt("w")); // default value of "Button"
+    assertNull(buttonGridData.opt("w")); // default value of "Button"
   }
 
   @Test
@@ -142,21 +140,21 @@ public class DefaultValuesFilterTest {
     }
 
     // Checks
-    assertEquals(null, ((JSONObject) adapterData.get(0)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(0)).opt("enabled"));
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
     assertEquals("auto", ((JSONObject) adapterData.get(0)).opt("borderDecoration"));
 
-    assertEquals(null, ((JSONObject) adapterData.get(1)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(1)).opt("enabled"));
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
     assertEquals("auto", ((JSONObject) adapterData.get(1)).opt("borderDecoration"));
 
-    assertEquals(null, ((JSONObject) adapterData.get(2)).opt("enabled"));
+    assertNull(((JSONObject) adapterData.get(2)).opt("enabled"));
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
     assertEquals("auto", ((JSONObject) adapterData.get(2)).opt("borderDecoration"));
 
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(3)).opt("enabled"));
     assertEquals(Boolean.TRUE, ((JSONObject) adapterData.get(0)).opt("visible"));
-    assertEquals(null, ((JSONObject) adapterData.get(3)).opt("borderDecoration"));
+    assertNull(((JSONObject) adapterData.get(3)).opt("borderDecoration"));
   }
 
   @Test

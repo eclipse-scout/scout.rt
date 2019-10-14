@@ -84,7 +84,7 @@ public class UiSessionTest {
   }
 
   @Test
-  public void testDispose() throws Exception {
+  public void testDispose() {
     UiSession session = (UiSession) JsonTestUtility.createAndInitializeUiSession();
     WeakReference<IUiSession> ref = new WeakReference<>(session);
 
@@ -96,7 +96,7 @@ public class UiSessionTest {
   }
 
   @Test
-  public void testLogout() throws Exception {
+  public void testLogout() {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
 
     uiSession.getClientSession().stop();
@@ -107,7 +107,7 @@ public class UiSessionTest {
   }
 
   @Test
-  public void testSessionInvalidation() throws Exception {
+  public void testSessionInvalidation() {
     UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
     HttpSession httpSession = UiSessionTestUtility.getHttpSession(uiSession);
     IClientSession clientSession = uiSession.getClientSession();

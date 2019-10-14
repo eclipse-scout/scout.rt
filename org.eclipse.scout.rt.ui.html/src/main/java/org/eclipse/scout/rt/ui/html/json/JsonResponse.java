@@ -81,8 +81,7 @@ public class JsonResponse {
    * JSON object. Only new adapters must be transferred, adapters already transferred to the client can be solely
    * referenced by their ID.
    * <p>
-   * Note that in javascript the adapters are not created unless the first event is received or
-   * {@link IJsonAdapter#isCreateImmediately()} is set
+   * Note that in javascript the adapters are not created unless the first event is received.
    */
   public void addAdapter(IJsonAdapter<?> adapter) {
     assertWritable();
@@ -339,8 +338,8 @@ public class JsonResponse {
   }
 
   /**
-   * Causes all registered {@link IBufferedEventsProvider}s to process their buffered events. This may add some events
-   * and adapters to this response. This method is called automatically during {@link #toJson()}.
+   * Causes all registered {@link IJsonAdapter}s to process their buffered events. This may add some events and adapters
+   * to this response. This method is called automatically during {@link #toJson()}.
    */
   public void fireProcessBufferedEvents() {
     assertWritable();
@@ -371,10 +370,7 @@ public class JsonResponse {
    * Example: NodesInserted event on tree must not be sent since the same nodes are already sent by Tree.toJson.
    */
   protected boolean doAddEvent(JsonEvent event) {
-    if (m_adapterMap.containsKey(event.getTarget()) && !event.isProtected()) {
-      return false;
-    }
-    return true;
+    return !m_adapterMap.containsKey(event.getTarget()) || event.isProtected();
   }
 
   /**

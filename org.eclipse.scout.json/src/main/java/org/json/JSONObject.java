@@ -102,7 +102,7 @@ public class JSONObject {
    */
   public static final Object NULL = new Object() {
     @Override
-    @SuppressWarnings({"squid:S1206", "findbugs:EQ_UNUSUAL"}) // hashCode() cannot be implemented for value <code>null</code>.
+    @SuppressWarnings({"squid:S1206", "findbugs:EQ_UNUSUAL", "EqualsWhichDoesntCheckParameterClass"}) // hashCode() cannot be implemented for value <code>null</code>.
     public boolean equals(Object o) {
       return o == this || o == null; // API specifies this broken equals implementation
     }
@@ -136,12 +136,10 @@ public class JSONObject {
    * @throws NullPointerException
    *           if any of the map's keys are null.
    */
-  /* (accept a raw type for API compatibility) */
   @SuppressWarnings("squid:S1695")
-  public JSONObject(Map copyFrom) {
+  public JSONObject(Map<?, ?> copyFrom) {
     this();
-    Map<?, ?> contentsTyped = (Map<?, ?>) copyFrom;
-    for (Entry<?, ?> entry : contentsTyped.entrySet()) {
+    for (Entry<?, ?> entry : copyFrom.entrySet()) {
       /*
        * Deviate from the original by checking that keys are non-null and
        * of the proper type. (We still defer validating the values).
@@ -327,7 +325,6 @@ public class JSONObject {
    * @throws JSONException
    *           if {@code name} is {@code null} or if the mapping for {@code name} is non-null and is not a
    *           {@link JSONArray}.
-   * @hide
    */
   public JSONObject append(String name, Object value) {
     Object current = m_nameValuePairs.get(checkName(name));
@@ -786,13 +783,13 @@ public class JSONObject {
     }
     try {
       if (o instanceof Collection) {
-        return new JSONArray((Collection) o);
+        return new JSONArray((Collection<?>) o);
       }
       else if (o.getClass().isArray()) {
         return new JSONArray(o);
       }
       if (o instanceof Map) {
-        return new JSONObject((Map) o);
+        return new JSONObject((Map<?, ?>) o);
       }
       if (o instanceof Boolean ||
           o instanceof Byte ||

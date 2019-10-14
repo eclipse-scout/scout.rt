@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 
@@ -66,7 +64,7 @@ public class JsonOutlineViewButtonTest {
   }
 
   @Test
-  public void testLazyLoadingOutline_onUiSelectionChanged() throws Exception {
+  public void testLazyLoadingOutline_onUiSelectionChanged() {
     OutlineWithOneNode outline = new OutlineWithOneNode();
     IDesktop desktop = Mockito.mock(IDesktop.class);
     Mockito.when(desktop.getAvailableOutlines()).thenReturn(Collections.<IOutline> singletonList(outline));

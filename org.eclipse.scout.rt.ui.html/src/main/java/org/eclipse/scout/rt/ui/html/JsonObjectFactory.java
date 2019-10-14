@@ -253,13 +253,13 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonTreeField<>((ITreeField) model, session, id, parent);
     }
     if (model instanceof ITreeBox<?>) {
-      return new JsonTreeBox<ITreeBox>((ITreeBox<?>) model, session, id, parent);
+      return new JsonTreeBox<ITreeBox<?>>((ITreeBox<?>) model, session, id, parent);
     }
     if (model instanceof IRadioButton<?>) {
-      return new JsonRadioButton<IRadioButton>((IRadioButton<?>) model, session, id, parent);
+      return new JsonRadioButton<IRadioButton<?>>((IRadioButton<?>) model, session, id, parent);
     }
     if (model instanceof IRadioButtonGroup<?>) {
-      return new JsonRadioButtonGroup<IRadioButtonGroup>((IRadioButtonGroup<?>) model, session, id, parent);
+      return new JsonRadioButtonGroup<IRadioButtonGroup<?>>((IRadioButtonGroup<?>) model, session, id, parent);
     }
     if (model instanceof IButton) {
       return new JsonButton<>((IButton) model, session, id, parent);
@@ -268,7 +268,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonStringField<>((IStringField) model, session, id, parent);
     }
     if (model instanceof INumberField<?>) {
-      return new JsonNumberField<INumberField>((INumberField<?>) model, session, id, parent);
+      return new JsonNumberField<INumberField<?>>((INumberField<?>) model, session, id, parent);
     }
     if (model instanceof IProposalField<?>) {
       return new JsonProposalField((IProposalField<?>) model, session, id, parent);
@@ -304,7 +304,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonComposerField<>((IComposerField) model, session, id, parent);
     }
     if (model instanceof IBeanField) {
-      return new JsonBeanField<IBeanField<?>>((IBeanField) model, session, id, parent);
+      return new JsonBeanField<IBeanField<?>>((IBeanField<?>) model, session, id, parent);
     }
     if (model instanceof IFileChooserButton) {
       return new JsonFileChooserButton<>((IFileChooserButton) model, session, id, parent);
@@ -322,7 +322,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonClipboardField<>((IClipboardField) model, session, id, parent);
     }
     if (model instanceof ITileField<?>) {
-      return new JsonTileField<ITileField<? extends ITileGrid>>((ITileField<?>) model, session, id, parent);
+      return new JsonTileField((ITileField<?>) model, session, id, parent);
     }
     if (model instanceof IAccordionField<?>) {
       return new JsonAccordionField<IAccordionField<? extends IAccordion>>((IAccordionField<?>) model, session, id, parent);
@@ -388,7 +388,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
     }
     if (model instanceof ITable) {
       ITable table = (ITable) model;
-      IPage page = (IPage) table.getProperty(JsonOutlineTable.PROP_PAGE);
+      IPage<?> page = (IPage<?>) table.getProperty(JsonOutlineTable.PROP_PAGE);
       if (page != null) {
         return new JsonOutlineTable<>(table, session, id, parent, page);
       }
@@ -410,7 +410,7 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonCalendarComponent<>((CalendarComponent) model, session, id, parent);
     }
     if (model instanceof IPlanner<?, ?>) {
-      return new JsonPlanner<IPlanner>((IPlanner<?, ?>) model, session, id, parent);
+      return new JsonPlanner<IPlanner<?, ?>>((IPlanner<?, ?>) model, session, id, parent);
     }
     if (model instanceof IFileChooser) {
       return new JsonFileChooser<>((IFileChooser) model, session, id, parent);
@@ -428,22 +428,22 @@ public class JsonObjectFactory extends AbstractJsonObjectFactory {
       return new JsonHtmlTile<>((IHtmlTile) model, session, id, parent);
     }
     if (model instanceof IBeanTile) {
-      return new JsonBeanTile<>((IBeanTile) model, session, id, parent);
+      return new JsonBeanTile<>((IBeanTile<?>) model, session, id, parent);
     }
     if (model instanceof IFormFieldTile) {
-      return new JsonFormFieldTile<>((IFormFieldTile) model, session, id, parent);
+      return new JsonFormFieldTile<>((IFormFieldTile<?>) model, session, id, parent);
     }
     if (model instanceof IWidgetTile) {
-      return new JsonWidgetTile<>((IWidgetTile) model, session, id, parent);
+      return new JsonWidgetTile<>((IWidgetTile<?>) model, session, id, parent);
     }
     if (model instanceof ITile) {
       return new JsonTile<>((ITile) model, session, id, parent);
     }
     if (model instanceof ITileGrid) {
-      return new JsonTileGrid<>((ITileGrid) model, session, id, parent);
+      return new JsonTileGrid<>((ITileGrid<?>) model, session, id, parent);
     }
     if (model instanceof ITileAccordion) {
-      return new JsonTileAccordion<>((ITileAccordion) model, session, id, parent);
+      return new JsonTileAccordion<>((ITileAccordion<?>) model, session, id, parent);
     }
     if (model instanceof IGroup) {
       return new JsonGroup<>((IGroup) model, session, id, parent);

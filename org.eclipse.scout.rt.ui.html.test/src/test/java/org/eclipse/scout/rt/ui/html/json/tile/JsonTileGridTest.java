@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.tile;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -21,6 +20,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.client.ui.tile.AbstractTileGrid;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -86,10 +86,12 @@ public class JsonTileGridTest {
     assertEquals(new JSONArray(Arrays.asList(jsonTile1.getId())), props.getJSONArray(ITileGrid.PROP_SELECTED_TILES));
   }
 
+  @ClassId("a90dd588-9fa2-4972-be1e-d16750cf5031")
   private static class P_TileGrid extends AbstractTileGrid<P_Tile> {
 
   }
 
+  @ClassId("3be001b5-a8f6-4ce1-a6cb-4b4b25be2d40")
   private static class P_Tile extends AbstractTile {
 
   }

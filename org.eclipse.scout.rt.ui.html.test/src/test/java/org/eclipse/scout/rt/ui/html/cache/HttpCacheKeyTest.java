@@ -20,21 +20,21 @@ import org.junit.Test;
 public class HttpCacheKeyTest {
 
   @Test
-  public void testNullPath() throws Exception {
+  public void testNullPath() {
     HttpCacheKey key = new HttpCacheKey(null);
     Assert.assertNull(key.getResourcePath());
     Assert.assertEquals(0, key.hashCode());
   }
 
   @Test
-  public void testEmptyPath() throws Exception {
+  public void testEmptyPath() {
     HttpCacheKey key = new HttpCacheKey("");
     Assert.assertEquals("", key.getResourcePath());
     Assert.assertEquals(0, key.hashCode());
   }
 
   @Test
-  public void testSimplePath() throws Exception {
+  public void testSimplePath() {
     String path = "/test.html";
     HttpCacheKey key = new HttpCacheKey(path);
     Assert.assertEquals(path, key.getResourcePath());
@@ -42,13 +42,13 @@ public class HttpCacheKeyTest {
   }
 
   @Test
-  public void testNoAttributes() throws Exception {
+  public void testNoAttributes() {
     HttpCacheKey key = new HttpCacheKey("/");
     Assert.assertNull(key.getAttribute("a"));
   }
 
   @Test
-  public void testAttributeWithNullKeyAndValue() throws Exception {
+  public void testAttributeWithNullKeyAndValue() {
     Map<String, String> atts = Collections.singletonMap((String) null, (String) null);
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertNull(key.getAttribute(null));
@@ -57,7 +57,7 @@ public class HttpCacheKeyTest {
   }
 
   @Test
-  public void testAttributeWithNullKey() throws Exception {
+  public void testAttributeWithNullKey() {
     Map<String, String> atts = Collections.singletonMap((String) null, "v");
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertEquals("v", key.getAttribute(null));
@@ -66,7 +66,7 @@ public class HttpCacheKeyTest {
   }
 
   @Test
-  public void testAttributeWithNullValue() throws Exception {
+  public void testAttributeWithNullValue() {
     Map<String, String> atts = Collections.singletonMap("a", (String) null);
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertNull(key.getAttribute(null));
@@ -75,7 +75,7 @@ public class HttpCacheKeyTest {
   }
 
   @Test
-  public void testAttribute() throws Exception {
+  public void testAttribute() {
     Map<String, String> atts = Collections.singletonMap("a", "v");
     HttpCacheKey key = new HttpCacheKey("/", atts);
     Assert.assertNull(key.getAttribute(null));
@@ -85,7 +85,7 @@ public class HttpCacheKeyTest {
   }
 
   @Test
-  public void testEquals() throws Exception {
+  public void testEquals() {
     Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null));
     Assert.assertEquals(new HttpCacheKey(null), new HttpCacheKey(null, Collections.<String, String> emptyMap()));
     Assert.assertEquals(new HttpCacheKey("/"), new HttpCacheKey("/"));

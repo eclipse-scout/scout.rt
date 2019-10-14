@@ -16,6 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.rt.client.ui.dnd.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.dnd.ResourceListTransferObject;
 import org.eclipse.scout.rt.client.ui.form.fields.tilefield.ITileField;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.client.ui.tile.ITileGrid;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -28,7 +29,7 @@ import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 /**
  * @since 8.0
  */
-public class JsonTileField<T extends ITileField> extends JsonFormField<T> implements IBinaryResourceConsumer {
+public class JsonTileField<T extends ITileField<? extends ITile>> extends JsonFormField<T> implements IBinaryResourceConsumer {
 
   public JsonTileField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -44,7 +45,7 @@ public class JsonTileField<T extends ITileField> extends JsonFormField<T> implem
     super.initJsonProperties(model);
     putJsonProperty(new JsonAdapterProperty<T>(ITileField.PROP_TILE_GRID, model, getUiSession()) {
       @Override
-      protected ITileGrid modelValue() {
+      protected ITileGrid<?> modelValue() {
         return getModel().getTileGrid();
       }
     });

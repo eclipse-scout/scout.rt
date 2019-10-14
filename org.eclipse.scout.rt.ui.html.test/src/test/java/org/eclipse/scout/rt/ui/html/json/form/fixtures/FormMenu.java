@@ -12,7 +12,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fixtures;
 
 import org.eclipse.scout.rt.client.ui.form.AbstractFormMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("098c8a82-c4f6-4fd8-8661-a8724fd41a3d")
 public class FormMenu extends AbstractFormMenu<IForm> {
 
 }

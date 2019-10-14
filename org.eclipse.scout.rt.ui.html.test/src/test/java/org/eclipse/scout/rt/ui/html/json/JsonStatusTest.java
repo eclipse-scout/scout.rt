@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.platform.status.IStatus;
 import org.eclipse.scout.rt.platform.status.Status;
@@ -21,7 +21,7 @@ public class JsonStatusTest {
 
   @Test
   public void testToJson() {
-    assertEquals(null, JsonStatus.toJson(null));
+    assertNull(JsonStatus.toJson(null));
     Status status = new Status("foo", IStatus.INFO);
     JSONObject json = (JSONObject) JsonStatus.toJson(status);
     assertEquals("foo", json.getString("message"));

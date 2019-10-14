@@ -25,7 +25,7 @@ public class JsonAdapterReferenceTracker {
     m_unreferencedAdapters = new HashSet<>();
   }
 
-  public void put(IJsonAdapter jsonAdapter, IJsonAdapter parent) {
+  public void put(IJsonAdapter<?> jsonAdapter, IJsonAdapter<?> parent) {
     Set<Object> parents = new HashSet<>();
     if (parent != null) {
       parents.add(parent);
@@ -34,7 +34,7 @@ public class JsonAdapterReferenceTracker {
     m_unreferencedAdapters.remove(jsonAdapter);
   }
 
-  public void remove(IJsonAdapter jsonAdapter, IJsonAdapter parent) {
+  public void remove(IJsonAdapter<?> jsonAdapter, IJsonAdapter<?> parent) {
     Set<Object> parents = m_usageMap.get(jsonAdapter);
     if (parents != null) {
       if (parent == null) {

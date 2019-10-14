@@ -54,7 +54,7 @@ public class HttpResourceCacheTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGet() {
     HttpCacheKey key = new HttpCacheKey("/");
     HttpCacheObject obj = rc.get(key);
     Assert.assertNull(obj);

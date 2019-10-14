@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,9 +39,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.StaticDate;
  * this case, the date has to be normalized to UTC. In the JSON representation, such dates are marked with a trailing
  * <code>'Z'</code> character.
  *
- * @see dates.js
- * @see DateFormat.js
- * @see StaticDate.java
+ * @see "dates.js"
+ * @see "DateFormat.js"
+ * @see StaticDate
  */
 public class JsonDate implements IJsonObject {
 

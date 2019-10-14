@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.planner.IPlanner;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerAdapter;
 import org.eclipse.scout.rt.client.ui.basic.planner.PlannerEvent;
 import org.eclipse.scout.rt.client.ui.basic.planner.Resource;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.Range;
 import org.eclipse.scout.rt.platform.util.date.DateUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -158,6 +159,7 @@ public class JsonPlannerTest {
     }
   }
 
+  @ClassId("6e444198-b06e-4197-834c-6271fe2fb545")
   public static class P_Planner extends AbstractPlanner<Integer, Integer> {
   }
 }

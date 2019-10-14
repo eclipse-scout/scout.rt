@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
@@ -353,6 +354,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     OPEN_MESSAGEBOX_IN_GUI_ATTACHED,
   }
 
+  @ClassId("3f8a1387-edae-44ab-a7e7-fcddfdbcc397")
   private class FixtureDesktop extends AbstractDesktop {
     protected IFuture<?> desktopFuture;
 
@@ -380,6 +382,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
     }
   }
 
+  @ClassId("883a6b59-8558-427d-bd96-8a646d6c6319")
   private class FixtureForm extends AbstractForm {
 
     public FixtureForm() {
@@ -391,6 +394,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
       return getFieldByClass(MainBox.class);
     }
 
+    @ClassId("8d42c646-6c31-4122-9f6c-51e3be81d7fe")
     public class MainBox extends AbstractGroupBox {
     }
 

@@ -57,13 +57,13 @@ public class DownloadHandlerStorage {
   public static final String RESOURCE_CLEANUP_JOB_MARKER = DownloadHandlerStorage.class.getName();
 
   private final Map<String, BinaryResourceHolderWithAction> m_valueMap = new HashMap<>();
-  private final Map<String, IFuture> m_futureMap = new HashMap<>();
+  private final Map<String, IFuture<?>> m_futureMap = new HashMap<>();
 
   protected Map<String, BinaryResourceHolderWithAction> valueMap() {
     return m_valueMap;
   }
 
-  protected Map<String, IFuture> futureMap() {
+  protected Map<String, IFuture<?>> futureMap() {
     return m_futureMap;
   }
 
@@ -103,7 +103,7 @@ public class DownloadHandlerStorage {
    *          time to live in milliseconds
    */
   protected void scheduleRemoval(final String key, long ttl) {
-    final IFuture oldFuture = m_futureMap.put(key, Jobs.schedule(() -> removeOnTimeout(key), Jobs.newInput()
+    final IFuture<?> oldFuture = m_futureMap.put(key, Jobs.schedule(() -> removeOnTimeout(key), Jobs.newInput()
         .withExecutionHint(RESOURCE_CLEANUP_JOB_MARKER)
         .withRunContext(RunContexts.copyCurrent())
         .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -117,7 +117,7 @@ public class DownloadHandlerStorage {
   protected void removeOnTimeout(String key) {
     synchronized (m_valueMap) {
       m_valueMap.remove(key);
-      IFuture future = m_futureMap.remove(key);
+      IFuture<?> future = m_futureMap.remove(key);
       if (future != null && !future.isCancelled()) {
         future.cancel(false);
       }

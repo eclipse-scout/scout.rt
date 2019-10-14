@@ -44,12 +44,9 @@ import org.eclipse.scout.rt.ui.html.logging.IUiRunContextDiagnostics;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 /**
  * This handler contributes to the {@link UiServlet} as the POST handler for /json.
- * <p>
- * Provides the {@link MDC#put(String, String)} properties {@value #MDC_SCOUT_SESSION_ID}
  */
 @Order(4500)
 public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
@@ -265,6 +262,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
    * @return <code>true</code> if the request is still valid after polling and response should be sent back to the UI.
    *         <code>false</code> when the polling was interrupted and the processing should be stopped immediately.
    */
+  @SuppressWarnings("UnnecessaryLocalVariable")
   protected boolean handlePollRequest(IUiSession uiSession, JsonRequest jsonRequest) {
     int curIdle = (int) ((System.currentTimeMillis() - uiSession.getLastAccessedTime()) / 1000L);
     int maxIdle = m_maxUserIdleTime;

@@ -19,22 +19,22 @@ import org.junit.Test;
 public class HttpCacheObjectTest {
 
   @Test(expected = Assertions.AssertionException.class)
-  public void testNullNull() throws Exception {
+  public void testNullNull() {
     new HttpCacheObject(null, null);
   }
 
   @Test(expected = Assertions.AssertionException.class)
-  public void testNullOk() throws Exception {
+  public void testNullOk() {
     new HttpCacheObject(null, BinaryResources.create().build());
   }
 
   @Test(expected = Assertions.AssertionException.class)
-  public void testOkNull() throws Exception {
+  public void testOkNull() {
     new HttpCacheObject(new HttpCacheKey(null), null);
   }
 
   @Test
-  public void testOkOk() throws Exception {
+  public void testOkOk() {
     new HttpCacheObject(new HttpCacheKey(null), BinaryResources.create().build());
   }
 }

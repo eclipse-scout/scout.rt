@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("ea8ed53d-ebd4-4163-9882-a64dd0188fca")
 public class TableWithDateColumn extends AbstractTable {
 
   public Column getColumn() {
@@ -21,6 +23,7 @@ public class TableWithDateColumn extends AbstractTable {
   }
 
   @Order(10)
+  @ClassId("8bcae097-ea0b-426d-9e7a-b634cea0719f")
   public class Column extends AbstractDateColumn {
 
     @Override

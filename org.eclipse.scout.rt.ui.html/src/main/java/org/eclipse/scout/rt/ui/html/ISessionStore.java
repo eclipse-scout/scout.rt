@@ -72,7 +72,7 @@ public interface ISessionStore {
   /**
    * Pre-registration of a new {@link UiSession} that is currently being built. This call ensures that the
    * {@link HttpSession} is not invalidated due to long {@link IClientSession#start(String)} delays. The effect is in
-   * {@link SessionStore#removeClientSession(IClientSession)}
+   * {@link SessionStore#removeClientSessionInsideWriteLock(IClientSession)}
    * <p>
    * This pre-registration queries the session store for a client session with the given ID. If such a client session is
    * currently registered at the store, it is returned. Otherwise, <code>null</code> is returned.

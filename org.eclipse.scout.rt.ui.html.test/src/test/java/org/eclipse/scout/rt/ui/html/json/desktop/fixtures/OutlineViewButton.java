@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("8ccc334e-f302-47dd-bbcb-95f4dba75cef")
 public class OutlineViewButton extends AbstractOutlineViewButton {
 
   public OutlineViewButton(IDesktop desktop, Class<? extends IOutline> outlineType) {

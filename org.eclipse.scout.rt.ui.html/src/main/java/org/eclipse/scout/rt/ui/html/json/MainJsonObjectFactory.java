@@ -51,7 +51,7 @@ public class MainJsonObjectFactory implements IJsonObjectFactory {
   @Override
   public IJsonAdapter<?> createJsonAdapter(Object model, IUiSession session, String id, IJsonAdapter<?> parent) {
     for (IJsonObjectFactory factory : getFactories()) {
-      IJsonAdapter adapter = factory.createJsonAdapter(model, session, id, parent);
+      IJsonAdapter<?> adapter = factory.createJsonAdapter(model, session, id, parent);
       if (adapter != null) {
         return adapter;
       }

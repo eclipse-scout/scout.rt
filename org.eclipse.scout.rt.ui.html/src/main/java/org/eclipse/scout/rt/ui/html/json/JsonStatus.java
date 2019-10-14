@@ -49,6 +49,7 @@ public class JsonStatus implements IJsonObject {
     return new JsonStatus(status).toJson();
   }
 
+  @SuppressWarnings("ConstantConditions")
   public static IStatus toScoutObject(JSONObject jsonStatus) {
     if (jsonStatus == null) {
       return null;

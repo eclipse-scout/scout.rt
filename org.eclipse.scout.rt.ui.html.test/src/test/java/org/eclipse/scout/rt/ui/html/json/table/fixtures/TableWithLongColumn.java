@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("a8b33afb-5ef8-436e-991b-b47f16d6b70f")
 public class TableWithLongColumn extends AbstractTable {
 
   public Column getColumn() {
@@ -21,6 +23,7 @@ public class TableWithLongColumn extends AbstractTable {
   }
 
   @Order(10)
+  @ClassId("dcce2693-b378-4678-a67f-c0ab060db0db")
   public class Column extends AbstractLongColumn {
 
     @Override

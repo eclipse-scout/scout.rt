@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -45,7 +43,7 @@ public class JsonEventTest {
   }
 
   @Test
-  public void testToJson() throws Exception {
+  public void testToJson() {
     JSONObject data = new JSONObject().put("myProp", "myValue");
     JsonEvent event = new JsonEvent("foo", "bar", data);
     JSONObject json = event.toJson();
@@ -55,7 +53,7 @@ public class JsonEventTest {
   }
 
   @Test
-  public void testFromJson() throws Exception {
+  public void testFromJson() {
     JSONObject json = new JSONObject();
     json.put("target", "foo");
     json.put("type", "bar");

@@ -72,11 +72,11 @@ public class DefaultValuesFilter {
     if (jsonDefaults == null) {
       return;
     }
-    for (Iterator it = jsonDefaults.keys(); it.hasNext();) {
-      String type = (String) it.next();
+    for (Iterator<String> it = jsonDefaults.keys(); it.hasNext();) {
+      String type = it.next();
       JSONObject jsonProperties = jsonDefaults.optJSONObject(type);
-      for (Iterator it2 = jsonProperties.keys(); it2.hasNext();) {
-        String prop = (String) it2.next();
+      for (Iterator<String> it2 = jsonProperties.keys(); it2.hasNext();) {
+        String prop = it2.next();
         Object value = jsonProperties.opt(prop);
         // Add to map
         Map<String, Object> propMap = m_defaults.computeIfAbsent(type, k -> new HashMap<>());
@@ -112,8 +112,8 @@ public class DefaultValuesFilter {
     if (targetMap == null) {
       throw new IllegalArgumentException("Argument 'targetMap' must not be null");
     }
-    for (Iterator it = json.keys(); it.hasNext();) {
-      String objectType = (String) it.next();
+    for (Iterator<String> it = json.keys(); it.hasNext();) {
+      String objectType = it.next();
       Object subHierarchy = json.opt(objectType);
 
       // Create a copy of the current object type list and add the current type to the front
@@ -167,8 +167,8 @@ public class DefaultValuesFilter {
     }
     FilterState filterState = new FilterState();
     for (String t : objectTypeHierarchy) {
-      for (Iterator it = json.keys(); it.hasNext();) {
-        String prop = (String) it.next();
+      for (Iterator<String> it = json.keys(); it.hasNext();) {
+        String prop = it.next();
         Object value = json.opt(prop);
         filterState.pushProperty(prop);
         if (!filterState.isCurrentPropertyProcessed() && checkPropertyValueEqualToDefaultValue(t, prop, value, filterState)) {
@@ -189,9 +189,7 @@ public class DefaultValuesFilter {
     if (properties.containsKey(propertyName)) {
       filterState.markCurrentPropertyAsProcessed();
       Object defaultValue = properties.get(propertyName);
-      if (checkValueEqualToDefaultValue(propertyValue, defaultValue, filterState)) {
-        return true;
-      }
+      return checkValueEqualToDefaultValue(propertyValue, defaultValue, filterState);
     }
     // Special case: Check if there is a "pseudo" default value, which will not
     // be removed itself, but might have sub-properties removed.
@@ -258,8 +256,8 @@ public class DefaultValuesFilter {
    */
   protected boolean filterDefaultObject(JSONObject valueObject, JSONObject defaultValueObject, FilterState filterState) {
     boolean sameKeys = CollectionUtility.equalsCollection(valueObject.keySet(), defaultValueObject.keySet());
-    for (Iterator it = valueObject.keys(); it.hasNext();) {
-      String prop = (String) it.next();
+    for (Iterator<String> it = valueObject.keys(); it.hasNext();) {
+      String prop = it.next();
       filterState.pushProperty(prop);
       if (!filterState.isCurrentPropertyProcessed()) {
         Object subValue = valueObject.opt(prop);
@@ -282,6 +280,7 @@ public class DefaultValuesFilter {
     }
     // Even more special case: If valueObject is now empty and it used to have the same keys as
     // the defaultValueObject, it is considered equal to the default value and MAY be removed.
+    //noinspection RedundantIfStatement
     if (valueObject.length() == 0 && sameKeys) {
       return true;
     }
@@ -387,6 +386,7 @@ public class DefaultValuesFilter {
       return sb.toString();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isCurrentPropertyProcessed() {
       return m_processedProperties.contains(getCurrentProperty());
     }

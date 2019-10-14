@@ -37,7 +37,7 @@ public class UiJobsTest {
   }
 
   @After
-  public void after() throws Exception {
+  public void after() {
     try {
       JsonTestUtility.endRequest(m_session);
     }

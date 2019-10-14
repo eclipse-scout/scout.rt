@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class JsonCalendarEvent implements IJsonObject {
 
-  private final JsonCalendar m_jsonCalendar;
+  private final JsonCalendar<?> m_jsonCalendar;
   private final CalendarEvent m_event;
 
   public JsonCalendarEvent(JsonCalendar<?> jsonCalendar, CalendarEvent event) {
@@ -24,7 +24,7 @@ public class JsonCalendarEvent implements IJsonObject {
     m_event = event;
   }
 
-  public final JsonCalendar getJsonCalendar() {
+  public final JsonCalendar<?> getJsonCalendar() {
     return m_jsonCalendar;
   }
 

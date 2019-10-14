@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("62b6c2d0-0048-43a9-8937-6bed3cae609c")
 public class HierarchicalTable extends AbstractTable {
 
   public ParentKeyColumn getParentKeyColumn() {
@@ -25,6 +27,7 @@ public class HierarchicalTable extends AbstractTable {
   }
 
   @Order(100)
+  @ClassId("298acab6-28b8-4e9a-99cd-ec256f924913")
   public class PrimaryKeyColumn extends AbstractIntegerColumn {
     @Override
     protected boolean getConfiguredPrimaryKey() {
@@ -33,6 +36,7 @@ public class HierarchicalTable extends AbstractTable {
   }
 
   @Order(200)
+  @ClassId("82bb67f1-58fc-45ff-823f-201956143017")
   public class ParentKeyColumn extends AbstractIntegerColumn {
     @Override
     protected boolean getConfiguredParentKey() {

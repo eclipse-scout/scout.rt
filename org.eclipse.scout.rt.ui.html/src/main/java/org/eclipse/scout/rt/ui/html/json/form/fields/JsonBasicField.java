@@ -24,13 +24,13 @@ public class JsonBasicField<T extends IBasicField<?>> extends JsonValueField<T> 
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IBasicField>(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, model) {
+    putJsonProperty(new JsonProperty<IBasicField<?>>(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isUpdateDisplayTextOnModify();
       }
     });
-    putJsonProperty(new JsonProperty<IBasicField>(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY, model) {
+    putJsonProperty(new JsonProperty<IBasicField<?>>(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY_DELAY, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getUpdateDisplayTextOnModifyDelay();

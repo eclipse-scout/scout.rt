@@ -84,6 +84,7 @@ public class JsonDesktopTest {
     testDispose(desktop);
   }
 
+  @SuppressWarnings("UnusedAssignment")
   private void testDispose(IDesktop desktop) {
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
@@ -93,7 +94,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormAddedAndRemoved() throws Exception {
+  public void testFormAddedAndRemoved() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -113,7 +114,7 @@ public class JsonDesktopTest {
 
     JsonResponse jsonResp = m_uiSession.currentJsonResponse();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formShow");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
 
     JsonEvent event = responseEvents.get(0);
     String formId = event.getData().getString("form");
@@ -137,7 +138,7 @@ public class JsonDesktopTest {
     desktop.hideForm(form);
 
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "formHide");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
 
     event = responseEvents.get(0);
     formId = event.getData().getString("form");
@@ -158,7 +159,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormClosedBeforeRemovedInDifferentRequests() throws Exception {
+  public void testFormClosedBeforeRemovedInDifferentRequests() {
     DesktopWithOneOutline desktop = new DesktopWithOneOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -238,7 +239,7 @@ public class JsonDesktopTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableMenus() throws Exception {
+  public void testDontSendNonDisplayableMenus() {
     IDesktop desktop = new DesktopWithNonDisplayableActions();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -270,7 +271,7 @@ public class JsonDesktopTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableViewButtons() throws Exception {
+  public void testDontSendNonDisplayableViewButtons() {
     IDesktop desktop = new DesktopWithNonDisplayableActions();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
@@ -295,7 +296,7 @@ public class JsonDesktopTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableOutline() throws Exception {
+  public void testDontSendNonDisplayableOutline() {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
     desktop.init();
     desktop.setOutline(NonDisplayableOutlineWithOneNode.class);
@@ -313,7 +314,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testHandleModelDownloadResource() throws Exception {
+  public void testHandleModelDownloadResource() {
     IDesktop desktop = new DesktopWithNonDisplayableOutline();
     desktop.init();
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);

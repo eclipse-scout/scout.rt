@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -39,7 +37,7 @@ import org.junit.runner.RunWith;
 public class JsonAdapterRegistryTest {
 
   @Test
-  public void testCreateDisposeInSameRequest() throws Exception {
+  public void testCreateDisposeInSameRequest() {
     UiSession session = new UiSessionMock();
     IStringField model = new AbstractStringField() {
 

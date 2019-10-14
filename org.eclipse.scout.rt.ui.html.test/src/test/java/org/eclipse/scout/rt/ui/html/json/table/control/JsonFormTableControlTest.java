@@ -10,9 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.controls.ITableControl;
@@ -65,7 +63,7 @@ public class JsonFormTableControlTest {
   }
 
   @Test
-  public void testLazyLoadingForm_onUiSelectionChanged() throws Exception {
+  public void testLazyLoadingForm_onUiSelectionChanged() {
     FormWithOneField form = new FormWithOneField();
     FormTableControl control = new FormTableControl();
     control.setTable(new Table());

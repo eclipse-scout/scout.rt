@@ -35,7 +35,7 @@ public class JsonAdapterPropertyConfigBuilderTest {
   }
 
   @Test
-  public void testGlobal() throws Exception {
+  public void testGlobal() {
     JsonAdapterPropertyConfig config = new JsonAdapterPropertyConfigBuilder().global().build();
     assertFalse(config.isDisposeOnChange());
     assertTrue(config.isGlobal());
@@ -43,7 +43,7 @@ public class JsonAdapterPropertyConfigBuilderTest {
   }
 
   @Test
-  public void testFilter() throws Exception {
+  public void testFilter() {
     DisplayableActionFilter<IAction> actionFilter = new DisplayableActionFilter<>();
     JsonAdapterPropertyConfig config = new JsonAdapterPropertyConfigBuilder().filter(actionFilter).build();
     assertTrue(config.isDisposeOnChange());

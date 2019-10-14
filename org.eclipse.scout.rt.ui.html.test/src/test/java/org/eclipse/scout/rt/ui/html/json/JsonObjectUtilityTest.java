@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +19,7 @@ import org.junit.Test;
 public class JsonObjectUtilityTest {
 
   @Test
-  public void testJsonWithHtmlCharacters() throws Exception {
+  public void testJsonWithHtmlCharacters() {
     assertEquals("foo", toJson("foo"));
     assertEquals("<foo>", toJson("<foo>"));
     assertEquals("foo & bar", toJson("foo & bar"));
@@ -55,14 +52,14 @@ public class JsonObjectUtilityTest {
     assertEquals("Test-String", a.opt("test"));
     assertEquals(Boolean.FALSE, a.opt("date"));
     assertEquals(12345, a.opt("value"));
-    assertEquals(null, a.opt("existing"));
-    assertEquals(null, a.opt("undefined"));
+    assertNull(a.opt("existing"));
+    assertNull(a.opt("undefined"));
     // check b
     assertEquals("Test-String", b.opt("test"));
     assertEquals(Boolean.FALSE, b.opt("date"));
     assertEquals(12345, b.opt("value"));
     assertEquals(Boolean.TRUE, b.opt("existing"));
-    assertEquals(null, b.opt("undefined"));
+    assertNull(b.opt("undefined"));
   }
 
   @Test

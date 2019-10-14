@@ -72,8 +72,7 @@ public class JSONArray {
    *          a collection whose values are of supported types. Unsupported values are not permitted and will yield an
    *          array in an inconsistent state.
    */
-  /* Accept a raw type for API compatibility */
-  public JSONArray(Collection copyFrom) {
+  public JSONArray(Collection<?> copyFrom) {
     this();
     if (copyFrom != null) {
       for (Object aCopyFrom : copyFrom) {

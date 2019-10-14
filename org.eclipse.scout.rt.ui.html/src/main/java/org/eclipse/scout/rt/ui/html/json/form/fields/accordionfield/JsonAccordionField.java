@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 
-public class JsonAccordionField<T extends IAccordionField> extends JsonFormField<T> implements IBinaryResourceConsumer {
+public class JsonAccordionField<T extends IAccordionField<? extends IAccordion>> extends JsonFormField<T> implements IBinaryResourceConsumer {
 
   public JsonAccordionField(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);

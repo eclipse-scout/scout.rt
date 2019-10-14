@@ -10,10 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Map;
 
@@ -38,13 +35,13 @@ public class JsonResponseTest {
   private UiSessionMock m_uiSession = new UiSessionMock();
 
   @Test
-  public void testJsonEventPropertyChangeEvent() throws Exception {
+  public void testJsonEventPropertyChangeEvent() {
     // Check empty response
     JSONObject json = m_uiSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
     JSONArray events = json.optJSONArray(JsonResponse.PROP_EVENTS);
-    assertEquals(null, events);
+    assertNull(events);
 
     // Check single property change event
     JsonTestUtility.endRequest(m_uiSession);
@@ -73,6 +70,7 @@ public class JsonResponseTest {
    * Test that properties with the value null get get added to the response. Normal Java "null" objects would get
    * removed by JSONObject, therefore the special NULL marker object should be used.
    */
+  @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions"})
   @Test
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
     m_uiSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
@@ -89,7 +87,7 @@ public class JsonResponseTest {
   }
 
   @Test
-  public void testDoAddEvent_PropertyChange() throws Exception {
+  public void testDoAddEvent_PropertyChange() {
     IJsonAdapter<?> mockAdapter = Mockito.mock(IJsonAdapter.class);
     Mockito.when(mockAdapter.getId()).thenReturn("foo");
 
@@ -105,7 +103,7 @@ public class JsonResponseTest {
     resp.addAdapter(mockAdapter);
     resp.addPropertyChangeEvent(mockAdapter.getId(), "name", "andre");
     json = resp.toJson();
-    assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
+    assertNull(json.optJSONArray(JsonResponse.PROP_EVENTS));
 
     // protected action events must be preserved, event when the corresponding adapter is in m_adapterMap
     resp = new JsonResponse();
@@ -124,7 +122,7 @@ public class JsonResponseTest {
     resp.addActionEvent(mockAdapter.getId(), "protectedEvent").protect();
     resp.removeJsonAdapter(mockAdapter.getId());
     json = resp.toJson();
-    assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
+    assertNull(json.optJSONArray(JsonResponse.PROP_EVENTS));
   }
 
   public static Map<String, IJsonAdapter<?>> getAdapterData(JsonResponse jsonResponse) {

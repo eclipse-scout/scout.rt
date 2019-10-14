@@ -284,7 +284,7 @@ public class JsonCalendar<CALENDAR extends ICalendar> extends AbstractJsonWidget
     addPropertyEventFilterCondition(ICalendar.PROP_SELECTED_DATE, selectedDate);
     uiFacade.setSelectedDateFromUI(selectedDate);
 
-    LOG.debug("displayMode={} viewRange={} selectedDate=", displayMode, viewRange, selectedDate);
+    LOG.debug("displayMode={} viewRange={} selectedDate={}", displayMode, viewRange, selectedDate);
   }
 
   /**

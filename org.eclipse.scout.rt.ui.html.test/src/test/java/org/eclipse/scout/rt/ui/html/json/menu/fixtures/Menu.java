@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.html.json.menu.fixtures;
 
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("81499e56-0712-4a42-962c-185d7907c99d")
 public class Menu extends AbstractMenu {
 
 }

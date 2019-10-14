@@ -79,6 +79,7 @@ public class JsonFileChooser<FILE_CHOOSER extends IFileChooser> extends Abstract
         .build();
   }
 
+  @SuppressWarnings("SwitchStatementWithTooFewBranches")
   protected void handleModelFileChooserEvent(FileChooserEvent event) {
     switch (event.getType()) {
       case FileChooserEvent.TYPE_CLOSED:

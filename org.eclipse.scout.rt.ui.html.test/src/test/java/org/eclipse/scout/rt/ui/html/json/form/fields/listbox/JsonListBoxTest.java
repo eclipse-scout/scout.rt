@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -54,7 +55,7 @@ public class JsonListBoxTest {
    * rowOrderChanged event contains the correct rows.
    */
   @Test
-  public void testReloadAndRowFilterChange() throws Exception {
+  public void testReloadAndRowFilterChange() {
     ListBox listBox = new ListBox();
     ITable table = listBox.getTable();
     listBox.init();
@@ -107,6 +108,7 @@ public class JsonListBoxTest {
     assertEquals(1, jsonRowIds.length());
   }
 
+  @ClassId("8bc2da35-a37d-4a4c-8860-9e31a361648f")
   public static class ListBox extends AbstractListBox<Long> {
     @Override
     protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) {

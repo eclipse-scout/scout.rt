@@ -101,7 +101,7 @@ public final class JsonTestUtility {
 
   public static HttpServletResponseWrapper createHttpServletResponse(final ServletOutputStream out) {
     HttpServletResponse mock = Mockito.mock(HttpServletResponse.class);
-    HttpServletResponseWrapper resp = new HttpServletResponseWrapper(mock) {
+    return new HttpServletResponseWrapper(mock) {
       private String m_contentType;
       private String m_characterEncoding;
 
@@ -134,17 +134,16 @@ public final class JsonTestUtility {
       }
 
       @Override
-      public ServletOutputStream getOutputStream() throws IOException {
+      public ServletOutputStream getOutputStream() {
         return out;
       }
     };
-    return resp;
   }
 
   /**
    * Empties the response object and flushes the session
    */
-  public static void endRequest(UiSession uiSession) throws Exception {
+  public static void endRequest(UiSession uiSession) {
     UiSessionTestUtility.endRequest(uiSession);
   }
 

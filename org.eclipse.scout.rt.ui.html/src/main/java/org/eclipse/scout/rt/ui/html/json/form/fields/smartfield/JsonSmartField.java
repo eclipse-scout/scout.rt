@@ -215,7 +215,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
     if (valueSet) {
       VALUE valueFromModel = getModel().getValue();
       if (!ObjectUtility.equals(valueFromUi, valueFromModel)) {
-        addPropertyChangeEvent(ISmartField.PROP_LOOKUP_ROW, lookupRowToJson((LookupRow<?>) getModel().getLookupRow(), hasMultipleColumns()));
+        addPropertyChangeEvent(ISmartField.PROP_LOOKUP_ROW, lookupRowToJson(getModel().getLookupRow(), hasMultipleColumns()));
         String displayTextFromModel = getModel().getDisplayText();
         addPropertyChangeEvent(IValueField.PROP_DISPLAY_TEXT, displayTextFromModel);
         return;
@@ -275,7 +275,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
 
   protected Object valueToJson(VALUE value) {
     if (value == null) {
-      return value;
+      return null;
     }
     return getIdForLookupRowKey(value);
   }
@@ -326,8 +326,6 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
    * Why resolve current key and not resolve key with a parameter? Because it is not guaranteed that the key is
    * serializable / comparable. So we cannot simply send the key from the UI to the server. Additionally we do not have
    * a list of lookup rows as we have in lookupByText
-   *
-   * @param event
    */
   protected void handleUiLookupByAll() {
     getModel().lookupByAll();
@@ -342,9 +340,6 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
   /**
    * Returns a numeric ID for the given lookup row key. If the key is already mapped to an ID the existing ID is
    * returned. Otherwise a new ID is returned.
-   *
-   * @param key
-   * @return
    */
   protected int getIdForLookupRowKey(Object key) {
     if (m_keyToIdMap.containsKey(key)) {
@@ -465,7 +460,7 @@ public class JsonSmartField<VALUE, MODEL extends ISmartField<VALUE>> extends Jso
    */
   class P_JsonLookupCallResult extends JsonLookupCallResult<VALUE> {
 
-    public P_JsonLookupCallResult(ILookupCallResult<VALUE> result, boolean multipleColumns, Function<VALUE, ? extends Object> keyMapper) {
+    public P_JsonLookupCallResult(ILookupCallResult<VALUE> result, boolean multipleColumns, Function<VALUE, ?> keyMapper) {
       super(result, multipleColumns, keyMapper);
     }
 

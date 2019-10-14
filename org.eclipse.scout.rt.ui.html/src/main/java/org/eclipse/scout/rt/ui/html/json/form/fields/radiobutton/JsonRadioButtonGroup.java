@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
-public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup> extends JsonValueField<RADIO_BUTTON_GROUP> {
+public class JsonRadioButtonGroup<RADIO_BUTTON_GROUP extends IRadioButtonGroup<?>> extends JsonValueField<RADIO_BUTTON_GROUP> {
 
   private static final String FIELDS = "fields";
 

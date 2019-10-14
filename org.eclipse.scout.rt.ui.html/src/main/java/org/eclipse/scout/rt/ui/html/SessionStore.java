@@ -100,8 +100,6 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   /**
    * New instances can be obtained using {@link HttpSessionHelper#getSessionStore(HttpSession)}.
-   *
-   * @param httpSession
    */
   protected SessionStore(HttpSession httpSession) {
     Assertions.assertNotNull(httpSession);
@@ -436,7 +434,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   /**
-   * Moved to {@link ClientSessionStopHelper#scheduleStop(IClientSession)}
+   * Moved to {@link ClientSessionStopHelper#scheduleStop(IClientSession, boolean, String)}
    *
    * @deprecated since 6.1
    */

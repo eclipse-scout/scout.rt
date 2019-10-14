@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("3833d31f-8494-41e7-b03c-b732464fb656")
 public class TableWithBooleanColumn extends AbstractTable {
 
   public Column getColumn() {
@@ -21,6 +23,7 @@ public class TableWithBooleanColumn extends AbstractTable {
   }
 
   @Order(10)
+  @ClassId("cfdfabef-803a-45aa-9f6a-439320755f38")
   public class Column extends AbstractBooleanColumn {
 
     @Override

@@ -1004,7 +1004,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonWidget<T> implement
     putProperty(jsonRow, "iconId", BinaryResourceUrlUtility.createIconUrl(row.getIconId()));
     putProperty(jsonRow, "cssClass", row.getCssClass());
     if (row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION) != null) {
-      JSONObject geoLocations = new JSONObject((Map) row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION));
+      JSONObject geoLocations = new JSONObject((Map<?, ?>) row.getCustomValue(AbstractTableRowData.CUSTOM_VALUES_ID_GEO_LOCATION));
       putProperty(jsonRow, "geoLocationValues", geoLocations);
     }
     JsonObjectUtility.filterDefaultValues(jsonRow, "TableRow");

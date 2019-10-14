@@ -13,10 +13,13 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("0287e077-2b8a-426e-a753-bf86a7e08733")
 public class TableWith3Cols extends AbstractTable {
 
   @Order(10)
+  @ClassId("e429eed5-0b8b-4152-8801-c4dc50d77631")
   public class Col0Column extends AbstractStringColumn {
 
     @Override
@@ -26,6 +29,7 @@ public class TableWith3Cols extends AbstractTable {
   }
 
   @Order(20)
+  @ClassId("6cef0c34-8aff-4f44-9d90-ec6a04b239ce")
   public class Col1Column extends AbstractStringColumn {
 
     @Override
@@ -35,6 +39,7 @@ public class TableWith3Cols extends AbstractTable {
   }
 
   @Order(30)
+  @ClassId("0519af62-a019-45c4-ac19-e85f6378b005")
   public class Col2Column extends AbstractStringColumn {
 
     @Override

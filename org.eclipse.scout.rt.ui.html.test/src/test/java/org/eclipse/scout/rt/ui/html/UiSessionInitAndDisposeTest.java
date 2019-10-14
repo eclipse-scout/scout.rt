@@ -1,9 +1,6 @@
 package org.eclipse.scout.rt.ui.html;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -29,6 +25,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanInstanceProducer;
 import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
@@ -97,7 +94,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   @Test
-  public void testStartupThenModelStop() throws ServletException, IOException {
+  public void testStartupThenModelStop() throws IOException {
     final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
     final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
 
@@ -149,7 +146,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   @Test
-  public void testStartupThenBrowserTabClose() throws ServletException, IOException {
+  public void testStartupThenBrowserTabClose() throws IOException {
     final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
     final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
     final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
@@ -207,7 +204,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   @Test
-  public void testStartupThenBrowserTabReload() throws ServletException, IOException {
+  public void testStartupThenBrowserTabReload() throws IOException {
     final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
     final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
     final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
@@ -307,7 +304,7 @@ public class UiSessionInitAndDisposeTest {
   }
 
   @Test
-  public void testStartupThenBrowserTabDuplicate() throws ServletException, IOException {
+  public void testStartupThenBrowserTabDuplicate() throws IOException {
     final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
     final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
     final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
@@ -410,7 +407,7 @@ public class UiSessionInitAndDisposeTest {
    * Desktop.execGuiDetached must not be called when the first tab closes
    */
   @Test
-  public void testStartupThenBrowserTabDuplicateThenBrowserTabClose() throws ServletException, IOException {
+  public void testStartupThenBrowserTabDuplicateThenBrowserTabClose() throws IOException {
     final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
     final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
     final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
@@ -594,6 +591,7 @@ public class UiSessionInitAndDisposeTest {
     }
   }
 
+  @ClassId("11f173db-8c27-4836-a180-c9d2a6252bab")
   private class FixtureDesktop extends AbstractDesktop {
     public FixtureDesktop() {
       super(true);

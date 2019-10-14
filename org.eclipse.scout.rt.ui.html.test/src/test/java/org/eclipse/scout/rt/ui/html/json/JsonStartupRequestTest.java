@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -31,9 +30,9 @@ public class JsonStartupRequestTest {
 
     JsonStartupRequest startupReq = new JsonStartupRequest(jsonReq);
 
-    assertEquals(null, startupReq.getAckSequenceNo());
+    assertNull(startupReq.getAckSequenceNo());
     assertEquals("0", startupReq.getPartId());
-    assertEquals(null, startupReq.getUserAgent());
+    assertNull(startupReq.getUserAgent());
     assertEquals(0, startupReq.getSessionStartupParams().size());
   }
 
@@ -57,11 +56,11 @@ public class JsonStartupRequestTest {
 
     JsonStartupRequest startupReq = new JsonStartupRequest(jsonReq);
 
-    assertEquals(null, startupReq.getAckSequenceNo());
+    assertNull(startupReq.getAckSequenceNo());
     assertEquals("512", startupReq.getPartId());
-    assertEquals(true, startupReq.getUserAgent().optBoolean("touch"));
+    assertTrue(startupReq.getUserAgent().optBoolean("touch"));
     assertEquals("http://localhost/xyz", startupReq.getSessionStartupParams().get("url"));
     assertTrue(startupReq.getSessionStartupParams().containsKey("noValue"));
-    assertEquals(null, startupReq.getSessionStartupParams().get("noValue"));
+    assertNull(startupReq.getSessionStartupParams().get("noValue"));
   }
 }

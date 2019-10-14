@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.html.json.tree.fixtures;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("2811b9e4-b6ca-485a-b1a7-6c9d93fd5a68")
 public class TreeWithOneNode extends AbstractTree {
 
   @Override

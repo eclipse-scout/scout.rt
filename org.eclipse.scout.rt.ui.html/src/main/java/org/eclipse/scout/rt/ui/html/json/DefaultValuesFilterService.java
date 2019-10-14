@@ -163,7 +163,7 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
   public synchronized BinaryResource getCombinedDefaultValuesConfigurationFile(String targetFilename) {
     ensureLoaded();
     byte[] content = (m_combinedDefaultValuesConfiguration == null ? null : m_combinedDefaultValuesConfiguration.getBytes(StandardCharsets.UTF_8));
-    BinaryResource res = BinaryResources.create()
+    return BinaryResources.create()
         .withFilename(targetFilename)
         .withContentType(FileUtility.getContentTypeForExtension("json"))
         .withContent(content)
@@ -171,6 +171,5 @@ public class DefaultValuesFilterService implements IDefaultValuesFilterService {
         .withCachingAllowed(true)
         .withCacheMaxAge(HttpCacheControl.MAX_AGE_4_HOURS)
         .build();
-    return res;
   }
 }

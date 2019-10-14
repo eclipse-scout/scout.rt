@@ -14,9 +14,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage.Table;
 
+@ClassId("d86a20c5-48eb-49f4-92dd-b72a27ca33fa")
 public class TablePage extends AbstractPageWithTable<Table> {
   private INodePageFactory m_nodePageFactory;
   private int m_numRows;
@@ -38,6 +40,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
   }
 
   @Order(10)
+  @ClassId("437877cd-e632-41d5-afb8-eb4676491db5")
   public class Table extends org.eclipse.scout.rt.ui.html.json.table.fixtures.Table {
 
   }

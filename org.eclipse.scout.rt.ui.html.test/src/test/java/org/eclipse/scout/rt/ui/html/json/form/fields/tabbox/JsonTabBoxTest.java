@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBoxUIFacade;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiSessionTestUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -88,7 +89,7 @@ public class JsonTabBoxTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableGroups() throws Exception {
+  public void testDontSendNonDisplayableGroups() {
     ITabBox tabBox = new TabBoxWithNonDisplayableGroup();
     tabBox.init();
 
@@ -106,14 +107,17 @@ public class JsonTabBoxTest {
     assertEquals(jsonDisplayableGroup.getId(), jsonGroupBoxes.get(0));
   }
 
+  @ClassId("0aa70c81-ec8e-453f-9a6d-0726b81931fb")
   private class TabBoxWithNonDisplayableGroup extends AbstractTabBox {
 
     @Order(10)
+    @ClassId("8cc5d9ad-7833-4b4b-8867-1bd5ffaddd51")
     public class DisplayableGroup extends AbstractGroupBox {
 
     }
 
     @Order(20)
+    @ClassId("ce251da5-80d9-4651-9264-79e210070387")
     public class NonDisplayableGroup extends AbstractGroupBox {
 
       @Override

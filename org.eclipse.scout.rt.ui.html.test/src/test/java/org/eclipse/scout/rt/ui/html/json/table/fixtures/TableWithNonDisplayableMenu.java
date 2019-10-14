@@ -15,11 +15,14 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 
+@ClassId("fb3f5f32-4278-4d9b-8ddf-65e35ee8ddd7")
 public class TableWithNonDisplayableMenu extends AbstractTable {
 
   @Order(10)
+  @ClassId("32202d0e-7362-478f-a4f8-a0375e0274f4")
   public class Col1Column extends AbstractStringColumn {
 
     @Override
@@ -34,10 +37,12 @@ public class TableWithNonDisplayableMenu extends AbstractTable {
   }
 
   @Order(10)
+  @ClassId("0420fe5a-15f3-4522-a3fb-268e2106fb0f")
   public class DisplayableMenu extends AbstractMenu {
   }
 
   @Order(20)
+  @ClassId("1ab1b81e-edcf-47e4-aebb-604e34cde13e")
   public class NonDisplayableMenu extends AbstractMenu {
 
     @Override

@@ -124,7 +124,7 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       @Override
       protected Object modelValue() {
         if (getModel() instanceof IActionNode) {
-          return ((IActionNode) getModel()).getChildActions();
+          return ((IActionNode<?>) getModel()).getChildActions();
         }
         return null;
       }

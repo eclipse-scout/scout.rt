@@ -38,9 +38,6 @@ import org.json.JSONObject;
  * Valid data types are: boolean, int, long, String, byte[], array, {@link Collection} of before mentioned types and
  * {@link Map} with String as key and value as one of before mentioned types.
  *
- * @param o
- *          the java bean
- * @return {@link JSONObject}, {@link JSONArray} or a basic type
  */
 public class JsonBean implements IJsonObject {
 
@@ -57,6 +54,9 @@ public class JsonBean implements IJsonObject {
     m_binaryResourceMediator = binaryResourceMediator;
   }
 
+  /**
+   * @return {@link JSONObject}, {@link JSONArray} or a basic type
+   */
   @Override
   public Object toJson() {
     if (m_bean == null) {
@@ -90,7 +90,7 @@ public class JsonBean implements IJsonObject {
     // collection
     if (Collection.class.isAssignableFrom(type)) {
       JSONArray jsonArray = new JSONArray();
-      Collection collection = (Collection) m_bean;
+      Collection<?> collection = (Collection<?>) m_bean;
       for (Object object : collection) {
         IJsonObject jsonObject = createJsonObject(object);
         jsonArray.put(jsonObject.toJson());
@@ -101,10 +101,9 @@ public class JsonBean implements IJsonObject {
     // Map
     if (Map.class.isAssignableFrom(type)) {
       JSONObject jsonMap = new JSONObject();
-      Map map = (Map) m_bean;
-      @SuppressWarnings("unchecked")
-      Set<Entry> entries = (Set<Entry>) map.entrySet();
-      for (Entry entry : entries) {
+      Map<?, ?> map = (Map<?, ?>) m_bean;
+      Set<? extends Entry<?, ?>> entries = map.entrySet();
+      for (Entry<?, ?> entry : entries) {
         if (!(entry.getKey() instanceof String)) {
           throw new IllegalArgumentException("Cannot convert " + type + " to json object");
         }

@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 public class JsonTagField extends JsonValueField<ITagField> {
 
-  public JsonTagField(ITagField model, IUiSession uiSession, String id, IJsonAdapter parent) {
+  public JsonTagField(ITagField model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 

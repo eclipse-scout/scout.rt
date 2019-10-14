@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 
+@ClassId("8ab0cd01-bb00-4a3d-8dc4-bd30856af3f5")
 public class NodePageWithForm extends AbstractPageWithNodes {
 
   @Override

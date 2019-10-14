@@ -15,7 +15,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("3b8790a2-dcb7-4b6f-afec-8fdd3bbaacac")
 public class DesktopWithNonDisplayableOutline extends AbstractDesktop {
 
   @Override

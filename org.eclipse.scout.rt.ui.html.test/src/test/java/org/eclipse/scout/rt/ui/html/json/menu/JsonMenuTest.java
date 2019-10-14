@@ -10,11 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.menu;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -53,7 +49,7 @@ public class JsonMenuTest {
   }
 
   @Test
-  public void testInitialVSPropertyChange() throws Exception {
+  public void testInitialVSPropertyChange() {
     Menu menu = new Menu();
     menu.setText("foo");
 
@@ -81,7 +77,7 @@ public class JsonMenuTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableMenus() throws Exception {
+  public void testDontSendNonDisplayableMenus() {
     IMenu menu = new MenuWithNonDisplayableChild();
     menu.init();
 
@@ -106,7 +102,7 @@ public class JsonMenuTest {
    * is called, because the response is still writable.
    */
   @Test
-  public void testDontSendNonDisplayableMenusSpecialCase() throws Exception {
+  public void testDontSendNonDisplayableMenusSpecialCase() {
     IMenu menu = new MenuWithNonDisplayableChild();
     DisplayableMenu displayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.DisplayableMenu.class);
     NonDisplayableMenu nonDisplayableMenu = new ActionFinder().findAction(menu.getChildActions(), MenuWithNonDisplayableChild.NonDisplayableMenu.class);
@@ -162,7 +158,7 @@ public class JsonMenuTest {
    * (still available) adapter.
    */
   @Test
-  public void testDontSendNonDisplayableMenusSpecialCaseWithEvent() throws Exception {
+  public void testDontSendNonDisplayableMenusSpecialCaseWithEvent() {
     JsonTestUtility.endRequest(m_uiSession); // skip startup response
 
     IForm form = new FormWithOneField();

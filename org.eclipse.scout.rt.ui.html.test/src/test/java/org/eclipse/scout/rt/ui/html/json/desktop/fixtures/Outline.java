@@ -14,7 +14,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("51fc8662-6d1e-4276-b660-2ab46c072826")
 public class Outline extends AbstractOutline {
   private List<IPage<?>> m_pages;
 

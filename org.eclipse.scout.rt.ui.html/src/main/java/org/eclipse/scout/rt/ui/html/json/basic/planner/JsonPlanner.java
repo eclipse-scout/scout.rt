@@ -255,7 +255,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
     return m_resourceIds.get(resource);
   }
 
-  protected Resource getResource(String id) {
+  protected Resource<?> getResource(String id) {
     if (id == null) {
       return null;
     }
@@ -269,7 +269,7 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
     return m_activityIds.get(activity);
   }
 
-  protected Activity getActivity(String id) {
+  protected Activity<?, ?> getActivity(String id) {
     if (id == null) {
       return null;
     }
@@ -445,9 +445,6 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
     else if (IPlanner.PROP_SELECTION_RANGE.equals(propertyName)) {
       handleUiSelectionRangeChange(data);
     }
-    else if (IPlanner.PROP_VIEW_RANGE.equals(propertyName)) {
-      handleUiViewRangeChange(data);
-    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
@@ -515,11 +512,11 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
     return resources;
   }
 
-  protected Object resourceToJson(Resource resource) {
+  protected Object resourceToJson(Resource<?> resource) {
     return new JsonResource(resource, this, new P_NewResourceIdProvider(), new P_NewCellIdProvider()).toJson();
   }
 
-  protected Object resourceToJson(Resource resource, IIdProvider<Resource<?>> idProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
+  protected Object resourceToJson(Resource<?> resource, IIdProvider<Resource<?>> idProvider, IIdProvider<Activity<?, ?>> cellIdProvider) {
     return new JsonResource(resource, this, idProvider, cellIdProvider).toJson();
   }
 
@@ -536,9 +533,9 @@ public class JsonPlanner<PLANNER extends IPlanner<?, ?>> extends AbstractJsonWid
   }
 
   protected PlannerEventFilterCondition addPlannerEventFilterCondition(int plannerEventType) {
-    PlannerEventFilterCondition conditon = new PlannerEventFilterCondition(plannerEventType);
-    m_plannerEventFilter.addCondition(conditon);
-    return conditon;
+    PlannerEventFilterCondition condition = new PlannerEventFilterCondition(plannerEventType);
+    m_plannerEventFilter.addCondition(condition);
+    return condition;
   }
 
   @Override

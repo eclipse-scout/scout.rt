@@ -10,8 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -19,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
@@ -66,7 +66,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
    * with the dev tools of the browser
    */
   @Test
-  public void testDontSendNonDisplayableFields() throws Exception {
+  public void testDontSendNonDisplayableFields() {
     IGroupBox groupBox = new GroupBoxWithNonDisplayableField();
     groupBox.init();
 
@@ -84,14 +84,18 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
     assertEquals(jsonDisplayableField.getId(), jsonFormFields.get(0));
   }
 
+  @ClassId("ecebb06f-1493-46d5-aa6b-281db2955a4c")
   private class GroupBoxWithNonDisplayableField extends AbstractGroupBox {
 
+
     @Order(10)
+    @ClassId("7d453fe5-dff0-4066-8afe-e3be0c9dac31")
     public class DisplayableField extends AbstractStringField {
 
     }
 
     @Order(20)
+    @ClassId("6e0b9ee1-e747-4c2a-a90d-e6c4dc606da4")
     public class NonDisplayableField extends AbstractStringField {
 
       @Override

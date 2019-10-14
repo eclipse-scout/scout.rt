@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,7 @@ public class JsonUtilityTest {
   @Test
   public void testJsonWithComments() throws IOException {
     // null string
-    assertEquals(null, JsonUtility.stripCommentsFromJson(null));
+    assertNull(JsonUtility.stripCommentsFromJson(null));
     // empty string
     assertEquals("", JsonUtility.stripCommentsFromJson(""));
     // plain string (not JSON)

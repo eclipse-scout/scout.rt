@@ -14,7 +14,9 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.platform.classid.ClassId;
 
+@ClassId("67078cc1-abec-4063-b6b4-2d87ed39c657")
 public class NonDisplayableOutlineWithOneNode extends AbstractOutline {
 
   @Override
