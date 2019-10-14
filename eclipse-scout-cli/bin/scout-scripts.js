@@ -26,11 +26,11 @@ const path = require('path');
 const webpackConfigFileName = './webpack.config.js';
 switch (script) {
   case 'test-server:start': {
-    runKarma('./karma.conf.js');
+    runKarma();
     break;
   }
   case 'test-server:stop': {
-    // TODO default port wird angenommen
+    // default port assumed
     const stopper = require('karma').stopper;
     stopper.stop({port: 9876}, exitCode => {
       if (exitCode === 0) {
@@ -41,7 +41,7 @@ switch (script) {
     break;
   }
   case 'test:ci': {
-    runKarma('./karma.conf.ci.js');
+    runKarma(null, true);
     break;
   }
   case 'build:dev': {
@@ -65,21 +65,46 @@ switch (script) {
     break;
 }
 
-function runKarma(configFileName) {
+function runKarma(configFileName, headless) {
   const cfg = require('karma').config;
-  const configFilePath = path.resolve(configFileName);
+  const cfgFile = configFileName || './karma.conf.js';
+
+  let configFilePath = null;
+  let autoSetupHeadlessConfig = headless;
+  if (headless) {
+    // try with CI config file first
+    const ciConfigFilePath = path.resolve('./karma.conf.ci.js');
+    if (fs.existsSync(ciConfigFilePath)) {
+      configFilePath = ciConfigFilePath;
+      autoSetupHeadlessConfig = false; // no need to autoconfig for headless mode because there is a specific CI config file
+    }
+  }
+  if (configFilePath == null) {
+    configFilePath = path.resolve(cfgFile);
+  }
   if (!fs.existsSync(configFilePath)) {
     // No config file found -> abort
-    console.log(`Skipping karma test run (config file ${configFileName} not found)`);
+    console.log(`Skipping Karma test run (config file ${cfgFile} not found)`);
     return;
   }
+
+  // load config
   const karmaConfig = cfg.parseConfig(configFilePath);
+  if (autoSetupHeadlessConfig) {
+    // only executed if headless and no specific CI config file is found: use headless defaults
+    karmaConfig.set({
+      singleRun: true,
+      autoWatch: false,
+      browsers: ['ChromeHeadless']
+    });
+  }
+
   const Server = require('karma').Server;
   const serverInstance = new Server(karmaConfig, exitCode => {
     console.log(`Karma has exited with ${exitCode}`);
     process.exit(exitCode);
   });
-  console.log(`Starting karma server using config file ${configFileName}`);
+  console.log(`Starting Karma server using config file ${configFilePath}`);
   serverInstance.start();
 }
 
