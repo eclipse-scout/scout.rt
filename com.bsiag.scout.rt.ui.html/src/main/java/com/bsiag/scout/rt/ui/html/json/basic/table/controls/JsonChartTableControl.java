@@ -89,8 +89,8 @@ public class JsonChartTableControl<CHART_TABLE_CONTROL extends IChartTableContro
     return null;
   }
 
-  private JsonTable getTableAdapter() {
-    return (JsonTable) getAdapter(getModel().getTable());
+  private JsonTable<?> getTableAdapter() {
+    return (JsonTable<?>) getAdapter(getModel().getTable());
   }
 
   @Override
