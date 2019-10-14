@@ -31,6 +31,7 @@ scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
     selectionStart: event.selectionStart,
     selectionEnd: event.selectionEnd
   }, {
+    showBusyIndicator: false,
     delay: 500,
     coalesce: function(previous) {
       return this.target === previous.target && this.type === previous.type;
