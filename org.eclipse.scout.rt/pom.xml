@@ -88,7 +88,6 @@
     <module>../org.eclipse.scout.rt-settings</module>
 
     <module>../eclipse-scout-cli</module>
-    <module>../eclipse-scout</module>
     <module>../eclipse-scout-core</module>
     <module>../eclipse-scout-testing</module>
     <module>../karma-jasmine-scout</module>
