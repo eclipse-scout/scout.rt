@@ -56,7 +56,6 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    * which means they're automatically included in the object returned by the <code>toJson()</code> method and also are
    * propagated to the browser-side client when a property change event occurs.
    */
-  @SuppressWarnings("unchecked")
   protected void putJsonProperty(JsonProperty<?> jsonProperty) {
     if (!m_initializingProperties) {
       throw new IllegalStateException("Putting properties is only allowed in initJsonProperties.");

@@ -18,17 +18,17 @@ import org.json.JSONObject;
 @SuppressWarnings("squid:S00118")
 public abstract class JsonTableUserFilter<T extends IUserFilterState> implements IJsonObject {
   private final T m_filter;
-  private JsonTable m_jsonTable;
+  private JsonTable<?> m_jsonTable;
 
   public JsonTableUserFilter(T filter) {
     m_filter = filter;
   }
 
-  public void setJsonTable(JsonTable jsonTable) {
+  public void setJsonTable(JsonTable<?> jsonTable) {
     m_jsonTable = jsonTable;
   }
 
-  public JsonTable getJsonTable() {
+  public JsonTable<?> getJsonTable() {
     return m_jsonTable;
   }
 

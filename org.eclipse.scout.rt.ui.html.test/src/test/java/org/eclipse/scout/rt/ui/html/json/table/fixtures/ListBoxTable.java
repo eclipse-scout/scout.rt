@@ -33,8 +33,8 @@ public class ListBoxTable extends AbstractListBox<Long> {
   }
 
   @SuppressWarnings("unchecked")
-  protected KeyColumn getKeyColumnInternal() {
-    return getTable().getColumnSet().getColumnByClass(KeyColumn.class);
+  protected DefaultListBoxTable.KeyColumn getKeyColumnInternal() {
+    return (DefaultListBoxTable.KeyColumn) getTable().getColumnSet().getColumnByClass(KeyColumn.class);
   }
 
   protected TextColumn getTextColumnInternal() {
@@ -71,5 +71,4 @@ public class ListBoxTable extends AbstractListBox<Long> {
       return new TableRow(getTable().getColumnSet());
     }
   }
-
 }
