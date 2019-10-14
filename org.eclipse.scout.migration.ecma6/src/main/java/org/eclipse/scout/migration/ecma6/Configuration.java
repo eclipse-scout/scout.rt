@@ -293,6 +293,23 @@ public class Configuration {
         setPersistLibraryName("@bsi-crm/bsiag-studio-lab");
         setPersistLibraryFileName("800-api_bsi_studio_lab.json");
         break;
+
+      case "com.bsiag.briefcase.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsibriefcase/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsibriefcase/" + moduleName);
+        setNamespace("briefcase");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-briefcase/core");
+        setPersistLibraryFileName("900-api_bsi_briefcase_core.json");
+        break;
+      case "com.bsiag.bsibriefcase.ui.html":
+        setSourceModuleDirectory(sourceBase + "/bsibriefcase/" + moduleName);
+        setTargetModuleDirectory(targetBase + "/bsibriefcase/" + moduleName);
+        setNamespace("bsibriefcase");
+        setJsFolderName(getNamespace());
+        setPersistLibraryName("@bsi-briefcase/bsiag");
+        setPersistLibraryFileName("920-api_bsi_briefcase_bsiag.json");
+        break;
       default:
         throw new ProcessingException("unknown module " + moduleName);
     }
