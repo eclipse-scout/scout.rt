@@ -8,12 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.ui.html.script;
+package org.eclipse.scout.rt.shared.ui.webresource;
 
 import static org.junit.Assert.*;
 
 import java.util.Optional;
 
+import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
 import org.junit.Test;
 
 public class ScriptRequestTest {

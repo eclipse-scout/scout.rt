@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const THEME_JS_OUT_FILTER = f => /.*theme.*\.js/.test(f);
+const listFiles = require('./list-files');
 
 function deleteFile(filename) {
   fs.access(filename, fs.constants.W_OK, err => {
@@ -32,13 +33,16 @@ module.exports = {
   createFileList: dir => {
     const scoutBuild = require('./constants');
     let content = '';
-    fs.readdirSync(dir, {withFileTypes: true})
-      .filter(dirent => dirent.isFile())
-      .map(dirent => dirent.name)
+    listFiles(dir)
       .filter(fileName => fileName !== scoutBuild.fileListName)
       .filter(fileName => !THEME_JS_OUT_FILTER(fileName))
+      .map(file => file.substring(dir.length + 1))
+      .map(path => path.replace(/\\/g, '/'))
       .map(fileName => `${fileName}\n`)
       .forEach(line => content += line);
+    if (content.length < 1) {
+      return;
+    }
     fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
     console.log(`created ${scoutBuild.fileListName}:\n${content}`);
   },
@@ -46,9 +50,9 @@ module.exports = {
     if (!fs.existsSync(dir)) {
       return;
     }
-    fs.readdirSync(dir)
+    listFiles(dir)
       .filter(THEME_JS_OUT_FILTER)
-      .forEach(f => deleteFile(path.join(dir, f)));
+      .forEach(f => deleteFile(f));
 
   }
 };

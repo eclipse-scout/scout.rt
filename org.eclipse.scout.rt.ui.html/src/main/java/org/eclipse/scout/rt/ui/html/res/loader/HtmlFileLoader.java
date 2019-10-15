@@ -10,6 +10,16 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
@@ -21,17 +31,9 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResponseHeaderContributor;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.ExternalBaseUrlProperty;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * This class loads and parses HTML files from WebContent/ folder.
@@ -93,8 +95,11 @@ public class HtmlFileLoader extends AbstractResourceLoader {
   @Override
   public BinaryResource loadResource(String pathInfo) throws IOException {
     URL url;
-    if (WebResourceHelpers.isNewMode()) {
-      url = WebResourceHelpers.create().getWebResource(pathInfo).orElse(null);
+    if (WebResourceResolvers.isNewMode()) {
+      url = WebResourceResolvers.create()
+          .resolveWebResource(pathInfo)
+          .map(WebResourceDescriptor::getUrl)
+          .orElse(null);
     }
     else {
       url = BEANS.get(IWebContentService.class).getWebContentResource(pathInfo);

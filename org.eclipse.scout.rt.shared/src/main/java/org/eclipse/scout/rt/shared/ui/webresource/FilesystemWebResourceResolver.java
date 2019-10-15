@@ -18,12 +18,12 @@ import java.nio.file.Paths;
 
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 
-public class FilesystemWebResourceHelper extends AbstractWebResourceHelper {
+public class FilesystemWebResourceResolver extends AbstractWebResourceResolver {
 
   private final Path m_root;
 
-  protected FilesystemWebResourceHelper() {
-    m_root = findModuleRoot().resolve(AbstractWebResourceHelper.OUTPUT_FOLDER_NAME);
+  protected FilesystemWebResourceResolver() {
+    m_root = findModuleRoot().resolve(AbstractWebResourceResolver.OUTPUT_FOLDER_NAME);
   }
 
   @Override

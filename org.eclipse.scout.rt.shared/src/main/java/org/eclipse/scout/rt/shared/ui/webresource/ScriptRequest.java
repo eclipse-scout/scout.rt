@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.rt.ui.html.script;
+package org.eclipse.scout.rt.shared.ui.webresource;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.StringUtility;
-import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 
 /**
  * Represents a script resource request path. Such requests include js and css/less files and are always of the form
@@ -30,7 +29,7 @@ public final class ScriptRequest {
   public static final String MINIMIZED_URL_KEYWORD = "min";
 
   /**
-   * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
+   * Pattern for a script url
    * <p>
    * <b>Regex groups:</b> <code>$1$2[-$3][.$4].$5</code><br>
    * <ul>
@@ -232,7 +231,7 @@ public final class ScriptRequest {
    */
   public static String toFullPath(String path, String baseName, String fingerprint, boolean min, String extension) {
     StringBuilder result = new StringBuilder();
-    if (path != null) {
+    if (path != null && !"./".equals(path)) {
       result.append(path);
     }
     if (baseName != null) {

@@ -10,6 +10,14 @@
  */
 package org.eclipse.scout.rt.ui.html.res.loader;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.config.CONFIG;
 import org.eclipse.scout.rt.platform.config.PlatformConfigProperties.ApplicationVersionProperty;
@@ -24,19 +32,13 @@ import org.eclipse.scout.rt.server.commons.servlet.cache.GlobalHttpResourceCache
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheKey;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheObject;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
+import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
+import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
-import org.eclipse.scout.rt.ui.html.script.ScriptRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A simple tag-parser used to replace scout-tags in HTML documents.
@@ -105,8 +107,12 @@ public class HtmlDocumentParser {
    * deals with caching, since we must build a script file first, before we can calculate its fingerprint.
    */
   protected String createExternalPath(String internalPath) throws IOException {
-    if (WebResourceHelpers.isNewMode()) {
-      return ScriptResourceIndexes.getExternalForm(internalPath, m_params.isMinify());
+    if (WebResourceResolvers.isNewMode()) {
+      String theme = UiThemeHelper.get().isDefaultTheme(m_params.getTheme()) ? null : m_params.getTheme();
+      return new WebResourceLoader(m_params.isMinify(), false, theme)
+          .resolveResource(internalPath)
+          .map(WebResourceDescriptor::getResolvedPath)
+          .orElse(internalPath);
     }
     else {
       String[] filenameParts = FileUtility.getFilenameParts(internalPath);
@@ -230,8 +236,11 @@ public class HtmlDocumentParser {
     while (m.find()) {
       String includeName = m.group(1);
       URL includeUrl;
-      if (WebResourceHelpers.isNewMode()) {
-        includeUrl = WebResourceHelpers.create().getWebResource(includeName).orElse(null);
+      if (WebResourceResolvers.isNewMode()) {
+        includeUrl = WebResourceResolvers.create()
+            .resolveWebResource(includeName)
+            .map(WebResourceDescriptor::getUrl)
+            .orElse(null);
       }
       else {
         includeUrl = BEANS.get(IWebContentService.class).getWebContentResource("/includes/" + includeName);

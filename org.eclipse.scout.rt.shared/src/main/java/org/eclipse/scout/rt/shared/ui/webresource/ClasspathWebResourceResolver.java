@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.ui.webresource;
 
 import java.net.URL;
 
-public class ClasspathWebResourceHelper extends AbstractWebResourceHelper {
+public class ClasspathWebResourceResolver extends AbstractWebResourceResolver {
   @Override
   protected URL getResourceImpl(String resourcePath) {
     return getClass().getClassLoader().getResource(resourcePath);

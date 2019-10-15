@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
+import org.eclipse.scout.rt.shared.ui.webresource.ScriptRequest;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.FileType;

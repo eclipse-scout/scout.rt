@@ -10,15 +10,14 @@
  */
 package org.eclipse.scout.rt.shared.ui.webresource;
 
-import org.eclipse.scout.rt.platform.Bean;
-
-import java.net.URL;
 import java.util.Optional;
 
+import org.eclipse.scout.rt.platform.Bean;
+
 @Bean
-public interface IWebResourceHelper {
+public interface IWebResourceResolver {
 
-  Optional<URL> getScriptResource(String path, boolean minified);
+  Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme);
 
-  Optional<URL> getWebResource(String path);
+  Optional<WebResourceDescriptor> resolveWebResource(String path);
 }

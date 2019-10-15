@@ -9,26 +9,25 @@ import java.util.Optional;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
-import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
-import org.eclipse.scout.rt.platform.util.Pair;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpCacheControl;
-import org.eclipse.scout.rt.shared.ui.webresource.IWebResourceHelper;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
+import org.eclipse.scout.rt.shared.ui.webresource.IWebResourceResolver;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceDescriptor;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
 
 public class WebResourceLoader extends AbstractResourceLoader {
 
   private final boolean m_minify;
   private final boolean m_cacheEnabled;
   private final String m_theme;
-  private final IWebResourceHelper m_helper;
+  private final IWebResourceResolver m_helper;
 
   public WebResourceLoader(boolean minify, boolean cacheEnabled, String theme) {
     m_minify = minify;
     m_cacheEnabled = cacheEnabled;
     m_theme = theme;
-    m_helper = WebResourceHelpers.create();
+    m_helper = WebResourceResolvers.create();
   }
 
   @Override
@@ -44,30 +43,19 @@ public class WebResourceLoader extends AbstractResourceLoader {
     return lookupResource(file).isPresent();
   }
 
-  protected Optional<Pair<URL, Integer>> lookupResource(String file) {
-    if (m_theme != null) {
-      // If the theme is set to something other than 'default', check if a file with that theme exists.
-      String[] parts = FileUtility.getFilenameParts(file);
-      if (parts != null && "css".equals(parts[1])) {
-        String themeFragmentPath = parts[0] + '-' + m_theme + '.' + parts[1];
-        Optional<Pair<URL, Integer>> resource = resolveResource(themeFragmentPath);
-        if (resource.isPresent()) {
-          return resource;
-        }
-      }
-    }
-    return resolveResource(file);
+  public Optional<WebResourceDescriptor> resolveResource(String pathInfo) {
+    return lookupResource(pathInfo).map(ImmutablePair::getLeft);
   }
 
-  protected Optional<Pair<URL, Integer>> resolveResource(String file) {
-    return m_helper.getScriptResource(file, m_minify)
-        .map(url -> Optional.<Pair<URL, Integer>> of(new ImmutablePair<>(url, HttpCacheControl.MAX_AGE_ONE_YEAR)))
-        .orElseGet(() -> m_helper.getWebResource(file)
-            .map(url -> new ImmutablePair<>(url, HttpCacheControl.MAX_AGE_4_HOURS)));
+  protected Optional<ImmutablePair<WebResourceDescriptor, Integer>> lookupResource(String file) {
+    return m_helper.resolveScriptResource(file, m_minify, m_theme)
+        .map(descriptor -> Optional.of(new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_ONE_YEAR)))
+        .orElseGet(() -> m_helper.resolveWebResource(file)
+            .map(descriptor -> new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_4_HOURS)));
   }
 
-  protected BinaryResources toBinaryResources(Pair<URL, Integer> urlAndMaxAge) {
-    URL url = urlAndMaxAge.getLeft();
+  protected BinaryResources toBinaryResources(ImmutablePair<WebResourceDescriptor, Integer> res) {
+    URL url = res.getLeft().getUrl();
     try {
       URLConnection connection = url.openConnection();
       byte[] bytes = IOUtility.readFromUrl(url);
@@ -76,10 +64,11 @@ public class WebResourceLoader extends AbstractResourceLoader {
           .withCharset(StandardCharsets.UTF_8)
           .withLastModified(connection.getLastModified())
           .withCachingAllowed(m_cacheEnabled)
-          .withCacheMaxAge(urlAndMaxAge.getRight());
+          .withCacheMaxAge(res.getRight());
     }
     catch (IOException e) {
       throw new PlatformException("Unable to read from url '{}'.", url, e);
     }
   }
+
 }

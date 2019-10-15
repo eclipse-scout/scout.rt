@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
-import org.eclipse.scout.rt.shared.ui.webresource.WebResourceHelpers;
+import org.eclipse.scout.rt.shared.ui.webresource.WebResourceResolvers;
 import org.eclipse.scout.rt.ui.html.UiThemeHelper;
 
 @ApplicationScoped
@@ -45,7 +45,7 @@ public class ResourceLoaders {
       boolean minify = UrlHints.isMinifyHint(req);
       return new HtmlFileLoader(theme, minify, cacheEnabled);
     }
-    boolean newMode = WebResourceHelpers.isNewMode();
+    boolean newMode = WebResourceResolvers.isNewMode();
     boolean minify = UrlHints.isMinifyHint(req);
     if (newMode) {
       boolean cacheEnabled = UrlHints.isCacheHint(req);

@@ -17,26 +17,26 @@ import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 @Bean
-public class WebResourceHelpers {
+public class WebResourceResolvers {
 
-  private static final LazyValue<WebResourceHelpers> HELPERS = new LazyValue<>(WebResourceHelpers.class);
-  private final FinalValue<IWebResourceHelper> m_helper = new FinalValue<>();
+  private static final LazyValue<WebResourceResolvers> HELPERS = new LazyValue<>(WebResourceResolvers.class);
+  private final FinalValue<IWebResourceResolver> m_helper = new FinalValue<>();
 
-  public static IWebResourceHelper create() {
-    return HELPERS.get().get();
+  public static IWebResourceResolver create() {
+    return HELPERS.get().getInstance();
   }
 
-  protected IWebResourceHelper get() {
+  protected IWebResourceResolver getInstance() {
     return m_helper.setIfAbsentAndGet(this::createHelper);
   }
 
-  protected IWebResourceHelper createHelper() {
+  protected IWebResourceResolver createHelper() {
     if (Platform.get().inDevelopmentMode()) {
-      return BEANS.get(FilesystemWebResourceHelper.class);
+      return BEANS.get(FilesystemWebResourceResolver.class);
     }
-    return BEANS.get(ClasspathWebResourceHelper.class);
+    return BEANS.get(ClasspathWebResourceResolver.class);
   }
-  
+
   public static boolean isNewMode() {
     return Boolean.parseBoolean(System.getProperty("newMode")); // TODO [mvi]: remove
   }
