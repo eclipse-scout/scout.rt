@@ -254,6 +254,8 @@
   __include("scout/form/lifecycle/ResetMenu.js");
   __include("scout/form/lifecycle/SaveMenu.js");
   __include("scout/form/DialogLayout.js");
+  __include("scout/form/TileOverviewForm.js");
+  __include("scout/form/TileOverviewFormAdapter.js");
   // Table
   __include("scout/table/Table.js");
   __include("scout/table/TableAdapter.js");
@@ -527,6 +529,7 @@
   __include("scout/tile/TileGridLayout.js");
   __include("scout/tile/TileGridLayoutConfig.js");
   __include("scout/tile/TileGridSelectionHandler.js");
+  __include("scout/tile/TileOverviewLayout.js");
   __include("scout/tile/HtmlTile.js");
   __include("scout/tile/HtmlTileAdapter.js");
   __include("scout/tile/accordion/TileAccordion.js");
@@ -616,7 +619,6 @@
   __include("scout/desktop/outline/keystrokes/OutlineNavigateToTopKeyStroke.js");
   __include("scout/desktop/outline/overview/OutlineOverview.js");
   __include("scout/desktop/outline/overview/TileOutlineOverview.js");
-  __include("scout/desktop/outline/overview/TileOutlineOverviewLayout.js");
   // More misc. elements
   __include("scout/desktop/DesktopFormController.js");
   __include("scout/table/FilterFieldsGroupBox.js"); // requires GroupBox.js
