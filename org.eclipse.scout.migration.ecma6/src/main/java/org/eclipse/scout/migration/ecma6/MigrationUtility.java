@@ -62,8 +62,9 @@ public final class MigrationUtility {
 
   public static boolean waitForUserConfirmation() {
     //noinspection resource
+    @SuppressWarnings("resource")
     Scanner inScanner = new Scanner(System.in); // Create a Scanner object
-    System.out.println("Type 'yes' or 'y' to continue, 'no' or 'n' to aboard.");
+    System.out.println("Type 'yes' or 'y' to continue, 'no' or 'n' to abort.");
     String answer = inScanner.nextLine(); // Read user input
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
