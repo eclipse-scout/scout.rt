@@ -51,6 +51,9 @@ export default class DragAndDropHandler {
   }
 
   _onDragEnterOrOver(event) {
+    // set dropEffect to copy. otherwise outlook will move dropped mails into the deleted files folder.
+    // see: https://bugs.chromium.org/p/chromium/issues/detail?id=322605#c33
+    event.originalEvent.dataTransfer.dropEffect = 'copy';
     dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
   }
 
