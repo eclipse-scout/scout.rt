@@ -39,32 +39,58 @@ public abstract class AbstractWebResourceResolver implements IWebResourceResolve
     if (path == null) {
       return Optional.empty();
     }
+    String subFolder = getScriptResourceFolder(minified);
     String themePath = getThemePath(path, theme);
-    Optional<WebResourceDescriptor> themeResource = findScriptResource(path, themePath, minified);
+    Optional<WebResourceDescriptor> themeResource = lookupResource(path, themePath, subFolder, minified);
     if (themeResource.isPresent() || Objects.equals(path, themePath)) {
       return themeResource;
     }
-    return findScriptResource(path, path, minified);
+    return lookupResource(path, path, subFolder, minified);
   }
 
   @Override
-  public Optional<WebResourceDescriptor> resolveWebResource(String path) {
-    return Optional.ofNullable(path)
-        .map(p -> getResourceImpl(WEB_RESOURCE_FOLDER_NAME + '/' + stripLeadingSlash(p)))
-        .map(url -> new WebResourceDescriptor(url, path, path));
+  public Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified) {
+    return lookupResource(path, path, WEB_RESOURCE_FOLDER_NAME, minified);
   }
 
-  protected String getWebResourceFolder(boolean minified) {
+  protected String getScriptResourceFolder(boolean minified) {
     return minified ? MIN_FOLDER_NAME : DEV_FOLDER_NAME;
   }
 
-  protected Optional<WebResourceDescriptor> findScriptResource(String path, String resolvedPath, boolean minified) {
+  protected Optional<WebResourceDescriptor> lookupResource(String requestedPath, String path, String subFolder, boolean minified) {
+    String[] lookupList = {null, null, path};
     if (minified) {
-      resolvedPath = ScriptResourceIndexes.getMinifiedPath(resolvedPath);
+      String pathFromIndex = ScriptResourceIndexes.getMinifiedPath(path);
+      if (Objects.equals(path, pathFromIndex)) {
+        // no mapping in the script resource index. try with simple minified extension
+        String minifiedPath = getMinifiedPath(path);
+        if (!Objects.equals(path, minifiedPath)) {
+          lookupList[1] = minifiedPath;
+        }
+      }
+      else {
+        lookupList[0] = pathFromIndex;
+      }
     }
-    final String lookupPath = resolvedPath;
-    return Optional.ofNullable(getResourceImpl(getWebResourceFolder(minified) + '/' + stripLeadingSlash(lookupPath)))
-        .map(u -> new WebResourceDescriptor(u, path, lookupPath));
+
+    for (String lookupPath : lookupList) {
+      if (lookupPath == null) {
+        continue;
+      }
+      URL url = getResourceImpl(subFolder + '/' + stripLeadingSlash(lookupPath));
+      if (url != null) {
+        return Optional.of(new WebResourceDescriptor(url, requestedPath, lookupPath));
+      }
+    }
+    return Optional.empty();
+  }
+
+  protected String getMinifiedPath(String path) {
+    String[] parts = FileUtility.getFilenameParts(path);
+    if (parts == null || parts[1] == null) {
+      return path;
+    }
+    return parts[0] + ".min." + parts[1];
   }
 
   protected String getThemePath(String path, String theme) {

@@ -97,7 +97,7 @@ public class HtmlFileLoader extends AbstractResourceLoader {
     URL url;
     if (WebResourceResolvers.isNewMode()) {
       url = WebResourceResolvers.create()
-          .resolveWebResource(pathInfo)
+          .resolveWebResource(pathInfo, m_minify)
           .map(WebResourceDescriptor::getUrl)
           .orElse(null);
     }

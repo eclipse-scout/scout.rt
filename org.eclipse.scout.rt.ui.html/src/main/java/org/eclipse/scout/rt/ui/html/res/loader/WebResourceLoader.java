@@ -50,7 +50,7 @@ public class WebResourceLoader extends AbstractResourceLoader {
   protected Optional<ImmutablePair<WebResourceDescriptor, Integer>> lookupResource(String file) {
     return m_helper.resolveScriptResource(file, m_minify, m_theme)
         .map(descriptor -> Optional.of(new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_ONE_YEAR)))
-        .orElseGet(() -> m_helper.resolveWebResource(file)
+        .orElseGet(() -> m_helper.resolveWebResource(file, m_minify)
             .map(descriptor -> new ImmutablePair<>(descriptor, HttpCacheControl.MAX_AGE_4_HOURS)));
   }
 

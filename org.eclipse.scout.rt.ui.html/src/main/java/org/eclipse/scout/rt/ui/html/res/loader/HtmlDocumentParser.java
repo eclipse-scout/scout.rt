@@ -238,7 +238,7 @@ public class HtmlDocumentParser {
       URL includeUrl;
       if (WebResourceResolvers.isNewMode()) {
         includeUrl = WebResourceResolvers.create()
-            .resolveWebResource(includeName)
+            .resolveWebResource(includeName, m_params.isMinify())
             .map(WebResourceDescriptor::getUrl)
             .orElse(null);
       }

@@ -19,5 +19,5 @@ public interface IWebResourceResolver {
 
   Optional<WebResourceDescriptor> resolveScriptResource(String path, boolean minified, String theme);
 
-  Optional<WebResourceDescriptor> resolveWebResource(String path);
+  Optional<WebResourceDescriptor> resolveWebResource(String path, boolean minified);
 }
