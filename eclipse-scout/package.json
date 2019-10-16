@@ -33,12 +33,12 @@
     "snapshot-version": "scout-scripts snapshot-version"
   },
   "devDependencies": {
-    "@eclipse-scout/cli": "^10.0.0"
+    "@eclipse-scout/cli": "^10.0.0-snapshot"
   },
   "dependencies": {
-    "jquery": "^3.4.1"
+    "jquery": "3.4.1"
   },
   "peerDependencies": {
-    "jquery": "^3.4.1"
+    "jquery": "3.4.1"
   }
 }

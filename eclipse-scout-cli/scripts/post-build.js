@@ -35,6 +35,7 @@ module.exports = {
     let content = '';
     listFiles(dir)
       .filter(fileName => fileName !== scoutBuild.fileListName)
+      .filter(fileName => !fileName.endsWith('.LICENSE'))
       .filter(fileName => !THEME_JS_OUT_FILTER(fileName))
       .map(file => file.substring(dir.length + 1))
       .map(path => path.replace(/\\/g, '/'))

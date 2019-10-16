@@ -14,7 +14,8 @@
   },
   "engines": {
     "node": ">=12.1.0",
-    "npm": ">=6.9.0"
+    "npm": ">=6.9.0",
+    "pnpm": ">=4"
   },
   "main": "./src/index.js",
   "files": [
@@ -25,10 +26,10 @@
   },
   "devDependencies": {
     "@eclipse-scout/cli": "^10.0.0-snapshot",
-    "jquery": "^3.4.1",
+    "jquery": "3.4.1",
     "@eclipse-scout/core": "^10.0.0-snapshot"
   },
   "peerDependencies": {
-    "jquery": "^3.4.1"
+    "jquery": "3.4.1"
   }
 }

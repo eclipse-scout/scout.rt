@@ -141,9 +141,7 @@ module.exports = (env, args) => {
         // minify js
         new TerserPlugin({
           test: /\.js(\?.*)?$/i,
-          sourceMap: devMode,
-          cache: true,
-          parallel: true
+          sourceMap: devMode
         })
       ],
       splitChunks: {
