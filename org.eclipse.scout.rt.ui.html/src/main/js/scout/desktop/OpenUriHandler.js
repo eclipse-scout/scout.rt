@@ -56,7 +56,7 @@ scout.OpenUriHandler.prototype.handleUriActionDownload = function(uri) {
 };
 
 scout.OpenUriHandler.prototype.isUriWithExternallyHandledProtocol = function(uri) {
-  return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|sms|tel):/.test(uri);
+  return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation):/.test(uri);
 };
 
 scout.OpenUriHandler.prototype.handleUriActionOpen = function(uri) {
