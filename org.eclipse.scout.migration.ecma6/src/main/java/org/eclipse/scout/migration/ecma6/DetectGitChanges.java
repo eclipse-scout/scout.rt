@@ -15,8 +15,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.platform.util.FileUtility;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 
 /**
  * Erstellt ausgehend vom GIT Workspace in einem lokalen Ordner die Struktur mit den Source Files, wie in diesem Share
@@ -147,6 +149,8 @@ public class DetectGitChanges {
     prepare("bsibriefcase/com.bsiag.bsibriefcase.app", "940 - com.bsiag.bsibriefcase.app/template");
     prepare("bsibriefcase/com.bsiag.bsibriefcase.app/src/main/js/bsibriefcase", "940 - com.bsiag.bsibriefcase.app/template/src/main/js");
     prepare("bsibriefcase/com.bsiag.bsibriefcase.app/src/main/resources/WebContent/res", "940 - com.bsiag.bsibriefcase.app/template/src/main/resources/WebContent");
+
+    compareFolders(GIT_BASE, GIT_LATEST);
   }
 
   /**
@@ -176,5 +180,45 @@ public class DetectGitChanges {
           }
         });
     System.out.println(relativeMigGuidePath + ": Copied " + copyCount.get() + " files");
+  }
+
+  private static void compareFolders(String leftDir, String rightDir) {
+    System.out.println();
+    System.out.println("Comparing folders");
+    AtomicInteger diffCount=new AtomicInteger();
+    Path leftPath = Paths.get(leftDir.replace('\\', '/'));
+    Path rightPath = Paths.get(rightDir.replace('\\', '/'));
+    Stream.concat(
+        FileUtility.listTree(new File(leftDir), true, false)
+            .stream()
+            .map(f -> leftPath.relativize(f.toPath())),
+        FileUtility.listTree(new File(rightDir), true, false)
+            .stream()
+            .map(f -> leftPath.relativize(f.toPath())))
+        .distinct()
+        .sorted()
+        .forEach(relPath -> {
+          File left=new File(leftDir+"/"+relPath.toString());
+          File right=new File(rightDir+"/"+relPath.toString());
+          if(!left.exists()){
+            diffCount.incrementAndGet();
+            System.out.println("MISSING_LEFT\t"+relPath);
+          }
+          else if(!right.exists()){
+            diffCount.incrementAndGet();
+            System.out.println("MISSING_RIGHT\t"+relPath);
+          }
+          else{
+            String leftSource= IOUtility.getContentInEncoding(left,"UTF-8");
+            String rightSource= IOUtility.getContentInEncoding(right,"UTF-8");
+            if(!leftSource.equals(rightSource)){
+              diffCount.incrementAndGet();
+              System.out.println("DIFFERENT\t"+relPath);
+            }
+          }
+        });
+    if(diffCount.get()==0){
+      System.out.println("No changes found, nothing to do");
+    }
   }
 }
