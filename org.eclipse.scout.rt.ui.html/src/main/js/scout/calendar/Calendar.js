@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -575,19 +575,25 @@ scout.Calendar.prototype.layoutSize = function(animate) {
     $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
     $weeksToHide.data('new-height', 0);
     $weeksToHide.removeClass('invisible');
-    selectedWeek.data('new-height', 24 * this.numberOfHourDivisions * this.heightPerDivision);
+    var newHeight = 24 * this.numberOfHourDivisions * this.heightPerDivision;
+    selectedWeek.data('new-height', newHeight);
     selectedWeek.addClass('calendar-week-noborder');
     selectedWeek.removeClass('hidden invisible'); // Current week must be shown
+    $('.calendar-day', selectedWeek).data('new-height', newHeight);
     // Hide the week-number in the lower grid
     $('.calendar-week-name', this.$grid).addClass('invisible'); // Keep the reserved space
     $('.calendar-week-allday-container', this.$topGrid).removeClass('hidden');
     $('.calendar-week-task', this.$topGrid).removeClass('hidden');
   } else {
     // Month
+    var newHeight = gridH / this.monthViewNumberOfWeeks;
     $allWeeks.removeClass('calendar-week-noborder invisible');
     $allWeeks.eq(0).addClass('calendar-week-noborder');
-    $allWeeks.data('new-height', parseInt((gridH - headerH) / this.monthViewNumberOfWeeks, 10));
-    $('.calendar-week-name', this.$grid).removeClass('hidden invisible');
+    $allWeeks.data('new-height', newHeight);
+    $('.calendar-day', this.$grid).data('new-height', newHeight);
+    var $allDays = $('.calendar-week-name', this.$grid);
+    $allDays.removeClass('hidden invisible');
+    $allDays.data('new-height', newHeight);
     $('.calendar-week-allday-container', this.$topGrid).addClass('hidden');
     $('.calendar-week-task', this.$topGrid).addClass('hidden');
   }
