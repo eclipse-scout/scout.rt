@@ -165,13 +165,17 @@ scout.events = {
    * </p>
    *
    * @param source {HTMLElement} the element for which the event listener should be added.
-   * @param target {HTMLElement} the element which should receive the event
-   * @param types {string[]} an array of event types
+   * @param target {HTMLElement} the element which should receive the event.
+   * @param types {string[]} an array of event types.
+   * @param [filter] {function} an optional filter function which can return false if the event should not be propagated.
    */
-  addPropagationListener: function(source, target, types) {
+  addPropagationListener: function(source, target, types, filter) {
     types = scout.arrays.ensure(types);
     types.forEach(function(type) {
       source.addEventListener(type, function(event) {
+        if (filter && !filter(event)) {
+          return;
+        }
         scout.events.propagateEvent(target, event);
       });
     });
