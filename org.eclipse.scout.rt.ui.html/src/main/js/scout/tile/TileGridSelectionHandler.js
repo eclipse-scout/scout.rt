@@ -157,7 +157,7 @@ scout.TileGridSelectionHandler.prototype._checkAndSetFocusedTile = function(even
   if (event.isDefaultPrevented()) {
     return;
   }
-  if (tile.rendered && tile.$container.hasClass('unfocusable')) {
+  if (tile && tile.rendered && tile.$container.hasClass('unfocusable')) {
     return;
   }
   this.setFocusedTile(tile);
