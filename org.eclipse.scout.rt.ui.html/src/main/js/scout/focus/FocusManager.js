@@ -135,16 +135,10 @@ scout.FocusManager.prototype.activate = function(activate) {
 /**
  * Installs a new focus context for the given $container, and sets the $container's initial focus, either by
  * the given rule, or tries to gain focus for the given element.
+ * @returns {scout.FocusContext} the installed context.
  */
 scout.FocusManager.prototype.installFocusContext = function($container, focusRuleOrElement) {
-  var elementToFocus;
-  if (!focusRuleOrElement || focusRuleOrElement === scout.FocusRule.AUTO) {
-    elementToFocus = this.findFirstFocusableElement($container);
-  } else if (focusRuleOrElement === scout.FocusRule.NONE) {
-    elementToFocus = null;
-  } else {
-    elementToFocus = focusRuleOrElement;
-  }
+  var elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
 
   // Create and register the focus context.
   var focusContext = new scout.FocusContext($container, this);
@@ -153,6 +147,22 @@ scout.FocusManager.prototype.installFocusContext = function($container, focusRul
   if (elementToFocus) {
     focusContext.validateAndSetFocus(elementToFocus);
   }
+  return focusContext;
+};
+
+/**
+ * Evaluates the {@link scout.FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
+ */
+scout.FocusManager.prototype.evaluateFocusRule = function($container, focusRuleOrElement) {
+  var elementToFocus;
+  if (!focusRuleOrElement || focusRuleOrElement === scout.FocusRule.AUTO) {
+    elementToFocus = this.findFirstFocusableElement($container);
+  } else if (focusRuleOrElement === scout.FocusRule.NONE) {
+    elementToFocus = null;
+  } else {
+    elementToFocus = focusRuleOrElement;
+  }
+  return elementToFocus;
 };
 
 /**
@@ -160,7 +170,7 @@ scout.FocusManager.prototype.installFocusContext = function($container, focusRul
  * This method has no effect, if there is no focus context installed for the given $container.
  */
 scout.FocusManager.prototype.uninstallFocusContext = function($container) {
-  var focusContext = this._findFocusContext($container);
+  var focusContext = this.getFocusContext($container);
   if (!focusContext) {
     return;
   }
@@ -183,7 +193,7 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
  * Returns whether there is a focus context installed for the given $container.
  */
 scout.FocusManager.prototype.isFocusContextInstalled = function($container) {
-  return !!this._findFocusContext($container);
+  return !!this.getFocusContext($container);
 };
 
 /**
@@ -193,7 +203,7 @@ scout.FocusManager.prototype.isFocusContextInstalled = function($container) {
 scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Container) {
   var focusContext = focusContextOr$Container;
   if (!(focusContextOr$Container instanceof scout.FocusContext)) {
-    focusContext = this._findFocusContext(focusContextOr$Container);
+    focusContext = this.getFocusContext(focusContextOr$Container);
   }
   if (!focusContext || this.isElementCovertByGlassPane(focusContext.$container)) {
     return;
@@ -260,8 +270,12 @@ scout.FocusManager.prototype.unregisterGlassPaneDisplayParent = function(display
 scout.FocusManager.prototype.validateFocus = function(filter) {
   var activeContext = this._findActiveContext();
   if (activeContext) {
-    activeContext.validateAndSetFocus(activeContext.lastValidFocusedElement, filter);
+    activeContext.validateFocus(filter);
   }
+};
+
+scout.FocusManager.prototype.requestFocusIfNotLocked = function(element, filter) {
+  return this.requestFocus(element, filter, true);
 };
 
 /**
@@ -269,7 +283,7 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
  *
  * @return {boolean} true if focus was gained, false otherwise.
  */
-scout.FocusManager.prototype.requestFocus = function(element, filter) {
+scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfNotLocked) {
   element = element instanceof $ ? element[0] : element;
   if (!element) {
     return false;
@@ -277,6 +291,9 @@ scout.FocusManager.prototype.requestFocus = function(element, filter) {
 
   var context = this._findFocusContextFor(element);
   if (context) {
+    if (onlyIfNotLocked && context.locked) {
+      return false;
+    }
     context.validateAndSetFocus(element, filter);
   }
 
@@ -356,7 +373,7 @@ scout.FocusManager.prototype._findActiveContext = function() {
 /**
  * Returns the focus context which is associated with the given $container, or null if not applicable.
  */
-scout.FocusManager.prototype._findFocusContext = function($container) {
+scout.FocusManager.prototype.getFocusContext = function($container) {
   return scout.arrays.find(this._focusContexts, function(focusContext) {
     return focusContext.$container === $container;
   });

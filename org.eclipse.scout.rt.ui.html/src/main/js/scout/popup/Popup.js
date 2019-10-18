@@ -163,12 +163,34 @@ scout.Popup.prototype.open = function($parent) {
   // It is important that this happens after layouting and positioning, otherwise we'd focus an element
   // that is currently not on the screen. Which would cause the whole desktop to
   // be shifted for a few pixels.
-  if (this.withFocusContext) {
-    this.session.focusManager.installFocusContext(this.$container, this.initialFocus());
-  }
+  this.validateFocus();
   if (this.animateOpening) {
     this.$container.addClassForAnimation('animate-open');
   }
+};
+
+scout.Popup.prototype.validateFocus = function() {
+  if (!this.withFocusContext) {
+    return;
+  }
+  var context = this.session.focusManager.getFocusContext(this.$container);
+  context.setLocked(false);
+  if (context.lastValidFocusedElement) {
+    // If a child widget requested the focus, lastValidFocusedElement is set to that child widget.
+    // -> Ensure the focus is on that widget
+    context.restoreFocus();
+  } else {
+    // Otherwise try to determine the initial focus
+    this._requestInitialFocus();
+  }
+};
+
+scout.Popup.prototype._requestInitialFocus = function() {
+  var initialFocusElement = this.session.focusManager.evaluateFocusRule(this.$container, this.initialFocus());
+  if (!initialFocusElement) {
+    return;
+  }
+  this.session.focusManager.requestFocus(initialFocusElement);
 };
 
 scout.Popup.prototype._open = function($parent) {
@@ -269,6 +291,13 @@ scout.Popup.prototype._destroy = function() {
 };
 
 scout.Popup.prototype._renderWithFocusContext = function() {
+  if (this.withFocusContext) {
+    var context = this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.NONE);
+    // Don't allow an element to be focused while the popup is opened.
+    // The popup will focus the element as soon as the opening is finished (see open());
+    // The context needs to be already installed so that child elements don't try to focus an element outside of this context
+    context.setLocked(true);
+  }
   // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
   if (this.withFocusContext && this.focusableContainer) {
     this.$container.attr('tabindex', -1);

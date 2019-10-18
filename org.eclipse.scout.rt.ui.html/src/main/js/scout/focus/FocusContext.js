@@ -17,6 +17,7 @@ scout.FocusContext = function($container, focusManager) {
 
   this.lastValidFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
   this.focusedElement = null;
+  this.locked = false;
 
   // Notice: every listener is installed on $container and not on $field level, except 'remove' listener because it does not bubble.
   this._keyDownListener = this._onKeyDown.bind(this);
@@ -172,11 +173,48 @@ scout.FocusContext.prototype.validateAndSetFocus = function(element, filter) {
 };
 
 /**
+ * Calls {@link #validateAndSetFocus} with {@link #lastValidFocusedElement}.
+ */
+scout.FocusContext.prototype.validateFocus = function(filter) {
+  this.validateAndSetFocus(this.lastValidFocusedElement, filter);
+};
+
+/**
+ * Restores the focus on the last valid focused element. Does nothing, if there is no last valid focused element.
+ */
+scout.FocusContext.prototype.restoreFocus = function() {
+  if (this.lastValidFocusedElement) {
+    this._focus(this.lastValidFocusedElement);
+  }
+};
+
+/**
+ * Controls, whether focus requests are allowed to be executed or not. The requests are not executed while the property is set to true.
+ * But: the element of the focused request will be stored as usual in lastValidFocusedElement. So as soon as the lock is removed, a call to restoreFocus would focus that element.
+ *
+ * This is useful to temporarily disable focus requests without losing the element which should be focused. Typical usage would look like this:
+ * <pre>
+ * context.setLocked(true);
+ * // do some stuff
+ * context.setLocked(false);
+ * context.restoreFocus();
+ * </pre>
+ *
+ * @param {boolean} locked true, to block focus requests, false to allow them again.
+ */
+scout.FocusContext.prototype.setLocked = function(locked) {
+  this.locked = locked;
+};
+
+/**
  * Focuses the requested element.
  */
 scout.FocusContext.prototype._focus = function(elementToFocus) {
   // Only focus element if focus manager is active
   if (!this.focusManager.active) {
+    return;
+  }
+  if (this.locked) {
     return;
   }
 
