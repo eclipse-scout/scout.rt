@@ -71,11 +71,15 @@ public class ServerSessionCache {
       return null;
     }
 
-    sessionContext.addHttpSessionId(httpSession.getId());
-    httpSession.setAttribute(SERVER_SESSION_KEY, session);
-    httpSession.setAttribute(UNBIND_LISTENER_KEY, new ScoutSessionBindingListener(session.getId()));
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Scout ServerSession Session added to HttpSession [scoutSessionId={}, httpSessionId={}]", session.getId(), httpSession.getId());
+    boolean newlyAdded = sessionContext.addHttpSessionId(httpSession.getId());
+    if (newlyAdded) {
+      // only set the attributes if it is not already set
+      // otherwise this might trigger an unbound event on the old SessionBindingListener which leads to a deadlock
+      httpSession.setAttribute(SERVER_SESSION_KEY, session);
+      httpSession.setAttribute(UNBIND_LISTENER_KEY, new ScoutSessionBindingListener(session.getId()));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Scout ServerSession Session added to HttpSession [scoutSessionId={}, httpSessionId={}]", session.getId(), httpSession.getId());
+      }
     }
     return session;
   }

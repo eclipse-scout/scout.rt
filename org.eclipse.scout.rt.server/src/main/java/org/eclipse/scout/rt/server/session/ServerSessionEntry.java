@@ -24,7 +24,7 @@ import org.eclipse.scout.rt.server.context.ServerRunContexts;
 public class ServerSessionEntry {
 
   // must be a set. in case multiple parallel requests from the same client arrive at the same time. then the same HTTP session id may be added several times. But it is only removed once, when the session is invalidated by the container.
-  private final Set<String> m_httpSessionList = new HashSet<>(1);
+  private final Set<String> m_httpSessionSet = new HashSet<>(1);
   private final IServerSessionLifecycleHandler m_sessionLifecycleHandler;
   private final FinalValue<IServerSession> m_serverSession;
 
@@ -48,19 +48,27 @@ public class ServerSessionEntry {
     return m_sessionLifecycleHandler;
   }
 
-  protected void addHttpSessionId(String httpSessionId) {
-    m_httpSessionList.add(httpSessionId);
+  /**
+   * @return {@code true} if this {@link ServerSessionEntry} did not already contain the specified HTTP session id.
+   *         {@code false} otherwise.
+   */
+  protected boolean addHttpSessionId(String httpSessionId) {
+    return m_httpSessionSet.add(httpSessionId);
   }
 
-  protected void removeHttpSessionId(String httpSessionId) {
-    m_httpSessionList.remove(httpSessionId);
+  /**
+   * {@code true} if this {@link ServerSessionEntry} contained the specified element and it was successfully removed.
+   * {@code false} if it was not part of this entry.
+   */
+  protected boolean removeHttpSessionId(String httpSessionId) {
+    return m_httpSessionSet.remove(httpSessionId);
   }
 
   /**
    * @return the number of HTTP sessions that use the {@link IServerSession} of this entry.
    */
   public int httpSessionCount() {
-    return m_httpSessionList.size();
+    return m_httpSessionSet.size();
   }
 
   protected void destroy() {
