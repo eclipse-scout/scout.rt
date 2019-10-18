@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -677,10 +677,20 @@ scout.Popup.prototype._alignClasses = function() {
 
 scout.Popup.prototype.getAnchorBounds = function() {
   var anchorBounds = this.anchorBounds;
+  var realAnchorBounds = scout.graphics.offsetBounds(this.$anchor, {
+    exact: true
+  });
   if (!anchorBounds) {
-    anchorBounds = scout.graphics.offsetBounds(this.$anchor, {
-      exact: true
-    });
+    anchorBounds = realAnchorBounds;
+  } else {
+    if (!anchorBounds.x) {
+      anchorBounds.x = realAnchorBounds.x;
+      anchorBounds.width = realAnchorBounds.width;
+    }
+    if (!anchorBounds.y) {
+      anchorBounds.y = realAnchorBounds.y;
+      anchorBounds.height = realAnchorBounds.height;
+    }
   }
   return anchorBounds;
 };

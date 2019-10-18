@@ -13,8 +13,8 @@ scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
   this.monthViewNumberOfWeeks = 6;
-  this.numberOfHourDivisions = 4;
-  this.heightPerDivision = 20;
+  this.numberOfHourDivisions = 2;
+  this.heightPerDivision = 40;
   this.startHour = 6;
   this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
   this.components = [];
@@ -27,6 +27,8 @@ scout.Calendar = function() {
   this.useOverflowCells = true;
   this.viewRange;
   this.needsScrollToStartHour = true;
+  this.calendarToggleListWidth = 270;
+  this.calendarToggleYearWidth = 215;
 
   // main elements
   this.$container;
@@ -63,11 +65,6 @@ scout.inherits(scout.Calendar, scout.Widget);
 
 scout.Calendar.prototype.init = function(model, session, register) {
   scout.Calendar.parent.prototype.init.call(this, model, session, register);
-
-  this._tooltipSupport = new scout.TooltipSupport({
-    parent: this,
-    htmlEnabled: true
-  });
 };
 
 /**
@@ -540,15 +537,16 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   // init vars (Selected: Day)
   var $selected = $('.selected', this.$grid),
     $topSelected = $('.selected', this.$topGrid),
-    headerH = this.$header.height(),
+    containerW = this.$container.width(),
     gridH = this.$grid.height(),
-    gridW = this.$container.width();
+    gridW = containerW - 20; // containerW - @root-group-box-padding-right
 
   // show or hide year
   $('.calendar-toggle-year', this.$commands).select(this._showYearPanel);
   if (this._showYearPanel) {
-    this._yearPanel.$container.data('new-width', 215);
-    gridW -= 215;
+    this._yearPanel.$container.data('new-width', this.calendarToggleYearWidth);
+    gridW -= this.calendarToggleYearWidth;
+    containerW -= this.calendarToggleYearWidth;
   } else {
     this._yearPanel.$container.data('new-width', 0);
   }
@@ -556,14 +554,15 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   // show or hide work list
   $('.calendar-toggle-list', this.$commands).select(this._showListPanel);
   if (this._showListPanel) {
-    this.$list.parent().data('new-width', 270);
-    gridW -= 270;
+    this.$list.parent().data('new-width', this.calendarToggleListWidth);
+    gridW -= this.calendarToggleListWidth;
+    containerW -= this.calendarToggleListWidth;
   } else {
     this.$list.parent().data('new-width', 0);
   }
 
   // basic grid width
-  this.$grids.data('new-width', gridW);
+  this.$grids.data('new-width', containerW);
 
   var $weeksToHide = $(); // Empty
   var $allWeeks = $('.calendar-week', this.$grid);
@@ -594,24 +593,25 @@ scout.Calendar.prototype.layoutSize = function(animate) {
   }
 
   // layout days
+  var contentW = gridW - 45; // gridW - @calendar-week-name-width
   if (this._isDay()) {
     $('.calendar-day-name, .calendar-day', this.$topGrid).data('new-width', 0);
     $('.calendar-day', this.$grid).data('new-width', 0);
     $('.calendar-day-name:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid)
-      .data('new-width', gridW - headerH);
-    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid).data('new-width', gridW - headerH);
-    $('.calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid).data('new-width', gridW - headerH);
+      .data('new-width', contentW);
+    $('.calendar-day:nth-child(' + ($topSelected.index() + 1) + ')', this.$topGrid).data('new-width', contentW);
+    $('.calendar-day:nth-child(' + ($selected.index() + 1) + ')', this.$grid).data('new-width', contentW);
   } else if (this._isWorkWeek()) {
     this.$topGrid.find('.calendar-day-name').data('new-width', 0);
     this.$grids.find('.calendar-day').data('new-width', 0);
     $('.calendar-day-name:nth-child(-n+6), ' +
         '.calendar-day:nth-child(-n+6)', this.$topGrid)
-      .data('new-width', parseInt((gridW - headerH) / this.workDayIndices.length, 10));
+      .data('new-width', parseInt(contentW / this.workDayIndices.length, 10));
     $('.calendar-day:nth-child(-n+6)', this.$grid)
-      .data('new-width', parseInt((gridW - headerH) / this.workDayIndices.length, 10));
+      .data('new-width', parseInt(contentW / this.workDayIndices.length, 10));
   } else if (this._isMonth() || this._isWeek()) {
-    this.$grids.find('.calendar-day').data('new-width', parseInt((gridW - headerH) / 7, 10));
-    this.$topGrid.find('.calendar-day-name').data('new-width', parseInt((gridW - headerH) / 7, 10));
+    this.$grids.find('.calendar-day').data('new-width', parseInt(contentW / 7, 10));
+    this.$topGrid.find('.calendar-day-name').data('new-width', parseInt(contentW / 7, 10));
   }
 
   // layout components
@@ -825,15 +825,13 @@ scout.Calendar.prototype.layoutAxis = function() {
     // Parent of selected day: Week
     //    var $parent = $selected.parent();
     var $parent = $('.calendar-week', this.$grid);
-    var divisionEachXMin = 15; // At this interval, additional lines are added.
-    var divisonsPerHour = 60 / divisionEachXMin;
 
     for (var h = 0; h < 24; h++) { // Render lines for each hour
       var paddedHour = ('00' + h).slice(-2);
-      var topPos = h * divisonsPerHour * this.heightPerDivision;
-      $parent.appendDiv('calendar-week-axis').attr('data-axis-name', paddedHour).css('top', topPos + 'px');
+      var topPos = h * this.numberOfHourDivisions * this.heightPerDivision;
+      $parent.appendDiv('calendar-week-axis hour' + (h === 0 ? ' first' : '')).attr('data-axis-name', paddedHour + ':00').css('top', topPos + 'px');
 
-      for (var m = 1; m < divisonsPerHour; m++) { // First one rendered above. Start at the next
+      for (var m = 1; m < this.numberOfHourDivisions; m++) { // First one rendered above. Start at the next
         topPos += this.heightPerDivision;
         $parent.appendDiv('calendar-week-axis').attr('data-axis-name', '').css('top', topPos + 'px');
       }
@@ -1013,7 +1011,6 @@ scout.Calendar.prototype._arrangeComponents = function() {
       axis: 'y'
     });
   }
-
 };
 
 scout.Calendar.prototype._getComponents = function($children) {

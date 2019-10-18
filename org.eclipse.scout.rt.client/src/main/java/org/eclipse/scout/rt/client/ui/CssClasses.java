@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,4 +29,9 @@ public interface CssClasses {
    * Class that hides the mandatory indicator (useful e.g. inside a {@link AbstractFormFieldMenu})
    */
   String NO_MANDATORY_INDICATOR = "no-mandatory-indicator";
+
+  /**
+   * Class that for example removes the right padding of the root-group-box in a form.
+   */
+  String RIGHT_PADDING_INVISIBLE = "right-padding-invisible";
 }

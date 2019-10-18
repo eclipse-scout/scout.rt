@@ -138,6 +138,11 @@
       "endHour": 19,
       "useOverflowCells": true
     },
+    "CalendarField": {
+      "gridDataHints": {
+        "weightY": 1
+      }
+    },
     "ClipboardField": {
       "dropType": 0,
       "dropMaximumSize": 52428800

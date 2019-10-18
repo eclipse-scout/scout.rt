@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,9 @@
 }
 
 .calendar {
-  min-height: 400px;
+  //min-height: 400px;
   white-space: nowrap;
+  padding-left: 0;
 }
 
 .calendar-scrollable-components {
@@ -32,7 +33,6 @@
   overflow: visible;
 }
 
-
 .calendar-scrollable-components-week {
   top: calc(@calendar-day-selected-circle-size ~'+ 5px');
   height: calc(~'15% - (' @calendar-day-selected-circle-size ~' + 5px)');
@@ -42,7 +42,7 @@
   position: relative;
   display: block;
   white-space: nowrap;
-  padding: 8px 3px 12px 0;
+  padding: 8px @root-group-box-padding-right 12px 0;
 
   & > .busyindicator-label {
     display: table-cell;
@@ -352,6 +352,7 @@
 .calendar-grid {
   display: block;
   height: calc(~'100% - 25px');
+  padding-right: @root-group-box-padding-right;
 }
 
 .calendar-grid.calendar-grid-short {
@@ -361,8 +362,9 @@
 .calendar-top-grid {
   display: block;
   overflow: hidden;
-  border-bottom: 1px solid @palette-gray-3;
+  border-bottom: 1px solid @border-color;
   height: 105px;
+  margin-right: @root-group-box-padding-right;
 }
 
 .calendar-top-grid.calendar-top-grid-short {
@@ -571,24 +573,31 @@
 
 .calendar-week-axis {
   position: absolute;
-  left: @calendar-week-name-width - 6px;
-  width: calc(~'100% - 8px');
-}
+  left: @calendar-week-name-width - @calendar-week-axis-overlap;
+  width: calc(~'100% - @{calendar-week-name-width} + @{calendar-week-axis-overlap}');
 
-.calendar-week-axis::after {
-  position: absolute;
-  height: 1px;
-  width: 100%;
-  content: '';
-  background-color: @palette-gray-3;
-}
+  &:not(.first) {
+    &::after {
+      position: absolute;
+      height: 1px;
+      width: 100%;
+      content: '';
+      background-color: @palette-gray-3;
+    }
 
-.calendar-week-axis::before {
-  position: absolute;
-  font-size: 13px;
-  left: -30px;
-  color: @calendar-week-axis-color;
-  content: attr(data-axis-name);
+    &.hour::after {
+      background-color: @border-color;
+    }
+
+    &::before {
+      position: absolute;
+      font-size: 12px;
+      left: -35px;
+      top: -8px;
+      color: @calendar-week-axis-color;
+      content: attr(data-axis-name);
+    }
+  }
 }
 
 .calendar-week-task {

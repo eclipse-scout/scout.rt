@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,9 +43,7 @@ scout.CalendarComponent.prototype._syncCoveredDaysRange = function(coveredDaysRa
  */
 scout.CalendarComponent.prototype._remove = function() {
   // remove $parts because they're not children of this.$container
-  var tooltipSupport = this.parent._tooltipSupport;
   this._$parts.forEach(function($part) {
-    tooltipSupport.uninstall($part);
     $part.remove();
   });
   scout.CalendarComponent.parent.prototype._remove.call(this);
@@ -107,7 +105,6 @@ scout.CalendarComponent.prototype._render = function() {
     $part
       .appendDiv('content', this.item.subject);
 
-    this.parent._tooltipSupport.install($part);
     this._$parts.push($part);
 
     if (this.parent._isMonth()) {
@@ -238,7 +235,34 @@ scout.CalendarComponent.prototype.setSelected = function(selected) {
 
 scout.CalendarComponent.prototype._onMouseDown = function(event) {
   var $part = $(event.delegateTarget);
+
   this.parent._selectedComponentChanged(this, $part.data('partDay'));
+  var popup = scout.create('WidgetPopup', {
+    parent: this.parent,
+    $anchor: $part,
+    closeOnAnchorMouseDown: true,
+    closeOnMouseDownOutside: true,
+    closeOnOtherPopupOpen: true,
+    horizontalAlignment: scout.Popup.Alignment.LEFT,
+    verticalAlignment: scout.Popup.Alignment.CENTER,
+    trimWidth: false,
+    trimHeight: false,
+    horizontalSwitch: true,
+    verticalSwitch: true,
+    withArrow: true,
+    cssClass: 'tooltip',
+    scrollType: 'remove',
+    location: {
+      y: event.originalEvent.y
+    },
+    widget: {
+      objectType: "Label",
+      htmlEnabled: true,
+      cssClass: 'tooltip-content',
+      value: this._description()
+    }
+  });
+  popup.open();
 };
 
 scout.CalendarComponent.prototype._onContextMenu = function(event) {

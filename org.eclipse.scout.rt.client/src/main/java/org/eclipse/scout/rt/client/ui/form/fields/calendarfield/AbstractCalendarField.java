@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IWidget;
-import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendarDisplayMode;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -65,6 +64,11 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   }
 
   @Override
+  protected double getConfiguredGridWeightY() {
+    return 1;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   protected void initConfig() {
 
@@ -79,9 +83,7 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
     }
 
     if (m_calendar != null) {
-      if (m_calendar instanceof AbstractCalendar) {
-        ((AbstractCalendar) m_calendar).setParentInternal(this);
-      }
+      m_calendar.setParentInternal(this);
 
       // restore calendar settings
       ClientUIPreferences env = ClientUIPreferences.getInstance();
