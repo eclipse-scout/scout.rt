@@ -470,6 +470,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
       }
       setLoading(true);
       try {
+        ITileGrid tileGridParent = getParentOfType(ITileGrid.class);
         BEANS.get(TileDataLoadManager.class).schedule(() -> {
           try {
             final DATA data = doLoadData();
@@ -484,7 +485,9 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
               handleLoadDataException(e);
             });
           }
-        }, getParentOfType(ITileGrid.class).createAsyncLoadJobInput(AbstractTile.this));
+        }, tileGridParent != null
+            ? tileGridParent.createAsyncLoadJobInput(AbstractTile.this)
+            : ModelJobs.newInput(ClientRunContexts.copyCurrent()));
       }
       catch (RuntimeException e) {
         setLoading(false);
