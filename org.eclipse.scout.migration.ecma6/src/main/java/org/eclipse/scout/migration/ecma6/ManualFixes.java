@@ -127,6 +127,10 @@ public class ManualFixes {
       if (pathEndsWith(pathInfo, "/ContentEditor.js")) {
         wc.setSource(wc.getSource().replace("'res/contenteditor.css'", "'contenteditor.css'"));
       }
+
+      if (pathEndsWith(pathInfo, "/StorySummaryTile.js")) {
+        wc.setSource(wc.getSource().replace("styles.element", "styles._getElement()"));
+      }
     }
   }
 
