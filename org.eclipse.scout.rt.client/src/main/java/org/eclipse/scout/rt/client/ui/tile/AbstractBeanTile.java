@@ -24,12 +24,25 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("f731542c-43bb-4747-b907-71e4e2ae3dcf")
 public abstract class AbstractBeanTile<BEAN> extends AbstractTile implements IBeanTile<BEAN> {
+
   private IBeanTileUIFacade m_uiFacade;
+
+  public AbstractBeanTile() {
+    super();
+  }
+
+  public AbstractBeanTile(boolean callInitializer) {
+    super(callInitializer);
+  }
 
   @Override
   protected void initConfig() {
     super.initConfig();
-    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(new P_UIFacade(), ModelContext.copyCurrent());
+    m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
+  }
+
+  protected IBeanTileUIFacade createUIFacade() {
+    return new P_UIFacade();
   }
 
   @Override
