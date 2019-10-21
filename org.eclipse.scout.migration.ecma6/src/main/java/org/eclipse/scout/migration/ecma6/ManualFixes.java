@@ -1,5 +1,5 @@
-/*
- * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+/*******************************************************************************
+ * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,46 +7,18 @@
  *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
- */
-package org.eclipse.scout.migration.ecma6.task;
+ ******************************************************************************/
+package org.eclipse.scout.migration.ecma6;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import org.eclipse.scout.migration.ecma6.Configuration;
-import org.eclipse.scout.migration.ecma6.PathInfo;
-import org.eclipse.scout.migration.ecma6.WorkingCopy;
-import org.eclipse.scout.migration.ecma6.context.Context;
-import org.eclipse.scout.migration.ecma6.model.old.Exemption;
-import org.eclipse.scout.rt.platform.Order;
-
-@Order(70010)
-public class T70010_ManualFixes extends AbstractTask {
-
-  private Path m_relativeNamespaceDirectory;
-
-  @Override
-  public void setup(Context context) {
-    m_relativeNamespaceDirectory = Paths.get("src", "main", "js");
-  }
-
-  @Override
-  public boolean accept(PathInfo pathInfo, Context context) {
-    return pathInfo.getModuleRelativePath().startsWith(m_relativeNamespaceDirectory);
-  }
-
-  private static boolean pathEndsWith(PathInfo pathInfo, String suffix) {
-    return pathInfo.getPath().toString().replace('\\', '/').endsWith(suffix.replace('\\', '/'));
-  }
-
-  @Exemption
-  @Override
-  public void process(PathInfo pathInfo, Context context) {
+public class ManualFixes {
+  public void apply(WorkingCopy wc) {
     String namespace = Configuration.get().getNamespace();
+    Path pathInfo = wc.getPath();
 
     if ("scout".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/popup/Popup.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String source = wc.getSource();
         String ln = wc.getLineDelimiter();
         int a = source.indexOf("// TODO MIG:  Looks like a dynamic jsEnum. Must be migrated by hand or added to T70010_ManualFixes.");
@@ -62,7 +34,6 @@ public class T70010_ManualFixes extends AbstractTask {
       }
 
       if (pathEndsWith(pathInfo, "/util/styles.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String source = wc.getSource();
         String ln = wc.getLineDelimiter();
         String aText = "let styleMap = {};";
@@ -75,13 +46,11 @@ public class T70010_ManualFixes extends AbstractTask {
 
       if (pathEndsWith(pathInfo, "/util/Device.js")) {
         // there is no longer a "res" folder for resources. therefore the fastclick lib can be found on top level now.
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("'res/fastclick-1.0.6.js'", "'fastclick-1.0.6.js'"));
       }
 
       if (pathEndsWith(pathInfo, "/logging/logging.js")) {
         // there is no longer a "res" folder for resources. therefore the log4javascript lib folder can be found on top level now.
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("(options.resourceUrl, 'res/');", "(options.resourceUrl, '');"));
       }
 
@@ -90,14 +59,12 @@ public class T70010_ManualFixes extends AbstractTask {
           || pathEndsWith(pathInfo, "/LoginApp.js")
           || pathEndsWith(pathInfo, "/LogoutApp.js")) {
         // there is no longer a "res" folder for resources. therefore the log4javascript lib folder can be found on top level now.
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("'res/logo.png'", "'logo.png'"));
       }
     }
 
     if ("jswidgets".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/App.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String source = wc.getSource();
         source = source.replace("import DesktopModel from './DesktopModel';", "import DesktopModel from './desktop/DesktopModel';");
         wc.setSource(source);
@@ -105,13 +72,11 @@ public class T70010_ManualFixes extends AbstractTask {
 
       if (pathEndsWith(pathInfo, "/desktop/Desktop.json")) {
         // the scout logo is moved into the img sub folder
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("logoUrl: 'scout-logo.png'", "logoUrl: 'img/scout-logo.png'"));
       }
       if (pathEndsWith(pathInfo, "/custom/chart/Chart.js")) {
         // Import the chart.js module and use it in the instance creation
         String importName = "ChartJs";
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String newSource = wc.getSource().replace("this.chart = new Chart(this.$container[0]", "this.chart = new " + importName + "(this.$container[0]");
         int importInsertPos = newSource.indexOf("import * as $ from 'jquery';");
         newSource = newSource.substring(0, importInsertPos) + "import {Chart as " + importName + "} from 'chart.js';" + wc.getLineDelimiter() + newSource.substring(importInsertPos);
@@ -122,7 +87,6 @@ public class T70010_ManualFixes extends AbstractTask {
     //heatmap
     if ("scout".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/HeatmapField.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String ln = wc.getLineDelimiter();
         String source = wc.getSource();
         String marker = "export default class HeatmapField";
@@ -131,7 +95,6 @@ public class T70010_ManualFixes extends AbstractTask {
       }
 
       if (pathEndsWith(pathInfo, "/heatmap-module.js")) {//will be saved as index.js
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String ln = wc.getLineDelimiter();
         String source = wc.getSource();
         String marker = "export { default as HeatmapFieldLayout } from './heatmap/HeatmapFieldLayout';";
@@ -142,7 +105,6 @@ public class T70010_ManualFixes extends AbstractTask {
 
     if ("widgets".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/ChartField.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String ln = wc.getLineDelimiter();
         String source = wc.getSource();
         String marker = "export default class ChartField";
@@ -154,7 +116,6 @@ public class T70010_ManualFixes extends AbstractTask {
     // map control
     if ("bsiscout".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/MapTableControl.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         String source = wc.getSource();
         String marker = "url: 'res/maps/' + mapId + '.json'";
         source = source.replace(marker, "url: 'maps/' + mapId + '.json'");
@@ -164,10 +125,12 @@ public class T70010_ManualFixes extends AbstractTask {
 
     if ("studio".equals(namespace)) {
       if (pathEndsWith(pathInfo, "/ContentEditor.js")) {
-        WorkingCopy wc = context.ensureWorkingCopy(pathInfo.getPath());
         wc.setSource(wc.getSource().replace("'res/contenteditor.css'", "'contenteditor.css'"));
       }
     }
+  }
 
+  private static boolean pathEndsWith(Path path, String suffix) {
+    return path.toString().replace('\\', '/').endsWith(suffix.replace('\\', '/'));
   }
 }

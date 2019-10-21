@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.platform.Order;
 
 @Order(5500)
 public class T5500_JasmineSpecs extends AbstractTask {
-  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcTestJs(), PathFilters.withExtension("js"));
   private static final Pattern SCOUT_TESTING_IMP_PAT = Pattern.compile("} from '[./]+main/js/index';");
 
@@ -42,7 +41,6 @@ public class T5500_JasmineSpecs extends AbstractTask {
     BEANS.get(T5030_ResolveClassConstructorReferencesAndCreateImports.class).process(pathInfo, context);
     BEANS.get(T5040_ResolveUtilityReferencesAndCreateImports.class).process(pathInfo, context);
     BEANS.get(T5050_ResolveTopLevelEnumReferencesAndCreateImports.class).process(pathInfo, context);
-    BEANS.get(T29000_JsCreateImports.class).process(pathInfo, context);
     WorkingCopy workingCopy = context.getWorkingCopy(pathInfo.getPath());
 
     // specs are migrated in the xyz.test maven module
@@ -57,7 +55,7 @@ public class T5500_JasmineSpecs extends AbstractTask {
 
     String source = workingCopy.getSource();
     String newSource = source.replace("} from '" + targetModuleName + "';", "} from '" + fromSpecToIndex + "/index';");
-    if("scout".equals(Configuration.get().getNamespace())) {
+    if ("scout".equals(Configuration.get().getNamespace())) {
       newSource = SCOUT_TESTING_IMP_PAT.matcher(newSource).replaceAll("} from '@eclipse-scout/testing';");
     }
     workingCopy.setSource(newSource);

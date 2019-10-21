@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 
 import org.eclipse.scout.migration.ecma6.Configuration;
+import org.eclipse.scout.migration.ecma6.MigrationUtility;
 import org.eclipse.scout.migration.ecma6.PathFilters;
 import org.eclipse.scout.migration.ecma6.PathInfo;
 import org.eclipse.scout.migration.ecma6.WorkingCopy;
@@ -84,7 +85,7 @@ public class T30000_JsonToJsModule extends AbstractTask {
 
     BEANS.get(T5020_ResolveClassEnumReferencesAndCreateImports.class).process(pathInfo, context);
     BEANS.get(T5040_ResolveUtilityReferencesAndCreateImports.class).process(pathInfo, context);
-    BEANS.get(T29000_JsCreateImports.class).process(pathInfo, context);
+    MigrationUtility.insertImports(workingCopy, context);
   }
 
   protected void migratePlaceholders(Matcher matcher, StringBuilder result, Path file, Context context) {

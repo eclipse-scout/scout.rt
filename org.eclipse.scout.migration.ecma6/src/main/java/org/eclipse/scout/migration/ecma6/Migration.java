@@ -51,12 +51,11 @@ public class Migration {
       migration.run();
     }
     catch (IOException e) {
-      e.printStackTrace();
+      throw new ProcessingException("Error in migration", e);
     }
   }
 
-  private Migration() {
-
+  protected Migration() {
   }
 
   public void init() throws IOException {
@@ -105,9 +104,6 @@ public class Migration {
     Files.walkFileTree(Configuration.get().getSourceModuleDirectory(), new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-
-        //if(!file.endsWith("popup/Popup.js")) return FileVisitResult.CONTINUE;
-
         PathInfo info = new PathInfo(file);
         if (pathFilter != null && !pathFilter.test(info)) {
           return FileVisitResult.CONTINUE;
@@ -150,15 +146,24 @@ public class Migration {
 
   private void processFileWithTask(ITask task, PathInfo pathInfo, Context context) {
     task.process(pathInfo, context);
-    /*
-    if(pathInfo.getPath().endsWith("objectFactories.js")){
-      System.out.println("=================\n"+task.getClass().getSimpleName()+"\n"+context.ensureWorkingCopy(pathInfo.getPath()).getSource());
-    }
-    */
+  }
+
+  protected void createJsImports() {
+    m_context.getWorkingCopies().stream()
+        .filter(wc -> wc.getPath().toString().endsWith(".js"))
+        .forEach(wc -> MigrationUtility.insertImports(wc, m_context));
+  }
+
+  protected void applyManualFixes() {
+    ManualFixes fixes = new ManualFixes();
+    m_context.getWorkingCopies().stream().forEach(fixes::apply);
   }
 
   protected void writeFiles() throws IOException {
+    createJsImports();
+    applyManualFixes();
     cleanTarget();
+
     if (Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())) {
       // write dirty working copies first
       writeDirtyWorkingCopies();
@@ -166,7 +171,6 @@ public class Migration {
       if (!MigrationUtility.waitForUserConfirmation()) {
         return;
       }
-
     }
 
     final Path targetModule = Configuration.get().getTargetModuleDirectory();
@@ -176,7 +180,7 @@ public class Migration {
     Map<Path, Path> skipCopyRelativePaths = m_context.getWorkingCopies()
         .stream()
         .filter(w -> w.getRelativeTargetPath() != null)
-        .collect(Collectors.toMap(w -> w.getRelativeTargetPath(), w -> w.getPath()));
+        .collect(Collectors.toMap(WorkingCopy::getRelativeTargetPath, WorkingCopy::getPath));
     visitMigrationFiles(info -> {
       Path file = info.getPath();
       WorkingCopy workingCopy = m_context.getWorkingCopy(file);
@@ -249,7 +253,7 @@ public class Migration {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
+      throw new ProcessingException("Cannot write working copies", e);
     }
   }
 }
