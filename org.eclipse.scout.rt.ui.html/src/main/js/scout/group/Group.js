@@ -116,7 +116,7 @@ scout.Group.prototype._remove = function() {
 
 scout.Group.prototype._renderEnabled = function() {
   scout.Group.parent.prototype._renderEnabled.call(this);
-  this.$header.setTabbable(this.enabled);
+  this.$header.setTabbable(this.enabledComputed);
 };
 
 scout.Group.prototype.setIconId = function(iconId) {

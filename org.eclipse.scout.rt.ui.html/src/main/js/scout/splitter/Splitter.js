@@ -40,7 +40,7 @@ scout.Splitter.prototype._renderProperties = function() {
 
 scout.Splitter.prototype._renderEnabled = function() {
   scout.Splitter.parent.prototype._renderEnabled.call(this);
-  if (this.enabled) {
+  if (this.enabledComputed) {
     this.$container.on('mousedown', this._mouseDownHandler);
   } else {
     this.$container.off('mousedown', this._mouseDownHandler);

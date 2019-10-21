@@ -110,9 +110,9 @@ scout.FileInput.prototype._renderEnabled = function() {
   scout.FileInput.parent.prototype._renderEnabled.call(this);
 
   if (this.legacy) {
-    this.$fileInput.setEnabled(this.enabled);
+    this.$fileInput.setEnabled(this.enabledComputed);
   } else {
-    this.$container.setTabbable(this.enabled);
+    this.$container.setTabbable(this.enabledComputed);
   }
 };
 

@@ -201,7 +201,7 @@ scout.Action.prototype._shouldInstallTooltip = function() {
 };
 
 scout.Action.prototype._renderTabbable = function() {
-  this.$container.setTabbable(this.tabbable && this.enabled && !scout.device.supportsTouch());
+  this.$container.setTabbable(this.tabbable && this.enabledComputed && !scout.device.supportsTouch());
 };
 
 scout.Action.prototype._renderCompact = function() {

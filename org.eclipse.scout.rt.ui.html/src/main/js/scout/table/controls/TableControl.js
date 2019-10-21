@@ -164,7 +164,7 @@ scout.TableControl.prototype.isContentAvailable = function() {
 };
 
 scout.TableControl.prototype.toggle = function() {
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     return;
   }
   if (this.tableFooter.selectedControl === this) {

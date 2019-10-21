@@ -22,7 +22,6 @@ scout.Tree = function() {
   this.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
-  this.enabled = true;
   this.filterEnabled = false;
   this.lazyExpandingEnabled = true;
   this.menus = [];
@@ -909,7 +908,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNode) {
 
 scout.Tree.prototype._renderNode = function(node) {
   var paddingLeft = this._computeNodePaddingLeft(node);
-  node.render(this.$container, paddingLeft, this.checkable, this.enabled);
+  node.render(this.$container, paddingLeft, this.checkable, this.enabledComputed);
   return node.$node;
 };
 
@@ -927,7 +926,7 @@ scout.Tree.prototype._filterMenus = function(argMenus, destination, onlyVisible,
 scout.Tree.prototype._renderEnabled = function() {
   scout.Tree.parent.prototype._renderEnabled.call(this);
 
-  var enabled = this.enabled;
+  var enabled = this.enabledComputed;
   this.$data.setEnabled(enabled);
   this.$container.setTabbable(enabled);
 
@@ -3127,7 +3126,7 @@ scout.Tree.prototype.changeNode = function(node) {
 // same as on scout.Table.prototype._onDesktopPopupOpen
 scout.Tree.prototype._onDesktopPopupOpen = function(event) {
   var popup = event.popup;
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     return;
   }
   // Set tree style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus

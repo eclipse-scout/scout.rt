@@ -20,7 +20,6 @@ scout.Table = function() {
   this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
   this.dropType = 0;
   this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
-  this.enabled = true;
   this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
   this.header = null;
   this.headerEnabled = true;
@@ -2133,7 +2132,7 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
       return false;
     }
     cell = this.cell(column, row);
-    return this.enabled && row.enabled && cell.editable;
+    return this.enabledComputed && row.enabled && cell.editable;
   }.bind(this);
 
   column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
@@ -4436,10 +4435,8 @@ scout.Table.prototype._removeFooter = function() {
 scout.Table.prototype._renderEnabled = function() {
   scout.Table.parent.prototype._renderEnabled.call(this);
 
-  var enabled = this.enabled;
-
+  var enabled = this.enabledComputed;
   if (!this.tileMode) {
-    // XXX
     this.$data.setEnabled(enabled);
   }
 
@@ -4901,7 +4898,7 @@ scout.Table.prototype.focusCell = function(column, row) {
   }
 
   var cell = this.cell(column, row);
-  if (this.enabled && row.enabled && cell.editable) {
+  if (this.enabledComputed && row.enabled && cell.editable) {
     this.prepareCellEdit(column, row, false);
   }
 };
@@ -5002,7 +4999,7 @@ scout.Table.prototype.visibleColumns = function(includeGuiColumns) {
 // same as on scout.Tree.prototype._onDesktopPopupOpen
 scout.Table.prototype._onDesktopPopupOpen = function(event) {
   var popup = event.popup;
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     return;
   }
   // Set table style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus

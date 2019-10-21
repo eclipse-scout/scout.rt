@@ -57,7 +57,6 @@ scout.TableField.prototype._setTable = function(table) {
     this.eventDelegator = scout.EventDelegator.create(this, table, {
       delegateProperties: ['enabled', 'disabledStyle', 'loading']
     });
-    table.setEnabled(this.enabled);
     table.setDisabledStyle(this.disabledStyle);
     table.setLoading(this.loading);
     table.setScrollTop(this.scrollTop);

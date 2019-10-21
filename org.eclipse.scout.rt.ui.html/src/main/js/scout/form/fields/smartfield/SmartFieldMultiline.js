@@ -58,7 +58,7 @@ scout.SmartFieldMultiline.prototype._renderEnabled = function() {
  * mousedown event here too.
  */
 scout.SmartFieldMultiline.prototype._onMultilineLinesClick = function(event) {
-  if (this.enabled) {
+  if (this.enabledComputed) {
     var selection = this.$field.window(true).getSelection();
     if (!selection.toString()) {
       this.$field.focus();

@@ -11,7 +11,6 @@
 scout.TableHeader = function() {
   scout.TableHeader.parent.call(this);
 
-  this.enabled = true;
   this.dragging = false;
   this.headerMenusEnabled = true;
   this.table = null;
@@ -42,7 +41,7 @@ scout.TableHeader.prototype._render = function() {
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
   this.$filler = this.$container.appendDiv('table-header-item filler').css('visibility', 'hidden');
 
-  if (!this.enabled) {
+  if (!this.enabledComputed) {
     this.menuBar.hiddenByUi = true;
   }
   // Required to make "height: 100%" rule work. menuBarContainer and menuBar itself must have the same visibility.
@@ -105,14 +104,14 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   }
 
   var $header = this.$filler.beforeDiv('table-header-item')
-    .setEnabled(this.enabled)
+    .setEnabled(this.enabledComputed)
     .data('column', column)
     .cssMinWidth(columnWidth)
     .cssMaxWidth(columnWidth)
     .cssMarginLeft(marginLeft)
     .cssMarginRight(marginRight);
   $header.appendSpan('table-header-item-text');
-  if (this.enabled) {
+  if (this.enabledComputed) {
     $header
       .on('click', this._onHeaderItemClick.bind(this))
       .on('mousedown', this._onHeaderItemMouseDown.bind(this));
@@ -134,12 +133,12 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   this._decorateHeader(column);
 
   var showSeparator = column.showSeparator;
-  if (isLastColumn && !this.enabled) {
+  if (isLastColumn && !this.enabledComputed) {
     showSeparator = false;
   }
   if (showSeparator) {
     var $separator = this.$filler.beforeDiv('table-header-resize');
-    if (column.fixedWidth || !this.enabled) {
+    if (column.fixedWidth || !this.enabledComputed) {
       $separator.setEnabled(false);
     } else {
       $separator
@@ -417,7 +416,7 @@ scout.TableHeader.prototype._renderColumnLegacyStyle = function(column) {
 };
 
 scout.TableHeader.prototype._renderColumnHeaderMenuEnabled = function(column) {
-  column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabled);
+  column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabledComputed);
 };
 
 scout.TableHeader.prototype._renderColumnState = function(column) {
