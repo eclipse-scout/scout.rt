@@ -101,7 +101,6 @@ import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.classid.ITypeWithClassId;
 import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.exception.PlatformError;
-import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.reflect.ConfigurationUtility;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
@@ -662,7 +661,7 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(280)
-  protected boolean getConfiguredTileModeEnabled() {
+  protected boolean getConfiguredTileMode() {
     return false;
   }
 
@@ -1031,8 +1030,9 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
     m_tableOrganizer = createTableOrganizer();
 
-    // setTileMode creates the mediator and tileTableHeader lazy if set to true. Do this here to already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
-    setTileMode(getConfiguredTileModeEnabled());
+    // setTileMode() creates the mediator and tileTableHeader lazy if set to true. Do this here to
+    // already have a mostly initialized table (AbstractTileTableHeader requires an initialized columnSet).
+    setTileMode(getConfiguredTileMode());
 
     // add Convenience observer for drag & drop callbacks, event history and ui sort possible check
     addTableListener(new TableAdapter() {
@@ -3172,7 +3172,6 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
             .add(row);
       }
       else {
-
         row.setParentRowInternal(null);
         rootNodes.add(row);
       }
@@ -4502,18 +4501,18 @@ public abstract class AbstractTable extends AbstractWidget implements ITable, IC
 
   @Override
   public List<ITableRowTileMapping> createTiles(List<? extends ITableRow> rows) {
-    try {
-      return rows.stream()
-          .map(r -> BEANS.get(TableRowTileMapping.class)
-              .withTableRow(r)
-              .withTile(interceptCreateTile(r)))
-          .filter(m -> m.getTile() != null)
-          .collect(Collectors.toList());
-    }
-    catch (Exception e) {
-      LOG.error("Could not create tiles [{}]", getClass().getName(), e);
-      throw new ProcessingException("Could not create tiles", e);
-    }
+    return rows.stream()
+        .map(row -> {
+          ITile tile = interceptCreateTile(row);
+          if (tile.getParent() == null) {
+            tile.setParentInternal(this);
+          }
+          return BEANS.get(TableRowTileMapping.class)
+              .withTableRow(row)
+              .withTile(tile);
+        })
+        .filter(m -> m.getTile() != null)
+        .collect(Collectors.toList());
   }
 
   /*

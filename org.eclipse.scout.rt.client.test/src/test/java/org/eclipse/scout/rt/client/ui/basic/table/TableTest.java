@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +26,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableTest.P_Table.FirstColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.userfilter.UserTableRowFilter;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.client.ui.tile.AbstractHtmlTile;
+import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.platform.Order;
+import org.eclipse.scout.rt.platform.html.HTML;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
@@ -609,6 +614,31 @@ public class TableTest {
     assertEquals(r4, table.getSelectedRows().get(1));
   }
 
+  @Test
+  public void testCreateTableWithTiles() {
+    P_Table table0 = new P_Table();
+    table0.init();
+    fillTable(table0);
+    assertNull(table0.getTableTileGridMediator());
+    assertNull(table0.getTileTableHeader());
+
+    // ---
+
+    P_TableWithTiles table = new P_TableWithTiles();
+    table.init();
+    fillTable(table);
+    assertNotNull(table.getTableTileGridMediator());
+    assertNotNull(table.getTileTableHeader());
+    assertEquals(table.getRowCount(), table.getTableTileGridMediator().getTileMappings().size());
+
+    addTableRow(table, 99, "Flupp", 161616);
+    assertEquals(table.getRowCount(), table.getTableTileGridMediator().getTileMappings().size());
+
+    table.deleteAllRows();
+    table.discardAllDeletedRows();
+    assertEquals(0, table.getTableTileGridMediator().getTileMappings().size());
+  }
+
   private void assertValidTestTable(P_Table table, int status) {
     assertRowCount(2, 0, table);
     assertStatusAndTable(table, status, table.getRow(0));
@@ -729,6 +759,50 @@ public class TableTest {
       @Override
       protected boolean getConfiguredAlwaysIncludeSortAtBegin() {
         return true;
+      }
+    }
+  }
+
+  public static class P_TableWithTiles extends P_Table {
+
+    @Override
+    protected boolean getConfiguredTileMode() {
+      return true;
+    }
+
+    @Override
+    protected ITile execCreateTile(ITableRow row) {
+      return new P_Tile(row);
+    }
+
+    protected class P_Tile extends AbstractHtmlTile {
+
+      private ITableRow m_row;
+
+      public P_Tile(ITableRow row) {
+        super(false);
+        m_row = row;
+        callInitializer();
+      }
+
+      @Override
+      protected String getConfiguredContent() {
+        return HTML.fragment(
+            HTML.bold(getSecondColumn().getValue(m_row)),
+            ": ",
+            getThirdColumn().getValue(m_row) + "").toHtml();
+      }
+    }
+
+    public class P_TileTableHeader extends AbstractTileTableHeader {
+
+      @Order(1000)
+      public class FilterField extends AbstractStringField {
+
+        @Override
+        protected String getConfiguredLabel() {
+          return "Filter";
+        }
       }
     }
   }
