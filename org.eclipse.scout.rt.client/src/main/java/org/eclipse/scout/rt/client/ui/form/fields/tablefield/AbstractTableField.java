@@ -247,7 +247,6 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
           m_table.setValueChangeTriggerEnabled(false);
         }
       }
-      m_table.setEnabled(isEnabled());
     }
     boolean changed = propertySupport.setProperty(PROP_TABLE, m_table);
     if (changed) {

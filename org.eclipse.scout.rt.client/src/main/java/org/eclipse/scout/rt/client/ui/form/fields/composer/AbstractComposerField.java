@@ -345,7 +345,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       rootNode.getCellForUpdate().setText(getLabel());
       m_tree.setRootNode(rootNode);
       m_tree.setNodeExpanded(rootNode, true);
-      m_tree.setEnabled(isEnabled());
       m_tree.setParentInternal(this);
       m_tree.addTreeListener(
           e -> {

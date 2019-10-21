@@ -332,7 +332,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
       if (m_table.getDefaultIconId() == null && this.getConfiguredIconId() != null) {
         m_table.setDefaultIconId(this.getConfiguredIconId());
       }
-      m_table.setEnabled(isEnabled());
     }
     else {
       LOG.warn("there is no inner class of type ITable in {}", getClass().getName());

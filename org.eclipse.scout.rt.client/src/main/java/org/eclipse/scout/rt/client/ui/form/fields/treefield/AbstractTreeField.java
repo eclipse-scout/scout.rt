@@ -270,9 +270,6 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
           TreeEvent.TYPE_NODES_UPDATED,
           TreeEvent.TYPE_NODES_CHECKED);
     }
-    if (m_tree != null) {
-      m_tree.setEnabled(isEnabled());
-    }
     boolean changed = propertySupport.setProperty(PROP_TREE, m_tree);
     if (changed && getForm() != null) {
       getForm().structureChanged(this);
