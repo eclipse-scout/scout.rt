@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.extension.ui.tile.ITileExtension;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigOperation;
+import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 
 @ClassId("f731542c-43bb-4747-b907-71e4e2ae3dcf")
@@ -37,8 +38,9 @@ public abstract class AbstractBeanTile<BEAN> extends AbstractTile implements IBe
 
   @Override
   protected void initConfig() {
-    super.initConfig();
     m_uiFacade = BEANS.get(ModelContextProxy.class).newProxy(createUIFacade(), ModelContext.copyCurrent());
+    super.initConfig();
+    setBean(getConfiguredBean());
   }
 
   protected IBeanTileUIFacade createUIFacade() {
@@ -48,6 +50,14 @@ public abstract class AbstractBeanTile<BEAN> extends AbstractTile implements IBe
   @Override
   public IBeanTileUIFacade getUIFacade() {
     return m_uiFacade;
+  }
+
+  /**
+   * @return the initial bean value
+   */
+  @ConfigProperty(ConfigProperty.OBJECT)
+  protected BEAN getConfiguredBean() {
+    return null;
   }
 
   @Override
