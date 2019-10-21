@@ -109,7 +109,7 @@ scout.PageTileGrid.prototype._onOutlineNodeChanged = function(event) {
 scout.PageTileGrid.prototype._onOutlineStructureChanged = function(event) {
   var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
     return !node.parentNode;
-  }) || event.type == 'allChildNodesDeleted';
+  }) || event.type === 'allChildNodesDeleted';
   // only rebuild if top level nodes change
   if (eventContainsTopLevelNode) {
     this._rebuild();
