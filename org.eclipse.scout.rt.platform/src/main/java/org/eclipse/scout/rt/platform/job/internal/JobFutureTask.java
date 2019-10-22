@@ -90,8 +90,17 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   protected final OperableTrigger m_trigger;
   protected final Calendar m_calendar;
 
-  /** The thread currently running the task */
+  /**
+   * The thread currently running the task
+   * <p>
+   * This thread is leased and released by the calling {@link JobManager}
+   * <p>
+   * The contract is that every access to the {@link Thread} is synchronized.
+   *
+   * @since 10.0
+   */
   protected volatile Thread m_runner;
+  protected Object m_runnerLock = new Object();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(() -> callableChain.call(callable) /* run all processors as contained in the chain before invoking the callable */ );
@@ -156,7 +165,6 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   @Override
   public void run() {
     m_trigger.triggered(m_calendar);
-
     m_runner = Thread.currentThread();
     try {
       if (isExpired()) {
@@ -170,7 +178,9 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
       }
     }
     finally {
-      m_runner = null;
+      synchronized (m_runnerLock) {
+        m_runner = null;
+      }
       finishInternal();
       releasePermit();
     }
@@ -200,9 +210,11 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
 
     // Interrupt a possible runner, but only if not running on behalf of a RunContext. Otherwise, interruption was already done by RunContext.
     if (interruptIfRunning && m_input.getRunContext() == null) {
-      final Thread runner = m_runner;
-      if (runner != null) {
-        runner.interrupt();
+      synchronized (m_runnerLock) {
+        Thread runner = m_runner;
+        if (runner != null) {
+          runner.interrupt();
+        }
       }
     }
   }
