@@ -17,7 +17,7 @@ scout.FocusContext = function($container, focusManager) {
 
   this.lastValidFocusedElement = null; // variable to store the last valid focus position; used to restore focus once being re-activated.
   this.focusedElement = null;
-  this.locked = false;
+  this.prepared = false;
 
   // Notice: every listener is installed on $container and not on $field level, except 'remove' listener because it does not bubble.
   this._keyDownListener = this._onKeyDown.bind(this);
@@ -25,15 +25,30 @@ scout.FocusContext = function($container, focusManager) {
   this._focusOutListener = this._onFocusOut.bind(this);
   this._unfocusableListener = this._onUnfocusable.bind(this);
   this._removeListener = this._onRemove.bind(this);
+};
 
+scout.FocusContext.prototype.ready = function() {
+  if (this.prepared) {
+    return;
+  }
   this.$container
     .on('keydown', this._keyDownListener)
     .on('focusin', this._focusInListener)
     .on('focusout', this._focusOutListener)
     .on('hide disable', this._unfocusableListener);
+  this.prepared = true;
+
+  if (this.lastValidFocusedElement) {
+    // If a widget requested the focus while focus context was not ready, lastValidFocusedElement is set to that widget but the widget itself is not focused.
+    // -> Ensure that widget is focused
+    this.restoreFocus();
+  }
 };
 
 scout.FocusContext.prototype.dispose = function() {
+  if (!this.prepared) {
+    return;
+  }
   this.$container
     .off('keydown', this._keyDownListener)
     .off('focusin', this._focusInListener)
@@ -189,24 +204,6 @@ scout.FocusContext.prototype.restoreFocus = function() {
 };
 
 /**
- * Controls, whether focus requests are allowed to be executed or not. The requests are not executed while the property is set to true.
- * But: the element of the focused request will be stored as usual in lastValidFocusedElement. So as soon as the lock is removed, a call to restoreFocus would focus that element.
- *
- * This is useful to temporarily disable focus requests without losing the element which should be focused. Typical usage would look like this:
- * <pre>
- * context.setLocked(true);
- * // do some stuff
- * context.setLocked(false);
- * context.restoreFocus();
- * </pre>
- *
- * @param {boolean} locked true, to block focus requests, false to allow them again.
- */
-scout.FocusContext.prototype.setLocked = function(locked) {
-  this.locked = locked;
-};
-
-/**
  * Focuses the requested element.
  */
 scout.FocusContext.prototype._focus = function(elementToFocus) {
@@ -214,7 +211,7 @@ scout.FocusContext.prototype._focus = function(elementToFocus) {
   if (!this.focusManager.active) {
     return;
   }
-  if (this.locked) {
+  if (!this.prepared) {
     return;
   }
 

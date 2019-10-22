@@ -164,6 +164,32 @@ describe("CellEditor", function() {
 
   });
 
+  describe("TAB key", function() {
+    var table, $rows, $cells0;
+
+    beforeEach(function() {
+      table = helper.createTable(helper.createModelFixture(2, 2));
+      table.render();
+      helper.applyDisplayStyle(table);
+      $rows = table.$rows();
+      $cells0 = $rows.eq(0).find('.table-cell');
+    });
+
+    it("starts the cell editor for the next editable cell", function() {
+      table.rows[0].cells[0].editable = true;
+      table.rows[1].cells[0].editable = true;
+
+      table.focusCell(table.columns[0], table.rows[0]);
+      jasmine.clock().tick();
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
+
+      $(document.activeElement).triggerKeyInputCapture(scout.keys.TAB);
+      jasmine.clock().tick();
+      jasmine.clock().tick();
+      assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
+    });
+  });
+
   describe("prepareCellEdit", function() {
     var table;
 

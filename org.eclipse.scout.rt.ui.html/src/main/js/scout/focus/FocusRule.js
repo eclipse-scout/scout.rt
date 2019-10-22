@@ -21,5 +21,14 @@ scout.FocusRule = {
   /**
    * Indicates to not focus any element.
    */
-  NONE: 'none'
+  NONE: 'none',
+  /**
+   * If prepare is used when installing a focus context, the context won't be ready until explicitly told. During that time, focus context listeners are not attached yet and focus requests are not allowed to be executed.
+   * But: the element of the focused request will be stored as usual in lastValidFocusedElement. So as soon as the context is ready, a call to restoreFocus would focus that element.
+   *
+   * This is useful to disable focus requests during a preparation phase without losing the element which should be focused.
+   *
+   * <b>Important</b>: {@link scout.FocusContext#ready()} must be called manually as soon as the focus context is ready.
+   */
+  PREPARE: 'prepare'
 };

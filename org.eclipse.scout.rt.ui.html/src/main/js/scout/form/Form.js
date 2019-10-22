@@ -875,8 +875,8 @@ scout.Form.prototype.renderInitialFocus = function() {
     this.initialFocus.focus();
   } else {
     // If no explicit focus is requested, try to focus the first focusable element.
-    // Do it only if the context belonging to that element is not locked. Locked means, some other widget (probably an outer container) will do it later.
-    this.session.focusManager.requestFocusIfNotLocked(this.session.focusManager.findFirstFocusableElement(this.$container));
+    // Do it only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
+    this.session.focusManager.requestFocusIfReady(this.session.focusManager.findFirstFocusableElement(this.$container));
   }
 };
 

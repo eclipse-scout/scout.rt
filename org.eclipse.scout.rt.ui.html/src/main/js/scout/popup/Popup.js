@@ -174,13 +174,9 @@ scout.Popup.prototype.validateFocus = function() {
     return;
   }
   var context = this.session.focusManager.getFocusContext(this.$container);
-  context.setLocked(false);
-  if (context.lastValidFocusedElement) {
-    // If a child widget requested the focus, lastValidFocusedElement is set to that child widget.
-    // -> Ensure the focus is on that widget
-    context.restoreFocus();
-  } else {
-    // Otherwise try to determine the initial focus
+  context.ready();
+  if (!context.lastValidFocusedElement) {
+    // No widget requested focus -> try to determine the initial focus
     this._requestInitialFocus();
   }
 };
@@ -292,11 +288,10 @@ scout.Popup.prototype._destroy = function() {
 
 scout.Popup.prototype._renderWithFocusContext = function() {
   if (this.withFocusContext) {
-    var context = this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.NONE);
     // Don't allow an element to be focused while the popup is opened.
     // The popup will focus the element as soon as the opening is finished (see open());
     // The context needs to be already installed so that child elements don't try to focus an element outside of this context
-    context.setLocked(true);
+    this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.PREPARE);
   }
   // Add programmatic 'tabindex' if the $container itself should be focusable (used by context menu popups with no focusable elements)
   if (this.withFocusContext && this.focusableContainer) {

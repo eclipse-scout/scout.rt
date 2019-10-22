@@ -142,6 +142,9 @@ scout.FocusManager.prototype.installFocusContext = function($container, focusRul
 
   // Create and register the focus context.
   var focusContext = new scout.FocusContext($container, this);
+  if (scout.FocusRule.PREPARE !== focusRuleOrElement) {
+    focusContext.ready();
+  }
   this._pushIfAbsendElseMoveTop(focusContext);
 
   if (elementToFocus) {
@@ -274,7 +277,7 @@ scout.FocusManager.prototype.validateFocus = function(filter) {
   }
 };
 
-scout.FocusManager.prototype.requestFocusIfNotLocked = function(element, filter) {
+scout.FocusManager.prototype.requestFocusIfReady = function(element, filter) {
   return this.requestFocus(element, filter, true);
 };
 
@@ -283,7 +286,7 @@ scout.FocusManager.prototype.requestFocusIfNotLocked = function(element, filter)
  *
  * @return {boolean} true if focus was gained, false otherwise.
  */
-scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfNotLocked) {
+scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfReady) {
   element = element instanceof $ ? element[0] : element;
   if (!element) {
     return false;
@@ -291,7 +294,7 @@ scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfNotL
 
   var context = this._findFocusContextFor(element);
   if (context) {
-    if (onlyIfNotLocked && context.locked) {
+    if (onlyIfReady && !context.prepared) {
       return false;
     }
     context.validateAndSetFocus(element, filter);
