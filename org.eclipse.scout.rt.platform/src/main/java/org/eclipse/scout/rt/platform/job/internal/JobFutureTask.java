@@ -98,7 +98,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
    * @since 10.0
    */
   protected volatile Thread m_runner;
-  protected Object m_runnerLock = new Object();
+  protected final Object m_runnerLock = new Object();
 
   public JobFutureTask(final JobManager jobManager, final RunMonitor runMonitor, final JobInput input, final CallableChain<RESULT> callableChain, final Callable<RESULT> callable) {
     super(new Callable<RESULT>() {
@@ -204,7 +204,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
     // Interrupt a possible runner, but only if not running on behalf of a RunContext. Otherwise, interruption was already done by RunContext.
     if (interruptIfRunning && m_input.getRunContext() == null) {
       synchronized (m_runnerLock) {
-        Thread runner = m_runner;
+        final Thread runner = m_runner;
         if (runner != null) {
           runner.interrupt();
         }
@@ -630,7 +630,7 @@ public class JobFutureTask<RESULT> extends FutureTask<RESULT> implements IFuture
   /**
    * Invokes {@link #finished()} if done and currently not executing.
    */
-  private void finishInternal() {
+  protected void finishInternal() {
     // Ensure task not currently running.
     if (m_runner != null) {
       return;

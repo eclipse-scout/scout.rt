@@ -1,22 +1,19 @@
 package org.eclipse.scout.rt.platform.job;
 
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
+import org.eclipse.scout.rt.platform.filter.IFilter;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.junit.Test;
 
@@ -34,73 +31,79 @@ public class JobFutureTaskTest {
    */
   @Test
   public void testRaceConditionOnCancel() throws InterruptedException, ExecutionException, TimeoutException {
-    Semaphore scheduleLock = new Semaphore(100, true);
-    AtomicInteger failureCount = new AtomicInteger();
-    AtomicBoolean active = new AtomicBoolean(true);
-    Random rnd = new Random(1234L);
+    final Semaphore scheduleLock = new Semaphore(100, true);
+    final AtomicInteger failureCount = new AtomicInteger();
+    final AtomicBoolean active = new AtomicBoolean(true);
+    final Random rnd = new Random(1234L);
 
     //progress
-    AtomicInteger runCount = new AtomicInteger();
-    Jobs.schedule(() -> {
-      long t0 = System.currentTimeMillis();
-      while (active.get()) {
-        SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
-        long c = runCount.get();
-        long t1 = System.currentTimeMillis();
-        System.out.println("Run: " + c + " [" + (1000L * c / (t1 - t0)) + " run/sec]");
-      }
-    }, Jobs.newInput().withExecutionHint(TEST_HINT));
+    final AtomicInteger runCount = new AtomicInteger();
+    Jobs.schedule(
+        new IRunnable() {
+          @Override
+          public void run() throws Exception {
+            long t0 = System.currentTimeMillis();
+            while (active.get()) {
+              SleepUtil.sleepSafe(1, TimeUnit.SECONDS);
+              long c = runCount.get();
+              long t1 = System.currentTimeMillis();
+              System.out.println("Run: " + c + " [" + (1000L * c / (t1 - t0)) + " run/sec]");
+            }
+          }
+        }, Jobs.newInput().withExecutionHint(TEST_HINT));
 
     try {
       for (int i = 0; i < ROUNDS; i++) {
         scheduleLock.acquire(1);
-        RunMonitor r = new RunMonitor();
-        JobFutureTask<String> f = new JobFutureTask<String>((JobManager) Jobs.getJobManager(), r, Jobs.newInput(), new CallableChain<String>(), () -> {
-          SleepUtil.sleepSafe(1, TimeUnit.MILLISECONDS);
-          return "FOO";
-        });
 
-        Jobs.schedule(() -> {
-          Thread.interrupted();//clear state
-          ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "foo-thread", 123L));
-          RunMonitor.CURRENT.set(r);
-          IFuture.CURRENT.set(f);
-          f.run();
-        }, Jobs.newInput().withExecutionHint(TEST_HINT));
+        final IFuture<String> f = Jobs.schedule(
+            new Callable<String>() {
+              @Override
+              public String call() throws Exception {
+                SleepUtil.sleepSafe(1, TimeUnit.MILLISECONDS);
+                return "FOO";
+              }
+            }, Jobs.newInput().withExecutionHint(TEST_HINT));
 
-        Jobs.schedule(() -> {
-          Thread.interrupted();//clear state
-          try {
-            Thread.sleep(0L, rnd.nextInt(100000));
-          }
-          catch (InterruptedException e) {
-            failureCount.incrementAndGet();
-            System.out.println("FAILURE: 'f.cancel(true)' cancelled the wrong thread (sleep)");
-          }
-          try {
-            f.cancel(true);
-            String s = f.awaitDoneAndGet();
-            if (s == null) {
-              failureCount.incrementAndGet();
-              System.out.println("FAILURE: value is null");
-            }
-          }
-          catch (FutureCancelledError | ThreadInterruptedError e) {
-            //nop
-          }
-          catch (Throwable t) {
-            t.printStackTrace();
-          }
-          runCount.incrementAndGet();
-          scheduleLock.release(1);
-        }, Jobs.newInput().withExecutionHint(TEST_HINT));
+        Jobs.schedule(
+            new IRunnable() {
+              @Override
+              public void run() throws Exception {
+                Thread.interrupted();//clear state
+                try {
+                  Thread.sleep(0L, rnd.nextInt(100000));
+                }
+                catch (InterruptedException e) {
+                  failureCount.incrementAndGet();
+                  System.out.println("FAILURE: 'f.cancel(true)' cancelled the wrong thread (sleep)");
+                }
+                try {
+                  f.cancel(true);
+                  String s = f.awaitDoneAndGet();
+                  if (s == null) {
+                    failureCount.incrementAndGet();
+                    System.out.println("FAILURE: value is null");
+                  }
+                }
+                catch (FutureCancelledError | ThreadInterruptedError e) {
+                  //nop
+                }
+                catch (Throwable t) {
+                  t.printStackTrace();
+                }
+                runCount.incrementAndGet();
+                scheduleLock.release(1);
+              }
+            }, Jobs.newInput().withExecutionHint(TEST_HINT));
       }
     }
-    finally {
+    finally
+
+    {
       active.set(false);
-      Predicate<IFuture<?>> filter = Jobs.newFutureFilterBuilder().andMatchExecutionHint(TEST_HINT).toFilter();
-      Jobs.getJobManager().cancel(filter, true);
+      IFilter<IFuture<?>> filter = Jobs.newFutureFilterBuilder().andMatchExecutionHint(TEST_HINT).toFilter();
       Jobs.getJobManager().awaitFinished(filter, 1, TimeUnit.MINUTES);
+      Jobs.getJobManager().cancel(filter, true);
     }
     Assertions.assertEqual(0, failureCount.get());
   }
