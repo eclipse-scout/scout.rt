@@ -9,11 +9,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.rt.platform.chain.callable.CallableChain;
-import org.eclipse.scout.rt.platform.context.RunMonitor;
-import org.eclipse.scout.rt.platform.job.internal.JobFutureTask;
-import org.eclipse.scout.rt.platform.job.internal.JobManager;
-import org.eclipse.scout.rt.platform.job.internal.NamedThreadFactory.ThreadInfo;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
@@ -54,18 +49,10 @@ public class JobFutureTaskTest {
     try {
       for (int i = 0; i < ROUNDS; i++) {
         scheduleLock.acquire(1);
-        RunMonitor r = new RunMonitor();
-        JobFutureTask<String> f = new JobFutureTask<String>((JobManager) Jobs.getJobManager(), r, Jobs.newInput(), new CallableChain<String>(), () -> {
+
+        IFuture<String> f = Jobs.schedule(() -> {
           SleepUtil.sleepSafe(1, TimeUnit.MILLISECONDS);
           return "FOO";
-        });
-
-        Jobs.schedule(() -> {
-          Thread.interrupted();//clear state
-          ThreadInfo.CURRENT.set(new ThreadInfo(Thread.currentThread(), "foo-thread", 123L));
-          RunMonitor.CURRENT.set(r);
-          IFuture.CURRENT.set(f);
-          f.run();
         }, Jobs.newInput().withExecutionHint(TEST_HINT));
 
         Jobs.schedule(() -> {
@@ -99,8 +86,8 @@ public class JobFutureTaskTest {
     finally {
       active.set(false);
       Predicate<IFuture<?>> filter = Jobs.newFutureFilterBuilder().andMatchExecutionHint(TEST_HINT).toFilter();
-      Jobs.getJobManager().cancel(filter, true);
       Jobs.getJobManager().awaitFinished(filter, 1, TimeUnit.MINUTES);
+      Jobs.getJobManager().cancel(filter, true);
     }
     Assertions.assertEqual(0, failureCount.get());
   }
