@@ -150,7 +150,7 @@ module.exports = (env, args) => {
           scout: {
             // Scout may be loaded as node module or may be part of the workspace
             // Also make sure the regex only matches *.js files to prevent the output from mixing with css
-            test: /([\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|.*[\\/]eclipse-scout.*[\\/].*\.js)/,
+            test: /[\\/]node_modules[\\/]@eclipse-scout[\\/].*\.js|[\\/]eclipse-scout-core[\\/].*\.js|[\\/]org.eclipse.scout.rt.svg.ui.html[\\/].*\.js/,
             name: 'eclipse-scout',
             priority: -5,
             reuseExistingChunk: true,
