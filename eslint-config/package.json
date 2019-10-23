@@ -1,0 +1,54 @@
+{
+  "name": "@eclipse-scout/eslint-config",
+  "version": "10.0.0",
+  "description": "ESLint shareable config for the Scout style",
+  "author": "BSI Business Systems Integration AG",
+  "homepage": "https://www.eclipse.org/scout",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git.eclipse.org:29418/scout/org.eclipse.scout.rt"
+  },
+  "license": "EPL-1.0",
+  "publishConfig": {
+    "registry": "https://scout.bsiag.com/repository/api/npm/com.bsiag.scout-npm-local/"
+  },
+  "engines": {
+    "node": ">=12.2.0",
+    "npm": ">=6.9.0",
+    "pnpm": ">=4"
+  },
+  "keywords": [
+    "scout",
+    "code",
+    "quality",
+    "style",
+    "lint",
+    "linter",
+    "jscs",
+    "jshint",
+    "jslint",
+    "eslint",
+    "validate",
+    "code style",
+    "strict",
+    "check",
+    "checker",
+    "verify",
+    "enforce",
+    "hint"
+  ],
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "snapshot-version": "scout-scripts snapshot-version"
+  },
+  "devDependencies": {
+    "@eclipse-scout/cli": "^10.0.0-snapshot",
+    "eslint": "6.5.1"
+  },
+  "peerDependencies": {
+    "eslint": ">=6.5.1"
+  }
+}
