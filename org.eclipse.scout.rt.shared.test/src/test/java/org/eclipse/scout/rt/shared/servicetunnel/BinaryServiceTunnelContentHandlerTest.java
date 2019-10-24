@@ -23,8 +23,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.config.IConfigProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.CompressServiceTunnelRequestProperty;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,12 +50,12 @@ public class BinaryServiceTunnelContentHandlerTest {
     }
     m_compressProperty = Mockito.mock(IConfigProperty.class);
     Mockito.when(m_compressProperty.getValue(ArgumentMatchers.<String> any())).thenReturn(true);
-    m_serviceReg = TestingUtility.registerBean(new BeanMetaData(CompressServiceTunnelRequestProperty.class, m_compressProperty));
+    m_serviceReg = BeanTestingHelper.get().registerBean(new BeanMetaData(CompressServiceTunnelRequestProperty.class, m_compressProperty));
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBean(m_serviceReg);
+    BeanTestingHelper.get().unregisterBean(m_serviceReg);
 
     IBeanManager beanManager = BEANS.getBeanManager();
     // restore

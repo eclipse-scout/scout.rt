@@ -34,10 +34,10 @@ import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterN
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationAddress;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
 import org.eclipse.scout.rt.shared.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,21 +59,21 @@ public class ClientNotificationClusterNotificationTest {
   @Before
   public void before() throws Exception {
     m_nullMomImplementorSpy = spy(NullMomImplementor.class);
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(TestClusterMom.class)));
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));
+    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(TestClusterMom.class)));
+    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(NullMomImplementor.class).withProducer((IBeanInstanceProducer<IMomImplementor>) bean -> m_nullMomImplementorSpy)));
     // verify that replacement works
     assertSame("NullMomImplementor-Spy expected", m_nullMomImplementorSpy, BEANS.get(NullMomImplementor.class));
 
     m_svc = new ClusterSynchronizationService();
     m_svc.enable();
     ClientNotificationTestRegistry reg = new ClientNotificationTestRegistry();
-    m_beans.add(TestingUtility.registerBean(new BeanMetaData(ClientNotificationRegistry.class, reg)));
+    m_beans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(ClientNotificationRegistry.class, reg)));
     reg.registerSession(TEST_NODE, "test", TEST_USER);
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   /**

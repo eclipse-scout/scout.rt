@@ -31,10 +31,10 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.runner.Times;
 import org.eclipse.scout.rt.testing.platform.util.BlockingCountDownLatch;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -57,7 +57,7 @@ public class ClientJobCancelTest {
   @Before
   public void before() throws Exception {
 
-    m_serviceReg = TestingUtility.registerBeans(
+    m_serviceReg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(MockServerProcessingCancelService.class)
             .withInitialInstance(new MockServerProcessingCancelService())
             .withApplicationScoped(true).withOrder(-1));
@@ -66,7 +66,7 @@ public class ClientJobCancelTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_serviceReg);
+    BeanTestingHelper.get().unregisterBeans(m_serviceReg);
   }
 
   /**
@@ -124,12 +124,12 @@ public class ClientJobCancelTest {
     runContext.withRunMonitor(runMonitor);
 
     IFuture<String> pingFuture = Jobs.schedule(() -> runContext.call(() -> {
-      IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(PingService.class).withInitialInstance(new PingService()).withApplicationScoped(true));
+      IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(PingService.class).withInitialInstance(new PingService()).withApplicationScoped(true));
       try {
         return ServiceTunnelUtility.createProxy(IPingService.class).ping(pingRequest);
       }
       finally {
-        TestingUtility.unregisterBeans(Arrays.asList(bean));
+        BeanTestingHelper.get().unregisterBeans(Arrays.asList(bean));
       }
     }), Jobs.newInput()
         .withExceptionHandling(null, false));

@@ -28,9 +28,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,12 +47,12 @@ public class ProposalFieldTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(P_LookupCall.class));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(P_LookupCall.class));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   private ProposalField m_proposalField = new ProposalField();

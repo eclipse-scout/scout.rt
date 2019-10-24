@@ -43,9 +43,9 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.http.RemoteServiceInvocationCallable;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -81,7 +81,7 @@ public class HttpServiceTunnelNetworkTest {
 
   @Before
   public void before() {
-    m_exceptionHandlerReplacement = TestingUtility.registerBean(
+    m_exceptionHandlerReplacement = BeanTestingHelper.get().registerBean(
         new BeanMetaData(UIExceptionHandler.class, new UIExceptionHandler())
             .withReplace(true));
     m_client = new TestingHttpClient();
@@ -92,7 +92,7 @@ public class HttpServiceTunnelNetworkTest {
   @After
   public void after() {
     m_sleepIsOver = true;
-    TestingUtility.unregisterBean(m_exceptionHandlerReplacement);
+    BeanTestingHelper.get().unregisterBean(m_exceptionHandlerReplacement);
     m_client.stop();
     m_server.stop();
     sysout("# HttpClient.read\n" + m_clientRead + "\n");

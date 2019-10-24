@@ -25,10 +25,10 @@ import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.CodeTypeProducer;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeRow;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,13 +47,13 @@ public class CodeServiceInvalidateTest {
 
   @Before
   public void before() {
-    codeTypeBean = TestingUtility.registerBean(new BeanMetaData(TestCodeType.class).withProducer(new CodeTypeProducer()));
+    codeTypeBean = BeanTestingHelper.get().registerBean(new BeanMetaData(TestCodeType.class).withProducer(new CodeTypeProducer()));
     TestCodeType.INSTANCE_SEQ.set(0);
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBean(codeTypeBean);
+    BeanTestingHelper.get().unregisterBean(codeTypeBean);
   }
 
   @Test

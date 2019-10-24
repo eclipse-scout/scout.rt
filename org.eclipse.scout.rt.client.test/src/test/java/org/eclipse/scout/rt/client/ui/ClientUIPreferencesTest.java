@@ -30,8 +30,8 @@ import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class ClientUIPreferencesTest {
   @Before
   public void setup() {
 
-    m_registeredUserPrefsStorageService = TestingUtility.registerBean(
+    m_registeredUserPrefsStorageService = BeanTestingHelper.get().registerBean(
         new BeanMetaData(IUserPreferencesStorageService.class)
             .withInitialInstance(new TestingUserPreferencesStorageService())
             .withApplicationScoped(true));
@@ -63,7 +63,7 @@ public class ClientUIPreferencesTest {
   public void tearDown() {
     ClientUIPreferences prefs = ClientUIPreferences.getInstance();
     prefs.m_prefs.clear();
-    TestingUtility.unregisterBean(m_registeredUserPrefsStorageService);
+    BeanTestingHelper.get().unregisterBean(m_registeredUserPrefsStorageService);
   }
 
   @Test

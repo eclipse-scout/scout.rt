@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.util.concurrent.TimedOutError;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -79,7 +79,7 @@ public class ClientSessionTest {
 
   @Test
   public void testStop() throws Exception {
-    TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
+    BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //run a job
@@ -96,7 +96,7 @@ public class ClientSessionTest {
 
   @Test
   public void testStopWithClosedMessageBox() throws Exception {
-    TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
+    BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
     session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
 
     //show a messagebox
@@ -129,8 +129,8 @@ public class ClientSessionTest {
 
   @Test
   public void testStopWithBlockingMessageBox() throws Exception {
-    TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
-    TestingUtility.registerBean(
+    BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
+    BeanTestingHelper.get().registerBean(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {
           @Override
           public Long getDefaultValue() {
@@ -170,8 +170,8 @@ public class ClientSessionTest {
 
   @Test
   public void testStopWithBlockingClientCallback() throws Exception {
-    TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
-    TestingUtility.registerBean(
+    BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
+    BeanTestingHelper.get().registerBean(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withProducer((IBeanInstanceProducer<JobCompletionDelayOnSessionShutdown>) bean -> new JobCompletionDelayOnSessionShutdown() {
           @Override
           public Long getDefaultValue() {

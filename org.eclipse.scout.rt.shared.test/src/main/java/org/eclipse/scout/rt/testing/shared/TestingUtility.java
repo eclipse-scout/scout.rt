@@ -29,8 +29,7 @@ import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO sme [9.0] mark as bean related methods as deprecated (use BeanTestingHelper instead) and remove in 10.0.
-// Methods clearHttpAuthenticationCache, registerWithReplace, registerWithTestingOrder will be removed completely.
+// TODO sme [11.0] remove deprecated methods
 public final class TestingUtility {
 
   private static final Logger LOG = LoggerFactory.getLogger(TestingUtility.class);
@@ -49,22 +48,27 @@ public final class TestingUtility {
   }
 
   /**
-   * @see TestingHelper#registerBeans(BeanMetaData...).
+   * @deprecated Use {@link BeanTestingHelper#registerBeans(BeanMetaData...)} instead. Will be removed in Scout 11.
    */
+  @Deprecated
   public static List<IBean<?>> registerBeans(BeanMetaData... beanDatas) {
     return BeanTestingHelper.get().registerBeans(beanDatas);
   }
 
   /**
-   * @see BeanTestingHelper#registerBean(BeanMetaData)
+   * @deprecated Use {@link BeanTestingHelper#registerBean(BeanMetaData)} instead. Will be removed in Scout 11.
    */
+  @Deprecated
   public static IBean<?> registerBean(BeanMetaData beanData) {
     return BeanTestingHelper.get().registerBean(beanData);
   }
 
   /**
    * Register a new bean to replace an existing bean.
+   *
+   * @deprecated Will be removed in Scout 11, no replacement.
    */
+  @Deprecated
   public static IBean<?> registerWithReplace(Class<?> beanClass) {
     IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
     BeanMetaData newBean = new BeanMetaData(bean).withReplace(true);
@@ -73,7 +77,10 @@ public final class TestingUtility {
 
   /**
    * Register an existing bean with order {@link TESTING_BEAN_ORDER}
+   *
+   * @deprecated Will be removed in Scout 11, no replacement.
    */
+  @Deprecated
   public static IBean<?> registerWithTestingOrder(Class<?> beanClass) {
     IBean<?> bean = BEANS.getBeanManager().getBean(beanClass);
     BeanMetaData newBean = new BeanMetaData(bean).withOrder(TESTING_BEAN_ORDER);
@@ -81,15 +88,17 @@ public final class TestingUtility {
   }
 
   /**
-   * @see BeanTestingHelper#unregisterBean(IBean)
+   * @deprecated Use {@link BeanTestingHelper#unregisterBean(IBean)} instead. Will be removed in Scout 11.
    */
+  @Deprecated
   public static void unregisterBean(IBean<?> bean) {
     BeanTestingHelper.get().unregisterBean(bean);
   }
 
   /**
-   * @see BeanTestingHelper#unregisterBeans(List)
+   * @deprecated Use {@link BeanTestingHelper#unregisterBeans(List)} instead. Will be removed in Scout 11.
    */
+  @Deprecated
   public static void unregisterBeans(List<? extends IBean<?>> beans) {
     BeanTestingHelper.get().unregisterBeans(beans);
   }
@@ -98,7 +107,9 @@ public final class TestingUtility {
    * Clears Java's HTTP authentication cache.
    *
    * @return Returns <code>true</code> if the operation was successful, otherwise <code>false</code>.
+   * @deprecated Will be removed in Scout 11, no replacement.
    */
+  @Deprecated
   public static boolean clearHttpAuthenticationCache() {
     boolean successful = true;
     try {
@@ -222,6 +233,10 @@ public final class TestingUtility {
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
+  /**
+   * @deprecated Use {@link BeanTestingHelper#mockConfigProperty(Class, Object)} instead. Will be removed in Scout 11.
+   */
+  @Deprecated
   public static <T> IBean<?> mockConfigProperty(Class<? extends IConfigProperty<T>> propertyClass, T value) {
     return BeanTestingHelper.get().mockConfigProperty(propertyClass, value);
   }

@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -33,13 +33,13 @@ public abstract class AbstractLocalExtensionTestCase {
 
   @Before
   public void registerLocalRegistry() {
-    m_localServiceRegistrations = TestingUtility.registerBeans(
+    m_localServiceRegistrations = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(ExtensionRegistry.class)
             .withApplicationScoped(true));
   }
 
   @After
   public void unregisterLocalRegistry() {
-    TestingUtility.unregisterBeans(m_localServiceRegistrations);
+    BeanTestingHelper.get().unregisterBeans(m_localServiceRegistrations);
   }
 }

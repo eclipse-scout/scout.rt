@@ -24,9 +24,9 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class NotificationCoalescerTest {
     // register new test coalescer
     P_TestNotificationCoalescer testCoalescer = BeanInstanceUtil.createBean(P_TestNotificationCoalescer.class);
     BeanInstanceUtil.initializeBeanInstance(testCoalescer);
-    m_registerServices = TestingUtility.registerBeans(
+    m_registerServices = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(ICoalescer.class).withInitialInstance(testCoalescer).withApplicationScoped(true));
 
     // now rebuild coalescer linking
@@ -54,7 +54,7 @@ public class NotificationCoalescerTest {
 
   @After
   public void tearDown() throws Exception {
-    TestingUtility.unregisterBeans(m_registerServices);
+    BeanTestingHelper.get().unregisterBeans(m_registerServices);
   }
 
   @Test

@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.shared.AllAccessControlService;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +56,7 @@ public class OrganizeColumnsFormTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBean(m_reg);
+    BeanTestingHelper.get().unregisterBean(m_reg);
   }
 
   @Test

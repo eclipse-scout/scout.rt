@@ -34,8 +34,8 @@ import org.eclipse.scout.rt.shared.notification.INotificationHandler;
 import org.eclipse.scout.rt.shared.notification.NotificationHandlerRegistry;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class NotificationDispatcherTest {
   public void before() throws Exception {
     m_globalNotificationHanlder = mock(GlobalNotificationHandler.class);
     m_groupNotificationHanlder = mock(GroupNotificationHandler.class);
-    m_serviceReg = TestingUtility.registerBeans(
+    m_serviceReg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(GlobalNotificationHandler.class).withInitialInstance(m_globalNotificationHanlder).withApplicationScoped(true),
         new BeanMetaData(GroupNotificationHandler.class).withInitialInstance(m_groupNotificationHanlder).withApplicationScoped(true));
 
@@ -68,7 +68,7 @@ public class NotificationDispatcherTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_serviceReg);
+    BeanTestingHelper.get().unregisterBeans(m_serviceReg);
     // ensure bean hander cache of notification dispatcher gets refreshed
     IBeanManager beanManager = BEANS.getBeanManager();
     IBean<NotificationHandlerRegistry> bean = beanManager.getBean(NotificationHandlerRegistry.class);

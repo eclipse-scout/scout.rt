@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.platform.DefaultPlatform;
 import org.eclipse.scout.rt.platform.IPlatform;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -56,7 +57,7 @@ public class ClientSessionDisposeTest {
     Platform.get().start();
     Platform.get().awaitPlatformStarted();
 
-    TestingUtility.registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
+    BeanTestingHelper.get().registerBean(new BeanMetaData(TestEnvironmentClientSession.class));
 
     IClientSession session = BEANS.get(ClientSessionProvider.class).provide(ClientRunContexts.empty().withUserAgent(UserAgents.createDefault()));
     WeakReference<IClientSession> ref = new WeakReference<>(session);

@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.platform.context.RunContexts;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -59,7 +60,7 @@ public class UiSessionTest {
     m_oldRunContext = RunContext.CURRENT.get();
     RunContext.CURRENT.set(RunContexts.empty()); // Because this test must be executed by a bare JUnit runner (see JavaDoc of test class).
 
-    m_beans = TestingUtility.registerBeans(
+    m_beans = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
           public Long getDefaultValue() {
@@ -79,7 +80,7 @@ public class UiSessionTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
     RunContext.CURRENT.set(m_oldRunContext);
   }
 

@@ -29,9 +29,9 @@ import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.TestHttpSession;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class ServerSessionCacheTest {
     if (!m_testScoutSession.isActive()) {
       m_testScoutSession.start(testSessionId);
     }
-    m_registrations.add(TestingUtility.registerBean(
+    m_registrations.add(BeanTestingHelper.get().registerBean(
         new BeanMetaData(ServerSessionCache.class)
             .withInitialInstance(new ServerSessionCache())
             .withApplicationScoped(true)));
@@ -68,7 +68,7 @@ public class ServerSessionCacheTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_registrations);
+    BeanTestingHelper.get().unregisterBeans(m_registrations);
   }
 
   /**

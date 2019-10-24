@@ -10,7 +10,9 @@
  */
 package org.eclipse.scout.rt.server.clientnotification;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +25,8 @@ import org.eclipse.scout.rt.server.commons.servlet.IHttpServletRoundtrip;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.clientnotification.ClientNotificationMessage;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -155,7 +157,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testEmptyNotificationsAreNotDistributedOverCluster() {
     final IClusterSynchronizationService mockClusterSyncService = Mockito.mock(IClusterSynchronizationService.class);
-    final IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(IClusterSynchronizationService.class)
+    final IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(IClusterSynchronizationService.class)
         .withInitialInstance(mockClusterSyncService)
         .withApplicationScoped(true));
     try {
@@ -166,7 +168,7 @@ public class ClientNotificationRegistryTest {
       Mockito.verifyZeroInteractions(mockClusterSyncService);
     }
     finally {
-      TestingUtility.unregisterBean(bean);
+      BeanTestingHelper.get().unregisterBean(bean);
     }
   }
 
@@ -176,7 +178,7 @@ public class ClientNotificationRegistryTest {
   @Test
   public void testNotificationsWithoutDistributingOverCluster() {
     final IClusterSynchronizationService mockClusterSyncService = Mockito.mock(IClusterSynchronizationService.class);
-    final IBean<?> bean = TestingUtility.registerBean(new BeanMetaData(IClusterSynchronizationService.class)
+    final IBean<?> bean = BeanTestingHelper.get().registerBean(new BeanMetaData(IClusterSynchronizationService.class)
         .withInitialInstance(mockClusterSyncService)
         .withApplicationScoped(true));
     try {
@@ -191,7 +193,7 @@ public class ClientNotificationRegistryTest {
       Mockito.verifyZeroInteractions(mockClusterSyncService);
     }
     finally {
-      TestingUtility.unregisterBean(bean);
+      BeanTestingHelper.get().unregisterBean(bean);
     }
   }
 

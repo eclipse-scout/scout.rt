@@ -19,8 +19,8 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -68,7 +68,7 @@ public class PreferencesTest {
 
     TestingUserPreferencesStorageService svc = new TestingUserPreferencesStorageService();
 
-    List<IBean<?>> registerServices = TestingUtility.registerBeans(
+    List<IBean<?>> registerServices = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(IUserPreferencesStorageService.class)
             .withInitialInstance(svc)
             .withApplicationScoped(true));
@@ -76,7 +76,7 @@ public class PreferencesTest {
       prefs.flush();
     }
     finally {
-      TestingUtility.unregisterBeans(registerServices);
+      BeanTestingHelper.get().unregisterBeans(registerServices);
     }
     assertFalse(prefs.isDirty());
     assertTrue(svc.m_flushed);

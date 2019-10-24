@@ -32,10 +32,10 @@ import org.eclipse.scout.rt.platform.job.JobState;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -57,7 +57,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
   @Before
   public void before() {
     m_protocol.clear();
-    m_beans = TestingUtility.registerBeans(
+    m_beans = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(JobCompletionDelayOnSessionShutdown.class).withInitialInstance(new JobCompletionDelayOnSessionShutdown() {
           @Override
           public Long getDefaultValue() {
@@ -79,7 +79,7 @@ public class ClientSessionWithBlockingConditionInterruptionTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
     m_protocol.clear();
   }
 

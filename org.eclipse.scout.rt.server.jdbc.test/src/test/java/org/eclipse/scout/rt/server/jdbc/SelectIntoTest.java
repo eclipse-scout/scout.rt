@@ -18,8 +18,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.holders.NVPair;
 import org.eclipse.scout.rt.server.jdbc.fixture.SqlServiceMock;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,12 +37,12 @@ public class SelectIntoTest {
   @Before
   public void before() throws Exception {
     SqlServiceMock sqlService = new SqlServiceMock();
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ISqlService.class).withInitialInstance(sqlService).withApplicationScoped(true));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ISqlService.class).withInitialInstance(sqlService).withApplicationScoped(true));
   }
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   @Test(expected = ProcessingException.class)

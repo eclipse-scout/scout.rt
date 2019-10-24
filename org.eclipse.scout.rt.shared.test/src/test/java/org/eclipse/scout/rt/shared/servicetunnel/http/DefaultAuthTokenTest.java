@@ -24,8 +24,8 @@ import org.eclipse.scout.rt.platform.security.SecurityUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPrivateKeyProperty;
 import org.eclipse.scout.rt.shared.SharedConfigProperties.AuthTokenPublicKeyProperty;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -56,14 +56,14 @@ public class DefaultAuthTokenTest {
   @BeforeClass
   public static void beforeClass() {
     s_pair = SecurityUtility.generateKeyPair();
-    s_beans.addAll(TestingUtility.registerBeans(
+    s_beans.addAll(BeanTestingHelper.get().registerBeans(
         new BeanMetaData(AuthTokenPrivateKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPrivateKeyPropertyEx()),
         new BeanMetaData(AuthTokenPublicKeyProperty.class).withApplicationScoped(true).withInitialInstance(new AuthTokenPublicKeyPropertyEx())));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(s_beans);
+    BeanTestingHelper.get().unregisterBeans(s_beans);
   }
 
   @Test

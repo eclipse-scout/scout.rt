@@ -34,9 +34,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.platform.util.ScoutAssert;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.form.DynamicStringField;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -56,12 +56,12 @@ public class ListBoxTest extends AbstractListBox<Long> {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(ListBoxLookupCall.class));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(ListBoxLookupCall.class));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   private HashSet<Long> m_testValue;

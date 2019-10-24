@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.concurrent.FutureCancelledError;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class UiJobsTest {
 
   @Before
   public void before() {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(TestEnvironmentClientSession.class));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(TestEnvironmentClientSession.class));
     m_session = (UiSession) JsonTestUtility.createAndInitializeUiSession();
   }
 
@@ -43,7 +43,7 @@ public class UiJobsTest {
     }
     finally {
       m_session = null;
-      TestingUtility.unregisterBeans(m_beans);
+      BeanTestingHelper.get().unregisterBeans(m_beans);
     }
   }
 

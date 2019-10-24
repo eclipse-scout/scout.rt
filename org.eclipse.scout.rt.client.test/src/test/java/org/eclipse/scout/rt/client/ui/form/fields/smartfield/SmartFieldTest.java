@@ -43,9 +43,9 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.rt.testing.client.runner.ClientTestRunner;
 import org.eclipse.scout.rt.testing.client.runner.RunWithClientSession;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.lookup.TestingLookupService;
 import org.eclipse.scout.testing.client.form.FormHandler;
 import org.junit.After;
@@ -85,12 +85,12 @@ public class SmartFieldTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    m_beans = TestingUtility.registerBeans(new BeanMetaData(StyleLookupCall.class));
+    m_beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(StyleLookupCall.class));
   }
 
   @AfterClass
   public static void afterClass() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   public static class TestForm extends AbstractForm {
@@ -270,7 +270,7 @@ public class SmartFieldTest {
 
   @Before
   public void setUp() throws Throwable {
-    m_reg = TestingUtility.registerBeans(
+    m_reg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(StyleLookupService.class)
             .withApplicationScoped(true));
     m_form = new TestForm();
@@ -427,7 +427,7 @@ public class SmartFieldTest {
 
   @After
   public void tearDown() throws Throwable {
-    TestingUtility.unregisterBeans(m_reg);
+    BeanTestingHelper.get().unregisterBeans(m_reg);
     m_form.doClose();
   }
 

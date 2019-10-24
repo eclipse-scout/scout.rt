@@ -49,10 +49,10 @@ import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgents;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithSubject;
 import org.eclipse.scout.rt.testing.server.runner.RunWithServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ServerTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -80,7 +80,7 @@ public class ServiceTunnelServletTest {
   public void before() throws ServletException, InstantiationException, IllegalAccessException {
     m_serverSessionProviderSpy = spy(BEANS.get(ServerSessionProvider.class));
 
-    m_beans = TestingUtility.registerBeans(
+    m_beans = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(ServerSessionProvider.class)
             .withInitialInstance(m_serverSessionProviderSpy)
             .withApplicationScoped(true));
@@ -94,7 +94,7 @@ public class ServiceTunnelServletTest {
 
   @After
   public void after() {
-    TestingUtility.unregisterBeans(m_beans);
+    BeanTestingHelper.get().unregisterBeans(m_beans);
   }
 
   @Test

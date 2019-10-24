@@ -26,8 +26,8 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,7 +42,7 @@ public class PermissionServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
-    List<IBean<?>> reg = TestingUtility.registerBeans(
+    List<IBean<?>> reg = BeanTestingHelper.get().registerBeans(
         new BeanMetaData(IPermissionService.class)
             .withInitialInstance(testService)
             .withApplicationScoped(true));
@@ -76,7 +76,7 @@ public class PermissionServiceTest {
       }
     }
     finally {
-      TestingUtility.unregisterBeans(reg);
+      BeanTestingHelper.get().unregisterBeans(reg);
     }
   }
 

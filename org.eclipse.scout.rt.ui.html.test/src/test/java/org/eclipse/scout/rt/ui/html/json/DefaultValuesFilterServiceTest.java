@@ -25,8 +25,8 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONObject;
 import org.junit.After;
@@ -48,16 +48,16 @@ public class DefaultValuesFilterServiceTest {
     BEANS.get(DefaultValuesFilterService.class).setFilter(null);
 
     m_origBeans = BEANS.getBeanManager().getBeans(IDefaultValuesConfigurationContributor.class);
-    TestingUtility.unregisterBeans(m_origBeans);
-    m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideOriginalContributor.class)));
-    m_newBeans.add(TestingUtility.registerBean(new BeanMetaData(OverrideContributor.class)));
+    BeanTestingHelper.get().unregisterBeans(m_origBeans);
+    m_newBeans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(OverrideOriginalContributor.class)));
+    m_newBeans.add(BeanTestingHelper.get().registerBean(new BeanMetaData(OverrideContributor.class)));
   }
 
   @After
   public void tearDown() {
-    TestingUtility.unregisterBeans(m_newBeans);
+    BeanTestingHelper.get().unregisterBeans(m_newBeans);
     for (IBean<?> bean : m_origBeans) {
-      TestingUtility.registerBean(new BeanMetaData(bean.getBeanClazz()));
+      BeanTestingHelper.get().registerBean(new BeanMetaData(bean.getBeanClazz()));
     }
 
     // Restore original filter
