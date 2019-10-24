@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 public interface IFileChooserButton extends IValueField<BinaryResource>, IHtmlCapable {
 
   String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
+  String PROP_FILE_EXTENSIONS = "fileExtensions";
   String PROP_ICON_ID = "iconId";
 
   /**

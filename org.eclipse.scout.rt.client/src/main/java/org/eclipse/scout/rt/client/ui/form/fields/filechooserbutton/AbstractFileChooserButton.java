@@ -19,12 +19,9 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
-import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("20038f90-75fa-4796-8a08-a9417ae69c60")
 public abstract class AbstractFileChooserButton extends AbstractValueField<BinaryResource> implements IFileChooserButton {
-
-  private Collection<String> m_fileExtensions;
 
   public AbstractFileChooserButton() {
     this(true);
@@ -86,13 +83,13 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
   }
 
   @Override
-  public void setFileExtensions(Collection<String> a) {
-    m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(a);
+  public void setFileExtensions(Collection<String> fileExtensions) {
+    propertySupport.setProperty(PROP_FILE_EXTENSIONS, fileExtensions);
   }
 
   @Override
   public Collection<String> getFileExtensions() {
-    return CollectionUtility.arrayList(m_fileExtensions);
+    return (Collection<String>) propertySupport.getProperty(PROP_FILE_EXTENSIONS);
   }
 
   @Override
@@ -102,7 +99,7 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
 
   @Override
   public long getMaximumUploadSize() {
-    return propertySupport.getPropertyInt(PROP_MAXIMUM_UPLOAD_SIZE);
+    return propertySupport.getPropertyLong(PROP_MAXIMUM_UPLOAD_SIZE);
   }
 
   @Override

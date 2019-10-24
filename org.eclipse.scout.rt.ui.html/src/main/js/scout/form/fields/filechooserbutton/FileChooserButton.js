@@ -22,6 +22,11 @@ scout.inherits(scout.FileChooserButton, scout.ValueField);
 scout.FileChooserButton.prototype._init = function(model) {
   scout.FileChooserButton.parent.prototype._init.call(this, model);
 
+  // FIXME [16.2] awe, unify fileExtensions and acceptTypes
+  if (model.fileExtensions) {
+    this.setFileExtensions(model.fileExtensions);
+  }
+
   this.button = scout.create('Button', {
     parent: this,
     label: this._buttonLabel(),
@@ -58,7 +63,7 @@ scout.FileChooserButton.prototype._initValue = function(value) {
 };
 
 scout.FileChooserButton.prototype._buttonLabel = function() {
-  return scout.strings.hasText(this.label) ? this.label : this.session.text('ui.Upload');
+  return this.label;
 };
 
 scout.FileChooserButton.prototype._render = function() {
@@ -116,6 +121,16 @@ scout.FileChooserButton.prototype.setIconId = function(iconId) {
 scout.FileChooserButton.prototype.setAcceptTypes = function(acceptTypes) {
   this.setProperty('acceptTypes', acceptTypes);
   this.fileInput.setAcceptTypes(acceptTypes);
+};
+
+scout.FileChooserButton.prototype.setFileExtensions = function(fileExtensions) {
+  this.setProperty('fileExtensions', fileExtensions);
+  var acceptTypes = scout.arrays.ensure(fileExtensions);
+  acceptTypes = acceptTypes.map(function(acceptType) {
+    return acceptType.indexOf(0) === '.' ? acceptType : '.' + acceptType;
+  });
+  this.setAcceptTypes(scout.strings.join(',', acceptTypes));
+  this.fileInput.acceptTypes = this.acceptTypes;
 };
 
 scout.FileChooserButton.prototype.setMaximumUploadSize = function(maximumUploadSize) {

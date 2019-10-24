@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserbutton;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,18 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
       @Override
       protected Long modelValue() {
         return getModel().getMaximumUploadSize();
+      }
+    });
+    putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_FILE_EXTENSIONS, model) {
+      @Override
+      protected Collection<String> modelValue() {
+        return getModel().getFileExtensions();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        Collection<String> val = (Collection<String>) value;
+        return new JSONArray(val);
       }
     });
     putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_ICON_ID, model) {
