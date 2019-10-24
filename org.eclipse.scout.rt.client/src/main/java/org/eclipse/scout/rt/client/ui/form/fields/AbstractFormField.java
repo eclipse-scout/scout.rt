@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -372,7 +373,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default alignment is left.
    *
    * @return -1 for left, 0 for center and 1 for right alignment
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
   @Order(85)
@@ -388,7 +389,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default alignment is top.
    *
    * @return -1 for top, 0 for center and 1 for bottom alignment
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
   @Order(86)
@@ -407,7 +408,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is true.
    *
    * @return {@code true} if this field should horizontally fill the grid cell, {@code false} otherwise
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(87)
@@ -426,7 +427,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is true.
    *
    * @return {@code true} if this field should vertically fill the grid cell, {@code false} otherwise
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(88)
@@ -446,7 +447,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is -1.
    *
    * @return the x position in the grid.
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(90)
@@ -465,7 +466,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is -1.
    *
    * @return the y position in the grid.
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(95)
@@ -531,9 +532,9 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is 1.
    *
    * @return the number of rows to span
-   * @see {@link #getConfiguredGridWeightY()} comment about weightY logic which depends on the gridH value configured
+   * @see #getConfiguredGridWeightY() comment about weightY logic which depends on the gridH value configured
    *      here
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(105)
@@ -564,7 +565,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is -1.
    *
    * @return a value between 0 and 1, or -1
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(130)
@@ -597,7 +598,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is -1.
    *
    * @return a value between 0 and 1, or -1
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(140)
@@ -614,7 +615,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is false.
    *
    * @return {@code true} if this field should be as width as preferred by the ui, {@code false} otherwise
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
@@ -631,7 +632,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is false.
    *
    * @return {@code true} if this field should be as height as preferred by the ui, {@code false} otherwise
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(142)
@@ -646,7 +647,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is 0.
    *
    * @return the preferred width in pixel
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(150)
@@ -661,7 +662,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
    * Subclasses can override this method. Default is 0.
    *
    * @return the preferred height in pixel
-   * @see {@link #getGridData()}, {@link #getGridDataHints()}
+   * @see #getGridData(), {@link #getGridDataHints()}
    */
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(160)
@@ -1183,7 +1184,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   /**
    * Computes a class id by considering the enclosing field list.
    * <p>
-   * Does not consider the complete path for lenient support. For dynamically injected fields {@link #classid()} needs
+   * Does not consider the complete path for lenient support. For dynamically injected fields {@link #classId()} needs
    * to be overridden.
    * </p>
    */
@@ -1587,10 +1588,10 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
     if (updateChildren) {
       // propagate change to children
       for (IWidget w : getChildren()) {
-        w.<IFormField> visit(field -> field.setVisible(visible, dimension), IFormField.class);
+        Consumer<IFormField> visitor = field -> field.setVisible(visible, dimension);
+        w.visit(visitor, IFormField.class);
       }
     }
-
   }
 
   @Override
@@ -1968,7 +1969,7 @@ public abstract class AbstractFormField extends AbstractWidget implements IFormF
   }
 
   protected List<IKeyStroke> getKeyStrokesInternal() {
-    return propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES);
+    return propertySupport.getPropertyList(PROP_KEY_STROKES);
   }
 
   @Override

@@ -177,7 +177,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * Provides 8 boolean flags.<br>
-   * Currently used: {@link #INITIALIZED}, {@link #CACHE_BOUNDS}, {@link #ASK_IF_NEED_SAVE}, {@link #BUTTONS_ARMED} ,
+   * Currently used: {@link #CACHE_BOUNDS}, {@link #ASK_IF_NEED_SAVE}, {@link #BUTTONS_ARMED} ,
    * {@link #CLOSE_TIMER_ARMED}, {@link #SHOW_ON_START}
    */
   private byte m_flags;
@@ -516,8 +516,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * This method is called in order to check field validity.<br>
-   * This method is called before {@link IFormHandler#interceptCheckFields()} and before the form is validated and
-   * stored.<br>
+   * This method is called before {@link IFormHandler#onCheckFields()} and before the form is validated and stored.<br>
    * After this method, the form is checking fields itself and displaying a dialog with missing and invalid fields.
    *
    * @return true when this check is done and further checks can continue, false to silently cancel the current process
@@ -532,7 +531,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * This method is called in order to update derived states like button enablings.<br>
-   * This method is called before {@link IFormHandler#interceptValidate()} and before the form is stored.
+   * This method is called before {@link IFormHandler#onCheckFields()} and before the form is stored.
    *
    * @return true when validate is successful, false to silently cancel the current process
    * @throws ProcessingException
@@ -546,7 +545,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
 
   /**
    * This method is called in order to update pages on the desktop after the form stored data.<br>
-   * This method is called after {@link IFormHandler#execStore()}.
+   * This method is called after {@link AbstractFormHandler#execStore()}.
    */
   @ConfigOperation
   @Order(16)
@@ -2863,9 +2862,8 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
    */
   protected IFuture<Void> startTimer(int intervalSeconds, final String timerId) {
     return ModelJobs.schedule(new IRunnable() {
-
       @Override
-      public void run() throws Exception {
+      public void run() {
         try {
           LOG.info("timer {}", timerId);
           interceptTimer(timerId);
@@ -2893,7 +2891,7 @@ public abstract class AbstractForm extends AbstractWidget implements IForm, IExt
     return ModelJobs.schedule(new IRunnable() {
 
       @Override
-      public void run() throws Exception {
+      public void run() {
         final long elapsedMillis = System.currentTimeMillis() - startMillis;
         final long remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(delayMillis - elapsedMillis);
 
