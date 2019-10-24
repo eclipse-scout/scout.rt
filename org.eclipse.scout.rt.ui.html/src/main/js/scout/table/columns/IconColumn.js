@@ -38,6 +38,15 @@ scout.IconColumn.prototype._formatValue = function(value) {
 /**
  * @override
  */
+scout.IconColumn.prototype._cellCssClass = function(cell, tableNode) {
+  var cssClass = scout.IconColumn.parent.prototype._cellCssClass.call(this, cell, tableNode);
+  cssClass += ' table-icon-cell';
+  return cssClass;
+};
+
+/**
+ * @override
+ */
 scout.IconColumn.prototype.cellTextForGrouping = function(row) {
   var cell = this.table.cell(this, row);
   return cell.value;
