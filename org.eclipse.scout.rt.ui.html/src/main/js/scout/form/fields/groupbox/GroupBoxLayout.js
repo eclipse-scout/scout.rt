@@ -57,20 +57,20 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   if (htmlMenuBar) {
     if (this.groupBox.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
       // position: TITLE
+      // Use Math.floor/ceil and +1 to avoid rounding issues with text-ellipsis and title label
       menuBarSize = htmlMenuBar.prefSize({
         exact: true
       });
       var titleSize = scout.graphics.prefSize(this.groupBox.$title);
-      var titleLabelWidth = scout.graphics.prefSize(this.groupBox.$label, true).width;
+      var titleLabelWidth = Math.ceil(scout.graphics.prefSize(this.groupBox.$label, true).width) + 1;
       var menuBarWidth = menuBarSize.width;
       var titleWidth = titleSize.width - statusWidth;
 
-      // Use Math.floor to avoid rounding issues with text-ellipsis
       if ((titleLabelWidth + menuBarWidth) < titleWidth) {
         // label and menu-bar both fit into the title
         // let menu-bar use all the available width
-        menuBarWidth = titleWidth - titleLabelWidth;
-        menuBarSize.width = Math.floor(menuBarWidth);
+        menuBarWidth = Math.floor(titleWidth - titleLabelWidth);
+        menuBarSize.width = menuBarWidth;
         $label.cssWidth('');
 
       } else {
