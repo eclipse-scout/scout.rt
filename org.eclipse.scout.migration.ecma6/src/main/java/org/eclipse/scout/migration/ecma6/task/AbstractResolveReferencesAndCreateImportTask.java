@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractResolveReferencesAndCreateImportTask extends AbstractTask {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractResolveReferencesAndCreateImportTask.class);
-  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
   @Override

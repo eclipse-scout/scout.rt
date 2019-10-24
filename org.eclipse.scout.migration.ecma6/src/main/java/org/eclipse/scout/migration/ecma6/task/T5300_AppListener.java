@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.platform.Order;
 @Order(5300)
 public class T5300_AppListener extends AbstractTask {
 
-  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
   private static final Pattern APP_LISTENER_PAT = Pattern.compile("scout\\.addAppListener\\('(\\w+)',");
 

@@ -24,8 +24,6 @@ import org.eclipse.scout.rt.platform.Order;
 public class T1100_ObjectFactories extends AbstractTask {
   private static final Pattern FACTORY_PAT = Pattern.compile("scout\\.objectFactories\\s*=\\s*\\$\\.extend\\(\\s*scout\\.objectFactories,\\s*\\{");
 
-  @SuppressWarnings("unchecked")
-
   public static boolean isObjectFactories(Path path, WorkingCopy workingCopy) {
     if (!path.toString().endsWith(".js")) {
       return false;

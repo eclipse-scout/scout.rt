@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.platform.Order;
 @Order(25000)
 public class T25000_ModelsGetModelToImport extends AbstractTask {
 
-  @SuppressWarnings("unchecked")
   private Predicate<PathInfo> m_filter = PathFilters.and(PathFilters.inSrcMainJs(), PathFilters.withExtension("js"));
 
   // use the "new" pattern (without scout) because the utility migration has already changed the static utility from scout.models to models.

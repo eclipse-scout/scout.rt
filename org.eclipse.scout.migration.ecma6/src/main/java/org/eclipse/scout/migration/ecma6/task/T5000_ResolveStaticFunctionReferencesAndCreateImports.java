@@ -74,6 +74,7 @@ public class T5000_ResolveStaticFunctionReferencesAndCreateImports extends Abstr
     for (INamedElement function : staticFunctions) {
       String replacement = function.getParent().getName() + "." + function.getName();
       source = createImportForReferences(function.getFullyQualifiedName(), function.getAncestor(Type.Class).getFullyQualifiedName(), replacement, source, jsFile, context);
+      @SuppressWarnings("unchecked")
       List<String> singletonRefs = (List<String>) function.getCustomAttribute(INamedElement.SINGLETON_REFERENCES);
       if (singletonRefs != null && singletonRefs.size() > 0) {
         for (String singletonRef : singletonRefs) {

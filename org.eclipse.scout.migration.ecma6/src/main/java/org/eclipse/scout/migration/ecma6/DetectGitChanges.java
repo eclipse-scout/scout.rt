@@ -163,7 +163,9 @@ public class DetectGitChanges {
     FileUtility.listTree(queryPath.toFile(), true, false)
         .forEach(f -> {
           Path rel = queryPath.relativize(f.toPath());
-          if (rel.toString().isEmpty()) return;
+          if (rel.toString().isEmpty()) {
+            return;
+          }
 
           File src = Paths.get(WORKSPACE + "/" + relativeModulePath + "/" + (rel.toString())).toFile();
           File dst = Paths.get(GIT_LATEST + "/" + relativeModulePath + "/" + (rel.toString())).toFile();
@@ -185,9 +187,9 @@ public class DetectGitChanges {
   private static void compareFolders(String leftDir, String rightDir) {
     System.out.println();
     System.out.println("Comparing folders");
-    AtomicInteger diffCount=new AtomicInteger();
+    AtomicInteger diffCount = new AtomicInteger();
     Path leftPath = Paths.get(leftDir.replace('\\', '/'));
-    Path rightPath = Paths.get(rightDir.replace('\\', '/'));
+    //Path rightPath = Paths.get(rightDir.replace('\\', '/'));
     Stream.concat(
         FileUtility.listTree(new File(leftDir), true, false)
             .stream()
@@ -198,26 +200,26 @@ public class DetectGitChanges {
         .distinct()
         .sorted()
         .forEach(relPath -> {
-          File left=new File(leftDir+"/"+relPath.toString());
-          File right=new File(rightDir+"/"+relPath.toString());
-          if(!left.exists()){
+          File left = new File(leftDir + "/" + relPath.toString());
+          File right = new File(rightDir + "/" + relPath.toString());
+          if (!left.exists()) {
             diffCount.incrementAndGet();
-            System.out.println("MISSING_LEFT\t"+relPath);
+            System.out.println("MISSING_LEFT\t" + relPath);
           }
-          else if(!right.exists()){
+          else if (!right.exists()) {
             diffCount.incrementAndGet();
-            System.out.println("MISSING_RIGHT\t"+relPath);
+            System.out.println("MISSING_RIGHT\t" + relPath);
           }
-          else{
-            String leftSource= IOUtility.getContentInEncoding(left,"UTF-8");
-            String rightSource= IOUtility.getContentInEncoding(right,"UTF-8");
-            if(!leftSource.equals(rightSource)){
+          else {
+            String leftSource = IOUtility.getContentInEncoding(left, "UTF-8");
+            String rightSource = IOUtility.getContentInEncoding(right, "UTF-8");
+            if (!leftSource.equals(rightSource)) {
               diffCount.incrementAndGet();
-              System.out.println("DIFFERENT\t"+relPath);
+              System.out.println("DIFFERENT\t" + relPath);
             }
           }
         });
-    if(diffCount.get()==0){
+    if (diffCount.get() == 0) {
       System.out.println("No changes found, nothing to do");
     }
   }
