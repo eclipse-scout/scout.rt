@@ -151,12 +151,13 @@ public class Migration {
   protected void createJsImports() {
     m_context.getWorkingCopies().stream()
         .filter(wc -> wc.getPath().toString().endsWith(".js"))
+        .filter(wc -> m_context.getJsFile(wc) != null) // only working copies that have a parsed js file may add imports
         .forEach(wc -> MigrationUtility.insertImports(wc, m_context));
   }
 
   protected void applyManualFixes() {
     ManualFixes fixes = new ManualFixes();
-    m_context.getWorkingCopies().stream().forEach(fixes::apply);
+    m_context.getWorkingCopies().forEach(fixes::apply);
   }
 
   protected void writeFiles() throws IOException {

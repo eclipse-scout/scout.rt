@@ -149,6 +149,10 @@ public class Context {
     return path.relativize(Configuration.get().getSourceModuleDirectory());
   }
 
+  public JsFile getJsFile(WorkingCopy workingCopy) {
+    return m_jsFiles.get(workingCopy);
+  }
+
   public JsFile ensureJsFile(WorkingCopy workingCopy) {
     JsFile file = m_jsFiles.get(workingCopy);
     if (file == null) {
