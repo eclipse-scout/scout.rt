@@ -3011,8 +3011,6 @@ scout.Table.prototype.setScrollTop = function(scrollTop) {
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   if (this.rendered) {
     this._renderViewport();
-    // TODO comment hack analog tree
-    //    this._renderScrollTop();
   }
 };
 
