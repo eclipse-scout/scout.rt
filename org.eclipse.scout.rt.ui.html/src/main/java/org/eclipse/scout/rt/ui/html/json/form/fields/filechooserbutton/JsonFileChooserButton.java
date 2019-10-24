@@ -59,6 +59,7 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
 
       @Override
       public Object prepareValueForToJson(Object value) {
+        @SuppressWarnings("unchecked")
         Collection<String> val = (Collection<String>) value;
         return new JSONArray(val);
       }

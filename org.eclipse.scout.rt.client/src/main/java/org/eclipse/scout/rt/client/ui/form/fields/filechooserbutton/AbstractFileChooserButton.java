@@ -88,6 +88,7 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Collection<String> getFileExtensions() {
     return (Collection<String>) propertySupport.getProperty(PROP_FILE_EXTENSIONS);
   }
