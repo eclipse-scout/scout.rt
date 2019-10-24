@@ -192,7 +192,7 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
   // (e.g. if it is not in the viewport anymore). In that case the animation must be stopped otherwise it may be placed at a wrong position
   tile.$container.stop();
 
-  if (tile.$container.hasClass('invisible')) {
+  if (tile.$container.hasClass('invisible') || tile.$container.hasClass('animate-visible')) {
     // When tiles are inserted they are invisible because a dedicated insert animation will be started after the layouting,
     // the animation here is to animate the position change -> don't animate inserted tiles here
 
