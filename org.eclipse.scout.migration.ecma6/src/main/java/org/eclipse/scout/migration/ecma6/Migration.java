@@ -218,7 +218,7 @@ public class Migration {
   protected void cleanTarget() {
     if (Configuration.get().cleanTargetBeforeWriteFiles()) {
       if (Configuration.get().getSourceModuleDirectory().equals(Configuration.get().getTargetModuleDirectory())) {
-        LOG.warn("Configuration 'cleanTargetBeforeWriteFiles' is ignored if source and target directory are same.");
+        LOG.info("Configuration 'cleanTargetBeforeWriteFiles' is ignored if source and target directory are same.");
         return;
       }
       try {
@@ -228,7 +228,6 @@ public class Migration {
         throw new ProcessingException("Could not delete target directory!", e);
       }
     }
-
   }
 
   private void writeWorkingCopy(WorkingCopy workingCopy, Map<Path, Path> skipCopyRelativePaths) {

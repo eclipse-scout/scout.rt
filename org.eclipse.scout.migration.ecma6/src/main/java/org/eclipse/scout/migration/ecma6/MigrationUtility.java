@@ -74,7 +74,7 @@ public final class MigrationUtility {
     //noinspection resource
     @SuppressWarnings("resource")
     Scanner inScanner = new Scanner(System.in); // Create a Scanner object
-    System.out.println("Type 'yes' or 'y' to continue, 'no' or 'n' to abort.");
+    System.out.println("First migration phase done. Commit all changes to VCS. Afterwards type 'yes' or 'y' to continue migration, 'no' or 'n' to abort.");
     String answer = inScanner.nextLine(); // Read user input
     return "yes".equalsIgnoreCase(answer) || "y".equalsIgnoreCase(answer);
   }
