@@ -675,7 +675,7 @@ scout.GroupBox.prototype._renderLabelVisible = function(labelVisible) {
   this.$title.setVisible(this._computeTitleVisible(labelVisible));
   this._updateFieldStatus();
   if (this.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
-    this.revalidateLayout();
+    this.invalidateLayoutTree();
   }
 };
 

@@ -538,8 +538,7 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
     if (htmlCompParent) {
       htmlCompParent.invalidateLayoutTree();
     }
-    // Validate now to prevent flickering
-    this.revalidateLayoutTree();
+    this.invalidateLayoutTree();
   }
 };
 
