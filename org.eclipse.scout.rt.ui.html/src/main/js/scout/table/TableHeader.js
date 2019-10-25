@@ -409,6 +409,8 @@ scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {
   }
   // Make text invisible if there is an icon but no text
   $text.setVisible(!($icon && $text.html() === '&nbsp;'));
+  // Mark icon-only columns to prevent ellipsis (like IconColumn.js does for table cells)
+  column.$header.toggleClass('table-header-item-icon-only', !!(column.headerIconId && !column.text));
 };
 
 scout.TableHeader.prototype._renderColumnLegacyStyle = function(column) {

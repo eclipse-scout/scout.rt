@@ -74,6 +74,12 @@
     padding-right: @table-cell-padding-left;
   }
 
+  &.last.halign-left,
+  &.last.halign-center,
+  &.last.halign-right {
+    padding-right: @table-cell-padding-right-last;
+  }
+
   &.sorted,
   &.grouped,
   &.filtered {
@@ -136,6 +142,10 @@
     /* explicitly disable ellipsis, because IE would display it for very narrow columns even if content is '&nbsp;' */
     text-overflow: clip;
   }
+}
+
+.table-header-item-icon-only {
+  text-overflow: clip;
 }
 
 .table-header-item-state {
