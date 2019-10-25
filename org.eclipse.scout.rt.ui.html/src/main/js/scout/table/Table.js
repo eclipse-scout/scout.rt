@@ -3596,13 +3596,14 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
 };
 
 /**
- * @returns {String[]} labels of the currently active TableUserFilters
+ * @returns {String[]} labels of the currently active Filters that provide a createLabel() function
  */
 scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
   for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
-    if (filter instanceof scout.TableUserFilter) {
+    // check if filter supports label
+    if (typeof filter.createLabel === 'function') {
       filteredBy.push(filter.createLabel());
     }
   }
@@ -3621,6 +3622,16 @@ scout.Table.prototype.resetUserFilter = function() {
   // reset rows
   this.filter();
   this._triggerFilterReset();
+};
+
+scout.Table.prototype.hasUserFilter = function() {
+  return Object.keys(this._filterMap).map(function(key) {
+      this._filterMap[key];
+    }, this)
+    .filter(function(filter) {
+      return filter instanceof scout.TableUserFilter;
+    })
+    .length > 0;
 };
 
 scout.Table.prototype.resizeToFit = function(column, maxWidth) {

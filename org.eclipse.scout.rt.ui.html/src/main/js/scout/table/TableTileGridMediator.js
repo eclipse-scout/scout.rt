@@ -33,6 +33,7 @@ scout.TableTileGridMediator = function() {
 
   this._tileAccordionPropertyChangeHandler = this._onTileAccordionPropertyChange.bind(this);
   this._tileAccordionActionHandler = this._onTileAccordionAction.bind(this);
+  this._tileAccordionClickHandler = this._onTileAccordionClick.bind(this);
   this._tableFilterAddedHandler = this._onTableFilterAdded.bind(this);
   this._tableFilterRemovedHandler = this._onTableFilterRemoved.bind(this);
   this._tableFilterHandler = this._onTableFilter.bind(this);
@@ -42,6 +43,7 @@ scout.TableTileGridMediator = function() {
   this._tableRowsDeletedHandler = this._onTableRowsDeleted.bind(this);
   this._tableAllRowsDeletedHandler = this._onTableAllRowsDeleted.bind(this);
   this._tableRowOrderChangedHandler = this._onTableRowOrderChangedHandler.bind(this);
+  this._tableRenderHandler = this._onTableRenderHandler.bind(this);
 
   this._destroyHandler = this._uninstallListeners.bind(this);
 
@@ -73,6 +75,7 @@ scout.TableTileGridMediator.prototype.init = function(model) {
 scout.TableTileGridMediator.prototype._installListeners = function() {
   this.tileAccordion.on('propertyChange', this._tileAccordionPropertyChangeHandler);
   this.tileAccordion.on('tileAction', this._tileAccordionActionHandler);
+  this.tileAccordion.on('tileClick', this._tileAccordionClickHandler);
   this.table.on('filterAdded', this._tableFilterAddedHandler);
   this.table.on('filterRemoved', this._tableFilterRemovedHandler);
   this.table.on('filter', this._tableFilterHandler);
@@ -82,6 +85,7 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
   this.table.on('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.on('allRowsDeleted', this._tableAllRowsDeletedHandler);
   this.table.on('rowOrderChanged', this._tableRowOrderChangedHandler);
+  this.table.on('render', this._tableRenderHandler);
 
   this.tileAccordion.on('destroy', this._destroyHandler);
   this.table.on('destroy', this._destroyHandler);
@@ -90,6 +94,7 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
 scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.tileAccordion.off('propertyChange', this._tileAccordionPropertyChangeHandler);
   this.tileAccordion.off('tileAction', this._tileAccordionActionHandler);
+  this.tileAccordion.off('tileClick', this._tileAccordionClickHandler);
   this.table.off('filterAdded', this._tableFilterAddedHandler);
   this.table.off('filterRemoved', this._tableFilterRemovedHandler);
   this.table.off('filter', this._tableFilterHandler);
@@ -99,6 +104,7 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
   this.table.off('rowsDeleted', this._tableRowsDeletedHandler);
   this.table.off('allRowsDeleted', this._tableAllRowsDeletedHandler);
   this.table.off('rowOrderChanged', this._tableRowOrderChangedHandler);
+  this.table.off('render', this._tableRenderHandler);
 
   this.tileAccordion.off('destroy', this._destroyHandler);
   this.table.off('destroy', this._destroyHandler);
@@ -176,7 +182,11 @@ scout.TableTileGridMediator.prototype._setTilesInternal = function(tiles) {
 
 // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
 scout.TableTileGridMediator.prototype.loadTiles = function() {
-  var tiles = this.table.createTiles(this.table.rows);
+  // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
+  var rows = this.table.rows.filter(function(row) {
+    return !row.parentRow;
+  });
+  var tiles = this.table.createTiles(rows);
   if (tiles) {
     this.setTiles(tiles);
   }
@@ -283,10 +293,22 @@ scout.TableTileGridMediator.prototype.activate = function() {
     return this.tileAccordion.$container;
   }.bind(this);
 
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
+  // check if there exists a hierarchy within the tableRows
+  var hasHierarchy = this.table.rows.find(function(row) {
+    return row.parentRow;
+  }) !== undefined;
+
+  if (hasHierarchy) {
+    // add the hierarchyFilter since the tileMode doesn't support hierarchy
+    this.table.addFilter(new scout.create('TileTableHierarchyFilter', {
+      table: this.table
+    }));
+    this.table.filter();
+  }
 
   // doesn't depend upon any tile data, therefore execute on activation
   this._syncFiltersFromTableToTile();
+
   this._syncScrollTopFromTableToTile();
 };
 
@@ -306,7 +328,9 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
   if (this.tableState.loadingSupportContainer) {
     this.table.loadingSupport.options$Container = this.tableState.loadingSupportContainer;
   }
-  this.session.keyStrokeManager.installKeyStrokeContext(this.table.keyStrokeContext);
+
+  this.table.removeFilter(new scout.create('TileTableHierarchyFilter'));
+  this.table.filter();
 
   this._syncScrollTopFromTileGridToTable();
 
@@ -330,11 +354,13 @@ scout.TableTileGridMediator.prototype.renderTileMode = function() {
     }
     this._renderTileTableHeader();
     this._renderTileAccordion();
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
   } else {
     this._removeTileTableHeader();
     this._removeTileAccordion();
     this.table._renderData();
     this.table._renderTableHeader();
+    this.session.keyStrokeManager.installKeyStrokeContext(this.table.keyStrokeContext);
   }
   this.table._refreshMenuBarPosition();
 };
@@ -382,7 +408,7 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
     return;
   }
   if (event.propertyName === 'selectedTiles') {
-    this.syncSelectionFromTileGridToTable(event.source.getSelectedTiles());
+    this._syncSelectionFromTileGridToTable(event.source.getSelectedTiles());
   }
   if (event.propertyName === 'filteredTiles') {
     this._updateGroupVisibility();
@@ -394,6 +420,13 @@ scout.TableTileGridMediator.prototype._onTileAccordionAction = function(event) {
     return;
   }
   this.table.doRowAction(this.table.rowsMap[event.tile.rowId]);
+};
+
+scout.TableTileGridMediator.prototype._onTileAccordionClick = function(event) {
+  if (!this.table.tileMode) {
+    return;
+  }
+  this.table._triggerRowClick(this.table.rowsMap[event.tile.rowId], event.mouseButton);
 };
 
 scout.TableTileGridMediator.prototype._onTableRowsSelected = function(event) {
@@ -433,6 +466,15 @@ scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(
     return this.tilesMap[row.id];
   }, this);
   this.tileAccordion.setTiles(this.tiles);
+};
+
+scout.TableTileGridMediator.prototype._onTableRenderHandler = function(event) {
+  if (this.table.tileMode) {
+    // the table's keyStrokeContext is actually un/installed in renderTileMode.
+    // When refreshing the whole page or getConfiguredTileMode is true renderTileMode is called before the table in Widget.render installs it's context.
+    // For this case this 'additional' uninstall is necessary.
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
+  }
 };
 
 scout.TableTileGridMediator.prototype._onTableGroup = function(event) {
@@ -493,7 +535,7 @@ scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function()
   }
 };
 
-scout.TableTileGridMediator.prototype.syncSelectionFromTileGridToTable = function(selectedTiles) {
+scout.TableTileGridMediator.prototype._syncSelectionFromTileGridToTable = function(selectedTiles) {
   if (!this._isUpdatingTiles) {
     var selectedRows = selectedTiles.map(function(tile) {
       return this.table.rowsMap[tile.rowId];
@@ -555,9 +597,13 @@ scout.TableTileGridMediator.prototype._syncScrollTopFromTileGridToTable = functi
 scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
   if (this.tileAccordion) {
     this.tileAccordion.setTileFilters([]);
-    Object.values(this.table._filterMap).forEach(function(tableFilter) {
-      this._addFilter(tableFilter);
-    }, this);
+    Object.keys(this.table._filterMap)
+      .map(function(key) {
+        return this.table._filterMap[key];
+      }, this)
+      .forEach(function(tableFilter) {
+        this._addFilter(tableFilter);
+      }, this);
     this.tileAccordion.filterTiles();
   }
 };

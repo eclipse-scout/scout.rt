@@ -284,8 +284,10 @@ scout.TableFooter.prototype._renderInfoFilter = function() {
         $info.appendSpan().text(this.session.text('ui.NumRowsFiltered', this.computeCountInfo(numRowsFiltered)));
       }
     }
-    $info.appendBr();
-    $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
+    if (this.table.hasUserFilter()) {
+      $info.appendBr();
+      $info.appendSpan('table-info-button').text(this.session.text('ui.RemoveFilter')).appendTo($info);
+    }
   } else {
     if (numRowsFiltered <= 1) {
       $info.appendSpan().text(this.session.text('ui.NumRowFilteredMin'));

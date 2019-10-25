@@ -85,6 +85,7 @@ public class UiTextContributor implements IUiTextContributor {
         "ui.TableRowCount0",
         "ui.TableRowCount1",
         "ui.TableRowCount",
+        "ui.TileView",
         "ui.NumRowSelected",
         "ui.NumRowsSelected",
         "ui.NumRowSelectedMin",

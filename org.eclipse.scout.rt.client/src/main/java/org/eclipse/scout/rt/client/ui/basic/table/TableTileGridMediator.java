@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.client.ui.tile.TileGridLayoutConfig;
 import org.eclipse.scout.rt.platform.reflect.AbstractPropertyObserver;
@@ -74,7 +75,7 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
           setTileMappings(tileMappings);
           break;
         case TableEvent.TYPE_ROWS_INSERTED:
-          tileMappings.addAll(m_table.createTiles(e.getRows()));
+          tileMappings.addAll(m_table.createTiles(filterTopLevelTableRows(e.getRows())));
           setTileMappings(tileMappings);
           break;
         case TableEvent.TYPE_ROWS_DELETED:
@@ -98,7 +99,12 @@ public class TableTileGridMediator extends AbstractPropertyObserver implements I
   }
 
   protected void loadTiles(List<ITableRow> rows) {
-    setTileMappings(m_table.createTiles(rows));
+    setTileMappings(m_table.createTiles(filterTopLevelTableRows(rows)));
+  }
+
+  protected List<ITableRow> filterTopLevelTableRows(List<ITableRow> rows) {
+    // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
+    return rows.stream().filter(r -> r.getParentRow() == null).collect(Collectors.toList());
   }
 
   @SuppressWarnings("unchecked")

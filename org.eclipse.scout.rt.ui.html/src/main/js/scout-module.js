@@ -365,6 +365,7 @@
   __include("scout/table/userfilter/NumberColumnUserFilter.js");
   __include("scout/table/userfilter/TextColumnUserFilter.js");
   __include("scout/table/userfilter/TableTextUserFilter.js");
+  __include("scout/table/TileTableHierarchyFilter.js");
   // TimePicker
   __include("scout/timepicker/TimePicker.js");
   __include("scout/timepicker/TimePickerPopup.js");
