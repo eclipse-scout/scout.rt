@@ -871,12 +871,22 @@ scout.Form.prototype._detach = function() {
 };
 
 scout.Form.prototype.renderInitialFocus = function() {
+  var focused = false;
   if (this.initialFocus) {
-    this.initialFocus.focus();
+    focused = this.initialFocus.focus();
   } else {
     // If no explicit focus is requested, try to focus the first focusable element.
     // Do it only if the context belonging to that element is ready. Not ready means, some other widget (probably an outer container) is still preparing the context and will do the initial focus later
-    this.session.focusManager.requestFocusIfReady(this.session.focusManager.findFirstFocusableElement(this.$container));
+    focused = this.session.focusManager.requestFocusIfReady(this.session.focusManager.findFirstFocusableElement(this.$container));
+  }
+  if (focused) {
+    // If the focus widget is outside of the view area the browser tries to scroll the widget into view.
+    // If the scroll area contains large (not absolutely positioned) content it can happen that the browsers scrolls the content even though the focused widget already is in the view area.
+    // This is probably because the focus happens while the form is not layouted yet. We should actually refactor this and do the focusing after layouting, but this would be a bigger change.
+    // The current workaround is to revert the scrolling done by the browser. Automatic scrolling to the focused widget when the form is not layouted does not work anyway.
+    var $scrollParent = this.$container.activeElement().scrollParent();
+    $scrollParent.scrollTop(0);
+    $scrollParent.scrollLeft(0);
   }
 };
 
