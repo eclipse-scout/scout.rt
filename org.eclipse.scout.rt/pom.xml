@@ -91,7 +91,8 @@
     <org.eclipse.scout.rt.version>${project.version}</org.eclipse.scout.rt.version>
     <jetty.version>9.4.14.v20181114</jetty.version>
     <slf4j.version>1.7.25</slf4j.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.9.10</jackson.version>
+    <jackson-databind.version>2.9.10.1</jackson-databind.version>
     <batik.version>1.10</batik.version>
     <activemq.version>5.15.8</activemq.version>
     <artemis.version>2.6.3</artemis.version>
@@ -185,7 +186,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson-databind.version}</version>
       </dependency>
 
       <dependency>
