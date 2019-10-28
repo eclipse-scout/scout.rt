@@ -9,7 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 /**
- * Base class for lookup calls.
+ * Base class for lookup calls. A concrete implementation of LookupCall.js which uses resources over a network
+ * must deal with I/O errors and set, in case of an error, the 'exception' property on the returned lookup result.
+ * The lookup call must _always_ return a result, otherwise the SmartField cannot work properly.
  */
 scout.LookupCall = function() {
   this.session = null;
