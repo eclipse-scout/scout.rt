@@ -22,7 +22,8 @@
     "src"
   ],
   "scripts": {
-    "snapshot-version": "scout-scripts snapshot-version"
+    "snapshot-version": "scout-scripts snapshot-version",
+    "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
     "@eclipse-scout/cli": "^10.0.0-snapshot",

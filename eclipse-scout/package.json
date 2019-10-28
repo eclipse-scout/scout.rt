@@ -30,7 +30,8 @@
     "build:prod": "scout-scripts build:prod",
     "build:all": "scout-scripts build:dev && scout-scripts build:prod",
     "build:dev:watch": "scout-scripts build:dev:watch",
-    "snapshot-version": "scout-scripts snapshot-version"
+    "snapshot-version": "scout-scripts snapshot-version",
+    "snapshot-cleanup": "scout-scripts snapshot-cleanup"
   },
   "devDependencies": {
     "@eclipse-scout/cli": "^10.0.0-snapshot"

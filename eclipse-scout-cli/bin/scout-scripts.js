@@ -60,6 +60,10 @@ switch (script) {
     require('../scripts/snapshot-version');
     break;
   }
+  case 'snapshot-cleanup': {
+    require('../scripts/snapshot-cleanup');
+    break;
+  }
   default:
     console.log(`Unknown script "${script}"`);
     break;
