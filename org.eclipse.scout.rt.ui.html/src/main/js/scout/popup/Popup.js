@@ -677,12 +677,25 @@ scout.Popup.prototype._alignClasses = function() {
 
 scout.Popup.prototype.getAnchorBounds = function() {
   var anchorBounds = this.anchorBounds;
+  if (!this.$anchor) {
+    // Use manually set anchor bounds
+    return anchorBounds;
+  }
   var realAnchorBounds = scout.graphics.offsetBounds(this.$anchor, {
     exact: true
   });
   if (!anchorBounds) {
+    // Use measured anchor bounds
     anchorBounds = realAnchorBounds;
   } else {
+    // Fill incomplete anchorBounds from measured anchor bounds. This allows setting one
+    // coordinate to a fixed value (e.g. the current mouse cursor position) while still
+    // aligning the other coordinate to the $anchor element.
+    //
+    // Implementation note:
+    // A coordinate is considered "undefined", when it is 0. Technically, this is not 100%
+    // correct, but will give the desired result in most of the cases. If would require too
+    // many code changes to correctly set missing values to undefined/null.
     if (!anchorBounds.x) {
       anchorBounds.x = realAnchorBounds.x;
       anchorBounds.width = realAnchorBounds.width;
