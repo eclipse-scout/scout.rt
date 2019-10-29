@@ -29,7 +29,7 @@ export default class App {
     this.errorHandler = this._createErrorHandler();
   }
 
-  getSessions() { // FIXME [awe] ES6: discuss where to put the sessions
+  getSessions() {
     return this.sessions;
   }
 

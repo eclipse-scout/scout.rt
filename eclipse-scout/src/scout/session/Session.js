@@ -109,13 +109,6 @@ export default class Session {
    *   [focusManagerActive]
    *     Forces the focus manager to be active or not. If undefined, the value is
    *     auto detected by Device.js.
-   *   [showTreeIcons]
-   *     Optional, default is false. Whether or not tree and outline show the icon
-   *     which is defined by the iconId property. Until Scout 6.1 trees did not have
-   *     icons. With Scout 6.1 and later trees can have icons and this init property
-   *     has been added to support the old behavior (no icons at all) without changing
-   *     existing code. From Scout 7.0 showTreeIcons will be true by default, which
-   *     means projects have to (potentially) migrate existing code. With 8.0 the flag will be removed.
    *   [reconnectorOptions]
    *     Optional, properties of this object are copied to the Session's reconnector
    *     instance (see Reconnector.js).
@@ -164,8 +157,6 @@ export default class Session {
         active: options.focusManagerActive
     });
     this.keyStrokeManager = new scout.KeyStrokeManager(this);*/
-
-    this.showTreeIcons = scout.nvl(options.showTreeIcons, true);
   };
 
   _throwError(message) {

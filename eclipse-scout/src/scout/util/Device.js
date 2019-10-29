@@ -187,8 +187,6 @@ export default class Device {
     return !!window.navigator.standalone;
   }
 
-  // TODO [awe] Scout 10.0 - remove functions required for IE 9 support, also check FocusManager#_handleIEEvent
-
   /**
    * This method returns false for very old browsers. Basically we check for the first version
    * that supports ECMAScript 5. This methods excludes all browsers that are known to be

@@ -151,7 +151,8 @@ scout.TreeNode.prototype.ensureLoadChildren = function() {
   }
   var deferred = this.loadChildren();
   var promise = deferred.promise();
-  if (deferred.state() === 'resolved') { // TODO [7.0] awe: better solution as this deferred mess -> create own deferred here?
+  // check if we can get rid of this state-check in a future release
+  if (deferred.state() === 'resolved') {
     this._loadChildrenPromise = null;
     return promise;
   }
@@ -214,11 +215,9 @@ scout.TreeNode.prototype._renderChecked = function() {
 };
 
 scout.TreeNode.prototype._renderIcon = function() {
-  if (this.getTree().session.showTreeIcons) {
-    this.$node.icon(this.iconId, function($icon) {
-      $icon.insertBefore(this.$text);
-    }.bind(this));
-  }
+  this.$node.icon(this.iconId, function($icon) {
+    $icon.insertBefore(this.$text);
+  }.bind(this));
 };
 
 scout.TreeNode.prototype.$icon = function() {

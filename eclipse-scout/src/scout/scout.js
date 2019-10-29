@@ -159,12 +159,10 @@ export function widget(widgetIdOrElement, partId) {
 
 };
 
-// FIXME [awe] ES6: review this change to object-factory pattern
 export function addObjectFactories(objectFactories0) {
   objectFactories = $.extend(objectFactories, objectFactories0);
 };
 
-// FIXME [awe] ES6: this is only required for ES5 clients, what to do with it?
 export function inherits(childCtor, parentCtor) {
   childCtor.prototype = Object.create(parentCtor.prototype);
   childCtor.prototype.constructor = childCtor;

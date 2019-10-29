@@ -98,7 +98,6 @@ scout.FormController.prototype.remove = function() {
  * Activates the given view or dialog.
  */
 scout.FormController.prototype.activateForm = function(form) {
-  // TODO [7.0] awe: (2nd screen) handle popupWindow?
   var displayParent = this.displayParent;
   while (displayParent) {
     if (displayParent instanceof scout.Outline) {

@@ -113,30 +113,6 @@ describe('strings', () => {
       expect(strings.encode('<b>hello</b>')).toBe('&lt;b&gt;hello&lt;/b&gt;');
       expect(strings.encode(123)).toBe('123');
     });
-
-// FIXME [awe] toolstack: _encodeElement is an internal property, and not exported - this could be a problem for many tests
-//    it('does not try to encode empty strings', () => {
-//      strings._encodeElement = null;
-//      spyOn(document, 'createElement').and.callThrough();
-//      expect(strings.encode('')).toBe('');
-//      expect(document.createElement).not.toHaveBeenCalled();
-//
-//      expect(strings.encode('hi')).toBe('hi');
-//      expect(document.createElement).toHaveBeenCalled();
-//    });
-//
-//    it('caches the html element used for encoding', () => {
-//      strings._encodeElement = null;
-//      spyOn(document, 'createElement').and.callThrough();
-//
-//      expect(strings.encode('hi')).toBe('hi');
-//      expect(document.createElement).toHaveBeenCalled();
-//
-//      document.createElement.calls.reset();
-//      expect(strings.encode('there')).toBe('there');
-//      expect(document.createElement).not.toHaveBeenCalled();
-//    });
-
   });
 
   describe('join', () => {

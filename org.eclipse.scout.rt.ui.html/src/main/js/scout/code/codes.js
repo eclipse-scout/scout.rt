@@ -64,7 +64,6 @@ scout.codes = {
         id = codeType.id;
       }
       delete this.registry[id];
-      // TODO [7.0] awe: also clean up texts?
     }, this);
   },
 

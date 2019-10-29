@@ -1,4 +1,4 @@
-import * as scout from '../scout'; // FIXME [awe] IntelliJ: how to use/define imports? relative, absolute, $basePath variable? Check what IDE prefers/supports.
+import * as scout from '../scout';
 import * as numbers from '../util/numbers';
 import * as strings from '../util/strings';
 

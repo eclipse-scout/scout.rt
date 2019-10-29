@@ -1813,7 +1813,6 @@ $.fn.isContentTruncated = function() {
   }
 };
 
-// TODO [7.0] awe: (graph) consider moving this function to DoubleClickHandler.js
 /**
  * This function is used to distinct between single and double clicks.
  * Instead of executing a handler immediately when the first click occurs,

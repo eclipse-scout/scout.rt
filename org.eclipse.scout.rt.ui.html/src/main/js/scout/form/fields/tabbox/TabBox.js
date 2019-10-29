@@ -23,7 +23,7 @@ scout.TabBox = function() {
   this.tabAreaStyle = scout.TabArea.DisplayStyle.DEFAULT;
 
   this._addWidgetProperties(['tabItems', 'selectedTab']);
-  this._addPreserveOnPropertyChangeProperties(['selectedTab']); // TODO [7.0] awe: do this in Calendar too, for selectedComponent
+  this._addPreserveOnPropertyChangeProperties(['selectedTab']);
   this._$tabContent = null;
 
   this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);

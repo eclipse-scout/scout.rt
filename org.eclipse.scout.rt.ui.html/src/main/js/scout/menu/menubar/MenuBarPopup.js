@@ -61,7 +61,6 @@ scout.MenuBarPopup.prototype._remove = function() {
 scout.MenuBarPopup.prototype._renderHead = function() {
   scout.MenuBarPopup.parent.prototype._renderHead.call(this);
 
-  // TODO [7.0] awe: throws exception if this.menu is a button because button is not rendered (MenuButtonAdapter is)
   if (this.menu.$container.parent().hasClass('main-menubar')) {
     this.$head.addClass('in-main-menubar');
   }

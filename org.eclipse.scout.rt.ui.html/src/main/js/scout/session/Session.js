@@ -32,7 +32,6 @@ scout.Session = function() {
   this.focusManager = null;
   this.keyStrokeManager = null;
 
-  // TODO [7.0] awe, cgu, bsh: Split in "RemoteSession" and "???" (maybe move to App)
   this.uiSessionId = null; // assigned by server on session startup (OWASP recommendation, see https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet#General_Recommendation:_Synchronizer_Token_Pattern).
   this.clientSessionId = this._getClientSessionIdFromStorage();
   this.forceNewClientSession = false;
@@ -118,13 +117,6 @@ scout.Session.JsonResponseError = {
  *   [focusManagerActive]
  *     Forces the focus manager to be active or not. If undefined, the value is
  *     auto detected by Device.js.
- *   [showTreeIcons]
- *     Optional, default is false. Whether or not tree and outline show the icon
- *     which is defined by the iconId property. Until Scout 6.1 trees did not have
- *     icons. With Scout 6.1 and later trees can have icons and this init property
- *     has been added to support the old behavior (no icons at all) without changing
- *     existing code. From Scout 7.0 showTreeIcons will be true by default, which
- *     means projects have to (potentially) migrate existing code. With 8.0 the flag will be removed.
  *   [reconnectorOptions]
  *     Optional, properties of this object are copied to the Session's reconnector
  *     instance (see Reconnector.js).
@@ -175,8 +167,6 @@ scout.Session.prototype.init = function(model) {
   this.keyStrokeManager = scout.create('KeyStrokeManager', {
     session: this
   });
-
-  this.showTreeIcons = scout.nvl(options.showTreeIcons, true); // TODO [awe] 8.0 remove this flag
 };
 
 scout.Session.prototype._throwError = function(message) {
@@ -1434,9 +1424,6 @@ scout.Session.prototype.start = function() {
   return this._sendStartupRequest();
 };
 
-// TODO [7.0] awe: discuss with C.GU. Session requires same methods as ModelAdapter, but it is NOT a ModelAdapter currently
-// guess we need a SessionAdapter.js - I noticed this in a jasmine test where _processEvents is called an the adapter is the Session
-// (event.type=disposeAdapter), also see resetEventFilters method
 scout.Session.prototype.onModelEvent = function(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);

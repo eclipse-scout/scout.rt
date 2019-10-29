@@ -297,7 +297,6 @@ scout.SequenceBox.prototype._getAutoDateProposal = function(field) {
   return newAutoDate;
 };
 
-// TODO [7.0] awe: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
 // The new sequence-box sets the label to invisible on the model.
 scout.SequenceBox.prototype._modifyLabel = function(field) {
   if (field instanceof scout.CheckBoxField) {
