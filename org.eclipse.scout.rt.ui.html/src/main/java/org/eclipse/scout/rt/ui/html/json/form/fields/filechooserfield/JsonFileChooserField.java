@@ -27,7 +27,7 @@ import org.json.JSONArray;
 
 public class JsonFileChooserField<M extends IFileChooserField> extends JsonValueField<M> implements IBinaryResourceConsumer {
 
-  protected final static String PROP_ACCEPT_TYPES = "acceptTypes";
+  protected static final String PROP_ACCEPT_TYPES = "acceptTypes";
 
   public JsonFileChooserField(M model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -50,9 +50,11 @@ public class JsonFileChooserField<M extends IFileChooserField> extends JsonValue
 
       @Override
       public Object prepareValueForToJson(Object value) {
+        @SuppressWarnings("unchecked")
+        List<String> fileExtensions = (List<String>) value;
         return new JSONArray(BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
-          .withTypes((List<String>) value)
-          .build());
+            .withTypes(fileExtensions)
+            .build());
       }
 
       @Override

@@ -89,6 +89,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
     setProperty(PROP_FILE_EXTENSIONS, CollectionUtility.arrayListWithoutNullElements(fileExtensions));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<String> getFileExtensions() {
     return CollectionUtility.arrayList((List<String>) getProperty(PROP_FILE_EXTENSIONS));
