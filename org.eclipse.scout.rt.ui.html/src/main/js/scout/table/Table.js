@@ -3494,22 +3494,33 @@ scout.Table.prototype._renderRowDelta = function() {
     return;
   }
   var renderedRows = [];
+  var rowsToHide = [];
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
       row = $row.data('row');
     if (this.visibleRows.indexOf(row) < 0) {
-      // remove animated
-      this._hideRow(row);
+      // remember for remove animated
+      row.$row.detach();
+      rowsToHide.push(row);
     } else {
       renderedRows.push(row);
     }
   }.bind(this));
 
   this._rerenderViewport();
+  // insert rows to remove animated
+  rowsToHide.forEach(function(row) {
+    row.$row.insertAfter(this.$fillBefore);
+  }, this);
   // Rows removed by an animation are still there, new rows were appended -> reset correct row order
   this._order$Rows().insertAfter(this.$fillBefore);
   // Also make sure aggregate rows are at the correct position (_renderAggregateRows does nothing because they are already rendered)
   this._order$AggregateRows();
+
+  rowsToHide.forEach(function(row) {
+    // remove animated
+    this._hideRow(row);
+  }, this);
 
   this.$rows().each(function(i, elem) {
     var $row = $(elem),
