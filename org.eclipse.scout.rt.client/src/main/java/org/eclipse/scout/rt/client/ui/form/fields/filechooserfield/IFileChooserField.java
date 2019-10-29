@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 public interface IFileChooserField extends IValueField<BinaryResource> {
 
   String PROP_MAXIMUM_UPLOAD_SIZE = "maximumUploadSize";
+  String PROP_FILE_EXTENSIONS = "fileExtensions";
 
   /**
    * Default maximum upload size.
@@ -30,7 +31,7 @@ public interface IFileChooserField extends IValueField<BinaryResource> {
 
   boolean isShowFileExtension();
 
-  void setFileExtensions(List<String> extensions);
+  void setFileExtensions(List<String> fileExtensions);
 
   List<String> getFileExtensions();
 

@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.IHtmlCapable;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -27,9 +27,9 @@ public interface IFileChooserButton extends IValueField<BinaryResource>, IHtmlCa
    */
   long DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // default: 50 MB
 
-  void setFileExtensions(Collection<String> extensions);
+  void setFileExtensions(List<String> fileExtensions);
 
-  Collection<String> getFileExtensions();
+  List<String> getFileExtensions();
 
   /**
    * @return the filename of the value (BinaryResource) or null

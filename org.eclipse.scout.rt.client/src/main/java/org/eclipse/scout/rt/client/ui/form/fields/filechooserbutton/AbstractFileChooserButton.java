@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserbutton.IFileChooserButtonExtension;
@@ -19,6 +18,7 @@ import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.annotations.ConfigProperty;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
+import org.eclipse.scout.rt.platform.util.CollectionUtility;
 
 @ClassId("20038f90-75fa-4796-8a08-a9417ae69c60")
 public abstract class AbstractFileChooserButton extends AbstractValueField<BinaryResource> implements IFileChooserButton {
@@ -83,14 +83,13 @@ public abstract class AbstractFileChooserButton extends AbstractValueField<Binar
   }
 
   @Override
-  public void setFileExtensions(Collection<String> fileExtensions) {
-    propertySupport.setProperty(PROP_FILE_EXTENSIONS, fileExtensions);
+  public void setFileExtensions(List<String> fileExtensions) {
+    setProperty(PROP_FILE_EXTENSIONS, CollectionUtility.arrayListWithoutNullElements(fileExtensions));
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Collection<String> getFileExtensions() {
-    return (Collection<String>) propertySupport.getProperty(PROP_FILE_EXTENSIONS);
+  public List<String> getFileExtensions() {
+    return CollectionUtility.arrayList((List<String>) getProperty(PROP_FILE_EXTENSIONS));
   }
 
   @Override

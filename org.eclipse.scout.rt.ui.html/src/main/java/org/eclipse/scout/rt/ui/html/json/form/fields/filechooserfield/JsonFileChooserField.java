@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserfield;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -25,36 +24,42 @@ import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooserAccept
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-public class JsonFileChooserField<FILE_CHOOSER_FIELD extends IFileChooserField> extends JsonValueField<FILE_CHOOSER_FIELD> implements IBinaryResourceConsumer {
+public class JsonFileChooserField<M extends IFileChooserField> extends JsonValueField<M> implements IBinaryResourceConsumer {
 
-  public JsonFileChooserField(FILE_CHOOSER_FIELD model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
+  protected final static String PROP_ACCEPT_TYPES = "acceptTypes";
+
+  public JsonFileChooserField(M model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
   }
 
   @Override
-  protected void initJsonProperties(FILE_CHOOSER_FIELD model) {
+  protected void initJsonProperties(M model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<FILE_CHOOSER_FIELD>(IFileChooserField.PROP_MAXIMUM_UPLOAD_SIZE, model) {
+    putJsonProperty(new JsonProperty<M>(IFileChooserField.PROP_MAXIMUM_UPLOAD_SIZE, model) {
       @Override
       protected Long modelValue() {
         return getModel().getMaximumUploadSize();
       }
     });
-  }
+    putJsonProperty(new JsonProperty<M>(IFileChooserField.PROP_FILE_EXTENSIONS, model) {
+      @Override
+      protected List<String> modelValue() {
+        return getModel().getFileExtensions();
+      }
 
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, "acceptTypes", new JSONArray(collectAcceptTypes()));
-    return json;
-  }
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JSONArray(BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
+          .withTypes((List<String>) value)
+          .build());
+      }
 
-  protected Set<String> collectAcceptTypes() {
-    return BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
-        .withTypes(getModel().getFileExtensions())
-        .build();
+      @Override
+      public String jsonPropertyName() {
+        return PROP_ACCEPT_TYPES;
+      }
+    });
   }
 
   @Override

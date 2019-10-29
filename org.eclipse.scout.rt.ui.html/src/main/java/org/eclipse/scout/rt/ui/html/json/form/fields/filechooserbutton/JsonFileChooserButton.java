@@ -10,10 +10,8 @@
  */
 package org.eclipse.scout.rt.ui.html.json.form.fields.filechooserbutton;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserbutton.IFileChooserButton;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -26,12 +24,13 @@ import org.eclipse.scout.rt.ui.html.json.basic.filechooser.JsonFileChooserAccept
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.res.IBinaryResourceConsumer;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 /**
  * @since 8.0
  */
 public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonValueField<M> implements IBinaryResourceConsumer {
+
+  protected final static String PROP_ACCEPT_TYPES = "acceptTypes";
 
   public JsonFileChooserButton(M model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -51,19 +50,6 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
         return getModel().getMaximumUploadSize();
       }
     });
-    putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_FILE_EXTENSIONS, model) {
-      @Override
-      protected Collection<String> modelValue() {
-        return getModel().getFileExtensions();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        @SuppressWarnings("unchecked")
-        Collection<String> val = (Collection<String>) value;
-        return new JSONArray(val);
-      }
-    });
     putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
@@ -76,19 +62,24 @@ public class JsonFileChooserButton<M extends IFileChooserButton> extends JsonVal
         return getModel().isHtmlEnabled();
       }
     });
-  }
+    putJsonProperty(new JsonProperty<M>(IFileChooserButton.PROP_FILE_EXTENSIONS, model) {
+      @Override
+      protected List<String> modelValue() {
+        return getModel().getFileExtensions();
+      }
 
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, "acceptTypes", new JSONArray(collectAcceptTypes()));
-    return json;
-  }
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return new JSONArray(BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
+          .withTypes((List<String>) value)
+          .build());
+      }
 
-  protected Set<String> collectAcceptTypes() {
-    return BEANS.get(JsonFileChooserAcceptAttributeBuilder.class)
-        .withTypes(getModel().getFileExtensions())
-        .build();
+      @Override
+      public String jsonPropertyName() {
+        return PROP_ACCEPT_TYPES;
+      }
+    });
   }
 
   @Override

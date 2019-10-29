@@ -29,7 +29,6 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
 
   private IFileChooserFieldUIFacade m_uiFacade;
   private boolean m_showFileExtension;
-  private List<String> m_fileExtensions;
 
   public AbstractFileChooserField() {
     this(true);
@@ -86,13 +85,13 @@ public abstract class AbstractFileChooserField extends AbstractValueField<Binary
   }
 
   @Override
-  public void setFileExtensions(List<String> a) {
-    m_fileExtensions = CollectionUtility.arrayListWithoutNullElements(a);
+  public void setFileExtensions(List<String> fileExtensions) {
+    setProperty(PROP_FILE_EXTENSIONS, CollectionUtility.arrayListWithoutNullElements(fileExtensions));
   }
 
   @Override
   public List<String> getFileExtensions() {
-    return CollectionUtility.arrayList(m_fileExtensions);
+    return CollectionUtility.arrayList((List<String>) getProperty(PROP_FILE_EXTENSIONS));
   }
 
   @Override

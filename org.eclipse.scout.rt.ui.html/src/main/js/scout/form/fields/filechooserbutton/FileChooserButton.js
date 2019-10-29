@@ -22,11 +22,6 @@ scout.inherits(scout.FileChooserButton, scout.ValueField);
 scout.FileChooserButton.prototype._init = function(model) {
   scout.FileChooserButton.parent.prototype._init.call(this, model);
 
-  // FIXME [16.2] awe, unify fileExtensions and acceptTypes
-  if (model.fileExtensions) {
-    this.setFileExtensions(model.fileExtensions);
-  }
-
   this.button = scout.create('Button', {
     parent: this,
     label: this._buttonLabel(),
