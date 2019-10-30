@@ -13,7 +13,7 @@ scout.Calendar = function() {
   scout.Calendar.parent.call(this);
 
   this.monthViewNumberOfWeeks = 6;
-  this.numberOfHourDivisions = 2;
+  this.numberOfHourDivisions = 4;
   this.heightPerDivision = 40;
   this.startHour = 6;
   this.workDayIndices = [1, 2, 3, 4, 5]; // Workdays: Mon-Fri (Week starts at Sun in JS)
