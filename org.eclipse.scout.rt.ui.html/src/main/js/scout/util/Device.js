@@ -24,14 +24,7 @@ scout.Device = function(model) {
   this.type = scout.Device.Type.DESKTOP;
   this.browser = scout.Device.Browser.UNKNOWN;
   this.browserVersion = 0;
-  this.scrollbarWidth;
-
-  // --- device specific configuration
-  // initialize with empty string so that it can be used without calling initUnselectableAttribute()
-  // this property is used with regular JQuery attr(key, value) Syntax and in cases where we create
-  // DOM elements by creating a string.
-  this.unselectableAttribute = scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
-  this.tableAdditionalDivRequired = false;
+  this.scrollbarWidth = 0;
 
   if (this.userAgent) {
     this._parseSystem();
@@ -40,13 +33,6 @@ scout.Device = function(model) {
     this._parseBrowserVersion();
   }
 };
-
-scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE = {
-  key: null,
-  value: null,
-  string: ''
-};
-
 
 scout.Device.VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
@@ -81,9 +67,7 @@ scout.Device.Type = {
 scout.Device.prototype.bootstrap = function() {
   var promises = [];
 
-  // Precalculate value and store in a simple property, to prevent many function calls inside loops (e.g. when generating table rows)
-  this.unselectableAttribute = this.getUnselectableAttribute();
-  this.tableAdditionalDivRequired = this.isTableAdditionalDivRequired();
+  // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
   this.scrollbarWidth = this._detectScrollbarWidth();
   this.type = this._detectType(this.userAgent);
 
@@ -103,7 +87,7 @@ scout.Device.prototype.bootstrap = function() {
  * It does not work if safari is opened in standalone/homescreen mode or in cordova. For IE (and safari since ios 9.3) it can be disabled using a css property called touch-action.
  * By default, zooming is disabled and home screen mode is enabled, see meta tags viewport and apple-mobile-web-app-capable in head.html
  * <p>
- * @return true if it is an older iOS (< 9.3), running in homescreen mode or running in a cordova container. Otherwise false.
+ * @return {boolean} true if it is an older iOS (< 9.3), running in homescreen mode or running in a cordova container. Otherwise false.
  */
 scout.Device.prototype._needsFastClick = function() {
   if (!this.isIos()) {
@@ -113,11 +97,11 @@ scout.Device.prototype._needsFastClick = function() {
 
   if (this.systemVersion >= 9.3 && !this.isStandalone() && this.browser !== scout.Device.Browser.UNKNOWN) {
     // With iOS >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
-    // It is also necessary if running in a cordova container (browser is set to unknown in that case)
+    // It is also necessary if running in a Cordova container (browser is set to unknown in that case)
     return false;
   }
 
-  // -> load only for older IOS devices or if running in home screen mode or cordova
+  // -> load only for older IOS devices or if running in home screen mode or Cordova
   return true;
 };
 
@@ -187,7 +171,7 @@ scout.Device.prototype.isFirefox = function() {
  * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
  * Most of the time isIos() is the way to go.
  * This function was mainly introduced to detect whether it is a real iOS or an emulated one (e.g. using chrome emulator).
- * @returns true if the platform is iOS, false if not (e.g. if chrome emulator is running)
+ * @returns {boolean} true if the platform is iOS, false if not (e.g. if chrome emulator is running)
  */
 scout.Device.prototype.isIosPlatform = function() {
   return /iPad|iPhone|iPod/.test(navigator.platform);
@@ -206,13 +190,11 @@ scout.Device.prototype.isWindowsTabletMode = function() {
 };
 
 /**
- * @returns true if navigator.standalone is true which is the case for iOS home screen mode
+ * @returns {boolean} true if navigator.standalone is true which is the case for iOS home screen mode
  */
 scout.Device.prototype.isStandalone = function() {
   return !!window.navigator.standalone;
 };
-
-// TODO [awe] Scout 10.0 - remove functions required for IE 9 support, also check FocusManager#_handleIEEvent
 
 /**
  * This method returns false for very old browsers. Basically we check for the first version
@@ -367,7 +349,7 @@ scout.Device.prototype.supportsTouch = function() {
 };
 
 scout.Device.prototype.supportsFile = function() {
-  return (window.File ? true : false);
+  return !!window.File;
 };
 
 /**
@@ -395,10 +377,6 @@ scout.Device.prototype.supportsCssGradient = function() {
   return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, function(actualValue) {
     return (actualValue + '').indexOf('gradient') > 0;
   }));
-};
-
-scout.Device.prototype.supportsCssUserSelect = function() {
-  return this.supportsCssProperty('userSelect');
 };
 
 scout.Device.prototype.supportsInternationalization = function() {
@@ -463,10 +441,7 @@ scout.Device.prototype.supportsCssProperty = function(property) {
 };
 
 scout.Device.prototype.supportsGeolocation = function() {
-  if (navigator.geolocation) {
-    return true;
-  }
-  return false;
+  return !!navigator.geolocation;
 };
 
 /**
@@ -521,60 +496,6 @@ scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
     }
   }
   return false;
-};
-
-/**
- * Returns '' for modern browsers, that support the 'user-select' CSS property.
- * Returns ' unselectable="on"' for IE9.
- * This string can be used to add to any HTML element as attribute.
- */
-scout.Device.prototype.getUnselectableAttribute = function() {
-  return this.supportsFeature('_unselectableAttribute', function(property) {
-    if (this.supportsCssUserSelect()) {
-      return scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE;
-    }
-    // required for IE 9
-    return {
-      key: 'unselectable',
-      value: 'on',
-      string: ' unselectable="on"'
-    };
-  }.bind(this));
-};
-
-/**
- * Returns false for modern browsers, that support CSS table-cell properties restricted with a
- * max-width and hidden overflow. Returns true if an additional div level is required (e.g. IE 9).
- */
-scout.Device.prototype.isTableAdditionalDivRequired = function() {
-  return this.supportsFeature('_tableAdditionalDivRequired', function(property) {
-    var $test = $('body')
-      .appendDiv()
-      .text('Scout')
-      .css('visibility', 'hidden')
-      .css('display', 'table-cell')
-      .css('max-width', '1px')
-      .css('overflow', 'hidden');
-    var w = $test.width();
-    $test.remove();
-    // Expected width is 1px, however this value could be larger when the browser zoom level
-    // is not set to 100% (e.g. 1.6px). To be on the safe side, we use a threshold of 5px.
-    // (If max-width is not supported, the width of the test text will be > 30px.)
-    return (w > 5);
-  }.bind(this));
-};
-
-scout.Device.prototype.requiresIframeSecurityAttribute = function() {
-  return this.supportsFeature('_requiresIframeSecurityAttribute', function(property) {
-    var test = document.createElement('iframe');
-    var supportsSandbox = ('sandbox' in test);
-
-    if (supportsSandbox) {
-      return false;
-    } else {
-      return ('security' in test);
-    }
-  }.bind(this));
 };
 
 scout.Device.prototype._detectScrollbarWidth = function(cssClass) {

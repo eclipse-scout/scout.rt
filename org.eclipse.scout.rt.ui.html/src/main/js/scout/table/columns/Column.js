@@ -258,18 +258,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
 };
 
 scout.Column.prototype._buildCell = function(content, style, cssClass) {
-  var cellHtml = '';
-  cellHtml += '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>';
-  if (scout.device.tableAdditionalDivRequired) {
-    cellHtml += '<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">';
-    // same calculation in scout.Table.prototype.resizeColumn
-  }
-  cellHtml += content;
-  if (scout.device.tableAdditionalDivRequired) {
-    cellHtml += '</div>';
-  }
-  cellHtml += '</div>';
-  return cellHtml;
+  return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
 };
 
 scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
@@ -278,8 +267,7 @@ scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
   if (expanded) {
     cssClasses += ' expanded';
   }
-  var html = '<div class="' + cssClasses + '" style="' + style + '"></div>';
-  return html;
+  return '<div class="' + cssClasses + '" style="' + style + '"></div>';
 };
 
 scout.Column.prototype._icon = function(iconId, hasText) {

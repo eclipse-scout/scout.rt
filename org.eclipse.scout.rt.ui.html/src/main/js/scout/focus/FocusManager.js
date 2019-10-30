@@ -104,10 +104,9 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
   }
 
   if ($element.closest('[contenteditable="true"]').length === 0 &&
-    ((userSelect && userSelect === 'none') ||
-      (!userSelect && $element.closest('div').not('[unselectable="on"]').length === 0)) /* IE 9 has no user-select */ ) {
+    (userSelect && userSelect === 'none')) {
     $elementToFocus = $element.closest(selectableElements);
-    if ($elementToFocus && $elementToFocus.not('[unselectable="on"]').length > 0) {
+    if ($elementToFocus) {
       this.requestFocus($elementToFocus.get(0));
     }
     event.preventDefault();

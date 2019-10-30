@@ -132,9 +132,6 @@ scout.IFrame.prototype._renderSandboxPermissions = function() {
     return;
   }
   this.$iframe.attr('sandbox', scout.nvl(this.sandboxPermissions, ''));
-  if (scout.device.requiresIframeSecurityAttribute()) {
-    this.$iframe.attr('security', 'restricted');
-  }
   // re-render location otherwise the attribute change would have no effect, see
   // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
   this._renderLocation();

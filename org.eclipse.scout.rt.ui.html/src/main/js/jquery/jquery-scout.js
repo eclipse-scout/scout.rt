@@ -546,23 +546,13 @@ $.fn.makeElement = function(element, cssClass, text) {
 };
 
 /**
- * Creates a DIV element in the current document. The function adds an unselectable attribute,
- * if this is required by the current device (@see Device.js). When you don't want the (un-)
- * selectable behavior use <code>makeElement('&lt;div&gt;')</code>.
+ * Creates a DIV element in the current document.
  *
  * @param cssClass (optional) string added to the 'class' attribute
  * @param text (optional) string used as inner text
  */
 $.fn.makeDiv = function(cssClass, text) {
-  var $div = this.makeElement('<div>', cssClass, text);
-
-  // scout.device may not be initialized yet (e.g. before app is created or if app bootstrap fails)
-  var unselectable = (scout.device ? scout.device.unselectableAttribute : scout.Device.DEFAULT_UNSELECTABLE_ATTRIBUTE);
-  if (unselectable.key) {
-    $div.attr(unselectable.key, unselectable.value);
-  }
-
-  return $div;
+  return this.makeElement('<div>', cssClass, text);
 };
 
 $.fn.makeSpan = function(cssClass, text) {

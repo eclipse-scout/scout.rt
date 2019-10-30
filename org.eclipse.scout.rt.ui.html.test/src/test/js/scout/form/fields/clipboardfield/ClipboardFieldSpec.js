@@ -37,19 +37,4 @@ describe('ClipboardField', function() {
     expect(field.$container.hasClass('clipboard-field')).toBe(true);
   });
 
-  it('Rendered field DIV has _not_ an unselectable attribute in IE9', function() {
-    var field = createField();
-
-    // regular non IE9 browser
-    field.render($sandbox);
-    expect(scout.device.unselectableAttribute.key).toBe(null);
-    expect(field.$field.attr('unselectable')).toBe(undefined);
-    field.remove();
-
-    // modify device to look like IE9
-    scout.device.unselectableAttribute = {key:'unselectable', value:'on'};
-    field.render($sandbox);
-    expect(field.$field.attr('unselectable')).toBe(undefined);
-  });
-
 });

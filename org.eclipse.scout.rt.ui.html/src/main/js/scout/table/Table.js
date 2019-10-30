@@ -436,16 +436,6 @@ scout.Table.prototype._renderData = function() {
   });
   this._installImageListeners();
   this._installCellTooltipSupport();
-
-  // layout bugfix for IE9 (and maybe other browsers)
-  if (scout.device.tableAdditionalDivRequired) {
-    // determine @table-cell-padding-left and @table-cell-padding-right (actually the sum)
-    var test = this.$data.appendDiv('table-cell');
-    test.text('&nbsp;');
-    this.cellHorizontalPadding = test.cssPxValue('padding-left') + test.cssPxValue('padding-right');
-    test.remove();
-  }
-
   this._calculateRowBorderWidth();
   this._updateRowWidth();
   this._updateRowHeight();
@@ -1425,7 +1415,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   }
 
   var i, column,
-    rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute.string + '>';
+    rowDiv = '<div class="' + rowClass + '" style="width: ' + rowWidth + 'px">';
   for (i = 0; i < this.columns.length; i++) {
     column = this.columns[i];
     if (column.isVisible()) {
@@ -3737,11 +3727,6 @@ scout.Table.prototype.resizeColumn = function(column, width) {
     this.$cellsForColIndex(colNum, true)
       .css('min-width', width)
       .css('max-width', width);
-    if (scout.device.tableAdditionalDivRequired) {
-      this.$cellsForColIndexWidthFix(colNum, true)
-        .css('max-width', (width - this.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ));
-      // same calculation in scout.Column.prototype.buildCellForRow;
-    }
 
     this._updateRowWidth();
     this.$rows(true)

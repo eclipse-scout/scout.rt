@@ -79,7 +79,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   }
   content = content + '<div class="' + checkBoxCssClass + '"/>';
 
-  return '<div class="' + cssClass + '" style="' + style + '"' + scout.device.unselectableAttribute.string + '>' + content + '</div>';
+  return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
 };
 
 scout.BooleanColumn.prototype.$checkBox = function($row) {

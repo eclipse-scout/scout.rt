@@ -10,14 +10,8 @@
  */
 scout.BeanColumn = function() {
   scout.BeanColumn.parent.call(this);
-  this.additionalDivMode = scout.BeanColumn.AdditionalDivMode.AUTO;
 };
 scout.inherits(scout.BeanColumn, scout.Column);
-
-scout.BeanColumn.AdditionalDivMode = {
-  NEVER: 0,
-  AUTO: 1
-};
 
 scout.BeanColumn.prototype.buildCellForRow = function(row) {
   var cell = this.cell(row);
@@ -31,10 +25,6 @@ scout.BeanColumn.prototype.buildCellForRow = function(row) {
   }
 
   this._renderValue($cell, value);
-  if (this.additionalDivMode === scout.BeanColumn.AdditionalDivMode.AUTO && scout.device.tableAdditionalDivRequired) {
-    $cell.html('<div class="width-fix" style="max-width: ' + (this.width - this.table.cellHorizontalPadding - 2 /* unknown IE9 extra space */ ) + 'px; ' + '">' + $cell.html() + '</div>');
-  }
-
   return $cell[0].outerHTML;
 };
 
