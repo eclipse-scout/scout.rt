@@ -20,11 +20,13 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.junit.Test;
@@ -83,6 +85,57 @@ public class CollectionUtilityTest {
     assertTrue(CollectionUtility.equalsCollection(createList("a", "b"), createList("a", "b")));
     assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("a")));
     assertFalse(CollectionUtility.equalsCollection(createList("a", "b"), createList("b", "a")));
+  }
+
+  @Test
+  public void testHashCodeCollectionConsistentWithEquals() {
+    Queue<Object> s = createQueue("a", "b");
+    assertEquals(CollectionUtility.hashCodeCollection(null), CollectionUtility.hashCodeCollection(null));
+    assertEquals(CollectionUtility.hashCodeCollection(s), CollectionUtility.hashCodeCollection(s));
+    assertEquals(CollectionUtility.hashCodeCollection(createQueue("a", "b")), CollectionUtility.hashCodeCollection(createQueue("a", "b")));
+    assertEquals(CollectionUtility.hashCodeCollection(createQueue("a", "b")), CollectionUtility.hashCodeCollection(createQueue("b", "a")));
+    assertEquals(CollectionUtility.hashCodeCollection(createQueue("a", "b", true)), CollectionUtility.hashCodeCollection(createQueue("a", "b", true)));
+    assertEquals(CollectionUtility.hashCodeCollection(CollectionUtility.hashSet("a", "b")), CollectionUtility.hashCodeCollection(createList("a", "b")));
+    List<Object> l = createList("a", "b");
+    assertTrue(CollectionUtility.equalsCollection(l, l));
+    assertTrue(CollectionUtility.equalsCollection(createList("a", "b"), createList("a", "b")));
+  }
+
+  @Test
+  public void testHashCodeCollectionForEmptyCollections() {
+    assertEquals(0, CollectionUtility.hashCodeCollection(null, true));
+    assertEquals(0, CollectionUtility.hashCodeCollection(null, false));
+    assertEquals(0, CollectionUtility.hashCodeCollection(new ArrayList<>()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(new LinkedList<>()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(new HashSet<>()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(new TreeSet<>()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(Collections.EMPTY_LIST));
+    assertEquals(0, CollectionUtility.hashCodeCollection(Collections.EMPTY_SET));
+    assertEquals(0, CollectionUtility.hashCodeCollection(CollectionUtility.emptyArrayList()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(CollectionUtility.emptyHashSet()));
+    assertEquals(0, CollectionUtility.hashCodeCollection(CollectionUtility.emptyTreeSet()));
+    assertEquals(CollectionUtility.hashCodeCollection(CollectionUtility.emptyArrayList(), false), CollectionUtility.hashCodeCollection(CollectionUtility.emptyArrayList(), true));
+    assertEquals(CollectionUtility.hashCodeCollection(CollectionUtility.emptyHashSet(), false), CollectionUtility.hashCodeCollection(CollectionUtility.emptyHashSet(), true));
+    assertEquals(CollectionUtility.hashCodeCollection(CollectionUtility.emptyTreeSet(), false), CollectionUtility.hashCodeCollection(CollectionUtility.emptyTreeSet(), true));
+  }
+
+  @Test
+  public void testHashCodeCollectionForSingletonCollections() {
+    String item = "a";
+    int hashCode = CollectionUtility.hashCodeCollection(CollectionUtility.hashSet(item));
+    assertEquals(hashCode, CollectionUtility.hashCodeCollection(CollectionUtility.arrayList(item)));
+    assertEquals(hashCode, CollectionUtility.hashCodeCollection(new TreeSet<>(CollectionUtility.arrayList(item))));
+    assertEquals(hashCode, CollectionUtility.hashCodeCollection(new LinkedList<>(CollectionUtility.arrayList(item))));
+  }
+
+  @Test
+  public void testHashCodeCollectionForNonSingletonList() {
+    String a = "a";
+    String b = "b";
+    String c = "c";
+    int hashCode = CollectionUtility.arrayList(a, b, c).hashCode();
+    assertEquals(hashCode, CollectionUtility.hashCodeCollection(CollectionUtility.arrayList(a, b, c), true));
+    assertEquals(hashCode, CollectionUtility.hashCodeCollection(new TreeSet<>(CollectionUtility.arrayList(a, b, c)), true));
   }
 
   /**

@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -103,6 +104,62 @@ public final class CollectionUtility {
 
       return histogram.isEmpty();
     }
+  }
+
+  /**
+   * Hash code suitable for use when equalsCollection is used within an object's {@link #equals(Object)} method. This
+   * method guarantees that if {@link #equalsCollection(Collection, Collection, boolean)} returns true, then this method
+   * will return the same hashCode for both arguments, i.e. this method is always consistent with
+   * {@link #equalsCollection}.
+   *
+   * @return If the size of the collection is <= 1, a hashCode equivalent to Set#hashCode will be returned. Otherwise, a
+   *         custom hashCode based on the histogram will be returned.
+   */
+  public static <T> int hashCodeCollection(Collection<? extends T> c) {
+    return hashCodeCollection(c, false);
+  }
+
+  /**
+   * Hash code suitable for use when equalsCollection is used within an object's {@link #equals(Object)} method. This
+   * method guarantees that if {@link #equalsCollection(Collection, Collection, boolean)} returns true, then this method
+   * will return the same hashCode for both arguments.
+   * <p>
+   * This method is always consistent with {@link #equalsCollection} if the parameter considerElementPosition is set to
+   * false, otherwise it is only consistent if {@link #equalsCollection} is only ever called with
+   * considerElementPosition true, or if the size of the collection is always <= 1.
+   *
+   * @return If the size of the collection is == 1, a hashCode equivalent to Set#hashCode will be returned. When
+   *         considerElementPosition is true and the size of the collection is > 1, a hashCode equivalent to
+   *         List#hashCode will be returned. Otherwise, a custom hashCode based on the histogram will be returned.
+   * @see #equalsCollection(Collection, Collection, boolean)
+   */
+  public static <T> int hashCodeCollection(Collection<? extends T> c, boolean considerElementPosition) {
+    if (c == null) {
+      return 0;
+    }
+
+    int hashCode = 0;
+    Iterator<? extends T> it = c.iterator();
+    if (it.hasNext()) {
+      // use Set#hashCode algorithm (see javadoc there) if size == 1.
+      hashCode += Objects.hashCode(it.next());
+    }
+    if (!considerElementPosition) {
+      // use custom algorithm (sum of all elements like Set#hashCode, but also counting duplicate items) if considerElementPosition == false
+      while (it.hasNext()) {
+        hashCode += Objects.hashCode(it.next());
+      }
+    }
+    else {
+      // use List#hashCode algorithm (see javadoc there) if size > 1 and considerElementPosition == true
+      if (it.hasNext()) {
+        hashCode += 31;
+      }
+      while (it.hasNext()) {
+        hashCode = 31 * hashCode + Objects.hashCode(it.next());
+      }
+    }
+    return hashCode;
   }
 
   /**
