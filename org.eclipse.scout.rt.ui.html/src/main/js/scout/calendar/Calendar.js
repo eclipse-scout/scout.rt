@@ -586,14 +586,14 @@ scout.Calendar.prototype.layoutSize = function(animate) {
     $('.calendar-week-task', this.$topGrid).removeClass('hidden');
   } else {
     // Month
-    var newHeight = gridH / this.monthViewNumberOfWeeks;
+    var newHeightMonth = gridH / this.monthViewNumberOfWeeks;
     $allWeeks.removeClass('calendar-week-noborder invisible');
     $allWeeks.eq(0).addClass('calendar-week-noborder');
-    $allWeeks.data('new-height', newHeight);
-    $('.calendar-day', this.$grid).data('new-height', newHeight);
+    $allWeeks.data('new-height', newHeightMonth);
+    $('.calendar-day', this.$grid).data('new-height', newHeightMonth);
     var $allDays = $('.calendar-week-name', this.$grid);
     $allDays.removeClass('hidden invisible');
-    $allDays.data('new-height', newHeight);
+    $allDays.data('new-height', newHeightMonth);
     $('.calendar-week-allday-container', this.$topGrid).addClass('hidden');
     $('.calendar-week-task', this.$topGrid).addClass('hidden');
   }
