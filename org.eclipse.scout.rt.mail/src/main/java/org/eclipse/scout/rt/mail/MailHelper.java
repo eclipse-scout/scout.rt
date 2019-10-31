@@ -791,8 +791,11 @@ public class MailHelper {
    * @param part
    * @return
    * @throws MessagingException
+   * @deprecated Use {@link #getPartCharset(Part)} and apply desired fallback charset if required (was
+   *             {@link StandardCharsets#UTF_8}).
    */
-  // TODO sme [9.0] mark deprecated in 9.0, use getPartCharset instead.
+  // TODO sme [11.0] remove deprecated method
+  @Deprecated
   public String getCharacterEncodingOfPart(Part part) throws MessagingException {
     return ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8).name(); // default, a good guess in Europe
   }
@@ -801,7 +804,7 @@ public class MailHelper {
    * Detects the charset of the given part. If none or and invalid charset is found, <code>null</code> is returned.
    */
   @SuppressWarnings("squid:S1166") // catch of UnsupportedCharsetException without a rethrow
-  protected Charset getPartCharset(Part part) throws MessagingException {
+  public Charset getPartCharset(Part part) throws MessagingException {
     String charset = getPartCharsetInternal(part);
 
     try {
@@ -931,7 +934,8 @@ public class MailHelper {
           if (content.getCount() >= 3) {
             // Try third part of the message, contains details of the DSN (https://tools.ietf.org/html/rfc3461#section-6.2).
             BodyPart part = content.getBodyPart(2);
-            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), getCharacterEncodingOfPart(part));
+            String charset = ObjectUtility.nvl(getPartCharset(part), StandardCharsets.UTF_8).name(); // default, a good guess in Europe
+            try (InputStreamReader in = new InputStreamReader(part.getInputStream(), charset);
                 BufferedReader reader = new BufferedReader(in)) {
               String s = null;
               while ((s = reader.readLine()) != null) {
