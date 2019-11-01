@@ -12,39 +12,39 @@ import {Tooltip} from '../index';
 
 export default class TableInfoSelectionTooltip extends Tooltip {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  super._init( options);
+  _init(options) {
+    super._init(options);
 
-  this.tableFooter = options.tableFooter;
-}
+    this.tableFooter = options.tableFooter;
+  }
 
-_renderText() {
-  var table = this.tableFooter.table,
-    numRowsSelected = table.selectedRows.length;
+  _renderText() {
+    var table = this.tableFooter.table,
+      numRowsSelected = table.selectedRows.length;
 
-  this.$content.appendSpan().text(this.session.text('ui.NumRowsSelected', this.tableFooter.computeCountInfo(numRowsSelected)));
-  this.$content.appendBr();
-  this.$content.appendSpan('link')
-    .text(this.session.text('ui.SelectNone'))
-    .on('click', this._onSelectNoneClick.bind(this));
-  this.$content.appendBr();
-  this.$content.appendSpan('link')
-    .text(this.session.text('ui.SelectAll'))
-    .on('click', this._onSelectAllClick.bind(this));
-}
+    this.$content.appendSpan().text(this.session.text('ui.NumRowsSelected', this.tableFooter.computeCountInfo(numRowsSelected)));
+    this.$content.appendBr();
+    this.$content.appendSpan('link')
+      .text(this.session.text('ui.SelectNone'))
+      .on('click', this._onSelectNoneClick.bind(this));
+    this.$content.appendBr();
+    this.$content.appendSpan('link')
+      .text(this.session.text('ui.SelectAll'))
+      .on('click', this._onSelectAllClick.bind(this));
+  }
 
-_onSelectNoneClick() {
-  this.tableFooter.table.deselectAll();
-  this.destroy();
-}
+  _onSelectNoneClick() {
+    this.tableFooter.table.deselectAll();
+    this.destroy();
+  }
 
-_onSelectAllClick() {
-  this.tableFooter.table.selectAll();
-  this.destroy();
-}
+  _onSelectAllClick() {
+    this.tableFooter.table.selectAll();
+    this.destroy();
+  }
 }

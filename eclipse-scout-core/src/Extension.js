@@ -38,28 +38,29 @@ import {scout} from './index';
  */
 export default class Extension {
 
-constructor() {};
-
-extend(extended, funcName) {
-  var origFunc = extended[funcName];
-  var extension = this;
-  var wrapper = function() {
-    extension.extended = this;
-    extension.next = origFunc.bind(this);
-    return extension[funcName].apply(extension, arguments);
+  constructor() {
   };
-  extended[funcName] = wrapper;
-}
 
-/**
- * Calls scout.create for each extension class in the given extensions array.
- *
- * @param extensions an Array of strings containing extension class names
- * @static
- */
-static install(extensions) {
-  extensions.forEach(function(ext) {
-    scout.create(ext);
-  });
-}
+  extend(extended, funcName) {
+    var origFunc = extended[funcName];
+    var extension = this;
+    var wrapper = function() {
+      extension.extended = this;
+      extension.next = origFunc.bind(this);
+      return extension[funcName].apply(extension, arguments);
+    };
+    extended[funcName] = wrapper;
+  }
+
+  /**
+   * Calls scout.create for each extension class in the given extensions array.
+   *
+   * @param extensions an Array of strings containing extension class names
+   * @static
+   */
+  static install(extensions) {
+    extensions.forEach(function(ext) {
+      scout.create(ext);
+    });
+  }
 }

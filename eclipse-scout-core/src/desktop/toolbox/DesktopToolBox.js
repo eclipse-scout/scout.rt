@@ -14,29 +14,29 @@ import {Popup} from '../../index';
 
 export default class DesktopToolBox extends MenuBox {
 
-constructor(menuBar) {
-  super();
-}
+  constructor(menuBar) {
+    super();
+  }
 
 
-_init(options) {
-  options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
-  super._init( options);
-}
+  _init(options) {
+    options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
+    super._init(options);
+  }
 
-/**
- * @override
- */
-_initMenu(menu) {
-  super._initMenu( menu);
-  menu.popupHorizontalAlignment = Popup.Alignment.RIGHTEDGE;
-}
+  /**
+   * @override
+   */
+  _initMenu(menu) {
+    super._initMenu(menu);
+    menu.popupHorizontalAlignment = Popup.Alignment.RIGHTEDGE;
+  }
 
-/**
- * @override
- */
-_render() {
-  super._render();
-  this.$container.addClass('desktop-tool-box');
-}
+  /**
+   * @override
+   */
+  _render() {
+    super._render();
+    this.$container.addClass('desktop-tool-box');
+  }
 }

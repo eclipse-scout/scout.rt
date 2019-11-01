@@ -13,17 +13,17 @@ import {graphics} from '../../index';
 
 export default class SearchOutlineLayout extends OutlineLayout {
 
-constructor(outline) {
-  super( outline);
-  this.outline = outline;
-}
+  constructor(outline) {
+    super(outline);
+    this.outline = outline;
+  }
 
 
-_setDataHeight(heightOffset) {
-  // Add search panel height to heightOffset
-  var searchPanelSize = graphics.size(this.outline.$searchPanel, true);
-  heightOffset += searchPanelSize.height;
+  _setDataHeight(heightOffset) {
+    // Add search panel height to heightOffset
+    var searchPanelSize = graphics.size(this.outline.$searchPanel, true);
+    heightOffset += searchPanelSize.height;
 
-  super._setDataHeight( heightOffset);
-}
+    super._setDataHeight(heightOffset);
+  }
 }

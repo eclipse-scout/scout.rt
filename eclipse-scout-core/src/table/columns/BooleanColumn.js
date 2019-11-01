@@ -18,120 +18,120 @@ import {Column} from '../../index';
  */
 export default class BooleanColumn extends Column {
 
-constructor() {
-  super();
-  this.comparator = comparators.NUMERIC;
-  this.filterType = 'ColumnUserFilter';
-  this.horizontalAlignment = 0;
-  this.minWidth = Column.NARROW_MIN_WIDTH;
-  this.triStateEnabled = false;
-  this.textBased = false;
-}
-
-
-/**
- * @override
- */
-_formatValue(value) {
-  // cell renders a checkbox, text is not visible
-  return null;
-}
-
-/**
- * @override
- */
-buildCell(cell, row) {
-  var style,
-    content = '',
-    cssClass,
-    checkBoxCssClass,
-    enabled = row.enabled,
-    tableNodeColumn = this.table.isTableNodeColumn(this),
-    rowPadding = 0;
-
-  if (tableNodeColumn) {
-    rowPadding = this.table._calcRowLevelPadding(row);
+  constructor() {
+    super();
+    this.comparator = comparators.NUMERIC;
+    this.filterType = 'ColumnUserFilter';
+    this.horizontalAlignment = 0;
+    this.minWidth = Column.NARROW_MIN_WIDTH;
+    this.triStateEnabled = false;
+    this.textBased = false;
   }
 
-  if (cell.empty) {
-    // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
-    return super.buildCell( cell, row);
+
+  /**
+   * @override
+   */
+  _formatValue(value) {
+    // cell renders a checkbox, text is not visible
+    return null;
   }
 
-  enabled = enabled && cell.editable;
-  cssClass = this._cellCssClass(cell, tableNodeColumn);
-  style = this._cellStyle(cell, tableNodeColumn, rowPadding);
-  if (!enabled) {
-    cssClass += ' disabled';
+  /**
+   * @override
+   */
+  buildCell(cell, row) {
+    var style,
+      content = '',
+      cssClass,
+      checkBoxCssClass,
+      enabled = row.enabled,
+      tableNodeColumn = this.table.isTableNodeColumn(this),
+      rowPadding = 0;
+
+    if (tableNodeColumn) {
+      rowPadding = this.table._calcRowLevelPadding(row);
+    }
+
+    if (cell.empty) {
+      // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
+      return super.buildCell(cell, row);
+    }
+
+    enabled = enabled && cell.editable;
+    cssClass = this._cellCssClass(cell, tableNodeColumn);
+    style = this._cellStyle(cell, tableNodeColumn, rowPadding);
+    if (!enabled) {
+      cssClass += ' disabled';
+    }
+
+    checkBoxCssClass = 'check-box';
+    if (cell.value === true) {
+      checkBoxCssClass += ' checked';
+    }
+    if (this.triStateEnabled && cell.value !== true && cell.value !== false) {
+      checkBoxCssClass += ' undefined';
+    }
+    if (!enabled) {
+      checkBoxCssClass += ' disabled';
+    }
+
+    if (tableNodeColumn && row._expandable) {
+      this.tableNodeColumn = true;
+      content = this._expandIcon(row.expanded, rowPadding) + content;
+      if (row.expanded) {
+        cssClass += ' expanded';
+      }
+    }
+    content = content + '<div class="' + checkBoxCssClass + '"/>';
+
+    return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
   }
 
-  checkBoxCssClass = 'check-box';
-  if (cell.value === true) {
-    checkBoxCssClass += ' checked';
-  }
-  if (this.triStateEnabled && cell.value !== true && cell.value !== false) {
-    checkBoxCssClass += ' undefined';
-  }
-  if (!enabled) {
-    checkBoxCssClass += ' disabled';
+  $checkBox($row) {
+    var $cell = this.table.$cell(this, $row);
+    return $cell.children('.check-box');
   }
 
-  if (tableNodeColumn && row._expandable) {
-    this.tableNodeColumn = true;
-    content = this._expandIcon(row.expanded, rowPadding) + content;
-    if (row.expanded) {
-      cssClass += ' expanded';
+  _cellCssClass(cell, tableNode) {
+    var cssClass = super._cellCssClass(cell);
+    cssClass = cssClass.replace(' editable', '');
+    cssClass += ' checkable';
+    if (tableNode) {
+      cssClass += ' table-node';
+    }
+
+    return cssClass;
+  }
+
+  /**
+   * This function does intentionally _not_ call the super function (prepareCellEdit) because we don't want to
+   * show an editor for BooleanColumns when user clicks on a cell.
+   */
+  onMouseUp(event, $row) {
+    var row = $row.data('row'),
+      cell = this.cell(row);
+    if (this.table.checkableColumn === this) {
+      this.table.checkRow(row, !row.checked);
+    } else if (this.isCellEditable(row, cell, event)) {
+      this._toggleCellValue(row, cell);
     }
   }
-  content = content + '<div class="' + checkBoxCssClass + '"/>';
 
-  return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
-}
-
-$checkBox($row) {
-  var $cell = this.table.$cell(this, $row);
-  return $cell.children('.check-box');
-}
-
-_cellCssClass(cell, tableNode) {
-  var cssClass = super._cellCssClass( cell);
-  cssClass = cssClass.replace(' editable', '');
-  cssClass += ' checkable';
-  if (tableNode) {
-    cssClass += ' table-node';
+  /**
+   * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
+   * @see TableAdapter.js
+   */
+  _toggleCellValue(row, cell) {
+    this.setCellValue(row, !cell.value);
   }
 
-  return cssClass;
-}
-
-/**
- * This function does intentionally _not_ call the super function (prepareCellEdit) because we don't want to
- * show an editor for BooleanColumns when user clicks on a cell.
- */
-onMouseUp(event, $row) {
-  var row = $row.data('row'),
-    cell = this.cell(row);
-  if (this.table.checkableColumn === this) {
-    this.table.checkRow(row, !row.checked);
-  } else if (this.isCellEditable(row, cell, event)) {
-    this._toggleCellValue(row, cell);
+  /**
+   * @override
+   */
+  _createEditor(row) {
+    return scout.create('CheckBoxField', {
+      parent: this.table
+    });
   }
-}
-
-/**
- * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
- * @see TableAdapter.js
- */
-_toggleCellValue(row, cell) {
-  this.setCellValue(row, !cell.value);
-}
-
-/**
- * @override
- */
-_createEditor(row) {
-  return scout.create('CheckBoxField', {
-    parent: this.table
-  });
-}
 }

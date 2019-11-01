@@ -19,38 +19,38 @@ import {RangeKeyStroke} from '../../index';
  */
 export default class DisableBrowserTabSwitchingKeyStroke extends RangeKeyStroke {
 
-constructor(desktop) {
-  super();
-  this.field = desktop;
+  constructor(desktop) {
+    super();
+    this.field = desktop;
 
-  // modifier
-  this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
+    // modifier
+    this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
 
-  // range [1..9]
-  this.registerRange(
-    keys['1'], // range from
-    keys['9'] // range to
-  );
+    // range [1..9]
+    this.registerRange(
+      keys['1'], // range from
+      keys['9'] // range to
+    );
 
-  // rendering hints
-  this.renderingHints.render = false;
+    // rendering hints
+    this.renderingHints.render = false;
 
-  this.preventDefault = true;
-}
+    this.preventDefault = true;
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-_isEnabled() {
-  var enabled = super._isEnabled();
-  return enabled && this.field.selectViewTabsKeyStrokesEnabled;
-}
+  /**
+   * @override KeyStroke.js
+   */
+  _isEnabled() {
+    var enabled = super._isEnabled();
+    return enabled && this.field.selectViewTabsKeyStrokesEnabled;
+  }
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  // NOOP
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    // NOOP
+  }
 }

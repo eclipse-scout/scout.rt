@@ -14,20 +14,20 @@ import {arrays} from '../../index';
 
 export default class CompactTreeUpKeyStroke extends AbstractCompactTreeControlKeyStroke {
 
-constructor(compactProcessTree) {
-  super( compactProcessTree);
-  this.which = [keys.UP];
-  this.renderingHints.text = '↑';
-}
-
-
-_findNextNode($currentNode, currentNode) {
-  if (currentNode) {
-    // Find last process node, or last process node in previous section.
-    return $currentNode.prev('.section-node').data('node') || $currentNode.parent().prev('.section').children('.section-node').last().data('node');
-  } else {
-    // Find last process node.
-    return arrays.last(arrays.last(this.field.nodes).childNodes);
+  constructor(compactProcessTree) {
+    super(compactProcessTree);
+    this.which = [keys.UP];
+    this.renderingHints.text = '↑';
   }
-}
+
+
+  _findNextNode($currentNode, currentNode) {
+    if (currentNode) {
+      // Find last process node, or last process node in previous section.
+      return $currentNode.prev('.section-node').data('node') || $currentNode.parent().prev('.section').children('.section-node').last().data('node');
+    } else {
+      // Find last process node.
+      return arrays.last(arrays.last(this.field.nodes).childNodes);
+    }
+  }
 }

@@ -13,32 +13,32 @@ import {scout} from '../index';
 
 export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall {
 
-constructor() {
-  super();
-  this.table = null;
-}
+  constructor() {
+    super();
+    this.table = null;
+  }
 
 
-_init(model) {
-  super._init( model);
-}
+  _init(model) {
+    super._init(model);
+  }
 
-_data() {
-  var lookupRows = [];
-  lookupRows.push([null, this.session.text('NoGrouping'), 'BOLD']);
-  this.table.visibleColumns().forEach(function(column) {
-    if (this.table.isGroupingPossible(column)) {
-      lookupRows.push([column, scout.nvl(column.text, column.headerTooltipText)]);
-    }
-  }, this);
-  return lookupRows;
-}
+  _data() {
+    var lookupRows = [];
+    lookupRows.push([null, this.session.text('NoGrouping'), 'BOLD']);
+    this.table.visibleColumns().forEach(function(column) {
+      if (this.table.isGroupingPossible(column)) {
+        lookupRows.push([column, scout.nvl(column.text, column.headerTooltipText)]);
+      }
+    }, this);
+    return lookupRows;
+  }
 
-_dataToLookupRow(data) {
-  return scout.create('LookupRow', {
-    key: data[0],
-    text: data[1],
-    font: data[2]
-  });
-}
+  _dataToLookupRow(data) {
+    return scout.create('LookupRow', {
+      key: data[0],
+      text: data[1],
+      font: data[2]
+    });
+  }
 }

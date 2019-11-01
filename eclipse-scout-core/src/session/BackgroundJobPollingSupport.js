@@ -12,32 +12,32 @@ import {BackgroundJobPollingStatus} from '../index';
 
 export default class BackgroundJobPollingSupport {
 
-constructor(enabled) {
-  this.enabled = !!enabled;
-  this.status = BackgroundJobPollingStatus.STOPPED;
-}
+  constructor(enabled) {
+    this.enabled = !!enabled;
+    this.status = BackgroundJobPollingStatus.STOPPED;
+  }
 
-setFailed() {
-  this.status = BackgroundJobPollingStatus.FAILURE;
-}
+  setFailed() {
+    this.status = BackgroundJobPollingStatus.FAILURE;
+  }
 
-setRunning() {
-  this.status = BackgroundJobPollingStatus.RUNNING;
-}
+  setRunning() {
+    this.status = BackgroundJobPollingStatus.RUNNING;
+  }
 
-setStopped() {
-  this.status = BackgroundJobPollingStatus.STOPPED;
-}
+  setStopped() {
+    this.status = BackgroundJobPollingStatus.STOPPED;
+  }
 
-isFailed() {
-  return (this.status === BackgroundJobPollingStatus.FAILURE);
-}
+  isFailed() {
+    return (this.status === BackgroundJobPollingStatus.FAILURE);
+  }
 
-isRunning() {
-  return (this.status === BackgroundJobPollingStatus.RUNNING);
-}
+  isRunning() {
+    return (this.status === BackgroundJobPollingStatus.RUNNING);
+  }
 
-isStopped() {
-  return (this.status === BackgroundJobPollingStatus.STOPPED);
-}
+  isStopped() {
+    return (this.status === BackgroundJobPollingStatus.STOPPED);
+  }
 }

@@ -15,78 +15,78 @@ import {scout} from '../index';
 
 export default class CalendarModesMenu extends Menu {
 
-constructor() {
-  super();
-  this.cssClass = 'calendar-mode-menu';
-  this.displayMode;
-}
+  constructor() {
+    super();
+    this.cssClass = 'calendar-mode-menu';
+    this.displayMode;
+  }
 
 
-_init(model) {
-  super._init( model);
-  this.calendar = this.parent;
-  var menusToAdd = [];
-  menusToAdd.push(scout.create('CalendarModeMenu', {
-    parent: this,
-    displayMode: Calendar.DisplayMode.DAY,
-    text: this.session.text('ui.CalendarDay')
-  }));
-  menusToAdd.push(scout.create('CalendarModeMenu', {
-    parent: this,
-    displayMode: Calendar.DisplayMode.WORK_WEEK,
-    text: this.session.text('ui.CalendarWorkWeek')
-  }));
-  menusToAdd.push(scout.create('CalendarModeMenu', {
-    parent: this,
-    displayMode: Calendar.DisplayMode.WEEK,
-    text: this.session.text('ui.CalendarWeek')
-  }));
-  menusToAdd.push(scout.create('CalendarModeMenu', {
-    parent: this,
-    displayMode: Calendar.DisplayMode.MONTH,
-    text: this.session.text('ui.CalendarMonth')
-  }));
-  this.addChildActions(menusToAdd);
+  _init(model) {
+    super._init(model);
+    this.calendar = this.parent;
+    var menusToAdd = [];
+    menusToAdd.push(scout.create('CalendarModeMenu', {
+      parent: this,
+      displayMode: Calendar.DisplayMode.DAY,
+      text: this.session.text('ui.CalendarDay')
+    }));
+    menusToAdd.push(scout.create('CalendarModeMenu', {
+      parent: this,
+      displayMode: Calendar.DisplayMode.WORK_WEEK,
+      text: this.session.text('ui.CalendarWorkWeek')
+    }));
+    menusToAdd.push(scout.create('CalendarModeMenu', {
+      parent: this,
+      displayMode: Calendar.DisplayMode.WEEK,
+      text: this.session.text('ui.CalendarWeek')
+    }));
+    menusToAdd.push(scout.create('CalendarModeMenu', {
+      parent: this,
+      displayMode: Calendar.DisplayMode.MONTH,
+      text: this.session.text('ui.CalendarMonth')
+    }));
+    this.addChildActions(menusToAdd);
 
-  this.childActions.forEach(function(menu) {
-    menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
-  }, this);
+    this.childActions.forEach(function(menu) {
+      menu.on('propertyChange', this._onMenuPropertyChange.bind(this));
+    }, this);
 
-  this._setDisplayMode(this.displayMode);
-}
+    this._setDisplayMode(this.displayMode);
+  }
 
-setDisplayMode(displayMode) {
-  this.setProperty('displayMode', displayMode);
-}
+  setDisplayMode(displayMode) {
+    this.setProperty('displayMode', displayMode);
+  }
 
-_setDisplayMode(displayMode) {
-  this._setProperty('displayMode', displayMode);
-  var menu = this.getMenuForMode(this.displayMode);
-  menu.setSelected(true);
-  this.setText(menu.text);
-}
+  _setDisplayMode(displayMode) {
+    this._setProperty('displayMode', displayMode);
+    var menu = this.getMenuForMode(this.displayMode);
+    menu.setSelected(true);
+    this.setText(menu.text);
+  }
 
-getMenuForMode(displayMode) {
-  return arrays.find(this.childActions, function(menu) {
-    return menu.displayMode === displayMode;
-  });
-}
+  getMenuForMode(displayMode) {
+    return arrays.find(this.childActions, function(menu) {
+      return menu.displayMode === displayMode;
+    });
+  }
 
-_onMenuPropertyChange(event) {
-  if (event.propertyName === 'selected') {
-    var selected = event.newValue;
-    if (selected) {
-      var displayMode = event.source.displayMode;
-      this.setDisplayMode(displayMode);
-      this.calendar.setDisplayMode(displayMode);
+  _onMenuPropertyChange(event) {
+    if (event.propertyName === 'selected') {
+      var selected = event.newValue;
+      if (selected) {
+        var displayMode = event.source.displayMode;
+        this.setDisplayMode(displayMode);
+        this.calendar.setDisplayMode(displayMode);
 
-      // unselect other menu items
-      this.childActions.forEach(function(menu) {
-        if (menu !== event.source) {
-          menu.setSelected(false);
-        }
-      }, this);
+        // unselect other menu items
+        this.childActions.forEach(function(menu) {
+          if (menu !== event.source) {
+            menu.setSelected(false);
+          }
+        }, this);
+      }
     }
   }
-}
 }

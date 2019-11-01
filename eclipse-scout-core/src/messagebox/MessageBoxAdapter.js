@@ -12,22 +12,22 @@ import {ModelAdapter} from '../index';
 
 export default class MessageBoxAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetAction(event) {
-  this._send('action', {
-    option: event.option
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'action') {
-    this._onWidgetAction(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
+
+
+  _onWidgetAction(event) {
+    this._send('action', {
+      option: event.option
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'action') {
+      this._onWidgetAction(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

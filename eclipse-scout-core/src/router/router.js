@@ -14,7 +14,6 @@ import {router} from '../index';
 import * as $ from 'jquery';
 
 
-
 let routes = []; // array with Routes
 let events = new EventSupport();
 let currentRoute = null;

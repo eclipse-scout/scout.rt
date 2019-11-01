@@ -13,31 +13,31 @@ import {keys} from '../../index';
 
 export default class MenuBarRightKeyStroke extends KeyStroke {
 
-constructor(menuBar) {
-  super();
-  this.field = menuBar;
-  this.which = [keys.RIGHT];
-  this.renderingHints.render = false;
-  this.stopPropagation = true;
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
+  constructor(menuBar) {
+    super();
+    this.field = menuBar;
+    this.which = [keys.RIGHT];
+    this.renderingHints.render = false;
+    this.stopPropagation = true;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
+  }
 
 
-handle(event) {
-  var menuItems = this.field.orderedMenuItems.all,
-    $menuItemFocused = this.field.$container.find(':focus'),
-    i, menuItem, focusNext = false;
+  handle(event) {
+    var menuItems = this.field.orderedMenuItems.all,
+      $menuItemFocused = this.field.$container.find(':focus'),
+      i, menuItem, focusNext = false;
 
-  for (i = 0; i < menuItems.length; i++) {
-    menuItem = menuItems[i];
-    if (focusNext && menuItem.isTabTarget()) {
-      this.field.setTabbableMenu(menuItem);
-      menuItem.focus();
-      break;
-    }
-    if ($menuItemFocused[0] === menuItem.$container[0]) {
-      focusNext = true;
+    for (i = 0; i < menuItems.length; i++) {
+      menuItem = menuItems[i];
+      if (focusNext && menuItem.isTabTarget()) {
+        this.field.setTabbableMenu(menuItem);
+        menuItem.focus();
+        break;
+      }
+      if ($menuItemFocused[0] === menuItem.$container[0]) {
+        focusNext = true;
+      }
     }
   }
-}
 }

@@ -12,9 +12,9 @@ import {ModelAdapter} from '../index';
 
 export default class SliderAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['value']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['value']);
+  }
 
 }

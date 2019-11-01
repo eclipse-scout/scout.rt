@@ -12,31 +12,31 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class FileChooserButtonAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetPropertyChange(event) {
-  super._onWidgetPropertyChange( event);
-
-  if (event.propertyName === 'value') {
-    this._onValueChange(event);
+  constructor() {
+    super();
   }
-}
 
-_onValueChange(event) {
-  var success = this.widget.fileInput.upload();
-  if (!success) {
-    this.widget.fileInput.clear();
+
+  _onWidgetPropertyChange(event) {
+    super._onWidgetPropertyChange(event);
+
+    if (event.propertyName === 'value') {
+      this._onValueChange(event);
+    }
   }
-}
 
-/**
- * @override
- */
-_syncDisplayText(displayText) {
-  this.widget.setDisplayText(displayText);
-  // When displayText comes from the server we must not call parseAndSetValue here.
-}
+  _onValueChange(event) {
+    var success = this.widget.fileInput.upload();
+    if (!success) {
+      this.widget.fileInput.clear();
+    }
+  }
+
+  /**
+   * @override
+   */
+  _syncDisplayText(displayText) {
+    this.widget.setDisplayText(displayText);
+    // When displayText comes from the server we must not call parseAndSetValue here.
+  }
 }

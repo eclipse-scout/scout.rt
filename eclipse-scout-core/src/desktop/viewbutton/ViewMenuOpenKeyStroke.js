@@ -16,40 +16,40 @@ import {keys} from '../../index';
  */
 export default class ViewMenuOpenKeyStroke extends KeyStroke {
 
-constructor(viewMenuTab) {
-  super();
-  this.field = viewMenuTab;
+  constructor(viewMenuTab) {
+    super();
+    this.field = viewMenuTab;
 
-  this.which = [keys.F2];
-  this.stopPropagation = true;
+    this.which = [keys.F2];
+    this.stopPropagation = true;
 
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$container;
-  }.bind(this);
-}
-
-
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  if (this.field.selected && !this.field.inBackground) {
-    this.field.togglePopup();
-  } else if (this.field.selectedButton) {
-    this.field.selectedButton.doAction();
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$container;
+    }.bind(this);
   }
-}
 
-_postRenderKeyBox($drawingArea) {
-  var wKeybox = $drawingArea.find('.key-box').outerWidth(),
-    left = this.field.dropdown.$container.outerWidth();
 
-  if (this.field.selected && !this.field.inBackground) {
-    left = left / 2;
-  } else if (this.field.selectedButton) {
-    left = left + this.field.selectedButton.$container.outerWidth() / 2;
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    if (this.field.selected && !this.field.inBackground) {
+      this.field.togglePopup();
+    } else if (this.field.selectedButton) {
+      this.field.selectedButton.doAction();
+    }
   }
-  left -= wKeybox / 2;
-  $drawingArea.find('.key-box').cssLeft(left);
-}
+
+  _postRenderKeyBox($drawingArea) {
+    var wKeybox = $drawingArea.find('.key-box').outerWidth(),
+      left = this.field.dropdown.$container.outerWidth();
+
+    if (this.field.selected && !this.field.inBackground) {
+      left = left / 2;
+    } else if (this.field.selectedButton) {
+      left = left + this.field.selectedButton.$container.outerWidth() / 2;
+    }
+    left -= wKeybox / 2;
+    $drawingArea.find('.key-box').cssLeft(left);
+  }
 }

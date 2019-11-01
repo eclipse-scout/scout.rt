@@ -12,23 +12,23 @@ import {CompositeFieldAdapter} from '../../../index';
 
 export default class SplitBoxAdapter extends CompositeFieldAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
-}
-
-
-_onWidgetPositionChange(event) {
-  this._send('setSplitterPosition', {
-    splitterPosition: event.position
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'positionChange') {
-    this._onWidgetPositionChange(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
+    this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
   }
-}
+
+
+  _onWidgetPositionChange(event) {
+    this._send('setSplitterPosition', {
+      splitterPosition: event.position
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'positionChange') {
+      this._onWidgetPositionChange(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

@@ -12,28 +12,28 @@ import {KeyStroke} from '../../../index';
 
 export default class SplitBoxSecondCollapseKeyStroke extends KeyStroke {
 
-constructor(splitBox, keyStroke) {
-  super();
-  this.field = splitBox;
-  this.parseAndSetKeyStroke(keyStroke);
-}
+  constructor(splitBox, keyStroke) {
+    super();
+    this.field = splitBox;
+    this.parseAndSetKeyStroke(keyStroke);
+  }
 
 
-handle(event) {
-  this.field.collapseHandleButtonPressed({
-    right: true
-  });
-}
+  handle(event) {
+    this.field.collapseHandleButtonPressed({
+      right: true
+    });
+  }
 
-_postRenderKeyBox($drawingArea, $keyBox) {
-  var handleOffset,
-    $collapseHandle = this.field._collapseHandle.$container;
+  _postRenderKeyBox($drawingArea, $keyBox) {
+    var handleOffset,
+      $collapseHandle = this.field._collapseHandle.$container;
 
-  $keyBox.addClass('split-box-collapse-key-box right');
-  handleOffset = $collapseHandle.offsetTo(this.field.$container);
+    $keyBox.addClass('split-box-collapse-key-box right');
+    handleOffset = $collapseHandle.offsetTo(this.field.$container);
 
-  $keyBox
-    .cssLeft(handleOffset.left + $collapseHandle.width() - $keyBox.outerWidth())
-    .cssTop(handleOffset.top - $keyBox.outerHeight());
-}
+    $keyBox
+      .cssLeft(handleOffset.left + $collapseHandle.width() - $keyBox.outerWidth())
+      .cssTop(handleOffset.top - $keyBox.outerHeight());
+  }
 }

@@ -13,14 +13,14 @@ import {AbstractGrid} from '../../index';
 
 export default class HorizontalGrid extends AbstractGrid {
 
-constructor(options) {
-  super( options);
-}
+  constructor(options) {
+    super(options);
+  }
 
 
-layoutAllDynamic(widgets) {
-  var matrix = new HorizontalGridMatrix(this.getGridColumnCount());
-  matrix.computeGridData(widgets);
-  this.gridRows = matrix.getRowCount();
-}
+  layoutAllDynamic(widgets) {
+    var matrix = new HorizontalGridMatrix(this.getGridColumnCount());
+    matrix.computeGridData(widgets);
+    this.gridRows = matrix.getRowCount();
+  }
 }

@@ -12,43 +12,43 @@ import {PopupLayout} from '../index';
 
 export default class TimePickerPopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super();
-  this.popup = popup;
-  this.doubleCalcPrefSize = false;
-}
-
-
-layout($container) {
-  var size,
-    htmlComp = this.popup.htmlComp,
-    htmlPicker = this.popup.picker.htmlComp;
-
-  super.layout( $container);
-
-  size = htmlComp.size()
-    .subtract(htmlComp.insets())
-    .subtract(htmlPicker.margins());
-
-  htmlPicker.setSize(size);
-
-  // Reposition because opening direction may have to be switched if popup gets bigger
-  // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
-  if (this.popup.htmlComp.layouted) {
-    this.popup.position();
+  constructor(popup) {
+    super();
+    this.popup = popup;
+    this.doubleCalcPrefSize = false;
   }
-}
 
-preferredLayoutSize($container) {
-  var prefSize,
-    htmlComp = this.popup.htmlComp,
-    htmlPicker = this.popup.picker.htmlComp;
 
-  prefSize = htmlPicker.prefSize()
-    .add(htmlComp.insets())
-    .add(htmlPicker.margins());
+  layout($container) {
+    var size,
+      htmlComp = this.popup.htmlComp,
+      htmlPicker = this.popup.picker.htmlComp;
 
-  prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
-  return prefSize;
-}
+    super.layout($container);
+
+    size = htmlComp.size()
+      .subtract(htmlComp.insets())
+      .subtract(htmlPicker.margins());
+
+    htmlPicker.setSize(size);
+
+    // Reposition because opening direction may have to be switched if popup gets bigger
+    // Don't do it the first time (will be done by popup.open), only if the popup is already open and gets layouted again
+    if (this.popup.htmlComp.layouted) {
+      this.popup.position();
+    }
+  }
+
+  preferredLayoutSize($container) {
+    var prefSize,
+      htmlComp = this.popup.htmlComp,
+      htmlPicker = this.popup.picker.htmlComp;
+
+    prefSize = htmlPicker.prefSize()
+      .add(htmlComp.insets())
+      .add(htmlPicker.margins());
+
+    prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
+    return prefSize;
+  }
 }

@@ -12,16 +12,16 @@ import {LogicalGridConfig} from '../../../index';
 
 export default class RadioButtonGroupGridConfig extends LogicalGridConfig {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-getGridColumnCount() {
-  return this.widget.gridColumnCount;
-}
+  getGridColumnCount() {
+    return this.widget.gridColumnCount;
+  }
 
-getGridWidgets() {
-  return this.widget.fields;
-}
+  getGridWidgets() {
+    return this.widget.fields;
+  }
 }

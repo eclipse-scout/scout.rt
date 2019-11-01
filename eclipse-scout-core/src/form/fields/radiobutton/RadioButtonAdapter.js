@@ -12,9 +12,9 @@ import {ButtonAdapter} from '../../../index';
 
 export default class RadioButtonAdapter extends ButtonAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['selected']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['selected']);
+  }
 
 }

@@ -16,55 +16,55 @@ import {App} from '../index';
  ******************************************************************************/
 export default class TableTileGridMediatorAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-/**
- * Static method to modify the prototype of TableTileGridMediatorAdapter.
- */
-static modifyTableTileGridMediator() {
-  if (!App.get().remote) {
-    return;
+  constructor() {
+    super();
   }
 
-  // tiles are already provided by the backend in classic mode
-  objects.replacePrototypeFunction(TableTileGridMediator, 'loadTiles', function() {
-    if (this.modelAdapter) {
-      // nop in classic mode
-      return;
-    }
-    return this.loadTilesOrig();
-  }, true);
 
-  // handled by the java mediator
-  objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function() {
-    if (this.modelAdapter) {
-      // nop in classic mode
+  /**
+   * Static method to modify the prototype of TableTileGridMediatorAdapter.
+   */
+  static modifyTableTileGridMediator() {
+    if (!App.get().remote) {
       return;
     }
-    return this._onTableRowsInsertedOrig();
-  }, true);
 
-  // handled by the java mediator
-  objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function() {
-    if (this.modelAdapter) {
-      // nop in classic mode
-      return;
-    }
-    return this._onTableRowsDeletedOrig();
-  }, true);
+    // tiles are already provided by the backend in classic mode
+    objects.replacePrototypeFunction(TableTileGridMediator, 'loadTiles', function() {
+      if (this.modelAdapter) {
+        // nop in classic mode
+        return;
+      }
+      return this.loadTilesOrig();
+    }, true);
 
-  // handled by the java mediator
-  objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function() {
-    if (this.modelAdapter) {
-      // nop in classic mode
-      return;
-    }
-    return this._onTableAllRowsDeletedOrig();
-  }, true);
-}
+    // handled by the java mediator
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsInserted', function() {
+      if (this.modelAdapter) {
+        // nop in classic mode
+        return;
+      }
+      return this._onTableRowsInsertedOrig();
+    }, true);
+
+    // handled by the java mediator
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableRowsDeleted', function() {
+      if (this.modelAdapter) {
+        // nop in classic mode
+        return;
+      }
+      return this._onTableRowsDeletedOrig();
+    }, true);
+
+    // handled by the java mediator
+    objects.replacePrototypeFunction(TableTileGridMediator, '_onTableAllRowsDeleted', function() {
+      if (this.modelAdapter) {
+        // nop in classic mode
+        return;
+      }
+      return this._onTableAllRowsDeletedOrig();
+    }, true);
+  }
 }
 
 App.addListener('bootstrap', TableTileGridMediatorAdapter.modifyTableTileGridMediator);

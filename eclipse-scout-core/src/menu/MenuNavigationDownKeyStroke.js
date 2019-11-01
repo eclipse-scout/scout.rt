@@ -14,20 +14,20 @@ import {menuNavigationKeyStrokes} from '../index';
 
 export default class MenuNavigationDownKeyStroke extends MenuNavigationKeyStroke {
 
-constructor(popup, menuItemClass) {
-  super( popup);
-  this._menuItemClass = menuItemClass;
-  this.which = [keys.DOWN];
-  this.renderingHints.render = false;
-}
-
-
-handle(event) {
-  var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-  if (menuItems.$selected.length > 0) {
-    menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
-  } else {
-    menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.first());
+  constructor(popup, menuItemClass) {
+    super(popup);
+    this._menuItemClass = menuItemClass;
+    this.which = [keys.DOWN];
+    this.renderingHints.render = false;
   }
-}
+
+
+  handle(event) {
+    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+    if (menuItems.$selected.length > 0) {
+      menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.nextAll(':visible').first());
+    } else {
+      menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.first());
+    }
+  }
 }

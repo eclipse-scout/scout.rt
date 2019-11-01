@@ -35,7 +35,7 @@ export function install(window) {
  * Polyfills for "Math"
  */
 //private
- export function _installPolyfillMath(window) {
+export function _installPolyfillMath(window) {
   if (Math.sign) {
     return; // Nothing to do
   }
@@ -53,7 +53,7 @@ export function install(window) {
  * Polyfills for "FormData"
  */
 //private
- export function _installPolyfillFormData(window) {
+export function _installPolyfillFormData(window) {
   if (window.FormData) {
     return; // Nothing to do
   }

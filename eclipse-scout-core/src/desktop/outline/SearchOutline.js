@@ -18,176 +18,176 @@ import * as $ from 'jquery';
 
 export default class SearchOutline extends Outline {
 
-constructor() {
-  super();
-  this.hasText = false;
-  this.$searchPanel = null;
-  this.$clearIcon = null;
-  this.$searchStatus = null;
-  this.$queryField = null;
-}
-
-
-/**
- * @override Tree.js
- */
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
-
-  this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
-}
-
-_createKeyStrokeContextForSearchField() {
-  var keyStrokeContext = new InputFieldKeyStrokeContext();
-  keyStrokeContext.$scopeTarget = function() {
-    return this.$searchPanel;
-  }.bind(this);
-  keyStrokeContext.$bindTarget = function() {
-    return this.$queryField;
-  }.bind(this);
-  keyStrokeContext.registerStopPropagationKeys(keyStrokeModifier.NONE, [
-    keys.ENTER, keys.BACKSPACE
-  ]);
-  return keyStrokeContext;
-}
-
-_render() {
-  super._render();
-
-  // Override layout
-  this.htmlComp.setLayout(new SearchOutlineLayout(this));
-
-  this.$container.addClass('search-outline');
-  this.$searchPanel = this.$container.prependDiv('search-outline-panel');
-  this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
-    .on('input', this._createOnQueryFieldInputFunction().bind(this))
-    .on('keypress', this._onQueryFieldKeyPress.bind(this));
-  this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick')
-    .on('mousedown', this._onClearIconMouseDown.bind(this));
-
-  this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
-    .on('mousedown', this._onTitleMouseDown.bind(this));
-  this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
-}
-
-_remove() {
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
-  this.$searchPanel.remove();
-  super._remove();
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderSearchQuery();
-  this._renderSearchStatus();
-  this._updateHasText();
-}
-
-_renderTitle() {
-  super._renderTitle();
-  // Move before search panel
-  if (this.titleVisible) {
-    this.$title.insertBefore(this.$searchPanel);
+  constructor() {
+    super();
+    this.hasText = false;
+    this.$searchPanel = null;
+    this.$clearIcon = null;
+    this.$searchStatus = null;
+    this.$queryField = null;
   }
-}
 
-_renderSearchQuery() {
-  this.$queryField.val(this.searchQuery);
-}
 
-_renderSearchStatus() {
-  var animate = this.rendered;
+  /**
+   * @override Tree.js
+   */
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
 
-  if (this.searchStatus && !this.$searchStatus.isVisible()) {
-    if (animate) {
-      this.$searchStatus.slideDown({
-        duration: 200,
-        progress: this.revalidateLayout.bind(this)
-      });
-    } else {
-      this.$searchStatus.show();
-    }
-  } else if (!this.searchStatus && this.$searchStatus.isVisible()) {
-    if (animate) {
-      this.$searchStatus.slideUp({
-        duration: 200,
-        progress: this.revalidateLayout.bind(this)
-      });
-    } else {
-      this.$searchStatus.hide();
-    }
+    this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
   }
-  this.$searchStatus.textOrNbsp(this.searchStatus);
-  this.$searchPanel.toggleClass('has-status', !!this.searchStatus);
-}
 
-focusQueryField() {
-  this.validateFocus();
-}
+  _createKeyStrokeContextForSearchField() {
+    var keyStrokeContext = new InputFieldKeyStrokeContext();
+    keyStrokeContext.$scopeTarget = function() {
+      return this.$searchPanel;
+    }.bind(this);
+    keyStrokeContext.$bindTarget = function() {
+      return this.$queryField;
+    }.bind(this);
+    keyStrokeContext.registerStopPropagationKeys(keyStrokeModifier.NONE, [
+      keys.ENTER, keys.BACKSPACE
+    ]);
+    return keyStrokeContext;
+  }
 
-_triggerSearch() {
-  this.trigger('search', {
-    query: scout.nvl(this.searchQuery, '')
-  });
-}
+  _render() {
+    super._render();
 
-_createOnQueryFieldInputFunction(event) {
-  var debounceFunction = $.debounce(this._search.bind(this));
-  var fn = function(event) {
+    // Override layout
+    this.htmlComp.setLayout(new SearchOutlineLayout(this));
+
+    this.$container.addClass('search-outline');
+    this.$searchPanel = this.$container.prependDiv('search-outline-panel');
+    this.$queryField = this.$searchPanel.appendElement('<input>', 'search-outline-field')
+      .on('input', this._createOnQueryFieldInputFunction().bind(this))
+      .on('keypress', this._onQueryFieldKeyPress.bind(this));
+    this.$clearIcon = this.$searchPanel.appendSpan('clear-icon unfocusable needsclick')
+      .on('mousedown', this._onClearIconMouseDown.bind(this));
+
+    this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
+      .on('mousedown', this._onTitleMouseDown.bind(this));
+    this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
+  }
+
+  _remove() {
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
+    this.$searchPanel.remove();
+    super._remove();
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderSearchQuery();
+    this._renderSearchStatus();
     this._updateHasText();
-    // debounced search
-    debounceFunction();
-  };
-  return fn;
-}
-
-_onClearIconMouseDown(event) {
-  this.$queryField.val('');
-  this._updateHasText();
-  this._search();
-  // focus field if x is pressed when the field does not have the focus
-  this.$queryField.focus();
-  // stay in field when x is pressed
-  event.preventDefault();
-}
-
-_onQueryFieldKeyPress(event) {
-  if (event.which === keys.ENTER) {
-    this._setSearchQuery(this.$queryField.val());
-    this._triggerSearch();
   }
-}
 
-_search(event) {
-  // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
-  var searchQuery = this.$queryField.val();
-  if (this.searchQuery !== searchQuery) {
-    // Store locally so that the value persists when changing the outline without performing the search
-    this._setSearchQuery(searchQuery);
-    this._triggerSearch();
+  _renderTitle() {
+    super._renderTitle();
+    // Move before search panel
+    if (this.titleVisible) {
+      this.$title.insertBefore(this.$searchPanel);
+    }
   }
-}
 
-_setSearchQuery(searchQuery) {
-  this.searchQuery = searchQuery;
-}
-
-_updateHasText() {
-  this.$queryField.toggleClass('has-text', !!this.$queryField.val());
-}
-
-/**
- * Focus and select content AFTER the search outline was rendered (and therefore the query field filled).
- *
- * @override Outline.js
- */
-validateFocus() {
-  if (!this.rendered) {
-    return;
+  _renderSearchQuery() {
+    this.$queryField.val(this.searchQuery);
   }
-  var elementToFocus = this.$queryField[0];
-  if (this.session.focusManager.requestFocus(elementToFocus)) {
-    elementToFocus.select();
+
+  _renderSearchStatus() {
+    var animate = this.rendered;
+
+    if (this.searchStatus && !this.$searchStatus.isVisible()) {
+      if (animate) {
+        this.$searchStatus.slideDown({
+          duration: 200,
+          progress: this.revalidateLayout.bind(this)
+        });
+      } else {
+        this.$searchStatus.show();
+      }
+    } else if (!this.searchStatus && this.$searchStatus.isVisible()) {
+      if (animate) {
+        this.$searchStatus.slideUp({
+          duration: 200,
+          progress: this.revalidateLayout.bind(this)
+        });
+      } else {
+        this.$searchStatus.hide();
+      }
+    }
+    this.$searchStatus.textOrNbsp(this.searchStatus);
+    this.$searchPanel.toggleClass('has-status', !!this.searchStatus);
   }
-}
+
+  focusQueryField() {
+    this.validateFocus();
+  }
+
+  _triggerSearch() {
+    this.trigger('search', {
+      query: scout.nvl(this.searchQuery, '')
+    });
+  }
+
+  _createOnQueryFieldInputFunction(event) {
+    var debounceFunction = $.debounce(this._search.bind(this));
+    var fn = function(event) {
+      this._updateHasText();
+      // debounced search
+      debounceFunction();
+    };
+    return fn;
+  }
+
+  _onClearIconMouseDown(event) {
+    this.$queryField.val('');
+    this._updateHasText();
+    this._search();
+    // focus field if x is pressed when the field does not have the focus
+    this.$queryField.focus();
+    // stay in field when x is pressed
+    event.preventDefault();
+  }
+
+  _onQueryFieldKeyPress(event) {
+    if (event.which === keys.ENTER) {
+      this._setSearchQuery(this.$queryField.val());
+      this._triggerSearch();
+    }
+  }
+
+  _search(event) {
+    // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
+    var searchQuery = this.$queryField.val();
+    if (this.searchQuery !== searchQuery) {
+      // Store locally so that the value persists when changing the outline without performing the search
+      this._setSearchQuery(searchQuery);
+      this._triggerSearch();
+    }
+  }
+
+  _setSearchQuery(searchQuery) {
+    this.searchQuery = searchQuery;
+  }
+
+  _updateHasText() {
+    this.$queryField.toggleClass('has-text', !!this.$queryField.val());
+  }
+
+  /**
+   * Focus and select content AFTER the search outline was rendered (and therefore the query field filled).
+   *
+   * @override Outline.js
+   */
+  validateFocus() {
+    if (!this.rendered) {
+      return;
+    }
+    var elementToFocus = this.$queryField[0];
+    if (this.session.focusManager.requestFocus(elementToFocus)) {
+      elementToFocus.select();
+    }
+  }
 }

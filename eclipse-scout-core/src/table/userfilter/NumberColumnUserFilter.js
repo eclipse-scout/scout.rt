@@ -14,80 +14,80 @@ import * as $ from 'jquery';
 
 export default class NumberColumnUserFilter extends ColumnUserFilter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.numberFrom;
-  this.numberFromField;
-  this.numberTo;
-  this.numberToField;
+    this.numberFrom;
+    this.numberFromField;
+    this.numberTo;
+    this.numberToField;
 
-  this.hasFilterFields = true;
-}
-
-
-/**
- * @override ColumnUserFilter
- */
-createFilterAddedEventData() {
-  var data = super.createFilterAddedEventData();
-  data.numberFrom = this.numberFrom;
-  data.numberTo = this.numberTo;
-  return data;
-}
-
-/**
- * @override ColumnUserFilter
- */
-fieldsFilterActive() {
-  return objects.isNumber(this.numberFrom) || objects.isNumber(this.numberTo);
-}
-
-/**
- * @override ColumnUserFilter
- */
-acceptByFields(key, normKey, row) {
-  var
-    hasFrom = objects.isNumber(this.numberFrom),
-    hasTo = objects.isNumber(this.numberTo);
-  if (hasFrom && hasTo) {
-    return normKey >= this.numberFrom && normKey <= this.numberTo;
-  } else if (hasFrom) {
-    return normKey >= this.numberFrom;
-  } else if (hasTo) {
-    return normKey <= this.numberTo;
+    this.hasFilterFields = true;
   }
-}
 
-/**
- * @override ColumnUserFilter
- */
-filterFieldsTitle() {
-  return this.session.text('ui.NumberRange');
-}
 
-/**
- * @override ColumnUserFilter
- */
-addFilterFields(groupBox) {
-  this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from');
-  this.numberFromField.decimalFormat = this.column.decimalFormat;
-  this.numberFromField.setValue(this.numberFrom);
-  this.numberFromField.on('propertyChange', this._onPropertyChange.bind(this));
-
-  this.numberToField = groupBox.addFilterField('NumberField', 'ui.to');
-  this.numberToField.decimalFormat = this.column.decimalFormat;
-  this.numberToField.setValue(this.numberTo);
-  this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));
-}
-
-_onPropertyChange(event) {
-  if (event.propertyName !== 'value') {
-    return;
+  /**
+   * @override ColumnUserFilter
+   */
+  createFilterAddedEventData() {
+    var data = super.createFilterAddedEventData();
+    data.numberFrom = this.numberFrom;
+    data.numberTo = this.numberTo;
+    return data;
   }
-  this.numberFrom = this.numberFromField.value;
-  this.numberTo = this.numberToField.value;
-  $.log.isDebugEnabled() && $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
-  this.triggerFilterFieldsChanged(event);
-}
+
+  /**
+   * @override ColumnUserFilter
+   */
+  fieldsFilterActive() {
+    return objects.isNumber(this.numberFrom) || objects.isNumber(this.numberTo);
+  }
+
+  /**
+   * @override ColumnUserFilter
+   */
+  acceptByFields(key, normKey, row) {
+    var
+      hasFrom = objects.isNumber(this.numberFrom),
+      hasTo = objects.isNumber(this.numberTo);
+    if (hasFrom && hasTo) {
+      return normKey >= this.numberFrom && normKey <= this.numberTo;
+    } else if (hasFrom) {
+      return normKey >= this.numberFrom;
+    } else if (hasTo) {
+      return normKey <= this.numberTo;
+    }
+  }
+
+  /**
+   * @override ColumnUserFilter
+   */
+  filterFieldsTitle() {
+    return this.session.text('ui.NumberRange');
+  }
+
+  /**
+   * @override ColumnUserFilter
+   */
+  addFilterFields(groupBox) {
+    this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from');
+    this.numberFromField.decimalFormat = this.column.decimalFormat;
+    this.numberFromField.setValue(this.numberFrom);
+    this.numberFromField.on('propertyChange', this._onPropertyChange.bind(this));
+
+    this.numberToField = groupBox.addFilterField('NumberField', 'ui.to');
+    this.numberToField.decimalFormat = this.column.decimalFormat;
+    this.numberToField.setValue(this.numberTo);
+    this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));
+  }
+
+  _onPropertyChange(event) {
+    if (event.propertyName !== 'value') {
+      return;
+    }
+    this.numberFrom = this.numberFromField.value;
+    this.numberTo = this.numberToField.value;
+    $.log.isDebugEnabled() && $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
+    this.triggerFilterFieldsChanged(event);
+  }
 }

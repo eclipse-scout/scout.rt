@@ -13,31 +13,31 @@ import {KeyStroke} from '../../../index';
 
 export default class TagFieldCancelKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.ESC];
-  this.stopPropagation = true;
-  this.preventInvokeAcceptInputOnActiveValueField = true;
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.ESC];
+    this.stopPropagation = true;
+    this.preventInvokeAcceptInputOnActiveValueField = true;
 
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$fieldContainer;
-  }.bind(this);
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$fieldContainer;
+    }.bind(this);
   }
-  if (!this.field.chooser) {
-    return false;
-  }
-  return true;
-}
 
-handle(event) {
-  this.field.closeChooserPopup();
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    if (!this.field.chooser) {
+      return false;
+    }
+    return true;
+  }
+
+  handle(event) {
+    this.field.closeChooserPopup();
+  }
 }

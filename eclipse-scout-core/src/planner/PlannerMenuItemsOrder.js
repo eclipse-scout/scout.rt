@@ -12,9 +12,9 @@ import {MenuItemsOrder} from '../index';
 
 export default class PlannerMenuItemsOrder extends MenuItemsOrder {
 
-constructor(session, objectType) {
-  super( session, objectType);
-  this.selectionTypes = ['Resource', 'Activity', 'Range'];
-}
+  constructor(session, objectType) {
+    super(session, objectType);
+    this.selectionTypes = ['Resource', 'Activity', 'Range'];
+  }
 
 }

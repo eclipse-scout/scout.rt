@@ -12,36 +12,36 @@ import {TableUserFilter} from '../../index';
 
 export default class TableTextUserFilter extends TableUserFilter {
 
-constructor() {
-  super();
-  this.filterType = TableTextUserFilter.TYPE;
-}
-
-
-static TYPE = 'text';
-
-/**
- * @override TableUserFilter.js
- */
-createFilterAddedEventData() {
-  var data = super.createFilterAddedEventData();
-  data.text = this.text;
-  return data;
-}
-
-createLabel() {
-  return this.text;
-}
-
-accept(row) {
-  var rowText = this.table.visibleColumns().reduce(function(acc, column) {
-    return acc + column.cellTextForTextFilter(row) + ' ';
-  }, '');
-  if (this.text !== this._cachedText) {
-    this._cachedText = this.text;
-    this._cachedTextLowerCase = this.text.toLowerCase();
+  constructor() {
+    super();
+    this.filterType = TableTextUserFilter.TYPE;
   }
-  rowText = rowText.trim().toLowerCase();
-  return rowText.indexOf(this._cachedTextLowerCase) > -1;
-}
+
+
+  static TYPE = 'text';
+
+  /**
+   * @override TableUserFilter.js
+   */
+  createFilterAddedEventData() {
+    var data = super.createFilterAddedEventData();
+    data.text = this.text;
+    return data;
+  }
+
+  createLabel() {
+    return this.text;
+  }
+
+  accept(row) {
+    var rowText = this.table.visibleColumns().reduce(function(acc, column) {
+      return acc + column.cellTextForTextFilter(row) + ' ';
+    }, '');
+    if (this.text !== this._cachedText) {
+      this._cachedText = this.text;
+      this._cachedTextLowerCase = this.text.toLowerCase();
+    }
+    rowText = rowText.trim().toLowerCase();
+    return rowText.indexOf(this._cachedTextLowerCase) > -1;
+  }
 }

@@ -12,37 +12,37 @@ import {LogicalGridLayoutConfig} from '../index';
 
 export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
 
-constructor(options) {
-  super( options);
-}
-
-
-_extend(options) {
-  super._extend( options);
-  options = options || {};
-  if (options.maxWidth > -2) {
-    this.maxWidth = options.maxWidth;
+  constructor(options) {
+    super(options);
   }
-}
 
-applyToLayout(layout) {
-  super.applyToLayout( layout);
-  if (this.maxWidth) {
-    layout.maxWidth = this.maxWidth;
-  }
-}
 
-clone() {
-  return new TileGridLayoutConfig(this);
-}
+  _extend(options) {
+    super._extend(options);
+    options = options || {};
+    if (options.maxWidth > -2) {
+      this.maxWidth = options.maxWidth;
+    }
+  }
 
-static ensure(layoutConfig) {
-  if (!layoutConfig) {
-    return layoutConfig;
+  applyToLayout(layout) {
+    super.applyToLayout(layout);
+    if (this.maxWidth) {
+      layout.maxWidth = this.maxWidth;
+    }
   }
-  if (layoutConfig instanceof TileGridLayoutConfig) {
-    return layoutConfig;
+
+  clone() {
+    return new TileGridLayoutConfig(this);
   }
-  return new TileGridLayoutConfig(layoutConfig);
-}
+
+  static ensure(layoutConfig) {
+    if (!layoutConfig) {
+      return layoutConfig;
+    }
+    if (layoutConfig instanceof TileGridLayoutConfig) {
+      return layoutConfig;
+    }
+    return new TileGridLayoutConfig(layoutConfig);
+  }
 }

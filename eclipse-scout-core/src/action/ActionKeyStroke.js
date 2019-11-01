@@ -12,26 +12,26 @@ import {KeyStroke} from '../index';
 
 export default class ActionKeyStroke extends KeyStroke {
 
-constructor(action) {
-  super();
-  this.field = action;
-  this.parseAndSetKeyStroke(action.keyStroke);
-  this.keyStrokeFirePolicy = action.keyStrokeFirePolicy;
+  constructor(action) {
+    super();
+    this.field = action;
+    this.parseAndSetKeyStroke(action.keyStroke);
+    this.keyStrokeFirePolicy = action.keyStrokeFirePolicy;
 
-  // If one action is executed, don't execute other actions by default
-  this.stopPropagation = true;
-  this.stopImmediatePropagation = true;
-}
-
-
-_isEnabled() {
-  if (!this.which.length) {
-    return false; // actions without a keystroke are not enabled.
+    // If one action is executed, don't execute other actions by default
+    this.stopPropagation = true;
+    this.stopImmediatePropagation = true;
   }
-  return super._isEnabled();
-}
 
-handle(event) {
-  this.field.doAction();
-}
+
+  _isEnabled() {
+    if (!this.which.length) {
+      return false; // actions without a keystroke are not enabled.
+    }
+    return super._isEnabled();
+  }
+
+  handle(event) {
+    this.field.doAction();
+  }
 }

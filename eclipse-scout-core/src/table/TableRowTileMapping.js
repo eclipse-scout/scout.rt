@@ -12,11 +12,11 @@ import {Widget} from '../index';
 
 export default class TableRowTileMapping extends Widget {
 
-constructor() {
-  super();
-  this.tableRow = null;
-  this.tile = null;
-  this._addWidgetProperties(['tile']);
-}
+  constructor() {
+    super();
+    this.tableRow = null;
+    this.tile = null;
+    this._addWidgetProperties(['tile']);
+  }
 
 }

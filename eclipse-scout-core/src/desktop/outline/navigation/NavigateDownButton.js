@@ -15,109 +15,109 @@ import * as $ from 'jquery';
 
 export default class NavigateDownButton extends NavigateButton {
 
-constructor() {
-  super();
-  this._defaultIconId = icons.ANGLE_DOWN;
-  this._defaultText = 'ui.Continue';
-  this.iconId = this._defaultIconId;
-  this.keyStroke = 'enter';
-  this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
-  this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
-}
-
-
-_init(options) {
-  super._init( options);
-
-  if (this.node.detailTable) {
-    this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
+  constructor() {
+    super();
+    this._defaultIconId = icons.ANGLE_DOWN;
+    this._defaultText = 'ui.Continue';
+    this.iconId = this._defaultIconId;
+    this.keyStroke = 'enter';
+    this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
+    this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
   }
-  this.outline.on('pageRowLink', this._outlinePageRowLinkHandler);
-}
 
-_destroy() {
-  if (this.node.detailTable) {
-    this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
+
+  _init(options) {
+    super._init(options);
+
+    if (this.node.detailTable) {
+      this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
+    }
+    this.outline.on('pageRowLink', this._outlinePageRowLinkHandler);
   }
-  this.outline.off('pageRowLink', this._outlinePageRowLinkHandler);
 
-  super._destroy();
-}
+  _destroy() {
+    if (this.node.detailTable) {
+      this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
+    }
+    this.outline.off('pageRowLink', this._outlinePageRowLinkHandler);
 
-_render() {
-  super._render();
-  this.$container.addClass('down');
-}
-
-_isDetail() {
-  // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
-  return !!(this.node.detailFormVisible && this.node.detailForm &&
-    this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
-}
-
-_toggleDetail() {
-  return false;
-}
-
-_buttonEnabled() {
-  if (this._isDetail()) {
-    return true;
+    super._destroy();
   }
-  if (this.node.leaf) {
+
+  _render() {
+    super._render();
+    this.$container.addClass('down');
+  }
+
+  _isDetail() {
+    // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
+    return !!(this.node.detailFormVisible && this.node.detailForm &&
+      this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
+  }
+
+  _toggleDetail() {
     return false;
   }
 
-  // when it's not a leaf and not a detail - the button is only enabled when a single row is selected and that row is linked to a page
-  var table = this.node.detailTable;
-  if (table) {
-    return table.selectedRows.length === 1 && !!table.selectedRows[0].page;
-  }
-  return true;
-}
-
-_drill() {
-  var drillNode;
-
-  if (this.node.detailTable) {
-    var row = this.node.detailTable.selectedRow();
-    drillNode = this.node.pageForTableRow(row);
-  } else {
-    drillNode = this.node.childNodes[0];
-  }
-
-  if (drillNode) {
-    $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
-    // Collapse other expanded child nodes
-    var parentNode = drillNode.parentNode;
-    if (parentNode) {
-      parentNode.childNodes.forEach(function(childNode) {
-        if (childNode.expanded && childNode !== drillNode) {
-          this.outline.collapseNode(childNode, {
-            animateExpansion: false
-          });
-        }
-      }.bind(this));
+  _buttonEnabled() {
+    if (this._isDetail()) {
+      return true;
+    }
+    if (this.node.leaf) {
+      return false;
     }
 
-    // Select the target node
-    this.outline.selectNodes(drillNode); // this also expands the parent node, if required
+    // when it's not a leaf and not a detail - the button is only enabled when a single row is selected and that row is linked to a page
+    var table = this.node.detailTable;
+    if (table) {
+      return table.selectedRows.length === 1 && !!table.selectedRows[0].page;
+    }
+    return true;
+  }
 
-    // If the parent node is a table page node, expand the drillNode
-    // --> Same logic as in OutlineMediator.mediateTableRowAction()
-    if (parentNode && parentNode.nodeType === Page.NodeType.TABLE) {
-      this.outline.expandNode(drillNode);
+  _drill() {
+    var drillNode;
+
+    if (this.node.detailTable) {
+      var row = this.node.detailTable.selectedRow();
+      drillNode = this.node.pageForTableRow(row);
+    } else {
+      drillNode = this.node.childNodes[0];
+    }
+
+    if (drillNode) {
+      $.log.isDebugEnabled() && $.log.debug('drill down to node ' + drillNode);
+      // Collapse other expanded child nodes
+      var parentNode = drillNode.parentNode;
+      if (parentNode) {
+        parentNode.childNodes.forEach(function(childNode) {
+          if (childNode.expanded && childNode !== drillNode) {
+            this.outline.collapseNode(childNode, {
+              animateExpansion: false
+            });
+          }
+        }.bind(this));
+      }
+
+      // Select the target node
+      this.outline.selectNodes(drillNode); // this also expands the parent node, if required
+
+      // If the parent node is a table page node, expand the drillNode
+      // --> Same logic as in OutlineMediator.mediateTableRowAction()
+      if (parentNode && parentNode.nodeType === Page.NodeType.TABLE) {
+        this.outline.expandNode(drillNode);
+      }
     }
   }
-}
 
-_onDetailTableRowsSelected(event) {
-  this.updateEnabled();
-}
-
-_onOutlinePageRowLink(event) {
-  var table = this.node.detailTable;
-  if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
+  _onDetailTableRowsSelected(event) {
     this.updateEnabled();
   }
-}
+
+  _onOutlinePageRowLink(event) {
+    var table = this.node.detailTable;
+    if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
+      this.updateEnabled();
+    }
+  }
 }

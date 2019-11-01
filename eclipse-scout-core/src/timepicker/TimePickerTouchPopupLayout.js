@@ -14,34 +14,34 @@ import {Dimension} from '../index';
 
 export default class TimePickerTouchPopupLayout extends TouchPopupLayout {
 
-constructor(popup) {
-  super( popup);
-}
+  constructor(popup) {
+    super(popup);
+  }
 
 
-layout($container) {
-  super.layout( $container);
-  var htmlPicker = this.popup.getTimePicker().htmlComp;
-  htmlPicker.setSize(this.popup._widgetContainerHtmlComp.size());
-}
+  layout($container) {
+    super.layout($container);
+    var htmlPicker = this.popup.getTimePicker().htmlComp;
+    htmlPicker.setSize(this.popup._widgetContainerHtmlComp.size());
+  }
 
-/**
- * @override
- */
-preferredLayoutSize($container, options) {
-  var containerInsets = this.popup.htmlComp.insets(),
-    fieldHtmlComp = this.popup._field.htmlComp,
-    widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
+  /**
+   * @override
+   */
+  preferredLayoutSize($container, options) {
+    var containerInsets = this.popup.htmlComp.insets(),
+      fieldHtmlComp = this.popup._field.htmlComp,
+      widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
 
-  var fieldPrefSize = fieldHtmlComp.prefSize(options)
-    .add(fieldHtmlComp.margins());
-  var widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
-    .add(widgetContainerHtmlComp.margins());
+    var fieldPrefSize = fieldHtmlComp.prefSize(options)
+      .add(fieldHtmlComp.margins());
+    var widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
+      .add(widgetContainerHtmlComp.margins());
 
-  var headerHeight = graphics.size(this.popup._$header, true).height;
-  var popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
-  var popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
+    var headerHeight = graphics.size(this.popup._$header, true).height;
+    var popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
+    var popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
-  return new Dimension(popupWidth, popupHeight);
-}
+    return new Dimension(popupWidth, popupHeight);
+  }
 }

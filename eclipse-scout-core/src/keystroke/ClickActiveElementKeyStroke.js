@@ -12,35 +12,35 @@ import {KeyStroke} from '../index';
 
 export default class ClickActiveElementKeyStroke extends KeyStroke {
 
-constructor(field, which) {
-  super();
-  this.field = field;
-  this.which = which;
-  this.stopPropagation = true;
-  this.renderingHints.render = true;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return event._$activeElement;
-  };
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(field, which) {
+    super();
+    this.field = field;
+    this.which = which;
+    this.stopPropagation = true;
+    this.renderingHints.render = true;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return event._$activeElement;
+    };
   }
 
-  event._$activeElement = this.field.$container.activeElement();
-  return true;
-}
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  event._$activeElement.trigger({
-    type: 'click',
-    which: 1
-  });
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+
+    event._$activeElement = this.field.$container.activeElement();
+    return true;
+  }
+
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    event._$activeElement.trigger({
+      type: 'click',
+      which: 1
+    });
+  }
 }

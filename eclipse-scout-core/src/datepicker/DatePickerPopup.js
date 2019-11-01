@@ -16,47 +16,47 @@ import {scout} from '../index';
 
 export default class DatePickerPopup extends Popup {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  options.scrollType = options.scrollType || 'layoutAndPosition';
-  options.withFocusContext = false;
-  super._init( options);
+  _init(options) {
+    options.scrollType = options.scrollType || 'layoutAndPosition';
+    options.withFocusContext = false;
+    super._init(options);
 
-  this.picker = scout.create('DatePicker', {
-    parent: this,
-    dateFormat: options.dateFormat,
-    allowedDates: options.allowedDates
-  });
-}
+    this.picker = scout.create('DatePicker', {
+      parent: this,
+      dateFormat: options.dateFormat,
+      allowedDates: options.allowedDates
+    });
+  }
 
-_createLayout() {
-  return new DatePickerPopupLayout(this);
-}
+  _createLayout() {
+    return new DatePickerPopupLayout(this);
+  }
 
-_render() {
-  this.$container = this.$parent.appendDiv('date-picker-popup');
-  this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(this._createLayout());
-  this.htmlComp.validateRoot = true;
-  this.picker.render();
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('date-picker-popup');
+    this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(this._createLayout());
+    this.htmlComp.validateRoot = true;
+    this.picker.render();
+  }
 
-/**
- * @implements DatePickerPopup
- */
-getDatePicker() {
-  return this.picker;
-}
+  /**
+   * @implements DatePickerPopup
+   */
+  getDatePicker() {
+    return this.picker;
+  }
 
-/**
- * @override because the icon is not in the $anchor container.
- */
-_isMouseDownOnAnchor(event) {
-  return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target) || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(event.target));
-}
+  /**
+   * @override because the icon is not in the $anchor container.
+   */
+  _isMouseDownOnAnchor(event) {
+    return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target) || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(event.target));
+  }
 }

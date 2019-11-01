@@ -12,79 +12,79 @@ import {Action} from '../index';
 
 export default class Mode extends Action {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.selected = false;
-  this.ref = null; // Arbitrary reference value, can be used to find and select modes (see ModeSelector.js)
-}
-
-
-_init(model) {
-  model.owner = model.parent;
-  super._init( model);
-}
-
-_render() {
-  super._render();
-  this.$container.addClass('mode');
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderSelected();
-}
-
-setSelected(selected) {
-  this.setProperty('selected', selected);
-}
-
-_renderSelected() {
-  this.$container.select(this.selected);
-}
-
-/**
- * @Override Action.js
- */
-doAction() {
-  if (!this.prepareDoAction()) {
-    return false;
+    this.selected = false;
+    this.ref = null; // Arbitrary reference value, can be used to find and select modes (see ModeSelector.js)
   }
 
-  if (!this.selected) {
-    this.setSelected(true);
+
+  _init(model) {
+    model.owner = model.parent;
+    super._init(model);
   }
 
-  return true;
-}
-
-/**
- * @Override Action.js
- */
-toggle() {
-  if (!this.selected) {
-    this.setSelected(true);
+  _render() {
+    super._render();
+    this.$container.addClass('mode');
   }
-}
 
-_renderIconId() {
-  super._renderIconId();
+  _renderProperties() {
+    super._renderProperties();
+    this._renderSelected();
+  }
 
-  this._updateLabelAndIconStyle();
-  // Invalidate layout because mode may now be longer or shorter
-  this.invalidateLayoutTree();
-}
+  setSelected(selected) {
+    this.setProperty('selected', selected);
+  }
 
-_renderText() {
-  super._renderText();
+  _renderSelected() {
+    this.$container.select(this.selected);
+  }
 
-  this._updateLabelAndIconStyle();
-  // Invalidate layout because mode may now be longer or shorter
-  this.invalidateLayoutTree();
-}
+  /**
+   * @Override Action.js
+   */
+  doAction() {
+    if (!this.prepareDoAction()) {
+      return false;
+    }
 
-_updateLabelAndIconStyle() {
-  var hasText = !!this.text;
-  this.get$Icon().toggleClass('with-label', hasText);
-}
+    if (!this.selected) {
+      this.setSelected(true);
+    }
+
+    return true;
+  }
+
+  /**
+   * @Override Action.js
+   */
+  toggle() {
+    if (!this.selected) {
+      this.setSelected(true);
+    }
+  }
+
+  _renderIconId() {
+    super._renderIconId();
+
+    this._updateLabelAndIconStyle();
+    // Invalidate layout because mode may now be longer or shorter
+    this.invalidateLayoutTree();
+  }
+
+  _renderText() {
+    super._renderText();
+
+    this._updateLabelAndIconStyle();
+    // Invalidate layout because mode may now be longer or shorter
+    this.invalidateLayoutTree();
+  }
+
+  _updateLabelAndIconStyle() {
+    var hasText = !!this.text;
+    this.get$Icon().toggleClass('with-label', hasText);
+  }
 }

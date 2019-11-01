@@ -21,109 +21,109 @@ import {scout} from '../index';
  */
 export default class Icon extends Widget {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  /** @type {IconDesc} */
-  this.iconDesc = null;
+    /** @type {IconDesc} */
+    this.iconDesc = null;
+
+    /**
+     * Is set if the icon is rendered and an image, it is not set if it is a font icon
+     * @type {scout.Inage}
+     */
+    this.image = null;
+    this.prepend = false;
+  }
+
+
+  _init(model) {
+    super._init(model);
+    this._setIconDesc(this.iconDesc);
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderIconDesc();
+  }
 
   /**
-   * Is set if the icon is rendered and an image, it is not set if it is a font icon
-   * @type {scout.Inage}
+   * Accepts either an iconId as string or an {@link IconDesc}.
+   * @param {(string|IconDesc)} icon
    */
-  this.image = null;
-  this.prepend = false;
-}
-
-
-_init(model) {
-  super._init( model);
-  this._setIconDesc(this.iconDesc);
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderIconDesc();
-}
-
-/**
- * Accepts either an iconId as string or an {@link IconDesc}.
- * @param {(string|IconDesc)} icon
- */
-setIconDesc(iconDesc) {
-  this.setProperty('iconDesc', iconDesc);
-}
-
-_setIconDesc(iconDesc) {
-  iconDesc = IconDesc.ensure(iconDesc);
-  this._setProperty('iconDesc', iconDesc);
-}
-
-_renderIconDesc() {
-  this._removeFontIcon();
-  this._removeImageIcon();
-
-  if (!this.iconDesc || this.iconDesc.isFontIcon()) {
-    this._renderFontIcon();
-  } else {
-    this._renderImageIcon();
+  setIconDesc(iconDesc) {
+    this.setProperty('iconDesc', iconDesc);
   }
 
-  this.invalidateLayoutTree();
-}
-
-_renderFontIcon() {
-  this.$container = this.$parent.appendIcon(this.iconDesc);
-  if (this.prepend) {
-    this.$container.prependTo(this.$parent);
+  _setIconDesc(iconDesc) {
+    iconDesc = IconDesc.ensure(iconDesc);
+    this._setProperty('iconDesc', iconDesc);
   }
 
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-}
+  _renderIconDesc() {
+    this._removeFontIcon();
+    this._removeImageIcon();
 
-_removeFontIcon() {
-  if (this.$container) {
-    this.$container.remove();
-    this.$container = null;
-  }
-}
+    if (!this.iconDesc || this.iconDesc.isFontIcon()) {
+      this._renderFontIcon();
+    } else {
+      this._renderImageIcon();
+    }
 
-_renderImageIcon() {
-  if (this.image) {
-    return;
+    this.invalidateLayoutTree();
   }
-  this.image = scout.create('Image', {
-    parent: this,
-    imageUrl: this.iconDesc.iconUrl,
-    cssClass: 'icon image-icon',
-    autoFit: this.autoFit,
-    prepend: this.prepend
-  });
-  this.image.render(this.$parent);
-  this.image.one('destroy', function() {
-    this.image = null;
-  }.bind(this));
-  this.image.on('load error', function(event) {
-    // propagate event
-    this.trigger(event.type, event);
-  }.bind(this));
-  this.$container = this.image.$container;
-  this.htmlComp = this.image.htmlComp;
-}
 
-_removeImageIcon() {
-  if (this.image) {
-    this.image.destroy();
-    this.image = null;
-  }
-}
+  _renderFontIcon() {
+    this.$container = this.$parent.appendIcon(this.iconDesc);
+    if (this.prepend) {
+      this.$container.prependTo(this.$parent);
+    }
 
-/**
- * Delegates to this.image.setAutoFit, but only if Icon is an image. This method has no effect when icon is a font-icon.
- */
-setAutoFit(autoFit) {
-  if (this.image) {
-    this.image.setAutoFit(autoFit);
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
-}
+
+  _removeFontIcon() {
+    if (this.$container) {
+      this.$container.remove();
+      this.$container = null;
+    }
+  }
+
+  _renderImageIcon() {
+    if (this.image) {
+      return;
+    }
+    this.image = scout.create('Image', {
+      parent: this,
+      imageUrl: this.iconDesc.iconUrl,
+      cssClass: 'icon image-icon',
+      autoFit: this.autoFit,
+      prepend: this.prepend
+    });
+    this.image.render(this.$parent);
+    this.image.one('destroy', function() {
+      this.image = null;
+    }.bind(this));
+    this.image.on('load error', function(event) {
+      // propagate event
+      this.trigger(event.type, event);
+    }.bind(this));
+    this.$container = this.image.$container;
+    this.htmlComp = this.image.htmlComp;
+  }
+
+  _removeImageIcon() {
+    if (this.image) {
+      this.image.destroy();
+      this.image = null;
+    }
+  }
+
+  /**
+   * Delegates to this.image.setAutoFit, but only if Icon is an image. This method has no effect when icon is a font-icon.
+   */
+  setAutoFit(autoFit) {
+    if (this.image) {
+      this.image.setAutoFit(autoFit);
+    }
+  }
 }

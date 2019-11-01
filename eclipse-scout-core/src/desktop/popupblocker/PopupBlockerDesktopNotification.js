@@ -14,53 +14,53 @@ import {DesktopNotification} from '../../index';
 
 export default class PopupBlockerDesktopNotification extends DesktopNotification {
 
-constructor() {
-  super();
-  this.duration = DesktopNotification.INFINITE;
-  this.linkUrl;
-  this.preserveOpener = false;
-}
-
-
-_init(model) {
-  super._init( model);
-  this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
-  this._setStatus({
-    message: this.session.text('ui.PopupBlockerDetected'),
-    severity: Status.Severity.WARNING
-  });
-}
-
-_render() {
-  super._render();
-
-  this.$messageText.addClass('popup-blocked-title');
-  this.$link = this.$content.appendElement('<a>', 'popup-blocked-link')
-    .text(this.linkText)
-    .on('click', this._onLinkClick.bind(this));
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderLinkUrl();
-}
-
-_renderLinkUrl() {
-  if (this.linkUrl) {
-    this.$link
-      .attr('href', this.linkUrl)
-      .attr('target', '_blank');
-    if (!this.preserveOpener) {
-      this.$link.attr('rel', 'noreferrer noopener');
-    }
-  } else {
-    this.$link.removeAttr('href')
-      .removeAttr('target');
+  constructor() {
+    super();
+    this.duration = DesktopNotification.INFINITE;
+    this.linkUrl;
+    this.preserveOpener = false;
   }
-}
 
-_onLinkClick() {
-  this.trigger('linkClick');
-  this.hide();
-}
+
+  _init(model) {
+    super._init(model);
+    this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
+    this._setStatus({
+      message: this.session.text('ui.PopupBlockerDetected'),
+      severity: Status.Severity.WARNING
+    });
+  }
+
+  _render() {
+    super._render();
+
+    this.$messageText.addClass('popup-blocked-title');
+    this.$link = this.$content.appendElement('<a>', 'popup-blocked-link')
+      .text(this.linkText)
+      .on('click', this._onLinkClick.bind(this));
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderLinkUrl();
+  }
+
+  _renderLinkUrl() {
+    if (this.linkUrl) {
+      this.$link
+        .attr('href', this.linkUrl)
+        .attr('target', '_blank');
+      if (!this.preserveOpener) {
+        this.$link.attr('rel', 'noreferrer noopener');
+      }
+    } else {
+      this.$link.removeAttr('href')
+        .removeAttr('target');
+    }
+  }
+
+  _onLinkClick() {
+    this.trigger('linkClick');
+    this.hide();
+  }
 }

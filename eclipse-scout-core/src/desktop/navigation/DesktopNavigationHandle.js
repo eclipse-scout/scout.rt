@@ -15,32 +15,32 @@ import {ShrinkNavigationKeyStroke} from '../../index';
 
 export default class DesktopNavigationHandle extends CollapseHandle {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
 
-  // Bound to desktop
-  this.desktopKeyStrokeContext = new KeyStrokeContext();
-  this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
-  this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
-  this.desktopKeyStrokeContext.registerKeyStroke([
-    new ShrinkNavigationKeyStroke(this),
-    new EnlargeNavigationKeyStroke(this)
-  ]);
-}
+    // Bound to desktop
+    this.desktopKeyStrokeContext = new KeyStrokeContext();
+    this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
+    this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
+    this.desktopKeyStrokeContext.registerKeyStroke([
+      new ShrinkNavigationKeyStroke(this),
+      new EnlargeNavigationKeyStroke(this)
+    ]);
+  }
 
-_render() {
-  super._render();
-  this.$container.addClass('desktop-navigation-handle');
-  this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
-}
+  _render() {
+    super._render();
+    this.$container.addClass('desktop-navigation-handle');
+    this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
+  }
 
-_remove() {
-  super._remove();
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
-}
+  _remove() {
+    super._remove();
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
+  }
 }

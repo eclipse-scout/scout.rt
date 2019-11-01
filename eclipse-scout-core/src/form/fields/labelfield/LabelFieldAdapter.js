@@ -12,8 +12,8 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class LabelFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

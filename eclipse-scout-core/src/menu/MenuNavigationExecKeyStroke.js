@@ -14,19 +14,19 @@ import {menuNavigationKeyStrokes} from '../index';
 
 export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
 
-constructor(popup, menuItemClass) {
-  super( popup);
-  this._menuItemClass = menuItemClass;
-  this.stopImmediatePropagation = true;
-  this.which = [keys.ENTER, keys.SPACE];
-  this.renderingHints.render = false;
-}
-
-
-handle(event) {
-  var $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
-  if ($menuItem.length > 0) {
-    $menuItem.data('widget').doAction();
+  constructor(popup, menuItemClass) {
+    super(popup);
+    this._menuItemClass = menuItemClass;
+    this.stopImmediatePropagation = true;
+    this.which = [keys.ENTER, keys.SPACE];
+    this.renderingHints.render = false;
   }
-}
+
+
+  handle(event) {
+    var $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
+    if ($menuItem.length > 0) {
+      $menuItem.data('widget').doAction();
+    }
+  }
 }

@@ -15,28 +15,28 @@ import {objects} from '../index';
  */
 export default class TreeSet {
 
-constructor() {
-  this.array = [];
-  this.properties = objects.createMap();
-}
-
-add(value) {
-  if (!this.contains(value)) {
-    this.array.push(value);
-    this.array.sort();
-    this.properties[value] = true;
+  constructor() {
+    this.array = [];
+    this.properties = objects.createMap();
   }
-}
 
-size() {
-  return this.array.length;
-}
+  add(value) {
+    if (!this.contains(value)) {
+      this.array.push(value);
+      this.array.sort();
+      this.properties[value] = true;
+    }
+  }
 
-contains(value) {
-  return (value in this.properties);
-}
+  size() {
+    return this.array.length;
+  }
 
-last() {
-  return this.array[this.array.length - 1];
-}
+  contains(value) {
+    return (value in this.properties);
+  }
+
+  last() {
+    return this.array[this.array.length - 1];
+  }
 }

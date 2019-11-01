@@ -12,8 +12,8 @@ import {ModelAdapter} from '../../index';
 
 export default class StatusMenuMappingAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

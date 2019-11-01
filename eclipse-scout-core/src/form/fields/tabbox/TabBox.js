@@ -24,248 +24,249 @@ import * as $ from 'jquery';
  */
 export default class TabBox extends CompositeField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.gridDataHints.useUiHeight = true;
-  this.gridDataHints.w = FormField.FULL_WIDTH;
-  this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
-  this.selectedTab = null;
-  this.tabItems = [];
-  this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
+    this.gridDataHints.useUiHeight = true;
+    this.gridDataHints.w = FormField.FULL_WIDTH;
+    this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
+    this.selectedTab = null;
+    this.tabItems = [];
+    this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
 
-  this._addWidgetProperties(['tabItems', 'selectedTab']);
-  this._addPreserveOnPropertyChangeProperties(['selectedTab']);
-  this._$tabContent = null;
+    this._addWidgetProperties(['tabItems', 'selectedTab']);
+    this._addPreserveOnPropertyChangeProperties(['selectedTab']);
+    this._$tabContent = null;
 
-  this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
-}
+    this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
+  }
 
 
-/**
- * @override FormField.js
- */
-_init(model) {
-  super._init( model);
-  this.header = scout.create('TabBoxHeader', {
-    parent: this,
-    tabBox: this
-  });
+  /**
+   * @override FormField.js
+   */
+  _init(model) {
+    super._init(model);
+    this.header = scout.create('TabBoxHeader', {
+      parent: this,
+      tabBox: this
+    });
 
-  this._initProperties(model);
-  this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHander);
-}
+    this._initProperties(model);
+    this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHander);
+  }
 
-_initProperties(model) {
-  this._setTabItems(this.tabItems);
-  this._setSelectedTab(this.selectedTab);
-  this._setTabAreaStyle(this.tabAreaStyle);
-}
+  _initProperties(model) {
+    this._setTabItems(this.tabItems);
+    this._setSelectedTab(this.selectedTab);
+    this._setTabAreaStyle(this.tabAreaStyle);
+  }
 
-_destroy() {
-  super._destroy();
-  this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHander);
-}
+  _destroy() {
+    super._destroy();
+    this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHander);
+  }
 
-_render() {
-  this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
+  _render() {
+    this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
 
-  this.header.render(this.$container);
-  this.addStatus();
+    this.header.render(this.$container);
+    this.addStatus();
 
-  this._$tabContent = this.$container.appendDiv('tab-content');
-  var htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
-  htmlCompContent.setLayout(new SingleLayout());
-}
+    this._$tabContent = this.$container.appendDiv('tab-content');
+    var htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
+    htmlCompContent.setLayout(new SingleLayout());
+  }
 
-/**
- * @override FormField.js
- */
-_renderProperties() {
-  super._renderProperties();
-  this._renderSelectedTab();
-}
+  /**
+   * @override FormField.js
+   */
+  _renderProperties() {
+    super._renderProperties();
+    this._renderSelectedTab();
+  }
 
-/**
- * @override FormField.js
- */
-_remove() {
-  super._remove();
-  this._removeSelectedTab();
-}
+  /**
+   * @override FormField.js
+   */
+  _remove() {
+    super._remove();
+    this._removeSelectedTab();
+  }
 
-_getCurrentMenus() {
-  // handled by the menubar
-  return [];
-}
+  _getCurrentMenus() {
+    // handled by the menubar
+    return [];
+  }
 
-_removeMenus() {
-  // menubar takes care about removal
-}
+  _removeMenus() {
+    // menubar takes care about removal
+  }
 
-deleteTabItem(tabItem) {
-  var index = this.tabItems.indexOf(tabItem);
-  var newTabItems = this.tabItems.slice();
-  if (index >= 0) {
-    newTabItems.splice(index, 1);
+  deleteTabItem(tabItem) {
+    var index = this.tabItems.indexOf(tabItem);
+    var newTabItems = this.tabItems.slice();
+    if (index >= 0) {
+      newTabItems.splice(index, 1);
+      this.setTabItems(newTabItems);
+    }
+  }
+
+  insertTabItem(tabItem, index) {
+    if (!tabItem) {
+      return;
+    }
+    index = scout.nvl(index, this.tabItems.length);
+    var newTabItems = this.tabItems.slice();
+    newTabItems.splice(index, 0, tabItem);
     this.setTabItems(newTabItems);
   }
-}
 
-insertTabItem(tabItem, index) {
-  if (!tabItem) {
-    return;
+  setTabItems(tabItems) {
+    this.setProperty('tabItems', tabItems);
   }
-  index = scout.nvl(index, this.tabItems.length);
-  var newTabItems = this.tabItems.slice();
-  newTabItems.splice(index, 0, tabItem);
-  this.setTabItems(newTabItems);
-}
 
-setTabItems(tabItems) {
-  this.setProperty('tabItems', tabItems);
-}
+  _setTabItems(tabItems) {
+    tabItems = tabItems || [];
+    var tabsToRemove = this.tabItems || [];
+    tabsToRemove.filter(function(tabItem) {
+      return tabItems.indexOf(tabItem) < 0;
+    }, this).forEach(function(tabItem) {
+      tabItem.remove();
+    });
 
-_setTabItems(tabItems) {
-  tabItems = tabItems || [];
-  var tabsToRemove = this.tabItems || [];
-  tabsToRemove.filter(function(tabItem) {
-    return tabItems.indexOf(tabItem) < 0;
-  }, this).forEach(function(tabItem) {
-    tabItem.remove();
-  });
-
-  this._setProperty('tabItems', tabItems);
-  this.header.setTabItems(this.tabItems);
-  // if no tab is selected select first
-  if (this.tabItems.indexOf(this.selectedTab) < 0) {
-    this.setSelectedTab(this.tabItems[0]);
+    this._setProperty('tabItems', tabItems);
+    this.header.setTabItems(this.tabItems);
+    // if no tab is selected select first
+    if (this.tabItems.indexOf(this.selectedTab) < 0) {
+      this.setSelectedTab(this.tabItems[0]);
+    }
   }
-}
 
-_renderTabItems(tabItems) {
-  // void only selected tab is rendered
-}
-_removeTabItems(tabItems) {
-  // void only selected tab is rendered
-}
-
-_removeTabContent() {
-  this.tabItems.forEach(function(tabItem) {
-    tabItem.remove();
-  }, this);
-}
-
-selectTabById(tabId) {
-  var tab = this.getTabItem(tabId);
-  if (!tab) {
-    throw new Error('Tab with ID \'' + tabId + '\' does not exist');
+  _renderTabItems(tabItems) {
+    // void only selected tab is rendered
   }
-  this.setSelectedTab(tab);
-}
 
-setSelectedTab(tabItem) {
-  this.setProperty('selectedTab', tabItem);
-}
-
-_setSelectedTab(tabItem) {
-  $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tabItem);
-  if (this.selectedTab && this.selectedTab.rendered) {
-    this.selectedTab.remove();
+  _removeTabItems(tabItems) {
+    // void only selected tab is rendered
   }
-  this._setProperty('selectedTab', tabItem);
-  this.header.setSelectedTabItem(this.selectedTab);
-}
 
-_renderSelectedTab() {
-  if (this.selectedTab) {
-    this.selectedTab.render(this._$tabContent);
+  _removeTabContent() {
+    this.tabItems.forEach(function(tabItem) {
+      tabItem.remove();
+    }, this);
   }
-  if (this.rendered) {
-    HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
-  }
-}
 
-_removeSelectedTab() {
-  if (this.selectedTab) {
-    this.selectedTab.remove();
+  selectTabById(tabId) {
+    var tab = this.getTabItem(tabId);
+    if (!tab) {
+      throw new Error('Tab with ID \'' + tabId + '\' does not exist');
+    }
+    this.setSelectedTab(tab);
   }
-}
 
-setTabAreaStyle(tabAreaStyle) {
-  this.setProperty('tabAreaStyle', tabAreaStyle);
-}
-
-_setTabAreaStyle(tabAreaStyle) {
-  this.tabAreaStyle = tabAreaStyle;
-  if (this.header && this.header.tabArea) {
-    this.header.tabArea.setDisplayStyle(tabAreaStyle);
+  setSelectedTab(tabItem) {
+    this.setProperty('selectedTab', tabItem);
   }
-}
 
-/**
- * @override FormField.js
- */
-_renderStatusPosition() {
-  super._renderStatusPosition();
-  if (!this.fieldStatus) {
-    return;
+  _setSelectedTab(tabItem) {
+    $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tabItem);
+    if (this.selectedTab && this.selectedTab.rendered) {
+      this.selectedTab.remove();
+    }
+    this._setProperty('selectedTab', tabItem);
+    this.header.setSelectedTabItem(this.selectedTab);
   }
-  if (this.statusPosition === FormField.StatusPosition.TOP) {
-    // move into title
-    this.$status.appendTo(this.header.$container);
-  } else {
-    this.$status.appendTo(this.$container);
-  }
-  this.invalidateLayoutTree();
-}
 
-/**
- * @override CompositeField.js
- */
-getFields() {
-  return this.tabItems;
-}
-
-getTabItem(tabId) {
-  return arrays.find(this.tabItems, function(tabItem) {
-    return tabItem.id === tabId;
-  });
-}
-
-/**
- * @override FormField.js
- */
-focus() {
-  if (!this.rendered) {
-    this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
-    return false;
+  _renderSelectedTab() {
+    if (this.selectedTab) {
+      this.selectedTab.render(this._$tabContent);
+    }
+    if (this.rendered) {
+      HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
+    }
   }
-  if (this.selectedTab) {
-    return this.selectedTab.focus();
-  }
-}
 
-/**
- * @override
- */
-getFocusableElement() {
-  if (this.selectedTab) {
-    return this.selectedTab.getFocusableElement();
+  _removeSelectedTab() {
+    if (this.selectedTab) {
+      this.selectedTab.remove();
+    }
   }
-  return null;
-}
 
-focusTab(tab) {
-  if (this.selectedTab !== tab) {
-    this.selectTab(tab);
+  setTabAreaStyle(tabAreaStyle) {
+    this.setProperty('tabAreaStyle', tabAreaStyle);
   }
-  this.header.focusTabItem(tab);
-}
 
-_onTabBoxHeaderPropertyChange(event) {
-  if (event.propertyName === 'selectedTabItem') {
-    this.setSelectedTab(event.newValue);
+  _setTabAreaStyle(tabAreaStyle) {
+    this.tabAreaStyle = tabAreaStyle;
+    if (this.header && this.header.tabArea) {
+      this.header.tabArea.setDisplayStyle(tabAreaStyle);
+    }
   }
-}
+
+  /**
+   * @override FormField.js
+   */
+  _renderStatusPosition() {
+    super._renderStatusPosition();
+    if (!this.fieldStatus) {
+      return;
+    }
+    if (this.statusPosition === FormField.StatusPosition.TOP) {
+      // move into title
+      this.$status.appendTo(this.header.$container);
+    } else {
+      this.$status.appendTo(this.$container);
+    }
+    this.invalidateLayoutTree();
+  }
+
+  /**
+   * @override CompositeField.js
+   */
+  getFields() {
+    return this.tabItems;
+  }
+
+  getTabItem(tabId) {
+    return arrays.find(this.tabItems, function(tabItem) {
+      return tabItem.id === tabId;
+    });
+  }
+
+  /**
+   * @override FormField.js
+   */
+  focus() {
+    if (!this.rendered) {
+      this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
+      return false;
+    }
+    if (this.selectedTab) {
+      return this.selectedTab.focus();
+    }
+  }
+
+  /**
+   * @override
+   */
+  getFocusableElement() {
+    if (this.selectedTab) {
+      return this.selectedTab.getFocusableElement();
+    }
+    return null;
+  }
+
+  focusTab(tab) {
+    if (this.selectedTab !== tab) {
+      this.selectTab(tab);
+    }
+    this.header.focusTabItem(tab);
+  }
+
+  _onTabBoxHeaderPropertyChange(event) {
+    if (event.propertyName === 'selectedTabItem') {
+      this.setSelectedTab(event.newValue);
+    }
+  }
 }

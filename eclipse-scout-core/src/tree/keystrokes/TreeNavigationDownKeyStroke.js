@@ -13,27 +13,27 @@ import {AbstractTreeNavigationKeyStroke} from '../../index';
 
 export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-constructor(tree, modifierBitMask) {
-  super( tree, modifierBitMask);
-  this.which = [keys.DOWN];
-  this.renderingHints.text = '↓';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
-    if (newSelectedNode) {
-      return newSelectedNode.$node;
+  constructor(tree, modifierBitMask) {
+    super(tree, modifierBitMask);
+    this.which = [keys.DOWN];
+    this.renderingHints.text = '↓';
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+      if (newSelectedNode) {
+        return newSelectedNode.$node;
+      }
+    }.bind(this);
+  }
+
+
+  _computeNewSelection(currentNode) {
+    var nodes = this.field.visibleNodesFlat;
+    if (nodes.length === 0) {
+      return;
     }
-  }.bind(this);
-}
-
-
-_computeNewSelection(currentNode) {
-  var nodes = this.field.visibleNodesFlat;
-  if (nodes.length === 0) {
-    return;
+    if (!currentNode) {
+      return nodes[0];
+    }
+    return nodes[nodes.indexOf(currentNode) + 1];
   }
-  if (!currentNode) {
-    return nodes[0];
-  }
-  return nodes[nodes.indexOf(currentNode) + 1];
-}
 }

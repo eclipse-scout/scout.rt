@@ -12,9 +12,9 @@ import {ValueFieldAdapter} from '../../index';
 
 export default class BasicFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-  this.enabledWhenOffline = true;
-}
+  constructor() {
+    super();
+    this.enabledWhenOffline = true;
+  }
 
 }

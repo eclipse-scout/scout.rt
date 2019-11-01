@@ -14,29 +14,29 @@ import {KeyStroke} from '../../../index';
 
 export default class TagFieldEnterKeyStroke extends KeyStroke {
 
-constructor(tagField) {
-  super();
-  this.field = tagField;
-  this.which = [keys.ENTER];
-  this.renderingHints.render = false;
-  this.preventDefault = false;
-  this.stopPropagation = true;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(tagField) {
+    super();
+    this.field = tagField;
+    this.which = [keys.ENTER];
+    this.renderingHints.render = false;
+    this.preventDefault = false;
+    this.stopPropagation = true;
   }
-  // set the stopPropagation flag dynamically. While the user is typing we only want the field
-  // to apply the current displayText as tag, when the user presses ENTER. But when the displayText
-  // is empty, the ENTER key should propagate up to the form.
-  this.stopPropagation = strings.hasText(this.field._readDisplayText());
-  return this.field.isInputFocused();
-}
 
-handle(event) {
-  this.field.acceptInput();
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    // set the stopPropagation flag dynamically. While the user is typing we only want the field
+    // to apply the current displayText as tag, when the user presses ENTER. But when the displayText
+    // is empty, the ENTER key should propagate up to the form.
+    this.stopPropagation = strings.hasText(this.field._readDisplayText());
+    return this.field.isInputFocused();
+  }
+
+  handle(event) {
+    this.field.acceptInput();
+  }
 }

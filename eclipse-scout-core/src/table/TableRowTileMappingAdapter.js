@@ -12,8 +12,8 @@ import {ModelAdapter} from '../index';
 
 export default class TableRowTileMappingAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

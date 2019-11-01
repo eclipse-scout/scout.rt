@@ -14,24 +14,24 @@ import {HAlign} from '../../../index';
 
 export default class CheckBoxToggleKeyStroke extends KeyStroke {
 
-constructor(checkbox) {
-  super();
-  this.field = checkbox;
-  this.which = [keys.SPACE];
-  this.stopPropagation = true;
-  this.stopImmediatePropagation = true;
+  constructor(checkbox) {
+    super();
+    this.field = checkbox;
+    this.which = [keys.SPACE];
+    this.stopPropagation = true;
+    this.stopImmediatePropagation = true;
 
-  this.renderingHints.hAlign = HAlign.LEFT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$fieldContainer;
-  }.bind(this);
-}
+    this.renderingHints.hAlign = HAlign.LEFT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$fieldContainer;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.toggleChecked();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.toggleChecked();
+  }
 }

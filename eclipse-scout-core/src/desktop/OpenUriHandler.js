@@ -16,115 +16,116 @@ import {PopupBlockerHandler} from '../index';
 
 export default class OpenUriHandler {
 
-constructor() {};
+  constructor() {
+  };
 
-init(model) {
-  this.session = model.session;
-}
-
-openUri(uri, action) {
-  $.log.isDebugEnabled() && $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
-  if (!uri) {
-    return;
+  init(model) {
+    this.session = model.session;
   }
-  action = scout.nvl(action, Desktop.UriAction.OPEN);
 
-  if (action === Desktop.UriAction.DOWNLOAD) {
-    this.handleUriActionDownload(uri);
-  } else if (action === Desktop.UriAction.OPEN) {
-    this.handleUriActionOpen(uri);
-  } else if (action === Desktop.UriAction.NEW_WINDOW) {
-    this.handleUriActionNewWindow(uri);
-  } else if (action === Desktop.UriAction.POPUP_WINDOW) {
-    this.handleUriActionPopupWindow(uri);
-  } else if (action === Desktop.UriAction.SAME_WINDOW) {
-    this.handleUriActionSameWindow(uri);
-  }
-}
-
-handleUriActionDownload(uri) {
-  if (Device.get().isIos()) {
-    // The iframe trick does not work for ios
-    // Since the file cannot be stored on the file system it will be shown in the browser if possible
-    // -> create a new window to not replace the existing content.
-    // Drawback: Popup-Blocker will show up
-    // Opening in new window does not work in standalone mode because the window will be opened in safari which creates a new http session.
-    // Because the downloads are linked to the http session they cannot be downloaded using safari
-    if (Device.get().isStandalone()) {
-      this.openUriInSameWindow(uri);
-    } else {
-      this.openUriAsNewWindow(uri);
+  openUri(uri, action) {
+    $.log.isDebugEnabled() && $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
+    if (!uri) {
+      return;
     }
-  } else if (Device.get().browser === Device.Browser.CHROME) {
-    // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
-    this.openUriInSameWindow(uri);
-  } else {
-    this.openUriInIFrame(uri);
+    action = scout.nvl(action, Desktop.UriAction.OPEN);
+
+    if (action === Desktop.UriAction.DOWNLOAD) {
+      this.handleUriActionDownload(uri);
+    } else if (action === Desktop.UriAction.OPEN) {
+      this.handleUriActionOpen(uri);
+    } else if (action === Desktop.UriAction.NEW_WINDOW) {
+      this.handleUriActionNewWindow(uri);
+    } else if (action === Desktop.UriAction.POPUP_WINDOW) {
+      this.handleUriActionPopupWindow(uri);
+    } else if (action === Desktop.UriAction.SAME_WINDOW) {
+      this.handleUriActionSameWindow(uri);
+    }
   }
-}
 
-isUriWithExternallyHandledProtocol(uri) {
-  return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation):/.test(uri);
-}
-
-handleUriActionOpen(uri) {
-  if (Device.get().isIos()) {
-    // Open in same window.
-    // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
-    // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
-    this.openUriInSameWindow(uri);
-  } else if (this.isUriWithExternallyHandledProtocol(uri)) {
-    if (Device.get().browser === Device.Browser.CHROME) {
+  handleUriActionDownload(uri) {
+    if (Device.get().isIos()) {
+      // The iframe trick does not work for ios
+      // Since the file cannot be stored on the file system it will be shown in the browser if possible
+      // -> create a new window to not replace the existing content.
+      // Drawback: Popup-Blocker will show up
+      // Opening in new window does not work in standalone mode because the window will be opened in safari which creates a new http session.
+      // Because the downloads are linked to the http session they cannot be downloaded using safari
+      if (Device.get().isStandalone()) {
+        this.openUriInSameWindow(uri);
+      } else {
+        this.openUriAsNewWindow(uri);
+      }
+    } else if (Device.get().browser === Device.Browser.CHROME) {
       // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
       this.openUriInSameWindow(uri);
     } else {
-      // do not use sameWindow since the poller would be disconnected in firefox
       this.openUriInIFrame(uri);
     }
-  } else {
+  }
+
+  isUriWithExternallyHandledProtocol(uri) {
+    return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation):/.test(uri);
+  }
+
+  handleUriActionOpen(uri) {
+    if (Device.get().isIos()) {
+      // Open in same window.
+      // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
+      // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
+      this.openUriInSameWindow(uri);
+    } else if (this.isUriWithExternallyHandledProtocol(uri)) {
+      if (Device.get().browser === Device.Browser.CHROME) {
+        // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
+        this.openUriInSameWindow(uri);
+      } else {
+        // do not use sameWindow since the poller would be disconnected in firefox
+        this.openUriInIFrame(uri);
+      }
+    } else {
+      this.openUriAsNewWindow(uri);
+    }
+  }
+
+  handleUriActionNewWindow(uri) {
     this.openUriAsNewWindow(uri);
   }
-}
 
-handleUriActionNewWindow(uri) {
-  this.openUriAsNewWindow(uri);
-}
-
-handleUriActionPopupWindow(uri) {
-  this.openUriAsPopupWindow(uri);
-}
-
-handleUriActionSameWindow(uri) {
-  this.openUriInSameWindow(uri);
-}
-
-openUriInSameWindow(uri) {
-  window.location.assign(uri);
-}
-
-openUriInIFrame(uri) {
-  // Create a hidden iframe and set the URI as src attribute value
-  var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
-    .attr('tabindex', -1)
-    .attr('src', uri);
-
-  // Remove the iframe again after 10s (should be enough to get the download started)
-  setTimeout(function() {
-    $iframe.remove();
-  }, 10 * 1000);
-}
-
-openUriAsNewWindow(uri) {
-  var popupBlockerHandler = new PopupBlockerHandler(this.session);
-  if (Device.get().isInternetExplorer()) {
-    popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
-  } else {
-    popupBlockerHandler.openWindow(uri);
+  handleUriActionPopupWindow(uri) {
+    this.openUriAsPopupWindow(uri);
   }
-}
 
-openUriAsPopupWindow(uri) {
-  var popupBlockerHandler = new PopupBlockerHandler(this.session);
-  popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
-}
+  handleUriActionSameWindow(uri) {
+    this.openUriInSameWindow(uri);
+  }
+
+  openUriInSameWindow(uri) {
+    window.location.assign(uri);
+  }
+
+  openUriInIFrame(uri) {
+    // Create a hidden iframe and set the URI as src attribute value
+    var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
+      .attr('tabindex', -1)
+      .attr('src', uri);
+
+    // Remove the iframe again after 10s (should be enough to get the download started)
+    setTimeout(function() {
+      $iframe.remove();
+    }, 10 * 1000);
+  }
+
+  openUriAsNewWindow(uri) {
+    var popupBlockerHandler = new PopupBlockerHandler(this.session);
+    if (Device.get().isInternetExplorer()) {
+      popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
+    } else {
+      popupBlockerHandler.openWindow(uri);
+    }
+  }
+
+  openUriAsPopupWindow(uri) {
+    var popupBlockerHandler = new PopupBlockerHandler(this.session);
+    popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
+  }
 }

@@ -12,8 +12,8 @@ import {FormFieldAdapter} from '../../index';
 
 export default class OutlineTileFieldAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

@@ -25,99 +25,99 @@ import {Dimension} from '../../../index';
  */
 export default class SmartFieldPopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super( popup);
+  constructor(popup) {
+    super(popup);
 
-  this.animating = false;
-  this.doubleCalcPrefSize = false;
-}
-
-
-layout($container) {
-  var size, popupSize,
-    htmlProposalChooser = this._htmlProposalChooser();
-
-  // skip layout while CSS animation is running (prefSize would not work while animation is running)
-  if (this.animating) {
-    this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-      this.popup.revalidateLayout();
-    }.bind(this));
-    return;
+    this.animating = false;
+    this.doubleCalcPrefSize = false;
   }
 
-  super.layout( $container);
 
-  popupSize = this.popup.htmlComp.size();
-  size = popupSize.subtract(this.popup.htmlComp.insets());
-  htmlProposalChooser.setSize(size);
+  layout($container) {
+    var size, popupSize,
+      htmlProposalChooser = this._htmlProposalChooser();
 
-  if (this.popup.htmlComp.layouted) {
-    // Reposition because opening direction may have to be switched if popup gets bigger
-    // Don't do it the first time (will be done by popup.open), only if the popup is already
-    // open and gets layouted again
-    this.popup.position();
-  } else if (SmartFieldPopup.hasPopupAnimation()) { // don't use animation on crappy browsers like IE
-    // This code here is a bit complicated because:
-    // 1. we must position the scrollTo position before we start the animation
-    //    because it looks ugly, when we jump to the scroll position after the
-    //    animation has ended
-    // 2. we must first layout the popup with the table/tree correctly because
-    //    revealSelection doesn't work when popup has not the right size or is
-    //    not visible. That's why we must set the visibility to hidden.
-    // 3. we wait for the layout validator until the popup layout is validated
-    //    which means the scroll position is set correctly. Then we make the
-    //    popup visible again and start the animation (which shrinks the popup
-    //    to 1px height initially.
-    this.animating = true;
-    this.popup.htmlComp.$comp.css('visibility', 'hidden');
-
-    this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
-      this.popup.htmlComp.$comp.css('visibility', '');
-      this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
+    // skip layout while CSS animation is running (prefSize would not work while animation is running)
+    if (this.animating) {
       this.popup.htmlComp.$comp.oneAnimationEnd(function() {
-        this.animating = false;
-        this.popup._onAnimationEnd();
+        this.popup.revalidateLayout();
       }.bind(this));
-    }.bind(this));
+      return;
+    }
+
+    super.layout($container);
+
+    popupSize = this.popup.htmlComp.size();
+    size = popupSize.subtract(this.popup.htmlComp.insets());
+    htmlProposalChooser.setSize(size);
+
+    if (this.popup.htmlComp.layouted) {
+      // Reposition because opening direction may have to be switched if popup gets bigger
+      // Don't do it the first time (will be done by popup.open), only if the popup is already
+      // open and gets layouted again
+      this.popup.position();
+    } else if (SmartFieldPopup.hasPopupAnimation()) { // don't use animation on crappy browsers like IE
+      // This code here is a bit complicated because:
+      // 1. we must position the scrollTo position before we start the animation
+      //    because it looks ugly, when we jump to the scroll position after the
+      //    animation has ended
+      // 2. we must first layout the popup with the table/tree correctly because
+      //    revealSelection doesn't work when popup has not the right size or is
+      //    not visible. That's why we must set the visibility to hidden.
+      // 3. we wait for the layout validator until the popup layout is validated
+      //    which means the scroll position is set correctly. Then we make the
+      //    popup visible again and start the animation (which shrinks the popup
+      //    to 1px height initially.
+      this.animating = true;
+      this.popup.htmlComp.$comp.css('visibility', 'hidden');
+
+      this.popup.session.layoutValidator.schedulePostValidateFunction(function() {
+        this.popup.htmlComp.$comp.css('visibility', '');
+        this.popup.htmlComp.$comp.addClassForAnimation('animate-open');
+        this.popup.htmlComp.$comp.oneAnimationEnd(function() {
+          this.animating = false;
+          this.popup._onAnimationEnd();
+        }.bind(this));
+      }.bind(this));
+    }
   }
-}
 
-/**
- * @override AbstractLayout.js
- */
-preferredLayoutSize($container, options) {
-  var prefSize,
-    htmlProposalChooser = this._htmlProposalChooser(),
-    fieldBounds = graphics.offsetBounds(this.popup.smartField.$field);
+  /**
+   * @override AbstractLayout.js
+   */
+  preferredLayoutSize($container, options) {
+    var prefSize,
+      htmlProposalChooser = this._htmlProposalChooser(),
+      fieldBounds = graphics.offsetBounds(this.popup.smartField.$field);
 
-  if (htmlProposalChooser) {
-    prefSize = htmlProposalChooser.prefSize(options);
-    prefSize = prefSize.add(this.popup.htmlComp.insets());
-  } else {
-    prefSize = new Dimension(
-      HtmlEnvironment.get().formColumnWidth,
-      HtmlEnvironment.get().formRowHeight * 2);
+    if (htmlProposalChooser) {
+      prefSize = htmlProposalChooser.prefSize(options);
+      prefSize = prefSize.add(this.popup.htmlComp.insets());
+    } else {
+      prefSize = new Dimension(
+        HtmlEnvironment.get().formColumnWidth,
+        HtmlEnvironment.get().formRowHeight * 2);
+    }
+
+    prefSize.width = Math.max(fieldBounds.width, prefSize.width);
+    prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
+
+    if (prefSize.width > this._maxWindowSize()) {
+      prefSize.width = this._maxWindowSize();
+    }
+
+    return prefSize;
   }
 
-  prefSize.width = Math.max(fieldBounds.width, prefSize.width);
-  prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
-
-  if (prefSize.width > this._maxWindowSize()) {
-    prefSize.width = this._maxWindowSize();
+  _htmlProposalChooser() {
+    var proposalChooser = this.popup.proposalChooser;
+    if (!proposalChooser) {
+      return null;
+    }
+    return proposalChooser.htmlComp;
   }
 
-  return prefSize;
-}
-
-_htmlProposalChooser() {
-  var proposalChooser = this.popup.proposalChooser;
-  if (!proposalChooser) {
-    return null;
+  _maxWindowSize() {
+    return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
   }
-  return proposalChooser.htmlComp;
-}
-
-_maxWindowSize() {
-  return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
-}
 }

@@ -12,42 +12,42 @@ import {KeyStroke} from '../../index';
 
 export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
 
-constructor(compactProcessTree) {
-  super();
-  this.repeatable = true;
-  this.field = compactProcessTree;
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(compactProcessTree) {
+    super();
+    this.repeatable = true;
+    this.field = compactProcessTree;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-  if (!this.field.nodes || !this.field.nodes.length) {
-    return false;
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+
+    if (!this.field.nodes || !this.field.nodes.length) {
+      return false;
+    }
+
+    var $currentNode = this.field.$nodesContainer.find('.section-node.selected'),
+      currentNode = $currentNode.data('node');
+
+    var nextNode = this._findNextNode($currentNode, currentNode);
+    if (nextNode) {
+      event._nextNode = nextNode;
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  var $currentNode = this.field.$nodesContainer.find('.section-node.selected'),
-    currentNode = $currentNode.data('node');
-
-  var nextNode = this._findNextNode($currentNode, currentNode);
-  if (nextNode) {
-    event._nextNode = nextNode;
-    return true;
-  } else {
-    return false;
+  handle(event) {
+    this.field.selectNodes(event._nextNode);
+    this.field.checkNode(event._nextNode, true);
   }
-}
 
-handle(event) {
-  this.field.selectNodes(event._nextNode);
-  this.field.checkNode(event._nextNode, true);
-}
-
-_findNextNode($currentNode, currentNode) {
-  throw new Error('method must be overwritten by subclass');
-}
+  _findNextNode($currentNode, currentNode) {
+    throw new Error('method must be overwritten by subclass');
+  }
 }

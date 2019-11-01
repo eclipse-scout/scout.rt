@@ -13,16 +13,16 @@ import {keys} from '../index';
 
 export default class TableHeaderMenuButtonKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.ENTER, keys.SPACE];
-  this.renderingHints.render = true;
-  this.stopPropagation = true;
-}
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.ENTER, keys.SPACE];
+    this.renderingHints.render = true;
+    this.stopPropagation = true;
+  }
 
 
-handle(event) {
-  this.field.doAction();
-}
+  handle(event) {
+    this.field.doAction();
+  }
 }

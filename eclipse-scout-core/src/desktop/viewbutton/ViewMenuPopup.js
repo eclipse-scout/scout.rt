@@ -20,114 +20,114 @@ import {arrays} from '../../index';
  */
 export default class ViewMenuPopup extends PopupWithHead {
 
-constructor() {
-  super();
-  this.$tab;
-  this.$headBlueprint;
-  this.viewMenus;
-  this.viewButtonBoxBounds;
-  this._addWidgetProperties('viewMenus');
-  this._viewMenuActionHandler = this._onViewMenuAction.bind(this);
-}
+  constructor() {
+    super();
+    this.$tab;
+    this.$headBlueprint;
+    this.viewMenus;
+    this.viewButtonBoxBounds;
+    this._addWidgetProperties('viewMenus');
+    this._viewMenuActionHandler = this._onViewMenuAction.bind(this);
+  }
 
 
-static MAX_MENU_WIDTH = 300;
+  static MAX_MENU_WIDTH = 300;
 
-_init(options) {
-  options.focusableContainer = true;
-  super._init( options);
+  _init(options) {
+    options.focusableContainer = true;
+    super._init(options);
 
-  this.$tab = options.$tab;
-  this.$headBlueprint = this.$tab;
-  this.viewButtonBoxBounds = options.naviBounds;
-}
+    this.$tab = options.$tab;
+    this.$headBlueprint = this.$tab;
+    this.viewButtonBoxBounds = options.naviBounds;
+  }
 
-_createLayout() {
-  return new ViewMenuPopupLayout(this);
-}
+  _createLayout() {
+    return new ViewMenuPopupLayout(this);
+  }
 
-/**
- * @override Popup.js
- */
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
+  /**
+   * @override Popup.js
+   */
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
 
-  menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'view-menu-item');
-}
+    menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'view-menu-item');
+  }
 
-_render() {
-  super._render();
+  _render() {
+    super._render();
 
-  this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.renderAsMenuItem(this.$body);
-    viewMenu.on('action', this._viewMenuActionHandler);
-  }, this);
+    this.viewMenus.forEach(function(viewMenu) {
+      viewMenu.renderAsMenuItem(this.$body);
+      viewMenu.on('action', this._viewMenuActionHandler);
+    }, this);
 
-  // Add last marker to last visible item
-  var lastVisibleMenu = arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
-    return viewMenu.visible;
-  }, this);
-  lastVisibleMenu.$container.addClass('last');
+    // Add last marker to last visible item
+    var lastVisibleMenu = arrays.findFromReverse(this.viewMenus, this.viewMenus.length - 1, function(viewMenu) {
+      return viewMenu.visible;
+    }, this);
+    lastVisibleMenu.$container.addClass('last');
 
-  this._installScrollbars({
-    axis: 'y'
-  });
-}
+    this._installScrollbars({
+      axis: 'y'
+    });
+  }
 
-_remove() {
-  this.viewMenus.forEach(function(viewMenu) {
-    viewMenu.off('action', this._viewMenuActionHandler);
-  }, this);
+  _remove() {
+    this.viewMenus.forEach(function(viewMenu) {
+      viewMenu.off('action', this._viewMenuActionHandler);
+    }, this);
 
-  super._remove();
-}
+    super._remove();
+  }
 
-/**
- * @override
- */
-get$Scrollable() {
-  return this.$body;
-}
+  /**
+   * @override
+   */
+  get$Scrollable() {
+    return this.$body;
+  }
 
-/**
- * @override PopupWithHead.js
- */
-_renderHead() {
-  super._renderHead();
+  /**
+   * @override PopupWithHead.js
+   */
+  _renderHead() {
+    super._renderHead();
 
-  this._copyCssClassToHead('view-menu');
-  this._copyCssClassToHead('unfocusable');
-  this.$head.removeClass('popup-head');
-  this.$head.addClass('view-menu-popup-head');
-}
+    this._copyCssClassToHead('view-menu');
+    this._copyCssClassToHead('unfocusable');
+    this.$head.removeClass('popup-head');
+    this.$head.addClass('view-menu-popup-head');
+  }
 
-/**
- * @override PopupWithHead.js
- */
-_modifyBody() {
-  this.$body.removeClass('popup-body');
-  this.$body.addClass('view-menu-popup-body');
-}
+  /**
+   * @override PopupWithHead.js
+   */
+  _modifyBody() {
+    this.$body.removeClass('popup-body');
+    this.$body.addClass('view-menu-popup-body');
+  }
 
-position() {
-  var pos = this.$tab.offset(),
-    headSize = graphics.size(this.$tab, true),
-    bodyTop = headSize.height;
+  position() {
+    var pos = this.$tab.offset(),
+      headSize = graphics.size(this.$tab, true),
+      bodyTop = headSize.height;
 
-  graphics.setBounds(this.$head, pos.left, pos.top, headSize.width, headSize.height);
+    graphics.setBounds(this.$head, pos.left, pos.top, headSize.width, headSize.height);
 
-  this.$deco.cssLeft(pos.left);
-  this.$deco.cssTop(0);
-  this.$deco.cssWidth(headSize.width - 1);
+    this.$deco.cssLeft(pos.left);
+    this.$deco.cssTop(0);
+    this.$deco.cssWidth(headSize.width - 1);
 
-  this.$head.cssTop(-bodyTop);
-  this.$body.cssTop(0);
-  this.$container.cssMarginTop(headSize.height);
+    this.$head.cssTop(-bodyTop);
+    this.$body.cssTop(0);
+    this.$container.cssMarginTop(headSize.height);
 
-  this.setLocation(new Point(0, 0));
-}
+    this.setLocation(new Point(0, 0));
+  }
 
-_onViewMenuAction(event) {
-  this.close();
-}
+  _onViewMenuAction(event) {
+    this.close();
+  }
 }

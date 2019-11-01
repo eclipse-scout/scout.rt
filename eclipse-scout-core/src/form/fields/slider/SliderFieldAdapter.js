@@ -12,8 +12,8 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class SequenceBoxAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

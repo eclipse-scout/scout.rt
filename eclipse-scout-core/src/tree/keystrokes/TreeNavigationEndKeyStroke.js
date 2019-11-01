@@ -14,30 +14,30 @@ import {arrays} from '../../index';
 
 export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-constructor(tree, modifierBitMask) {
-  super( tree, modifierBitMask);
-  this.which = [keys.END];
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
-    if (newSelectedNode) {
-      return newSelectedNode.$node;
+  constructor(tree, modifierBitMask) {
+    super(tree, modifierBitMask);
+    this.which = [keys.END];
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
+      if (newSelectedNode) {
+        return newSelectedNode.$node;
+      }
+    }.bind(this);
+  }
+
+
+  handle(event) {
+    var newSelection = this._computeNewSelection(event._treeCurrentNode);
+    if (newSelection) {
+      this.selectNodesAndReveal(newSelection);
     }
-  }.bind(this);
-}
-
-
-handle(event) {
-  var newSelection = this._computeNewSelection(event._treeCurrentNode);
-  if (newSelection) {
-    this.selectNodesAndReveal(newSelection);
   }
-}
 
-_computeNewSelection(currentNode) {
-  var nodes = this.field.visibleNodesFlat;
-  if (nodes.length === 0) {
-    return;
+  _computeNewSelection(currentNode) {
+    var nodes = this.field.visibleNodesFlat;
+    if (nodes.length === 0) {
+      return;
+    }
+    return arrays.last(nodes);
   }
-  return arrays.last(nodes);
-}
 }

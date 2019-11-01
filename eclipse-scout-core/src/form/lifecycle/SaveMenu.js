@@ -17,29 +17,29 @@ import {Event} from '../../index';
 
 export default class SaveMenu extends Menu {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.actionStyle = Action.ActionStyle.BUTTON;
-  this.keyStroke = 'enter';
-  this.systemType = Button.SystemType.SAVE;
-}
-
-
-_init(model) {
-  super._init( model);
-  this.text = scout.nvl(this.text, this.session.text('SaveButton'));
-}
-
-getForm() {
-  return Form.findForm(this);
-}
-
-_doAction() {
-  var event = new Event();
-  this.trigger('action', event);
-  if (!event.defaultPrevented) {
-    this.getForm().save();
+    this.actionStyle = Action.ActionStyle.BUTTON;
+    this.keyStroke = 'enter';
+    this.systemType = Button.SystemType.SAVE;
   }
-}
+
+
+  _init(model) {
+    super._init(model);
+    this.text = scout.nvl(this.text, this.session.text('SaveButton'));
+  }
+
+  getForm() {
+    return Form.findForm(this);
+  }
+
+  _doAction() {
+    var event = new Event();
+    this.trigger('action', event);
+    if (!event.defaultPrevented) {
+      this.getForm().save();
+    }
+  }
 }

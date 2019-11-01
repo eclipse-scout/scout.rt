@@ -12,35 +12,35 @@ import {Tooltip} from '../index';
 
 export default class TableTooltip extends Tooltip {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  super._init( options);
+  _init(options) {
+    super._init(options);
 
-  this.table = options.table;
-}
+    this.table = options.table;
+  }
 
-_render() {
-  super._render();
+  _render() {
+    super._render();
 
-  this._rowOrderChangedFunc = function(event) {
-    if (event.animating) {
-      // row is only set while animating
-      if (event.row === this.row) {
+    this._rowOrderChangedFunc = function(event) {
+      if (event.animating) {
+        // row is only set while animating
+        if (event.row === this.row) {
+          this.position();
+        }
+      } else {
         this.position();
       }
-    } else {
-      this.position();
-    }
-  }.bind(this);
-  this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
-}
+    }.bind(this);
+    this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
+  }
 
-_remove() {
-  super._remove();
-  this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
-}
+  _remove() {
+    super._remove();
+    this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
+  }
 }

@@ -18,92 +18,92 @@ import {FormTableControlLayout} from '../../index';
 
 export default class FormTableControl extends TableControl {
 
-constructor() {
-  super();
-  this._addWidgetProperties('form');
+  constructor() {
+    super();
+    this._addWidgetProperties('form');
 
-  this._formDestroyedHandler = this._onFormDestroyed.bind(this);
-}
-
-
-_init(model) {
-  super._init( model);
-  this._setForm(this.form);
-}
-
-_createLayout() {
-  return new FormTableControlLayout(this);
-}
-
-_renderContent($parent) {
-  this.form.renderInitialFocusEnabled = false;
-  this.form.render($parent);
-
-  // Tab box gets a special style if it is the first field in the root group box
-  var rootGroupBox = this.form.rootGroupBox;
-  if (rootGroupBox.controls[0] instanceof TabBox) {
-    rootGroupBox.controls[0].$container.addClass('in-table-control');
+    this._formDestroyedHandler = this._onFormDestroyed.bind(this);
   }
 
-  this.form.$container.height($parent.height());
-  this.form.$container.width($parent.width());
-  this.form.htmlComp.validateRoot = true;
-  this.form.htmlComp.validateLayout();
-}
 
-_removeContent() {
-  if (this.form) {
-    this.form.remove();
+  _init(model) {
+    super._init(model);
+    this._setForm(this.form);
   }
-}
 
-_removeForm() {
-  this.removeContent();
-}
-
-_renderForm(form) {
-  this.renderContent();
-}
-
-/**
- * Returns true if the table control may be displayed (opened).
- */
-isContentAvailable() {
-  return !!this.form;
-}
-
-_setForm(form) {
-  if (this.form) {
-    this.form.off('destroy', this._formDestroyedHandler);
+  _createLayout() {
+    return new FormTableControlLayout(this);
   }
-  if (form) {
-    form.on('destroy', this._formDestroyedHandler);
-    this._adaptForm(form);
-  }
-  this._setProperty('form', form);
-}
 
-_adaptForm(form) {
-  form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
-  form.setDisplayHint(Form.DisplayHint.VIEW);
-  form.setModal(false);
-  form.setAskIfNeedSave(false);
-  if (this.session.userAgent.deviceType !== Device.Type.MOBILE && form.rootGroupBox.fieldStyle === FormField.FieldStyle.ALTERNATIVE) {
-    // Use default style because alternative style does not look as good with a background color
-    form.rootGroupBox.setFieldStyle(FormField.FieldStyle.CLASSIC);
-  }
-}
+  _renderContent($parent) {
+    this.form.renderInitialFocusEnabled = false;
+    this.form.render($parent);
 
-onControlContainerOpened() {
-  if (!this.form.rendered) {
-    return;
-  }
-  this.form.renderInitialFocus();
-}
+    // Tab box gets a special style if it is the first field in the root group box
+    var rootGroupBox = this.form.rootGroupBox;
+    if (rootGroupBox.controls[0] instanceof TabBox) {
+      rootGroupBox.controls[0].$container.addClass('in-table-control');
+    }
 
-_onFormDestroyed(event) {
-  // Called when the inner form is destroyed --> unlink it from this table control
-  this._removeForm();
-  this._setForm(null);
-}
+    this.form.$container.height($parent.height());
+    this.form.$container.width($parent.width());
+    this.form.htmlComp.validateRoot = true;
+    this.form.htmlComp.validateLayout();
+  }
+
+  _removeContent() {
+    if (this.form) {
+      this.form.remove();
+    }
+  }
+
+  _removeForm() {
+    this.removeContent();
+  }
+
+  _renderForm(form) {
+    this.renderContent();
+  }
+
+  /**
+   * Returns true if the table control may be displayed (opened).
+   */
+  isContentAvailable() {
+    return !!this.form;
+  }
+
+  _setForm(form) {
+    if (this.form) {
+      this.form.off('destroy', this._formDestroyedHandler);
+    }
+    if (form) {
+      form.on('destroy', this._formDestroyedHandler);
+      this._adaptForm(form);
+    }
+    this._setProperty('form', form);
+  }
+
+  _adaptForm(form) {
+    form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+    form.setDisplayHint(Form.DisplayHint.VIEW);
+    form.setModal(false);
+    form.setAskIfNeedSave(false);
+    if (this.session.userAgent.deviceType !== Device.Type.MOBILE && form.rootGroupBox.fieldStyle === FormField.FieldStyle.ALTERNATIVE) {
+      // Use default style because alternative style does not look as good with a background color
+      form.rootGroupBox.setFieldStyle(FormField.FieldStyle.CLASSIC);
+    }
+  }
+
+  onControlContainerOpened() {
+    if (!this.form.rendered) {
+      return;
+    }
+    this.form.renderInitialFocus();
+  }
+
+  _onFormDestroyed(event) {
+    // Called when the inner form is destroyed --> unlink it from this table control
+    this._removeForm();
+    this._setForm(null);
+  }
 }

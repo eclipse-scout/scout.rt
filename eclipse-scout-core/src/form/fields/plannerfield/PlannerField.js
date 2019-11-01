@@ -12,33 +12,33 @@ import {FormField} from '../../../index';
 
 export default class PlannerField extends FormField {
 
-constructor() {
-  super();
-  this._addWidgetProperties(['planner']);
+  constructor() {
+    super();
+    this._addWidgetProperties(['planner']);
 
-  this.gridDataHints.weightY = 1.0;
-}
-
-
-_render() {
-  this.addContainer(this.$parent, 'planner-field');
-  this.addLabel();
-  this.addStatus();
-  if (this.planner) {
-    this._renderPlanner();
+    this.gridDataHints.weightY = 1.0;
   }
-}
 
-/**
- * Will also be called by model adapter on property change event
- */
-_renderPlanner() {
-  this.planner.render();
-  this.addField(this.planner.$container);
-}
 
-_removePlanner() {
-  this.planner.remove();
-  this._removeField();
-}
+  _render() {
+    this.addContainer(this.$parent, 'planner-field');
+    this.addLabel();
+    this.addStatus();
+    if (this.planner) {
+      this._renderPlanner();
+    }
+  }
+
+  /**
+   * Will also be called by model adapter on property change event
+   */
+  _renderPlanner() {
+    this.planner.render();
+    this.addField(this.planner.$container);
+  }
+
+  _removePlanner() {
+    this.planner.remove();
+    this._removeField();
+  }
 }

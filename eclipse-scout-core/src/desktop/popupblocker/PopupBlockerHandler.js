@@ -18,81 +18,81 @@ import * as $ from 'jquery';
  */
 export default class PopupBlockerHandler {
 
-constructor(session, preserveOpener) {
-  this.session = session;
-  this.preserveOpener = preserveOpener;
-}
-
-/**
- * @param {String} uri The URI for the window to open
- * @param {optional String} windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space. Note that the window name does not specify the title of the new window.
- * @param {optional String} windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window. The string must not contain any blank space, each feature name and value must be separated by a comma.
- * @param {optional function} onWindowOpened Optional function to call when the window has been successfully opened. Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
- */
-openWindow(uri, windowName, windowSpecs, onWindowOpened) {
-  windowName = windowName || 'scout_' + new Date().getTime();
-
-  var popup = window.open('', windowName, windowSpecs);
-  if (popup) {
-    if (!this.preserveOpener) {
-      popup.opener = null;
-    }
-    try {
-      popup.window.location.href = uri;
-    } catch (err) {
-      this._handleInvalidUri(uri, popup, err);
-      return;
-    }
-    if (onWindowOpened) {
-      onWindowOpened(popup);
-    }
-  } else {
-    $.log.warn('Popup-blocker detected! Show link to open window manually');
-    this.showNotification(function() {
-      this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
-    }.bind(this));
+  constructor(session, preserveOpener) {
+    this.session = session;
+    this.preserveOpener = preserveOpener;
   }
-}
+
+  /**
+   * @param {String} uri The URI for the window to open
+   * @param {optional String} windowName An optional string name for the new window. The name can be used as the target of links and forms using the target attribute of an 'a' or 'form' element. The name should not contain any blank space. Note that the window name does not specify the title of the new window.
+   * @param {optional String} windowSpecs Optional parameter listing the features (size, position, scrollbars, etc.) of the new window. The string must not contain any blank space, each feature name and value must be separated by a comma.
+   * @param {optional function} onWindowOpened Optional function to call when the window has been successfully opened. Due to popup-blockers this may not necessarily be directly after the call to this method but may be later when the popup-blocker-notification-link is manually activated by the user.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
+   */
+  openWindow(uri, windowName, windowSpecs, onWindowOpened) {
+    windowName = windowName || 'scout_' + new Date().getTime();
+
+    var popup = window.open('', windowName, windowSpecs);
+    if (popup) {
+      if (!this.preserveOpener) {
+        popup.opener = null;
+      }
+      try {
+        popup.window.location.href = uri;
+      } catch (err) {
+        this._handleInvalidUri(uri, popup, err);
+        return;
+      }
+      if (onWindowOpened) {
+        onWindowOpened(popup);
+      }
+    } else {
+      $.log.warn('Popup-blocker detected! Show link to open window manually');
+      this.showNotification(function() {
+        this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
+      }.bind(this));
+    }
+  }
 
 // Shows a notification when popup-blocker has been detected
-showNotification(vararg) {
-  var notification, linkUrl,
-    desktop = this.session.desktop;
+  showNotification(vararg) {
+    var notification, linkUrl,
+      desktop = this.session.desktop;
 
-  if (typeof vararg === 'string') {
-    linkUrl = vararg;
+    if (typeof vararg === 'string') {
+      linkUrl = vararg;
+    }
+
+    notification = scout.create('DesktopNotification:PopupBlocker', {
+      parent: desktop,
+      linkUrl: linkUrl,
+      preserveOpener: this.preserveOpener
+    });
+
+    if (!linkUrl && $.isFunction(vararg)) {
+      notification.on('linkClick', vararg);
+    }
+    notification.show();
   }
 
-  notification = scout.create('DesktopNotification:PopupBlocker', {
-    parent: desktop,
-    linkUrl: linkUrl,
-    preserveOpener: this.preserveOpener
-  });
+  _handleInvalidUri(uri, popup, err) {
+    // Log
+    scout.create('ErrorHandler', {
+      logError: true,
+      displayError: false,
+      sendError: false
+    }).handle(err);
 
-  if (!linkUrl && $.isFunction(vararg)) {
-    notification.on('linkClick', vararg);
+    // Close popup
+    popup.close();
+
+    // Show message
+    MessageBoxes.createOk(this.session.desktop)
+      .withHeader(this.session.text('ui.UnexpectedProblem'))
+      .withBody(this.session.text('ui.InvalidUriMsg'))
+      .withSeverity(Status.Severity.ERROR)
+      .buildAndOpen();
   }
-  notification.show();
-}
-
-_handleInvalidUri(uri, popup, err) {
-  // Log
-  scout.create('ErrorHandler', {
-    logError: true,
-    displayError: false,
-    sendError: false
-  }).handle(err);
-
-  // Close popup
-  popup.close();
-
-  // Show message
-  MessageBoxes.createOk(this.session.desktop)
-    .withHeader(this.session.text('ui.UnexpectedProblem'))
-    .withBody(this.session.text('ui.InvalidUriMsg'))
-    .withSeverity(Status.Severity.ERROR)
-    .buildAndOpen();
-}
 }

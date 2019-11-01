@@ -16,124 +16,125 @@ import {arrays} from '../index';
 
 export default class TagBarOverflowPopup extends PopupWithHead {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this._tagBarPropertyChangeListener = null;
+    this._tagBarPropertyChangeListener = null;
 
-  // We need not only to return which element receives the initial focus
-  // but we must also prepare this element so it can receive the focus
-  this.initialFocus = function() {
-    return TagBar.firstTagElement(this.$body)
-      .setTabbable(true)
-      .addClass('focused')[0];
-  };
-}
-
-
-_init(options) {
-  super._init( options);
-  this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
-  this.parent.on('propertyChange', this._tagBarPropertyChangeListener);
-}
-
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
-  this.keyStrokeContext.registerKeyStrokes([
-    new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
-    new TagFieldDeleteKeyStroke(this._createFieldAdapter())
-  ]);
-}
-
-_destroy() {
-  this.parent.off('propertyChange', this._tagBarPropertyChangeListener);
-  super._destroy();
-}
-
-_render() {
-  super._render();
-
-  this.$body.addClass('tag-overflow-popup');
-  this._renderTags();
-}
-
-_renderTags() {
-  var tagBar = this.parent;
-  var visibleTags = tagBar.visibleTags();
-  var allTags = arrays.ensure(tagBar.tags);
-  var overflowTags = allTags.filter(function(tagText) {
-    return visibleTags.indexOf(tagText) === -1;
-  });
-
-  var clickHandler = tagBar._onTagClick.bind(tagBar);
-  var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
-  TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
-
-  if (!this.rendering) {
-    this.revalidateLayout();
+    // We need not only to return which element receives the initial focus
+    // but we must also prepare this element so it can receive the focus
+    this.initialFocus = function() {
+      return TagBar.firstTagElement(this.$body)
+        .setTabbable(true)
+        .addClass('focused')[0];
+    };
   }
 
-}
 
-_renderHead() {
-  super._renderHead();
+  _init(options) {
+    super._init(options);
+    this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
+    this.parent.on('propertyChange', this._tagBarPropertyChangeListener);
+  }
 
-  this._copyCssClassToHead('overflow-icon');
-  this.$head
-    .removeClass('popup-head menu-item')
-    .addClass('tag-overflow-popup-head');
-}
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    this.keyStrokeContext.registerKeyStrokes([
+      new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
+      new TagFieldDeleteKeyStroke(this._createFieldAdapter())
+    ]);
+  }
 
-_focusFirstTagElement() {
-  TagBar.focusFirstTagElement(this.$body);
-}
+  _destroy() {
+    this.parent.off('propertyChange', this._tagBarPropertyChangeListener);
+    super._destroy();
+  }
 
-_onTagRemoveClick(event) {
-  this.parent._onTagRemoveClick(event);
-}
+  _render() {
+    super._render();
 
-_onTagBarPropertyChange(event) {
-  if (event.propertyName === 'tags') {
-    var allTags = arrays.ensure(this.parent.tags);
-    var visibleTags = this.parent.visibleTags();
-    var numTags = allTags.length;
-    // close popup when no more tags left or all tags are visible (=no overflow icon)
-    if (numTags === 0 || numTags === visibleTags.length) {
-      this.close();
-    } else {
-      this._renderTags();
-      this._focusFirstTagElement();
+    this.$body.addClass('tag-overflow-popup');
+    this._renderTags();
+  }
+
+  _renderTags() {
+    var tagBar = this.parent;
+    var visibleTags = tagBar.visibleTags();
+    var allTags = arrays.ensure(tagBar.tags);
+    var overflowTags = allTags.filter(function(tagText) {
+      return visibleTags.indexOf(tagText) === -1;
+    });
+
+    var clickHandler = tagBar._onTagClick.bind(tagBar);
+    var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
+    TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
+
+    if (!this.rendering) {
+      this.revalidateLayout();
+    }
+
+  }
+
+  _renderHead() {
+    super._renderHead();
+
+    this._copyCssClassToHead('overflow-icon');
+    this.$head
+      .removeClass('popup-head menu-item')
+      .addClass('tag-overflow-popup-head');
+  }
+
+  _focusFirstTagElement() {
+    TagBar.focusFirstTagElement(this.$body);
+  }
+
+  _onTagRemoveClick(event) {
+    this.parent._onTagRemoveClick(event);
+  }
+
+  _onTagBarPropertyChange(event) {
+    if (event.propertyName === 'tags') {
+      var allTags = arrays.ensure(this.parent.tags);
+      var visibleTags = this.parent.visibleTags();
+      var numTags = allTags.length;
+      // close popup when no more tags left or all tags are visible (=no overflow icon)
+      if (numTags === 0 || numTags === visibleTags.length) {
+        this.close();
+      } else {
+        this._renderTags();
+        this._focusFirstTagElement();
+      }
     }
   }
-}
 
-_createFieldAdapter() {
-  return TagBarOverflowPopup.createFieldAdapter(this);
-}
+  _createFieldAdapter() {
+    return TagBarOverflowPopup.createFieldAdapter(this);
+  }
 
-static createFieldAdapter(field) {
-  return {
-    $container: function() {
-      return field.$body;
-    },
+  static createFieldAdapter(field) {
+    return {
+      $container: function() {
+        return field.$body;
+      },
 
-    enabled: function() {
-      return true;
-    },
+      enabled: function() {
+        return true;
+      },
 
-    focus: function() {},
+      focus: function() {
+      },
 
-    one: function(p1, p2) {
-      field.one(p1, p2);
-    },
+      one: function(p1, p2) {
+        field.one(p1, p2);
+      },
 
-    off: function(p1, p2) {
-      field.off(p1, p2);
-    },
+      off: function(p1, p2) {
+        field.off(p1, p2);
+      },
 
-    removeTag: function(tag) {
-      field.parent.parent.removeTag(tag);
-    }
-  };
-}
+      removeTag: function(tag) {
+        field.parent.parent.removeTag(tag);
+      }
+    };
+  }
 }

@@ -13,14 +13,14 @@ import {keys} from '../../index';
 
 export default class GroupToggleCollapseKeyStroke extends KeyStroke {
 
-constructor(group) {
-  super( group);
-  this.field = group;
-  this.which = [keys.SPACE];
-}
+  constructor(group) {
+    super(group);
+    this.field = group;
+    this.which = [keys.SPACE];
+  }
 
 
-handle(event) {
-  this.field.toggleCollapse();
-}
+  handle(event) {
+    this.field.toggleCollapse();
+  }
 }

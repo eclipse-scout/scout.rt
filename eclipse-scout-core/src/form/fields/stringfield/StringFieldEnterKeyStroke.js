@@ -13,26 +13,26 @@ import {KeyStroke} from '../../../index';
 
 export default class StringFieldEnterKeyStroke extends KeyStroke {
 
-constructor(stringField) {
-  super();
-  this.field = stringField;
-  this.which = [keys.ENTER];
-  this.renderingHints.render = false;
-  this.preventDefault = false;
-}
-
-
-_applyPropagationFlags(event) {
-  super._applyPropagationFlags( event);
-
-  var activeElement = this.field.$container.activeElement(true);
-  this.preventInvokeAcceptInputOnActiveValueField = !event.isPropagationStopped() && activeElement.tagName.toLowerCase() === 'textarea';
-  if (this.preventInvokeAcceptInputOnActiveValueField) {
-    event.stopPropagation();
+  constructor(stringField) {
+    super();
+    this.field = stringField;
+    this.which = [keys.ENTER];
+    this.renderingHints.render = false;
+    this.preventDefault = false;
   }
-}
 
-handle(event) {
-  // NOP
-}
+
+  _applyPropagationFlags(event) {
+    super._applyPropagationFlags(event);
+
+    var activeElement = this.field.$container.activeElement(true);
+    this.preventInvokeAcceptInputOnActiveValueField = !event.isPropagationStopped() && activeElement.tagName.toLowerCase() === 'textarea';
+    if (this.preventInvokeAcceptInputOnActiveValueField) {
+      event.stopPropagation();
+    }
+  }
+
+  handle(event) {
+    // NOP
+  }
 }

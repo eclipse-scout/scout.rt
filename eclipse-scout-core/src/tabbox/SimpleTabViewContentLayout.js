@@ -14,37 +14,37 @@ import {Dimension} from '../index';
 
 export default class SimpleTabViewContentLayout extends AbstractLayout {
 
-constructor(tabBox) {
-  super();
-  this.tabBox = tabBox;
-}
-
-
-layout($container) {
-  var currentView = this.tabBox.currentView;
-  if (!currentView || !currentView.rendered || !currentView.htmlComp) {
-    return;
+  constructor(tabBox) {
+    super();
+    this.tabBox = tabBox;
   }
 
-  var htmlContainer = HtmlComponent.get($container);
-  var size = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets())
-    .subtract(currentView.htmlComp.margins());
 
-  currentView.htmlComp.setSize(size);
-}
+  layout($container) {
+    var currentView = this.tabBox.currentView;
+    if (!currentView || !currentView.rendered || !currentView.htmlComp) {
+      return;
+    }
 
-preferredLayoutSize($container) {
-  var currentView = this.tabBox.currentView;
-  if (!currentView || !currentView.rendered || !currentView.htmlComp) {
-    return new Dimension();
+    var htmlContainer = HtmlComponent.get($container);
+    var size = htmlContainer.availableSize()
+      .subtract(htmlContainer.insets())
+      .subtract(currentView.htmlComp.margins());
+
+    currentView.htmlComp.setSize(size);
   }
 
-  var htmlContainer = HtmlComponent.get($container);
-  var prefSize = currentView.htmlComp.prefSize()
-    .add(htmlContainer.insets())
-    .add(currentView.htmlComp.margins());
+  preferredLayoutSize($container) {
+    var currentView = this.tabBox.currentView;
+    if (!currentView || !currentView.rendered || !currentView.htmlComp) {
+      return new Dimension();
+    }
 
-  return prefSize;
-}
+    var htmlContainer = HtmlComponent.get($container);
+    var prefSize = currentView.htmlComp.prefSize()
+      .add(htmlContainer.insets())
+      .add(currentView.htmlComp.margins());
+
+    return prefSize;
+  }
 }

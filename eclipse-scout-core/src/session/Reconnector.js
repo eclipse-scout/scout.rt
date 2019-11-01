@@ -12,36 +12,36 @@ import * as $ from 'jquery';
 
 export default class Reconnector {
 
-constructor(session) {
-  this.session = session;
-  this.started = false;
+  constructor(session) {
+    this.session = session;
+    this.started = false;
 
-  // Delay before first ping
-  this.initialDelay = 1000; // ms
-  // Interval to be used between pings (indefinite retries).
-  this.interval = 3000; // ms
-  // Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast)
-  this.minPingDuration = 1000; // ms
-}
-
-start() {
-  if (this.started) {
-    return;
+    // Delay before first ping
+    this.initialDelay = 1000; // ms
+    // Interval to be used between pings (indefinite retries).
+    this.interval = 3000; // ms
+    // Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast)
+    this.minPingDuration = 1000; // ms
   }
 
-  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] start');
-  this.started = true;
-  this._schedulePing(this.initialDelay);
-}
+  start() {
+    if (this.started) {
+      return;
+    }
 
-stop() {
-  this.started = false;
-}
+    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] start');
+    this.started = true;
+    this._schedulePing(this.initialDelay);
+  }
 
-_schedulePing(delay) {
-  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
-  setTimeout(this._ping.bind(this), delay);
-}
+  stop() {
+    this.started = false;
+  }
+
+  _schedulePing(delay) {
+    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
+    setTimeout(this._ping.bind(this), delay);
+  }
 
 //
 //   [START]
@@ -54,39 +54,39 @@ _schedulePing(delay) {
 //      |                   |
 //      +-------------------+
 //
-_ping() {
-  this.session.onReconnecting();
+  _ping() {
+    this.session.onReconnecting();
 
-  var pingAjaxOptions = this.session.defaultAjaxOptions({
-    ping: true
-  });
+    var pingAjaxOptions = this.session.defaultAjaxOptions({
+      ping: true
+    });
 
-  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
-  this.pingStartTimestamp = Date.now();
-  $.ajax(pingAjaxOptions)
-    .done(this._onPingDone.bind(this))
-    .fail(this._onPingFail.bind(this));
-}
-
-_onPingDone(data, textStatus, jqXHR) {
-  $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
-  this.session.onReconnectingSucceeded();
-  this.stop();
-}
-
-_onPingFail(jqXHR, textStatus, errorThrown) {
-  var handleFailedPing = function handleFailedPing() {
-    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
-    this.session.onReconnectingFailed();
-    this._schedulePing(this.interval);
-  }.bind(this);
-
-  var pingDuration = Date.now() - this.pingStartTimestamp;
-  if (pingDuration < this.minPingDuration) {
-    // Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
-    setTimeout(handleFailedPing, this.minPingDuration - pingDuration);
-  } else {
-    handleFailedPing();
+    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.type + ' "' + pingAjaxOptions.url + '"');
+    this.pingStartTimestamp = Date.now();
+    $.ajax(pingAjaxOptions)
+      .done(this._onPingDone.bind(this))
+      .fail(this._onPingFail.bind(this));
   }
-}
+
+  _onPingDone(data, textStatus, jqXHR) {
+    $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
+    this.session.onReconnectingSucceeded();
+    this.stop();
+  }
+
+  _onPingFail(jqXHR, textStatus, errorThrown) {
+    var handleFailedPing = function handleFailedPing() {
+      $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
+      this.session.onReconnectingFailed();
+      this._schedulePing(this.interval);
+    }.bind(this);
+
+    var pingDuration = Date.now() - this.pingStartTimestamp;
+    if (pingDuration < this.minPingDuration) {
+      // Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
+      setTimeout(handleFailedPing, this.minPingDuration - pingDuration);
+    } else {
+      handleFailedPing();
+    }
+  }
 }

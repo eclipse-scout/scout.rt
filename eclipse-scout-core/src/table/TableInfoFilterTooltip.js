@@ -12,32 +12,32 @@ import {Tooltip} from '../index';
 
 export default class TableInfoFilterTooltip extends Tooltip {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  super._init( options);
+  _init(options) {
+    super._init(options);
 
-  this.tableFooter = options.tableFooter;
-}
+    this.tableFooter = options.tableFooter;
+  }
 
-_renderText() {
-  var table = this.tableFooter.table,
-    numRowsFiltered = table.filteredRows().length,
-    filteredBy = table.filteredBy().join(', '); // filteredBy() returns an array
+  _renderText() {
+    var table = this.tableFooter.table,
+      numRowsFiltered = table.filteredRows().length,
+      filteredBy = table.filteredBy().join(', '); // filteredBy() returns an array
 
-  this.$content.appendSpan()
-    .text(this.session.text('ui.NumRowsFilteredBy', this.tableFooter.computeCountInfo(numRowsFiltered), filteredBy));
-  this.$content.appendBr();
-  this.$content.appendSpan('link')
-    .text(this.session.text('ui.RemoveFilter'))
-    .on('click', this._onRemoveFilterClick.bind(this));
-}
+    this.$content.appendSpan()
+      .text(this.session.text('ui.NumRowsFilteredBy', this.tableFooter.computeCountInfo(numRowsFiltered), filteredBy));
+    this.$content.appendBr();
+    this.$content.appendSpan('link')
+      .text(this.session.text('ui.RemoveFilter'))
+      .on('click', this._onRemoveFilterClick.bind(this));
+  }
 
-_onRemoveFilterClick() {
-  this.tableFooter.table.resetUserFilter();
-  this.destroy();
-}
+  _onRemoveFilterClick() {
+    this.tableFooter.table.resetUserFilter();
+    this.destroy();
+  }
 }

@@ -20,99 +20,100 @@
  */
 export default class Calculator {
 
-constructor() {};
+  constructor() {
+  };
 
-isFormula(input) {
-  return input.match(/^[\d\(\)\+\-\*\/\.]+$/);
-}
-
-evalFormula(input) {
-  this._tokens = input
-    .split(/([\d.]+|\(|\)|[\+\-\*\/])/)
-    .filter(function(e) {
-      return e.length !== 0;
-    });
-  return this._expr();
-}
-
-_next() {
-  if (this._tokens.length === 0) {
-    return undefined;
+  isFormula(input) {
+    return input.match(/^[\d\(\)\+\-\*\/\.]+$/);
   }
-  return this._tokens[0];
-}
 
-_consumeNext() {
-  var cur = this._tokens[0];
-  this._tokens = this._tokens.slice(1, this._tokens.length);
-  return cur;
-}
+  evalFormula(input) {
+    this._tokens = input
+      .split(/([\d.]+|\(|\)|[\+\-\*\/])/)
+      .filter(function(e) {
+        return e.length !== 0;
+      });
+    return this._expr();
+  }
 
-_expr() {
-  return this._sum();
-}
+  _next() {
+    if (this._tokens.length === 0) {
+      return undefined;
+    }
+    return this._tokens[0];
+  }
+
+  _consumeNext() {
+    var cur = this._tokens[0];
+    this._tokens = this._tokens.slice(1, this._tokens.length);
+    return cur;
+  }
+
+  _expr() {
+    return this._sum();
+  }
 
 //a+b+...
-_sum() {
-  var v = this._prod();
-  while (this._next() === '+' || this._next() === '-') {
-    switch (this._consumeNext()) { // NOSONAR
-      case '+':
-        v = v + this._prod();
-        break;
-      case '-':
-        v = v - this._prod();
-        break;
+  _sum() {
+    var v = this._prod();
+    while (this._next() === '+' || this._next() === '-') {
+      switch (this._consumeNext()) { // NOSONAR
+        case '+':
+          v = v + this._prod();
+          break;
+        case '-':
+          v = v - this._prod();
+          break;
+      }
     }
-  }
-  return v;
-}
-
-//a*b*...
-_prod() {
-  var v = this._unary();
-  while (this._next() === '*' || this._next() === '/') {
-    switch (this._consumeNext()) { // NOSONAR
-      case '*':
-        v = v * this._unary();
-        break;
-      case '/':
-        v = v / this._unary();
-        break;
-    }
-  }
-  return v;
-}
-
-//[+-]123, [+-](a)
-_unary() {
-  var qualifier = 1;
-  if (this._next() === '+') {
-    this._consumeNext();
-  } else if (this._next() === '-') {
-    this._consumeNext();
-    qualifier = -1;
-  }
-  var v;
-  if ((v = this._group()) !== undefined) {
-    return qualifier * v;
-  }
-  //must be num
-  v = this._consumeNext();
-  return qualifier * v;
-}
-
-//(a)
-_group() {
-  if (this._next() === '(') {
-    this._consumeNext();
-    var v = this._expr();
-    if (this._next() !== ')') {
-      throw 'missing closing bracket';
-    }
-    this._consumeNext();
     return v;
   }
-  return undefined;
-}
+
+//a*b*...
+  _prod() {
+    var v = this._unary();
+    while (this._next() === '*' || this._next() === '/') {
+      switch (this._consumeNext()) { // NOSONAR
+        case '*':
+          v = v * this._unary();
+          break;
+        case '/':
+          v = v / this._unary();
+          break;
+      }
+    }
+    return v;
+  }
+
+//[+-]123, [+-](a)
+  _unary() {
+    var qualifier = 1;
+    if (this._next() === '+') {
+      this._consumeNext();
+    } else if (this._next() === '-') {
+      this._consumeNext();
+      qualifier = -1;
+    }
+    var v;
+    if ((v = this._group()) !== undefined) {
+      return qualifier * v;
+    }
+    //must be num
+    v = this._consumeNext();
+    return qualifier * v;
+  }
+
+//(a)
+  _group() {
+    if (this._next() === '(') {
+      this._consumeNext();
+      var v = this._expr();
+      if (this._next() !== ')') {
+        throw 'missing closing bracket';
+      }
+      this._consumeNext();
+      return v;
+    }
+    return undefined;
+  }
 }

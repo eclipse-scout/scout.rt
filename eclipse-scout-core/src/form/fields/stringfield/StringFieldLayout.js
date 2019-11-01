@@ -13,15 +13,15 @@ import {graphics} from '../../../index';
 
 export default class StringFieldLayout extends FormFieldLayout {
 
-constructor(stringField) {
-  super( stringField);
-}
-
-
-_layoutClearIcon(formField, fieldBounds, right, top) {
-  if (formField.$icon && formField.$icon.isVisible()) {
-    right += graphics.prefSize(formField.$icon, true).width;
+  constructor(stringField) {
+    super(stringField);
   }
-  super._layoutClearIcon( formField, fieldBounds, right, top);
-}
+
+
+  _layoutClearIcon(formField, fieldBounds, right, top) {
+    if (formField.$icon && formField.$icon.isVisible()) {
+      right += graphics.prefSize(formField.$icon, true).width;
+    }
+    super._layoutClearIcon(formField, fieldBounds, right, top);
+  }
 }

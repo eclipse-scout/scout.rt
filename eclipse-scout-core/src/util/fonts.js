@@ -14,7 +14,6 @@ import * as $ from 'jquery';
 import {scout} from '../index';
 
 
-
 let _deferred = $.Deferred();
 
 /**
@@ -284,7 +283,7 @@ export function autoDetectFonts() {
       // In some browsers, access to style sheets of other origins is blocked:
       // https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet#Notes
       $.log.info('Skipped automatic font detection for style sheet ' + styleSheet.href +
-          ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.');
+        ' (access blocked by browser). Use the bootstrap argument "fonts" to manually list fonts to pre-load.');
       continue;
     }
     for (var j = 0; j < styleSheet.cssRules.length; j++) {

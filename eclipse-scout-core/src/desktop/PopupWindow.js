@@ -19,118 +19,118 @@ import {Dimension} from '../index';
 
 export default class PopupWindow {
 
-constructor(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
-  this.myWindow = myWindow;
-  this.form = form;
-  this.session = form.session;
-  this.events = new EventSupport();
-  this.initialized = false;
-  this.$container;
-  this.htmlComp;
+  constructor(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
+    this.myWindow = myWindow;
+    this.form = form;
+    this.session = form.session;
+    this.events = new EventSupport();
+    this.initialized = false;
+    this.$container;
+    this.htmlComp;
 
-  // link Form instance with this popupWindow instance
-  // this is required when form (and popup-window) is closed by the model
-  form.popupWindow = this;
+    // link Form instance with this popupWindow instance
+    // this is required when form (and popup-window) is closed by the model
+    form.popupWindow = this;
 
-  // link Window instance with this popupWindow instance
-  // this is required when we want to check if a certain DOM element belongs
-  // to a popup window
-  myWindow.popupWindow = this;
-  myWindow.name = 'Scout popup-window ' + form.modelClass;
-}
-
-_onUnload() {
-  $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
-  if (this.form.destroyed) {
-    $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
-  } else {
-    this.events.trigger('popupWindowUnload', this);
-  }
-}
-
-_onReady() {
-  // set container (used as document-root from callers)
-  var myDocument = this.myWindow.document,
-    $myWindow = $(this.myWindow),
-    $myDocument = $(myDocument);
-
-  // Install polyfills on new window
-  polyfills.install(this.myWindow);
-  scout.prepareDOM(myDocument);
-
-  this.$container = $('.scout', myDocument);
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new SingleLayout());
-  this.$container.height($myWindow.height());
-  this.form.render(this.$container);
-
-  // resize browser-window before layout?
-  if (this.resizeToPrefSize) {
-    var prefSize = this.htmlComp.prefSize(),
-      // we cannot simply set the pref. size of the component as window size,
-      // since the window "chrome" (window-border, -title and location bar)
-      // occupies some space. That's why we measure the difference between
-      // the current document size and the window size first.
-      myWindowSize = new Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
-      myDocumentSize = new Dimension($myDocument.width(), $myDocument.height()),
-      windowChromeHoriz = myWindowSize.width - myDocumentSize.width,
-      windowChromeVert = myWindowSize.height - myDocumentSize.height;
-
-    this.myWindow.resizeTo(prefSize.width + windowChromeHoriz, prefSize.height + windowChromeVert);
-    this.resizeToPrefSize = false;
-  }
-  this.form.htmlComp.validateLayout();
-
-  // Must register some top-level keystroke- and mouse-handlers on popup-window
-  // We do the same thing here, as with the $entryPoint of the main window
-  this.session.keyStrokeManager.installTopLevelKeyStrokeHandlers(this.$container);
-  this.session.focusManager.installTopLevelMouseHandlers(this.$container);
-  scout.installGlobalMouseDownInterceptor(myDocument);
-
-  // Attach event handlers on window
-  $(this.myWindow)
-    .on('unload', this._onUnload.bind(this))
-    .on('resize', this._onResize.bind(this));
-
-  // Delegate uncaught JavaScript errors in the popup-window to the main-window
-  if (this.myWindow.opener) {
-    this.myWindow.onerror = this.myWindow.opener.onerror;
+    // link Window instance with this popupWindow instance
+    // this is required when we want to check if a certain DOM element belongs
+    // to a popup window
+    myWindow.popupWindow = this;
+    myWindow.name = 'Scout popup-window ' + form.modelClass;
   }
 
-  // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
-  this.initialized = true;
-  this.events.trigger('init');
-}
+  _onUnload() {
+    $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
+    if (this.form.destroyed) {
+      $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
+    } else {
+      this.events.trigger('popupWindowUnload', this);
+    }
+  }
+
+  _onReady() {
+    // set container (used as document-root from callers)
+    var myDocument = this.myWindow.document,
+      $myWindow = $(this.myWindow),
+      $myDocument = $(myDocument);
+
+    // Install polyfills on new window
+    polyfills.install(this.myWindow);
+    scout.prepareDOM(myDocument);
+
+    this.$container = $('.scout', myDocument);
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new SingleLayout());
+    this.$container.height($myWindow.height());
+    this.form.render(this.$container);
+
+    // resize browser-window before layout?
+    if (this.resizeToPrefSize) {
+      var prefSize = this.htmlComp.prefSize(),
+        // we cannot simply set the pref. size of the component as window size,
+        // since the window "chrome" (window-border, -title and location bar)
+        // occupies some space. That's why we measure the difference between
+        // the current document size and the window size first.
+        myWindowSize = new Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
+        myDocumentSize = new Dimension($myDocument.width(), $myDocument.height()),
+        windowChromeHoriz = myWindowSize.width - myDocumentSize.width,
+        windowChromeVert = myWindowSize.height - myDocumentSize.height;
+
+      this.myWindow.resizeTo(prefSize.width + windowChromeHoriz, prefSize.height + windowChromeVert);
+      this.resizeToPrefSize = false;
+    }
+    this.form.htmlComp.validateLayout();
+
+    // Must register some top-level keystroke- and mouse-handlers on popup-window
+    // We do the same thing here, as with the $entryPoint of the main window
+    this.session.keyStrokeManager.installTopLevelKeyStrokeHandlers(this.$container);
+    this.session.focusManager.installTopLevelMouseHandlers(this.$container);
+    scout.installGlobalMouseDownInterceptor(myDocument);
+
+    // Attach event handlers on window
+    $(this.myWindow)
+      .on('unload', this._onUnload.bind(this))
+      .on('resize', this._onResize.bind(this));
+
+    // Delegate uncaught JavaScript errors in the popup-window to the main-window
+    if (this.myWindow.opener) {
+      this.myWindow.onerror = this.myWindow.opener.onerror;
+    }
+
+    // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
+    this.initialized = true;
+    this.events.trigger('init');
+  }
 
 // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
 // if we need to do that in a later release we should take a look on the SO-post below:
 // http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
-_onResize() {
-  var $myWindow = $(this.myWindow),
-    width = $myWindow.width(),
-    height = $myWindow.height(),
-    left = this.myWindow.screenX,
-    top = this.myWindow.screenY;
-  $.log.isDebugEnabled() && $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
+  _onResize() {
+    var $myWindow = $(this.myWindow),
+      width = $myWindow.width(),
+      height = $myWindow.height(),
+      left = this.myWindow.screenX,
+      top = this.myWindow.screenY;
+    $.log.isDebugEnabled() && $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
-  this.form.storeCacheBounds(new Rectangle(left, top, width, height));
-  var windowSize = new Dimension($myWindow.width(), $myWindow.height());
-  this.htmlComp.setSize(windowSize);
-}
+    this.form.storeCacheBounds(new Rectangle(left, top, width, height));
+    var windowSize = new Dimension($myWindow.width(), $myWindow.height());
+    this.htmlComp.setSize(windowSize);
+  }
 
-isClosed() {
-  return this.myWindow.closed;
-}
+  isClosed() {
+    return this.myWindow.closed;
+  }
 
-one(type, func) {
-  this.events.one(type, func);
-}
+  one(type, func) {
+    this.events.one(type, func);
+  }
 
-close() {
-  this.myWindow.close();
-}
+  close() {
+    this.myWindow.close();
+  }
 
-title(title) {
-  this.myWindow.document.title = title;
-}
+  title(title) {
+    this.myWindow.document.title = title;
+  }
 }

@@ -12,7 +12,6 @@ import {objects} from '../index';
 import {strings} from '../index';
 
 
-
 /**
  * Ensures the given parameter is an array
  * @memberOf scout.arrays

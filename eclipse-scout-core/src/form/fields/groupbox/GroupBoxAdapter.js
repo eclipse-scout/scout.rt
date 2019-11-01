@@ -14,43 +14,43 @@ import {CompositeFieldAdapter} from '../../../index';
 
 export default class GroupBoxAdapter extends CompositeFieldAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['expanded']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['expanded']);
+  }
 
 
-/**
- * @override
- */
-_initModel(model, parent) {
-  model = super._initModel( model, parent);
-  // Set logical grid to null -> Calculation happens on server side
-  model.logicalGrid = null;
+  /**
+   * @override
+   */
+  _initModel(model, parent) {
+    model = super._initModel(model, parent);
+    // Set logical grid to null -> Calculation happens on server side
+    model.logicalGrid = null;
 
-  return model;
-}
+    return model;
+  }
 
 // Replace method on responsive handler.
-_postCreateWidget() {
-  super._postCreateWidget();
+  _postCreateWidget() {
+    super._postCreateWidget();
 
-  if (this.widget.responsiveHandler) {
-    this.widget.responsiveHandler.setAllowedStates([ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.CONDENSED]);
-    this.widget.responsiveHandler.getGridData = this._getGridData;
-    this.widget.responsiveHandler.setGridData = this._setGridData;
+    if (this.widget.responsiveHandler) {
+      this.widget.responsiveHandler.setAllowedStates([ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.CONDENSED]);
+      this.widget.responsiveHandler.getGridData = this._getGridData;
+      this.widget.responsiveHandler.setGridData = this._setGridData;
+    }
   }
-}
 
-destroy() {
-  super.destroy();
-}
+  destroy() {
+    super.destroy();
+  }
 
-_getGridData(field) {
-  return new GridData(field.gridData);
-}
+  _getGridData(field) {
+    return new GridData(field.gridData);
+  }
 
-_setGridData(field, gridData) {
-  field._setGridData(gridData);
-}
+  _setGridData(field, gridData) {
+    field._setGridData(gridData);
+  }
 }

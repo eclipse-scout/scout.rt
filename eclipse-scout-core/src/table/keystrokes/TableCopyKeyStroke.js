@@ -13,16 +13,16 @@ import {keys} from '../../index';
 
 export default class TableCopyKeyStroke extends KeyStroke {
 
-constructor(table) {
-  super();
-  this.field = table;
-  this.which = [keys.C];
-  this.ctrl = true;
-  this.renderingHints.render = false;
-}
+  constructor(table) {
+    super();
+    this.field = table;
+    this.which = [keys.C];
+    this.ctrl = true;
+    this.renderingHints.render = false;
+  }
 
 
-handle(event) {
-  this.field.exportToClipboard();
-}
+  handle(event) {
+    this.field.exportToClipboard();
+  }
 }

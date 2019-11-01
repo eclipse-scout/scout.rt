@@ -17,37 +17,37 @@ import {HtmlComponent} from '../../../index';
  */
 export default class SmartFieldMultilineLayout extends AbstractLayout {
 
-constructor(smartField) {
-  super();
-  this.smartField = smartField;
+  constructor(smartField) {
+    super();
+    this.smartField = smartField;
 
-  this._initDefaults();
+    this._initDefaults();
 
-  this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
-  this.smartField.one('remove', function() {
-    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
-  }.bind(this));
-}
+    this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
+    HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
+    this.smartField.one('remove', function() {
+      HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
+    }.bind(this));
+  }
 
 
-_initDefaults() {
-  this.rowHeight = HtmlEnvironment.get().formRowHeight;
-}
+  _initDefaults() {
+    this.rowHeight = HtmlEnvironment.get().formRowHeight;
+  }
 
-_onHtmlEnvironmenPropertyChange() {
-  this._initDefaults();
-  this.smartField.invalidateLayoutTree();
-}
+  _onHtmlEnvironmenPropertyChange() {
+    this._initDefaults();
+    this.smartField.invalidateLayoutTree();
+  }
 
-layout($container) {
-  var htmlContainer = HtmlComponent.get($container),
-    $input = $container.children('.multiline-input'),
-    $lines = $container.children('.multiline-lines'),
-    innerSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets());
+  layout($container) {
+    var htmlContainer = HtmlComponent.get($container),
+      $input = $container.children('.multiline-input'),
+      $lines = $container.children('.multiline-lines'),
+      innerSize = htmlContainer.availableSize()
+        .subtract(htmlContainer.insets());
 
-  $input.cssHeight(this.rowHeight);
-  $lines.cssHeight(innerSize.height - this.rowHeight);
-}
+    $input.cssHeight(this.rowHeight);
+    $lines.cssHeight(innerSize.height - this.rowHeight);
+  }
 }

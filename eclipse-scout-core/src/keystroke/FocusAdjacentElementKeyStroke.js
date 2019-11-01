@@ -13,37 +13,37 @@ import {KeyStroke} from '../index';
 
 export default class FocusAdjacentElementKeyStroke extends KeyStroke {
 
-constructor(session, field) {
-  super();
-  this.session = session;
-  this.field = field;
-  this.which = [keys.LEFT, keys.RIGHT];
-  this.renderingHints.render = false;
-  this.stopPropagation = true;
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
-
-
-handle(event) {
-  var activeElement = this.field.$container.activeElement(true),
-    $focusableElements = this.field.$container.find(':focusable');
-
-  switch (event.which) { // NOSONAR
-    case keys.RIGHT:
-      if (activeElement === $focusableElements.last()[0]) {
-        this.session.focusManager.requestFocus($focusableElements.first());
-      } else {
-        this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) + 1]);
-      }
-
-      break;
-    case keys.LEFT:
-      if (activeElement === $focusableElements.first()[0]) {
-        this.session.focusManager.requestFocus($focusableElements.last());
-      } else {
-        this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) - 1]);
-      }
-      break;
+  constructor(session, field) {
+    super();
+    this.session = session;
+    this.field = field;
+    this.which = [keys.LEFT, keys.RIGHT];
+    this.renderingHints.render = false;
+    this.stopPropagation = true;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
-}
+
+
+  handle(event) {
+    var activeElement = this.field.$container.activeElement(true),
+      $focusableElements = this.field.$container.find(':focusable');
+
+    switch (event.which) { // NOSONAR
+      case keys.RIGHT:
+        if (activeElement === $focusableElements.last()[0]) {
+          this.session.focusManager.requestFocus($focusableElements.first());
+        } else {
+          this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) + 1]);
+        }
+
+        break;
+      case keys.LEFT:
+        if (activeElement === $focusableElements.first()[0]) {
+          this.session.focusManager.requestFocus($focusableElements.last());
+        } else {
+          this.session.focusManager.requestFocus($focusableElements[$focusableElements.index(activeElement) - 1]);
+        }
+        break;
+    }
+  }
 }

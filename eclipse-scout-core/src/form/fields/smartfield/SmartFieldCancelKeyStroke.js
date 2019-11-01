@@ -16,35 +16,35 @@ import {KeyStroke} from '../../../index';
  */
 export default class SmartFieldCancelKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.ESC];
-  this.stopPropagation = true;
-  this.preventInvokeAcceptInputOnActiveValueField = true;
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.ESC];
+    this.stopPropagation = true;
+    this.preventInvokeAcceptInputOnActiveValueField = true;
 
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$fieldContainer;
-  }.bind(this);
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$fieldContainer;
+    }.bind(this);
   }
-  if (!this.field.popup) {
-    return false;
-  }
-  return true;
-}
 
-/**
- * @override
- */
-handle(event) {
-  this.field.closePopup();
-  this.field.resetDisplayText();
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    if (!this.field.popup) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  handle(event) {
+    this.field.closePopup();
+    this.field.resetDisplayText();
+  }
 }

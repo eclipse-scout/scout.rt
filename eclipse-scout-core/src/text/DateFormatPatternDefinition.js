@@ -73,85 +73,85 @@ import {DateFormatPatternType} from '../index';
  */
 export default class DateFormatPatternDefinition {
 
-constructor(options) { // NOSONAR
-  options = options || {};
-  this.type = options.type;
-  this.terms = options.terms;
-  this.dateFormat = options.dateFormat;
-  this.formatFunction = options.formatFunction && options.formatFunction.bind(this);
-  this.parseRegExp = options.parseRegExp;
-  this.applyMatchFunction = options.applyMatchFunction && options.applyMatchFunction.bind(this);
-  this.parseFunction = options.parseFunction && options.parseFunction.bind(this);
-}
-
-createFormatFunction(acceptedTerm) {
-  return function(formatContext) {
-    if (this.formatFunction) {
-      var result = this.formatFunction(formatContext, acceptedTerm);
-      if (result !== undefined) { // convenience
-        formatContext.formattedString += result;
-      }
-    }
-  }.bind(this);
-}
-
-createParseFunction(acceptedTerm) {
-  return function(parseContext) {
-    var m, parsedTerm, match;
-
-    var success = false;
-    if (this.parseRegExp) {
-      // RegEx handling (default)
-      m = this.parseRegExp.exec(parseContext.inputString);
-      if (m) { // match found
-        if (this.applyMatchFunction) {
-          this.applyMatchFunction(parseContext, m[1], acceptedTerm);
-        }
-        match = m[1];
-        // update remaining string
-        parseContext.inputString = m[2];
-        success = true;
-      }
-    }
-    if (!success && this.parseFunction) {
-      // Custom function
-      match = this.parseFunction(parseContext, acceptedTerm);
-      if (match !== null) {
-        success = true;
-      }
-    }
-
-    if (success) {
-      // If patternDefinition accepts more than one term, try to choose
-      // the form that matches the length of the match.
-      parsedTerm = this.terms[0];
-      if (this.terms.length > 1) {
-        this.terms.some(function(term) {
-          if (term.length === match.length) {
-            parsedTerm = term;
-            return true; // found
-          }
-          return false; // look further
-        });
-      }
-      parseContext.parsedPattern += parsedTerm;
-    }
-    return success;
-  }.bind(this);
-}
-
-/**
- * @return the accepted term (if is accepted) or null (if it is not accepted)
- */
-accept(term) {
-  if (term) {
-    // Check if one of the terms matches
-    for (var i = 0; i < this.terms.length; i++) {
-      if (term === this.terms[i]) {
-        return this.terms[i];
-      }
-    }
+  constructor(options) { // NOSONAR
+    options = options || {};
+    this.type = options.type;
+    this.terms = options.terms;
+    this.dateFormat = options.dateFormat;
+    this.formatFunction = options.formatFunction && options.formatFunction.bind(this);
+    this.parseRegExp = options.parseRegExp;
+    this.applyMatchFunction = options.applyMatchFunction && options.applyMatchFunction.bind(this);
+    this.parseFunction = options.parseFunction && options.parseFunction.bind(this);
   }
-  return null;
-}
+
+  createFormatFunction(acceptedTerm) {
+    return function(formatContext) {
+      if (this.formatFunction) {
+        var result = this.formatFunction(formatContext, acceptedTerm);
+        if (result !== undefined) { // convenience
+          formatContext.formattedString += result;
+        }
+      }
+    }.bind(this);
+  }
+
+  createParseFunction(acceptedTerm) {
+    return function(parseContext) {
+      var m, parsedTerm, match;
+
+      var success = false;
+      if (this.parseRegExp) {
+        // RegEx handling (default)
+        m = this.parseRegExp.exec(parseContext.inputString);
+        if (m) { // match found
+          if (this.applyMatchFunction) {
+            this.applyMatchFunction(parseContext, m[1], acceptedTerm);
+          }
+          match = m[1];
+          // update remaining string
+          parseContext.inputString = m[2];
+          success = true;
+        }
+      }
+      if (!success && this.parseFunction) {
+        // Custom function
+        match = this.parseFunction(parseContext, acceptedTerm);
+        if (match !== null) {
+          success = true;
+        }
+      }
+
+      if (success) {
+        // If patternDefinition accepts more than one term, try to choose
+        // the form that matches the length of the match.
+        parsedTerm = this.terms[0];
+        if (this.terms.length > 1) {
+          this.terms.some(function(term) {
+            if (term.length === match.length) {
+              parsedTerm = term;
+              return true; // found
+            }
+            return false; // look further
+          });
+        }
+        parseContext.parsedPattern += parsedTerm;
+      }
+      return success;
+    }.bind(this);
+  }
+
+  /**
+   * @return the accepted term (if is accepted) or null (if it is not accepted)
+   */
+  accept(term) {
+    if (term) {
+      // Check if one of the terms matches
+      for (var i = 0; i < this.terms.length; i++) {
+        if (term === this.terms[i]) {
+          return this.terms[i];
+        }
+      }
+    }
+    return null;
+  }
 }

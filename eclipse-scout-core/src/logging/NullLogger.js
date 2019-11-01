@@ -20,100 +20,100 @@ import {strings} from '../index';
  */
 export default class NullLogger {
 
-constructor() {
-}
-
-trace() {
-  // NOP - don't log trace, we don't want to spam the browser console
-}
-
-debug() {
-  // NOP - don't log debug, we don't want to spam the browser console
-}
-
-info() {
-  this._log('info', objects.argumentsToArray(arguments));
-}
-
-warn() {
-  this._log('warn', objects.argumentsToArray(arguments));
-}
-
-error(logArgs) {
-  this._log('error', objects.argumentsToArray(arguments));
-}
-
-fatal(logArgs) {
-  this._log('fatal', objects.argumentsToArray(arguments));
-}
-
-isEnabledFor() {
-  return false;
-}
-
-isTraceEnabled() {
-  return false;
-}
-
-isDebugEnabled() {
-  return false;
-}
-
-isInfoEnabled() {
-  return false;
-}
-
-isWarnEnabled() {
-  return false;
-}
-
-isErrorEnabled() {
-  return false;
-}
-
-isFatalEnabled() {
-  return false;
-}
-
-_log(level, logArgs) {
-  // check if console is available
-  var myConsole = objects.optProperty(window, 'console');
-  if (!myConsole) {
-    return;
+  constructor() {
   }
 
-  // map level to log function
-  var funcName;
-  if ('fatal' === level) {
-    funcName = 'error';
-  } else {
-    funcName = level;
+  trace() {
+    // NOP - don't log trace, we don't want to spam the browser console
   }
 
-  // check if log function exists on console
-  var logFunc = myConsole[funcName];
-  if (!logFunc) {
-    return;
+  debug() {
+    // NOP - don't log debug, we don't want to spam the browser console
   }
 
-  // log the message
-  if (logArgs.length > 0) {
-    logArgs[0] = this._formatTime() + ' [' + level.toUpperCase() + '] ' + logArgs[0];
+  info() {
+    this._log('info', objects.argumentsToArray(arguments));
   }
-  try {
-    logFunc.apply(myConsole, logArgs);
-  } catch (e) {
-    // NOP - this seems a bit paranoid, because we've already checked that the error function exists,
-    // but some restrictive security settings in Internet Explorer may cause an Error when the function
-    // is called. Our logger should not produce additional errors #249626.
-  }
-}
 
-_formatTime() {
-  var date = new Date();
-  return strings.padZeroLeft(date.getHours(), 2) + ':' +
-    strings.padZeroLeft(date.getMinutes(), 2) + ':' +
-    strings.padZeroLeft(date.getSeconds(), 2) + '.' +
-    strings.padZeroLeft(date.getMilliseconds(), 3);
-}
+  warn() {
+    this._log('warn', objects.argumentsToArray(arguments));
+  }
+
+  error(logArgs) {
+    this._log('error', objects.argumentsToArray(arguments));
+  }
+
+  fatal(logArgs) {
+    this._log('fatal', objects.argumentsToArray(arguments));
+  }
+
+  isEnabledFor() {
+    return false;
+  }
+
+  isTraceEnabled() {
+    return false;
+  }
+
+  isDebugEnabled() {
+    return false;
+  }
+
+  isInfoEnabled() {
+    return false;
+  }
+
+  isWarnEnabled() {
+    return false;
+  }
+
+  isErrorEnabled() {
+    return false;
+  }
+
+  isFatalEnabled() {
+    return false;
+  }
+
+  _log(level, logArgs) {
+    // check if console is available
+    var myConsole = objects.optProperty(window, 'console');
+    if (!myConsole) {
+      return;
+    }
+
+    // map level to log function
+    var funcName;
+    if ('fatal' === level) {
+      funcName = 'error';
+    } else {
+      funcName = level;
+    }
+
+    // check if log function exists on console
+    var logFunc = myConsole[funcName];
+    if (!logFunc) {
+      return;
+    }
+
+    // log the message
+    if (logArgs.length > 0) {
+      logArgs[0] = this._formatTime() + ' [' + level.toUpperCase() + '] ' + logArgs[0];
+    }
+    try {
+      logFunc.apply(myConsole, logArgs);
+    } catch (e) {
+      // NOP - this seems a bit paranoid, because we've already checked that the error function exists,
+      // but some restrictive security settings in Internet Explorer may cause an Error when the function
+      // is called. Our logger should not produce additional errors #249626.
+    }
+  }
+
+  _formatTime() {
+    var date = new Date();
+    return strings.padZeroLeft(date.getHours(), 2) + ':' +
+      strings.padZeroLeft(date.getMinutes(), 2) + ':' +
+      strings.padZeroLeft(date.getSeconds(), 2) + '.' +
+      strings.padZeroLeft(date.getMilliseconds(), 3);
+  }
 }

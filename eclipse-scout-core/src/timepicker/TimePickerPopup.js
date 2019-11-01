@@ -16,46 +16,46 @@ import {scout} from '../index';
 
 export default class TimePickerPopup extends Popup {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  options.scrollType = options.scrollType || 'layoutAndPosition';
-  options.withFocusContext = false;
-  super._init( options);
+  _init(options) {
+    options.scrollType = options.scrollType || 'layoutAndPosition';
+    options.withFocusContext = false;
+    super._init(options);
 
-  this.picker = scout.create('TimePicker', {
-    parent: this,
-    timeResolution: options.timeResolution
-  });
-}
+    this.picker = scout.create('TimePicker', {
+      parent: this,
+      timeResolution: options.timeResolution
+    });
+  }
 
-_createLayout() {
-  return new TimePickerPopupLayout(this);
-}
+  _createLayout() {
+    return new TimePickerPopupLayout(this);
+  }
 
-_render() {
-  this.$container = this.$parent.appendDiv('time-picker-popup');
-  this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(this._createLayout());
-  this.htmlComp.validateRoot = true;
-  this.picker.render();
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('time-picker-popup');
+    this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(this._createLayout());
+    this.htmlComp.validateRoot = true;
+    this.picker.render();
+  }
 
-/**
- * @implements DatePickerPopup
- */
-getTimePicker() {
-  return this.picker;
-}
+  /**
+   * @implements DatePickerPopup
+   */
+  getTimePicker() {
+    return this.picker;
+  }
 
-/**
- * @override because the icon is not in the $anchor container.
- */
-_isMouseDownOnAnchor(event) {
-  return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target) || (this.field.$timeClearIcon && this.field.$timeClearIcon.isOrHas(event.target));
-}
+  /**
+   * @override because the icon is not in the $anchor container.
+   */
+  _isMouseDownOnAnchor(event) {
+    return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target) || (this.field.$timeClearIcon && this.field.$timeClearIcon.isOrHas(event.target));
+  }
 }

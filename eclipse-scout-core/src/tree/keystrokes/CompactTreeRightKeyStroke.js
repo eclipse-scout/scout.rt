@@ -13,15 +13,15 @@ import {keys} from '../../index';
 
 export default class CompactTreeRightKeyStroke extends AbstractCompactTreeControlKeyStroke {
 
-constructor(compactProcessTree) {
-  super( compactProcessTree);
-  this.renderingHints.text = '→';
-  this.which = [keys.RIGHT];
-}
+  constructor(compactProcessTree) {
+    super(compactProcessTree);
+    this.renderingHints.text = '→';
+    this.which = [keys.RIGHT];
+  }
 
 
-_findNextNode($currentNode, currentNode) {
-  // Find first process node of next section.
-  return $currentNode.parent().next('.section').children('.section-node').first().data('node');
-}
+  _findNextNode($currentNode, currentNode) {
+    // Find first process node of next section.
+    return $currentNode.parent().next('.section').children('.section-node').first().data('node');
+  }
 }

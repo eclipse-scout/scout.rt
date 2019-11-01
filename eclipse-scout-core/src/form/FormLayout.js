@@ -15,60 +15,60 @@ import * as $ from 'jquery';
 
 export default class FormLayout extends AbstractLayout {
 
-constructor(form) {
-  super();
-  this.form = form;
-}
-
-
-layout($container) {
-  var htmlContainer = HtmlComponent.get($container),
-    htmlRootGb = this._htmlRootGroupBox(),
-    rootGbSize;
-
-  this.form.validateLogicalGrid();
-
-  rootGbSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets())
-    .subtract(htmlRootGb.margins());
-
-  if (this.form.isDialog()) {
-    rootGbSize.height -= this._titleHeight();
+  constructor(form) {
+    super();
+    this.form = form;
   }
 
-  $.log.isTraceEnabled() && $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
-  htmlRootGb.setSize(rootGbSize);
-}
 
-preferredLayoutSize($container, options) {
-  options = options || {};
-  var htmlContainer = HtmlComponent.get($container),
-    htmlRootGb = this._htmlRootGroupBox(),
-    prefSize;
+  layout($container) {
+    var htmlContainer = HtmlComponent.get($container),
+      htmlRootGb = this._htmlRootGroupBox(),
+      rootGbSize;
 
-  this.form.validateLogicalGrid();
+    this.form.validateLogicalGrid();
 
-  var titleHeight = this._titleHeight();
-  if (options.heightHint) {
-    options.heightHint -= titleHeight;
+    rootGbSize = htmlContainer.availableSize()
+      .subtract(htmlContainer.insets())
+      .subtract(htmlRootGb.margins());
+
+    if (this.form.isDialog()) {
+      rootGbSize.height -= this._titleHeight();
+    }
+
+    $.log.isTraceEnabled() && $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
+    htmlRootGb.setSize(rootGbSize);
   }
-  prefSize = htmlRootGb.prefSize(options)
-    .add(htmlContainer.insets())
-    .add(htmlRootGb.margins());
-  prefSize.height += titleHeight;
 
-  return prefSize;
-}
+  preferredLayoutSize($container, options) {
+    options = options || {};
+    var htmlContainer = HtmlComponent.get($container),
+      htmlRootGb = this._htmlRootGroupBox(),
+      prefSize;
 
-_htmlRootGroupBox() {
-  var $rootGroupBox = this.form.$container.children('.root-group-box');
-  return HtmlComponent.get($rootGroupBox);
-}
+    this.form.validateLogicalGrid();
 
-_titleHeight() {
-  if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
-    return graphics.prefSize(this.form.$header, true).height;
+    var titleHeight = this._titleHeight();
+    if (options.heightHint) {
+      options.heightHint -= titleHeight;
+    }
+    prefSize = htmlRootGb.prefSize(options)
+      .add(htmlContainer.insets())
+      .add(htmlRootGb.margins());
+    prefSize.height += titleHeight;
+
+    return prefSize;
   }
-  return 0;
-}
+
+  _htmlRootGroupBox() {
+    var $rootGroupBox = this.form.$container.children('.root-group-box');
+    return HtmlComponent.get($rootGroupBox);
+  }
+
+  _titleHeight() {
+    if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
+      return graphics.prefSize(this.form.$header, true).height;
+    }
+    return 0;
+  }
 }

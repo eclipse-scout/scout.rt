@@ -10,27 +10,27 @@
  */
 export default class WidgetEventTypeFilter {
 
-constructor() {
-  this.filters = [];
-}
+  constructor() {
+    this.filters = [];
+  }
 
-addFilter(filterFunc) {
-  this.filters.push(filterFunc);
-}
+  addFilter(filterFunc) {
+    this.filters.push(filterFunc);
+  }
 
-addFilterForEventType(eventType) {
-  this.filters.push(function(event) {
-    return event.type === eventType;
-  });
-}
+  addFilterForEventType(eventType) {
+    this.filters.push(function(event) {
+      return event.type === eventType;
+    });
+  }
 
-filter(event) {
-  return this.filters.some(function(filterFunc) {
-    return filterFunc(event);
-  });
-}
+  filter(event) {
+    return this.filters.some(function(filterFunc) {
+      return filterFunc(event);
+    });
+  }
 
-reset() {
-  this.filters = [];
-}
+  reset() {
+    this.filters = [];
+  }
 }

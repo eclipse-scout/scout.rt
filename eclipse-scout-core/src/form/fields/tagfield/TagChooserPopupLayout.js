@@ -13,31 +13,31 @@ import {scout} from '../../../index';
 
 export default class TagChooserPopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super( popup);
-  this.doubleCalcPrefSize = false;
-}
+  constructor(popup) {
+    super(popup);
+    this.doubleCalcPrefSize = false;
+  }
 
 
-layout($container) {
-  super.layout( $container);
+  layout($container) {
+    super.layout($container);
 
-  // layout table
-  var htmlComp = this.popup.htmlComp;
-  var size = htmlComp.size().subtract(htmlComp.insets());
-  this.popup.table.htmlComp.setSize(size);
+    // layout table
+    var htmlComp = this.popup.htmlComp;
+    var size = htmlComp.size().subtract(htmlComp.insets());
+    this.popup.table.htmlComp.setSize(size);
 
-  this.popup.position();
-}
+    this.popup.position();
+  }
 
-/**
- * @override AbstractLayout.js
- */
-preferredLayoutSize($container) {
-  var tableHandler = scout.create('TableLayoutResetter', this.popup.table);
-  tableHandler.modifyDom();
-  var prefSize = super.preferredLayoutSize( $container);
-  tableHandler.restoreDom();
-  return prefSize;
-}
+  /**
+   * @override AbstractLayout.js
+   */
+  preferredLayoutSize($container) {
+    var tableHandler = scout.create('TableLayoutResetter', this.popup.table);
+    tableHandler.modifyDom();
+    var prefSize = super.preferredLayoutSize($container);
+    tableHandler.restoreDom();
+    return prefSize;
+  }
 }

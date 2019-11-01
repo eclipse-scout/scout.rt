@@ -16,58 +16,58 @@ import {KeyStroke} from '../index';
  */
 export default class RangeKeyStroke extends KeyStroke {
 
-constructor() {
-  super();
-  this.ranges = [];
-}
-
-
-registerRange(from, to) {
-  this.ranges.push({
-    from: from,
-    to: to
-  });
-}
-
-/**
- * @override KeyStroke.js
- */
-_accept(event) {
-  //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
-  if ((event.ctrlKey || event.metaKey) !== this.ctrl ||
-    event.altKey !== this.alt ||
-    event.shiftKey !== this.shift
-  ) {
-    return false;
+  constructor() {
+    super();
+    this.ranges = [];
   }
 
-  return this.ranges.some(function(range) {
-    return event.which >= this._getRangeFrom(range) && event.which <= this._getRangeTo(range);
-  }, this);
-}
 
-/**
- * @override KeyStroke.js
- */
-keys() {
-  var keys = [];
-  this.ranges.forEach(function(range) {
-    var from = this._getRangeFrom(range);
-    var to = this._getRangeTo(range);
+  registerRange(from, to) {
+    this.ranges.push({
+      from: from,
+      to: to
+    });
+  }
 
-    for (var which = from; which <= to; which++) {
-      keys.push(new Key(this, which));
+  /**
+   * @override KeyStroke.js
+   */
+  _accept(event) {
+    //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
+    if ((event.ctrlKey || event.metaKey) !== this.ctrl ||
+      event.altKey !== this.alt ||
+      event.shiftKey !== this.shift
+    ) {
+      return false;
     }
-  }, this);
 
-  return keys;
-}
+    return this.ranges.some(function(range) {
+      return event.which >= this._getRangeFrom(range) && event.which <= this._getRangeTo(range);
+    }, this);
+  }
 
-_getRangeFrom(range) {
-  return (typeof range.from === 'function' ? range.from() : range.from);
-}
+  /**
+   * @override KeyStroke.js
+   */
+  keys() {
+    var keys = [];
+    this.ranges.forEach(function(range) {
+      var from = this._getRangeFrom(range);
+      var to = this._getRangeTo(range);
 
-_getRangeTo(range) {
-  return (typeof range.to === 'function' ? range.to() : range.to);
-}
+      for (var which = from; which <= to; which++) {
+        keys.push(new Key(this, which));
+      }
+    }, this);
+
+    return keys;
+  }
+
+  _getRangeFrom(range) {
+    return (typeof range.from === 'function' ? range.from() : range.from);
+  }
+
+  _getRangeTo(range) {
+    return (typeof range.to === 'function' ? range.to() : range.to);
+  }
 }

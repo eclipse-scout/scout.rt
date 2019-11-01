@@ -13,21 +13,21 @@ import {keys} from '../../index';
 
 export default class TableSelectAllKeyStroke extends KeyStroke {
 
-constructor(table) {
-  super();
-  this.field = table;
-  this.ctrl = true;
-  this.which = [keys.A];
-  this.renderingHints.offset = 14;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
-  }.bind(this);
-}
+  constructor(table) {
+    super();
+    this.field = table;
+    this.ctrl = true;
+    this.which = [keys.A];
+    this.renderingHints.offset = 14;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
+    }.bind(this);
+  }
 
 
-handle(event) {
-  var table = this.field;
-  table.toggleSelection();
-  table.selectionHandler.lastActionRow = null;
-}
+  handle(event) {
+    var table = this.field;
+    table.toggleSelection();
+    table.selectionHandler.lastActionRow = null;
+  }
 }

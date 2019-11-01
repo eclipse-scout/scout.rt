@@ -14,7 +14,6 @@ import * as $ from 'jquery';
 import {scout} from '../index';
 
 
-
 let modelMap = {};
 
 /**
@@ -27,7 +26,7 @@ export function bootstrap(url) {
 }
 
 //private
- export function _preInit(url, data) {
+export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -88,7 +87,7 @@ export function getExtension(extensionId) {
  * @returns {Object}
  */
 //private
- export function _get(id, type) {
+export function _get(id, type) {
   var model = modelMap[id];
   if (!model) {
     throw new Error('No model map entry found for id \'' + id + '\'');
@@ -216,7 +215,7 @@ export function extend(extension, parentModel) {
  * @returns extension index between 0 and targetArray.length or targetArray.length if no index is found.
  */
 //private
- export function _findExtensionIndex(target, targetArray) {
+export function _findExtensionIndex(target, targetArray) {
   var insertAt = targetArray.length;
   if (target.before) {
     insertAt = arrays.findIndex(targetArray, function(element) {
@@ -250,7 +249,7 @@ export function extend(extension, parentModel) {
  *          extensions to bind
  */
 //private
- export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
+export function _bindExtensionsToBeforeOrAfter(target, extensionsArray) {
   var beforeOrAfter = target.before || target.after;
   if (beforeOrAfter && target.groupWithTarget) {
     extensionsArray.forEach(function(element) {

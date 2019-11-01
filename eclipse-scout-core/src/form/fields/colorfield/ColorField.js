@@ -12,16 +12,16 @@ import {ValueField} from '../../../index';
 
 export default class ColorField extends ValueField {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_render() {
-  this.addContainer(this.$parent, 'color-field');
-  this.addLabel();
-  this.addField(this.$parent.makeDiv('not-implemented').text('not implemented yet'));
-  this.addMandatoryIndicator();
-  this.addStatus();
-}
+  _render() {
+    this.addContainer(this.$parent, 'color-field');
+    this.addLabel();
+    this.addField(this.$parent.makeDiv('not-implemented').text('not implemented yet'));
+    this.addMandatoryIndicator();
+    this.addStatus();
+  }
 }

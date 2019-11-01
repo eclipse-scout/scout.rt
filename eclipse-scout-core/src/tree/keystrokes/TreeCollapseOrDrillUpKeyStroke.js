@@ -13,33 +13,33 @@ import {AbstractTreeNavigationKeyStroke} from '../../index';
 
 export default class TreeCollapseOrDrillUpKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-constructor(tree, modifierBitMask) {
-  super( tree, modifierBitMask);
-  this.which = [keys.SUBTRACT];
-  this.renderingHints.text = '-';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
+  constructor(tree, modifierBitMask) {
+    super(tree, modifierBitMask);
+    this.which = [keys.SUBTRACT];
+    this.renderingHints.text = '-';
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var currentNode = event._treeCurrentNode;
+      if (currentNode.expanded) {
+        return currentNode.$node;
+      } else if (currentNode.parentNode) {
+        return currentNode.parentNode.$node;
+      }
+    }.bind(this);
+  }
+
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    var currentNode = event._treeCurrentNode;
+    return accepted && currentNode && (currentNode.expanded || currentNode.parentNode);
+  }
+
+  handle(event) {
     var currentNode = event._treeCurrentNode;
     if (currentNode.expanded) {
-      return currentNode.$node;
+      this.field.collapseNode(currentNode);
     } else if (currentNode.parentNode) {
-      return currentNode.parentNode.$node;
+      this.selectNodesAndReveal(currentNode.parentNode, true);
     }
-  }.bind(this);
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  var currentNode = event._treeCurrentNode;
-  return accepted && currentNode && (currentNode.expanded || currentNode.parentNode);
-}
-
-handle(event) {
-  var currentNode = event._treeCurrentNode;
-  if (currentNode.expanded) {
-    this.field.collapseNode(currentNode);
-  } else if (currentNode.parentNode) {
-    this.selectNodesAndReveal(currentNode.parentNode, true);
   }
-}
 }

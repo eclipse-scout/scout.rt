@@ -12,23 +12,23 @@ import {ActionAdapter} from '../../index';
 
 export default class TableControlAdapter extends ActionAdapter {
 
-constructor() {
-  super();
-}
-
-
-_goOffline() {
-  if (this.widget.isContentAvailable()) {
-    return;
+  constructor() {
+    super();
   }
-  this._enabledBeforeOffline = this.widget.enabled;
-  this.widget.setEnabled(false);
-}
 
-_goOnline() {
-  if (this.widget.isContentAvailable()) {
-    return;
+
+  _goOffline() {
+    if (this.widget.isContentAvailable()) {
+      return;
+    }
+    this._enabledBeforeOffline = this.widget.enabled;
+    this.widget.setEnabled(false);
   }
-  this.widget.setEnabled(this._enabledBeforeOffline);
-}
+
+  _goOnline() {
+    if (this.widget.isContentAvailable()) {
+      return;
+    }
+    this.widget.setEnabled(this._enabledBeforeOffline);
+  }
 }

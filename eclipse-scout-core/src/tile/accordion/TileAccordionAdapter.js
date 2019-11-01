@@ -12,19 +12,19 @@ import {AccordionAdapter} from '../../index';
 
 export default class TileAccordionAdapter extends AccordionAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-/**
- * @override
- */
-_initProperties(model) {
-  super._initProperties( model);
-  // TileGridAdapter creates a RemoteTileFilter for each grid.
-  // Such filters must not be added to the tile accordion, otherwise no tiles would be visible at all.
-  // Because taking the filters from the group is only necessary for Scout JS usage, it is ok to disable this feature completely.
-  model.takeTileFiltersFromGroup = false;
-}
+  /**
+   * @override
+   */
+  _initProperties(model) {
+    super._initProperties(model);
+    // TileGridAdapter creates a RemoteTileFilter for each grid.
+    // Such filters must not be added to the tile accordion, otherwise no tiles would be visible at all.
+    // Because taking the filters from the group is only necessary for Scout JS usage, it is ok to disable this feature completely.
+    model.takeTileFiltersFromGroup = false;
+  }
 }

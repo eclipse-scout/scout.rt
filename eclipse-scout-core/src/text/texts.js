@@ -13,7 +13,6 @@ import * as $ from 'jquery';
 import {scout} from '../index';
 
 
-
 const TEXT_KEY_REGEX = /\$\{textKey\:([^\}]*)\}/;
 
 let textsByLocale = {};
@@ -24,12 +23,12 @@ export function bootstrap(url) {
 }
 
 //private
- export function _setTextsByLocale (val) {
+export function _setTextsByLocale(val) {
   textsByLocale = val;
 }
 
 //private
- export function _preInit(url, data) {
+export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -111,7 +110,7 @@ export function get(languageTag) {
 }
 
 //private
- export function _get(languageTag) {
+export function _get(languageTag) {
   return textsByLocale[languageTag];
 }
 

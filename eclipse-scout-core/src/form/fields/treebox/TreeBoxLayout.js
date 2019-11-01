@@ -12,8 +12,8 @@ import {LookupBoxLayout} from '../../../index';
 
 export default class TreeBoxLayout extends LookupBoxLayout {
 
-constructor(treeBox, tree, filterBox) {
-  super( treeBox, tree, filterBox);
-}
+  constructor(treeBox, tree, filterBox) {
+    super(treeBox, tree, filterBox);
+  }
 
 }

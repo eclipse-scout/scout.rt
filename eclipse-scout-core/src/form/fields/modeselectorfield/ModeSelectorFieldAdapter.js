@@ -12,24 +12,24 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_createWidget(model) {
-  this._addModeSelector(model);
-  return super._createWidget( model);
-}
+  _createWidget(model) {
+    this._addModeSelector(model);
+    return super._createWidget(model);
+  }
 
-_addModeSelector(model) {
-  model.modeSelector = {
-    objectType: 'ModeSelector'
-  };
-}
+  _addModeSelector(model) {
+    model.modeSelector = {
+      objectType: 'ModeSelector'
+    };
+  }
 
-_postCreateWidget() {
-  this.widget.modeSelector.setModes(this.widget.modes);
-  delete this.widget.modes;
-}
+  _postCreateWidget() {
+    this.widget.modeSelector.setModes(this.widget.modes);
+    delete this.widget.modes;
+  }
 }

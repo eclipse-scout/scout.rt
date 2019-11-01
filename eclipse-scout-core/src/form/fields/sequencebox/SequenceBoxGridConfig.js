@@ -12,16 +12,16 @@ import {LogicalGridConfig} from '../../../index';
 
 export default class SequenceBoxGridConfig extends LogicalGridConfig {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-getGridColumnCount() {
-  return this.widget.fields.length;
-}
+  getGridColumnCount() {
+    return this.widget.fields.length;
+  }
 
-getGridWidgets() {
-  return this.widget.fields;
-}
+  getGridWidgets() {
+    return this.widget.fields;
+  }
 }

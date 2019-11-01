@@ -12,8 +12,8 @@ import {MenuAdapter} from '../index';
 
 export default class FormMenuAdapter extends MenuAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

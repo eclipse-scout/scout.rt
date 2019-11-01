@@ -12,30 +12,30 @@ import {ModelAdapter} from '../../index';
 
 export default class FormFieldAdapter extends ModelAdapter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  /**
-   * Set this property to true when the form-field should stay enabled in offline case.
-   * By default the field will be disabled.
-   */
-  this.enabledWhenOffline = false;
+    /**
+     * Set this property to true when the form-field should stay enabled in offline case.
+     * By default the field will be disabled.
+     */
+    this.enabledWhenOffline = false;
 
-}
-
-
-_goOffline() {
-  if (this.enabledWhenOffline) {
-    return;
   }
-  this._enabledBeforeOffline = this.widget.enabled;
-  this.widget.setEnabled(false);
-}
 
-_goOnline() {
-  if (this.enabledWhenOffline) {
-    return;
+
+  _goOffline() {
+    if (this.enabledWhenOffline) {
+      return;
+    }
+    this._enabledBeforeOffline = this.widget.enabled;
+    this.widget.setEnabled(false);
   }
-  this.widget.setEnabled(this._enabledBeforeOffline);
-}
+
+  _goOnline() {
+    if (this.enabledWhenOffline) {
+      return;
+    }
+    this.widget.setEnabled(this._enabledBeforeOffline);
+  }
 }

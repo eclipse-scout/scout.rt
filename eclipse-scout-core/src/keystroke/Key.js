@@ -12,43 +12,43 @@ import {keys} from '../index';
 
 export default class Key {
 
-constructor(keyStroke, which) {
-  this.keyStroke = keyStroke;
-  this.which = which;
+  constructor(keyStroke, which) {
+    this.keyStroke = keyStroke;
+    this.which = which;
 
-  this.ctrl = keyStroke.ctrl;
-  this.alt = keyStroke.alt;
-  this.shift = keyStroke.shift;
+    this.ctrl = keyStroke.ctrl;
+    this.alt = keyStroke.alt;
+    this.shift = keyStroke.shift;
 
-  this.keyStrokeMode = keyStroke.keyStrokeMode;
-}
-
-render($drawingArea, event) {
-  this.$drawingArea = this.keyStroke.renderKeyBox($drawingArea, event);
-  return !!this.$drawingArea;
-}
-
-remove() {
-  this.keyStroke.removeKeyBox(this.$drawingArea);
-  this.$drawingArea = null;
-}
-
-toKeyStrokeString() {
-  var keyStroke = '';
-  if (this.ctrl) {
-    keyStroke += 'Ctrl-';
+    this.keyStrokeMode = keyStroke.keyStrokeMode;
   }
-  if (this.alt) {
-    keyStroke += 'Alt-';
+
+  render($drawingArea, event) {
+    this.$drawingArea = this.keyStroke.renderKeyBox($drawingArea, event);
+    return !!this.$drawingArea;
   }
-  if (this.shift) {
-    keyStroke += 'Shift-';
+
+  remove() {
+    this.keyStroke.removeKeyBox(this.$drawingArea);
+    this.$drawingArea = null;
   }
-  var key = keys.codesToKeys[this.which];
-  if (key === undefined) {
-    key = this.which;
+
+  toKeyStrokeString() {
+    var keyStroke = '';
+    if (this.ctrl) {
+      keyStroke += 'Ctrl-';
+    }
+    if (this.alt) {
+      keyStroke += 'Alt-';
+    }
+    if (this.shift) {
+      keyStroke += 'Shift-';
+    }
+    var key = keys.codesToKeys[this.which];
+    if (key === undefined) {
+      key = this.which;
+    }
+    keyStroke += key;
+    return keyStroke;
   }
-  keyStroke += key;
-  return keyStroke;
-}
 }

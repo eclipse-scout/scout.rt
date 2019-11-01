@@ -31,193 +31,193 @@ import {scout} from '../index';
  */
 export default class StaticLookupCall extends LookupCall {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.delay = 0; // delay in [ms]
-  this.data = null;
-  this.active = true;
-}
-
-
-static MAX_ROW_COUNT = 100;
-
-_init(model) {
-  super._init( model);
-  if (!this.data) {
-    // data may either be provided by the model or by implementing the _data function
-    this.data = this._data();
+    this.delay = 0; // delay in [ms]
+    this.data = null;
+    this.active = true;
   }
-}
 
-refreshData(data) {
-  if (data === undefined) {
-    this.data = this._data();
-  } else {
-    this.data = data;
+
+  static MAX_ROW_COUNT = 100;
+
+  _init(model) {
+    super._init(model);
+    if (!this.data) {
+      // data may either be provided by the model or by implementing the _data function
+      this.data = this._data();
+    }
   }
-}
 
-_getAll() {
-  var deferred = $.Deferred();
-  setTimeout(this._queryByAll.bind(this, deferred), this.delay);
-  return deferred.promise();
-}
-
-_queryByAll(deferred) {
-  deferred.resolve({
-    queryBy: QueryBy.ALL,
-    lookupRows: this._lookupRowsByAll()
-  });
-}
-
-_lookupRowsByAll() {
-  var datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
-  return datas
-    .map(this._dataToLookupRow, this)
-    .filter(this._filterActiveLookupRow, this);
-}
-
-_filterActiveLookupRow(dataRow) {
-  if (objects.isNullOrUndefined(this.active)) {
-    return true;
+  refreshData(data) {
+    if (data === undefined) {
+      this.data = this._data();
+    } else {
+      this.data = data;
+    }
   }
-  return this.active === scout.nvl(dataRow.active, true);
-}
 
-_getByText(text) {
-  var deferred = $.Deferred();
-  setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
-  return deferred.promise();
-}
+  _getAll() {
+    var deferred = $.Deferred();
+    setTimeout(this._queryByAll.bind(this, deferred), this.delay);
+    return deferred.promise();
+  }
 
-_queryByText(deferred, text) {
-  var lookupRows = this._lookupRowsByText(text);
-
-  // resolve non-hierarchical results immediately
-  if (!this.hierarchical) {
+  _queryByAll(deferred) {
     deferred.resolve({
-      queryBy: QueryBy.TEXT,
-      text: text,
-      lookupRows: lookupRows
+      queryBy: QueryBy.ALL,
+      lookupRows: this._lookupRowsByAll()
     });
   }
 
-  // if loadIncremental=false we must also load children
-  var promise, builder = new HierarchicalLookupResultBuilder(this);
-  if (this.loadIncremental) {
-    promise = $.resolvedPromise(lookupRows);
-  } else {
-    promise = builder.addChildLookupRows(lookupRows);
+  _lookupRowsByAll() {
+    var datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
+    return datas
+      .map(this._dataToLookupRow, this)
+      .filter(this._filterActiveLookupRow, this);
   }
 
-  // hierarchical lookups must first load their parent nodes
-  // before we can resolve the results
-  promise
-    .then(function(lookupRows) {
-      return builder.addParentLookupRows(lookupRows);
-    })
-    .done(function(lookupRows) {
+  _filterActiveLookupRow(dataRow) {
+    if (objects.isNullOrUndefined(this.active)) {
+      return true;
+    }
+    return this.active === scout.nvl(dataRow.active, true);
+  }
+
+  _getByText(text) {
+    var deferred = $.Deferred();
+    setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
+    return deferred.promise();
+  }
+
+  _queryByText(deferred, text) {
+    var lookupRows = this._lookupRowsByText(text);
+
+    // resolve non-hierarchical results immediately
+    if (!this.hierarchical) {
       deferred.resolve({
         queryBy: QueryBy.TEXT,
         text: text,
         lookupRows: lookupRows
       });
-    }.bind(this))
-    .fail(function(error) {
-      throw error;
-    });
-}
-
-_lookupRowsByText(text) {
-  var datas = this.data.filter(function(data) {
-    return strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
-  });
-  return datas
-    .map(this._dataToLookupRow, this)
-    .filter(this._filterActiveLookupRow, this);
-}
-
-_getByKey(key) {
-  var deferred = $.Deferred();
-  setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
-  return deferred.promise();
-}
-
-_queryByKey(deferred, key) {
-  var lookupRow = this._lookupRowByKey(key);
-  if (lookupRow) {
-    deferred.resolve({
-      queryBy: QueryBy.KEY,
-      lookupRows: [lookupRow]
-    });
-  } else {
-    deferred.reject();
-  }
-}
-
-_lookupRowByKey(key) {
-  var data = arrays.find(this.data, function(data) {
-    return data[0] === key;
-  });
-  if (!data) {
-    return null;
-  }
-  return this._dataToLookupRow(data);
-}
-
-_getByRec(rec) {
-  var deferred = $.Deferred();
-  setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
-  return deferred.promise();
-}
-
-_queryByRec(deferred, rec) {
-  deferred.resolve({
-    queryBy: QueryBy.REC,
-    rec: rec,
-    lookupRows: this._lookupRowsByRec(rec)
-  });
-}
-
-_lookupRowsByRec(rec) {
-  return this.data.reduce(function(aggr, data) {
-    if (data[2] === rec) {
-      aggr.push(this._dataToLookupRow(data));
     }
-    return aggr;
-  }.bind(this), [])
-  .filter(this._filterActiveLookupRow, this);
-}
 
-setDelay(delay) {
-  this.delay = delay;
-}
+    // if loadIncremental=false we must also load children
+    var promise, builder = new HierarchicalLookupResultBuilder(this);
+    if (this.loadIncremental) {
+      promise = $.resolvedPromise(lookupRows);
+    } else {
+      promise = builder.addChildLookupRows(lookupRows);
+    }
 
-/**
- * Implement this function to convert a single data array into an instance of LookupRow.
- */
-_dataToLookupRow(data) {
-  var lookupRow = scout.create('LookupRow', {
-    key: data[0],
-    text: data[1],
-    parentKey: data[2]
-  });
-  return lookupRow;
-}
+    // hierarchical lookups must first load their parent nodes
+    // before we can resolve the results
+    promise
+      .then(function(lookupRows) {
+        return builder.addParentLookupRows(lookupRows);
+      })
+      .done(function(lookupRows) {
+        deferred.resolve({
+          queryBy: QueryBy.TEXT,
+          text: text,
+          lookupRows: lookupRows
+        });
+      }.bind(this))
+      .fail(function(error) {
+        throw error;
+      });
+  }
 
-/**
- * Implement this function to provide static data. The data should be an array of arrays,
- * where the inner array contains the values required to create a LookupRow. By
- * default the first two elements of the array are mandatory, the others are optional:
- *
- *   0: Key
- *   1: Text
- *   2: ParentKey (optional)
- *
- * When your data contains more elements you must also implement the _dataToLookupRow() function.
- */
-_data() {
-  return [];
-}
+  _lookupRowsByText(text) {
+    var datas = this.data.filter(function(data) {
+      return strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
+    });
+    return datas
+      .map(this._dataToLookupRow, this)
+      .filter(this._filterActiveLookupRow, this);
+  }
+
+  _getByKey(key) {
+    var deferred = $.Deferred();
+    setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
+    return deferred.promise();
+  }
+
+  _queryByKey(deferred, key) {
+    var lookupRow = this._lookupRowByKey(key);
+    if (lookupRow) {
+      deferred.resolve({
+        queryBy: QueryBy.KEY,
+        lookupRows: [lookupRow]
+      });
+    } else {
+      deferred.reject();
+    }
+  }
+
+  _lookupRowByKey(key) {
+    var data = arrays.find(this.data, function(data) {
+      return data[0] === key;
+    });
+    if (!data) {
+      return null;
+    }
+    return this._dataToLookupRow(data);
+  }
+
+  _getByRec(rec) {
+    var deferred = $.Deferred();
+    setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
+    return deferred.promise();
+  }
+
+  _queryByRec(deferred, rec) {
+    deferred.resolve({
+      queryBy: QueryBy.REC,
+      rec: rec,
+      lookupRows: this._lookupRowsByRec(rec)
+    });
+  }
+
+  _lookupRowsByRec(rec) {
+    return this.data.reduce(function(aggr, data) {
+      if (data[2] === rec) {
+        aggr.push(this._dataToLookupRow(data));
+      }
+      return aggr;
+    }.bind(this), [])
+      .filter(this._filterActiveLookupRow, this);
+  }
+
+  setDelay(delay) {
+    this.delay = delay;
+  }
+
+  /**
+   * Implement this function to convert a single data array into an instance of LookupRow.
+   */
+  _dataToLookupRow(data) {
+    var lookupRow = scout.create('LookupRow', {
+      key: data[0],
+      text: data[1],
+      parentKey: data[2]
+    });
+    return lookupRow;
+  }
+
+  /**
+   * Implement this function to provide static data. The data should be an array of arrays,
+   * where the inner array contains the values required to create a LookupRow. By
+   * default the first two elements of the array are mandatory, the others are optional:
+   *
+   *   0: Key
+   *   1: Text
+   *   2: ParentKey (optional)
+   *
+   * When your data contains more elements you must also implement the _dataToLookupRow() function.
+   */
+  _data() {
+    return [];
+  }
 }

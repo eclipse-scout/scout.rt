@@ -13,33 +13,33 @@ import {keys} from '../../index';
 
 export default class MenuBarLeftKeyStroke extends KeyStroke {
 
-constructor(menuBar) {
-  super();
-  this.field = menuBar;
-  this.which = [keys.LEFT];
-  this.renderingHints.render = false;
-  this.stopPropagation = true;
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
+  constructor(menuBar) {
+    super();
+    this.field = menuBar;
+    this.which = [keys.LEFT];
+    this.renderingHints.render = false;
+    this.stopPropagation = true;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
+  }
 
 
-handle(event) {
-  var menuItems = this.field.orderedMenuItems.all,
-    $menuItemFocused = this.field.$container.find(':focus'),
-    i, menuItem, lastValidItem;
+  handle(event) {
+    var menuItems = this.field.orderedMenuItems.all,
+      $menuItemFocused = this.field.$container.find(':focus'),
+      i, menuItem, lastValidItem;
 
-  for (i = 0; i < menuItems.length; i++) {
-    menuItem = menuItems[i];
-    if ($menuItemFocused[0] === menuItem.$container[0]) {
-      if (lastValidItem) {
-        this.field.setTabbableMenu(lastValidItem);
-        lastValidItem.focus();
+    for (i = 0; i < menuItems.length; i++) {
+      menuItem = menuItems[i];
+      if ($menuItemFocused[0] === menuItem.$container[0]) {
+        if (lastValidItem) {
+          this.field.setTabbableMenu(lastValidItem);
+          lastValidItem.focus();
+        }
+        break;
       }
-      break;
-    }
-    if (menuItem.isTabTarget()) {
-      lastValidItem = menuItem;
+      if (menuItem.isTabTarget()) {
+        lastValidItem = menuItem;
+      }
     }
   }
-}
 }

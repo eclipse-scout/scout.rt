@@ -12,34 +12,34 @@ import {dates} from '../index';
 
 export default class DateRange {
 
-constructor(from, to) {
-  this.from = from;
-  this.to = to;
-}
-
-equals(other) {
-  if (!other) {
-    return false;
+  constructor(from, to) {
+    this.from = from;
+    this.to = to;
   }
-  return dates.equals(this.from, other.from) &&
-    dates.equals(this.to, other.to);
-}
 
-toString() {
-  return 'scout.DateRange[' +
-    'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
-    ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
-}
+  equals(other) {
+    if (!other) {
+      return false;
+    }
+    return dates.equals(this.from, other.from) &&
+      dates.equals(this.to, other.to);
+  }
 
-static ensure(dateRange) {
-  if (!dateRange) {
-    return dateRange;
+  toString() {
+    return 'scout.DateRange[' +
+      'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
+      ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
   }
-  if (dateRange instanceof DateRange) {
-    return dateRange;
+
+  static ensure(dateRange) {
+    if (!dateRange) {
+      return dateRange;
+    }
+    if (dateRange instanceof DateRange) {
+      return dateRange;
+    }
+    return new DateRange(
+      dates.ensure(dateRange.from),
+      dates.ensure(dateRange.to));
   }
-  return new DateRange(
-    dates.ensure(dateRange.from),
-    dates.ensure(dateRange.to));
-}
 }

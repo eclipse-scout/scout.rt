@@ -12,35 +12,35 @@ import {OutlineAdapter} from '../../index';
 
 export default class SearchOutlineAdapter extends OutlineAdapter {
 
-constructor() {
-  super();
-}
-
-
-_initProperties(model) {
-  if (model.requestFocusQueryField !== undefined) {
-    // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
-    delete model.requestFocusQueryField;
+  constructor() {
+    super();
   }
-}
 
-_syncRequestFocusQueryField() {
-  this.widget.focusQueryField();
-}
 
-_onWidgetSearch(event) {
-  this._send('search', {
-    query: event.query
-  }, {
-    showBusyIndicator: false
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'search') {
-    this._onWidgetSearch(event);
-  } else {
-    super._onWidgetEvent( event);
+  _initProperties(model) {
+    if (model.requestFocusQueryField !== undefined) {
+      // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
+      delete model.requestFocusQueryField;
+    }
   }
-}
+
+  _syncRequestFocusQueryField() {
+    this.widget.focusQueryField();
+  }
+
+  _onWidgetSearch(event) {
+    this._send('search', {
+      query: event.query
+    }, {
+      showBusyIndicator: false
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'search') {
+      this._onWidgetSearch(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

@@ -13,56 +13,56 @@ import {Widget} from '../index';
 
 export default class Switch extends Widget {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.activated = false;
-  this.switchLabel = null;
-  this.htmlEnabled = false;
+    this.activated = false;
+    this.switchLabel = null;
+    this.htmlEnabled = false;
 
-  this.$switchLabel = null;
-  this.$switchButton = null;
-}
-
-
-_render() {
-  this.$container = this.$parent.appendDiv('switch');
-  this.$switchLabel = this.$container.appendDiv('switch-label');
-  this.$switchButton = this.$container.appendDiv('switch-button')
-    .on('click', this._onSwitchButtonClick.bind(this));
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderActivated();
-  this._renderSwitchLabel();
-}
-
-_onSwitchButtonClick() {
-  var event = new Event();
-  this.trigger('switch', event);
-  if (!event.defaultPrevented) {
-    this.setActivated(!this.activated);
+    this.$switchLabel = null;
+    this.$switchButton = null;
   }
-}
 
-setSwitchLabel(switchLabel) {
-  this.setProperty('switchLabel', switchLabel);
-}
 
-_renderSwitchLabel() {
-  if (this.htmlEnabled) {
-    this.$switchLabel.html(this.switchLabel);
-  } else {
-    this.$switchLabel.text(this.switchLabel);
+  _render() {
+    this.$container = this.$parent.appendDiv('switch');
+    this.$switchLabel = this.$container.appendDiv('switch-label');
+    this.$switchButton = this.$container.appendDiv('switch-button')
+      .on('click', this._onSwitchButtonClick.bind(this));
   }
-}
 
-setActivated(activated) {
-  this.setProperty('activated', activated);
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderActivated();
+    this._renderSwitchLabel();
+  }
 
-_renderActivated() {
-  this.$switchButton.toggleClass('activated', this.activated);
-}
+  _onSwitchButtonClick() {
+    var event = new Event();
+    this.trigger('switch', event);
+    if (!event.defaultPrevented) {
+      this.setActivated(!this.activated);
+    }
+  }
+
+  setSwitchLabel(switchLabel) {
+    this.setProperty('switchLabel', switchLabel);
+  }
+
+  _renderSwitchLabel() {
+    if (this.htmlEnabled) {
+      this.$switchLabel.html(this.switchLabel);
+    } else {
+      this.$switchLabel.text(this.switchLabel);
+    }
+  }
+
+  setActivated(activated) {
+    this.setProperty('activated', activated);
+  }
+
+  _renderActivated() {
+    this.$switchButton.toggleClass('activated', this.activated);
+  }
 }

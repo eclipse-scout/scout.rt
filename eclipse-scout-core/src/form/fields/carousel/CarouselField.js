@@ -12,31 +12,31 @@ import {FormField} from '../../../index';
 
 export default class CarouselField extends FormField {
 
-constructor() {
-  super();
-  this.gridDataHints.weightY = 1.0;
+  constructor() {
+    super();
+    this.gridDataHints.weightY = 1.0;
 
-  this._addWidgetProperties(['carousel']);
-}
-
-
-_render() {
-  this.addContainer(this.$parent, 'carousel-field');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
-  if (this.carousel) {
-    this._renderCarousel();
+    this._addWidgetProperties(['carousel']);
   }
-}
 
-_renderCarousel() {
-  this.carousel.render();
-  this.addField(this.carousel.$container);
-}
 
-_removeCarousel() {
-  this.carousel.remove();
-  this._removeField();
-}
+  _render() {
+    this.addContainer(this.$parent, 'carousel-field');
+    this.addLabel();
+    this.addMandatoryIndicator();
+    this.addStatus();
+    if (this.carousel) {
+      this._renderCarousel();
+    }
+  }
+
+  _renderCarousel() {
+    this.carousel.render();
+    this.addField(this.carousel.$container);
+  }
+
+  _removeCarousel() {
+    this.carousel.remove();
+    this._removeField();
+  }
 }

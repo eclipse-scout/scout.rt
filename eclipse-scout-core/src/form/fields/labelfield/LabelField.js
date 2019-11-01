@@ -14,87 +14,87 @@ import {texts} from '../../../index';
 
 export default class LabelField extends ValueField {
 
-constructor() {
-  super();
-  this.htmlEnabled = false;
-  this.selectable = true;
-  this.wrapText = false;
-}
-
-
-/**
- * Resolves the text key if value contains one.
- * This cannot be done in _init because the value field would call _setValue first
- */
-_initValue(value) {
-  value = texts.resolveText(value, this.session.locale.languageTag);
-  super._initValue( value);
-}
-
-_render() {
-  this.addContainer(this.$parent, 'label-field');
-  this.addLabel();
-  this.addField(this.$parent.makeDiv());
-  this.addStatus();
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderWrapText();
-  // TODO [7.0] cgu: render selectable
-}
-
-/**
- * Since a LabelField cannot be changed by a user, acceptInput does nothing.
- * Otherwise LabelFields could 'become' touched, because value and displayText
- * of the LabelField don't match.
- */
-acceptInput() {
-  // NOP
-}
-
-setHtmlEnabled(htmlEnabled) {
-  this.setProperty('htmlEnabled', htmlEnabled);
-}
-
-_renderHtmlEnabled() {
-  // Render the display text again when html enabled changes dynamically
-  this._renderDisplayText();
-}
-
-/**
- * @override
- */
-_renderDisplayText() {
-  var displayText = this.displayText || '';
-  if (this.htmlEnabled) {
-    this.$field.html(displayText);
-  } else {
-    this.$field.html(strings.nl2br(displayText));
+  constructor() {
+    super();
+    this.htmlEnabled = false;
+    this.selectable = true;
+    this.wrapText = false;
   }
-  this.invalidateLayoutTree();
-}
 
-setWrapText(wrapText) {
-  this.setProperty('wrapText', wrapText);
-}
 
-_renderWrapText() {
-  this.$field.toggleClass('white-space-nowrap', !this.wrapText);
-  this.invalidateLayoutTree();
-}
+  /**
+   * Resolves the text key if value contains one.
+   * This cannot be done in _init because the value field would call _setValue first
+   */
+  _initValue(value) {
+    value = texts.resolveText(value, this.session.locale.languageTag);
+    super._initValue(value);
+  }
 
-_renderGridData() {
-  super._renderGridData();
-  this.updateInnerAlignment({
-    useHorizontalAlignment: true
-  });
-}
+  _render() {
+    this.addContainer(this.$parent, 'label-field');
+    this.addLabel();
+    this.addField(this.$parent.makeDiv());
+    this.addStatus();
+  }
 
-_renderGridDataHints() {
-  super._renderGridDataHints();
-  this.updateInnerAlignment({
-    useHorizontalAlignment: true
-  });
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderWrapText();
+    // TODO [7.0] cgu: render selectable
+  }
+
+  /**
+   * Since a LabelField cannot be changed by a user, acceptInput does nothing.
+   * Otherwise LabelFields could 'become' touched, because value and displayText
+   * of the LabelField don't match.
+   */
+  acceptInput() {
+    // NOP
+  }
+
+  setHtmlEnabled(htmlEnabled) {
+    this.setProperty('htmlEnabled', htmlEnabled);
+  }
+
+  _renderHtmlEnabled() {
+    // Render the display text again when html enabled changes dynamically
+    this._renderDisplayText();
+  }
+
+  /**
+   * @override
+   */
+  _renderDisplayText() {
+    var displayText = this.displayText || '';
+    if (this.htmlEnabled) {
+      this.$field.html(displayText);
+    } else {
+      this.$field.html(strings.nl2br(displayText));
+    }
+    this.invalidateLayoutTree();
+  }
+
+  setWrapText(wrapText) {
+    this.setProperty('wrapText', wrapText);
+  }
+
+  _renderWrapText() {
+    this.$field.toggleClass('white-space-nowrap', !this.wrapText);
+    this.invalidateLayoutTree();
+  }
+
+  _renderGridData() {
+    super._renderGridData();
+    this.updateInnerAlignment({
+      useHorizontalAlignment: true
+    });
+  }
+
+  _renderGridDataHints() {
+    super._renderGridDataHints();
+    this.updateInnerAlignment({
+      useHorizontalAlignment: true
+    });
+  }
 }

@@ -23,57 +23,57 @@ import {objects} from '../index';
  */
 export default class PromiseCreator {
 
-constructor(items) {
-  this.results = [];
-  this.error = null;
+  constructor(items) {
+    this.results = [];
+    this.error = null;
 
-  this.items = items;
-  this.currentItem = 0;
-  this.aborted = false;
-}
-
-hasNext() {
-  if (this.error || this.aborted) {
-    return false;
-  }
-  return this.currentItem < this.items.length;
-}
-
-next() {
-  var thisItem = this.currentItem;
-  return this.createPromise()
-    .done(function() {
-      this._addResults.apply(this, [thisItem, objects.argumentsToArray(arguments)]);
-    }.bind(this))
-    .fail(function() {
-      this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
-    }.bind(this));
-}
-
-createPromise() {
-  if (this.currentItem >= this.items.length) {
-    throw new Error('items out of bounds');
+    this.items = items;
+    this.currentItem = 0;
+    this.aborted = false;
   }
 
-  var promise = this._createPromise();
-  this.currentItem++;
-  return promise;
-}
-
-_createPromise() {
-  return this.items[this.currentItem]();
-}
-
-_addResults(index, result) {
-  if (result.length === 0) {
-    result = undefined;
-  } else if (result.length === 1) {
-    result = result[0];
+  hasNext() {
+    if (this.error || this.aborted) {
+      return false;
+    }
+    return this.currentItem < this.items.length;
   }
-  this.results[index] = result;
-}
 
-abort() {
-  this.aborted = true;
-}
+  next() {
+    var thisItem = this.currentItem;
+    return this.createPromise()
+      .done(function() {
+        this._addResults.apply(this, [thisItem, objects.argumentsToArray(arguments)]);
+      }.bind(this))
+      .fail(function() {
+        this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
+      }.bind(this));
+  }
+
+  createPromise() {
+    if (this.currentItem >= this.items.length) {
+      throw new Error('items out of bounds');
+    }
+
+    var promise = this._createPromise();
+    this.currentItem++;
+    return promise;
+  }
+
+  _createPromise() {
+    return this.items[this.currentItem]();
+  }
+
+  _addResults(index, result) {
+    if (result.length === 0) {
+      result = undefined;
+    } else if (result.length === 1) {
+      result = result[0];
+    }
+    this.results[index] = result;
+  }
+
+  abort() {
+    this.aborted = true;
+  }
 }

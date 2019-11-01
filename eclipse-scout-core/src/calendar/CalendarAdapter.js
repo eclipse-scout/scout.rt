@@ -13,63 +13,63 @@ import {ModelAdapter} from '../index';
 
 export default class CalendarAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-/**
- * We must send the view-range to the client-model on the server. The view-range is determined by the UI.
- * Thus the calendar cannot be completely initialized without the view-range from the UI.
- * @override ModelAdapter.js
- */
-_postCreateWidget() {
-  this._sendViewRangeChange();
-}
-
-/**
- * @override ModelAdapter.js
- */
-_onWidgetEvent(event) {
-  if (event.type === 'viewRangeChange') {
-    this._sendViewRangeChange();
-  } else if (event.type === 'modelChange') {
-    this._sendModelChange();
-  } else if (event.type === 'selectionChange') {
-    this._sendSelectionChange();
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
 
-_jsonViewRange() {
-  return dates.toJsonDateRange(this.widget.viewRange);
-}
 
-_jsonSelectedDate() {
-  return dates.toJsonDate(this.widget.selectedDate);
-}
+  /**
+   * We must send the view-range to the client-model on the server. The view-range is determined by the UI.
+   * Thus the calendar cannot be completely initialized without the view-range from the UI.
+   * @override ModelAdapter.js
+   */
+  _postCreateWidget() {
+    this._sendViewRangeChange();
+  }
 
-_sendViewRangeChange() {
-  this._send('viewRangeChange', {
-    viewRange: this._jsonViewRange()
-  });
-}
+  /**
+   * @override ModelAdapter.js
+   */
+  _onWidgetEvent(event) {
+    if (event.type === 'viewRangeChange') {
+      this._sendViewRangeChange();
+    } else if (event.type === 'modelChange') {
+      this._sendModelChange();
+    } else if (event.type === 'selectionChange') {
+      this._sendSelectionChange();
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 
-_sendModelChange() {
-  var data = {
-    viewRange: this._jsonViewRange(),
-    selectedDate: this._jsonSelectedDate(),
-    displayMode: this.widget.displayMode
-  };
-  this._send('modelChange', data);
-}
+  _jsonViewRange() {
+    return dates.toJsonDateRange(this.widget.viewRange);
+  }
 
-_sendSelectionChange() {
-  var selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
-  this._send('selectionChange', {
-    date: this._jsonSelectedDate(),
-    componentId: selectedComponentId
-  });
-}
+  _jsonSelectedDate() {
+    return dates.toJsonDate(this.widget.selectedDate);
+  }
+
+  _sendViewRangeChange() {
+    this._send('viewRangeChange', {
+      viewRange: this._jsonViewRange()
+    });
+  }
+
+  _sendModelChange() {
+    var data = {
+      viewRange: this._jsonViewRange(),
+      selectedDate: this._jsonSelectedDate(),
+      displayMode: this.widget.displayMode
+    };
+    this._send('modelChange', data);
+  }
+
+  _sendSelectionChange() {
+    var selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
+    this._send('selectionChange', {
+      date: this._jsonSelectedDate(),
+      componentId: selectedComponentId
+    });
+  }
 }

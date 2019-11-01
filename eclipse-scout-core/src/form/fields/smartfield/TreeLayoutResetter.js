@@ -14,37 +14,37 @@
  */
 export default class TreeLayoutResetter {
 
-constructor(tree) {
-  this._tree = tree;
-  this.cssSelector = '.tree';
-}
+  constructor(tree) {
+    this._tree = tree;
+    this.cssSelector = '.tree';
+  }
 
-modifyDom() {
-  this._ensureFirstLast();
-  this._tree.$container
-    .css('display', 'inline-block')
-    .css('width', 'auto')
-    .css('height', 'auto');
-  this._tree.$data
-    .css('display', 'inline-block');
-}
+  modifyDom() {
+    this._ensureFirstLast();
+    this._tree.$container
+      .css('display', 'inline-block')
+      .css('width', 'auto')
+      .css('height', 'auto');
+    this._tree.$data
+      .css('display', 'inline-block');
+  }
 
-restoreDom() {
-  this._tree.$container
-    .css('display', 'block')
-    .css('width', '100%')
-    .css('height', '100%');
-  this._tree.$data
-    .css('display', 'block');
-}
+  restoreDom() {
+    this._tree.$container
+      .css('display', 'block')
+      .css('width', '100%')
+      .css('height', '100%');
+    this._tree.$data
+      .css('display', 'block');
+  }
 
-_ensureFirstLast() {
-  var $nodes = this._tree.$data
-    .children('.tree-node')
-    .removeClass('first last');
-  $nodes.first()
-    .addClass('first');
-  $nodes.last()
-    .addClass('last');
-}
+  _ensureFirstLast() {
+    var $nodes = this._tree.$data
+      .children('.tree-node')
+      .removeClass('first last');
+    $nodes.first()
+      .addClass('first');
+    $nodes.last()
+      .addClass('last');
+  }
 }

@@ -8,7 +8,7 @@ module.exports = class AfterEmitWebpackPlugin {
       outDir
     } = options;
 
-    this.options = { createFileList, outDir };
+    this.options = {createFileList, outDir};
   }
 
   // noinspection JSUnusedGlobalSymbols

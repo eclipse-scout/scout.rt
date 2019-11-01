@@ -14,7 +14,6 @@ import {TypeDescriptor} from '../index';
 import * as $ from 'jquery';
 
 
-
 /**
  * map of "objectType" -> { defaultValuesObject }
  */
@@ -54,7 +53,7 @@ export function init(data) {
 }
 
 //private
- export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, targetMap) {
+export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, targetMap) {
   if (!json) {
     return;
   }
@@ -99,7 +98,7 @@ export function applyTo(object, objectType) {
 }
 
 //private
- export function _applyToInternal(object, objectType) {
+export function _applyToInternal(object, objectType) {
   var objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
   if (!objectTypeHierarchy) {
     // Remove model variant and try again
@@ -119,7 +118,7 @@ export function applyTo(object, objectType) {
 }
 
 //private
- export function _extendWithDefaults(object, defaults) {
+export function _extendWithDefaults(object, defaults) {
   if (object === undefined || defaults === undefined) {
     return;
   }

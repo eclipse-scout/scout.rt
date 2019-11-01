@@ -16,104 +16,104 @@ import {Column} from '../../index';
 
 export default class DateColumn extends Column {
 
-constructor() {
-  super();
-  this.format;
-  this.groupFormat = 'yyyy';
-  this.hasDate = true;
-  this.hasTime = false;
-  this.filterType = 'DateColumnUserFilter';
-  this.comparator = comparators.NUMERIC;
-  this.textBased = false;
-}
-
-
-_init(model) {
-  super._init( model);
-
-  this._setFormat(this.format);
-  this._setGroupFormat(this.groupFormat);
-}
-
-setFormat(format) {
-  if (this.format === format) {
-    return;
+  constructor() {
+    super();
+    this.format;
+    this.groupFormat = 'yyyy';
+    this.hasDate = true;
+    this.hasTime = false;
+    this.filterType = 'DateColumnUserFilter';
+    this.comparator = comparators.NUMERIC;
+    this.textBased = false;
   }
-  this._setFormat(format);
-  if (this.initialized) {
-    //if format changes on the fly, just update the cell text
-    this.table.rows.forEach(function(row) {
-      this._updateCellText(row, this.cell(row));
-    }.bind(this));
+
+
+  _init(model) {
+    super._init(model);
+
+    this._setFormat(this.format);
+    this._setGroupFormat(this.groupFormat);
   }
-}
 
-_setFormat(format) {
-  if (!format) {
-    format = this._getDefaultFormat(this.session.locale);
+  setFormat(format) {
+    if (this.format === format) {
+      return;
+    }
+    this._setFormat(format);
+    if (this.initialized) {
+      //if format changes on the fly, just update the cell text
+      this.table.rows.forEach(function(row) {
+        this._updateCellText(row, this.cell(row));
+      }.bind(this));
+    }
   }
-  format = DateFormat.ensure(this.session.locale, format);
-  this.format = format;
-}
 
-setGroupFormat(format) {
-  if (this.groupFormat === format) {
-    return;
+  _setFormat(format) {
+    if (!format) {
+      format = this._getDefaultFormat(this.session.locale);
+    }
+    format = DateFormat.ensure(this.session.locale, format);
+    this.format = format;
   }
-  this._setGroupFormat(format);
-  if (this.initialized) {
-    //if format changes on the fly, just update the cell text
-    this.table.rows.forEach(function(row) {
-      this._updateCellText(row, this.cell(row));
-    }.bind(this));
+
+  setGroupFormat(format) {
+    if (this.groupFormat === format) {
+      return;
+    }
+    this._setGroupFormat(format);
+    if (this.initialized) {
+      //if format changes on the fly, just update the cell text
+      this.table.rows.forEach(function(row) {
+        this._updateCellText(row, this.cell(row));
+      }.bind(this));
+    }
   }
-}
 
-_setGroupFormat(format) {
-  if (!format) {
-    format = this._getDefaultFormat(this.session.locale);
+  _setGroupFormat(format) {
+    if (!format) {
+      format = this._getDefaultFormat(this.session.locale);
+    }
+    format = DateFormat.ensure(this.session.locale, format);
+    this.groupFormat = format;
   }
-  format = DateFormat.ensure(this.session.locale, format);
-  this.groupFormat = format;
-}
 
-/**
- * @override Columns.js
- */
-_formatValue(value) {
-  return this.format.format(value);
-}
-
-/**
- * @override Columns.js
- */
-_parseValue(text) {
-  return dates.ensure(text);
-}
-
-_getDefaultFormat(locale) {
-  if (this.hasDate && this.hasTime) {
-    return locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault;
+  /**
+   * @override Columns.js
+   */
+  _formatValue(value) {
+    return this.format.format(value);
   }
-  if (this.hasDate) {
-    return locale.dateFormatPatternDefault;
+
+  /**
+   * @override Columns.js
+   */
+  _parseValue(text) {
+    return dates.ensure(text);
   }
-  return locale.timeFormatPatternDefault;
-}
 
-cellTextForGrouping(row) {
-  var val = this.table.cellValue(this, row);
-  return this.groupFormat.format(val);
-}
+  _getDefaultFormat(locale) {
+    if (this.hasDate && this.hasTime) {
+      return locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault;
+    }
+    if (this.hasDate) {
+      return locale.dateFormatPatternDefault;
+    }
+    return locale.timeFormatPatternDefault;
+  }
 
-/**
- * @override Column.js
- */
-_createEditor() {
-  return scout.create('DateField', {
-    parent: this.table,
-    hasDate: this.hasDate,
-    hasTime: this.hasTime
-  });
-}
+  cellTextForGrouping(row) {
+    var val = this.table.cellValue(this, row);
+    return this.groupFormat.format(val);
+  }
+
+  /**
+   * @override Column.js
+   */
+  _createEditor() {
+    return scout.create('DateField', {
+      parent: this.table,
+      hasDate: this.hasDate,
+      hasTime: this.hasTime
+    });
+  }
 }

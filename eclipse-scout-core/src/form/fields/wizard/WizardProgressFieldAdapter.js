@@ -12,22 +12,22 @@ import {FormFieldAdapter} from '../../../index';
 
 export default class WizardProgressFieldAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetStepAction(event) {
-  this._send('doStepAction', {
-    stepIndex: event.stepIndex
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'stepAction') {
-    this._onWidgetStepAction(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
+
+
+  _onWidgetStepAction(event) {
+    this._send('doStepAction', {
+      stepIndex: event.stepIndex
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'stepAction') {
+      this._onWidgetStepAction(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

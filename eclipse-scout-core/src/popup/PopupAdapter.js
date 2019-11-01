@@ -12,22 +12,22 @@ import {ModelAdapter} from '../index';
 
 export default class PopupAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetClose(event) {
-  // Do not close the popup immediately, server will send the close event
-  event.preventDefault();
-  this._send('close');
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'close') {
-    this._onWidgetClose(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
+
+
+  _onWidgetClose(event) {
+    // Do not close the popup immediately, server will send the close event
+    event.preventDefault();
+    this._send('close');
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'close') {
+      this._onWidgetClose(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

@@ -13,25 +13,25 @@ import {KeyStroke} from '../index';
 
 export default class ContextMenuKeyStroke extends KeyStroke {
 
-constructor(field, contextFunction, bindObject) {
-  super();
-  this._contextFunction = contextFunction;
-  this._bindObject = bindObject || this;
+  constructor(field, contextFunction, bindObject) {
+    super();
+    this._contextFunction = contextFunction;
+    this._bindObject = bindObject || this;
 
-  this.field = field;
-  this.renderingHints.render = false;
+    this.field = field;
+    this.renderingHints.render = false;
 
-  this.which = [keys.SELECT]; // = "Menu" key
-  this.ctrl = false;
-  this.shift = false;
-  this.stopPropagation = true;
-}
+    this.which = [keys.SELECT]; // = "Menu" key
+    this.ctrl = false;
+    this.shift = false;
+    this.stopPropagation = true;
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this._contextFunction.call(this._bindObject, event);
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this._contextFunction.call(this._bindObject, event);
+  }
 }

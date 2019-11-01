@@ -12,8 +12,8 @@ import {ModelAdapter} from '../index';
 
 export default class NotificationAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

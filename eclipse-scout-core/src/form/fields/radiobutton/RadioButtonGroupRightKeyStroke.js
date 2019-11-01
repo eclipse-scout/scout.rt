@@ -14,27 +14,27 @@ import * as $ from 'jquery';
 
 export default class RadioButtonGroupRightKeyStroke extends KeyStroke {
 
-constructor(radioButtonGroup) {
-  super();
-  this.field = radioButtonGroup;
-  this.which = [keys.RIGHT];
-  this.renderingHints.render = false;
-}
+  constructor(radioButtonGroup) {
+    super();
+    this.field = radioButtonGroup;
+    this.which = [keys.RIGHT];
+    this.renderingHints.render = false;
+  }
 
 
-handle(event) {
-  var fieldBefore,
-    focusedButton = $(event.target).data('radiobutton');
+  handle(event) {
+    var fieldBefore,
+      focusedButton = $(event.target).data('radiobutton');
 
-  this.field.radioButtons.some(function(radioButton) {
-    if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
-      radioButton.select();
-      radioButton.focus();
-      return true;
-    }
-    if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {
-      fieldBefore = radioButton;
-    }
-  }, this);
-}
+    this.field.radioButtons.some(function(radioButton) {
+      if (fieldBefore && radioButton.enabledComputed && radioButton.visible) {
+        radioButton.select();
+        radioButton.focus();
+        return true;
+      }
+      if (radioButton === focusedButton && radioButton.enabledComputed && radioButton.visible) {
+        fieldBefore = radioButton;
+      }
+    }, this);
+  }
 }

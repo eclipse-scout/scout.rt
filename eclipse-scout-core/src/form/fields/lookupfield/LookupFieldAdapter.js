@@ -19,24 +19,24 @@ import {objects} from '../../../index';
  */
 export default class LookupFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-/**
- * @param {QueryBy} queryBy
- * @param {object} [queryData] optional data (text, key, rec)
- */
-sendLookup(queryBy, queryData) {
-  var propertyName = queryBy.toLowerCase(),
-    requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
-    requestData = {
-      showBusyIndicator: false
-    };
-  if (!objects.isNullOrUndefined(queryData)) {
-    requestData[propertyName] = queryData;
+  constructor() {
+    super();
   }
-  this._send(requestType, requestData);
-}
+
+
+  /**
+   * @param {QueryBy} queryBy
+   * @param {object} [queryData] optional data (text, key, rec)
+   */
+  sendLookup(queryBy, queryData) {
+    var propertyName = queryBy.toLowerCase(),
+      requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
+      requestData = {
+        showBusyIndicator: false
+      };
+    if (!objects.isNullOrUndefined(queryData)) {
+      requestData[propertyName] = queryData;
+    }
+    this._send(requestType, requestData);
+  }
 }

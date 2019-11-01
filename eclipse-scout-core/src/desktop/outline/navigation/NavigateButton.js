@@ -22,69 +22,69 @@ import * as $ from 'jquery';
  */
 export default class NavigateButton extends Menu {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.node = null;
-  this.outline = null;
-  this.actionStyle = Action.ActionStyle.BUTTON;
+    this.node = null;
+    this.outline = null;
+    this.actionStyle = Action.ActionStyle.BUTTON;
+    /**
+     * Additional CSS class to be applied in _render method.
+     */
+    this._additionalCssClass = '';
+    this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
+    this.inheritAccessibility = false;
+  }
+
+
   /**
-   * Additional CSS class to be applied in _render method.
+   * @override
    */
-  this._additionalCssClass = '';
-  this._addCloneProperties(['node', 'outline', 'altKeyStrokeContext']);
-  this.inheritAccessibility = false;
-}
-
-
-/**
- * @override
- */
-_render() {
-  if (this.overflow) {
-    this.text = this.session.text(this._defaultText);
-    this.iconId = null;
-  } else {
-    this.text = null;
-    this.iconId = this._defaultIconId;
+  _render() {
+    if (this.overflow) {
+      this.text = this.session.text(this._defaultText);
+      this.iconId = null;
+    } else {
+      this.text = null;
+      this.iconId = this._defaultIconId;
+    }
+    this.updateEnabled();
+    super._render();
+    this.$container.addClass('navigate-button small');
+    this.$container.addClass(this._additionalCssClass);
+    this.altKeyStrokeContext.registerKeyStroke(this);
   }
-  this.updateEnabled();
-  super._render();
-  this.$container.addClass('navigate-button small');
-  this.$container.addClass(this._additionalCssClass);
-  this.altKeyStrokeContext.registerKeyStroke(this);
-}
 
-/**
- * @override Action.js
- */
-_remove() {
-  super._remove();
-  this.altKeyStrokeContext.unregisterKeyStroke(this);
-}
-
-_setDetailVisible() {
-  var detailVisible = this._toggleDetail();
-  $.log.isDebugEnabled() && $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
-  this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
-}
-
-/**
- * @override Menu.js
- */
-_doAction() {
-  super._doAction();
-  if (this._isDetail()) {
-    this._setDetailVisible();
-  } else {
-    this._drill();
+  /**
+   * @override Action.js
+   */
+  _remove() {
+    super._remove();
+    this.altKeyStrokeContext.unregisterKeyStroke(this);
   }
-}
 
-/**
- * Called when enabled state must be re-calculated and probably rendered.
- */
-updateEnabled() {
-  this.setEnabled(this._buttonEnabled());
-}
+  _setDetailVisible() {
+    var detailVisible = this._toggleDetail();
+    $.log.isDebugEnabled() && $.log.debug('show detail-' + (detailVisible ? 'form' : 'table'));
+    this.outline.setDetailFormVisibleByUi(this.node, detailVisible);
+  }
+
+  /**
+   * @override Menu.js
+   */
+  _doAction() {
+    super._doAction();
+    if (this._isDetail()) {
+      this._setDetailVisible();
+    } else {
+      this._drill();
+    }
+  }
+
+  /**
+   * Called when enabled state must be re-calculated and probably rendered.
+   */
+  updateEnabled() {
+    this.setEnabled(this._buttonEnabled());
+  }
 }

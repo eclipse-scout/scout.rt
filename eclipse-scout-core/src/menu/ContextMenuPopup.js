@@ -21,488 +21,489 @@ import {arrays} from '../index';
 
 export default class ContextMenuPopup extends PopupWithHead {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
-  this._headVisible = false;
-  this.menuItems = [];
-  this.cloneMenuItems = true;
-  this._toggleSubMenuQueue = [];
-}
-
-
-_init(options) {
-  options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
-
-  // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
-  if (options.cloneMenuItems === false) {
-    this._addWidgetProperties('menuItems');
+    // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
+    this._headVisible = false;
+    this.menuItems = [];
+    this.cloneMenuItems = true;
+    this._toggleSubMenuQueue = [];
   }
 
-  super._init( options);
-}
 
-/**
- * @override Popup.js
- */
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
+  _init(options) {
+    options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
 
-  menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
-}
-
-_createLayout() {
-  return new ContextMenuPopupLayout(this);
-}
-
-_createBodyLayout() {
-  return new RowLayout({
-    pixelBasedSizing: false
-  });
-}
-
-_render() {
-  super._render();
-  this._installScrollbars();
-  this._renderMenuItems();
-}
-
-/**
- * @override
- */
-_installScrollbars(options) {
-  super._installScrollbars( {
-    axis: 'y'
-  });
-}
-
-/**
- * @override
- */
-get$Scrollable() {
-  return this.$body;
-}
-
-removeSubMenuItems(parentMenu, animated) {
-  if (!this.rendered) {
-    return;
-  }
-  if (this.bodyAnimating) {
-    // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
-    this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
-    return;
-  }
-
-  this.$body = parentMenu.__originalParent.$subMenuBody;
-  // move new body to back
-  this.$body.insertBefore(parentMenu.$subMenuBody);
-
-  if (parentMenu.__originalParent._doActionTogglesSubMenu) {
-    parentMenu.__originalParent._doActionTogglesSubMenu();
-  }
-
-  var actualBounds = this.htmlComp.offsetBounds();
-
-  this.revalidateLayout();
-  this.position();
-
-  if (animated) {
-    this.bodyAnimating = true;
-    var duration = 300;
-    var position = parentMenu.$placeHolder.position();
-    parentMenu.$subMenuBody.css({
-      width: 'auto',
-      height: 'auto'
-    });
-    var targetSize = this.htmlComp.size();
-    parentMenu.$subMenuBody.css('box-shadow', 'none');
-    this.htmlComp.setBounds(actualBounds);
-    if (this.verticalAlignment !== Popup.Alignment.TOP) {
-      // set container to element
-      parentMenu.$subMenuBody.cssTop();
+    // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
+    if (options.cloneMenuItems === false) {
+      this._addWidgetProperties('menuItems');
     }
-    // move new body to top of popup
-    parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, parentMenu.$container.cssHeight(), {
-      duration: duration,
-      queue: false
+
+    super._init(options);
+  }
+
+  /**
+   * @override Popup.js
+   */
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+
+    menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
+  }
+
+  _createLayout() {
+    return new ContextMenuPopupLayout(this);
+  }
+
+  _createBodyLayout() {
+    return new RowLayout({
+      pixelBasedSizing: false
     });
+  }
 
-    var endTopposition = position.top - this.$body.cssHeight(),
-      startTopposition = 0 - actualBounds.height;
+  _render() {
+    super._render();
+    this._installScrollbars();
+    this._renderMenuItems();
+  }
 
-    parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
-      duration: duration,
-      queue: false,
-      complete: function() {
-        if (parentMenu.$container) { //check if $container is not removed before by closing operation.
-          scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
-          parentMenu.$placeHolder.replaceWith(parentMenu.$container);
-          parentMenu.$container.toggleClass('expanded', false);
-          this._updateFirstLastClass();
-          this.updateNextToSelected('menu-item', parentMenu.$container);
+  /**
+   * @override
+   */
+  _installScrollbars(options) {
+    super._installScrollbars({
+      axis: 'y'
+    });
+  }
 
-          parentMenu.$subMenuBody.detach();
-          this._installScrollbars();
-          this.$body.css('box-shadow', '');
+  /**
+   * @override
+   */
+  get$Scrollable() {
+    return this.$body;
+  }
+
+  removeSubMenuItems(parentMenu, animated) {
+    if (!this.rendered) {
+      return;
+    }
+    if (this.bodyAnimating) {
+      // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
+      this._toggleSubMenuQueue.push(this.removeSubMenuItems.bind(this, parentMenu, animated));
+      return;
+    }
+
+    this.$body = parentMenu.__originalParent.$subMenuBody;
+    // move new body to back
+    this.$body.insertBefore(parentMenu.$subMenuBody);
+
+    if (parentMenu.__originalParent._doActionTogglesSubMenu) {
+      parentMenu.__originalParent._doActionTogglesSubMenu();
+    }
+
+    var actualBounds = this.htmlComp.offsetBounds();
+
+    this.revalidateLayout();
+    this.position();
+
+    if (animated) {
+      this.bodyAnimating = true;
+      var duration = 300;
+      var position = parentMenu.$placeHolder.position();
+      parentMenu.$subMenuBody.css({
+        width: 'auto',
+        height: 'auto'
+      });
+      var targetSize = this.htmlComp.size();
+      parentMenu.$subMenuBody.css('box-shadow', 'none');
+      this.htmlComp.setBounds(actualBounds);
+      if (this.verticalAlignment !== Popup.Alignment.TOP) {
+        // set container to element
+        parentMenu.$subMenuBody.cssTop();
+      }
+      // move new body to top of popup
+      parentMenu.$subMenuBody.cssHeightAnimated(actualBounds.height, parentMenu.$container.cssHeight(), {
+        duration: duration,
+        queue: false
+      });
+
+      var endTopposition = position.top - this.$body.cssHeight(),
+        startTopposition = 0 - actualBounds.height;
+
+      parentMenu.$subMenuBody.cssTopAnimated(startTopposition, endTopposition, {
+        duration: duration,
+        queue: false,
+        complete: function() {
+          if (parentMenu.$container) { //check if $container is not removed before by closing operation.
+            scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
+            parentMenu.$placeHolder.replaceWith(parentMenu.$container);
+            parentMenu.$container.toggleClass('expanded', false);
+            this._updateFirstLastClass();
+            this.updateNextToSelected('menu-item', parentMenu.$container);
+
+            parentMenu.$subMenuBody.detach();
+            this._installScrollbars();
+            this.$body.css('box-shadow', '');
+            this.bodyAnimating = false;
+            // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
+            this._invalidateLayoutTreeAndRepositionPopup();
+            var next = this._toggleSubMenuQueue.shift();
+            if (next) {
+              next();
+            }
+          }
+        }.bind(this)
+      });
+
+      this.$body.cssWidthAnimated(actualBounds.width, targetSize.width, {
+        duration: duration,
+        start: this.revalidateLayout.bind(this),
+        progress: this.revalidateLayout.bind(this),
+        queue: false
+      });
+
+      if (targetSize.height !== actualBounds.height) {
+        this.$body.cssHeightAnimated(actualBounds.height, targetSize.height, {
+          duration: duration,
+          queue: false
+        });
+      }
+    }
+  }
+
+  renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
+    if (!this.session.desktop.rendered && !initialSubMenuRendering) {
+      this.initialSubMenusToRender = {
+        parentMenu: parentMenu,
+        menus: menus
+      };
+      return;
+    }
+    if (!this.rendered) {
+      return;
+    }
+    if (this.bodyAnimating) {
+      // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
+      this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
+      return;
+    }
+
+    var actualBounds = this.htmlComp.offsetBounds();
+
+    parentMenu.__originalParent.$subMenuBody = this.$body;
+
+    var $all = this.$body.find('.' + 'menu-item');
+    $all.removeClass('next-to-selected');
+
+    if (!parentMenu.$subMenuBody) {
+      this._$createBody();
+      parentMenu.$subMenuBody = this.$body;
+      this._renderMenuItems(menus, initialSubMenuRendering);
+    } else {
+      // append $body
+      this.$body = parentMenu.$subMenuBody;
+    }
+    var $insertAfterElement = parentMenu.$container.prev();
+    var position = parentMenu.$container.position();
+    parentMenu.$placeHolder = parentMenu.$container.clone();
+    // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
+    HtmlComponent.install(parentMenu.$placeHolder, this.session);
+    if ($insertAfterElement.length) {
+      parentMenu.$placeHolder.insertAfter($insertAfterElement);
+    } else {
+      parentMenu.__originalParent.$subMenuBody.prepend(parentMenu.$placeHolder);
+    }
+
+    this.$body.insertAfter(parentMenu.__originalParent.$subMenuBody);
+    this.$body.prepend(parentMenu.$container);
+    parentMenu.$container.toggleClass('expanded');
+
+    this.revalidateLayout();
+    this.position();
+
+    this.updateNextToSelected();
+
+    if (animated) {
+      this.bodyAnimating = true;
+      var duration = 300;
+      parentMenu.__originalParent.$subMenuBody.css({
+        width: 'auto',
+        height: 'auto'
+      });
+      var targetBounds = this.htmlComp.offsetBounds();
+      this.$body.css('box-shadow', 'none');
+      // set container to element
+      this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
+        duration: duration,
+        start: this.revalidateLayout.bind(this),
+        progress: this.revalidateLayout.bind(this),
+        queue: false
+      });
+
+      this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetBounds.height, {
+        duration: duration,
+        queue: false
+      });
+
+      var endTopposition = 0 - targetBounds.height,
+        startTopposition = position.top - parentMenu.__originalParent.$subMenuBody.cssHeight(),
+        topMargin = 0;
+
+      // move new body to top of popup.
+      this.$body.cssTopAnimated(startTopposition, endTopposition, {
+        duration: duration,
+        queue: false,
+        complete: function() {
           this.bodyAnimating = false;
+          if (parentMenu.__originalParent.$subMenuBody) {
+            scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
+            parentMenu.__originalParent.$subMenuBody.detach();
+            this.$body.cssTop(topMargin);
+            this._installScrollbars();
+            this._updateFirstLastClass();
+            this.$body.css('box-shadow', '');
+          }
           // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
           this._invalidateLayoutTreeAndRepositionPopup();
           var next = this._toggleSubMenuQueue.shift();
           if (next) {
             next();
           }
-        }
-      }.bind(this)
-    });
-
-    this.$body.cssWidthAnimated(actualBounds.width, targetSize.width, {
-      duration: duration,
-      start: this.revalidateLayout.bind(this),
-      progress: this.revalidateLayout.bind(this),
-      queue: false
-    });
-
-    if (targetSize.height !== actualBounds.height) {
-      this.$body.cssHeightAnimated(actualBounds.height, targetSize.height, {
-        duration: duration,
-        queue: false
+        }.bind(this)
       });
+
+      if (actualBounds.height !== targetBounds.height) {
+        parentMenu.__originalParent.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
+          duration: duration,
+          queue: false
+        });
+        this.$container.cssHeight(actualBounds.height, targetBounds.height, {
+          duration: duration,
+          queue: false
+        });
+      }
+      if (this.verticalAlignment === Popup.Alignment.TOP) {
+        this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
+          duration: duration,
+          queue: false
+        }).css('overflow', 'visible');
+        // ajust top of head and deco
+        this.$head.cssTopAnimated(actualBounds.height, targetBounds.height, {
+          duration: duration,
+          queue: false
+        });
+        this.$deco.cssTopAnimated(actualBounds.height - 1, targetBounds.height - 1, {
+          duration: duration,
+          queue: false
+        });
+      }
+    } else {
+      if (!initialSubMenuRendering) {
+        scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
+      }
+      parentMenu.__originalParent.$subMenuBody.detach();
+      this._installScrollbars();
+      this._updateFirstLastClass();
     }
   }
-}
 
-renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
-  if (!this.session.desktop.rendered && !initialSubMenuRendering) {
-    this.initialSubMenusToRender = {
-      parentMenu: parentMenu,
-      menus: menus
-    };
-    return;
-  }
-  if (!this.rendered) {
-    return;
-  }
-  if (this.bodyAnimating) {
-    // Let current animation finish and execute afterwards to prevent an unpredictable behavior and inconsistent state
-    this._toggleSubMenuQueue.push(this.renderSubMenuItems.bind(this, parentMenu, menus, animated, initialSubMenuRendering));
-    return;
-  }
-
-  var actualBounds = this.htmlComp.offsetBounds();
-
-  parentMenu.__originalParent.$subMenuBody = this.$body;
-
-  var $all = this.$body.find('.' + 'menu-item');
-  $all.removeClass('next-to-selected');
-
-  if (!parentMenu.$subMenuBody) {
-    this._$createBody();
-    parentMenu.$subMenuBody = this.$body;
-    this._renderMenuItems(menus, initialSubMenuRendering);
-  } else {
-    // append $body
-    this.$body = parentMenu.$subMenuBody;
-  }
-  var $insertAfterElement = parentMenu.$container.prev();
-  var position = parentMenu.$container.position();
-  parentMenu.$placeHolder = parentMenu.$container.clone();
-  // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
-  HtmlComponent.install(parentMenu.$placeHolder, this.session);
-  if ($insertAfterElement.length) {
-    parentMenu.$placeHolder.insertAfter($insertAfterElement);
-  } else {
-    parentMenu.__originalParent.$subMenuBody.prepend(parentMenu.$placeHolder);
-  }
-
-  this.$body.insertAfter(parentMenu.__originalParent.$subMenuBody);
-  this.$body.prepend(parentMenu.$container);
-  parentMenu.$container.toggleClass('expanded');
-
-  this.revalidateLayout();
-  this.position();
-
-  this.updateNextToSelected();
-
-  if (animated) {
-    this.bodyAnimating = true;
-    var duration = 300;
-    parentMenu.__originalParent.$subMenuBody.css({
-      width: 'auto',
-      height: 'auto'
-    });
-    var targetBounds = this.htmlComp.offsetBounds();
-    this.$body.css('box-shadow', 'none');
-    // set container to element
-    this.$body.cssWidthAnimated(actualBounds.width, targetBounds.width, {
-      duration: duration,
-      start: this.revalidateLayout.bind(this),
-      progress: this.revalidateLayout.bind(this),
-      queue: false
-    });
-
-    this.$body.cssHeightAnimated(parentMenu.$container.cssHeight(), targetBounds.height, {
-      duration: duration,
-      queue: false
-    });
-
-    var endTopposition = 0 - targetBounds.height,
-      startTopposition = position.top - parentMenu.__originalParent.$subMenuBody.cssHeight(),
-      topMargin = 0;
-
-    // move new body to top of popup.
-    this.$body.cssTopAnimated(startTopposition, endTopposition, {
-      duration: duration,
-      queue: false,
-      complete: function() {
-        this.bodyAnimating = false;
-        if (parentMenu.__originalParent.$subMenuBody) {
-          scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
-          parentMenu.__originalParent.$subMenuBody.detach();
-          this.$body.cssTop(topMargin);
-          this._installScrollbars();
-          this._updateFirstLastClass();
-          this.$body.css('box-shadow', '');
-        }
-        // Do one final layout to fix any potentially wrong sizes (e.g. due to async image loading)
-        this._invalidateLayoutTreeAndRepositionPopup();
-        var next = this._toggleSubMenuQueue.shift();
-        if (next) {
-          next();
-        }
-      }.bind(this)
-    });
-
-    if (actualBounds.height !== targetBounds.height) {
-      parentMenu.__originalParent.$subMenuBody.cssHeightAnimated(actualBounds.height, targetBounds.height, {
-        duration: duration,
-        queue: false
-      });
-      this.$container.cssHeight(actualBounds.height, targetBounds.height, {
-        duration: duration,
-        queue: false
-      });
+  _renderMenuItems(menus, initialSubMenuRendering) {
+    menus = menus ? menus : this._getMenuItems();
+    if (this.menuFilter) {
+      menus = this.menuFilter(menus, MenuDestinations.CONTEXT_MENU);
     }
-    if (this.verticalAlignment === Popup.Alignment.TOP) {
-      this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
-        duration: duration,
-        queue: false
-      }).css('overflow', 'visible');
-      // ajust top of head and deco
-      this.$head.cssTopAnimated(actualBounds.height, targetBounds.height, {
-        duration: duration,
-        queue: false
-      });
-      this.$deco.cssTopAnimated(actualBounds.height - 1, targetBounds.height - 1, {
-        duration: duration,
-        queue: false
-      });
-    }
-  } else {
-    if (!initialSubMenuRendering) {
-      scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
-    }
-    parentMenu.__originalParent.$subMenuBody.detach();
-    this._installScrollbars();
-    this._updateFirstLastClass();
-  }
-}
 
-_renderMenuItems(menus, initialSubMenuRendering) {
-  menus = menus ? menus : this._getMenuItems();
-  if (this.menuFilter) {
-    menus = this.menuFilter(menus, MenuDestinations.CONTEXT_MENU);
-  }
-
-  if (!menus || menus.length === 0) {
-    return;
-  }
-
-  menus.forEach(function(menu) {
-    // Invisible menus are rendered as well because their visibility might change dynamically
-    if (menu.separator) {
+    if (!menus || menus.length === 0) {
       return;
     }
 
-    // prevent loosing original parent
-    var originalParent = menu.parent;
-    if (this.cloneMenuItems && !menu.cloneOf) {
-      // clone will recursively also clone all child actions.
-      menu = menu.clone({
-        parent: this
-      }, {
-        delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
-        delegateAllPropertiesToClone: true,
-        delegateAllPropertiesToOriginal: true,
-        excludePropertiesToOriginal: ['selected', 'logicalGrid']
-      });
-      // attach listener
-      this._attachCloneMenuListeners(menu);
-    }
+    menus.forEach(function(menu) {
+      // Invisible menus are rendered as well because their visibility might change dynamically
+      if (menu.separator) {
+        return;
+      }
 
-    // just set once because on second execution of this menu.parent is set to a popup
-    if (!menu.__originalParent) {
-      menu.__originalParent = originalParent;
-    }
-    menu.render(this.$body);
-    this._attachMenuListeners(menu);
+      // prevent loosing original parent
+      var originalParent = menu.parent;
+      if (this.cloneMenuItems && !menu.cloneOf) {
+        // clone will recursively also clone all child actions.
+        menu = menu.clone({
+          parent: this
+        }, {
+          delegateEventsToOriginal: ['acceptInput', 'action', 'click'],
+          delegateAllPropertiesToClone: true,
+          delegateAllPropertiesToOriginal: true,
+          excludePropertiesToOriginal: ['selected', 'logicalGrid']
+        });
+        // attach listener
+        this._attachCloneMenuListeners(menu);
+      }
 
-    // Invalidate popup layout after images icons have been loaded, because the
-    // correct size might not be known yet. If the layout would not be revalidated, the popup
-    // size will be wrong (text is cut off after image has been loaded).
-    // The menu item actually does it by itself, but the popup needs to be repositioned too.
-    if (menu.icon) {
-      menu.icon.on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
-    }
-  }, this);
+      // just set once because on second execution of this menu.parent is set to a popup
+      if (!menu.__originalParent) {
+        menu.__originalParent = originalParent;
+      }
+      menu.render(this.$body);
+      this._attachMenuListeners(menu);
 
-  this._handleInitialSubMenus(initialSubMenuRendering);
-  this._updateFirstLastClass();
-}
+      // Invalidate popup layout after images icons have been loaded, because the
+      // correct size might not be known yet. If the layout would not be revalidated, the popup
+      // size will be wrong (text is cut off after image has been loaded).
+      // The menu item actually does it by itself, but the popup needs to be repositioned too.
+      if (menu.icon) {
+        menu.icon.on('load error', this._invalidateLayoutTreeAndRepositionPopup.bind(this));
+      }
+    }, this);
 
-_attachCloneMenuListeners(menu) {
-  menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
-  menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
-}
-
-_onCloneMenuPropertyChange(event) {
-  if (event.propertyName === 'selected') {
-    var menu = event.source;
-    // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
-    menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
+    this._handleInitialSubMenus(initialSubMenuRendering);
+    this._updateFirstLastClass();
   }
-}
 
-_handleInitialSubMenus(initialSubMenuRendering) {
-  var menusObj;
-  while (this.initialSubMenusToRender && !initialSubMenuRendering) {
-    menusObj = this.initialSubMenusToRender;
-    this.initialSubMenusToRender = undefined;
-    this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
+  _attachCloneMenuListeners(menu) {
+    menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
+    menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
   }
-}
 
-_attachMenuListeners(menu) {
-  var menuItemActionHandler = this._onMenuItemAction.bind(this);
-  var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
-  menu.on('action', menuItemActionHandler);
-  menu.on('propertyChange', menuItemPropertyChange);
-  this.one('remove', function() {
-    menu.off('action', menuItemActionHandler);
-    menu.off('propertyChange', menuItemPropertyChange);
-  });
-}
+  _onCloneMenuPropertyChange(event) {
+    if (event.propertyName === 'selected') {
+      var menu = event.source;
+      // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
+      menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
+    }
+  }
 
-/**
- * @override PopupWithHead.js
- */
-_modifyBody() {
-  this.$body.addClass('context-menu');
-}
+  _handleInitialSubMenus(initialSubMenuRendering) {
+    var menusObj;
+    while (this.initialSubMenusToRender && !initialSubMenuRendering) {
+      menusObj = this.initialSubMenusToRender;
+      this.initialSubMenusToRender = undefined;
+      this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
+    }
+  }
 
-updateMenuItems(menuItems) {
-  menuItems = arrays.ensure(menuItems);
-  // Only update if list of menus changed. Don't compare this.menuItems, because that list
-  // may contain additional UI separators, and may not be in the same order
-  if (!arrays.equals(this.menuItems, menuItems)) {
+  _attachMenuListeners(menu) {
+    var menuItemActionHandler = this._onMenuItemAction.bind(this);
+    var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
+    menu.on('action', menuItemActionHandler);
+    menu.on('propertyChange', menuItemPropertyChange);
+    this.one('remove', function() {
+      menu.off('action', menuItemActionHandler);
+      menu.off('propertyChange', menuItemPropertyChange);
+    });
+  }
+
+  /**
+   * @override PopupWithHead.js
+   */
+  _modifyBody() {
+    this.$body.addClass('context-menu');
+  }
+
+  updateMenuItems(menuItems) {
+    menuItems = arrays.ensure(menuItems);
+    // Only update if list of menus changed. Don't compare this.menuItems, because that list
+    // may contain additional UI separators, and may not be in the same order
+    if (!arrays.equals(this.menuItems, menuItems)) {
+      this.close();
+    }
+  }
+
+  /**
+   * Override this method to return menu items or actions used to render menu items.
+   */
+  _getMenuItems() {
+    return this.menuItems;
+  }
+
+  /**
+   * Currently rendered $menuItems
+   */
+  $menuItems() {
+    return this.$body.children('.menu-item');
+  }
+
+  $visibleMenuItems() {
+    return this.$body.children('.menu-item:visible');
+  }
+
+  /**
+   * Updates the first and last visible menu items with the according css classes.
+   * Necessary because invisible menu-items are rendered.
+   */
+  _updateFirstLastClass(event) {
+    var $firstMenuItem, $lastMenuItem;
+
+    this.$body.children('.menu-item').each(function() {
+      var $menuItem = $(this);
+      $menuItem.removeClass('context-menu-item-first context-menu-item-last');
+
+      if ($menuItem.isVisible()) {
+        if (!$firstMenuItem) {
+          $firstMenuItem = $menuItem;
+        }
+        $lastMenuItem = $menuItem;
+      }
+    });
+    if ($firstMenuItem) {
+      $firstMenuItem.addClass('context-menu-item-first');
+    }
+    if ($lastMenuItem) {
+      $lastMenuItem.addClass('context-menu-item-last');
+    }
+  }
+
+  updateNextToSelected(menuItemClass, $selectedItem) {
+    menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
+    var $all = this.$body.find('.' + menuItemClass);
+    $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
+
+    $all.removeClass('next-to-selected');
+    if ($selectedItem.hasClass('selected')) {
+      $selectedItem.nextAll(':visible').first().addClass('next-to-selected');
+    }
+  }
+
+  _onMenuItemAction(event) {
+    if (event.source.isToggleAction()) {
+      return;
+    }
     this.close();
   }
-}
-/**
- * Override this method to return menu items or actions used to render menu items.
- */
-_getMenuItems() {
-  return this.menuItems;
-}
 
-/**
- * Currently rendered $menuItems
- */
-$menuItems() {
-  return this.$body.children('.menu-item');
-}
-
-$visibleMenuItems() {
-  return this.$body.children('.menu-item:visible');
-}
-
-/**
- * Updates the first and last visible menu items with the according css classes.
- * Necessary because invisible menu-items are rendered.
- */
-_updateFirstLastClass(event) {
-  var $firstMenuItem, $lastMenuItem;
-
-  this.$body.children('.menu-item').each(function() {
-    var $menuItem = $(this);
-    $menuItem.removeClass('context-menu-item-first context-menu-item-last');
-
-    if ($menuItem.isVisible()) {
-      if (!$firstMenuItem) {
-        $firstMenuItem = $menuItem;
-      }
-      $lastMenuItem = $menuItem;
-    }
-  });
-  if ($firstMenuItem) {
-    $firstMenuItem.addClass('context-menu-item-first');
-  }
-  if ($lastMenuItem) {
-    $lastMenuItem.addClass('context-menu-item-last');
-  }
-}
-
-updateNextToSelected(menuItemClass, $selectedItem) {
-  menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
-  var $all = this.$body.find('.' + menuItemClass);
-  $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
-
-  $all.removeClass('next-to-selected');
-  if ($selectedItem.hasClass('selected')) {
-    $selectedItem.nextAll(':visible').first().addClass('next-to-selected');
-  }
-}
-
-_onMenuItemAction(event) {
-  if (event.source.isToggleAction()) {
-    return;
-  }
-  this.close();
-}
-
-_onMenuItemPropertyChange(event) {
-  if (!this.rendered) {
-    return;
-  }
-  if (event.propertyName === 'visible') {
-    this._updateFirstLastClass();
-  } else if (event.propertyName === 'selected') {
-    // Key stroke navigation marks the currently focused item as selected.
-    // When a sub menu item is opened while another element is selected (focused), make sure the other element gets unselected.
-    // Otherwise two items would be selected when the sub menu is closed again.
-    this._deselectSiblings(event.source);
-  }
-  // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
-  this.position();
-}
-
-/**
- * Deselects the visible siblings of the given menu item. It just removes the CSS class and does not modify the selected property.
- */
-_deselectSiblings(menuItem) {
-  menuItem.$container.siblings('.menu-item').each(function(i, elem) {
-    var $menuItem = $(elem);
-    $menuItem.select(false);
-  }, this);
-}
-
-_invalidateLayoutTreeAndRepositionPopup() {
-  this.invalidateLayoutTree();
-  this.session.layoutValidator.schedulePostValidateFunction(function() {
-    if (!this.rendered) { // check needed because this is an async callback
+  _onMenuItemPropertyChange(event) {
+    if (!this.rendered) {
       return;
     }
+    if (event.propertyName === 'visible') {
+      this._updateFirstLastClass();
+    } else if (event.propertyName === 'selected') {
+      // Key stroke navigation marks the currently focused item as selected.
+      // When a sub menu item is opened while another element is selected (focused), make sure the other element gets unselected.
+      // Otherwise two items would be selected when the sub menu is closed again.
+      this._deselectSiblings(event.source);
+    }
+    // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
     this.position();
-  }.bind(this));
-}
+  }
+
+  /**
+   * Deselects the visible siblings of the given menu item. It just removes the CSS class and does not modify the selected property.
+   */
+  _deselectSiblings(menuItem) {
+    menuItem.$container.siblings('.menu-item').each(function(i, elem) {
+      var $menuItem = $(elem);
+      $menuItem.select(false);
+    }, this);
+  }
+
+  _invalidateLayoutTreeAndRepositionPopup() {
+    this.invalidateLayoutTree();
+    this.session.layoutValidator.schedulePostValidateFunction(function() {
+      if (!this.rendered) { // check needed because this is an async callback
+        return;
+      }
+      this.position();
+    }.bind(this));
+  }
 }

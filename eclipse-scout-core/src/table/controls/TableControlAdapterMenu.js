@@ -12,93 +12,93 @@ import {FormMenu} from '../../index';
 
 export default class TableControlAdapterMenu extends FormMenu {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
-  this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
+    this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
+    this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
 
-  this._addCloneProperties(['tableControl']);
-}
-
-
-/**
- * @override Action.js
- */
-_init(model) {
-  super._init( model);
-  if (!this.tableControl) {
-    throw new Error('Cannot adapt to undefined tableControl');
+    this._addCloneProperties(['tableControl']);
   }
-  this._installListeners();
-}
 
-_installListeners() {
-  this.tableControl.on('propertyChange', this._tableControlPropertyChangeHandler);
-  this.tableControl.on('destroy', this._tableControlDestroyHandler);
-}
 
-_uninstallListeners() {
-  this.tableControl.off('propertyChange', this._tableControlPropertyChangeHandler);
-  this.tableControl.off('destroy', this._tableControlDestroyHandler);
-}
-
-_render() {
-  super._render();
-  // Convenience: Add ID of original tableControl to DOM for debugging purposes
-  this.$container.attr('data-tableControlAdapter', this.tableControl.id);
-}
-
-_onTableControlPropertyChange(event) {
-  // Whenever a tableControl property changes, apply the changes to the menu
-  var changedProperties = {};
-  changedProperties[event.propertyName] = event.newValue;
-  changedProperties = TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
-  for (var prop in changedProperties) { // NOSONAR
-    // Set the property (don't use callSetter because this may delegate to the table control)
-    this.setProperty(prop, changedProperties[prop]);
+  /**
+   * @override Action.js
+   */
+  _init(model) {
+    super._init(model);
+    if (!this.tableControl) {
+      throw new Error('Cannot adapt to undefined tableControl');
+    }
+    this._installListeners();
   }
-}
 
-_onTableControlDestroy(event) {
-  this.destroy();
-  this._uninstallListeners();
-}
+  _installListeners() {
+    this.tableControl.on('propertyChange', this._tableControlPropertyChangeHandler);
+    this.tableControl.on('destroy', this._tableControlDestroyHandler);
+  }
 
-/**
- * @override Action.js
- */
-doAction() {
-  return this.tableControl.doAction();
-}
+  _uninstallListeners() {
+    this.tableControl.off('propertyChange', this._tableControlPropertyChangeHandler);
+    this.tableControl.off('destroy', this._tableControlDestroyHandler);
+  }
 
-/**
- * @override Action.js
- */
-setSelected(selected) {
-  this.tableControl.setSelected(selected);
-}
+  _render() {
+    super._render();
+    // Convenience: Add ID of original tableControl to DOM for debugging purposes
+    this.$container.attr('data-tableControlAdapter', this.tableControl.id);
+  }
 
-/* --- STATIC HELPERS ------------------------------------------------------------- */
-
-/**
- * @memberOf TableControlAdapterMenu
- */
-static adaptTableControlProperties(tableControlProperties, menuProperties) {
-  menuProperties = menuProperties || {};
-
-  // Plain properties: simply copy, no translation required
-  ['text', 'iconId', 'enabled', 'visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId', 'form'].forEach(function(prop) {
-    menuProperties[prop] = tableControlProperties[prop];
-  });
-
-  // Cleanup: Remove all properties that have value 'undefined' from the result object,
-  // otherwise, they would be applied to the model adapter.
-  for (var prop in menuProperties) {
-    if (menuProperties[prop] === undefined) {
-      delete menuProperties[prop];
+  _onTableControlPropertyChange(event) {
+    // Whenever a tableControl property changes, apply the changes to the menu
+    var changedProperties = {};
+    changedProperties[event.propertyName] = event.newValue;
+    changedProperties = TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
+    for (var prop in changedProperties) { // NOSONAR
+      // Set the property (don't use callSetter because this may delegate to the table control)
+      this.setProperty(prop, changedProperties[prop]);
     }
   }
-  return menuProperties;
-}
+
+  _onTableControlDestroy(event) {
+    this.destroy();
+    this._uninstallListeners();
+  }
+
+  /**
+   * @override Action.js
+   */
+  doAction() {
+    return this.tableControl.doAction();
+  }
+
+  /**
+   * @override Action.js
+   */
+  setSelected(selected) {
+    this.tableControl.setSelected(selected);
+  }
+
+  /* --- STATIC HELPERS ------------------------------------------------------------- */
+
+  /**
+   * @memberOf TableControlAdapterMenu
+   */
+  static adaptTableControlProperties(tableControlProperties, menuProperties) {
+    menuProperties = menuProperties || {};
+
+    // Plain properties: simply copy, no translation required
+    ['text', 'iconId', 'enabled', 'visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'modelClass', 'classId', 'form'].forEach(function(prop) {
+      menuProperties[prop] = tableControlProperties[prop];
+    });
+
+    // Cleanup: Remove all properties that have value 'undefined' from the result object,
+    // otherwise, they would be applied to the model adapter.
+    for (var prop in menuProperties) {
+      if (menuProperties[prop] === undefined) {
+        delete menuProperties[prop];
+      }
+    }
+    return menuProperties;
+  }
 }

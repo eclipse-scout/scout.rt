@@ -15,7 +15,6 @@ import {arrays} from '../index';
 import {scout} from '../index';
 
 
-
 export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
   var allowedTypes = [];
 
@@ -144,7 +143,7 @@ export function checkType(menu, types) {
 }
 
 //private
- export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
+export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
   if (activated) {
     menu.excludedByFilter = exclude;
   }
@@ -154,7 +153,7 @@ export function checkType(menu, types) {
  * Checks the type of a menu. Don't use this for menu groups.
  */
 //private
- export function _checkType(menu, types) {
+export function _checkType(menu, types) {
   if (!types || types.length === 0) {
     return false;
   }

@@ -12,33 +12,33 @@ import {ModelAdapter} from '../index';
 
 export default class ActionAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['selected']);
-}
-
-
-_goOffline() {
-  this._enabledBeforeOffline = this.widget.enabled;
-  this.widget.setEnabled(false);
-}
-
-_goOnline() {
-  this.widget.setEnabled(this._enabledBeforeOffline);
-}
-
-_onWidgetAction(event) {
-  if (this.widget.isToggleAction()) {
-    return;
+  constructor() {
+    super();
+    this._addRemoteProperties(['selected']);
   }
-  this._send('action');
-}
 
-_onWidgetEvent(event) {
-  if (event.type === 'action') {
-    this._onWidgetAction(event);
-  } else {
-    super._onWidgetEvent( event);
+
+  _goOffline() {
+    this._enabledBeforeOffline = this.widget.enabled;
+    this.widget.setEnabled(false);
   }
-}
+
+  _goOnline() {
+    this.widget.setEnabled(this._enabledBeforeOffline);
+  }
+
+  _onWidgetAction(event) {
+    if (this.widget.isToggleAction()) {
+      return;
+    }
+    this._send('action');
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'action') {
+      this._onWidgetAction(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

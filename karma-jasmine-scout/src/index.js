@@ -13,12 +13,12 @@ var createPattern = function(path) {
 };
 
 var findJqueryPosition = function(files) {
-  if(files.length <= 1) {
+  if (files.length <= 1) {
     return 0;
   }
-  for(var index = 0; index < files.length; index++) {
+  for (var index = 0; index < files.length; index++) {
     var entry = files[index];
-    if(entry.pattern && entry.pattern.endsWith('/jquery.js')) {
+    if (entry.pattern && entry.pattern.endsWith('/jquery.js')) {
       return index + 1; // right after the jquery
     }
   }

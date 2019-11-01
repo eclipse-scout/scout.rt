@@ -16,86 +16,86 @@ import {scout} from '../index';
 
 export default class WidgetTooltip extends Tooltip {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.$widgetContainer = null;
-  this.widget = null;
-  this._addWidgetProperties(['widget']);
+    this.$widgetContainer = null;
+    this.widget = null;
+    this._addWidgetProperties(['widget']);
 
-  // Default interceptor that stops the propagation for all key strokes except ESCAPE and ENTER.
-  // Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
-  // root (see global document listener in Tooltip.js).
-  this.keyStrokeStopPropagationInterceptor = function(event) {
-    if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
-      return;
+    // Default interceptor that stops the propagation for all key strokes except ESCAPE and ENTER.
+    // Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
+    // root (see global document listener in Tooltip.js).
+    this.keyStrokeStopPropagationInterceptor = function(event) {
+      if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
+        return;
+      }
+      event.stopPropagation();
+    };
+
+    this.withFocusContext = true;
+    this.initialFocus = function() {
+      return FocusRule.AUTO;
+    };
+    this.focusableContainer = false;
+  }
+
+
+  _createKeyStrokeContext() {
+    return new KeyStrokeContext();
+  }
+
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
+    if (this.keyStrokeStopPropagationInterceptor) {
+      this.keyStrokeContext.registerStopPropagationInterceptor(this.keyStrokeStopPropagationInterceptor);
     }
-    event.stopPropagation();
-  };
-
-  this.withFocusContext = true;
-  this.initialFocus = function() {
-    return FocusRule.AUTO;
-  };
-  this.focusableContainer = false;
-}
-
-
-_createKeyStrokeContext() {
-  return new KeyStrokeContext();
-}
-
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
-  if (this.keyStrokeStopPropagationInterceptor) {
-    this.keyStrokeContext.registerStopPropagationInterceptor(this.keyStrokeStopPropagationInterceptor);
-  }
-}
-
-_render() {
-  super._render();
-  this.$container.addClass('widget-tooltip');
-  this.$widgetContainer = this.$container.appendDiv('tooltip-widget-container');
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderWidget();
-}
-
-_remove() {
-  this._removeWidget();
-  super._remove();
-}
-
-setWidget(widget) {
-  this.setProperty('widget', widget);
-}
-
-_renderWidget() {
-  if (this.widget) {
-    this.widget.render(this.$widgetContainer);
-    this.widget.$container.addClass('widget');
-    this.widget.pack();
-  }
-  this.$widgetContainer.setVisible(!!this.widget);
-  if (!this.rendering) {
-    this.position();
   }
 
-  // Focus the widget
-  // It is important that this happens after layouting and positioning, otherwise we'd focus an element
-  // that is currently not on the screen. Which would cause the whole desktop to
-  // be shifted for a few pixels.
-  if (this.withFocusContext && this.widget) {
-    this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
+  _render() {
+    super._render();
+    this.$container.addClass('widget-tooltip');
+    this.$widgetContainer = this.$container.appendDiv('tooltip-widget-container');
   }
-}
 
-_removeWidget() {
-  if (this.widget) {
-    this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
-    this.widget.remove();
+  _renderProperties() {
+    super._renderProperties();
+    this._renderWidget();
   }
-}
+
+  _remove() {
+    this._removeWidget();
+    super._remove();
+  }
+
+  setWidget(widget) {
+    this.setProperty('widget', widget);
+  }
+
+  _renderWidget() {
+    if (this.widget) {
+      this.widget.render(this.$widgetContainer);
+      this.widget.$container.addClass('widget');
+      this.widget.pack();
+    }
+    this.$widgetContainer.setVisible(!!this.widget);
+    if (!this.rendering) {
+      this.position();
+    }
+
+    // Focus the widget
+    // It is important that this happens after layouting and positioning, otherwise we'd focus an element
+    // that is currently not on the screen. Which would cause the whole desktop to
+    // be shifted for a few pixels.
+    if (this.withFocusContext && this.widget) {
+      this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
+    }
+  }
+
+  _removeWidget() {
+    if (this.widget) {
+      this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
+      this.widget.remove();
+    }
+  }
 }

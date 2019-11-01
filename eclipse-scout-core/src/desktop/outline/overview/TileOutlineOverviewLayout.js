@@ -13,26 +13,26 @@ import {graphics} from '../../../index';
 
 export default class TileOutlineOverviewLayout extends AbstractLayout {
 
-constructor(tileOutlineOverview) {
-  super();
-  this.tileOutlineOverview = tileOutlineOverview;
-}
+  constructor(tileOutlineOverview) {
+    super();
+    this.tileOutlineOverview = tileOutlineOverview;
+  }
 
 
-layout($container) {
-  var htmlContainer = this.tileOutlineOverview.htmlComp;
-  var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
-  var $content = this.tileOutlineOverview.$content;
-  var contentSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets())
-    .subtract(graphics.insets($content, {
-      includeMargin: true
-    }));
+  layout($container) {
+    var htmlContainer = this.tileOutlineOverview.htmlComp;
+    var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
+    var $content = this.tileOutlineOverview.$content;
+    var contentSize = htmlContainer.availableSize()
+      .subtract(htmlContainer.insets())
+      .subtract(graphics.insets($content, {
+        includeMargin: true
+      }));
 
-  var htmlTileGrid = pageTileGrid.htmlComp;
-  var tilesPrefSize = pageTileGrid.htmlComp.prefSize({
-    widthHint: contentSize.width
-  });
-  htmlTileGrid.setSize(tilesPrefSize);
-}
+    var htmlTileGrid = pageTileGrid.htmlComp;
+    var tilesPrefSize = pageTileGrid.htmlComp.prefSize({
+      widthHint: contentSize.width
+    });
+    htmlTileGrid.setSize(tilesPrefSize);
+  }
 }

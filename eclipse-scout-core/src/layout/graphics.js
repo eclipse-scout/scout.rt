@@ -422,7 +422,7 @@ export function offset($elem) {
 }
 
 //private
- export function _bounds($elem, pos, options) {
+export function _bounds($elem, pos, options) {
   var s = size($elem, options);
   return new Rectangle(pos.left, pos.top, s.width, s.height);
 }

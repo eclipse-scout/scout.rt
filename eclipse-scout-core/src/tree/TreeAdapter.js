@@ -16,241 +16,241 @@ import {arrays} from '../index';
 
 export default class TreeAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['displayStyle']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['displayStyle']);
+  }
 
 
-_sendNodesSelected(nodeIds, debounceSend) {
-  var eventData = {
-    nodeIds: nodeIds
-  };
+  _sendNodesSelected(nodeIds, debounceSend) {
+    var eventData = {
+      nodeIds: nodeIds
+    };
 
-  // send delayed to avoid a lot of requests while selecting
-  // coalesce: only send the latest selection changed event for a field
-  this._send('nodesSelected', eventData, {
-    delay: (debounceSend ? 250 : 0),
-    coalesce: function(previous) {
-      return this.target === previous.target && this.type === previous.type;
-    }
-  });
-}
-
-_onWidgetNodeClick(event) {
-  this._send('nodeClick', {
-    nodeId: event.node.id
-  });
-}
-
-_onWidgetNodeAction(event) {
-  this._send('nodeAction', {
-    nodeId: event.node.id
-  });
-}
-
-_onWidgetNodesSelected(event) {
-  var nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
-  this._sendNodesSelected(nodeIds, event.debounce);
-}
-
-_onWidgetNodeExpanded(event) {
-  this._send('nodeExpanded', {
-    nodeId: event.node.id,
-    expanded: event.expanded,
-    expandedLazy: event.expandedLazy
-  });
-}
-
-_onWidgetNodesChecked(event) {
-  this._sendNodesChecked(event.nodes);
-}
-
-_sendNodesChecked(nodes) {
-  var data = {
-    nodes: []
-  };
-
-  for (var i = 0; i < nodes.length; i++) {
-    data.nodes.push({
-      nodeId: nodes[i].id,
-      checked: nodes[i].checked
+    // send delayed to avoid a lot of requests while selecting
+    // coalesce: only send the latest selection changed event for a field
+    this._send('nodesSelected', eventData, {
+      delay: (debounceSend ? 250 : 0),
+      coalesce: function(previous) {
+        return this.target === previous.target && this.type === previous.type;
+      }
     });
   }
 
-  this._send('nodesChecked', data);
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'nodesSelected') {
-    this._onWidgetNodesSelected(event);
-  } else if (event.type === 'nodeClick') {
-    this._onWidgetNodeClick(event);
-  } else if (event.type === 'nodeAction') {
-    this._onWidgetNodeAction(event);
-  } else if (event.type === 'nodeExpanded') {
-    this._onWidgetNodeExpanded(event);
-  } else if (event.type === 'nodesChecked') {
-    this._onWidgetNodesChecked(event);
-  } else {
-    super._onWidgetEvent( event);
+  _onWidgetNodeClick(event) {
+    this._send('nodeClick', {
+      nodeId: event.node.id
+    });
   }
-}
 
-onModelAction(event) {
-  if (event.type === 'nodesInserted') {
-    this._onNodesInserted(event.nodes, event.commonParentNodeId);
-  } else if (event.type === 'nodesUpdated') {
-    this._onNodesUpdated(event.nodes);
-  } else if (event.type === 'nodesDeleted') {
-    this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
-  } else if (event.type === 'allChildNodesDeleted') {
-    this._onAllChildNodesDeleted(event.commonParentNodeId);
-  } else if (event.type === 'nodesSelected') {
-    this._onNodesSelected(event.nodeIds);
-  } else if (event.type === 'nodeExpanded') {
-    this._onNodeExpanded(event.nodeId, event);
-  } else if (event.type === 'nodeChanged') {
-    this._onNodeChanged(event.nodeId, event);
-  } else if (event.type === 'nodesChecked') {
-    this._onNodesChecked(event.nodes);
-  } else if (event.type === 'childNodeOrderChanged') {
-    this._onChildNodeOrderChanged(event.childNodeIds, event.parentNodeId);
-  } else if (event.type === 'requestFocus') {
-    this._onRequestFocus();
-  } else if (event.type === 'scrollToSelection') {
-    this._onScrollToSelection();
-  } else {
-    super.onModelAction( event);
+  _onWidgetNodeAction(event) {
+    this._send('nodeAction', {
+      nodeId: event.node.id
+    });
   }
-}
 
-_onNodesInserted(nodes, parentNodeId) {
-  var parentNode;
-  if (parentNodeId !== null && parentNodeId !== undefined) {
-    parentNode = this.widget.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
+  _onWidgetNodesSelected(event) {
+    var nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
+    this._sendNodesSelected(nodeIds, event.debounce);
   }
-  this.widget.insertNodes(nodes, parentNode);
-}
 
-_onNodesUpdated(nodes) {
-  this.widget.updateNodes(nodes);
-}
-
-_onNodesDeleted(nodeIds, parentNodeId) {
-  var parentNode;
-  if (parentNodeId !== null && parentNodeId !== undefined) {
-    parentNode = this.widget.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
+  _onWidgetNodeExpanded(event) {
+    this._send('nodeExpanded', {
+      nodeId: event.node.id,
+      expanded: event.expanded,
+      expandedLazy: event.expandedLazy
+    });
   }
-  var nodes = this.widget._nodesByIds(nodeIds);
-  this.widget.deleteNodes(nodes, parentNode);
-}
 
-_onAllChildNodesDeleted(parentNodeId) {
-  var parentNode;
-  if (parentNodeId !== null && parentNodeId !== undefined) {
-    parentNode = this.widget.nodesMap[parentNodeId];
-    if (!parentNode) {
-      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
-    }
+  _onWidgetNodesChecked(event) {
+    this._sendNodesChecked(event.nodes);
   }
-  this.widget.deleteAllChildNodes(parentNode);
-}
 
-_onNodesSelected(nodeIds) {
-  this.addFilterForWidgetEvent(function(widgetEvent) {
-    return widgetEvent.type === 'nodesSelected' &&
-      arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
-  }.bind(this));
-  var nodes = this.widget._nodesByIds(nodeIds);
-  this.widget.selectNodes(nodes);
-}
-
-_onNodeExpanded(nodeId, event) {
-  var node = this.widget.nodesMap[nodeId],
-    options = {
-      lazy: event.expandedLazy
+  _sendNodesChecked(nodes) {
+    var data = {
+      nodes: []
     };
 
-  var affectedNodesMap = objects.createMap();
-  affectedNodesMap[nodeId] = true;
-  if (event.recursive) {
-    Tree.visitNodes(function(n) {
-      affectedNodesMap[n.id] = true;
-    }, node.childNodes);
-  }
-  this.addFilterForWidgetEvent(function(widgetEvent) {
-    return widgetEvent.type === 'nodeExpanded' &&
-      affectedNodesMap[widgetEvent.node.id] &&
-      event.expanded === widgetEvent.expanded &&
-      event.expandedLazy === widgetEvent.expandedLazy;
-  }.bind(this));
-
-  this.widget.setNodeExpanded(node, event.expanded, options);
-  if (event.recursive) {
-    this.widget.setNodeExpandedRecursive(node.childNodes, event.expanded, options);
-  }
-}
-
-_onNodeChanged(nodeId, cell) {
-  var node = this.widget.nodesMap[nodeId];
-
-  defaultValues.applyTo(cell, 'TreeNode');
-  node.text = cell.text;
-  node.cssClass = cell.cssClass;
-  node.iconId = cell.iconId;
-  node.tooltipText = cell.tooltipText;
-  node.foregroundColor = cell.foregroundColor;
-  node.backgroundColor = cell.backgroundColor;
-  node.font = cell.font;
-  node.htmlEnabled = cell.htmlEnabled;
-
-  this.widget.changeNode(node);
-}
-
-_onNodesChecked(nodes) {
-  var checkedNodes = [],
-    uncheckedNodes = [];
-
-  nodes.forEach(function(nodeData) {
-    var node = this.widget._nodeById(nodeData.id);
-    if (nodeData.checked) {
-      checkedNodes.push(node);
-    } else {
-      uncheckedNodes.push(node);
+    for (var i = 0; i < nodes.length; i++) {
+      data.nodes.push({
+        nodeId: nodes[i].id,
+        checked: nodes[i].checked
+      });
     }
-  }, this);
 
-  this.addFilterForWidgetEventType('nodesChecked');
+    this._send('nodesChecked', data);
+  }
 
-  this.widget.checkNodes(checkedNodes, {
-    checked: true,
-    checkChildren: false,
-    checkOnlyEnabled: false
-  });
-  this.widget.uncheckNodes(uncheckedNodes, {
-    checkChildren: false,
-    checkOnlyEnabled: false
-  });
-}
+  _onWidgetEvent(event) {
+    if (event.type === 'nodesSelected') {
+      this._onWidgetNodesSelected(event);
+    } else if (event.type === 'nodeClick') {
+      this._onWidgetNodeClick(event);
+    } else if (event.type === 'nodeAction') {
+      this._onWidgetNodeAction(event);
+    } else if (event.type === 'nodeExpanded') {
+      this._onWidgetNodeExpanded(event);
+    } else if (event.type === 'nodesChecked') {
+      this._onWidgetNodesChecked(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 
-_onChildNodeOrderChanged(childNodeIds, parentNodeId) {
-  var parentNode = this.widget._nodeById([parentNodeId]);
-  var nodes = this.widget._nodesByIds(childNodeIds);
-  this.widget.updateNodeOrder(nodes, parentNode);
-}
+  onModelAction(event) {
+    if (event.type === 'nodesInserted') {
+      this._onNodesInserted(event.nodes, event.commonParentNodeId);
+    } else if (event.type === 'nodesUpdated') {
+      this._onNodesUpdated(event.nodes);
+    } else if (event.type === 'nodesDeleted') {
+      this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
+    } else if (event.type === 'allChildNodesDeleted') {
+      this._onAllChildNodesDeleted(event.commonParentNodeId);
+    } else if (event.type === 'nodesSelected') {
+      this._onNodesSelected(event.nodeIds);
+    } else if (event.type === 'nodeExpanded') {
+      this._onNodeExpanded(event.nodeId, event);
+    } else if (event.type === 'nodeChanged') {
+      this._onNodeChanged(event.nodeId, event);
+    } else if (event.type === 'nodesChecked') {
+      this._onNodesChecked(event.nodes);
+    } else if (event.type === 'childNodeOrderChanged') {
+      this._onChildNodeOrderChanged(event.childNodeIds, event.parentNodeId);
+    } else if (event.type === 'requestFocus') {
+      this._onRequestFocus();
+    } else if (event.type === 'scrollToSelection') {
+      this._onScrollToSelection();
+    } else {
+      super.onModelAction(event);
+    }
+  }
 
-_onRequestFocus() {
-  this.widget.focus();
-}
+  _onNodesInserted(nodes, parentNodeId) {
+    var parentNode;
+    if (parentNodeId !== null && parentNodeId !== undefined) {
+      parentNode = this.widget.nodesMap[parentNodeId];
+      if (!parentNode) {
+        throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+      }
+    }
+    this.widget.insertNodes(nodes, parentNode);
+  }
 
-_onScrollToSelection() {
-  this.widget.revealSelection();
-}
+  _onNodesUpdated(nodes) {
+    this.widget.updateNodes(nodes);
+  }
+
+  _onNodesDeleted(nodeIds, parentNodeId) {
+    var parentNode;
+    if (parentNodeId !== null && parentNodeId !== undefined) {
+      parentNode = this.widget.nodesMap[parentNodeId];
+      if (!parentNode) {
+        throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+      }
+    }
+    var nodes = this.widget._nodesByIds(nodeIds);
+    this.widget.deleteNodes(nodes, parentNode);
+  }
+
+  _onAllChildNodesDeleted(parentNodeId) {
+    var parentNode;
+    if (parentNodeId !== null && parentNodeId !== undefined) {
+      parentNode = this.widget.nodesMap[parentNodeId];
+      if (!parentNode) {
+        throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+      }
+    }
+    this.widget.deleteAllChildNodes(parentNode);
+  }
+
+  _onNodesSelected(nodeIds) {
+    this.addFilterForWidgetEvent(function(widgetEvent) {
+      return widgetEvent.type === 'nodesSelected' &&
+        arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
+    }.bind(this));
+    var nodes = this.widget._nodesByIds(nodeIds);
+    this.widget.selectNodes(nodes);
+  }
+
+  _onNodeExpanded(nodeId, event) {
+    var node = this.widget.nodesMap[nodeId],
+      options = {
+        lazy: event.expandedLazy
+      };
+
+    var affectedNodesMap = objects.createMap();
+    affectedNodesMap[nodeId] = true;
+    if (event.recursive) {
+      Tree.visitNodes(function(n) {
+        affectedNodesMap[n.id] = true;
+      }, node.childNodes);
+    }
+    this.addFilterForWidgetEvent(function(widgetEvent) {
+      return widgetEvent.type === 'nodeExpanded' &&
+        affectedNodesMap[widgetEvent.node.id] &&
+        event.expanded === widgetEvent.expanded &&
+        event.expandedLazy === widgetEvent.expandedLazy;
+    }.bind(this));
+
+    this.widget.setNodeExpanded(node, event.expanded, options);
+    if (event.recursive) {
+      this.widget.setNodeExpandedRecursive(node.childNodes, event.expanded, options);
+    }
+  }
+
+  _onNodeChanged(nodeId, cell) {
+    var node = this.widget.nodesMap[nodeId];
+
+    defaultValues.applyTo(cell, 'TreeNode');
+    node.text = cell.text;
+    node.cssClass = cell.cssClass;
+    node.iconId = cell.iconId;
+    node.tooltipText = cell.tooltipText;
+    node.foregroundColor = cell.foregroundColor;
+    node.backgroundColor = cell.backgroundColor;
+    node.font = cell.font;
+    node.htmlEnabled = cell.htmlEnabled;
+
+    this.widget.changeNode(node);
+  }
+
+  _onNodesChecked(nodes) {
+    var checkedNodes = [],
+      uncheckedNodes = [];
+
+    nodes.forEach(function(nodeData) {
+      var node = this.widget._nodeById(nodeData.id);
+      if (nodeData.checked) {
+        checkedNodes.push(node);
+      } else {
+        uncheckedNodes.push(node);
+      }
+    }, this);
+
+    this.addFilterForWidgetEventType('nodesChecked');
+
+    this.widget.checkNodes(checkedNodes, {
+      checked: true,
+      checkChildren: false,
+      checkOnlyEnabled: false
+    });
+    this.widget.uncheckNodes(uncheckedNodes, {
+      checkChildren: false,
+      checkOnlyEnabled: false
+    });
+  }
+
+  _onChildNodeOrderChanged(childNodeIds, parentNodeId) {
+    var parentNode = this.widget._nodeById([parentNodeId]);
+    var nodes = this.widget._nodesByIds(childNodeIds);
+    this.widget.updateNodeOrder(nodes, parentNode);
+  }
+
+  _onRequestFocus() {
+    this.widget.focus();
+  }
+
+  _onScrollToSelection() {
+    this.widget.revealSelection();
+  }
 }

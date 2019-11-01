@@ -13,11 +13,11 @@ import {scout} from '../index';
 
 export default class RemoteEvent {
 
-constructor(target, type, data) {
-  scout.assertParameter('target', target);
-  scout.assertParameter('type', type);
-  $.extend(this, data);
-  this.target = target;
-  this.type = type;
-}
+  constructor(target, type, data) {
+    scout.assertParameter('target', target);
+    scout.assertParameter('type', type);
+    $.extend(this, data);
+    this.target = target;
+    this.type = type;
+  }
 }

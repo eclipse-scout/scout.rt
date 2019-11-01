@@ -12,24 +12,23 @@ import {KeyStrokeContext} from '../../../index';
 
 export default class OutlineKeyStrokeContext extends KeyStrokeContext {
 
-constructor(outline) {
-  super();
-  this._outline = outline;
-}
+  constructor(outline) {
+    super();
+    this._outline = outline;
+  }
 
 
+  /**
+   * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
+   */
+  accept(event) {
+    return !this._outline.inBackground && !this.isFormMenuOpen() && super.accept(event);
+  }
 
-/**
- * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
- */
-accept(event) {
-  return !this._outline.inBackground && !this.isFormMenuOpen() && super.accept( event);
-}
-
-isFormMenuOpen() {
-  var menus = this._outline.session.desktop.menus;
-  return menus.some(function(menu) {
-    return menu.popup && menu.popup.$container && menu.popup.$container.isAttached();
-  }, this);
-}
+  isFormMenuOpen() {
+    var menus = this._outline.session.desktop.menus;
+    return menus.some(function(menu) {
+      return menu.popup && menu.popup.$container && menu.popup.$container.isAttached();
+    }, this);
+  }
 }

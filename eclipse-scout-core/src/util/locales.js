@@ -16,7 +16,6 @@ import {scout} from '../index';
 import {Locale} from '../index';
 
 
-
 let localesMap = {};
 
 export function bootstrap(url) {
@@ -25,7 +24,7 @@ export function bootstrap(url) {
 }
 
 //private
- export function _preInit(url, data) {
+export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -43,7 +42,7 @@ export function init(data) {
 }
 
 //private
- export function _get(languageTag) {
+export function _get(languageTag) {
   return localesMap[languageTag];
 }
 

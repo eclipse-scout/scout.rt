@@ -2133,6 +2133,6 @@ $.extend($.easing, {
   });
 })($);
 
-if(window.$ !== $) {
+if (window.$ !== $) {
   window.$ = $;
 }

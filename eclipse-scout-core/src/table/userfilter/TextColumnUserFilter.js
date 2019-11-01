@@ -15,81 +15,81 @@ import * as $ from 'jquery';
 
 export default class TextColumnUserFilter extends ColumnUserFilter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.freeText = null;
-  this.freeTextField = null;
-  this.hasFilterFields = true;
-}
+    this.freeText = null;
+    this.freeTextField = null;
+    this.hasFilterFields = true;
+  }
 
 
-/**
- * @override ColumnUserFilter.js
- */
-createFilterAddedEventData() {
-  var data = super.createFilterAddedEventData();
-  data.freeText = this.freeText;
-  return data;
-}
+  /**
+   * @override ColumnUserFilter.js
+   */
+  createFilterAddedEventData() {
+    var data = super.createFilterAddedEventData();
+    data.freeText = this.freeText;
+    return data;
+  }
 
-/**
- * @override ColumnUserFilter.js
- */
-fieldsFilterActive() {
-  return strings.hasText(this.freeText);
-}
+  /**
+   * @override ColumnUserFilter.js
+   */
+  fieldsFilterActive() {
+    return strings.hasText(this.freeText);
+  }
 
-/**
- * @override ColumnUserFilter.js
- */
-acceptByFields(key, normKey, row) {
-  var filterFieldText = strings.nvl(this.freeText).toLowerCase(),
-    rowText = strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
-  return rowText.indexOf(filterFieldText) > -1;
-}
+  /**
+   * @override ColumnUserFilter.js
+   */
+  acceptByFields(key, normKey, row) {
+    var filterFieldText = strings.nvl(this.freeText).toLowerCase(),
+      rowText = strings.nvl(this.column.cellTextForTextFilter(row)).toLowerCase();
+    return rowText.indexOf(filterFieldText) > -1;
+  }
 
-/**
- * @implements ColumnUserFilter.js
- */
-_useTextInsteadOfNormValue(value) {
-  // null is valid, if for text columns. We do not want to store -empty-
-  return value === null ? false : true;
-}
+  /**
+   * @implements ColumnUserFilter.js
+   */
+  _useTextInsteadOfNormValue(value) {
+    // null is valid, if for text columns. We do not want to store -empty-
+    return value === null ? false : true;
+  }
 
-/**
- * @implements ColumnUserFilter.js
- */
-filterFieldsTitle() {
-  return this.session.text('ui.FreeText');
-}
+  /**
+   * @implements ColumnUserFilter.js
+   */
+  filterFieldsTitle() {
+    return this.session.text('ui.FreeText');
+  }
 
-/**
- * @override ColumnUserFilter.js
- */
-addFilterFields(groupBox) {
-  this.freeTextField = scout.create('StringField', {
-    parent: groupBox,
-    labelVisible: false,
-    statusVisible: false,
-    maxLength: 100,
-    displayText: this.freeText,
-    updateDisplayTextOnModify: true
-  });
-  this.freeTextField.on('acceptInput', this._onAcceptInput.bind(this));
-  groupBox.addField0(this.freeTextField);
-}
+  /**
+   * @override ColumnUserFilter.js
+   */
+  addFilterFields(groupBox) {
+    this.freeTextField = scout.create('StringField', {
+      parent: groupBox,
+      labelVisible: false,
+      statusVisible: false,
+      maxLength: 100,
+      displayText: this.freeText,
+      updateDisplayTextOnModify: true
+    });
+    this.freeTextField.on('acceptInput', this._onAcceptInput.bind(this));
+    groupBox.addField0(this.freeTextField);
+  }
 
-_onAcceptInput(event) {
-  this.freeText = this.freeTextField.$field.val().trim();
-  $.log.isDebugEnabled() && $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
-  this.triggerFilterFieldsChanged(event);
-}
+  _onAcceptInput(event) {
+    this.freeText = this.freeTextField.$field.val().trim();
+    $.log.isDebugEnabled() && $.log.debug('(TextColumnUserFilter#_onAcceptInput) freeText=' + this.freeText);
+    this.triggerFilterFieldsChanged(event);
+  }
 
-/**
- * @override ColumnUserFilter.js
- */
-modifyFilterFields() {
-  this.freeTextField.removeMandatoryIndicator();
-}
+  /**
+   * @override ColumnUserFilter.js
+   */
+  modifyFilterFields() {
+    this.freeTextField.removeMandatoryIndicator();
+  }
 }

@@ -13,15 +13,15 @@ import {keys} from '../../index';
 
 export default class CellEditorCompleteEditKeyStroke extends KeyStroke {
 
-constructor(popup) {
-  super();
-  this.field = popup;
-  this.which = [keys.ENTER];
-  this.stopPropagation = true;
-}
+  constructor(popup) {
+    super();
+    this.field = popup;
+    this.which = [keys.ENTER];
+    this.stopPropagation = true;
+  }
 
 
-handle(event) {
-  this.field.completeEdit();
-}
+  handle(event) {
+    this.field.completeEdit();
+  }
 }

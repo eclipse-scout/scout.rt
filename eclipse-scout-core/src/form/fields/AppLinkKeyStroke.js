@@ -14,28 +14,28 @@ import * as $ from 'jquery';
 
 export default class AppLinkKeyStroke extends KeyStroke {
 
-constructor(field, appLinkTriggerFunction) {
-  super();
-  this.field = field;
-  this.appLinkTriggerFunction = appLinkTriggerFunction;
+  constructor(field, appLinkTriggerFunction) {
+    super();
+    this.field = field;
+    this.appLinkTriggerFunction = appLinkTriggerFunction;
 
-  this.which = [keys.SPACE];
-  this.renderingHints.render = false;
-}
+    this.which = [keys.SPACE];
+    this.renderingHints.render = false;
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted && $(event.target).hasClass('app-link');
-}
+  /**
+   * @override KeyStroke.js
+   */
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted && $(event.target).hasClass('app-link');
+  }
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.appLinkTriggerFunction.call(this.field, event);
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.appLinkTriggerFunction.call(this.field, event);
+  }
 }

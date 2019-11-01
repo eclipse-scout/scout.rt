@@ -13,24 +13,24 @@ import {FormFieldAdapter} from '../../../index';
 
 export default class ButtonAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['selected']);
-}
-
-
-_onWidgetClick(event) {
-  if (this.widget.displayStyle === Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
-    return;
+  constructor() {
+    super();
+    this._addRemoteProperties(['selected']);
   }
-  this._send('click');
-}
 
-_onWidgetEvent(event) {
-  if (event.type === 'click') {
-    this._onWidgetClick(event);
-  } else {
-    super._onWidgetEvent( event);
+
+  _onWidgetClick(event) {
+    if (this.widget.displayStyle === Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
+      return;
+    }
+    this._send('click');
   }
-}
+
+  _onWidgetEvent(event) {
+    if (event.type === 'click') {
+      this._onWidgetClick(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

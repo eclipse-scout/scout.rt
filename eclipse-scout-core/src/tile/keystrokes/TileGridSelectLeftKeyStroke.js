@@ -13,27 +13,27 @@ import {keys} from '../../index';
 
 export default class TileGridSelectLeftKeyStroke extends TileGridSelectKeyStroke {
 
-constructor(tileGrid) {
-  super( tileGrid);
-  this.stopPropagation = true;
-  this.repeatable = true;
-  this.which = [keys.LEFT];
-  this.renderingHints.text = '←';
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(tileGrid) {
+    super(tileGrid);
+    this.stopPropagation = true;
+    this.repeatable = true;
+    this.which = [keys.LEFT];
+    this.renderingHints.text = '←';
   }
-  if (!(this.getSelectionHandler().isHorizontalGridActive())) {
-    return false;
-  }
-  return true;
-}
 
-_computeNewSelection(extend) {
-  return this.getSelectionHandler().computeSelectionX(-1, extend);
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    if (!(this.getSelectionHandler().isHorizontalGridActive())) {
+      return false;
+    }
+    return true;
+  }
+
+  _computeNewSelection(extend) {
+    return this.getSelectionHandler().computeSelectionX(-1, extend);
+  }
 }

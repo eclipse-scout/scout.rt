@@ -17,7 +17,6 @@ import {FormField} from '../../index';
 import * as $ from 'jquery';
 
 
-
 /**
  * @param $parent used to determine which HTML document is used to create the new HTML element
  * @returns an INPUT element as used in Scout forms.

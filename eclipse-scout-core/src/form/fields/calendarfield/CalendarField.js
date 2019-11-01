@@ -12,20 +12,20 @@ import {FormField} from '../../../index';
 
 export default class CalendarField extends FormField {
 
-constructor() {
-  super();
-  this.gridDataHints.weightY = 1;
-  this._addWidgetProperties(['calendar']);
-}
-
-
-_render() {
-  this.addContainer(this.$parent, 'calendar-field');
-  this.addLabel();
-  this.addStatus();
-  if (this.calendar) {
-    this.calendar.render();
-    this.addField(this.calendar.$container);
+  constructor() {
+    super();
+    this.gridDataHints.weightY = 1;
+    this._addWidgetProperties(['calendar']);
   }
-}
+
+
+  _render() {
+    this.addContainer(this.$parent, 'calendar-field');
+    this.addLabel();
+    this.addStatus();
+    if (this.calendar) {
+      this.calendar.render();
+      this.addField(this.calendar.$container);
+    }
+  }
 }

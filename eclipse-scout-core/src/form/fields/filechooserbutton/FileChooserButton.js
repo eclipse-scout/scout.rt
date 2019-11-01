@@ -19,154 +19,154 @@ import {arrays} from '../../../index';
 
 export default class FileChooserButton extends ValueField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.button = null;
-  this.fileInput = null;
+    this.button = null;
+    this.fileInput = null;
 
-  this.acceptTypes = null;
-  this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
-}
-
-
-_init(model) {
-  super._init( model);
-
-  this.button = scout.create('Button', {
-    parent: this,
-    label: this._buttonLabel(),
-    iconId: this.iconId,
-    htmlEnabled: this.htmlEnabled
-  });
-  this.button.on('click', this._onButtonClick.bind(this));
-
-  this.fileInput.on('change', this._onFileChange.bind(this));
-  this.on('propertyChange', function(event) {
-    if (event.propertyName === 'enabledComputed') {
-      // Propagate "enabledComputed" to inner widgets
-      this.button.setEnabled(event.newValue);
-      this.fileInput.setEnabled(event.newValue);
-    }
-  }.bind(this));
-}
-
-/**
- * Initializes the file input before calling set value.
- * This cannot be done in _init because the value field would call _setValue first
- */
-_initValue(value) {
-  this.fileInput = scout.create('FileInput', {
-    parent: this,
-    acceptTypes: this.acceptTypes,
-    text: this.displayText,
-    enabled: this.enabledComputed,
-    maximumUploadSize: this.maximumUploadSize,
-    visible: !Device.get().supportsFile()
-  });
-
-  super._initValue( value);
-}
-
-_buttonLabel() {
-  return this.label;
-}
-
-_render() {
-  this.addContainer(this.$parent, 'file-chooser-button has-icon');
-  this.addLabel();
-
-  var $field = this.$parent.makeDiv();
-  var fieldHtmlComp = HtmlComponent.install($field, this.session);
-  this.button.render($field);
-
-  fieldHtmlComp.setLayout(new SingleLayout(this.button.htmlComp));
-  this.fileInput.render($field);
-  this.addField($field);
-  $field.setTabbable(false);
-
-  this.addStatus();
-}
-
-setDisplayText(text) {
-  super.setDisplayText( text);
-  this.fileInput.setText(text);
-  if (!text) {
-    this.fileInput.clear();
+    this.acceptTypes = null;
+    this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
   }
-}
 
-/**
- * @override
- */
-_readDisplayText() {
-  return this.fileInput.text;
-}
 
-/**
- * @override
- */
-_renderLabel() {
-  this._renderEmptyLabel();
-}
+  _init(model) {
+    super._init(model);
 
-_onButtonClick(event) {
-  this.fileInput.browse();
-}
+    this.button = scout.create('Button', {
+      parent: this,
+      label: this._buttonLabel(),
+      iconId: this.iconId,
+      htmlEnabled: this.htmlEnabled
+    });
+    this.button.on('click', this._onButtonClick.bind(this));
 
-setLabel(label) {
-  super.setLabel( label);
-  this.button.setLabel(this._buttonLabel());
-}
+    this.fileInput.on('change', this._onFileChange.bind(this));
+    this.on('propertyChange', function(event) {
+      if (event.propertyName === 'enabledComputed') {
+        // Propagate "enabledComputed" to inner widgets
+        this.button.setEnabled(event.newValue);
+        this.fileInput.setEnabled(event.newValue);
+      }
+    }.bind(this));
+  }
 
-setIconId(iconId) {
-  this.setProperty('iconId', iconId);
-  this.button.setIconId(iconId);
-}
+  /**
+   * Initializes the file input before calling set value.
+   * This cannot be done in _init because the value field would call _setValue first
+   */
+  _initValue(value) {
+    this.fileInput = scout.create('FileInput', {
+      parent: this,
+      acceptTypes: this.acceptTypes,
+      text: this.displayText,
+      enabled: this.enabledComputed,
+      maximumUploadSize: this.maximumUploadSize,
+      visible: !Device.get().supportsFile()
+    });
 
-setAcceptTypes(acceptTypes) {
-  this.setProperty('acceptTypes', acceptTypes);
-  this.fileInput.setAcceptTypes(acceptTypes);
-}
+    super._initValue(value);
+  }
 
-setFileExtensions(fileExtensions) {
-  this.setProperty('fileExtensions', fileExtensions);
-  var acceptTypes = arrays.ensure(fileExtensions);
-  acceptTypes = acceptTypes.map(function(acceptType) {
-    return acceptType.indexOf(0) === '.' ? acceptType : '.' + acceptType;
-  });
-  this.setAcceptTypes(strings.join(',', acceptTypes));
-  this.fileInput.acceptTypes = this.acceptTypes;
-}
+  _buttonLabel() {
+    return this.label;
+  }
 
-setMaximumUploadSize(maximumUploadSize) {
-  this.setProperty('maximumUploadSize', maximumUploadSize);
-  this.fileInput.setMaximumUploadSize(maximumUploadSize);
-}
+  _render() {
+    this.addContainer(this.$parent, 'file-chooser-button has-icon');
+    this.addLabel();
 
-_onFileChange(event) {
-  this.setValue(arrays.first(event.files));
-}
+    var $field = this.$parent.makeDiv();
+    var fieldHtmlComp = HtmlComponent.install($field, this.session);
+    this.button.render($field);
 
-/**
- * @override
- */
-_validateValue(value) {
-  this.fileInput.validateMaximumUploadSize(value);
-  return value;
-}
+    fieldHtmlComp.setLayout(new SingleLayout(this.button.htmlComp));
+    this.fileInput.render($field);
+    this.addField($field);
+    $field.setTabbable(false);
 
-/**
- * @override
- */
-_formatValue(value) {
-  return !value ? '' : value.name;
-}
+    this.addStatus();
+  }
 
-/**
- * @override
- */
-getFocusableElement() {
-  return this.button.getFocusableElement();
-}
+  setDisplayText(text) {
+    super.setDisplayText(text);
+    this.fileInput.setText(text);
+    if (!text) {
+      this.fileInput.clear();
+    }
+  }
+
+  /**
+   * @override
+   */
+  _readDisplayText() {
+    return this.fileInput.text;
+  }
+
+  /**
+   * @override
+   */
+  _renderLabel() {
+    this._renderEmptyLabel();
+  }
+
+  _onButtonClick(event) {
+    this.fileInput.browse();
+  }
+
+  setLabel(label) {
+    super.setLabel(label);
+    this.button.setLabel(this._buttonLabel());
+  }
+
+  setIconId(iconId) {
+    this.setProperty('iconId', iconId);
+    this.button.setIconId(iconId);
+  }
+
+  setAcceptTypes(acceptTypes) {
+    this.setProperty('acceptTypes', acceptTypes);
+    this.fileInput.setAcceptTypes(acceptTypes);
+  }
+
+  setFileExtensions(fileExtensions) {
+    this.setProperty('fileExtensions', fileExtensions);
+    var acceptTypes = arrays.ensure(fileExtensions);
+    acceptTypes = acceptTypes.map(function(acceptType) {
+      return acceptType.indexOf(0) === '.' ? acceptType : '.' + acceptType;
+    });
+    this.setAcceptTypes(strings.join(',', acceptTypes));
+    this.fileInput.acceptTypes = this.acceptTypes;
+  }
+
+  setMaximumUploadSize(maximumUploadSize) {
+    this.setProperty('maximumUploadSize', maximumUploadSize);
+    this.fileInput.setMaximumUploadSize(maximumUploadSize);
+  }
+
+  _onFileChange(event) {
+    this.setValue(arrays.first(event.files));
+  }
+
+  /**
+   * @override
+   */
+  _validateValue(value) {
+    this.fileInput.validateMaximumUploadSize(value);
+    return value;
+  }
+
+  /**
+   * @override
+   */
+  _formatValue(value) {
+    return !value ? '' : value.name;
+  }
+
+  /**
+   * @override
+   */
+  getFocusableElement() {
+    return this.button.getFocusableElement();
+  }
 }

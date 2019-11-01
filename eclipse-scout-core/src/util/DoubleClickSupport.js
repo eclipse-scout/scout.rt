@@ -29,42 +29,42 @@ import {scout} from '../index';
  */
 export default class DoubleClickSupport {
 
-constructor(options) {
-  options = options || {};
+  constructor(options) {
+    options = options || {};
 
-  this._lastPosX;
-  this._lastPosY;
-  this._lastTimestamp;
+    this._lastPosX;
+    this._lastPosY;
+    this._lastTimestamp;
 
-  this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500; // ms
-  this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10; // px
-  this._doubleClicked = false;
-}
+    this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500; // ms
+    this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10; // px
+    this._doubleClicked = false;
+  }
 
-mousedown(event) {
-  if (event && event.type === 'mousedown') {
-    var posX = scout.nvl(event.pageX, 0);
-    var posY = scout.nvl(event.pageY, 0);
-    var timestamp = Date.now();
-    var isDoubleClick = false;
-    if (this._lastTimestamp !== undefined) {
-      var interval = timestamp - this._lastTimestamp;
-      if (interval <= this._maxDoubleClickInterval) {
-        var distance = Math.max(Math.abs(posX - this._lastPosX), Math.abs(posY - this._lastPosY));
-        if (distance <= this._maxDoubleClickDistance) {
-          // Double click detected
-          isDoubleClick = true;
+  mousedown(event) {
+    if (event && event.type === 'mousedown') {
+      var posX = scout.nvl(event.pageX, 0);
+      var posY = scout.nvl(event.pageY, 0);
+      var timestamp = Date.now();
+      var isDoubleClick = false;
+      if (this._lastTimestamp !== undefined) {
+        var interval = timestamp - this._lastTimestamp;
+        if (interval <= this._maxDoubleClickInterval) {
+          var distance = Math.max(Math.abs(posX - this._lastPosX), Math.abs(posY - this._lastPosY));
+          if (distance <= this._maxDoubleClickDistance) {
+            // Double click detected
+            isDoubleClick = true;
+          }
         }
       }
+      this._lastPosX = posX;
+      this._lastPosY = posY;
+      this._lastTimestamp = timestamp;
+      this._doubleClicked = isDoubleClick;
     }
-    this._lastPosX = posX;
-    this._lastPosY = posY;
-    this._lastTimestamp = timestamp;
-    this._doubleClicked = isDoubleClick;
   }
-}
 
-doubleClicked() {
-  return this._doubleClicked;
-}
+  doubleClicked() {
+    return this._doubleClicked;
+  }
 }

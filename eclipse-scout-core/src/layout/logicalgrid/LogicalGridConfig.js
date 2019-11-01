@@ -10,19 +10,19 @@
  */
 export default class LogicalGridConfig {
 
-constructor() {
-  this.widget = null;
-}
+  constructor() {
+    this.widget = null;
+  }
 
-setWidget(widget) {
-  this.widget = widget;
-}
+  setWidget(widget) {
+    this.widget = widget;
+  }
 
-getGridColumnCount() {
-  return this.widget.gridColumnCount;
-}
+  getGridColumnCount() {
+    return this.widget.gridColumnCount;
+  }
 
-getGridWidgets() {
-  return this.widget.widgets;
-}
+  getGridWidgets() {
+    return this.widget.widgets;
+  }
 }

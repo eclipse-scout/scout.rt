@@ -27,21 +27,21 @@ import {Action} from '../index';
  */
 export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
 
-constructor(desktop) {
-  super();
-  this.field = desktop;
+  constructor(desktop) {
+    super();
+    this.field = desktop;
 
-  this.which = [keys.F5];
-  this.preventDefault = true;
-  this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
-  this.renderingHints.render = false;
-}
+    this.which = [keys.F5];
+    this.preventDefault = true;
+    this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
+    this.renderingHints.render = false;
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  // NOP
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    // NOP
+  }
 }

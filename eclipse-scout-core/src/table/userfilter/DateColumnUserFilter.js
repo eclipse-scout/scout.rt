@@ -15,126 +15,126 @@ import * as $ from 'jquery';
 
 export default class DateColumnUserFilter extends ColumnUserFilter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.dateFrom;
-  this.dateFromField;
-  this.dateTo;
-  this.dateToField;
+    this.dateFrom;
+    this.dateFromField;
+    this.dateTo;
+    this.dateToField;
 
-  this.hasFilterFields = true;
-}
-
-
-/**
- * @override TableUserFilter.js
- */
-_init(model) {
-  super._init( model);
-  this.dateFrom = dates.parseJsonDate(this.dateFrom);
-  this.dateTo = dates.parseJsonDate(this.dateTo);
-}
-
-/**
- * @override ColumnUserFilter.js
- */
-axisGroup() {
-  if (this.column.hasDate) {
-    // Default grouping for date columns is year
-    return TableMatrix.DateGroup.YEAR;
-  } else {
-    // No grouping for time columns
-    return TableMatrix.DateGroup.NONE;
-  }
-}
-
-/**
- * @override ColumnUserFilter.js
- */
-createFilterAddedEventData() {
-  var data = super.createFilterAddedEventData();
-  data.dateFrom = dates.toJsonDate(this.dateFrom);
-  data.dateTo = dates.toJsonDate(this.dateTo);
-  return data;
-}
-
-/**
- * @override ColumnUserFilter.js
- */
-fieldsFilterActive() {
-  return this.dateFrom || this.dateTo;
-}
-
-/**
- * @override ColumnUserFilter.js
- */
-acceptByFields(key, normKey, row) {
-  // if date is empty and dateFrom/dateTo is set, the row should never match
-  if (!key) {
-    return false;
+    this.hasFilterFields = true;
   }
 
-  var
-    keyValue = key.valueOf(),
-    fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
-    // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.
-    toValue = this.dateTo ? dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
 
-  if (fromValue && toValue) {
-    return keyValue >= fromValue && keyValue <= toValue;
-  } else if (fromValue) {
-    return keyValue >= fromValue;
-  } else if (toValue) {
-    return keyValue <= toValue;
+  /**
+   * @override TableUserFilter.js
+   */
+  _init(model) {
+    super._init(model);
+    this.dateFrom = dates.parseJsonDate(this.dateFrom);
+    this.dateTo = dates.parseJsonDate(this.dateTo);
   }
 
-  // acceptByFields is only called when filter fields are active
-  throw new Error('illegal state');
-}
-
-/**
- * @implements ColumnUserFilter.js
- */
-filterFieldsTitle() {
-  return this.session.text('ui.DateRange');
-}
-
-/**
- * @override ColumnUserFilter.js
- */
-addFilterFields(groupBox) {
-  this.dateFromField = groupBox.addFilterField('DateField', 'ui.from');
-  this.dateFromField.setValue(this.dateFrom);
-  this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
-
-  this.dateToField = groupBox.addFilterField('DateField', 'ui.to');
-  this.dateToField.setValue(this.dateTo);
-  this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
-}
-
-_onPropertyChange(event) {
-  if (event.propertyName !== 'value') {
-    return;
+  /**
+   * @override ColumnUserFilter.js
+   */
+  axisGroup() {
+    if (this.column.hasDate) {
+      // Default grouping for date columns is year
+      return TableMatrix.DateGroup.YEAR;
+    } else {
+      // No grouping for time columns
+      return TableMatrix.DateGroup.NONE;
+    }
   }
-  this.dateFrom = this.dateFromField.value;
-  this.dateTo = this.dateToField.value;
-  $.log.isDebugEnabled() && $.log.debug('(DateColumnUserFilter#_onAcceptInput) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
-  this.triggerFilterFieldsChanged(event);
-}
 
-modifyFilterFields() {
-  this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
-  this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
-}
-
-_onInput(event) {
-  if (!this.dateFromField.rendered) {
-    // popup has been closed in the mean time
-    return;
+  /**
+   * @override ColumnUserFilter.js
+   */
+  createFilterAddedEventData() {
+    var data = super.createFilterAddedEventData();
+    data.dateFrom = dates.toJsonDate(this.dateFrom);
+    data.dateTo = dates.toJsonDate(this.dateTo);
+    return data;
   }
-  this.dateFrom = this.dateFromField.value;
-  this.dateTo = this.dateToField.value;
-  this.triggerFilterFieldsChanged(event);
-}
+
+  /**
+   * @override ColumnUserFilter.js
+   */
+  fieldsFilterActive() {
+    return this.dateFrom || this.dateTo;
+  }
+
+  /**
+   * @override ColumnUserFilter.js
+   */
+  acceptByFields(key, normKey, row) {
+    // if date is empty and dateFrom/dateTo is set, the row should never match
+    if (!key) {
+      return false;
+    }
+
+    var
+      keyValue = key.valueOf(),
+      fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
+      // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.
+      toValue = this.dateTo ? dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
+
+    if (fromValue && toValue) {
+      return keyValue >= fromValue && keyValue <= toValue;
+    } else if (fromValue) {
+      return keyValue >= fromValue;
+    } else if (toValue) {
+      return keyValue <= toValue;
+    }
+
+    // acceptByFields is only called when filter fields are active
+    throw new Error('illegal state');
+  }
+
+  /**
+   * @implements ColumnUserFilter.js
+   */
+  filterFieldsTitle() {
+    return this.session.text('ui.DateRange');
+  }
+
+  /**
+   * @override ColumnUserFilter.js
+   */
+  addFilterFields(groupBox) {
+    this.dateFromField = groupBox.addFilterField('DateField', 'ui.from');
+    this.dateFromField.setValue(this.dateFrom);
+    this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
+
+    this.dateToField = groupBox.addFilterField('DateField', 'ui.to');
+    this.dateToField.setValue(this.dateTo);
+    this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
+  }
+
+  _onPropertyChange(event) {
+    if (event.propertyName !== 'value') {
+      return;
+    }
+    this.dateFrom = this.dateFromField.value;
+    this.dateTo = this.dateToField.value;
+    $.log.isDebugEnabled() && $.log.debug('(DateColumnUserFilter#_onAcceptInput) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
+    this.triggerFilterFieldsChanged(event);
+  }
+
+  modifyFilterFields() {
+    this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+    this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
+  }
+
+  _onInput(event) {
+    if (!this.dateFromField.rendered) {
+      // popup has been closed in the mean time
+      return;
+    }
+    this.dateFrom = this.dateFromField.value;
+    this.dateTo = this.dateToField.value;
+    this.triggerFilterFieldsChanged(event);
+  }
 }

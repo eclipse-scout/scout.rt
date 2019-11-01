@@ -13,23 +13,23 @@ import {keys} from '../../index';
 
 export default class TableRefreshKeyStroke extends KeyStroke {
 
-constructor(table) {
-  super();
-  this.field = table;
-  this.which = [keys.F5];
-  this.renderingHints.offset = 14;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
-  }.bind(this);
-}
+  constructor(table) {
+    super();
+    this.field = table;
+    this.which = [keys.F5];
+    this.renderingHints.offset = 14;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
+    }.bind(this);
+  }
 
 
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted && this.field.hasReloadHandler;
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted && this.field.hasReloadHandler;
+  }
 
-handle(event) {
-  this.field.reload();
-}
+  handle(event) {
+    this.field.reload();
+  }
 }

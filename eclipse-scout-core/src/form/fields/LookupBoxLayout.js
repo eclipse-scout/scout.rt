@@ -15,83 +15,83 @@ import {HtmlEnvironment} from '../../index';
 
 export default class LookupBoxLayout extends AbstractLayout {
 
-constructor(box, structure, filterBox) {
-  super();
-  this.box = box;
-  this.structure = structure;
-  this.filterBox = filterBox;
-}
-
-
-layout($container) {
-  var htmlContainer = HtmlComponent.get($container),
-    size = htmlContainer.size(),
-    height = size.height,
-    filterBoxHeight;
-
-  if (this.filterBox && this.filterBox.rendered) {
-    filterBoxHeight = HtmlComponent.get(this.filterBox.$container).prefSize().height;
-    height -= filterBoxHeight;
+  constructor(box, structure, filterBox) {
+    super();
+    this.box = box;
+    this.structure = structure;
+    this.filterBox = filterBox;
   }
 
-  height = Math.max(height, 20);
-  var htmlStructure = HtmlComponent.get(this.structure.$container);
-  htmlStructure.setSize(new Dimension(size.width, height));
 
-  if (this.filterBox && this.filterBox.rendered) {
-    var htmlFilterBox = HtmlComponent.get(this.filterBox.$container);
-    htmlFilterBox.setSize(new Dimension(size.width, filterBoxHeight));
-  }
-}
+  layout($container) {
+    var htmlContainer = HtmlComponent.get($container),
+      size = htmlContainer.size(),
+      height = size.height,
+      filterBoxHeight;
 
-preferredLayoutSize($container, options) {
-  options = options || {};
-  var prefSizeStructure, prefSizeFilterBox, structureContainer, filterContainer,
-    width = 0,
-    htmlContainer = HtmlComponent.get($container),
-    height = HtmlEnvironment.get().formRowHeight,
-    box = this.box;
+    if (this.filterBox && this.filterBox.rendered) {
+      filterBoxHeight = HtmlComponent.get(this.filterBox.$container).prefSize().height;
+      height -= filterBoxHeight;
+    }
 
-  // HeightHint not supported
-  options.heightHint = null;
+    height = Math.max(height, 20);
+    var htmlStructure = HtmlComponent.get(this.structure.$container);
+    htmlStructure.setSize(new Dimension(size.width, height));
 
-  if (box.$label && box.labelVisible) {
-    width += HtmlEnvironment.get().fieldLabelWidth;
-  }
-  if (box.$mandatory && box.$mandatory.isVisible()) {
-    width += box.$mandatory.outerWidth(true);
-  }
-  if (box.$status && box.statusVisible) {
-    width += box.$status.outerWidth(true);
-  }
-
-  // size of table and size of filterBox
-  structureContainer = HtmlComponent.optGet(this.structure.$container);
-  if (structureContainer) {
-    prefSizeStructure = structureContainer.prefSize(options)
-      .add(htmlContainer.insets())
-      .add(structureContainer.margins());
-  } else {
-    prefSizeStructure = this.naturalSize(box);
-  }
-
-  prefSizeFilterBox = new Dimension(0, 0);
-  if (this.filterBox) {
-    filterContainer = HtmlComponent.optGet(this.filterBox.$container);
-    if (filterContainer) {
-      prefSizeFilterBox = filterContainer.prefSize(options)
-        .add(htmlContainer.insets())
-        .add(filterContainer.margins());
+    if (this.filterBox && this.filterBox.rendered) {
+      var htmlFilterBox = HtmlComponent.get(this.filterBox.$container);
+      htmlFilterBox.setSize(new Dimension(size.width, filterBoxHeight));
     }
   }
 
-  width += Math.max(prefSizeStructure.width, prefSizeFilterBox.width);
-  height = Math.max(height, prefSizeStructure.height + prefSizeFilterBox.height);
+  preferredLayoutSize($container, options) {
+    options = options || {};
+    var prefSizeStructure, prefSizeFilterBox, structureContainer, filterContainer,
+      width = 0,
+      htmlContainer = HtmlComponent.get($container),
+      height = HtmlEnvironment.get().formRowHeight,
+      box = this.box;
 
-  return new Dimension(width, height);
-}
+    // HeightHint not supported
+    options.heightHint = null;
 
-naturalSize(formField) {
-  return new Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
-}
+    if (box.$label && box.labelVisible) {
+      width += HtmlEnvironment.get().fieldLabelWidth;
+    }
+    if (box.$mandatory && box.$mandatory.isVisible()) {
+      width += box.$mandatory.outerWidth(true);
+    }
+    if (box.$status && box.statusVisible) {
+      width += box.$status.outerWidth(true);
+    }
+
+    // size of table and size of filterBox
+    structureContainer = HtmlComponent.optGet(this.structure.$container);
+    if (structureContainer) {
+      prefSizeStructure = structureContainer.prefSize(options)
+        .add(htmlContainer.insets())
+        .add(structureContainer.margins());
+    } else {
+      prefSizeStructure = this.naturalSize(box);
+    }
+
+    prefSizeFilterBox = new Dimension(0, 0);
+    if (this.filterBox) {
+      filterContainer = HtmlComponent.optGet(this.filterBox.$container);
+      if (filterContainer) {
+        prefSizeFilterBox = filterContainer.prefSize(options)
+          .add(htmlContainer.insets())
+          .add(filterContainer.margins());
+      }
+    }
+
+    width += Math.max(prefSizeStructure.width, prefSizeFilterBox.width);
+    height = Math.max(height, prefSizeStructure.height + prefSizeFilterBox.height);
+
+    return new Dimension(width, height);
+  }
+
+  naturalSize(formField) {
+    return new Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
+  }
 }

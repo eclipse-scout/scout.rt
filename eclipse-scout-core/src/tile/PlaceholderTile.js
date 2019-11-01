@@ -12,15 +12,15 @@ import {Tile} from '../index';
 
 export default class PlaceholderTile extends Tile {
 
-constructor() {
-  super();
-  this.cssClass = 'placeholder-tile';
-  this.displayStyle = Tile.DisplayStyle.PLAIN;
-}
+  constructor() {
+    super();
+    this.cssClass = 'placeholder-tile';
+    this.displayStyle = Tile.DisplayStyle.PLAIN;
+  }
 
 
-_setSelectable(selectable) {
-  // Placeholder tiles should not be selectable
-  super._setSelectable( false);
-}
+  _setSelectable(selectable) {
+    // Placeholder tiles should not be selectable
+    super._setSelectable(false);
+  }
 }

@@ -12,8 +12,8 @@ import {ActionAdapter} from '../index';
 
 export default class ModeAdapter extends ActionAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

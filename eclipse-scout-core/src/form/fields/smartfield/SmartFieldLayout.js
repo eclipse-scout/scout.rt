@@ -15,27 +15,27 @@ import {FormFieldLayout} from '../../../index';
  */
 export default class SmartFieldLayout extends FormFieldLayout {
 
-constructor(smartField) {
-  super( smartField);
-  this._smartField = smartField;
-}
-
-
-layout($container) {
-  super.layout( $container);
-
-  // when embedded smart-field layout must not validate the popup
-  // since this would lead to an endless recursion because the smart-field
-  // is a child of the popup.
-  if (this._smartField.embedded) {
-    return;
+  constructor(smartField) {
+    super(smartField);
+    this._smartField = smartField;
   }
 
-  var popup = this._smartField.popup;
-  if (popup && popup.rendered) {
-    // Make sure the popup is correctly layouted and positioned
-    popup.position();
-    popup.validateLayout();
+
+  layout($container) {
+    super.layout($container);
+
+    // when embedded smart-field layout must not validate the popup
+    // since this would lead to an endless recursion because the smart-field
+    // is a child of the popup.
+    if (this._smartField.embedded) {
+      return;
+    }
+
+    var popup = this._smartField.popup;
+    if (popup && popup.rendered) {
+      // Make sure the popup is correctly layouted and positioned
+      popup.position();
+      popup.validateLayout();
+    }
   }
-}
 }

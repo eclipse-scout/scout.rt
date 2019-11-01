@@ -13,49 +13,49 @@ import {keys} from '../../index';
 
 export default class TableNavigationExpandKeyStroke extends AbstractTableNavigationKeyStroke {
 
-constructor(table) {
-  super( table);
-  this.field = table;
-  this.which = [keys.ADD, keys.RIGHT];
-  this.renderingHints.text = '+';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var row = this.field.selectedRows[0];
-    if (row) {
-      return row.$row;
+  constructor(table) {
+    super(table);
+    this.field = table;
+    this.which = [keys.ADD, keys.RIGHT];
+    this.renderingHints.text = '+';
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var row = this.field.selectedRows[0];
+      if (row) {
+        return row.$row;
+      }
+    }.bind(this);
+  }
+
+
+  _accept(event) {
+    var accepted = super._accept(event),
+      selectedRow = this.field.selectedRows[0];
+    if (!accepted) {
+      return false;
     }
-  }.bind(this);
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event),
-    selectedRow = this.field.selectedRows[0];
-  if (!accepted) {
-    return false;
+    if (!selectedRow) {
+      return false;
+    }
+    return selectedRow._expandable;
   }
-  if (!selectedRow) {
-    return false;
-  }
-  return selectedRow._expandable;
-}
 
-handle(event) {
-  var table = this.field,
-    selectedRow = this.field.selectedRows[0],
-    visibleChildRows;
-  if (!selectedRow) {
-    return;
-  }
-  if (selectedRow._expandable) {
-    if (selectedRow.expanded) {
-      // select first child
-      visibleChildRows = this.field.visibleChildRows(selectedRow);
-      table.selectRow(visibleChildRows[0]);
-      table.selectionHandler.lastActionRow = visibleChildRows[0];
-    } else {
-      // expand
-      table.expandRow(selectedRow);
+  handle(event) {
+    var table = this.field,
+      selectedRow = this.field.selectedRows[0],
+      visibleChildRows;
+    if (!selectedRow) {
+      return;
+    }
+    if (selectedRow._expandable) {
+      if (selectedRow.expanded) {
+        // select first child
+        visibleChildRows = this.field.visibleChildRows(selectedRow);
+        table.selectRow(visibleChildRows[0]);
+        table.selectionHandler.lastActionRow = visibleChildRows[0];
+      } else {
+        // expand
+        table.expandRow(selectedRow);
+      }
     }
   }
-}
 }

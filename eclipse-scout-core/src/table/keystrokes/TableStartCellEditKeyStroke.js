@@ -13,51 +13,51 @@ import {keys} from '../../index';
 
 export default class TableStartCellEditKeyStroke extends KeyStroke {
 
-constructor(table) {
-  super();
-  this.field = table;
-  this.ctrl = true;
-  this.which = [keys.ENTER];
-  this.stopPropagation = true;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var editPosition = event._editPosition,
-      columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
-    if (columnIndex === 0) {
-      // Other key strokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit key stroke will be displayed next to the other ones
-      return editPosition.row.$row;
+  constructor(table) {
+    super();
+    this.field = table;
+    this.ctrl = true;
+    this.which = [keys.ENTER];
+    this.stopPropagation = true;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var editPosition = event._editPosition,
+        columnIndex = this.field.visibleColumns().indexOf(editPosition.column);
+      if (columnIndex === 0) {
+        // Other key strokes like PageDown, Home etc. are displayed in the row -> make sure the cell edit key stroke will be displayed next to the other ones
+        return editPosition.row.$row;
+      }
+      return this.field.$cell(columnIndex, editPosition.row.$row);
+    }.bind(this);
+  }
+
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
     }
-    return this.field.$cell(columnIndex, editPosition.row.$row);
-  }.bind(this);
-}
 
+    if (this.field.cellEditorPopup) {
+      // Already open
+      return false;
+    }
 
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+    var selectedRows = this.field.selectedRows;
+    if (!selectedRows.length) {
+      return false;
+    }
+
+    var position = this.field.nextEditableCellPosForRow(0, selectedRows[0]);
+    if (position) {
+      event._editPosition = position;
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  if (this.field.cellEditorPopup) {
-    // Already open
-    return false;
+  handle(event) {
+    var editPosition = event._editPosition;
+    this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
   }
-
-  var selectedRows = this.field.selectedRows;
-  if (!selectedRows.length) {
-    return false;
-  }
-
-  var position = this.field.nextEditableCellPosForRow(0, selectedRows[0]);
-  if (position) {
-    event._editPosition = position;
-    return true;
-  } else {
-    return false;
-  }
-}
-
-handle(event) {
-  var editPosition = event._editPosition;
-  this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
-}
 }

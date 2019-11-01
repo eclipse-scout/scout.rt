@@ -13,32 +13,32 @@ import {HAlign} from '../../../index';
 
 export default class ButtonKeyStroke extends KeyStroke {
 
-constructor(button, keyStroke) {
-  super();
-  this.field = button;
-  this.parseAndSetKeyStroke(keyStroke);
-  this.stopPropagation = true;
-  this.stopImmediatePropagation = true;
+  constructor(button, keyStroke) {
+    super();
+    this.field = button;
+    this.parseAndSetKeyStroke(keyStroke);
+    this.stopPropagation = true;
+    this.stopImmediatePropagation = true;
 
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$container;
-  }.bind(this);
-}
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$container;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted && this.field.$field.isAttached();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted && this.field.$field.isAttached();
+  }
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.doAction();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.doAction();
+  }
 }

@@ -10,63 +10,65 @@
  */
 export default class OutlineMediator {
 
-constructor() {};
+  constructor() {
+  };
 
-init(model) {};
+  init(model) {
+  };
 
-_skipEvent(page) {
-  return page === null || page.getOutline() === null || page.leaf;
-}
-
-onTableRowsInserted(rows, childPages, pageWithTable) {
-  if (this._skipEvent(pageWithTable)) {
-    return;
-  }
-  pageWithTable.getTree().insertNodes(childPages, pageWithTable);
-}
-
-onTableRowsDeleted(rows, childPages, pageWithTable) {
-  if (this._skipEvent(pageWithTable)) {
-    return;
-  }
-  pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
-}
-
-onTableRowsUpdated(event, pageWithTable) {
-  if (this._skipEvent(pageWithTable)) {
-    return;
+  _skipEvent(page) {
+    return page === null || page.getOutline() === null || page.leaf;
   }
 
-  var pages = pageWithTable.updatePagesFromTableRows(event.rows);
-  pageWithTable.getTree().updateNodes(pages);
-}
-
-onTableRowAction(event, page) {
-  var childPage = event.row.page;
-  if (!childPage) {
-    return;
+  onTableRowsInserted(rows, childPages, pageWithTable) {
+    if (this._skipEvent(pageWithTable)) {
+      return;
+    }
+    pageWithTable.getTree().insertNodes(childPages, pageWithTable);
   }
 
-  var outline = childPage.getOutline();
-  if (!outline) {
-    return;
+  onTableRowsDeleted(rows, childPages, pageWithTable) {
+    if (this._skipEvent(pageWithTable)) {
+      return;
+    }
+    pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
   }
 
-  outline.selectNode(childPage);
-  outline.setNodeExpanded(childPage, true);
-}
+  onTableRowsUpdated(event, pageWithTable) {
+    if (this._skipEvent(pageWithTable)) {
+      return;
+    }
 
-onTableRowOrderChanged(event, pageWithTable) {
-  if (this._skipEvent(pageWithTable)) {
-    return;
+    var pages = pageWithTable.updatePagesFromTableRows(event.rows);
+    pageWithTable.getTree().updateNodes(pages);
   }
 
-  var table = event.source;
-  var childPages = pageWithTable.pagesForTableRows(table.rows);
-  pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
-}
+  onTableRowAction(event, page) {
+    var childPage = event.row.page;
+    if (!childPage) {
+      return;
+    }
 
-onTableFilter(event, page) {
-  page.getOutline().filter();
-}
+    var outline = childPage.getOutline();
+    if (!outline) {
+      return;
+    }
+
+    outline.selectNode(childPage);
+    outline.setNodeExpanded(childPage, true);
+  }
+
+  onTableRowOrderChanged(event, pageWithTable) {
+    if (this._skipEvent(pageWithTable)) {
+      return;
+    }
+
+    var table = event.source;
+    var childPages = pageWithTable.pagesForTableRows(table.rows);
+    pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
+  }
+
+  onTableFilter(event, page) {
+    page.getOutline().filter();
+  }
 }

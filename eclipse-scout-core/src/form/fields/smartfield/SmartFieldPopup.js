@@ -16,126 +16,126 @@ import {FormField} from '../../../index';
 
 export default class SmartFieldPopup extends Popup {
 
-constructor() {
-  super();
-  this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
-}
-
-
-_init(options) {
-  options.withFocusContext = false;
-  super._init( options);
-
-  this.smartField = this.parent;
-  this.proposalChooser = this._createProposalChooser();
-  this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
-  this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
-  this.smartField.on('remove', this._onRemoveSmartField.bind(this));
-
-  this.setLookupResult(options.lookupResult);
-  this.setStatus(options.status);
-}
-
-_createProposalChooser() {
-  var objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
-  return scout.create(objectType, {
-    parent: this
-  });
-}
-
-_createLayout() {
-  return new SmartFieldPopupLayout(this, this.proposalChooser);
-}
-
-_render() {
-  var cssClass = this.smartField.cssClassName() + '-popup';
-  super._render();
-  this.$container
-    .addClass(cssClass)
-    .on('mousedown', this._onContainerMouseDown.bind(this));
-  this.$container.toggleClass('alternative', this.smartField.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
-  this.proposalChooser.render();
-}
-
-setLookupResult(result) {
-  this._setProperty('lookupResult', result);
-  this.proposalChooser.setLookupResult(result);
-}
-
-/**
- * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
- */
-getSelectedLookupRow() {
-  var lookupRow = this.proposalChooser.getSelectedLookupRow();
-  if (lookupRow && lookupRow.enabled) {
-    return lookupRow;
-  } else {
-    return null;
+  constructor() {
+    super();
+    this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
   }
-}
 
-setStatus(status) {
-  this.proposalChooser.setStatus(status);
-}
 
-selectFirstLookupRow() {
-  this.proposalChooser.selectFirstLookupRow();
-}
+  _init(options) {
+    options.withFocusContext = false;
+    super._init(options);
 
-selectLookupRow() {
-  this.proposalChooser.triggerLookupRowSelected();
-}
+    this.smartField = this.parent;
+    this.proposalChooser = this._createProposalChooser();
+    this.proposalChooser.on('lookupRowSelected', this._triggerEvent.bind(this));
+    this.proposalChooser.on('activeFilterSelected', this._triggerEvent.bind(this));
+    this.smartField.on('remove', this._onRemoveSmartField.bind(this));
 
-/**
- * Delegates the key event to the proposal chooser.
- */
-delegateKeyEvent(event) {
-  event.originalEvent.smartFieldEvent = true;
-  this.proposalChooser.delegateKeyEvent(event);
-}
+    this.setLookupResult(options.lookupResult);
+    this.setStatus(options.status);
+  }
 
-_triggerEvent(event) {
-  this.trigger(event.type, event);
-}
+  _createProposalChooser() {
+    var objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
+    return scout.create(objectType, {
+      parent: this
+    });
+  }
 
-/**
- * This event handler is called before the mousedown handler on the _document_ is triggered
- * This allows us to prevent the default, which is important for the CellEditorPopup which
- * should stay open when the SmartField popup is closed. It also prevents the focus blur
- * event on the SmartField input-field.
- */
-_onContainerMouseDown(event) {
-  // when user clicks on proposal popup with table or tree (prevent default,
-  // so input-field does not lose the focus, popup will be closed by the
-  // proposal chooser impl.
-  return false;
-}
+  _createLayout() {
+    return new SmartFieldPopupLayout(this, this.proposalChooser);
+  }
+
+  _render() {
+    var cssClass = this.smartField.cssClassName() + '-popup';
+    super._render();
+    this.$container
+      .addClass(cssClass)
+      .on('mousedown', this._onContainerMouseDown.bind(this));
+    this.$container.toggleClass('alternative', this.smartField.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+    this.proposalChooser.render();
+  }
+
+  setLookupResult(result) {
+    this._setProperty('lookupResult', result);
+    this.proposalChooser.setLookupResult(result);
+  }
+
+  /**
+   * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
+   */
+  getSelectedLookupRow() {
+    var lookupRow = this.proposalChooser.getSelectedLookupRow();
+    if (lookupRow && lookupRow.enabled) {
+      return lookupRow;
+    } else {
+      return null;
+    }
+  }
+
+  setStatus(status) {
+    this.proposalChooser.setStatus(status);
+  }
+
+  selectFirstLookupRow() {
+    this.proposalChooser.selectFirstLookupRow();
+  }
+
+  selectLookupRow() {
+    this.proposalChooser.triggerLookupRowSelected();
+  }
+
+  /**
+   * Delegates the key event to the proposal chooser.
+   */
+  delegateKeyEvent(event) {
+    event.originalEvent.smartFieldEvent = true;
+    this.proposalChooser.delegateKeyEvent(event);
+  }
+
+  _triggerEvent(event) {
+    this.trigger(event.type, event);
+  }
+
+  /**
+   * This event handler is called before the mousedown handler on the _document_ is triggered
+   * This allows us to prevent the default, which is important for the CellEditorPopup which
+   * should stay open when the SmartField popup is closed. It also prevents the focus blur
+   * event on the SmartField input-field.
+   */
+  _onContainerMouseDown(event) {
+    // when user clicks on proposal popup with table or tree (prevent default,
+    // so input-field does not lose the focus, popup will be closed by the
+    // proposal chooser impl.
+    return false;
+  }
 
 // when smart-field is removed, also remove popup. Don't animate removal in that case
-_onRemoveSmartField(event) {
-  this.animateRemoval = false;
-  this.remove();
-}
+  _onRemoveSmartField(event) {
+    this.animateRemoval = false;
+    this.remove();
+  }
 
-/**
- * @override because the icon is not in the $anchor container.
- */
-_isMouseDownOnAnchor(event) {
-  return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(event.target));
-}
+  /**
+   * @override because the icon is not in the $anchor container.
+   */
+  _isMouseDownOnAnchor(event) {
+    return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(event.target));
+  }
 
-_onAnimationEnd() {
-  this.proposalChooser.updateScrollbars();
-}
+  _onAnimationEnd() {
+    this.proposalChooser.updateScrollbars();
+  }
 
 //--- static helpers --- //
 
-/**
- * Don't do popup animation on Internet Explorer, because IE is slow when
- * it comes to rendering the popup and the additional CSS animation causes the popup
- * to flicker. Every other browser (including Edge) that supports CSS animation is fine.
- */
-static hasPopupAnimation() {
-  return Device.get().supportsCssAnimation() && !Device.get().isInternetExplorer();
-}
+  /**
+   * Don't do popup animation on Internet Explorer, because IE is slow when
+   * it comes to rendering the popup and the additional CSS animation causes the popup
+   * to flicker. Every other browser (including Edge) that supports CSS animation is fine.
+   */
+  static hasPopupAnimation() {
+    return Device.get().supportsCssAnimation() && !Device.get().isInternetExplorer();
+  }
 }

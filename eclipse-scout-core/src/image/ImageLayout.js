@@ -13,26 +13,26 @@ import {Dimension} from '../index';
 
 export default class ImageLayout extends AbstractLayout {
 
-constructor(image) {
-  super();
-  this.image = image;
-}
-
-
-preferredLayoutSize($container, options) {
-  var img = $container[0];
-  if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
-    var prefHeight = img.naturalHeight;
-    var prefWidth = img.naturalWidth;
-    if (options.widthHint > 0 && options.widthHint < img.naturalWidth) {
-      prefHeight = options.widthHint / img.naturalWidth * img.naturalHeight;
-      prefWidth = options.widthHint;
-    } else if (options.heightHint > 0 && options.heightHint < img.naturalHeight) {
-      prefHeight = options.heightHint;
-      prefWidth = options.heightHint / img.naturalHeight * img.naturalWidth;
-    }
-    return new Dimension(prefWidth, prefHeight);
+  constructor(image) {
+    super();
+    this.image = image;
   }
-  return super.preferredLayoutSize( $container, options);
-}
+
+
+  preferredLayoutSize($container, options) {
+    var img = $container[0];
+    if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
+      var prefHeight = img.naturalHeight;
+      var prefWidth = img.naturalWidth;
+      if (options.widthHint > 0 && options.widthHint < img.naturalWidth) {
+        prefHeight = options.widthHint / img.naturalWidth * img.naturalHeight;
+        prefWidth = options.widthHint;
+      } else if (options.heightHint > 0 && options.heightHint < img.naturalHeight) {
+        prefHeight = options.heightHint;
+        prefWidth = options.heightHint / img.naturalHeight * img.naturalWidth;
+      }
+      return new Dimension(prefWidth, prefHeight);
+    }
+    return super.preferredLayoutSize($container, options);
+  }
 }

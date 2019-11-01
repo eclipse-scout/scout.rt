@@ -13,20 +13,20 @@ import {KeyStroke} from '../../../index';
 
 export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
 
-constructor(stringField) {
-  super();
-  this.field = stringField;
-  this.which = [keys.ENTER];
-  this.ctrl = true;
-}
+  constructor(stringField) {
+    super();
+    this.field = stringField;
+    this.which = [keys.ENTER];
+    this.ctrl = true;
+  }
 
 
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted && this.field.hasAction;
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted && this.field.hasAction;
+  }
 
-handle(event) {
-  this.field._onIconClick();
-}
+  handle(event) {
+    this.field._onIconClick();
+  }
 }

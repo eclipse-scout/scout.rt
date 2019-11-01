@@ -12,27 +12,27 @@ import {TileButton} from '../../../index';
 
 export default class PageTileButton extends TileButton {
 
-constructor() {
-  super();
-  this.page = null;
-}
+  constructor() {
+    super();
+    this.page = null;
+  }
 
 
-_init(model) {
-  super._init( model);
+  _init(model) {
+    super._init(model);
 
-  this.label = this.page.text;
-  this.iconId = this.page.overviewIconId;
-  this.htmlEnabled = this.page.htmlEnabled;
+    this.label = this.page.text;
+    this.iconId = this.page.overviewIconId;
+    this.htmlEnabled = this.page.htmlEnabled;
 
-  this.on('click', function(event) {
-    this.outline.selectNode(this.page);
-  }.bind(this));
-}
+    this.on('click', function(event) {
+      this.outline.selectNode(this.page);
+    }.bind(this));
+  }
 
-notifyPageChanged() {
-  this.setLabel(this.page.text);
-  this.setIconId(this.page.overviewIconId);
-  this.setHtmlEnabled(this.page.htmlEnabled);
-}
+  notifyPageChanged() {
+    this.setLabel(this.page.text);
+    this.setIconId(this.page.overviewIconId);
+    this.setHtmlEnabled(this.page.htmlEnabled);
+  }
 }

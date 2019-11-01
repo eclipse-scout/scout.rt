@@ -95,7 +95,7 @@ const NUMERIC = {
     if (objects.isNullOrUndefined(valueB)) {
       return 1;
     }
-	
+
     if (valueA < valueB) {
       return -1;
     } else if (valueA > valueB) {

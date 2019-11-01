@@ -13,33 +13,33 @@ import {keys} from '../../index';
 
 export default class TableToggleRowKeyStroke extends KeyStroke {
 
-constructor(table) {
-  super();
-  this.field = table;
+  constructor(table) {
+    super();
+    this.field = table;
 
-  this.which = [keys.SPACE];
-  this.stopPropagation = true;
-  this.renderingHints.render = false;
-}
+    this.which = [keys.SPACE];
+    this.stopPropagation = true;
+    this.renderingHints.render = false;
+  }
 
 
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted &&
-    this.field.checkable &&
-    this.field.selectedRows.length;
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted &&
+      this.field.checkable &&
+      this.field.selectedRows.length;
+  }
 
-handle(event) {
-  var selectedRows = this.field.selectedRows.filter(function(row) {
-    return row.enabled;
-  });
-  // Toggle checked state to 'true', except if every row is already checked
-  var checked = selectedRows.some(function(row) {
-    return !row.checked;
-  });
-  selectedRows.forEach(function(row) {
-    this.field.checkRow(row, checked);
-  }, this);
-}
+  handle(event) {
+    var selectedRows = this.field.selectedRows.filter(function(row) {
+      return row.enabled;
+    });
+    // Toggle checked state to 'true', except if every row is already checked
+    var checked = selectedRows.some(function(row) {
+      return !row.checked;
+    });
+    selectedRows.forEach(function(row) {
+      this.field.checkRow(row, checked);
+    }, this);
+  }
 }

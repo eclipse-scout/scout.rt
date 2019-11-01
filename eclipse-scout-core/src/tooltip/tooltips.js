@@ -13,7 +13,6 @@ import {Device} from '../index';
 import * as $ from 'jquery';
 
 
-
 const DEFAULT_TOOLTIP_DELAY = 600; // ms
 
 // Quite long tooltip delay for cases where the normal delay would be annoying

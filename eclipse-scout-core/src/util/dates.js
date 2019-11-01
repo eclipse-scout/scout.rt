@@ -14,7 +14,6 @@ import {scout} from '../index';
 import {Locale} from '../index';
 
 
-
 /**
  * @memberOf scout.dates
  */
@@ -247,7 +246,7 @@ export function weekInYear(date, option) {
 }
 
 //private
- export function _thursdayOfWeek(date, firstDayOfWeekArg) {
+export function _thursdayOfWeek(date, firstDayOfWeekArg) {
   if (!date || typeof firstDayOfWeekArg !== 'number') {
     return undefined;
   }

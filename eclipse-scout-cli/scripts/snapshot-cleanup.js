@@ -36,7 +36,7 @@ const getPackageName = itemName => {
   return itemName.replace(NAME_REGEX, '');
 };
 
-const getSnapshots = async(artifactoryUrl, repoName, config, verbose) => {
+const getSnapshots = async (artifactoryUrl, repoName, config, verbose) => {
   const AQL_API = 'api/search/aql'; // use aql for search
   const searchUrl = `${artifactoryUrl}${AQL_API}`;
   const query = `items.find({"repo":"${repoName}","name":{"$match":"*snapshot.*tgz"}})`;
@@ -71,7 +71,7 @@ const getSnapshots = async(artifactoryUrl, repoName, config, verbose) => {
   return snapshotMap;
 };
 
-const calculateItemsToDelete = async(itemMap, noToKeep) => {
+const calculateItemsToDelete = async (itemMap, noToKeep) => {
   const toDelete = [];
   for (const itemSet of itemMap.values()) {
     // order the snapshots of each package by date and select the oldest items to delete
@@ -83,7 +83,7 @@ const calculateItemsToDelete = async(itemMap, noToKeep) => {
   return toDelete;
 };
 
-const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
+const deleteItems = async (artifactoryUrl, items, config, dryrun) => {
   let success = true;
   if (!items || items.length === 0) {
     console.log('Nothing to cleanup');
@@ -109,7 +109,7 @@ const deleteItems = async(artifactoryUrl, items, config, dryrun) => {
   }
 };
 
-const doCleanup = async() => {
+const doCleanup = async () => {
   const yargs = require('yargs');
   const argv = yargs
     .option('apikey', {

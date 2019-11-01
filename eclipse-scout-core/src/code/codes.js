@@ -16,7 +16,6 @@ import {arrays} from '../index';
 import {scout} from '../index';
 
 
-
 /**
  * This default language is used whenever a code registers its texts in scout.texts.
  */
@@ -30,7 +29,7 @@ export function bootstrap(url) {
 }
 
 //private
- export function _preInit(url, data) {
+export function _preInit(url, data) {
   if (data && data.error) {
     // The result may contain a json error (e.g. session timeout) -> abort processing
     throw {
@@ -115,7 +114,7 @@ export function optGet(vararg, codeId) {
 }
 
 //private
- export function _get(funcName, funcArgs) {
+export function _get(funcName, funcArgs) {
   var codeTypeId, codeId;
   if (funcArgs.length === 2) {
     codeTypeId = funcArgs[0];

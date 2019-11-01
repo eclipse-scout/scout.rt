@@ -17,56 +17,56 @@ import {RangeKeyStroke} from '../../index';
  */
 export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
 
-constructor(desktop) {
-  super();
-  this.field = desktop;
+  constructor(desktop) {
+    super();
+    this.field = desktop;
 
-  // modifier
-  this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
+    // modifier
+    this.parseAndSetKeyStroke(desktop.selectViewTabsKeyStrokeModifier);
 
-  // range [1..9]
-  this.registerRange(
-    keys['1'], // range from
-    function() {
-      return keys[Math.min(this._viewTabs().length, 9)]; // range to
-    }.bind(this)
-  );
+    // range [1..9]
+    this.registerRange(
+      keys['1'], // range from
+      function() {
+        return keys[Math.min(this._viewTabs().length, 9)]; // range to
+      }.bind(this)
+    );
 
-  // rendering hints
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
+    // rendering hints
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var viewIndex = event.which - keys['1'];
+      return this._viewTabs()[viewIndex].$container;
+    }.bind(this);
+  }
+
+
+  /**
+   * @override KeyStroke.js
+   */
+  _isEnabled() {
+    var enabled = super._isEnabled();
+    return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
+  }
+
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
     var viewIndex = event.which - keys['1'];
-    return this._viewTabs()[viewIndex].$container;
-  }.bind(this);
-}
 
-
-/**
- * @override KeyStroke.js
- */
-_isEnabled() {
-  var enabled = super._isEnabled();
-  return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
-}
-
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  var viewIndex = event.which - keys['1'];
-
-  if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
-    var viewTab = this._viewTabs()[viewIndex];
-    if (this.field.bench) {
-      this.field.bench.activateView(viewTab.view);
+    if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
+      var viewTab = this._viewTabs()[viewIndex];
+      if (this.field.bench) {
+        this.field.bench.activateView(viewTab.view);
+      }
     }
   }
-}
 
-_viewTabs() {
-  if (this.field.bench) {
-    return this.field.bench.getTabs();
+  _viewTabs() {
+    if (this.field.bench) {
+      return this.field.bench.getTabs();
+    }
+    return [];
   }
-  return [];
-}
 }

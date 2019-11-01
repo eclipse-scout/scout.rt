@@ -14,57 +14,57 @@ import {scout} from '../index';
 
 export default class TableHeaderMenuGroup extends Widget {
 
-constructor() {
-  super();
-  this.text;
-  this.textKey;
-  this.cssClass;
-  this.visible = true;
-  this.last = false;
-}
-
-
-_init(options) {
-  super._init( options);
-  this.text = scout.nvl(this.text, this.session.text(this.textKey));
-}
-
-_render() {
-  this.$container = this.$parent.appendDiv('table-header-menu-group buttons');
-  this.$text = this.$container.appendDiv('table-header-menu-group-text');
-  if (this.cssClass) {
-    this.$container.addClass(this.cssClass);
+  constructor() {
+    super();
+    this.text;
+    this.textKey;
+    this.cssClass;
+    this.visible = true;
+    this.last = false;
   }
-  this._renderText();
-  this.children.forEach(function(child) {
-    child.render();
-  }, this);
-  widgets.updateFirstLastMarker(this.children);
-}
 
-appendText(text) {
-  this.text = this.session.text(this.textKey) + ' ' + text;
-  if (this.rendered) {
+
+  _init(options) {
+    super._init(options);
+    this.text = scout.nvl(this.text, this.session.text(this.textKey));
+  }
+
+  _render() {
+    this.$container = this.$parent.appendDiv('table-header-menu-group buttons');
+    this.$text = this.$container.appendDiv('table-header-menu-group-text');
+    if (this.cssClass) {
+      this.$container.addClass(this.cssClass);
+    }
     this._renderText();
+    this.children.forEach(function(child) {
+      child.render();
+    }, this);
+    widgets.updateFirstLastMarker(this.children);
   }
-}
 
-resetText() {
-  this.text = this.session.text(this.textKey);
-  if (this.rendered) {
-    this._renderText();
+  appendText(text) {
+    this.text = this.session.text(this.textKey) + ' ' + text;
+    if (this.rendered) {
+      this._renderText();
+    }
   }
-}
 
-_renderText() {
-  this.$text.text(this.text);
-}
+  resetText() {
+    this.text = this.session.text(this.textKey);
+    if (this.rendered) {
+      this._renderText();
+    }
+  }
 
-setLast(last) {
-  this.setProperty('last', last);
-}
+  _renderText() {
+    this.$text.text(this.text);
+  }
 
-_renderLast() {
-  this.$container.toggleClass('last', this.last);
-}
+  setLast(last) {
+    this.setProperty('last', last);
+  }
+
+  _renderLast() {
+    this.$container.toggleClass('last', this.last);
+  }
 }

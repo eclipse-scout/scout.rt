@@ -12,25 +12,25 @@ import {Widget} from '../../index';
 
 export default class StatusMenuMapping extends Widget {
 
-constructor() {
-  super();
-  this.codes = [];
-  this.severities = [];
-  this.menu = null;
-  this._addWidgetProperties(['menu']);
-}
-
-
-_createChild(model) {
-  if (typeof model === 'string') {
-    // If the model is a string it is probably the id of the menu.
-    // Menus are defined by the parent (form field) -> search the parent's children for the menu
-    var existingWidget = this.parent.widget(model);
-    if (!existingWidget) {
-      throw new Error('Referenced widget not found: ' + model);
-    }
-    return existingWidget;
+  constructor() {
+    super();
+    this.codes = [];
+    this.severities = [];
+    this.menu = null;
+    this._addWidgetProperties(['menu']);
   }
-  return super._createChild(model);
-}
+
+
+  _createChild(model) {
+    if (typeof model === 'string') {
+      // If the model is a string it is probably the id of the menu.
+      // Menus are defined by the parent (form field) -> search the parent's children for the menu
+      var existingWidget = this.parent.widget(model);
+      if (!existingWidget) {
+        throw new Error('Referenced widget not found: ' + model);
+      }
+      return existingWidget;
+    }
+    return super._createChild(model);
+  }
 }

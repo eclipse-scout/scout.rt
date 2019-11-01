@@ -13,43 +13,43 @@ import {scout} from '../index';
 
 export default class FilterFieldsGroupBox extends GroupBox {
 
-constructor() {
-  super();
-  this.gridColumnCount = 1;
-  this.cssClass = 'filter-fields';
-}
+  constructor() {
+    super();
+    this.gridColumnCount = 1;
+    this.cssClass = 'filter-fields';
+  }
 
 
-_init(model) {
-  super._init( model);
-  this.filter.addFilterFields(this);
-}
+  _init(model) {
+    super._init(model);
+    this.filter.addFilterFields(this);
+  }
 
-/**
- * @override GroupBox.js
- */
-_renderProperties($parent) {
-  super._renderProperties( $parent);
-  this.filter.modifyFilterFields();
-}
+  /**
+   * @override GroupBox.js
+   */
+  _renderProperties($parent) {
+    super._renderProperties($parent);
+    this.filter.modifyFilterFields();
+  }
 
-addFilterField(objectType, text) {
-  var field = scout.create(objectType, {
-    parent: this,
-    label: this.session.text(text),
-    statusVisible: false,
-    labelWidthInPixel: 50,
-    maxLength: 100,
-    updateDisplayTextOnModify: true
-  });
-  this.addField0(field);
-  return field;
-}
+  addFilterField(objectType, text) {
+    var field = scout.create(objectType, {
+      parent: this,
+      label: this.session.text(text),
+      statusVisible: false,
+      labelWidthInPixel: 50,
+      maxLength: 100,
+      updateDisplayTextOnModify: true
+    });
+    this.addField0(field);
+    return field;
+  }
 
 // Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
 // This should be refactored in a future release
-addField0(field) {
-  this.fields.push(field);
-  this._prepareFields();
-}
+  addField0(field) {
+    this.fields.push(field);
+    this._prepareFields();
+  }
 }

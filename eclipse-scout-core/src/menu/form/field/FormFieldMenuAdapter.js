@@ -13,19 +13,19 @@ import {GridData} from '../../../index';
 
 export default class FormFieldMenuAdapter extends MenuAdapter {
 
-constructor() {
-  super();
-}
-
-
-/**
- * @override
- */
-_postCreateWidget() {
-  super._postCreateWidget();
-  // Use grid data from server as hints
-  if (this.widget.field) {
-    this.widget.field.gridDataHints = new GridData(this.widget.field.gridData);
+  constructor() {
+    super();
   }
-}
+
+
+  /**
+   * @override
+   */
+  _postCreateWidget() {
+    super._postCreateWidget();
+    // Use grid data from server as hints
+    if (this.widget.field) {
+      this.widget.field.gridDataHints = new GridData(this.widget.field.gridData);
+    }
+  }
 }

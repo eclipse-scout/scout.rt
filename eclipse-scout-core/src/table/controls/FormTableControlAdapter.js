@@ -12,8 +12,8 @@ import {TableControlAdapter} from '../../index';
 
 export default class FormTableControlAdapter extends TableControlAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

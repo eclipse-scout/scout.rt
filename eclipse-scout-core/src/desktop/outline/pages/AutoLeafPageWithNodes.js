@@ -18,19 +18,19 @@ import {Page} from '../../../index';
  */
 export default class AutoLeafPageWithNodes extends Page {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.leaf = true;
-}
+    this.leaf = true;
+  }
 
 
-/**
- * @override Page.js
- */
-_init(model) {
-  scout.assertParameter('row', model.row, TableRow);
-  super._init( model);
-  this.text = this.row.cells[0].text;
-}
+  /**
+   * @override Page.js
+   */
+  _init(model) {
+    scout.assertParameter('row', model.row, TableRow);
+    super._init(model);
+    this.text = this.row.cells[0].text;
+  }
 }

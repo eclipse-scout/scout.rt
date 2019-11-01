@@ -10,13 +10,14 @@
  */
 export default class TableFilter {
 
-constructor() {};
+  constructor() {
+  };
 
-createKey() {
-  return 'filterKey';
-}
+  createKey() {
+    return 'filterKey';
+  }
 
-accept(row) {
-  // to be implemented by subclasses
-}
+  accept(row) {
+    // to be implemented by subclasses
+  }
 }

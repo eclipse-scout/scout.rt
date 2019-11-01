@@ -12,23 +12,23 @@ import {FormFieldAdapter} from '../../../index';
 
 export default class ImageFieldAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetEvent(event) {
-  if (event.type === 'fileUpload') {
-    this._onFileUpload(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
 
-_onFileUpload(event) {
-  var success = this.widget.fileInput.upload();
-  if (!success) {
-    this.widget.fileInput.clear();
+
+  _onWidgetEvent(event) {
+    if (event.type === 'fileUpload') {
+      this._onFileUpload(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
   }
-}
+
+  _onFileUpload(event) {
+    var success = this.widget.fileInput.upload();
+    if (!success) {
+      this.widget.fileInput.clear();
+    }
+  }
 }

@@ -13,69 +13,69 @@ import {FormField} from '../../index';
 
 export default class WidgetField extends FormField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.scrollable = true;
-  this.fieldWidget = null;
-  this._addWidgetProperties(['fieldWidget']);
-}
-
-
-_init(model) {
-  super._init( model);
-}
-
-_render() {
-  this.addContainer(this.$parent, 'widget-field', new WidgetFieldLayout(this));
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderFieldWidget();
-  this._renderScrollable();
-}
-
-setFieldWidget(fieldWidget) {
-  this.setProperty('fieldWidget', fieldWidget);
-}
-
-_renderFieldWidget() {
-  if (!this.fieldWidget) {
-    return;
+    this.scrollable = true;
+    this.fieldWidget = null;
+    this._addWidgetProperties(['fieldWidget']);
   }
-  this.fieldWidget.render();
-  this.addField(this.fieldWidget.$container);
-  this.invalidateLayoutTree();
-}
 
-_removeFieldWidget() {
-  if (!this.fieldWidget) {
-    return;
+
+  _init(model) {
+    super._init(model);
   }
-  this.fieldWidget.remove();
-  this._removeField();
-  this.invalidateLayoutTree();
-}
 
-setScrollable(scrollable) {
-  this.setProperty('scrollable', scrollable);
-}
-
-_renderScrollable() {
-  this._uninstallScrollbars();
-  if (this.scrollable) {
-    this._installScrollbars();
+  _render() {
+    this.addContainer(this.$parent, 'widget-field', new WidgetFieldLayout(this));
+    this.addLabel();
+    this.addMandatoryIndicator();
+    this.addStatus();
   }
-}
 
-/**
- * @override
- */
-get$Scrollable() {
-  return this.$fieldContainer;
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderFieldWidget();
+    this._renderScrollable();
+  }
+
+  setFieldWidget(fieldWidget) {
+    this.setProperty('fieldWidget', fieldWidget);
+  }
+
+  _renderFieldWidget() {
+    if (!this.fieldWidget) {
+      return;
+    }
+    this.fieldWidget.render();
+    this.addField(this.fieldWidget.$container);
+    this.invalidateLayoutTree();
+  }
+
+  _removeFieldWidget() {
+    if (!this.fieldWidget) {
+      return;
+    }
+    this.fieldWidget.remove();
+    this._removeField();
+    this.invalidateLayoutTree();
+  }
+
+  setScrollable(scrollable) {
+    this.setProperty('scrollable', scrollable);
+  }
+
+  _renderScrollable() {
+    this._uninstallScrollbars();
+    if (this.scrollable) {
+      this._installScrollbars();
+    }
+  }
+
+  /**
+   * @override
+   */
+  get$Scrollable() {
+    return this.$fieldContainer;
+  }
 }

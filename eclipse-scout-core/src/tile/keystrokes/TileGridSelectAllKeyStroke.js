@@ -13,33 +13,33 @@ import {keys} from '../../index';
 
 export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
 
-constructor(tileGrid) {
-  super( tileGrid);
-  this.ctrl = true;
-  this.shift = false;
-  this.which = [keys.A];
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var tile = this.getSelectionHandler().getVisibleTiles()[0];
-    if (tile) {
-      // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
-      return tile.$container;
+  constructor(tileGrid) {
+    super(tileGrid);
+    this.ctrl = true;
+    this.shift = false;
+    this.which = [keys.A];
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var tile = this.getSelectionHandler().getVisibleTiles()[0];
+      if (tile) {
+        // Draw in first tile so that other key stroke hints (e.g. left, right etc.) don't overlap this one
+        return tile.$container;
+      }
+    }.bind(this);
+  }
+
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
     }
-  }.bind(this);
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+    if (!this.getSelectionHandler().isMultiSelect()) {
+      return false;
+    }
+    return true;
   }
-  if (!this.getSelectionHandler().isMultiSelect()) {
-    return false;
-  }
-  return true;
-}
 
-handle(event) {
-  this.getSelectionHandler().toggleSelection();
-}
+  handle(event) {
+    this.getSelectionHandler().toggleSelection();
+  }
 }

@@ -19,157 +19,157 @@ import {scout} from '../index';
 
 export default class PlannerLayout extends AbstractLayout {
 
-constructor(planner) {
-  super();
-  this.planner = planner;
-}
+  constructor(planner) {
+    super();
+    this.planner = planner;
+  }
 
 
-layout($container) {
-  var menuBarSize,
-    $header = this.planner._header.$container,
-    $scale = this.planner.$scale,
-    $grid = this.planner.$grid,
-    menuBar = this.planner.menuBar,
-    $yearContainer = this.planner._yearPanel.$container,
-    menuBarHeight = 0,
-    gridHeight = 0,
-    yearContainerHeight = 0,
-    gridTop = 0,
-    scaleTop = 0,
-    htmlMenuBar = HtmlComponent.get(menuBar.$container),
-    htmlContainer = this.planner.htmlComp,
-    containerSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets());
+  layout($container) {
+    var menuBarSize,
+      $header = this.planner._header.$container,
+      $scale = this.planner.$scale,
+      $grid = this.planner.$grid,
+      menuBar = this.planner.menuBar,
+      $yearContainer = this.planner._yearPanel.$container,
+      menuBarHeight = 0,
+      gridHeight = 0,
+      yearContainerHeight = 0,
+      gridTop = 0,
+      scaleTop = 0,
+      htmlMenuBar = HtmlComponent.get(menuBar.$container),
+      htmlContainer = this.planner.htmlComp,
+      containerSize = htmlContainer.availableSize()
+        .subtract(htmlContainer.insets());
 
-  if (menuBar.$container.isVisible()) {
-    menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
-    htmlMenuBar.setSize(menuBarSize);
-    menuBarHeight = menuBarSize.height;
-    if (menuBar.position === 'top') {
-      scaleTop += menuBarHeight;
+    if (menuBar.$container.isVisible()) {
+      menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+      htmlMenuBar.setSize(menuBarSize);
+      menuBarHeight = menuBarSize.height;
+      if (menuBar.position === 'top') {
+        scaleTop += menuBarHeight;
+      }
     }
+
+    if ($header.isVisible()) {
+      scaleTop += graphics.size($header).height;
+    }
+    $scale.css('top', scaleTop);
+    gridTop += scaleTop + graphics.size($scale).height;
+    $grid.css('top', gridTop);
+
+    yearContainerHeight = scaleTop + $yearContainer.cssMarginY();
+    gridHeight = gridTop + $grid.cssMarginY();
+
+    if (menuBar.$container.isVisible() && menuBar.position === 'bottom') {
+      yearContainerHeight += menuBarHeight;
+      gridHeight += menuBarHeight;
+    }
+
+    $yearContainer.css('height', 'calc(100% - ' + yearContainerHeight + 'px)');
+    $grid.css('height', 'calc(100% - ' + gridHeight + 'px)');
+
+    this._updateMinWidth();
+    this._layoutScaleLines();
+    // immediate update to prevent flickering, due to reset in layoutScaleLines
+    scrollbars.update(this.planner.$grid, true);
+    this.planner.layoutYearPanel();
   }
 
-  if ($header.isVisible()) {
-    scaleTop += graphics.size($header).height;
-  }
-  $scale.css('top', scaleTop);
-  gridTop += scaleTop + graphics.size($scale).height;
-  $grid.css('top', gridTop);
+  /**
+   * Min width is necessary for horizontal scrollbar
+   */
+  _updateMinWidth() {
+    var minWidth = this._minWidth(),
+      $scaleTitle = this.planner.$scaleTitle,
+      $timeline = this.planner.$timeline;
 
-  yearContainerHeight = scaleTop + $yearContainer.cssMarginY();
-  gridHeight = gridTop + $grid.cssMarginY();
+    if (!$timeline) {
+      // May be null if no view range is rendered
+      return;
+    }
 
-  if (menuBar.$container.isVisible() && menuBar.position === 'bottom') {
-    yearContainerHeight += menuBarHeight;
-    gridHeight += menuBarHeight;
-  }
-
-  $yearContainer.css('height', 'calc(100% - ' + yearContainerHeight + 'px)');
-  $grid.css('height', 'calc(100% - ' + gridHeight + 'px)');
-
-  this._updateMinWidth();
-  this._layoutScaleLines();
-  // immediate update to prevent flickering, due to reset in layoutScaleLines
-  scrollbars.update(this.planner.$grid, true);
-  this.planner.layoutYearPanel();
-}
-
-/**
- * Min width is necessary for horizontal scrollbar
- */
-_updateMinWidth() {
-  var minWidth = this._minWidth(),
-    $scaleTitle = this.planner.$scaleTitle,
-    $timeline = this.planner.$timeline;
-
-  if (!$timeline) {
-    // May be null if no view range is rendered
-    return;
+    $timeline.css('min-width', minWidth);
+    minWidth += $scaleTitle.outerWidth(true);
+    this.planner.resources.forEach(function(resource) {
+      resource.$resource.css('min-width', minWidth);
+    });
   }
 
-  $timeline.css('min-width', minWidth);
-  minWidth += $scaleTitle.outerWidth(true);
-  this.planner.resources.forEach(function(resource) {
-    resource.$resource.css('min-width', minWidth);
-  });
-}
+  /**
+   * Positions the scale lines and set to correct height
+   */
+  _layoutScaleLines() {
+    var height, $smallScaleItems, $largeScaleItems, scrollLeft,
+      $timelineSmall = this.planner.$timelineSmall,
+      $timelineLarge = this.planner.$timelineLarge;
 
-/**
- * Positions the scale lines and set to correct height
- */
-_layoutScaleLines() {
-  var height, $smallScaleItems, $largeScaleItems, scrollLeft,
-    $timelineSmall = this.planner.$timelineSmall,
-    $timelineLarge = this.planner.$timelineLarge;
+    if (!$timelineSmall) {
+      // May be null if no view range is rendered
+      return;
+    }
 
-  if (!$timelineSmall) {
-    // May be null if no view range is rendered
-    return;
-  }
+    $smallScaleItems = $timelineSmall.children('.scale-item');
+    $largeScaleItems = $timelineLarge.children('.scale-item');
 
-  $smallScaleItems = $timelineSmall.children('.scale-item');
-  $largeScaleItems = $timelineLarge.children('.scale-item');
-
-  // First loop through every item and set height to 0 in order to get the correct scrollHeight
-  $largeScaleItems.each(function() {
-    var $scaleItemLine = $(this).data('scale-item-line');
-    $scaleItemLine.cssHeight(0);
-  });
-  $smallScaleItems.each(function() {
-    var $scaleItemLine = $(this).data('scale-item-line');
-    if ($scaleItemLine) {
+    // First loop through every item and set height to 0 in order to get the correct scrollHeight
+    $largeScaleItems.each(function() {
+      var $scaleItemLine = $(this).data('scale-item-line');
       $scaleItemLine.cssHeight(0);
-    }
-  });
-  // also make sure there is no scrollbar anymore which could influence scrollHeight
-  scrollbars.reset(this.planner.$grid);
+    });
+    $smallScaleItems.each(function() {
+      var $scaleItemLine = $(this).data('scale-item-line');
+      if ($scaleItemLine) {
+        $scaleItemLine.cssHeight(0);
+      }
+    });
+    // also make sure there is no scrollbar anymore which could influence scrollHeight
+    scrollbars.reset(this.planner.$grid);
 
-  // Loop again and update height and left
-  height = this.planner.$grid[0].scrollHeight;
-  scrollLeft = this.planner.$scale[0].scrollLeft;
-  $largeScaleItems.each(function() {
-    var $scaleItem = $(this),
-      $scaleItemLine = $scaleItem.data('scale-item-line');
-    $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
-      .cssHeight(height);
-  });
-  $smallScaleItems.each(function() {
-    var $scaleItem = $(this),
-      $scaleItemLine = $scaleItem.data('scale-item-line');
-    if ($scaleItemLine) {
+    // Loop again and update height and left
+    height = this.planner.$grid[0].scrollHeight;
+    scrollLeft = this.planner.$scale[0].scrollLeft;
+    $largeScaleItems.each(function() {
+      var $scaleItem = $(this),
+        $scaleItemLine = $scaleItem.data('scale-item-line');
       $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
         .cssHeight(height);
+    });
+    $smallScaleItems.each(function() {
+      var $scaleItem = $(this),
+        $scaleItemLine = $scaleItem.data('scale-item-line');
+      if ($scaleItemLine) {
+        $scaleItemLine.cssLeft(scrollLeft + $scaleItem.position().left)
+          .cssHeight(height);
+      }
+    });
+  }
+
+  _minWidth() {
+    var $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
+      $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
+      numScaleItemsLarge = $scaleItemsLarge.length,
+      numScaleItemsSmall = $scaleItemsSmall.length,
+      displayMode = Planner.DisplayMode,
+      cellInsets = graphics.insets($scaleItemsSmall, {
+        includeBorder: false
+      }),
+      minWidth = numScaleItemsSmall * cellInsets.horizontal(); //no matter what, this width must never be deceeded
+
+    if (this.planner.displayMode === displayMode.DAY) {
+      return Math.max(minWidth, numScaleItemsLarge * 52);
     }
-  });
-}
-
-_minWidth() {
-  var $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
-    $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
-    numScaleItemsLarge = $scaleItemsLarge.length,
-    numScaleItemsSmall = $scaleItemsSmall.length,
-    displayMode = Planner.DisplayMode,
-    cellInsets = graphics.insets($scaleItemsSmall, {
-      includeBorder: false
-    }),
-    minWidth = numScaleItemsSmall * cellInsets.horizontal(); //no matter what, this width must never be deceeded
-
-  if (this.planner.displayMode === displayMode.DAY) {
-    return Math.max(minWidth, numScaleItemsLarge * 52);
+    if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
+      return Math.max(minWidth, numScaleItemsLarge * 160);
+    }
+    if (this.planner.displayMode === displayMode.MONTH) {
+      return Math.max(minWidth, numScaleItemsSmall * 23);
+    }
+    if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
+      return Math.max(minWidth, numScaleItemsSmall * 23);
+    }
+    if (this.planner.displayMode === displayMode.YEAR) {
+      return Math.max(minWidth, numScaleItemsSmall * 90);
+    }
   }
-  if (scout.isOneOf(this.planner.displayMode, displayMode.WORK_WEEK, displayMode.WEEK)) {
-    return Math.max(minWidth, numScaleItemsLarge * 160);
-  }
-  if (this.planner.displayMode === displayMode.MONTH) {
-    return Math.max(minWidth, numScaleItemsSmall * 23);
-  }
-  if (this.planner.displayMode === displayMode.CALENDAR_WEEK) {
-    return Math.max(minWidth, numScaleItemsSmall * 23);
-  }
-  if (this.planner.displayMode === displayMode.YEAR) {
-    return Math.max(minWidth, numScaleItemsSmall * 90);
-  }
-}
 }

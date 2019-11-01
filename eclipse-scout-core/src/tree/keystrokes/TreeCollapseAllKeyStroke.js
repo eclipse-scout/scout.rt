@@ -14,22 +14,22 @@ import {AbstractTreeNavigationKeyStroke} from '../../index';
 
 export default class TreeCollapseAllKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-constructor(tree, keyStrokeModifier) {
-  super( tree, keyStrokeModifier);
-  this.which = [keys.HOME];
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    if (this.field.visibleNodesFlat.length > 0) {
-      return this.field.visibleNodesFlat[0].$node;
-    }
-  }.bind(this);
-}
-
-
-handle(event) {
-  this.field.collapseAll();
-  if (this.field.visibleNodesFlat.length > 0) {
-    this.selectNodesAndReveal(this.field.visibleNodesFlat[0]);
+  constructor(tree, keyStrokeModifier) {
+    super(tree, keyStrokeModifier);
+    this.which = [keys.HOME];
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      if (this.field.visibleNodesFlat.length > 0) {
+        return this.field.visibleNodesFlat[0].$node;
+      }
+    }.bind(this);
   }
-}
+
+
+  handle(event) {
+    this.field.collapseAll();
+    if (this.field.visibleNodesFlat.length > 0) {
+      this.selectNodesAndReveal(this.field.visibleNodesFlat[0]);
+    }
+  }
 }

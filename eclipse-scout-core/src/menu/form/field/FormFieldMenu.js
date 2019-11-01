@@ -16,75 +16,75 @@ import {GridData} from '../../../index';
 
 export default class FormFieldMenu extends Menu {
 
-constructor() {
-  super();
-  this._addWidgetProperties('field');
-}
-
-
-_render() {
-  this.$container = this.$parent.appendDiv('menu-item');
-  this.$container.addClass('form-field-menu');
-  if (this.uiCssClass) {
-    this.$container.addClass(this.uiCssClass);
+  constructor() {
+    super();
+    this._addWidgetProperties('field');
   }
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new ColumnLayout({
-    stretch: false
-  }));
-}
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderField();
-}
 
-/**
- * Override
- */
-_renderText(text) {
-  super._renderText( text);
-  if (this.field && this.field.rendered && this.$text) {
-    this.field.$container.insertAfter(this.$text);
+  _render() {
+    this.$container = this.$parent.appendDiv('menu-item');
+    this.$container.addClass('form-field-menu');
+    if (this.uiCssClass) {
+      this.$container.addClass(this.uiCssClass);
+    }
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new ColumnLayout({
+      stretch: false
+    }));
   }
-}
 
-setField(field) {
-  this.setProperty('field', field);
-}
-
-_renderField() {
-  if (this.field) {
-    // Use gridDataHints as "computed" gridData property, because FormFieldMenu
-    // does not have a logical grid (see FormField._updateElementInnerAlignment()).
-    this.field.gridData = GridData.createFromHints(this.field, 1);
-
-    this.field.render(this.$container);
-    var layoutData = new LogicalGridData(this.field);
-    layoutData.validate();
-    this.field.setLayoutData(layoutData);
-    this.field.$container.addClass('content');
+  _renderProperties() {
+    super._renderProperties();
+    this._renderField();
   }
-}
 
-_removeField() {
-  if (this.field) {
-    this.field.remove();
+  /**
+   * Override
+   */
+  _renderText(text) {
+    super._renderText(text);
+    if (this.field && this.field.rendered && this.$text) {
+      this.field.$container.insertAfter(this.$text);
+    }
   }
-}
 
-clone(model, options) {
-  var clone = super.clone( model, options);
-  this._deepCloneProperties(clone, ['field'], options);
-  return clone;
-}
+  setField(field) {
+    this.setProperty('field', field);
+  }
 
-isTabTarget() {
-  return false;
-}
+  _renderField() {
+    if (this.field) {
+      // Use gridDataHints as "computed" gridData property, because FormFieldMenu
+      // does not have a logical grid (see FormField._updateElementInnerAlignment()).
+      this.field.gridData = GridData.createFromHints(this.field, 1);
 
-_renderOverflown() {
-  super._renderOverflown();
-  this.field._hideStatusMessage();
-}
+      this.field.render(this.$container);
+      var layoutData = new LogicalGridData(this.field);
+      layoutData.validate();
+      this.field.setLayoutData(layoutData);
+      this.field.$container.addClass('content');
+    }
+  }
+
+  _removeField() {
+    if (this.field) {
+      this.field.remove();
+    }
+  }
+
+  clone(model, options) {
+    var clone = super.clone(model, options);
+    this._deepCloneProperties(clone, ['field'], options);
+    return clone;
+  }
+
+  isTabTarget() {
+    return false;
+  }
+
+  _renderOverflown() {
+    super._renderOverflown();
+    this.field._hideStatusMessage();
+  }
 }

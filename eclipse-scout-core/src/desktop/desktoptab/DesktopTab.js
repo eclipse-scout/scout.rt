@@ -14,55 +14,55 @@ import {arrays} from '../../index';
 
 export default class DesktopTab extends SimpleTab {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_render() {
-  super._render();
-  this.$container.addClass('desktop-tab');
-  this.$container.on('contextmenu', this._onContextMenu.bind(this));
-}
+  _render() {
+    super._render();
+    this.$container.addClass('desktop-tab');
+    this.$container.on('contextmenu', this._onContextMenu.bind(this));
+  }
 
-_onContextMenu(event) {
-  var menuCloseAllTabs = scout.create('Menu', {
-    parent: this,
-    text: this.session.text('ui.CloseAllTabs')
-  });
-  menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
+  _onContextMenu(event) {
+    var menuCloseAllTabs = scout.create('Menu', {
+      parent: this,
+      text: this.session.text('ui.CloseAllTabs')
+    });
+    menuCloseAllTabs.on('action', this._onCloseAll.bind(this));
 
-  var menuCloseOtherTabs = scout.create('Menu', {
-    parent: this,
-    text: this.session.text('ui.CloseOtherTabs'),
-    enabled: this.parent.tabs.length > 1
-  });
-  menuCloseOtherTabs.on('action', this._onCloseOther.bind(this));
+    var menuCloseOtherTabs = scout.create('Menu', {
+      parent: this,
+      text: this.session.text('ui.CloseOtherTabs'),
+      enabled: this.parent.tabs.length > 1
+    });
+    menuCloseOtherTabs.on('action', this._onCloseOther.bind(this));
 
-  var popup = scout.create('ContextMenuPopup', {
-    parent: this,
-    menuItems: [menuCloseAllTabs, menuCloseOtherTabs],
-    cloneMenuItems: false,
-    location: {
-      x: event.pageX,
-      y: event.pageY
-    }
-  });
-  popup.open();
-}
+    var popup = scout.create('ContextMenuPopup', {
+      parent: this,
+      menuItems: [menuCloseAllTabs, menuCloseOtherTabs],
+      cloneMenuItems: false,
+      location: {
+        x: event.pageX,
+        y: event.pageY
+      }
+    });
+    popup.open();
+  }
 
-_onCloseAll() {
-  var openViews = this.parent.tabs.map(function(desktopTab) {
-    return desktopTab.view;
-  });
-  this.session.desktop.cancelViews(openViews);
-}
+  _onCloseAll() {
+    var openViews = this.parent.tabs.map(function(desktopTab) {
+      return desktopTab.view;
+    });
+    this.session.desktop.cancelViews(openViews);
+  }
 
-_onCloseOther() {
-  var openViews = this.parent.tabs.map(function(desktopTab) {
-    return desktopTab.view;
-  });
-  arrays.remove(openViews, this.view);
-  this.session.desktop.cancelViews(openViews);
-}
+  _onCloseOther() {
+    var openViews = this.parent.tabs.map(function(desktopTab) {
+      return desktopTab.view;
+    });
+    arrays.remove(openViews, this.view);
+    this.session.desktop.cancelViews(openViews);
+  }
 }

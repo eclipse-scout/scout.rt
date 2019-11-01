@@ -19,31 +19,31 @@ import {CalendarComponent} from '../index';
  */
 export default class CalendarListComponent {
 
-constructor(partDay, source) {
-  this.partDay = partDay;
-  this.source = source;
-  this.$container;
-  this._selectedListener = source.on('selected', function(event) {
-    this.$container.toggleClass('comp-selected', event.selected);
-  }.bind(this));
-  this._removeListener = source.on('remove', this.remove.bind(this));
-}
+  constructor(partDay, source) {
+    this.partDay = partDay;
+    this.source = source;
+    this.$container;
+    this._selectedListener = source.on('selected', function(event) {
+      this.$container.toggleClass('comp-selected', event.selected);
+    }.bind(this));
+    this._removeListener = source.on('remove', this.remove.bind(this));
+  }
 
-render($parent) {
-  var source = this.source;
-  this.$container = $parent
-    .appendDiv('calendar-component')
-    .data('partDay', this.partDay)
-    .addClass(source.item.cssClass)
-    .toggleClass('comp-selected', source._selected)
-    .mousedown(source._onMouseDown.bind(source))
-    .on('contextmenu', source._onContextMenu.bind(source))
-    .html(source._description());
-}
+  render($parent) {
+    var source = this.source;
+    this.$container = $parent
+      .appendDiv('calendar-component')
+      .data('partDay', this.partDay)
+      .addClass(source.item.cssClass)
+      .toggleClass('comp-selected', source._selected)
+      .mousedown(source._onMouseDown.bind(source))
+      .on('contextmenu', source._onContextMenu.bind(source))
+      .html(source._description());
+  }
 
-remove() {
-  this.source.removeListener(this._selectedListener);
-  this.source.removeListener(this._removeListener);
-  this.$container.remove();
-}
+  remove() {
+    this.source.removeListener(this._selectedListener);
+    this.source.removeListener(this._removeListener);
+    this.$container.remove();
+  }
 }

@@ -13,29 +13,29 @@ import {AbstractGrid} from '../../index';
 
 export default class VerticalSmartGrid extends AbstractGrid {
 
-constructor(options) {
-  super( options);
-}
-
-
-layoutAllDynamic(widgets) {
-  var cellCount = 0;
-  widgets.forEach(function(f) {
-    var hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
-    cellCount += hints.w * hints.h;
-  }.bind(this));
-
-  // do the calc
-  var rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
-  var matrix = new VerticalGridMatrix(this.getGridColumnCount(), rowCount);
-  while (!matrix.computeGridData(widgets)) {
-    matrix.resetAll(this.getGridColumnCount(), ++rowCount);
+  constructor(options) {
+    super(options);
   }
 
-  // set gridData
-  widgets.forEach(function(f) {
-    f.gridData = matrix.getGridData(f);
-  });
-  this.gridRows = matrix.getRowCount();
-}
+
+  layoutAllDynamic(widgets) {
+    var cellCount = 0;
+    widgets.forEach(function(f) {
+      var hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
+      cellCount += hints.w * hints.h;
+    }.bind(this));
+
+    // do the calc
+    var rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
+    var matrix = new VerticalGridMatrix(this.getGridColumnCount(), rowCount);
+    while (!matrix.computeGridData(widgets)) {
+      matrix.resetAll(this.getGridColumnCount(), ++rowCount);
+    }
+
+    // set gridData
+    widgets.forEach(function(f) {
+      f.gridData = matrix.getGridData(f);
+    });
+    this.gridRows = matrix.getRowCount();
+  }
 }

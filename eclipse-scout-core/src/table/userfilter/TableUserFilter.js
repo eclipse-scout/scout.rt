@@ -13,45 +13,45 @@ import * as $ from 'jquery';
 
 export default class TableUserFilter extends TableFilter {
 
-constructor() {
-  super();
-}
-
-
-init(model) {
-  this.session = model.session;
-  if (!this.session) {
-    throw new Error('Session expected: ' + this);
+  constructor() {
+    super();
   }
-  this._init(model);
-}
 
-_init(model) {
-  $.extend(this, model);
-}
 
-createFilterAddedEventData() {
-  return {
-    filterType: this.filterType
-  };
-}
+  init(model) {
+    this.session = model.session;
+    if (!this.session) {
+      throw new Error('Session expected: ' + this);
+    }
+    this._init(model);
+  }
 
-createFilterRemovedEventData() {
-  return {
-    filterType: this.filterType
-  };
-}
+  _init(model) {
+    $.extend(this, model);
+  }
 
-createKey() {
-  return this.filterType;
-}
+  createFilterAddedEventData() {
+    return {
+      filterType: this.filterType
+    };
+  }
 
-createLabel() {
-  // to be implemented by subclasses
-  return '';
-}
+  createFilterRemovedEventData() {
+    return {
+      filterType: this.filterType
+    };
+  }
 
-accept(row) {
-  // to be implemented by subclasses
-}
+  createKey() {
+    return this.filterType;
+  }
+
+  createLabel() {
+    // to be implemented by subclasses
+    return '';
+  }
+
+  accept(row) {
+    // to be implemented by subclasses
+  }
 }

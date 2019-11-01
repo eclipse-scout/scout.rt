@@ -13,32 +13,32 @@ import {keys} from '../../index';
 
 export default class TreeSpaceKeyStroke extends KeyStroke {
 
-constructor(tree) {
-  super();
-  this.field = tree;
+  constructor(tree) {
+    super();
+    this.field = tree;
 
-  this.which = [keys.SPACE];
-  this.renderingHints.render = false;
-}
+    this.which = [keys.SPACE];
+    this.renderingHints.render = false;
+  }
 
 
-_accept(event) {
-  var accepted = super._accept( event);
-  return accepted &&
-    this.field.checkable &&
-    this.field.selectedNodes.length;
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    return accepted &&
+      this.field.checkable &&
+      this.field.selectedNodes.length;
+  }
 
-handle(event) {
-  var selectedNodes = this.field.selectedNodes.filter(function(node) {
-    return node.enabled;
-  });
-  // Toggle checked state to 'true', except if every node is already checked
-  var checked = selectedNodes.some(function(node) {
-    return !node.checked;
-  });
-  selectedNodes.forEach(function(node) {
-    this.field.checkNode(node, checked);
-  }, this);
-}
+  handle(event) {
+    var selectedNodes = this.field.selectedNodes.filter(function(node) {
+      return node.enabled;
+    });
+    // Toggle checked state to 'true', except if every node is already checked
+    var checked = selectedNodes.some(function(node) {
+      return !node.checked;
+    });
+    selectedNodes.forEach(function(node) {
+      this.field.checkNode(node, checked);
+    }, this);
+  }
 }

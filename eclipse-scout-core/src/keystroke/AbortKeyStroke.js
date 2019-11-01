@@ -12,12 +12,12 @@ import {CloseKeyStroke} from '../index';
 
 export default class AbortKeyStroke extends CloseKeyStroke {
 
-constructor(field, $drawingArea) {
-  super( field, $drawingArea);
-}
+  constructor(field, $drawingArea) {
+    super(field, $drawingArea);
+  }
 
 
-handle(event) {
-  this.field.abort();
-}
+  handle(event) {
+    this.field.abort();
+  }
 }

@@ -13,24 +13,24 @@ import {KeyStroke} from '../../../index';
 
 export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
 
-constructor(tagField) {
-  super();
-  this.field = tagField;
-  this.which = [keys.ENTER, keys.SPACE];
-  this.renderingHints.render = false;
-  this.preventDefault = false;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(tagField) {
+    super();
+    this.field = tagField;
+    this.which = [keys.ENTER, keys.SPACE];
+    this.renderingHints.render = false;
+    this.preventDefault = false;
   }
-  return this.field.tagBar && this.field.tagBar.isOverflowIconFocused();
-}
 
-handle(event) {
-  this.field.tagBar.openOverflowPopup();
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    return this.field.tagBar && this.field.tagBar.isOverflowIconFocused();
+  }
+
+  handle(event) {
+    this.field.tagBar.openOverflowPopup();
+  }
 }

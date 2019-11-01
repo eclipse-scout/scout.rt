@@ -13,17 +13,17 @@ import {KeyStroke} from '../../../index';
 
 export default class TabAreaRightKeyStroke extends KeyStroke {
 
-constructor(tabArea) {
-  super();
-  this.field = tabArea;
-  this.which = [keys.RIGHT];
-  this.renderingHints.render = false;
-  this.stopPropagation = true;
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
+  constructor(tabArea) {
+    super();
+    this.field = tabArea;
+    this.which = [keys.RIGHT];
+    this.renderingHints.render = false;
+    this.stopPropagation = true;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
+  }
 
 
-handle(event) {
-  this.field.selectNextTab(true);
-}
+  handle(event) {
+    this.field.selectNextTab(true);
+  }
 }

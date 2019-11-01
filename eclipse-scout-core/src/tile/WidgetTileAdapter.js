@@ -12,8 +12,8 @@ import {TileAdapter} from '../index';
 
 export default class WidgetTileAdapter extends TileAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

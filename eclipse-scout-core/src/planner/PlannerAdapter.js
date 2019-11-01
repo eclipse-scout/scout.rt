@@ -14,100 +14,100 @@ import {ModelAdapter} from '../index';
 
 export default class PlannerAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
-}
-
-
-_sendViewRange(viewRange) {
-  this._send('property', {
-    viewRange: dates.toJsonDateRange(viewRange)
-  });
-}
-
-_sendSelectedActivity() {
-  var activityId = null;
-  if (this.widget.selectedActivity) {
-    activityId = this.widget.selectedActivity.id;
+  constructor() {
+    super();
+    this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
   }
-  this._send('property', {
-    selectedActivity: activityId
-  });
-}
 
-_sendSelectionRange() {
-  var selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
-  this._send('property', {
-    selectionRange: selectionRange
-  });
-}
 
-_onWidgetResourcesSelected(event) {
-  this._sendResourcesSelected();
-}
-
-_sendResourcesSelected() {
-  var resourceIds = this.widget.selectedResources.map(function(r) {
-    return r.id;
-  });
-  this._send('resourcesSelected', {
-    resourceIds: resourceIds
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'resourcesSelected') {
-    this._onWidgetResourcesSelected(event);
-  } else {
-    super._onWidgetEvent( event);
+  _sendViewRange(viewRange) {
+    this._send('property', {
+      viewRange: dates.toJsonDateRange(viewRange)
+    });
   }
-}
 
-_onResourcesInserted(resources) {
-  this.widget.insertResources(resources);
-}
-
-_onResourcesDeleted(resourceIds) {
-  var resources = this.widget._resourcesByIds(resourceIds);
-  this.addFilterForWidgetEventType('resourcesSelected');
-  this.addFilterForProperties({
-    selectionRange: new DateRange()
-  });
-  this.widget.deleteResources(resources);
-}
-
-_onAllResourcesDeleted() {
-  this.addFilterForWidgetEventType('resourcesSelected');
-  this.addFilterForProperties({
-    selectionRange: new DateRange()
-  });
-  this.widget.deleteAllResources();
-}
-
-_onResourcesSelected(resourceIds) {
-  var resources = this.widget._resourcesByIds(resourceIds);
-  this.addFilterForWidgetEventType('resourcesSelected');
-  this.widget.selectResources(resources, false);
-}
-
-_onResourcesUpdated(resources) {
-  this.widget.updateResources(resources);
-}
-
-onModelAction(event) {
-  if (event.type === 'resourcesInserted') {
-    this._onResourcesInserted(event.resources);
-  } else if (event.type === 'resourcesDeleted') {
-    this._onResourcesDeleted(event.resourceIds);
-  } else if (event.type === 'allResourcesDeleted') {
-    this._onAllResourcesDeleted();
-  } else if (event.type === 'resourcesSelected') {
-    this._onResourcesSelected(event.resourceIds);
-  } else if (event.type === 'resourcesUpdated') {
-    this._onResourcesUpdated(event.resources);
-  } else {
-    super.onModelAction( event);
+  _sendSelectedActivity() {
+    var activityId = null;
+    if (this.widget.selectedActivity) {
+      activityId = this.widget.selectedActivity.id;
+    }
+    this._send('property', {
+      selectedActivity: activityId
+    });
   }
-}
+
+  _sendSelectionRange() {
+    var selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
+    this._send('property', {
+      selectionRange: selectionRange
+    });
+  }
+
+  _onWidgetResourcesSelected(event) {
+    this._sendResourcesSelected();
+  }
+
+  _sendResourcesSelected() {
+    var resourceIds = this.widget.selectedResources.map(function(r) {
+      return r.id;
+    });
+    this._send('resourcesSelected', {
+      resourceIds: resourceIds
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'resourcesSelected') {
+      this._onWidgetResourcesSelected(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
+
+  _onResourcesInserted(resources) {
+    this.widget.insertResources(resources);
+  }
+
+  _onResourcesDeleted(resourceIds) {
+    var resources = this.widget._resourcesByIds(resourceIds);
+    this.addFilterForWidgetEventType('resourcesSelected');
+    this.addFilterForProperties({
+      selectionRange: new DateRange()
+    });
+    this.widget.deleteResources(resources);
+  }
+
+  _onAllResourcesDeleted() {
+    this.addFilterForWidgetEventType('resourcesSelected');
+    this.addFilterForProperties({
+      selectionRange: new DateRange()
+    });
+    this.widget.deleteAllResources();
+  }
+
+  _onResourcesSelected(resourceIds) {
+    var resources = this.widget._resourcesByIds(resourceIds);
+    this.addFilterForWidgetEventType('resourcesSelected');
+    this.widget.selectResources(resources, false);
+  }
+
+  _onResourcesUpdated(resources) {
+    this.widget.updateResources(resources);
+  }
+
+  onModelAction(event) {
+    if (event.type === 'resourcesInserted') {
+      this._onResourcesInserted(event.resources);
+    } else if (event.type === 'resourcesDeleted') {
+      this._onResourcesDeleted(event.resourceIds);
+    } else if (event.type === 'allResourcesDeleted') {
+      this._onAllResourcesDeleted();
+    } else if (event.type === 'resourcesSelected') {
+      this._onResourcesSelected(event.resourceIds);
+    } else if (event.type === 'resourcesUpdated') {
+      this._onResourcesUpdated(event.resources);
+    } else {
+      super.onModelAction(event);
+    }
+  }
 }

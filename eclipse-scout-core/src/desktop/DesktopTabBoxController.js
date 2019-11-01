@@ -14,15 +14,15 @@ import {scout} from '../index';
 
 export default class DesktopTabBoxController extends SimpleTabBoxController {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_createTab(view) {
-  return scout.create('DesktopTab', {
-    parent: this.tabArea,
-    view: view
-  });
-}
+  _createTab(view) {
+    return scout.create('DesktopTab', {
+      parent: this.tabArea,
+      view: view
+    });
+  }
 }

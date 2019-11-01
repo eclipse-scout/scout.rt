@@ -13,33 +13,33 @@ import {FormField} from '../../index';
 
 export default class OutlineTileField extends FormField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  // outline is not a widget, because at the time where _init runs, outline is not yet available
-  this.outline = null;
-  this.tileOutlineOverview = null;
-}
-
-
-_render() {
-  this._ensureTileOutlineOverview();
-  this.addContainer(this.$parent, 'outline-tile-field');
-  this.tileOutlineOverview.render(this.$container);
-  this.addField(this.tileOutlineOverview.$container);
-}
-
-/**
- * We cannot create the TileOutlineOverview instance in the _init function, because at the time where _init runs, outlines are not yet available.
- */
-_ensureTileOutlineOverview() {
-  if (this.tileOutlineOverview) {
-    return;
+    // outline is not a widget, because at the time where _init runs, outline is not yet available
+    this.outline = null;
+    this.tileOutlineOverview = null;
   }
-  var outline = this.outline ? this.session.getWidget(this.outline) : null;
-  this.tileOutlineOverview = scout.create('TileOutlineOverview', {
-    parent: this,
-    outline: outline
-  });
-}
+
+
+  _render() {
+    this._ensureTileOutlineOverview();
+    this.addContainer(this.$parent, 'outline-tile-field');
+    this.tileOutlineOverview.render(this.$container);
+    this.addField(this.tileOutlineOverview.$container);
+  }
+
+  /**
+   * We cannot create the TileOutlineOverview instance in the _init function, because at the time where _init runs, outlines are not yet available.
+   */
+  _ensureTileOutlineOverview() {
+    if (this.tileOutlineOverview) {
+      return;
+    }
+    var outline = this.outline ? this.session.getWidget(this.outline) : null;
+    this.tileOutlineOverview = scout.create('TileOutlineOverview', {
+      parent: this,
+      outline: outline
+    });
+  }
 }

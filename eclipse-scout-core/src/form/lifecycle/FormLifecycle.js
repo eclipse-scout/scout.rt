@@ -15,86 +15,86 @@ import {ValueField} from '../../index';
 
 export default class FormLifecycle extends Lifecycle {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
-  this.invalidElementsTextKey = 'FormInvalidFieldsMessage';
-  this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
-}
+    this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
+    this.invalidElementsTextKey = 'FormInvalidFieldsMessage';
+    this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
+  }
 
 
-init(model) {
-  scout.assertParameter('widget', model.widget, Form);
-  super.init( model);
-}
+  init(model) {
+    scout.assertParameter('widget', model.widget, Form);
+    super.init(model);
+  }
 
-_reset() {
-  this.widget.visitFields(function(field) {
-    if (field instanceof ValueField) {
-      field.resetValue();
-    }
-  });
-}
+  _reset() {
+    this.widget.visitFields(function(field) {
+      if (field instanceof ValueField) {
+        field.resetValue();
+      }
+    });
+  }
 
-_invalidElements() {
-  var missingFields = [];
-  var invalidFields = [];
+  _invalidElements() {
+    var missingFields = [];
+    var invalidFields = [];
 
-  this.widget.visitFields(function(field) {
-    var result = field.getValidationResult();
-    if (result.valid) {
-      return;
-    }
-    // error status has priority over mandatory
-    if (!result.validByErrorStatus) {
-      invalidFields.push(field);
-      return;
-    }
-    if (!result.validByMandatory) {
-      missingFields.push(field);
-    }
-  });
+    this.widget.visitFields(function(field) {
+      var result = field.getValidationResult();
+      if (result.valid) {
+        return;
+      }
+      // error status has priority over mandatory
+      if (!result.validByErrorStatus) {
+        invalidFields.push(field);
+        return;
+      }
+      if (!result.validByMandatory) {
+        missingFields.push(field);
+      }
+    });
 
-  return {
-    missingElements: missingFields,
-    invalidElements: invalidFields
-  };
-}
+    return {
+      missingElements: missingFields,
+      invalidElements: invalidFields
+    };
+  }
 
-_invalidElementText(element) {
-  return element.label;
-}
+  _invalidElementText(element) {
+    return element.label;
+  }
 
-_missingElementText(element) {
-  return element.label;
-}
+  _missingElementText(element) {
+    return element.label;
+  }
 
-_validateWidget() {
-  return this.widget._validate();
-}
+  _validateWidget() {
+    return this.widget._validate();
+  }
 
-markAsSaved() {
-  this.widget.visitFields(function(field) {
-    field.markAsSaved();
-  });
-}
+  markAsSaved() {
+    this.widget.visitFields(function(field) {
+      field.markAsSaved();
+    });
+  }
 
-/**
- * Visits all form fields and calls the updateRequiresSave() function. If any
- * field has the requiresSave flag set to true, this function returns true,
- * false otherwise.
- *
- * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
- */
-requiresSave() {
-  var requiresSave = false;
-  this.widget.visitFields(function(field) {
-    field.updateRequiresSave();
-    if (field.requiresSave) {
-      requiresSave = true;
-    }
-  });
-  return requiresSave;
-}
+  /**
+   * Visits all form fields and calls the updateRequiresSave() function. If any
+   * field has the requiresSave flag set to true, this function returns true,
+   * false otherwise.
+   *
+   * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
+   */
+  requiresSave() {
+    var requiresSave = false;
+    this.widget.visitFields(function(field) {
+      field.updateRequiresSave();
+      if (field.requiresSave) {
+        requiresSave = true;
+      }
+    });
+    return requiresSave;
+  }
 }

@@ -12,21 +12,21 @@ import {ButtonLayout} from '../../../index';
 
 export default class RadioButtonLayout extends ButtonLayout {
 
-constructor(radioButton) {
-  super( radioButton);
-  this.radioButton = radioButton;
-}
+  constructor(radioButton) {
+    super(radioButton);
+    this.radioButton = radioButton;
+  }
 
 
-layout($container) {
-  super.layout( $container);
+  layout($container) {
+    super.layout($container);
 
-  var $icon = this.radioButton.get$Icon(),
-    $circle = this.radioButton.$radioButton,
-    $label = this.radioButton.$buttonLabel,
-    $fieldContainer = this.radioButton.$fieldContainer;
+    var $icon = this.radioButton.get$Icon(),
+      $circle = this.radioButton.$radioButton,
+      $label = this.radioButton.$buttonLabel,
+      $fieldContainer = this.radioButton.$fieldContainer;
 
-  var labelMaxWidth = $fieldContainer.width() - ($circle.outerWidth(true) + ($icon.length ? $icon.outerWidth(true) : 0));
-  $label.css('max-width', labelMaxWidth);
-}
+    var labelMaxWidth = $fieldContainer.width() - ($circle.outerWidth(true) + ($icon.length ? $icon.outerWidth(true) : 0));
+    $label.css('max-width', labelMaxWidth);
+  }
 }

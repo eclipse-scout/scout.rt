@@ -13,39 +13,39 @@ import {keys} from '../../index';
 
 export default class EnlargeNavigationKeyStroke extends KeyStroke {
 
-constructor(handle) {
-  super();
-  this.field = handle;
-  this.desktop = handle.session.desktop;
-  this.ctrl = true;
-  this.shift = true;
-  this.which = [keys.ANGULAR_BRACKET];
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.desktop.$container;
-  }.bind(this);
-}
+  constructor(handle) {
+    super();
+    this.field = handle;
+    this.desktop = handle.session.desktop;
+    this.ctrl = true;
+    this.shift = true;
+    this.which = [keys.ANGULAR_BRACKET];
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.desktop.$container;
+    }.bind(this);
+  }
 
 
-_isEnabled() {
-  var enabled = super._isEnabled();
-  return enabled && this.field.rightVisible;
-}
+  _isEnabled() {
+    var enabled = super._isEnabled();
+    return enabled && this.field.rightVisible;
+  }
 
-handle(event) {
-  this.desktop.enlargeNavigation();
-}
+  handle(event) {
+    this.desktop.enlargeNavigation();
+  }
 
-_postRenderKeyBox($drawingArea, $keyBox) {
-  var handleOffset, keyBoxLeft, keyBoxTop,
-    handle = this.field;
+  _postRenderKeyBox($drawingArea, $keyBox) {
+    var handleOffset, keyBoxLeft, keyBoxTop,
+      handle = this.field;
 
-  $keyBox.addClass('navigation-handle-key-box right');
+    $keyBox.addClass('navigation-handle-key-box right');
 
-  handleOffset = handle.$right.offsetTo(this.desktop.$container);
-  keyBoxLeft = handleOffset.left + handle.$right.outerWidth();
-  keyBoxTop = handleOffset.top;
+    handleOffset = handle.$right.offsetTo(this.desktop.$container);
+    keyBoxLeft = handleOffset.left + handle.$right.outerWidth();
+    keyBoxTop = handleOffset.top;
 
-  $keyBox.cssLeft(keyBoxLeft)
-    .cssTop(keyBoxTop);
-}
+    $keyBox.cssLeft(keyBoxLeft)
+      .cssTop(keyBoxTop);
+  }
 }

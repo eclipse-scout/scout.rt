@@ -13,109 +13,109 @@ import {HorizontalGrid} from '../../index';
 
 export default class TileAccordionSelectionHandler extends TileGridSelectionHandler {
 
-constructor(tileAccordion) {
-  super( tileAccordion);
-  // The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid
-  this.tileAccordion = this.tileGrid;
-}
-
-
-/**
- * @override
- */
-getFilteredTiles() {
-  return this.tileAccordion.getFilteredTiles();
-}
-
-/**
- * @override
- */
-getFilteredTileCount() {
-  return this.tileAccordion.getFilteredTileCount();
-}
-
-/**
- * @override
- */
-getVisibleTiles() {
-  return this.tileAccordion.getVisibleTiles();
-}
-
-/**
- * @override
- */
-getVisibleTileCount() {
-  return this.tileAccordion.getVisibleTileCount();
-}
-
-/**
- * @override
- */
-getSelectedTiles(event) {
-  return this.tileAccordion.getSelectedTiles();
-}
-
-/**
- * @override
- */
-getFocusedTile() {
-  return this.tileAccordion.getFocusedTile();
-}
-
-/**
- * @override
- */
-getVisibleGridRowCount() {
-  return this.tileAccordion.getVisibleGridRowCount();
-}
-
-/**
- * @override
- */
-getVisibleGridX(tile) {
-  return this.tileAccordion.getVisibleGridX(tile);
-}
-
-/**
- * @override
- */
-getVisibleGridY(tile) {
-  return this.tileAccordion.getVisibleGridY(tile);
-}
-
-/**
- * @override
- */
-scrollTo(tile) {
-  var group = this.tileAccordion.getGroupByTile(tile);
-  group.body.scrollTo(tile);
-}
-
-/**
- * @override
- */
-getTileGridByRow(rowIndex) {
-  var group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
-  if (group) {
-    return group.body;
+  constructor(tileAccordion) {
+    super(tileAccordion);
+    // The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid
+    this.tileAccordion = this.tileGrid;
   }
-  return null;
-}
 
-/**
- * @override
- */
-findVisibleTileIndexAt(x, y, startIndex, reverse) {
-  return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
-}
 
-/**
- * @override
- */
-isHorizontalGridActive() {
-  if (this.tileAccordion.groups.length === 0) {
-    return false;
+  /**
+   * @override
+   */
+  getFilteredTiles() {
+    return this.tileAccordion.getFilteredTiles();
   }
-  return this.tileAccordion.groups[0].body.logicalGrid instanceof HorizontalGrid;
-}
+
+  /**
+   * @override
+   */
+  getFilteredTileCount() {
+    return this.tileAccordion.getFilteredTileCount();
+  }
+
+  /**
+   * @override
+   */
+  getVisibleTiles() {
+    return this.tileAccordion.getVisibleTiles();
+  }
+
+  /**
+   * @override
+   */
+  getVisibleTileCount() {
+    return this.tileAccordion.getVisibleTileCount();
+  }
+
+  /**
+   * @override
+   */
+  getSelectedTiles(event) {
+    return this.tileAccordion.getSelectedTiles();
+  }
+
+  /**
+   * @override
+   */
+  getFocusedTile() {
+    return this.tileAccordion.getFocusedTile();
+  }
+
+  /**
+   * @override
+   */
+  getVisibleGridRowCount() {
+    return this.tileAccordion.getVisibleGridRowCount();
+  }
+
+  /**
+   * @override
+   */
+  getVisibleGridX(tile) {
+    return this.tileAccordion.getVisibleGridX(tile);
+  }
+
+  /**
+   * @override
+   */
+  getVisibleGridY(tile) {
+    return this.tileAccordion.getVisibleGridY(tile);
+  }
+
+  /**
+   * @override
+   */
+  scrollTo(tile) {
+    var group = this.tileAccordion.getGroupByTile(tile);
+    group.body.scrollTo(tile);
+  }
+
+  /**
+   * @override
+   */
+  getTileGridByRow(rowIndex) {
+    var group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
+    if (group) {
+      return group.body;
+    }
+    return null;
+  }
+
+  /**
+   * @override
+   */
+  findVisibleTileIndexAt(x, y, startIndex, reverse) {
+    return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
+  }
+
+  /**
+   * @override
+   */
+  isHorizontalGridActive() {
+    if (this.tileAccordion.groups.length === 0) {
+      return false;
+    }
+    return this.tileAccordion.groups[0].body.logicalGrid instanceof HorizontalGrid;
+  }
 }

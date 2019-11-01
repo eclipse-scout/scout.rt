@@ -13,33 +13,33 @@ import {LookupFieldAdapter} from '../../../index';
 
 export default class TagFieldAdapter extends LookupFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-_initProperties(model) {
-  if (model.insertText !== undefined) {
-    // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
-    delete model.insertText;
+  constructor() {
+    super();
   }
-}
 
-_postCreateWidget() {
-  super._postCreateWidget();
-  this.widget.lookupCall = scout.create('RemoteLookupCall', this);
-}
 
-_syncResult(result) {
-  if (this.widget._currentLookupCall) {
-    this.widget._currentLookupCall.resolveLookup(result);
+  _initProperties(model) {
+    if (model.insertText !== undefined) {
+      // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
+      delete model.insertText;
+    }
   }
-}
 
-_onWidgetAcceptInput(event) {
-  this._send('acceptInput', {
-    displayText: event.displayText,
-    value: event.value
-  });
-}
+  _postCreateWidget() {
+    super._postCreateWidget();
+    this.widget.lookupCall = scout.create('RemoteLookupCall', this);
+  }
+
+  _syncResult(result) {
+    if (this.widget._currentLookupCall) {
+      this.widget._currentLookupCall.resolveLookup(result);
+    }
+  }
+
+  _onWidgetAcceptInput(event) {
+    this._send('acceptInput', {
+      displayText: event.displayText,
+      value: event.value
+    });
+  }
 }

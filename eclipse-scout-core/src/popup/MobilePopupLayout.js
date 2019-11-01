@@ -15,39 +15,39 @@ import {Dimension} from '../index';
 
 export default class MobilePopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super( popup);
-  this.doubleCalcPrefSize = false;
-}
+  constructor(popup) {
+    super(popup);
+    this.doubleCalcPrefSize = false;
+  }
 
 
-layout($container) {
-  super.layout( $container);
+  layout($container) {
+    super.layout($container);
 
-  var htmlPopup = this.popup.htmlComp,
-    popupSize = htmlPopup.size(),
-    htmlWidget = this.popup.widget.htmlComp,
-    widgetSize = 0,
-    $header = this.popup.$header,
-    headerSize = 0;
+    var htmlPopup = this.popup.htmlComp,
+      popupSize = htmlPopup.size(),
+      htmlWidget = this.popup.widget.htmlComp,
+      widgetSize = 0,
+      $header = this.popup.$header,
+      headerSize = 0;
 
-  popupSize = popupSize.subtract(htmlPopup.insets());
-  headerSize = graphics.prefSize($header, true);
-  graphics.setLocation($header, new Point(0, 0));
+    popupSize = popupSize.subtract(htmlPopup.insets());
+    headerSize = graphics.prefSize($header, true);
+    graphics.setLocation($header, new Point(0, 0));
 
-  widgetSize = popupSize.clone();
-  widgetSize.height -= headerSize.height;
-  htmlWidget.setLocation(new Point(0, headerSize.height));
-  htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
-}
+    widgetSize = popupSize.clone();
+    widgetSize.height -= headerSize.height;
+    htmlWidget.setLocation(new Point(0, headerSize.height));
+    htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
+  }
 
-/**
- * @override AbstractLayout.js
- */
-preferredLayoutSize($container) {
-  var $window = this.popup.$container.window(),
-    windowSize = new Dimension($window.width(), $window.height());
+  /**
+   * @override AbstractLayout.js
+   */
+  preferredLayoutSize($container) {
+    var $window = this.popup.$container.window(),
+      windowSize = new Dimension($window.width(), $window.height());
 
-  return windowSize;
-}
+    return windowSize;
+  }
 }

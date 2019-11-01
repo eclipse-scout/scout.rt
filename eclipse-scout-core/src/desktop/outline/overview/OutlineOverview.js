@@ -15,43 +15,43 @@ import {Outline} from '../../../index';
 
 export default class OutlineOverview extends Widget {
 
-constructor() {
-  super();
-  this.outline = null;
-}
-
-
-_init(model) {
-  super._init( model);
-  if (!this.outline && this.parent instanceof Outline) {
-    this.outline = this.parent;
+  constructor() {
+    super();
+    this.outline = null;
   }
-  scout.assertProperty(this, 'outline', Outline);
-}
 
-_render() {
-  this.$container = this.$parent.appendDiv('outline-overview');
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.$content = this.$container.appendDiv('outline-overview-content');
-  this.$content.appendDiv('outline-overview-icon').icon(this.outline.iconId);
-  this.$content.appendDiv('outline-overview-title').text(this.outline.title);
-}
 
-/**
- * @override Widget.js
- */
-_attach() {
-  this.$parent.append(this.$container);
-  var htmlParent = this.htmlComp.getParent();
-  this.htmlComp.setSize(htmlParent.size());
-  super._attach();
-}
+  _init(model) {
+    super._init(model);
+    if (!this.outline && this.parent instanceof Outline) {
+      this.outline = this.parent;
+    }
+    scout.assertProperty(this, 'outline', Outline);
+  }
 
-/**
- * @override Widget.js
- */
-_detach() {
-  this.$container.detach();
-  super._detach();
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('outline-overview');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.$content = this.$container.appendDiv('outline-overview-content');
+    this.$content.appendDiv('outline-overview-icon').icon(this.outline.iconId);
+    this.$content.appendDiv('outline-overview-title').text(this.outline.title);
+  }
+
+  /**
+   * @override Widget.js
+   */
+  _attach() {
+    this.$parent.append(this.$container);
+    var htmlParent = this.htmlComp.getParent();
+    this.htmlComp.setSize(htmlParent.size());
+    super._attach();
+  }
+
+  /**
+   * @override Widget.js
+   */
+  _detach() {
+    this.$container.detach();
+    super._detach();
+  }
 }

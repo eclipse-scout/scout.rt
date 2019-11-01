@@ -14,7 +14,6 @@ import {Status} from '../index';
 import {scout} from '../index';
 
 
-
 /**
  * Copies the given text to the clipboard. To make this work, the method must be called inside
  * a "user action" (i.e. mouse or keyboard event handler). For security reasons, the access to
@@ -63,7 +62,7 @@ export function copyText(options) {
 }
 
 //private
- export function _copyText(options) {
+export function _copyText(options) {
   // Modern clipboard API
   // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
   if (navigator.clipboard) {
@@ -102,7 +101,7 @@ export function copyText(options) {
 }
 
 //private
- export function _showNotification(options, promise) {
+export function _showNotification(options, promise) {
   var status = _successStatus(options.parent.session);
   promise
     .catch(function() {
@@ -113,7 +112,7 @@ export function copyText(options) {
 }
 
 //private
- export function _successStatus(session) {
+export function _successStatus(session) {
   return new Status({
     message: session.text('ui.CopyToClipboardSuccessStatus'),
     severity: Status.Severity.INFO
@@ -121,7 +120,7 @@ export function copyText(options) {
 }
 
 //private
- export function _failedStatus(session) {
+export function _failedStatus(session) {
   return new Status({
     message: session.text('ui.CopyToClipboardFailedStatus'),
     severity: Status.Severity.WARNING

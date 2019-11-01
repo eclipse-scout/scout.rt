@@ -10,22 +10,22 @@
  */
 export default class RemoteTileFilter {
 
-constructor(model) {
-  model = model || {};
-  this.tileMap = {};
-  if (model.tileIds) {
-    this.setTileIds(model.tileIds);
+  constructor(model) {
+    model = model || {};
+    this.tileMap = {};
+    if (model.tileIds) {
+      this.setTileIds(model.tileIds);
+    }
   }
-}
 
-setTileIds(tileIds) {
-  this.tileMap = {};
-  tileIds.forEach(function(tileId) {
-    this.tileMap[tileId] = tileId;
-  }, this);
-}
+  setTileIds(tileIds) {
+    this.tileMap = {};
+    tileIds.forEach(function(tileId) {
+      this.tileMap[tileId] = tileId;
+    }, this);
+  }
 
-accept(tile) {
-  return !!this.tileMap[tile.id];
-}
+  accept(tile) {
+    return !!this.tileMap[tile.id];
+  }
 }

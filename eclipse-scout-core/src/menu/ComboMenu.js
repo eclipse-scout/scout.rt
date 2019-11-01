@@ -13,27 +13,27 @@ import {Menu} from '../index';
 
 export default class ComboMenu extends Menu {
 
-constructor() {
-  super();
-}
-
-
-_render() {
-  this.$container = this.$parent.appendDiv('menu-item combo-menu');
-  if (this.uiCssClass) {
-    this.$container.addClass(this.uiCssClass);
+  constructor() {
+    super();
   }
-  this.$container.unfocusable();
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
-  this.childActions.forEach(function(childAction) {
-    childAction.addCssClass('combo-menu-child');
-    childAction.render();
-  });
-}
+
+  _render() {
+    this.$container = this.$parent.appendDiv('menu-item combo-menu');
+    if (this.uiCssClass) {
+      this.$container.addClass(this.uiCssClass);
+    }
+    this.$container.unfocusable();
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+
+    this.childActions.forEach(function(childAction) {
+      childAction.addCssClass('combo-menu-child');
+      childAction.render();
+    });
+  }
 
 // @override
-_togglesSubMenu() {
-  return false;
-}
+  _togglesSubMenu() {
+    return false;
+  }
 }

@@ -12,32 +12,32 @@ import {AbstractLayout} from '../index';
 
 export default class ModeSelectorLayout extends AbstractLayout {
 
-constructor(modeSelector) {
-  super();
-  this.modeSelector = modeSelector;
-}
+  constructor(modeSelector) {
+    super();
+    this.modeSelector = modeSelector;
+  }
 
 
-preferredLayoutSize($container, options) {
-  var prefSize = super.preferredLayoutSize( $container, options);
+  preferredLayoutSize($container, options) {
+    var prefSize = super.preferredLayoutSize($container, options);
 
-  var oldStyle = this.modeSelector.$container.attr('style');
-  this.modeSelector.$container.css({
-    'width': 'auto',
-    'height': 'auto'
-  });
+    var oldStyle = this.modeSelector.$container.attr('style');
+    this.modeSelector.$container.css({
+      'width': 'auto',
+      'height': 'auto'
+    });
 
-  var maxWidth = 0;
-  this.modeSelector.modes.forEach(function(mode) {
-    var modeWidth = mode.htmlComp.prefSize().width;
-    if (modeWidth > maxWidth) {
-      maxWidth = modeWidth;
-    }
-  });
+    var maxWidth = 0;
+    this.modeSelector.modes.forEach(function(mode) {
+      var modeWidth = mode.htmlComp.prefSize().width;
+      if (modeWidth > maxWidth) {
+        maxWidth = modeWidth;
+      }
+    });
 
-  this.modeSelector.$container.attrOrRemove('style', oldStyle);
+    this.modeSelector.$container.attrOrRemove('style', oldStyle);
 
-  prefSize.width = maxWidth * this.modeSelector.modes.length + this.modeSelector.htmlComp.insets().horizontal();
-  return prefSize;
-}
+    prefSize.width = maxWidth * this.modeSelector.modes.length + this.modeSelector.htmlComp.insets().horizontal();
+    return prefSize;
+  }
 }

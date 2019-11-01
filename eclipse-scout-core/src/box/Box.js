@@ -17,41 +17,41 @@ import * as $ from 'jquery';
  */
 export default class Box {
 
-constructor() {
-  this.$parent = null;
-}
-
-render($parent) {
-  this.$parent = $parent;
-  this._render();
-  this.rendered = true;
-}
-
-remove() {
-  this.$container.remove();
-  this.$container = null;
-  this.rendered = false;
-}
-
-_render() {
-  this.$container = $('<div>')
-    .addClass('box')
-    .appendTo(this.$parent);
-
-  this.$wrapper = $('<div>')
-    .addClass('wrapper')
-    .appendTo(this.$container);
-
-  this.$content = $('<div>')
-    .addClass('box-content')
-    .appendTo(this.$wrapper);
-
-  if (this.logoUrl) {
-    this.$header = this.$content.appendDiv('header');
-    this.$logo = $('<img>')
-      .addClass('logo')
-      .attr('src', this.logoUrl)
-      .appendTo(this.$header);
+  constructor() {
+    this.$parent = null;
   }
-}
+
+  render($parent) {
+    this.$parent = $parent;
+    this._render();
+    this.rendered = true;
+  }
+
+  remove() {
+    this.$container.remove();
+    this.$container = null;
+    this.rendered = false;
+  }
+
+  _render() {
+    this.$container = $('<div>')
+      .addClass('box')
+      .appendTo(this.$parent);
+
+    this.$wrapper = $('<div>')
+      .addClass('wrapper')
+      .appendTo(this.$container);
+
+    this.$content = $('<div>')
+      .addClass('box-content')
+      .appendTo(this.$wrapper);
+
+    if (this.logoUrl) {
+      this.$header = this.$content.appendDiv('header');
+      this.$logo = $('<img>')
+        .addClass('logo')
+        .attr('src', this.logoUrl)
+        .appendTo(this.$header);
+    }
+  }
 }

@@ -15,73 +15,73 @@ import {arrays} from '../../index';
 
 export default class TableNavigationDownKeyStroke extends AbstractTableNavigationKeyStroke {
 
-constructor(table) {
-  super( table);
-  this.which = [keys.DOWN];
-  this.renderingHints.text = '↓';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var row = this.firstRowAfterSelection();
-    if (row) {
-      return row.$row;
-    }
-  }.bind(this);
-}
-
-
-handle(event) {
-  var table = this.field,
-    rows = table.visibleRows,
-    selectedRows = table.selectedRows,
-    lastActionRow = table.selectionHandler.lastActionRow,
-    lastActionRowIndex = -1,
-    newActionRowIndex = -1,
-    newSelectedRows, newActionRow;
-
-  if (lastActionRow) {
-    lastActionRowIndex = rows.indexOf(lastActionRow);
+  constructor(table) {
+    super(table);
+    this.which = [keys.DOWN];
+    this.renderingHints.text = '↓';
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var row = this.firstRowAfterSelection();
+      if (row) {
+        return row.$row;
+      }
+    }.bind(this);
   }
 
-  if (rows.length > 1 && (selectedRows.length > 0 || lastActionRowIndex > -1)) {
-    // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
-    if (lastActionRowIndex < 0) {
-      if (rows.length === selectedRows.length) {
-        lastActionRow = arrays.first(rows);
-      } else {
-        lastActionRow = arrays.last(selectedRows);
-      }
+
+  handle(event) {
+    var table = this.field,
+      rows = table.visibleRows,
+      selectedRows = table.selectedRows,
+      lastActionRow = table.selectionHandler.lastActionRow,
+      lastActionRowIndex = -1,
+      newActionRowIndex = -1,
+      newSelectedRows, newActionRow;
+
+    if (lastActionRow) {
       lastActionRowIndex = rows.indexOf(lastActionRow);
     }
-    if (lastActionRowIndex === rows.length - 1) {
-      return;
-    }
 
-    newActionRowIndex = lastActionRowIndex + 1;
-    newActionRow = rows[newActionRowIndex];
-    newSelectedRows = [newActionRow];
-
-    if (event.shiftKey) {
-      if (table.isRowSelected(newActionRow)) {
-        // if new action row already is selected, remove last action row from selection
-        // use case: rows 2,3,4 are selected, last action row is 2. User presses shift-down -> rows 3,4 need to be the new selection
-        newSelectedRows = [];
-        arrays.pushAll(newSelectedRows, selectedRows);
-        // only unselect when first or last row (but not in the middle of the selection, see #172929)
-        var selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
-        if (scout.isOneOf(lastActionRowIndex, selectionIndizes[0], selectionIndizes[1])) {
-          arrays.remove(newSelectedRows, lastActionRow);
+    if (rows.length > 1 && (selectedRows.length > 0 || lastActionRowIndex > -1)) {
+      // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
+      if (lastActionRowIndex < 0) {
+        if (rows.length === selectedRows.length) {
+          lastActionRow = arrays.first(rows);
+        } else {
+          lastActionRow = arrays.last(selectedRows);
         }
-      } else {
-        newSelectedRows = arrays.union(selectedRows, newSelectedRows);
-        newActionRow = this._findLastSelectedRowAfter(table, newActionRowIndex);
+        lastActionRowIndex = rows.indexOf(lastActionRow);
       }
-    }
-  } else {
-    newSelectedRows = [arrays.first(rows)];
-    newActionRow = newSelectedRows[0];
-  }
+      if (lastActionRowIndex === rows.length - 1) {
+        return;
+      }
 
-  table.selectionHandler.lastActionRow = newActionRow;
-  table.selectRows(newSelectedRows, true);
-  table.scrollTo(newActionRow);
-}
+      newActionRowIndex = lastActionRowIndex + 1;
+      newActionRow = rows[newActionRowIndex];
+      newSelectedRows = [newActionRow];
+
+      if (event.shiftKey) {
+        if (table.isRowSelected(newActionRow)) {
+          // if new action row already is selected, remove last action row from selection
+          // use case: rows 2,3,4 are selected, last action row is 2. User presses shift-down -> rows 3,4 need to be the new selection
+          newSelectedRows = [];
+          arrays.pushAll(newSelectedRows, selectedRows);
+          // only unselect when first or last row (but not in the middle of the selection, see #172929)
+          var selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
+          if (scout.isOneOf(lastActionRowIndex, selectionIndizes[0], selectionIndizes[1])) {
+            arrays.remove(newSelectedRows, lastActionRow);
+          }
+        } else {
+          newSelectedRows = arrays.union(selectedRows, newSelectedRows);
+          newActionRow = this._findLastSelectedRowAfter(table, newActionRowIndex);
+        }
+      }
+    } else {
+      newSelectedRows = [arrays.first(rows)];
+      newActionRow = newSelectedRows[0];
+    }
+
+    table.selectionHandler.lastActionRow = newActionRow;
+    table.selectRows(newSelectedRows, true);
+    table.scrollTo(newActionRow);
+  }
 }

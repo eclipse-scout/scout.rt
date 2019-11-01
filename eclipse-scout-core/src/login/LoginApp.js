@@ -28,33 +28,33 @@ import {App} from '../index';
  */
 export default class LoginApp extends App {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-/**
- * Default adds polyfills too, not required here
- * @override
- */
-_prepareEssentials(options) {
-  ObjectFactory.get().init();
-}
+  /**
+   * Default adds polyfills too, not required here
+   * @override
+   */
+  _prepareEssentials(options) {
+    ObjectFactory.get().init();
+  }
 
-/**
- * No bootstrapping required
- * @override
- */
-_doBootstrap(options) {
-  return [];
-}
+  /**
+   * No bootstrapping required
+   * @override
+   */
+  _doBootstrap(options) {
+    return [];
+  }
 
-_init(options) {
-  options = options || {};
-  options.texts = $.extend({}, texts.readFromDOM(), options.texts);
-  this._prepareDOM();
+  _init(options) {
+    options = options || {};
+    options.texts = $.extend({}, texts.readFromDOM(), options.texts);
+    this._prepareDOM();
 
-  var loginBox = scout.create('LoginBox', options);
-  loginBox.render($('body'));
-}
+    var loginBox = scout.create('LoginBox', options);
+    loginBox.render($('body'));
+  }
 }

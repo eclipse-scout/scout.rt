@@ -15,40 +15,40 @@ import {scout} from '../index';
 
 export default class GlassPane extends Widget {
 
-constructor() {
-  super();
-}
-
-
-_render() {
-  this.$container = this.$parent
-    .appendDiv('glasspane')
-    .on('mousedown', this._onMouseDown.bind(this));
-
-  // This is required in touch mode, because FastClick messes up the order
-  // of mouse/click events which is especially important for TouchPopups.
-  if (Device.get().supportsTouch()) {
-    this.$container.addClass('needsclick');
+  constructor() {
+    super();
   }
 
-  this.$parent.addClass('glasspane-parent');
-  var cssPosition = this.$parent.css('position');
-  if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
-    this.$parent.css('position', 'relative');
+
+  _render() {
+    this.$container = this.$parent
+      .appendDiv('glasspane')
+      .on('mousedown', this._onMouseDown.bind(this));
+
+    // This is required in touch mode, because FastClick messes up the order
+    // of mouse/click events which is especially important for TouchPopups.
+    if (Device.get().supportsTouch()) {
+      this.$container.addClass('needsclick');
+    }
+
+    this.$parent.addClass('glasspane-parent');
+    var cssPosition = this.$parent.css('position');
+    if (!scout.isOneOf(cssPosition, 'relative', 'absolute')) {
+      this.$parent.css('position', 'relative');
+    }
+
+    // Register 'glassPaneTarget' in focus manager.
+    this.session.focusManager.registerGlassPaneTarget(this.$parent);
   }
 
-  // Register 'glassPaneTarget' in focus manager.
-  this.session.focusManager.registerGlassPaneTarget(this.$parent);
-}
+  _remove() {
+    this.$parent.removeClass('glasspane-parent');
+    this.session.focusManager.unregisterGlassPaneTarget(this.$parent);
+    super._remove();
+  }
 
-_remove() {
-  this.$parent.removeClass('glasspane-parent');
-  this.session.focusManager.unregisterGlassPaneTarget(this.$parent);
-  super._remove();
-}
-
-_onMouseDown(event) {
-  // Won't be executed if pointer events is set to none. But acts as safety net if pointer events are not supported or even removed by the user
-  $.suppressEvent(event);
-}
+  _onMouseDown(event) {
+    // Won't be executed if pointer events is set to none. But acts as safety net if pointer events are not supported or even removed by the user
+    $.suppressEvent(event);
+  }
 }

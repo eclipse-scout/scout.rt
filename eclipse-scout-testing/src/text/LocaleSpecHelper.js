@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import { Locale } from '@eclipse-scout/core';
+import {Locale} from '@eclipse-scout/core';
 
 export default class LocaleSpecHelper {
   static DEFAULT_LOCALE = 'de-CH';

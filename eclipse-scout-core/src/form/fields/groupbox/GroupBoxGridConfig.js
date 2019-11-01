@@ -13,23 +13,23 @@ import {scout} from '../../../index';
 
 export default class GroupBoxGridConfig extends LogicalGridConfig {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-getGridWidgets() {
-  return this.widget.controls;
-}
+  getGridWidgets() {
+    return this.widget.controls;
+  }
 
-getGridColumnCount() {
-  var gridColumns = -1,
-    widget = this.widget;
+  getGridColumnCount() {
+    var gridColumns = -1,
+      widget = this.widget;
 
-  do {
-    gridColumns = scout.nvl(widget.gridColumnCount, gridColumns);
-  } while (gridColumns < 0 && widget.getParentGroupBox && (widget = widget.getParentGroupBox()));
+    do {
+      gridColumns = scout.nvl(widget.gridColumnCount, gridColumns);
+    } while (gridColumns < 0 && widget.getParentGroupBox && (widget = widget.getParentGroupBox()));
 
-  return gridColumns < 0 ? 2 : gridColumns;
-}
+    return gridColumns < 0 ? 2 : gridColumns;
+  }
 }

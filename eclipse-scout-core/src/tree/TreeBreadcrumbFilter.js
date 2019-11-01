@@ -10,14 +10,14 @@
  */
 export default class TreeBreadcrumbFilter {
 
-constructor(tree) {
-  this.tree = tree;
-}
-
-accept(node) {
-  if (this.tree.selectedNodes.length === 0) {
-    return node.parentNode === undefined;
+  constructor(tree) {
+    this.tree = tree;
   }
-  return this.tree.isNodeInBreadcrumbVisible(node);
-}
+
+  accept(node) {
+    if (this.tree.selectedNodes.length === 0) {
+      return node.parentNode === undefined;
+    }
+    return this.tree.isNodeInBreadcrumbVisible(node);
+  }
 }

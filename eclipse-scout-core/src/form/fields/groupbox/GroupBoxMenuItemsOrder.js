@@ -10,50 +10,51 @@
  */
 export default class GroupBoxMenuItemsOrder {
 
-constructor() {};
-
-/**
- * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
- * The result looks as follows:
- *
- * <em>
- * [horizontalAlignment=-1|0]    [horizontalAlignment=1]
- * [  buttons  ]  [  menus  ]    [ menus ]   [ buttons ]
- * </em>
- *
- * The buttons are always on the outer side of the group-box, the menus are on the inner side.
- */
-order(items) {
-  var leftButtons = [],
-    leftMenus = [],
-    rightButtons = [],
-    rightMenus = [];
-
-  items.forEach(function(item) {
-    if (item.isButton()) {
-      var horizontalAlignment = item.horizontalAlignment;
-      if (horizontalAlignment === undefined) {
-        // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData
-        horizontalAlignment = (item.gridData && item.gridData.horizontalAlignment);
-      }
-      if (horizontalAlignment === 1) {
-        rightButtons.push(item);
-      } else { // also 0
-        leftButtons.push(item);
-      }
-    } else {
-      if (item.horizontalAlignment === 1) {
-        rightMenus.push(item);
-      } else { // also 0
-        leftMenus.push(item);
-      }
-    }
-  });
-
-  return {
-    left: leftButtons.concat(leftMenus),
-    right: rightMenus.concat(rightButtons),
-    all: leftButtons.concat(leftMenus).concat(rightMenus).concat(rightButtons)
+  constructor() {
   };
-}
+
+  /**
+   * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
+   * The result looks as follows:
+   *
+   * <em>
+   * [horizontalAlignment=-1|0]    [horizontalAlignment=1]
+   * [  buttons  ]  [  menus  ]    [ menus ]   [ buttons ]
+   * </em>
+   *
+   * The buttons are always on the outer side of the group-box, the menus are on the inner side.
+   */
+  order(items) {
+    var leftButtons = [],
+      leftMenus = [],
+      rightButtons = [],
+      rightMenus = [];
+
+    items.forEach(function(item) {
+      if (item.isButton()) {
+        var horizontalAlignment = item.horizontalAlignment;
+        if (horizontalAlignment === undefined) {
+          // Real buttons have no property 'horizontalAlignment' but a corresponding field on the gridData
+          horizontalAlignment = (item.gridData && item.gridData.horizontalAlignment);
+        }
+        if (horizontalAlignment === 1) {
+          rightButtons.push(item);
+        } else { // also 0
+          leftButtons.push(item);
+        }
+      } else {
+        if (item.horizontalAlignment === 1) {
+          rightMenus.push(item);
+        } else { // also 0
+          leftMenus.push(item);
+        }
+      }
+    });
+
+    return {
+      left: leftButtons.concat(leftMenus),
+      right: rightMenus.concat(rightButtons),
+      all: leftButtons.concat(leftMenus).concat(rightMenus).concat(rightButtons)
+    };
+  }
 }

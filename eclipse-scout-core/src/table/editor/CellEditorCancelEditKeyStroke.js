@@ -13,15 +13,15 @@ import {keys} from '../../index';
 
 export default class CellEditorCancelEditKeyStroke extends KeyStroke {
 
-constructor(popup) {
-  super();
-  this.field = popup;
-  this.which = [keys.ESC];
-  this.stopPropagation = true;
-}
+  constructor(popup) {
+    super();
+    this.field = popup;
+    this.which = [keys.ESC];
+    this.stopPropagation = true;
+  }
 
 
-handle(event) {
-  this.field.cancelEdit();
-}
+  handle(event) {
+    this.field.cancelEdit();
+  }
 }

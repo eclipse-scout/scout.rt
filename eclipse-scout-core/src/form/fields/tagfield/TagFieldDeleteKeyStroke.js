@@ -19,30 +19,30 @@ import {TagBar} from '../../../index';
  */
 export default class TagFieldDeleteKeyStroke extends KeyStroke {
 
-constructor(fieldAdapter) {
-  super();
-  this.fieldAdapter = fieldAdapter;
-  this.which = [keys.DELETE];
-  this.renderingHints.render = false;
-  this.preventDefault = false;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(fieldAdapter) {
+    super();
+    this.fieldAdapter = fieldAdapter;
+    this.which = [keys.DELETE];
+    this.renderingHints.render = false;
+    this.preventDefault = false;
   }
-  return this._$focusedTag().length > 0;
-}
 
-handle(event) {
-  var $tag = this._$focusedTag();
-  var tag = TagBar.getTagData($tag);
-  this.fieldAdapter.removeTag(tag);
-}
 
-_$focusedTag() {
-  return TagBar.findFocusedTagElement(this.fieldAdapter.$container());
-}
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    return this._$focusedTag().length > 0;
+  }
+
+  handle(event) {
+    var $tag = this._$focusedTag();
+    var tag = TagBar.getTagData($tag);
+    this.fieldAdapter.removeTag(tag);
+  }
+
+  _$focusedTag() {
+    return TagBar.findFocusedTagElement(this.fieldAdapter.$container());
+  }
 }

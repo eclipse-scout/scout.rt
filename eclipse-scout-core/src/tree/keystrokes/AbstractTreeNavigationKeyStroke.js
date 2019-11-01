@@ -14,47 +14,47 @@ import {KeyStroke} from '../../index';
 
 export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
 
-constructor(tree, modifierBitMask) {
-  super();
-  this.field = tree;
-  this.repeatable = true;
-  this.stopPropagation = true;
-  this.renderingHints.hAlign = HAlign.RIGHT;
+  constructor(tree, modifierBitMask) {
+    super();
+    this.field = tree;
+    this.repeatable = true;
+    this.stopPropagation = true;
+    this.renderingHints.hAlign = HAlign.RIGHT;
 
-  this.ctrl = keyStrokeModifier.isCtrl(modifierBitMask);
-  this.shift = keyStrokeModifier.isShift(modifierBitMask);
-  this.alt = keyStrokeModifier.isAlt(modifierBitMask);
+    this.ctrl = keyStrokeModifier.isCtrl(modifierBitMask);
+    this.shift = keyStrokeModifier.isShift(modifierBitMask);
+    this.alt = keyStrokeModifier.isAlt(modifierBitMask);
 
-  this.keyStrokeMode = KeyStroke.Mode.DOWN;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+    this.keyStrokeMode = KeyStroke.Mode.DOWN;
   }
 
-  if (this.field.selectedNodes.length > 0) {
-    event._treeCurrentNode = this.field.selectedNodes[0];
-    event._$treeCurrentNode = event._treeCurrentNode.$node;
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+
+    if (this.field.selectedNodes.length > 0) {
+      event._treeCurrentNode = this.field.selectedNodes[0];
+      event._$treeCurrentNode = event._treeCurrentNode.$node;
+    }
+    return true;
   }
-  return true;
-}
 
-handle(event) {
-  var newSelection = this._computeNewSelection(event._treeCurrentNode);
-  if (newSelection) {
-    this.selectNodesAndReveal(newSelection, true);
+  handle(event) {
+    var newSelection = this._computeNewSelection(event._treeCurrentNode);
+    if (newSelection) {
+      this.selectNodesAndReveal(newSelection, true);
+    }
   }
-}
 
-_computeNewSelection(currentNode) {
-  return [];
-}
+  _computeNewSelection(currentNode) {
+    return [];
+  }
 
-selectNodesAndReveal(newSelection, debounceSend) {
-  this.field.selectNodes(newSelection, debounceSend);
-  this.field.revealSelection();
-}
+  selectNodesAndReveal(newSelection, debounceSend) {
+    this.field.selectNodes(newSelection, debounceSend);
+    this.field.revealSelection();
+  }
 }

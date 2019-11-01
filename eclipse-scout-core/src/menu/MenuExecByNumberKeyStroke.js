@@ -15,34 +15,34 @@ import {menuNavigationKeyStrokes} from '../index';
 
 export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
 
-constructor(popup, menuItemClass) {
-  super( popup, menuItemClass);
-  this._menuItemClass = menuItemClass;
-  this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];
-  this.renderingHints.render = true;
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return event.$menuItem;
-  }.bind(this);
-}
+  constructor(popup, menuItemClass) {
+    super(popup, menuItemClass);
+    this._menuItemClass = menuItemClass;
+    this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];
+    this.renderingHints.render = true;
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return event.$menuItem;
+    }.bind(this);
+  }
 
 
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+
+    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+    var index = keys.codesToKeys[event.which];
+    event.$menuItem = menuItems.$allVisible.eq(index - 1);
+    if (event.$menuItem.length > 0) {
+      return true;
+    }
     return false;
   }
 
-  var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-  var index = keys.codesToKeys[event.which];
-  event.$menuItem = menuItems.$allVisible.eq(index - 1);
-  if (event.$menuItem.length > 0) {
-    return true;
+  handle(event) {
+    event.$menuItem.data('widget').doAction();
   }
-  return false;
-}
-
-handle(event) {
-  event.$menuItem.data('widget').doAction();
-}
 }

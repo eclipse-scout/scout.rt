@@ -15,26 +15,26 @@ import {Dimension} from '../index';
 
 export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
 
-constructor(popup) {
-  super( popup);
-}
+  constructor(popup) {
+    super(popup);
+  }
 
 
-/**
- * @override
- */
-preferredLayoutSize($container, options) {
-  var popupWidth = HtmlEnvironment.get().formColumnWidth,
-    containerInsets = this.popup.htmlComp.insets(),
-    fieldHtmlComp = this.popup._field.htmlComp,
-    widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
-    fieldPrefSize = fieldHtmlComp.prefSize(options)
-    .add(fieldHtmlComp.margins()),
-    widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
-    .add(widgetContainerHtmlComp.margins()),
-    headerHeight = graphics.size(this.popup._$header, true).height,
-    popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
+  /**
+   * @override
+   */
+  preferredLayoutSize($container, options) {
+    var popupWidth = HtmlEnvironment.get().formColumnWidth,
+      containerInsets = this.popup.htmlComp.insets(),
+      fieldHtmlComp = this.popup._field.htmlComp,
+      widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
+      fieldPrefSize = fieldHtmlComp.prefSize(options)
+        .add(fieldHtmlComp.margins()),
+      widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
+        .add(widgetContainerHtmlComp.margins()),
+      headerHeight = graphics.size(this.popup._$header, true).height,
+      popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
 
-  return new Dimension(popupWidth, popupHeight);
-}
+    return new Dimension(popupWidth, popupHeight);
+  }
 }

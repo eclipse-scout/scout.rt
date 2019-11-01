@@ -13,29 +13,29 @@ import {Dimension} from '../../index';
 
 export default class MenubarBoxLayout extends AbstractLayout {
 
-constructor(menubox) {
-  super();
-  this.menubox = menubox;
-}
+  constructor(menubox) {
+    super();
+    this.menubox = menubox;
+  }
 
 
-layout($container) {
-  // void since the menu items are floated inline block.
-}
+  layout($container) {
+    // void since the menu items are floated inline block.
+  }
 
-preferredLayoutSize($container, options) {
-  var menuItemSize = null;
+  preferredLayoutSize($container, options) {
+    var menuItemSize = null;
 
-  return this.menubox.menuItems.filter(function(menuItem) {
-    return !menuItem.overflown && menuItem.isVisible();
-  }).reduce(function(prefSize, menuItem) {
-    menuItemSize = menuItem.htmlComp.prefSize({
-      useCssSize: true,
-      includeMargin: true
-    });
-    prefSize.height = Math.max(prefSize.height, menuItemSize.height);
-    prefSize.width = Math.max(prefSize.width, menuItemSize.width);
-    return prefSize;
-  }, new Dimension());
-}
+    return this.menubox.menuItems.filter(function(menuItem) {
+      return !menuItem.overflown && menuItem.isVisible();
+    }).reduce(function(prefSize, menuItem) {
+      menuItemSize = menuItem.htmlComp.prefSize({
+        useCssSize: true,
+        includeMargin: true
+      });
+      prefSize.height = Math.max(prefSize.height, menuItemSize.height);
+      prefSize.width = Math.max(prefSize.width, menuItemSize.width);
+      return prefSize;
+    }, new Dimension());
+  }
 }

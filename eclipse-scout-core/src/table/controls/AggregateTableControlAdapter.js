@@ -16,25 +16,25 @@ import {TableControlAdapter} from '../../index';
 
 export default class AggregateTableControlAdapter extends TableControlAdapter {
 
-constructor() {
-  super();
-}
-
-
-static modifyAggregateTableControlPrototype() {
-  if (!App.get().remote) {
-    return;
+  constructor() {
+    super();
   }
 
-  // _onTableColumnStructureChanged
-  objects.replacePrototypeFunction(AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
-    if (this.modelAdapter) {
-      this._updateEnabledAndSelectedState();
-    } else {
-      this._onTableColumnStructureChangedOrig();
+
+  static modifyAggregateTableControlPrototype() {
+    if (!App.get().remote) {
+      return;
     }
-  }, true);
-}
+
+    // _onTableColumnStructureChanged
+    objects.replacePrototypeFunction(AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
+      if (this.modelAdapter) {
+        this._updateEnabledAndSelectedState();
+      } else {
+        this._onTableColumnStructureChangedOrig();
+      }
+    }, true);
+  }
 }
 
 App.addListener('bootstrap', AggregateTableControlAdapter.modifyAggregateTableControlPrototype);

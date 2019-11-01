@@ -12,8 +12,8 @@ import {GroupBoxAdapter} from '../../../index';
 
 export default class TabItemAdapter extends GroupBoxAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

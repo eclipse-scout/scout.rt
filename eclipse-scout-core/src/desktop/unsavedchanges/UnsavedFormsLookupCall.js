@@ -13,17 +13,17 @@ import {StaticLookupCall} from '../../index';
 
 export default class UnsavedFormsLookupCall extends StaticLookupCall {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.unsavedForms = [];
-}
+    this.unsavedForms = [];
+  }
 
 
-_data() {
-  return this.unsavedForms.map(function(form) {
-    var text = UnsavedFormChangesForm.getFormDisplayName(form);
-    return [form, text];
-  });
-}
+  _data() {
+    return this.unsavedForms.map(function(form) {
+      var text = UnsavedFormChangesForm.getFormDisplayName(form);
+      return [form, text];
+    });
+  }
 }

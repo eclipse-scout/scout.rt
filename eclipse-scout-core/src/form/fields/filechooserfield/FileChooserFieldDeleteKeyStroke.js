@@ -14,24 +14,24 @@ import {HAlign} from '../../../index';
 
 export default class FileChooserFieldDeleteKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.DELETE];
-  this.stopPropagation = true;
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.DELETE];
+    this.stopPropagation = true;
 
-  this.renderingHints.offset = 25;
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$fieldContainer;
-  }.bind(this);
-}
+    this.renderingHints.offset = 25;
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$fieldContainer;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.clear();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.clear();
+  }
 }

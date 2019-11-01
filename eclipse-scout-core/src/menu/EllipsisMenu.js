@@ -13,50 +13,50 @@ import {Menu} from '../index';
 
 export default class EllipsisMenu extends Menu {
 
-constructor() {
-  super();
-  this.hidden = true;
-  this.ellipsis = true;
-  this.stackable = false;
-  this.horizontalAlignment = 1;
-  this.iconId = icons.ELLIPSIS_V;
-  this.tabbable = false;
-  this.rightAligned = false;
-  this._addPreserveOnPropertyChangeProperties(['childActions']);
-}
-
-
-_render() {
-  super._render();
-  this.$container.addClass('ellipsis');
-}
-
-setChildActions(childActions) {
-  super.setChildActions( childActions);
-
-  if (childActions) {
-    // close all actions that have been added to the ellipsis
-    childActions.forEach(function(ca) {
-      ca.setSelected(false);
-    });
+  constructor() {
+    super();
+    this.hidden = true;
+    this.ellipsis = true;
+    this.stackable = false;
+    this.horizontalAlignment = 1;
+    this.iconId = icons.ELLIPSIS_V;
+    this.tabbable = false;
+    this.rightAligned = false;
+    this._addPreserveOnPropertyChangeProperties(['childActions']);
   }
-}
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderHidden();
-}
+
+  _render() {
+    super._render();
+    this.$container.addClass('ellipsis');
+  }
+
+  setChildActions(childActions) {
+    super.setChildActions(childActions);
+
+    if (childActions) {
+      // close all actions that have been added to the ellipsis
+      childActions.forEach(function(ca) {
+        ca.setSelected(false);
+      });
+    }
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderHidden();
+  }
 
 // add the set hidden function to the ellipsis
-setHidden(hidden) {
-  this.setProperty('hidden', hidden);
-}
+  setHidden(hidden) {
+    this.setProperty('hidden', hidden);
+  }
 
-_renderHidden() {
-  this.$container.setVisible(!this.hidden);
-}
+  _renderHidden() {
+    this.$container.setVisible(!this.hidden);
+  }
 
-isTabTarget() {
-  return super.isTabTarget() && !this.hidden;
-}
+  isTabTarget() {
+    return super.isTabTarget() && !this.hidden;
+  }
 }

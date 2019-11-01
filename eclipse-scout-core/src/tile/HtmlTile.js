@@ -13,46 +13,46 @@ import {HtmlComponent} from '../index';
 
 export default class HtmlTile extends Tile {
 
-constructor() {
-  super();
-  this.content = null;
-}
-
-
-_render() {
-  this.$container = this.$parent.appendDiv('html-tile');
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderContent();
-}
-
-setContent(content) {
-  this.setProperty('content', content);
-}
-
-_renderContent() {
-  if (!this.content) {
-    this.$container.empty();
-    return;
+  constructor() {
+    super();
+    this.content = null;
   }
-  this.$container.html(this.content);
 
-  // Add listener to images to update the layout when the images are loaded
-  this.$container.find('img')
-    .on('load', this._onImageLoad.bind(this))
-    .on('error', this._onImageError.bind(this));
 
-  this.invalidateLayoutTree();
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('html-tile');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  }
 
-_onImageLoad(event) {
-  this.invalidateLayoutTree();
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderContent();
+  }
 
-_onImageError(event) {
-  this.invalidateLayoutTree();
-}
+  setContent(content) {
+    this.setProperty('content', content);
+  }
+
+  _renderContent() {
+    if (!this.content) {
+      this.$container.empty();
+      return;
+    }
+    this.$container.html(this.content);
+
+    // Add listener to images to update the layout when the images are loaded
+    this.$container.find('img')
+      .on('load', this._onImageLoad.bind(this))
+      .on('error', this._onImageError.bind(this));
+
+    this.invalidateLayoutTree();
+  }
+
+  _onImageLoad(event) {
+    this.invalidateLayoutTree();
+  }
+
+  _onImageError(event) {
+    this.invalidateLayoutTree();
+  }
 }

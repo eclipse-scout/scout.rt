@@ -18,44 +18,44 @@ import {scout} from '../index';
  */
 export default class WidgetTile extends Tile {
 
-constructor() {
-  super();
-  // The referenced widget which will be rendered (it is not possible to just call it 'widget' due to the naming conflict with the widget function)
-  this.tileWidget = null;
-  this._addWidgetProperties(['tileWidget']);
-  this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
-}
-
-
-_init(model) {
-  super._init( model);
-  scout.assertProperty(this, 'tileWidget', Widget);
-  // Hide tile if tileWidget is made invisible (don't do it if visible is true to not accidentally override the visibility state)
-  if (!this.tileWidget.visible) {
-    this.setVisible(false);
+  constructor() {
+    super();
+    // The referenced widget which will be rendered (it is not possible to just call it 'widget' due to the naming conflict with the widget function)
+    this.tileWidget = null;
+    this._addWidgetProperties(['tileWidget']);
+    this._widgetPropertyChangeHandler = this._onWidgetPropertyChange.bind(this);
   }
-  if (!this.tileWidget.enabled) {
-    this.setEnabled(false);
+
+
+  _init(model) {
+    super._init(model);
+    scout.assertProperty(this, 'tileWidget', Widget);
+    // Hide tile if tileWidget is made invisible (don't do it if visible is true to not accidentally override the visibility state)
+    if (!this.tileWidget.visible) {
+      this.setVisible(false);
+    }
+    if (!this.tileWidget.enabled) {
+      this.setEnabled(false);
+    }
+    this.tileWidget.on('propertyChange', this._widgetPropertyChangeHandler);
   }
-  this.tileWidget.on('propertyChange', this._widgetPropertyChangeHandler);
-}
 
-_destroy() {
-  this.tileWidget.off('propertyChange', this._widgetPropertyChangeHandler);
-  super._destroy();
-}
-
-_render() {
-  this.tileWidget.render(this.$parent);
-  this.$container = this.tileWidget.$container;
-  this.htmlComp = this.tileWidget.htmlComp;
-}
-
-_onWidgetPropertyChange(event) {
-  if (event.propertyName === 'visible') {
-    this.setVisible(event.newValue);
-  } else if (event.propertyName === 'enabled') {
-    this.setEnabled(event.newValue);
+  _destroy() {
+    this.tileWidget.off('propertyChange', this._widgetPropertyChangeHandler);
+    super._destroy();
   }
-}
+
+  _render() {
+    this.tileWidget.render(this.$parent);
+    this.$container = this.tileWidget.$container;
+    this.htmlComp = this.tileWidget.htmlComp;
+  }
+
+  _onWidgetPropertyChange(event) {
+    if (event.propertyName === 'visible') {
+      this.setVisible(event.newValue);
+    } else if (event.propertyName === 'enabled') {
+      this.setEnabled(event.newValue);
+    }
+  }
 }

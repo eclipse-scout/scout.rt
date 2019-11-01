@@ -12,9 +12,9 @@ import {ModelAdapter} from '../index';
 
 export default class NullWidgetAdapter extends ModelAdapter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-}
+  }
 
 }

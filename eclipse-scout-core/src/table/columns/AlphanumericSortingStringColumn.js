@@ -13,9 +13,9 @@ import {Column} from '../../index';
 
 export default class AlphanumericSortingStringColumn extends Column {
 
-constructor() {
-  super();
-  this.comparator = comparators.ALPHANUMERIC;
-}
+  constructor() {
+    super();
+    this.comparator = comparators.ALPHANUMERIC;
+  }
 
 }

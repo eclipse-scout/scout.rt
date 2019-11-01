@@ -16,36 +16,36 @@ import {scout} from '../../index';
  */
 export default class LogicalGrid {
 
-constructor(options) {
-  options = options || {};
-  this.dirty = true;
-  this.gridConfig = options.gridConfig || null;
-  this._setGridConfig(this.gridConfig);
-}
-
-setDirty(dirty) {
-  this.dirty = dirty;
-}
-
-setGridConfig(gridConfig) {
-  this._setGridConfig(gridConfig);
-}
-
-_setGridConfig(gridConfig) {
-  if (gridConfig && !(gridConfig instanceof LogicalGridConfig)) {
-    gridConfig = scout.create('LogicalGridConfig', gridConfig);
+  constructor(options) {
+    options = options || {};
+    this.dirty = true;
+    this.gridConfig = options.gridConfig || null;
+    this._setGridConfig(this.gridConfig);
   }
-  this.gridConfig = gridConfig;
-}
 
-/**
- * Calls {@link #_validate} if the grid is dirty. Sets dirty to false afterwards.
- */
-validate(gridContainer) {
-  if (!this.dirty) {
-    return;
+  setDirty(dirty) {
+    this.dirty = dirty;
   }
-  this._validate(gridContainer);
-  this.setDirty(false);
-}
+
+  setGridConfig(gridConfig) {
+    this._setGridConfig(gridConfig);
+  }
+
+  _setGridConfig(gridConfig) {
+    if (gridConfig && !(gridConfig instanceof LogicalGridConfig)) {
+      gridConfig = scout.create('LogicalGridConfig', gridConfig);
+    }
+    this.gridConfig = gridConfig;
+  }
+
+  /**
+   * Calls {@link #_validate} if the grid is dirty. Sets dirty to false afterwards.
+   */
+  validate(gridContainer) {
+    if (!this.dirty) {
+      return;
+    }
+    this._validate(gridContainer);
+    this.setDirty(false);
+  }
 }

@@ -12,66 +12,66 @@ import * as $ from 'jquery';
 
 export default class LookupRow {
 
-constructor() {
-  this.key = null;
-  this.text = null;
-  this.parentKey = null;
-  this.enabled = true;
-  this.active = true;
-  this.additionalTableRowData = null;
-  this.cssClass = null;
-  this.iconId = null;
-  this.tooltipText = null;
-  this.backgroundColor = null;
-  this.foregroundColor = null;
-  this.font = null;
-}
+  constructor() {
+    this.key = null;
+    this.text = null;
+    this.parentKey = null;
+    this.enabled = true;
+    this.active = true;
+    this.additionalTableRowData = null;
+    this.cssClass = null;
+    this.iconId = null;
+    this.tooltipText = null;
+    this.backgroundColor = null;
+    this.foregroundColor = null;
+    this.font = null;
+  }
 
-init(model) {
-  $.extend(this, model);
-}
+  init(model) {
+    $.extend(this, model);
+  }
 
-setKey(key) {
-  this.key = key;
-}
+  setKey(key) {
+    this.key = key;
+  }
 
-setText(text) {
-  this.text = text;
-}
+  setText(text) {
+    this.text = text;
+  }
 
-setParentKey(parentKey) {
-  this.parentKey = parentKey;
-}
+  setParentKey(parentKey) {
+    this.parentKey = parentKey;
+  }
 
-setCssClass(cssClass) {
-  this.cssClass = cssClass;
-}
+  setCssClass(cssClass) {
+    this.cssClass = cssClass;
+  }
 
-setAdditionalTableRowData(additionalTableRowData) {
-  this.additionalTableRowData = additionalTableRowData;
-}
+  setAdditionalTableRowData(additionalTableRowData) {
+    this.additionalTableRowData = additionalTableRowData;
+  }
 
-setIconId(iconId) {
-  this.iconId = iconId;
-}
+  setIconId(iconId) {
+    this.iconId = iconId;
+  }
 
-setTooltipText(tooltipText) {
-  this.tooltipText = tooltipText;
-}
+  setTooltipText(tooltipText) {
+    this.tooltipText = tooltipText;
+  }
 
-setBackgroundColor(backgroundColor) {
-  this.backgroundColor = backgroundColor;
-}
+  setBackgroundColor(backgroundColor) {
+    this.backgroundColor = backgroundColor;
+  }
 
-setForegroundColor(foregroundColor) {
-  this.foregroundColor = foregroundColor;
-}
+  setForegroundColor(foregroundColor) {
+    this.foregroundColor = foregroundColor;
+  }
 
-setFont(font) {
-  this.font = font;
-}
+  setFont(font) {
+    this.font = font;
+  }
 
-toString() {
-  return 'scout.LookupRow[key=' + this.key + ' text=' + this.text + ']';
-}
+  toString() {
+    return 'scout.LookupRow[key=' + this.key + ' text=' + this.text + ']';
+  }
 }

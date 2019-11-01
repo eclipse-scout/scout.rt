@@ -15,54 +15,54 @@ import {OutlineOverview} from '../../../index';
 
 export default class TileOutlineOverview extends OutlineOverview {
 
-constructor() {
-  super();
-  this.pageTileGrid = null;
-  this.scrollable = true;
-  this._addWidgetProperties(['pageTileGrid']);
-}
-
-
-_init(model) {
-  super._init( model);
-  if (!this.pageTileGrid) {
-    this.pageTileGrid = this._createPageTileGrid();
+  constructor() {
+    super();
+    this.pageTileGrid = null;
+    this.scrollable = true;
+    this._addWidgetProperties(['pageTileGrid']);
   }
-}
 
-_render() {
-  this.$container = this.$parent.appendDiv('tile-outline-overview');
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new TileOutlineOverviewLayout(this));
-  this.$content = this.$container.appendDiv('tile-outline-overview-content');
-  this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
-  this.$title = this.$content.appendDiv('tile-outline-overview-title').text(this.outline.title);
-}
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderPageTileGrid();
-  this._renderScrollable();
-}
+  _init(model) {
+    super._init(model);
+    if (!this.pageTileGrid) {
+      this.pageTileGrid = this._createPageTileGrid();
+    }
+  }
 
-_renderPageTileGrid() {
-  this.pageTileGrid.render(this.$content);
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('tile-outline-overview');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new TileOutlineOverviewLayout(this));
+    this.$content = this.$container.appendDiv('tile-outline-overview-content');
+    this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
+    this.$title = this.$content.appendDiv('tile-outline-overview-title').text(this.outline.title);
+  }
 
-_createPageTileGrid() {
-  return scout.create('PageTileGrid', {
-    parent: this,
-    outline: this.outline
-  });
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderPageTileGrid();
+    this._renderScrollable();
+  }
 
-_renderScrollable() {
-  if (this.scrollable) {
-    this._installScrollbars({
-      axis: 'y'
+  _renderPageTileGrid() {
+    this.pageTileGrid.render(this.$content);
+  }
+
+  _createPageTileGrid() {
+    return scout.create('PageTileGrid', {
+      parent: this,
+      outline: this.outline
     });
-  } else {
-    this._uninstallScrollbars();
   }
-}
+
+  _renderScrollable() {
+    if (this.scrollable) {
+      this._installScrollbars({
+        axis: 'y'
+      });
+    } else {
+      this._uninstallScrollbars();
+    }
+  }
 }

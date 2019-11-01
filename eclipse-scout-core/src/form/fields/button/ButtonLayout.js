@@ -13,45 +13,45 @@ import {graphics} from '../../../index';
 
 export default class ButtonLayout extends FormFieldLayout {
 
-constructor(button) {
-  super( button);
-  this.button = button;
-}
+  constructor(button) {
+    super(button);
+    this.button = button;
+  }
 
 
-layout($container) {
-  super.layout( $container);
+  layout($container) {
+    super.layout($container);
 
-  var $icon = this.button.get$Icon(),
-    $submenuIcon = this.button.$submenuIcon,
-    $label = this.button.$buttonLabel,
-    $fieldContainer = this.button.$fieldContainer;
+    var $icon = this.button.get$Icon(),
+      $submenuIcon = this.button.$submenuIcon,
+      $label = this.button.$buttonLabel,
+      $fieldContainer = this.button.$fieldContainer;
 
-  // Set max width to make it possible to set text-overflow: ellipsis using CSS
-  $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
-  var submenuIconWidth = $submenuIcon ? graphics.size($submenuIcon, {
-    includeMargin: true,
-    exact: true
-  }).width : 0;
-  var iconWidth = $icon.length ? graphics.size($icon, {
-    includeMargin: true,
-    exact: true
-  }).width : 0;
-  // Round up to make sure ellipsis are not shown unnecessarily when having rounding issues (e.g. in IE 11)
-  var labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
-  $label.css('max-width', labelMaxWidth);
-}
+    // Set max width to make it possible to set text-overflow: ellipsis using CSS
+    $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
+    var submenuIconWidth = $submenuIcon ? graphics.size($submenuIcon, {
+      includeMargin: true,
+      exact: true
+    }).width : 0;
+    var iconWidth = $icon.length ? graphics.size($icon, {
+      includeMargin: true,
+      exact: true
+    }).width : 0;
+    // Round up to make sure ellipsis are not shown unnecessarily when having rounding issues (e.g. in IE 11)
+    var labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
+    $label.css('max-width', labelMaxWidth);
+  }
 
-preferredLayoutSize($container, options) {
-  var $label = this.button.$buttonLabel;
+  preferredLayoutSize($container, options) {
+    var $label = this.button.$buttonLabel;
 
-  // Reset max width before calculating pref size
-  var maxWidth = $label.css('max-width');
-  $label.css('max-width', '');
+    // Reset max width before calculating pref size
+    var maxWidth = $label.css('max-width');
+    $label.css('max-width', '');
 
-  var prefSize = super.preferredLayoutSize( $container, options);
-  $label.css('max-width', maxWidth);
+    var prefSize = super.preferredLayoutSize($container, options);
+    $label.css('max-width', maxWidth);
 
-  return prefSize;
-}
+    return prefSize;
+  }
 }

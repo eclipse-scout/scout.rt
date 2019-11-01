@@ -20,49 +20,49 @@ import {graphics} from '../index';
  */
 export default class SingleLayout extends AbstractLayout {
 
-constructor(htmlChild) {
-  super();
-  this._htmlChild = htmlChild;
-}
-
-
-layout($container) {
-  var htmlContainer = HtmlComponent.get($container);
-  var childSize = htmlContainer.availableSize()
-    .subtract(htmlContainer.insets()),
-    htmlChild = this._htmlChild;
-
-  if (!htmlChild) {
-    htmlChild = this._getHtmlSingleChild($container);
+  constructor(htmlChild) {
+    super();
+    this._htmlChild = htmlChild;
   }
-  if (htmlChild) {
-    htmlChild.setSize(childSize);
-  }
-}
 
-preferredLayoutSize($container, options) {
-  var htmlChild = this._htmlChild;
-  if (!htmlChild) {
-    htmlChild = this._getHtmlSingleChild($container);
-  }
-  if (htmlChild) {
-    return htmlChild.prefSize(options).add(graphics.insets($container));
-  }
-  return new Dimension(1, 1);
-}
 
-/**
- * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
- */
-_getHtmlSingleChild($container) {
-  var htmlComp = null;
-  $container.children().each(function(i, child) {
-    var htmlChild = HtmlComponent.optGet($(child));
-    if (htmlChild) {
-      htmlComp = htmlChild;
-      return false;
+  layout($container) {
+    var htmlContainer = HtmlComponent.get($container);
+    var childSize = htmlContainer.availableSize()
+        .subtract(htmlContainer.insets()),
+      htmlChild = this._htmlChild;
+
+    if (!htmlChild) {
+      htmlChild = this._getHtmlSingleChild($container);
     }
-  });
-  return htmlComp;
-}
+    if (htmlChild) {
+      htmlChild.setSize(childSize);
+    }
+  }
+
+  preferredLayoutSize($container, options) {
+    var htmlChild = this._htmlChild;
+    if (!htmlChild) {
+      htmlChild = this._getHtmlSingleChild($container);
+    }
+    if (htmlChild) {
+      return htmlChild.prefSize(options).add(graphics.insets($container));
+    }
+    return new Dimension(1, 1);
+  }
+
+  /**
+   * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
+   */
+  _getHtmlSingleChild($container) {
+    var htmlComp = null;
+    $container.children().each(function(i, child) {
+      var htmlChild = HtmlComponent.optGet($(child));
+      if (htmlChild) {
+        htmlComp = htmlChild;
+        return false;
+      }
+    });
+    return htmlComp;
+  }
 }

@@ -12,8 +12,8 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class ColorFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

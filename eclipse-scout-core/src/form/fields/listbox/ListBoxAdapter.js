@@ -12,8 +12,8 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class ListBoxAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

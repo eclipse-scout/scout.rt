@@ -13,32 +13,32 @@ import {HtmlComponent} from '../index';
 
 export default class Composite extends Widget {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.widgets = [];
-  this._addWidgetProperties(['widgets']);
-}
+    this.widgets = [];
+    this._addWidgetProperties(['widgets']);
+  }
 
 
-_render() {
-  this.$container = this.$parent.appendDiv();
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-}
+  _render() {
+    this.$container = this.$parent.appendDiv();
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  }
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderWidgets();
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderWidgets();
+  }
 
-setWidgets(widgets) {
-  this.setProperty('widgets', widgets);
-}
+  setWidgets(widgets) {
+    this.setProperty('widgets', widgets);
+  }
 
-_renderWidgets() {
-  this.widgets.forEach(function(widget) {
-    widget.render();
-  }, this);
-  this.invalidateLayoutTree();
-}
+  _renderWidgets() {
+    this.widgets.forEach(function(widget) {
+      widget.render();
+    }, this);
+    this.invalidateLayoutTree();
+  }
 }

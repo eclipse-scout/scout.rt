@@ -18,100 +18,100 @@ import * as $ from 'jquery';
  */
 export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.invokeAcceptInputOnActiveValueField = true;
+    this.invokeAcceptInputOnActiveValueField = true;
 
-  this.registerStopPropagationKeys(keyStrokeModifier.CTRL, [
-    keys.A,
-    keys.C,
-    keys.Y,
-    keys.V,
-    keys.Z,
-    keys.RIGHT,
-    keys.BACKSPACE,
-    keys.LEFT,
-    keys.HOME,
-    keys.END,
-    keys.NUMPAD_4,
-    keys.NUMPAD_6
-  ]);
+    this.registerStopPropagationKeys(keyStrokeModifier.CTRL, [
+      keys.A,
+      keys.C,
+      keys.Y,
+      keys.V,
+      keys.Z,
+      keys.RIGHT,
+      keys.BACKSPACE,
+      keys.LEFT,
+      keys.HOME,
+      keys.END,
+      keys.NUMPAD_4,
+      keys.NUMPAD_6
+    ]);
 
-  this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, [ // NOSONAR
-    keys.RIGHT,
-    keys.BACKSPACE,
-    keys.LEFT,
-    keys.HOME,
-    keys.END,
-    keys.NUMPAD_4,
-    keys.NUMPAD_6
-  ]);
+    this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, [ // NOSONAR
+      keys.RIGHT,
+      keys.BACKSPACE,
+      keys.LEFT,
+      keys.HOME,
+      keys.END,
+      keys.NUMPAD_4,
+      keys.NUMPAD_6
+    ]);
 
-  this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, [
-    keys.RIGHT,
-    keys.BACKSPACE,
-    keys.LEFT,
-    keys.HOME,
-    keys.END,
-    keys.NUMPAD_4,
-    keys.NUMPAD_6
-  ]);
-  this.registerStopPropagationKeys(keyStrokeModifier.NONE, [
-    keys.SEMICOLON,
-    keys.DASH,
-    keys.COMMA,
-    keys.POINT,
-    keys.FORWARD_SLASH,
-    keys.OPEN_BRACKET,
-    keys.BACK_SLASH,
-    keys.CLOSE_BRACKET,
-    keys.SINGLE_QUOTE,
-    keys.MULTIPLY,
-    keys.ADD,
-    keys.SUBTRACT,
-    keys.DECIMAL_POINT,
-    keys.DIVIDE,
-    keys.NUMPAD_0,
-    keys.NUMPAD_1,
-    keys.NUMPAD_2,
-    keys.NUMPAD_3,
-    keys.NUMPAD_4,
-    keys.NUMPAD_5,
-    keys.NUMPAD_6,
-    keys.NUMPAD_7,
-    keys.NUMPAD_8,
-    keys.NUMPAD_9,
-    keys.MULTIPLY,
-    keys.END,
-    keys.HOME,
-    keys.RIGHT,
-    keys.BACKSPACE,
-    keys.LEFT,
-    keys.DELETE,
-    keys.SPACE
-  ]);
-}
-
-
-_applyPropagationFlags(event) {
-  super._applyPropagationFlags( event);
-
-  if (event.isPropagationStopped()) {
-    return;
+    this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, [
+      keys.RIGHT,
+      keys.BACKSPACE,
+      keys.LEFT,
+      keys.HOME,
+      keys.END,
+      keys.NUMPAD_4,
+      keys.NUMPAD_6
+    ]);
+    this.registerStopPropagationKeys(keyStrokeModifier.NONE, [
+      keys.SEMICOLON,
+      keys.DASH,
+      keys.COMMA,
+      keys.POINT,
+      keys.FORWARD_SLASH,
+      keys.OPEN_BRACKET,
+      keys.BACK_SLASH,
+      keys.CLOSE_BRACKET,
+      keys.SINGLE_QUOTE,
+      keys.MULTIPLY,
+      keys.ADD,
+      keys.SUBTRACT,
+      keys.DECIMAL_POINT,
+      keys.DIVIDE,
+      keys.NUMPAD_0,
+      keys.NUMPAD_1,
+      keys.NUMPAD_2,
+      keys.NUMPAD_3,
+      keys.NUMPAD_4,
+      keys.NUMPAD_5,
+      keys.NUMPAD_6,
+      keys.NUMPAD_7,
+      keys.NUMPAD_8,
+      keys.NUMPAD_9,
+      keys.MULTIPLY,
+      keys.END,
+      keys.HOME,
+      keys.RIGHT,
+      keys.BACKSPACE,
+      keys.LEFT,
+      keys.DELETE,
+      keys.SPACE
+    ]);
   }
 
-  var inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
-  if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
-    event.stopPropagation();
+
+  _applyPropagationFlags(event) {
+    super._applyPropagationFlags(event);
+
+    if (event.isPropagationStopped()) {
+      return;
+    }
+
+    var inputField = $(event.target).is('input:text') || $(event.target).is('input:file') || $(event.target).is('textarea');
+    if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
+      event.stopPropagation();
+    }
   }
-}
 
-_isNumberKeyStroke(event) {
-  return !event.ctrlKey && event.which >= keys[0] && event.which <= keys[9];
-}
+  _isNumberKeyStroke(event) {
+    return !event.ctrlKey && event.which >= keys[0] && event.which <= keys[9];
+  }
 
-_isLetterKeyStroke(event) {
-  return !event.ctrlKey && event.which >= keys.A && event.which <= keys.Z;
-}
+  _isLetterKeyStroke(event) {
+    return !event.ctrlKey && event.which >= keys.A && event.which <= keys.Z;
+  }
 }

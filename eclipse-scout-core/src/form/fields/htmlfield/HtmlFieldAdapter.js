@@ -12,33 +12,33 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class HtmlFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
-
-
-_initProperties(model) {
-  if (model.scrollToEnd !== undefined) {
-    // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
-    delete model.scrollToEnd;
+  constructor() {
+    super();
   }
-}
 
-_syncScrollToEnd() {
-  this.widget.scrollToBottom();
-}
 
-_onWidgetAppLinkAction(event) {
-  this._send('appLinkAction', {
-    ref: event.ref
-  });
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'appLinkAction') {
-    this._onWidgetAppLinkAction(event);
-  } else {
-    super._onWidgetEvent( event);
+  _initProperties(model) {
+    if (model.scrollToEnd !== undefined) {
+      // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
+      delete model.scrollToEnd;
+    }
   }
-}
+
+  _syncScrollToEnd() {
+    this.widget.scrollToBottom();
+  }
+
+  _onWidgetAppLinkAction(event) {
+    this._send('appLinkAction', {
+      ref: event.ref
+    });
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'appLinkAction') {
+      this._onWidgetAppLinkAction(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

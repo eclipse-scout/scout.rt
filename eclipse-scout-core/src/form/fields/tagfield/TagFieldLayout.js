@@ -12,13 +12,13 @@ import {FormFieldLayout} from '../../../index';
 
 export default class TagFieldLayout extends FormFieldLayout {
 
-constructor(field) {
-  super( field);
-}
+  constructor(field) {
+    super(field);
+  }
 
 
-_$elementForIconLayout() {
-  // The field container has the border and not the input ($field) element
-  return this.formField.$fieldContainer;
-}
+  _$elementForIconLayout() {
+    // The field container has the border and not the input ($field) element
+    return this.formField.$fieldContainer;
+  }
 }

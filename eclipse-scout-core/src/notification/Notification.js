@@ -17,67 +17,67 @@ import {scout} from '../index';
 
 export default class Notification extends Widget {
 
-constructor() {
-  super();
-  this.status = Status.info();
-}
-
-
-_init(model) {
-  super._init( model);
-
-  // this allows to set the properties severity and message directly on the model object
-  // without having a status object. because it's more convenient when you must create
-  // a notification programmatically.
-  if (model.severity || model.message) {
-    this.status = new Status({
-      severity: scout.nvl(model.severity, this.status.severity),
-      message: scout.nvl(model.message, this.status.message)
-    });
+  constructor() {
+    super();
+    this.status = Status.info();
   }
-  texts.resolveTextProperty(this.status, 'message', this.session);
-  this._setStatus(this.status);
-}
 
-_render() {
-  this.$container = this.$parent.appendDiv('notification');
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-}
 
-_renderProperties() {
-  super._renderProperties();
+  _init(model) {
+    super._init(model);
 
-  this._renderStatus();
-}
-
-setStatus(status) {
-  this.setProperty('status', status);
-}
-
-_setStatus(status) {
-  if (this.rendered) {
-    this._removeStatus();
+    // this allows to set the properties severity and message directly on the model object
+    // without having a status object. because it's more convenient when you must create
+    // a notification programmatically.
+    if (model.severity || model.message) {
+      this.status = new Status({
+        severity: scout.nvl(model.severity, this.status.severity),
+        message: scout.nvl(model.message, this.status.message)
+      });
+    }
+    texts.resolveTextProperty(this.status, 'message', this.session);
+    this._setStatus(this.status);
   }
-  status = Status.ensure(status);
-  this._setProperty('status', status);
-}
 
-_removeStatus() {
-  if (this.status) {
-    this.$container.removeClass(this.status.cssClass());
+  _render() {
+    this.$container = this.$parent.appendDiv('notification');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
   }
-}
 
-_renderStatus() {
-  if (this.status) {
-    this.$container.addClass(this.status.cssClass());
+  _renderProperties() {
+    super._renderProperties();
+
+    this._renderStatus();
   }
-  this._renderMessage();
-}
 
-_renderMessage() {
-  var message = scout.nvl(strings.nl2br(this.status.message), '');
-  this.$container.html(message);
-  this.invalidateLayoutTree();
-}
+  setStatus(status) {
+    this.setProperty('status', status);
+  }
+
+  _setStatus(status) {
+    if (this.rendered) {
+      this._removeStatus();
+    }
+    status = Status.ensure(status);
+    this._setProperty('status', status);
+  }
+
+  _removeStatus() {
+    if (this.status) {
+      this.$container.removeClass(this.status.cssClass());
+    }
+  }
+
+  _renderStatus() {
+    if (this.status) {
+      this.$container.addClass(this.status.cssClass());
+    }
+    this._renderMessage();
+  }
+
+  _renderMessage() {
+    var message = scout.nvl(strings.nl2br(this.status.message), '');
+    this.$container.html(message);
+    this.invalidateLayoutTree();
+  }
 }

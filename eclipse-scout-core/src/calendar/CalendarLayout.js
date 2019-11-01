@@ -12,76 +12,76 @@ import {AbstractLayout} from '../index';
 
 export default class CalendarLayout extends AbstractLayout {
 
-constructor(calendar) {
-  super();
-  this.calendar = calendar;
-  this.stacked = false;
-  this.compacted = false;
-}
-
-
-layout($container) {
-  var height = 0,
-    headerHeight = 0,
-    $yearContainer = this.calendar._yearPanel.$container,
-    $grids = this.calendar.$grids,
-    $header = this.calendar.$header;
-
-  height += $container.cssMarginTop() + $container.cssMarginBottom();
-  $container.css('height', 'calc(100% - ' + height + 'px)');
-
-  this.undoCompact();
-  this.undoStack();
-  if ($header[0].scrollWidth > $container.width()) {
-    this.stack();
-  }
-  if ($header[0].scrollWidth > $container.width()) {
-    this.compact();
+  constructor(calendar) {
+    super();
+    this.calendar = calendar;
+    this.stacked = false;
+    this.compacted = false;
   }
 
-  headerHeight = $header.outerHeight(true);
-  $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
-  $grids.css('height', 'calc(100% - ' + (headerHeight + $grids.cssMarginY()) + 'px)');
 
-  this.calendar.layoutSize();
-  this.calendar.layoutYearPanel();
-}
+  layout($container) {
+    var height = 0,
+      headerHeight = 0,
+      $yearContainer = this.calendar._yearPanel.$container,
+      $grids = this.calendar.$grids,
+      $header = this.calendar.$header;
 
-compact() {
-  if (this.compacted) {
-    return;
+    height += $container.cssMarginTop() + $container.cssMarginBottom();
+    $container.css('height', 'calc(100% - ' + height + 'px)');
+
+    this.undoCompact();
+    this.undoStack();
+    if ($header[0].scrollWidth > $container.width()) {
+      this.stack();
+    }
+    if ($header[0].scrollWidth > $container.width()) {
+      this.compact();
+    }
+
+    headerHeight = $header.outerHeight(true);
+    $yearContainer.css('height', 'calc(100% - ' + (headerHeight + $yearContainer.cssMarginY()) + 'px)');
+    $grids.css('height', 'calc(100% - ' + (headerHeight + $grids.cssMarginY()) + 'px)');
+
+    this.calendar.layoutSize();
+    this.calendar.layoutYearPanel();
   }
-  var $headerRow2 = this.calendar.$headerRow2;
-  this.calendar.$title.appendTo(this.calendar.$headerRow2);
-  $headerRow2.show();
-  this.compacted = true;
-}
 
-undoCompact() {
-  if (!this.compacted) {
-    return;
+  compact() {
+    if (this.compacted) {
+      return;
+    }
+    var $headerRow2 = this.calendar.$headerRow2;
+    this.calendar.$title.appendTo(this.calendar.$headerRow2);
+    $headerRow2.show();
+    this.compacted = true;
   }
-  var $headerRow2 = this.calendar.$headerRow2;
-  this.calendar.$title.insertBefore(this.calendar.$commands);
-  $headerRow2.hide();
-  this.compacted = false;
-}
 
-stack() {
-  if (this.stacked) {
-    return;
+  undoCompact() {
+    if (!this.compacted) {
+      return;
+    }
+    var $headerRow2 = this.calendar.$headerRow2;
+    this.calendar.$title.insertBefore(this.calendar.$commands);
+    $headerRow2.hide();
+    this.compacted = false;
   }
-  this.calendar.$commands.children('.calendar-mode').hide();
-  this.calendar.modesMenu.setVisible(true);
-  this.stacked = true;
-}
 
-undoStack() {
-  if (!this.stacked) {
-    return;
+  stack() {
+    if (this.stacked) {
+      return;
+    }
+    this.calendar.$commands.children('.calendar-mode').hide();
+    this.calendar.modesMenu.setVisible(true);
+    this.stacked = true;
   }
-  this.calendar.$commands.children('.calendar-mode').show();
-  this.calendar.modesMenu.setVisible(false);
-  this.stacked = false;
-}
+
+  undoStack() {
+    if (!this.stacked) {
+      return;
+    }
+    this.calendar.$commands.children('.calendar-mode').show();
+    this.calendar.modesMenu.setVisible(false);
+    this.stacked = false;
+  }
 }

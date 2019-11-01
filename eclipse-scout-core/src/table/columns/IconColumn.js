@@ -12,54 +12,54 @@ import {Column} from '../../index';
 
 export default class IconColumn extends Column {
 
-constructor() {
-  super();
-  this.minWidth = Column.NARROW_MIN_WIDTH;
-  this.filterType = 'ColumnUserFilter';
-  this.textBased = false;
-}
+  constructor() {
+    super();
+    this.minWidth = Column.NARROW_MIN_WIDTH;
+    this.filterType = 'ColumnUserFilter';
+    this.textBased = false;
+  }
 
 
-/**
- * @override
- */
-_initCell(cell) {
-  super._initCell( cell);
-  // only display icon, no text
-  cell.text = null;
-  cell.iconId = cell.value || cell.iconId;
-  return cell;
-}
+  /**
+   * @override
+   */
+  _initCell(cell) {
+    super._initCell(cell);
+    // only display icon, no text
+    cell.text = null;
+    cell.iconId = cell.value || cell.iconId;
+    return cell;
+  }
 
-/**
- * @override
- */
-_formatValue(value) {
-  // only display icon, no text
-  return null;
-}
+  /**
+   * @override
+   */
+  _formatValue(value) {
+    // only display icon, no text
+    return null;
+  }
 
-/**
- * @override
- */
-_cellCssClass(cell, tableNode) {
-  var cssClass = super._cellCssClass( cell, tableNode);
-  cssClass += ' table-icon-cell';
-  return cssClass;
-}
+  /**
+   * @override
+   */
+  _cellCssClass(cell, tableNode) {
+    var cssClass = super._cellCssClass(cell, tableNode);
+    cssClass += ' table-icon-cell';
+    return cssClass;
+  }
 
-/**
- * @override
- */
-cellTextForGrouping(row) {
-  var cell = this.table.cell(this, row);
-  return cell.value;
-}
+  /**
+   * @override
+   */
+  cellTextForGrouping(row) {
+    var cell = this.table.cell(this, row);
+    return cell.value;
+  }
 
-createAggrGroupCell(row) {
-  var cell = super.createAggrGroupCell( row);
-  // Make sure only icon and no text is displayed
-  cell.text = null;
-  return cell;
-}
+  createAggrGroupCell(row) {
+    var cell = super.createAggrGroupCell(row);
+    // Make sure only icon and no text is displayed
+    cell.text = null;
+    return cell;
+  }
 }

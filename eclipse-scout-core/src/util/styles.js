@@ -15,7 +15,6 @@ import * as $ from 'jquery';
 import {scout} from '../index';
 
 
-
 /**
  * @memberOf scout.styles
  */

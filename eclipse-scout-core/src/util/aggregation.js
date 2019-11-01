@@ -11,7 +11,6 @@
 import {icons} from '../index';
 
 
-
 export function sumStart() {
   return null;
 }

@@ -13,13 +13,13 @@ import {scrollbars} from '../../index';
 
 export default class WidgetFieldLayout extends FormFieldLayout {
 
-constructor(formField) {
-  super( formField);
-}
+  constructor(formField) {
+    super(formField);
+  }
 
 
-layout($container) {
-  super.layout( $container);
-  scrollbars.update(this.$fieldContainer);
-}
+  layout($container) {
+    super.layout($container);
+    scrollbars.update(this.$fieldContainer);
+  }
 }

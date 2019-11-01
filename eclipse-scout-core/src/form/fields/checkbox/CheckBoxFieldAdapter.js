@@ -12,9 +12,9 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class CheckBoxFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['value']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['value']);
+  }
 
 }

@@ -14,77 +14,77 @@ import {Widget} from '../index';
 
 export default class Image extends Widget {
 
-constructor() {
-  super();
-  this.autoFit = false;
-  this.imageUrl = null;
-  this.prepend = false;
-}
-
-
-_render() {
-  this.$container = this.$parent.makeElement('<img>', 'image')
-    .on('load', this._onImageLoad.bind(this))
-    .on('error', this._onImageError.bind(this));
-
-  if (this.prepend) {
-    this.$container.prependTo(this.$parent);
-  } else {
-    this.$container.appendTo(this.$parent);
+  constructor() {
+    super();
+    this.autoFit = false;
+    this.imageUrl = null;
+    this.prepend = false;
   }
 
-  this.htmlComp = HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new ImageLayout(this));
-  this.htmlComp.pixelBasedSizing = false;
-}
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderImageUrl();
-  this._renderAutoFit();
-}
+  _render() {
+    this.$container = this.$parent.makeElement('<img>', 'image')
+      .on('load', this._onImageLoad.bind(this))
+      .on('error', this._onImageError.bind(this));
 
-_remove() {
-  super._remove();
-  this.htmlComp = null;
-}
+    if (this.prepend) {
+      this.$container.prependTo(this.$parent);
+    } else {
+      this.$container.appendTo(this.$parent);
+    }
 
-setImageUrl(imageUrl) {
-  this.setProperty('imageUrl', imageUrl);
-}
-
-_renderImageUrl() {
-  this.$container.attr('src', this.imageUrl);
-
-  // Hide <img> when it has no content (event 'load' will not fire)
-  if (!this.imageUrl) {
-    this.$container.addClass('empty').removeClass('broken');
+    this.htmlComp = HtmlComponent.install(this.$container, this.session);
+    this.htmlComp.setLayout(new ImageLayout(this));
+    this.htmlComp.pixelBasedSizing = false;
   }
-}
 
-setAutoFit(autoFit) {
-  this.setProperty('autoFit', autoFit);
-}
-
-_renderAutoFit() {
-  this.$container.toggleClass('autofit', this.autoFit);
-}
-
-_onImageLoad(event) {
-  if (!this.rendered) { // check needed, because this is an async callback
-    return;
+  _renderProperties() {
+    super._renderProperties();
+    this._renderImageUrl();
+    this._renderAutoFit();
   }
-  this.$container.removeClass('empty broken');
-  this.invalidateLayoutTree();
-  this.trigger('load');
-}
 
-_onImageError(event) {
-  if (!this.rendered) { // check needed, because this is an async callback
-    return;
+  _remove() {
+    super._remove();
+    this.htmlComp = null;
   }
-  this.$container.addClass('empty broken');
-  this.invalidateLayoutTree();
-  this.trigger('error');
-}
+
+  setImageUrl(imageUrl) {
+    this.setProperty('imageUrl', imageUrl);
+  }
+
+  _renderImageUrl() {
+    this.$container.attr('src', this.imageUrl);
+
+    // Hide <img> when it has no content (event 'load' will not fire)
+    if (!this.imageUrl) {
+      this.$container.addClass('empty').removeClass('broken');
+    }
+  }
+
+  setAutoFit(autoFit) {
+    this.setProperty('autoFit', autoFit);
+  }
+
+  _renderAutoFit() {
+    this.$container.toggleClass('autofit', this.autoFit);
+  }
+
+  _onImageLoad(event) {
+    if (!this.rendered) { // check needed, because this is an async callback
+      return;
+    }
+    this.$container.removeClass('empty broken');
+    this.invalidateLayoutTree();
+    this.trigger('load');
+  }
+
+  _onImageError(event) {
+    if (!this.rendered) { // check needed, because this is an async callback
+      return;
+    }
+    this.$container.addClass('empty broken');
+    this.invalidateLayoutTree();
+    this.trigger('error');
+  }
 }

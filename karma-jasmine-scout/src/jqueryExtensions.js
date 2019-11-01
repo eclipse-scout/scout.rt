@@ -109,8 +109,7 @@ $.fn.triggerKeyCapture = function(eventType, which, modifier) {
       'bubbles': true,
       'cancelable': true
     });
-  }
-  catch (e) {
+  } catch (e) {
     // Workaround for PhantomJS
     eventObj = document.createEvent('CustomEvent');
     eventObj.initEvent(eventType, true, true);

@@ -12,62 +12,62 @@ import {icons} from '../index';
 
 export default class IconDesc {
 
-constructor() {
-  this.iconType;
-  this.font;
-  this.iconCharacter;
-  this.iconUrl;
-}
-
-static IconType = {
-  FONT_ICON: 0,
-  BITMAP: 1
-};
-
-static DEFAULT_FONT = 'scoutIcons';
-
-/**
- * Returns a CSS class based on the used font-name.
- */
-cssClass() {
-  if (this.isFontIcon() && this.font !== IconDesc.DEFAULT_FONT) {
-    return 'font-' + this.font;
-  } else {
-    return '';
+  constructor() {
+    this.iconType;
+    this.font;
+    this.iconCharacter;
+    this.iconUrl;
   }
-}
 
-/**
- * Returns a CSS class string to be used with JQuery.add/removeClass().
- */
-appendCssClass(cssClass) {
-  var additionalCssClass = this.cssClass();
-  if (additionalCssClass.length > 0) {
-    return cssClass + ' ' + additionalCssClass;
-  } else {
-    return cssClass;
+  static IconType = {
+    FONT_ICON: 0,
+    BITMAP: 1
+  };
+
+  static DEFAULT_FONT = 'scoutIcons';
+
+  /**
+   * Returns a CSS class based on the used font-name.
+   */
+  cssClass() {
+    if (this.isFontIcon() && this.font !== IconDesc.DEFAULT_FONT) {
+      return 'font-' + this.font;
+    } else {
+      return '';
+    }
   }
-}
 
-isFontIcon() {
-  return this.iconType === IconDesc.IconType.FONT_ICON;
-}
-
-isBitmap() {
-  return this.iconType === IconDesc.IconType.BITMAP;
-}
-
-/**
- * Ensures that the given icon is of type {@link scout.iconDesc}. It a string is provided it is assumed that the string is the iconId which may be parsed to create the {@link IconDesc}.
- * @param {(string|IconDesc)} icon
- */
-static ensure(icon) {
-  if (!icon) {
-    return icon;
+  /**
+   * Returns a CSS class string to be used with JQuery.add/removeClass().
+   */
+  appendCssClass(cssClass) {
+    var additionalCssClass = this.cssClass();
+    if (additionalCssClass.length > 0) {
+      return cssClass + ' ' + additionalCssClass;
+    } else {
+      return cssClass;
+    }
   }
-  if (icon instanceof IconDesc) {
-    return icon;
+
+  isFontIcon() {
+    return this.iconType === IconDesc.IconType.FONT_ICON;
   }
-  return icons.parseIconId(icon);
-}
+
+  isBitmap() {
+    return this.iconType === IconDesc.IconType.BITMAP;
+  }
+
+  /**
+   * Ensures that the given icon is of type {@link scout.iconDesc}. It a string is provided it is assumed that the string is the iconId which may be parsed to create the {@link IconDesc}.
+   * @param {(string|IconDesc)} icon
+   */
+  static ensure(icon) {
+    if (!icon) {
+      return icon;
+    }
+    if (icon instanceof IconDesc) {
+      return icon;
+    }
+    return icons.parseIconId(icon);
+  }
 }

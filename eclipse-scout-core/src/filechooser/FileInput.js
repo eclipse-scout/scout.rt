@@ -19,256 +19,256 @@ import {arrays} from '../index';
 
 export default class FileInput extends Widget {
 
-constructor() {
-  super();
-  this.acceptTypes = null;
-  this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
-  this.multiSelect = false;
-  this.files = [];
-  this.legacyFileUploadUrl = null;
-  this.text = null;
-}
-
-
-static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
-
-_init(model) {
-  super._init( model);
-  this.uploadController = model.uploadController || model.parent;
-  var url = new URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
-  url.setParameter('legacy', true);
-  this.legacyFileUploadUrl = url.toString();
-  this.legacy = !Device.get().supportsFile();
-}
-
-/**
- * @override
- */
-_initKeyStrokeContext() {
-  // Need to create keystroke context here because this.legacy is not set at the time the constructor is executed
-  this.keyStrokeContext = this._createKeyStrokeContext();
-  super._initKeyStrokeContext();
-}
-
-_createKeyStrokeContext() {
-  if (this.legacy) {
-    // native input control is a text field -> use input field context to make sure backspace etc. does not bubble up
-    return new InputFieldKeyStrokeContext();
-  }
-}
-
-_render() {
-  this.$fileInput = this.$parent.makeElement('<input>')
-    .attr('type', 'file')
-    .on('change', this._onFileChange.bind(this));
-
-  if (!this.legacy) {
-    this.$container = this.$parent.appendDiv('file-input input-field')
-      .on('dragenter', this._onDragEnterOrOver.bind(this))
-      .on('dragover', this._onDragEnterOrOver.bind(this))
-      .on('drop', this._onDrop.bind(this));
-    this.$fileInput.appendTo(this.$container);
-    this.$container.on('mousedown', this._onMouseDown.bind(this));
-    this.$text = this.$container.appendDiv('file-input-text');
-  } else {
-    this._renderLegacyMode();
+  constructor() {
+    super();
+    this.acceptTypes = null;
+    this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+    this.multiSelect = false;
+    this.files = [];
+    this.legacyFileUploadUrl = null;
+    this.text = null;
   }
 
-  if (this.legacy) {
-    // Files may not be set into native control -> clear list in order to be sync again
-    this.clear();
+
+  static DEFAULT_MAXIMUM_UPLOAD_SIZE = 50 * 1024 * 1024; // 50 MB
+
+  _init(model) {
+    super._init(model);
+    this.uploadController = model.uploadController || model.parent;
+    var url = new URL(model.legacyFileUploadUrl || 'upload/' + this.session.uiSessionId + '/' + this.uploadController.id);
+    url.setParameter('legacy', true);
+    this.legacyFileUploadUrl = url.toString();
+    this.legacy = !Device.get().supportsFile();
   }
-}
 
-_renderLegacyMode() {
-  this.$legacyFormTarget = this.$fileInput.appendElement('<iframe>')
-    .attr('name', 'legacyFileUpload' + this.uploadController.id)
-    .on('load', function() {
-      // Manually handle JSON response from iframe
-      try {
-        // "onAjaxDone"
-        var text = this.$legacyFormTarget.contents().text();
-        if (strings.hasText(text)) {
-          // Manually handle JSON response
-          var json = $.parseJSON(text);
-          this.session.responseQueue.process(json);
-        }
-      } finally {
-        // "onAjaxAlways"
-        this.session.setBusy(false);
-      }
-    }.bind(this));
-  this.$fileInput
-    .attr('name', 'file')
-    .addClass('legacy-upload-file-input');
-  this.$legacyForm = this.$parent.appendElement('<form>', 'legacy-upload-form')
-    .attr('action', this.legacyFileUploadUrl)
-    .attr('enctype', 'multipart/form-data')
-    .attr('method', 'post')
-    .attr('target', 'legacyFileUpload' + this.uploadController.id)
-    .append(this.$fileInput);
-  this.$container = this.$legacyForm;
-}
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderText();
-  this._renderAcceptTypes();
-  this._renderMultiSelect();
-}
-
-_renderEnabled() {
-  super._renderEnabled();
-
-  if (this.legacy) {
-    this.$fileInput.setEnabled(this.enabledComputed);
-  } else {
-    this.$container.setTabbable(this.enabledComputed);
+  /**
+   * @override
+   */
+  _initKeyStrokeContext() {
+    // Need to create keystroke context here because this.legacy is not set at the time the constructor is executed
+    this.keyStrokeContext = this._createKeyStrokeContext();
+    super._initKeyStrokeContext();
   }
-}
 
-setText(text) {
-  this.setProperty('text', text);
-}
-
-_renderText() {
-  if (this.legacy) {
-    return;
-  }
-  var text = this.text || '';
-  this.$text.text(text);
-}
-
-setAcceptTypes(acceptTypes) {
-  this.setProperty('acceptTypes', acceptTypes);
-}
-
-_renderAcceptTypes() {
-  var acceptTypes = this.acceptTypes || '';
-  this.$fileInput.attr('accept', acceptTypes);
-}
-
-setMultiSelect(multiSelect) {
-  this.setProperty('multiSelect', multiSelect);
-}
-
-_renderMultiSelect() {
-  this.$fileInput.prop('multiple', this.multiSelect);
-}
-
-setMaximumUploadSize(maximumUploadSize) {
-  this.setProperty('maximumUploadSize', maximumUploadSize);
-}
-
-clear() {
-  this._setFiles([]);
-  // _setFiles actually sets the text as well, but only if files have changed.
-  // Make sure text is cleared as well if there are no files but a text set.
-  this.setText(null);
-  if (this.rendered) {
-    this.$fileInput.val(null);
-  }
-}
-
-_setFiles(files) {
-  if (files instanceof FileList) {
-    files = FileInput.fileListToArray(files);
-  }
-  files = arrays.ensure(files);
-  if (arrays.equals(this.files, files)) {
-    return;
-  }
-  var name = '';
-  if (files.length > 0) {
+  _createKeyStrokeContext() {
     if (this.legacy) {
-      name = files[0];
-    } else {
-      name = files[0].name;
+      // native input control is a text field -> use input field context to make sure backspace etc. does not bubble up
+      return new InputFieldKeyStrokeContext();
     }
   }
-  this.files = files;
-  this.setText(name);
-  this.trigger('change', {
-    files: files
-  });
-}
 
-upload() {
-  if (this.files.length === 0) {
+  _render() {
+    this.$fileInput = this.$parent.makeElement('<input>')
+      .attr('type', 'file')
+      .on('change', this._onFileChange.bind(this));
+
+    if (!this.legacy) {
+      this.$container = this.$parent.appendDiv('file-input input-field')
+        .on('dragenter', this._onDragEnterOrOver.bind(this))
+        .on('dragover', this._onDragEnterOrOver.bind(this))
+        .on('drop', this._onDrop.bind(this));
+      this.$fileInput.appendTo(this.$container);
+      this.$container.on('mousedown', this._onMouseDown.bind(this));
+      this.$text = this.$container.appendDiv('file-input-text');
+    } else {
+      this._renderLegacyMode();
+    }
+
+    if (this.legacy) {
+      // Files may not be set into native control -> clear list in order to be sync again
+      this.clear();
+    }
+  }
+
+  _renderLegacyMode() {
+    this.$legacyFormTarget = this.$fileInput.appendElement('<iframe>')
+      .attr('name', 'legacyFileUpload' + this.uploadController.id)
+      .on('load', function() {
+        // Manually handle JSON response from iframe
+        try {
+          // "onAjaxDone"
+          var text = this.$legacyFormTarget.contents().text();
+          if (strings.hasText(text)) {
+            // Manually handle JSON response
+            var json = $.parseJSON(text);
+            this.session.responseQueue.process(json);
+          }
+        } finally {
+          // "onAjaxAlways"
+          this.session.setBusy(false);
+        }
+      }.bind(this));
+    this.$fileInput
+      .attr('name', 'file')
+      .addClass('legacy-upload-file-input');
+    this.$legacyForm = this.$parent.appendElement('<form>', 'legacy-upload-form')
+      .attr('action', this.legacyFileUploadUrl)
+      .attr('enctype', 'multipart/form-data')
+      .attr('method', 'post')
+      .attr('target', 'legacyFileUpload' + this.uploadController.id)
+      .append(this.$fileInput);
+    this.$container = this.$legacyForm;
+  }
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderText();
+    this._renderAcceptTypes();
+    this._renderMultiSelect();
+  }
+
+  _renderEnabled() {
+    super._renderEnabled();
+
+    if (this.legacy) {
+      this.$fileInput.setEnabled(this.enabledComputed);
+    } else {
+      this.$container.setTabbable(this.enabledComputed);
+    }
+  }
+
+  setText(text) {
+    this.setProperty('text', text);
+  }
+
+  _renderText() {
+    if (this.legacy) {
+      return;
+    }
+    var text = this.text || '';
+    this.$text.text(text);
+  }
+
+  setAcceptTypes(acceptTypes) {
+    this.setProperty('acceptTypes', acceptTypes);
+  }
+
+  _renderAcceptTypes() {
+    var acceptTypes = this.acceptTypes || '';
+    this.$fileInput.attr('accept', acceptTypes);
+  }
+
+  setMultiSelect(multiSelect) {
+    this.setProperty('multiSelect', multiSelect);
+  }
+
+  _renderMultiSelect() {
+    this.$fileInput.prop('multiple', this.multiSelect);
+  }
+
+  setMaximumUploadSize(maximumUploadSize) {
+    this.setProperty('maximumUploadSize', maximumUploadSize);
+  }
+
+  clear() {
+    this._setFiles([]);
+    // _setFiles actually sets the text as well, but only if files have changed.
+    // Make sure text is cleared as well if there are no files but a text set.
+    this.setText(null);
+    if (this.rendered) {
+      this.$fileInput.val(null);
+    }
+  }
+
+  _setFiles(files) {
+    if (files instanceof FileList) {
+      files = FileInput.fileListToArray(files);
+    }
+    files = arrays.ensure(files);
+    if (arrays.equals(this.files, files)) {
+      return;
+    }
+    var name = '';
+    if (files.length > 0) {
+      if (this.legacy) {
+        name = files[0];
+      } else {
+        name = files[0].name;
+      }
+    }
+    this.files = files;
+    this.setText(name);
+    this.trigger('change', {
+      files: files
+    });
+  }
+
+  upload() {
+    if (this.files.length === 0) {
+      return true;
+    }
+    if (!this.legacy) {
+      return this.session.uploadFiles(this.uploadController, this.files, undefined, this.maximumUploadSize);
+    }
+    this.session.setBusy(true);
+    this.$legacyForm[0].submit();
     return true;
   }
-  if (!this.legacy) {
-    return this.session.uploadFiles(this.uploadController, this.files, undefined, this.maximumUploadSize);
+
+  browse() {
+    // Trigger browser's file chooser
+    this.$fileInput.click();
   }
-  this.session.setBusy(true);
-  this.$legacyForm[0].submit();
-  return true;
-}
 
-browse() {
-  // Trigger browser's file chooser
-  this.$fileInput.click();
-}
+  _onFileChange(event) {
+    var files = [];
 
-_onFileChange(event) {
-  var files = [];
-
-  if (!this.legacy) {
-    files = this.$fileInput[0].files;
-  } else {
-    if (this.$fileInput[0].value) {
-      files.push(this.$fileInput[0].value);
+    if (!this.legacy) {
+      files = this.$fileInput[0].files;
+    } else {
+      if (this.$fileInput[0].value) {
+        files.push(this.$fileInput[0].value);
+      }
     }
-  }
-  if (files.length) {
-    this._setFiles(files);
-  }
-}
-
-_onMouseDown() {
-  if (!this.enabled) {
-    return;
-  }
-  this.browse();
-}
-
-_onDragEnterOrOver(event) {
-  dragAndDrop.verifyDataTransferTypesScoutTypes(event, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-}
-
-_onDrop(event) {
-  if (dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
-    event.stopPropagation();
-    event.preventDefault();
-
-    var files = event.originalEvent.dataTransfer.files;
-    if (files.length >= 1) {
+    if (files.length) {
       this._setFiles(files);
     }
   }
-}
 
-static fileListToArray(fileList) {
-  var files = [],
-    i;
-  for (i = 0; i < fileList.length; i++) {
-    files.push(fileList[i]);
-  }
-  return files;
-}
-
-validateMaximumUploadSize(files) {
-  files = arrays.ensure(files);
-  if (files.length === 0) {
-    return;
+  _onMouseDown() {
+    if (!this.enabled) {
+      return;
+    }
+    this.browse();
   }
 
-  var totalSize = files.reduce(function(total, file) {
-    return total + file.size;
-  }, 0);
-
-  if (this.maximumUploadSize !== null && totalSize > this.maximumUploadSize) {
-    throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
+  _onDragEnterOrOver(event) {
+    dragAndDrop.verifyDataTransferTypesScoutTypes(event, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
   }
-}
+
+  _onDrop(event) {
+    if (dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+      event.stopPropagation();
+      event.preventDefault();
+
+      var files = event.originalEvent.dataTransfer.files;
+      if (files.length >= 1) {
+        this._setFiles(files);
+      }
+    }
+  }
+
+  static fileListToArray(fileList) {
+    var files = [],
+      i;
+    for (i = 0; i < fileList.length; i++) {
+      files.push(fileList[i]);
+    }
+    return files;
+  }
+
+  validateMaximumUploadSize(files) {
+    files = arrays.ensure(files);
+    if (files.length === 0) {
+      return;
+    }
+
+    var totalSize = files.reduce(function(total, file) {
+      return total + file.size;
+    }, 0);
+
+    if (this.maximumUploadSize !== null && totalSize > this.maximumUploadSize) {
+      throw this.session.text('ui.FileSizeLimit', (this.maximumUploadSize / 1024 / 1024));
+    }
+  }
 }

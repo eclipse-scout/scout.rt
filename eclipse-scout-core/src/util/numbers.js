@@ -13,7 +13,6 @@ import {objects} from '../index';
 import {strings} from '../index';
 
 
-
 /**
  * Converts the given decimal number to base-62 (i.e. the same value, but
  * represented by [a-zA-Z0-9] instead of only [0-9].
@@ -219,7 +218,7 @@ export function isNumber(number) {
 }
 
 //private
- export function _setCorrelationCounter(val) {
+export function _setCorrelationCounter(val) {
   _correlationCounter = val;
 }
 

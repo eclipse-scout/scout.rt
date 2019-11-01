@@ -12,7 +12,6 @@ import {objects} from '../index';
 import {scout} from '../index';
 
 
-
 /**
  * @param text
  * @param encodeHtml defaults to true
@@ -276,7 +275,7 @@ export function uppercaseFirstLetter(string) {
 }
 
 //private
- export function _changeFirstLetter(string, funcName) {
+export function _changeFirstLetter(string, funcName) {
   if (string === undefined || string === null) {
     return string;
   }
@@ -416,22 +415,22 @@ export function removeSuffix(string, suffix) {
 }
 
 //private
- export function _setPlainTextElement(el) {
+export function _setPlainTextElement(el) {
   plainTextElement = el;
 }
 
 //private
- export function _getPlainTextElement() {
+export function _getPlainTextElement() {
   return plainTextElement;
 }
 
 //private
- export function _setEncodeElement(el) {
+export function _setEncodeElement(el) {
   _encodeElement = el;
 }
 
 //private
- export function _getEncodeElement() {
+export function _getEncodeElement() {
   return _encodeElement;
 }
 

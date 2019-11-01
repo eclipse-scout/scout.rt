@@ -12,8 +12,8 @@ import {FormFieldAdapter} from '../../../index';
 
 export default class WrappedFormFieldAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

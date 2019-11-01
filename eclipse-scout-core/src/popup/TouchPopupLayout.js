@@ -16,35 +16,35 @@ import {Dimension} from '../index';
 
 export default class TouchPopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super( popup);
-  this.doubleCalcPrefSize = false;
-}
+  constructor(popup) {
+    super(popup);
+    this.doubleCalcPrefSize = false;
+  }
 
 
-layout($container) {
-  super.layout( $container);
+  layout($container) {
+    super.layout($container);
 
-  var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
-    headerHeight = graphics.size(this.popup._$header, true).height,
-    field = this.popup._field,
-    fieldHeight = field.htmlComp.prefSize().height,
-    fieldMargins = field.htmlComp.margins(),
-    fieldWidth = popupSize.width - fieldMargins.horizontal(),
-    widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
+    var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
+      headerHeight = graphics.size(this.popup._$header, true).height,
+      field = this.popup._field,
+      fieldHeight = field.htmlComp.prefSize().height,
+      fieldMargins = field.htmlComp.margins(),
+      fieldWidth = popupSize.width - fieldMargins.horizontal(),
+      widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
 
-  field.htmlComp.setBounds(new Rectangle(0, headerHeight, fieldWidth, fieldHeight));
-  this.popup._widgetContainerHtmlComp.setBounds(
-    new Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
-}
+    field.htmlComp.setBounds(new Rectangle(0, headerHeight, fieldWidth, fieldHeight));
+    this.popup._widgetContainerHtmlComp.setBounds(
+      new Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
+  }
 
-/**
- * @override AbstractLayout.js
- */
-preferredLayoutSize($container) {
-  var popupWidth = HtmlEnvironment.get().formColumnWidth,
-    popupHeight = HtmlEnvironment.get().formRowHeight * 15;
+  /**
+   * @override AbstractLayout.js
+   */
+  preferredLayoutSize($container) {
+    var popupWidth = HtmlEnvironment.get().formColumnWidth,
+      popupHeight = HtmlEnvironment.get().formRowHeight * 15;
 
-  return new Dimension(popupWidth, popupHeight);
-}
+    return new Dimension(popupWidth, popupHeight);
+  }
 }

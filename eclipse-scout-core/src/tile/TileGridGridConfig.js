@@ -12,12 +12,12 @@ import {LogicalGridConfig} from '../index';
 
 export default class TileGridGridConfig extends LogicalGridConfig {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-getGridWidgets() {
-  return this.widget.filteredTiles;
-}
+  getGridWidgets() {
+    return this.widget.filteredTiles;
+  }
 }

@@ -12,10 +12,10 @@ import {SmartFieldAdapter} from '../../../index';
 
 export default class ProposalFieldAdapter extends SmartFieldAdapter {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this._addRemoteProperties(['lookupRows']);
-}
+    this._addRemoteProperties(['lookupRows']);
+  }
 
 }

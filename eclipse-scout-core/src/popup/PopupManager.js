@@ -13,40 +13,40 @@ import {arrays} from '../index';
 
 export default class PopupManager extends Widget {
 
-constructor() {
-  super();
-  this.popups = [];
-  this._addWidgetProperties(['popups']);
-  this._addPreserveOnPropertyChangeProperties(['popups']);
-}
+  constructor() {
+    super();
+    this.popups = [];
+    this._addWidgetProperties(['popups']);
+    this._addPreserveOnPropertyChangeProperties(['popups']);
+  }
 
 
-_init(model) {
-  super._init( model);
-  this.session.layoutValidator.schedulePostValidateFunction(function() {
-    this._openPopups(this.popups);
-  }.bind(this));
-}
+  _init(model) {
+    super._init(model);
+    this.session.layoutValidator.schedulePostValidateFunction(function() {
+      this._openPopups(this.popups);
+    }.bind(this));
+  }
 
-setPopups(popups) {
-  this.setProperty('popups', popups);
-}
+  setPopups(popups) {
+    this.setProperty('popups', popups);
+  }
 
-_setPopups(popups) {
-  this._openPopups(arrays.diff(popups, this.popups));
-  this._destroyPopups(arrays.diff(this.popups, popups));
-  this._setProperty('popups', popups);
-}
+  _setPopups(popups) {
+    this._openPopups(arrays.diff(popups, this.popups));
+    this._destroyPopups(arrays.diff(this.popups, popups));
+    this._setProperty('popups', popups);
+  }
 
-_openPopups(popups) {
-  popups.forEach(function(popup) {
-    popup.open(popup.session.$entryPoint);
-  });
-}
+  _openPopups(popups) {
+    popups.forEach(function(popup) {
+      popup.open(popup.session.$entryPoint);
+    });
+  }
 
-_destroyPopups(popups) {
-  popups.forEach(function(popup) {
-    popup.destroy();
-  });
-}
+  _destroyPopups(popups) {
+    popups.forEach(function(popup) {
+      popup.destroy();
+    });
+  }
 }

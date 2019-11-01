@@ -421,9 +421,11 @@ describe('jquery-scout', function() {
 
     it('is debounces function calls', function() {
       var counter = 0;
-      function incImpl () {
+
+      function incImpl() {
         counter++;
       }
+
       var inc = $.debounce(incImpl);
       var incFast = $.debounce(incImpl, 40);
 
@@ -462,9 +464,11 @@ describe('jquery-scout', function() {
 
     it('it debounces only the first function call when reschedule=false', function() {
       var counter = 0;
-      function incImpl () {
+
+      function incImpl() {
         counter++;
       }
+
       var inc = $.debounce(incImpl, {
         delay: 100,
         reschedule: false

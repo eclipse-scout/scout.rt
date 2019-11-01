@@ -13,25 +13,25 @@ import {keys} from '../../index';
 
 export default class TileGridSelectFirstKeyStroke extends TileGridSelectKeyStroke {
 
-constructor(tileGrid) {
-  super( tileGrid);
-  this.stopPropagation = true;
-  this.which = [keys.HOME];
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
+  constructor(tileGrid) {
+    super(tileGrid);
+    this.stopPropagation = true;
+    this.which = [keys.HOME];
   }
-  if (!(this.getSelectionHandler().isHorizontalGridActive())) {
-    return false;
-  }
-  return true;
-}
 
-_computeNewSelection(extend) {
-  return this.getSelectionHandler().computeSelectionToFirst(extend);
-}
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
+    if (!(this.getSelectionHandler().isHorizontalGridActive())) {
+      return false;
+    }
+    return true;
+  }
+
+  _computeNewSelection(extend) {
+    return this.getSelectionHandler().computeSelectionToFirst(extend);
+  }
 }

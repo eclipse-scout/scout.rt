@@ -14,43 +14,43 @@ import {Tile} from '../../index';
 
 export default class FormFieldTile extends WidgetTile {
 
-constructor() {
-  super();
-  this.displayStyle = FormFieldTile.DisplayStyle.DASHBOARD;
-}
-
-
-static DisplayStyle = {
-  DEFAULT: Tile.DEFAULT,
-  PLAIN: Tile.PLAIN,
-  DASHBOARD: 'dashboard'
-};
-
-_renderProperties() {
-  super._renderProperties();
-  this._renderFieldLabelVisible();
-}
-
-_renderDisplayStyle() {
-  super._renderDisplayStyle();
-  this.$container.toggleClass('dashboard', this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD);
-}
-
-_renderFieldLabelVisible() {
-  if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
-    return;
+  constructor() {
+    super();
+    this.displayStyle = FormFieldTile.DisplayStyle.DASHBOARD;
   }
-  // Special handling for browser field (remove padding when label is invisible)
-  if (this.tileWidget instanceof BrowserField) {
-    this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
-  }
-}
 
-_onFieldPropertyChange(event) {
-  if (event.propertyName === 'labelVisible' || event.propertyName === 'errorStatus') {
-    if (this.rendered) {
-      this._renderFieldLabelVisible();
+
+  static DisplayStyle = {
+    DEFAULT: Tile.DEFAULT,
+    PLAIN: Tile.PLAIN,
+    DASHBOARD: 'dashboard'
+  };
+
+  _renderProperties() {
+    super._renderProperties();
+    this._renderFieldLabelVisible();
+  }
+
+  _renderDisplayStyle() {
+    super._renderDisplayStyle();
+    this.$container.toggleClass('dashboard', this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD);
+  }
+
+  _renderFieldLabelVisible() {
+    if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+      return;
+    }
+    // Special handling for browser field (remove padding when label is invisible)
+    if (this.tileWidget instanceof BrowserField) {
+      this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
     }
   }
-}
+
+  _onFieldPropertyChange(event) {
+    if (event.propertyName === 'labelVisible' || event.propertyName === 'errorStatus') {
+      if (this.rendered) {
+        this._renderFieldLabelVisible();
+      }
+    }
+  }
 }

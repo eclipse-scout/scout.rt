@@ -13,20 +13,20 @@ import {KeyStroke} from '../index';
 
 export default class CloseKeyStroke extends KeyStroke {
 
-constructor(field, $drawingArea) {
-  super();
-  this.field = field;
-  this.which = [keys.ESC];
-  this.renderingHints.render = true;
-  this.stopPropagation = true;
-  this.renderingHints = {
-    render: !!$drawingArea,
-    $drawingArea: $drawingArea
-  };
-}
+  constructor(field, $drawingArea) {
+    super();
+    this.field = field;
+    this.which = [keys.ESC];
+    this.renderingHints.render = true;
+    this.stopPropagation = true;
+    this.renderingHints = {
+      render: !!$drawingArea,
+      $drawingArea: $drawingArea
+    };
+  }
 
 
-handle(event) {
-  this.field.close();
-}
+  handle(event) {
+    this.field.close();
+  }
 }

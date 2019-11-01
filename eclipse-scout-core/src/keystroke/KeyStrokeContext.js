@@ -18,164 +18,164 @@ import {scout} from '../index';
 
 export default class KeyStrokeContext {
 
-constructor(options) {
-  /*
-   * Holds the target where to bind this context as keydown listener.
-   * This can either be a static value or a function to resolve the target.
-   */
-  this.$bindTarget = null;
-  /*
-   * Holds the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
-   * This can either be a static value or a function to resolve the target.
-   */
-  this.$scopeTarget = null;
-  /*
-   * Holds the keystrokes registered within this context.
-   */
-  this.keyStrokes = [];
-  /*
-   * Array of interceptors to participate in setting 'stop propagation' flags.
-   */
-  this.stopPropagationInterceptors = [];
+  constructor(options) {
+    /*
+     * Holds the target where to bind this context as keydown listener.
+     * This can either be a static value or a function to resolve the target.
+     */
+    this.$bindTarget = null;
+    /*
+     * Holds the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
+     * This can either be a static value or a function to resolve the target.
+     */
+    this.$scopeTarget = null;
+    /*
+     * Holds the keystrokes registered within this context.
+     */
+    this.keyStrokes = [];
+    /*
+     * Array of interceptors to participate in setting 'stop propagation' flags.
+     */
+    this.stopPropagationInterceptors = [];
 
-  /*
-   * Arrays with combinations of keys to prevent from bubbling up in the DOM tree.
-   */
-  this._stopPropagationKeys = {};
+    /*
+     * Arrays with combinations of keys to prevent from bubbling up in the DOM tree.
+     */
+    this._stopPropagationKeys = {};
 
-  /*
-   * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
-   */
-  this.invokeAcceptInputOnActiveValueField = false;
+    /*
+     * Indicates whether to invoke 'acceptInput' on a currently focused value field prior handling the keystroke.
+     */
+    this.invokeAcceptInputOnActiveValueField = false;
 
-  options = options || {};
-  $.extend(this, options);
-}
-
-/**
- * Registers the given keys as 'stopPropagation' keys, meaning that any keystroke event with that key and matching the modifier bit mask is prevented from bubbling the DOM tree up.
- *
- * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
- * @param keys the keys to match a keystroke event.
- */
-registerStopPropagationKeys(modifierBitMask, keys) {
-  this._stopPropagationKeys[modifierBitMask] = this._stopPropagationKeys[modifierBitMask] || [];
-  arrays.pushAll(this._stopPropagationKeys[modifierBitMask], keys);
-}
-
-/**
- * Use this method to register an interceptor to set propagation flags on context level.
- */
-registerStopPropagationInterceptor(interceptor) {
-  this.stopPropagationInterceptors.push(interceptor);
-}
-
-/**
- * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
- */
-accept(event) {
-  // Check whether this event is accepted.
-  if (!this._accept(event)) {
-    return false;
+    options = options || {};
+    $.extend(this, options);
   }
 
-  // Apply propagation flags to the event.
-  this._applyPropagationFlags(event);
-
-  return true;
-}
-
-/**
- * Sets the propagation flags to the given event.
- */
-_applyPropagationFlags(event) {
-  var modifierBitMask = keyStrokeModifier.toModifierBitMask(event);
-  var keys = this._stopPropagationKeys[modifierBitMask];
-
-  if (keys && scout.isOneOf(event.which, keys)) {
-    event.stopPropagation();
+  /**
+   * Registers the given keys as 'stopPropagation' keys, meaning that any keystroke event with that key and matching the modifier bit mask is prevented from bubbling the DOM tree up.
+   *
+   * @param modifierBitMask bitwise OR'ing together modifier constants to match a keystroke event. (KeyStrokeModifier.js)
+   * @param keys the keys to match a keystroke event.
+   */
+  registerStopPropagationKeys(modifierBitMask, keys) {
+    this._stopPropagationKeys[modifierBitMask] = this._stopPropagationKeys[modifierBitMask] || [];
+    arrays.pushAll(this._stopPropagationKeys[modifierBitMask], keys);
   }
 
-  // Let registered interceptors participate.
-  this.stopPropagationInterceptors.forEach(function(interceptor) {
-    interceptor(event);
-  }, this);
-}
+  /**
+   * Use this method to register an interceptor to set propagation flags on context level.
+   */
+  registerStopPropagationInterceptor(interceptor) {
+    this.stopPropagationInterceptors.push(interceptor);
+  }
 
-_accept(event) {
-  return true;
-}
+  /**
+   * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
+   */
+  accept(event) {
+    // Check whether this event is accepted.
+    if (!this._accept(event)) {
+      return false;
+    }
 
-registerKeyStroke(keyStroke) {
-  this.registerKeyStrokes(keyStroke);
-}
+    // Apply propagation flags to the event.
+    this._applyPropagationFlags(event);
 
-/**
- * Registers the given keystroke(s) if not installed yet.
- */
-registerKeyStrokes(keyStrokes) {
-  arrays.ensure(keyStrokes)
-    .map(this._resolveKeyStroke, this)
-    .filter(function(ks) {
-      return this.keyStrokes.indexOf(ks) === -1; // must not be registered yet
-    }, this)
-    .forEach(function(ks) {
-      this.keyStrokes.push(ks);
+    return true;
+  }
 
-      // Registers a destroy listener, so that the keystroke is uninstalled once its field is destroyed.
-      if (ks.field && !ks.destroyListener) {
-        ks.destroyListener = function(event) {
-          this.unregisterKeyStroke(ks);
+  /**
+   * Sets the propagation flags to the given event.
+   */
+  _applyPropagationFlags(event) {
+    var modifierBitMask = keyStrokeModifier.toModifierBitMask(event);
+    var keys = this._stopPropagationKeys[modifierBitMask];
+
+    if (keys && scout.isOneOf(event.which, keys)) {
+      event.stopPropagation();
+    }
+
+    // Let registered interceptors participate.
+    this.stopPropagationInterceptors.forEach(function(interceptor) {
+      interceptor(event);
+    }, this);
+  }
+
+  _accept(event) {
+    return true;
+  }
+
+  registerKeyStroke(keyStroke) {
+    this.registerKeyStrokes(keyStroke);
+  }
+
+  /**
+   * Registers the given keystroke(s) if not installed yet.
+   */
+  registerKeyStrokes(keyStrokes) {
+    arrays.ensure(keyStrokes)
+      .map(this._resolveKeyStroke, this)
+      .filter(function(ks) {
+        return this.keyStrokes.indexOf(ks) === -1; // must not be registered yet
+      }, this)
+      .forEach(function(ks) {
+        this.keyStrokes.push(ks);
+
+        // Registers a destroy listener, so that the keystroke is uninstalled once its field is destroyed.
+        if (ks.field && !ks.destroyListener) {
+          ks.destroyListener = function(event) {
+            this.unregisterKeyStroke(ks);
+            ks.destroyListener = null;
+          }.bind(this);
+          ks.field.one('destroy', ks.destroyListener);
+        }
+      }, this);
+  }
+
+  /**
+   * Uninstalls the given keystroke. Has no effect if not installed.
+   */
+  unregisterKeyStroke(keyStroke) {
+    this.unregisterKeyStrokes(keyStroke);
+  }
+
+  unregisterKeyStrokes(keyStrokes) {
+    arrays.ensure(keyStrokes)
+      .map(this._resolveKeyStroke, this)
+      .forEach(function(ks) {
+        if (arrays.remove(this.keyStrokes, ks) && ks.field && ks.destroyListener) {
+          ks.field.off('destroy', ks.destroyListener);
           ks.destroyListener = null;
-        }.bind(this);
-        ks.field.one('destroy', ks.destroyListener);
-      }
-    }, this);
-}
-
-/**
- * Uninstalls the given keystroke. Has no effect if not installed.
- */
-unregisterKeyStroke(keyStroke) {
-  this.unregisterKeyStrokes(keyStroke);
-}
-
-unregisterKeyStrokes(keyStrokes) {
-  arrays.ensure(keyStrokes)
-    .map(this._resolveKeyStroke, this)
-    .forEach(function(ks) {
-      if (arrays.remove(this.keyStrokes, ks) && ks.field && ks.destroyListener) {
-        ks.field.off('destroy', ks.destroyListener);
-        ks.destroyListener = null;
-      }
-    }, this);
-}
-
-_resolveKeyStroke(keyStroke) {
-  if (keyStroke instanceof KeyStroke) {
-    return keyStroke;
-  } else if (keyStroke instanceof Action) {
-    return keyStroke.actionKeyStroke;
-  } else {
-    throw new Error('unsupported keystroke: ' + keyStroke);
+        }
+      }, this);
   }
-}
 
-/**
- * Returns the $target where to bind this context as keydown listener.
- */
-$getBindTarget() {
-  return (typeof this.$bindTarget === 'function' ? this.$bindTarget() : this.$bindTarget);
-}
+  _resolveKeyStroke(keyStroke) {
+    if (keyStroke instanceof KeyStroke) {
+      return keyStroke;
+    } else if (keyStroke instanceof Action) {
+      return keyStroke.actionKeyStroke;
+    } else {
+      throw new Error('unsupported keystroke: ' + keyStroke);
+    }
+  }
 
-/**
- * Returns the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
- */
-$getScopeTarget() {
-  return (typeof this.$scopeTarget === 'function' ? this.$scopeTarget() : this.$scopeTarget);
-}
+  /**
+   * Returns the $target where to bind this context as keydown listener.
+   */
+  $getBindTarget() {
+    return (typeof this.$bindTarget === 'function' ? this.$bindTarget() : this.$bindTarget);
+  }
 
-clone() {
-  return new KeyStrokeContext(objects.copyOwnProperties(this, {}));
-}
+  /**
+   * Returns the scope of this context and is used to determine the context's accessibility, meaning not covert by a glasspane.
+   */
+  $getScopeTarget() {
+    return (typeof this.$scopeTarget === 'function' ? this.$scopeTarget() : this.$scopeTarget);
+  }
+
+  clone() {
+    return new KeyStrokeContext(objects.copyOwnProperties(this, {}));
+  }
 }

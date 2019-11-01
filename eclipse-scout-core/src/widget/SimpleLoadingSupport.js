@@ -16,20 +16,20 @@ import {LoadingSupport} from '../index';
  */
 export default class SimpleLoadingSupport extends LoadingSupport {
 
-constructor(options) {
-  super( options);
-}
-
-
-_renderLoadingIndicator() {
-  if (this.widget.rendered || this.widget.rendering) {
-    this.$container.addClass('loading');
+  constructor(options) {
+    super(options);
   }
-}
 
-_removeLoadingIndicator() {
-  if (this.widget.rendered || this.widget.rendering) {
-    this.$container.removeClass('loading');
+
+  _renderLoadingIndicator() {
+    if (this.widget.rendered || this.widget.rendering) {
+      this.$container.addClass('loading');
+    }
   }
-}
+
+  _removeLoadingIndicator() {
+    if (this.widget.rendered || this.widget.rendering) {
+      this.$container.removeClass('loading');
+    }
+  }
 }

@@ -12,22 +12,22 @@ import {ActionKeyStroke} from '../index';
 
 export default class FormMenuActionKeyStroke extends ActionKeyStroke {
 
-constructor(action) {
-  super( action);
-}
-
-
-handle(event) {
-  this.field.toggle();
-}
-
-_postRenderKeyBox($drawingArea) {
-  if (this.field.iconId) {
-    var wIcon = $drawingArea.find('.icon').width();
-    var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var containerPadding = $drawingArea.cssPaddingLeft();
-    var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
-    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
+  constructor(action) {
+    super(action);
   }
-}
+
+
+  handle(event) {
+    this.field.toggle();
+  }
+
+  _postRenderKeyBox($drawingArea) {
+    if (this.field.iconId) {
+      var wIcon = $drawingArea.find('.icon').width();
+      var wKeybox = $drawingArea.find('.key-box').outerWidth();
+      var containerPadding = $drawingArea.cssPaddingLeft();
+      var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
+      $drawingArea.find('.key-box').cssLeft(leftKeyBox);
+    }
+  }
 }

@@ -16,47 +16,47 @@ import {defaultValues} from './index';
 
 export default class RemoteApp extends App {
 
-constructor() {
-  super();
-  this.remote = true;
-}
+  constructor() {
+    super();
+    this.remote = true;
+  }
 
 
-/**
- * @override
- */
-_doBootstrap(options) {
-  return super._doBootstrap( options).concat([
-    this._doBootstrapDefaultValues()
-  ]);
-}
+  /**
+   * @override
+   */
+  _doBootstrap(options) {
+    return super._doBootstrap(options).concat([
+      this._doBootstrapDefaultValues()
+    ]);
+  }
 
-_doBootstrapDefaultValues() {
-  defaultValues.bootstrap();
-}
+  _doBootstrapDefaultValues() {
+    defaultValues.bootstrap();
+  }
 
-_createErrorHandler() {
-  return scout.create('ErrorHandler', {
-    sendError: true
-  });
-}
+  _createErrorHandler() {
+    return scout.create('ErrorHandler', {
+      sendError: true
+    });
+  }
 
-/**
- * @override
- */
-_loadSession($entryPoint, options) {
-  options = options || {};
-  options.$entryPoint = $entryPoint;
-  var session = this._createSession(options);
-  App.get().sessions.push(session);
-  return session.start();
-}
+  /**
+   * @override
+   */
+  _loadSession($entryPoint, options) {
+    options = options || {};
+    options.$entryPoint = $entryPoint;
+    var session = this._createSession(options);
+    App.get().sessions.push(session);
+    return session.start();
+  }
 
-_fail(options, error) {
-  $.log.error('App initialization failed', error);
-  // Session.js already handled the error -> don't show a message here
-  // Reject with original rejection arguments
-  var args = objects.argumentsToArray(arguments).slice(1);
-  return $.rejectedPromise.apply($, args);
-}
+  _fail(options, error) {
+    $.log.error('App initialization failed', error);
+    // Session.js already handled the error -> don't show a message here
+    // Reject with original rejection arguments
+    var args = objects.argumentsToArray(arguments).slice(1);
+    return $.rejectedPromise.apply($, args);
+  }
 }

@@ -14,18 +14,18 @@ import {HAlign} from '../../../index';
 
 export default class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStroke {
 
-constructor(tree, modifierBitMask) {
-  super( tree, modifierBitMask);
-  this.which = [keys.HOME];
-  this.renderingHints.hAlign = HAlign.RIGHT;
+  constructor(tree, modifierBitMask) {
+    super(tree, modifierBitMask);
+    this.which = [keys.HOME];
+    this.renderingHints.hAlign = HAlign.RIGHT;
 
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$title || this.field.$data;
-  }.bind(this);
-}
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$title || this.field.$data;
+    }.bind(this);
+  }
 
 
-handle(event) {
-  this.field.navigateToTop();
-}
+  handle(event) {
+    this.field.navigateToTop();
+  }
 }

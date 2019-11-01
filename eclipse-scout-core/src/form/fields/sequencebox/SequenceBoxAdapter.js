@@ -12,18 +12,18 @@ import {CompositeFieldAdapter} from '../../../index';
 
 export default class SequenceBoxAdapter extends CompositeFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-/**
- * @override
- */
-_initModel(model, parent) {
-  model = super._initModel( model, parent);
-  // Set logical grid to null -> Calculation happens on server side
-  model.logicalGrid = null;
-  return model;
-}
+  /**
+   * @override
+   */
+  _initModel(model, parent) {
+    model = super._initModel(model, parent);
+    // Set logical grid to null -> Calculation happens on server side
+    model.logicalGrid = null;
+    return model;
+  }
 }

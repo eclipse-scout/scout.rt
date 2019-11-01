@@ -14,49 +14,49 @@ import * as $ from 'jquery';
 
 export default class SliderField extends ValueField {
 
-constructor() {
-  super();
-  this.slider;
-}
+  constructor() {
+    super();
+    this.slider;
+  }
 
 
-_init(model) {
-  super._init( model);
-  var sliderOptions = $.extend({
-    parent: this
-  }, model);
-  this.slider = scout.create('Slider', sliderOptions);
-}
+  _init(model) {
+    super._init(model);
+    var sliderOptions = $.extend({
+      parent: this
+    }, model);
+    this.slider = scout.create('Slider', sliderOptions);
+  }
 
-_render() {
-  this.addContainer(this.$parent, 'slider-field');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this._renderSlider();
-}
+  _render() {
+    this.addContainer(this.$parent, 'slider-field');
+    this.addLabel();
+    this.addMandatoryIndicator();
+    this._renderSlider();
+  }
 
-_renderSlider() {
-  this.slider.render();
-  this.addField(this.slider.$container);
-}
+  _renderSlider() {
+    this.slider.render();
+    this.addField(this.slider.$container);
+  }
 
-_readDisplayText() {
-  // Use the inner slider's value as display text, as the user cannot enter the value manually.
-  // This value is already guaranteed to be a valid number (see Slider.js, _onValueChange). We
-  // convert it to a string to match the expected data type for a display text.
-  return String(this.slider.value);
-}
+  _readDisplayText() {
+    // Use the inner slider's value as display text, as the user cannot enter the value manually.
+    // This value is already guaranteed to be a valid number (see Slider.js, _onValueChange). We
+    // convert it to a string to match the expected data type for a display text.
+    return String(this.slider.value);
+  }
 
-_parseValue(displayText) {
-  // Convert display text back to number
-  return Number(displayText);
-}
+  _parseValue(displayText) {
+    // Convert display text back to number
+    return Number(displayText);
+  }
 
-setValue(value) {
-  this.slider.setValue(value);
-}
+  setValue(value) {
+    this.slider.setValue(value);
+  }
 
-getValue() {
-  return this.slider.value;
-}
+  getValue() {
+    return this.slider.value;
+  }
 }

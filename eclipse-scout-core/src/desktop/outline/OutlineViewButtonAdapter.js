@@ -12,24 +12,24 @@ import {ViewButtonAdapter} from '../../index';
 
 export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
 
-constructor() {
-  super();
-}
-
-
-_goOffline() {
-  // Disable only if outline has not been loaded yet
-  if (this.widget.outline) {
-    return;
+  constructor() {
+    super();
   }
-  this._enabledBeforeOffline = this.widget.enabled;
-  this.widget.setEnabled(false);
-}
 
-_goOnline() {
-  if (this.widget.outline) {
-    return;
+
+  _goOffline() {
+    // Disable only if outline has not been loaded yet
+    if (this.widget.outline) {
+      return;
+    }
+    this._enabledBeforeOffline = this.widget.enabled;
+    this.widget.setEnabled(false);
   }
-  this.widget.setEnabled(this._enabledBeforeOffline);
-}
+
+  _goOnline() {
+    if (this.widget.outline) {
+      return;
+    }
+    this.widget.setEnabled(this._enabledBeforeOffline);
+  }
 }

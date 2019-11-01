@@ -10,12 +10,12 @@
  */
 export default class LogicalGridMatrixCell {
 
-constructor(widget, data) {
-  this.widget = widget;
-  this.data = data;
-}
+  constructor(widget, data) {
+    this.widget = widget;
+    this.data = data;
+  }
 
-isEmpty() {
-  return !this.widget;
-}
+  isEmpty() {
+    return !this.widget;
+  }
 }

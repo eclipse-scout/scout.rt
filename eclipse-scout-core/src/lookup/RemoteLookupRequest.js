@@ -24,18 +24,18 @@ import {QueryBy} from '../index';
  */
 export default class RemoteLookupRequest {
 
-constructor(requestType, requestData) {
-  if (!QueryBy.hasOwnProperty(requestType)) {
-    throw new Error('Invalid enum value');
+  constructor(requestType, requestData) {
+    if (!QueryBy.hasOwnProperty(requestType)) {
+      throw new Error('Invalid enum value');
+    }
+    this.requestType = requestType;
+    this.requestData = requestData;
   }
-  this.requestType = requestType;
-  this.requestData = requestData;
-}
 
-equals(o) {
-  if (!o || !(o instanceof RemoteLookupRequest)) {
-    return false;
+  equals(o) {
+    if (!o || !(o instanceof RemoteLookupRequest)) {
+      return false;
+    }
+    return objects.propertiesEquals(this, o, ['requestType', 'requestData']);
   }
-  return objects.propertiesEquals(this, o, ['requestType', 'requestData']);
-}
 }

@@ -12,18 +12,18 @@ import {CompositeFieldAdapter} from '../../../index';
 
 export default class TabBoxAdapter extends CompositeFieldAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['selectedTab']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['selectedTab']);
+  }
 
 
-/**
- * @override ModelAdapter.js
- */
-exportAdapterData(adapterData) {
-  adapterData = super.exportAdapterData( adapterData);
-  delete adapterData.selectedTab;
-  return adapterData;
-}
+  /**
+   * @override ModelAdapter.js
+   */
+  exportAdapterData(adapterData) {
+    adapterData = super.exportAdapterData(adapterData);
+    delete adapterData.selectedTab;
+    return adapterData;
+  }
 }

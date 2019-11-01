@@ -12,28 +12,28 @@ import {PopupLayout} from '../index';
 
 export default class WidgetPopupLayout extends PopupLayout {
 
-constructor(popup) {
-  super( popup);
-}
+  constructor(popup) {
+    super(popup);
+  }
 
 
-_setSize(prefSize) {
-  super._setSize( prefSize);
+  _setSize(prefSize) {
+    super._setSize(prefSize);
 
-  var htmlPopup = this.popup.htmlComp;
-  var htmlWidget = this.popup.widget.htmlComp;
-  var widgetSize = prefSize.subtract(htmlPopup.insets());
-  htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
-}
+    var htmlPopup = this.popup.htmlComp;
+    var htmlWidget = this.popup.widget.htmlComp;
+    var widgetSize = prefSize.subtract(htmlPopup.insets());
+    htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
+  }
 
-preferredLayoutSize($container, options) {
-  var htmlComp = this.popup.htmlComp;
-  var htmlWidget = this.popup.widget.htmlComp;
+  preferredLayoutSize($container, options) {
+    var htmlComp = this.popup.htmlComp;
+    var htmlWidget = this.popup.widget.htmlComp;
 
-  var prefSize = htmlWidget.prefSize(options)
-    .add(htmlComp.insets())
-    .add(htmlWidget.margins());
+    var prefSize = htmlWidget.prefSize(options)
+      .add(htmlComp.insets())
+      .add(htmlWidget.margins());
 
-  return prefSize;
-}
+    return prefSize;
+  }
 }

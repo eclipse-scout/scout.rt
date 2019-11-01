@@ -12,11 +12,11 @@ import * as $ from 'jquery';
 
 export default class AjaxError {
 
-constructor(model) {
-  this.jqXHR = null;
-  this.textStatus = null;
-  this.errorThrown = null;
-  this.requestOptions = null;
-  $.extend(this, model);
-}
+  constructor(model) {
+    this.jqXHR = null;
+    this.textStatus = null;
+    this.errorThrown = null;
+    this.requestOptions = null;
+    $.extend(this, model);
+  }
 }

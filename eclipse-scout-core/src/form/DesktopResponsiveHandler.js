@@ -13,31 +13,31 @@ import {ResponsiveHandler} from '../index';
 
 export default class DesktopResponsiveHandler extends ResponsiveHandler {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.compactThreshold = 500;
-  this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
-}
+    this.compactThreshold = 500;
+    this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
+  }
 
 
-init(model) {
-  super.init( model);
+  init(model) {
+    super.init(model);
 
-  this._registerTransformation('navigationVisible', this._transformNavigationVisible);
-  this._enableTransformation(ResponsiveManager.ResponsiveState.COMPACT, 'navigationVisible');
-}
+    this._registerTransformation('navigationVisible', this._transformNavigationVisible);
+    this._enableTransformation(ResponsiveManager.ResponsiveState.COMPACT, 'navigationVisible');
+  }
 
-/* --- TRANSFORMATIONS ------------------------------------------------------------- */
+  /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
-_transformNavigationVisible(widget, apply) {
-  if (apply) {
-    this._storeFieldProperty(widget, 'navigationVisible', widget.navigationVisible);
-    widget.setNavigationVisible(false);
-  } else {
-    if (this._hasFieldProperty(widget, 'navigationVisible')) {
-      widget.setNavigationVisible(this._getFieldProperty(widget, 'navigationVisible'));
+  _transformNavigationVisible(widget, apply) {
+    if (apply) {
+      this._storeFieldProperty(widget, 'navigationVisible', widget.navigationVisible);
+      widget.setNavigationVisible(false);
+    } else {
+      if (this._hasFieldProperty(widget, 'navigationVisible')) {
+        widget.setNavigationVisible(this._getFieldProperty(widget, 'navigationVisible'));
+      }
     }
   }
-}
 }

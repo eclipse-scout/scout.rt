@@ -21,440 +21,440 @@ import {FormField} from '../../../index';
 
 export default class Button extends FormField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.defaultButton = false;
-  this.displayStyle = Button.DisplayStyle.DEFAULT;
-  this.gridDataHints.fillHorizontal = false;
-  this.htmlEnabled = false;
-  this.iconId = null;
-  this.keyStroke = null;
-  this.processButton = true;
-  this.selected = false;
-  this.statusVisible = false;
-  this.systemType = Button.SystemType.NONE;
-  this.preventDoubleClick = false;
-  this.stackable = true;
-  this.shrinkable = false;
+    this.defaultButton = false;
+    this.displayStyle = Button.DisplayStyle.DEFAULT;
+    this.gridDataHints.fillHorizontal = false;
+    this.htmlEnabled = false;
+    this.iconId = null;
+    this.keyStroke = null;
+    this.processButton = true;
+    this.selected = false;
+    this.statusVisible = false;
+    this.systemType = Button.SystemType.NONE;
+    this.preventDoubleClick = false;
+    this.stackable = true;
+    this.shrinkable = false;
 
-  this.$buttonLabel = null;
-  this.buttonKeyStroke = new ButtonKeyStroke(this, null);
-  this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
-}
+    this.$buttonLabel = null;
+    this.buttonKeyStroke = new ButtonKeyStroke(this, null);
+    this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
+  }
 
 
-static SystemType = {
-  NONE: 0,
-  CANCEL: 1,
-  CLOSE: 2,
-  OK: 3,
-  RESET: 4,
-  SAVE: 5,
-  SAVE_WITHOUT_MARKER_CHANGE: 6
-};
+  static SystemType = {
+    NONE: 0,
+    CANCEL: 1,
+    CLOSE: 2,
+    OK: 3,
+    RESET: 4,
+    SAVE: 5,
+    SAVE_WITHOUT_MARKER_CHANGE: 6
+  };
 
-static DisplayStyle = {
-  DEFAULT: 0,
-  TOGGLE: 1,
-  RADIO: 2,
-  LINK: 3
-};
+  static DisplayStyle = {
+    DEFAULT: 0,
+    TOGGLE: 1,
+    RADIO: 2,
+    LINK: 3
+  };
 
-static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
+  static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
-_init(model) {
-  super._init( model);
-  this.resolveIconIds(['iconId']);
-  this._setKeyStroke(this.keyStroke);
-  this._setKeyStrokeScope(this.keyStrokeScope);
-  this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
-}
+  _init(model) {
+    super._init(model);
+    this.resolveIconIds(['iconId']);
+    this._setKeyStroke(this.keyStroke);
+    this._setKeyStrokeScope(this.keyStrokeScope);
+    this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
+  }
 
-/**
- * @override
- */
-_initKeyStrokeContext() {
-  super._initKeyStrokeContext();
+  /**
+   * @override
+   */
+  _initKeyStrokeContext() {
+    super._initKeyStrokeContext();
 
-  this._initDefaultKeyStrokes();
+    this._initDefaultKeyStrokes();
 
-  this.formKeyStrokeContext = new KeyStrokeContext();
-  this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
-  this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
-  this.formKeyStrokeContext.$bindTarget = function() {
-    if (this.keyStrokeScope) {
-      return this.keyStrokeScope.$container;
+    this.formKeyStrokeContext = new KeyStrokeContext();
+    this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
+    this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
+    this.formKeyStrokeContext.$bindTarget = function() {
+      if (this.keyStrokeScope) {
+        return this.keyStrokeScope.$container;
+      }
+      // use form if available
+      var form = this.getForm();
+      if (form) {
+        return form.$container;
+      }
+      // use desktop otherwise
+      return this.session.desktop.$container;
+    }.bind(this);
+  }
+
+  _isIgnoreAccessibilityFlags() {
+    return this.systemType === Button.SystemType.CANCEL || this.systemType === Button.SystemType.CLOSE;
+  }
+
+  _initDefaultKeyStrokes() {
+    this.keyStrokeContext.registerKeyStroke([
+      new ButtonKeyStroke(this, 'ENTER'),
+      new ButtonKeyStroke(this, 'SPACE')
+    ]);
+  }
+
+  /**
+   * @override
+   */
+  _createLoadingSupport() {
+    return new LoadingSupport({
+      widget: this,
+      $container: function() {
+        return this.$field;
+      }.bind(this)
+    });
+  }
+
+  /**
+   * The button form-field has no label and no status. Additionally it also has no container.
+   * Container and field are the same thing.
+   */
+  _render() {
+    var $button;
+    if (this.displayStyle === Button.DisplayStyle.LINK) {
+      // Render as link-button/ menu-item.
+      // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
+      // Probably it would be more reasonable to change the configuration (which would lead to additional
+      // effort required to change an existing application).
+      $button = this.$parent.makeDiv('link-button');
+      // Separate $link element to have a smaller focus border
+      this.$link = $button.appendDiv('menu-item link');
+      this.$buttonLabel = this.$link.appendSpan('button-label text');
+    } else {
+      // render as button
+      $button = this.$parent.makeElement('<button>')
+        .addClass('button');
+      this.$buttonLabel = $button.appendSpan('button-label');
+
+      if (Device.get().supportsTouch()) {
+        $button.setTabbable(false);
+      }
     }
-    // use form if available
-    var form = this.getForm();
-    if (form) {
-      return form.$container;
+    this.addContainer(this.$parent, 'button-field', new ButtonLayout(this));
+    this.addField($button);
+    // TODO [10.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
+    this.addStatus();
+
+    $button.on('click', this._onClick.bind(this))
+      .unfocusable();
+
+    if (this.menus && this.menus.length > 0) {
+      this.menus.forEach(function(menu) {
+        this.keyStrokeContext.registerKeyStroke(menu);
+      }, this);
+      if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
+        var icon = icons.parseIconId(Button.SUBMENU_ICON);
+        this.$submenuIcon = (this.$link || $button)
+          .appendSpan('submenu-icon')
+          .text(icon.iconCharacter);
+      }
     }
-    // use desktop otherwise
-    return this.session.desktop.$container;
-  }.bind(this);
-}
+    this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 
-_isIgnoreAccessibilityFlags() {
-  return this.systemType === Button.SystemType.CANCEL || this.systemType === Button.SystemType.CLOSE;
-}
+    tooltips.installForEllipsis(this.$buttonLabel, {
+      parent: this
+    });
+  }
 
-_initDefaultKeyStrokes() {
-  this.keyStrokeContext.registerKeyStroke([
-    new ButtonKeyStroke(this, 'ENTER'),
-    new ButtonKeyStroke(this, 'SPACE')
-  ]);
-}
+  _remove() {
+    super._remove();
+    tooltips.uninstall(this.$buttonLabel);
+    this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
+    this.$submenuIcon = null;
+  }
 
-/**
- * @override
- */
-_createLoadingSupport() {
-  return new LoadingSupport({
-    widget: this,
-    $container: function() {
-      return this.$field;
-    }.bind(this)
-  });
-}
+  /**
+   * @override
+   */
+  _renderProperties() {
+    super._renderProperties();
+    this._renderIconId();
+    this._renderSelected();
+    this._renderDefaultButton();
+  }
 
-/**
- * The button form-field has no label and no status. Additionally it also has no container.
- * Container and field are the same thing.
- */
-_render() {
-  var $button;
-  if (this.displayStyle === Button.DisplayStyle.LINK) {
-    // Render as link-button/ menu-item.
-    // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
-    // Probably it would be more reasonable to change the configuration (which would lead to additional
-    // effort required to change an existing application).
-    $button = this.$parent.makeDiv('link-button');
-    // Separate $link element to have a smaller focus border
-    this.$link = $button.appendDiv('menu-item link');
-    this.$buttonLabel = this.$link.appendSpan('button-label text');
-  } else {
-    // render as button
-    $button = this.$parent.makeElement('<button>')
-      .addClass('button');
-    this.$buttonLabel = $button.appendSpan('button-label');
+  _renderForegroundColor() {
+    super._renderForegroundColor();
+    // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
+    styles.legacyForegroundColor(this, this.$buttonLabel);
+    styles.legacyForegroundColor(this, this.get$Icon());
+    styles.legacyForegroundColor(this, this.$submenuIcon);
+  }
 
-    if (Device.get().supportsTouch()) {
-      $button.setTabbable(false);
+  _renderBackgroundColor() {
+    super._renderBackgroundColor();
+    styles.legacyBackgroundColor(this, this.$fieldContainer);
+  }
+
+  _renderFont() {
+    super._renderFont();
+    styles.legacyFont(this, this.$buttonLabel);
+    // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
+    this.invalidateLayoutTree();
+  }
+
+  /**
+   * @returns {Boolean}
+   *          <code>true</code> if the action has been performed or <code>false</code> if it
+   *          has not been performed (e.g. when the button is not enabled).
+   */
+  doAction() {
+    if (!this.enabledComputed || !this.visible) {
+      return false;
+    }
+
+    if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
+      this.setSelected(!this.selected);
+    } else if (this.menus.length > 0) {
+      this.togglePopup();
+    }
+    this._doAction();
+    return true;
+  }
+
+  _doAction() {
+    this.trigger('click');
+  }
+
+  togglePopup() {
+    if (this.popup) {
+      this.popup.close();
+    } else {
+      this.popup = this._openPopup();
+      this.popup.one('destroy', function(event) {
+        this.popup = null;
+      }.bind(this));
     }
   }
-  this.addContainer(this.$parent, 'button-field', new ButtonLayout(this));
-  this.addField($button);
-  // TODO [10.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
-  this.addStatus();
 
-  $button.on('click', this._onClick.bind(this))
-    .unfocusable();
-
-  if (this.menus && this.menus.length > 0) {
-    this.menus.forEach(function(menu) {
-      this.keyStrokeContext.registerKeyStroke(menu);
-    }, this);
-    if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-      var icon = icons.parseIconId(Button.SUBMENU_ICON);
-      this.$submenuIcon = (this.$link || $button)
-        .appendSpan('submenu-icon')
-        .text(icon.iconCharacter);
-    }
+  _openPopup() {
+    var popup = scout.create('ContextMenuPopup', {
+      parent: this,
+      menuItems: this.menus,
+      cloneMenuItems: false,
+      closeOnAnchorMouseDown: false,
+      $anchor: this.$field
+    });
+    popup.open();
+    return popup;
   }
-  this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 
-  tooltips.installForEllipsis(this.$buttonLabel, {
-    parent: this
-  });
-}
-
-_remove() {
-  super._remove();
-  tooltips.uninstall(this.$buttonLabel);
-  this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
-  this.$submenuIcon = null;
-}
-
-/**
- * @override
- */
-_renderProperties() {
-  super._renderProperties();
-  this._renderIconId();
-  this._renderSelected();
-  this._renderDefaultButton();
-}
-
-_renderForegroundColor() {
-  super._renderForegroundColor();
-  // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
-  styles.legacyForegroundColor(this, this.$buttonLabel);
-  styles.legacyForegroundColor(this, this.get$Icon());
-  styles.legacyForegroundColor(this, this.$submenuIcon);
-}
-
-_renderBackgroundColor() {
-  super._renderBackgroundColor();
-  styles.legacyBackgroundColor(this, this.$fieldContainer);
-}
-
-_renderFont() {
-  super._renderFont();
-  styles.legacyFont(this, this.$buttonLabel);
-  // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
-  this.invalidateLayoutTree();
-}
-
-/**
- * @returns {Boolean}
- *          <code>true</code> if the action has been performed or <code>false</code> if it
- *          has not been performed (e.g. when the button is not enabled).
- */
-doAction() {
-  if (!this.enabledComputed || !this.visible) {
+  _doActionTogglesSubMenu() {
     return false;
   }
 
-  if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
-    this.setSelected(!this.selected);
-  } else if (this.menus.length > 0) {
-    this.togglePopup();
+  setDefaultButton(defaultButton) {
+    this.setProperty('defaultButton', defaultButton);
   }
-  this._doAction();
-  return true;
-}
 
-_doAction() {
-  this.trigger('click');
-}
-
-togglePopup() {
-  if (this.popup) {
-    this.popup.close();
-  } else {
-    this.popup = this._openPopup();
-    this.popup.one('destroy', function(event) {
-      this.popup = null;
-    }.bind(this));
+  _renderDefaultButton() {
+    this.$field.toggleClass('default', this.defaultButton);
   }
-}
 
-_openPopup() {
-  var popup = scout.create('ContextMenuPopup', {
-    parent: this,
-    menuItems: this.menus,
-    cloneMenuItems: false,
-    closeOnAnchorMouseDown: false,
-    $anchor: this.$field
-  });
-  popup.open();
-  return popup;
-}
-
-_doActionTogglesSubMenu() {
-  return false;
-}
-
-setDefaultButton(defaultButton) {
-  this.setProperty('defaultButton', defaultButton);
-}
-
-_renderDefaultButton() {
-  this.$field.toggleClass('default', this.defaultButton);
-}
-
-/**
- * @override
- */
-_renderEnabled() {
-  super._renderEnabled();
-  if (this.displayStyle === Button.DisplayStyle.LINK) {
-    this.$link.setEnabled(this.enabledComputed);
-    this.$field.setTabbable(this.enabledComputed && !Device.get().supportsTouch());
-  }
-}
-
-setSelected(selected) {
-  this.setProperty('selected', selected);
-}
-
-_renderSelected() {
-  if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
-    this.$field.toggleClass('selected', this.selected);
-  }
-}
-
-setHtmlEnabled(htmlEnabled) {
-  this.setProperty('htmlEnabled', htmlEnabled);
-}
-
-_renderHtmlEnabled() {
-  // Render the label again when html enabled changes dynamically
-  this._renderLabel();
-}
-
-/**
- * @override
- */
-_renderLabel() {
-  if (this.htmlEnabled) {
-    this.$buttonLabel.html(this.label || '');
-  } else {
-    this.$buttonLabel.textOrNbsp(this.label, 'empty');
-  }
-  this._updateLabelAndIconStyle();
-
-  // Invalidate layout because button may now be longer or shorter
-  this.invalidateLayoutTree();
-}
-
-setIconId(iconId) {
-  this.setProperty('iconId', iconId);
-}
-
-/**
- * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
- */
-_renderIconId() {
-  var $iconTarget = this.$link || this.$fieldContainer;
-  $iconTarget.icon(this.iconId);
-  var $icon = $iconTarget.data('$icon');
-  if ($icon) {
-    // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
-    // We add a listener to revalidate the button layout after this has happened. The 'loading' and
-    // 'broken' classes ensure the incomplete icon is not taking any space.
-    $icon.removeClass('loading broken');
-    if ($icon.is('img')) {
-      $icon.addClass('loading');
-      $icon
-        .off('load error')
-        .on('load', updateButtonLayoutAfterImageLoaded.bind(this, true))
-        .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
-    }
-    if (!this.rendered) {
-      styles.legacyForegroundColor(this, $icon);
+  /**
+   * @override
+   */
+  _renderEnabled() {
+    super._renderEnabled();
+    if (this.displayStyle === Button.DisplayStyle.LINK) {
+      this.$link.setEnabled(this.enabledComputed);
+      this.$field.setTabbable(this.enabledComputed && !Device.get().supportsTouch());
     }
   }
 
-  this._updateLabelAndIconStyle();
-  // Invalidate layout because button may now be longer or shorter
-  this.invalidateLayoutTree();
+  setSelected(selected) {
+    this.setProperty('selected', selected);
+  }
 
-  // ----- Helper functions -----
+  _renderSelected() {
+    if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
+      this.$field.toggleClass('selected', this.selected);
+    }
+  }
 
-  function updateButtonLayoutAfterImageLoaded(success) {
-    $icon.removeClass('loading');
-    $icon.toggleClass('broken', !success);
+  setHtmlEnabled(htmlEnabled) {
+    this.setProperty('htmlEnabled', htmlEnabled);
+  }
+
+  _renderHtmlEnabled() {
+    // Render the label again when html enabled changes dynamically
+    this._renderLabel();
+  }
+
+  /**
+   * @override
+   */
+  _renderLabel() {
+    if (this.htmlEnabled) {
+      this.$buttonLabel.html(this.label || '');
+    } else {
+      this.$buttonLabel.textOrNbsp(this.label, 'empty');
+    }
+    this._updateLabelAndIconStyle();
+
+    // Invalidate layout because button may now be longer or shorter
     this.invalidateLayoutTree();
   }
-}
 
-get$Icon() {
-  var $iconTarget = this.$link || this.$fieldContainer;
-  return $iconTarget.children('.icon');
-}
+  setIconId(iconId) {
+    this.setProperty('iconId', iconId);
+  }
 
-_updateLabelAndIconStyle() {
-  var hasText = !!this.label;
-  this.$buttonLabel.setVisible(hasText || !this.iconId);
-  this.get$Icon().toggleClass('with-label', hasText);
-}
+  /**
+   * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
+   */
+  _renderIconId() {
+    var $iconTarget = this.$link || this.$fieldContainer;
+    $iconTarget.icon(this.iconId);
+    var $icon = $iconTarget.data('$icon');
+    if ($icon) {
+      // <img>s are loaded asynchronously. The real image size is not known until the image is loaded.
+      // We add a listener to revalidate the button layout after this has happened. The 'loading' and
+      // 'broken' classes ensure the incomplete icon is not taking any space.
+      $icon.removeClass('loading broken');
+      if ($icon.is('img')) {
+        $icon.addClass('loading');
+        $icon
+          .off('load error')
+          .on('load', updateButtonLayoutAfterImageLoaded.bind(this, true))
+          .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
+      }
+      if (!this.rendered) {
+        styles.legacyForegroundColor(this, $icon);
+      }
+    }
 
-setKeyStroke(keyStroke) {
-  this.setProperty('keyStroke', keyStroke);
-}
+    this._updateLabelAndIconStyle();
+    // Invalidate layout because button may now be longer or shorter
+    this.invalidateLayoutTree();
 
-_setKeyStroke(keyStroke) {
-  this._setProperty('keyStroke', keyStroke);
-  this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
-}
+    // ----- Helper functions -----
 
-_setKeyStrokeScope(keyStrokeScope) {
-  if (typeof keyStrokeScope === 'string') {
-    keyStrokeScope = this._resolveKeyStrokeScope(keyStrokeScope);
-    if (!keyStrokeScope) {
-      // Will be resolved later
-      return;
+    function updateButtonLayoutAfterImageLoaded(success) {
+      $icon.removeClass('loading');
+      $icon.toggleClass('broken', !success);
+      this.invalidateLayoutTree();
     }
   }
 
-  this._setProperty('keyStrokeScope', keyStrokeScope);
-}
-
-_resolveKeyStrokeScope(keyStrokeScope) {
-  // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
-  // To make it faster the form is used instead but that limits the resolving to the form.
-  // This should be acceptable because the scope can still be set explicitly without using an id.
-  var form = this.findNonWrappedForm();
-  if (!form) {
-    throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' because no form has been found.');
-  }
-  if (!form.initialized) {
-    // KeyStrokeScope is another widget (form or formfield) which may not be initialized yet.
-    // The widget must be on the same form as the button, so once that form is initialized the keyStrokeScope has to be available
-    form.one('init', this._setKeyStrokeScope.bind(this, keyStrokeScope));
-    return;
-  }
-  keyStrokeScope = form.widget(keyStrokeScope);
-  if (!keyStrokeScope) {
-    throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' using form ' + form);
-  }
-  return keyStrokeScope;
-}
-
-_onClick(event) {
-  if (event.which !== 1) {
-    return; // Other button than left mouse button --> nop
-  }
-  if (event.detail > 1 && this.preventDoubleClick) {
-    return; // More than one consecutive click --> nop
+  get$Icon() {
+    var $iconTarget = this.$link || this.$fieldContainer;
+    return $iconTarget.children('.icon');
   }
 
-  if (this.enabledComputed) {
-    this.doAction();
+  _updateLabelAndIconStyle() {
+    var hasText = !!this.label;
+    this.$buttonLabel.setVisible(hasText || !this.iconId);
+    this.get$Icon().toggleClass('with-label', hasText);
   }
-}
 
-setStackable(stackable) {
-  this.setProperty('stackable', stackable);
-}
-
-setShrinkable(shrinkable) {
-  this.setProperty('shrinkable', shrinkable);
-}
-
-/**
- * @override
- */
-getFocusableElement() {
-  if (this.adaptedBy) {
-    return this.adaptedBy.getFocusableElement();
-  } else {
-    return super.getFocusableElement();
+  setKeyStroke(keyStroke) {
+    this.setProperty('keyStroke', keyStroke);
   }
-}
 
-/**
- * @override
- */
-isFocusable() {
-  if (this.adaptedBy) {
-    return this.adaptedBy.isFocusable();
-  } else {
-    return super.isFocusable();
+  _setKeyStroke(keyStroke) {
+    this._setProperty('keyStroke', keyStroke);
+    this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
   }
-}
 
-/**
- * @override
- */
-focus() {
-  if (this.adaptedBy) {
-    return this.adaptedBy.focus();
-  } else {
-    return super.focus();
+  _setKeyStrokeScope(keyStrokeScope) {
+    if (typeof keyStrokeScope === 'string') {
+      keyStrokeScope = this._resolveKeyStrokeScope(keyStrokeScope);
+      if (!keyStrokeScope) {
+        // Will be resolved later
+        return;
+      }
+    }
+
+    this._setProperty('keyStrokeScope', keyStrokeScope);
   }
-}
+
+  _resolveKeyStrokeScope(keyStrokeScope) {
+    // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
+    // To make it faster the form is used instead but that limits the resolving to the form.
+    // This should be acceptable because the scope can still be set explicitly without using an id.
+    var form = this.findNonWrappedForm();
+    if (!form) {
+      throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' because no form has been found.');
+    }
+    if (!form.initialized) {
+      // KeyStrokeScope is another widget (form or formfield) which may not be initialized yet.
+      // The widget must be on the same form as the button, so once that form is initialized the keyStrokeScope has to be available
+      form.one('init', this._setKeyStrokeScope.bind(this, keyStrokeScope));
+      return;
+    }
+    keyStrokeScope = form.widget(keyStrokeScope);
+    if (!keyStrokeScope) {
+      throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' using form ' + form);
+    }
+    return keyStrokeScope;
+  }
+
+  _onClick(event) {
+    if (event.which !== 1) {
+      return; // Other button than left mouse button --> nop
+    }
+    if (event.detail > 1 && this.preventDoubleClick) {
+      return; // More than one consecutive click --> nop
+    }
+
+    if (this.enabledComputed) {
+      this.doAction();
+    }
+  }
+
+  setStackable(stackable) {
+    this.setProperty('stackable', stackable);
+  }
+
+  setShrinkable(shrinkable) {
+    this.setProperty('shrinkable', shrinkable);
+  }
+
+  /**
+   * @override
+   */
+  getFocusableElement() {
+    if (this.adaptedBy) {
+      return this.adaptedBy.getFocusableElement();
+    } else {
+      return super.getFocusableElement();
+    }
+  }
+
+  /**
+   * @override
+   */
+  isFocusable() {
+    if (this.adaptedBy) {
+      return this.adaptedBy.isFocusable();
+    } else {
+      return super.isFocusable();
+    }
+  }
+
+  /**
+   * @override
+   */
+  focus() {
+    if (this.adaptedBy) {
+      return this.adaptedBy.focus();
+    } else {
+      return super.focus();
+    }
+  }
 }

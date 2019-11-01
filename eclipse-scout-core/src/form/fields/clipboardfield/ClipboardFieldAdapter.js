@@ -12,8 +12,8 @@ import {ValueFieldAdapter} from '../../../index';
 
 export default class ClipboardFieldAdapter extends ValueFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

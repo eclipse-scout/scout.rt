@@ -27,265 +27,266 @@ import * as $ from 'jquery';
  */
 export default class Page extends TreeNode {
 
-constructor() {
-  super();
+  constructor() {
+    super();
+
+    /**
+     * This property is set by the server, see: JsonOutline#putNodeType.
+     */
+    this.nodeType = null;
+    this.detailTable = null;
+    this.detailTableVisible = true;
+    this.detailForm = null;
+    this.detailFormVisible = true;
+    this.detailFormVisibleByUi = true;
+
+    /**
+     * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
+     */
+    this.detailFormType = null;
+    this.tableStatusVisible = true;
+    /**
+     * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
+     */
+    this.drillDownOnRowClick = false;
+    /**
+     * The icon id which is used for icons in the tile outline overview.
+     */
+    this.overviewIconId = null;
+  }
+
 
   /**
-   * This property is set by the server, see: JsonOutline#putNodeType.
+   * This enum defines a node-type. This is basically used for the online case where we only have instances
+   * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
+   * instead.
+   *
+   * @type {{NODES: string, TABLE: string}}
    */
-  this.nodeType = null;
-  this.detailTable = null;
-  this.detailTableVisible = true;
-  this.detailForm = null;
-  this.detailFormVisible = true;
-  this.detailFormVisibleByUi = true;
+  static NodeType = {
+    NODES: 'nodes',
+    TABLE: 'table'
+  };
 
   /**
-   * This property contains the class-name of the form to be instantiated, when createDetailForm() is called.
+   * Override this function to return a detail form which is displayed in the outline when this page is selected.
+   * The default impl. returns null.
    */
-  this.detailFormType = null;
-  this.tableStatusVisible = true;
+  createDetailForm() {
+    return null;
+  }
+
   /**
-   * True to select the page linked with the selected row when the row was selected. May be useful on touch devices.
+   * @override TreeNode.js
    */
-  this.drillDownOnRowClick = false;
+  _init(model) {
+    super._init(model);
+    icons.resolveIconProperty(this, 'overviewIconId');
+    this._internalInitTable();
+    this._internalInitDetailForm();
+  }
+
   /**
-   * The icon id which is used for icons in the tile outline overview.
+   * @override TreeNode.js
    */
-  this.overviewIconId = null;
-}
-
-
-/**
- * This enum defines a node-type. This is basically used for the online case where we only have instances
- * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
- * instead.
- *
- * @type {{NODES: string, TABLE: string}}
- */
-static NodeType = {
-  NODES: 'nodes',
-  TABLE: 'table'
-};
-
-/**
- * Override this function to return a detail form which is displayed in the outline when this page is selected.
- * The default impl. returns null.
- */
-createDetailForm() {
-  return null;
-}
-
-/**
- * @override TreeNode.js
- */
-_init(model) {
-  super._init( model);
-  icons.resolveIconProperty(this, 'overviewIconId');
-  this._internalInitTable();
-  this._internalInitDetailForm();
-}
-
-/**
- * @override TreeNode.js
- */
-_destroy() {
-  super._destroy();
-  if (this.detailTable) {
-    this.detailTable.destroy();
-  }
-  if (this.detailForm) {
-    this.detailForm.destroy();
-  }
-}
-
-_internalInitTable() {
-  var table = this.detailTable;
-  if (table) {
-    // this case is used for Scout classic
-    table = this.getOutline()._createChild(table);
-  } else {
-    table = this._createTable();
+  _destroy() {
+    super._destroy();
+    if (this.detailTable) {
+      this.detailTable.destroy();
+    }
+    if (this.detailForm) {
+      this.detailForm.destroy();
+    }
   }
 
-  this.setDetailTable(table);
-}
+  _internalInitTable() {
+    var table = this.detailTable;
+    if (table) {
+      // this case is used for Scout classic
+      table = this.getOutline()._createChild(table);
+    } else {
+      table = this._createTable();
+    }
 
-_internalInitDetailForm() {
-  var detailForm = this.detailForm;
-  if (detailForm) {
-    detailForm = this.getOutline()._createChild(detailForm);
+    this.setDetailTable(table);
   }
 
-  this.setDetailForm(detailForm);
-}
+  _internalInitDetailForm() {
+    var detailForm = this.detailForm;
+    if (detailForm) {
+      detailForm = this.getOutline()._createChild(detailForm);
+    }
 
-/**
- * Override this function to create the internal table. Default impl. returns null.
- */
-_createTable() {
-  return null;
-}
+    this.setDetailForm(detailForm);
+  }
 
-/**
- * Override this function to initialize the internal (detail) table. Default impl. delegates
- * <code>filter</code> events to the outline mediator.
- */
-_initTable(table) {
-  table.menuBar.setPosition(MenuBar.Position.TOP);
-  table.on('filter', this._onTableFilter.bind(this));
-  if (this.drillDownOnRowClick) {
-    table.on('rowClick', this._onTableRowClick.bind(this));
-    table.setMultiSelect(false);
+  /**
+   * Override this function to create the internal table. Default impl. returns null.
+   */
+  _createTable() {
+    return null;
   }
-}
 
-_ensureDetailForm() {
-  if (this.detailForm) {
-    return;
+  /**
+   * Override this function to initialize the internal (detail) table. Default impl. delegates
+   * <code>filter</code> events to the outline mediator.
+   */
+  _initTable(table) {
+    table.menuBar.setPosition(MenuBar.Position.TOP);
+    table.on('filter', this._onTableFilter.bind(this));
+    if (this.drillDownOnRowClick) {
+      table.on('rowClick', this._onTableRowClick.bind(this));
+      table.setMultiSelect(false);
+    }
   }
-  var form = this.createDetailForm();
-  if (form && !form.displayParent) {
-    form.setDisplayParent(this.getOutline());
+
+  _ensureDetailForm() {
+    if (this.detailForm) {
+      return;
+    }
+    var form = this.createDetailForm();
+    if (form && !form.displayParent) {
+      form.setDisplayParent(this.getOutline());
+    }
+    this.setDetailForm(form);
   }
-  this.setDetailForm(form);
-}
 
 // see Java: AbstractPage#pageActivatedNotify
-activate() {
-  this._ensureDetailForm();
-}
+  activate() {
+    this._ensureDetailForm();
+  }
 
 // see Java: AbstractPage#pageDeactivatedNotify
-deactivate() {};
-
-/**
- * @returns {Outline} the tree / outline / parent instance. it's all the same,
- *     but it's more intuitive to work with the 'outline' when we deal with pages.
- */
-getOutline() {
-  return this.parent;
-}
-
-/**
- * @returns {Array.<Page>} an array of pages linked with the given rows.
- *   The order of the returned pages will be the same as the order of the rows.
- */
-pagesForTableRows(rows) {
-  return rows.map(this.pageForTableRow);
-}
-
-pageForTableRow(row) {
-  if (!row.page) {
-    throw new Error('Table-row is not linked to a page');
-  }
-  return row.page;
-}
-
-setDetailForm(form) {
-  this.detailForm = form;
-  if (this.detailForm) {
-    this.detailForm.setModal(false);
-  }
-}
-
-setDetailTable(table) {
-  if (table) {
-    this._initTable(table);
-    table.setTableStatusVisible(this.tableStatusVisible);
-  }
-  this.detailTable = table;
-}
-
-/**
- * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
- *
- * @returns {Array.<Page>} pages linked with the given rows.
- */
-updatePagesFromTableRows(rows) {
-  return rows.map(function(row) {
-    var page = row.page;
-    page.updatePageFromTableRow(row);
-    return page;
-  });
-}
-
-/**
- * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
- *
- * @returns {Page} page linked with the given row.
- */
-updatePageFromTableRow(row) {
-  var page = row.page;
-  page.enabled = row.enabled;
-  page.text = page.computeTextForRow(row);
-  if (row.cells.length >= 1) {
-    page.htmlEnabled = row.cells[0].htmlEnabled;
-    page.cssClass = row.cells[0].cssClass;
-  }
-  return page;
-}
-
-/**
- * This function creates the text property of this page. The default implementation returns the
- * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
- * this function.
- *
- * @param {TableRow} row
- */
-computeTextForRow(row) {
-  var text = '';
-  if (row.cells.length >= 1) {
-    text = row.cells[0].text;
-  }
-  return text;
-}
-
-/**
- * @returns {object} a page parameter object used to pass to newly created child pages. Sets the parent
- *     to our outline instance and adds optional other properties. Typically you'll pass an
- *     object (entity-key or arbitrary data) to a child page.
- */
-_pageParam(paramProperties) {
-  var param = {
-    parent: this.getOutline()
+  deactivate() {
   };
-  $.extend(param, paramProperties);
-  return param;
-}
 
-reloadPage() {
-  var outline = this.getOutline();
-  if (outline) {
-    this.loadChildren();
+  /**
+   * @returns {Outline} the tree / outline / parent instance. it's all the same,
+   *     but it's more intuitive to work with the 'outline' when we deal with pages.
+   */
+  getOutline() {
+    return this.parent;
   }
-}
 
-linkWithRow(row) {
-  this.row = row;
-  row.page = this;
-  this.getOutline().trigger('pageRowLink', {
-    page: this,
-    row: row
-  });
-}
-
-unlinkWithRow(row) {
-  delete this.row;
-  delete row.page;
-}
-
-_onTableFilter(event) {
-  this.getOutline().mediator.onTableFilter(event, this);
-}
-
-_onTableRowClick(event) {
-  if (!this.drillDownOnRowClick) {
-    return;
+  /**
+   * @returns {Array.<Page>} an array of pages linked with the given rows.
+   *   The order of the returned pages will be the same as the order of the rows.
+   */
+  pagesForTableRows(rows) {
+    return rows.map(this.pageForTableRow);
   }
-  var row = event.row;
-  var drillNode = this.pageForTableRow(row);
-  this.getOutline().selectNode(drillNode);
-  this.detailTable.deselectRow(row);
-}
+
+  pageForTableRow(row) {
+    if (!row.page) {
+      throw new Error('Table-row is not linked to a page');
+    }
+    return row.page;
+  }
+
+  setDetailForm(form) {
+    this.detailForm = form;
+    if (this.detailForm) {
+      this.detailForm.setModal(false);
+    }
+  }
+
+  setDetailTable(table) {
+    if (table) {
+      this._initTable(table);
+      table.setTableStatusVisible(this.tableStatusVisible);
+    }
+    this.detailTable = table;
+  }
+
+  /**
+   * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
+   *
+   * @returns {Array.<Page>} pages linked with the given rows.
+   */
+  updatePagesFromTableRows(rows) {
+    return rows.map(function(row) {
+      var page = row.page;
+      page.updatePageFromTableRow(row);
+      return page;
+    });
+  }
+
+  /**
+   * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
+   *
+   * @returns {Page} page linked with the given row.
+   */
+  updatePageFromTableRow(row) {
+    var page = row.page;
+    page.enabled = row.enabled;
+    page.text = page.computeTextForRow(row);
+    if (row.cells.length >= 1) {
+      page.htmlEnabled = row.cells[0].htmlEnabled;
+      page.cssClass = row.cells[0].cssClass;
+    }
+    return page;
+  }
+
+  /**
+   * This function creates the text property of this page. The default implementation returns the
+   * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
+   * this function.
+   *
+   * @param {TableRow} row
+   */
+  computeTextForRow(row) {
+    var text = '';
+    if (row.cells.length >= 1) {
+      text = row.cells[0].text;
+    }
+    return text;
+  }
+
+  /**
+   * @returns {object} a page parameter object used to pass to newly created child pages. Sets the parent
+   *     to our outline instance and adds optional other properties. Typically you'll pass an
+   *     object (entity-key or arbitrary data) to a child page.
+   */
+  _pageParam(paramProperties) {
+    var param = {
+      parent: this.getOutline()
+    };
+    $.extend(param, paramProperties);
+    return param;
+  }
+
+  reloadPage() {
+    var outline = this.getOutline();
+    if (outline) {
+      this.loadChildren();
+    }
+  }
+
+  linkWithRow(row) {
+    this.row = row;
+    row.page = this;
+    this.getOutline().trigger('pageRowLink', {
+      page: this,
+      row: row
+    });
+  }
+
+  unlinkWithRow(row) {
+    delete this.row;
+    delete row.page;
+  }
+
+  _onTableFilter(event) {
+    this.getOutline().mediator.onTableFilter(event, this);
+  }
+
+  _onTableRowClick(event) {
+    if (!this.drillDownOnRowClick) {
+      return;
+    }
+    var row = event.row;
+    var drillNode = this.pageForTableRow(row);
+    this.getOutline().selectNode(drillNode);
+    this.detailTable.deselectRow(row);
+  }
 }

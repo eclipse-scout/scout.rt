@@ -12,57 +12,57 @@ import {ModelAdapter} from '../index';
 
 export default class FormAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-/**
- * @override
- */
-_initModel(model, parent) {
-  model = super._initModel( model, parent);
-  // Set logical grid to null -> Calculation happens on server side
-  model.logicalGrid = null;
-  return model;
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'abort') {
-    this._onWidgetAbort(event);
-  } else if (event.type === 'close') {
-    this._onWidgetClose(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
 
-_onWidgetAbort(event) {
-  // Do not close the form immediately, server will send the close event
-  event.preventDefault();
 
-  this._send('formClosing');
-}
-
-_onWidgetClose(event) {
-  this._send('close');
-}
-
-onModelAction(event) {
-  if (event.type === 'requestFocus') {
-    this._onRequestFocus(event);
-  } else if (event.type === 'requestInput') {
-    this._onRequestInput(event);
-  } else {
-    super.onModelAction( event);
+  /**
+   * @override
+   */
+  _initModel(model, parent) {
+    model = super._initModel(model, parent);
+    // Set logical grid to null -> Calculation happens on server side
+    model.logicalGrid = null;
+    return model;
   }
-}
 
-_onRequestFocus(event) {
-  this.session.getOrCreateWidget(event.formField, this.widget).focus();
-}
+  _onWidgetEvent(event) {
+    if (event.type === 'abort') {
+      this._onWidgetAbort(event);
+    } else if (event.type === 'close') {
+      this._onWidgetClose(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 
-_onRequestInput(event) {
-  this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
-}
+  _onWidgetAbort(event) {
+    // Do not close the form immediately, server will send the close event
+    event.preventDefault();
+
+    this._send('formClosing');
+  }
+
+  _onWidgetClose(event) {
+    this._send('close');
+  }
+
+  onModelAction(event) {
+    if (event.type === 'requestFocus') {
+      this._onRequestFocus(event);
+    } else if (event.type === 'requestInput') {
+      this._onRequestInput(event);
+    } else {
+      super.onModelAction(event);
+    }
+  }
+
+  _onRequestFocus(event) {
+    this.session.getOrCreateWidget(event.formField, this.widget).focus();
+  }
+
+  _onRequestInput(event) {
+    this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
+  }
 }

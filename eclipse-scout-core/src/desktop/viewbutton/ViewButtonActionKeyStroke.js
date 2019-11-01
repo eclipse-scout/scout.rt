@@ -13,25 +13,25 @@ import {ActionKeyStroke} from '../../index';
 
 export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
-constructor(action) {
-  super( action);
+  constructor(action) {
+    super(action);
 
-}
-
-
-_postRenderKeyBox($drawingArea) {
-  if (this.field.iconId && !this.field._isMenuItem) {
-    var width = $drawingArea.outerWidth();
-    var wKeybox = $drawingArea.find('.key-box').outerWidth();
-    var leftKeyBox = width / 2 - wKeybox / 2;
-    $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
-}
 
-renderKeyBox($drawingArea, event) {
-  if (this.field._isMenuItem) {
-    this.renderingHints.hAlign = HAlign.RIGHT;
+
+  _postRenderKeyBox($drawingArea) {
+    if (this.field.iconId && !this.field._isMenuItem) {
+      var width = $drawingArea.outerWidth();
+      var wKeybox = $drawingArea.find('.key-box').outerWidth();
+      var leftKeyBox = width / 2 - wKeybox / 2;
+      $drawingArea.find('.key-box').cssLeft(leftKeyBox);
+    }
   }
-  return super.renderKeyBox( $drawingArea, event);
-}
+
+  renderKeyBox($drawingArea, event) {
+    if (this.field._isMenuItem) {
+      this.renderingHints.hAlign = HAlign.RIGHT;
+    }
+    return super.renderKeyBox($drawingArea, event);
+  }
 }

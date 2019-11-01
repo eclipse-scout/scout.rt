@@ -12,30 +12,30 @@ import {Widget} from '../index';
 
 export default class DesktopLogo extends Widget {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(model) {
-  super._init( model);
-  this.url = model.url;
-}
+  _init(model) {
+    super._init(model);
+    this.url = model.url;
+  }
 
-_render() {
-  this.$container = this.$parent.appendDiv('desktop-logo');
-}
+  _render() {
+    this.$container = this.$parent.appendDiv('desktop-logo');
+  }
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderUrl();
-}
+  _renderProperties() {
+    super._renderProperties();
+    this._renderUrl();
+  }
 
-_renderUrl() {
-  this.$container.css('backgroundImage', 'url(' + this.url + ')');
-}
+  _renderUrl() {
+    this.$container.css('backgroundImage', 'url(' + this.url + ')');
+  }
 
-setUrl(url) {
-  this.setProperty('url', url);
-}
+  setUrl(url) {
+    this.setProperty('url', url);
+  }
 }

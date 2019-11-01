@@ -12,17 +12,17 @@ import {KeyStroke} from '../index';
 
 export default class MenuNavigationKeyStroke extends KeyStroke {
 
-constructor(popup) {
-  super();
-  this.field = popup;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted || this.field.bodyAnimating) {
-    return false;
+  constructor(popup) {
+    super();
+    this.field = popup;
   }
-  return accepted;
-}
+
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted || this.field.bodyAnimating) {
+      return false;
+    }
+    return accepted;
+  }
 }

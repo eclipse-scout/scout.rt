@@ -20,273 +20,119 @@ import {scout} from '../index';
 
 export default class TableMatrix {
 
-constructor(table, session) {
-  this.session = session;
-  this.locale = session.locale;
-  this._allData = [];
-  this._allAxis = [];
-  this._rows = table.rows;
-  this._table = table;
-}
-
-static DateGroup = {
-  NONE: 0,
-  YEAR: 256,
-  MONTH: 257,
-  WEEKDAY: 258,
-  DATE: 259
-};
-
-static NumberGroup = {
-  COUNT: -1,
-  SUM: 1,
-  AVG: 2
-};
-
-/**
- * add data axis
- */
-addData(data, dataGroup) {
-  var dataAxis = [],
-    locale = this.locale;
-
-  // collect all axis
-  this._allData.push(dataAxis);
-
-  // copy column for later access
-  dataAxis.column = data;
-
-  // data always is number
-  dataAxis.format = function(n) {
-    return locale.decimalFormat.format(n);
-  };
-
-  // count, sum, avg
-  if (dataGroup === TableMatrix.NumberGroup.COUNT) {
-    dataAxis.norm = function(f) {
-      return 1;
-    };
-    dataAxis.group = function(array) {
-      return array.length;
-    };
-  } else if (dataGroup === TableMatrix.NumberGroup.SUM) {
-    dataAxis.norm = function(f) {
-      if (isNaN(f) || f === null || f === '') {
-        return null;
-      } else {
-        return parseFloat(f);
-      }
-    };
-    dataAxis.group = function(array) {
-      return array.reduce(function(a, b) {
-        return a + b;
-      });
-    };
-  } else if (dataGroup === TableMatrix.NumberGroup.AVG) {
-    dataAxis.norm = function(f) {
-      if (isNaN(f) || f === null || f === '') {
-        return null;
-      } else {
-        return parseFloat(f);
-      }
-    };
-    dataAxis.group = function(array) {
-      var sum = array.reduce(function(a, b) {
-          return a + b;
-        }),
-        count = array.reduce(function(a, b) {
-          return (b === null ? a : a + 1);
-        }, 0);
-
-      if (count === 0) {
-        return null;
-      } else {
-        return sum / count;
-      }
-    };
+  constructor(table, session) {
+    this.session = session;
+    this.locale = session.locale;
+    this._allData = [];
+    this._allAxis = [];
+    this._rows = table.rows;
+    this._table = table;
   }
 
-  return dataAxis;
-}
+  static DateGroup = {
+    NONE: 0,
+    YEAR: 256,
+    MONTH: 257,
+    WEEKDAY: 258,
+    DATE: 259
+  };
+
+  static NumberGroup = {
+    COUNT: -1,
+    SUM: 1,
+    AVG: 2
+  };
+
+  /**
+   * add data axis
+   */
+  addData(data, dataGroup) {
+    var dataAxis = [],
+      locale = this.locale;
+
+    // collect all axis
+    this._allData.push(dataAxis);
+
+    // copy column for later access
+    dataAxis.column = data;
+
+    // data always is number
+    dataAxis.format = function(n) {
+      return locale.decimalFormat.format(n);
+    };
+
+    // count, sum, avg
+    if (dataGroup === TableMatrix.NumberGroup.COUNT) {
+      dataAxis.norm = function(f) {
+        return 1;
+      };
+      dataAxis.group = function(array) {
+        return array.length;
+      };
+    } else if (dataGroup === TableMatrix.NumberGroup.SUM) {
+      dataAxis.norm = function(f) {
+        if (isNaN(f) || f === null || f === '') {
+          return null;
+        } else {
+          return parseFloat(f);
+        }
+      };
+      dataAxis.group = function(array) {
+        return array.reduce(function(a, b) {
+          return a + b;
+        });
+      };
+    } else if (dataGroup === TableMatrix.NumberGroup.AVG) {
+      dataAxis.norm = function(f) {
+        if (isNaN(f) || f === null || f === '') {
+          return null;
+        } else {
+          return parseFloat(f);
+        }
+      };
+      dataAxis.group = function(array) {
+        var sum = array.reduce(function(a, b) {
+            return a + b;
+          }),
+          count = array.reduce(function(a, b) {
+            return (b === null ? a : a + 1);
+          }, 0);
+
+        if (count === 0) {
+          return null;
+        } else {
+          return sum / count;
+        }
+      };
+    }
+
+    return dataAxis;
+  }
 
 //add x or y Axis
-addAxis(axis, axisGroup) {
-  var keyAxis = [],
-    locale = this.locale,
-    session = this.session,
-    getText = this.session.text.bind(this.session),
-    emptyCell = getText('ui.EmptyCell');
+  addAxis(axis, axisGroup) {
+    var keyAxis = [],
+      locale = this.locale,
+      session = this.session,
+      getText = this.session.text.bind(this.session),
+      emptyCell = getText('ui.EmptyCell');
 
-  // collect all axis
-  this._allAxis.push(keyAxis);
-  keyAxis.column = axis;
+    // collect all axis
+    this._allAxis.push(keyAxis);
+    keyAxis.column = axis;
 
-  // normalized string data
-  keyAxis.normTable = [];
+    // normalized string data
+    keyAxis.normTable = [];
 
-  // add a key to the axis
-  keyAxis.add = function(k) {
-    if (keyAxis.indexOf(k) === -1) {
-      keyAxis.push(k);
-    }
-  };
-
-  // default functions
-  keyAxis.reorder = function() {
-    keyAxis.sort(function(a, b) {
-      // make sure -empty- is at the bottom
-      if (a === null) {
-        return 1;
-      }
-      if (b === null) {
-        return -1;
-      }
-      // sort others
-      return (a - b);
-    });
-  };
-  keyAxis.norm = function(f) {
-    if (f === null || f === '') {
-      return null;
-    } else {
-      var index = keyAxis.normTable.indexOf(f);
-      if (index === -1) {
-        return keyAxis.normTable.push(f) - 1;
-      } else {
-        return index;
-      }
-    }
-  };
-  keyAxis.format = function(n) {
-    if (n === null) {
-      return emptyCell;
-    } else {
-      return keyAxis.normTable[n];
-    }
-  };
-
-  // norm and format depends of datatype and group functionality
-  if (axis instanceof DateColumn) {
-    if (axisGroup === TableMatrix.DateGroup.NONE) {
-      keyAxis.norm = function(f) {
-        if (f === null || f === '') {
-          return null;
-        } else {
-          return f.getTime();
-        }
-      };
-      keyAxis.format = function(n) {
-        if (n === null) {
-          return null;
-        } else {
-          var format = axis.format;
-          if (format) {
-            format = DateFormat.ensure(locale, format);
-          } else {
-            format = locale.dateFormat;
-          }
-          return format.format(new Date(n));
-        }
-      };
-    } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
-      keyAxis.norm = function(f) {
-        if (f === null || f === '') {
-          return null;
-        } else {
-          return f.getFullYear();
-        }
-      };
-      keyAxis.format = function(n) {
-        if (n === null) {
-          return emptyCell;
-        } else {
-          return String(n);
-        }
-      };
-    } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
-      keyAxis.norm = function(f) {
-        if (f === null || f === '') {
-          return null;
-        } else {
-          return f.getMonth();
-        }
-      };
-      keyAxis.format = function(n) {
-        if (n === null) {
-          return emptyCell;
-        } else {
-          return locale.dateFormatSymbols.months[n];
-        }
-      };
-    } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
-      keyAxis.norm = function(f) {
-        if (f === null || f === '') {
-          return null;
-        } else {
-          var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
-          return b;
-        }
-      };
-      keyAxis.format = function(n) {
-        if (n === null) {
-          return emptyCell;
-        } else {
-          return locale.dateFormatSymbols.weekdaysOrdered[n];
-        }
-      };
-    } else if (axisGroup === TableMatrix.DateGroup.DATE) {
-      keyAxis.norm = function(f) {
-        if (f === null || f === '') {
-          return null;
-        } else {
-          return dates.trunc(f).getTime();
-        }
-      };
-      keyAxis.format = function(n) {
-        if (n === null) {
-          return emptyCell;
-        } else {
-          return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
-        }
-      };
-    }
-  } else if (axis instanceof NumberColumn) {
-    keyAxis.norm = function(f) {
-      if (isNaN(f) || f === null || f === '') {
-        return null;
-      } else {
-        return parseFloat(f);
+    // add a key to the axis
+    keyAxis.add = function(k) {
+      if (keyAxis.indexOf(k) === -1) {
+        keyAxis.push(k);
       }
     };
-    keyAxis.format = function(n) {
-      if (isNaN(n) || n === null) {
-        return emptyCell;
-      } else {
-        return axis.decimalFormat.format(n);
-      }
-    };
-  } else if (axis instanceof BooleanColumn) {
-    keyAxis.norm = function(f) {
-      if (!f) {
-        return 0;
-      } else {
-        return 1;
-      }
-    };
-    keyAxis.format = function(n) {
-      if (n === 0) {
-        return getText('ui.BooleanColumnGroupingFalse');
-      } else {
-        return getText('ui.BooleanColumnGroupingTrue');
-      }
-    };
-  } else if (axis instanceof IconColumn) {
-    keyAxis.textIsIcon = true;
-  } else {
+
+    // default functions
     keyAxis.reorder = function() {
-      var comparator = comparators.TEXT;
-      comparator.install(session);
-
       keyAxis.sort(function(a, b) {
         // make sure -empty- is at the bottom
         if (a === null) {
@@ -296,180 +142,334 @@ addAxis(axis, axisGroup) {
           return -1;
         }
         // sort others
-        return comparator.compare(keyAxis.format(a), keyAxis.format(b));
+        return (a - b);
       });
     };
-  }
-
-  return keyAxis;
-}
-
-/**
- * @returns a cube containing the results
- */
-calculate() {
-  var cube = {},
-    r, v, k, data, key, normData, normKey;
-
-  // collect data from table
-  for (r = 0; r < this._rows.length; r++) {
-    var row = this._rows[r];
-    // collect keys of x, y axis from row
-    var keys = [];
-    for (k = 0; k < this._allAxis.length; k++) {
-      var column = this._allAxis[k].column;
-      key = column.cellValueOrTextForCalculation(row);
-      normKey = this._allAxis[k].norm(key);
-
-      if (normKey !== undefined) {
-        this._allAxis[k].add(normKey);
-        keys.push(normKey);
+    keyAxis.norm = function(f) {
+      if (f === null || f === '') {
+        return null;
+      } else {
+        var index = keyAxis.normTable.indexOf(f);
+        if (index === -1) {
+          return keyAxis.normTable.push(f) - 1;
+        } else {
+          return index;
+        }
       }
-    }
-    keys = JSON.stringify(keys);
-
-    // collect values of data axis from row
-    var values = [];
-    for (v = 0; v < this._allData.length; v++) {
-      data = this._table.cellValue(this._allData[v].column, row);
-      normData = this._allData[v].norm(data);
-      if (normData !== undefined) {
-        values.push(normData);
+    };
+    keyAxis.format = function(n) {
+      if (n === null) {
+        return emptyCell;
+      } else {
+        return keyAxis.normTable[n];
       }
-    }
+    };
 
-    // build cube
-    if (cube[keys]) {
-      cube[keys].push(values);
+    // norm and format depends of datatype and group functionality
+    if (axis instanceof DateColumn) {
+      if (axisGroup === TableMatrix.DateGroup.NONE) {
+        keyAxis.norm = function(f) {
+          if (f === null || f === '') {
+            return null;
+          } else {
+            return f.getTime();
+          }
+        };
+        keyAxis.format = function(n) {
+          if (n === null) {
+            return null;
+          } else {
+            var format = axis.format;
+            if (format) {
+              format = DateFormat.ensure(locale, format);
+            } else {
+              format = locale.dateFormat;
+            }
+            return format.format(new Date(n));
+          }
+        };
+      } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
+        keyAxis.norm = function(f) {
+          if (f === null || f === '') {
+            return null;
+          } else {
+            return f.getFullYear();
+          }
+        };
+        keyAxis.format = function(n) {
+          if (n === null) {
+            return emptyCell;
+          } else {
+            return String(n);
+          }
+        };
+      } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
+        keyAxis.norm = function(f) {
+          if (f === null || f === '') {
+            return null;
+          } else {
+            return f.getMonth();
+          }
+        };
+        keyAxis.format = function(n) {
+          if (n === null) {
+            return emptyCell;
+          } else {
+            return locale.dateFormatSymbols.months[n];
+          }
+        };
+      } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
+        keyAxis.norm = function(f) {
+          if (f === null || f === '') {
+            return null;
+          } else {
+            var b = (f.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+            return b;
+          }
+        };
+        keyAxis.format = function(n) {
+          if (n === null) {
+            return emptyCell;
+          } else {
+            return locale.dateFormatSymbols.weekdaysOrdered[n];
+          }
+        };
+      } else if (axisGroup === TableMatrix.DateGroup.DATE) {
+        keyAxis.norm = function(f) {
+          if (f === null || f === '') {
+            return null;
+          } else {
+            return dates.trunc(f).getTime();
+          }
+        };
+        keyAxis.format = function(n) {
+          if (n === null) {
+            return emptyCell;
+          } else {
+            return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
+          }
+        };
+      }
+    } else if (axis instanceof NumberColumn) {
+      keyAxis.norm = function(f) {
+        if (isNaN(f) || f === null || f === '') {
+          return null;
+        } else {
+          return parseFloat(f);
+        }
+      };
+      keyAxis.format = function(n) {
+        if (isNaN(n) || n === null) {
+          return emptyCell;
+        } else {
+          return axis.decimalFormat.format(n);
+        }
+      };
+    } else if (axis instanceof BooleanColumn) {
+      keyAxis.norm = function(f) {
+        if (!f) {
+          return 0;
+        } else {
+          return 1;
+        }
+      };
+      keyAxis.format = function(n) {
+        if (n === 0) {
+          return getText('ui.BooleanColumnGroupingFalse');
+        } else {
+          return getText('ui.BooleanColumnGroupingTrue');
+        }
+      };
+    } else if (axis instanceof IconColumn) {
+      keyAxis.textIsIcon = true;
     } else {
-      cube[keys] = [values];
+      keyAxis.reorder = function() {
+        var comparator = comparators.TEXT;
+        comparator.install(session);
+
+        keyAxis.sort(function(a, b) {
+          // make sure -empty- is at the bottom
+          if (a === null) {
+            return 1;
+          }
+          if (b === null) {
+            return -1;
+          }
+          // sort others
+          return comparator.compare(keyAxis.format(a), keyAxis.format(b));
+        });
+      };
     }
+
+    return keyAxis;
   }
 
-  // group values and find sum, min and max of data axis
-  for (v = 0; v < this._allData.length; v++) {
-    data = this._allData[v];
+  /**
+   * @returns a cube containing the results
+   */
+  calculate() {
+    var cube = {},
+      r, v, k, data, key, normData, normKey;
 
-    data.total = 0;
-    data.min = null;
-    data.max = null;
-
-    for (k in cube) {
-      if (cube.hasOwnProperty(k)) {
-        var allCell = cube[k],
-          subCell = [];
-
-        for (var i = 0; i < allCell.length; i++) {
-          subCell.push(allCell[i][v]);
-        }
-
-        var newValue = this._allData[v].group(subCell);
-        cube[k][v] = newValue;
-        data.total += newValue;
-
-        if (newValue === null) {
-          continue;
-        }
-
-        if (newValue < data.min || data.min === null) {
-          data.min = newValue;
-        }
-        if (newValue > data.max || data.min === null) {
-          data.max = newValue;
-        }
-      }
-    }
-
-    //To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
-    if (scout.nvl(data.max, 0) === 0) {
-      data.max = 0.1;
-    }
-
-    var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
-
-    data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
-    data.max = Math.ceil(data.max / 4) * 4;
-  }
-
-  // find dimensions and sort for x, y axis
-  for (k = 0; k < this._allAxis.length; k++) {
-    key = this._allAxis[k];
-
-    key.min = arrays.min(key);
-    key.max = arrays.max(key);
-
-    // null value should be handled as first value (in charts)
-    if (key.indexOf(null) !== -1) {
-      key.max = key.max + 1;
-    }
-
-    key.reorder();
-  }
-
-  // access function used by chart
-  cube.getValue = function(keys) {
-    keys = JSON.stringify(keys);
-
-    if (cube.hasOwnProperty(keys)) {
-      return cube[keys];
-    } else {
-      return null;
-    }
-  };
-
-  return cube;
-}
-
-columnCount(filterNumberColumns) {
-  var c, column, r, row, cellValue,
-    columns = this.columns(filterNumberColumns),
-    colCount = [],
-    count = 0;
-
-  for (c = 0; c < columns.length; c++) {
-    column = columns[c];
-    colCount.push([column, []]);
-
+    // collect data from table
     for (r = 0; r < this._rows.length; r++) {
-      row = this._rows[r];
-      cellValue = column.cellValueOrTextForCalculation(row);
-      if (colCount[count][1].indexOf(cellValue) === -1) {
-        colCount[count][1].push(cellValue);
+      var row = this._rows[r];
+      // collect keys of x, y axis from row
+      var keys = [];
+      for (k = 0; k < this._allAxis.length; k++) {
+        var column = this._allAxis[k].column;
+        key = column.cellValueOrTextForCalculation(row);
+        normKey = this._allAxis[k].norm(key);
+
+        if (normKey !== undefined) {
+          this._allAxis[k].add(normKey);
+          keys.push(normKey);
+        }
+      }
+      keys = JSON.stringify(keys);
+
+      // collect values of data axis from row
+      var values = [];
+      for (v = 0; v < this._allData.length; v++) {
+        data = this._table.cellValue(this._allData[v].column, row);
+        normData = this._allData[v].norm(data);
+        if (normData !== undefined) {
+          values.push(normData);
+        }
+      }
+
+      // build cube
+      if (cube[keys]) {
+        cube[keys].push(values);
+      } else {
+        cube[keys] = [values];
       }
     }
 
-    colCount[count][1] = colCount[count][1].length;
-    count++;
+    // group values and find sum, min and max of data axis
+    for (v = 0; v < this._allData.length; v++) {
+      data = this._allData[v];
+
+      data.total = 0;
+      data.min = null;
+      data.max = null;
+
+      for (k in cube) {
+        if (cube.hasOwnProperty(k)) {
+          var allCell = cube[k],
+            subCell = [];
+
+          for (var i = 0; i < allCell.length; i++) {
+            subCell.push(allCell[i][v]);
+          }
+
+          var newValue = this._allData[v].group(subCell);
+          cube[k][v] = newValue;
+          data.total += newValue;
+
+          if (newValue === null) {
+            continue;
+          }
+
+          if (newValue < data.min || data.min === null) {
+            data.min = newValue;
+          }
+          if (newValue > data.max || data.min === null) {
+            data.max = newValue;
+          }
+        }
+      }
+
+      //To calculate correct y axis scale data.max must not be 0. If data.max===0-> log(data.max)=-infinity
+      if (scout.nvl(data.max, 0) === 0) {
+        data.max = 0.1;
+      }
+
+      var f = Math.ceil(Math.log(data.max) / Math.LN10) - 1;
+
+      data.max = Math.ceil(data.max / Math.pow(10, f)) * Math.pow(10, f);
+      data.max = Math.ceil(data.max / 4) * 4;
+    }
+
+    // find dimensions and sort for x, y axis
+    for (k = 0; k < this._allAxis.length; k++) {
+      key = this._allAxis[k];
+
+      key.min = arrays.min(key);
+      key.max = arrays.max(key);
+
+      // null value should be handled as first value (in charts)
+      if (key.indexOf(null) !== -1) {
+        key.max = key.max + 1;
+      }
+
+      key.reorder();
+    }
+
+    // access function used by chart
+    cube.getValue = function(keys) {
+      keys = JSON.stringify(keys);
+
+      if (cube.hasOwnProperty(keys)) {
+        return cube[keys];
+      } else {
+        return null;
+      }
+    };
+
+    return cube;
   }
-  return colCount;
-}
 
-isEmpty() {
-  return this._rows.length === 0 || this.columns().length === 0;
-}
+  columnCount(filterNumberColumns) {
+    var c, column, r, row, cellValue,
+      columns = this.columns(filterNumberColumns),
+      colCount = [],
+      count = 0;
 
-/**
- * @returns valid columns for table-matrix (not instance of NumberColumn and not guiOnly)
- * @param filterNumberColumns whether or not to filter NumberColumn, default is true
- */
-columns(filterNumberColumns) {
-  filterNumberColumns = scout.nvl(filterNumberColumns, true);
-  return this._table.visibleColumns().filter(function(column) {
-    if (column.guiOnly) {
-      return false;
+    for (c = 0; c < columns.length; c++) {
+      column = columns[c];
+      colCount.push([column, []]);
+
+      for (r = 0; r < this._rows.length; r++) {
+        row = this._rows[r];
+        cellValue = column.cellValueOrTextForCalculation(row);
+        if (colCount[count][1].indexOf(cellValue) === -1) {
+          colCount[count][1].push(cellValue);
+        }
+      }
+
+      colCount[count][1] = colCount[count][1].length;
+      count++;
     }
-    if (filterNumberColumns && column instanceof NumberColumn) {
-      return false;
-    }
-    return true;
-  });
-}
+    return colCount;
+  }
 
-/**
- * Table rows and columns are not always in a consistent state.
- * @returns {boolean} true, if table is in a valid, consistent state
- * */
-isMatrixValid() {
-  return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
-}
+  isEmpty() {
+    return this._rows.length === 0 || this.columns().length === 0;
+  }
+
+  /**
+   * @returns valid columns for table-matrix (not instance of NumberColumn and not guiOnly)
+   * @param filterNumberColumns whether or not to filter NumberColumn, default is true
+   */
+  columns(filterNumberColumns) {
+    filterNumberColumns = scout.nvl(filterNumberColumns, true);
+    return this._table.visibleColumns().filter(function(column) {
+      if (column.guiOnly) {
+        return false;
+      }
+      if (filterNumberColumns && column instanceof NumberColumn) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  /**
+   * Table rows and columns are not always in a consistent state.
+   * @returns {boolean} true, if table is in a valid, consistent state
+   * */
+  isMatrixValid() {
+    return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
+  }
 }

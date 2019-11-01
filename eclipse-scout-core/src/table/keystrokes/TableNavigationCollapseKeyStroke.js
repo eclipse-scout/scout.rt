@@ -13,49 +13,49 @@ import {keys} from '../../index';
 
 export default class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKeyStroke {
 
-constructor(table) {
-  super( table);
-  this.field = table;
-  this.which = [keys.SUBTRACT, keys.LEFT];
-  this.renderingHints.text = '-';
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var row = this.field.selectedRows[0];
-    if (row) {
-      return row.$row;
+  constructor(table) {
+    super(table);
+    this.field = table;
+    this.which = [keys.SUBTRACT, keys.LEFT];
+    this.renderingHints.text = '-';
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      var row = this.field.selectedRows[0];
+      if (row) {
+        return row.$row;
+      }
+    }.bind(this);
+  }
+
+
+  _accept(event) {
+    var accepted = super._accept(event),
+      selectedRow = this.field.selectedRows[0];
+    if (!accepted) {
+      return false;
     }
-  }.bind(this);
-}
 
+    if (!selectedRow) {
+      return false;
+    }
+    if (selectedRow.expanded && selectedRow._expandable) {
+      // collapse
+      return true;
+    }
 
-_accept(event) {
-  var accepted = super._accept( event),
-    selectedRow = this.field.selectedRows[0];
-  if (!accepted) {
-    return false;
+    return !!selectedRow.parentRow;
   }
 
-  if (!selectedRow) {
-    return false;
+  handle(event) {
+    var table = this.field,
+      selectedRow = this.field.selectedRows[0];
+    if (!selectedRow) {
+      return;
+    }
+    if (selectedRow.expanded && selectedRow._expandable) {
+      table.collapseRow(selectedRow);
+    } else if (selectedRow.parentRow) {
+      table.selectRow(selectedRow.parentRow);
+      table.selectionHandler.lastActionRow = selectedRow.parentRow;
+    }
   }
-  if (selectedRow.expanded && selectedRow._expandable) {
-    // collapse
-    return true;
-  }
-
-  return !!selectedRow.parentRow;
-}
-
-handle(event) {
-  var table = this.field,
-    selectedRow = this.field.selectedRows[0];
-  if (!selectedRow) {
-    return;
-  }
-  if (selectedRow.expanded && selectedRow._expandable) {
-    table.collapseRow(selectedRow);
-  } else if (selectedRow.parentRow) {
-    table.selectRow(selectedRow.parentRow);
-    table.selectionHandler.lastActionRow = selectedRow.parentRow;
-  }
-}
 }

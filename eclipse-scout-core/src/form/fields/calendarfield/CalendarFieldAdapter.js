@@ -12,8 +12,8 @@ import {FormFieldAdapter} from '../../../index';
 
 export default class CalendarFieldAdapter extends FormFieldAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

@@ -13,23 +13,23 @@ import {keys} from '../index';
 
 export default class MenuExecKeyStroke extends KeyStroke {
 
-constructor(menu) {
-  super();
-  this.field = menu;
-  this.which = [keys.SPACE, keys.ENTER];
-  this.stopPropagation = true;
+  constructor(menu) {
+    super();
+    this.field = menu;
+    this.which = [keys.SPACE, keys.ENTER];
+    this.stopPropagation = true;
 
-  this.renderingHints.offset = 16;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$container;
-  }.bind(this);
-}
+    this.renderingHints.offset = 16;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$container;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.doAction();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.doAction();
+  }
 }

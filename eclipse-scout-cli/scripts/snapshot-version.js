@@ -20,9 +20,9 @@ const npmlog = require('npm/node_modules/npmlog');
 const npm = require('npm');
 
 npmlog.on('log', msg => {
-  const { level } = msg;
+  const {level} = msg;
   if (level === 'info' || level === 'error' || level === 'warn') {
-    console.log({ msg });
+    console.log({msg});
   }
 });
 

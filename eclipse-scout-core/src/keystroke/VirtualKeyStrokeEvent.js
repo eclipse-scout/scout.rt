@@ -10,45 +10,45 @@
  */
 export default class VirtualKeyStrokeEvent {
 
-constructor(which, ctrl, alt, shift, keyStrokeMode, target) {
-  this.which = which;
-  this.ctrlKey = ctrl;
-  this.metaKey = false;
-  this.altKey = alt;
-  this.shiftKey = shift;
-  this.target = target;
-  this.type = keyStrokeMode;
+  constructor(which, ctrl, alt, shift, keyStrokeMode, target) {
+    this.which = which;
+    this.ctrlKey = ctrl;
+    this.metaKey = false;
+    this.altKey = alt;
+    this.shiftKey = shift;
+    this.target = target;
+    this.type = keyStrokeMode;
 
-  this._propagationStopped = false;
-  this._immediatePropagationStopped = false;
-  this._defaultPrevented = false;
-}
+    this._propagationStopped = false;
+    this._immediatePropagationStopped = false;
+    this._defaultPrevented = false;
+  }
 
-stopPropagation() {
-  this._propagationStopped = true;
-}
+  stopPropagation() {
+    this._propagationStopped = true;
+  }
 
-stopImmediatePropagation() {
-  this._immediatePropagationStopped = true;
-}
+  stopImmediatePropagation() {
+    this._immediatePropagationStopped = true;
+  }
 
-preventDefault() {
-  this._defaultPrevented = true;
-}
+  preventDefault() {
+    this._defaultPrevented = true;
+  }
 
-isPropagationStopped() {
-  return this._propagationStopped;
-}
+  isPropagationStopped() {
+    return this._propagationStopped;
+  }
 
-isImmediatePropagationStopped() {
-  return this._immediatePropagationStopped;
-}
+  isImmediatePropagationStopped() {
+    return this._immediatePropagationStopped;
+  }
 
-isDefaultPrevented() {
-  return this._defaultPrevented;
-}
+  isDefaultPrevented() {
+    return this._defaultPrevented;
+  }
 
-isAnyPropagationStopped() {
-  return this._propagationStopped || this._immediatePropagationStopped;
-}
+  isAnyPropagationStopped() {
+    return this._propagationStopped || this._immediatePropagationStopped;
+  }
 }

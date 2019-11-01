@@ -13,95 +13,95 @@ import {FormField} from '../../../index';
 
 export default class AccordionField extends FormField {
 
-constructor() {
-  super();
-  this.eventDelegator = null;
-  this._addWidgetProperties(['accordion']);
-}
-
-
-_init(model) {
-  super._init( model);
-
-  this._setAccordion(this.accordion);
-}
-
-/**
- * @override
- */
-_createLoadingSupport() {
-  // Loading is delegated to accordion
-  return null;
-}
-
-_render() {
-  this.addContainer(this.$parent, 'accordion-field');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
-  if (this.accordion) {
-    this._renderAccordion();
+  constructor() {
+    super();
+    this.eventDelegator = null;
+    this._addWidgetProperties(['accordion']);
   }
-}
 
-_renderProperties() {
-  super._renderProperties();
-  this._renderDropType();
-}
 
-setAccordion(accordion) {
-  this.setProperty('accordion', accordion);
-}
+  _init(model) {
+    super._init(model);
 
-_setAccordion(accordion) {
-  if (this.accordion) {
-    if (this.eventDelegator) {
-      this.eventDelegator.destroy();
-      this.eventDelegator = null;
+    this._setAccordion(this.accordion);
+  }
+
+  /**
+   * @override
+   */
+  _createLoadingSupport() {
+    // Loading is delegated to accordion
+    return null;
+  }
+
+  _render() {
+    this.addContainer(this.$parent, 'accordion-field');
+    this.addLabel();
+    this.addMandatoryIndicator();
+    this.addStatus();
+    if (this.accordion) {
+      this._renderAccordion();
     }
   }
-  this._setProperty('accordion', accordion);
-  if (accordion) {
-    this.eventDelegator = EventDelegator.create(this, accordion, {
-      delegateProperties: ['loading']
-    });
-    accordion.setLoading(this.loading);
-    accordion.setScrollTop(this.scrollTop);
-  }
-}
 
-_renderAccordion() {
-  if (!this.accordion) {
-    return;
+  _renderProperties() {
+    super._renderProperties();
+    this._renderDropType();
   }
-  this.accordion.render();
-  this.addField(this.accordion.$container);
-  this.invalidateLayoutTree();
-}
 
-_removeAccordion() {
-  if (!this.accordion) {
-    return;
+  setAccordion(accordion) {
+    this.setProperty('accordion', accordion);
   }
-  this.accordion.remove();
-  this._removeField();
-  this.invalidateLayoutTree();
-}
 
-/**
- * @override
- */
-getFocusableElement() {
-  if (this.accordion) {
-    return this.accordion.getFocusableElement();
+  _setAccordion(accordion) {
+    if (this.accordion) {
+      if (this.eventDelegator) {
+        this.eventDelegator.destroy();
+        this.eventDelegator = null;
+      }
+    }
+    this._setProperty('accordion', accordion);
+    if (accordion) {
+      this.eventDelegator = EventDelegator.create(this, accordion, {
+        delegateProperties: ['loading']
+      });
+      accordion.setLoading(this.loading);
+      accordion.setScrollTop(this.scrollTop);
+    }
   }
-  return null;
-}
 
-/**
- * @override
- */
-getDelegateScrollable() {
-  return this.accordion;
-}
+  _renderAccordion() {
+    if (!this.accordion) {
+      return;
+    }
+    this.accordion.render();
+    this.addField(this.accordion.$container);
+    this.invalidateLayoutTree();
+  }
+
+  _removeAccordion() {
+    if (!this.accordion) {
+      return;
+    }
+    this.accordion.remove();
+    this._removeField();
+    this.invalidateLayoutTree();
+  }
+
+  /**
+   * @override
+   */
+  getFocusableElement() {
+    if (this.accordion) {
+      return this.accordion.getFocusableElement();
+    }
+    return null;
+  }
+
+  /**
+   * @override
+   */
+  getDelegateScrollable() {
+    return this.accordion;
+  }
 }

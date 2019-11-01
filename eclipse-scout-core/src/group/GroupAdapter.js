@@ -12,9 +12,9 @@ import {ModelAdapter} from '../index';
 
 export default class GroupAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['collapsed']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['collapsed']);
+  }
 
 }

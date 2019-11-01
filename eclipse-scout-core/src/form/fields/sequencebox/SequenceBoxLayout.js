@@ -13,16 +13,16 @@ import {HtmlEnvironment} from '../../../index';
 
 export default class SequenceBoxLayout extends LogicalGridLayout {
 
-constructor(widget, layoutConfig) {
-  super( widget, layoutConfig);
-}
+  constructor(widget, layoutConfig) {
+    super(widget, layoutConfig);
+  }
 
 
-/**
- * @override LogicalGridLayout.js
- */
-_initDefaults() {
-  super._initDefaults();
-  this.hgap = HtmlEnvironment.get().smallColumnGap;
-}
+  /**
+   * @override LogicalGridLayout.js
+   */
+  _initDefaults() {
+    super._initDefaults();
+    this.hgap = HtmlEnvironment.get().smallColumnGap;
+  }
 }

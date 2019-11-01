@@ -14,42 +14,42 @@ import {scout} from '../index';
 
 export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
 
-constructor() {
-  super();
-  this.table = null;
-}
+  constructor() {
+    super();
+    this.table = null;
+  }
 
 
-_init(model) {
-  super._init( model);
-}
+  _init(model) {
+    super._init(model);
+  }
 
-_data() {
-  var lookupRows = [];
-  this.table.visibleColumns().forEach(function(column) {
-    if (column.isSortingPossible()) {
-      lookupRows.push([{
+  _data() {
+    var lookupRows = [];
+    this.table.visibleColumns().forEach(function(column) {
+      if (column.isSortingPossible()) {
+        lookupRows.push([{
           column: column,
           asc: true
         }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.ascending') + ')',
-        icons.LONG_ARROW_UP_BOLD
-      ]);
-      lookupRows.push([{
+          icons.LONG_ARROW_UP_BOLD
+        ]);
+        lookupRows.push([{
           column: column,
           asc: false
         }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.descending') + ')',
-        icons.LONG_ARROW_DOWN_BOLD
-      ]);
-    }
-  }, this);
-  return lookupRows;
-}
+          icons.LONG_ARROW_DOWN_BOLD
+        ]);
+      }
+    }, this);
+    return lookupRows;
+  }
 
-_dataToLookupRow(data) {
-  return scout.create('LookupRow', {
-    key: data[0],
-    text: data[1],
-    iconId: data[2]
-  });
-}
+  _dataToLookupRow(data) {
+    return scout.create('LookupRow', {
+      key: data[0],
+      text: data[1],
+      iconId: data[2]
+    });
+  }
 }

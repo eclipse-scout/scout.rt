@@ -35,7 +35,7 @@ export function isAlt(modifierBitMask) {
 }
 
 //private
- export function _eval(testee, modifier, modifierUndefined) {
+export function _eval(testee, modifier, modifierUndefined) {
   if ((modifierUndefined & testee) > 0) { // NOSONAR
     return undefined;
   } else {

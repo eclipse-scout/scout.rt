@@ -13,23 +13,23 @@ import {MenuBarLayout} from '../../../index';
 
 export default class TabItemLayout extends GroupBoxLayout {
 
-constructor(tabItem) {
-  super( tabItem);
-}
+  constructor(tabItem) {
+    super(tabItem);
+  }
 
 
-_layoutStatus() {
-  // NOP: $status width is set in TabItem.addStatus()
-}
+  _layoutStatus() {
+    // NOP: $status width is set in TabItem.addStatus()
+  }
 
-_menuBarSize(htmlMenuBar, containerSize, statusWidth) {
-  var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
-  var tabBox = this.groupBox.parent;
-  menuBarSize.width = tabBox.header.$container.outerWidth();
-  return menuBarSize;
-}
+  _menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+    var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
+    var tabBox = this.groupBox.parent;
+    menuBarSize.width = tabBox.header.$container.outerWidth();
+    return menuBarSize;
+  }
 
-_titleHeight() {
-  return 0;
-}
+  _titleHeight() {
+    return 0;
+  }
 }

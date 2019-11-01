@@ -17,78 +17,78 @@ import {styles} from '../index';
  */
 export default class CompactTreeNode extends TreeNode {
 
-constructor(tree) {
-  super( tree);
-}
-
-
-/**
- * @override
- */
-render() {
-  var tree = this.getTree();
-
-  if (this.isSection()) {
-    var $section = tree.$container
-      .makeDiv('section expanded')
-      .data('node', this);
-    $section
-      .appendDiv('title')
-      .text(this.text);
-
-    this.$node = $section;
-  } else {
-    var $parent = this.parentNode.$node;
-    // Sections nodes
-    var $sectionNode = $parent.makeDiv('section-node')
-      .data('node', this)
-      .on('mousedown', tree._onNodeMouseDown.bind(tree))
-      .on('mouseup', tree._onNodeMouseUp.bind(tree));
-
-    this.$node = $sectionNode;
+  constructor(tree) {
+    super(tree);
   }
 
-  return this.$node;
-}
 
-/**
- * @override
- */
-_decorate() {
-  // This node is not yet rendered, nothing to do
-  if (!this.$node) {
-    return;
+  /**
+   * @override
+   */
+  render() {
+    var tree = this.getTree();
+
+    if (this.isSection()) {
+      var $section = tree.$container
+        .makeDiv('section expanded')
+        .data('node', this);
+      $section
+        .appendDiv('title')
+        .text(this.text);
+
+      this.$node = $section;
+    } else {
+      var $parent = this.parentNode.$node;
+      // Sections nodes
+      var $sectionNode = $parent.makeDiv('section-node')
+        .data('node', this)
+        .on('mousedown', tree._onNodeMouseDown.bind(tree))
+        .on('mouseup', tree._onNodeMouseUp.bind(tree));
+
+      this.$node = $sectionNode;
+    }
+
+    return this.$node;
   }
 
-  var formerClasses,
-    $node = this.$node;
+  /**
+   * @override
+   */
+  _decorate() {
+    // This node is not yet rendered, nothing to do
+    if (!this.$node) {
+      return;
+    }
 
-  if ($node.hasClass('section')) {
-    $node = $node.children('title');
-    formerClasses = 'title';
-  } else {
-    formerClasses = 'section-node';
-    if ($node.isSelected()) {
-      formerClasses += ' selected';
+    var formerClasses,
+      $node = this.$node;
+
+    if ($node.hasClass('section')) {
+      $node = $node.children('title');
+      formerClasses = 'title';
+    } else {
+      formerClasses = 'section-node';
+      if ($node.isSelected()) {
+        formerClasses += ' selected';
+      }
+    }
+    $node.removeClass();
+    $node.addClass(formerClasses);
+    $node.addClass(this.cssClass);
+    $node.text(this.text);
+
+    styles.legacyStyle(this, $node);
+
+    if (strings.hasText(this.tooltipText)) {
+      $node.attr('title', this.tooltipText);
     }
   }
-  $node.removeClass();
-  $node.addClass(formerClasses);
-  $node.addClass(this.cssClass);
-  $node.text(this.text);
 
-  styles.legacyStyle(this, $node);
-
-  if (strings.hasText(this.tooltipText)) {
-    $node.attr('title', this.tooltipText);
+  isSection() {
+    return this.level === 0;
   }
-}
 
-isSection() {
-  return this.level === 0;
-}
-
-_updateIconWidth() {
-  // NOP
-}
+  _updateIconWidth() {
+    // NOP
+  }
 }

@@ -13,74 +13,74 @@ import * as $ from 'jquery';
 
 export default class TableRow {
 
-constructor() {
-  this.$row;
-  this.aggregateRowAfter;
-  this.cells = [];
-  this.checked = false;
-  this.enabled = true;
-  this.filterAccepted = true;
-  this.height;
-  this.hasError = false;
-  this.id;
-  this.initialized = false;
-  this.parentRow;
-  this.childRows = [];
-  this.expanded = false;
-  this.status = TableRow.Status.NON_CHANGED;
-}
-
-static Status = {
-  NON_CHANGED: 'nonChanged',
-  INSERTED: 'inserted',
-  UPDATED: 'updated'
-};
-
-init(model) {
-  this._init(model);
-  this.initialized = true;
-}
-
-_init(model) {
-  if (!model.parent) {
-    throw new Error('missing property \'parent\'');
+  constructor() {
+    this.$row;
+    this.aggregateRowAfter;
+    this.cells = [];
+    this.checked = false;
+    this.enabled = true;
+    this.filterAccepted = true;
+    this.height;
+    this.hasError = false;
+    this.id;
+    this.initialized = false;
+    this.parentRow;
+    this.childRows = [];
+    this.expanded = false;
+    this.status = TableRow.Status.NON_CHANGED;
   }
-  $.extend(this, model);
-  defaultValues.applyTo(this);
-  this._initCells();
-}
 
-_initCells() {
-  this.getTable().columns.forEach(function(column) {
-    if (!column.guiOnly) {
-      var cell = this.cells[column.index];
-      cell = column.initCell(cell, this);
-      this.cells[column.index] = cell;
+  static Status = {
+    NON_CHANGED: 'nonChanged',
+    INSERTED: 'inserted',
+    UPDATED: 'updated'
+  };
+
+  init(model) {
+    this._init(model);
+    this.initialized = true;
+  }
+
+  _init(model) {
+    if (!model.parent) {
+      throw new Error('missing property \'parent\'');
     }
-  }, this);
-}
-
-animateExpansion() {
-  var $row = this.$row,
-    $rowControl;
-  if (!$row) {
-    return;
+    $.extend(this, model);
+    defaultValues.applyTo(this);
+    this._initCells();
   }
-  $rowControl = $row.find('.table-row-control');
-  if (this.expanded) {
-    $rowControl.addClassForAnimation('expand-rotate');
-  } else {
-    $rowControl.addClassForAnimation('collapse-rotate');
+
+  _initCells() {
+    this.getTable().columns.forEach(function(column) {
+      if (!column.guiOnly) {
+        var cell = this.cells[column.index];
+        cell = column.initCell(cell, this);
+        this.cells[column.index] = cell;
+      }
+    }, this);
   }
-}
 
-hasFilterAcceptedChildren() {
-  return this.childRows.some(function(childRow) {
-    return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
-  });
-}
+  animateExpansion() {
+    var $row = this.$row,
+      $rowControl;
+    if (!$row) {
+      return;
+    }
+    $rowControl = $row.find('.table-row-control');
+    if (this.expanded) {
+      $rowControl.addClassForAnimation('expand-rotate');
+    } else {
+      $rowControl.addClassForAnimation('collapse-rotate');
+    }
+  }
 
-getTable() {
-  return this.parent;
-}
+  hasFilterAcceptedChildren() {
+    return this.childRows.some(function(childRow) {
+      return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
+    });
+  }
+
+  getTable() {
+    return this.parent;
+  }
 }

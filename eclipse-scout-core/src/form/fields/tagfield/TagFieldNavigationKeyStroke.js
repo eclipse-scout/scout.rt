@@ -20,74 +20,74 @@ import {TagBar} from '../../../index';
  */
 export default class TagFieldNavigationKeyStroke extends KeyStroke {
 
-constructor(fieldAdapter) {
-  super();
-  this.fieldAdapter = fieldAdapter;
-  this.which = [keys.LEFT, keys.RIGHT];
-  this.preventDefault = false;
-  this.preventInvokeAcceptInputOnActiveValueField = true;
-}
-
-
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
-    return false;
-  }
-  return this.fieldAdapter.enabled();
-}
-
-handle(event) {
-  if (event.which === keys.LEFT) {
-    this._focusTagElement(-1);
-  } else if (event.which === keys.RIGHT) {
-    this._focusTagElement(1);
-  }
-}
-
-_focusTagElement(direction) {
-  var UNDEFINED = -1;
-  var INPUT = -2;
-
-  // find overflow-icon and all tag-elements
-  var $focusTargets = TagBar.findFocusableTagElements(this.fieldAdapter.$container());
-  var numTargets = $focusTargets.length;
-  if (numTargets === 0) {
-    return;
+  constructor(fieldAdapter) {
+    super();
+    this.fieldAdapter = fieldAdapter;
+    this.which = [keys.LEFT, keys.RIGHT];
+    this.preventDefault = false;
+    this.preventInvokeAcceptInputOnActiveValueField = true;
   }
 
-  // check which element has the focus
-  var focusIndex = UNDEFINED;
-  $focusTargets.each(function(index) {
-    var $element = $(this);
-    if ($element.hasClass('focused')) {
-      focusIndex = index;
+
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
     }
-  });
+    return this.fieldAdapter.enabled();
+  }
 
-  if (focusIndex === UNDEFINED) {
-    // no tag-elements focused currently
-    if (direction === -1) {
-      focusIndex = numTargets - 1;
+  handle(event) {
+    if (event.which === keys.LEFT) {
+      this._focusTagElement(-1);
+    } else if (event.which === keys.RIGHT) {
+      this._focusTagElement(1);
     }
-  } else {
-    var nextFocusIndex = focusIndex + direction;
-    if (nextFocusIndex >= numTargets) {
-      focusIndex = INPUT;
-    } else if (nextFocusIndex < 0) {
-      focusIndex = UNDEFINED;
+  }
+
+  _focusTagElement(direction) {
+    var UNDEFINED = -1;
+    var INPUT = -2;
+
+    // find overflow-icon and all tag-elements
+    var $focusTargets = TagBar.findFocusableTagElements(this.fieldAdapter.$container());
+    var numTargets = $focusTargets.length;
+    if (numTargets === 0) {
+      return;
+    }
+
+    // check which element has the focus
+    var focusIndex = UNDEFINED;
+    $focusTargets.each(function(index) {
+      var $element = $(this);
+      if ($element.hasClass('focused')) {
+        focusIndex = index;
+      }
+    });
+
+    if (focusIndex === UNDEFINED) {
+      // no tag-elements focused currently
+      if (direction === -1) {
+        focusIndex = numTargets - 1;
+      }
     } else {
-      TagBar.unfocusTagElement($focusTargets.eq(focusIndex));
-      focusIndex = nextFocusIndex;
+      var nextFocusIndex = focusIndex + direction;
+      if (nextFocusIndex >= numTargets) {
+        focusIndex = INPUT;
+      } else if (nextFocusIndex < 0) {
+        focusIndex = UNDEFINED;
+      } else {
+        TagBar.unfocusTagElement($focusTargets.eq(focusIndex));
+        focusIndex = nextFocusIndex;
+      }
+    }
+
+    if (focusIndex === UNDEFINED) {
+      // leave focus untouched
+    } else if (focusIndex === INPUT) {
+      this.fieldAdapter.focus();
+    } else {
+      TagBar.focusTagElement($focusTargets.eq(focusIndex));
     }
   }
-
-  if (focusIndex === UNDEFINED) {
-    // leave focus untouched
-  } else if (focusIndex === INPUT) {
-    this.fieldAdapter.focus();
-  } else {
-    TagBar.focusTagElement($focusTargets.eq(focusIndex));
-  }
-}
 }

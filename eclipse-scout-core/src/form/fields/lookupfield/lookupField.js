@@ -11,7 +11,6 @@
 import {scout} from '../../../index';
 
 
-
 /**
  * Creates a table-row for the given lookup-row.
  *

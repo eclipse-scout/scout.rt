@@ -13,20 +13,20 @@ import {keys} from '../index';
 
 export default class CopyKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.C];
-  this.ctrl = true;
-  this.preventDefault = false;
-  this.renderingHints.render = true;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return field.$container;
-  };
-}
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.C];
+    this.ctrl = true;
+    this.preventDefault = false;
+    this.renderingHints.render = true;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return field.$container;
+    };
+  }
 
 
-handle(event) {
-  this.field.copy();
-}
+  handle(event) {
+    this.field.copy();
+  }
 }

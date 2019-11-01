@@ -14,107 +14,107 @@ import {App} from '../index';
 let instance;
 export default class ResponsiveManager {
 
-constructor() {
-  this.active = true;
-  this.globalState = null;
+  constructor() {
+    this.active = true;
+    this.globalState = null;
 
-  this._responsiveHandlers = [];
-}
-
-static ResponsiveState = {
-  NORMAL: 'normal',
-  CONDENSED: 'condensed',
-  COMPACT: 'compact'
-};
-
-init() {};
-
-destroy() {
-  this._responsiveHandlers.forEach(function(handler) {
-    handler.destroy();
-  }.bind(this));
-}
-
-/**
- * Sets the responsive manager to active or inactive globally. Default is active.
- */
-setActive(active) {
-  this.active = active;
-}
-
-/**
- * Set a global responsive state. This state will always be set. Resizing will no longer result in a different responsive state.
- *
- * @param {string} responsive state (ResponsiveManager.ResponsiveState)
- */
-setGlobalState(globalState) {
-  this.globalState = globalState;
-}
-
-/**
- * Checks if the form is smaller than the preferred width of the form. If this is reached, the fields will
- * be transformed to ensure better readability.
- */
-handleResponsive(target, width) {
-  if (!this.active) {
-    return false;
+    this._responsiveHandlers = [];
   }
 
-  if (!target.responsiveHandler || !target.responsiveHandler.active()) {
-    return false;
+  static ResponsiveState = {
+    NORMAL: 'normal',
+    CONDENSED: 'condensed',
+    COMPACT: 'compact'
+  };
+
+  init() {
+  };
+
+  destroy() {
+    this._responsiveHandlers.forEach(function(handler) {
+      handler.destroy();
+    }.bind(this));
   }
 
-  var newState;
-  var state = target.responsiveHandler.state;
-  if (this.globalState) {
-    newState = this.globalState;
-  } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.COMPACT)) {
-    newState = ResponsiveManager.ResponsiveState.COMPACT;
-  } else {
-    if (state === ResponsiveManager.ResponsiveState.COMPACT) {
-      target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.CONDENSED);
+  /**
+   * Sets the responsive manager to active or inactive globally. Default is active.
+   */
+  setActive(active) {
+    this.active = active;
+  }
+
+  /**
+   * Set a global responsive state. This state will always be set. Resizing will no longer result in a different responsive state.
+   *
+   * @param {string} responsive state (ResponsiveManager.ResponsiveState)
+   */
+  setGlobalState(globalState) {
+    this.globalState = globalState;
+  }
+
+  /**
+   * Checks if the form is smaller than the preferred width of the form. If this is reached, the fields will
+   * be transformed to ensure better readability.
+   */
+  handleResponsive(target, width) {
+    if (!this.active) {
+      return false;
     }
-    if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.CONDENSED)) {
-      newState = ResponsiveManager.ResponsiveState.CONDENSED;
+
+    if (!target.responsiveHandler || !target.responsiveHandler.active()) {
+      return false;
+    }
+
+    var newState;
+    var state = target.responsiveHandler.state;
+    if (this.globalState) {
+      newState = this.globalState;
+    } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.COMPACT)) {
+      newState = ResponsiveManager.ResponsiveState.COMPACT;
     } else {
-      newState = ResponsiveManager.ResponsiveState.NORMAL;
+      if (state === ResponsiveManager.ResponsiveState.COMPACT) {
+        target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.CONDENSED);
+      }
+      if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.CONDENSED)) {
+        newState = ResponsiveManager.ResponsiveState.CONDENSED;
+      } else {
+        newState = ResponsiveManager.ResponsiveState.NORMAL;
+      }
+    }
+
+    return target.responsiveHandler.transform(newState);
+  }
+
+  reset(target, force) {
+    if (!this.active) {
+      return;
+    }
+
+    if ((!target.responsiveHandler || !target.responsiveHandler.active()) && !force) {
+      return false;
+    }
+
+    target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.NORMAL, force);
+  }
+
+  registerHandler(target, handler) {
+    if (target.responsiveHandler) {
+      target.responsiveHandler.destroy();
+    }
+    target.responsiveHandler = handler;
+  }
+
+  unregisterHandler(target) {
+    if (target.responsiveHandler) {
+      target.responsiveHandler.destroy();
+      target.responsiveHandler = null;
     }
   }
 
-  return target.responsiveHandler.transform(newState);
-}
-
-reset(target, force) {
-  if (!this.active) {
-    return;
-  }
-
-  if ((!target.responsiveHandler || !target.responsiveHandler.active()) && !force) {
-    return false;
-  }
-
-  target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.NORMAL, force);
-}
-
-registerHandler(target, handler) {
-  if (target.responsiveHandler) {
-    target.responsiveHandler.destroy();
-  }
-  target.responsiveHandler = handler;
-}
-
-unregisterHandler(target) {
-  if (target.responsiveHandler) {
-    target.responsiveHandler.destroy();
-    target.responsiveHandler = null;
+  static get() {
+    return instance;
   }
 }
-
-static get() {
-  return instance;
-}
-}
-
 
 
 App.addListener('prepare', function() {

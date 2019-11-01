@@ -14,56 +14,57 @@ import {scout} from '../index';
 
 export default class DatePickerTouchPopup extends TouchPopup {
 
-constructor() {
-  super();
-}
-
-
-_init(options) {
-  super._init( options);
-  this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
-}
-
-/**
- * @override TouchPopup.js
- */
-_initWidget(options) {
-  this._widget = scout.create('DatePicker', {
-    parent: this,
-    dateFormat: options.dateFormat,
-    allowedDates: options.allowedDates
-  });
-}
-_render() {
-  super._render();
-  this._field.$container.addClass('date');
-}
-
-_onMouseDownOutside() {
-  this._acceptInput();
-}
-
-/**
- * @implements DatePickerPopup
- */
-getDatePicker() {
-  return this._widget;
-}
-
-/**
- * @override
- */
-_createLayout() {
-  return new DatePickerTouchPopupLayout(this);
-}
-
-_onFieldAcceptInput(event) {
-  // Delegate to original field
-  this._touchField.setDisplayText(event.displayText);
-  this._touchField.setErrorStatus(event.errorStatus);
-  if (!event.errorStatus) {
-    this._touchField.setValue(event.value);
+  constructor() {
+    super();
   }
-  this._touchField._triggerAcceptInput();
-}
+
+
+  _init(options) {
+    super._init(options);
+    this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
+  }
+
+  /**
+   * @override TouchPopup.js
+   */
+  _initWidget(options) {
+    this._widget = scout.create('DatePicker', {
+      parent: this,
+      dateFormat: options.dateFormat,
+      allowedDates: options.allowedDates
+    });
+  }
+
+  _render() {
+    super._render();
+    this._field.$container.addClass('date');
+  }
+
+  _onMouseDownOutside() {
+    this._acceptInput();
+  }
+
+  /**
+   * @implements DatePickerPopup
+   */
+  getDatePicker() {
+    return this._widget;
+  }
+
+  /**
+   * @override
+   */
+  _createLayout() {
+    return new DatePickerTouchPopupLayout(this);
+  }
+
+  _onFieldAcceptInput(event) {
+    // Delegate to original field
+    this._touchField.setDisplayText(event.displayText);
+    this._touchField.setErrorStatus(event.errorStatus);
+    if (!event.errorStatus) {
+      this._touchField.setValue(event.value);
+    }
+    this._touchField._triggerAcceptInput();
+  }
 }

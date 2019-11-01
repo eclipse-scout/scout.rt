@@ -12,31 +12,31 @@ import {FlexboxLayoutData} from '../../../index';
 
 export default class BenchRowLayoutData extends FlexboxLayoutData {
 
-constructor(model) {
-  super( model);
-  this._ensureRows();
-}
+  constructor(model) {
+    super(model);
+    this._ensureRows();
+  }
 
 
-_prepare() {
-  super._prepare();
-  this.rows = [null, null, null];
-}
+  _prepare() {
+    super._prepare();
+    this.rows = [null, null, null];
+  }
 
-getRows() {
-  return this.rows;
-}
+  getRows() {
+    return this.rows;
+  }
 
-_ensureRows() {
-  this.rows = this.rows.map(function(row, i) {
-    return new FlexboxLayoutData(row).withOrder(i * 2);
-  });
-}
+  _ensureRows() {
+    this.rows = this.rows.map(function(row, i) {
+      return new FlexboxLayoutData(row).withOrder(i * 2);
+    });
+  }
 
-updateVisibilities(rows) {
-  rows.forEach(function(row, index) {
-    this.rows[index].visible = row.rendered;
+  updateVisibilities(rows) {
+    rows.forEach(function(row, index) {
+      this.rows[index].visible = row.rendered;
 
-  }.bind(this));
-}
+    }.bind(this));
+  }
 }

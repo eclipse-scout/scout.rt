@@ -13,19 +13,19 @@ import {keys} from '../../index';
 
 export default class TableControlCloseKeyStroke extends KeyStroke {
 
-constructor(tableControl) {
-  super();
-  this.field = tableControl;
-  this.which = [keys.ESC];
-  this.stopPropagation = true;
-  this.renderingHints.render = false;
-}
+  constructor(tableControl) {
+    super();
+    this.field = tableControl;
+    this.which = [keys.ESC];
+    this.stopPropagation = true;
+    this.renderingHints.render = false;
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.toggle();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.toggle();
+  }
 }

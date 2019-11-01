@@ -12,8 +12,8 @@ import {ActionAdapter} from '../../index';
 
 export default class ViewButtonAdapter extends ActionAdapter {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 }

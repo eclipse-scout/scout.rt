@@ -16,45 +16,45 @@ import * as $ from 'jquery';
 
 export default class LogoutBox extends Box {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-init(opts) {
-  var defaultOpts = {
-    loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
-    logoUrl: 'logo.png'
-  };
-  this.options = $.extend({}, defaultOpts, opts);
-  var defaultTexts = {
-    'ui.LogoutSuccessful': 'Good bye!',
-    'ui.LoginAgain': 'Login again'
-  };
-  this.options.texts = $.extend({}, defaultTexts, opts.texts);
+  init(opts) {
+    var defaultOpts = {
+      loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
+      logoUrl: 'logo.png'
+    };
+    this.options = $.extend({}, defaultOpts, opts);
+    var defaultTexts = {
+      'ui.LogoutSuccessful': 'Good bye!',
+      'ui.LoginAgain': 'Login again'
+    };
+    this.options.texts = $.extend({}, defaultTexts, opts.texts);
 
-  this.texts = new TextMap(this.options.texts);
-  this.loginUrl = this.options.loginUrl;
-  this.logoUrl = this.options.logoUrl;
-}
+    this.texts = new TextMap(this.options.texts);
+    this.loginUrl = this.options.loginUrl;
+    this.logoUrl = this.options.logoUrl;
+  }
 
-_render() {
-  super._render();
+  _render() {
+    super._render();
 
-  this.$content.addClass('small centered')
-    .appendDiv().html(strings.nl2br(this.texts.get('ui.LogoutSuccessful')));
+    this.$content.addClass('small centered')
+      .appendDiv().html(strings.nl2br(this.texts.get('ui.LogoutSuccessful')));
 
-  this.$buttonBar = $('<div>')
-    .addClass('button-bar')
-    .appendTo(this.$content);
-  $('<button>')
-    .addClass('button')
-    .text(this.texts.get('ui.LoginAgain'))
-    .on('click', this._loginAgain.bind(this))
-    .appendTo(this.$buttonBar);
-}
+    this.$buttonBar = $('<div>')
+      .addClass('button-bar')
+      .appendTo(this.$content);
+    $('<button>')
+      .addClass('button')
+      .text(this.texts.get('ui.LoginAgain'))
+      .on('click', this._loginAgain.bind(this))
+      .appendTo(this.$buttonBar);
+  }
 
-_loginAgain() {
-  window.location = this.loginUrl;
-}
+  _loginAgain() {
+    window.location = this.loginUrl;
+  }
 }

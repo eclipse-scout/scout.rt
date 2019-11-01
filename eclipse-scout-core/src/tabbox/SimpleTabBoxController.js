@@ -24,128 +24,128 @@ import {scout} from '../index';
  */
 export default class SimpleTabBoxController {
 
-constructor(tabBox, tabArea) {
-  this.tabBox = null;
-  this._viewAddHandler = this._onViewAdd.bind(this);
-  this._viewRemoveHandler = this._onViewRemove.bind(this);
-  this._viewActivateHandler = this._onViewActivate.bind(this);
-  this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
+  constructor(tabBox, tabArea) {
+    this.tabBox = null;
+    this._viewAddHandler = this._onViewAdd.bind(this);
+    this._viewRemoveHandler = this._onViewRemove.bind(this);
+    this._viewActivateHandler = this._onViewActivate.bind(this);
+    this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
-  this.tabArea = null;
-  this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
-}
-
-init(model) {
-  $.extend(this, model);
-}
-
-install(tabBox, tabArea) {
-  this.tabBox = scout.assertParameter('tabBox', tabBox);
-  this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
-
-  this._installListeners();
-}
-
-uninstall() {
-  this._uninstallListeners();
-}
-
-_installListeners() {
-  this.tabBox.on('viewAdd', this._viewAddHandler);
-  this.tabBox.on('viewRemove', this._viewRemoveHandler);
-  this.tabBox.on('viewActivate', this._viewActivateHandler);
-  this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
-
-  this.tabArea.on('tabSelect', this._viewTabSelectHandler);
-}
-
-_uninstallListeners() {
-  this.tabBox.off('viewAdd', this._viewAddHandler);
-  this.tabBox.off('viewRemove', this._viewRemoveHandler);
-  this.tabBox.off('viewActivate', this._viewActivateHandler);
-  this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
-
-  this.tabArea.off('tabSelect', this._viewTabSelectHandler);
-}
-
-_onViewAdd(event) {
-  var view = event.view,
-    siblingView = event.siblingView,
-    viewTab,
-    // the sibling to insert the tab after.
-    siblingViewTab;
-
-  if (!SimpleTabBoxController.hasViewTab(view)) {
-    return;
+    this.tabArea = null;
+    this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
   }
-  viewTab = this._getTab(view);
-  if (!viewTab) {
-    siblingViewTab = this._getTab(siblingView);
-    viewTab = this._createTab(view);
-    this.tabArea.addTab(viewTab, siblingViewTab);
+
+  init(model) {
+    $.extend(this, model);
   }
-}
 
-_onViewRemove(event) {
-  var view = event.view;
-  if (!view) {
-    return;
+  install(tabBox, tabArea) {
+    this.tabBox = scout.assertParameter('tabBox', tabBox);
+    this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
+
+    this._installListeners();
   }
-  var viewTab = this._getTab(view);
-  if (viewTab) {
-    this.tabArea.destroyTab(viewTab);
+
+  uninstall() {
+    this._uninstallListeners();
   }
-}
 
-_onViewActivate(event) {
-  var viewTab = this._getTab(event.view);
-  // also reset selection if no view tab of the view is found.
-  this.tabArea.selectTab(viewTab);
-}
+  _installListeners() {
+    this.tabBox.on('viewAdd', this._viewAddHandler);
+    this.tabBox.on('viewRemove', this._viewRemoveHandler);
+    this.tabBox.on('viewActivate', this._viewActivateHandler);
+    this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
 
-_onViewDeactivate(event) {
-  var viewTab = this._getTab(event.view);
-  // also reset selection if no view tab of the view is found.
-  this.tabArea.deselectTab(viewTab);
-}
-
-_onViewTabSelect(event) {
-  if (!event.viewTab) {
-    return;
+    this.tabArea.on('tabSelect', this._viewTabSelectHandler);
   }
-  var view = event.viewTab.view;
-  this.tabBox.activateView(view);
-}
 
-_createTab(view) {
-  return scout.create('SimpleTab', {
-    parent: this.tabArea,
-    view: view
-  });
-}
+  _uninstallListeners() {
+    this.tabBox.off('viewAdd', this._viewAddHandler);
+    this.tabBox.off('viewRemove', this._viewRemoveHandler);
+    this.tabBox.off('viewActivate', this._viewActivateHandler);
+    this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
 
-_getTab(view) {
-  if (!view) {
-    return;
+    this.tabArea.off('tabSelect', this._viewTabSelectHandler);
   }
-  var viewTab = null;
-  this.tabArea.getTabs().some(function(tab) {
-    if (tab.view === view) {
-      viewTab = tab;
-      return true;
+
+  _onViewAdd(event) {
+    var view = event.view,
+      siblingView = event.siblingView,
+      viewTab,
+      // the sibling to insert the tab after.
+      siblingViewTab;
+
+    if (!SimpleTabBoxController.hasViewTab(view)) {
+      return;
     }
-    return false;
-  });
-  return viewTab;
-}
+    viewTab = this._getTab(view);
+    if (!viewTab) {
+      siblingViewTab = this._getTab(siblingView);
+      viewTab = this._createTab(view);
+      this.tabArea.addTab(viewTab, siblingViewTab);
+    }
+  }
 
-getTabs() {
-  return this.tabArea.getTabs();
-}
+  _onViewRemove(event) {
+    var view = event.view;
+    if (!view) {
+      return;
+    }
+    var viewTab = this._getTab(view);
+    if (viewTab) {
+      this.tabArea.destroyTab(viewTab);
+    }
+  }
 
-/* ----- static functions ----- */
+  _onViewActivate(event) {
+    var viewTab = this._getTab(event.view);
+    // also reset selection if no view tab of the view is found.
+    this.tabArea.selectTab(viewTab);
+  }
 
-static hasViewTab(view) {
-  return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
-}
+  _onViewDeactivate(event) {
+    var viewTab = this._getTab(event.view);
+    // also reset selection if no view tab of the view is found.
+    this.tabArea.deselectTab(viewTab);
+  }
+
+  _onViewTabSelect(event) {
+    if (!event.viewTab) {
+      return;
+    }
+    var view = event.viewTab.view;
+    this.tabBox.activateView(view);
+  }
+
+  _createTab(view) {
+    return scout.create('SimpleTab', {
+      parent: this.tabArea,
+      view: view
+    });
+  }
+
+  _getTab(view) {
+    if (!view) {
+      return;
+    }
+    var viewTab = null;
+    this.tabArea.getTabs().some(function(tab) {
+      if (tab.view === view) {
+        viewTab = tab;
+        return true;
+      }
+      return false;
+    });
+    return viewTab;
+  }
+
+  getTabs() {
+    return this.tabArea.getTabs();
+  }
+
+  /* ----- static functions ----- */
+
+  static hasViewTab(view) {
+    return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
+  }
 }

@@ -16,14 +16,14 @@ import {LogicalGrid} from '../index';
  */
 export default class FormGrid extends LogicalGrid {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_validate(form) {
-  // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
-  // Grid.w is not relevant for the form, no need to pass a gridColumnCount
-  form.rootGroupBox.gridData = GridData.createFromHints(form.rootGroupBox);
-}
+  _validate(form) {
+    // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
+    // Grid.w is not relevant for the form, no need to pass a gridColumnCount
+    form.rootGroupBox.gridData = GridData.createFromHints(form.rootGroupBox);
+  }
 }

@@ -13,13 +13,13 @@ import {scrollbars} from '../../../index';
 
 export default class ImageFieldLayout extends FormFieldLayout {
 
-constructor(imageField) {
-  super( imageField);
-}
+  constructor(imageField) {
+    super(imageField);
+  }
 
 
-layout($container) {
-  super.layout( $container);
-  scrollbars.update(this.formField.$fieldContainer);
-}
+  layout($container) {
+    super.layout($container);
+    scrollbars.update(this.formField.$fieldContainer);
+  }
 }

@@ -12,30 +12,30 @@ import {Tooltip} from '../index';
 
 export default class TableInfoLoadTooltip extends Tooltip {
 
-constructor() {
-  super();
-}
+  constructor() {
+    super();
+  }
 
 
-_init(options) {
-  super._init( options);
+  _init(options) {
+    super._init(options);
 
-  this.tableFooter = options.tableFooter;
-}
+    this.tableFooter = options.tableFooter;
+  }
 
-_renderText() {
-  var table = this.tableFooter.table,
-    numRows = table.rows.length;
+  _renderText() {
+    var table = this.tableFooter.table,
+      numRows = table.rows.length;
 
-  this.$content.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.tableFooter.computeCountInfo(numRows)));
-  this.$content.appendBr();
-  this.$content.appendSpan('link')
-    .text(this.session.text('ui.ReloadData'))
-    .on('click', this._onReloadClick.bind(this));
-}
+    this.$content.appendSpan().text(this.session.text('ui.NumRowsLoaded', this.tableFooter.computeCountInfo(numRows)));
+    this.$content.appendBr();
+    this.$content.appendSpan('link')
+      .text(this.session.text('ui.ReloadData'))
+      .on('click', this._onReloadClick.bind(this));
+  }
 
-_onReloadClick() {
-  this.tableFooter.table.reload();
-  this.destroy();
-}
+  _onReloadClick() {
+    this.tableFooter.table.reload();
+    this.destroy();
+  }
 }

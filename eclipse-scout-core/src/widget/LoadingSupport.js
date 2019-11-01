@@ -20,83 +20,83 @@ import {scout} from '../index';
  */
 export default class LoadingSupport {
 
-constructor(options) {
-  scout.assertParameter('widget', options.widget);
+  constructor(options) {
+    scout.assertParameter('widget', options.widget);
 
-  this.widget = options.widget;
-  this.options$Container = options.$container;
-  this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
+    this.widget = options.widget;
+    this.options$Container = options.$container;
+    this.loadingIndicatorDelay = scout.nvl(options.loadingIndicatorDelay, 250); // ms
 
-  this._$loadingIndicator = null;
-  this._loadingIndicatorTimeoutId = null;
-}
-
-setLoadingIndicatorDelay(loadingIndicatorDelay) {
-  this.loadingIndicatorDelay = loadingIndicatorDelay;
-}
-
-_ensure$Container() {
-  if (objects.isFunction(this.options$Container)) {
-    // resolve function provided by options.$container that returns a jQuery element
-    this.$container = this.options$Container();
-  } else if (this.options$Container) {
-    // use jQuery element provided by options.$container
-    this.$container = this.options$Container;
-  } else {
-    // default: when no options.$container is not set, use jQuery element of widget
-    this.$container = this.widget.$container;
+    this._$loadingIndicator = null;
+    this._loadingIndicatorTimeoutId = null;
   }
-}
 
-renderLoading() {
-  // Clear any pending loading function
-  clearTimeout(this._loadingIndicatorTimeoutId);
-  this._ensure$Container();
+  setLoadingIndicatorDelay(loadingIndicatorDelay) {
+    this.loadingIndicatorDelay = loadingIndicatorDelay;
+  }
 
-  if (this.widget.isLoading()) {
-    // add loading indicator
-    if (this.loadingIndicatorDelay && !this.widget.rendering) {
-      this._loadingIndicatorTimeoutId = setTimeout(
-        this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
+  _ensure$Container() {
+    if (objects.isFunction(this.options$Container)) {
+      // resolve function provided by options.$container that returns a jQuery element
+      this.$container = this.options$Container();
+    } else if (this.options$Container) {
+      // use jQuery element provided by options.$container
+      this.$container = this.options$Container;
     } else {
-      this._renderLoadingIndicator();
+      // default: when no options.$container is not set, use jQuery element of widget
+      this.$container = this.widget.$container;
     }
-  } else {
-    // remove loading indicator
-    this._removeLoadingIndicator();
-  }
-}
-
-_renderLoadingIndicator() {
-  if (this._$loadingIndicator || !this.widget.rendered && !this.widget.rendering) {
-    return;
   }
 
-  // Hide widget content
-  this.$container.addClass('loading');
-  // Create loading indicator
-  this._$loadingIndicator = this.$container.appendDiv('loading-indicator');
-}
+  renderLoading() {
+    // Clear any pending loading function
+    clearTimeout(this._loadingIndicatorTimeoutId);
+    this._ensure$Container();
 
-_removeLoadingIndicator() {
-  if (!this._$loadingIndicator) {
-    return;
-  }
-
-  this._$loadingIndicator.fadeOutAndRemove(function() {
-    this._$loadingIndicator = null;
-    if (this.widget.rendered) {
-      // Show widget's content (layout if necessary)
-      this.$container.removeClass('loading');
-      this.widget.invalidateLayoutTree();
+    if (this.widget.isLoading()) {
+      // add loading indicator
+      if (this.loadingIndicatorDelay && !this.widget.rendering) {
+        this._loadingIndicatorTimeoutId = setTimeout(
+          this._renderLoadingIndicator.bind(this), this.loadingIndicatorDelay);
+      } else {
+        this._renderLoadingIndicator();
+      }
+    } else {
+      // remove loading indicator
+      this._removeLoadingIndicator();
     }
-  }.bind(this));
-}
-
-remove() {
-  if (this._$loadingIndicator) {
-    this._$loadingIndicator.remove();
-    this._$loadingIndicator = null;
   }
-}
+
+  _renderLoadingIndicator() {
+    if (this._$loadingIndicator || !this.widget.rendered && !this.widget.rendering) {
+      return;
+    }
+
+    // Hide widget content
+    this.$container.addClass('loading');
+    // Create loading indicator
+    this._$loadingIndicator = this.$container.appendDiv('loading-indicator');
+  }
+
+  _removeLoadingIndicator() {
+    if (!this._$loadingIndicator) {
+      return;
+    }
+
+    this._$loadingIndicator.fadeOutAndRemove(function() {
+      this._$loadingIndicator = null;
+      if (this.widget.rendered) {
+        // Show widget's content (layout if necessary)
+        this.$container.removeClass('loading');
+        this.widget.invalidateLayoutTree();
+      }
+    }.bind(this));
+  }
+
+  remove() {
+    if (this._$loadingIndicator) {
+      this._$loadingIndicator.remove();
+      this._$loadingIndicator = null;
+    }
+  }
 }

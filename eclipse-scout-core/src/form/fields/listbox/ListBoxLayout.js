@@ -12,9 +12,9 @@ import {LookupBoxLayout} from '../../../index';
 
 export default class ListBoxLayout extends LookupBoxLayout {
 
-constructor(listBox, table, filterBox) {
-  super( listBox, table, filterBox);
-}
+  constructor(listBox, table, filterBox) {
+    super(listBox, table, filterBox);
+  }
 
 
 }

@@ -20,188 +20,188 @@ import * as $ from 'jquery';
  */
 export default class PageWithTable extends Page {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.nodeType = Page.NodeType.TABLE;
-  this.alwaysCreateChildPage = false;
-}
-
-
-/**
- * @override Page
- */
-_initTable(table) {
-  super._initTable( table);
-  table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
-  table.on('rowsInserted', this._onTableRowsInserted.bind(this));
-  table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
-  table.on('rowAction', this._onTableRowAction.bind(this));
-  table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
-  table.on('reload', this.loadTableData.bind(this));
-  table.hasReloadHandler = true;
-}
-
-_onTableRowsDeleted(event) {
-  if (this.leaf) { // when page is a leaf we do nothing at all
-    return;
-  }
-  var rows = arrays.ensure(event.rows),
-    childPages = rows.map(function(row) {
-      var childPage = row.page;
-      childPage.unlinkWithRow(row);
-      return childPage;
-    }, this);
-
-  this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
-}
-
-/**
- * We must set childNodeIndex on each created childPage because it is required to
- * determine the order of nodes in the tree.
- */
-_onTableRowsInserted(event) {
-  if (this.leaf) { // when page is a leaf we do nothing at all
-    return;
+    this.nodeType = Page.NodeType.TABLE;
+    this.alwaysCreateChildPage = false;
   }
 
-  var rows = arrays.ensure(event.rows),
-    childPages = rows.map(function(row) {
-      return this._createChildPageInternal(row);
-    }, this);
 
-  this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
-}
-
-_onTableRowsUpdated(event) {
-  this.getOutline().mediator.onTableRowsUpdated(event, this);
-}
-
-_onTableRowAction(event) {
-  this.getOutline().mediator.onTableRowAction(event, this);
-}
-
-_onTableRowOrderChanged(event) {
-  if (event.animating) { // do nothing while row order animation is in progress
-    return;
+  /**
+   * @override Page
+   */
+  _initTable(table) {
+    super._initTable(table);
+    table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
+    table.on('rowsInserted', this._onTableRowsInserted.bind(this));
+    table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
+    table.on('rowAction', this._onTableRowAction.bind(this));
+    table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
+    table.on('reload', this.loadTableData.bind(this));
+    table.hasReloadHandler = true;
   }
-  this.getOutline().mediator.onTableRowOrderChanged(event, this);
-}
 
-_createChildPageInternal(row) {
-  var childPage = this.createChildPage(row);
-  if (childPage === null && this.alwaysCreateChildPage) {
-    childPage = this.createDefaultChildPage(row);
+  _onTableRowsDeleted(event) {
+    if (this.leaf) { // when page is a leaf we do nothing at all
+      return;
+    }
+    var rows = arrays.ensure(event.rows),
+      childPages = rows.map(function(row) {
+        var childPage = row.page;
+        childPage.unlinkWithRow(row);
+        return childPage;
+      }, this);
+
+    this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
   }
-  childPage.linkWithRow(row);
-  childPage = childPage.updatePageFromTableRow(row);
-  return childPage;
-}
 
-/**
- * Override this method to return a specific Page instance for the given table-row.
- * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
- */
-createChildPage(row) {
-  return null;
-}
+  /**
+   * We must set childNodeIndex on each created childPage because it is required to
+   * determine the order of nodes in the tree.
+   */
+  _onTableRowsInserted(event) {
+    if (this.leaf) { // when page is a leaf we do nothing at all
+      return;
+    }
 
-createDefaultChildPage(row) {
-  return scout.create('AutoLeafPageWithNodes', {
-    parent: this.getOutline(),
-    row: row
-  });
-}
+    var rows = arrays.ensure(event.rows),
+      childPages = rows.map(function(row) {
+        return this._createChildPageInternal(row);
+      }, this);
 
-/**
- * @override TreeNode.js
- */
-loadChildren() {
-  // It's allowed to have no table - but we don't have to load data in that case
-  if (!this.detailTable) {
+    this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
+  }
+
+  _onTableRowsUpdated(event) {
+    this.getOutline().mediator.onTableRowsUpdated(event, this);
+  }
+
+  _onTableRowAction(event) {
+    this.getOutline().mediator.onTableRowAction(event, this);
+  }
+
+  _onTableRowOrderChanged(event) {
+    if (event.animating) { // do nothing while row order animation is in progress
+      return;
+    }
+    this.getOutline().mediator.onTableRowOrderChanged(event, this);
+  }
+
+  _createChildPageInternal(row) {
+    var childPage = this.createChildPage(row);
+    if (childPage === null && this.alwaysCreateChildPage) {
+      childPage = this.createDefaultChildPage(row);
+    }
+    childPage.linkWithRow(row);
+    childPage = childPage.updatePageFromTableRow(row);
+    return childPage;
+  }
+
+  /**
+   * Override this method to return a specific Page instance for the given table-row.
+   * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
+   */
+  createChildPage(row) {
+    return null;
+  }
+
+  createDefaultChildPage(row) {
+    return scout.create('AutoLeafPageWithNodes', {
+      parent: this.getOutline(),
+      row: row
+    });
+  }
+
+  /**
+   * @override TreeNode.js
+   */
+  loadChildren() {
+    // It's allowed to have no table - but we don't have to load data in that case
+    if (!this.detailTable) {
+      return $.resolvedDeferred();
+    }
+    return this.loadTableData();
+  }
+
+  _createSearchFilter() {
+    var firstFormTableControl = arrays.find(this.detailTable.tableControls, function(tableControl) {
+      return tableControl.form;
+    });
+    if (firstFormTableControl) {
+      return firstFormTableControl.form.exportData();
+    }
+    return null;
+  }
+
+  /**
+   * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
+   * @returns {$.Deferred}
+   */
+  loadTableData() {
+    this.detailTable.deleteAllRows();
+    this.detailTable.setLoading(true);
+    return this._loadTableData(this._createSearchFilter())
+      .then(this._onLoadTableDataDone.bind(this))
+      .catch(this._onLoadTableDataFail.bind(this))
+      .then(this._onLoadTableDataAlways.bind(this));
+  }
+
+  /**
+   * Override this method to load table data (rows to be added to table).
+   * This is an asynchronous operation working with a Deferred. When table data load is successful
+   * <code>_onLoadTableDataDone(data)</code> will be called. When a failure occurs while loading table
+   * data <code>_onLoadTableDataFail(data)</code> will be called.
+   * <p>
+   * When you want to return static data you still need a deferred. But you can resolve it
+   * immediately. Example code:
+   * <code>
+   *   var deferred = $.Deferred();
+   *   deferred.resolve([{...},{...}]);
+   *   return deferred;
+   * </code>
+   *
+   * @param searchFilter The search filter as exported by the search form or null.
+   *
+   * @return {$.Deferred}
+   */
+  _loadTableData(searchFilter) {
     return $.resolvedDeferred();
   }
-  return this.loadTableData();
-}
 
-_createSearchFilter() {
-  var firstFormTableControl = arrays.find(this.detailTable.tableControls, function(tableControl) {
-    return tableControl.form;
-  });
-  if (firstFormTableControl) {
-    return firstFormTableControl.form.exportData();
+  /**
+   * This method is called when table data load is successful. It should transform the table data
+   * object to table rows.
+   *
+   * @param tableData data loaded by <code>_loadTableData</code>
+   */
+  _onLoadTableDataDone(tableData) {
+    var rows = this._transformTableDataToTableRows(tableData);
+    if (rows && rows.length > 0) {
+      this.detailTable.insertRows(rows);
+    }
   }
-  return null;
-}
 
-/**
- * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
- * @returns {$.Deferred}
- */
-loadTableData() {
-  this.detailTable.deleteAllRows();
-  this.detailTable.setLoading(true);
-  return this._loadTableData(this._createSearchFilter())
-    .then(this._onLoadTableDataDone.bind(this))
-    .catch(this._onLoadTableDataFail.bind(this))
-    .then(this._onLoadTableDataAlways.bind(this));
-}
-
-/**
- * Override this method to load table data (rows to be added to table).
- * This is an asynchronous operation working with a Deferred. When table data load is successful
- * <code>_onLoadTableDataDone(data)</code> will be called. When a failure occurs while loading table
- * data <code>_onLoadTableDataFail(data)</code> will be called.
- * <p>
- * When you want to return static data you still need a deferred. But you can resolve it
- * immediately. Example code:
- * <code>
- *   var deferred = $.Deferred();
- *   deferred.resolve([{...},{...}]);
- *   return deferred;
- * </code>
- *
- * @param searchFilter The search filter as exported by the search form or null.
- *
- * @return {$.Deferred}
- */
-_loadTableData(searchFilter) {
-  return $.resolvedDeferred();
-}
-
-/**
- * This method is called when table data load is successful. It should transform the table data
- * object to table rows.
- *
- * @param tableData data loaded by <code>_loadTableData</code>
- */
-_onLoadTableDataDone(tableData) {
-  var rows = this._transformTableDataToTableRows(tableData);
-  if (rows && rows.length > 0) {
-    this.detailTable.insertRows(rows);
+  _onLoadTableDataFail(error) {
+    this.detailTable.setTableStatus(Status.error({
+      message: this.session.text('ErrorWhileLoadingData')
+    }));
+    $.log.error('Failed to load tableData. error=', error);
   }
-}
 
-_onLoadTableDataFail(error) {
-  this.detailTable.setTableStatus(Status.error({
-    message: this.session.text('ErrorWhileLoadingData')
-  }));
-  $.log.error('Failed to load tableData. error=', error);
-}
+  _onLoadTableDataAlways() {
+    this.childrenLoaded = true;
+    this.detailTable.setLoading(false);
+  }
 
-_onLoadTableDataAlways() {
-  this.childrenLoaded = true;
-  this.detailTable.setLoading(false);
-}
-
-/**
- * This method converts the loaded table data, which can be any object, into table rows.
- * You must override this method unless tableData is already an array of table rows.
- *
- * @param tableData
- * @returns
- */
-_transformTableDataToTableRows(tableData) {
-  return tableData;
-}
+  /**
+   * This method converts the loaded table data, which can be any object, into table rows.
+   * You must override this method unless tableData is already an array of table rows.
+   *
+   * @param tableData
+   * @returns
+   */
+  _transformTableDataToTableRows(tableData) {
+    return tableData;
+  }
 }

@@ -14,23 +14,23 @@ import {HAlign} from '../../../index';
 
 export default class FileChooserFieldBrowseKeyStroke extends KeyStroke {
 
-constructor(field) {
-  super();
-  this.field = field;
-  this.which = [keys.SPACE];
-  this.stopPropagation = true;
+  constructor(field) {
+    super();
+    this.field = field;
+    this.which = [keys.SPACE];
+    this.stopPropagation = true;
 
-  this.renderingHints.hAlign = HAlign.LEFT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$fieldContainer;
-  }.bind(this);
-}
+    this.renderingHints.hAlign = HAlign.LEFT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$fieldContainer;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.fileInput.browse();
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.fileInput.browse();
+  }
 }

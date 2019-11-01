@@ -12,16 +12,16 @@ import {ActionKeyStroke} from '../index';
 
 export default class MenuKeyStroke extends ActionKeyStroke {
 
-constructor(action) {
-  super( action);
-}
-
-
-_isEnabled() {
-  if (this.field.excludedByFilter) {
-    return false;
-  } else {
-    return super._isEnabled();
+  constructor(action) {
+    super(action);
   }
-}
+
+
+  _isEnabled() {
+    if (this.field.excludedByFilter) {
+      return false;
+    } else {
+      return super._isEnabled();
+    }
+  }
 }

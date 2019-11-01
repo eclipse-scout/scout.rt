@@ -19,303 +19,303 @@ import * as $ from 'jquery';
 
 export default class BrowserField extends ValueField {
 
-constructor() {
-  super();
+  constructor() {
+    super();
 
-  this.autoCloseExternalWindow = false;
-  this.externalWindowButtonText = null;
-  this.externalWindowFieldText = null;
-  this.location = null;
-  this.trackLocation = false;
-  this.sandboxEnabled = true;
-  this.sandboxPermissions = null;
-  this.scrollBarEnabled = false;
-  this.showInExternalWindow = false;
-  this._messageListener = null;
-  this._popupWindow = null;
-  this._externalWindowTextField = null;
-  this._externalWindowButton = null;
-}
-
-
-static WindowStates = {
-  WINDOW_OPEN: 'true',
-  WINDOW_CLOSED: 'false'
-};
-
-_init(model) {
-  super._init( model);
-
-  this.iframe = scout.create('IFrame', {
-    parent: this,
-    location: model.location,
-    sandboxEnabled: model.sandboxEnabled,
-    sandboxPermissions: model.sandboxPermissions,
-    scrollBarEnabled: model.scrollBarEnabled,
-    trackLocation: model.trackLocation
-  });
-  this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
-}
-
-_render() {
-  this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
-  this.addLabel();
-  this.addStatus();
-
-  if (!this.showInExternalWindow) {
-    // mode 1: <iframe>
-    this.iframe.render();
-    this.addFieldContainer(this.iframe.$container);
-    this.addField(this.iframe.$iframe);
-    this.$field.on('load', this._onLoad.bind(this));
-  } else {
-    // mode 2: separate window
-    this.addField(this.$parent.makeDiv());
-    this._externalWindowTextField = this.$field.appendDiv()
-      .addClass('alt');
-    this._externalWindowButton = this.$field.appendDiv()
-      .addClass('button')
-      .on('click', this._openPopupWindow.bind(this));
+    this.autoCloseExternalWindow = false;
+    this.externalWindowButtonText = null;
+    this.externalWindowFieldText = null;
+    this.location = null;
+    this.trackLocation = false;
+    this.sandboxEnabled = true;
+    this.sandboxPermissions = null;
+    this.scrollBarEnabled = false;
+    this.showInExternalWindow = false;
+    this._messageListener = null;
+    this._popupWindow = null;
+    this._externalWindowTextField = null;
+    this._externalWindowButton = null;
   }
 
-  this.myWindow = this.$parent.window(true);
 
-  this._messageListener = this._onMessage.bind(this);
-  this.myWindow.addEventListener('message', this._messageListener);
+  static WindowStates = {
+    WINDOW_OPEN: 'true',
+    WINDOW_CLOSED: 'false'
+  };
 
-  if (this.enabledComputed) {
-    // use setTimeout to call method, because _openPopupWindow must be called after layouting
-    setTimeout(this._openPopupWindow.bind(this, true), 20);
-  }
-}
+  _init(model) {
+    super._init(model);
 
-/**
- * @override ValueField.js
- */
-_renderProperties() {
-  super._renderProperties();
-  this._renderExternalWindowButtonText();
-  this._renderExternalWindowFieldText();
-}
-
-/**
- * @override FormField.js
- */
-_remove() {
-  super._remove();
-  this.myWindow.removeEventListener('message', this._messageListener);
-  this._messageListener = null;
-
-  // if content is shown in an external window and auto close is set to true
-  if (this.showInExternalWindow && this.autoCloseExternalWindow) {
-    // try to close popup window (if it is not already closed)
-    if (this._popupWindow && !this._popupWindow.closed) {
-      this._popupWindow.close();
-    }
-  }
-}
-
-setLocation(location) {
-  this.setProperty('location', location);
-  this.iframe.setLocation(location);
-}
-
-_renderLocation() {
-  // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
-  // empty locations simply remove the src attribute but don't remove the old content.
-  var location = this.location || 'about:blank';
-  if (this.showInExternalWindow) {
-    // fallback: separate window
-    if (this._popupWindow && !this._popupWindow.closed) {
-      this._popupWindow.location = location;
-    }
-  }
-}
-
-setAutoCloseExternalWindow(autoCloseExternalWindow) {
-  this.setProperty('autoCloseExternalWindow', autoCloseExternalWindow);
-}
-
-setExternalWindowButtonText(externalWindowButtonText) {
-  this.setProperty('externalWindowButtonText', externalWindowButtonText);
-}
-
-_renderExternalWindowButtonText() {
-  if (this.showInExternalWindow) {
-    this._externalWindowButton.text(this.externalWindowButtonText || '');
-  }
-}
-
-setExternalWindowFieldText(externalWindowFieldText) {
-  this.setProperty('externalWindowFieldText', externalWindowFieldText);
-}
-
-_renderExternalWindowFieldText() {
-  if (this.showInExternalWindow) {
-    this._externalWindowTextField.text(this.externalWindowFieldText || '');
-  }
-}
-
-/**
- * Note: this function is designed to deliver good results to position a popup over a BrowserField in Internet Explorer.
- * Other browsers may not perfectly position the popup, since they return different values for screenX/screenY. Also
- * there's no way to retrieve all required values from the window or screen object, that's why we have to use hard coded
- * values here. In order to make this function more flexible you could implement it as a strategy which has different
- * browser dependent implementations.
- *
- * This implementation does also deal with a multi screen setup (secondary monitor). An earlier implementation used
- * screen.availWidth to make sure the popup is within the visible area of the screen. However, screen.availWidth only
- * returns the size of the primary monitor, so we cannot use it. There's no way to check for a secondary monitor from
- * a HTML document. So we removed the check entirely, which shouldn't be an issue since the browser itself does prevent
- * popups from having an invalid position.
- */
-_calcPopupBounds() {
-  var myWindow = this.$container.window(true);
-
-  var POPUP_WINDOW_TOP_HEIGHT = 30;
-  var POPUP_WINDOW_BOTTOM_HEIGHT = 8;
-  var POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
-
-  var BROWSER_WINDOW_TOP_HEIGHT = 55;
-
-  // Don't limit screenX/Y in any way. Coordinates can be negative (if we have a secondary monitor on the left side
-  // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
-  // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
-  // to ignore negative X coordinates somehow (but not entirely).
-  var browserBounds = new Rectangle(
-    myWindow.screenX,
-    myWindow.screenY,
-    $(myWindow).width(),
-    $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
-
-  var fieldBounds = new Rectangle(
-    this.$field.offset().left,
-    this.$field.offset().top,
-    this.$field.width(),
-    this.$field.height());
-
-  var popupX = browserBounds.x + fieldBounds.x;
-  var popupY = browserBounds.y + fieldBounds.y + BROWSER_WINDOW_TOP_HEIGHT;
-  var popupWidth = fieldBounds.width;
-  var popupHeight = fieldBounds.height + POPUP_WINDOW_CHROME_HEIGHT;
-
-  // ensure that the lower Y of the new popup is not below the lower Y of the browser window
-  var popupLowerY = popupY + popupHeight;
-  var browserLowerY = browserBounds.y + browserBounds.height;
-  if (popupLowerY > browserLowerY) {
-    popupHeight -= (popupLowerY - browserLowerY) + POPUP_WINDOW_CHROME_HEIGHT;
-  }
-
-  return new Rectangle(
-    numbers.round(popupX),
-    numbers.round(popupY),
-    numbers.round(popupWidth),
-    numbers.round(popupHeight)
-  );
-}
-
-_openPopupWindow(reopenIfClosed) {
-  reopenIfClosed = scout.nvl(reopenIfClosed, true);
-  if (!this.showInExternalWindow) {
-    return;
-  }
-
-  if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
-    var popupBlockerHandler = new PopupBlockerHandler(this.session);
-    var popupBounds = this._calcPopupBounds();
-    // (b) window specifications
-    var windowSpecs = strings.join(',',
-      'directories=no',
-      'location=no',
-      'menubar=no',
-      'resizable=yes',
-      'status=no',
-      'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
-      'toolbar=no',
-      'dependent=yes',
-      'left=' + popupBounds.x,
-      'top=' + popupBounds.y,
-      'width=' + popupBounds.width,
-      'height=' + popupBounds.height
-    );
-    var location = this.location || 'about:blank';
-    popupBlockerHandler.openWindow(location, undefined, windowSpecs, this._popupWindowOpen.bind(this));
-  } else if (reopenIfClosed) {
-    this._popupWindow.focus();
-  }
-}
-
-_popupWindowOpen(popup) {
-  this._popupWindow = popup;
-  if (this._popupWindow && !this._popupWindow.closed) {
-    this.trigger('externalWindowStateChange', {
-      windowState: BrowserField.WindowStates.WINDOW_OPEN
+    this.iframe = scout.create('IFrame', {
+      parent: this,
+      location: model.location,
+      sandboxEnabled: model.sandboxEnabled,
+      sandboxPermissions: model.sandboxPermissions,
+      scrollBarEnabled: model.scrollBarEnabled,
+      trackLocation: model.trackLocation
     });
-    var popupInterval = window.setInterval(function() {
-      var popupWindowClosed = false;
-      try {
-        popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
-      } catch (e) {
-        // for some unknown reason, IE sometimes throws a "SCRIPT16386" error while trying to read '._popupWindow.closed'.
-        $.log.isInfoEnabled() && $.log.info('Reading the property popupWindow.closed threw an error (Retry in 500ms)');
-        return;
+    this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
+  }
+
+  _render() {
+    this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
+    this.addLabel();
+    this.addStatus();
+
+    if (!this.showInExternalWindow) {
+      // mode 1: <iframe>
+      this.iframe.render();
+      this.addFieldContainer(this.iframe.$container);
+      this.addField(this.iframe.$iframe);
+      this.$field.on('load', this._onLoad.bind(this));
+    } else {
+      // mode 2: separate window
+      this.addField(this.$parent.makeDiv());
+      this._externalWindowTextField = this.$field.appendDiv()
+        .addClass('alt');
+      this._externalWindowButton = this.$field.appendDiv()
+        .addClass('button')
+        .on('click', this._openPopupWindow.bind(this));
+    }
+
+    this.myWindow = this.$parent.window(true);
+
+    this._messageListener = this._onMessage.bind(this);
+    this.myWindow.addEventListener('message', this._messageListener);
+
+    if (this.enabledComputed) {
+      // use setTimeout to call method, because _openPopupWindow must be called after layouting
+      setTimeout(this._openPopupWindow.bind(this, true), 20);
+    }
+  }
+
+  /**
+   * @override ValueField.js
+   */
+  _renderProperties() {
+    super._renderProperties();
+    this._renderExternalWindowButtonText();
+    this._renderExternalWindowFieldText();
+  }
+
+  /**
+   * @override FormField.js
+   */
+  _remove() {
+    super._remove();
+    this.myWindow.removeEventListener('message', this._messageListener);
+    this._messageListener = null;
+
+    // if content is shown in an external window and auto close is set to true
+    if (this.showInExternalWindow && this.autoCloseExternalWindow) {
+      // try to close popup window (if it is not already closed)
+      if (this._popupWindow && !this._popupWindow.closed) {
+        this._popupWindow.close();
       }
-      if (popupWindowClosed) {
-        window.clearInterval(popupInterval);
-        this.trigger('externalWindowStateChange', {
-          windowState: BrowserField.WindowStates.WINDOW_CLOSED
-        });
+    }
+  }
+
+  setLocation(location) {
+    this.setProperty('location', location);
+    this.iframe.setLocation(location);
+  }
+
+  _renderLocation() {
+    // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
+    // empty locations simply remove the src attribute but don't remove the old content.
+    var location = this.location || 'about:blank';
+    if (this.showInExternalWindow) {
+      // fallback: separate window
+      if (this._popupWindow && !this._popupWindow.closed) {
+        this._popupWindow.location = location;
       }
-    }.bind(this), 500);
-  }
-}
-
-_onMessage(event) {
-  if (event.source !== this.$field[0].contentWindow) {
-    $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
-    return;
-  }
-  $.log.isDebugEnabled() && $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
-  this.trigger('message', {
-    data: event.data,
-    origin: event.origin
-  });
-}
-
-setTrackLocationChange(trackLocation) {
-  this.setProperty('trackLocation', trackLocation);
-  this.iframe.setTrackLocationChange(trackLocation);
-}
-
-_onIFramePropertyChange(event) {
-  if (!this.trackLocation) {
-    return;
-  }
-  if (event.propertyName === 'location') {
-    this._setProperty('location', event.newValue);
-  }
-}
-
-_onLoad(event) {
-  if (!this.rendered) { // check needed, because this is an async callback
-    return;
+    }
   }
 
-  this.invalidateLayoutTree();
-}
+  setAutoCloseExternalWindow(autoCloseExternalWindow) {
+    this.setProperty('autoCloseExternalWindow', autoCloseExternalWindow);
+  }
 
-setSandboxEnabled(sandboxEnabled) {
-  this.setProperty('sandboxEnabled', sandboxEnabled);
-  this.iframe.setSandboxEnabled(sandboxEnabled);
-}
+  setExternalWindowButtonText(externalWindowButtonText) {
+    this.setProperty('externalWindowButtonText', externalWindowButtonText);
+  }
 
-setSandboxPermissions(sandboxPermissions) {
-  this.setProperty('sandboxPermissions', sandboxPermissions);
-  this.iframe.setSandboxPermissions(sandboxPermissions);
-}
+  _renderExternalWindowButtonText() {
+    if (this.showInExternalWindow) {
+      this._externalWindowButton.text(this.externalWindowButtonText || '');
+    }
+  }
 
-setScrollBarEnabled(scrollBarEnabled) {
-  this.setProperty('scrollBarEnabled', scrollBarEnabled);
-  this.iframe.setScrollBarEnabled(scrollBarEnabled);
-}
+  setExternalWindowFieldText(externalWindowFieldText) {
+    this.setProperty('externalWindowFieldText', externalWindowFieldText);
+  }
+
+  _renderExternalWindowFieldText() {
+    if (this.showInExternalWindow) {
+      this._externalWindowTextField.text(this.externalWindowFieldText || '');
+    }
+  }
+
+  /**
+   * Note: this function is designed to deliver good results to position a popup over a BrowserField in Internet Explorer.
+   * Other browsers may not perfectly position the popup, since they return different values for screenX/screenY. Also
+   * there's no way to retrieve all required values from the window or screen object, that's why we have to use hard coded
+   * values here. In order to make this function more flexible you could implement it as a strategy which has different
+   * browser dependent implementations.
+   *
+   * This implementation does also deal with a multi screen setup (secondary monitor). An earlier implementation used
+   * screen.availWidth to make sure the popup is within the visible area of the screen. However, screen.availWidth only
+   * returns the size of the primary monitor, so we cannot use it. There's no way to check for a secondary monitor from
+   * a HTML document. So we removed the check entirely, which shouldn't be an issue since the browser itself does prevent
+   * popups from having an invalid position.
+   */
+  _calcPopupBounds() {
+    var myWindow = this.$container.window(true);
+
+    var POPUP_WINDOW_TOP_HEIGHT = 30;
+    var POPUP_WINDOW_BOTTOM_HEIGHT = 8;
+    var POPUP_WINDOW_CHROME_HEIGHT = POPUP_WINDOW_TOP_HEIGHT + POPUP_WINDOW_BOTTOM_HEIGHT;
+
+    var BROWSER_WINDOW_TOP_HEIGHT = 55;
+
+    // Don't limit screenX/Y in any way. Coordinates can be negative (if we have a secondary monitor on the left side
+    // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
+    // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
+    // to ignore negative X coordinates somehow (but not entirely).
+    var browserBounds = new Rectangle(
+      myWindow.screenX,
+      myWindow.screenY,
+      $(myWindow).width(),
+      $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
+
+    var fieldBounds = new Rectangle(
+      this.$field.offset().left,
+      this.$field.offset().top,
+      this.$field.width(),
+      this.$field.height());
+
+    var popupX = browserBounds.x + fieldBounds.x;
+    var popupY = browserBounds.y + fieldBounds.y + BROWSER_WINDOW_TOP_HEIGHT;
+    var popupWidth = fieldBounds.width;
+    var popupHeight = fieldBounds.height + POPUP_WINDOW_CHROME_HEIGHT;
+
+    // ensure that the lower Y of the new popup is not below the lower Y of the browser window
+    var popupLowerY = popupY + popupHeight;
+    var browserLowerY = browserBounds.y + browserBounds.height;
+    if (popupLowerY > browserLowerY) {
+      popupHeight -= (popupLowerY - browserLowerY) + POPUP_WINDOW_CHROME_HEIGHT;
+    }
+
+    return new Rectangle(
+      numbers.round(popupX),
+      numbers.round(popupY),
+      numbers.round(popupWidth),
+      numbers.round(popupHeight)
+    );
+  }
+
+  _openPopupWindow(reopenIfClosed) {
+    reopenIfClosed = scout.nvl(reopenIfClosed, true);
+    if (!this.showInExternalWindow) {
+      return;
+    }
+
+    if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
+      var popupBlockerHandler = new PopupBlockerHandler(this.session);
+      var popupBounds = this._calcPopupBounds();
+      // (b) window specifications
+      var windowSpecs = strings.join(',',
+        'directories=no',
+        'location=no',
+        'menubar=no',
+        'resizable=yes',
+        'status=no',
+        'scrollbars=' + (this.scrollBarEnabled ? 'yes' : 'no'),
+        'toolbar=no',
+        'dependent=yes',
+        'left=' + popupBounds.x,
+        'top=' + popupBounds.y,
+        'width=' + popupBounds.width,
+        'height=' + popupBounds.height
+      );
+      var location = this.location || 'about:blank';
+      popupBlockerHandler.openWindow(location, undefined, windowSpecs, this._popupWindowOpen.bind(this));
+    } else if (reopenIfClosed) {
+      this._popupWindow.focus();
+    }
+  }
+
+  _popupWindowOpen(popup) {
+    this._popupWindow = popup;
+    if (this._popupWindow && !this._popupWindow.closed) {
+      this.trigger('externalWindowStateChange', {
+        windowState: BrowserField.WindowStates.WINDOW_OPEN
+      });
+      var popupInterval = window.setInterval(function() {
+        var popupWindowClosed = false;
+        try {
+          popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
+        } catch (e) {
+          // for some unknown reason, IE sometimes throws a "SCRIPT16386" error while trying to read '._popupWindow.closed'.
+          $.log.isInfoEnabled() && $.log.info('Reading the property popupWindow.closed threw an error (Retry in 500ms)');
+          return;
+        }
+        if (popupWindowClosed) {
+          window.clearInterval(popupInterval);
+          this.trigger('externalWindowStateChange', {
+            windowState: BrowserField.WindowStates.WINDOW_CLOSED
+          });
+        }
+      }.bind(this), 500);
+    }
+  }
+
+  _onMessage(event) {
+    if (event.source !== this.$field[0].contentWindow) {
+      $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
+      return;
+    }
+    $.log.isDebugEnabled() && $.log.debug('received post-message data=' + event.data + ' origin=' + event.origin);
+    this.trigger('message', {
+      data: event.data,
+      origin: event.origin
+    });
+  }
+
+  setTrackLocationChange(trackLocation) {
+    this.setProperty('trackLocation', trackLocation);
+    this.iframe.setTrackLocationChange(trackLocation);
+  }
+
+  _onIFramePropertyChange(event) {
+    if (!this.trackLocation) {
+      return;
+    }
+    if (event.propertyName === 'location') {
+      this._setProperty('location', event.newValue);
+    }
+  }
+
+  _onLoad(event) {
+    if (!this.rendered) { // check needed, because this is an async callback
+      return;
+    }
+
+    this.invalidateLayoutTree();
+  }
+
+  setSandboxEnabled(sandboxEnabled) {
+    this.setProperty('sandboxEnabled', sandboxEnabled);
+    this.iframe.setSandboxEnabled(sandboxEnabled);
+  }
+
+  setSandboxPermissions(sandboxPermissions) {
+    this.setProperty('sandboxPermissions', sandboxPermissions);
+    this.iframe.setSandboxPermissions(sandboxPermissions);
+  }
+
+  setScrollBarEnabled(scrollBarEnabled) {
+    this.setProperty('scrollBarEnabled', scrollBarEnabled);
+    this.iframe.setScrollBarEnabled(scrollBarEnabled);
+  }
 }

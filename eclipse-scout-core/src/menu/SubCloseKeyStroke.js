@@ -14,33 +14,32 @@ import {menuNavigationKeyStrokes} from '../index';
 
 export default class SubCloseKeyStroke extends MenuNavigationExecKeyStroke {
 
-constructor(popup, menuItemClass) {
-  super( popup, menuItemClass);
-  this._menuItemClass = menuItemClass;
-  this.which = [keys.BACKSPACE];
-  this.renderingHints.render = true;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return event.$menuItem;
-  }.bind(this);
-}
+  constructor(popup, menuItemClass) {
+    super(popup, menuItemClass);
+    this._menuItemClass = menuItemClass;
+    this.which = [keys.BACKSPACE];
+    this.renderingHints.render = true;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return event.$menuItem;
+    }.bind(this);
+  }
 
 
+  _accept(event) {
+    var accepted = super._accept(event);
+    if (!accepted) {
+      return false;
+    }
 
-_accept(event) {
-  var accepted = super._accept( event);
-  if (!accepted) {
+    var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass + '.expanded');
+    if (menuItems.$all.length > 0) {
+      event.$menuItem = menuItems.$all;
+      return true;
+    }
     return false;
   }
 
-  var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass + '.expanded');
-  if (menuItems.$all.length > 0) {
-    event.$menuItem = menuItems.$all;
-    return true;
+  handle(event) {
+    event.$menuItem.data('widget').doAction();
   }
-  return false;
-}
-
-handle(event) {
-  event.$menuItem.data('widget').doAction();
-}
 }

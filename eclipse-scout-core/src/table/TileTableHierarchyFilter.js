@@ -13,21 +13,21 @@ import * as $ from 'jquery';
 
 export default class TileTableHierarchyFilter extends TableFilter {
 
-constructor(model) {
-  super();
-  $.extend(this, model);
-}
+  constructor(model) {
+    super();
+    $.extend(this, model);
+  }
 
 
-createKey() {
-  return 'TileTableHierarchyFilter';
-}
+  createKey() {
+    return 'TileTableHierarchyFilter';
+  }
 
-accept(row) {
-  return !row.parentRow;
-}
+  accept(row) {
+    return !row.parentRow;
+  }
 
-createLabel() {
-  return this.table.session.text('ui.TileView');
-}
+  createLabel() {
+    return this.table.session.text('ui.TileView');
+  }
 }

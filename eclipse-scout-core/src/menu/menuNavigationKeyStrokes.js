@@ -15,7 +15,6 @@ import {MenuNavigationDownKeyStroke} from '../index';
 import {SubCloseKeyStroke} from '../index';
 
 
-
 export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
   keyStrokeContext.registerKeyStroke([
     new MenuNavigationUpKeyStroke(popup, menuItemClass),
@@ -27,7 +26,7 @@ export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
 }
 
 //private
- export function _findMenuItems(popup, menuItemClass) {
+export function _findMenuItems(popup, menuItemClass) {
   return {
     $all: popup.$body.find('.' + menuItemClass),
     $allVisible: popup.$body.find('.' + menuItemClass + ':visible'),
@@ -36,7 +35,7 @@ export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
 }
 
 //private
- export function _changeSelection($oldItem, $newItem) {
+export function _changeSelection($oldItem, $newItem) {
   if ($newItem.length === 0) {
     // do not change selection
     return;

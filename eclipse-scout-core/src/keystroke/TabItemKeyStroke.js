@@ -13,23 +13,23 @@ import {KeyStroke} from '../index';
 
 export default class TabItemKeyStroke extends KeyStroke {
 
-constructor(keyStroke, field) {
-  super();
-  this.field = field;
-  this.parseAndSetKeyStroke(keyStroke);
+  constructor(keyStroke, field) {
+    super();
+    this.field = field;
+    this.parseAndSetKeyStroke(keyStroke);
 
-  this.renderingHints.offset = 16;
-  this.renderingHints.hAlign = HAlign.RIGHT;
-  this.renderingHints.$drawingArea = function($drawingArea, event) {
-    return this.field.$tabContainer;
-  }.bind(this);
-}
+    this.renderingHints.offset = 16;
+    this.renderingHints.hAlign = HAlign.RIGHT;
+    this.renderingHints.$drawingArea = function($drawingArea, event) {
+      return this.field.$tabContainer;
+    }.bind(this);
+  }
 
 
-/**
- * @override KeyStroke.js
- */
-handle(event) {
-  this.field.parent.setSelectedTab(this.field);
-}
+  /**
+   * @override KeyStroke.js
+   */
+  handle(event) {
+    this.field.parent.setSelectedTab(this.field);
+  }
 }

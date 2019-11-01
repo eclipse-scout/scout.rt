@@ -13,35 +13,35 @@ import {PopupWithHeadLayout} from '../index';
 
 export default class FormMenuPopupLayout extends PopupWithHeadLayout {
 
-constructor(popup) {
-  super( popup);
-  this.popup = popup;
-}
+  constructor(popup) {
+    super(popup);
+    this.popup = popup;
+  }
 
 
-_setSize(prefSize) {
-  var popupSize,
-    htmlForm = this.popup.form.htmlComp;
+  _setSize(prefSize) {
+    var popupSize,
+      htmlForm = this.popup.form.htmlComp;
 
-  super._setSize( prefSize);
+    super._setSize(prefSize);
 
-  popupSize = graphics.size(this.popup.$body);
+    popupSize = graphics.size(this.popup.$body);
 
-  // set size of form
-  popupSize = popupSize.subtract(graphics.insets(this.popup.$body));
-  htmlForm.setSize(popupSize);
-}
+    // set size of form
+    popupSize = popupSize.subtract(graphics.insets(this.popup.$body));
+    htmlForm.setSize(popupSize);
+  }
 
-preferredLayoutSize($container) {
-  var htmlComp = this.popup.htmlComp,
-    htmlForm = this.popup.form.htmlComp,
-    prefSize;
+  preferredLayoutSize($container) {
+    var htmlComp = this.popup.htmlComp,
+      htmlForm = this.popup.form.htmlComp,
+      prefSize;
 
-  prefSize = htmlForm.prefSize()
-    .add(htmlComp.insets())
-    .add(graphics.insets(this.popup.$body, true))
-    .add(htmlForm.margins());
+    prefSize = htmlForm.prefSize()
+      .add(htmlComp.insets())
+      .add(graphics.insets(this.popup.$body, true))
+      .add(htmlForm.margins());
 
-  return prefSize;
-}
+    return prefSize;
+  }
 }
