@@ -203,8 +203,8 @@ export default class BenchColumn extends Widget {
       }.bind(this), []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
     this.components.filter(function(comp) {
-        return comp instanceof SimpleTabBox;
-      })
+      return comp instanceof SimpleTabBox;
+    })
       .reduce(function(c1, c2, index) {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);

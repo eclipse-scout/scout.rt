@@ -5,15 +5,15 @@ import * as arrays from '../util/arrays';
 import BenchColumnLayoutData from './BenchColumnLayoutData';
 import HtmlComponent from '../layout/HtmlComponent';
 import DesktopLayout from './DesktopLayout';
-import DesktopNavigation, { BREADCRUMB_STYLE_WIDTH } from './DesktopNavigation';
+import DesktopNavigation, {BREADCRUMB_STYLE_WIDTH} from './DesktopNavigation';
 import DesktopHeader from './DesktopHeader';
 import DesktopBench from './DesktopBench';
 import Splitter from '../splitter/Splitter';
 import DeferredGlassPaneTarget from '../glasspane/DeferredGlassPaneTarget';
-import { DisplayHint } from '../form/Form';
+import {DisplayHint} from '../form/Form';
 import Outline from '../outline/Outline';
 import Table from '../table/Table';
-import Tree, { DisplayStyle as TreeDisplayStyle } from '../tree/Tree';
+import Tree, {DisplayStyle as TreeDisplayStyle} from '../tree/Tree';
 import * as cookies from '../util/cookies';
 
 export default class Desktop extends Widget {

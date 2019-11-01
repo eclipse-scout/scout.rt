@@ -7,7 +7,7 @@ import TypeDescriptor from '../TypeDescriptor';
 import LayoutValidator from '../layout/LayoutValidator';
 import NullWidget from '../widget/NullWidget';
 import DetachHelper from '../util/DetachHelper';
-import { Severity, FileInput, BackgroundJobPollingStatus, JsonResponseError } from '../constants';
+import {Severity, FileInput, BackgroundJobPollingStatus, JsonResponseError} from '../constants';
 import RemoteEvent from './RemoteEvent';
 import URL from '../util/URL';
 
@@ -631,10 +631,10 @@ export default class Session {
       success = false;
 
     this._callAjax({
-        ajaxOptions: ajaxOptions,
-        request: request,
-        name: this._getRequestName(request, 'user request')
-      })
+      ajaxOptions: ajaxOptions,
+      request: request,
+      name: this._getRequestName(request, 'user request')
+    })
       .done(onAjaxDone.bind(this))
       .fail(onAjaxFail.bind(this))
       .always(onAjaxAlways.bind(this));
@@ -760,10 +760,10 @@ export default class Session {
     var ajaxOptions = this.defaultAjaxOptions(request);
 
     this._callAjax({
-        ajaxOptions: ajaxOptions,
-        request: request,
-        name: this._getRequestName(request, 'request')
-      })
+      ajaxOptions: ajaxOptions,
+      request: request,
+      name: this._getRequestName(request, 'request')
+    })
       .done(onAjaxDone.bind(this))
       .fail(onAjaxFail.bind(this));
 
@@ -926,7 +926,8 @@ export default class Session {
       boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
       boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
       boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
-      boxOptions.yesButtonAction = function() {};
+      boxOptions.yesButtonAction = function() {
+      };
     }
     this.showFatalMessage(boxOptions, jsonError.code);
   };

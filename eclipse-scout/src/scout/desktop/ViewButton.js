@@ -13,6 +13,7 @@ export default class ViewButton extends Action {
     this._renderedAsMenu = true;
     super.render($parent);
   };
+
   renderAsTab($parent) {
     this._renderedAsMenu = false;
     super.render($parent);

@@ -587,7 +587,7 @@ export const Browser = {
   SAFARI: 'Safari'
 };
 
-export const System ={
+export const System = {
   UNKNOWN: 'Unknown',
   IOS: 'IOS',
   ANDROID: 'ANDROID',

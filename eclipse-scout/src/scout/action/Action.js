@@ -45,6 +45,7 @@ export default class Action extends Widget {
   /**
    * @override
    */
+
   /*_createKeyStrokeContext() {
       return new scout.KeyStrokeContext();
   };*/

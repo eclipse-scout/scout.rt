@@ -464,6 +464,7 @@ export default class DesktopBench extends Widget {
       this.updateNavigationHandleVisibility();
     }
   };
+
   _onBenchLayoutDataChange(event) {
     this.updateLayoutData(this.desktop.benchLayoutData);
   };
@@ -513,8 +514,8 @@ export default class DesktopBench extends Widget {
       }.bind(this), []);
     // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
     this.components.filter(function(comp) {
-        return comp instanceof BenchColumn;
-      })
+      return comp instanceof BenchColumn;
+    })
       .reduce(function(c1, c2, index) {
         if (index > 0) {
           c2.$container.insertAfter(c1.$container);

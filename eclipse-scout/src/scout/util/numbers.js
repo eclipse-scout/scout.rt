@@ -36,9 +36,9 @@ export function round(number, roundingMode, decimalPlaces) {
         number = -Math.round(-number);
       }
       break;
-      // case scout.numbers.RoundingMode.HALF_EVEN:
-      // case scout.numbers.RoundingMode.UNNECESSARY:
-      // not implemented, default is used.
+    // case scout.numbers.RoundingMode.HALF_EVEN:
+    // case scout.numbers.RoundingMode.UNNECESSARY:
+    // not implemented, default is used.
     default:
       // scout.numbers.RoundingMode.HALF_UP is used as default
       if (number < 0) {

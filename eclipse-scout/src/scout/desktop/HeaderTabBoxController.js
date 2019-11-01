@@ -29,8 +29,8 @@ export default class HeaderTabBoxController extends DesktopTabBoxController {
 
   _onViewsChanged() {
     if (this.bench.getViews().some(function(view) {
-        return 'C' !== view.displayViewId;
-      })) {
+      return 'C' !== view.displayViewId;
+    })) {
       // has views in other view stacks
       this._setViewTabAreaInHeader(false);
     } else {

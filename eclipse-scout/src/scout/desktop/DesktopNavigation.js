@@ -2,12 +2,12 @@ import Widget from '../widget/Widget';
 import HtmlComponent from '../layout/HtmlComponent';
 import * as scout from '../scout';
 import ViewButtonBox from './ViewButtonBox';
-import { DisplayStyle } from './Desktop';
+import {DisplayStyle} from './Desktop';
 import DesktopNavigationLayout from './DesktopNavigationLayout';
 import SingleLayout from '../layout/SingleLayout';
-import { HorizontalAlignment } from './CollapseHandle';
+import {HorizontalAlignment} from './CollapseHandle';
 import DesktopNavigationHandle from './DesktopNavigationHandle';
-import { DisplayStyle as TreeDisplayStyle } from '../tree/Tree';
+import {DisplayStyle as TreeDisplayStyle} from '../tree/Tree';
 
 export var DEFAULT_STYLE_WIDTH; // Configured in sizes.css
 export var BREADCRUMB_STYLE_WIDTH; // Configured in sizes.css

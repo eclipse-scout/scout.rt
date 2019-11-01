@@ -134,7 +134,8 @@ export default class Widget {
    * Default implementation simply returns undefined. A Subclass
    * may override this method to load or extend a JSON model with scout.models.getModel or scout.models.extend.
    */
-  _jsonModel() {};
+  _jsonModel() {
+  };
 
   /**
    * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
@@ -389,7 +390,8 @@ export default class Widget {
     this._removeInternal();
   };
 
-  _renderInspectorInfo() {};
+  _renderInspectorInfo() {
+  };
 
   /**
    * Links $container with the widget.
@@ -518,6 +520,7 @@ export default class Widget {
 
     return false;
   };
+
   /*
       getForm() {
           return scout.Form.findForm(this);

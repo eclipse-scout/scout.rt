@@ -16,8 +16,8 @@ export default class SimpleTabBoxLayout extends AbstractLayout {
       tabAreaSize;
 
     containerSize = htmlContainer.availableSize({
-        exact: true
-      })
+      exact: true
+    })
       .subtract(htmlContainer.insets());
 
     tabAreaSize = this._layoutTabArea(containerSize);
