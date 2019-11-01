@@ -19,6 +19,8 @@ module.exports = {
     'no-caller': 'warn',
     'no-console': 'off',
     'no-labels': 'error',
+    'no-undef': 'off',
+    'camelcase': ['error', {allow: ['^\\$', '_']}],
     'no-lone-blocks': 'error',
     'no-loop-func': 'error',
     'no-multi-spaces': 'error',
