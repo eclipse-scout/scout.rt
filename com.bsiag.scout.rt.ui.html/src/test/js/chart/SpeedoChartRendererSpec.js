@@ -1,5 +1,3 @@
-import {SpeedoChartRenderer, Chart} from '../../../main/js/index';
-
 /*
  * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
@@ -10,15 +8,19 @@ import {SpeedoChartRenderer, Chart} from '../../../main/js/index';
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 /* global sandboxSession, createSimpleModel*/
-describe('SpeedoChartRenderer', function() {
 
+import {SpeedoChartRenderer, Chart} from '../../../main/js/index';
+import {scout} from '@eclipse-scout/core';
+import {LocaleSpecHelper} from '@eclipse-scout/testing';
+
+describe('SpeedoChartRenderer', function() {
   var locale, helper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.LocaleSpecHelper();
-    locale = helper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new LocaleSpecHelper();
+    locale = helper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   describe('_formatValue', function() {
@@ -37,7 +39,6 @@ describe('SpeedoChartRenderer', function() {
       expect(speedo._formatValue(1200000)).toBe('1.2M');
       expect(speedo._formatValue(1230000)).toBe('1.23M');
     });
-
   });
 
   describe('click handling', function() {
@@ -45,7 +46,7 @@ describe('SpeedoChartRenderer', function() {
       var chart = scout.create('Chart', {
         parent: session.desktop,
         clickable: true,
-        chartType: scout.Chart.SPEEDO,
+        chartType: Chart.SPEEDO,
         chartData: {
           axes: [],
           chartValueGroups: [{
@@ -57,7 +58,7 @@ describe('SpeedoChartRenderer', function() {
             ]
           }],
           customProperties: {
-            greenAreaPosition: scout.SpeedoChartRenderer.GREEN_AREA_POSITION_CENTER
+            greenAreaPosition: SpeedoChartRenderer.GREEN_AREA_POSITION_CENTER
           }
         }
       });
@@ -77,5 +78,4 @@ describe('SpeedoChartRenderer', function() {
       });
     });
   });
-
 });
