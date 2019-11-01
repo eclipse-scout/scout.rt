@@ -74,6 +74,7 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
     //previous events may be deleted from the list
     final Set<Integer> typesToDelete = new HashSet<>();
     final List<DeletedNodesRemover> deletedNodesRemoverList = new LinkedList<>();
+    Set<ITreeNode> newNodes = null;
 
     for (ListIterator<TreeEvent> it = events.listIterator(events.size()); it.hasPrevious();) {
       final TreeEvent event = it.previous();
@@ -104,7 +105,25 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         typesToDelete.addAll(getExpansionRelatedEvents());
       }
       else if ((type == TreeEvent.TYPE_NODES_DELETED || type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED) && event.hasNodes()) {
-        deletedNodesRemoverList.add(new DeletedNodesRemover(event));
+        // Built a set of all nodes that were newly added to the tree.
+        // (This will only be required when processing delete events, therefore we create it lazily here.)
+        if (newNodes == null) {
+          newNodes = new HashSet<>();
+          for (TreeEvent e : events) {
+            if (e == event) { // no need to look further
+              break;
+            }
+            if (e.getType() == TreeEvent.TYPE_NODES_INSERTED) {
+              final List<ITreeNode> toProcess = new LinkedList<>(e.getChildNodes()); // LinkedList can remove elements in O(1)
+              while (!toProcess.isEmpty()) {
+                ITreeNode node = toProcess.remove(0);
+                newNodes.add(node);
+                toProcess.addAll(node.getChildNodes());
+              }
+            }
+          }
+        }
+        deletedNodesRemoverList.add(new DeletedNodesRemover(event, newNodes));
       }
     }
 
@@ -528,13 +547,15 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
   protected static class DeletedNodesRemover {
 
     private final TreeEvent m_deleteEvent;
+    private final Set<ITreeNode> m_newNodes;
     private Map<ITreeNode, Set<ITreeNode>> m_childNodesByNodeToRemove;
     private Set<ITreeNode> m_nodesToRemove;
     private Set<ITreeNode> m_allNodesToRemove;
     private Set<ITreeNode> m_removedNodesCollector;
 
-    public DeletedNodesRemover(TreeEvent deleteEvent) {
+    public DeletedNodesRemover(TreeEvent deleteEvent, Set<ITreeNode> newNodes) {
       m_deleteEvent = deleteEvent;
+      m_newNodes = newNodes;
     }
 
     public boolean removeDeletedNodes(TreeEvent event) {
@@ -546,7 +567,6 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
       final int type = event.getType();
       final boolean insertEvent = type == TreeEvent.TYPE_NODES_INSERTED;
       final boolean deleteEvent = type == TreeEvent.TYPE_ALL_CHILD_NODES_DELETED || type == TreeEvent.TYPE_NODES_DELETED;
-
       if (deleteEvent) {
         Set<ITreeNode> additionalNodesToRemoveCollector = new HashSet<>();
         event.removeNodes(m_allNodesToRemove, additionalNodesToRemoveCollector);
@@ -556,7 +576,13 @@ public class TreeEventBuffer extends AbstractEventBuffer<TreeEvent> {
         return false;
       }
       else if (!insertEvent) {
-        event.removeNodes(m_allNodesToRemove, null);
+        Set<ITreeNode> nodesToRemove = m_allNodesToRemove;
+        if (type == TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED) {
+          // Special handling for order changed events: remove only new nodes, keep all others
+          nodesToRemove = new HashSet<>(m_allNodesToRemove);
+          nodesToRemove.retainAll(m_newNodes);
+        }
+        event.removeNodes(nodesToRemove, null);
         return false;
       }
       else {

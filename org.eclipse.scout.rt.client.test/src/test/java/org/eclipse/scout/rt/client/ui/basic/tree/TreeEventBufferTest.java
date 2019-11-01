@@ -485,7 +485,12 @@ public class TreeEventBufferTest {
     installChildNodes(nodeE, nodeF);
     installChildNodes(nodeC, nodeG);
 
+    // -------------------------------------
     // NODES_DELETED
+    // -------------------------------------
+
+    // Deleted nodes are removed from all previous events _except_ CHILD_NODE_ORDER_CHANGED
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, nodeB, nodeC, nodeD));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
@@ -493,11 +498,35 @@ public class TreeEventBufferTest {
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_DELETED, nodeB, nodeC));
 
     List<TreeEvent> coalesced = m_testBuffer.consumeAndCoalesceEvents();
-    assertEquals(1, coalesced.size());
-    assertEquals(TreeEvent.TYPE_NODES_DELETED, coalesced.get(0).getType());
-    assertEquals(2, coalesced.get(0).getChildNodes().size());
+    assertEquals(2, coalesced.size());
+    assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(0).getType());
+    assertEquals(3, coalesced.get(0).getChildNodes().size()); // <-- all three nodes should be preserved
+    assertEquals(TreeEvent.TYPE_NODES_DELETED, coalesced.get(1).getType());
+    assertEquals(2, coalesced.get(1).getChildNodes().size());
 
+    // Same test, but with previous insert event -> in this case, removed nodes can be completely wiped
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_NODES_INSERTED, nodeC));
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, nodeB, nodeC, nodeD));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_COLLAPSED, nodeG));
+    m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_DELETED, nodeB, nodeC));
+
+    coalesced = m_testBuffer.consumeAndCoalesceEvents();
+    assertEquals(2, coalesced.size());
+    assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(0).getType());
+    assertEquals(2, coalesced.get(0).getChildNodes().size()); // <-- B should be preserved, but C should be removed
+    assertEquals(TreeEvent.TYPE_NODES_DELETED, coalesced.get(1).getType());
+    assertEquals(1, coalesced.get(1).getChildNodes().size());
+
+    // -------------------------------------
     // ALL_CHILD_NODES_DELETED
+    // -------------------------------------
+
+    // Deleted nodes are removed from all previous events. Entire CHILD_NODE_ORDER_CHANGED event is removed as well.
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_NODES_INSERTED, nodeC));
+    m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, nodeB, nodeC, nodeD));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeB));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODE_EXPANDED, nodeE));
     m_testBuffer.add(mockEvent(TreeEvent.TYPE_NODES_UPDATED, nodeF));
@@ -505,9 +534,11 @@ public class TreeEventBufferTest {
     m_testBuffer.add(mockEvent(nodeA, TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, nodeB, nodeC, nodeD));
 
     coalesced = m_testBuffer.consumeAndCoalesceEvents();
-    assertEquals(1, coalesced.size());
-    assertEquals(TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, coalesced.get(0).getType());
-    assertEquals(3, coalesced.get(0).getChildNodes().size());
+    assertEquals(2, coalesced.size());
+    assertEquals(TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, coalesced.get(0).getType());
+    assertEquals(2, coalesced.get(0).getChildNodes().size());
+    assertEquals(TreeEvent.TYPE_ALL_CHILD_NODES_DELETED, coalesced.get(1).getType());
+    assertEquals(2, coalesced.get(0).getChildNodes().size());
   }
 
   /**
