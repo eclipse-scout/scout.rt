@@ -2130,6 +2130,33 @@ describe('Tree', function() {
       expect(tree.visibleNodesFlat[3].text).toBe('A+B');
       expect(tree.visibleNodesFlat[4].text).toBe('B1');
     });
+
+    it('shows nodes correctly if nodes are made hidden right before', function(done) {
+      var model = helper.createModelFixture(2, 1, true);
+      var tree = helper.createTree(model);
+      var node0 = tree.nodes[0];
+      var node1 = tree.nodes[1];
+      var filter = {
+        accept: function(node) {
+          return node.text === 'node 0';
+        }
+      };
+      tree.render();
+
+      $.fx.off = false;
+      jasmine.clock().uninstall();
+
+      tree.addFilter(filter);
+      tree.removeFilter(filter);
+
+      node1.$node.promise().then(function() {
+        expect(node1.rendered).toBe(true);
+        expect(node1.attached).toBe(true);
+        expect(node1.$node).not.toHaveClass('hiding showing');
+        expect(tree.runningAnimations).toBe(0);
+        done();
+      });
+    });
   });
 
   describe('tree enabled/disabled', function() {

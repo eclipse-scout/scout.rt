@@ -2770,7 +2770,13 @@ export default class Tree extends Widget {
         // with the previous filter. That's why we must make sure, the node is attached to
         // the DOM, even though the filter state hasn't changed. Otherwise we'd have a
         // problem when we insert nodes in this._insertNodeInDOMAtPlace.
-        this.showNode(node, useAnimation);
+        if (!node.attached) {
+          this.showNode(node, useAnimation);
+          if (node.attached) {
+            // If sibling nodes are hiding at the same time, the nodes to be shown should be added after these nodes to make the animation look correctly -> move them
+            node.$node.insertAfter(node.$node.nextAll('.hiding:last'));
+          }
+        }
       }
       if ((node.expanded || node.expandedLazy) && node.isFilterAccepted()) {
         return false;
@@ -2955,11 +2961,13 @@ export default class Tree extends Widget {
   }
 
   showNode(node, useAnimation, indexHint) {
-    if (node.attached || !this.rendered) {
+    if (!this.rendered || (node.attached && !node.$node.hasClass('hiding'))) {
       return;
     }
-    this._ensureNodeInDOM(node.parentNode, useAnimation, indexHint - 1);
-    this._insertNodesInDOM([node], indexHint);
+    if (!node.attached) {
+      this._ensureNodeInDOM(node.parentNode, useAnimation, indexHint - 1);
+      this._insertNodesInDOM([node], indexHint);
+    }
     if (!node.rendered) {
       return;
     }
@@ -2971,17 +2979,14 @@ export default class Tree extends Widget {
     $node.removeClass('hiding');
     var that = this;
     if (useAnimation) {
-      var oldStyle = $node.attr('style');
-      var oldVisible = $node.isVisible();
-      $node.setVisible(false);
-      $node.stop().slideDown({
+      // hide node first and then make it appear using slideDown (setVisible(false) won't work because it would stay invisible during the animation)
+      $node.hide();
+      $node.stop(false, true).slideDown({
         duration: 250,
         start: that.startAnimationFunc,
         complete: function() {
           that.runningAnimationsFinishFunc();
           $node.removeClass('showing');
-          $node.setVisible(oldVisible);
-          $node.attrOrRemove('style', oldStyle);
         }
       });
     }
@@ -3005,18 +3010,18 @@ export default class Tree extends Widget {
 
     $node.addClass('hiding');
     $node.removeClass('showing');
-
     if (useAnimation) {
       this._renderViewportBlocked = true;
-      var oldStyle = $node.attr('style');
-      $node.stop().slideUp({
+      $node.stop(false, true).slideUp({
         duration: 250,
         start: that.startAnimationFunc,
         complete: function() {
           that.runningAnimationsFinishFunc();
-          $node.detach();
-          node.attached = false;
-          $node.attrOrRemove('style', oldStyle);
+          $node.removeClass('hiding');
+          if (!$node.hasClass('showing')) {
+            $node.detach();
+            node.attached = false;
+          }
         }
       });
     } else if (!suppressDetachHandling) {
