@@ -24,8 +24,8 @@
     "src"
   ],
   "scripts": {
-    "test-server:start": "scout-scripts test-server:start",
-    "test-server:stop": "scout-scripts test-server:stop",
+    "testserver:start": "scout-scripts test-server:start",
+    "testserver:stop": "scout-scripts test-server:stop",
     "test:ci": "scout-scripts test:ci",
     "build:dev": "scout-scripts build:dev",
     "build:prod": "scout-scripts build:prod",

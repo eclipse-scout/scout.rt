@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-import {scout, Widget} from '../../../src/index';
+import {scout, Widget, keys} from '../../../src/index';
 import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
 
 
-describe("CellEditor", function() {
+describe('CellEditor', function() {
   var session;
   var helper;
   var formHelper;
@@ -61,7 +61,7 @@ describe("CellEditor", function() {
     expect($popup.find('.form-field').length).toBe(1);
   }
 
-  describe("mouse click", function() {
+  describe('mouse click', function() {
     var table, model, $rows, $cells0, $cells1, $cell0_0, $cell0_1, $cell1_0;
 
     beforeEach(function() {
@@ -77,7 +77,7 @@ describe("CellEditor", function() {
       $cell1_0 = $cells1.eq(0);
     });
 
-    it("starts cell edit if cell is editable", function() {
+    it('starts cell edit if cell is editable', function() {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = false;
 
@@ -88,7 +88,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).toHaveBeenCalled();
     });
 
-    it("does not start cell edit if cell is not editable", function() {
+    it('does not start cell edit if cell is not editable', function() {
       table.rows[0].cells[0].editable = false;
 
       spyOn(table, 'prepareCellEdit');
@@ -96,7 +96,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if row is disabled", function() {
+    it('does not start cell edit if row is disabled', function() {
       table.rows[0].cells[0].editable = true;
       table.rows[0].enabled = false;
 
@@ -105,7 +105,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if table is disabled", function() {
+    it('does not start cell edit if table is disabled', function() {
       table.rows[0].cells[0].editable = true;
       table.enabled = false;
       table.recomputeEnabled();
@@ -115,7 +115,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if form is disabled", function() {
+    it('does not start cell edit if form is disabled', function() {
       table.rows[0].cells[0].editable = true;
       table.enabledComputed = false;
 
@@ -124,7 +124,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if mouse down and up happened on different cells", function() {
+    it('does not start cell edit if mouse down and up happened on different cells', function() {
       table.rows[0].cells[0].editable = true;
       table.rows[0].cells[1].editable = true;
 
@@ -134,7 +134,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if right mouse button was pressed", function() {
+    it('does not start cell edit if right mouse button was pressed', function() {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
@@ -143,7 +143,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not start cell edit if middle mouse button was pressed", function() {
+    it('does not start cell edit if middle mouse button was pressed', function() {
       table.rows[0].cells[0].editable = true;
 
       spyOn(table, 'prepareCellEdit');
@@ -152,7 +152,7 @@ describe("CellEditor", function() {
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
 
-    it("does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing", function() {
+    it('does not open cell editor if a ctrl or shift is pressed, because the user probably wants to do row selection rather than cell editing', function() {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
@@ -165,10 +165,9 @@ describe("CellEditor", function() {
       $cell1_0.triggerClick({modifier: 'ctrl'});
       expect(table.prepareCellEdit).not.toHaveBeenCalled();
     });
-
   });
 
-  describe("TAB key", function() {
+  describe('TAB key', function() {
     var table, $rows, $cells0;
 
     beforeEach(function() {
@@ -179,7 +178,7 @@ describe("CellEditor", function() {
       $cells0 = $rows.eq(0).find('.table-cell');
     });
 
-    it("starts the cell editor for the next editable cell", function() {
+    it('starts the cell editor for the next editable cell', function() {
       table.rows[0].cells[0].editable = true;
       table.rows[1].cells[0].editable = true;
 
@@ -187,14 +186,14 @@ describe("CellEditor", function() {
       jasmine.clock().tick();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
 
-      $(document.activeElement).triggerKeyInputCapture(scout.keys.TAB);
+      $(document.activeElement).triggerKeyInputCapture(keys.TAB);
       jasmine.clock().tick();
       jasmine.clock().tick();
       assertCellEditorIsOpen(table, table.columns[0], table.rows[1]);
     });
   });
 
-  describe("prepareCellEdit", function() {
+  describe('prepareCellEdit', function() {
     var table;
 
     beforeEach(function() {
@@ -204,7 +203,7 @@ describe("CellEditor", function() {
       helper.applyDisplayStyle(table);
     });
 
-    it("creates field and calls start", function() {
+    it('creates field and calls start', function() {
       table.columns[0].setEditable(true);
       spyOn(table, 'startCellEdit').and.callThrough();
 
@@ -214,7 +213,7 @@ describe("CellEditor", function() {
       assertCellEditorIsOpen(table, table.columns[0], table.rows[0]);
     });
 
-    it("triggers prepareCellEdit event", function() {
+    it('triggers prepareCellEdit event', function() {
       var triggeredEvent;
       table.columns[0].setEditable(true);
       table.on('prepareCellEdit', function(event) {
@@ -225,10 +224,9 @@ describe("CellEditor", function() {
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.row).toBe(table.rows[0]);
     });
-
   });
 
-  describe("startCellEdit", function() {
+  describe('startCellEdit', function() {
     var table;
 
     beforeEach(function() {
@@ -238,7 +236,7 @@ describe("CellEditor", function() {
       helper.applyDisplayStyle(table);
     });
 
-    it("opens popup with field", function() {
+    it('opens popup with field', function() {
       table.columns[0].setEditable(true);
       var field = createStringField(table);
       table.startCellEdit(table.columns[0], table.rows[0], field);
@@ -258,10 +256,9 @@ describe("CellEditor", function() {
       expect(triggeredEvent.column).toBe(table.columns[0]);
       expect(triggeredEvent.field instanceof Widget).toBe(true);
     });
-
   });
 
-  describe("completeCellEdit", function() {
+  describe('completeCellEdit', function() {
     var table;
 
     beforeEach(function() {
@@ -271,7 +268,7 @@ describe("CellEditor", function() {
       helper.applyDisplayStyle(table);
     });
 
-    it("triggers completeCellEdit event", function() {
+    it('triggers completeCellEdit event', function() {
       var triggeredEvent;
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
@@ -285,7 +282,7 @@ describe("CellEditor", function() {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it("calls endCellEdit with saveEditorValue=true", function() {
+    it('calls endCellEdit with saveEditorValue=true', function() {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -298,7 +295,7 @@ describe("CellEditor", function() {
       expect($findPopup().length).toBe(0);
     });
 
-    it("saves editor value", function() {
+    it('saves editor value', function() {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -308,7 +305,7 @@ describe("CellEditor", function() {
       expect(table.rows[0].cells[0].value).toBe('my new value');
     });
 
-    it("does not reopen the editor again", function() {
+    it('does not reopen the editor again', function() {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -324,7 +321,7 @@ describe("CellEditor", function() {
     });
   });
 
-  describe("cancelCellEdit", function() {
+  describe('cancelCellEdit', function() {
     var table;
 
     beforeEach(function() {
@@ -334,7 +331,7 @@ describe("CellEditor", function() {
       helper.applyDisplayStyle(table);
     });
 
-    it("triggers cancelCellEdit event", function() {
+    it('triggers cancelCellEdit event', function() {
       var triggeredEvent;
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
@@ -348,7 +345,7 @@ describe("CellEditor", function() {
       expect(triggeredEvent.field).toBe(table.rows[0].cells[0].field);
     });
 
-    it("calls endCellEdit with saveEditorValue=false", function() {
+    it('calls endCellEdit with saveEditorValue=false', function() {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -361,7 +358,7 @@ describe("CellEditor", function() {
       expect($findPopup().length).toBe(0);
     });
 
-    it("does not save editor value", function() {
+    it('does not save editor value', function() {
       table.columns[0].setEditable(true);
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
@@ -370,10 +367,9 @@ describe("CellEditor", function() {
       table.cancelCellEdit();
       expect(table.rows[0].cells[0].value).toBe('cell0_0');
     });
-
   });
 
-  describe("endCellEdit", function() {
+  describe('endCellEdit', function() {
     var table;
 
     beforeEach(function() {
@@ -383,7 +379,7 @@ describe("CellEditor", function() {
       helper.applyDisplayStyle(table);
     });
 
-    it("destroys the field", function() {
+    it('destroys the field', function() {
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       var popup = table.cellEditorPopup;
@@ -394,7 +390,7 @@ describe("CellEditor", function() {
       expect(field.destroyed).toBe(true);
     });
 
-    it("removes the cell editor popup", function() {
+    it('removes the cell editor popup', function() {
       table.prepareCellEdit(table.columns[0], table.rows[0]);
       jasmine.clock().tick();
       var popup = table.cellEditorPopup;
@@ -408,10 +404,9 @@ describe("CellEditor", function() {
       expect(popup.rendered).toBe(false);
       expect(popup.cell.field.rendered).toBe(false);
     });
-
   });
 
-  describe("validation", function() {
+  describe('validation', function() {
     var table, model, cell0_0, $tooltip;
 
     beforeEach(function() {
@@ -420,7 +415,7 @@ describe("CellEditor", function() {
       cell0_0 = table.rows[0].cells[0];
     });
 
-    it("shows a tooltip if field has an error", function() {
+    it('shows a tooltip if field has an error', function() {
       cell0_0.editable = true;
       cell0_0.errorStatus = 'Validation error';
       $tooltip = $('.tooltip');
@@ -431,7 +426,7 @@ describe("CellEditor", function() {
       expect($tooltip.length).toBe(1);
     });
 
-    it("does not sho a tooltip if field has no error", function() {
+    it('does not sho a tooltip if field has no error', function() {
       cell0_0.editable = true;
       $tooltip = $('.tooltip');
 
@@ -442,7 +437,7 @@ describe("CellEditor", function() {
     });
   });
 
-  describe("popup recovery", function() {
+  describe('popup recovery', function() {
     var model, table, row0, $cells0, $cell0_0;
 
     beforeEach(function() {
@@ -451,7 +446,7 @@ describe("CellEditor", function() {
       row0 = table.rows[0];
     });
 
-    it("reopens popup if row gets updated", function() {
+    it('reopens popup if row gets updated', function() {
       row0.cells[0].editable = true;
       table.render();
       $cells0 = table.$cellsForRow(row0.$row);
@@ -474,7 +469,7 @@ describe("CellEditor", function() {
       expect(table.cellEditorPopup.$anchor[0]).toBe($cell0_0[0]);
     });
 
-    it("closes popup if row gets deleted", function() {
+    it('closes popup if row gets deleted', function() {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -490,7 +485,7 @@ describe("CellEditor", function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it("closes popup if all rows get deleted", function() {
+    it('closes popup if all rows get deleted', function() {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -506,7 +501,7 @@ describe("CellEditor", function() {
       expect(table.cancelCellEdit).toHaveBeenCalled();
     });
 
-    it("closes popup (before) table is removed", function() {
+    it('closes popup (before) table is removed', function() {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -517,7 +512,7 @@ describe("CellEditor", function() {
       expect(table.cellEditorPopup).toBe(null);
     });
 
-    it("closes popup when table is removed", function() {
+    it('closes popup when table is removed', function() {
       row0.cells[0].editable = true;
       table.render();
       table.prepareCellEdit(table.columns[0], row0);
@@ -527,11 +522,9 @@ describe("CellEditor", function() {
       jasmine.clock().tick();
       expect(table.cellEditorPopup).toBe(null);
     });
-
   });
 
-  describe("tooltip recovery", function() {
-
+  describe('tooltip recovery', function() {
     var model, table, row0;
 
     beforeEach(function() {
@@ -540,7 +533,7 @@ describe("CellEditor", function() {
       row0 = model.rows[0];
     });
 
-    it("removes tooltip if row gets deleted", function() {
+    it('removes tooltip if row gets deleted', function() {
       row0.cells[0].editable = true;
       row0.cells[0].errorStatus = 'Validation error';
 
@@ -553,6 +546,5 @@ describe("CellEditor", function() {
       expect($('.tooltip').length).toBe(0);
       expect(table.tooltips.length).toBe(0);
     });
-
   });
 });

@@ -8,7 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-describe("WidgetPopup", function() {
+
+import {scout, Form} from '../../src/index';
+
+describe('WidgetPopup', function() {
   var session;
 
   beforeEach(function() {
@@ -20,12 +23,12 @@ describe("WidgetPopup", function() {
     return scout.create('WidgetPopup', {
       parent: session.desktop,
       widget: {
-        objectType: "Form",
-        displayHint: scout.Form.DisplayHint.VIEW,
+        objectType: 'Form',
+        displayHint: Form.DisplayHint.VIEW,
         modal: false,
         initialFocus: initialFocus,
         rootGroupBox: {
-          objectType: "GroupBox",
+          objectType: 'GroupBox',
           fields: [{
             id: 'First Field',
             objectType: 'StringField'
