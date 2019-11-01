@@ -1,0 +1,598 @@
+/*
+ * Copyright (c) 2014-2016 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSI CRM Software License v1.0
+ * which accompanies this distribution as bsi-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+#scout {
+  /* Mixin to use the correct tile background color for the given attribute (use 'fill' or 'stroke') */
+  .tile-colors(@attr: fill) {
+
+    .tile & {
+      @{attr}: @tile-default-background-color;
+
+      .inverted& {
+        @{attr}: @tile-default-inverted-background-color;
+      }
+
+      .color-alternative& {
+        @{attr}: @tile-alternative-background-color;
+      }
+
+      .color-alternative.inverted& {
+        @{attr}: @tile-alternative-inverted-background-color;
+      }
+    }
+  }
+
+  /* Mixin to define .color0 - .color5 fill and stroke colors */
+  .chart-auto-colors(@color1, @color2, @color3, @color4, @color5, @color6, @active-color:red) {
+    fill: @color1;
+
+    /* Hover colors */
+    & .color0:hover,
+    & .color1:hover,
+    & .color2:hover,
+    & .color3:hover,
+    & .color4:hover,
+    & .color5:hover {
+      fill: @active-color;
+    }
+
+    & .color0:not(:hover) {
+      fill: @color1;
+    }
+
+    & .color1:not(:hover) {
+      fill: @color2;
+    }
+
+    & .color2:not(:hover) {
+      fill: @color3;
+    }
+
+    & .color3:not(:hover) {
+      fill: @color4;
+    }
+
+    & .color4:not(:hover) {
+      fill: @color5;
+    }
+
+    & .color5:not(:hover) {
+      fill: @color6;
+    }
+
+    & .stroke-color0 {
+      stroke: @color1;
+    }
+
+    & .stroke-color1 {
+      stroke: @color2;
+    }
+
+    & .stroke-color2 {
+      stroke: @color3;
+    }
+
+    & .stroke-color3 {
+      stroke: @color4;
+    }
+
+    & .stroke-color4 {
+      stroke: @color5;
+    }
+
+    & .stroke-color5 {
+      stroke: @color6;
+    }
+  }
+}
+
+/* use padding area for label, legend */
+.tile.form-field > .field.chart {
+  overflow: visible;
+
+  & > svg {
+    overflow: visible;
+  }
+}
+
+/* increase space between chart and tile-title if available */
+.tile.form-field:not(.label-hidden) > .field.chart {
+  margin-top: 10px;
+}
+
+.chart > svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  font-size: @font-size-normal;
+
+  & :focus {
+    outline: none;
+  }
+
+  #scout.chart-auto-colors(
+    @chart-data-color-1,
+    @chart-data-color-2,
+    @chart-data-color-3,
+    @chart-data-color-4,
+    @chart-data-color-5,
+    @chart-data-color-6,
+    @chart-data-active-color);
+
+  .tile.inverted & {
+    #scout.chart-auto-colors(
+      @chart-data-color-1-inverted,
+      @chart-data-color-2-inverted,
+      @chart-data-color-3-inverted,
+      @chart-data-color-4-inverted,
+      @chart-data-color-5-inverted,
+      @chart-data-color-6-inverted,
+      @chart-data-active-color-inverted);
+  }
+  .tile.color-alternative & {
+    #scout.chart-auto-colors(
+      @chart-data-color-1-alternative,
+      @chart-data-color-2-alternative,
+      @chart-data-color-3-alternative,
+      @chart-data-color-4-alternative,
+      @chart-data-color-5-alternative,
+      @chart-data-color-6-alternative,
+      @chart-data-active-color-alternative);
+  }
+  .tile.color-alternative.inverted & {
+    #scout.chart-auto-colors(
+      @chart-data-color-1-alternative-inverted,
+      @chart-data-color-2-alternative-inverted,
+      @chart-data-color-3-alternative-inverted,
+      @chart-data-color-4-alternative-inverted,
+      @chart-data-color-5-alternative-inverted,
+      @chart-data-color-6-alternative-inverted,
+      @chart-data-active-color-alternative-inverted);
+  }
+  .tile.color-rainbow & {
+    #scout.chart-auto-colors(
+      @chart-data-color-1-rainbow,
+      @chart-data-color-2-rainbow,
+      @chart-data-color-3-rainbow,
+      @chart-data-color-4-rainbow,
+      @chart-data-color-5-rainbow,
+      @chart-data-color-6-rainbow,
+      @chart-data-active-color-rainbow);
+  }
+}
+
+text.legend-label,
+text.legend-label-grid {
+
+  fill: @chart-legend-label-color;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+line.chart-axis {
+  stroke-width: 1px;
+  stroke: @chart-axis-line-color;
+  stroke-dasharray: 2,4;
+}
+
+text.chart-x-axis {
+  fill: @palette-white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+text.chart-y-axis-label {
+  fill: @chart-axis-text-color;
+  text-anchor: end;
+  dominant-baseline: central;
+  font-size: @font-size-normal;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+text.line-label {
+  fill: @chart-line-label-color;
+  font-size: @font-size-normal;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+text.line-label-background {
+  font-size: @font-size-normal;
+
+  fill: @chart-line-label-background-color;
+
+  .inverted & {
+    fill: @tile-default-inverted-background-color;
+  }
+
+  .color-alternative & {
+    fill: @chart-alternative-line-label-background-color;
+  }
+
+  .color-alternative.inverted & {
+    fill: @tile-alternative-inverted-background-color;
+  }
+}
+
+line.label-line {
+  stroke-width: 1px;
+  stroke: @chart-axis-line-color;
+}
+
+text.chart-x-axis-label,
+textPath.chart-x-axis-label {
+  fill: @chart-axis-text-color;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: @font-size-normal;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+/* --- Wire labels default ---*/
+
+.line-chart-wire-label {
+  fill: @chart-axis-text-color;
+  dominant-baseline: auto;
+  text-anchor: start;
+
+  &.small {
+    font-size: @font-size-normal;
+  }
+}
+
+.wire-legend-background-box {
+  fill: @background-color;
+  #scout.tile-colors(fill);
+  stroke-width: 0px;
+}
+
+/* --- PieChart / Donutchart --- */
+
+circle.innerCircle {
+  fill: @background-color;
+  #scout.tile-colors(fill);
+}
+
+.pie-chart {
+  stroke-width: 1px;
+  stroke: @background-color;
+  #scout.tile-colors(stroke);
+
+  &.clickable {
+    cursor: pointer;
+  }
+
+  &.selected {
+    fill: @chart-data-active-color;
+  }
+}
+
+text.pie-chart-percentage {
+  fill: @palette-white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+/* --- FulfillmentChart --- */
+
+path.fulfillment-chart {
+  stroke-width: 0px;
+
+  .clickable & {
+    cursor: pointer;
+  }
+
+  &.auto-color {
+    fill: @chart-data-color-2;
+
+    .clickable &:hover {
+      fill: @chart-data-color-3;
+    }
+
+    &.selected {
+      fill: @chart-data-color-3;
+    }
+  }
+
+  .color-alternative &.auto-color {
+    fill: @chart-data-color-2-alternative;
+
+    .clickable &:hover {
+      fill: @chart-data-color-3-alternative;
+    }
+
+    &.selected {
+      fill: @chart-data-color-3-alternative;
+    }
+  }
+
+  .tile.inverted & {
+    &.auto-color {
+      fill: @chart-data-color-1-inverted;
+
+      .clickable &:hover {
+        fill: @chart-data-color-2-inverted;
+      }
+
+      &.selected {
+        fill: @chart-data-color-2-inverted;
+      }
+    }
+
+    .color-alternative&.auto-color {
+      fill: @chart-data-color-2-alternative-inverted;
+
+      .clickable &:hover {
+        fill: @chart-data-color-3-alternative-inverted;
+      }
+
+      &.selected {
+        fill: @chart-data-color-3-alternative-inverted;
+      }
+    }
+  }
+}
+
+path.fulfillment-chart-inner-circle {
+  fill: @palette-gray-3;
+}
+
+path.fulfillment-chart-inner-circle-transparent {
+  fill: @background-color;
+  #scout.tile-colors(fill);
+}
+
+text.fulfillment-chart-label {
+  fill: @chart-axis-text-color;
+  text-anchor: middle;
+
+  .tile.inverted & {
+    fill: @fulfillment-chart-inverted-label-color;
+  }
+}
+
+/* --- LineChart --- */
+
+path.line-chart-line {
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: stroke 0.7s ease;
+
+  &.hover-style {
+    stroke: @chart-data-active-color
+  }
+}
+
+.line-chart-value-bubble {
+  fill: @palette-white;
+  stroke-width: 2px;
+  transition: opacity 0.7s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  .clickable & {
+    cursor: pointer;
+  }
+
+  .clickable &:hover {
+    fill: @chart-data-active-color;
+  }
+}
+
+.line-chart-value-box {
+  fill: @palette-white;
+  stroke: @border-color;
+  stroke-width: 1px;
+}
+
+/* --- BarChart --- */
+
+rect.bar-chart-bar {
+  stroke: @palette-white;
+  stroke-width: 0px;
+
+  &:hover {
+    fill: @chart-data-active-color;
+  }
+
+  .clickable & {
+    cursor: pointer;
+  }
+}
+
+/* --- SpeedoChart ---*/
+
+.speedo-chart-svg {
+  .clickable & {
+    cursor: pointer;
+  }
+}
+
+text.speedo-chart-label {
+  fill: @chart-axis-text-color;
+  text-anchor: middle;
+}
+
+path.speedo-chart-arc, path.pointer {
+
+  &.dark-green {
+    stroke: @speedo-chart-dark-green;
+  }
+
+  &.light-green {
+    stroke: @speedo-chart-green;
+  }
+
+  &.yellow {
+    stroke: @speedo-chart-yellow;
+  }
+
+  &.red {
+    stroke: @speedo-chart-red;
+  }
+}
+
+/* --- Salesfunnel --- */
+
+line.label-separator {
+  stroke: @chart-axis-line-color;
+
+  .tile.inverted & {
+    stroke: @palette-white;
+  }
+}
+
+polygon.salesfunnel-chart-bar {
+  stroke: @background-color;
+  #scout.tile-colors(stroke);
+  stroke-width: 1px;
+
+  .clickable & {
+    cursor: pointer;
+  }
+
+  /* Override standard colors set for auto-colors in SVG (see above) */
+  .tile.inverted &.auto-color:not(:hover),
+  .tile.inverted.color-alternative &.auto-color:not(:hover) {
+    fill: @palette-white;
+  }
+
+  .tile.inverted &.auto-color:hover {
+    fill: @salesfunnel-inverted-hover-color;
+  }
+}
+
+text.salesfunnel-bar-label {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-size: @font-size-normal;
+  fill: @salesfunnel-bar-label-color;
+  pointer-events: none;
+
+  .inverted & {
+    fill: @salesfunnel-inverted-bar-label-color;
+  }
+
+  .color-alternative & {
+    fill: @salesfunnel-alternative-bar-label-color;
+  }
+
+  .color-alternative.inverted & {
+    fill: @salesfunnel-alternative-inverted-bar-label-color;
+  }
+}
+
+text.salesfunnel-label {
+  fill: @salesfunnel-label-color;
+
+  .color-alternative & {
+    fill: @salesfunnel-alternative-label-color;
+  }
+
+  text-anchor: end;
+  dominant-baseline: central;
+  font-size: @font-size-normal;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+text.salesfunnel-conversionrate-label {
+  fill: @chart-axis-text-color;
+  text-anchor: start;
+  dominant-baseline: central;
+  font-size: @font-size-normal;
+
+  .tile.inverted & {
+    fill: @palette-white;
+  }
+}
+
+
+/* --- Venn --- */
+
+circle.venn-circle {
+   opacity: 0.5;
+
+  .clickable & {
+    cursor: pointer;
+  }
+
+  &.auto-color {
+    fill: @chart-data-color-2;
+
+    .tile.inverted & {
+      fill: @chart-data-text-color;
+    }
+
+    .tile.color-alternative & {
+      fill: @chart-data-color-2-alternative;
+    }
+
+    .tile.color-alternative.inverted & {
+      fill: @chart-data-color-2-alternative-inverted;
+    }
+  }
+}
+
+text.venn-label {
+  fill: @palette-white;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: @font-size-normal;
+  pointer-events: none;
+}
+
+line.venn-axis-white {
+  stroke: @palette-white;
+}
+
+text.venn-legend {
+  font-size: @font-size-normal;
+  dominant-baseline: auto;
+  text-anchor: start;
+}
+
+.venn-chart-loading-indicator {
+  @loading-animation-size: 30px;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -(@loading-animation-size / 2);
+  margin-left: -(@loading-animation-size / 2);
+  #scout.animation(fade-in 0.15s);
+
+  &::before {
+    #scout.animation(pulsate 2.0s linear infinite);
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 50%;
+    border: 1px solid @border-color;
+    width: @loading-animation-size;
+    height: @loading-animation-size;
+  }
+}

@@ -1,0 +1,278 @@
+/*
+ * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the BSI CRM Software License v1.0
+ * which accompanies this distribution as bsi-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+.chart-table-control-content {
+  padding: @table-control-content-padding;
+}
+
+.chart-container{
+  white-space: nowrap;
+  position: relative;
+  height: 100%;
+  width: 100%;
+
+  & > .scrollbar.y-axis {
+    width: 22px;
+  }
+}
+
+/* chart - type select */
+
+.chart-select {
+  float: left;
+  padding: 10px 40px 10px 30px;
+}
+
+svg.select-chart {
+  height: 60px;
+  width: 65px;
+  display: block;
+}
+
+svg.select-chart:not(.disabled) > rect.select-events:not(.disabled) {
+  cursor: pointer;
+}
+
+rect.select-fill, circle.select-fill {
+  fill: @chart-type-color;
+}
+
+path.select-fill-line, line.select-fill-line {
+  stroke: @chart-type-color;
+  fill: @table-control-container-background-color;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+path.select-fill-pie {
+  stroke: @table-control-container-background-color;
+  fill: @chart-type-color;
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+svg.select-chart:hover:not(.disabled) {
+  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
+    fill: @chart-selected-color;
+  }
+
+  & path.select-fill-line, & line.select-fill-line {
+    stroke: @chart-selected-color;
+  }
+}
+
+svg.select-chart.selected:not(.disabled) {
+  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
+    fill: @chart-selected-color;
+  }
+
+  & path.select-fill-line, & line.select-fill-line {
+    stroke: @chart-selected-color;
+  }
+}
+
+/* chart - axis and data select */
+
+.xaxis-select, .yaxis-select, .data-select {
+  float: left;
+  margin-top: 10px;
+  width: 175px;
+  display: inline-block;
+  overflow: hidden;
+
+  & > .disabled {
+    cursor: default;
+    background-color: @table-control-container-background-color;
+    color: @table-control-disabled-color;
+
+    &:hover {
+      color: @table-control-disabled-color;
+    }
+  }
+}
+
+.xaxis-select {
+  margin-right: 15px;
+}
+
+.yaxis-select {
+  width: 0px;
+}
+
+.data-select {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.select-axis, .select-data {
+  background-color: @control-background-color;
+  position: relative;
+  padding-left: 8px;
+  padding-right: 20px;
+  height: 30px;
+  line-height: 30px;
+  width: 100%;
+  cursor: pointer;
+  #scout.overflow-ellipsis();
+  border-top: 1px solid @border-color;
+  border-left: 1px solid @border-color;
+  border-right: 1px solid @border-color;
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &:last-child {
+    border-bottom: 1px solid @border-color;
+  }
+
+  &.selected {
+    background-color: @chart-selected-color;
+    color: @palette-white;
+    border-top: 1px solid transparent;
+    border-left: 1px solid @chart-selected-color;
+    border-right: 1px solid @chart-selected-color;
+    border-bottom: 1px solid transparent;
+  }
+
+  &.selected + & {
+    border-top: 1px solid transparent;
+  }
+
+  & .select-axis-group {
+    position: relative;
+    top: -7px;
+    font-size: @font-size-extra-small;
+    line-height: 12px;
+    display: none;
+  }
+
+  &.selected > .select-axis-group {
+    display: block;
+  }
+
+  &::before {
+    position: absolute;
+    font-size: 16px;
+    line-height: 16px;
+    right: 9px;
+    top: 6px;
+    #scout.font-icon();
+  }
+
+  &.axis-ver.selected::before {
+  content: @icon-long-arrow-down-bold;
+  }
+
+  &.axis-hor.selected::before {
+    content: @icon-long-arrow-right-bold;
+    right: 5px;
+  }
+
+  &.axis-around.selected::before {
+    content: @icon-rotate-right-bold;
+    right: 6px;
+  }
+
+  &.axis-up.selected::before {
+    content: @icon-long-arrow-up-bold;
+  }
+
+  &.data-count.selected::before {
+    content: @icon-count;
+    font-size: 20px;
+    top: 4px;
+    right: 5px;
+  }
+
+  &.data-sum.selected::before {
+    content: @icon-sum-bold;
+    top: 6px;
+    right: 8px;
+  }
+
+  &.data-avg.selected::before {
+    content: @icon-median;
+    top: 2px;
+    right: 8px;
+    font-size: 30px;
+  }
+}
+
+/* chart - main */
+
+.chart-main {
+  & :focus {
+      outline: none;
+    }
+}
+
+.main-chart {
+
+  rect&, circle& {
+    fill: @chart-data-color;
+    stroke: @palette-white;
+    stroke-width: 0px;
+    cursor: pointer;
+  }
+
+  circle& {
+    opacity: 0.7;
+  }
+
+  path& {
+    fill: @chart-data-color;
+    stroke: @table-control-container-background-color;
+    stroke-width: 2px;
+    cursor: pointer;
+  }
+
+  line& {
+    stroke: @chart-data-color;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  &:hover {
+    fill: @chart-data-active-color;
+  }
+
+  &.selected {
+    fill: @chart-data-active-color;
+  }
+}
+
+line.main-axis {
+  stroke: @chart-axis-line-color;
+  stroke-width: 1px;
+}
+
+text.main-axis {
+  fill: @chart-data-text-color;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+text.main-axis-y {
+  fill: @chart-axis-text-color;
+  text-anchor: end;
+  dominant-baseline: central;
+  font-size: @font-size-extra-small;
+}
+
+text.main-axis-x, textPath.main-axis-x {
+  fill: @chart-axis-text-color;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: @font-size-extra-small;
+}
