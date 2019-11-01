@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,27 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+import {scout} from './index';
+import {Action} from './index';
 import {ActionAdapter} from './index';
 import {TreeField} from './index';
-import {Action} from './index';
 import {TreeFieldAdapter} from './index';
 
-
-'KeyStroke': function() {
-  // A model keystroke is represented as an Action
-  return new Action();
-}
-'KeyStrokeAdapter': function() {
-  return new ActionAdapter();
-}
-'ComposerField': function() {
-  // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
-  return new TreeField();
-}
-'ComposerFieldAdapter': function() {
-  return new TreeFieldAdapter();
-}
-
-export default {
-
-};
+scout.addObjectFactories({
+  'KeyStroke': function() {
+    // A model keystroke is represented as an Action
+    return new Action();
+  },
+  'KeyStrokeAdapter': function() {
+    return new ActionAdapter();
+  },
+  'ComposerField': function() {
+    // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
+    return new TreeField();
+  },
+  'ComposerFieldAdapter': function() {
+    return new TreeFieldAdapter();
+  }
+});

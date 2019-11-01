@@ -52,5 +52,7 @@ export function registerKeyStrokes(keyStrokeContext, popup, menuItemClass) {
 }
 
 export default {
-  registerKeyStrokes
+  registerKeyStrokes,
+  _findMenuItems,
+  _changeSelection
 };

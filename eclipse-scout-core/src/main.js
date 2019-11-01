@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,38 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+
+import {App, Device, ObjectFactory, objects, strings, ValueField, widgets} from './index';
 import * as $ from 'jquery';
 
-
-export let sessions =[];
-export let appListeners =[];
-export let $activeElements =null;
-
-/**
- * Adds a listener to the app. If the app is not created yet it remembers the listener and adds it as soon the app is started.
- */
-export function addAppListener(type, func) {
-  var listener = {
-    type: type,
-    func: func
-  };
-  if (app) {
-    app.events.addListener(listener);
-  } else {
-    appListeners.push(listener);
-  }
-  return listener;
-};
-
-/**
- *  session.start();
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
- */
-export function inherits(childCtor, parentCtor) {
-  childCtor.prototype = Object.create(parentCtor.prototype);
-  childCtor.prototype.constructor = childCtor;
-  childCtor.parent = parentCtor;
-};
+let $activeElements = null;
+let objectFactories = {};
 
 /**
  * Returns the first of the given arguments that is not null or undefined. If no such element
@@ -54,7 +28,7 @@ export function nvl() {
     }
   }
   return result;
-};
+}
 
 /**
  * Use this method in your functions to assert that a mandatory parameter is passed
@@ -71,7 +45,7 @@ export function assertParameter(parameterName, value, type) {
     throw new Error('Parameter \'' + parameterName + '\' has wrong type');
   }
   return value;
-};
+}
 
 /**
  * Use this method to assert that a mandatory property is set. Throws an error when value is not set.
@@ -88,7 +62,7 @@ export function assertProperty(object, propertyName, type) {
     throw new Error('Property \'' + propertyName + '\' has wrong type');
   }
   return value;
-};
+}
 
 /**
  * Checks if one of the arguments from 1-n is equal to the first argument.
@@ -103,21 +77,21 @@ export function isOneOf(value) {
   if (arguments.length === 2 && Array.isArray(arguments[1])) {
     argsToCheck = arguments[1];
   } else {
-    argsToCheck = [...arguments].slice(1);
+    argsToCheck = Array.prototype.slice.call(arguments, 1);
   }
   return argsToCheck.indexOf(value) !== -1;
-};
+}
 
 /**
- * Creates a new object instance.<p> Delegates the create call to ObjectFactory#create.
+ * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
  * @returns {object}
  */
 export function create(objectType, model, options) {
-  return objectFactory.create(objectType, model, options);
-};
+  return ObjectFactory.get().create(objectType, model, options);
+}
 
 /**
- * Prepares the DOM for scout in the given document. This should be called once while initializing 
+ * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
  * If the target document is not specified, the global "document" variable is used instead.
  *
  * This is used by apps (App, LoginApp, LogoutApp)
@@ -125,7 +99,7 @@ export function create(objectType, model, options) {
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
  * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
- * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
+ * - Remove <scout-version> tag (it must have been processed before, see scout.App._initVersion())
  * - Add a device / browser class to the body tag to allow for device specific CSS rules.
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
@@ -138,7 +112,7 @@ export function prepareDOM(targetDocument) {
   $('body', targetDocument).addDeviceClass();
 
   // Prevent "Do you want to translate this page?" in Google Chrome
-  if (device.browser === Device.Browser.CHROME) {
+  if (Device.get().browser === Device.Browser.CHROME) {
     var metaNoTranslate = '<meta name="google" content="notranslate" />';
     var $title = $('head > title', targetDocument);
     if ($title.length === 0) {
@@ -148,7 +122,7 @@ export function prepareDOM(targetDocument) {
       $title.after(metaNoTranslate);
     }
   }
-};
+}
 
 /**
  * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
@@ -157,7 +131,7 @@ export function installGlobalMouseDownInterceptor(myDocument) {
   myDocument.addEventListener('mousedown', function(event) {
     ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
-};
+}
 
 /**
  * Because Firefox does not set the active state of a DOM element when the mousedown event
@@ -169,7 +143,7 @@ export function installGlobalMouseDownInterceptor(myDocument) {
  *   button:active, button.active { ... }
  */
 export function installSyntheticActiveStateHandler(myDocument) {
-  if (device.requiresSyntheticActiveState()) {
+  if (Device.get().requiresSyntheticActiveState()) {
     $activeElements = [];
     $(myDocument)
       .on('mousedown', function(event) {
@@ -186,7 +160,7 @@ export function installSyntheticActiveStateHandler(myDocument) {
         $activeElements = [];
       });
   }
-};
+}
 
 /**
  * Resolves the widget using the given widget id or HTML element.
@@ -209,14 +183,14 @@ export function widget(widgetIdOrElement, partId) {
   var $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
-    var session = getSession(partId);
+    var session = scout.getSession(partId);
     if (session) {
       widgetIdOrElement = strings.asString(widgetIdOrElement);
       return session.root.widget(widgetIdOrElement);
     }
   }
   return widgets.get($elem);
-};
+}
 
 /**
  * Helper function to get the model adapter for a given adapterId. If there is more than one
@@ -228,35 +202,15 @@ export function adapter(adapterId, partId) {
   if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
-  var session = getSession(partId);
+  var session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
   return null;
-};
-
-export function cloneShallow(template, properties, createUniqueId) {
-  assertParameter('template', template);
-  var clone = Object.create(Object.getPrototypeOf(template));
-  Object.getOwnPropertyNames(template)
-    .forEach(function(key) {
-      clone[key] = template[key];
-    });
-  if (properties) {
-    for (var key in properties) {
-      clone[key] = properties[key];
-    }
-  }
-  if (nvl(createUniqueId, true)) {
-    clone.id = objectFactory.createUniqueId();
-  }
-  if (clone.cloneOf === undefined) {
-    clone.cloneOf = template;
-  }
-  return clone;
-};
+}
 
 export function getSession(partId) {
+  let sessions = App.get().sessions;
   if (!sessions) {
     return null;
   }
@@ -271,7 +225,7 @@ export function getSession(partId) {
     }
   }
   return null;
-};
+}
 
 /**
  * This method exports the adapter with the given ID as JSON, it returns an plain object containing the
@@ -279,12 +233,12 @@ export function getSession(partId) {
  * This method can only be called through the browser JavaScript console.
  * Here's an example of how to call the method:
  *
- * JSON.stringify(exportAdapter(4))
+ * JSON.stringify(scout.exportAdapter(4))
  *
  * @param adapterId
  */
 export function exportAdapter(adapterId, partId) {
-  var session = getSession(partId);
+  var session = scout.getSession(partId);
   if (session && session.modelAdapterRegistry) {
     var adapter = session.getModelAdapter(adapterId);
     if (!adapter) {
@@ -331,7 +285,7 @@ export function exportAdapter(adapterId, partId) {
     });
     adapterData = adapter.exportAdapterData(adapterData);
   }
-};
+}
 
 /**
  * Reloads the entire browser window.
@@ -371,26 +325,48 @@ export function reloadPage(options) {
       }
     });
   }
-};
+}
+
+export function addObjectFactories(factories) {
+  objectFactories = $.extend(objectFactories, factories);
+}
+
+export function cloneShallow(template, properties, createUniqueId) {
+  assertParameter('template', template);
+  var clone = Object.create(Object.getPrototypeOf(template));
+  Object.getOwnPropertyNames(template)
+    .forEach((key) => {
+      clone[key] = template[key];
+    });
+  if (properties) {
+    for (let key in properties) {
+      clone[key] = properties[key];
+    }
+  }
+  if (nvl(createUniqueId, true)) {
+    clone.id = ObjectFactory.get().createUniqueId();
+  }
+  if (clone.cloneOf === undefined) {
+    clone.cloneOf = template;
+  }
+  return clone;
+}
 
 export default {
-  $activeElements,
-  adapter,
-  addAppListener,
-  appListeners,
+  nvl,
   assertParameter,
   assertProperty,
-  cloneShallow,
+  isOneOf,
   create,
-  exportAdapter,
-  getSession,
-  inherits,
+  prepareDOM,
   installGlobalMouseDownInterceptor,
   installSyntheticActiveStateHandler,
-  isOneOf,
-  nvl,
-  prepareDOM,
+  widget,
+  adapter,
+  getSession,
+  exportAdapter,
   reloadPage,
-  sessions,
-  widget
-};
+  addObjectFactories,
+  objectFactories,
+  cloneShallow
+}

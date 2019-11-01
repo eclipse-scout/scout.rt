@@ -350,6 +350,9 @@ export function legacyFont(obj, $element, propertyPrefix) {
   return style;
 }
 
+export function _getElement() {
+  return element;
+}
 
 export default {
   RGB_BLACK,
@@ -368,5 +371,6 @@ export default {
   parseFontSpec,
   put,
   rgb,
-  styleMap
+  styleMap,
+  _getElement
 };
