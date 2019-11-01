@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Range, RemoteEvent, Table} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableFilter", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("TableFilter", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -295,7 +299,7 @@ describe("TableFilter", function() {
       expect(table.$rows().eq(0).data('row')).toBe(table.filteredRows()[0]);
 
       // Use last filtered row as base row index
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 2));
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 2));
       table._renderViewport();
 
       expect(table.$rows().length).toBe(1); // only one row in view range
@@ -468,12 +472,13 @@ describe("TableFilter", function() {
 
     describe("filter", function() {
       var listener = {
-        _onFilter: function() {}
+        _onFilter: function() {
+        }
       };
 
       it("gets fired when table with a filter is initializing", function() {
         var model = helper.createModelFixture(2, 2);
-        var table = new scout.Table();
+        var table = new Table();
         var filter = createColumnFilterModel(model.columns[0].id, ['cell1_0']);
         model.filters = [filter];
 
@@ -486,7 +491,7 @@ describe("TableFilter", function() {
 
       it("does not get fired when table with no filters is initializing", function() {
         var model = helper.createModelFixture(2, 2);
-        var table = new scout.Table();
+        var table = new Table();
 
         spyOn(listener, '_onFilter');
         table.on('filter', listener._onFilter);
@@ -675,7 +680,7 @@ describe("TableFilter", function() {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new scout.RemoteEvent(table.id, 'filter', {
+        var event = new RemoteEvent(table.id, 'filter', {
           rowIds: [table.rows[1].id],
           showBusyIndicator: false
         });

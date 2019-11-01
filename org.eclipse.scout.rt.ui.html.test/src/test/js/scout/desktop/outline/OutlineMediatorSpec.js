@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,22 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device, Outline, scout} from '../../../src/index';
+import {OutlineSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('OutlineMediator', function() {
 
   var session, tableModel, detailTable, page, firstColumn;
 
-  /** @type {scout.Outline} */
+  /** @type {Outline} */
   var outline;
-  /** @type {scout.OutlineSpecHelper} */
+  /** @type {OutlineSpecHelper} */
   var helper;
-  /** @type {scout.TableSpecHelper} */
+  /** @type {TableSpecHelper} */
   var tableHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.OutlineSpecHelper(session);
-    tableHelper = new scout.TableSpecHelper(session);
+    helper = new OutlineSpecHelper(session);
+    tableHelper = new TableSpecHelper(session);
     var model = helper.createModelFixture(1, 1, false);
     outline = helper.createOutline(model);
 
@@ -82,7 +86,7 @@ describe('OutlineMediator', function() {
   });
 
   it('tableRowOrderChanged', function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     var modelRows = [

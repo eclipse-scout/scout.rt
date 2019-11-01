@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('NumberFieldAdapter', function() {
   var session;
   var helper;
@@ -15,7 +18,7 @@ describe('NumberFieldAdapter', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   describe('parse', function() {
@@ -42,9 +45,11 @@ describe('NumberFieldAdapter', function() {
       // The error status is handled completely by the server, thus it must not be cleared by JS, even if the value is valid
       // Use case: SequenceBox with number fields, second field contains smaller (invalid) value than first one, user types another too small value
       // -> error status must stay (server won't send another error status because the message has not changed)
-      field.modelAdapter._syncPropertiesOnPropertyChange({errorStatus: {
-        message: 'error status from server'
-      }});
+      field.modelAdapter._syncPropertiesOnPropertyChange({
+        errorStatus: {
+          message: 'error status from server'
+        }
+      });
       field.render();
       expect(field.errorStatus.message).toBe('error status from server');
 

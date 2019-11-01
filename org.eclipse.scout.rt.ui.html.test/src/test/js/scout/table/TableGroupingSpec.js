@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays, Device, Range, Table} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("Table Grouping", function() {
 
   var session, helper, model, table, column0, column1, column2, column3, column4, rows, columns, adapter;
@@ -16,7 +20,7 @@ describe("Table Grouping", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -115,7 +119,7 @@ describe("Table Grouping", function() {
   }
 
   function assertGroupingProperty(table) {
-    var i, expectGrouped = scout.arrays.init(5, false);
+    var i, expectGrouped = arrays.init(5, false);
     for (i = 1; i < arguments.length; i++) {
       expectGrouped[arguments[i]] = true;
     }
@@ -155,7 +159,7 @@ describe("Table Grouping", function() {
   }
 
   it("renders an aggregate row for each group", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -170,17 +174,17 @@ describe("Table Grouping", function() {
   });
 
   it("considers groupingStyle -> aggregate rows must be rendered previous to the grouped rows", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
-    table.groupingStyle = scout.Table.GroupingStyle.TOP;
+    table.groupingStyle = Table.GroupingStyle.TOP;
     prepareContent();
     render(table);
     addGrouping(table, column0, false);
 
     var // check in the DOM if the aggregate row comes previous to the first
-    // row of the group
+      // row of the group
       $mixedRows = table.$data.children('.table-row,.table-aggregate-row'),
       $aggregateRows = table.$data.find('.table-aggregate-row'),
       aggrRow1Pos = $mixedRows.index($aggregateRows.get(0)),
@@ -193,7 +197,7 @@ describe("Table Grouping", function() {
   });
 
   it("considers view range -> only renders an aggregate row for rendered rows", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -215,7 +219,7 @@ describe("Table Grouping", function() {
   });
 
   it("considers view range -> doesn't render an aggregate row if the last row of the group is not rendered", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -236,7 +240,7 @@ describe("Table Grouping", function() {
     expect(table._aggregateRows[0].$row).toBeFalsy();
     expect(table._aggregateRows[1].$row).toBeFalsy();
 
-    spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
+    spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
     table._renderViewport();
 
     // Last row is rendered -> aggregate row needs to be rendered as well
@@ -249,7 +253,7 @@ describe("Table Grouping", function() {
   });
 
   it("regroups if rows get inserted", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -276,7 +280,7 @@ describe("Table Grouping", function() {
   });
 
   it("regroups if rows get inserted, event is from server and table was empty", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable(true);
@@ -300,7 +304,7 @@ describe("Table Grouping", function() {
   });
 
   it("does not regroup if rows get inserted, event is from server and table was not empty", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable(true);
@@ -328,7 +332,7 @@ describe("Table Grouping", function() {
   });
 
   it("regroups when a filter is applied", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -348,7 +352,7 @@ describe("Table Grouping", function() {
   });
 
   it("regroups if rows get deleted", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -378,7 +382,7 @@ describe("Table Grouping", function() {
   });
 
   it("removes aggregate rows if all rows get deleted", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -400,7 +404,7 @@ describe("Table Grouping", function() {
   });
 
   it("regroups if rows get updated", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -427,7 +431,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group column 0 only", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -446,7 +450,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group column 1 only", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -465,7 +469,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group columns 0 (avg) and 1 (sum)", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -487,7 +491,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group columns 0, 1 and 2", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -512,7 +516,7 @@ describe("Table Grouping", function() {
 
   // vary order
   it("may group columns 2 and 1", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -534,7 +538,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group column 1 only after grouping column 0 first", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();
@@ -555,7 +559,7 @@ describe("Table Grouping", function() {
   });
 
   it("may group column 1 and 2 after grouping column 0 first", function() {
-    if (!scout.device.supportsInternationalization()) {
+    if (!Device.get().supportsInternationalization()) {
       return;
     }
     prepareTable();

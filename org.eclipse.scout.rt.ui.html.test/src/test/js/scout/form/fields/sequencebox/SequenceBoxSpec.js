@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {dates, scout, SequenceBoxGridConfig, Status} from '../../../../src/index';
+import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('SequenceBox', function() {
   var session, helper, menuHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
-    menuHelper = new scout.MenuSpecHelper(session);
+    helper = new FormSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
   });
 
   function createField(modelProperties) {
@@ -185,7 +189,7 @@ describe('SequenceBox', function() {
       var field = createField({
         statusVisible: false
       });
-      field.fields[0].errorStatus = new scout.Status({
+      field.fields[0].errorStatus = new Status({
         message: 'foo'
       });
       field.render();
@@ -210,7 +214,7 @@ describe('SequenceBox', function() {
       var field = createField({
         statusVisible: false
       });
-      field.fields[0].errorStatus = new scout.Status({
+      field.fields[0].errorStatus = new Status({
         message: 'foo'
       });
       field.render();
@@ -513,7 +517,7 @@ describe('SequenceBox', function() {
 
   describe("clone", function() {
     it("considers the clone properties and deep clones fields", function() {
-      var cloneHelper = new scout.CloneSpecHelper();
+      var cloneHelper = new CloneSpecHelper();
       var seqBox = scout.create('SequenceBox', {
         parent: session.desktop,
         id: 'seq01',
@@ -544,7 +548,7 @@ describe('SequenceBox', function() {
 
       // Assert that logical grid is a new instance
       expect(clone.logicalGrid).not.toBe(seqBox.logicalGrid);
-      expect(clone.logicalGrid.gridConfig instanceof scout.SequenceBoxGridConfig).toBe(true);
+      expect(clone.logicalGrid.gridConfig instanceof SequenceBoxGridConfig).toBe(true);
     });
   });
 
@@ -614,13 +618,13 @@ describe('SequenceBox', function() {
       expect(box.fields[0].autoDate).toBe(null);
       expect(box.fields[1].autoDate).toBe(null);
 
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[0].setValue(date);
 
       expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
       expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('is set only on following fields in the sequence box', function() {
@@ -642,21 +646,21 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate).toBe(null);
       expect(box.fields[3].autoDate).toBe(null);
 
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[1].setValue(date);
 
       expect(box.fields[0].autoDate).toBe(null);
       expect(box.fields[1].autoDate).toBe(null);
       expect(box.fields[1].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[2].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
 
-      var date2 = scout.dates.create('2017-05-26 12:30:00.000');
+      var date2 = dates.create('2017-05-26 12:30:00.000');
       box.fields[2].setValue(date2);
 
       expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
     it('is correctly removed again after a date field value is removed', function() {
@@ -678,23 +682,23 @@ describe('SequenceBox', function() {
       expect(box.fields[2].autoDate).toBe(null);
       expect(box.fields[3].autoDate).toBe(null);
 
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
-      var date2 = scout.dates.create('2017-05-26 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
+      var date2 = dates.create('2017-05-26 12:30:00.000');
 
       box.fields[0].setValue(date);
       box.fields[2].setValue(date2);
 
       expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
       expect(box.fields[2].value.toISOString()).toBe(date2.toISOString());
-      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
 
       box.fields[0].setValue(null);
       expect(box.fields[0].value).toBe(null);
       expect(box.fields[1].autoDate).toBe(null);
       expect(box.fields[2].autoDate).toBe(null);
       // field3.autoDate shouldn't be touched by field0's value change
-      expect(box.fields[3].autoDate.toISOString()).toBe(scout.dates.shift(date2, 0, 0, 1).toISOString());
+      expect(box.fields[3].autoDate.toISOString()).toBe(dates.shift(date2, 0, 0, 1).toISOString());
     });
 
     it('is correctly set within sequence boxes containing other fields as well', function() {
@@ -714,16 +718,16 @@ describe('SequenceBox', function() {
       expect(box.fields[0].autoDate).toBe(null);
       expect(box.fields[2].autoDate).toBe(null);
 
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
 
       box.fields[0].setValue(date);
 
       expect(box.fields[0].value.toISOString()).toBe(date.toISOString());
-      expect(box.fields[2].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[2].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('works correctly with values already set on the datefield model', function() {
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
       var box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{
@@ -735,12 +739,12 @@ describe('SequenceBox', function() {
       });
       box.render();
       expect(box.fields[0].autoDate).toBe(null);
-      expect(box.fields[1].autoDate.toISOString()).toBe(scout.dates.shift(date, 0, 0, 1).toISOString());
+      expect(box.fields[1].autoDate.toISOString()).toBe(dates.shift(date, 0, 0, 1).toISOString());
     });
 
     it('dont conflict with already set/programmed autoDates', function() {
-      var date = scout.dates.create('2017-05-23 12:30:00.000');
-      var date2 = scout.dates.create('2017-05-27 12:30:00.000');
+      var date = dates.create('2017-05-23 12:30:00.000');
+      var date2 = dates.create('2017-05-27 12:30:00.000');
       var box = scout.create('SequenceBox', {
         parent: session.desktop,
         fields: [{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {BeanColumn, NullWidget, ObjectFactory, scout} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TableTextUserFilter', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('TableTextUserFilter', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -27,31 +31,28 @@ describe('TableTextUserFilter', function() {
   });
 
   function createFilter(table) {
-    var filter = scout.create('TableTextUserFilter', {
+    return scout.create('TableTextUserFilter', {
       session: session,
       table: table
     });
-    return filter;
   }
 
-  var ASpecBeanColumn = function() {
-    ASpecBeanColumn.parent.call(this);
-  };
-  scout.inherits(ASpecBeanColumn, scout.BeanColumn);
-  ASpecBeanColumn.prototype._renderValue = function($cell, value) {
-    $cell.appendDiv().text(value.a);
-  };
+  class ASpecBeanColumn extends BeanColumn {
+    _renderValue($cell, value) {
+      $cell.appendDiv().text(value.a);
+    }
+  }
 
   describe('filter', function() {
 
     beforeEach(function() {
-      scout.objectFactory.register('ASpecBeanColumn', function() {
+      ObjectFactory.get().register('ASpecBeanColumn', function() {
         return new ASpecBeanColumn();
       });
     });
 
     afterEach(function() {
-      scout.objectFactory.unregister('ASpecBeanColumn');
+      ObjectFactory.get().unregister('ASpecBeanColumn');
     });
 
     it('filters rows based on cell text', function() {
@@ -126,7 +127,7 @@ describe('TableTextUserFilter', function() {
 
     it('works with bean columns', function() {
       var table = scout.create('Table', {
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session,
         columns: [
           scout.create('ASpecBeanColumn', {

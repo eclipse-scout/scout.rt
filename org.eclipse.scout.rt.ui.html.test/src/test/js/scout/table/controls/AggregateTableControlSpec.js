@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+import {DecimalFormat, HtmlComponent, scout} from '../../../src/index';
+
+
 describe("AggregateTableControl", function() {
   var session;
   var helper;
@@ -15,8 +19,8 @@ describe("AggregateTableControl", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
-    helper = new scout.TableSpecHelper(session);
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new TableSpecHelper(session);
 
     $.fx.off = true;
     jasmine.Ajax.install();
@@ -32,14 +36,16 @@ describe("AggregateTableControl", function() {
 
   function createFormMock() {
     var form = {
-      render: function() {},
-      remove: function() {},
+      render: function() {
+      },
+      remove: function() {
+      },
       $container: $('<div>'),
       rootGroupBox: {
         fields: []
       }
     };
-    form.htmlComp = scout.HtmlComponent.install(form.$container, session);
+    form.htmlComp = HtmlComponent.install(form.$container, session);
     return form;
   }
 
@@ -180,7 +186,7 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 1000;
       rows[1].cells[1].value = 1000;
       rows[2].cells[1].value = 2000;
-      column1.decimalFormat = new scout.DecimalFormat(session.locale, {
+      column1.decimalFormat = new DecimalFormat(session.locale, {
         pattern: '#.00'
       });
       table.render();
@@ -196,7 +202,7 @@ describe("AggregateTableControl", function() {
       rows[0].cells[1].value = 0.005;
       rows[1].cells[1].value = 0.006;
       rows[2].cells[1].value = 0.005;
-      column1.decimalFormat = new scout.DecimalFormat(session.locale, {
+      column1.decimalFormat = new DecimalFormat(session.locale, {
         pattern: '#.00'
       });
       table.render();

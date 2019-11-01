@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DesktopNotification, scout, Status, Widget} from '../../../src/index';
+
+
 describe('DesktopNotification', function() {
   var session, helper, $sandbox,
-    parent = new scout.Widget();
+    parent = new Widget();
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -46,7 +49,7 @@ describe('DesktopNotification', function() {
   });
 
   it('_init copies properties from event (model)', function() {
-    var notification = new scout.DesktopNotification();
+    var notification = new DesktopNotification();
     notification.init({
       parent: parent,
       id: 'foo',
@@ -54,14 +57,14 @@ describe('DesktopNotification', function() {
       closable: true,
       status: {
         message: 'bar',
-        severity: scout.Status.Severity.OK
+        severity: Status.Severity.OK
       }
     });
     expect(notification.id).toBe('foo');
     expect(notification.duration).toBe(123);
     expect(notification.closable).toBe(true);
     expect(notification.status.message).toBe('bar');
-    expect(notification.status.severity).toBe(scout.Status.Severity.OK);
+    expect(notification.status.severity).toBe(Status.Severity.OK);
   });
 
   it('has close-icon when notification is closable', function() {
@@ -72,7 +75,7 @@ describe('DesktopNotification', function() {
       closable: true,
       status: {
         message: 'bar',
-        severity: scout.Status.Severity.OK
+        severity: Status.Severity.OK
       }
     });
     notification.render($sandbox);

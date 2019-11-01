@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Range, scout} from '../../src/index';
+
+
 describe("VirtualTileGrid", function() {
   var session;
 
@@ -55,7 +58,7 @@ describe("VirtualTileGrid", function() {
       expect($tiles.eq(2).data('widget')).toBe(tileGrid.tiles[2]);
       expect($tiles.eq(3).data('widget')).toBe(tileGrid.tiles[3]);
 
-      tileGrid._renderViewRange(new scout.Range(1, 3));
+      tileGrid._renderViewRange(new Range(1, 3));
       $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(4);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[2]);
@@ -63,7 +66,7 @@ describe("VirtualTileGrid", function() {
       expect($tiles.eq(2).data('widget')).toBe(tileGrid.tiles[4]);
       expect($tiles.eq(3).data('widget')).toBe(tileGrid.tiles[5]);
 
-      tileGrid._renderViewRange(new scout.Range(2, 4));
+      tileGrid._renderViewRange(new Range(2, 4));
       $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(3);
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[4]);
@@ -86,7 +89,7 @@ describe("VirtualTileGrid", function() {
       };
       tileGrid.setVirtual(true);
       $tiles = tileGrid.$container.children('.tile');
-      expect(tileGrid.viewRangeRendered.equals(new scout.Range(0, 2))).toBe(true);
+      expect(tileGrid.viewRangeRendered.equals(new Range(0, 2))).toBe(true);
       expect($tiles.length).toBe(4); // Only first to rows rendered
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[0]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[1]);
@@ -113,7 +116,7 @@ describe("VirtualTileGrid", function() {
       };
       tileGrid.setVirtual(true);
       $tiles = tileGrid.$container.children('.tile');
-      expect(tileGrid.viewRangeRendered.equals(new scout.Range(0, 2))).toBe(true);
+      expect(tileGrid.viewRangeRendered.equals(new Range(0, 2))).toBe(true);
       expect($tiles.length).toBe(4); // Still 4, all tiles are visible
       tileGrid.validateLayout(); // Enforce layout to check whether it runs without exceptions
 
@@ -143,7 +146,7 @@ describe("VirtualTileGrid", function() {
       };
       tileGrid.setVirtual(true);
       $tiles = tileGrid.$container.children('.tile');
-      expect(tileGrid.viewRangeRendered.equals(new scout.Range(0, 2))).toBe(true);
+      expect(tileGrid.viewRangeRendered.equals(new Range(0, 2))).toBe(true);
       expect($tiles.length).toBe(4); // Only first to rows rendered
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.tiles[0]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.tiles[1]);
@@ -175,7 +178,7 @@ describe("VirtualTileGrid", function() {
       };
       tileGrid.setVirtual(true);
       $tiles = tileGrid.$container.children('.tile');
-      expect(tileGrid.viewRangeRendered.equals(new scout.Range(0, 1))).toBe(true);
+      expect(tileGrid.viewRangeRendered.equals(new Range(0, 1))).toBe(true);
       expect($tiles.length).toBe(2); // Only first row has to be rendered
       expect($tiles.eq(0).data('widget')).toBe(tileGrid.filteredTiles[0]);
       expect($tiles.eq(1).data('widget')).toBe(tileGrid.filteredTiles[1]);
@@ -202,12 +205,12 @@ describe("VirtualTileGrid", function() {
       expect(tileGrid.$container.children('.tile.selected').eq(1)[0]).toBe(tileGrid.selectedTiles[1].$container[0]);
 
       // Scroll down
-      tileGrid._renderViewRange(new scout.Range(1, 2));
+      tileGrid._renderViewRange(new Range(1, 2));
       expect(tileGrid.$container.children('.tile.selected').length).toBe(1);
       expect(tileGrid.$container.children('.tile.selected').eq(0)[0]).toBe(tileGrid.selectedTiles[2].$container[0]);
 
       // Scroll up again
-      tileGrid._renderViewRange(new scout.Range(0, 1));
+      tileGrid._renderViewRange(new Range(0, 1));
       expect(tileGrid.$container.children('.tile.selected').length).toBe(2);
       expect(tileGrid.$container.children('.tile.selected').eq(0)[0]).toBe(tileGrid.selectedTiles[0].$container[0]);
       expect(tileGrid.$container.children('.tile.selected').eq(1)[0]).toBe(tileGrid.selectedTiles[1].$container[0]);
@@ -500,7 +503,7 @@ describe("VirtualTileGrid", function() {
           expect(tile0.selected).toBe(true);
           expect(tile2.selected).toBe(false);
 
-          tileGrid._renderViewRange(new scout.Range(1, 2));
+          tileGrid._renderViewRange(new Range(1, 2));
           expect(tile0.rendered).toBe(false);
           tile2.$container.triggerMouseDown({
             modifier: 'ctrl'
@@ -590,7 +593,7 @@ describe("VirtualTileGrid", function() {
       expect($tiles.eq(0).data('widget')).toBe(tile0);
       expect($tiles.eq(1).data('widget')).toBe(tile1);
 
-      tileGrid._renderViewRange(new scout.Range(1, 2));
+      tileGrid._renderViewRange(new Range(1, 2));
       $tiles = tileGrid.$container.children('.tile');
       expect($tiles.length).toBe(1);
       expect($tiles.eq(0).data('widget')).toBe(tile2);

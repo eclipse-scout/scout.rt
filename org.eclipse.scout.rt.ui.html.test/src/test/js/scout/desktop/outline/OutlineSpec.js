@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,15 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ObjectFactory, objects, OutlineOverview, scout, Status, TileOutlineOverview, Tree} from '../../../src/index';
+import {FormSpecHelper, MenuSpecHelper, OutlineSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("Outline", function() {
   var helper, menuHelper, formHelper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.OutlineSpecHelper(session);
-    menuHelper = new scout.MenuSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    helper = new OutlineSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -52,7 +56,7 @@ describe("Outline", function() {
       var model = {
         session: session,
         parent: session.desktop,
-        severity: scout.Status.Severity.ERROR
+        severity: Status.Severity.ERROR
       };
       var messageBox = scout.create('MessageBox', model);
 
@@ -128,7 +132,7 @@ describe("Outline", function() {
 
       tree.deleteAllChildNodes();
       expect(tree._onNodeDeleted.calls.count()).toBe(39);
-      expect(scout.objects.countOwnProperties(tree.nodesMap)).toBe(0);
+      expect(objects.countOwnProperties(tree.nodesMap)).toBe(0);
     });
 
   });
@@ -140,7 +144,7 @@ describe("Outline", function() {
       var tree = helper.createOutline(model);
       var node0 = tree.nodes[0];
 
-      tree.displayStyle = scout.Tree.DisplayStyle.BREADCRUMB;
+      tree.displayStyle = Tree.DisplayStyle.BREADCRUMB;
       tree.render();
 
       tree.selectNodes(node0);
@@ -176,8 +180,10 @@ describe("Outline", function() {
     it("otherwise handle single selection (or do nothing when selection is != 1 node)", function() {
       node.detailFormVisibleByUi = false;
       outline.navigateUpInProgress = false;
-      outline._renderSelection = function() {};
-      outline._renderMenus = function() {};
+      outline._renderSelection = function() {
+      };
+      outline._renderMenus = function() {
+      };
 
       // don't change the visibleByUi flag when selection is != 1
       outline.selectNodes([]);
@@ -386,7 +392,7 @@ describe("Outline", function() {
       outline.setEmbedDetailContent(true);
       outline.render();
       var node0 = outline.nodes[0];
-      node0.childNodes[0].detailForm = new scout.FormSpecHelper(session).createFormWithOneField({
+      node0.childNodes[0].detailForm = new FormSpecHelper(session).createFormWithOneField({
         modal: false
       });
       expect(outline.detailContent).toBe(null);
@@ -414,9 +420,9 @@ describe("Outline", function() {
         outline.selectNodes(outline.nodes[1]);
 
         // The outline node contains a tree as detail node (real life case would be a form with a tree field, but this is easier to test)
-        var treeHelper = new scout.TreeSpecHelper(session);
+        var treeHelper = new TreeSpecHelper(session);
         var treeModel = treeHelper.createModelFixture(3, 3);
-        treeModel.nodes[0].id = scout.objectFactory.createUniqueId(); // tree helper doesn't use unique ids -> do it here
+        treeModel.nodes[0].id = ObjectFactory.get().createUniqueId(); // tree helper doesn't use unique ids -> do it here
         var tree = treeHelper.createTree(treeModel);
         outline.setDetailContent(tree);
 
@@ -469,7 +475,7 @@ describe("Outline", function() {
     it("uses the TileOutlineOverview by default", function() {
       var outline = helper.createOutline(helper.createModelFixture(3, 2));
       session.desktop.setOutline(outline);
-      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(true);
+      expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
     });
 
     it("may be replaced by another OutlineOverview", function() {
@@ -479,12 +485,12 @@ describe("Outline", function() {
       };
       var outline = helper.createOutline(model);
       session.desktop.setOutline(outline);
-      expect(outline.outlineOverview instanceof scout.OutlineOverview).toBe(true);
-      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(false);
+      expect(outline.outlineOverview instanceof OutlineOverview).toBe(true);
+      expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(false);
 
       var outlineOverview = scout.create('TileOutlineOverview', {parent: outline});
       outline.setOutlineOverview(outlineOverview);
-      expect(outline.outlineOverview instanceof scout.TileOutlineOverview).toBe(true);
+      expect(outline.outlineOverview instanceof TileOutlineOverview).toBe(true);
       expect(outline.outlineOverview).toBe(outlineOverview);
     });
 

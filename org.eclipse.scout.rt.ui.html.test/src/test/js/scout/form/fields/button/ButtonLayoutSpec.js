@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,31 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Button, FormField, graphics, HtmlEnvironment} from '../../../../src/index';
+
+
 describe('ButtonLayout', function() {
   var session;
-  var helper;
 
-  var CustomButton = function() {
-    CustomButton.parent.call(this);
-  };
-  scout.inherits(CustomButton, scout.Button);
+  class CustomButton extends Button {
+    _render() {
+      super._render();
+      this.$fieldContainer.css({
+        display: 'inline-block',
+        minHeight: 40,
+        minWidth: 100,
+        margin: 5
+      });
 
-  CustomButton.prototype._render = function() {
-    CustomButton.parent.prototype._render.call(this);
-    this.$fieldContainer.css({
-      display: 'inline-block',
-      minHeight: 40,
-      minWidth: 100,
-      margin: 5
-    });
+      this.$status.css({
+        display: 'inline-block',
+        minHeight: 30,
+        minWidth: 40,
+        margin: 5
+      });
+    }
+  }
 
-    this.$status.css({
-      display: 'inline-block',
-      minHeight: 30,
-      minWidth: 40,
-      margin: 5
-    });
-  };
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -44,7 +44,7 @@ describe('ButtonLayout', function() {
     var fieldSize, statusMargins;
 
     beforeEach(function() {
-      statusWidth = scout.htmlEnvironment.fieldStatusWidth;
+      statusWidth = HtmlEnvironment.get().fieldStatusWidth;
 
       button = new CustomButton();
       button.init({
@@ -55,16 +55,16 @@ describe('ButtonLayout', function() {
     });
 
     function readSizes() {
-      fieldSize = scout.graphics.prefSize(button.$fieldContainer, true);
-      statusMargins = scout.graphics.margins(button.$status);
+      fieldSize = graphics.prefSize(button.$fieldContainer, true);
+      statusMargins = graphics.margins(button.$status);
     }
 
     describe('statusPosition', function() {
       describe('top', function() {
         it('increases width because status is always on the right side', function() {
           button.setStatusVisible(true);
-          button.setLabelPosition(scout.FormField.LabelPosition.TOP);
-          button.setStatusPosition(scout.FormField.StatusPosition.TOP);
+          button.setLabelPosition(FormField.LabelPosition.TOP);
+          button.setStatusPosition(FormField.StatusPosition.TOP);
           readSizes();
 
           // Status is still on the right side

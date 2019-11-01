@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HtmlComponent, PopupWindow} from '../../src/index';
+
+
 describe('PopupWindow', function() {
   var session, helper, $sandbox, origDevice, myForm, myWindow,
-    myErrorHandler = function() {};
+    myErrorHandler = function() {
+    };
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -21,8 +25,9 @@ describe('PopupWindow', function() {
     myForm = {
       modelClass: 'Foo',
       session: session,
-      render: function() {},
-      htmlComp: scout.HtmlComponent.install($sandbox, session)
+      render: function() {
+      },
+      htmlComp: HtmlComponent.install($sandbox, session)
     };
 
     // window mock
@@ -37,7 +42,7 @@ describe('PopupWindow', function() {
   });
 
   it('Constructor sets cross references and window-name', function() {
-    var popupWindow = new scout.PopupWindow(myWindow, myForm);
+    var popupWindow = new PopupWindow(myWindow, myForm);
 
     expect(myWindow.popupWindow).toBe(popupWindow);
     expect(myWindow.name).toBe('Scout popup-window Foo');
@@ -45,7 +50,7 @@ describe('PopupWindow', function() {
   });
 
   it('Initialization in _onReady', function() {
-    var popupWindow = new scout.PopupWindow(myWindow, myForm),
+    var popupWindow = new PopupWindow(myWindow, myForm),
       called = false;
 
     popupWindow.one('init', function() {

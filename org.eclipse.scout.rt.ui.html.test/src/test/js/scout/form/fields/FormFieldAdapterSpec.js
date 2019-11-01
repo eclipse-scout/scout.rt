@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormFieldAdapter, Status} from '../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("FormFieldAdapter", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("FormFieldAdapter", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   describe("onModelPropertyChange", function() {
@@ -23,7 +27,7 @@ describe("FormFieldAdapter", function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      adapter = new scout.FormFieldAdapter();
+      adapter = new FormFieldAdapter();
       adapter.init(model);
       formField = adapter.createWidget(model, session.desktop);
     });
@@ -34,8 +38,8 @@ describe("FormFieldAdapter", function() {
       // check whether or not the onModelPropertyChange method applies
       // the ID of the event by error (should not happen).
       var event = {
-        id:'123',
-        type:'property',
+        id: '123',
+        type: 'property',
         properties: {
           errorStatus: {message: 'foo'}
         }
@@ -43,7 +47,7 @@ describe("FormFieldAdapter", function() {
       // required
       formField._$statusLabel = $('<div></div>');
       adapter.onModelPropertyChange(event);
-      expect(formField.errorStatus).toEqual(new scout.Status({message: 'foo'}));
+      expect(formField.errorStatus).toEqual(new Status({message: 'foo'}));
       // never apply id, type, properties on model
       expect(formField.id).toBe(model.id);
       expect(formField.hasOwnProperty('type')).toBe(false);

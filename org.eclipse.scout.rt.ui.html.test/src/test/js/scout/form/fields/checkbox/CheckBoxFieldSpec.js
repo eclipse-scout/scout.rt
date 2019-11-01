@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {CheckBoxField, keys, scout, ValueField} from '../../../../src/index';
+
+
 describe("CheckBoxField", function() {
   var session;
 
@@ -22,12 +25,12 @@ describe("CheckBoxField", function() {
 
     beforeEach(function() {
       model = createSimpleModel('CheckBoxField', session);
-      checkBox = new scout.CheckBoxField();
+      checkBox = new CheckBoxField();
       checkBox.init(model);
     });
 
     it("inherits from ValueField", function() {
-      expect(scout.ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
+      expect(ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
     });
 
     it("_renderValue sets checked property", function() {
@@ -80,22 +83,22 @@ describe("CheckBoxField", function() {
       field.render();
       expect(field.value).toBe(null);
 
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.value).toBe(true);
 
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.value).toBe(false);
 
       // Set another key stroke -> only the new one has to be active
       field.setKeyStroke('ctrl-g');
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.value).toBe(false);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.G, 'ctrl');
       expect(field.value).toBe(true);
 
       // Remove key stroke -> value should stay unchanged because key stroke must not be executed
       field.setKeyStroke(null);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.G, 'ctrl');
       expect(field.value).toBe(true);
     });
 

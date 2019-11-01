@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+import {scout} from '../../src/index';
+
+
 describe("ModeSelector", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("ModeSelector", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -50,7 +54,7 @@ describe("ModeSelector", function() {
   describe('init', function() {
     it('sets the selectedMode if it is provided', function() {
       var mode1 = scout.create('Mode', {
-        parent: session.desktop,
+          parent: session.desktop,
           ref: 1
         }
       );

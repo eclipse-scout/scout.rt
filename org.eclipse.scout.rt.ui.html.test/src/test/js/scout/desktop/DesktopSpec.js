@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
+import {arrays, Desktop, Device, Form, RemoteEvent, scout, Status, strings, Widget} from '../../src/index';
+
+
 describe('Desktop', function() {
   var session, desktop, outlineHelper, formHelper;
 
@@ -21,15 +25,15 @@ describe('Desktop', function() {
       },
       renderDesktop: false
     });
-    outlineHelper = new scout.OutlineSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    outlineHelper = new OutlineSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     desktop = session.desktop;
     desktop.viewButtons = [];
   });
 
   describe('notification', function() {
     var ntfc,
-      parent = new scout.Widget();
+      parent = new Widget();
 
     beforeEach(function() {
       parent.session = session;
@@ -63,7 +67,7 @@ describe('Desktop', function() {
       scout.create('DesktopNotification', {
         parent: desktop,
         status: {
-          severity: scout.Status.Severity.OK,
+          severity: Status.Severity.OK,
           message: 'Test'
         },
         duration: 3000,
@@ -146,7 +150,7 @@ describe('Desktop', function() {
       jasmine.clock().install();
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
-      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(form);
 
       expect(form.rendered).toBe(true);
@@ -243,48 +247,48 @@ describe('Desktop', function() {
       promises.push(dialog.open());
       var view = formHelper.createFormWithOneField({
         parent: outline,
-        displayHint: scout.Form.DisplayHint.VIEW,
+        displayHint: Form.DisplayHint.VIEW,
         displayParent: outline,
         modal: true
       });
       promises.push(view.open());
       $.promiseAll(promises).then(function() {
-          expect(desktop.navigationVisible).toBe(true);
-          expect(desktop.navigation.rendered).toBe(true);
-          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4); // Every glass pane renderer added one
-          expect(session.focusManager._glassPaneTargets.length).toBe(8); // Every glass pane renderer added one for navigation and bench
-          expect(dialog.rendered).toBe(true);
-          expect(view.rendered).toBe(true);
-          expect(msgBox.rendered).toBe(true);
-          expect(fileChooser.rendered).toBe(true);
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.navigation.rendered).toBe(true);
+        expect(desktop.navigation.$body.children('.glasspane').length).toBe(4); // Every glass pane renderer added one
+        expect(session.focusManager._glassPaneTargets.length).toBe(8); // Every glass pane renderer added one for navigation and bench
+        expect(dialog.rendered).toBe(true);
+        expect(view.rendered).toBe(true);
+        expect(msgBox.rendered).toBe(true);
+        expect(fileChooser.rendered).toBe(true);
 
-          // Outline is not visible anymore, but form, msg box and file chooser still are
-          desktop.setNavigationVisible(false);
-          // Force removal of navigation
-          desktop.onLayoutAnimationComplete();
-          expect(desktop.navigationVisible).toBe(false);
-          expect(desktop.navigation).toBeFalsy();
-          expect(outline.rendered).toBe(false);
-          expect(dialog.rendered).toBe(true);
-          expect(view.rendered).toBe(true);
-          expect(msgBox.rendered).toBe(true);
-          expect(fileChooser.rendered).toBe(true);
+        // Outline is not visible anymore, but form, msg box and file chooser still are
+        desktop.setNavigationVisible(false);
+        // Force removal of navigation
+        desktop.onLayoutAnimationComplete();
+        expect(desktop.navigationVisible).toBe(false);
+        expect(desktop.navigation).toBeFalsy();
+        expect(outline.rendered).toBe(false);
+        expect(dialog.rendered).toBe(true);
+        expect(view.rendered).toBe(true);
+        expect(msgBox.rendered).toBe(true);
+        expect(fileChooser.rendered).toBe(true);
 
-          // Make it visible again and expect that glass pane is correctly reverted
-          desktop.setNavigationVisible(true);
-          desktop.onLayoutAnimationComplete();
-          expect(desktop.navigationVisible).toBe(true);
-          expect(desktop.navigation.rendered).toBe(true);
-          expect(desktop.navigation.$body.children('.glasspane').length).toBe(4);
-          expect(session.focusManager._glassPaneTargets.length).toBe(8);
+        // Make it visible again and expect that glass pane is correctly reverted
+        desktop.setNavigationVisible(true);
+        desktop.onLayoutAnimationComplete();
+        expect(desktop.navigationVisible).toBe(true);
+        expect(desktop.navigation.rendered).toBe(true);
+        expect(desktop.navigation.$body.children('.glasspane').length).toBe(4);
+        expect(session.focusManager._glassPaneTargets.length).toBe(8);
 
-          dialog.close();
-          view.close();
-          msgBox.close();
-          fileChooser.close();
-          expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
-          expect(session.focusManager._glassPaneTargets.length).toBe(0);
-        })
+        dialog.close();
+        view.close();
+        msgBox.close();
+        fileChooser.close();
+        expect(desktop.navigation.$body.children('.glasspane').length).toBe(0);
+        expect(session.focusManager._glassPaneTargets.length).toBe(0);
+      })
         .catch(fail)
         .always(done);
     });
@@ -378,7 +382,7 @@ describe('Desktop', function() {
             id: '123',
             dialogs: [{
               objectType: 'Form',
-              displayHint: scout.Form.DisplayHint.DIALOG,
+              displayHint: Form.DisplayHint.DIALOG,
               modal: true,
               rootGroupBox: {
                 objectType: 'GroupBox'
@@ -510,7 +514,8 @@ describe('Desktop', function() {
     var browserImpl;
     if (!navigator.geolocation) {
       navigator.geolocation = {
-        getCurrentPosition: function() {}
+        getCurrentPosition: function() {
+        }
       };
     }
     browserImpl = navigator.geolocation.getCurrentPosition;
@@ -529,7 +534,7 @@ describe('Desktop', function() {
     });
 
     it('asks the browser for its geographic location', function() {
-      expect(scout.device.supportsGeolocation()).toBe(true);
+      expect(Device.get().supportsGeolocation()).toBe(true);
       var message = {
         events: [{
           target: session.desktop.id,
@@ -541,7 +546,7 @@ describe('Desktop', function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var expectedEvent = new scout.RemoteEvent(session.desktop.id, 'geolocationDetermined', {
+      var expectedEvent = new RemoteEvent(session.desktop.id, 'geolocationDetermined', {
         latitude: 1,
         longitude: 1
       });
@@ -579,7 +584,7 @@ describe('Desktop', function() {
     it('adds a view to the bench if displayHint is View', function() {
       var form = formHelper.createFormWithOneField();
       var tabBox = desktop.bench.getTabBox('C');
-      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(form);
 
       expect(form.rendered).toBe(true);
@@ -893,7 +898,7 @@ describe('Desktop', function() {
         displayParent: dialog2,
         header: 'Title',
         body: 'hello',
-        severity: scout.Status.Severity.INFO,
+        severity: Status.Severity.INFO,
         yesButtonText: 'OK'
       });
       messagebox.open();
@@ -931,7 +936,7 @@ describe('Desktop', function() {
         displayParent: dialog0,
         header: 'Title',
         body: 'hello',
-        severity: scout.Status.Severity.INFO,
+        severity: Status.Severity.INFO,
         yesButtonText: 'OK'
       });
       messagebox.open();
@@ -979,7 +984,7 @@ describe('Desktop', function() {
         displayParent: desktop,
         header: 'Title',
         body: 'hello',
-        severity: scout.Status.Severity.INFO,
+        severity: Status.Severity.INFO,
         yesButtonText: 'OK'
       });
       messagebox.open();
@@ -1132,7 +1137,7 @@ describe('Desktop', function() {
       var tabBox = desktop.bench.getTabBox('C');
 
       var viewForm0 = formHelper.createFormWithOneField();
-      viewForm0.displayHint = scout.Form.DisplayHint.VIEW;
+      viewForm0.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(viewForm0);
 
       var dialog0 = formHelper.createFormWithOneField({
@@ -1147,7 +1152,7 @@ describe('Desktop', function() {
       expect(desktopOverlayHtmlElements()).toEqual(widgetHtmlElements([dialog0]));
 
       var viewForm1 = formHelper.createFormWithOneField();
-      viewForm1.displayHint = scout.Form.DisplayHint.VIEW;
+      viewForm1.displayHint = Form.DisplayHint.VIEW;
       desktop.showForm(viewForm1);
 
       // expect viewForm2 as currentView and dialog0 removed from the DOM
@@ -1195,7 +1200,7 @@ describe('Desktop', function() {
       desktop.setOutline(outline);
 
       var view = formHelper.createFormWithOneField({
-        displayHint: scout.Form.DisplayHint.VIEW
+        displayHint: Form.DisplayHint.VIEW
       });
 
       desktop.showForm(view);
@@ -1310,7 +1315,7 @@ describe('Desktop', function() {
     describe('COMPACT', function() {
 
       beforeEach(function() {
-        desktop.displayStyle = scout.Desktop.DisplayStyle.COMPACT;
+        desktop.displayStyle = Desktop.DisplayStyle.COMPACT;
         // Flags currently only set by server, therefore we need to set them here as well
         desktop.navigationVisible = true;
         desktop.benchVisible = false;
@@ -1449,7 +1454,7 @@ describe('Desktop', function() {
 
       it('does not bring activateForm to fail for fake views', function() {
         var form = formHelper.createFormWithOneField();
-        form.displayHint = scout.Form.DisplayHint.VIEW;
+        form.displayHint = Form.DisplayHint.VIEW;
         scout.create('FormMenu', {
           parent: desktop,
           form: form
@@ -1513,11 +1518,11 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2, view3]);
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.close).toHaveBeenCalled();
-          expect(view3.close).toHaveBeenCalled();
-          expect(desktop.views).toEqual([]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(view3.close).toHaveBeenCalled();
+        expect(desktop.views).toEqual([]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1529,11 +1534,11 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.close).toHaveBeenCalled();
-          expect(view3.close).not.toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(view3.close).not.toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1554,11 +1559,11 @@ describe('Desktop', function() {
       desktop.bench.getViewTab(modalView)._onCloseOther();
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).not.toHaveBeenCalled();
-          expect(view2.close).toHaveBeenCalled();
-          expect(view3.close).toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view1, modalView]);
-        })
+        expect(view1.close).not.toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(view3.close).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view1, modalView]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1573,7 +1578,7 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1585,10 +1590,10 @@ describe('Desktop', function() {
       });
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.ok).toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1598,15 +1603,15 @@ describe('Desktop', function() {
 
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       unsavedFormChangesForm.whenPostLoad().then(function() {
         unsavedFormChangesForm.close();
       });
 
       unsavedFormChangesForm.whenClose().then(function() {
-          expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
-        })
+        expect(desktop.bench.getViews()).toEqual([view1, view2, view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1620,7 +1625,7 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1633,11 +1638,11 @@ describe('Desktop', function() {
       promises.push(unsavedFormChangesForm.whenClose());
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.ok).not.toHaveBeenCalled();
-          expect(view2.close).toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).not.toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1683,7 +1688,7 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1695,11 +1700,11 @@ describe('Desktop', function() {
       });
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.ok).toHaveBeenCalled();
-          expect(fileChooser.close).toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).toHaveBeenCalled();
+        expect(fileChooser.close).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1726,7 +1731,7 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1738,11 +1743,11 @@ describe('Desktop', function() {
       });
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.ok).toHaveBeenCalled();
-          expect(modalDialog.ok).toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.ok).toHaveBeenCalled();
+        expect(modalDialog.ok).toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
@@ -1768,20 +1773,20 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       $.promiseAll(promises).then(function() {
-          expect(view1.close).toHaveBeenCalled();
-          expect(view2.close).toHaveBeenCalled();
-          expect(view2.ok).not.toHaveBeenCalled();
-          expect(modalDialog.close).toHaveBeenCalled();
-          expect(modalDialog.ok).not.toHaveBeenCalled();
-          expect(desktop.bench.getViews()).toEqual([view3]);
-        })
+        expect(view1.close).toHaveBeenCalled();
+        expect(view2.close).toHaveBeenCalled();
+        expect(view2.ok).not.toHaveBeenCalled();
+        expect(modalDialog.close).toHaveBeenCalled();
+        expect(modalDialog.ok).not.toHaveBeenCalled();
+        expect(desktop.bench.getViews()).toEqual([view3]);
+      })
         .catch(fail)
         .always(done);
     });
 
     it('close tabs when one tab has invalid unsaved changes', function() {
       view2.rootGroupBox.fields[0].setValidator(function(value) {
-        if (scout.strings.equalsIgnoreCase(value, 'Foo')) {
+        if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
         }
         return value;
@@ -1793,7 +1798,7 @@ describe('Desktop', function() {
       desktop.cancelViews([view1, view2]);
 
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1836,7 +1841,7 @@ describe('Desktop', function() {
       spyOn(modalDialog, 'ok').and.callThrough();
 
       modalDialog.rootGroupBox.fields[0].setValidator(function(value) {
-        if (scout.strings.equalsIgnoreCase(value, 'Foo')) {
+        if (strings.equalsIgnoreCase(value, 'Foo')) {
           throw new Error('Validation failed');
         }
         return value;
@@ -1847,7 +1852,7 @@ describe('Desktop', function() {
       jasmine.clock().install();
       desktop.cancelViews([view1, view2]);
       // UnsavedFormChangesForm should be the last child
-      var unsavedFormChangesForm = scout.arrays.last(desktop.children);
+      var unsavedFormChangesForm = arrays.last(desktop.children);
       expect(unsavedFormChangesForm.objectType).toBe('scout.UnsavedFormChangesForm');
       var openFormsField = unsavedFormChangesForm.rootGroupBox.fields[0].fields[0];
       expect(openFormsField.id).toBe('OpenFormsField');
@@ -1929,7 +1934,7 @@ describe('Desktop', function() {
       var form = scout.create('Form', {
         parent: session.desktop,
         id: 'outerForm',
-        displayHint: scout.Form.DisplayHint.VIEW,
+        displayHint: Form.DisplayHint.VIEW,
         rootGroupBox: {
           objectType: 'GroupBox',
           fields: [{

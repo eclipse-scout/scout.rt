@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {QueryBy, RemoteEvent, scout, SmartField, Status} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global linkWidgetAndAdapter */
 describe('SmartFieldRemote', function() {
 
@@ -18,7 +22,7 @@ describe('SmartFieldRemote', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -32,7 +36,7 @@ describe('SmartFieldRemote', function() {
 
   function createSmartFieldWithAdapter() {
     var model = helper.createFieldModel('SmartField');
-    var smartField = new scout.SmartField();
+    var smartField = new SmartField();
     smartField.init(model);
     linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
     return smartField;
@@ -54,7 +58,7 @@ describe('SmartFieldRemote', function() {
     it('must "browse all" when field is valid and browse parameter is true', function() {
       smartField.openPopup(true);
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByAll', {
+      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByAll', {
         showBusyIndicator: false
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
@@ -64,24 +68,24 @@ describe('SmartFieldRemote', function() {
       smartField.openPopup();
       jasmine.clock().tick(500); // because we use a debounce in SmartField
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
+      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
-        text: 'foo',
+        text: 'foo'
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
 
     it('must "lookup by text" when error status is NOT_UNIQUE, even though the browse parameter is true', function() {
-      smartField.errorStatus = scout.Status.error({
+      smartField.errorStatus = Status.error({
         message: 'bar',
-        code: scout.SmartField.ErrorCode.NOT_UNIQUE
+        code: SmartField.ErrorCode.NOT_UNIQUE
       });
       smartField.openPopup(true);
       jasmine.clock().tick(500); // because we use a debounce in SmartField
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
+      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         showBusyIndicator: false,
-        text: 'foo',
+        text: 'foo'
       });
       expect(mostRecentJsonRequest()).toContainEvents([expectedEvent]);
     });
@@ -142,7 +146,7 @@ describe('SmartFieldRemote', function() {
       smartField.acceptInput();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'acceptInput', {
+      var expectedEvent = new RemoteEvent(smartField.id, 'acceptInput', {
         value: 123,
         displayText: 'foo',
         errorStatus: null,
@@ -177,7 +181,7 @@ describe('SmartFieldRemote', function() {
       smartField.acceptInput();
 
       sendQueuedAjaxCalls();
-      var expectedEvent = new scout.RemoteEvent(smartField.id, 'lookupByText', {
+      var expectedEvent = new RemoteEvent(smartField.id, 'lookupByText', {
         text: 'bar',
         showBusyIndicator: false
       });
@@ -195,7 +199,7 @@ describe('SmartFieldRemote', function() {
 
     function resolveLookupCall(lookupCall) {
       lookupCall.resolveLookup({
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [scout.create('LookupRow', {
           key: 123,
           text: 'foo'

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,28 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {defaultValues} from '../../src/index';
+
+
 describe('scout.defaultValues', function() {
 
   afterEach(function() {
     // Reload default values to not influence other tests
-    scout.defaultValues.bootstrap();
+    defaultValues.bootstrap();
   });
 
   describe('init', function() {
 
     it('can load invalid configurations', function() {
       expect(function() {
-        scout.defaultValues.init();
+        defaultValues.init();
       }).toThrow();
-      scout.defaultValues.init({});
-      scout.defaultValues.init({
+      defaultValues.init({});
+      defaultValues.init({
         'defaults': {}
       });
-      scout.defaultValues.init({
+      defaultValues.init({
         'objectTypeHierarchy': {}
       });
       expect(function() {
-        scout.defaultValues.init({
+        defaultValues.init({
           'objectTypeHierarchy': {
             'FormField': {
               'TableField': null,
@@ -82,7 +85,7 @@ describe('scout.defaultValues', function() {
           }
         }
       };
-      scout.defaultValues.init(config);
+      defaultValues.init(config);
 
       var testObjects = [{ // [0]
         'id': '2',
@@ -145,7 +148,7 @@ describe('scout.defaultValues', function() {
         'objectType': 'Chart',
         'axisData': []
       }];
-      scout.defaultValues.applyTo(testObjects);
+      defaultValues.applyTo(testObjects);
 
       expect(testObjects[0].width).toBe(10);
       expect(testObjects[0].x).toBe(undefined);
@@ -191,7 +194,7 @@ describe('scout.defaultValues', function() {
           }
         }
       };
-      scout.defaultValues.init(config);
+      defaultValues.init(config);
 
       var testObjects = [{ // [0]
         'id': '1',
@@ -214,7 +217,7 @@ describe('scout.defaultValues', function() {
         'enabled': true,
         'visible': true
       }];
-      scout.defaultValues.applyTo(testObjects);
+      defaultValues.applyTo(testObjects);
 
       expect(testObjects[0].enabled).toBe(true);
       expect(testObjects[0].visible).toBe(true);
@@ -238,7 +241,7 @@ describe('scout.defaultValues', function() {
           }
         }
       };
-      scout.defaultValues.init(config);
+      defaultValues.init(config);
 
       var testObjects = [{
         'id': '1',
@@ -251,7 +254,7 @@ describe('scout.defaultValues', function() {
         'objectType': 'Table',
         rows: ['three']
       }];
-      scout.defaultValues.applyTo(testObjects);
+      defaultValues.applyTo(testObjects);
 
       expect(testObjects[0].rows).toEqual([]);
       expect(testObjects[1].rows).toEqual([]);
@@ -263,7 +266,6 @@ describe('scout.defaultValues', function() {
       expect(testObjects[0].rows).toEqual(['one']);
       expect(testObjects[1].rows).toEqual([]);
       expect(testObjects[2].rows).toEqual(['three']);
-      expect(scout.defaultValues._defaults.Table.rows).toEqual([]);
     });
 
   });

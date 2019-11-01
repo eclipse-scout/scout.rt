@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Status} from '../../src/index';
+
+
 describe("scout.Status", function() {
 
   describe("convenience functions", function() {
@@ -16,40 +19,40 @@ describe("scout.Status", function() {
       var status;
 
       // 1. Options argument (default)
-      status = scout.Status.error({
+      status = Status.error({
         message: 'Oops'
       });
-      expect(status.severity).toBe(scout.Status.Severity.ERROR);
+      expect(status.severity).toBe(Status.Severity.ERROR);
       expect(status.message).toBe('Oops');
       expect(status.isError()).toBe(true);
       expect(status.isWarning()).toBe(false);
       expect(status.isInfo()).toBe(false);
       expect(status.isOk()).toBe(false);
 
-      status = scout.Status.warning({
+      status = Status.warning({
         message: 'foo'
       });
-      expect(status.severity).toBe(scout.Status.Severity.WARNING);
+      expect(status.severity).toBe(Status.Severity.WARNING);
       expect(status.message).toBe('foo');
       expect(status.isError()).toBe(false);
       expect(status.isWarning()).toBe(true);
       expect(status.isInfo()).toBe(false);
       expect(status.isOk()).toBe(false);
 
-      status = scout.Status.info({
+      status = Status.info({
         message: 'bar'
       });
-      expect(status.severity).toBe(scout.Status.Severity.INFO);
+      expect(status.severity).toBe(Status.Severity.INFO);
       expect(status.message).toBe('bar');
       expect(status.isError()).toBe(false);
       expect(status.isWarning()).toBe(false);
       expect(status.isInfo()).toBe(true);
       expect(status.isOk()).toBe(false);
 
-      status = scout.Status.ok({
+      status = Status.ok({
         message: 'Okay'
       });
-      expect(status.severity).toBe(scout.Status.Severity.OK);
+      expect(status.severity).toBe(Status.Severity.OK);
       expect(status.message).toBe('Okay');
       expect(status.isError()).toBe(false);
       expect(status.isWarning()).toBe(false);
@@ -57,20 +60,20 @@ describe("scout.Status", function() {
       expect(status.isOk()).toBe(true);
 
       // 2. String argument (convenience)
-      status = scout.Status.error('Oops');
-      expect(status.severity).toBe(scout.Status.Severity.ERROR);
+      status = Status.error('Oops');
+      expect(status.severity).toBe(Status.Severity.ERROR);
       expect(status.message).toBe('Oops');
 
-      status = scout.Status.warning('foo');
-      expect(status.severity).toBe(scout.Status.Severity.WARNING);
+      status = Status.warning('foo');
+      expect(status.severity).toBe(Status.Severity.WARNING);
       expect(status.message).toBe('foo');
 
-      status = scout.Status.info('bar');
-      expect(status.severity).toBe(scout.Status.Severity.INFO);
+      status = Status.info('bar');
+      expect(status.severity).toBe(Status.Severity.INFO);
       expect(status.message).toBe('bar');
 
-      status = scout.Status.ok('Okay');
-      expect(status.severity).toBe(scout.Status.Severity.OK);
+      status = Status.ok('Okay');
+      expect(status.severity).toBe(Status.Severity.OK);
       expect(status.message).toBe('Okay');
     });
 

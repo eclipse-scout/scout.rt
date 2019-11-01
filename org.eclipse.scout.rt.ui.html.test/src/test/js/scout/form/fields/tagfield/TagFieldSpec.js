@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays, keys, scout, TagChooserPopup, TagField} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TagField', function() {
 
   var session, field, lookupRow, helper;
@@ -15,13 +19,13 @@ describe('TagField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.TagField();
+    field = new TagField();
     field.session = session;
     lookupRow = scout.create('LookupRow', {
       key: 123,
       data: 'Foo'
     });
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -44,13 +48,13 @@ describe('TagField', function() {
     it('add tag', function() {
       field.setValue(['foo']);
       field.addTag('bar');
-      expect(scout.arrays.equals(['foo', 'bar'], field.value)).toBe(true);
+      expect(arrays.equals(['foo', 'bar'], field.value)).toBe(true);
     });
 
     it('remove tag', function() {
       field.setValue(['foo', 'bar']);
       field.removeTag('bar');
-      expect(scout.arrays.equals(['foo'], field.value)).toBe(true);
+      expect(arrays.equals(['foo'], field.value)).toBe(true);
     });
 
   });
@@ -96,17 +100,17 @@ describe('TagField', function() {
       // type a proposal that yields exactly 1 result, but do NOT
       // select the returned lookup row
       field.render();
-      typeProposal(field, 'fo', scout.keys.O);
+      typeProposal(field, 'fo', keys.O);
       jasmine.clock().tick(500);
 
-      expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
+      expect(field.chooser instanceof TagChooserPopup).toBe(true);
 
       // trigger a keydown event, all the flags are required  to pass
       // the accept-checks in KeyStroke.js
       var $input = field.$container.find('input');
       $input.trigger(jQuery.Event('keydown', {
-        keyCode: scout.keys.ENTER,
-        which: scout.keys.ENTER,
+        keyCode: keys.ENTER,
+        which: keys.ENTER,
         altKey: false,
         shiftKey: false,
         ctrlKey: false,
@@ -142,14 +146,14 @@ describe('TagField', function() {
         eventCounter++;
       });
 
-      expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
+      expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
 
       field.render();
-      typeProposal(field, 'ba', scout.keys.A);
+      typeProposal(field, 'ba', keys.A);
       jasmine.clock().tick(500);
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)
-      expect(field.chooser instanceof scout.TagChooserPopup).toBe(true);
+      expect(field.chooser instanceof TagChooserPopup).toBe(true);
       expect(field.chooser.table.rows.length).toBe(2);
       expect(eventCounter).toBe(1);
     });

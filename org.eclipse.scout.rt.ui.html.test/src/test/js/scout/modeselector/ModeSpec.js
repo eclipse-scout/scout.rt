@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Mode} from '../../src/index';
+
+
 describe("Mode", function() {
   var session;
 
@@ -19,7 +22,7 @@ describe("Mode", function() {
   describe('defaults', function() {
 
     it('should be as expected', function() {
-      var mode = new scout.Mode();
+      var mode = new Mode();
       mode.init(createSimpleModel('Mode', session));
       expect(mode.selected).toBe(false);
     });

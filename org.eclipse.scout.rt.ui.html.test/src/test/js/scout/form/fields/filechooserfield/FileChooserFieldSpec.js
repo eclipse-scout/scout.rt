@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device, scout, Status} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('FileChooserField', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('FileChooserField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -33,7 +37,7 @@ describe('FileChooserField', function() {
     });
 
     it('sets the file as value', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var file = new File(['lorem'], 'ipsum.txt');
@@ -54,7 +58,7 @@ describe('FileChooserField', function() {
   describe('maximumUploadSize', function() {
 
     it('is validated when setting new value', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var smallFile = new File(['a'], 'small file.txt');
@@ -65,7 +69,7 @@ describe('FileChooserField', function() {
       field.setMaximumUploadSize(5); // 5 bytes
 
       field.setValue(largeFile);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.value).toBe(null);
 
       field.setValue(smallFile);
@@ -73,12 +77,12 @@ describe('FileChooserField', function() {
       expect(field.value).toBe(smallFile);
 
       field.setValue(largerFile);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.value).toBe(smallFile);
     });
 
     it('is not validated when changing maximumUploadSize', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var largeFile = new File(['abcdefghijklmnopqrstuvwxyz'], 'large file.txt');

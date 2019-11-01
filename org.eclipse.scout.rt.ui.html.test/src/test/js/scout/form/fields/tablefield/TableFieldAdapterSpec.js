@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from '../../../../src/index';
+import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableFieldAdapter", function() {
   var session, helper, tableHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    tableHelper = new scout.TableSpecHelper(session);
-    helper = new scout.FormSpecHelper(session);
+    tableHelper = new TableSpecHelper(session);
+    helper = new FormSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();

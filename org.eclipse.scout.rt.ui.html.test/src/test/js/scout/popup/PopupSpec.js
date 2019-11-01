@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Dimension, HtmlComponent, Popup, scout, Widget} from '../../src/index';
+
+
 describe("Popup", function() {
-  var helper, session, $desktop;
+  var session, $desktop;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -20,52 +23,57 @@ describe("Popup", function() {
     });
     $desktop = session.desktop.$container;
     $('<style>' +
-        '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
-        '.popup {position: absolute; min-width: 50px; min-height: 50px; max-width: 50px; max-height: 50px; background-color: white;}' +
-        '.popup.with-margin {margin: 10px;}' +
-        '.popup.with-dyn-margin.top {margin-bottom: 5px;}' +
-        '.popup.with-dyn-margin.bottom {margin-top: 5px;}' +
-        '.popup.scalable {min-width: 0; min-height: 0; max-width: 500px; max-height: 500px;}' +
-        '.anchor {position: absolute; left: 70px; top: 70px; width: 80px; height: 80px; background-color: red;}' +
-        '.wrapping-block {display: inline-block; vertical-align: middle; width: 25px; height: 50px; background-color: rgba(0, 255, 0, 0.5);}' +
-        '.large-block {display: block; width: 25px; height: 25px; background-color: rgba(0, 255, 0, 0.5);}' +
-        '</style>').appendTo($('#sandbox'));
+      '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
+      '.popup {position: absolute; min-width: 50px; min-height: 50px; max-width: 50px; max-height: 50px; background-color: white;}' +
+      '.popup.with-margin {margin: 10px;}' +
+      '.popup.with-dyn-margin.top {margin-bottom: 5px;}' +
+      '.popup.with-dyn-margin.bottom {margin-top: 5px;}' +
+      '.popup.scalable {min-width: 0; min-height: 0; max-width: 500px; max-height: 500px;}' +
+      '.anchor {position: absolute; left: 70px; top: 70px; width: 80px; height: 80px; background-color: red;}' +
+      '.wrapping-block {display: inline-block; vertical-align: middle; width: 25px; height: 50px; background-color: rgba(0, 255, 0, 0.5);}' +
+      '.large-block {display: block; width: 25px; height: 25px; background-color: rgba(0, 255, 0, 0.5);}' +
+      '</style>').appendTo($('#sandbox'));
   });
 
 
-  var WrappingContent = function() {
-    WrappingContent.parent.call(this);
-    this.numBlocks = 2;
-  };
-  scout.inherits(WrappingContent, scout.Widget);
-
-  WrappingContent.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    for (var i = 0; i < this.numBlocks; i++) {
-      this.$container.appendDiv('wrapping-block');
+  class WrappingContent extends Widget {
+    constructor() {
+      super();
+      this.numBlocks = 2;
     }
-  };
+
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      for (var i = 0; i < this.numBlocks; i++) {
+        this.$container.appendDiv('wrapping-block');
+      }
+    }
+  }
+
   window.scouttests = window.scouttests || {};
   window.scouttests.WrappingContent = WrappingContent;
 
-  var LargeContent = function() {
-    LargeContent.parent.call(this);
-    this.numBlocks = 2;
-  };
-  scout.inherits(LargeContent, scout.Widget);
 
-  LargeContent.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    for (var i = 0; i < this.numBlocks; i++) {
-      this.$container.appendDiv('large-block');
+  class LargeContent extends Widget {
+    constructor() {
+      super();
+      this.numBlocks = 2;
     }
-  };
+
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      for (var i = 0; i < this.numBlocks; i++) {
+        this.$container.appendDiv('large-block');
+      }
+    }
+  }
+
   window.scouttests.LargeContent = LargeContent;
 
   var entryPointSizeFunc = function() {
-    return new scout.Dimension($desktop.width(), $desktop.height());
+    return new Dimension($desktop.width(), $desktop.height());
   };
 
   afterEach(function() {
@@ -99,7 +107,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -114,7 +122,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -129,7 +137,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -144,7 +152,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           $anchor: $anchor,
           cssClass: 'with-margin',
           windowPaddingX: 0
@@ -163,7 +171,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -178,7 +186,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -194,7 +202,7 @@ describe("Popup", function() {
         $anchor.cssLeft(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -210,7 +218,7 @@ describe("Popup", function() {
         $anchor.cssLeft(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           $anchor: $anchor,
           cssClass: 'with-margin',
           windowPaddingX: 0
@@ -228,7 +236,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -243,7 +251,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -260,7 +268,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHTEDGE,
+          horizontalAlignment: Popup.Alignment.RIGHTEDGE,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -275,7 +283,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.RIGHTEDGE,
+          horizontalAlignment: Popup.Alignment.RIGHTEDGE,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -292,7 +300,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -306,7 +314,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -325,7 +333,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -340,7 +348,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -355,8 +363,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           verticalSwitch: false,
           $anchor: $anchor,
           windowPaddingY: 0
@@ -372,8 +380,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           verticalSwitch: false,
           $anchor: $anchor,
           cssClass: 'with-margin',
@@ -393,7 +401,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -408,7 +416,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -424,8 +432,8 @@ describe("Popup", function() {
         $anchor.cssTop(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.TOP,
           verticalSwitch: false,
           $anchor: $anchor,
           windowPaddingY: 0
@@ -441,8 +449,8 @@ describe("Popup", function() {
         $anchor.cssTop(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.TOP,
           verticalSwitch: false,
           $anchor: $anchor,
           cssClass: 'with-margin',
@@ -461,7 +469,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -475,7 +483,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -491,7 +499,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOMEDGE,
+          verticalAlignment: Popup.Alignment.BOTTOMEDGE,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -505,7 +513,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          verticalAlignment: scout.Popup.Alignment.BOTTOMEDGE,
+          verticalAlignment: Popup.Alignment.BOTTOMEDGE,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -521,7 +529,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -535,7 +543,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor,
           windowPaddingX: 0
         });
@@ -555,8 +563,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.LEFT,
+          verticalAlignment: Popup.Alignment.CENTER,
           trimWidth: true,
           $anchor: $anchor,
           windowPaddingX: 0,
@@ -577,8 +585,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.CENTER,
           trimWidth: true,
           $anchor: $anchor,
           windowPaddingX: 0,
@@ -601,8 +609,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           horizontalSwitch: true,
           trimWidth: true,
           $anchor: $anchor,
@@ -628,8 +636,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          horizontalAlignment: Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
@@ -649,8 +657,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          horizontalAlignment: Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.TOP,
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
@@ -670,8 +678,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.CENTER,
           trimHeight: true,
           $anchor: $anchor,
           windowPaddingY: 0,
@@ -692,8 +700,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          horizontalAlignment: Popup.Alignment.LEFT,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           trimHeight: true,
           verticalSwitch: false,
           $anchor: $anchor,
@@ -717,8 +725,8 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           verticalSwitch: true,
           trimHeight: true,
           $anchor: $anchor,
@@ -743,7 +751,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -758,7 +766,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           cssClass: 'with-margin',
           windowPaddingY: 0
@@ -776,7 +784,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           cssClass: 'with-dyn-margin',
           windowPaddingY: 0
@@ -793,7 +801,7 @@ describe("Popup", function() {
         $anchor = $desktop.appendDiv('anchor');
         popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           cssClass: 'with-dyn-margin',
           windowPaddingY: 0
@@ -813,7 +821,7 @@ describe("Popup", function() {
         $anchor.cssTop(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
           windowPaddingY: 0
         });
@@ -828,7 +836,7 @@ describe("Popup", function() {
         $anchor.cssTop(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
           cssClass: 'with-margin',
           windowPaddingY: 0
@@ -847,7 +855,7 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           verticalSwitch: true,
           $anchor: $anchor,
           windowPaddingY: 0,
@@ -868,7 +876,7 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          verticalAlignment: scout.Popup.Alignment.TOPEDGE,
+          verticalAlignment: Popup.Alignment.TOPEDGE,
           verticalSwitch: true,
           $anchor: $anchor,
           windowPaddingY: 0,
@@ -893,7 +901,7 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0
@@ -910,7 +918,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
+          horizontalAlignment: Popup.Alignment.RIGHT,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0
@@ -930,7 +938,7 @@ describe("Popup", function() {
         $anchor.cssLeft(70 - 25);
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0
@@ -947,7 +955,7 @@ describe("Popup", function() {
         var popup = scout.create('Popup', {
           parent: session.desktop,
           cssClass: 'with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
+          horizontalAlignment: Popup.Alignment.LEFT,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0
@@ -966,7 +974,7 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable',
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0,
@@ -987,7 +995,7 @@ describe("Popup", function() {
         var popup = scout.create('WidgetPopup', {
           parent: session.desktop,
           cssClass: 'scalable with-margin',
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           horizontalSwitch: true,
           $anchor: $anchor,
           windowPaddingX: 0,
@@ -1012,8 +1020,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.LEFT,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.LEFT,
+          verticalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor,
           windowPaddingX: 0,
           withArrow: true
@@ -1032,8 +1040,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.RIGHT,
-          verticalAlignment: scout.Popup.Alignment.CENTER,
+          horizontalAlignment: Popup.Alignment.RIGHT,
+          verticalAlignment: Popup.Alignment.CENTER,
           $anchor: $anchor,
           windowPaddingX: 0,
           withArrow: true
@@ -1052,8 +1060,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
-          verticalAlignment: scout.Popup.Alignment.TOP,
+          horizontalAlignment: Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.TOP,
           $anchor: $anchor,
           windowPaddingY: 0,
           withArrow: true
@@ -1072,8 +1080,8 @@ describe("Popup", function() {
         var $anchor = $desktop.appendDiv('anchor');
         var popup = scout.create('Popup', {
           parent: session.desktop,
-          horizontalAlignment: scout.Popup.Alignment.CENTER,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          horizontalAlignment: Popup.Alignment.CENTER,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           $anchor: $anchor,
           windowPaddingY: 0,
           withArrow: true

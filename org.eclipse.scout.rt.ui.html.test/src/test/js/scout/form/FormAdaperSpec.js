@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global linkWidgetAndAdapter */
 describe('FormAdapter', function() {
   var session, helper;
@@ -17,7 +20,7 @@ describe('FormAdapter', function() {
     jasmine.Ajax.install();
     jasmine.clock().install();
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 

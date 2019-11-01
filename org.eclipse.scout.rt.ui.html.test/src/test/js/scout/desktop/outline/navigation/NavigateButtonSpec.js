@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {NavigateDownButton, NavigateUpButton} from '../../../../src/index';
+import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('NavigateButton', function() {
 
   var session, helper, formHelper;
@@ -15,8 +19,8 @@ describe('NavigateButton', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.OutlineSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    helper = new OutlineSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
   });
 
   it('is only created once for each node', function() {
@@ -27,14 +31,14 @@ describe('NavigateButton', function() {
     model.nodes[1].detailFormVisible = true;
     var outline = helper.createOutline(model);
     var staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
-    expect(staticMenus[0] instanceof scout.NavigateUpButton).toBe(true);
-    expect(staticMenus[1] instanceof scout.NavigateDownButton).toBe(true);
+    expect(staticMenus[0] instanceof NavigateUpButton).toBe(true);
+    expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
 
     outline.selectNode(outline.nodes[1]);
     outline.selectNode(outline.nodes[0]);
     var newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
-    expect(newStaticMenus[0] instanceof scout.NavigateUpButton).toBe(true);
-    expect(newStaticMenus[1] instanceof scout.NavigateDownButton).toBe(true);
+    expect(newStaticMenus[0] instanceof NavigateUpButton).toBe(true);
+    expect(newStaticMenus[1] instanceof NavigateDownButton).toBe(true);
     // static menus should still be the same
     expect(newStaticMenus[0]).toBe(staticMenus[0]);
     expect(newStaticMenus[1]).toBe(staticMenus[1]);
@@ -48,8 +52,8 @@ describe('NavigateButton', function() {
     model.nodes[1].detailFormVisible = true;
     var outline = helper.createOutline(model);
     var staticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;
-    expect(staticMenus[0] instanceof scout.NavigateUpButton).toBe(true);
-    expect(staticMenus[1] instanceof scout.NavigateDownButton).toBe(true);
+    expect(staticMenus[0] instanceof NavigateUpButton).toBe(true);
+    expect(staticMenus[1] instanceof NavigateDownButton).toBe(true);
 
     outline.setNavigateButtonsVisible(false);
     var newStaticMenus = outline.nodes[0].detailForm.rootGroupBox.staticMenus;

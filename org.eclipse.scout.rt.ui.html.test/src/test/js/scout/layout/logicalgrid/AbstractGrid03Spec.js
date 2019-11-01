@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Button, GridData, GroupBoxGridConfig, HorizontalGrid, scout, VerticalSmartGrid} from '../../../src/index';
+import {GroupBoxSpecHelper} from '@eclipse-scout/testing';
+
 /**
  * Javadoc:
  *
@@ -51,7 +54,7 @@ describe("AbstractGrid03", function() {
     this.fields.push(scout.create('StringField', {
       parent: this.groupBox,
       label: "Field 01",
-      gridDataHints: new scout.GridData({
+      gridDataHints: new GridData({
         w: 3
       })
     }));
@@ -66,7 +69,7 @@ describe("AbstractGrid03", function() {
     this.fields.push(scout.create('Button', {
       parent: this.groupBox,
       label: "Close",
-      systemType: scout.Button.SystemType.CLOSE
+      systemType: Button.SystemType.CLOSE
     }));
     this.groupBox.setProperty('fields', this.fields);
     this.groupBox.render();
@@ -74,8 +77,8 @@ describe("AbstractGrid03", function() {
 
   describe('group box layout 0100', function() {
     it('test horizontal layout', function() {
-      var grid = new scout.HorizontalGrid();
-      grid.setGridConfig(new scout.GroupBoxGridConfig());
+      var grid = new HorizontalGrid();
+      grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
@@ -83,18 +86,18 @@ describe("AbstractGrid03", function() {
       expect(grid.getGridColumnCount()).toEqual(2);
 
       // field01
-      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
+      GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
 
       // field02
-      scout.GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
+      GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
 
       // field03
-      scout.GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
+      GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
     });
 
     it('test vertical smart layout', function() {
-      var grid = new scout.VerticalSmartGrid();
-      grid.setGridConfig(new scout.GroupBoxGridConfig());
+      var grid = new VerticalSmartGrid();
+      grid.setGridConfig(new GroupBoxGridConfig());
       grid.validate(this.groupBox);
 
       // group box
@@ -102,13 +105,13 @@ describe("AbstractGrid03", function() {
       expect(grid.getGridColumnCount()).toEqual(2);
 
       // field01
-      scout.GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
+      GroupBoxSpecHelper.assertGridData(0, 0, 2, 1, this.fields[0].gridData);
 
       // field02
-      scout.GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
+      GroupBoxSpecHelper.assertGridData(0, 1, 1, 1, this.fields[1].gridData);
 
       // field03
-      scout.GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
+      GroupBoxSpecHelper.assertGridData(1, 1, 1, 1, this.fields[2].gridData);
     });
   });
 

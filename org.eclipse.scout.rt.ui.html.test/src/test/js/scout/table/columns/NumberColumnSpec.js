@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+import {DecimalFormat, Device, Range, RemoteEvent, Status, styles} from '../../../src/index';
+
+
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
 describe('NumberColumn', function() {
@@ -18,8 +22,8 @@ describe('NumberColumn', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
-    locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new TableSpecHelper(session);
+    locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -39,19 +43,19 @@ describe('NumberColumn', function() {
     var defaultBackgroundColor;
 
     beforeEach(function() {
-      scout.styles.put('column-background-effect-gradient1-start', {
+      styles.put('column-background-effect-gradient1-start', {
         backgroundColor: rgbLevel0
       });
-      scout.styles.put('column-background-effect-gradient1-end', {
+      styles.put('column-background-effect-gradient1-end', {
         backgroundColor: rgbLevel100
       });
-      scout.styles.put('column-background-effect-gradient2-start', {
+      styles.put('column-background-effect-gradient2-start', {
         backgroundColor: rgbLevel100
       });
-      scout.styles.put('column-background-effect-gradient2-end', {
+      styles.put('column-background-effect-gradient2-end', {
         backgroundColor: rgbLevel0
       });
-      scout.styles.put('column-background-effect-bar-chart', {
+      styles.put('column-background-effect-bar-chart', {
         backgroundColor: barChartColor
       });
 
@@ -60,7 +64,7 @@ describe('NumberColumn', function() {
     });
 
     afterEach(function() {
-      scout.styles.clearCache();
+      styles.clearCache();
     });
 
     describe('colorGradient1', function() {
@@ -82,7 +86,7 @@ describe('NumberColumn', function() {
         var column0 = table.columns[0];
         table.render();
 
-        column0.decimalFormat = new scout.DecimalFormat(locale, {
+        column0.decimalFormat = new DecimalFormat(locale, {
           pattern: '#.00'
         });
         table.setColumnBackgroundEffect(column0, 'colorGradient1');
@@ -105,7 +109,7 @@ describe('NumberColumn', function() {
       expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
       expect(table.rows[2].$row).toBeFalsy();
 
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 3));
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 3));
       table._renderViewport();
 
       expect(table.rows[0].$row).toBeFalsy();
@@ -190,7 +194,7 @@ describe('NumberColumn', function() {
 
     describe('barChart', function() {
       it('does not overwrite existing background color', function() {
-        if (!scout.device.supportsCssGradient()) {
+        if (!Device.get().supportsCssGradient()) {
           // PhantomJs does not support gradients
           return;
         }
@@ -227,7 +231,7 @@ describe('NumberColumn', function() {
         expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(rgbLevel50);
         expect(table.$cell(column0, table.rows[2].$row).css('background-color')).toBe(rgbLevel0);
 
-        if (scout.device.supportsCssGradient()) {
+        if (Device.get().supportsCssGradient()) {
           table.setColumnBackgroundEffect(column0, 'barChart');
           expect(table.$cell(column0, table.rows[1].$row).css('background-color')).toBe(defaultBackgroundColor);
           expect(table.$cell(column0, table.rows[1].$row).css('background-image')).toBe(imageLevel50);
@@ -251,7 +255,7 @@ describe('NumberColumn', function() {
         sendQueuedAjaxCalls();
         expect(jasmine.Ajax.requests.count()).toBe(1);
 
-        var event = new scout.RemoteEvent(table.id, 'columnBackgroundEffectChanged', {
+        var event = new RemoteEvent(table.id, 'columnBackgroundEffectChanged', {
           columnId: column0.id,
           backgroundEffect: 'barChart'
         });
@@ -291,7 +295,7 @@ describe('NumberColumn', function() {
       var column0 = table.columns[0];
       table.render();
 
-      column0.decimalFormat = new scout.DecimalFormat(locale, {
+      column0.decimalFormat = new DecimalFormat(locale, {
         pattern: '#.00'
       });
 
@@ -347,7 +351,7 @@ describe('NumberColumn', function() {
       jasmine.clock().tick();
       table.cellEditorPopup.cell.field.setValue(5);
       table.completeCellEdit();
-      expect(table.rows[0].cells[0].errorStatus instanceof scout.Status).toBe(true);
+      expect(table.rows[0].cells[0].errorStatus instanceof Status).toBe(true);
       expect(column0.cell(table.rows[0]).text).toBe('5');
 
       //set a valid value

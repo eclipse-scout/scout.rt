@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DialogLayout, FormField, GroupBox, HorizontalGrid, scout, VerticalSmartGrid} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("GroupBox", function() {
   var session;
   var helper;
@@ -15,11 +19,11 @@ describe("GroupBox", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createField(model, parent) {
-    var field = new scout.GroupBox();
+    var field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -55,14 +59,14 @@ describe("GroupBox", function() {
       expect($('#sandbox')).toContainElement('div.group-box-title');
     });
 
-    it("renders controls initially if expanded", function () {
+    it("renders controls initially if expanded", function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.render();
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it("does not render controls initially if collapsed, but on expand", function () {
+    it("does not render controls initially if collapsed, but on expand", function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       spyOn(groupBox, '_renderControls');
       groupBox.setExpanded(false);
@@ -72,7 +76,7 @@ describe("GroupBox", function() {
       expect(groupBox._renderControls.calls.count()).toEqual(1);
     });
 
-    it("automatically hides the label if it is empty", function () {
+    it("automatically hides the label if it is empty", function() {
       // Test 1: render first
       var groupBox = createField({});
       groupBox.render();
@@ -185,7 +189,7 @@ describe("GroupBox", function() {
       var groupBox = helper.createGroupBoxWithOneField(session.desktop);
       var gdh = groupBox.gridDataHints;
       expect(gdh.useUiHeight).toBe(true);
-      expect(gdh.w).toBe(scout.FormField.FULL_WIDTH);
+      expect(gdh.w).toBe(FormField.FULL_WIDTH);
     });
 
   });
@@ -233,12 +237,12 @@ describe("GroupBox", function() {
         fields: [{
           objectType: 'StringField'
         },
-        {
-          objectType: 'StringField'
-        },
-        {
-          objectType: 'StringField'
-        }]
+          {
+            objectType: 'StringField'
+          },
+          {
+            objectType: 'StringField'
+          }]
       });
       groupBox.render();
       expect(groupBox.fields[0].gridData.x).toBe(-1);
@@ -265,12 +269,12 @@ describe("GroupBox", function() {
         fields: [{
           objectType: 'StringField'
         },
-        {
-          objectType: 'StringField'
-        },
-        {
-          objectType: 'StringField'
-        }]
+          {
+            objectType: 'StringField'
+          },
+          {
+            objectType: 'StringField'
+          }]
       });
       groupBox.render();
       groupBox.revalidateLayout();
@@ -290,19 +294,19 @@ describe("GroupBox", function() {
         parent: session.desktop,
         logicalGrid: 'HorizontalGrid'
       });
-      expect(groupBox.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
 
       groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         logicalGrid: 'VerticalSmartGrid'
       });
-      expect(groupBox.logicalGrid instanceof scout.VerticalSmartGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof VerticalSmartGrid).toBe(true);
 
       groupBox = scout.create('GroupBox', {
         parent: session.desktop,
         logicalGrid: scout.create('HorizontalGrid')
       });
-      expect(groupBox.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
+      expect(groupBox.logicalGrid instanceof HorizontalGrid).toBe(true);
     });
 
     it('uses widthInPixel and heightInPixel as dialog width and height if set on main box', function(done) {
@@ -310,7 +314,7 @@ describe("GroupBox", function() {
         .appendTo($('head'));
 
       // stub function because when running in phantom js the window has an unpredictable size, it seems to get smaller when adding new specs...
-      spyOn(scout.DialogLayout, 'fitContainerInWindow').and.callFake(function(windowSize, containerPosition, containerSize, containerMargins) {
+      spyOn(DialogLayout, 'fitContainerInWindow').and.callFake(function(windowSize, containerPosition, containerSize, containerMargins) {
         return containerSize;
       });
 

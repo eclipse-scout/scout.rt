@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device, scout} from '../../src/index';
+
+
 describe('FileChooser', function() {
   var session;
 
@@ -42,7 +45,7 @@ describe('FileChooser', function() {
 
   describe('addFiles', function() {
     it('adds the files if multiSelect is true', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
@@ -63,7 +66,7 @@ describe('FileChooser', function() {
     });
 
     it('does only add one file if multiSelect is false', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var fileChooser = scout.create('FileChooser', {
@@ -89,7 +92,7 @@ describe('FileChooser', function() {
 
   describe('removeFile', function() {
     it('removes the file', function() {
-      if (!scout.device.supportsFileConstructor()) {
+      if (!Device.get().supportsFileConstructor()) {
         return;
       }
       var file1 = new File([''], 'file 1');

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {GroupBox, GroupBoxGridConfig, HorizontalGrid, scout} from '../../../../src/index';
+import {CloneSpecHelper, FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("GroupBox", function() {
   var session;
   var helper;
@@ -16,12 +20,12 @@ describe("GroupBox", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
-    cloneHelper = new scout.CloneSpecHelper();
+    helper = new FormSpecHelper(session);
+    cloneHelper = new CloneSpecHelper();
   });
 
   function createField(model, parent) {
-    var field = new scout.GroupBox();
+    var field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -77,8 +81,8 @@ describe("GroupBox", function() {
 
       // Assert that logical grid is a new instance
       expect(clone.logicalGrid).not.toBe(groupBox.logicalGrid);
-      expect(clone.logicalGrid instanceof scout.HorizontalGrid).toBe(true);
-      expect(clone.logicalGrid.gridConfig instanceof scout.GroupBoxGridConfig).toBe(true);
+      expect(clone.logicalGrid instanceof HorizontalGrid).toBe(true);
+      expect(clone.logicalGrid.gridConfig instanceof GroupBoxGridConfig).toBe(true);
     });
 
     it("does not render the cloned box", function() {

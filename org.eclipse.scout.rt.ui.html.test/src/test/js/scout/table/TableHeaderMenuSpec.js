@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ColumnUserFilter, TableHeaderMenu} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TableHeaderMenu', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('TableHeaderMenu', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -26,7 +30,7 @@ describe('TableHeaderMenu', function() {
   });
 
   function createAndRegisterColumnFilter(table, column, selectedValues) {
-    var filter = new scout.ColumnUserFilter();
+    var filter = new ColumnUserFilter();
     helper.createAndRegisterColumnFilter({
       session: session,
       table: table,
@@ -300,7 +304,7 @@ describe('TableHeaderMenu', function() {
         var $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'AValue');
         expectTableRowText($filterItems, 1, 'BValue');
-        expect(tableHeaderMenu.filterSortMode).toBe(scout.TableHeaderMenu.SortMode.ALPHABETICALLY);
+        expect(tableHeaderMenu.filterSortMode).toBe(TableHeaderMenu.SortMode.ALPHABETICALLY);
         table.header.closeHeaderMenu();
       });
 
@@ -314,7 +318,7 @@ describe('TableHeaderMenu', function() {
         var $filterItems = find$FilterItems(table);
         expectTableRowText($filterItems, 0, 'BValue');
         expectTableRowText($filterItems, 1, 'AValue');
-        expect(tableHeaderMenu.filterSortMode).toBe(scout.TableHeaderMenu.SortMode.AMOUNT);
+        expect(tableHeaderMenu.filterSortMode).toBe(TableHeaderMenu.SortMode.AMOUNT);
         table.header.closeHeaderMenu();
       });
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from '../../../../src/index';
+import {CloneSpecHelper, FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('SequenceBoxAdapter', function() {
   var session, helper, menuHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
-    menuHelper = new scout.MenuSpecHelper(session);
+    helper = new FormSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
   });
 
   describe("clone", function() {
     it("does not accidentally create a logical grid", function() {
-      var cloneHelper = new scout.CloneSpecHelper();
+      var cloneHelper = new CloneSpecHelper();
       var model = {
         id: 'seq01',
         parent: session.desktop,

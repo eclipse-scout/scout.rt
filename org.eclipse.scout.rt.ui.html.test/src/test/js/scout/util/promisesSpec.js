@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,20 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays, PromiseCreator, promises} from '../../src/index';
+
+
 describe("scout.promises", function() {
 
   function createDeferredArray(len) {
-    return scout.arrays.init(len, null);
+    return arrays.init(len, null);
   }
 
   function createPromiseCreatorForDeferredArray(deferredArray) {
-    return new scout.PromiseCreator(deferredArray.map(function(v, i) { return function() { deferredArray[i] = new $.Deferred(); return deferredArray[i]; }; }));
+    return new PromiseCreator(deferredArray.map(function(v, i) {
+      return function() {
+        deferredArray[i] = new $.Deferred();
+        return deferredArray[i];
+      };
+    }));
   }
 
   it("oneByOne stops executing after failure", function(done) {
     var deferredArray = createDeferredArray(3);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    scout.promises.oneByOne(promiseCreator).then(function() {
+    promises.oneByOne(promiseCreator).then(function() {
       fail('Unexpected code branch');
     }, function(msg) {
       expect(msg).toBe('Foo');
@@ -35,7 +43,7 @@ describe("scout.promises", function() {
   it("groupwise stops executing after failed group", function(done) {
     var deferredArray = createDeferredArray(3);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    scout.promises.groupwise(2, promiseCreator).then(function() {
+    promises.groupwise(2, promiseCreator).then(function() {
       fail('Unexpected code branch');
     }, function(msg) {
       expect(msg).toBe('Bar');
@@ -49,7 +57,7 @@ describe("scout.promises", function() {
   it("parallel stops executing after failed promise", function(done) {
     var deferredArray = createDeferredArray(9);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    scout.promises.parallel(3, promiseCreator).then(function() {
+    promises.parallel(3, promiseCreator).then(function() {
       fail('Unexpected code branch');
     }, function(msg) {
       expect(msg).toBe(4);
@@ -89,7 +97,7 @@ describe("scout.promises", function() {
   it("does not cut off error arguments", function(done) {
     var deferredArray = createDeferredArray(1);
     var promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
-    scout.promises.oneByOne(promiseCreator).then(function() {
+    promises.oneByOne(promiseCreator).then(function() {
       fail('Unexpected code branch');
     }, function() {
       expect(arguments).toBeTruthy();
@@ -102,9 +110,15 @@ describe("scout.promises", function() {
   });
 
   it("adds all result arguments, one for each deferred", function(done) {
-    var deferredArray = scout.arrays.init(3, null).map(function() { return new $.Deferred(); });
-    var promiseCreator = new scout.PromiseCreator(deferredArray.map(function(v, i) { return function() { return deferredArray[i].promise(); }; }));
-    scout.promises.groupwise(4, promiseCreator).then(function() {
+    var deferredArray = arrays.init(3, null).map(function() {
+      return new $.Deferred();
+    });
+    var promiseCreator = new PromiseCreator(deferredArray.map(function(v, i) {
+      return function() {
+        return deferredArray[i].promise();
+      };
+    }));
+    promises.groupwise(4, promiseCreator).then(function() {
       expect(arguments).toBeTruthy();
       expect(arguments.length).toBe(3);
       // same behavior as if multiple Deferred or Promise or Thenable objects have been used with $.when or $.promiseAll method

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../../src/index';
+import {TreeSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TreeKeyStrokes", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("TreeKeyStrokes", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TreeSpecHelper(session);
+    helper = new TreeSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -39,11 +43,11 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node1]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -60,11 +64,11 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node1Child1]);
 
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node1Child0]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node1]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0Child2]);
     });
 
@@ -75,7 +79,7 @@ describe("TreeKeyStrokes", function() {
       var node2 = tree.nodes[2];
 
       tree.render();
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -85,17 +89,17 @@ describe("TreeKeyStrokes", function() {
 
       var node0 = tree.nodes[0];
       tree.render();
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
 
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
 
       tree.deselectAll();
 
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
     });
     it("does nothing if first node already is selected", function() {
@@ -105,7 +109,7 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       var node0 = tree.nodes[0];
       helper.selectNodesAndAssert(tree, [node0]);
-      tree.$data.triggerKeyDown(scout.keys.UP);
+      tree.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(tree, [node0]);
     });
   });
@@ -122,11 +126,11 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node1]);
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node2]);
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -138,7 +142,7 @@ describe("TreeKeyStrokes", function() {
 
       tree.render();
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -155,11 +159,11 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0Child2]);
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node1]);
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node1Child0]);
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node1Child1]);
     });
 
@@ -169,17 +173,17 @@ describe("TreeKeyStrokes", function() {
 
       var node0 = tree.nodes[0];
       tree.render();
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
 
       tree.deselectAll();
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node0]);
     });
 
@@ -192,7 +196,7 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      tree.$data.triggerKeyDown(scout.keys.DOWN);
+      tree.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(tree, [node2]);
     });
   });
@@ -208,7 +212,7 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node2]);
 
-      tree.$data.triggerKeyDown(scout.keys.HOME);
+      tree.$data.triggerKeyDown(keys.HOME);
       helper.assertSelection(tree, [node0]);
     });
     it("selects first node in expanded tree", function() {
@@ -221,7 +225,7 @@ describe("TreeKeyStrokes", function() {
       tree.render();
       helper.selectNodesAndAssert(tree, [node0Child2]);
 
-      tree.$data.triggerKeyDown(scout.keys.HOME);
+      tree.$data.triggerKeyDown(keys.HOME);
       helper.assertSelection(tree, [node0]);
       tree.visitNodes(function(node) {
         expect(node.expanded).toBeFalsy();
@@ -241,7 +245,7 @@ describe("TreeKeyStrokes", function() {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeTruthy();
 
-      tree.$data.triggerKeyDown(scout.keys.SUBTRACT);
+      tree.$data.triggerKeyDown(keys.SUBTRACT);
       expect(node0.expanded).toBeFalsy();
     });
 
@@ -256,12 +260,12 @@ describe("TreeKeyStrokes", function() {
       helper.selectNodesAndAssert(tree, [node0Child0]);
       expect(node0Child0.expanded).toBeTruthy();
 
-      tree.$data.triggerKeyDown(scout.keys.SUBTRACT);
+      tree.$data.triggerKeyDown(keys.SUBTRACT);
       expect(node0Child0.expanded).toBeFalsy();
-      tree.$data.triggerKeyDown(scout.keys.SUBTRACT);
+      tree.$data.triggerKeyDown(keys.SUBTRACT);
       helper.assertSelection(tree, [node0]);
       expect(node0.expanded).toBeTruthy();
-      tree.$data.triggerKeyDown(scout.keys.SUBTRACT);
+      tree.$data.triggerKeyDown(keys.SUBTRACT);
       expect(node0.expanded).toBeFalsy();
     });
 
@@ -278,7 +282,7 @@ describe("TreeKeyStrokes", function() {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      tree.$data.triggerKeyDown(scout.keys.ADD);
+      tree.$data.triggerKeyDown(keys.ADD);
       expect(node0.expanded).toBeTruthy();
     });
 
@@ -292,9 +296,9 @@ describe("TreeKeyStrokes", function() {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      tree.$data.triggerKeyDown(scout.keys.ADD);
+      tree.$data.triggerKeyDown(keys.ADD);
       expect(node0.expanded).toBeTruthy();
-      tree.$data.triggerKeyDown(scout.keys.ADD);
+      tree.$data.triggerKeyDown(keys.ADD);
       helper.assertSelection(tree, [node0.childNodes[0]]);
     });
   });
@@ -311,7 +315,7 @@ describe("TreeKeyStrokes", function() {
       helper.selectNodesAndAssert(tree, [node0]);
       expect(node0.expanded).toBeFalsy();
 
-      tree.$data.triggerKeyDown(scout.keys.END);
+      tree.$data.triggerKeyDown(keys.END);
       helper.assertSelection(tree, [node2]);
     });
 
@@ -328,7 +332,7 @@ describe("TreeKeyStrokes", function() {
       tree.checkNode(node0, true);
       expect(node0.checked).toBeTruthy();
       tree.render();
-      tree.$data.triggerKeyDown(scout.keys.SPACE);
+      tree.$data.triggerKeyDown(keys.SPACE);
 
       tree.visitNodes(function(node) {
         if (node === node0) {
@@ -349,7 +353,7 @@ describe("TreeKeyStrokes", function() {
       expect(node0.checked).toBeFalsy();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      tree.$data.triggerKeyDown(scout.keys.SPACE);
+      tree.$data.triggerKeyDown(keys.SPACE);
 
       tree.visitNodes(function(node) {
         if (node === node0) {
@@ -371,7 +375,7 @@ describe("TreeKeyStrokes", function() {
       expect(node0.checked).toBeTruthy();
       helper.selectNodesAndAssert(tree, [node0]);
 
-      tree.$data.triggerKeyDown(scout.keys.SPACE);
+      tree.$data.triggerKeyDown(keys.SPACE);
 
       tree.visitNodes(function(node) {
         expect(node.checked).toBeFalsy();

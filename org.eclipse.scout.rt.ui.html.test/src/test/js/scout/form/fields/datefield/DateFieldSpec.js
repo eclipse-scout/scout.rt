@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DateFormat, DatePickerTouchPopup, dates, keys, RemoteEvent, scout, Status, TimePickerTouchPopup} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('DateField', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('DateField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -118,7 +122,7 @@ describe('DateField', function() {
     var $box = picker.currentMonth.$container;
     return $box.find('.date-picker-day').filter(function(i, elem) {
       var $day = $(elem);
-      return (scout.dates.isSameDay(date, $day.data('date')));
+      return (dates.isSameDay(date, $day.data('date')));
     }.bind(this));
   }
 
@@ -169,7 +173,7 @@ describe('DateField', function() {
       expect(field.dateDisplayText).toBe('14.04.2016');
       expect(field.timeDisplayText).toBe('12:28');
       expect(field.displayText).toBe('14.04.2016\n12:28');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2016-04-14 12:28:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2016-04-14 12:28:00.000').toISOString());
     });
 
   });
@@ -199,8 +203,8 @@ describe('DateField', function() {
         parent: session.desktop,
         hasTime: true
       });
-      field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-23 12:30:00.000').toISOString());
+      field.setValue(dates.create('2017-05-23 12:30:00.000'));
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-23 12:30:00.000').toISOString());
       expect(field.displayText).toBe('23.05.2017\n12:30');
       field.setValue(null);
       expect(field.value).toBe(null);
@@ -215,9 +219,9 @@ describe('DateField', function() {
       field.setValidator(function(value) {
         throw new Error('Validation failed');
       });
-      field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
+      field.setValue(dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.displayText).toBe('23.05.2017\n12:30');
     });
 
@@ -229,20 +233,20 @@ describe('DateField', function() {
       field.setValidator(function(value) {
         throw new Error('Validation failed');
       });
-      field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
+      field.setValue(dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setValue('2019-03-14');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.displayText).toBe('14.03.2019\n00:00');
 
       field.setValidator(function(value) {
         return value;
       });
-      field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-23 12:30:00.000').toISOString());
+      field.setValue(dates.create('2017-05-23 12:30:00.000'));
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-23 12:30:00.000').toISOString());
       expect(field.errorStatus).toBe(null);
     });
 
@@ -258,15 +262,15 @@ describe('DateField', function() {
       field.render();
       field.$dateField.focus();
       field.setValidator(function(value) {
-        if (scout.dates.equals(value, scout.dates.create('2017-05-23 12:30:00.000'))) {
+        if (dates.equals(value, dates.create('2017-05-23 12:30:00.000'))) {
           throw new Error('Validation failed');
         }
         return value;
       });
       // Enter invalid date
-      field.setValue(scout.dates.create('2017-05-23 12:30:00.000'));
+      field.setValue(dates.create('2017-05-23 12:30:00.000'));
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       // Enter another date, but don't press enter
       field.$dateField.val('23.05.201');
@@ -279,7 +283,7 @@ describe('DateField', function() {
       field._onDateFieldInput();
       field.acceptInput();
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
     });
 
   });
@@ -307,7 +311,7 @@ describe('DateField', function() {
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
       expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
+      expect(dateField.errorStatus instanceof Status).toBe(false);
     });
 
     it('does not remove time if date was deleted and time has an error', function() {
@@ -322,7 +326,7 @@ describe('DateField', function() {
       dateField.acceptInput();
       expect(dateField.$dateField.val()).toBe('01.10.2014');
       expect(dateField.$timeField.val()).toBe('asdf');
-      expect(dateField.errorStatus instanceof scout.Status).toBe(true);
+      expect(dateField.errorStatus instanceof Status).toBe(true);
 
       dateField.$dateField.val('');
       expect(dateField.$dateField.val()).toBe('');
@@ -332,7 +336,7 @@ describe('DateField', function() {
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('asdf');
       expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof scout.Status).toBe(true);
+      expect(dateField.errorStatus instanceof Status).toBe(true);
     });
 
   });
@@ -360,7 +364,7 @@ describe('DateField', function() {
       expect(dateField.$dateField.val()).toBe('');
       expect(dateField.$timeField.val()).toBe('');
       expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof scout.Status).toBe(false);
+      expect(dateField.errorStatus instanceof Status).toBe(false);
     });
 
     it('does not remove date if time was deleted and date has an error', function() {
@@ -375,7 +379,7 @@ describe('DateField', function() {
       dateField.acceptInput();
       expect(dateField.$dateField.val()).toBe('asdf');
       expect(dateField.$timeField.val()).toBe('05:00');
-      expect(dateField.errorStatus instanceof scout.Status).toBe(true);
+      expect(dateField.errorStatus instanceof Status).toBe(true);
 
       dateField.$timeField.val('');
       expect(dateField.$dateField.val()).toBe('asdf');
@@ -385,7 +389,7 @@ describe('DateField', function() {
       expect(dateField.$dateField.val()).toBe('asdf');
       expect(dateField.$timeField.val()).toBe('');
       expect(dateField.value).toBe(null);
-      expect(dateField.errorStatus instanceof scout.Status).toBe(true);
+      expect(dateField.errorStatus instanceof Status).toBe(true);
     });
 
   });
@@ -408,16 +412,16 @@ describe('DateField', function() {
         parent: session.desktop
       });
       dateField.render();
-      dateField.setValue(scout.dates.create('2017-05-23 00:00:00.000'));
+      dateField.setValue(dates.create('2017-05-23 00:00:00.000'));
       dateField.$dateField.triggerMouseDown();
 
-      expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, scout.dates.create('2017-05-23 00:00:00.000'))).toBe(true);
+      expect(dates.isSameDay(dateField.getDatePicker().selectedDate, dates.create('2017-05-23 00:00:00.000'))).toBe(true);
       dateField.popup.close();
 
       dateField.clear();
       dateField.$dateField.triggerMouseDown();
       expect(dateField.getDatePicker().selectedDate).toBe(null);
-      expect(scout.dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
+      expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
       expect(dateField.value).toBe(null);
     });
 
@@ -488,7 +492,7 @@ describe('DateField', function() {
       // Order is important, displayText needs to be before value
       // Otherwise server would generate a display text as soon as value changes and send it back even if it is the same as the ui is sending
       var events = [
-        new scout.RemoteEvent(dateField.id, 'acceptInput', {
+        new RemoteEvent(dateField.id, 'acceptInput', {
           displayText: '11.02.2015',
           value: '2015-02-11 00:00:00.000',
           errorStatus: null,
@@ -560,7 +564,7 @@ describe('DateField', function() {
       find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       expect(dateField.displayText).toBe('01.02.2016');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
     });
 
     it('unselects the date if the field\'s text was removed', function() {
@@ -572,12 +576,12 @@ describe('DateField', function() {
       focusAndOpenDatePicker(dateField);
       find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
       openDatePicker(dateField);
-      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
 
       dateField.$dateField.val('');
       dateField.$dateField.trigger('input');
       expect(dateField.getDatePicker().selectedDate).toBe(null);
-      expect(dateField.getDatePicker().preselectedDate.toISOString()).toBe(scout.dates.create('2016-02-05 00:00:00.000').toISOString());
+      expect(dateField.getDatePicker().preselectedDate.toISOString()).toBe(dates.create('2016-02-05 00:00:00.000').toISOString());
     });
 
     it('sets selected date as field value when a date was selected even if another date was typed', function() {
@@ -589,19 +593,19 @@ describe('DateField', function() {
       focusAndOpenDatePicker(dateField);
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       expect(dateField.displayText).toBe('01.02.2016');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
-      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
 
       // Enter another date
       dateField.$dateField.val('02.02.2016');
       dateField.$dateField.trigger('input');
-      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(scout.dates.create('2016-02-02 00:00:00.000').toISOString());
+      expect(dateField.getDatePicker().selectedDate.toISOString()).toBe(dates.create('2016-02-02 00:00:00.000').toISOString());
 
       // Click the date which was selected when the picker opened
       find$Day(dateField.getDatePicker(), new Date(2016, 1, 1)).triggerClick();
       expect(dateField.$dateField.val()).toBe('01.02.2016');
       expect(dateField.displayText).toBe('01.02.2016');
-      expect(dateField.value.toISOString()).toBe(scout.dates.create('2016-02-01 00:00:00.000').toISOString());
+      expect(dateField.value.toISOString()).toBe(dates.create('2016-02-01 00:00:00.000').toISOString());
     });
 
   });
@@ -615,7 +619,7 @@ describe('DateField', function() {
         var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(findDatePicker().length).toBe(1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.ESC);
+        dateField.$dateField.triggerKeyDown(keys.ESC);
         expect(findDatePicker().length).toBe(0);
       });
 
@@ -638,7 +642,7 @@ describe('DateField', function() {
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.$dateField.triggerKeyDown(keys.ENTER);
         var date = dateField.value;
         expectDate(date, 2015, 2, 11);
         expect(findDatePicker().length).toBe(0);
@@ -662,17 +666,17 @@ describe('DateField', function() {
           hasTime: true
         });
         dateField.render();
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
+        dateField.$dateField.triggerKeyDown(keys.DOWN);
 
-        var expectedTime = scout.dates.ceil(new Date(), dateField.timePickerResolution);
-        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        var expectedTime = dates.ceil(new Date(), dateField.timePickerResolution);
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.$timeField.val()).toBe(dateField.isolatedTimeFormat.format(expectedTime));
         expect(dateField.displayText).toBe(dateField.formatValue(expectedTime));
         expect(dateField.value).toBe(null); // value is still unchanged
 
         dateField.acceptInput();
-        expect(scout.dates.isSameDay(dateField.value, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.value, new Date())).toBe(true);
         expectTime(dateField.value, expectedTime.getHours(), expectedTime.getMinutes(), expectedTime.getSeconds());
       });
 
@@ -682,8 +686,8 @@ describe('DateField', function() {
         });
         dateField.render();
         focusDate(dateField);
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
-        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        dateField.$dateField.triggerKeyDown(keys.DOWN);
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.value).toBe(null); // value is still unchanged
@@ -692,11 +696,11 @@ describe('DateField', function() {
         dateField.$dateField.val('');
         dateField.$dateField.trigger('input');
         expect(dateField.getDatePicker().selectedDate).toBe(null);
-        expect(scout.dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.getDatePicker().preselectedDate, new Date())).toBe(true);
 
         // Assert that current date is selected
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
-        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        dateField.$dateField.triggerKeyDown(keys.DOWN);
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.value).toBe(null); // value is still unchanged
@@ -709,17 +713,17 @@ describe('DateField', function() {
         });
         dateField.render();
         dateField.acceptInput();
-        expect(dateField.errorStatus instanceof scout.Status).toBe(true);
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
+        expect(dateField.errorStatus instanceof Status).toBe(true);
+        dateField.$dateField.triggerKeyDown(keys.DOWN);
 
-        expect(scout.dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.getDatePicker().selectedDate, new Date())).toBe(true);
         expect(dateField.$dateField.val()).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.displayText).toBe(dateField.isolatedDateFormat.format(new Date()));
         expect(dateField.value).toBe(null); // value is still unchanged
         expect(dateField.errorStatus).toBe(null);
 
         dateField.acceptInput();
-        expect(scout.dates.isSameDay(dateField.value, new Date())).toBe(true);
+        expect(dates.isSameDay(dateField.value, new Date())).toBe(true);
       });
 
       it('increases day by one', function() {
@@ -727,7 +731,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN);
+        dateField.$dateField.triggerKeyDown(keys.DOWN);
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -744,7 +748,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'shift');
+        dateField.$dateField.triggerKeyDown(keys.DOWN, 'shift');
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
         expect(dateField.$dateField.val()).toBe('01.11.2014');
@@ -755,7 +759,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.DOWN, 'ctrl');
+        dateField.$dateField.triggerKeyDown(keys.DOWN, 'ctrl');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -766,10 +770,10 @@ describe('DateField', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
           hasTime: true,
-          value: scout.dates.create('2017-04-14 12:18:00.000')
+          value: dates.create('2017-04-14 12:18:00.000')
         });
         dateField.render();
-        dateField.$timeField.triggerKeyDown(scout.keys.DOWN);
+        dateField.$timeField.triggerKeyDown(keys.DOWN);
 
         expectTime(dateField.value, 12, 18, 0);
         expect(dateField.$timeField.val()).toBe('12:30');
@@ -797,7 +801,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.UP);
+        dateField.$dateField.triggerKeyDown(keys.UP);
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -809,7 +813,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.UP, 'shift');
+        dateField.$dateField.triggerKeyDown(keys.UP, 'shift');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -821,7 +825,7 @@ describe('DateField', function() {
         var dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
 
-        dateField.$dateField.triggerKeyDown(scout.keys.UP, 'ctrl');
+        dateField.$dateField.triggerKeyDown(keys.UP, 'ctrl');
 
         dateBefore = dateField.value;
         expectDate(dateBefore, 2014, 10, 1);
@@ -839,7 +843,7 @@ describe('DateField', function() {
         parent: session.desktop
       });
 
-      dateField.isolatedDateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
+      dateField.isolatedDateFormat = new DateFormat(session.locale, 'dd.MM.yyyy');
       expect(!!dateField._predictDate('')).toBe(true);
       expect(!!dateField._predictDate(undefined)).toBe(true);
       expect(!!dateField._predictDate('0')).toBe(true);
@@ -878,7 +882,7 @@ describe('DateField', function() {
         expect(prediction.text).toBe(expectedPrediction);
       }
 
-      dateField.isolatedDateFormat = new scout.DateFormat(session.locale, 'dd.MM.yyyy');
+      dateField.isolatedDateFormat = new DateFormat(session.locale, 'dd.MM.yyyy');
       expectPrediction('0', '01.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
       expectPrediction('1', '1.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
       expectPrediction('2', '2.' + ('0' + (now.getMonth() + 1)).slice(-2) + '.' + now.getFullYear());
@@ -967,7 +971,7 @@ describe('DateField', function() {
         dateField.$dateField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
         expect($('.touch-popup').length).toBe(1);
-        expect(scout.widget($('.touch-popup')) instanceof scout.DatePickerTouchPopup).toBe(true);
+        expect(scout.widget($('.touch-popup')) instanceof DatePickerTouchPopup).toBe(true);
         expect($('.date-picker-popup').length).toBe(0);
         dateField.popup.close();
       });
@@ -975,7 +979,7 @@ describe('DateField', function() {
       it('is closed when date in picker is selected', function() {
         var dateField = scout.create('DateField', {
           parent: session.desktop,
-          touchMode: true,
+          touchMode: true
         });
         dateField.render();
 
@@ -1032,9 +1036,9 @@ describe('DateField', function() {
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup._field.$dateField.val('11.02.2015');
-        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$dateField.triggerKeyDown(keys.ENTER);
         expect(dateField.popup).toBe(null);
-        expectDate(dateField.value, 2015, 02, 11);
+        expectDate(dateField.value, 2015, 2, 11);
         expect(dateField.displayText).toBe('11.02.2015');
         expect(dateField.$dateField.text()).toBe(dateField.displayText);
       });
@@ -1051,18 +1055,18 @@ describe('DateField', function() {
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup._field.$dateField.val('29.02.2016');
-        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$dateField.triggerKeyDown(keys.ENTER);
 
         expect(dateField.popup).toBe(null);
         dateField.$timeField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup._field.$timeField.val('10:42');
-        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$timeField.triggerKeyDown(keys.ENTER);
 
         expect(dateField.popup).toBe(null);
 
-        expectDate(dateField.value, 2016, 02, 29, 10, 42);
+        expectDate(dateField.value, 2016, 2, 29, 10, 42);
         expect(dateField.displayText).toBe('29.02.2016\n10:42');
         expect(dateField.$dateField.text()).toBe('29.02.2016');
         expect(dateField.$timeField.text()).toBe('10:42');
@@ -1098,7 +1102,7 @@ describe('DateField', function() {
 
         // Enter date and close
         dateField.popup._field.$dateField.val('11.02.2015');
-        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$dateField.triggerKeyDown(keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.displayText).toBe('11.02.2015');
 
@@ -1124,7 +1128,7 @@ describe('DateField', function() {
         expect(dateField.popup._field.$dateField.val()).toBe(dateField.displayText);
 
         dateField.popup._field.$dateField.val('');
-        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$dateField.triggerKeyDown(keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.value).toBe(null);
         expect(dateField.displayText).toBe('');
@@ -1147,7 +1151,7 @@ describe('DateField', function() {
 
         // Clear text
         dateField.popup._field.$dateField.val('');
-        dateField.popup._field.$dateField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$dateField.triggerKeyDown(keys.ENTER);
         expect(dateField.popup).toBe(null);
         expect(dateField.$dateField.text()).toBe('');
 
@@ -1215,7 +1219,7 @@ describe('DateField', function() {
         dateField.$timeField.triggerClick();
         expect(dateField.popup.rendered).toBe(true);
         expect($('.touch-popup').length).toBe(1);
-        expect(scout.widget($('.touch-popup')) instanceof scout.TimePickerTouchPopup).toBe(true);
+        expect(scout.widget($('.touch-popup')) instanceof TimePickerTouchPopup).toBe(true);
         expect($('.time-picker-popup').length).toBe(0);
         dateField.popup.close();
       });
@@ -1268,7 +1272,7 @@ describe('DateField', function() {
         expect(dateField.popup.rendered).toBe(true);
 
         dateField.popup._field.$timeField.val('05:13');
-        dateField.popup._field.$timeField.triggerKeyDown(scout.keys.ENTER);
+        dateField.popup._field.$timeField.triggerKeyDown(keys.ENTER);
         expect(dateField.popup).toBe(null);
         expectTime(dateField.value, 5, 13, 0);
         expect(dateField.displayText).toBe('05:13');
@@ -1364,25 +1368,25 @@ describe('DateField', function() {
       field.render();
       expect(field.$dateField.val()).toBe('01.05.2017');
       expect(field.$timeField.val()).toBe('05:50');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 05:50:00.000').toISOString());
       expect(field.displayText).toBe('01.05.2017\n05:50');
 
       field.setHasDate(false);
       expect(field.$timeField.val()).toBe('05:50');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 05:50:00.000').toISOString());
       expect(field.displayText).toBe('05:50');
 
       // enter another time, date should be preserved
       field.$timeField.val('02:30');
       field.$timeField.trigger('input');
       field.acceptInput();
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 02:30:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 02:30:00.000').toISOString());
       expect(field.displayText).toBe('02:30');
 
       field.setHasDate(true);
       expect(field.$dateField.val()).toBe('01.05.2017');
       expect(field.$timeField.val()).toBe('02:30');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 02:30:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 02:30:00.000').toISOString());
       expect(field.displayText).toBe('01.05.2017\n02:30');
     });
 
@@ -1453,25 +1457,25 @@ describe('DateField', function() {
       field.render();
       expect(field.$dateField.val()).toBe('01.05.2017');
       expect(field.$timeField.val()).toBe('05:50');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 05:50:00.000').toISOString());
       expect(field.displayText).toBe('01.05.2017\n05:50');
 
       field.setHasTime(false);
       expect(field.$dateField.val()).toBe('01.05.2017');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2017-05-01 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2017-05-01 05:50:00.000').toISOString());
       expect(field.displayText).toBe('01.05.2017');
 
       // enter another date, time should be preserved
       field.$dateField.val('02.02.2016');
       field.$dateField.trigger('input');
       field.acceptInput();
-      expect(field.value.toISOString()).toBe(scout.dates.create('2016-02-02 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2016-02-02 05:50:00.000').toISOString());
       expect(field.displayText).toBe('02.02.2016');
 
       field.setHasTime(true);
       expect(field.$dateField.val()).toBe('02.02.2016');
       expect(field.$timeField.val()).toBe('05:50');
-      expect(field.value.toISOString()).toBe(scout.dates.create('2016-02-02 05:50:00.000').toISOString());
+      expect(field.value.toISOString()).toBe(dates.create('2016-02-02 05:50:00.000').toISOString());
       expect(field.displayText).toBe('02.02.2016\n05:50');
     });
 

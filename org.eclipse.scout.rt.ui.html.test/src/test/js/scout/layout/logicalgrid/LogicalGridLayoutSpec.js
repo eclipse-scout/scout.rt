@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {AbstractLayout, Dimension, GridData, HtmlComponent, LogicalGridData, LogicalGridLayout, Widget} from '../../../src/index';
+
+
 describe("LogicalGridLayout", function() {
   var session;
   var containerPadding = 5;
@@ -22,49 +25,49 @@ describe("LogicalGridLayout", function() {
     session = sandboxSession();
   });
 
-  var StaticLayout = function() {
-    StaticLayout.parent.call(this);
-    this.prefSize = new scout.Dimension();
-  };
-  scout.inherits(StaticLayout, scout.AbstractLayout);
+  class StaticLayout extends AbstractLayout {
+    constructor() {
+      super();
+      this.prefSize = new Dimension();
+    }
 
-  StaticLayout.prototype.preferredLayoutSize = function($container, options) {
-    return this.prefSize;
-  };
+    preferredLayoutSize($container, options) {
+      return this.prefSize;
+    }
+  }
 
-  var LglContainer = function() {
-    LglContainer.parent.call(this);
-  };
-  scout.inherits(LglContainer, scout.Widget);
+  class LglContainer extends Widget {
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.$container.css({
+        padding: containerPadding
+      });
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      this.htmlComp.setLayout(new LogicalGridLayout(this, {
+        rowHeight: rowHeight,
+        columnWidth: columnWidth,
+        hgap: hgap,
+        vgap: vgap
+      }));
+    }
+  }
 
-  LglContainer.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.$container.css({
-      padding: containerPadding
-    });
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new scout.LogicalGridLayout(this, {
-      rowHeight: rowHeight,
-      columnWidth: columnWidth,
-      hgap: hgap,
-      vgap: vgap
-    }));
-  };
+  class LglChild extends Widget {
+    constructor() {
+      super();
+      this.gridData = new GridData();
+    }
 
-  var LglChild = function() {
-    LglChild.parent.call(this);
-    this.gridData = new scout.GridData();
-  };
-  scout.inherits(LglChild, scout.Widget);
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.$container.css({
+        margin: childMargin
+      });
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      this.htmlComp.setLayout(new StaticLayout());
+    }
+  }
 
-  LglChild.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.$container.css({
-      margin: childMargin
-    });
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.setLayout(new StaticLayout());
-  };
 
   function createLglChild(model) {
     var defaults = {
@@ -74,7 +77,7 @@ describe("LogicalGridLayout", function() {
     var lglChild = new LglChild();
     lglChild.init(model);
     lglChild.render();
-    lglChild.setLayoutData(new scout.LogicalGridData(lglChild));
+    lglChild.setLayoutData(new LogicalGridData(lglChild));
     return lglChild;
   }
 
@@ -91,12 +94,12 @@ describe("LogicalGridLayout", function() {
 
     it("returns row height and column width incl. insets", function() {
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = false;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(10, 20);
+      lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
       var prefSize = lglContainer.htmlComp.prefSize();
       expect(prefSize.height).toBe(rowHeight + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth + containerPadding * 2);
@@ -104,12 +107,12 @@ describe("LogicalGridLayout", function() {
 
     it("returns pref size of its child incl. insets if useUiHeight is true", function() {
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(10, 20);
+      lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
       var prefSize = lglContainer.htmlComp.prefSize();
       expect(prefSize.height).toBe(20 + childMargin * 2 + containerPadding * 2);
       expect(prefSize.width).toBe(columnWidth + containerPadding * 2);
@@ -117,20 +120,20 @@ describe("LogicalGridLayout", function() {
 
     it("returns max pref size of its children at on same row incl. insets if useUiHeight is true", function() {
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(10, 20);
+      lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
 
       var lglChild2 = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild2.gridData.x = 1;
       lglChild2.gridData.y = 0;
       lglChild2.gridData.useUiHeight = true;
-      lglChild2.htmlComp.layout.prefSize = new scout.Dimension(10, 88);
+      lglChild2.htmlComp.layout.prefSize = new Dimension(10, 88);
 
       var prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 100
@@ -141,16 +144,16 @@ describe("LogicalGridLayout", function() {
 
     it("passes widthHint to its children", function() {
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         if (options.widthHint === 100 - childMargin * 2 - containerPadding * 2) {
-          return new scout.Dimension(75, 75);
+          return new Dimension(75, 75);
         }
-        return new scout.Dimension();
+        return new Dimension();
       };
       var prefSize = lglContainer.htmlComp.prefSize({
         widthHint: 100
@@ -162,12 +165,12 @@ describe("LogicalGridLayout", function() {
     it("considers hgap when passing widthHint if there are multiple children on the same row", function() {
       var widthHint;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(10, 20);
+      lglChild.htmlComp.layout.prefSize = new Dimension(10, 20);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint = options.widthHint;
         return this.prefSize;
@@ -175,12 +178,12 @@ describe("LogicalGridLayout", function() {
 
       var widthHint2;
       var lglChild2 = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild2.gridData.x = 1;
       lglChild2.gridData.y = 0;
       lglChild2.gridData.useUiHeight = true;
-      lglChild2.htmlComp.layout.prefSize = new scout.Dimension(10, 88);
+      lglChild2.htmlComp.layout.prefSize = new Dimension(10, 88);
       lglChild2.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint2 = options.widthHint;
         return this.prefSize;
@@ -196,13 +199,13 @@ describe("LogicalGridLayout", function() {
     it("considers weightX when passing widthHint if there are multiple children on the same row", function() {
       var widthHint;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.useUiHeight = true;
       lglChild.gridData.weightX = 0;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(100, 88);
+      lglChild.htmlComp.layout.prefSize = new Dimension(100, 88);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint = options.widthHint;
         return this.prefSize;
@@ -210,13 +213,13 @@ describe("LogicalGridLayout", function() {
 
       var widthHint2;
       var lglChild2 = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild2.gridData.x = 1;
       lglChild2.gridData.y = 0;
       lglChild2.gridData.useUiHeight = true;
       lglChild2.gridData.weightX = 1;
-      lglChild2.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild2.htmlComp.layout.prefSize = new Dimension(120, 50);
       lglChild2.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint2 = options.widthHint;
         return this.prefSize;
@@ -234,13 +237,13 @@ describe("LogicalGridLayout", function() {
       var widthHint;
       var prefSize1Called = false;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.widthInPixel = 300;
       lglChild.gridData.weightX = 0;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(100, 88);
+      lglChild.htmlComp.layout.prefSize = new Dimension(100, 88);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         prefSize1Called = true;
         widthHint = options.widthHint;
@@ -249,13 +252,13 @@ describe("LogicalGridLayout", function() {
 
       var widthHint2;
       var lglChild2 = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild2.gridData.x = 1;
       lglChild2.gridData.y = 0;
       lglChild2.gridData.useUiHeight = true;
       lglChild2.gridData.weightX = 1;
-      lglChild2.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild2.htmlComp.layout.prefSize = new Dimension(120, 50);
       lglChild2.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint2 = options.widthHint;
         return this.prefSize;
@@ -273,13 +276,13 @@ describe("LogicalGridLayout", function() {
     it("uses preferred width as widthHint if fill horizontal is false", function() {
       var widthHint;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.fillHorizontal = false;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild.htmlComp.layout.prefSize = new Dimension(120, 50);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint = options.widthHint;
         return this.prefSize;
@@ -295,13 +298,13 @@ describe("LogicalGridLayout", function() {
     it("uses container width as widthHint if fill horizontal is false and pref width is bigger", function() {
       var widthHint;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.fillHorizontal = false;
       lglChild.gridData.useUiHeight = true;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(500, 50);
+      lglChild.htmlComp.layout.prefSize = new Dimension(500, 50);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint = options.widthHint;
         return this.prefSize;
@@ -317,13 +320,13 @@ describe("LogicalGridLayout", function() {
     it("does not mess comp size up if fill horizontal and fill vertical are false", function() {
       var widthHint;
       var lglChild = createLglChild({
-        parent: lglContainer,
+        parent: lglContainer
       });
       lglChild.gridData.x = 0;
       lglChild.gridData.y = 0;
       lglChild.gridData.fillHorizontal = false;
       lglChild.gridData.fillVertical = false;
-      lglChild.htmlComp.layout.prefSize = new scout.Dimension(120, 50);
+      lglChild.htmlComp.layout.prefSize = new Dimension(120, 50);
       lglChild.htmlComp.layout.preferredLayoutSize = function($container, options) {
         widthHint = options.widthHint;
         return this.prefSize;

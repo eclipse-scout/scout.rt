@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Button, icons, scout} from '../../../../src/index';
+
+
 describe("Button", function() {
   var session;
 
@@ -21,7 +24,7 @@ describe("Button", function() {
       var button = scout.create('Button', {
         parent: session.desktop,
         label: 'label',
-        iconId: scout.icons.ANGLE_DOWN
+        iconId: icons.ANGLE_DOWN
       });
       button.render();
       expect(button.$field.data('$icon')).toHaveClass('with-label');
@@ -39,7 +42,7 @@ describe("Button", function() {
       var button = scout.create('Button', {
         parent: session.desktop,
         label: 'label',
-        iconId: scout.icons.ANGLE_DOWN
+        iconId: icons.ANGLE_DOWN
       });
       button.render();
       expect(button.$field.data('$icon')).toHaveClass('with-label');
@@ -47,7 +50,7 @@ describe("Button", function() {
       button.setIconId(null);
       expect(button.$field.data('$icon')).toBeFalsy();
 
-      button.setIconId(scout.icons.ANGLE_UP);
+      button.setIconId(icons.ANGLE_UP);
       expect(button.$field.data('$icon')).toHaveClass('with-label');
     });
   });
@@ -187,7 +190,7 @@ describe("Button", function() {
     it('is fired when doAction is called even if it is a toggle button', function() {
       var button = scout.create('Button', {
         parent: session.desktop,
-        displayStyle: scout.Button.DisplayStyle.TOGGLE
+        displayStyle: Button.DisplayStyle.TOGGLE
       });
       var executed = 0;
       var selected = null;

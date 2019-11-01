@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Form} from '../../../src/index';
+import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("DesktopBench", function() {
   var helper, session, desktop, formHelper;
 
@@ -19,8 +23,8 @@ describe("DesktopBench", function() {
       }
     });
     desktop = session.desktop;
-    helper = new scout.OutlineSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    helper = new OutlineSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -86,7 +90,7 @@ describe("DesktopBench", function() {
 
       // open new form in foreground
       var form = formHelper.createFormWithOneField();
-      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayHint = Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
       desktop.showForm(form);
 
@@ -115,7 +119,7 @@ describe("DesktopBench", function() {
 
       // open new form in foreground
       var form = formHelper.createFormWithOneField();
-      form.displayHint = scout.Form.DisplayHint.VIEW;
+      form.displayHint = Form.DisplayHint.VIEW;
       form.displayViewId = 'C';
       desktop.showForm(form);
 

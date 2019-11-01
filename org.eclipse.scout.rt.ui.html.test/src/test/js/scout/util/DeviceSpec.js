@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device} from '../../src/index';
+
+
 describe('Device', function() {
 
   function test(userAgent, expectedDevice) {
@@ -33,7 +36,7 @@ describe('Device', function() {
   }
 
   function bootstrapDevice(userAgent) {
-    var device = new scout.Device({
+    var device = new Device({
       userAgent: userAgent
     });
     device.bootstrap();
@@ -43,8 +46,8 @@ describe('Device', function() {
   describe('scout.device', function() {
 
     it('is initialized automatically', function() {
-      expect(scout.device).toBeDefined();
-      expect(scout.device.browser).toBeDefined();
+      expect(Device.get()).toBeDefined();
+      expect(Device.get().browser).toBeDefined();
     });
 
   });
@@ -52,10 +55,10 @@ describe('Device', function() {
   describe('isWindowsTabletMode', function() {
 
     it('returns true if system is windows and scrollbarWidth is 0', function() {
-      scout.device.scrollbarWidth = 0;
-      scout.device.system = scout.Device.System.WINDOWS;
-      scout.device.systemVersion = 10.0;
-      expect(scout.device.isWindowsTabletMode()).toBe(true);
+      Device.get().scrollbarWidth = 0;
+      Device.get().system = Device.System.WINDOWS;
+      Device.get().systemVersion = 10.0;
+      expect(Device.get().isWindowsTabletMode()).toBe(true);
     });
 
   });
@@ -65,28 +68,28 @@ describe('Device', function() {
     it('recognizes iOS devices', function() {
       // iPhone 4S
       test('Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25', {
-        system: scout.Device.System.IOS,
+        system: Device.System.IOS,
         systemVersion: 6,
-        type: scout.Device.Type.MOBILE,
-        browser: scout.Device.Browser.SAFARI,
+        type: Device.Type.MOBILE,
+        browser: Device.Browser.SAFARI,
         browserVersion: 6
       });
 
       // iPad 3
       test('Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9B176 Safari/7534.48.3', {
-        system: scout.Device.System.IOS,
+        system: Device.System.IOS,
         systemVersion: 5.1,
-        type: scout.Device.Type.TABLET,
-        browser: scout.Device.Browser.SAFARI,
+        type: Device.Type.TABLET,
+        browser: Device.Browser.SAFARI,
         browserVersion: 5.1
       });
 
       // iPad 3 (home screen icon mode)
       test('Mozilla/5.0 (iPad; CPU OS 5_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Mobile/9B176', {
-        system: scout.Device.System.IOS,
+        system: Device.System.IOS,
         systemVersion: 5.1,
-        type: scout.Device.Type.TABLET,
-        browser: scout.Device.Browser.UNKNOWN
+        type: Device.Type.TABLET,
+        browser: Device.Browser.UNKNOWN
       });
 
     });
@@ -94,17 +97,17 @@ describe('Device', function() {
     it('recognizes Android devices', function() {
       // Samsung Galaxy S4
       test('Mozilla/5.0 (Linux; Android 4.4.2; GT-I9505 Build/KVT49L) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.170 Mobile Safari/537.36', {
-        system: scout.Device.System.ANDROID,
-        type: scout.Device.Type.MOBILE,
-        browser: scout.Device.Browser.CHROME,
+        system: Device.System.ANDROID,
+        type: Device.Type.MOBILE,
+        browser: Device.Browser.CHROME,
         browserVersion: 33
       });
 
       // Google Nexus 10 Tablet
       test('Mozilla/5.0 (Linux; Android 4.3; Nexus 10 Build/JWR66Y) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.82 Safari/537.36', {
-        system: scout.Device.System.ANDROID,
-        type: scout.Device.Type.TABLET,
-        browser: scout.Device.Browser.CHROME,
+        system: Device.System.ANDROID,
+        type: Device.Type.TABLET,
+        browser: Device.Browser.CHROME,
         browserVersion: 30
       });
     });
@@ -112,15 +115,15 @@ describe('Device', function() {
     it('recognizes Windows devices', function() {
       // Windows with Firefox browser
       test('Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36', {
-        system: scout.Device.System.WINDOWS,
+        system: Device.System.WINDOWS,
         systemVersion: 6.1, // -> Windows 7
-        type: scout.Device.Type.DESKTOP
+        type: Device.Type.DESKTOP
       });
 
       test('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393', {
-        system: scout.Device.System.WINDOWS,
+        system: Device.System.WINDOWS,
         systemVersion: 10.0,
-        type: scout.Device.Type.DESKTOP
+        type: Device.Type.DESKTOP
       });
     });
 
@@ -132,33 +135,33 @@ describe('Device', function() {
 
       // Microsoft Edge 12
       _test('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240',
-        scout.Device.Browser.EDGE, 12.10240);
+        Device.Browser.EDGE, 12.10240);
 
       // Internet Explorer 11
       _test('Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
-        scout.Device.Browser.INTERNET_EXPLORER, 11.0);
+        Device.Browser.INTERNET_EXPLORER, 11.0);
       // Internet Explorer 11 - as used by Outlook - note the additional ; and text after the version-no (rv).
       _test('Mozilla/5.0 (Windows NT 6.1; WOW65; Trident/7.0; rv:11.0; Microsoft Outlook 14.0.7155)',
-        scout.Device.Browser.INTERNET_EXPLORER, 11.0);
+        Device.Browser.INTERNET_EXPLORER, 11.0);
 
       // Internet Explorer 8
       _test('Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; WOW64; Trident/4.0; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; InfoPath.2; .NET CLR 3.5.30729; .NET CLR 3.0.30729)',
-        scout.Device.Browser.INTERNET_EXPLORER, 8.0);
+        Device.Browser.INTERNET_EXPLORER, 8.0);
 
       // Safari (6)
       _test('Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25',
-        scout.Device.Browser.SAFARI, 6.0);
+        Device.Browser.SAFARI, 6.0);
 
       // Firefox (21) from v21 Firefox supports ECMA 5
       _test('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/21.0.1',
-        scout.Device.Browser.FIREFOX, 21.0);
+        Device.Browser.FIREFOX, 21.0);
 
       // Chrome (23) from v23 Chrome supports ECMA 5
       _test('Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.6 Safari/537.11',
-        scout.Device.Browser.CHROME, 23.0);
+        Device.Browser.CHROME, 23.0);
 
       function _test(userAgent, expectedBrowser, expectedVersion) {
-        var device = new scout.Device({
+        var device = new Device({
           userAgent: userAgent
         });
         expect(device.browser).toBe(expectedBrowser);

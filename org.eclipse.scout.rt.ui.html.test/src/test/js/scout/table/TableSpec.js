@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {BeanColumn, Column, Device, graphics, IconColumn, icons, MenuDestinations, Range, RemoteEvent, scout, scrollbars, Table, TableRow} from '../../src/index';
+import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global removePopups */
 
 describe("Table", function() {
@@ -16,21 +20,21 @@ describe("Table", function() {
   /**
    * TestBeanColumn that validates that the table is available in _init
    */
-  scout.TestBeanColumn = function() {
-    scout.TestBeanColumn.parent.call(this);
-  };
-  scout.inherits(scout.TestBeanColumn, scout.BeanColumn);
-  scout.TestBeanColumn.prototype._init = function(model) {
-    scout.TestBeanColumn.parent.prototype._init.call(this, model);
-    expect(this.table).toBeDefined();
-    expect(this.table).not.toBeNull();
-  };
+  class TestBeanColumn extends BeanColumn {
+    _init(model) {
+      super._init(model);
+      expect(this.table).toBeDefined();
+      expect(this.table).not.toBeNull();
+    }
+  }
+
+  window.scout.TestBeanColumn = TestBeanColumn;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
-    helper = new scout.TableSpecHelper(session);
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new TableSpecHelper(session);
     $.fx.off = true; // generation of sumrows is animated. leads to misleading test failures.
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -55,7 +59,7 @@ describe("Table", function() {
 
       // checkable table (row style)
       model.checkable = true;
-      model.checkableStyle = scout.Table.CheckableStyle.TABLE_ROW;
+      model.checkableStyle = Table.CheckableStyle.TABLE_ROW;
       table = helper.createTable(model);
       table.render();
       expect('table checkable', table.$container.attr('class'));
@@ -111,35 +115,35 @@ describe("Table", function() {
       var table = helper.createTable(model);
 
       table.viewRangeSize = 4;
-      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 4));
-      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 4));
-      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 5));
-      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(2, 6));
-      expect(table._calculateViewRangeForRowIndex(6)).toEqual(new scout.Range(5, 9));
-      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(6, 10));
-      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(6, 10));
-      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(6, 10));
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new Range(0, 4));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new Range(0, 4));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new Range(1, 5));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new Range(2, 6));
+      expect(table._calculateViewRangeForRowIndex(6)).toEqual(new Range(5, 9));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new Range(6, 10));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new Range(6, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new Range(6, 10));
 
       table.viewRangeSize = 5;
-      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 5));
-      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 5));
-      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(1, 6));
-      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(2, 7));
-      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new scout.Range(3, 8));
-      expect(table._calculateViewRangeForRowIndex(5)).toEqual(new scout.Range(4, 9));
-      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(5, 10));
-      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(5, 10));
-      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(5, 10));
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new Range(0, 5));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new Range(0, 5));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new Range(1, 6));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new Range(2, 7));
+      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new Range(3, 8));
+      expect(table._calculateViewRangeForRowIndex(5)).toEqual(new Range(4, 9));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new Range(5, 10));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new Range(5, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new Range(5, 10));
 
       table.viewRangeSize = 8;
-      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new scout.Range(0, 8));
-      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new scout.Range(0, 8));
-      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new scout.Range(0, 8));
-      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new scout.Range(1, 9));
-      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new scout.Range(2, 10));
-      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new scout.Range(2, 10));
-      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new scout.Range(2, 10));
-      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new scout.Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(0)).toEqual(new Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(1)).toEqual(new Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(2)).toEqual(new Range(0, 8));
+      expect(table._calculateViewRangeForRowIndex(3)).toEqual(new Range(1, 9));
+      expect(table._calculateViewRangeForRowIndex(4)).toEqual(new Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(7)).toEqual(new Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(8)).toEqual(new Range(2, 10));
+      expect(table._calculateViewRangeForRowIndex(9)).toEqual(new Range(2, 10));
     });
   });
 
@@ -152,12 +156,12 @@ describe("Table", function() {
       model.rowIconVisible = true;
       table = helper.createTable(model);
       row = helper.createModelRow(1, ['Foo']);
-      row.rowIcon = scout.icons.WORLD;
+      row.rowIcon = icons.WORLD;
       table.insertRow(row);
 
       var columns = table.columns;
       expect(columns.length).toBe(2);
-      expect(columns[0] instanceof scout.IconColumn).toBe(true);
+      expect(columns[0] instanceof IconColumn).toBe(true);
       var cell = table.cell(table.columns[0], table.rows[0]);
       expect(cell.cssClass).toBe('row-icon-cell');
     });
@@ -193,25 +197,25 @@ describe("Table", function() {
       table.render();
       expect(table.rows.length).toBe(0);
       expect(table.$rows().length).toBe(0);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 0));
 
       table.insertRows(helper.createModelRows(2, 1));
       expect(table.rows.length).toBe(1);
       expect(table.$rows().length).toBe(1);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 1));
 
       // 2 rows may get rendered, one row already is. Inserting another 2 rows
       // must only render 1 row
       table.insertRows(helper.createModelRows(2, 2));
       expect(table.rows.length).toBe(3);
       expect(table.$rows().length).toBe(2);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 2));
     });
 
     it("rowsInserted event must be triggered before rowOrderChanged event", function() {
       var events = '',
         rowsOnInsert;
-      if (!scout.device.supportsInternationalization()) {
+      if (!Device.get().supportsInternationalization()) {
         return;
       }
       // we sort 1st column desc which means Z is before A
@@ -335,7 +339,7 @@ describe("Table", function() {
     it("silently updates rows which are not in view range", function() {
       table.viewRangeSize = 1;
       table.render();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect(table.$rows().length).toBe(1);
       expect(table.rows.length).toBe(2);
       var $rows = table.$rows();
@@ -405,9 +409,9 @@ describe("Table", function() {
     it("considers view range (distinguishes between rendered and non rendered rows, adjusts viewRangeRendered)", function() {
       model = helper.createModelFixture(2, 6);
       table = helper.createTable(model);
-      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new scout.Range(1, 4));
+      var spy = spyOn(table, '_calculateCurrentViewRange').and.returnValue(new Range(1, 4));
       table.render();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(1, 4));
+      expect(table.viewRangeRendered).toEqual(new Range(1, 4));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(6);
 
@@ -417,25 +421,25 @@ describe("Table", function() {
 
       // delete first (not rendered)
       table.deleteRows([table.rows[0]]);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(5);
 
       // delete first rendered
       table.deleteRows([table.rows[0]]);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(4);
 
       // delete last not rendered
       table.deleteRows([table.rows[3]]);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 3));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 3));
       expect(table.$rows().length).toBe(3);
       expect(table.rows.length).toBe(3);
 
       // delete remaining (rendered) rows
       table.deleteRows([table.rows[0], table.rows[1], table.rows[2]]);
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 0));
       expect(table.$rows().length).toBe(0);
       expect(table.rows.length).toBe(0);
       expect(table.$fillBefore.height()).toBe(0);
@@ -469,14 +473,14 @@ describe("Table", function() {
     it("silently removes not rendered rows", function() {
       table.viewRangeSize = 2;
       table.render();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 2));
       expect(table.$rows().length).toBe(2);
       expect(table.rows.length).toBe(3);
       expect(table.$fillBefore.height()).toBe(0);
       expect(table.$fillAfter.height()).not.toBe(0);
 
       table.deleteAllRows();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 0));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 0));
       expect(table.$rows().length).toBe(0);
       expect(table.rows.length).toBe(0);
       expect(table.$fillBefore.height()).toBe(0);
@@ -518,7 +522,7 @@ describe("Table", function() {
       table.render();
 
       var $rows = table.$rows();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 2));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 2));
       expect($rows.eq(0).data('row').id).toBe(model.rows[0].id);
       expect($rows.eq(1).data('row').id).toBe(model.rows[1].id);
       expect(table.$rows().length).toBe(2);
@@ -705,7 +709,7 @@ describe("Table", function() {
 
     it("checkablestyle.checbox_table_row checks row with click event", function() {
       var model = helper.createModelFixture(2, 5);
-      model.checkableStyle = scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW;
+      model.checkableStyle = Table.CheckableStyle.CHECKBOX_TABLE_ROW;
       model.checkable = true;
       model.multiCheck = true;
       var table = helper.createTable(model);
@@ -883,7 +887,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'rowAction', {
+      var event = new RemoteEvent(table.id, 'rowAction', {
         columnId: column0.id,
         rowId: row0.id
       });
@@ -923,7 +927,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'rowAction', {
+      var event = new RemoteEvent(table.id, 'rowAction', {
         columnId: column0.id,
         rowId: row0.id
       });
@@ -962,7 +966,7 @@ describe("Table", function() {
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls('', 1000);
-      var event = new scout.RemoteEvent(table.id, 'columnResized', {
+      var event = new RemoteEvent(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 100,
         showBusyIndicator: false
@@ -999,7 +1003,7 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'columnResized', {
+      var event = new RemoteEvent(table.id, 'columnResized', {
         columnId: table.columns[0].id,
         width: 150,
         showBusyIndicator: false
@@ -1139,7 +1143,7 @@ describe("Table", function() {
     it("does not make the column smaller than a minimum size", function() {
       var model = helper.createModelFixture(2);
       model.columns[0].initialWidth = 1000;
-      model.columns[1].initialWidth = scout.Column.DEFAULT_MIN_WIDTH - 10;
+      model.columns[1].initialWidth = Column.DEFAULT_MIN_WIDTH - 10;
       var table = helper.createTable(model);
       table.render();
       table.$data.width(450);
@@ -1150,7 +1154,7 @@ describe("Table", function() {
       table.revalidateLayout();
 
       expect(table.columns[0].width).toBe(1000);
-      expect(table.columns[1].width).toBe(scout.Column.DEFAULT_MIN_WIDTH);
+      expect(table.columns[1].width).toBe(Column.DEFAULT_MIN_WIDTH);
     });
 
   });
@@ -1389,13 +1393,13 @@ describe("Table", function() {
       render(table);
       // Make sure sorting is not executed because it does not work with
       // phantomJS
-      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
+      spyOn(Device.get(), "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sort").and.returnValue(true);
 
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.RemoteEvent(table.id, 'sort', {
+      var event = new RemoteEvent(table.id, 'sort', {
         columnId: table.columns[0].id,
         sortAscending: false
       });
@@ -1405,12 +1409,12 @@ describe("Table", function() {
     it("sends sort event with sortingRequested if client side sorting is not possible", function() {
       prepareTableWithAdapter();
       render(table);
-      spyOn(scout.device, "supportsInternationalization").and.returnValue(false);
+      spyOn(Device.get(), "supportsInternationalization").and.returnValue(false);
 
       table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.RemoteEvent(table.id, 'sort', {
+      var event = new RemoteEvent(table.id, 'sort', {
         columnId: table.columns[0].id,
         sortAscending: false,
         sortingRequested: true
@@ -1429,7 +1433,7 @@ describe("Table", function() {
     });
 
     it("regroups the data if group by column is active", function() {
-      if (!scout.device.supportsInternationalization()) {
+      if (!Device.get().supportsInternationalization()) {
         return;
       }
 
@@ -1438,7 +1442,7 @@ describe("Table", function() {
 
       // Make sure sorting is not executed because it does not work with
       // phantomJS
-      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
+      spyOn(Device.get(), "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sortImpl").and.returnValue(true);
       spyOn(table, '_group');
 
@@ -1497,7 +1501,7 @@ describe("Table", function() {
     describe("sorting", function() {
 
       it("sorts text columns considering locale (if browser supports it)", function() {
-        if (!scout.device.supportsInternationalization()) {
+        if (!Device.get().supportsInternationalization()) {
           return;
         }
 
@@ -1515,7 +1519,7 @@ describe("Table", function() {
         // In order to change Collator at runtime, we must reset the "static"
         // property
         // since it is set only once
-        session.locale = new scout.LocaleSpecHelper().createLocale('sv');
+        session.locale = new LocaleSpecHelper().createLocale('sv');
         helper.resetIntlCollator();
 
         table.sort(column0, 'desc');
@@ -1552,7 +1556,7 @@ describe("Table", function() {
       });
 
       it("uses non sort columns as fallback", function() {
-        if (!scout.device.supportsInternationalization()) {
+        if (!Device.get().supportsInternationalization()) {
           return;
         }
 
@@ -1603,7 +1607,7 @@ describe("Table", function() {
       expect($selectedRows.length).toBe(1);
 
       var $selectedRow = $selectedRows.first();
-      expect($selectedRow).toEqual($row);
+      expect($selectedRow.innerText).toEqual($row.innerText);
 
       expect($selectedRow.hasClass('selected')).toBeTruthy();
       expect($selectedRow.hasClass('select-single')).toBeTruthy();
@@ -1779,19 +1783,19 @@ describe("Table", function() {
     // context menu
     it("returns no menus for contextMenu if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([]);
     });
 
     it("returns only single selection menus for contextMenu if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu]);
     });
 
     it("returns only multi selection menus for contextMenu if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([multiSelMenu]);
     });
 
@@ -1801,34 +1805,34 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      var menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([singleSelMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([multiSelMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenus(table.menus, scout.MenuDestinations.CONTEXT_MENU);
+      menus = table._filterMenus(table.menus, MenuDestinations.CONTEXT_MENU);
       expect(menus).toEqual([]);
     });
 
     // menuBar
     it("returns only empty space menus if no row is selected", function() {
       table.selectRows([]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
     });
 
     it("returns empty space and single selection menus if one row is selected", function() {
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu]);
     });
 
     it("returns empty space and multi selection menus if multiple rows are selected", function() {
       table.selectRows([table.rows[0], table.rows[1]]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu]);
     });
 
@@ -1838,15 +1842,15 @@ describe("Table", function() {
       });
       table.menus = [singleSelMenu, multiSelMenu, emptySpaceMenu, bothSelMenu];
       table.selectRows(table.rows[0]);
-      var menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      var menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([singleSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([table.rows[0], table.rows[1]]);
-      menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([multiSelMenu, emptySpaceMenu, bothSelMenu]);
 
       table.selectRows([]);
-      menus = table._filterMenus(table.menus, scout.MenuDestinations.MENU_BAR);
+      menus = table._filterMenus(table.menus, MenuDestinations.MENU_BAR);
       expect(menus).toEqual([emptySpaceMenu]);
     });
   });
@@ -1860,7 +1864,7 @@ describe("Table", function() {
 
       menuBarMenu = scout.create('Menu', {
         parent: table,
-        menuTypes: ['Table.EmptySpace'],
+        menuTypes: ['Table.EmptySpace']
       });
       singleSelMenu = scout.create('Menu', {
         parent: table,
@@ -1924,9 +1928,9 @@ describe("Table", function() {
     it("updates the menubar with the relevant menus", function() {
       var table = helper.createTable(helper.createModelFixture(2, 2));
       var menus = [scout.create('Menu', {
-          parent: table,
-          menuTypes: ['Table.EmptySpace']
-        }),
+        parent: table,
+        menuTypes: ['Table.EmptySpace']
+      }),
         scout.create('Menu', {
           parent: table,
           menuTypes: ['Table.EmptySpace']
@@ -2018,7 +2022,7 @@ describe("Table", function() {
       // remaining rows (including first row)
       expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected']);
 
-      var event = [new scout.RemoteEvent(table.id, 'rowsSelected', {
+      var event = [new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
       })];
       expect(requestData).toContainEvents(event);
@@ -2044,7 +2048,7 @@ describe("Table", function() {
       // exactly only one selection event for first row
       expect(requestData).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
 
-      var event = [new scout.RemoteEvent(table.id, 'rowsSelected', {
+      var event = [new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[0].id]
       })];
       expect(requestData).toContainEvents(event);
@@ -2091,7 +2095,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
+      var event = new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: [model.rows[expectedSelectedRowIndex].id]
       });
       expect(requestData).toContainEvents(event);
@@ -2137,7 +2141,7 @@ describe("Table", function() {
       table.render();
 
       var $rows = table.$rows();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect(table.$rows().length).toBe(1);
       expect(table.rows.length).toBe(2);
       var $cells0 = table.$cellsForRow($rows.eq(0));
@@ -2147,7 +2151,7 @@ describe("Table", function() {
 
       table.moveColumn(table.columns[0], 0, 2);
       $rows = table.$rows();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 1));
       expect($rows.length).toBe(1);
       expect(table.rows.length).toBe(2);
       $cells0 = table.$cellsForRow($rows.eq(0));
@@ -2204,7 +2208,7 @@ describe("Table", function() {
       var table = scout.create('Table', {
         parent: session.desktop,
         columns: [{
-          objectType: 'scout.TestBeanColumn'
+          objectType: 'TestBeanColumn'
         }]
       });
       // assertions are done in the TestBeanColumn
@@ -2359,7 +2363,7 @@ describe("Table", function() {
     it("silently moves cells which are not rendered in view range", function() {
       table.viewRangeSize = 1;
       table.render();
-      expect(table.viewRangeRendered).toEqual(new scout.Range(0, 1));
+      expect(table.viewRangeRendered).toEqual(new Range(0, 1));
 
       var $colHeaders = table.header.findHeaderItems();
       var $rows = table.$rows();
@@ -2942,38 +2946,38 @@ describe("Table", function() {
       var table = helper.createTable(model);
 
       // Check initial status
-      expect(table.rows[0].status).toBe(scout.TableRow.Status.NON_CHANGED);
-      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
-      expect(table.rows[2].status).toBe(scout.TableRow.Status.NON_CHANGED);
-      expect(table.rows[3].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[0].status).toBe(TableRow.Status.NON_CHANGED);
+      expect(table.rows[1].status).toBe(TableRow.Status.NON_CHANGED);
+      expect(table.rows[2].status).toBe(TableRow.Status.NON_CHANGED);
+      expect(table.rows[3].status).toBe(TableRow.Status.NON_CHANGED);
 
       var column0 = table.columns[0];
 
       // Update value --> should change status
       column0.setCellValue(table.rows[0], 77);
-      expect(table.rows[0].status).toBe(scout.TableRow.Status.UPDATED);
-      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[0].status).toBe(TableRow.Status.UPDATED);
+      expect(table.rows[1].status).toBe(TableRow.Status.NON_CHANGED);
 
       // Call setCellValue(), but with same value --> should not change status
       column0.setCellValue(table.rows[1], table.cellValue(column0, table.rows[1]));
-      expect(table.rows[1].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[1].status).toBe(TableRow.Status.NON_CHANGED);
 
       // Change displayText --> should not change status
       column0.setCellText(table.rows[2], 'ABC');
-      expect(table.rows[2].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[2].status).toBe(TableRow.Status.NON_CHANGED);
 
       // Change value via cell.setValue() --> does not update anything
       table.rows[3].cells[0].setValue(88);
-      expect(table.rows[3].status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(table.rows[3].status).toBe(TableRow.Status.NON_CHANGED);
 
       // Inserted rows are "INSERTED"
       expect(table.rows[4]).toBeUndefined();
       table.insertRow({
         cells: [null, null]
       });
-      expect(table.rows[4].status).toBe(scout.TableRow.Status.INSERTED);
+      expect(table.rows[4].status).toBe(TableRow.Status.INSERTED);
       column0.setCellValue(table.rows[4], 99);
-      expect(table.rows[4].status).toBe(scout.TableRow.Status.INSERTED); // Still inserted
+      expect(table.rows[4].status).toBe(TableRow.Status.INSERTED); // Still inserted
     });
   });
 
@@ -3013,30 +3017,30 @@ describe("Table", function() {
     });
 
     it("scrolls current row to the top when expanding a large child set", function() {
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(1).$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(1).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
       expect(table._rowById(4).expanded).toBe(false);
       table.expandRow(table._rowById(4), true);
       expect(table._rowById(4).expanded).toBe(true);
       // first visible row should be row3 (one above the expanded node)
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(2).$row), $scrollable)).toBe(false);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(3).$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(2).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(3).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
       // node5 isn't visible anymore since node4's children use up all the space
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(false);
     });
 
     it("scrolls current row up so that the full expansion is visible plus half a row at the bottom", function() {
       expect(table._rowById(5).expanded).toBe(false);
       table.expandRow(table._rowById(5), true);
       expect(table._rowById(5).expanded).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).childRows[0].$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(5).childRows[1].$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(4).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).childRows[0].$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(5).childRows[1].$row), $scrollable)).toBe(true);
       // half of row6 should still be visible after the expansion
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(6).$row), $scrollable)).toBe(true);
-      expect(scout.scrollbars.isLocationInView(scout.graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(6).$row), $scrollable)).toBe(true);
+      expect(scrollbars.isLocationInView(graphics.offsetBounds(table._rowById(7).$row), $scrollable)).toBe(false);
     });
 
   });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RemoteEvent} from '../../src/index';
+import {LocaleSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global removePopups */
 describe("TableAdapter", function() {
   var session, helper;
@@ -15,8 +19,8 @@ describe("TableAdapter", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
-    helper = new scout.TableSpecHelper(session);
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
+    helper = new TableSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -43,7 +47,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'rowsSelected', {
+      var event = new RemoteEvent(table.id, 'rowsSelected', {
         rowIds: helper.getRowIds(rows)
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -76,7 +80,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'rowsChecked', {
+      var event = new RemoteEvent(table.id, 'rowsChecked', {
         rows: [{
           rowId: rows[0].id,
           checked: true
@@ -124,7 +128,7 @@ describe("TableAdapter", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.RemoteEvent(table.id, 'rowsExpanded', {
+      var event = new RemoteEvent(table.id, 'rowsExpanded', {
         rows: [{
           rowId: rows[0].id,
           expanded: false

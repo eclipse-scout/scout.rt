@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('Column', function() {
   var session;
   var helper;
@@ -16,7 +20,7 @@ describe('Column', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -191,19 +195,19 @@ describe('Column', function() {
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0]._cachedEncodedText).toBeFalsy();
 
-    spyOn(scout.strings, 'encode').and.callThrough();
+
     table.render();
 
-    expect(scout.strings.encode.calls.count()).toBe(6); // header and table cells
     expect(table.rows[0].cells[0].text).toBe('<b>hi</b>');
     expect(table.rows[0].cells[0].encodedText()).toBe('&lt;b&gt;hi&lt;/b&gt;');
     expect(table.rows[0].$row.find('.table-cell').eq(0).text()).toBe('<b>hi</b>');
+    var firstElement = table.rows[0].cells[0]._cachedEncodedText;
+    expect(firstElement).not.toBeFalsy();
 
     // re render -> encode must not be called again
     table.remove();
-    scout.strings.encode.calls.reset();
     table.render();
-    expect(scout.strings.encode.calls.count()).toBe(3); // only for header cells
+    expect(firstElement).toBe(table.rows[0].cells[0]._cachedEncodedText);
   });
 
   describe('multilineText', function() {

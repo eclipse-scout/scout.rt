@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,44 +8,48 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+import {ModelAdapter, ObjectFactory, RemoteEvent, scout} from '../../src/index';
+
+
 describe('ModelAdapter', function() {
 
   var session, $sandbox, myObjectFactory, helper,
     model = {},
-    originalObjectFactory = scout.objectFactory;
+    originalObjectFactory = ObjectFactory.get();
 
   beforeEach(function() {
     setFixtures(sandbox());
     jasmine.Ajax.install();
     jasmine.clock().install();
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     uninstallUnloadHandlers(session);
     $sandbox = $('#sandbox');
 
     // Create a private object factory used for these tests
-    myObjectFactory = new scout.ObjectFactory();
+    myObjectFactory = new ObjectFactory();
     myObjectFactory.register('Generic', function() {
-      return new scout.ModelAdapter();
+      return new ModelAdapter();
     });
     myObjectFactory.register('HasChildAdapter', function() {
-      var adapter = new scout.ModelAdapter();
+      var adapter = new ModelAdapter();
       adapter._addWidgetProperties('childAdapter');
       return adapter;
     });
     myObjectFactory.register('HasChildAdapters', function() {
-      var adapter = new scout.ModelAdapter();
+      var adapter = new ModelAdapter();
       adapter._addWidgetProperties('childAdapters');
       return adapter;
     });
-    scout.objectFactory = myObjectFactory;
+    ObjectFactory._set(myObjectFactory);
   });
 
   afterEach(function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
-    scout.objectFactory = originalObjectFactory;
+    ObjectFactory._set(originalObjectFactory);
   });
 
   /**
@@ -73,7 +77,7 @@ describe('ModelAdapter', function() {
     var widget = createWidget({id: '2'});
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    var event = new scout.RemoteEvent('2', 'property', {
+    var event = new RemoteEvent('2', 'property', {
       properties: {
         x1: 'val1',
         x2: 'val2',
@@ -97,7 +101,7 @@ describe('ModelAdapter', function() {
     expect(widget.o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
-    event = new scout.RemoteEvent('2', 'property', {
+    event = new RemoteEvent('2', 'property', {
       properties: {
         x2: 'val20',
         x1: 'val10',
@@ -124,14 +128,15 @@ describe('ModelAdapter', function() {
   it('_syncPropertiesOnPropertyChange calls set* methods or setProperty method', function() {
     var widget = createWidget({
       foo: 1,
-      bar: 2});
+      bar: 2
+    });
     widget.setFoo = function(value) {
       this.foo = value;
     };
     var newValues = {
-        foo: 6,
-        bar: 7
-      };
+      foo: 6,
+      bar: 7
+    };
     spyOn(widget, 'setFoo').and.callThrough();
     spyOn(widget, 'setProperty').and.callThrough();
 
@@ -287,7 +292,7 @@ describe('ModelAdapter', function() {
           sendQueuedAjaxCalls();
           expect(jasmine.Ajax.requests.count()).toBe(1);
 
-          var event = new scout.RemoteEvent(widget.id, 'property', {
+          var event = new RemoteEvent(widget.id, 'property', {
             foo: 'bar'
           });
           expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -295,7 +300,7 @@ describe('ModelAdapter', function() {
         });
 
         it('should not send event when property is triggered by server', function() {
-          var propertyChangeEvent = new scout.RemoteEvent('123', 'propertyChange', {
+          var propertyChangeEvent = new RemoteEvent('123', 'propertyChange', {
             properties: {foo: 'bar'}
           });
           adapter.onModelPropertyChange(propertyChangeEvent);
@@ -334,7 +339,7 @@ describe('ModelAdapter', function() {
     describe('export adapter', function() {
 
       it('exportAdapterData should export last part of model-class as ID', function() {
-        var adapter = new scout.ModelAdapter();
+        var adapter = new ModelAdapter();
 
         // regular top-level classes (.)
         var model = {modelClass: 'com.bsiag.sandbox.FooField'};

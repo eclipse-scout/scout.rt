@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,24 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-/**
- *
- */
-/*
- * Copyright (c) 2014-2015 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- */
+import * as models from '../../src/util/models';
+
 describe("scout.models", function() {
 
   describe('get', function() {
 
-    var models = {
+    var model = {
       model: {
         type: 'model',
         value: 'modelValue'
@@ -40,16 +29,16 @@ describe("scout.models", function() {
     };
 
     beforeEach(function() {
-      scout.models.init(models);
+      models.init(model);
     });
 
     it('load object without type possible', function() {
-      expect(scout.models._get('object', 'model').value).toBe('objectValue');
+      expect(models._get('object', 'model').value).toBe('objectValue');
     });
 
     it('ensure the object is a copy', function() {
-      scout.models._get('model', 'model').value = 'changed';
-      expect(scout.models._get('model', 'model').value).toBe('modelValue');
+      models._get('model', 'model').value = 'changed';
+      expect(models._get('model', 'model').value).toBe('modelValue');
     });
 
   });
@@ -66,21 +55,21 @@ describe("scout.models", function() {
         id: 'root',
         text: 'rootContainer',
         childs: [{
-            id: 'child1',
-            value: 1
-          }, {
-            id: 'child2',
-            value: 2,
-            childs: [{
-                id: 'child3',
-                value: 3
-              }
-
-            ]
-          }, {
-            id: 'child4',
-            value: 4
+          id: 'child1',
+          value: 1
+        }, {
+          id: 'child2',
+          value: 2,
+          childs: [{
+            id: 'child3',
+            value: 3
           }
+
+          ]
+        }, {
+          id: 'child4',
+          value: 4
+        }
 
         ]
       }
@@ -257,54 +246,54 @@ describe("scout.models", function() {
     });
 
     it('insert new property into root object', function() {
-      scout.models.extend(newPropertyInRoot, parentObj);
+      models.extend(newPropertyInRoot, parentObj);
       expect(parentObj.newColor).toBe('green');
     });
     it('override property in root object', function() {
-      scout.models.extend(overridePropertyInRoot, parentObj);
+      models.extend(overridePropertyInRoot, parentObj);
       expect(parentObj.color).toBe('yellow');
     });
     it('insert new property into a non existing array on root object', function() {
-      scout.models.extend(newObjectNoArrayInRoot, parentObj);
+      models.extend(newObjectNoArrayInRoot, parentObj);
       expect(parentObj.array[0].value).toBe('inserted into non existing Array');
     });
     it('override property in tree object', function() {
-      scout.models.extend(overridePropertyInTree, parentObj);
+      models.extend(overridePropertyInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].value).toBe('property in tree overriden');
     });
     it('insert new object into tree object', function() {
-      scout.models.extend(newObjectInTree, parentObj);
+      models.extend(newObjectInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('new object in tree');
     });
     it('insert new object tree into tree object', function() {
-      scout.models.extend(newObjectTreeInTree, parentObj);
+      models.extend(newObjectTreeInTree, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[1].childs[0].value).toBe('new object tree in tree');
     });
     it('insert new object into tree object with fixed index', function() {
-      scout.models.extend(newObjectInTreeIndexed, parentObj);
+      models.extend(newObjectInTreeIndexed, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('fixed index insert');
     });
     it('insert new object into tree object with relative index', function() {
-      scout.models.extend(newObjectInTreeRelativeindex, parentObj);
+      models.extend(newObjectInTreeRelativeindex, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
     });
     it('insert new object into tree object with relative index and two extension elements', function() {
-      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+      models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
       expect(parentObj.rootContainer.childs[1].childs[1].value).toBe('relative index insert2');
     });
     it('insert object referenced by String', function() {
-      var models = {};
-      models.newObjectInTreeRelativeindex = newObjectInTreeRelativeindex;
-      scout.models.init(models);
-      scout.models.extend('newObjectInTreeRelativeindex', parentObj);
+      var model = {};
+      model.newObjectInTreeRelativeindex = newObjectInTreeRelativeindex;
+      models.init(model);
+      models.extend('newObjectInTreeRelativeindex', parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].value).toBe('relative index insert');
     });
     it('insert object bound to field', function() {
-      scout.models.extend(newObjectgroupWithTarget, parentObj);
+      models.extend(newObjectgroupWithTarget, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
 
-      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+      models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
 
       expect(parentObj.rootContainer.childs[1].childs[0].id).toBe('newObj');
       expect(parentObj.rootContainer.childs[1].childs[1].id).toBe('newObj2');
@@ -314,11 +303,11 @@ describe("scout.models", function() {
     });
 
     it('insert objects array bound to field', function() {
-      scout.models.extend(newObjectArraygroupWithTarget, parentObj);
+      models.extend(newObjectArraygroupWithTarget, parentObj);
       expect(parentObj.rootContainer.childs[1].childs[0].groupedWith).toBe('child3');
       expect(parentObj.rootContainer.childs[1].childs[1].groupedWith).toBe('child3');
 
-      scout.models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
+      models.extend(newObjectInTreeRelativeindexWithArray, parentObj);
 
       expect(parentObj.rootContainer.childs[1].childs[0].id).toBe('newObj');
       expect(parentObj.rootContainer.childs[1].childs[1].id).toBe('newObj2');

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Dimension} from '../../src/index';
+import {TreeSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TreeNodePosition', function() {
 
-  /** @type {scout.TreeSpecHelper} */
+  /** @type {TreeSpecHelper} */
   var helper;
 
   var session, tree, node0, node1, node2, rootNode;
@@ -18,7 +22,7 @@ describe('TreeNodePosition', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TreeSpecHelper(session);
+    helper = new TreeSpecHelper(session);
 
     var rootNodeModel = helper.createModelNode('0', 'root');
     rootNodeModel.expanded = true;
@@ -116,7 +120,7 @@ describe('TreeNodePosition', function() {
 
       node2 = helper.createModelNode('0_2', 'node2'),
 
-      tree.render();
+        tree.render();
       tree.insertNodes([node0, node2], rootNode);
       tree.insertNodes([node1], rootNode);
 
@@ -213,7 +217,7 @@ describe('TreeNodePosition', function() {
       tree.insertNodes([n5_1], tree.nodes[4]);
 
       tree.render();
-      tree.htmlComp.setSize(new scout.Dimension(190, 190));
+      tree.htmlComp.setSize(new Dimension(190, 190));
       tree.viewRangeSize = 14;
 
       function expectVisibleNodesFlatToBe(nodes) {
@@ -326,7 +330,7 @@ describe('TreeNodePosition', function() {
       tree.insertNodes([n3_1], tree.nodes[0].childNodes[2]);
 
       tree.render();
-      tree.htmlComp.setSize(new scout.Dimension(190, 190));
+      tree.htmlComp.setSize(new Dimension(190, 190));
       tree.viewRangeSize = 14;
 
       function expectVisibleNodesFlatToBe(nodes) {

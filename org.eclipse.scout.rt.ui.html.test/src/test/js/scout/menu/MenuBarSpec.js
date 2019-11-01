@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Action, Button, ButtonAdapterMenu, Dimension, GroupBoxMenuItemsOrder, HtmlComponent, MenuBar, MenuItemsOrder, menus, scout} from '../../src/index';
+import {MenuSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("MenuBar", function() {
   var helper, session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.MenuSpecHelper(session);
+    helper = new MenuSpecHelper(session);
     $('<style>' +
       '.menubar { overflow: hidden; background-color: red; padding: 5px; }' +
       '.menubar > .menubox { display: inline-block; height: 100% }' +
@@ -32,7 +36,7 @@ describe("MenuBar", function() {
   function createMenuBar(menuOrder) {
     return scout.create('MenuBar', {
       parent: session.desktop,
-      menuOrder: scout.nvl(menuOrder, new scout.MenuItemsOrder(session, 'Table'))
+      menuOrder: scout.nvl(menuOrder, new MenuItemsOrder(session, 'Table'))
     });
   }
 
@@ -133,23 +137,23 @@ describe("MenuBar", function() {
       var menuModel = helper.createModel();
       menuModel.menuTypes = ['Table.EmptySpace'];
 
-      var sep1a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep1a', separator: true }));
-      var sep1b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep1b', separator: true }));
-      var menu1 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu1', text: 'Menu 1 (L)' }));
-      var sep12a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep12a', separator: true }));
-      var sep12b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep12b', separator: true, menuTypes: ['Table.SingleSelection'] })); // <-- will generate an additional artificial separator menu
-      var menu2 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: ['Table.SingleSelection'] }));
-      var sep2a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep2a', separator: true, menuTypes: ['Table.SingleSelection'] }));
-      var sep2b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep2b', separator: true, menuTypes: ['Table.SingleSelection'] }));
+      var sep1a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1a', separator: true}));
+      var sep1b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep1b', separator: true}));
+      var menu1 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu1', text: 'Menu 1 (L)'}));
+      var sep12a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12a', separator: true}));
+      var sep12b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep12b', separator: true, menuTypes: ['Table.SingleSelection']})); // <-- will generate an additional artificial separator menu
+      var menu2 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu2', text: 'Menu 2 (L)', menuTypes: ['Table.SingleSelection']}));
+      var sep2a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2a', separator: true, menuTypes: ['Table.SingleSelection']}));
+      var sep2b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep2b', separator: true, menuTypes: ['Table.SingleSelection']}));
 
-      var sep3a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep3a', horizontalAlignment: 1, separator: true }));
-      var sep3b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep3b', horizontalAlignment: 1, separator: true }));
-      var menu3 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)' }));
-      var sep34a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep34a', horizontalAlignment: 1, separator: true }));
-      var sep34b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep34b', horizontalAlignment: 1, separator: true }));
-      var menu4 = helper.createMenu($.extend({}, menuModel, { id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)' }));
-      var sep4a = helper.createMenu($.extend({}, menuModel, { id: 'test.sep4a', horizontalAlignment: 1, separator: true }));
-      var sep4b = helper.createMenu($.extend({}, menuModel, { id: 'test.sep4b', horizontalAlignment: 1, separator: true }));
+      var sep3a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3a', horizontalAlignment: 1, separator: true}));
+      var sep3b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep3b', horizontalAlignment: 1, separator: true}));
+      var menu3 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu3', horizontalAlignment: 1, text: 'Menu 3 (R)'}));
+      var sep34a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34a', horizontalAlignment: 1, separator: true}));
+      var sep34b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep34b', horizontalAlignment: 1, separator: true}));
+      var menu4 = helper.createMenu($.extend({}, menuModel, {id: 'test.menu4', horizontalAlignment: 1, text: 'Menu 4 (R)'}));
+      var sep4a = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4a', horizontalAlignment: 1, separator: true}));
+      var sep4b = helper.createMenu($.extend({}, menuModel, {id: 'test.sep4b', horizontalAlignment: 1, separator: true}));
 
       var menuBar = createMenuBar();
       menuBar.render();
@@ -164,8 +168,12 @@ describe("MenuBar", function() {
 
       function listVisibleMenuIds(menus) {
         return menus
-          .filter(function(menu) { return menu.visible && !menu.ellipsis; })
-          .map(function(menu) { return menu.id; })
+          .filter(function(menu) {
+            return menu.visible && !menu.ellipsis;
+          })
+          .map(function(menu) {
+            return menu.id;
+          })
           .join(', ');
       }
 
@@ -182,8 +190,8 @@ describe("MenuBar", function() {
       var menuModel = helper.createModel();
       menuModel.menuTypes = ['Table.EmptySpace'];
 
-      var menu1 = helper.createMenu($.extend({}, menuModel, { id: 'menu1', text: 'Menu 1' }));
-      var menu2 = helper.createMenu($.extend({}, menuModel, { id: 'menu2', text: 'Menu 2' }));
+      var menu1 = helper.createMenu($.extend({}, menuModel, {id: 'menu1', text: 'Menu 1'}));
+      var menu2 = helper.createMenu($.extend({}, menuModel, {id: 'menu2', text: 'Menu 2'}));
 
       var menuBar = createMenuBar();
       menuBar.render();
@@ -234,7 +242,7 @@ describe("MenuBar", function() {
       var menu1 = helper.createMenu(createModel('Menu 1'));
       var menu2 = helper.createMenu(createModel('Menu 2'));
       var menu3 = helper.createMenu(createModel('Menu 3'));
-      var separator = helper.createMenu($.extend({}, createModel(), { separator: true }));
+      var separator = helper.createMenu($.extend({}, createModel(), {separator: true}));
 
       var menuBar = createMenuBar();
       menuBar.render();
@@ -291,7 +299,7 @@ describe("MenuBar", function() {
 
       menuBar.setMenuItems(menus);
       menuBar.render();
-      menuBar.htmlComp.setSize(new scout.Dimension(100, 50));
+      menuBar.htmlComp.setSize(new Dimension(100, 50));
 
       menu3.setVisible(true);
       menuBar.validateLayout();
@@ -312,15 +320,15 @@ describe("MenuBar", function() {
       menu2.visible = true;
       menuBar.setMenuItems(menus);
       menuBar.render();
-      menuBar.htmlComp.setSize(new scout.Dimension(500, 50));
+      menuBar.htmlComp.setSize(new Dimension(500, 50));
 
       expect(menu1.$container.isVisible()).toBe(true);
-      expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(true);
+      expect(HtmlComponent.get(menuBar.$container).valid).toBe(true);
 
       menu1.setProperty('visible', false);
 
       expect(menu1.$container.isVisible()).toBe(false);
-      expect(scout.HtmlComponent.get(menuBar.$container).valid).toBe(false);
+      expect(HtmlComponent.get(menuBar.$container).valid).toBe(false);
     });
   });
 
@@ -347,12 +355,12 @@ describe("MenuBar", function() {
     });
 
     it('marks ButtonAdapterMenu that reacts to ENTER keystroke as default menu', function() {
-      var button = new scout.Button();
+      var button = new Button();
       button.init({
         id: '123',
         parent: session.desktop
       });
-      var adapterMenu = new scout.ButtonAdapterMenu();
+      var adapterMenu = new ButtonAdapterMenu();
       adapterMenu.init({
         id: '234',
         button: button,
@@ -362,7 +370,7 @@ describe("MenuBar", function() {
       button.setProperty('defaultButton', false);
       button.setProperty('keyStroke', 'enter');
 
-      var menuBar = createMenuBar(new scout.GroupBoxMenuItemsOrder()),
+      var menuBar = createMenuBar(new GroupBoxMenuItemsOrder()),
         menus = [adapterMenu];
 
       menuBar.setMenuItems(menus);
@@ -431,14 +439,14 @@ describe("MenuBar", function() {
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
-        menus = [menu1, menu2];
+        menusItems = [menu1, menu2];
 
-      var ellipsisMenu = scout.menus.createEllipsisMenu({
+      var ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      menuBar.setMenuItems(menus);
+      menuBar.setMenuItems(menusItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
       expect(menu1.$container).not.toHaveClass('default-menu');
@@ -463,14 +471,14 @@ describe("MenuBar", function() {
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
-        menus = [menu1, menu2];
+        menuItems = [menu1, menu2];
 
-      var ellipsisMenu = scout.menus.createEllipsisMenu({
+      var ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      menuBar.setMenuItems(menus);
+      menuBar.setMenuItems(menuItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
       expect(menu2.rendered).toBe(true);
@@ -514,14 +522,14 @@ describe("MenuBar", function() {
       var menu1 = helper.createMenu(modelMenu1),
         menu2 = helper.createMenu(modelMenu2),
         menuBar = createMenuBar(),
-        menus = [menu1, menu2];
+        menuItems = [menu1, menu2];
 
-      var ellipsisMenu = scout.menus.createEllipsisMenu({
+      var ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      menuBar.setMenuItems(menus);
+      menuBar.setMenuItems(menuItems);
       menuBar.render();
       expect(menu1.rendered).toBe(true);
       expect(menu1.$container).not.toHaveClass('default-menu');
@@ -530,7 +538,7 @@ describe("MenuBar", function() {
       expect(menu2.$container).toHaveClass('default-menu');
 
       // Move default menu into ellipsis and call updateDefaultMenu explicitly to recalculate state
-      scout.menus.moveMenuIntoEllipsis(menu2, ellipsisMenu);
+      menus.moveMenuIntoEllipsis(menu2, ellipsisMenu);
       menuBar.updateDefaultMenu();
       expect(menu1.rendered).toBe(true);
       expect(menu1.$container).not.toHaveClass('default-menu');
@@ -564,7 +572,7 @@ describe("MenuBar", function() {
       leftMenu1.horizontalAlignment = -1;
       leftMenu2.visible = true;
       leftMenu2.horizontalAlignment = -1;
-      menuBar.setEllipsisPosition(scout.MenuBar.EllipsisPosition.RIGHT);
+      menuBar.setEllipsisPosition(MenuBar.EllipsisPosition.RIGHT);
       menuBar.setMenuItems(menus);
       menuBar.render();
 
@@ -605,7 +613,7 @@ describe("MenuBar", function() {
       leftMenu1.horizontalAlignment = -1;
       leftMenu2.visible = true;
       leftMenu2.horizontalAlignment = -1;
-      menuBar.setEllipsisPosition(scout.MenuBar.EllipsisPosition.LEFT);
+      menuBar.setEllipsisPosition(MenuBar.EllipsisPosition.LEFT);
       menuBar.setMenuItems(menus);
       menuBar.render();
 
@@ -635,11 +643,11 @@ describe("MenuBar", function() {
     it('updates left-of-button correctly', function() {
       var button1 = scout.create('Menu', {
           parent: session.desktop,
-          actionStyle: scout.Action.ActionStyle.BUTTON
+          actionStyle: Action.ActionStyle.BUTTON
         }),
         button2 = scout.create('Menu', {
           parent: session.desktop,
-          actionStyle: scout.Action.ActionStyle.BUTTON
+          actionStyle: Action.ActionStyle.BUTTON
         }),
         menuBar = createMenuBar(),
         menus = [button1, button2];
@@ -657,11 +665,11 @@ describe("MenuBar", function() {
     it('updates last correctly', function() {
       var button1 = scout.create('Menu', {
           parent: session.desktop,
-          actionStyle: scout.Action.ActionStyle.BUTTON
+          actionStyle: Action.ActionStyle.BUTTON
         }),
         button2 = scout.create('Menu', {
           parent: session.desktop,
-          actionStyle: scout.Action.ActionStyle.BUTTON
+          actionStyle: Action.ActionStyle.BUTTON
         }),
         menuBar = createMenuBar(),
         menus = [button1, button2];

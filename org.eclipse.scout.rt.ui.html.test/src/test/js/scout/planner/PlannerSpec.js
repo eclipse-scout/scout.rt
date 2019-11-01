@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DateRange, dates, ObjectFactory, Planner} from '../../src/index';
+
+
 describe("Planner", function() {
   var session;
   var helper;
@@ -36,24 +39,24 @@ describe("Planner", function() {
 
   function createResource(text) {
     return {
-      id: scout.objectFactory.createUniqueId(),
+      id: ObjectFactory.get().createUniqueId(),
       resourceCell: {
         text: text
       },
       activities: [{
         beginTime: '2015-04-01 01:23:45.678Z',
         endTime: '2015-04-31 01:23:45.678Z',
-        id: scout.objectFactory.createUniqueId()
+        id: ObjectFactory.get().createUniqueId()
       }, {
         beginTime: '2016-02-29 01:23:45.678Z',
         endTime: '2400-02-29 01:23:45.678Z',
-        id: scout.objectFactory.createUniqueId()
+        id: ObjectFactory.get().createUniqueId()
       }]
     };
   }
 
   function createPlanner(model) {
-    var planner = new scout.Planner();
+    var planner = new Planner();
     planner.init(model);
     return planner;
   }
@@ -196,8 +199,8 @@ describe("Planner", function() {
     describe("displayMode: DAY", function() {
 
       beforeEach(function() {
-        planner.displayMode = scout.Planner.DisplayMode.DAY;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-21'));
+        planner.displayMode = Planner.DisplayMode.DAY;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-21'));
       });
 
       afterEach(function() {
@@ -271,8 +274,8 @@ describe("Planner", function() {
     describe("displayMode: WEEK / WORK_WEEK", function() {
 
       beforeEach(function() {
-        planner.displayMode = scout.Planner.DisplayMode.WEEK;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
+        planner.displayMode = Planner.DisplayMode.WEEK;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
       });
 
       afterEach(function() {
@@ -305,7 +308,7 @@ describe("Planner", function() {
         for (var i = 0; i < smallCount; i++) {
           var visible = i % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(scout.dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
+          var labalValue = planner._dateFormat(dates.shiftTime(new Date(planner.viewRange.from.valueOf()), 0, interval * (i % dayParts), 0, 0), 'HH:mm');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
@@ -329,7 +332,7 @@ describe("Planner", function() {
       });
 
       it("draws scale for WEEK with changing month", function() {
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-27'), scout.dates.create('2016-07-04'));
+        planner.viewRange = new DateRange(dates.create('2016-06-27'), dates.create('2016-07-04'));
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 2,
@@ -339,8 +342,8 @@ describe("Planner", function() {
       });
 
       it("draws scale for WORK_WEEK for whole day with 6h interval", function() {
-        planner.displayMode = scout.Planner.DisplayMode.WORK_WEEK;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-25'));
+        planner.displayMode = Planner.DisplayMode.WORK_WEEK;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 1,
@@ -350,8 +353,8 @@ describe("Planner", function() {
       });
 
       it("draws scale for WORK_WEEK with only showing every second label", function() {
-        planner.displayMode = scout.Planner.DisplayMode.WORK_WEEK;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-25'));
+        planner.displayMode = Planner.DisplayMode.WORK_WEEK;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-25'));
         planner.displayModeOptions[planner.displayMode] = {
           interval: 360,
           labelPeriod: 1,
@@ -364,8 +367,8 @@ describe("Planner", function() {
     describe("displayMode: MONTH", function() {
 
       beforeEach(function() {
-        planner.displayMode = scout.Planner.DisplayMode.MONTH;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-08-20'));
+        planner.displayMode = Planner.DisplayMode.MONTH;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-08-20'));
       });
 
       afterEach(function() {
@@ -390,9 +393,9 @@ describe("Planner", function() {
 
         // labels
         for (var i = 0; i < days; i++) {
-          var visible = scout.dates.shift(planner.viewRange.from, 0, 0, i).getDate() % labelPeriod === 0;
+          var visible = dates.shift(planner.viewRange.from, 0, 0, i).getDate() % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(scout.dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
+          var labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, i), 'dd');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
@@ -414,8 +417,8 @@ describe("Planner", function() {
     describe("displayMode: CALENDAR_WEEK", function() {
 
       beforeEach(function() {
-        planner.displayMode = scout.Planner.DisplayMode.CALENDAR_WEEK;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2017-03-20'));
+        planner.displayMode = Planner.DisplayMode.CALENDAR_WEEK;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2017-03-20'));
       });
 
       afterEach(function() {
@@ -432,9 +435,9 @@ describe("Planner", function() {
         if (months < 0) {
           months += 12;
         }
-        weeks = scout.dates.weekInYear(scout.dates.trunc(planner.viewRange.to)) - scout.dates.weekInYear(scout.dates.trunc(planner.viewRange.from));
+        weeks = dates.weekInYear(dates.trunc(planner.viewRange.to)) - dates.weekInYear(dates.trunc(planner.viewRange.from));
         if (weeks < 0) {
-          weeks += scout.dates.weekInYear(scout.dates.create(planner.viewRange.from.getFullYear() + '-12-28'));
+          weeks += dates.weekInYear(dates.create(planner.viewRange.from.getFullYear() + '-12-28'));
         }
 
         // element count
@@ -443,7 +446,7 @@ describe("Planner", function() {
 
         // labels
         for (var i = 0; i < weeks; i++) {
-          var weekInYear = scout.dates.weekInYear(scout.dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, 7 * i));
+          var weekInYear = dates.weekInYear(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, 0, 7 * i));
           var visible = weekInYear % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
           var labalValue = weekInYear + '';
@@ -474,8 +477,8 @@ describe("Planner", function() {
     describe("displayMode: YEAR", function() {
 
       beforeEach(function() {
-        planner.displayMode = scout.Planner.DisplayMode.YEAR;
-        planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2018-06-20'));
+        planner.displayMode = Planner.DisplayMode.YEAR;
+        planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2018-06-20'));
       });
 
       afterEach(function() {
@@ -497,9 +500,9 @@ describe("Planner", function() {
 
         // labels
         for (var i = 0; i < months; i++) {
-          var visible = (scout.dates.shift(planner.viewRange.from, 0, i, 0).getMonth()) % labelPeriod === 0;
+          var visible = (dates.shift(planner.viewRange.from, 0, i, 0).getMonth()) % labelPeriod === 0;
           expect(planner.$timelineSmall.children()[i].classList.contains('label-invisible')).toBe(!visible);
-          var labalValue = planner._dateFormat(scout.dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
+          var labalValue = planner._dateFormat(dates.shift(new Date(planner.viewRange.from.valueOf()), 0, i, 0), 'MMMM');
           expect(planner.$timelineSmall.children()[i].textContent).toBe(labalValue);
         }
       }
@@ -536,8 +539,8 @@ describe("Planner", function() {
     });
 
     it("calculates left and width in WEEK mode for whole days", function() {
-      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
-      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
+      planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
         interval: 360,
         firstHourOfDay: 0,
@@ -548,16 +551,16 @@ describe("Planner", function() {
       var options = planner.displayModeOptions[planner.displayMode];
       var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 06:00:00'))).toBeCloseTo(cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 06:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 06:00:00'))).toBeCloseTo(cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(cellWidthPercent, 5);
 
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 06:00:00'), scout.dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 06:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 06:00:00'), dates.create('2016-06-21 12:00:00'))).toBeCloseTo(5 * cellWidthPercent, 5);
     });
 
     it("calculates left and width in WEEK mode for limitted day range", function() {
-      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
-      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
+      planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
         interval: 60,
         firstHourOfDay: 8,
@@ -569,44 +572,44 @@ describe("Planner", function() {
       var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 09:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(4 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 09:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 12:00:00'))).toBeCloseTo(4 * cellWidthPercent, 5);
 
       // till the end of the day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-20 18:00:00'))).toBeCloseTo(2 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 18:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-20 18:00:00'))).toBeCloseTo(2 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 18:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
 
       // to the next day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
 
       // into the day
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-21 06:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-21 06:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
 
       // into the day from previous day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 20:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 20:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 20:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 20:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 09:00:00'))).toBeCloseTo(11 * cellWidthPercent, 5);
 
       // during night
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-21 06:00:00'), scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(0, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 06:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-21 06:00:00'), dates.create('2016-06-21 08:00:00'))).toBeCloseTo(0, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 08:00:00'))).toBeCloseTo(10 * cellWidthPercent, 5);
 
       // over two days
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(13 * cellWidthPercent, 5);
-      expect(planner.transformLeft(scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 16:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-22 09:00:00'))).toBeCloseTo(13 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-22 09:00:00'))).toBeCloseTo(21 * cellWidthPercent, 5);
     });
 
     it("calculates left and width in WEEK mode for limitted day range (only firstHourOfDay set)", function() {
-      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
-      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
+      planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
         interval: 60,
         firstHourOfDay: 8,
@@ -618,20 +621,20 @@ describe("Planner", function() {
       var cellWidthPercent = 100 / (((options.lastHourOfDay - options.firstHourOfDay + 1) * 7 * 60) / options.interval);
 
       // during a day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 09:00:00'), scout.dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 09:00:00'))).toBeCloseTo(1 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 09:00:00'), dates.create('2016-06-20 12:00:00'))).toBeCloseTo(3 * cellWidthPercent, 5);
 
       // till the end of the day
-      expect(planner.transformLeft(scout.dates.create('2016-06-20 23:00:00'))).toBeCloseTo(15 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-20 24:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-20 23:00:00'))).toBeCloseTo(15 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-20 24:00:00'))).toBeCloseTo(8 * cellWidthPercent, 5);
 
       // to the next day
-      expect(planner.transformLeft(scout.dates.create('2016-06-21 08:00:00'))).toBeCloseTo(16 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-21 09:00:00'))).toBeCloseTo(9 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-21 08:00:00'))).toBeCloseTo(16 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-21 09:00:00'))).toBeCloseTo(9 * cellWidthPercent, 5);
 
       // over two days
-      expect(planner.transformLeft(scout.dates.create('2016-06-22 08:00:00'))).toBeCloseTo(32 * cellWidthPercent, 5);
-      expect(planner.transformWidth(scout.dates.create('2016-06-20 16:00:00'), scout.dates.create('2016-06-22 09:00:00'))).toBeCloseTo(25 * cellWidthPercent, 5);
+      expect(planner.transformLeft(dates.create('2016-06-22 08:00:00'))).toBeCloseTo(32 * cellWidthPercent, 5);
+      expect(planner.transformWidth(dates.create('2016-06-20 16:00:00'), dates.create('2016-06-22 09:00:00'))).toBeCloseTo(25 * cellWidthPercent, 5);
     });
   });
 
@@ -645,8 +648,8 @@ describe("Planner", function() {
     });
 
     it("selects at least the number of intervals configured by display mode options", function() {
-      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
-      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
+      planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
         interval: 60,
         firstHourOfDay: 0,
@@ -658,37 +661,37 @@ describe("Planner", function() {
       // start of view range
       planner.startRow = planner.resources[0];
       planner.lastRow = planner.resources[0];
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 00:00:00').getTime(), scout.dates.create('2016-06-20 01:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 00:00:00').getTime(), scout.dates.create('2016-06-20 01:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 00:00:00').getTime(), dates.create('2016-06-20 01:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-20 00:00:00').getTime(), dates.create('2016-06-20 01:00:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 00:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 03:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 00:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 03:00:00').toISOString());
 
       // end of view range
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 23:00:00').getTime(), scout.dates.create('2016-06-20 24:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 23:00:00').getTime(), scout.dates.create('2016-06-20 24:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 23:00:00').getTime(), dates.create('2016-06-20 24:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-26 23:00:00').getTime(), dates.create('2016-06-20 24:00:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 21:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 24:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 21:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 24:00:00').toISOString());
 
       // selection to right
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 16:00:00').getTime(), scout.dates.create('2016-06-20 17:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 17:00:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00').getTime(), dates.create('2016-06-20 17:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-20 17:00:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 16:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 19:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 16:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 19:00:00').toISOString());
 
       // selection to left
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 16:00:00').getTime(), scout.dates.create('2016-06-20 17:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 15:00:00').getTime(), scout.dates.create('2016-06-20 16:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 16:00:00').getTime(), dates.create('2016-06-20 17:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00').getTime(), dates.create('2016-06-20 16:00:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 14:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 17:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 14:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 17:00:00').toISOString());
     });
 
     it("respects end of day if minSelectionIntervalCount is set", function() {
-      planner.viewRange = new scout.DateRange(scout.dates.create('2016-06-20'), scout.dates.create('2016-06-27'));
-      planner.displayMode = scout.Planner.DisplayMode.WEEK;
+      planner.viewRange = new DateRange(dates.create('2016-06-20'), dates.create('2016-06-27'));
+      planner.displayMode = Planner.DisplayMode.WEEK;
       planner.displayModeOptions[planner.displayMode] = {
         interval: 30,
         firstHourOfDay: 8,
@@ -700,32 +703,32 @@ describe("Planner", function() {
       planner.lastRow = planner.resources[0];
 
       // end of day
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 17:00:00').getTime(), scout.dates.create('2016-06-20 17:30:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 17:00:00').getTime(), scout.dates.create('2016-06-20 17:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 17:00:00').getTime(), dates.create('2016-06-20 17:30:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-26 17:00:00').getTime(), dates.create('2016-06-20 17:30:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 17:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 18:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 17:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 18:00:00').toISOString());
 
       // end of day, click in last interval -> actual end would be 18:30 but since this is not visible to the user use 18:00 as end
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-26 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-26 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-26 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-26 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-26 17:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-26 18:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-26 17:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-26 18:00:00').toISOString());
 
       // manual selection over end of day should still be possible
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-21 09:00:00').getTime(), scout.dates.create('2016-06-21 09:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-21 09:00:00').getTime(), dates.create('2016-06-21 09:30:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 17:30:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-21 09:30:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 17:30:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-21 09:30:00').toISOString());
 
       // selection to left
-      planner.startRange = new scout.DateRange(scout.dates.create('2016-06-20 17:30:00').getTime(), scout.dates.create('2016-06-20 18:00:00').getTime());
-      planner.lastRange = new scout.DateRange(scout.dates.create('2016-06-20 15:00:00').getTime(), scout.dates.create('2016-06-20 15:30:00').getTime());
+      planner.startRange = new DateRange(dates.create('2016-06-20 17:30:00').getTime(), dates.create('2016-06-20 18:00:00').getTime());
+      planner.lastRange = new DateRange(dates.create('2016-06-20 15:00:00').getTime(), dates.create('2016-06-20 15:30:00').getTime());
       planner._select();
-      expect(planner.selectionRange.from.toISOString()).toBe(scout.dates.create('2016-06-20 15:00:00').toISOString());
-      expect(planner.selectionRange.to.toISOString()).toBe(scout.dates.create('2016-06-20 18:00:00').toISOString());
+      expect(planner.selectionRange.from.toISOString()).toBe(dates.create('2016-06-20 15:00:00').toISOString());
+      expect(planner.selectionRange.to.toISOString()).toBe(dates.create('2016-06-20 18:00:00').toISOString());
     });
   });
 });

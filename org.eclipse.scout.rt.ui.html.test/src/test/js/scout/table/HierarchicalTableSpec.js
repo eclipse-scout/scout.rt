@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("HierarchicalTableSpec", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("HierarchicalTableSpec", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -504,7 +508,7 @@ describe("HierarchicalTableSpec", function() {
       table.filter();
       var expectedRowIds = [0, 1, 2];
       expectRowIds(table.visibleRows, expectedRowIds);
-      expect(scout.arrays.equalsIgnoreOrder(expectedRowIds, Object.keys(table.visibleRowsMap).map(function(n) {
+      expect(arrays.equalsIgnoreOrder(expectedRowIds, Object.keys(table.visibleRowsMap).map(function(n) {
         return Number(n);
       }))).toBe(true);
       table.selectAll();

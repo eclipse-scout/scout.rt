@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+import {FormMenu, menus, scout} from '../../src/index';
+
+
 /* global linkWidgetAndAdapter */
 describe('FormMenu', function() {
   var session, desktop, helper;
@@ -15,7 +19,7 @@ describe('FormMenu', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     desktop = session.desktop;
   });
 
@@ -45,7 +49,7 @@ describe('FormMenu', function() {
     });
 
     it('opens the popup and the ellipsis if the menu is overflown', function() {
-      var ellipsisMenu = scout.menus.createEllipsisMenu({
+      var ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
@@ -53,7 +57,7 @@ describe('FormMenu', function() {
       var menu = createMenu();
       menu.render();
 
-      scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+      menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
       expect(menu.rendered).toBe(false);
       expect(findPopup()).not.toExist();
 
@@ -68,15 +72,15 @@ describe('FormMenu', function() {
     });
 
     it('opens the popup but not the ellipsis if the menu is overflown and mobile popup style is used', function() {
-      var ellipsisMenu = scout.menus.createEllipsisMenu({
+      var ellipsisMenu = menus.createEllipsisMenu({
         parent: session.desktop
       });
       ellipsisMenu.render();
 
-      var menu = createMenu({popupStyle: scout.FormMenu.PopupStyle.MOBILE});
+      var menu = createMenu({popupStyle: FormMenu.PopupStyle.MOBILE});
       menu.render();
 
-      scout.menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
+      menus.moveMenuIntoEllipsis(menu, ellipsisMenu);
       expect(menu.rendered).toBe(false);
       expect(findPopup()).not.toExist();
 
@@ -101,7 +105,7 @@ describe('FormMenu', function() {
       menu.setSelected(true);
       expect(menu.popup.rendered).toBe(true);
 
-      // scout.Popup#_renderOnDetach will remove the popup and eventually the form.
+      // Popup#_renderOnDetach will remove the popup and eventually the form.
       // As soon as the form is removed, the FormMenu will unselected the menu which closes the popup (FormMenu#_onFormRemove).
       menuBar.detach();
       expect(menu.popup).toBe(null);

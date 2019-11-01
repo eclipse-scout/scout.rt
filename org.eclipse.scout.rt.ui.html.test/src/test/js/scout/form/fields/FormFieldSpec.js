@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormField, GridData, RadioButtonGroup, scout, Status, StringField, TreeVisitResult, Widget} from '../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('FormField', function() {
   var session;
   var helper;
@@ -15,11 +19,11 @@ describe('FormField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createFormField(model) {
-    var formField = new scout.FormField();
+    var formField = new FormField();
     formField._render = function() {
       this.addContainer(this.$parent, 'form-field');
       this.addLabel();
@@ -36,12 +40,12 @@ describe('FormField', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.FormField();
+      formField = new FormField();
       formField.init(model);
     });
 
     it('inherits from Widget', function() {
-      expect(scout.Widget.prototype.isPrototypeOf(formField)).toBe(true);
+      expect(Widget.prototype.isPrototypeOf(formField)).toBe(true);
     });
 
   });
@@ -51,13 +55,13 @@ describe('FormField', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.FormField();
+      formField = new FormField();
     });
 
     it('gridDataHints are extended (not replaced) on init when gridDataHints is a plain object', function() {
       var defaultGridDataHints = formField.gridDataHints;
-      expect(defaultGridDataHints instanceof scout.GridData).toBe(true);
-      // expect one of the many default values of scout.GridData
+      expect(defaultGridDataHints instanceof GridData).toBe(true);
+      // expect one of the many default values of GridData
       expect(defaultGridDataHints.fillHorizontal).toBe(true);
 
       model.gridDataHints = {
@@ -72,7 +76,7 @@ describe('FormField', function() {
     });
 
     it('gridDataHints are replaced when gridDataHints is instanceof GridData', function() {
-      var gridDataHints = new scout.GridData();
+      var gridDataHints = new GridData();
       model.gridDataHints = gridDataHints;
       formField.init(model);
       expect(formField.gridDataHints).toBe(gridDataHints);
@@ -85,7 +89,7 @@ describe('FormField', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.StringField();
+      formField = new StringField();
       formField.init(model);
     });
 
@@ -93,7 +97,7 @@ describe('FormField', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
-        formField.labelPosition = scout.FormField.LabelPosition.ON_FIELD;
+        formField.labelPosition = FormField.LabelPosition.ON_FIELD;
       });
 
       it('sets the label as placeholder', function() {
@@ -117,7 +121,7 @@ describe('FormField', function() {
 
       beforeEach(function() {
         formField.label = 'labelName';
-        formField.labelPosition = scout.FormField.LabelPosition.TOP;
+        formField.labelPosition = FormField.LabelPosition.TOP;
       });
 
       it('guarantees a minimum height if label is empty', function() {
@@ -148,7 +152,7 @@ describe('FormField', function() {
 
     it('sets css class \'read-only\' when field is disabled and setDisabledStyle has been called ', function() {
       formField.render();
-      formField.setDisabledStyle(scout.Widget.DisabledStyle.READ_ONLY);
+      formField.setDisabledStyle(Widget.DisabledStyle.READ_ONLY);
       formField.setEnabled(false);
       expect(formField.$field.attr('class')).toContain('read-only');
       formField.setEnabled(true);
@@ -193,7 +197,7 @@ describe('FormField', function() {
       expect(formField.hasStatusTooltip()).toBe(true);
       expect(formField.hasOnFieldTooltip()).toBe(false);
 
-      formField.setTooltipAnchor(scout.FormField.TooltipAnchor.ON_FIELD);
+      formField.setTooltipAnchor(FormField.TooltipAnchor.ON_FIELD);
       expect(formField.hasStatusTooltip()).toBe(false);
       expect(formField.hasOnFieldTooltip()).toBe(true);
     });
@@ -206,7 +210,7 @@ describe('FormField', function() {
       expect(formField.$field.hasClass('has-tooltip')).toBe(true);
 
       // expect status-icon to become invisible
-      formField.setTooltipAnchor(scout.FormField.TooltipAnchor.ON_FIELD);
+      formField.setTooltipAnchor(FormField.TooltipAnchor.ON_FIELD);
       expect(formField.$field.hasClass('has-tooltip')).toBe(false);
     });
 
@@ -286,9 +290,9 @@ describe('FormField', function() {
 
     it('shows a status even though status visible is false but errorStatus is set', function() {
       formField.statusVisible = false;
-      formField.errorStatus = new scout.Status({
+      formField.errorStatus = new Status({
         message: 'error',
-        severity: scout.Status.Severity.ERROR
+        severity: Status.Severity.ERROR
       });
       formField.render();
 
@@ -322,9 +326,9 @@ describe('FormField', function() {
     });
 
     it('hides the status message if field is made invisible', function() {
-      formField.errorStatus = new scout.Status({
+      formField.errorStatus = new Status({
         message: 'error',
-        severity: scout.Status.Severity.ERROR
+        severity: Status.Severity.ERROR
       });
       formField.render();
 
@@ -338,9 +342,9 @@ describe('FormField', function() {
     });
 
     it('shows the status message if field is made visible', function() {
-      formField.errorStatus = new scout.Status({
+      formField.errorStatus = new Status({
         message: 'error',
-        severity: scout.Status.Severity.ERROR
+        severity: Status.Severity.ERROR
       });
       formField.visible = false;
       formField.render();
@@ -360,14 +364,14 @@ describe('FormField', function() {
     var groupBox = scout.create('GroupBox', {
       parent: session.desktop,
       fields: [{
-        objectType: 'StringField',
+        objectType: 'StringField'
       }, {
-        objectType: 'CheckBoxField',
+        objectType: 'CheckBoxField'
       }, {
         objectType: 'GroupBox',
         toSkip: true,
         fields: [{
-          objectType: 'StringField',
+          objectType: 'StringField'
         }, {
           objectType: 'RadioButtonGroup',
           fields: [{
@@ -380,7 +384,7 @@ describe('FormField', function() {
       }, {
         objectType: 'GroupBox',
         fields: [{
-          objectType: 'StringField',
+          objectType: 'StringField'
         }]
       }],
       responsive: true
@@ -415,14 +419,14 @@ describe('FormField', function() {
       expectVisited(groupBox.fields[3].fields[0]);
     });
 
-    it('can skip subtree of a group box when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+    it('can skip subtree of a group box when returning TreeVisitResult.SKIP_SUBTREE', function() {
       var groupBox = createVisitStructure();
       groupBox.visitFields(function(field) {
         field.hasBeenVisited = true;
         if (field.toSkip) {
-          return scout.TreeVisitResult.SKIP_SUBTREE;
+          return TreeVisitResult.SKIP_SUBTREE;
         }
-        return scout.TreeVisitResult.CONTINUE;
+        return TreeVisitResult.CONTINUE;
       });
 
       expectVisited(groupBox);
@@ -437,14 +441,14 @@ describe('FormField', function() {
       expectVisited(groupBox.fields[3].fields[0]);
     });
 
-    it('can skip subtree of radio button group when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+    it('can skip subtree of radio button group when returning TreeVisitResult.SKIP_SUBTREE', function() {
       var groupBox = createVisitStructure();
       groupBox.visitFields(function(field) {
         field.hasBeenVisited = true;
-        if (field instanceof scout.RadioButtonGroup) {
-          return scout.TreeVisitResult.SKIP_SUBTREE;
+        if (field instanceof RadioButtonGroup) {
+          return TreeVisitResult.SKIP_SUBTREE;
         }
-        return scout.TreeVisitResult.CONTINUE;
+        return TreeVisitResult.CONTINUE;
       });
 
       expectVisited(groupBox);
@@ -459,14 +463,14 @@ describe('FormField', function() {
       expectVisited(groupBox.fields[3].fields[0]);
     });
 
-    it('can terminate visiting by returning scout.TreeVisitResult.TERMINATE', function() {
+    it('can terminate visiting by returning TreeVisitResult.TERMINATE', function() {
       var groupBox = createVisitStructure();
       groupBox.visitFields(function(field) {
         field.hasBeenVisited = true;
         if (field.toSkip) {
-          return scout.TreeVisitResult.TERMINATE;
+          return TreeVisitResult.TERMINATE;
         }
-        return scout.TreeVisitResult.CONTINUE;
+        return TreeVisitResult.CONTINUE;
       });
 
       expectVisited(groupBox);
@@ -487,10 +491,10 @@ describe('FormField', function() {
 
       groupBox.visitFields(function(field) {
         field.hasBeenVisited = true;
-        if (field instanceof scout.RadioButtonGroup) {
-          return scout.TreeVisitResult.TERMINATE;
+        if (field instanceof RadioButtonGroup) {
+          return TreeVisitResult.TERMINATE;
         }
-        return scout.TreeVisitResult.CONTINUE;
+        return TreeVisitResult.CONTINUE;
       });
 
       expectVisited(groupBox);
@@ -511,7 +515,7 @@ describe('FormField', function() {
 
       groupBox.visitFields(function(field) {
         field.hasBeenVisited = true;
-        return scout.TreeVisitResult.TERMINATE;
+        return TreeVisitResult.TERMINATE;
       });
 
       expectVisited(groupBox);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Range} from '../../src/index';
+import {TreeSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("Compacttree", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("Compacttree", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TreeSpecHelper(session);
+    helper = new TreeSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -34,24 +38,24 @@ describe("Compacttree", function() {
       //top-level node (section) is only rendered, if there are child nodes
       var model = helper.createModelFixture(1);
       var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 1));
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 1));
       tree.render();
       expect(tree.nodes.length).toBe(1);
     });
 
     it("adds a node with child node", function() {
-      var model = helper.createModelFixture(1,1, true);
+      var model = helper.createModelFixture(1, 1, true);
       var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 4));
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 4));
       tree.render();
       expect(tree.nodes.length).toBe(1);
       expect(tree.visibleNodesFlat.length).toBe(2);
     });
 
     it("adds a node with child nodes in correct order", function() {
-      var model = helper.createModelFixture(2,1,true);
+      var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       expect(tree.nodes.length).toBe(2);
       expect(tree.visibleNodesFlat.length).toBe(6);
@@ -68,9 +72,9 @@ describe("Compacttree", function() {
 
     //deletion
     it("deletes a node", function() {
-      var model = helper.createModelFixture(2,1,true);
+      var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([tree.nodes[0].childNodes[0]], tree.nodes[0]);
       expect(tree.nodes.length).toBe(2);
@@ -86,11 +90,11 @@ describe("Compacttree", function() {
 
     //insertions
     it("inserts a child node", function() {
-      var model = helper.createModelFixture(2,1,true);
+      var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       var parent0 = tree.nodes[0];
       var child0 = parent0.childNodes[0];
-      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new scout.Range(0, 5));
+      var spy = spyOn(tree, '_calculateCurrentViewRange').and.returnValue(new Range(0, 5));
       tree.render();
       tree.deleteNodes([child0], parent0);
       tree.insertNodes([child0], parent0);
@@ -113,7 +117,7 @@ describe("Compacttree", function() {
   describe("node click", function() {
 
     it("calls selectNodes", function() {
-      var model = helper.createModelFixture(2,1,true);
+      var model = helper.createModelFixture(2, 1, true);
       var tree = helper.createCompactTree(model);
       spyOn(tree, 'selectNodes');
       tree.render();

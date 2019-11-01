@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {TestingApp} from '@eclipse-scout/testing';
+
+
 describe('RemoteApp', function() {
   var session;
 
@@ -21,7 +24,7 @@ describe('RemoteApp', function() {
   describe('initDone', function() {
 
     it('waits for session startup to complete', function(done) {
-      var app = new scout.RemoteApp();
+      var app = new TestingApp();
       app.init();
       app._createSession = function(options) {
         return session;
@@ -45,7 +48,7 @@ describe('RemoteApp', function() {
     });
 
     it('is not executed when session startup fails', function(done) {
-      var app = new scout.RemoteApp();
+      var app = new TestingApp();
       app.init()
         .catch(function() {
           expect(app.initialized).toBe(false);

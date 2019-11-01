@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, Status, StringField} from '../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('FieldStatus', function() {
   var session, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -27,11 +31,11 @@ describe('FieldStatus', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.StringField();
+      formField = new StringField();
       formField.init(model);
       formField.render();
       formField.setErrorStatus({
-        severity: scout.Status.Severity.ERROR,
+        severity: Status.Severity.ERROR,
         message: 'foo'
       });
     });

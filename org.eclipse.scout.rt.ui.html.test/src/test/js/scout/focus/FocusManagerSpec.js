@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FocusManagerSpecHelper, FormSpecHelper, TableSpecHelper, TreeSpecHelper} from '@eclipse-scout/testing';
+import {Device, focusUtils, scout} from '../../src/index';
+
+
 /* global FocusManagerSpecHelper */
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 describe('scout.FocusManager', function() {
@@ -18,7 +22,7 @@ describe('scout.FocusManager', function() {
     jasmine.Ajax.install();
     session = sandboxSession();
     focusManager = session.focusManager;
-    formHelper = new scout.FormSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     focusHelper = new FocusManagerSpecHelper();
     jasmine.clock().install();
     uninstallUnloadHandlers(session);
@@ -43,7 +47,7 @@ describe('scout.FocusManager', function() {
       var $textField = $('<input>')
         .attr('type', 'text')
         .attr('disabled', 'disabled');
-      expect(scout.focusUtils.isSelectableText($textField)).toBe(true);
+      expect(focusUtils.isSelectableText($textField)).toBe(true);
     });
 
   });
@@ -52,11 +56,11 @@ describe('scout.FocusManager', function() {
 
     beforeEach(function() {
       // simulate we are an IE
-      scout.device.browser = scout.Device.Browser.INTERNET_EXPLORER;
+      Device.get().browser = Device.Browser.INTERNET_EXPLORER;
     });
 
     it('Click on table-cell, must focus table', function() {
-      var tableHelper = new scout.TableSpecHelper(session);
+      var tableHelper = new TableSpecHelper(session);
       var tableModel = tableHelper.createModelFixture(2, 1);
       var table = tableHelper.createTable(tableModel);
       table.render();
@@ -64,7 +68,8 @@ describe('scout.FocusManager', function() {
       // we don't really click - just simulate that the method has been called by the FocusManager
       var event = {
         target: $('.table-cell')[0],
-        preventDefault: function() {}
+        preventDefault: function() {
+        }
       };
       spyOn(event, 'preventDefault');
       focusManager._handleIEEvent(event);
@@ -73,7 +78,7 @@ describe('scout.FocusManager', function() {
     });
 
     it('Click on tree-node, must focus tree', function() {
-      var treeHelper = new scout.TreeSpecHelper(session);
+      var treeHelper = new TreeSpecHelper(session);
       var treeModel = treeHelper.createModelFixture(1);
       var tree = treeHelper.createTree(treeModel);
       tree.render();
@@ -81,7 +86,8 @@ describe('scout.FocusManager', function() {
       // we don't really click - just simulate that the method has been called by the FocusManager
       var event = {
         target: $('.tree-node')[0],
-        preventDefault: function() {}
+        preventDefault: function() {
+        }
       };
       spyOn(event, 'preventDefault');
       focusManager._handleIEEvent(event);
@@ -167,7 +173,7 @@ describe('scout.FocusManager', function() {
 
       it('Must focus another valid field if the focused field is hidden', function() {
         var $firstField = form.rootGroupBox.fields[0].$field,
-        $secondField = form.rootGroupBox.fields[1].$field;
+          $secondField = form.rootGroupBox.fields[1].$field;
 
         expect($firstField).toBeFocused();
         $firstField.setVisible(false);

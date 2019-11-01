@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys, scout} from '../../../../src/index';
+import {TabBoxSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TabBox', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('TabBox', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TabBoxSpecHelper(session);
+    helper = new TabBoxSpecHelper(session);
   });
 
   describe('render', function() {
@@ -45,6 +49,7 @@ describe('TabBox', function() {
       var tabBox = scout.create('TabBox', {parent: session.desktop});
       tabBox.render();
       tabBox.remove();
+      expect().nothing();
     });
 
   });
@@ -82,18 +87,18 @@ describe('TabBox', function() {
       tabItemA.focus();
       // check right/left keys
       expect(tabBox.selectedTab).toBe(tabItemA);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.RIGHT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.LEFT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA);
 
       // make sure that nothing happens when first or last tab is selected and left/right is pressed
       tabBox.setSelectedTab(tabItemA);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.LEFT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.LEFT);
       expect(tabBox.selectedTab).toBe(tabItemA); // still A
 
       tabBox.setSelectedTab(tabItemB);
-      tabBox.header.tabArea.$container.triggerKeyDownCapture(scout.keys.RIGHT);
+      tabBox.header.tabArea.$container.triggerKeyDownCapture(keys.RIGHT);
       expect(tabBox.selectedTab).toBe(tabItemB); // still B
     });
 

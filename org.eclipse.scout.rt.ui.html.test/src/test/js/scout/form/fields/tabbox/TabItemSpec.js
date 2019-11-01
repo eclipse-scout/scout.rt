@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HtmlComponent} from '../../../../src/index';
+import {TabBoxSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('TabItem', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('TabItem', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TabBoxSpecHelper(session);
+    helper = new TabBoxSpecHelper(session);
   });
 
   describe('_renderStatusVisible', function() {
@@ -31,13 +35,13 @@ describe('TabItem', function() {
     it('invalidates tabarea if status visibility changes', function() {
       tabBox.render();
       tabBox.validateLayout();
-      expect(scout.HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
+      expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(true);
       expect(tabBox.header.tabArea.tabs[0]._computeVisible()).toBe(false);
 
       // TabArea needs to be invalidated, it may necessary to show ellipsis now because status got visible
       tabBox.tabItems[0].setTooltipText('test');
       expect(tabBox.header.tabArea.tabs[0]._computeVisible()).toBe(true);
-      expect(scout.HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(false);
+      expect(HtmlComponent.get(tabBox.header.tabArea.$container).valid).toBe(false);
     });
 
   });

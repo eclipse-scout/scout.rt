@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Action, scout, tooltips} from '../../src/index';
+import {MenuSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("Menu", function() {
 
   var helper, session, $sandbox, menu1, menu2;
@@ -17,7 +21,7 @@ describe("Menu", function() {
     setFixtures(sandbox());
     session = sandboxSession();
     $sandbox = $('#sandbox');
-    helper = new scout.MenuSpecHelper(session);
+    helper = new MenuSpecHelper(session);
     menu1 = helper.createMenu({
       text: 'foo'
     });
@@ -46,7 +50,7 @@ describe("Menu", function() {
       expect(menu1.$container.hasClass('menu-item')).toBe(true);
       menu1.remove();
 
-      menu1.actionStyle = scout.Action.ActionStyle.BUTTON;
+      menu1.actionStyle = Action.ActionStyle.BUTTON;
       menu1.render($sandbox);
       expect(menu1.$container.hasClass('menu-button')).toBe(true);
       menu1.remove();
@@ -105,10 +109,10 @@ describe("Menu", function() {
     it('should return true when menu can be a target of TAB action', function() {
       menu1.setEnabled(true);
       menu1.visible = true;
-      menu1.actionStyle = scout.Action.ActionStyle.BUTTON;
+      menu1.actionStyle = Action.ActionStyle.BUTTON;
       expect(menu1.isTabTarget()).toBe(true);
 
-      menu1.actionStyle = scout.Action.ActionStyle.DEFAULT;
+      menu1.actionStyle = Action.ActionStyle.DEFAULT;
       expect(menu1.isTabTarget()).toBe(true);
 
       menu1.separator = true;
@@ -156,7 +160,7 @@ describe("Menu", function() {
 
       // Close
       testMenu.setTooltipText('meeeep');
-      scout.tooltips.close(testMenu.$container);
+      tooltips.close(testMenu.$container);
 
       tooltip = $('body').find('.tooltip');
       expect(tooltip.length).toBe(0);

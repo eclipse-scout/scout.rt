@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {BasicFieldAdapter, RemoteEvent, scout} from '../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("BasicField", function() {
   var session, helper, field;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     field = createField(createModel());
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -26,7 +30,7 @@ describe("BasicField", function() {
   });
 
   function createField(model) {
-    var adapter = new scout.BasicFieldAdapter();
+    var adapter = new BasicFieldAdapter();
     adapter.init(model);
     var field = adapter.createWidget(model, session.desktop);
     field.$field = $('<input>').on('blur', field._onFieldBlur.bind(field));
@@ -45,7 +49,7 @@ describe("BasicField", function() {
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
@@ -53,7 +57,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -73,7 +77,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).toBeUndefined(); // not yet...
 
       jasmine.clock().tick(15);
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
@@ -88,7 +92,7 @@ describe("BasicField", function() {
       field.$field.val('Test7');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test7',
         whileTyping: true,
         showBusyIndicator: false
@@ -102,7 +106,7 @@ describe("BasicField", function() {
       field.$field.val('Test2');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
         whileTyping: true,
         showBusyIndicator: false
@@ -110,7 +114,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test2',
         whileTyping: false,
         showBusyIndicator: true
@@ -125,7 +129,7 @@ describe("BasicField", function() {
       field.$field.trigger('input');
       jasmine.clock().tick(251); // because of debounce
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
         showBusyIndicator: false
@@ -134,7 +138,7 @@ describe("BasicField", function() {
       field.setUpdateDisplayTextOnModify(false);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,
         showBusyIndicator: true
@@ -149,7 +153,7 @@ describe("BasicField", function() {
       field.$field.trigger('input');
       jasmine.clock().tick(100); // debounced function has not been executed yet!
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: true,
         showBusyIndicator: false
@@ -162,7 +166,7 @@ describe("BasicField", function() {
 
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,
         showBusyIndicator: true
@@ -177,7 +181,7 @@ describe("BasicField", function() {
       field.$field.trigger('input');
       field.acceptInput(false);
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test3',
         whileTyping: false,
         showBusyIndicator: true
@@ -192,7 +196,7 @@ describe("BasicField", function() {
       field.$field.val('Test4');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test4',
         whileTyping: true,
         showBusyIndicator: false
@@ -200,7 +204,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test4',
         whileTyping: false,
         showBusyIndicator: false
@@ -215,7 +219,7 @@ describe("BasicField", function() {
       field.$field.val('Test5');
       field.$field.trigger('input');
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test5',
         whileTyping: true,
         showBusyIndicator: false
@@ -223,7 +227,7 @@ describe("BasicField", function() {
       expect(mostRecentJsonRequest()).not.toContainEvents(event);
       field.$field.triggerBlur();
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test5',
         whileTyping: false,
         showBusyIndicator: true

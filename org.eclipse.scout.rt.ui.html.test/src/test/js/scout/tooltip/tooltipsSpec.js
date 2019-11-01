@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+import {tooltips, ValueField} from '../../src/index';
+
+
 describe("scout.tooltips", function() {
 
   var session, helper, formField, model;
@@ -17,13 +21,13 @@ describe("scout.tooltips", function() {
 
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
 
     // Add class desktop to sandbox, tooltip will be added to closest desktop
     session.$entryPoint.addClass('desktop');
 
     model = helper.createFieldModel();
-    formField = new scout.ValueField();
+    formField = new ValueField();
     formField._render = function() {
       this.addContainer(this.$parent, 'form-field');
       this.addField($('<div>TestField</div>'));
@@ -38,18 +42,18 @@ describe("scout.tooltips", function() {
   });
 
   it("can be installed and uninstalled for a form field", function() {
-    scout.tooltips.install(formField.$container, {
+    tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
       text: 'Test1'
     });
     expect(formField.$container.data('tooltipSupport')).not.toBeUndefined();
-    scout.tooltips.uninstall(formField.$container);
+    tooltips.uninstall(formField.$container);
     expect(formField.$container.data('tooltipSupport')).toBeUndefined();
   });
 
   it("creates a tooltip on mouseenter and removes it on mouseleave", function() {
-    scout.tooltips.install(formField.$container, {
+    tooltips.install(formField.$container, {
       parent: session.desktop,
       session: session,
       text: 'Test2',
@@ -72,13 +76,13 @@ describe("scout.tooltips", function() {
     expect(tooltip).not.toBeUndefined();
     expect(tooltip.length).toBe(0);
 
-    scout.tooltips.uninstall(formField.$container);
+    tooltips.uninstall(formField.$container);
   });
 
   describe("if text", function() {
 
     it("is empty no tooltip will be shown", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: '',
@@ -93,11 +97,11 @@ describe("scout.tooltips", function() {
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(0);
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is a function, it will be called for tooltip text", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: function() {
@@ -116,11 +120,11 @@ describe("scout.tooltips", function() {
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test3');
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is undefined no tooltip will be shown", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: function() {
@@ -137,11 +141,11 @@ describe("scout.tooltips", function() {
       expect(tooltip).not.toBeUndefined();
       expect(tooltip.length).toBe(0);
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is provided by component, it will be used as tooltip text", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         delay: 0
@@ -158,11 +162,11 @@ describe("scout.tooltips", function() {
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test4');
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is provided as function by component, it will be called and used as tooltip text", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         delay: 0
@@ -181,11 +185,11 @@ describe("scout.tooltips", function() {
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test5');
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is provided using options and by component, text provided using options will be used", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: 'Test6',
@@ -203,11 +207,11 @@ describe("scout.tooltips", function() {
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test6');
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
     it("is a function, component is passed as first and only argument", function() {
-      scout.tooltips.install(formField.$container, {
+      tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
         text: function() {
@@ -226,7 +230,7 @@ describe("scout.tooltips", function() {
       expect(tooltip.length).toBe(1);
       expect(tooltipContent.text()).toBe('Test8');
 
-      scout.tooltips.uninstall(formField.$container);
+      tooltips.uninstall(formField.$container);
     });
 
   });
@@ -236,7 +240,7 @@ describe("scout.tooltips", function() {
     var $testElement = session.$entryPoint.appendDiv('tooltip-test')
       .data('tooltipText', 'initial text');
 
-    scout.tooltips.install($testElement, {
+    tooltips.install($testElement, {
       parent: session.desktop,
       session: session,
       delay: 123
@@ -264,7 +268,7 @@ describe("scout.tooltips", function() {
     expect(tooltip.text()).toBe('initial text');
 
     var support = $testElement.data('tooltipSupport');
-    scout.tooltips.update($testElement);
+    tooltips.update($testElement);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(1);
@@ -272,7 +276,7 @@ describe("scout.tooltips", function() {
     var support2 = $testElement.data('tooltipSupport');
     expect(support2).toBe(support);
 
-    scout.tooltips.uninstall($testElement);
+    tooltips.uninstall($testElement);
 
     tooltip = $('body').find('.tooltip');
     expect(tooltip.length).toBe(0);
@@ -280,7 +284,7 @@ describe("scout.tooltips", function() {
     // 2. Test with 'text' property in tooltip support
     $testElement.removeData('tooltipText');
 
-    scout.tooltips.install($testElement, {
+    tooltips.install($testElement, {
       parent: session.desktop,
       session: session,
       delay: 123,
@@ -294,7 +298,7 @@ describe("scout.tooltips", function() {
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('hard coded text');
 
-    scout.tooltips.update($testElement, {
+    tooltips.update($testElement, {
       text: 'my new text',
       delay: 70
     });
@@ -315,7 +319,7 @@ describe("scout.tooltips", function() {
     expect(tooltip.length).toBe(1);
     expect(tooltip.text()).toBe('my new text');
 
-    scout.tooltips.uninstall($testElement);
+    tooltips.uninstall($testElement);
   });
 
 });

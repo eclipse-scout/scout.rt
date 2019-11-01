@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Action, keys, scout} from '../../src/index';
+
+
 describe('Action', function() {
   var $sandbox, session;
 
@@ -20,10 +23,10 @@ describe('Action', function() {
   describe('defaults', function() {
 
     it('should be as expected', function() {
-      var action = new scout.Action();
+      var action = new Action();
       action.init(createSimpleModel('Action', session));
       expect(action.tabbable).toBe(false);
-      expect(action.actionStyle).toBe(scout.Action.ActionStyle.DEFAULT);
+      expect(action.actionStyle).toBe(Action.ActionStyle.DEFAULT);
     });
 
   });
@@ -31,7 +34,7 @@ describe('Action', function() {
   describe('setTabbable', function() {
 
     it('should modify $container tabindex', function() {
-      var action = new scout.Action();
+      var action = new Action();
       action.init(createSimpleModel('Action', session));
       // because Action is 'abstract' and has no _render method yet
       // but _renderProperties() is called anyway
@@ -60,7 +63,7 @@ describe('Action', function() {
       });
 
       expect(executed).toBe(0);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.X, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.X, 'ctrl');
       expect(executed).toBe(1);
     });
 
@@ -89,7 +92,7 @@ describe('Action', function() {
 
       expect(actionExecuted).toBe(0);
       expect(action2Executed).toBe(0);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.X, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.X, 'ctrl');
       expect(actionExecuted).toBe(1);
       expect(action2Executed).toBe(0);
     });

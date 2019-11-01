@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, Status, StringField, ValueField} from '../../../src/index';
+import {FormSpecHelper, MenuSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global removePopups */
 describe('ValueField', function() {
   var session, helper, menuHelper;
@@ -15,8 +19,8 @@ describe('ValueField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
-    menuHelper = new scout.MenuSpecHelper(session);
+    helper = new FormSpecHelper(session);
+    menuHelper = new MenuSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -31,7 +35,7 @@ describe('ValueField', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.ValueField();
+      formField = new ValueField();
       formField._render = function() {
         this.addContainer(this.$parent, 'form-field');
         this.addField($('<div>'));
@@ -94,7 +98,7 @@ describe('ValueField', function() {
     });
 
     it('does not set value if value is invalid initially', function() {
-      var field = new scout.StringField();
+      var field = new StringField();
       field.setValidator(function(value) {
         throw "Validation failed";
       });
@@ -120,7 +124,7 @@ describe('ValueField', function() {
 
     it('does not override the errorStatus if an errorStatus set initially even if an invalid value is set', function() {
       // Don't override error status, otherwise specifying the error status would not have any effect
-      var field = new scout.StringField();
+      var field = new StringField();
       field.setValidator(function(value) {
         throw "Validation failed";
       });
@@ -138,14 +142,14 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('Validation failed');
 
       // If calling setErrorStatus error status may be set explicitly independent of the value
-      field.setErrorStatus(scout.Status.error({
+      field.setErrorStatus(Status.error({
         message: 'another error'
       }));
       expect(field.errorStatus.message).toBe('another error');
     });
 
     it('calls validate and format when value is set initially', function() {
-      var field = new scout.StringField();
+      var field = new StringField();
       field.setValidator(function(value) {
         return (value === 'gelb' ? 'rot' : value);
       });
@@ -182,7 +186,7 @@ describe('ValueField', function() {
       });
       field.setValue('Foo');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.displayText).toBe("Foo");
     });
 
@@ -193,7 +197,7 @@ describe('ValueField', function() {
       });
       field.setValue('Foo');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setValidator(function(value) {
         return value;
@@ -270,10 +274,10 @@ describe('ValueField', function() {
       expect(field.errorStatus.message).toBe('[undefined text: InvalidValueMessageX]');
     });
 
-    it('may throw a scout.Status if value is invalid', function() {
+    it('may throw a Status if value is invalid', function() {
       var field = helper.createField('StringField');
       field.setValidator(function(value) {
-        throw scout.Status.error({
+        throw Status.error({
           message: 'Custom message'
         });
       });
@@ -310,7 +314,7 @@ describe('ValueField', function() {
       });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
     });
 
     it('deletes the error status if parsing succeeds', function() {
@@ -320,7 +324,7 @@ describe('ValueField', function() {
       });
       field.parseAndSetValue('Foo');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setParser(function(value) {
         return value;
@@ -406,7 +410,7 @@ describe('ValueField', function() {
       expect(field.displayText).toBe('Error');
       expect(field.$field.val()).toBe('Error');
       expect(field.value).toBe('Bar');
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       // Revert back to valid value -> display text has to be updated as well even though value was not changed
       field.$field.val('Foo');
@@ -670,8 +674,8 @@ describe('ValueField', function() {
     });
 
     it('validate returns not valid when errorStatus is set or field is mandatory and empty', function() {
-      var errorStatus = new scout.Status({
-        severity: scout.Status.Severity.ERROR
+      var errorStatus = new Status({
+        severity: Status.Severity.ERROR
       });
       field.setErrorStatus(errorStatus);
       var result = field.getValidationResult();
@@ -692,7 +696,7 @@ describe('ValueField', function() {
 
     beforeEach(function() {
       model = helper.createFieldModel();
-      formField = new scout.ValueField();
+      formField = new ValueField();
       formField._render = function() {
         this.addContainer(this.$parent, 'form-field');
         this.addField($('<input>'));

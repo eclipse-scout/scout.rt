@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {dates} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 /* global LocaleSpecHelper */
 /* global linkWidgetAndAdapter */
 describe('DateColumn', function() {
@@ -18,7 +22,7 @@ describe('DateColumn', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -31,7 +35,7 @@ describe('DateColumn', function() {
 
   describe('format', function() {
     it('updates the value and the display text if the format changes', function() {
-      var testDate = scout.dates.create('2017-01-01 13:01');
+      var testDate = dates.create('2017-01-01 13:01');
       var model = helper.createModelSingleColumnByValues([testDate], 'DateColumn');
       var table = helper.createTable(model);
       var column0 = table.columns[0];

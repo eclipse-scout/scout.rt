@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Dimension, Popup, scout} from '../../src/index';
+
+
 describe("PopupWithHead", function() {
   var helper, session, $desktop;
 
@@ -20,17 +23,17 @@ describe("PopupWithHead", function() {
     });
     $desktop = session.desktop.$container;
     $('<style>' +
-        '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
-        '.popup {position: absolute;}' +
-        '.popup-head {position: absolute;}' +
-        '.popup-body {position: relative;}' +
-        '.anchor {position: absolute; left: 70px; top: 70px; width: 80px; height: 80px; background-color: red;}' +
-        '.popup-body > .menu-item {display: block; min-height: 30px; min-width: 140px; background-color: grey}' +
-        '</style>').appendTo($('#sandbox'));
+      '.desktop {position: absolute; left: 0; top: 0; width: 220px; height: 220px; background-color: blue;}' +
+      '.popup {position: absolute;}' +
+      '.popup-head {position: absolute;}' +
+      '.popup-body {position: relative;}' +
+      '.anchor {position: absolute; left: 70px; top: 70px; width: 80px; height: 80px; background-color: red;}' +
+      '.popup-body > .menu-item {display: block; min-height: 30px; min-width: 140px; background-color: grey}' +
+      '</style>').appendTo($('#sandbox'));
   });
 
   var entryPointSizeFunc = function() {
-    return new scout.Dimension($desktop.width(), $desktop.height());
+    return new Dimension($desktop.width(), $desktop.height());
   };
 
   afterEach(function() {
@@ -61,7 +64,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           windowPaddingY: 10
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -80,7 +83,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           windowPaddingX: 10
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -97,7 +100,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          horizontalAlignment: scout.Popup.Alignment.RIGHTEDGE,
+          horizontalAlignment: Popup.Alignment.RIGHTEDGE,
           windowPaddingX: 10
         });
         popup.getWindowSize = entryPointSizeFunc;
@@ -116,7 +119,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           windowPaddingY: 10
         });
         $desktop.cssHeight(220 - 1);
@@ -132,7 +135,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          verticalAlignment: scout.Popup.Alignment.BOTTOM,
+          verticalAlignment: Popup.Alignment.BOTTOM,
           windowPaddingY: 10
         });
         $desktop.cssHeight(220 - 20);
@@ -153,7 +156,7 @@ describe("PopupWithHead", function() {
         var popup = scout.create('MenuBarPopup', {
           parent: session.desktop,
           menu: menu,
-          horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+          horizontalAlignment: Popup.Alignment.LEFTEDGE,
           windowPaddingX: 10
         });
         $desktop.cssWidth(220 - 1);
@@ -170,7 +173,7 @@ describe("PopupWithHead", function() {
       var popup = scout.create('MenuBarPopup', {
         parent: session.desktop,
         menu: menu,
-        horizontalAlignment: scout.Popup.Alignment.LEFTEDGE,
+        horizontalAlignment: Popup.Alignment.LEFTEDGE,
         windowPaddingX: 10
       });
       $desktop.cssWidth(220 - 20);

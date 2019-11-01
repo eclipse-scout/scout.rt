@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RemoteEvent, scout, TableControlAdapter} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableControl", function() {
   var session;
   var tableHelper;
@@ -15,7 +19,7 @@ describe("TableControl", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    tableHelper = new scout.TableSpecHelper(session);
+    tableHelper = new TableSpecHelper(session);
 
     $.fx.off = true; // Open and closing of the container is animated -> disable animation in order to be able to test it
     jasmine.Ajax.install();
@@ -38,7 +42,7 @@ describe("TableControl", function() {
   }
 
   function createTableControlAdapter(model) {
-    var action = new scout.TableControlAdapter();
+    var action = new TableControlAdapter();
     action.init(model);
     return action;
   }
@@ -110,10 +114,10 @@ describe("TableControl", function() {
       action2.setSelected(true);
       sendQueuedAjaxCalls();
       var events = [
-        new scout.RemoteEvent(action.id, 'property', {
+        new RemoteEvent(action.id, 'property', {
           selected: false
         }),
-        new scout.RemoteEvent(action2.id, 'property', {
+        new RemoteEvent(action2.id, 'property', {
           selected: true
         })
       ];

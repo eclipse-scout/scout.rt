@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormField, GroupBox, HtmlEnvironment, ResponsiveManager, scout} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("GroupBoxResponsiveHandler", function() {
   var session;
   var helper;
@@ -15,11 +19,11 @@ describe("GroupBoxResponsiveHandler", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createField(model, parent) {
-    var field = new scout.GroupBox();
+    var field = new GroupBox();
     model.session = session;
     model.parent = parent || session.desktop;
     field.init(model);
@@ -28,15 +32,15 @@ describe("GroupBoxResponsiveHandler", function() {
 
   function createGroupBox(fields) {
     fields = fields || [{
-      objectType: 'StringField',
+      objectType: 'StringField'
     }, {
-      objectType: 'CheckBoxField',
+      objectType: 'CheckBoxField'
     }, {
-      objectType: 'LabelField',
+      objectType: 'LabelField'
     }, {
       objectType: 'GroupBox',
       fields: [{
-        objectType: 'StringField',
+        objectType: 'StringField'
       }]
     }];
     var groupBox = scout.create('GroupBox', {
@@ -47,53 +51,53 @@ describe("GroupBoxResponsiveHandler", function() {
     return groupBox;
   }
 
-  var normalWidth = scout.htmlEnvironment.formColumnWidth * 2 + 10;
-  var condensedWidth = scout.htmlEnvironment.formColumnWidth + 10;
-  var compactWidth = scout.htmlEnvironment.formColumnWidth - 10;
+  var normalWidth = HtmlEnvironment.get().formColumnWidth * 2 + 10;
+  var condensedWidth = HtmlEnvironment.get().formColumnWidth + 10;
+  var compactWidth = HtmlEnvironment.get().formColumnWidth - 10;
 
   function expectNormal(groupBox) {
-    expect(groupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
-    expect(groupBox.fields[1].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(true);
-    expect(groupBox.fields[2].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(2);
 
     var innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === false) {
-      expect(innerGroupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+      expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
       expect(innerGroupBox.gridColumnCount).toBe(2);
     }
   }
 
   function expectCondensed(groupBox) {
-    expect(groupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.TOP);
-    expect(groupBox.fields[1].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
+    expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(false);
-    expect(groupBox.fields[2].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(2);
 
     var innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
-      expect(innerGroupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.TOP);
+      expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(2);
-    }else{
-      expect(innerGroupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    } else {
+      expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
       expect(innerGroupBox.gridColumnCount).toBe(2);
     }
   }
 
   function expectCompact(groupBox) {
-    expect(groupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.TOP);
-    expect(groupBox.fields[0].statusPosition).toBe(scout.FormField.StatusPosition.TOP);
+    expect(groupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
+    expect(groupBox.fields[0].statusPosition).toBe(FormField.StatusPosition.TOP);
     expect(groupBox.fields[0].statusVisible).toBe(false);
-    expect(groupBox.fields[1].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[1].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.fields[1].labelVisible).toBe(false);
-    expect(groupBox.fields[2].labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+    expect(groupBox.fields[2].labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     expect(groupBox.gridColumnCount).toBe(1);
 
     var innerGroupBox = groupBox.fields[3];
     if (innerGroupBox.responsive === null || innerGroupBox.responsive === true) {
-      expect(innerGroupBox.fields[0].labelPosition).toBe(scout.FormField.LabelPosition.TOP);
+      expect(innerGroupBox.fields[0].labelPosition).toBe(FormField.LabelPosition.TOP);
       expect(innerGroupBox.gridColumnCount).toBe(1);
     }
   }
@@ -123,7 +127,7 @@ describe("GroupBoxResponsiveHandler", function() {
       groupBox.$container.cssWidth(normalWidth);
       groupBox.invalidateLayout();
       groupBox.validateLayout();
-      scout.responsiveManager.reset(groupBox);
+      ResponsiveManager.get().reset(groupBox);
       expectNormal(groupBox);
 
     });
@@ -196,10 +200,10 @@ describe("GroupBoxResponsiveHandler", function() {
 
       var dynamicField = scout.create('StringField', {
         parent: session.desktop,
-        labelPosition: scout.FormField.LabelPosition.DEFAULT
+        labelPosition: FormField.LabelPosition.DEFAULT
       });
       groupBox.insertField(dynamicField);
-      expect(dynamicField.labelPosition).toBe(scout.FormField.LabelPosition.TOP);
+      expect(dynamicField.labelPosition).toBe(FormField.LabelPosition.TOP);
 
       // back to normal
       groupBox.$container.cssWidth(normalWidth);
@@ -207,7 +211,7 @@ describe("GroupBoxResponsiveHandler", function() {
       groupBox.validateLayout();
       expectNormal(groupBox);
 
-      expect(dynamicField.labelPosition).toBe(scout.FormField.LabelPosition.DEFAULT);
+      expect(dynamicField.labelPosition).toBe(FormField.LabelPosition.DEFAULT);
     });
   });
 

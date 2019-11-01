@@ -1,4 +1,17 @@
 /*
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
+import {QueryBy, scout, Status, TreeBox} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
+
+/*
  * Copyright (c) 2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -14,8 +27,8 @@ describe("TreeBox", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.TreeBox();
-    helper = new scout.FormSpecHelper(session);
+    field = new TreeBox();
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -39,7 +52,7 @@ describe("TreeBox", function() {
 
   function createTreeBoxWithAdapter() {
     var model = helper.createFieldModel('TreeBox');
-    var treeBox = new scout.TreeBox();
+    var treeBox = new TreeBox();
     treeBox.init(model);
     linkWidgetAndAdapter(treeBox, 'TreeBoxAdapter');
     return treeBox;
@@ -54,7 +67,7 @@ describe("TreeBox", function() {
 
     it('init LookupCall when configured as string', function() {
       field = createFieldWithLookupCall();
-      expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
+      expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
     });
 
     it('LookupCall can be prepared if value is set explicitly', function(done) {
@@ -69,8 +82,8 @@ describe("TreeBox", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
@@ -89,9 +102,9 @@ describe("TreeBox", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-          expect(box.getCheckedLookupRows().length).toBe(1);
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(box.getCheckedLookupRows().length).toBe(1);
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
@@ -178,7 +191,7 @@ describe("TreeBox", function() {
 
       field.tree.checkNodes(field.tree.visibleNodesFlat[2]);
       expect(field.value).toEqual([]);
-      field.tree.checkNodes(field.tree.visibleNodesFlat[2], { checkOnlyEnabled: false });
+      field.tree.checkNodes(field.tree.visibleNodesFlat[2], {checkOnlyEnabled: false});
       expect(field.value).toEqual([3]);
 
       field.setValue([1]);
@@ -259,20 +272,20 @@ describe("TreeBox", function() {
     it('should set error status when result has an exception', function() {
       var field = createFieldWithLookupCall();
       field._lookupByAllDone({
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
-      expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
+      expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      var lookupStatus = scout.Status.warning({
+      var lookupStatus = Status.warning({
         message: 'bar'
       });
-      var errorStatus = scout.Status.error({
+      var errorStatus = Status.error({
         message: 'foo'
       });
       field.setLookupStatus(lookupStatus);

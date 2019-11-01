@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-/* global CalendarSpecHelper */
+import {Calendar, dates} from '../../src/index';
+import {CalendarSpecHelper} from '@eclipse-scout/testing';
+
 describe("Calendar", function() {
   var session, helper;
 
@@ -58,8 +60,8 @@ describe("Calendar", function() {
 
   describe("component", function() {
     var cal, c1, c2, c3, c4, c5, c6, c7, c8;
-    var day = scout.dates.parseJsonDate('2016-07-20 00:00:00.000');
-    var day2 = scout.dates.parseJsonDate('2016-07-21 00:00:00.000');
+    var day = dates.parseJsonDate('2016-07-20 00:00:00.000');
+    var day2 = dates.parseJsonDate('2016-07-21 00:00:00.000');
     var option1 = {
       fromDate: "2016-07-20 12:00:00.000",
       toDate: "2016-07-20 12:30:00.000"
@@ -93,14 +95,14 @@ describe("Calendar", function() {
 
     beforeEach(function() {
       cal = helper.createCalendar(helper.createSimpleModel());
-      c1 = helper.createCompoment(option1, cal);
-      c2 = helper.createCompoment(option2, cal);
-      c3 = helper.createCompoment(option3, cal);
-      c4 = helper.createCompoment(option4, cal);
-      c5 = helper.createCompoment(option5, cal);
-      c6 = helper.createCompoment(optionSmall1, cal);
-      c7 = helper.createCompoment(optionSmall1, cal);
-      c8 = helper.createCompoment(option8, cal);
+      c1 = helper.createComponent(option1, cal);
+      c2 = helper.createComponent(option2, cal);
+      c3 = helper.createComponent(option3, cal);
+      c4 = helper.createComponent(option4, cal);
+      c5 = helper.createComponent(option5, cal);
+      c6 = helper.createComponent(optionSmall1, cal);
+      c7 = helper.createComponent(optionSmall1, cal);
+      c8 = helper.createComponent(option8, cal);
     });
 
     describe("part day position", function() {
@@ -233,7 +235,7 @@ describe("Calendar", function() {
       // init model
       var model = helper.createSimpleModel();
       model.selectedDate = "2016-01-01 12:00:00.000";
-      model.displayMode = scout.Calendar.DisplayMode.MONTH;
+      model.displayMode = Calendar.DisplayMode.MONTH;
 
       // init and render calendar
       var cal = helper.createCalendar(model);
@@ -267,7 +269,7 @@ describe("Calendar", function() {
       // init model
       var model = helper.createSimpleModel();
       model.selectedDate = "2016-01-31 12:00:00.000";
-      model.displayMode = scout.Calendar.DisplayMode.MONTH;
+      model.displayMode = Calendar.DisplayMode.MONTH;
 
       // init and render calendar
       var cal = helper.createCalendar(model);
@@ -292,7 +294,7 @@ describe("Calendar", function() {
 
       // expect selectedDate is the same as 2016-01-29,
       // because the day was shifted to 29 while navigating over Feb. 2016
-      expect(cal.selectedDate).toEqual(scout.dates.parseJsonDate("2016-01-29 12:00:00.000"));
+      expect(cal.selectedDate).toEqual(dates.parseJsonDate("2016-01-29 12:00:00.000"));
     });
 
   });

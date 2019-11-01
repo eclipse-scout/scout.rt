@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,89 +8,95 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Extension, scout, StringField} from '../src/index';
+import {LocaleSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('Extension', function() {
   var session;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    session.locale = new scout.LocaleSpecHelper().createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    session.locale = new LocaleSpecHelper().createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   describe('extend functions of StringField', function() {
 
     // create a dummy class and extensions to that class
-    scout.MyStringField = function() {
-      scout.MyStringField.parent.call(this);
-    };
-    scout.inherits(scout.MyStringField, scout.StringField);
+    class MyStringField extends StringField {
+    }
+
+    window.scout.MyStringField = MyStringField;
 
     // ---- extension #1 ----
-    scout.MyExtension1 = function() {
-    };
-    scout.inherits(scout.MyExtension1, scout.Extension);
+    class MyExtension1 extends Extension {
+      init() {
+        var proto = MyStringField.prototype;
+        this.extend(proto, '_init');
+        this.extend(proto, '_renderProperties');
+        this.extend(proto, '_renderInputMasked');
+      };
 
-    scout.MyExtension1.prototype.init = function() {
-      var proto = scout.MyStringField.prototype;
-      this.extend(proto, '_init');
-      this.extend(proto, '_renderProperties');
-      this.extend(proto, '_renderInputMasked');
-    };
+      _init(model) {
+        this.next(model);
+        this.extended.setProperty('foo', 'bar');
+      };
 
-    scout.MyExtension1.prototype._init = function(model) {
-      this.next(model);
-      this.extended.setProperty('foo', 'bar');
-    };
+      _renderProperties() {
+        this.next();
+        this._renderFoo();
+      };
 
-    scout.MyExtension1.prototype._renderProperties = function() {
-      this.next();
-      this._renderFoo();
-    };
+      _renderFoo() {
+        this.extended.$container.appendDiv('foo').text(this.extended.foo);
+      };
 
-    scout.MyExtension1.prototype._renderFoo = function() {
-      this.extended.$container.appendDiv('foo').text(this.extended.foo);
-    };
+      _renderInputMasked = function() {
+        this.extended.$field.attr('type', 'ext-password');
+      };
+    }
 
-    scout.MyExtension1.prototype._renderInputMasked = function() {
-      this.extended.$field.attr('type', 'ext-password');
-    };
+    window.scout.MyExtension1 = MyExtension1;
+
 
     // ---- extension #2 ----
-    scout.MyExtension2 = function() {
-    };
-    scout.inherits(scout.MyExtension2, scout.Extension);
+    class MyExtension2 extends Extension {
+      init() {
+        var proto = MyStringField.prototype;
+        this.extend(proto, '_init');
+        this.extend(proto, '_renderProperties');
+      };
 
-    scout.MyExtension2.prototype.init = function() {
-      var proto = scout.MyStringField.prototype;
-      this.extend(proto, '_init');
-      this.extend(proto, '_renderProperties');
-    };
+      _init(model) {
+        this.next(model);
+        this.extended.setProperty('bar', 'foo');
+      };
 
-    scout.MyExtension2.prototype._init = function(model) {
-      this.next(model);
-      this.extended.setProperty('bar', 'foo');
-    };
+      _renderProperties() {
+        this.next();
+        this._renderBar();
+      };
 
-    scout.MyExtension2.prototype._renderProperties = function() {
-      this.next();
-      this._renderBar();
-    };
+      _renderBar() {
+        this.extended.$container.appendDiv('bar').text(this.extended.bar);
+      };
+    }
 
-    scout.MyExtension2.prototype._renderBar = function() {
-      this.extended.$container.appendDiv('bar').text(this.extended.bar);
-    };
+    window.scout.MyExtension2 = MyExtension2;
+
 
     // ---- Spec starts here ----
 
     var myStringField;
-    scout.Extension.install([
+    Extension.install([
       'scout.MyExtension1',
       'scout.MyExtension2'
     ]);
 
     beforeEach(function() {
       var model = createSimpleModel('StringField', session);
-      myStringField = scout.create('MyStringField', model);
+      myStringField = scout.create('scout.MyStringField', model);
     });
 
     it('should extend _init method', function() {

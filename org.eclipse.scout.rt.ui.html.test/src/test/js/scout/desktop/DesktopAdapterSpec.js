@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
+import {RemoteEvent, Widget} from '../../src/index';
+
+
 describe('DesktopAdapter', function() {
   var session, desktop, outlineHelper, formHelper, desktopAdapter;
 
@@ -21,8 +25,8 @@ describe('DesktopAdapter', function() {
       },
       renderDesktop: false
     });
-    outlineHelper = new scout.OutlineSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    outlineHelper = new OutlineSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     desktop = session.desktop;
     linkWidgetAndAdapter(desktop, 'DesktopAdapter');
     desktopAdapter = desktop.modelAdapter;
@@ -44,7 +48,7 @@ describe('DesktopAdapter', function() {
 
   describe('activateForm', function() {
     var ntfc,
-      parent = new scout.Widget();
+      parent = new Widget();
 
     it('sends formActivateEvent', function() {
       var formModel = createAndRegisterFormModel();
@@ -58,7 +62,7 @@ describe('DesktopAdapter', function() {
       expect(desktop.activeForm).toBe(form);
 
       sendQueuedAjaxCalls();
-      var event = new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+      var event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -67,7 +71,7 @@ describe('DesktopAdapter', function() {
       expect(desktop.activeForm).toBe(form2);
 
       sendQueuedAjaxCalls();
-      event = new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+      event = new RemoteEvent(desktopAdapter.id, 'formActivate', {
         formId: form2.modelAdapter.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -112,13 +116,13 @@ describe('DesktopAdapter', function() {
           {
             target: desktopAdapter.id,
             type: 'formHide',
-            displayParent:  desktopAdapter.id,
+            displayParent: desktopAdapter.id,
             form: formModel.id
           },
           {
             target: desktopAdapter.id,
             type: 'formShow',
-            displayParent:  desktopAdapter.id,
+            displayParent: desktopAdapter.id,
             form: '400'
           }
         ]
@@ -127,10 +131,10 @@ describe('DesktopAdapter', function() {
       sendQueuedAjaxCalls();
 
       var expectedEvents = [
-        new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+        new RemoteEvent(desktopAdapter.id, 'formActivate', {
           formId: null
         }),
-        new scout.RemoteEvent(desktopAdapter.id, 'formActivate', {
+        new RemoteEvent(desktopAdapter.id, 'formActivate', {
           formId: '400'
         })
       ];
@@ -146,7 +150,7 @@ describe('DesktopAdapter', function() {
           {
             target: desktopAdapter.id,
             type: 'formHide',
-            displayParent:  desktopAdapter.id,
+            displayParent: desktopAdapter.id,
             form: '400'
           }
         ]
@@ -159,13 +163,13 @@ describe('DesktopAdapter', function() {
 
   describe('onFormShow', function() {
     var ntfc,
-      parent = new scout.Widget();
+      parent = new Widget();
 
     it('activates form but does not send an activate form event', function() {
       session._renderDesktop();
       var formModel = createAndRegisterFormModel();
 
-      var formShowEvent = new scout.RemoteEvent(desktopAdapter.id, 'formShow', {
+      var formShowEvent = new RemoteEvent(desktopAdapter.id, 'formShow', {
         form: formModel.id,
         displayParent: desktopAdapter.id
       });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Menu, NullWidget, ObjectFactory, objects, scout, Status, Tooltip} from '../src/index';
+
+
 describe('main', function() {
   var session;
 
@@ -67,10 +70,10 @@ describe('main', function() {
 
     it('throws Error when value has wrong type', function() {
       var foo = {};
-      var func = scout.assertParameter.bind(scout, 'foo', foo, scout.Status);
+      var func = scout.assertParameter.bind(scout, 'foo', foo, Status);
       expect(func).toThrowError();
-      foo = new scout.Status();
-      func = scout.assertParameter.bind(scout, 'foo', foo, scout.Status);
+      foo = new Status();
+      func = scout.assertParameter.bind(scout, 'foo', foo, Status);
       expect(func).not.toThrowError();
     });
 
@@ -108,31 +111,32 @@ describe('main', function() {
         scout.create(true);
       }).toThrow();
       expect(function() {
-        scout.create(function() {});
+        scout.create(function() {
+        });
       }).toThrow();
 
       var menu = scout.create('Menu', {
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session
       });
-      expect(menu instanceof scout.Menu).toBe(true);
+      expect(menu instanceof Menu).toBe(true);
 
       menu = scout.create({
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session,
         objectType: 'Menu'
       });
-      expect(menu instanceof scout.Menu).toBe(true);
+      expect(menu instanceof Menu).toBe(true);
     });
 
     it('creates a new initialized widget with parent and session set', function() {
-      var parent = new scout.NullWidget();
+      var parent = new NullWidget();
       var widget = scout.create('Tooltip', {
         parent: parent,
         session: session
       });
       expect(widget).toBeTruthy();
-      expect(widget instanceof scout.Tooltip).toBe(true);
+      expect(widget instanceof Tooltip).toBe(true);
       expect(widget.parent).toBe(parent);
       expect(widget.session).toBe(session);
     });
@@ -140,36 +144,36 @@ describe('main', function() {
     describe('creates local object if first parameter is the objectType', function() {
 
       it('sets property \'id\' correctly when no ID is provided', function() {
-        var expectedSeqNo = scout.objectFactory.uniqueIdSeqNo + 1,
+        var expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
           menu = scout.create('Menu', {
-            parent: new scout.NullWidget(),
+            parent: new NullWidget(),
             session: session
           });
         expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-        expect(scout.objectFactory.uniqueIdSeqNo).toBe(expectedSeqNo);
+        expect(ObjectFactory.get().uniqueIdSeqNo).toBe(expectedSeqNo);
       });
 
       it('session must be set, but adapter should not be registered', function() {
-        var oldNumProperties = scout.objects.countOwnProperties(session.modelAdapterRegistry),
+        var oldNumProperties = objects.countOwnProperties(session.modelAdapterRegistry),
           menu = scout.create('Menu', {
-            parent: new scout.NullWidget(),
+            parent: new NullWidget(),
             session: session
           });
         expect(menu.session === session).toBe(true);
-        expect(scout.objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
+        expect(objects.countOwnProperties(session.modelAdapterRegistry)).toBe(oldNumProperties);
       });
 
     });
 
     it('creates local object if first parameter of type object and contains objectType property', function() {
-      var expectedSeqNo = scout.objectFactory.uniqueIdSeqNo + 1,
+      var expectedSeqNo = ObjectFactory.get().uniqueIdSeqNo + 1,
         menu = scout.create({
-          parent: new scout.NullWidget(),
+          parent: new NullWidget(),
           session: session,
           objectType: 'Menu'
         });
       expect(menu.id).toBe('ui' + expectedSeqNo.toString());
-      expect(scout.objectFactory.uniqueIdSeqNo).toBe(expectedSeqNo);
+      expect(ObjectFactory.get().uniqueIdSeqNo).toBe(expectedSeqNo);
     });
 
   });

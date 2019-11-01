@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper} from '@eclipse-scout/testing';
+import {scout, Status} from '../../src/index';
+
+
 describe('FormLifecycle', function() {
 
   var session, helper, form, field;
@@ -23,7 +27,7 @@ describe('FormLifecycle', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
 
     form = helper.createFormWithOneField();
     form.lifecycle = scout.create('FormLifecycle', {widget: form});
@@ -77,7 +81,7 @@ describe('FormLifecycle', function() {
       field.setValue('Foo');
       form.lifecycle.handle('save', function() {
         saved = true;
-        return $.resolvedPromise(scout.Status.ok());
+        return $.resolvedPromise(Status.ok());
       });
       form.lifecycle.ok();
       jasmine.clock().tick(1000);
@@ -91,7 +95,7 @@ describe('FormLifecycle', function() {
         widget: form
       });
       form2.lifecycle._validate = function() {
-        return $.resolvedPromise(scout.Status.error({
+        return $.resolvedPromise(Status.error({
           message: 'This is a fatal error'
         }));
       }.bind(form2.lifecycle);
@@ -114,7 +118,7 @@ describe('FormLifecycle', function() {
         widget: form
       });
       form2.lifecycle._validate = function() {
-        return $.resolvedPromise(scout.Status.warning({
+        return $.resolvedPromise(Status.warning({
           message: 'This is only a warning'
         }));
       }.bind(form2.lifecycle);
@@ -140,7 +144,7 @@ describe('FormLifecycle', function() {
       var validateCalled = false;
       Object.getPrototypeOf(form2)._validate = function() {
         validateCalled = true;
-        return scout.Status.ok();
+        return Status.ok();
       };
       form2.ok();
       expect(validateCalled).toBe(true);

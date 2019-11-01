@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {BackgroundJobPollingStatus, Device, RemoteEvent, TextMap, UserAgent} from '../../src/index';
+
+
 /*global receiveResponseForAjaxCall */
 describe('Session', function() {
 
@@ -27,12 +30,13 @@ describe('Session', function() {
       'userAgent': userAgent
     });
     // test request only, don't test response (would require valid session, desktop etc.)
-    session._processStartupResponse = function() {};
+    session._processStartupResponse = function() {
+    };
     return session;
   }
 
   function send(session, target, type, data, delay) {
-    session.sendEvent(new scout.RemoteEvent(target, type, data), delay);
+    session.sendEvent(new RemoteEvent(target, type, data), delay);
   }
 
   describe('send', function() {
@@ -149,26 +153,26 @@ describe('Session', function() {
         return this.target === previous.target && this.type === previous.type && this.column === previous.column;
       };
 
-      var event0 = new scout.RemoteEvent(1, 'columnResized', {
+      var event0 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event0.coalesce = coalesce;
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new scout.RemoteEvent(1, 'rowSelected');
+      var event1 = new RemoteEvent(1, 'rowSelected');
       event1.coalesce = coalesce;
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new scout.RemoteEvent(1, 'columnResized', {
+      var event2 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event2.coalesce = coalesce;
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new scout.RemoteEvent(1, 'columnResized', {
+      var event3 = new RemoteEvent(1, 'columnResized', {
         column: 'z'
       });
       event3.coalesce = coalesce;
@@ -176,14 +180,14 @@ describe('Session', function() {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // event for another target
-      var event4 = new scout.RemoteEvent(2, 'columnResized', {
+      var event4 = new RemoteEvent(2, 'columnResized', {
         column: 'a'
       });
       event4.coalesce = coalesce;
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event5 = new scout.RemoteEvent(1, 'columnResized', {
+      var event5 = new RemoteEvent(1, 'columnResized', {
         column: 'a'
       });
       event5.coalesce = coalesce;
@@ -287,27 +291,27 @@ describe('Session', function() {
     it('splits events into separate requests if an event requires a new request', function() {
       var session = createSession();
 
-      var event0 = new scout.RemoteEvent(1, 'eventType0');
+      var event0 = new RemoteEvent(1, 'eventType0');
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new scout.RemoteEvent(1, 'eventType1', {
+      var event1 = new RemoteEvent(1, 'eventType1', {
         newRequest: true
       });
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new scout.RemoteEvent(1, 'eventType2');
+      var event2 = new RemoteEvent(1, 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event3 = new scout.RemoteEvent(1, 'eventType3', {
+      var event3 = new RemoteEvent(1, 'eventType3', {
         newRequest: true
       });
       session.sendEvent(event3);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event4 = new scout.RemoteEvent(1, 'eventType4');
+      var event4 = new RemoteEvent(1, 'eventType4');
       session.sendEvent(event4);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
@@ -340,17 +344,17 @@ describe('Session', function() {
     it('does not split events into separate requests if only first request requires a new request', function() {
       var session = createSession();
 
-      var event0 = new scout.RemoteEvent(1, 'eventType0', {
+      var event0 = new RemoteEvent(1, 'eventType0', {
         newRequest: true
       });
       session.sendEvent(event0);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event1 = new scout.RemoteEvent(1, 'eventType1');
+      var event1 = new RemoteEvent(1, 'eventType1');
       session.sendEvent(event1);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      var event2 = new scout.RemoteEvent(1, 'eventType2');
+      var event2 = new RemoteEvent(1, 'eventType2');
       session.sendEvent(event2);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
@@ -372,7 +376,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -381,7 +385,7 @@ describe('Session', function() {
       send(session, 1, 'nodeSelected');
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(2);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true); // <--
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -389,7 +393,7 @@ describe('Session', function() {
       // Send response for ?poll request (response must be queued)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0));
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(true);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(true); // <--
@@ -398,7 +402,7 @@ describe('Session', function() {
       // Send response for user request (must be executed, including the queued response)
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1));
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false); // <--
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false); // <--
@@ -416,7 +420,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -427,7 +431,7 @@ describe('Session', function() {
         responseText: '{"events": []}'
       });
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -447,7 +451,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -460,7 +464,7 @@ describe('Session', function() {
         });
       }).toThrow();
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(true); // still in queue
@@ -480,7 +484,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -491,7 +495,7 @@ describe('Session', function() {
         responseText: '{"error": true}'
       });
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -511,7 +515,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -522,7 +526,7 @@ describe('Session', function() {
         responseText: 'Not found'
       });
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.FAILURE); // <--
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -542,7 +546,7 @@ describe('Session', function() {
       session._resumeBackgroundJobPolling();
       jasmine.clock().tick(0);
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.RUNNING);
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.RUNNING);
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -553,7 +557,7 @@ describe('Session', function() {
         responseText: '{"sessionTerminated": true}'
       });
       jasmine.clock().tick(0);
-      expect(session.backgroundJobPollingSupport.status).toBe(scout.BackgroundJobPollingStatus.STOPPED); // <--
+      expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.STOPPED); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
       expect(session.areResponsesQueued()).toBe(false);
@@ -584,8 +588,8 @@ describe('Session', function() {
     });
 
     it('sends user agent on startup', function() {
-      var session = createSession(new scout.UserAgent({
-        deviceType: scout.Device.Type.MOBILE
+      var session = createSession(new UserAgent({
+        deviceType: Device.Type.MOBILE
       }));
       session.start();
 
@@ -605,14 +609,14 @@ describe('Session', function() {
 
   });
 
-  // Tests whether delegation to scout.TextMap works as expected
+  // Tests whether delegation to TextMap works as expected
   describe('texts', function() {
 
     var session;
 
     beforeEach(function() {
       session = createSession();
-      session.textMap = new scout.TextMap({
+      session.textMap = new TextMap({
         NoOptions: 'Keine Übereinstimmung',
         NumOptions: '{0} Optionen',
         Greeting: 'Hello {0}, my name is {2}, {1}.',

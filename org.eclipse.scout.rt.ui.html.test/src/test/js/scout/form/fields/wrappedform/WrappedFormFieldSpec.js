@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {focusUtils} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('WrappedForm', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('WrappedForm', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createField(modelProperties) {
@@ -43,7 +47,7 @@ describe('WrappedForm', function() {
       field.render();
 
       var $stringField = innerForm.rootGroupBox.fields[0].$field;
-      expect(scout.focusUtils.isActiveElement($stringField)).toBe(false);
+      expect(focusUtils.isActiveElement($stringField)).toBe(false);
     });
   });
 
@@ -56,7 +60,7 @@ describe('WrappedForm', function() {
       field.render();
 
       var $stringField = innerForm.rootGroupBox.fields[0].$field;
-      expect(scout.focusUtils.isActiveElement($stringField)).toBe(true);
+      expect(focusUtils.isActiveElement($stringField)).toBe(true);
     });
   });
 

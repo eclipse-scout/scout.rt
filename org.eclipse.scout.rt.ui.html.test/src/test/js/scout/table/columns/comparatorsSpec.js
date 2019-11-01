@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {comparators} from '../../../src/index';
+
+
 describe("scout.comparators", function() {
 
   it("tests 'compare' method of TEXT comparator", function() {
-    var comparator = scout.comparators.TEXT;
+    var comparator = comparators.TEXT;
 
     expect(comparator.compare(null, null)).toBe(0);
     expect(comparator.compare(null, 'a')).toBe(-1);
@@ -22,7 +25,7 @@ describe("scout.comparators", function() {
   });
 
   it("tests 'compareIgnoreCase' method of TEXT comparator", function() {
-    var comparator = scout.comparators.TEXT;
+    var comparator = comparators.TEXT;
 
     expect(comparator.compareIgnoreCase(null, null)).toBe(0);
     expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
@@ -48,7 +51,7 @@ describe("scout.comparators", function() {
   });
 
   it("tests 'compare' method of NUMERIC comparator", function() {
-    var comparator = scout.comparators.NUMERIC;
+    var comparator = comparators.NUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
     expect(comparator.compare(undefined, '1')).toBe(-1);
@@ -80,7 +83,7 @@ describe("scout.comparators", function() {
   });
 
   it("tests 'compare' method of ALPHANUMERIC comparator", function() {
-    var comparator = scout.comparators.ALPHANUMERIC;
+    var comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compare(undefined, undefined)).toBe(0);
     expect(comparator.compare(null, null)).toBe(0);
@@ -97,7 +100,7 @@ describe("scout.comparators", function() {
   });
 
   it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator", function() {
-    var comparator = scout.comparators.ALPHANUMERIC;
+    var comparator = comparators.ALPHANUMERIC;
 
     expect(comparator.compareIgnoreCase(undefined, undefined)).toBe(0);
     expect(comparator.compareIgnoreCase(null, null)).toBe(0);
@@ -131,7 +134,7 @@ describe("scout.comparators", function() {
   });
 
   it("tests 'compareIgnoreCase' method of ALPHANUMERIC comparator with session", function() {
-    var comparator = scout.comparators.ALPHANUMERIC;
+    var comparator = comparators.ALPHANUMERIC;
     comparator.install(createSession());
     expect(comparator.compareIgnoreCase('doc8', 'doc8')).toBe(0);
     expect(comparator.compareIgnoreCase('DoC8', 'dOc8')).toBe(0);
@@ -151,7 +154,8 @@ describe("scout.comparators", function() {
       'userAgent': userAgent
     });
     // test request only, don't test response (would require valid session, desktop etc.)
-    session._processStartupResponse = function() {};
+    session._processStartupResponse = function() {
+    };
     return session;
   }
 });

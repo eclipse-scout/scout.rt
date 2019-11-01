@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableKeyStrokes", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("TableKeyStrokes", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -36,11 +40,11 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[1]]);
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -50,7 +54,7 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[4]]);
     });
 
@@ -61,7 +65,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       table.selectAll();
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[3]]);
     });
 
@@ -71,13 +75,13 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -89,7 +93,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [rows[0], rows[1]]);
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[0], rows[1]]);
     });
 
@@ -103,7 +107,7 @@ describe("TableKeyStrokes", function() {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[1]]);
     });
 
@@ -117,7 +121,7 @@ describe("TableKeyStrokes", function() {
 
       table.selectionHandler.lastActionRow = rows[4];
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -131,7 +135,7 @@ describe("TableKeyStrokes", function() {
 
       table.selectionHandler.lastActionRow = rows[4];
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -153,7 +157,7 @@ describe("TableKeyStrokes", function() {
       });
       table.filter();
 
-      table.$data.triggerKeyDown(scout.keys.UP);
+      table.$data.triggerKeyDown(keys.UP);
       helper.assertSelection(table, [rows[0]]);
     });
 
@@ -166,11 +170,11 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -184,11 +188,11 @@ describe("TableKeyStrokes", function() {
 
         table.selectionHandler.lastActionRow = rows[4];
 
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[3]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[2]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2]]);
       });
 
@@ -202,11 +206,11 @@ describe("TableKeyStrokes", function() {
 
         table.selectionHandler.lastActionRow = rows[5];
 
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[4], rows[5]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
-        table.$data.triggerKeyDown(scout.keys.UP, 'shift');
+        table.$data.triggerKeyDown(keys.UP, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
@@ -223,11 +227,11 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [row2]);
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[3]]);
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[4]]);
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[4]]);
     });
 
@@ -237,7 +241,7 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -248,7 +252,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       table.selectAll();
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[1]]);
     });
 
@@ -258,13 +262,13 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -276,7 +280,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [rows[3], rows[4]]);
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [rows[3], rows[4]]);
     });
 
@@ -290,7 +294,7 @@ describe("TableKeyStrokes", function() {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -304,7 +308,7 @@ describe("TableKeyStrokes", function() {
 
       table.selectionHandler.lastActionRow = rows[2];
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -326,7 +330,7 @@ describe("TableKeyStrokes", function() {
       });
       table.filter();
 
-      table.$data.triggerKeyDown(scout.keys.DOWN);
+      table.$data.triggerKeyDown(keys.DOWN);
       helper.assertSelection(table, [rows[5]]);
     });
 
@@ -339,11 +343,11 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4]]);
       });
 
@@ -357,11 +361,11 @@ describe("TableKeyStrokes", function() {
 
         table.selectionHandler.lastActionRow = rows[2];
 
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[3], rows[4]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[4]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[4], rows[5]]);
       });
 
@@ -375,11 +379,11 @@ describe("TableKeyStrokes", function() {
 
         table.selectionHandler.lastActionRow = rows[2];
 
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[5]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5]]);
-        table.$data.triggerKeyDown(scout.keys.DOWN, 'shift');
+        table.$data.triggerKeyDown(keys.DOWN, 'shift');
         helper.assertSelection(table, [rows[2], rows[3], rows[4], rows[5], rows[6]]);
       });
 
@@ -396,7 +400,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [rows[1]]);
 
-      table.$data.triggerKeyDown(scout.keys.END);
+      table.$data.triggerKeyDown(keys.END);
       helper.assertSelection(table, [rows[3]]);
     });
 
@@ -409,7 +413,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[1]]);
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3]]);
       });
 
@@ -420,7 +424,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[3], rows[4], rows[5]]);
       });
 
@@ -432,7 +436,7 @@ describe("TableKeyStrokes", function() {
         helper.selectRowsAndAssert(table, [rows[1], rows[3], rows[4]]);
         table.selectionHandler.lastActionRow = rows[1];
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[1], rows[2], rows[3], rows[4], rows[5]]);
       });
 
@@ -454,7 +458,7 @@ describe("TableKeyStrokes", function() {
         });
         table.filter();
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[3], rows[4], rows[5]]);
       });
 
@@ -465,7 +469,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[5]]);
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[5]]);
       });
 
@@ -477,7 +481,7 @@ describe("TableKeyStrokes", function() {
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[0];
 
-        table.$data.triggerKeyDown(scout.keys.END, 'shift');
+        table.$data.triggerKeyDown(keys.END, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -494,7 +498,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [rows[2]]);
 
-      table.$data.triggerKeyDown(scout.keys.HOME);
+      table.$data.triggerKeyDown(keys.HOME);
       helper.assertSelection(table, [rows[0]]);
     });
 
@@ -507,7 +511,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2]]);
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -518,7 +522,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[2], rows[3], rows[5]]);
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[5]]);
       });
 
@@ -530,7 +534,7 @@ describe("TableKeyStrokes", function() {
         helper.selectRowsAndAssert(table, [rows[1], rows[2], rows[4]]);
         table.selectionHandler.lastActionRow = rows[4];
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2], rows[3], rows[4]]);
       });
 
@@ -552,7 +556,7 @@ describe("TableKeyStrokes", function() {
         });
         table.filter();
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[3]]);
       });
 
@@ -563,7 +567,7 @@ describe("TableKeyStrokes", function() {
         table.render();
         helper.selectRowsAndAssert(table, [rows[0]]);
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0]]);
       });
 
@@ -575,7 +579,7 @@ describe("TableKeyStrokes", function() {
         helper.selectRowsAndAssert(table, [rows[0], rows[2]]);
         table.selectionHandler.lastActionRow = rows[2];
 
-        table.$data.triggerKeyDown(scout.keys.HOME, 'shift');
+        table.$data.triggerKeyDown(keys.HOME, 'shift');
         helper.assertSelection(table, [rows[0], rows[1], rows[2]]);
       });
 
@@ -593,7 +597,7 @@ describe("TableKeyStrokes", function() {
       table.checkRow(rows[2], true);
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.SPACE);
+      table.$data.triggerKeyDown(keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(true);
@@ -608,7 +612,7 @@ describe("TableKeyStrokes", function() {
       table.render();
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      table.$data.triggerKeyDown(scout.keys.SPACE);
+      table.$data.triggerKeyDown(keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
@@ -624,14 +628,14 @@ describe("TableKeyStrokes", function() {
       table.checkRow(rows[2], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      table.$data.triggerKeyDownCapture(scout.keys.SPACE);
+      table.$data.triggerKeyDownCapture(keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(true);
       expect(rows[2].checked).toBe(true);
       expect(rows[3].checked).toBe(false);
 
-      table.$data.triggerKeyUpCapture(scout.keys.SPACE);
-      table.$data.triggerKeyDownCapture(scout.keys.SPACE);
+      table.$data.triggerKeyUpCapture(keys.SPACE);
+      table.$data.triggerKeyDownCapture(keys.SPACE);
       expect(rows[0].checked).toBe(false);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
@@ -650,7 +654,7 @@ describe("TableKeyStrokes", function() {
       table.checkRow(rows[3], true);
       helper.selectRowsAndAssert(table, [rows[1], rows[2]]);
 
-      table.$data.triggerKeyDown(scout.keys.SPACE);
+      table.$data.triggerKeyDown(keys.SPACE);
       expect(rows[0].checked).toBe(true);
       expect(rows[1].checked).toBe(false);
       expect(rows[2].checked).toBe(false);
@@ -667,13 +671,13 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.PAGE_UP);
+      table.$data.triggerKeyDown(keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      table.$data.triggerKeyDown(scout.keys.PAGE_UP);
+      table.$data.triggerKeyDown(keys.PAGE_UP);
       helper.assertSelection(table, [table.rows[0]]);
     });
 
@@ -687,13 +691,13 @@ describe("TableKeyStrokes", function() {
 
       table.render();
 
-      table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
+      table.$data.triggerKeyDown(keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);
 
       table.deselectAll();
       table.selectionHandler.lastActionRow = table.rows[0];
 
-      table.$data.triggerKeyDown(scout.keys.PAGE_DOWN);
+      table.$data.triggerKeyDown(keys.PAGE_DOWN);
       helper.assertSelection(table, [table.rows[0]]);
     });
 

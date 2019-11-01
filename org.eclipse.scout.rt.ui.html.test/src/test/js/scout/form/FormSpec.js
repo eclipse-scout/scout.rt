@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper, OutlineSpecHelper} from '@eclipse-scout/testing';
+import {Form, NullWidget, Rectangle, scout, Status, webstorage} from '../../src/index';
+
+
 describe('Form', function() {
   var session, helper, outlineHelper;
 
@@ -27,8 +31,8 @@ describe('Form', function() {
         benchVisible: true
       }
     });
-    helper = new scout.FormSpecHelper(session);
-    outlineHelper = new scout.OutlineSpecHelper(session);
+    helper = new FormSpecHelper(session);
+    outlineHelper = new OutlineSpecHelper(session);
     uninstallUnloadHandlers(session);
   });
 
@@ -202,7 +206,7 @@ describe('Form', function() {
       var field = form.rootGroupBox.fields[0];
 
       form._save = function(data) {
-        return $.resolvedPromise(scout.Status.error());
+        return $.resolvedPromise(Status.error());
       };
 
       field.setValue('whatever');
@@ -269,7 +273,7 @@ describe('Form', function() {
         rootGroupBox: {
           objectType: 'GroupBox',
           menus: [{
-            objectType: 'CloseMenu',
+            objectType: 'CloseMenu'
           }]
         }
       });
@@ -292,7 +296,7 @@ describe('Form', function() {
         rootGroupBox: {
           objectType: 'GroupBox',
           menus: [{
-            objectType: 'CloseMenu',
+            objectType: 'CloseMenu'
           }]
         }
       });
@@ -357,7 +361,7 @@ describe('Form', function() {
       form.cacheBoundsKey = 'FOO';
       form.render();
 
-      scout.webstorage.removeItem(localStorage, 'scout:formBounds:FOO');
+      webstorage.removeItem(localStorage, 'scout:formBounds:FOO');
     });
 
     it('read and store bounds', function() {
@@ -365,7 +369,7 @@ describe('Form', function() {
       expect(form.readCacheBounds()).toBe(null);
 
       // should return the stored Rectangle
-      var storeBounds = new scout.Rectangle(0, 1, 2, 3);
+      var storeBounds = new Rectangle(0, 1, 2, 3);
       form.storeCacheBounds(storeBounds);
       var readBounds = form.readCacheBounds();
       expect(readBounds).toEqual(storeBounds);
@@ -373,7 +377,7 @@ describe('Form', function() {
 
     it('update bounds - if cacheBounds is true', function() {
       form.updateCacheBounds();
-      expect(form.readCacheBounds() instanceof scout.Rectangle).toBe(true);
+      expect(form.readCacheBounds() instanceof Rectangle).toBe(true);
     });
 
     it('update bounds - if cacheBounds is false', function() {
@@ -445,7 +449,7 @@ describe('Form', function() {
 
     it('same as parent if display parent is set', function(done) {
       // Parent would be something different, removing the parent would remove the form which is not expected, because only removing the display parent has to remove the form
-      var initialParent = new scout.NullWidget();
+      var initialParent = new NullWidget();
       var form = helper.createFormWithOneField({
         parent: initialParent,
         session: session
@@ -466,7 +470,7 @@ describe('Form', function() {
       // Parent must not be outline if display parent is outline, otherwise making the outline invisible would remove the form, which is not expected. See also DesktopSpec
       var outline = outlineHelper.createOutlineWithOneDetailForm();
       desktop.setOutline(outline);
-      var initialParent = new scout.NullWidget();
+      var initialParent = new NullWidget();
       var form = helper.createFormWithOneField({
         parent: initialParent,
         session: session,
@@ -507,7 +511,7 @@ describe('Form', function() {
       desktop.setOutline(outline);
       outline.selectNodes(outline.nodes[0]);
       var form = helper.createFormWithOneField({
-        displayHint: scout.Form.DisplayHint.DIALOG,
+        displayHint: Form.DisplayHint.DIALOG,
         modal: true,
         displayParent: outline
       });
@@ -605,7 +609,7 @@ describe('Form', function() {
 
     beforeEach(function() {
       desktop = session.desktop;
-      outlineHelper = new scout.OutlineSpecHelper(session);
+      outlineHelper = new OutlineSpecHelper(session);
     });
 
     /**

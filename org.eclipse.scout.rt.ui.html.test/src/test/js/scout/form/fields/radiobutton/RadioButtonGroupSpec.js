@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RadioButtonGroup, scout} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("RadioButtonGroup", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("RadioButtonGroup", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -40,7 +44,7 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.gridColumnCount).toBe(numButtons);
       expect(radioButtonGroup._setGridColumnCount(numButtons)).toBe(false);
 
-      expect(radioButtonGroup._setGridColumnCount(scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
+      expect(radioButtonGroup._setGridColumnCount(RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
       expect(radioButtonGroup.gridColumnCount).toBe(numButtons);
 
       radioButtonGroup.gridDataHints.h = 2;
@@ -48,10 +52,10 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.gridColumnCount).toBe(0);
 
       radioButtonGroup.gridDataHints.h = numButtons;
-      expect(radioButtonGroup._setGridColumnCount(-2 /* also triggers 'set to default' */ )).toBe(true);
+      expect(radioButtonGroup._setGridColumnCount(-2 /* also triggers 'set to default' */)).toBe(true);
       expect(radioButtonGroup.gridColumnCount).toBe(1);
 
-      expect(radioButtonGroup._setGridColumnCount(scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
+      expect(radioButtonGroup._setGridColumnCount(RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT)).toBe(false);
       expect(radioButtonGroup.gridColumnCount).toBe(1);
 
       expect(radioButtonGroup._setGridColumnCount(4)).toBe(true);
@@ -132,7 +136,7 @@ describe("RadioButtonGroup", function() {
     });
   });
 
-  describe('lookupCall', function(){
+  describe('lookupCall', function() {
 
     it('can be prepared with initial value', function(done) {
       var group = scout.create('RadioButtonGroup', {
@@ -147,9 +151,9 @@ describe("RadioButtonGroup", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-          expect(group.radioButtons.length).toBe(3);
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(group.radioButtons.length).toBe(3);
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
@@ -167,15 +171,15 @@ describe("RadioButtonGroup", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-          expect(group.radioButtons.length).toBe(3);
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(group.radioButtons.length).toBe(3);
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
     });
 
-    it('creates a radio button for each lookup row', function(){
+    it('creates a radio button for each lookup row', function() {
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
@@ -187,7 +191,7 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.errorStatus).toBe(null);
     });
 
-    it('selects correct radio button', function(){
+    it('selects correct radio button', function() {
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall',
@@ -214,7 +218,7 @@ describe("RadioButtonGroup", function() {
       expect(radioButtonGroup.value).toBe(2);
     });
 
-    it('lookupRow lives on the radioButton', function(){
+    it('lookupRow lives on the radioButton', function() {
       var radioButtonGroup = scout.create('RadioButtonGroup', {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'

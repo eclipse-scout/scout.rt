@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,49 +8,47 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HtmlComponent, NullWidget, scout, TreeVisitResult, Widget} from '../../src/index';
+
 describe('Widget', function() {
 
   var session, parent;
 
-  var TestWidget = function() {
-    TestWidget.parent.call(this);
-  };
-  scout.inherits(TestWidget, scout.NullWidget);
-  TestWidget.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.$container.setTabbable(true);
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.getParent = function() {
-      return null; // Detach from parent because our parent does not layout children
-    };
-  };
+  class TestWidget extends NullWidget {
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.$container.setTabbable(true);
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      this.htmlComp.getParent = function() {
+        return null; // Detach from parent because our parent does not layout children
+      };
+    }
+  }
 
-  var ScrollableWidget = function() {
-    ScrollableWidget.parent.call(this);
-  };
-  scout.inherits(ScrollableWidget, scout.NullWidget);
-  ScrollableWidget.prototype._render = function() {
-    this.$container = this.$parent.appendDiv();
-    this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-    this.htmlComp.getParent = function() {
-      return null; // Detach from parent because our parent does not layout children
-    };
-    this.$container.css({
-      position: 'absolute',
-      minHeight: 50,
-      minWidth: 50
-    });
-    this.$elem = this.$container.appendDiv();
-    this.$elem.css({
-      display: 'inline-block',
-      position: 'absolute',
-      minHeight: 100,
-      minWidth: 100
-    });
-    this._installScrollbars({
-      axis: 'both'
-    });
-  };
+  class ScrollableWidget extends NullWidget {
+    _render() {
+      this.$container = this.$parent.appendDiv();
+      this.htmlComp = HtmlComponent.install(this.$container, this.session);
+      this.htmlComp.getParent = function() {
+        return null; // Detach from parent because our parent does not layout children
+      };
+      this.$container.css({
+        position: 'absolute',
+        minHeight: 50,
+        minWidth: 50
+      });
+      this.$elem = this.$container.appendDiv();
+      this.$elem.css({
+        display: 'inline-block',
+        position: 'absolute',
+        minHeight: 100,
+        minWidth: 100
+      });
+      this._installScrollbars({
+        axis: 'both'
+      });
+    }
+  }
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -115,7 +113,7 @@ describe('Widget', function() {
     }
 
     it('visits all descendants', function() {
-      createWidget({
+      var widget = createWidget({
         session: session,
         parent: parent
       });
@@ -163,14 +161,14 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
     });
 
-    it('can be aborted when returning scout.TreeVisitResult.TERMINATE', function() {
+    it('can be aborted when returning TreeVisitResult.TERMINATE', function() {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
       parent.visitChildren(function(child) {
         child.wasVisited = true;
         if (child === grandChild1) {
-          return scout.TreeVisitResult.TERMINATE;
+          return TreeVisitResult.TERMINATE;
         }
       });
       expect(child1.wasVisited).toBe(true);
@@ -194,7 +192,7 @@ describe('Widget', function() {
       parent.visitChildren(function(child) {
         child.wasVisited = true;
         if (child === child2) {
-          return scout.TreeVisitResult.TERMINATE;
+          return TreeVisitResult.TERMINATE;
         }
       });
       expect(child1.wasVisited).toBe(true);
@@ -204,14 +202,14 @@ describe('Widget', function() {
       expect(grandChild2_1.wasVisited).toBe(false);
     });
 
-    it('can skip a subtree when returning scout.TreeVisitResult.SKIP_SUBTREE', function() {
+    it('can skip a subtree when returning TreeVisitResult.SKIP_SUBTREE', function() {
       createVisitStructure();
 
       // Abort at grandChild1 -> don't visit siblings of grandChild1 and siblings of parent
       parent.visitChildren(function(child) {
         child.wasVisited = true;
         if (child === child1) {
-          return scout.TreeVisitResult.SKIP_SUBTREE;
+          return TreeVisitResult.SKIP_SUBTREE;
         }
       });
       expect(child1.wasVisited).toBe(true);
@@ -235,7 +233,7 @@ describe('Widget', function() {
       parent.visitChildren(function(child) {
         child.wasVisited = true;
         if (child === child2) {
-          return scout.TreeVisitResult.SKIP_SUBTREE;
+          return TreeVisitResult.SKIP_SUBTREE;
         }
       });
       expect(child1.wasVisited).toBe(true);
@@ -467,7 +465,7 @@ describe('Widget', function() {
       expect(widget.rootGroupBox.menus[0].enabledComputed).toBe(true);
     });
 
-    it('should correctly recalculate enabled state when adding a new widget', function() {
+    it('should correctly recalculate enabled state when adding a new field', function() {
       var widget = createWidget({
         session: session,
         parent: parent
@@ -494,33 +492,6 @@ describe('Widget', function() {
       expect(additionalWidget.enabled).toBe(true);
       expect(additionalWidget.enabledComputed).toBe(false);
     });
-
-    it('should correctly recalculate enabled state when setEnabled was called during _init', function() {
-      // ExtendedWidget disables itself in _init
-      // This is commonly done in a form (e.g. if permission is not sufficient to edit the data)
-      var ExtendedWidget = function() {
-        ExtendedWidget.parent.call(this);
-      };
-      scout.inherits(ExtendedWidget, TestWidget);
-      ExtendedWidget.prototype._init = function(model) {
-        ExtendedWidget.parent.prototype._init.call(this, model);
-        this.setEnabled(false);
-      };
-
-      var widget = new ExtendedWidget();
-      widget.init({
-        parent: parent
-      });
-
-      var child = createWidget({
-        parent: widget
-      });
-
-      expect(widget.enabled).toBe(false);
-      expect(widget.enabledComputed).toBe(false);
-      expect(child.enabled).toBe(true);
-      expect(child.enabledComputed).toBe(false);
-    });
   });
 
   describe('rendering', function() {
@@ -538,7 +509,7 @@ describe('Widget', function() {
     });
 
     it('should set rendering flag to true _while_ the component is rendering', function() {
-      var rendering = null;
+      var rendering;
       var widget = createWidget();
       widget._render = function() {
         rendering = this.rendering;
@@ -903,7 +874,7 @@ describe('Widget', function() {
   describe('setProperty', function() {
 
     it('triggers a property change event if the value changes', function() {
-      var propertyChangeEvent = null;
+      var propertyChangeEvent;
       var widget = createWidget();
       widget.on('propertyChange', function(event) {
         propertyChangeEvent = event;
@@ -922,14 +893,14 @@ describe('Widget', function() {
     });
 
     it('does not trigger a property change event if the value does not change', function() {
-      var propertyChangeEvent = null;
+      var propertyChangeEvent;
       var widget = createWidget();
       widget.on('propertyChange', function(event) {
         propertyChangeEvent = event;
       });
       widget.selected = true;
       widget.setProperty('selected', true);
-      expect(propertyChangeEvent).toBe(null);
+      expect(propertyChangeEvent).toBe(undefined);
     });
 
     describe('with widget property', function() {
@@ -984,6 +955,9 @@ describe('Widget', function() {
 
       it('does not fail if new widget is null', function() {
         var widget = createWidget({
+          parent: parent
+        });
+        var another = createWidget({
           parent: parent
         });
         var child = createWidget({
@@ -1413,10 +1387,14 @@ describe('Widget', function() {
   describe('prepareModel', function() {
     it('default case', function() {
       var model = {};
-      var widget = new scout.Widget();
-      widget._init = function(model0) {
-        expect(model0).toBe(model);
-      };
+
+      class TestClass extends Widget {
+        _init(model0) {
+          expect(model0).toBe(model);
+        }
+      }
+
+      var widget = new TestClass();
 
       spyOn(widget, '_prepareModel').and.callThrough();
       widget.init(model);
@@ -1424,13 +1402,14 @@ describe('Widget', function() {
     });
 
     it('changes the model before _init', function() {
-      var widget = new scout.Widget();
+      class TestClass extends Widget {
+        _prepareModel(model) {
+          model.message = 'B';
+          return model;
+        }
+      }
 
-      widget._prepareModel = function(model) {
-        model.message = 'B';
-        return model;
-      };
-
+      var widget = new TestClass();
       widget.init({
         parent: parent,
         session: session,
@@ -1445,19 +1424,25 @@ describe('Widget', function() {
 
     it("automatically resolves referenced widgets", function() {
       window.testns = {};
-      // ----- Define class "ComplexTestWidget" -----
-      window.testns.ComplexTestWidget = function() {
-        window.testns.ComplexTestWidget.parent.call(this);
-        this._addWidgetProperties(['items', 'selectedItem']);
-        this._addPreserveOnPropertyChangeProperties(['selectedItem']);
-      };
-      scout.inherits(window.testns.ComplexTestWidget, scout.Widget);
-      // ----- Define class "TestItem" -----
-      window.testns.TestItem = function() {
-        window.testns.TestItem.parent.call(this);
-        this._addWidgetProperties(['linkedItem']);
-      };
-      scout.inherits(window.testns.TestItem, scout.Widget);
+
+      class ComplexTestWidget extends Widget {
+        constructor() {
+          super();
+          this._addWidgetProperties(['items', 'selectedItem']);
+          this._addPreserveOnPropertyChangeProperties(['selectedItem']);
+        }
+      }
+
+      window.testns.ComplexTestWidget = ComplexTestWidget;
+
+      class TestItem extends Widget {
+        constructor() {
+          super();
+          this._addWidgetProperties(['linkedItem']);
+        }
+      }
+
+      window.testns.TestItem = TestItem;
 
       // Create an instance
       var model1 = {

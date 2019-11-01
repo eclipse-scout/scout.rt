@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys, scout} from '../../../../src/index';
+
+
 describe("RadioButton", function() {
   var session;
 
@@ -40,25 +43,25 @@ describe("RadioButton", function() {
       field.render();
       expect(field.selected).toBe(false);
 
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Another execution does not change the selection state
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Set another key stroke -> only the new one has to be active
       field.setKeyStroke('ctrl-g');
       field.setSelected(false);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.selected).toBe(false);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.G, 'ctrl');
       expect(field.selected).toBe(true);
 
       // Remove key stroke -> selected property should stay unchanged because key stroke must not be executed
       field.setKeyStroke(null);
       field.setSelected(false);
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.G, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.G, 'ctrl');
       expect(field.selected).toBe(false);
     });
 
@@ -70,7 +73,7 @@ describe("RadioButton", function() {
       field.render();
       expect(field.selected).toBe(false);
 
-      session.desktop.$container.triggerKeyInputCapture(scout.keys.B, 'ctrl');
+      session.desktop.$container.triggerKeyInputCapture(keys.B, 'ctrl');
       expect(field.selected).toBe(true);
       expect(field.isFocused()).toBe(false);
     });

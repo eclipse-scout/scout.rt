@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {NavigateUpButton} from '../../../../src/index';
+
+
 describe('NavigateUpButton', function() {
 
   var session, outline, menu, node = {};
@@ -17,12 +20,13 @@ describe('NavigateUpButton', function() {
     session = sandboxSession();
     outline = {
       session: session,
-      navigateToTop: function() {}
+      navigateToTop: function() {
+      }
     };
     var model = createSimpleModel('NavigateUpButton', session);
     model.outline = outline;
     model.node = node;
-    menu = new scout.NavigateUpButton();
+    menu = new NavigateUpButton();
     menu.init(model);
   });
 
@@ -87,9 +91,12 @@ describe('NavigateUpButton', function() {
   describe('_drill', function() {
 
     beforeEach(function() {
-      outline.selectNodes = function(node) {};
-      outline.collapseNode = function(node) {};
-      outline.collapseAll = function(node) {};
+      outline.selectNodes = function(node) {
+      };
+      outline.collapseNode = function(node) {
+      };
+      outline.collapseAll = function(node) {
+      };
     });
 
     it('drills up to parent node, sets the selection on the tree', function() {

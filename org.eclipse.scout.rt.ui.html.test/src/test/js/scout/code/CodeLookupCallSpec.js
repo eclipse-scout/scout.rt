@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {codes, scout} from '../../src/index';
+
+
 describe('CodeLookupCall', function() {
   var session, codeType123;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    scout.codes.registry = {};
+    codes.registry = {};
     codeType123 = scout.create('CodeType', {
       id: 'codeType.123',
       codes: [{
@@ -47,7 +50,7 @@ describe('CodeLookupCall', function() {
 
   describe('getByKey', function() {
     beforeEach(function() {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
     });
 
     it('returns a promise which will resolve with a lookup row for the code by key', function(done) {
@@ -74,7 +77,7 @@ describe('CodeLookupCall', function() {
 
   describe('getByText', function() {
     beforeEach(function() {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
     });
 
     it('returns the lookupRows which match the given text', function(done) {
@@ -111,7 +114,7 @@ describe('CodeLookupCall', function() {
 
   describe('getByRec', function() {
     beforeEach(function() {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
     });
 
     it('returns the lookupRows of the children of the given parent key', function(done) {
@@ -148,7 +151,7 @@ describe('CodeLookupCall', function() {
 
   describe('getByAll', function() {
     beforeEach(function() {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
     });
 
     it('returns lookupRows for every code', function(done) {
@@ -176,7 +179,7 @@ describe('CodeLookupCall', function() {
   describe('scout.codes.remove', function() {
 
     it('makes, that existing lookup calls don\'t return a result anymore', function(done) {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
       var lookupCall = createLookupCall(codeType123);
 
       lookupCall.cloneForKey('code.1').execute()
@@ -186,7 +189,7 @@ describe('CodeLookupCall', function() {
         })
         .catch(fail)
         .then(function() {
-          scout.codes.remove(codeType123);
+          codes.remove(codeType123);
           return lookupCall.cloneForKey('code.1').execute();
         })
         .then(function(result) {
@@ -201,7 +204,7 @@ describe('CodeLookupCall', function() {
   describe('scout.codes.add', function() {
 
     it('makes, that existing lookups consider the new code type', function(done) {
-      scout.codes.add(codeType123);
+      codes.add(codeType123);
       var lookupCall = createLookupCall(codeType123);
 
       lookupCall.cloneForKey('code.1').execute()
@@ -210,8 +213,8 @@ describe('CodeLookupCall', function() {
           expect(result.lookupRows[0].text).toBe('code 1');
         })
         .then(function() {
-          scout.codes.remove(codeType123);
-          scout.codes.add({
+          codes.remove(codeType123);
+          codes.add({
             id: 'codeType.123',
             objectType: 'CodeType',
             codes: [{

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,17 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {TableRow} from '../../../../src/index';
+import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableField", function() {
   var session;
   var helper;
-  /** @type {scout.TableSpecHelper} */
+  /** @type {TableSpecHelper} */
   var tableHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    tableHelper = new scout.TableSpecHelper(session);
-    helper = new scout.FormSpecHelper(session);
+    tableHelper = new TableSpecHelper(session);
+    helper = new FormSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -177,7 +181,7 @@ describe("TableField", function() {
       expect(tableField.requiresSave).toBe(false);
     });
 
-    it('should require save after a cell edit.', function(){
+    it('should require save after a cell edit.', function() {
       tableField.render();
       tableField.table.columns[0].setEditable(true);
       tableField.markAsSaved();
@@ -191,7 +195,7 @@ describe("TableField", function() {
       expect(tableField.requiresSave).toBe(true);
     });
 
-    it('should NOT require save open and close cell editor without any text change.', function(){
+    it('should NOT require save open and close cell editor without any text change.', function() {
       tableField.render();
       tableField.table.columns[0].setEditable(true);
       tableField.markAsSaved();
@@ -204,17 +208,17 @@ describe("TableField", function() {
       expect(tableField.requiresSave).toBe(false);
     });
 
-    it('resets row status on markAsSaved', function(){
-      expect(firstRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
+    it('resets row status on markAsSaved', function() {
+      expect(firstRow.status).toBe(TableRow.Status.NON_CHANGED);
       expect(tableField.requiresSave).toBe(false);
 
       tableField.table.columns[0].setCellValue(firstRow, 77);
-      expect(firstRow.status).toBe(scout.TableRow.Status.UPDATED);
+      expect(firstRow.status).toBe(TableRow.Status.UPDATED);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(true);
 
       tableField.markAsSaved();
-      expect(firstRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(firstRow.status).toBe(TableRow.Status.NON_CHANGED);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
 
@@ -222,12 +226,12 @@ describe("TableField", function() {
         cells: [null, null]
       });
       var lastRow = tableField.table.rows[tableField.table.rows.length - 1];
-      expect(lastRow.status).toBe(scout.TableRow.Status.INSERTED);
+      expect(lastRow.status).toBe(TableRow.Status.INSERTED);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(true);
 
       tableField.markAsSaved();
-      expect(lastRow.status).toBe(scout.TableRow.Status.NON_CHANGED);
+      expect(lastRow.status).toBe(TableRow.Status.NON_CHANGED);
       tableField.updateRequiresSave();
       expect(tableField.requiresSave).toBe(false);
     });

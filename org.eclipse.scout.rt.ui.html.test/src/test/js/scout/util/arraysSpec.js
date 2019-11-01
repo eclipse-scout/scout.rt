@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays} from '../../src/index';
+
+
 describe("scout.arrays", function() {
 
   describe("init", function() {
 
     it("checks whether array has correct length and initial values", function() {
-      var i, arr = scout.arrays.init(5, 'foo');
+      var i, arr = arrays.init(5, 'foo');
       expect(arr.length).toBe(5);
       for (i = 0; i < arr.length; i++) {
         expect(arr[i]).toBe('foo');
@@ -25,19 +28,19 @@ describe("scout.arrays", function() {
   describe("ensure", function() {
 
     it("creates an array if the param is not an array", function() {
-      expect(scout.arrays.ensure()).toEqual([]);
-      expect(scout.arrays.ensure(undefined)).toEqual([]);
-      expect(scout.arrays.ensure(null)).toEqual([]);
-      expect(scout.arrays.ensure('')).toEqual(['']);
-      expect(scout.arrays.ensure(true)).toEqual([true]);
-      expect(scout.arrays.ensure(false)).toEqual([false]);
+      expect(arrays.ensure()).toEqual([]);
+      expect(arrays.ensure(undefined)).toEqual([]);
+      expect(arrays.ensure(null)).toEqual([]);
+      expect(arrays.ensure('')).toEqual(['']);
+      expect(arrays.ensure(true)).toEqual([true]);
+      expect(arrays.ensure(false)).toEqual([false]);
     });
 
     it("returns the param if the param already is an array", function() {
       var arr = [];
-      expect(scout.arrays.ensure(arr)).toBe(arr);
+      expect(arrays.ensure(arr)).toBe(arr);
       arr = [0, 1];
-      expect(scout.arrays.ensure(arr)).toBe(arr);
+      expect(arrays.ensure(arr)).toBe(arr);
     });
   });
 
@@ -45,27 +48,27 @@ describe("scout.arrays", function() {
 
     it("removes elements", function() {
       // Ensure empty arguments are supported
-      expect(scout.arrays.remove()).toBe(false);
-      expect(scout.arrays.remove([])).toBe(false);
-      expect(scout.arrays.remove([], 'x')).toBe(false);
+      expect(arrays.remove()).toBe(false);
+      expect(arrays.remove([])).toBe(false);
+      expect(arrays.remove([], 'x')).toBe(false);
 
       var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
 
-      expect(scout.arrays.remove(arr, 'y')).toBe(false);
+      expect(arrays.remove(arr, 'y')).toBe(false);
       expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
-      expect(scout.arrays.remove(arr, 'b')).toBe(true);
+      expect(arrays.remove(arr, 'b')).toBe(true);
       expect(arr).toEqual(['a', 'c', 'a', 'd']);
-      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arrays.remove(arr, 'a')).toBe(true);
       expect(arr).toEqual(['c', 'a', 'd']);
-      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arrays.remove(arr, 'a')).toBe(true);
       expect(arr).toEqual(['c', 'd']);
-      expect(scout.arrays.remove(arr, 'a')).toBe(false);
+      expect(arrays.remove(arr, 'a')).toBe(false);
       expect(arr).toEqual(['c', 'd']);
 
       arr = ['a', 'b', undefined, 'c', undefined, 'd'];
-      expect(scout.arrays.remove(arr, 'a')).toBe(true);
+      expect(arrays.remove(arr, 'a')).toBe(true);
       expect(arr).toEqual(['b', undefined, 'c', undefined, 'd']);
-      expect(scout.arrays.remove(arr)).toBe(true);
+      expect(arrays.remove(arr)).toBe(true);
       expect(arr).toEqual(['b', 'c', undefined, 'd']);
     });
 
@@ -76,27 +79,27 @@ describe("scout.arrays", function() {
     it("removes all given elements", function() {
       var arr = ['a', 'b', 'c', 'a', 'd']; // 'a' is two times in the list
 
-      expect(scout.arrays.removeAll(arr, ['y'])).toBe(false);
+      expect(arrays.removeAll(arr, ['y'])).toBe(false);
       expect(arr).toEqual(['a', 'b', 'c', 'a', 'd']);
-      expect(scout.arrays.removeAll(arr, ['b'])).toBe(true);
+      expect(arrays.removeAll(arr, ['b'])).toBe(true);
       expect(arr).toEqual(['a', 'c', 'a', 'd']);
-      expect(scout.arrays.removeAll(arr, ['a'])).toBe(true);
+      expect(arrays.removeAll(arr, ['a'])).toBe(true);
       expect(arr).toEqual(['c', 'd']);
 
       arr = ['a', 'b', 'c', 'a', 'd'];
-      expect(scout.arrays.removeAll(arr, ['a', 'd'])).toBe(true);
+      expect(arrays.removeAll(arr, ['a', 'd'])).toBe(true);
       expect(arr).toEqual(['b', 'c']);
 
       arr = ['a', 'b', 'c', 'a', 'd'];
-      expect(scout.arrays.removeAll(arr, ['a', 'b', 'c', 'd'])).toBe(true);
+      expect(arrays.removeAll(arr, ['a', 'b', 'c', 'd'])).toBe(true);
       expect(arr).toEqual([]);
     });
 
     it("considers emtpy args", function() {
-      expect(scout.arrays.removeAll()).toBe(false);
-      expect(scout.arrays.removeAll([])).toBe(false);
-      expect(scout.arrays.removeAll([], [])).toBe(false);
-      expect(scout.arrays.removeAll([], ['x'])).toBe(false);
+      expect(arrays.removeAll()).toBe(false);
+      expect(arrays.removeAll([])).toBe(false);
+      expect(arrays.removeAll([], [])).toBe(false);
+      expect(arrays.removeAll([], ['x'])).toBe(false);
     });
 
   });
@@ -106,9 +109,9 @@ describe("scout.arrays", function() {
     it("replaces elements", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      scout.arrays.replace(arr, 'c', 'x');
+      arrays.replace(arr, 'c', 'x');
       expect(arr).toEqual(['a', 'b', 'x', 'd']);
-      scout.arrays.replace(arr, 'e', 'y');
+      arrays.replace(arr, 'e', 'y');
       expect(arr).toEqual(['a', 'b', 'x', 'd']);
     });
 
@@ -118,15 +121,15 @@ describe("scout.arrays", function() {
 
     it("insert element at index", function() {
       var arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insert(arr, 'e', 0);
+      arrays.insert(arr, 'e', 0);
       expect(arr).toEqual(['e', 'a', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insert(arr, 'e', 1);
+      arrays.insert(arr, 'e', 1);
       expect(arr).toEqual(['a', 'e', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insert(arr, 'e', 10);
+      arrays.insert(arr, 'e', 10);
       expect(arr).toEqual(['a', 'b', 'c', 'd', 'e']);
     });
 
@@ -136,15 +139,15 @@ describe("scout.arrays", function() {
 
     it("insert element array at index", function() {
       var arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 0);
+      arrays.insertAll(arr, ['e', 'f', 'g'], 0);
       expect(arr).toEqual(['e', 'f', 'g', 'a', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 1);
+      arrays.insertAll(arr, ['e', 'f', 'g'], 1);
       expect(arr).toEqual(['a', 'e', 'f', 'g', 'b', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.insertAll(arr, ['e', 'f', 'g'], 10);
+      arrays.insertAll(arr, ['e', 'f', 'g'], 10);
       expect(arr).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g']);
     });
 
@@ -164,30 +167,30 @@ describe("scout.arrays", function() {
 
       // Without duplicates
       var arr = [];
-      scout.arrays.insertSorted(arr, { order: 10, text: 'A' }, compareOrdered);
-      scout.arrays.insertSorted(arr, { order: 20, text: 'B' }, compareOrdered);
-      scout.arrays.insertSorted(arr, { order: 5, text: 'C' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 10, text: 'A'}, compareOrdered);
+      arrays.insertSorted(arr, {order: 20, text: 'B'}, compareOrdered);
+      arrays.insertSorted(arr, {order: 5, text: 'C'}, compareOrdered);
       expect(flat(arr)).toBe('C, A, B');
 
       // With duplicates
-      scout.arrays.insertSorted(arr, { order: 10, text: 'D' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 10, text: 'D'}, compareOrdered);
       expect(flat(arr)).toBe('C, A, D, B');
-      scout.arrays.insertSorted(arr, { order: 10, text: 'E' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 10, text: 'E'}, compareOrdered);
       expect(flat(arr)).toBe('C, A, D, E, B');
-      scout.arrays.insertSorted(arr, { order: 5, text: 'F' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 5, text: 'F'}, compareOrdered);
       expect(flat(arr)).toBe('C, F, A, D, E, B');
-      scout.arrays.insertSorted(arr, { order: 5, text: 'G' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 5, text: 'G'}, compareOrdered);
       expect(flat(arr)).toBe('C, F, G, A, D, E, B');
-      scout.arrays.insertSorted(arr, { order: 5, text: 'H' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 5, text: 'H'}, compareOrdered);
       expect(flat(arr)).toBe('C, F, G, H, A, D, E, B');
-      scout.arrays.insertSorted(arr, { order: 5, text: 'I' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 5, text: 'I'}, compareOrdered);
       expect(flat(arr)).toBe('C, F, G, H, I, A, D, E, B');
 
       // Only duplicates
       arr = [];
-      scout.arrays.insertSorted(arr, { order: 11, text: 'X' }, compareOrdered);
-      scout.arrays.insertSorted(arr, { order: 11, text: 'Y' }, compareOrdered);
-      scout.arrays.insertSorted(arr, { order: 11, text: 'Z' }, compareOrdered);
+      arrays.insertSorted(arr, {order: 11, text: 'X'}, compareOrdered);
+      arrays.insertSorted(arr, {order: 11, text: 'Y'}, compareOrdered);
+      arrays.insertSorted(arr, {order: 11, text: 'Z'}, compareOrdered);
       expect(flat(arr)).toBe('X, Y, Z');
     });
 
@@ -195,14 +198,14 @@ describe("scout.arrays", function() {
 
   describe("max", function() {
     it("returns 0 iff input contains 0", function() {
-      expect(scout.arrays.max([null, 5])).toBe(5);
-      expect(scout.arrays.max([null, 0])).toBe(0);
-      expect(scout.arrays.max([null, -13])).toBe(-13);
+      expect(arrays.max([null, 5])).toBe(5);
+      expect(arrays.max([null, 0])).toBe(0);
+      expect(arrays.max([null, -13])).toBe(-13);
     });
 
     it("behaves like Math.max on null and undefined", function() {
       var doTest = function(arr) {
-        expect(scout.arrays.max(arr)).toBe(Math.max.apply(Math, arr));
+        expect(arrays.max(arr)).toBe(Math.max.apply(Math, arr));
       };
 
       doTest(null);
@@ -210,20 +213,20 @@ describe("scout.arrays", function() {
     });
 
     it("ignores non-number elements", function() {
-      expect(scout.arrays.max([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(6.7);
+      expect(arrays.max([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(6.7);
     });
   });
 
   describe("min", function() {
     it("returns 0 iff input contains 0", function() {
-      expect(scout.arrays.min([null, 5])).toBe(5);
-      expect(scout.arrays.min([null, 0])).toBe(0);
-      expect(scout.arrays.min([null, -13])).toBe(-13);
+      expect(arrays.min([null, 5])).toBe(5);
+      expect(arrays.min([null, 0])).toBe(0);
+      expect(arrays.min([null, -13])).toBe(-13);
     });
 
     it("behaves like Math.min on null and undefined", function() {
       var doTest = function(arr) {
-        expect(scout.arrays.min(arr)).toBe(Math.min.apply(Math, arr));
+        expect(arrays.min(arr)).toBe(Math.min.apply(Math, arr));
       };
 
       doTest(null);
@@ -231,7 +234,7 @@ describe("scout.arrays", function() {
     });
 
     it("ignores non-number elements", function() {
-      expect(scout.arrays.min([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(5);
+      expect(arrays.min([null, 5, 6.7, false, undefined, NaN, {}, "batman"])).toBe(5);
     });
   });
 
@@ -239,19 +242,19 @@ describe("scout.arrays", function() {
 
     it("replaces elements", function() {
       var arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.move(arr, 0, 1);
+      arrays.move(arr, 0, 1);
       expect(arr).toEqual(['b', 'a', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.move(arr, 1, 0);
+      arrays.move(arr, 1, 0);
       expect(arr).toEqual(['b', 'a', 'c', 'd']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.move(arr, 0, 100);
+      arrays.move(arr, 0, 100);
       expect(arr).toEqual(['b', 'c', 'd', 'a']);
 
       arr = ['a', 'b', 'c', 'd'];
-      scout.arrays.move(arr, 10, 0);
+      arrays.move(arr, 10, 0);
       expect(arr).toEqual([undefined, 'a', 'b', 'c', 'd']);
     });
 
@@ -263,21 +266,21 @@ describe("scout.arrays", function() {
       var arr1 = ['a', 'b', 'c'];
       var arr2 = ['d', 'e', 'f'];
 
-      expect(scout.arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+      expect(arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
     });
 
     it("merges two arrays and removes duplicates", function() {
       var arr1 = ['a', 'b', 'c'];
       var arr2 = ['d', 'a', 'e'];
 
-      expect(scout.arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e']);
+      expect(arrays.union(arr1, arr2)).toEqual(['a', 'b', 'c', 'd', 'e']);
     });
 
     it("also works with floats", function() {
       var arr1 = [1.5, 2];
       var arr2 = [1.5, 30];
 
-      expect(scout.arrays.union(arr1, arr2)).toEqual([1.5, 2, 30]);
+      expect(arrays.union(arr1, arr2)).toEqual([1.5, 2, 30]);
     });
 
     it("if the arrays contain objects instead of primitives, it uses their id to check for equality", function() {
@@ -293,13 +296,13 @@ describe("scout.arrays", function() {
       var arr1 = [obj1, obj2];
       var arr2 = [obj2, obj3, obj1];
 
-      expect(scout.arrays.union(arr1, arr2)).toEqual([obj1, obj2, obj3]);
+      expect(arrays.union(arr1, arr2)).toEqual([obj1, obj2, obj3]);
     });
 
     it("does not fail if arr1 or arr2 are not defined", function() {
-      expect(scout.arrays.union(null, ['d', 'e', 'f'])).toEqual(['d', 'e', 'f']);
-      expect(scout.arrays.union(['d', 'e', 'f'], null)).toEqual(['d', 'e', 'f']);
-      expect(scout.arrays.union(null, null)).toEqual([]);
+      expect(arrays.union(null, ['d', 'e', 'f'])).toEqual(['d', 'e', 'f']);
+      expect(arrays.union(['d', 'e', 'f'], null)).toEqual(['d', 'e', 'f']);
+      expect(arrays.union(null, null)).toEqual([]);
     });
   });
 
@@ -308,63 +311,63 @@ describe("scout.arrays", function() {
     it("checks whether two arrays contain the same elements in the same order", function() {
       var arr1 = ['a', 'b', 'c'];
       var arr2 = ['a', 'b', 'c'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a', 'b', 'c'];
       arr2 = ['b', 'a', 'b'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a', 'b', 'c'];
       arr2 = ['a', 'b'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a', 'b'];
       arr2 = ['a', 'b', 'c'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = ['a'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = ['b'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
     });
 
     it("considers emtpy and same arrays", function() {
       var arr1 = [];
       var arr2 = ['b', 'a', 'b'];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = [];
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = [];
       arr2 = [];
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = arr1;
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
     });
 
     it("returns true if one array is undefined/null and the other empty", function() {
       var arr1 = [];
       var arr2;
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = undefined;
-      expect(scout.arrays.equals(arr1, arr2)).toBeFalsy();
+      expect(arrays.equals(arr1, arr2)).toBeFalsy();
 
       arr1 = null;
       arr2 = [];
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
 
       arr1 = null;
       arr2 = null;
-      expect(scout.arrays.equals(arr1, arr2)).toBeTruthy();
+      expect(arrays.equals(arr1, arr2)).toBeTruthy();
     });
 
   });
@@ -374,59 +377,59 @@ describe("scout.arrays", function() {
     it("checks whether two arrays contain the same elements without considering the order", function() {
       var arr1 = ['a', 'b', 'c'];
       var arr2 = ['b', 'a', 'b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a', 'b', 'c'];
       arr2 = ['a', 'b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a', 'b'];
       arr2 = ['a', 'b', 'c'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = ['a'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = ['b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
     });
 
     it("considers emtpy and same arrays", function() {
       var arr1 = [];
       var arr2 = ['b', 'a', 'b'];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = ['a'];
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = [];
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = arr1;
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
 
     it("returns true if one array is undefined/null and the other empty", function() {
       var arr1 = [];
       var arr2;
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = ['a'];
       arr2 = undefined;
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeFalsy();
 
       arr1 = null;
       arr2 = [];
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
 
       arr1 = null;
       arr2 = null;
-      expect(scout.arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
+      expect(arrays.equalsIgnoreOrder(arr1, arr2)).toBeTruthy();
     });
 
   });
@@ -436,15 +439,15 @@ describe("scout.arrays", function() {
     it("returns the index of the element for which the given predicate returns true", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      expect(scout.arrays.findIndex()).toBe(-1);
-      expect(scout.arrays.findIndex()).toBe(-1);
+      expect(arrays.findIndex()).toBe(-1);
+      expect(arrays.findIndex()).toBe(-1);
 
-      var index = scout.arrays.findIndex(arr, function(element) {
+      var index = arrays.findIndex(arr, function(element) {
         return element === 'c';
       });
       expect(index).toBe(2);
 
-      index = scout.arrays.findIndex(arr, function(element) {
+      index = arrays.findIndex(arr, function(element) {
         return element === 'z';
       });
       expect(index).toBe(-1);
@@ -457,15 +460,15 @@ describe("scout.arrays", function() {
     it("returns the element for which the given predicate returns true", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      expect(scout.arrays.find()).toBe(null);
-      expect(scout.arrays.find(arr)).toBe(null);
+      expect(arrays.find()).toBe(null);
+      expect(arrays.find(arr)).toBe(null);
 
-      var element = scout.arrays.find(arr, function(element) {
+      var element = arrays.find(arr, function(element) {
         return element === 'c';
       });
       expect(element).toBe('c');
 
-      element = scout.arrays.find(arr, function(element) {
+      element = arrays.find(arr, function(element) {
         return element === 'z';
       });
       expect(element).toBeFalsy();
@@ -478,15 +481,15 @@ describe("scout.arrays", function() {
     it("returns the element for which the given predicate returns true, starting from a given index", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      expect(scout.arrays.find()).toBe(null);
-      expect(scout.arrays.find(arr)).toBe(null);
+      expect(arrays.find()).toBe(null);
+      expect(arrays.find(arr)).toBe(null);
 
-      var element = scout.arrays.findFrom(arr, 1, function(element) {
+      var element = arrays.findFrom(arr, 1, function(element) {
         return element === 'c';
       });
       expect(element).toBe('c');
 
-      element = scout.arrays.findFrom(arr, 1, function(element) {
+      element = arrays.findFrom(arr, 1, function(element) {
         return element === 'z';
       });
       expect(element).toBeFalsy();
@@ -495,7 +498,7 @@ describe("scout.arrays", function() {
     it("does not return the element for which the given predicate returns true, if it is on the left side of the start index", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      var element = scout.arrays.findFrom(arr, 1, function(element) {
+      var element = arrays.findFrom(arr, 1, function(element) {
         return element === 'a';
       });
       expect(element).toBeFalsy();
@@ -504,23 +507,23 @@ describe("scout.arrays", function() {
     it("also checks the element at start index ", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      var element = scout.arrays.findFrom(arr, 1, function(element) {
+      var element = arrays.findFrom(arr, 1, function(element) {
         return element === 'b';
       });
       expect(element).toBeTruthy();
 
       // edge cases
-      element = scout.arrays.findFrom(arr, 0, function(element) {
+      element = arrays.findFrom(arr, 0, function(element) {
         return element === 'a';
       });
       expect(element).toBeTruthy();
 
-      element = scout.arrays.findFrom(arr, 3, function(element) {
+      element = arrays.findFrom(arr, 3, function(element) {
         return element === 'd';
       });
       expect(element).toBeTruthy();
 
-      element = scout.arrays.findFrom(arr, 3, function(element) {
+      element = arrays.findFrom(arr, 3, function(element) {
         return element === 'z';
       });
       expect(element).toBeFalsy();
@@ -529,12 +532,12 @@ describe("scout.arrays", function() {
     it("searches from right to left if backwards is true", function() {
       var arr = ['a', 'b', 'c', 'd'];
 
-      var element = scout.arrays.findFrom(arr, 2, function(element) {
+      var element = arrays.findFrom(arr, 2, function(element) {
         return element === 'a';
       }, true);
       expect(element).toBeTruthy();
 
-      element = scout.arrays.findFrom(arr, 2, function(element) {
+      element = arrays.findFrom(arr, 2, function(element) {
         return element === 'd';
       }, true);
       expect(element).toBeFalsy();
@@ -546,22 +549,22 @@ describe("scout.arrays", function() {
 
     it("formats an array by concatenating each entry", function() {
       var arr = ['a', 'b', 'c', 'd'];
-      expect(scout.arrays.format(arr)).toBe('abcd');
-      expect(scout.arrays.format(arr, '_')).toBe('a_b_c_d');
+      expect(arrays.format(arr)).toBe('abcd');
+      expect(arrays.format(arr, '_')).toBe('a_b_c_d');
 
       arr = ['abc', 'def'];
-      expect(scout.arrays.format(arr)).toBe('abcdef');
-      expect(scout.arrays.format(arr, '_')).toBe('abc_def');
+      expect(arrays.format(arr)).toBe('abcdef');
+      expect(arrays.format(arr, '_')).toBe('abc_def');
 
       arr = ['abc'];
-      expect(scout.arrays.format(arr)).toBe('abc');
-      expect(scout.arrays.format(arr, '_')).toBe('abc');
+      expect(arrays.format(arr)).toBe('abc');
+      expect(arrays.format(arr, '_')).toBe('abc');
     });
 
     it("returns '' for empty array or if no array was provided", function() {
       var arr = [];
-      expect(scout.arrays.format(arr)).toBe('');
-      expect(scout.arrays.format()).toBe('');
+      expect(arrays.format(arr)).toBe('');
+      expect(arrays.format()).toBe('');
     });
 
   });
@@ -570,15 +573,15 @@ describe("scout.arrays", function() {
 
     it("encodes the html of each array element", function() {
       var arr = ['<span>a</span>', 'b', 'c<p>', '<script>d</script>'];
-      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('&lt;span&gt;a&lt;/span&gt;<br>b<br>c&lt;p&gt;<br>&lt;script&gt;d&lt;/script&gt;');
+      expect(arrays.formatEncoded(arr, '<br>')).toBe('&lt;span&gt;a&lt;/span&gt;<br>b<br>c&lt;p&gt;<br>&lt;script&gt;d&lt;/script&gt;');
 
       arr = ['abc', '<script>def'];
-      expect(scout.arrays.formatEncoded(arr)).toBe('abc&lt;script&gt;def');
-      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('abc<br>&lt;script&gt;def');
+      expect(arrays.formatEncoded(arr)).toBe('abc&lt;script&gt;def');
+      expect(arrays.formatEncoded(arr, '<br>')).toBe('abc<br>&lt;script&gt;def');
 
       arr = ['<p>abc'];
-      expect(scout.arrays.formatEncoded(arr)).toBe('&lt;p&gt;abc');
-      expect(scout.arrays.formatEncoded(arr, '<br>')).toBe('&lt;p&gt;abc');
+      expect(arrays.formatEncoded(arr)).toBe('&lt;p&gt;abc');
+      expect(arrays.formatEncoded(arr, '<br>')).toBe('&lt;p&gt;abc');
     });
 
   });
@@ -586,18 +589,18 @@ describe("scout.arrays", function() {
   describe("first", function() {
 
     it("finds first array element", function() {
-      expect(scout.arrays.first()).toBe(undefined);
-      expect(scout.arrays.first('test')).toBe('test');
-      expect(scout.arrays.first({
+      expect(arrays.first()).toBe(undefined);
+      expect(arrays.first('test')).toBe('test');
+      expect(arrays.first({
         x: 'y'
       })).toEqual({
         x: 'y'
       });
-      expect(scout.arrays.first([])).toBe(undefined);
-      expect(scout.arrays.first([undefined])).toBe(undefined);
-      expect(scout.arrays.first(['a', 'b', 'c'])).toBe('a');
-      expect(scout.arrays.first([null, undefined, 123])).toBe(null);
-      expect(scout.arrays.first(['', 'b', 'c'])).toBe('');
+      expect(arrays.first([])).toBe(undefined);
+      expect(arrays.first([undefined])).toBe(undefined);
+      expect(arrays.first(['a', 'b', 'c'])).toBe('a');
+      expect(arrays.first([null, undefined, 123])).toBe(null);
+      expect(arrays.first(['', 'b', 'c'])).toBe('');
     });
 
   });
@@ -605,18 +608,18 @@ describe("scout.arrays", function() {
   describe("last", function() {
 
     it("finds last array element", function() {
-      expect(scout.arrays.last()).toBe(undefined);
-      expect(scout.arrays.last('test')).toBe('test');
-      expect(scout.arrays.last({
+      expect(arrays.last()).toBe(undefined);
+      expect(arrays.last('test')).toBe('test');
+      expect(arrays.last({
         x: 'y'
       })).toEqual({
         x: 'y'
       });
-      expect(scout.arrays.last([])).toBe(undefined);
-      expect(scout.arrays.last([undefined])).toBe(undefined);
-      expect(scout.arrays.last(['a', 'b', 'c'])).toBe('c');
-      expect(scout.arrays.last([123, undefined, null])).toBe(null);
-      expect(scout.arrays.last(['a', 'b', ''])).toBe('');
+      expect(arrays.last([])).toBe(undefined);
+      expect(arrays.last([undefined])).toBe(undefined);
+      expect(arrays.last(['a', 'b', 'c'])).toBe('c');
+      expect(arrays.last([123, undefined, null])).toBe(null);
+      expect(arrays.last(['a', 'b', ''])).toBe('');
     });
 
   });
@@ -627,33 +630,33 @@ describe("scout.arrays", function() {
       var arr = null;
 
       // expect no errors:
-      scout.arrays.pushIfDefined();
-      scout.arrays.pushIfDefined(arr);
-      scout.arrays.pushIfDefined(arr, 'element');
+      arrays.pushIfDefined();
+      arrays.pushIfDefined(arr);
+      arrays.pushIfDefined(arr, 'element');
 
       arr = [];
-      scout.arrays.pushIfDefined(arr);
+      arrays.pushIfDefined(arr);
       expect(arr).toEqual([]);
-      scout.arrays.pushIfDefined(arr, undefined);
+      arrays.pushIfDefined(arr, undefined);
       expect(arr).toEqual([]);
-      scout.arrays.pushIfDefined(arr, null);
+      arrays.pushIfDefined(arr, null);
       expect(arr).toEqual([]);
-      scout.arrays.pushIfDefined(arr, 'element');
+      arrays.pushIfDefined(arr, 'element');
       expect(arr).toEqual(['element']);
-      scout.arrays.pushIfDefined(arr, 0);
+      arrays.pushIfDefined(arr, 0);
       expect(arr).toEqual(['element', 0]);
-      scout.arrays.pushIfDefined(arr, false);
-      scout.arrays.pushIfDefined(arr, true);
+      arrays.pushIfDefined(arr, false);
+      arrays.pushIfDefined(arr, true);
       expect(arr).toEqual(['element', 0, false, true]);
 
       arr = [];
-      scout.arrays.pushIfDefined(arr, null, 1, undefined, 2, 3, null, null, '');
+      arrays.pushIfDefined(arr, null, 1, undefined, 2, 3, null, null, '');
       expect(arr).toEqual([1, 2, 3, '']);
 
       arr = [];
-      scout.arrays.pushIfDefined(arr, []);
+      arrays.pushIfDefined(arr, []);
       expect(arr).toEqual([[]]);
-      scout.arrays.pushIfDefined(arr, [1, 2]);
+      arrays.pushIfDefined(arr, [1, 2]);
       expect(arr).toEqual([[], [1, 2]]);
     });
 
@@ -663,15 +666,15 @@ describe("scout.arrays", function() {
 
     it("only pushes the element if it is truthy and does not already exist in the array", function() {
       var arr = [1, 2, 3];
-      scout.arrays.pushSet(arr, 1);
+      arrays.pushSet(arr, 1);
       expect(arr).toEqual([1, 2, 3]);
 
       arr = [1, 2, 3];
-      scout.arrays.pushSet(arr, null);
+      arrays.pushSet(arr, null);
       expect(arr).toEqual([1, 2, 3]);
 
       arr = [1, 2, 3];
-      scout.arrays.pushSet(arr, 4);
+      arrays.pushSet(arr, 4);
       expect(arr).toEqual([1, 2, 3, 4]);
     });
 
@@ -683,8 +686,8 @@ describe("scout.arrays", function() {
       var arr1 = ['a', 'b', 'b1', 'c'];
       var arr2 = ['b', 'c', 'c1', 'd'];
 
-      expect(scout.arrays.diff(arr1, arr2)).toEqual(['a', 'b1']);
-      expect(scout.arrays.diff(arr2, arr1)).toEqual(['c1', 'd']);
+      expect(arrays.diff(arr1, arr2)).toEqual(['a', 'b1']);
+      expect(arrays.diff(arr2, arr1)).toEqual(['c1', 'd']);
     });
 
   });
@@ -697,7 +700,7 @@ describe("scout.arrays", function() {
         '1 2',
         'x'
       ];
-      var result = scout.arrays.flatMap(arr, function(text) {
+      var result = arrays.flatMap(arr, function(text) {
         return text.split(' ');
       });
       expect(['a', 'b', 'c', '1', '2', 'x']).toEqual(result);

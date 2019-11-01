@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {App} from '../src/index';
+
+
 describe('App', function() {
 
   beforeEach(function() {
@@ -20,7 +23,7 @@ describe('App', function() {
 
   describe('initDone', function() {
     it('is executed after desktop is rendered', function(done) {
-      var app = new scout.App();
+      var app = new App();
       app.init();
 
       var desktop;
@@ -37,7 +40,7 @@ describe('App', function() {
     });
 
     it('waits for load to complete', function(done) {
-      var app = new scout.App();
+      var app = new App();
       app.init();
 
       var loaded = false;
@@ -59,7 +62,7 @@ describe('App', function() {
     });
 
     it('is not executed when loading fails', function(done) {
-      var app = new scout.App();
+      var app = new App();
       app.init()
         .catch(function() {
           expect(app.initialized).toBe(false);

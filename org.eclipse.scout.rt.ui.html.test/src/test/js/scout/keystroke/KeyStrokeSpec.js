@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys, KeyStroke} from '../../src/index';
+
+
 describe("KeyStroke", function() {
   var session;
 
-  var spyable = function() {};
-
-  var TestingKeyStroke = function() {
-    TestingKeyStroke.parent.call(this);
-    this.parseAndSetKeyStroke("enter");
+  var spyable = function() {
   };
-  scout.inherits(TestingKeyStroke, scout.KeyStroke);
 
-  TestingKeyStroke.prototype.handle = function() {
-    expect(false).toBe(true);
-    spyable();
-  };
+  class TestingKeyStroke extends KeyStroke {
+    constructor() {
+      super();
+      this.parseAndSetKeyStroke("enter");
+    }
+
+    handle() {
+      expect(false).toBe(true);
+      spyable();
+    }
+  }
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -42,10 +47,10 @@ describe("KeyStroke", function() {
 
       spyOn(keyStroke, 'handle');
 
-      while(keyDownCount-- > 0) {
-        session.desktop.$container.triggerKeyDownCapture(scout.keys.ENTER);
+      while (keyDownCount-- > 0) {
+        session.desktop.$container.triggerKeyDownCapture(keys.ENTER);
       }
-      session.desktop.$container.triggerKeyUpCapture(scout.keys.ENTER);
+      session.desktop.$container.triggerKeyUpCapture(keys.ENTER);
 
       expect(keyStroke.handle.calls.count())
         .toEqual(1, "because an unrepeatable keystroke should only be invoked once before the closing keyup event");

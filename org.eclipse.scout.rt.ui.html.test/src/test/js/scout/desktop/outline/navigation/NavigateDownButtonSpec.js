@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {NullWidget, scout} from '../../../../src/index';
+
+
 describe('NavigateDownButton', function() {
 
   var session, outline, menu, node;
@@ -38,7 +41,7 @@ describe('NavigateDownButton', function() {
     node.detailFormVisible = true;
     node.detailFormVisibleByUi = true;
     node.detailTable = scout.create('Table', {
-      parent: new scout.NullWidget(),
+      parent: new NullWidget(),
       session: session
     });
     node.detailTableVisible = true;
@@ -53,7 +56,7 @@ describe('NavigateDownButton', function() {
     delete node.detailTable;
     expect(menu._isDetail()).toBe(false);
     node.detailTable = scout.create('Table', {
-      parent: new scout.NullWidget(),
+      parent: new NullWidget(),
       session: session
     });
 
@@ -91,7 +94,7 @@ describe('NavigateDownButton', function() {
         return false;
       };
       node.detailTable = scout.create('Table', {
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session
       });
       expect(menu._buttonEnabled()).toBe(false);
@@ -109,7 +112,7 @@ describe('NavigateDownButton', function() {
         return false;
       };
       node.detailTable = scout.create('Table', {
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session
       });
       expect(menu._buttonEnabled()).toBe(false);
@@ -130,7 +133,7 @@ describe('NavigateDownButton', function() {
         return false;
       };
       node.detailTable = scout.create('Table', {
-        parent: new scout.NullWidget(),
+        parent: new NullWidget(),
         session: session
       });
       outline.insertNode(node);
@@ -155,7 +158,7 @@ describe('NavigateDownButton', function() {
 
   it('_drill drills down to first selected row in the detail table', function() {
     node.detailTable = scout.create('Table', {
-      parent: new scout.NullWidget(),
+      parent: new NullWidget(),
       session: session,
       rows: [{
         id: '123',

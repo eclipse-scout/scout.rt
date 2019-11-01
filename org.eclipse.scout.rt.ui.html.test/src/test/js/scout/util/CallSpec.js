@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Call, scout} from '../../src/index';
+
+
 describe('scout.Call', function() {
 
   beforeEach(function() {
@@ -20,41 +23,43 @@ describe('scout.Call', function() {
 
   // ----- Test classes -----
 
-  var SuccessCall = function() {
-    SuccessCall.parent.call(this);
-  };
-  scout.inherits(SuccessCall, scout.Call);
-  SuccessCall.prototype._callImpl = function() {
-    var deferred = $.Deferred();
-    deferred.resolve();
-    return deferred.promise();
-  };
-
-  var FailCall = function() {
-    FailCall.parent.call(this);
-    this.maxRetries = 0;
-  };
-  scout.inherits(FailCall, scout.Call);
-  FailCall.prototype._callImpl = function() {
-    var deferred = $.Deferred();
-    deferred.reject();
-    return deferred.promise();
-  };
-
-  var FailOnFirstTryCall = function() {
-    FailOnFirstTryCall.parent.call(this);
-    this.maxRetries = 5;
-  };
-  scout.inherits(FailOnFirstTryCall, scout.Call);
-  FailOnFirstTryCall.prototype._callImpl = function() {
-    var deferred = $.Deferred();
-    if (this.callCounter > 1) {
+  class SuccessCall extends Call {
+    _callImpl() {
+      var deferred = $.Deferred();
       deferred.resolve();
-    } else {
-      deferred.reject();
+      return deferred.promise();
     }
-    return deferred.promise();
-  };
+  }
+
+  class FailCall extends Call {
+    constructor() {
+      super();
+      this.maxRetries = 0;
+    }
+
+    _callImpl() {
+      var deferred = $.Deferred();
+      deferred.reject();
+      return deferred.promise();
+    }
+  }
+
+  class FailOnFirstTryCall extends Call {
+    constructor() {
+      super();
+      this.maxRetries = 5;
+    }
+
+    _callImpl() {
+      var deferred = $.Deferred();
+      if (this.callCounter > 1) {
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise();
+    }
+  }
 
   // ----- Tests -----
 

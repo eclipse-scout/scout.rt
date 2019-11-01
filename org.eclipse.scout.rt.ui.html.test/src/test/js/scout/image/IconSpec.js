@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {icons, scout} from '../../src/index';
+
+
 describe('Icon', function() {
 
   var session;
@@ -22,7 +25,7 @@ describe('Icon', function() {
     it('creates a span if it is a font icon', function() {
       var icon = scout.create('Icon', {
         parent: session.desktop,
-        iconDesc: scout.icons.INFO
+        iconDesc: icons.INFO
       });
       icon.render();
       expect(icon.$container[0].tagName).toBe('SPAN');
@@ -55,11 +58,11 @@ describe('Icon', function() {
     it('accepts a scout.IconDesc', function() {
       var icon = scout.create('Icon', {
         parent: session.desktop,
-        iconDesc: scout.icons.parseIconId('icon/image.png')
+        iconDesc: icons.parseIconId('icon/image.png')
       });
       expect(icon.iconDesc.iconUrl).toBe('icon/image.png');
 
-      icon.setIconDesc(scout.icons.parseIconId('icon/image2.png'));
+      icon.setIconDesc(icons.parseIconId('icon/image2.png'));
       expect(icon.iconDesc.iconUrl).toBe('icon/image2.png');
     });
 

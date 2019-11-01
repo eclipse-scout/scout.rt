@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RemoteEvent, scout, StringField} from '../../../../src/index';
+import {FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("StringField", function() {
   var session, helper, field;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     field = createField(createModel());
     linkWidgetAndAdapter(field, 'StringFieldAdapter');
     jasmine.Ajax.install();
@@ -27,7 +31,7 @@ describe("StringField", function() {
   });
 
   function createField(model) {
-    var field = new scout.StringField();
+    var field = new StringField();
     field.init(model);
     return field;
   }
@@ -101,7 +105,7 @@ describe("StringField", function() {
       field.insertText('Test1');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
-      var event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      var event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -112,7 +116,7 @@ describe("StringField", function() {
       expect(field.$field[0].value).toBe('Test1ABC2');
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
-      event = new scout.RemoteEvent(field.id, 'acceptInput', {
+      event = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1ABC2',
         whileTyping: false,
         showBusyIndicator: true
@@ -133,12 +137,12 @@ describe("StringField", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       var events = [];
       // acceptInput needs to be sent twice, with whileTyping = true and = false
-      events[0] = new scout.RemoteEvent(field.id, 'acceptInput', {
+      events[0] = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: true,
         showBusyIndicator: false
       });
-      events[1] = new scout.RemoteEvent(field.id, 'acceptInput', {
+      events[1] = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1',
         whileTyping: false,
         showBusyIndicator: true
@@ -155,12 +159,12 @@ describe("StringField", function() {
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(2);
       events = [];
-      events[0] = new scout.RemoteEvent(field.id, 'acceptInput', {
+      events[0] = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1ABC2',
         whileTyping: true,
         showBusyIndicator: false
       });
-      events[1] = new scout.RemoteEvent(field.id, 'acceptInput', {
+      events[1] = new RemoteEvent(field.id, 'acceptInput', {
         displayText: 'Test1ABC2',
         whileTyping: false,
         showBusyIndicator: true

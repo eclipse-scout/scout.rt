@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {TextMap} from '../../src/index';
+
+
 describe("TextMap", function() {
 
-  var texts = new scout.TextMap({
+  var texts = new TextMap({
     NoOptions: 'Keine Übereinstimmung',
     NumOptions: '{0} Optionen',
     Greeting: 'Hello {0}, my name is {2}, {1}.',
@@ -19,12 +22,12 @@ describe("TextMap", function() {
     Null: null
   });
 
-  var textsChild = new scout.TextMap({
+  var textsChild = new TextMap({
     ChildKey: 'A Child Key',
     DuplicateKey: 'Child Duplicate Key'
   });
 
-  var textsParent = new scout.TextMap({
+  var textsParent = new TextMap({
     ParentKey: 'A Parent Key',
     DuplicateKey: 'Parent Duplicate Key'
   });

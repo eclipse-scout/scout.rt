@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {fields, keys, QueryBy, scout, SmartField, Status, strings} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('SmartField', function() {
 
   var session, field, lookupRow, helper;
@@ -15,12 +19,12 @@ describe('SmartField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.SmartField();
+    field = new SmartField();
     lookupRow = scout.create('LookupRow', {
       key: 123,
       text: 'Foo'
     });
-    helper = new scout.FormSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -44,7 +48,7 @@ describe('SmartField', function() {
 
   function createSmartFieldWithAdapter() {
     var model = helper.createFieldModel('SmartField');
-    var smartField = new scout.SmartField();
+    var smartField = new SmartField();
     smartField.init(model);
     linkWidgetAndAdapter(smartField, 'SmartFieldAdapter');
     return smartField;
@@ -77,7 +81,7 @@ describe('SmartField', function() {
 
     it('init LookupCall when configured as string', function() {
       field = createFieldWithLookupCall();
-      expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
+      expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
     });
 
     it('when setValue is called, load and set the correct lookup row', function() {
@@ -252,7 +256,7 @@ describe('SmartField', function() {
       // Simulate that lookup call does not return any data (happens if user clicks 'inactive' radio button and there are no inactive rows
       field.popup._field.lookupCall.data = [];
       field.popup._field.$field.focus();
-      field.popup._field.$field.triggerKeyDown(scout.keys.BACKSPACE);
+      field.popup._field.$field.triggerKeyDown(keys.BACKSPACE);
       field.popup._field._onFieldKeyUp({});
       jasmine.clock().tick(500);
       expect(field.popup).not.toBe(null);
@@ -262,7 +266,7 @@ describe('SmartField', function() {
       // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       var field = createFieldWithLookupCall({
         touchMode: true,
-        errorStatus: scout.Status.error({
+        errorStatus: Status.error({
           message: 'foo'
         })
       });
@@ -283,7 +287,7 @@ describe('SmartField', function() {
       // Use case: Click on touch smart field, select inactive radio button, clear the text in the field -> smart field has to stay open
       var field = createFieldWithLookupCall({
         touchMode: true,
-        errorStatus: scout.Status.error({
+        errorStatus: Status.error({
           message: 'foo'
         })
       });
@@ -390,13 +394,13 @@ describe('SmartField', function() {
     // test for ticket #228288
     it('must add CSS class from selected lookup-row to field', function() {
       var field = createFieldWithLookupCall();
-      expect(scout.strings.hasText(field.cssClass)).toBe(false);
+      expect(strings.hasText(field.cssClass)).toBe(false);
       field.setValue(1);
       jasmine.clock().tick(500);
       expect(field.cssClass).toEqual('foo');
       field.setValue(null);
       jasmine.clock().tick(500);
-      expect(scout.strings.hasText(field.cssClass)).toBe(false);
+      expect(strings.hasText(field.cssClass)).toBe(false);
     });
 
   });
@@ -457,20 +461,20 @@ describe('SmartField', function() {
     it('should set error status when result has an exception', function() {
       var field = createFieldWithLookupCall();
       field._lookupByTextOrAllDone({
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
-      expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
+      expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      var lookupStatus = scout.Status.warning({
+      var lookupStatus = Status.warning({
         message: 'bar'
       });
-      var errorStatus = scout.Status.error({
+      var errorStatus = Status.error({
         message: 'foo'
       });
       field.setLookupStatus(lookupStatus);
@@ -548,7 +552,7 @@ describe('SmartField', function() {
         key: 123,
         text: 'baz'
       }));
-      embeddedField.setErrorStatus(scout.Status.error({
+      embeddedField.setErrorStatus(Status.error({
         message: 'bar'
       }));
       embeddedField.setDisplayText('Foo');
@@ -598,7 +602,7 @@ describe('SmartField', function() {
       jasmine.clock().tick(500);
 
       expect(field.isPopupOpen()).toBe(false);
-      expect(field.lookupStatus.code).toBe(scout.SmartField.ErrorCode.SEARCH_REQUIRED);
+      expect(field.lookupStatus.code).toBe(SmartField.ErrorCode.SEARCH_REQUIRED);
     });
 
     it('has empty popup if no search available and searchRequired=true and touch', function() {
@@ -612,7 +616,7 @@ describe('SmartField', function() {
 
       expect(field.isPopupOpen()).toBe(true);
       expect(findTableProposals().length).toBe(0);
-      expect(field.lookupStatus.code).toBe(scout.SmartField.ErrorCode.SEARCH_REQUIRED);
+      expect(field.lookupStatus.code).toBe(SmartField.ErrorCode.SEARCH_REQUIRED);
     });
 
   });
@@ -625,7 +629,7 @@ describe('SmartField', function() {
       field.render();
       field.$field.focus();
       var result = {
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
       field._lookupByTextOrAllDone(result);
@@ -640,13 +644,13 @@ describe('SmartField', function() {
       field.render();
       field.$field.focus();
       var result = {
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [1, 2, 3, 4, 5]
       };
       field._lookupByTextOrAllDone(result);
       expect(result.lookupRows.length).toBe(3);
       expect(result.lookupRows[2]).toBe(3); // last element in array should be '3'
-      expect(field.popup.proposalChooser.status.severity).toBe(scout.Status.Severity.INFO);
+      expect(field.popup.proposalChooser.status.severity).toBe(Status.Severity.INFO);
     });
 
   });
@@ -693,7 +697,7 @@ describe('SmartField', function() {
 
       // send a regular key-press (no navigation)
       field._onFieldKeyDown({
-        which: scout.keys.A
+        which: keys.A
       });
       expect(field._userWasTyping).toBe(true);
 
@@ -717,16 +721,17 @@ describe('SmartField', function() {
 
     it('does not call openPopup() when TAB, CTRL or ALT has been pressed', function() {
       field.render();
-      field.openPopup = function(browse) {};
+      field.openPopup = function(browse) {
+      };
 
       var keyEvents = [{
-        which: scout.keys.TAB
+        which: keys.TAB
       }, {
         ctrlKey: true,
-        which: scout.keys.A
+        which: keys.A
       }, {
         altKey: true,
-        which: scout.keys.A
+        which: keys.A
       }];
 
       spyOn(field, 'openPopup');
@@ -739,9 +744,10 @@ describe('SmartField', function() {
     it('calls _lookupByTextOrAll() when a character key has been pressed', function() {
       field.render();
       field._pendingOpenPopup = true;
-      field._lookupByTextOrAll = function() {};
+      field._lookupByTextOrAll = function() {
+      };
       var event = {
-        which: scout.keys.A
+        which: keys.A
       };
       spyOn(field, '_lookupByTextOrAll').and.callThrough();
       field._onFieldKeyUp(event);
@@ -870,7 +876,7 @@ describe('SmartField', function() {
       jasmine.clock().tick(300);
       smartField.render();
       expect(smartField.value).toBe(1);
-      expect(scout.fields.valOrText(smartField.$field)).toBe('1:Foo');
+      expect(fields.valOrText(smartField.$field)).toBe('1:Foo');
       expect(smartField.displayText).toEqual('1:Foo\n2:Foo');
     });
 
@@ -884,7 +890,7 @@ describe('SmartField', function() {
       jasmine.clock().tick(300);
       smartFieldMultiline.render();
       expect(smartFieldMultiline.value).toBe(1);
-      expect(scout.fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
+      expect(fields.valOrText(smartFieldMultiline.$field)).toBe('1:Foo');
       expect(smartFieldMultiline._$multilineLines.text()).toEqual('2:Foo');
     });
   });
@@ -940,8 +946,8 @@ describe('SmartField', function() {
 
   });
 
-  describe('column descriptors', function(){
-    it('with default lookup column at first position renders lookup row column at first position', function(){
+  describe('column descriptors', function() {
+    it('with default lookup column at first position renders lookup row column at first position', function() {
       var field = createFieldWithLookupCall({}, {
         objectType: 'ColumnDescriptorDummyLookupCall'
       });
@@ -966,7 +972,7 @@ describe('SmartField', function() {
       expect(field.popup.proposalChooser.model.rows[0].cells[2].text).toBe("Bar column2");
     });
 
-    it('with default lookup column in the middle renders lookup row column in the middle', function(){
+    it('with default lookup column in the middle renders lookup row column in the middle', function() {
       var field = createFieldWithLookupCall({}, {
         objectType: 'ColumnDescriptorDummyLookupCall'
       });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, Status} from '../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TableFooterSpec", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("TableFooterSpec", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -131,7 +135,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       model.tableStatus = {
-        severity: scout.Status.Severity.ERROR,
+        severity: Status.Severity.ERROR,
         message: 'Table has an error'
       };
       var table = helper.createTable(model);
@@ -190,7 +194,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2);
       model.tableStatusVisible = true;
       model.tableStatus = {
-        severity: scout.Status.Severity.INFO,
+        severity: Status.Severity.INFO,
         message: 'Table has an information'
       };
       var table = helper.createTable(model);
@@ -245,7 +249,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2, 5);
       model.tableStatusVisible = true;
       model.tableStatus = {
-        severity: scout.Status.Severity.INFO,
+        severity: Status.Severity.INFO,
         message: 'Table has an information'
       };
       var table = helper.createTable(model);
@@ -268,7 +272,7 @@ describe("TableFooterSpec", function() {
       var model = helper.createModelFixture(2, 5);
       model.tableStatusVisible = true;
       model.tableStatus = {
-        severity: scout.Status.Severity.ERROR,
+        severity: Status.Severity.ERROR,
         message: 'Table has an error'
       };
       var table = helper.createTable(model);

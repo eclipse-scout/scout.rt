@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays, Outline, PageWithTable, scout} from '../../../../src/index';
+import {OutlineSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('PageWithTable', function() {
 
   var session, helper;
 
-  /** @type {scout.Outline} */
+  /** @type {Outline} */
   var outline;
-  /** @type {scout.PageWithTable} */
+  /** @type {PageWithTable} */
   var page;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.OutlineSpecHelper(session);
+    helper = new OutlineSpecHelper(session);
     outline = helper.createOutline();
 
     page = scout.create('PageWithTable', {
@@ -42,7 +46,7 @@ describe('PageWithTable', function() {
 
   it('updates the page on table reload', function() {
     var counter = 0;
-    page._loadTableData = function(searchFilter){
+    page._loadTableData = function(searchFilter) {
       counter++;
       return $.resolvedDeferred();
     };
@@ -53,7 +57,7 @@ describe('PageWithTable', function() {
   });
 
   it('should handle errors in _onLoadTableDataDone', function() {
-    page._loadTableData = function(searchFilter){
+    page._loadTableData = function(searchFilter) {
       return $.resolvedDeferred([{
         rowId: 1,
         parentRow: 666, // does not exist -> causes an error in Table.js#insertRows
@@ -66,7 +70,7 @@ describe('PageWithTable', function() {
 
     // expect error to be set as tableStatus
     var keys = Object.keys(page.detailTable.tableStatus);
-    expect(scout.arrays.containsAll(keys, ['message', 'code', 'severity'])).toBe(true);
+    expect(arrays.containsAll(keys, ['message', 'code', 'severity'])).toBe(true);
   });
 
 });

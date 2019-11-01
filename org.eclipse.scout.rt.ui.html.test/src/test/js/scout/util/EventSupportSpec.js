@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {EventSupport} from '../../src/index';
+
+
 describe('EventSupport', function() {
 
   var count, events;
@@ -19,7 +22,7 @@ describe('EventSupport', function() {
   describe('on / trigger / off', function() {
 
     beforeEach(function() {
-      events = new scout.EventSupport();
+      events = new EventSupport();
       count = 0;
     });
 
@@ -45,7 +48,7 @@ describe('EventSupport', function() {
   describe('one', function() {
 
     beforeEach(function() {
-      events = new scout.EventSupport();
+      events = new EventSupport();
       count = 0;
     });
 
@@ -111,7 +114,7 @@ describe('EventSupport', function() {
     }
 
     beforeEach(function() {
-      events = new scout.EventSupport();
+      events = new EventSupport();
       count = 0;
     });
 

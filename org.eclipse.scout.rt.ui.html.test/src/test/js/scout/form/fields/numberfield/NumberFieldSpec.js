@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormSpecHelper, LocaleSpecHelper} from '@eclipse-scout/testing';
+import {DecimalFormat, scout, Status} from '../../../../src/index';
+
+
 describe('NumberField', function() {
   var session;
   var helper;
@@ -17,11 +21,11 @@ describe('NumberField', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.FormSpecHelper(session);
-    localeHelper = new scout.LocaleSpecHelper();
+    helper = new FormSpecHelper(session);
+    localeHelper = new LocaleSpecHelper();
     jasmine.Ajax.install();
     jasmine.clock().install();
-    locale = localeHelper.createLocale(scout.LocaleSpecHelper.DEFAULT_LOCALE);
+    locale = localeHelper.createLocale(LocaleSpecHelper.DEFAULT_LOCALE);
   });
 
   afterEach(function() {
@@ -60,7 +64,7 @@ describe('NumberField', function() {
       field.render();
       field.setValue('abc');
       expect(field.value).toBe(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
       expect(field.displayText).toBe("abc");
     });
 
@@ -94,13 +98,13 @@ describe('NumberField', function() {
       field.setMaxValue(10);
 
       field.setValue(0);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setValue(3);
       expect(field.errorStatus).toBe(null);
 
       field.setValue(13);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
     });
 
     it('is validated when changing minMaxValue', function() {
@@ -109,13 +113,13 @@ describe('NumberField', function() {
       expect(field.errorStatus).toBe(null);
 
       field.setMinValue(6);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setMinValue(5);
       expect(field.errorStatus).toBe(null);
 
       field.setMaxValue(4);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setMaxValue(5);
       expect(field.errorStatus).toBe(null);
@@ -127,21 +131,21 @@ describe('NumberField', function() {
         maxValue: null
       });
       field.setValue(5);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field = helper.createField('NumberField', helper.session.desktop, {
         minValue: null,
         maxValue: 6
       });
       field.setValue(7);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field = helper.createField('NumberField');
 
       field.setValue(5);
       field.setMinValue(6);
       field.setMaxValue(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setMinValue(5);
       field.setMaxValue(null);
@@ -149,7 +153,7 @@ describe('NumberField', function() {
 
       field.setMaxValue(4);
       field.setMinValue(null);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       field.setMaxValue(5);
       field.setMinValue(null);
@@ -173,7 +177,7 @@ describe('NumberField', function() {
       expect(field.displayText).toBe('3---3');
       expect(field.$field.val()).toBe('3---3');
       expect(field.value).toBe(6);
-      expect(field.errorStatus instanceof scout.Status).toBe(true);
+      expect(field.errorStatus instanceof Status).toBe(true);
 
       // Fix input -> Calculator will change the display text to 6 using parseValue
       field.$field.val('3+3');
@@ -195,7 +199,7 @@ describe('NumberField', function() {
     it('sets the decimal format', function() {
       expect(field.decimalFormat.pattern).not.toBe('###0.000');
 
-      field.setDecimalFormat(new scout.DecimalFormat(session.locale, '###0.000'));
+      field.setDecimalFormat(new DecimalFormat(session.locale, '###0.000'));
       expect(field.decimalFormat.pattern).toBe('###0.000');
     });
 

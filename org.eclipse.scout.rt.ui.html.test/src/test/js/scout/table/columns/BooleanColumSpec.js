@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {BooleanColumn} from '../../../src/index';
+import {TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('BooleanColumn', function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe('BooleanColumn', function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
+    helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -36,7 +40,7 @@ describe('BooleanColumn', function() {
       expect(table.columns.length).toBe(3);
 
       table.render();
-      expect(table.columns[0] instanceof scout.BooleanColumn).toBeTruthy();
+      expect(table.columns[0] instanceof BooleanColumn).toBeTruthy();
     });
 
     it('no checkbox column gets inserted if table.checkable=false', function() {
@@ -47,7 +51,7 @@ describe('BooleanColumn', function() {
       expect(table.columns.length).toBe(2);
 
       table.render();
-      expect(table.columns[0] instanceof scout.BooleanColumn).toBeFalsy();
+      expect(table.columns[0] instanceof BooleanColumn).toBeFalsy();
     });
 
     it('this.checkableColumn is set to the new column', function() {

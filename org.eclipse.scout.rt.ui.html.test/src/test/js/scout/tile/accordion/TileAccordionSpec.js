@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, TileGridLayoutConfig} from '../../../src/index';
+
+
 describe("TileAccordion", function() {
   var session;
 
@@ -86,7 +89,7 @@ describe("TileAccordion", function() {
       });
       expect(accordion.groups[0].body.selectable).toBe(true);
       expect(accordion.groups[0].body.multiSelect).toBe(false);
-      expect(accordion.groups[0].body.layoutConfig).toEqual(scout.TileGridLayoutConfig.ensure({
+      expect(accordion.groups[0].body.layoutConfig).toEqual(TileGridLayoutConfig.ensure({
         columnWidth: 100,
         rowHeight: 100
       }));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, Widget} from '../../../src/index';
+import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("CellEditor", function() {
   var session;
   var helper;
@@ -16,8 +20,8 @@ describe("CellEditor", function() {
   beforeEach(function() {
     setFixtures(sandboxDesktop());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    helper = new TableSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -252,7 +256,7 @@ describe("CellEditor", function() {
       jasmine.clock().tick();
       expect(triggeredEvent.row).toBe(table.rows[0]);
       expect(triggeredEvent.column).toBe(table.columns[0]);
-      expect(triggeredEvent.field instanceof scout.Widget).toBe(true);
+      expect(triggeredEvent.field instanceof Widget).toBe(true);
     });
 
   });

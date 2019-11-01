@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {CheckBoxField, ValueField} from '../../../../src/index';
+
+
 describe("CheckBoxFieldWithTriState", function() {
 
   describe("inheritance", function() {
@@ -21,12 +24,12 @@ describe("CheckBoxFieldWithTriState", function() {
       session = sandboxSession();
       model = createSimpleModel('CheckBoxField', session);
       model.triStateEnabled = true;
-      checkBoxField = new scout.CheckBoxField();
+      checkBoxField = new CheckBoxField();
       checkBoxField.init(model);
     });
 
     it("inherits from ValueField", function() {
-      expect(scout.ValueField.prototype.isPrototypeOf(checkBoxField)).toBe(true);
+      expect(ValueField.prototype.isPrototypeOf(checkBoxField)).toBe(true);
     });
 
     it("_renderValue sets checked and undefined classes", function() {

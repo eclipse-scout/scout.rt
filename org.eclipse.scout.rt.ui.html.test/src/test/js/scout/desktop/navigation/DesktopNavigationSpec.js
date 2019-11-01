@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout, Tree} from '../../../src/index';
+import {OutlineSpecHelper} from '@eclipse-scout/testing';
+
+
 describe('DesktopNavigation', function() {
   var session, desktop, outlineHelper;
 
@@ -20,7 +24,7 @@ describe('DesktopNavigation', function() {
       }
     });
     desktop = session.desktop;
-    outlineHelper = new scout.OutlineSpecHelper(session);
+    outlineHelper = new OutlineSpecHelper(session);
   });
 
   describe('viewButtonBox', function() {
@@ -28,15 +32,15 @@ describe('DesktopNavigation', function() {
     it('is visible when there are more than one ViewButtons', function() {
       desktop.viewButtons = [
         scout.create('ViewButton', {
-        parent: desktop,
-        text: 'Button1',
-        displayStyle: 'TAB'
-      }),
-      scout.create('ViewButton', {
-        parent: desktop,
-        text: 'Button2',
-        displayStyle: 'TAB'
-      })
+          parent: desktop,
+          text: 'Button1',
+          displayStyle: 'TAB'
+        }),
+        scout.create('ViewButton', {
+          parent: desktop,
+          text: 'Button2',
+          displayStyle: 'TAB'
+        })
       ];
       desktop.render(session.$entryPoint);
       expect(desktop.navigation.viewButtonBox.visible).toBe(true);
@@ -82,14 +86,14 @@ describe('DesktopNavigation', function() {
       var outline = _setupOutline(outlineHelper, desktop, true);
 
       expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);
 
       // collapse to breadcrumb
       desktop.shrinkNavigation();
       expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.BREADCRUMB);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.BREADCRUMB);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(true);
 
@@ -100,14 +104,14 @@ describe('DesktopNavigation', function() {
       //enlarge to breadcrumb
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.BREADCRUMB);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.BREADCRUMB);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(true);
 
       //enlarge to default
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);
     });
@@ -117,7 +121,7 @@ describe('DesktopNavigation', function() {
 
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
 
       // collapse completely
       desktop.shrinkNavigation();
@@ -126,7 +130,7 @@ describe('DesktopNavigation', function() {
       //enlarge to default
       desktop.enlargeNavigation();
       expect(desktop.navigationVisible).toBe(true);
-      expect(desktop.outline.displayStyle).toBe(scout.Tree.DisplayStyle.DEFAULT);
+      expect(desktop.outline.displayStyle).toBe(Tree.DisplayStyle.DEFAULT);
       expect(desktop.navigation.handle.leftVisible).toBe(true);
       expect(desktop.navigation.handle.rightVisible).toBe(false);
     });
@@ -139,7 +143,7 @@ function _setupOutline(outlineHelper, desktop, toggleBreadcrumbStyleEnabled) {
   var model = outlineHelper.createModelFixture(3, 2);
   var outline = outlineHelper.createOutline(model);
   outline.toggleBreadcrumbStyleEnabled = toggleBreadcrumbStyleEnabled;
-  outline.displayStyle = scout.Tree.DisplayStyle.DEFAULT;
+  outline.displayStyle = Tree.DisplayStyle.DEFAULT;
   desktop.setOutline(outline);
   desktop.render(desktop.session.$entryPoint);
   return outline;

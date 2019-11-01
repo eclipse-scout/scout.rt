@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RemoteEvent} from '../../src/index';
+import {TreeSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("TreeAdapter", function() {
   var session;
   var helper;
@@ -15,7 +19,7 @@ describe("TreeAdapter", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    helper = new scout.TreeSpecHelper(session);
+    helper = new TreeSpecHelper(session);
     $.fx.off = true;
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -184,12 +188,12 @@ describe("TreeAdapter", function() {
 
       sendQueuedAjaxCalls();
 
-      var event0 = new scout.RemoteEvent(tree.id, 'nodeExpanded', {
+      var event0 = new RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: node0.id,
         expanded: true,
         expandedLazy: false
       });
-      var event1 = new scout.RemoteEvent(tree.id, 'nodeExpanded', {
+      var event1 = new RemoteEvent(tree.id, 'nodeExpanded', {
         nodeId: child0.id,
         expanded: true,
         expandedLazy: false

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ListBox, QueryBy, scout, Status} from '../../../../src/index';
+import {DummyLookupCall, FormSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("ListBox", function() {
   var session, field, helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = sandboxSession();
-    field = new scout.ListBox();
-    helper = new scout.FormSpecHelper(session);
+    field = new ListBox();
+    helper = new FormSpecHelper(session);
     jasmine.clock().install();
   });
 
@@ -39,7 +43,7 @@ describe("ListBox", function() {
 
   function createListBoxWithAdapter() {
     var model = helper.createFieldModel('ListBox');
-    var listBox = new scout.ListBox();
+    var listBox = new ListBox();
     listBox.init(model);
     linkWidgetAndAdapter(listBox, 'ListBoxAdapter');
     return listBox;
@@ -54,7 +58,7 @@ describe("ListBox", function() {
 
     it('init LookupCall when configured as string', function() {
       field = createFieldWithLookupCall();
-      expect(field.lookupCall instanceof scout.DummyLookupCall).toBe(true);
+      expect(field.lookupCall instanceof DummyLookupCall).toBe(true);
     });
 
     it('LookupCall can be prepared if value is set explicitly', function(done) {
@@ -69,8 +73,8 @@ describe("ListBox", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
@@ -89,9 +93,9 @@ describe("ListBox", function() {
       jasmine.clock().tick(500);
 
       $.promiseAll([lookupPrepared, lookupDone]).then(function(event) {
-          expect(event.lookupCall.objectType).toBe('DummyLookupCall');
-          expect(box.getCheckedLookupRows().length).toBe(1);
-        })
+        expect(event.lookupCall.objectType).toBe('DummyLookupCall');
+        expect(box.getCheckedLookupRows().length).toBe(1);
+      })
         .catch(fail)
         .always(done);
       jasmine.clock().tick(500);
@@ -177,7 +181,7 @@ describe("ListBox", function() {
 
       field.table.checkRows(field.table.rows[2]);
       expect(field.value).toEqual([]);
-      field.table.checkRows(field.table.rows[2], { checkOnlyEnabled: false });
+      field.table.checkRows(field.table.rows[2], {checkOnlyEnabled: false});
       expect(field.value).toEqual([3]);
 
       field.setValue([1]);
@@ -256,20 +260,20 @@ describe("ListBox", function() {
     it('should set error status when result has an exception', function() {
       var field = createFieldWithLookupCall();
       field._lookupByAllDone({
-        queryBy: scout.QueryBy.ALL,
+        queryBy: QueryBy.ALL,
         lookupRows: [],
         exception: 'a total disaster'
       });
-      expect(field.errorStatus.severity).toBe(scout.Status.Severity.ERROR);
+      expect(field.errorStatus.severity).toBe(Status.Severity.ERROR);
       expect(field.errorStatus.message).toBe('a total disaster');
     });
 
     it('_executeLookup should always remove lookup-status (but not the error-status)', function() {
       var field = createFieldWithLookupCall();
-      var lookupStatus = scout.Status.warning({
+      var lookupStatus = Status.warning({
         message: 'bar'
       });
-      var errorStatus = scout.Status.error({
+      var errorStatus = Status.error({
         message: 'foo'
       });
       field.setLookupStatus(lookupStatus);

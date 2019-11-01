@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RemoteEvent, StringFieldAdapter} from '../../../src/index';
+import {FormSpecHelper, TableSpecHelper} from '@eclipse-scout/testing';
+
+
 describe("CellEditorAdapter", function() {
   var session;
   var helper;
@@ -16,8 +20,8 @@ describe("CellEditorAdapter", function() {
   beforeEach(function() {
     setFixtures(sandboxDesktop());
     session = sandboxSession();
-    helper = new scout.TableSpecHelper(session);
-    formHelper = new scout.FormSpecHelper(session);
+    helper = new TableSpecHelper(session);
+    formHelper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -34,7 +38,7 @@ describe("CellEditorAdapter", function() {
 
   function createStringField(table) {
     var model = formHelper.createFieldModel('StringField', session.desktop);
-    var adapter = new scout.StringFieldAdapter();
+    var adapter = new StringFieldAdapter();
     adapter.init(model);
     return adapter.createWidget(model, session.desktop);
   }
@@ -50,7 +54,7 @@ describe("CellEditorAdapter", function() {
   function createTableAndStartCellEdit() {
     var model = helper.createModelFixture(2, 2);
     model.rows[0].cells[0].editable = true;
-    var adapter = helper.createTableAdapter(model) ;
+    var adapter = helper.createTableAdapter(model);
     var table = adapter.createWidget(model, session.desktop);
     table.render();
 
@@ -107,7 +111,7 @@ describe("CellEditorAdapter", function() {
       popup.completeEdit()
         .then(function() {
           sendQueuedAjaxCalls();
-          var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
+          var event = new RemoteEvent(popup.table.id, 'completeCellEdit', {
             fieldId: popup.cell.field.id
           });
           expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -123,7 +127,7 @@ describe("CellEditorAdapter", function() {
 
         expect(jasmine.Ajax.requests.count()).toBe(1);
         expect(mostRecentJsonRequest().events.length).toBe(1);
-        var event = new scout.RemoteEvent(popup.table.id, 'completeCellEdit', {
+        var event = new RemoteEvent(popup.table.id, 'completeCellEdit', {
           fieldId: popup.cell.field.id
         });
         expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -154,7 +158,7 @@ describe("CellEditorAdapter", function() {
       popup.cancelEdit();
       sendQueuedAjaxCalls();
 
-      var event = new scout.RemoteEvent(popup.table.id, 'cancelCellEdit', {
+      var event = new RemoteEvent(popup.table.id, 'cancelCellEdit', {
         fieldId: popup.cell.field.id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2019 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,17 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Dimension, Insets, LogicalGridData, LogicalGridLayoutInfo, Rectangle} from '../../../src/index';
+
+
 /* This test also exists as Java code, to make sure Java and JS code produces the same results */
 describe("LogicalGridLayoutInfo", function() {
 
   describe("Rectangle.union", function() {
 
-    var r1 = new scout.Rectangle(0, 0, 675, 558);
-    var r2 = new scout.Rectangle(687, 0, 674, 558);
+    var r1 = new Rectangle(0, 0, 675, 558);
+    var r2 = new Rectangle(687, 0, 674, 558);
 
     it("produces same results as java.awt.Rectangle", function() {
       var r = r1.union(r2);
-      var expected = new scout.Rectangle(0, 0, 1361, 558);
+      var expected = new Rectangle(0, 0, 1361, 558);
       expect(expected.equals(r)).toBe(true);
     });
 
@@ -43,7 +46,7 @@ describe("LogicalGridLayoutInfo", function() {
     function mockHtmlComp(jquery) {
       return {
         prefSize: function() {
-          return new scout.Dimension(1, 1);
+          return new Dimension(1, 1);
         }
       };
     }
@@ -53,7 +56,7 @@ describe("LogicalGridLayoutInfo", function() {
       mockJquery('StringField')
     ];
 
-    var gd1 = new scout.LogicalGridData();
+    var gd1 = new LogicalGridData();
     gd1.gridx = 0;
     gd1.gridy = 0;
     gd1.gridw = 1;
@@ -61,7 +64,7 @@ describe("LogicalGridLayoutInfo", function() {
     gd1.weightx = 0.0;
     gd1.widthHint = 70;
 
-    var gd2 = new scout.LogicalGridData();
+    var gd2 = new LogicalGridData();
     gd2.gridx = 1;
     gd2.gridy = 0;
     gd2.gridw = 1;
@@ -69,15 +72,15 @@ describe("LogicalGridLayoutInfo", function() {
     gd2.weightx = 1.0;
 
     var cons = [gd1, gd2];
-    var lgli = new scout.LogicalGridLayoutInfo({
+    var lgli = new LogicalGridLayoutInfo({
       $components: components,
       cons: cons,
       hgap: 5,
       vgap: 5,
       rowHeight: 30
     });
-    var parentSize = new scout.Dimension(500, 23);
-    var parentInsets = new scout.Insets(0, 0, 0, 0);
+    var parentSize = new Dimension(500, 23);
+    var parentInsets = new Insets(0, 0, 0, 0);
 
     it("calculates bounds", function() {
       lgli.layoutCellBounds(parentSize, parentInsets);
