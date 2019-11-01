@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.platform.util.LazyValue;
+import org.eclipse.scout.rt.platform.util.StringUtility;
 
 @Bean
 public class WebResourceResolvers {
@@ -38,6 +39,7 @@ public class WebResourceResolvers {
   }
 
   public static boolean isNewMode() {
-    return Boolean.parseBoolean(System.getProperty("newMode")); // TODO [mvi]: remove
+    String newModeValue = System.getProperty("newMode");
+    return !StringUtility.hasText(newModeValue) || "true".equalsIgnoreCase(newModeValue);
   }
 }
