@@ -11,36 +11,36 @@ import {FormField} from '@eclipse-scout/core';
 
 export default class ChartField extends FormField {
 
-constructor() {
-  super();
-  this._addWidgetProperties(['chart']);
-}
-
-
-_render() {
-  this.addContainer(this.$parent, 'chart-field');
-  this.addLabel();
-  this.addMandatoryIndicator();
-  this.addStatus();
-  this._renderChart();
-}
-
-_renderChart() {
-  if (this.chart) {
-    this.chart.render();
-    this.addField(this.chart.$container);
+  constructor() {
+    super();
+    this._addWidgetProperties(['chart']);
   }
-}
 
-_removeChart() {
-  this.chart.remove();
-  this._removeField();
-}
 
-_renderOnAttach() {
-  super._renderOnAttach();
-  if (this.chart && this.chart.chartRenderer) {
-    this.chart.chartRenderer.checkCompletlyRendered();
+  _render() {
+    this.addContainer(this.$parent, 'chart-field');
+    this.addLabel();
+    this.addMandatoryIndicator();
+    this.addStatus();
+    this._renderChart();
   }
-}
+
+  _renderChart() {
+    if (this.chart) {
+      this.chart.render();
+      this.addField(this.chart.$container);
+    }
+  }
+
+  _removeChart() {
+    this.chart.remove();
+    this._removeField();
+  }
+
+  _renderOnAttach() {
+    super._renderOnAttach();
+    if (this.chart && this.chart.chartRenderer) {
+      this.chart.chartRenderer.checkCompletlyRendered();
+    }
+  }
 }

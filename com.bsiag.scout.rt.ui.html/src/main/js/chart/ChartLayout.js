@@ -12,26 +12,26 @@ import {Chart} from '../index';
 
 export default class ChartLayout extends AbstractLayout {
 
-constructor(chart) {
-  super();
-  this.chart = chart;
-}
+  constructor(chart) {
+    super();
+    this.chart = chart;
+  }
 
 
-layout($container) {
-  var opts = {
-    requestAnimation: true,
-    debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
-  };
-  // Don't request animations when the session is not ready or the chart was already updated once
-  if (!this.chart.session.ready || this.chart.updatedOnce) {
-    opts.requestAnimation = false;
+  layout($container) {
+    var opts = {
+      requestAnimation: true,
+      debounce: Chart.DEFAULT_DEBOUNCE_TIMEOUT
+    };
+    // Don't request animations when the session is not ready or the chart was already updated once
+    if (!this.chart.session.ready || this.chart.updatedOnce) {
+      opts.requestAnimation = false;
+    }
+    // Don't debounce while session is not yet ready. Otherwise, it might happen that the area to layout is not
+    // attached anymore because some other view tab is in front when the setTimeout() functions is finally called.
+    if (!this.chart.session.ready) {
+      opts.debounce = false;
+    }
+    this.chart.updateChart(opts);
   }
-  // Don't debounce while session is not yet ready. Otherwise, it might happen that the area to layout is not
-  // attached anymore because some other view tab is in front when the setTimeout() functions is finally called.
-  if (!this.chart.session.ready) {
-    opts.debounce = false;
-  }
-  this.chart.updateChart(opts);
-}
 }

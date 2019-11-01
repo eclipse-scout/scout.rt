@@ -11,19 +11,19 @@ import {AbstractLayout, scrollbars} from '@eclipse-scout/core';
 
 export default class ChartTableControlLayout extends AbstractLayout {
 
-constructor(control) {
-  super();
-  this.control = control;
-}
+  constructor(control) {
+    super();
+    this.control = control;
+  }
 
 
-layout($container) {
-  if (!this.control.contentRendered) {
-    return;
+  layout($container) {
+    if (!this.control.contentRendered) {
+      return;
+    }
+    // ChartTableControl enlarges the content which would lead to scrollbars -> make them invisible while size is dirty
+    if (!this.control.sizeDirty) {
+      scrollbars.update(this.control.$contentContainer);
+    }
   }
-  // ChartTableControl enlarges the content which would lead to scrollbars -> make them invisible while size is dirty
-  if (!this.control.sizeDirty) {
-    scrollbars.update(this.control.$contentContainer);
-  }
-}
 }

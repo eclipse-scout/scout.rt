@@ -11,17 +11,17 @@ import * as $ from 'jquery';
 
 export default class PieSegment {
 
-constructor() {
-  this.label = null;
-  this.value = null;
-  this.color = null;
-  this.cssClass = null;
-  this.valueGroup = null; // reference to the original group
-  this.valueGroupIndex = null;
-  this.clickable = true;
-}
+  constructor() {
+    this.label = null;
+    this.value = null;
+    this.color = null;
+    this.cssClass = null;
+    this.valueGroup = null; // reference to the original group
+    this.valueGroupIndex = null;
+    this.clickable = true;
+  }
 
-init(model) {
-  $.extend(this, model);
-}
+  init(model) {
+    $.extend(this, model);
+  }
 }

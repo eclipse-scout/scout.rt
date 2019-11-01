@@ -11,20 +11,20 @@ import {ModelAdapter} from '@eclipse-scout/core';
 
 export default class ChartAdapter extends ModelAdapter {
 
-constructor() {
-  super();
-}
-
-
-_onWidgetValueClick(event) {
-  this._send('valueClick', event.data);
-}
-
-_onWidgetEvent(event) {
-  if (event.type === 'valueClick') {
-    this._onWidgetValueClick(event);
-  } else {
-    super._onWidgetEvent( event);
+  constructor() {
+    super();
   }
-}
+
+
+  _onWidgetValueClick(event) {
+    this._send('valueClick', event.data);
+  }
+
+  _onWidgetEvent(event) {
+    if (event.type === 'valueClick') {
+      this._onWidgetValueClick(event);
+    } else {
+      super._onWidgetEvent(event);
+    }
+  }
 }

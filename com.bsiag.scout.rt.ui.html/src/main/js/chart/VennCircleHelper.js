@@ -9,94 +9,94 @@
  */
 export default class VennCircleHelper {
 
-constructor(distR, maxR, minR, total) {
-  this.distR = distR;
-  this.maxR = maxR;
-  this.minR = minR;
-  this.total = total;
-}
-
-findBalance2(venn1, venn2) {
-  // find center
-  var midX = (venn1.r * venn1.x + venn2.r * venn2.x) / (venn1.r + venn2.r);
-  var midY = (venn1.r * venn1.y + venn2.r * venn2.y) / (venn1.r + venn2.r);
-
-  // move to center
-  venn1.x = venn1.x - midX;
-  venn2.x = venn2.x - midX;
-
-  venn1.y = venn1.y - midY;
-  venn2.y = venn2.y - midY;
-}
-
-findBalance3(venn1, venn2, venn3) {
-  // find center
-  var midX = (venn1.r * venn1.x + venn2.r * venn2.x + venn3.r * venn3.x) / (venn1.r + venn2.r + venn3.r);
-  var midY = (venn1.r * venn1.y + venn2.r * venn2.y + venn3.r * venn3.y) / (venn1.r + venn2.r + venn3.r);
-
-  // move to center
-  venn1.x = venn1.x - midX;
-  venn2.x = venn2.x - midX;
-  venn3.x = venn3.x - midX;
-
-  venn1.y = venn1.y - midY;
-  venn2.y = venn2.y - midY;
-  venn3.y = venn3.y - midY;
-}
-
-calcR(count, factorMax) {
-  if (count == -1) {
-    return this.maxR * factorMax;
-  } else {
-    return Math.max(this.minR, Math.sqrt(count / this.total) * this.maxR * factorMax);
-  }
-}
-
-calcD(venn1, venn2, u, v, uv, changeR) {
-  var ret;
-  if (uv === 0) {
-    // separated circles
-    ret = venn1.r + venn2.r + this.distR * 2;
-
-  } else if (u === 0 && v === 0) {
-    // same circle
-    ret = 0;
-
-  } else if (u === 0) {
-    // a part of b
-    ret = Math.max(0, venn2.r - venn1.r - this.distR);
-
-    // check if inner circle is to large
-    if (ret < 1.5 * this.distR && changeR) {
-      ret = 1.5 * this.distR;
-      venn1.r = venn2.r - ret;
-    }
-
-  } else if (v === 0) {
-    // b part of a
-    ret = Math.max(0, venn1.r - venn2.r - this.distR);
-
-    // check if inner circle is to large
-    if (ret < 1.5 * this.distR && changeR) {
-      ret = 1.5 * this.distR;
-      venn2.r = venn1.r - ret;
-    }
-
-  } else {
-    //  this is pure magic ;) please do not touch!
-    var ri = Math.min(venn1.r, venn2.r);
-    var ra = Math.max(venn1.r, venn2.r);
-    var q = Math.min(u, v) / (Math.min(u, v) + uv);
-
-    // unfortunately, there is no closed solution for cricles, so handle as squares
-    ret = 2 * q * ri - ri + ra;
-
-    // check and fix
-    ret = Math.max(3 * this.distR, ret);
-    ret = Math.min(ri + ra - 3 * this.distR, ret);
-    ret = Math.max(ra - ri + 3 * this.distR, ret);
+  constructor(distR, maxR, minR, total) {
+    this.distR = distR;
+    this.maxR = maxR;
+    this.minR = minR;
+    this.total = total;
   }
 
-  return ret;
-}
+  findBalance2(venn1, venn2) {
+    // find center
+    var midX = (venn1.r * venn1.x + venn2.r * venn2.x) / (venn1.r + venn2.r);
+    var midY = (venn1.r * venn1.y + venn2.r * venn2.y) / (venn1.r + venn2.r);
+
+    // move to center
+    venn1.x = venn1.x - midX;
+    venn2.x = venn2.x - midX;
+
+    venn1.y = venn1.y - midY;
+    venn2.y = venn2.y - midY;
+  }
+
+  findBalance3(venn1, venn2, venn3) {
+    // find center
+    var midX = (venn1.r * venn1.x + venn2.r * venn2.x + venn3.r * venn3.x) / (venn1.r + venn2.r + venn3.r);
+    var midY = (venn1.r * venn1.y + venn2.r * venn2.y + venn3.r * venn3.y) / (venn1.r + venn2.r + venn3.r);
+
+    // move to center
+    venn1.x = venn1.x - midX;
+    venn2.x = venn2.x - midX;
+    venn3.x = venn3.x - midX;
+
+    venn1.y = venn1.y - midY;
+    venn2.y = venn2.y - midY;
+    venn3.y = venn3.y - midY;
+  }
+
+  calcR(count, factorMax) {
+    if (count == -1) {
+      return this.maxR * factorMax;
+    } else {
+      return Math.max(this.minR, Math.sqrt(count / this.total) * this.maxR * factorMax);
+    }
+  }
+
+  calcD(venn1, venn2, u, v, uv, changeR) {
+    var ret;
+    if (uv === 0) {
+      // separated circles
+      ret = venn1.r + venn2.r + this.distR * 2;
+
+    } else if (u === 0 && v === 0) {
+      // same circle
+      ret = 0;
+
+    } else if (u === 0) {
+      // a part of b
+      ret = Math.max(0, venn2.r - venn1.r - this.distR);
+
+      // check if inner circle is to large
+      if (ret < 1.5 * this.distR && changeR) {
+        ret = 1.5 * this.distR;
+        venn1.r = venn2.r - ret;
+      }
+
+    } else if (v === 0) {
+      // b part of a
+      ret = Math.max(0, venn1.r - venn2.r - this.distR);
+
+      // check if inner circle is to large
+      if (ret < 1.5 * this.distR && changeR) {
+        ret = 1.5 * this.distR;
+        venn2.r = venn1.r - ret;
+      }
+
+    } else {
+      //  this is pure magic ;) please do not touch!
+      var ri = Math.min(venn1.r, venn2.r);
+      var ra = Math.max(venn1.r, venn2.r);
+      var q = Math.min(u, v) / (Math.min(u, v) + uv);
+
+      // unfortunately, there is no closed solution for cricles, so handle as squares
+      ret = 2 * q * ri - ri + ra;
+
+      // check and fix
+      ret = Math.max(3 * this.distR, ret);
+      ret = Math.min(ri + ra - 3 * this.distR, ret);
+      ret = Math.max(ra - ri + 3 * this.distR, ret);
+    }
+
+    return ret;
+  }
 }

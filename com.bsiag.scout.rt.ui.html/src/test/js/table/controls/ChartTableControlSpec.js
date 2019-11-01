@@ -22,11 +22,11 @@ describe('ChartTableControl', function() {
     jasmine.clock().install();
   });
 
-  afterEach(function(){
+  afterEach(function() {
     jasmine.clock().uninstall();
   });
 
-  function createModelFromTable(table){
+  function createModelFromTable(table) {
     var model = createSimpleModel('ChartTableControl', session);
     var defaults = {
       enabled: true,

@@ -11,9 +11,9 @@ import {TableControlAdapter} from '@eclipse-scout/core';
 
 export default class ChartTableControlAdapter extends TableControlAdapter {
 
-constructor() {
-  super();
-  this._addRemoteProperties(['chartType', 'chartAggregation', 'chartGroup1', 'chartGroup2']);
-}
+  constructor() {
+    super();
+    this._addRemoteProperties(['chartType', 'chartAggregation', 'chartGroup1', 'chartGroup2']);
+  }
 
 }

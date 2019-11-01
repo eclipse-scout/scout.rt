@@ -11,18 +11,18 @@ import {PieChartRenderer} from '../index';
 
 export default class DonutChartRenderer extends PieChartRenderer {
 
-constructor(chart) {
-  super( chart);
-}
+  constructor(chart) {
+    super(chart);
+  }
 
 
-_render() {
-  var outerCircleR = Math.min(this.chartBox.height, this.chartBox.width) / 2;
-  this.centerCircleR = outerCircleR * 0.65; // donut thickness = 35% of outer circle
-  super._render();
-}
+  _render() {
+    var outerCircleR = Math.min(this.chartBox.height, this.chartBox.width) / 2;
+    this.centerCircleR = outerCircleR * 0.65; // donut thickness = 35% of outer circle
+    super._render();
+  }
 
-_renderPieChartPercentage(midPoint, percentage) {
-  // NOP
-}
+  _renderPieChartPercentage(midPoint, percentage) {
+    // NOP
+  }
 }

@@ -11,8 +11,8 @@ import {AbstractChartRenderer} from '../index';
 
 export default class ScatterChartRenderer extends AbstractChartRenderer {
 
-constructor(chart) {
-  super( chart);
-}
+  constructor(chart) {
+    super(chart);
+  }
 
 }

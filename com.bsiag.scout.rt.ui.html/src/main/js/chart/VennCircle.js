@@ -11,30 +11,30 @@
 
 export default class VennCircle {
 
-constructor($circle) {
-  this.$circle = $circle;
-  this.x;
-  this.y;
-  this.r;
-  this.legend;
-  this.legendR;
-  this.legendH;
-  this.legendV;
-  this.labels = [];
-}
+  constructor($circle) {
+    this.$circle = $circle;
+    this.x;
+    this.y;
+    this.r;
+    this.legend;
+    this.legendR;
+    this.legendH;
+    this.legendV;
+    this.labels = [];
+  }
 
-setLegend(legend, horizontal, vertical, r) {
-  this.legend = legend;
-  this.legendH = horizontal;
-  this.legendV = vertical;
-  this.legendR = r || this.r;
-}
+  setLegend(legend, horizontal, vertical, r) {
+    this.legend = legend;
+    this.legendH = horizontal;
+    this.legendV = vertical;
+    this.legendR = r || this.r;
+  }
 
-addLabel(text, x, y) {
-  this.labels.push({
-    text: text,
-    x: x,
-    y: y
-  });
-}
+  addLabel(text, x, y) {
+    this.labels.push({
+      text: text,
+      x: x,
+      y: y
+    });
+  }
 }

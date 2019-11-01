@@ -11,8 +11,8 @@ import {AbstractChartRenderer} from '../index';
 
 export default class BarHorizontalChartRenderer extends AbstractChartRenderer {
 
-constructor(chart) {
-  super( chart);
-}
+  constructor(chart) {
+    super(chart);
+  }
 
 }
