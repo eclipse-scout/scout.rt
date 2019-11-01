@@ -8,33 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SvgField = function() {
-  scout.SvgField.parent.call(this);
-};
-scout.inherits(scout.SvgField, scout.ValueField);
+import {ValueField, AppLinkKeyStroke} from '@eclipse-scout/core';
+import * as $ from 'jquery';
 
-scout.SvgField.prototype._render = function() {
+export default class SvgField extends ValueField {
+
+constructor() {
+  super();
+}
+
+
+_render() {
   this.addContainer(this.$parent, 'svg-field');
   this.addLabel();
   this.addField(this.$parent.makeDiv());
   this.addMandatoryIndicator();
   this.addStatus();
-};
+}
 
-scout.SvgField.prototype._renderProperties = function() {
-  scout.SvgField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSvgDocument();
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.SvgField.prototype._initKeyStrokeContext = function() {
-  scout.SvgField.parent.prototype._initKeyStrokeContext.call(this);
-  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
-};
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
+  this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
+}
 
-scout.SvgField.prototype._renderSvgDocument = function() {
+_renderSvgDocument() {
   if (!this.svgDocument) {
     this.$field.empty();
     return;
@@ -44,17 +49,18 @@ scout.SvgField.prototype._renderSvgDocument = function() {
     .on('click', this._onAppLinkAction.bind(this))
     .attr('tabindex', '0')
     .unfocusable();
-};
+}
 
-scout.SvgField.prototype._onAppLinkAction = function(event) {
+_onAppLinkAction(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this._triggerAppLinkAction(ref);
   event.preventDefault();
-};
+}
 
-scout.SvgField.prototype._triggerAppLinkAction = function(ref) {
+_triggerAppLinkAction(ref) {
   this.trigger('appLinkAction', {
     ref: ref
   });
-};
+}
+}

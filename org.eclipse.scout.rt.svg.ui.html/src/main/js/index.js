@@ -11,4 +11,8 @@
 
 import * as self from './index.js';
 
-window.scout = Object.assign(window.scout || {}, self);
+export let scout =Object.assign(scout || {}, self);
+
+export default {
+  scout
+};

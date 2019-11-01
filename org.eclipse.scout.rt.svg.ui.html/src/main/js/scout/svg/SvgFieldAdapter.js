@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SvgFieldAdapter = function() {
-  scout.SvgFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.SvgFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '@eclipse-scout/core';
 
-scout.SvgFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
+export default class SvgFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.SvgFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.SvgFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}
