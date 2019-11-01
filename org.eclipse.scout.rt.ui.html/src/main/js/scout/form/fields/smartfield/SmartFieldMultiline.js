@@ -8,23 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartFieldMultiline = function() {
-  scout.SmartFieldMultiline.parent.call(this);
+import {SmartField} from '../../../index';
+import {fields} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {SmartFieldLayout} from '../../../index';
+import {graphics} from '../../../index';
+import {SmartFieldMultilineLayout} from '../../../index';
+import {FormField} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class SmartFieldMultiline extends SmartField {
+
+constructor() {
+  super();
   this.options;
   this._$multilineLines;
-};
-scout.inherits(scout.SmartFieldMultiline, scout.SmartField);
+}
 
-scout.SmartFieldMultiline.prototype._render = function() {
+
+_render() {
   var $input, htmlComp;
 
-  this.addContainer(this.$parent, 'smart-field has-icon', new scout.SmartFieldLayout(this));
+  this.addContainer(this.$parent, 'smart-field has-icon', new SmartFieldLayout(this));
   this.addLabel();
   this.addFieldContainer(this.$parent.makeDiv('multiline'));
-  htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(new scout.SmartFieldMultilineLayout(this));
+  htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
+  htmlComp.setLayout(new SmartFieldMultilineLayout(this));
 
-  $input = scout.fields.makeInputOrDiv(this, 'multiline-input')
+  $input = fields.makeInputOrDiv(this, 'multiline-input')
     .on('mousedown', this._onFieldMouseDown.bind(this))
     .appendTo(this.$fieldContainer);
 
@@ -45,51 +56,52 @@ scout.SmartFieldMultiline.prototype._render = function() {
   this.addIcon();
   this.$icon.addClass('needsclick');
   this.addStatus();
-};
+}
 
-scout.SmartFieldMultiline.prototype._renderEnabled = function() {
-  scout.SmartFieldMultiline.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this._$multilineLines.setEnabled(this.enabledComputed);
-};
+}
 
 /**
  * Sets the focus to the input field when user clicks on text lines, but only if nothing is selected.
  * Otherwise it would be impossible for the user to select the text. That's why we cannot use the
  * mousedown event here too.
  */
-scout.SmartFieldMultiline.prototype._onMultilineLinesClick = function(event) {
+_onMultilineLinesClick(event) {
   if (this.enabledComputed) {
     var selection = this.$field.window(true).getSelection();
     if (!selection.toString()) {
       this.$field.focus();
     }
   }
-};
+}
 
-scout.SmartFieldMultiline.prototype._renderDisplayText = function() {
-  scout.SmartFieldMultiline.parent.prototype._renderDisplayText.call(this);
+_renderDisplayText() {
+  super._renderDisplayText();
   var additionalLines = this.additionalLines();
   if (additionalLines) {
-    this._$multilineLines.html(scout.arrays.formatEncoded(additionalLines, '<br/>'));
+    this._$multilineLines.html(arrays.formatEncoded(additionalLines, '<br/>'));
   } else {
     this._$multilineLines.empty();
   }
-};
+}
 
-scout.SmartFieldMultiline.prototype._getInputBounds = function() {
-  var fieldBounds = scout.graphics.offsetBounds(this.$fieldContainer),
-    textFieldBounds = scout.graphics.offsetBounds(this.$field);
+_getInputBounds() {
+  var fieldBounds = graphics.offsetBounds(this.$fieldContainer),
+    textFieldBounds = graphics.offsetBounds(this.$field);
   fieldBounds.height = textFieldBounds.height;
   return fieldBounds;
-};
+}
 
-scout.SmartFieldMultiline.prototype._renderFocused = function() {
-  scout.SmartFieldMultiline.parent.prototype._renderFocused.call(this);
+_renderFocused() {
+  super._renderFocused();
   this._$multilineLines.toggleClass('focused', this.focused);
-};
+}
 
-scout.SmartFieldMultiline.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
-  scout.SmartFieldMultiline.parent.prototype._updateErrorStatusClasses.call(this, statusClass, hasStatus);
-  this._$multilineLines.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+_updateErrorStatusClasses(statusClass, hasStatus) {
+  super._updateErrorStatusClasses( statusClass, hasStatus);
+  this._$multilineLines.removeClass(FormField.SEVERITY_CSS_CLASSES);
   this._$multilineLines.addClass(statusClass, hasStatus);
-};
+}
+}

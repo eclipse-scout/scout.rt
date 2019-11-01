@@ -8,34 +8,43 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TouchPopupLayout = function(popup) {
-  scout.TouchPopupLayout.parent.call(this, popup);
-  this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.TouchPopupLayout, scout.PopupLayout);
+import {graphics} from '../index';
+import {Rectangle} from '../index';
+import {HtmlEnvironment} from '../index';
+import {PopupLayout} from '../index';
+import {Dimension} from '../index';
 
-scout.TouchPopupLayout.prototype.layout = function($container) {
-  scout.TouchPopupLayout.parent.prototype.layout.call(this, $container);
+export default class TouchPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
+  this.doubleCalcPrefSize = false;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   var popupSize = this.popup.htmlComp.size().subtract(this.popup.htmlComp.insets()),
-    headerHeight = scout.graphics.size(this.popup._$header, true).height,
+    headerHeight = graphics.size(this.popup._$header, true).height,
     field = this.popup._field,
     fieldHeight = field.htmlComp.prefSize().height,
     fieldMargins = field.htmlComp.margins(),
     fieldWidth = popupSize.width - fieldMargins.horizontal(),
     widgetVerticalOffset = headerHeight + fieldHeight + fieldMargins.vertical();
 
-  field.htmlComp.setBounds(new scout.Rectangle(0, headerHeight, fieldWidth, fieldHeight));
+  field.htmlComp.setBounds(new Rectangle(0, headerHeight, fieldWidth, fieldHeight));
   this.popup._widgetContainerHtmlComp.setBounds(
-    new scout.Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
-};
+    new Rectangle(0, widgetVerticalOffset, popupSize.width, popupSize.height - widgetVerticalOffset));
+}
 
 /**
  * @override AbstractLayout.js
  */
-scout.TouchPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var popupWidth = scout.htmlEnvironment.formColumnWidth,
-    popupHeight = scout.htmlEnvironment.formRowHeight * 15;
+preferredLayoutSize($container) {
+  var popupWidth = HtmlEnvironment.get().formColumnWidth,
+    popupHeight = HtmlEnvironment.get().formRowHeight * 15;
 
-  return new scout.Dimension(popupWidth, popupHeight);
-};
+  return new Dimension(popupWidth, popupHeight);
+}
+}

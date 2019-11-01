@@ -8,14 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagBarLayout = function(tagBar) {
-  scout.TagBarLayout.parent.call(this);
-  this.tagBar = tagBar;
-};
-scout.inherits(scout.TagBarLayout, scout.AbstractLayout);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+import {Dimension} from '../index';
 
-scout.TagBarLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container);
+export default class TagBarLayout extends AbstractLayout {
+
+constructor(tagBar) {
+  super();
+  this.tagBar = tagBar;
+}
+
+
+layout($container) {
+  var htmlContainer = HtmlComponent.get($container);
   var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
 
   if (hasTags) {
@@ -35,7 +43,7 @@ scout.TagBarLayout.prototype.layout = function($container) {
     // use a for loop, because don't want to loop all elements when we already know the rest is in overflow
     for (i = numTagElements - 1; i >= 0; i--) {
       $te = $($tagElements[i]);
-      teSizes[i] = scout.graphics.size($te, {
+      teSizes[i] = graphics.size($te, {
         includeMargin: true
       });
       overflow = (prefTagsWidth + teSizes[i].width) > maxTagsWidth;
@@ -49,7 +57,7 @@ scout.TagBarLayout.prototype.layout = function($container) {
     this.tagBar.setOverflowVisible(overflow);
 
     if (overflow) {
-      prefTagsWidth = scout.graphics.size(this.tagBar.$overflowIcon, {
+      prefTagsWidth = graphics.size(this.tagBar.$overflowIcon, {
         includeMargin: true
       }).width;
       for (i = numTagElements - 1; i >= 0; i--) {
@@ -72,24 +80,25 @@ scout.TagBarLayout.prototype.layout = function($container) {
       }
     }
   }
-};
+}
 
-scout.TagBarLayout.prototype.preferredLayoutSize = function($container, options) {
-  var htmlContainer = scout.HtmlComponent.get($container);
+preferredLayoutSize($container, options) {
+  var htmlContainer = HtmlComponent.get($container);
   var hasTags = this.tagBar.tags && this.tagBar.tags.length > 0;
   var availableSize = htmlContainer.availableSize();
   var prefTagsWidth = 0;
 
   if (!hasTags) {
-    return new scout.Dimension(0, availableSize.height);
+    return new Dimension(0, availableSize.height);
   }
 
   var $tagElements = $container.find('.tag-element');
   $tagElements.removeClass('hidden');
   $tagElements.each(function() {
-    prefTagsWidth += scout.graphics.size($(this), {
+    prefTagsWidth += graphics.size($(this), {
       includeMargin: true
     }).width;
   });
-  return new scout.Dimension(prefTagsWidth, availableSize.height);
-};
+  return new Dimension(prefTagsWidth, availableSize.height);
+}
+}

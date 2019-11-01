@@ -8,32 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerField = function() {
-  scout.PlannerField.parent.call(this);
+import {FormField} from '../../../index';
+
+export default class PlannerField extends FormField {
+
+constructor() {
+  super();
   this._addWidgetProperties(['planner']);
 
   this.gridDataHints.weightY = 1.0;
-};
-scout.inherits(scout.PlannerField, scout.FormField);
+}
 
-scout.PlannerField.prototype._render = function() {
+
+_render() {
   this.addContainer(this.$parent, 'planner-field');
   this.addLabel();
   this.addStatus();
   if (this.planner) {
     this._renderPlanner();
   }
-};
+}
 
 /**
  * Will also be called by model adapter on property change event
  */
-scout.PlannerField.prototype._renderPlanner = function() {
+_renderPlanner() {
   this.planner.render();
   this.addField(this.planner.$container);
-};
+}
 
-scout.PlannerField.prototype._removePlanner = function() {
+_removePlanner() {
   this.planner.remove();
   this._removeField();
-};
+}
+}

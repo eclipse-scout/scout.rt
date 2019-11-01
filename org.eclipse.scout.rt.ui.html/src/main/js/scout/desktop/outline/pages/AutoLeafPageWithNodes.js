@@ -8,22 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {TableRow} from '../../../index';
+import {scout} from '../../../index';
+import {Page} from '../../../index';
+
 /**
  * @class
- * @augments {scout.Page}
+ * @augments {Page}
  */
-scout.AutoLeafPageWithNodes = function() {
-  scout.AutoLeafPageWithNodes.parent.call(this);
+export default class AutoLeafPageWithNodes extends Page {
+
+constructor() {
+  super();
 
   this.leaf = true;
-};
-scout.inherits(scout.AutoLeafPageWithNodes, scout.Page);
+}
+
 
 /**
  * @override Page.js
  */
-scout.AutoLeafPageWithNodes.prototype._init = function(model) {
-  scout.assertParameter('row', model.row, scout.TableRow);
-  scout.AutoLeafPageWithNodes.parent.prototype._init.call(this, model);
+_init(model) {
+  scout.assertParameter('row', model.row, TableRow);
+  super._init( model);
   this.text = this.row.cells[0].text;
-};
+}
+}

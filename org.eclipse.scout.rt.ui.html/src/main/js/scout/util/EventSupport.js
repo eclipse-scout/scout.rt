@@ -8,16 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.EventSupport = function() {
-  this._eventListeners = [];
-  this._subTypePredicates = scout.objects.createMap();
-};
+import {objects} from '../index';
+import {arrays} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
 
-scout.EventSupport.prototype._assertFunc = function(func) {
+export default class EventSupport {
+
+constructor() {
+  this._eventListeners = [];
+  this._subTypePredicates = objects.createMap();
+}
+
+_assertFunc(func) {
   if (!func) {
     throw new Error('Missing callback function');
   }
-};
+}
 
 /**
  * Registers the given func for the event specified by the type param.
@@ -27,7 +34,7 @@ scout.EventSupport.prototype._assertFunc = function(func) {
  * @param {function} [origFunc] (optional) used internally when func is registered with one(). The property is set on the listener
  *   object so the event-handler can be de-registered by using the original function.
  */
-scout.EventSupport.prototype.on = function(type, func, origFunc) {
+on(type, func, origFunc) {
   this._assertFunc(func);
   var listener = {
     type: type,
@@ -36,7 +43,7 @@ scout.EventSupport.prototype.on = function(type, func, origFunc) {
   };
   this.addListener(listener);
   return listener;
-};
+}
 
 /**
  * Registers the given func for the event specified by the type param.
@@ -45,7 +52,7 @@ scout.EventSupport.prototype.on = function(type, func, origFunc) {
  * @param {string} type event-name
  * @param {function} func callback function executed when event is triggered. An event object is passed to the func as first parameter
  */
-scout.EventSupport.prototype.one = function(type, func) {
+one(type, func) {
   this._assertFunc(func);
   var that = this,
     offFunc = function(event) {
@@ -53,9 +60,9 @@ scout.EventSupport.prototype.one = function(type, func) {
       func(event);
     }.bind(this);
   return this.on(type, offFunc, func);
-};
+}
 
-scout.EventSupport.prototype.off = function(type, func) {
+off(type, func) {
   if (!type && !func) {
     return;
   }
@@ -77,27 +84,27 @@ scout.EventSupport.prototype.off = function(type, func) {
       this._eventListeners.splice(i, 1);
     }
   }
-};
+}
 
 /**
  * Adds an event handler using {@link #one()} and returns a promise.
  * The promise is resolved as soon as the event is triggered.
  */
-scout.EventSupport.prototype.when = function(type) {
+when(type) {
   var deferred = $.Deferred();
   this.one(type, deferred.resolve.bind(deferred));
   return deferred.promise();
-};
+}
 
-scout.EventSupport.prototype.addListener = function(listener) {
+addListener(listener) {
   this._eventListeners.push(listener);
-};
+}
 
-scout.EventSupport.prototype.removeListener = function(listener) {
-  scout.arrays.remove(this._eventListeners, listener);
-};
+removeListener(listener) {
+  arrays.remove(this._eventListeners, listener);
+}
 
-scout.EventSupport.prototype.count = function(type, func) {
+count(type, func) {
   var count = 0;
   this._eventListeners.forEach(function(listener) {
     if (type && type !== listener.type) {
@@ -109,9 +116,9 @@ scout.EventSupport.prototype.count = function(type, func) {
     count++;
   });
   return count;
-};
+}
 
-scout.EventSupport.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.type = type;
 
@@ -139,9 +146,9 @@ scout.EventSupport.prototype.trigger = function(type, event) {
     }
     return false;
   }
-};
+}
 
-scout.EventSupport.prototype._subTypeMatches = function(event, listenerType) {
+_subTypeMatches(event, listenerType) {
   if (listenerType.indexOf(':') < 0) {
     return false;
   }
@@ -153,15 +160,16 @@ scout.EventSupport.prototype._subTypeMatches = function(event, listenerType) {
     return;
   }
   return predicate(event, subType);
-};
+}
 
 /**
  *
  * @param {string} type the type which could contain a sub type
  * @param {function} predicate the predicate which will be tested when an event with the given type is triggered. The function has two parameters: event and subType
  */
-scout.EventSupport.prototype.registerSubTypePredicate = function(type, predicate) {
+registerSubTypePredicate(type, predicate) {
   scout.assertParameter('type', type);
   scout.assertParameter('predicate', predicate);
   this._subTypePredicates[type] = predicate;
-};
+}
+}

@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeField = function() {
-  scout.TreeField.parent.call(this);
+import {FormField} from '../../../index';
+
+export default class TreeField extends FormField {
+
+constructor() {
+  super();
 
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 3;
   this._addWidgetProperties(['tree']);
-};
-scout.inherits(scout.TreeField, scout.FormField);
+}
 
-scout.TreeField.prototype._render = function() {
+
+_render() {
   this.addContainer(this.$parent, 'tree-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -25,20 +29,20 @@ scout.TreeField.prototype._render = function() {
   if (this.tree) {
     this._renderTree();
   }
-};
+}
 
-scout.TreeField.prototype.setTree = function(tree) {
+setTree(tree) {
   this.setProperty('tree', tree);
-};
+}
 
-scout.TreeField.prototype._setTree = function(tree) {
+_setTree(tree) {
   this._setProperty('tree', tree);
   if (tree) {
     tree.setScrollTop(this.scrollTop);
   }
-};
+}
 
-scout.TreeField.prototype._renderTree = function() {
+_renderTree() {
   if (!this.tree) {
     return;
   }
@@ -46,20 +50,21 @@ scout.TreeField.prototype._renderTree = function() {
   this.addField(this.tree.$container);
   this.$field.addDeviceClass();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TreeField.prototype._removeTree = function() {
+_removeTree() {
   if (!this.tree) {
     return;
   }
   this.tree.remove();
   this._removeField();
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.TreeField.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return this.tree;
-};
+}
+}

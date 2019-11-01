@@ -8,53 +8,58 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.IconColumn = function() {
-  scout.IconColumn.parent.call(this);
-  this.minWidth = scout.Column.NARROW_MIN_WIDTH;
+import {Column} from '../../index';
+
+export default class IconColumn extends Column {
+
+constructor() {
+  super();
+  this.minWidth = Column.NARROW_MIN_WIDTH;
   this.filterType = 'ColumnUserFilter';
   this.textBased = false;
-};
-scout.inherits(scout.IconColumn, scout.Column);
+}
+
 
 /**
  * @override
  */
-scout.IconColumn.prototype._initCell = function(cell) {
-  scout.IconColumn.parent.prototype._initCell.call(this, cell);
+_initCell(cell) {
+  super._initCell( cell);
   // only display icon, no text
   cell.text = null;
   cell.iconId = cell.value || cell.iconId;
   return cell;
-};
+}
 
 /**
  * @override
  */
-scout.IconColumn.prototype._formatValue = function(value) {
+_formatValue(value) {
   // only display icon, no text
   return null;
-};
+}
 
 /**
  * @override
  */
-scout.IconColumn.prototype._cellCssClass = function(cell, tableNode) {
-  var cssClass = scout.IconColumn.parent.prototype._cellCssClass.call(this, cell, tableNode);
+_cellCssClass(cell, tableNode) {
+  var cssClass = super._cellCssClass( cell, tableNode);
   cssClass += ' table-icon-cell';
   return cssClass;
-};
+}
 
 /**
  * @override
  */
-scout.IconColumn.prototype.cellTextForGrouping = function(row) {
+cellTextForGrouping(row) {
   var cell = this.table.cell(this, row);
   return cell.value;
-};
+}
 
-scout.IconColumn.prototype.createAggrGroupCell = function(row) {
-  var cell = scout.IconColumn.parent.prototype.createAggrGroupCell.call(this, row);
+createAggrGroupCell(row) {
+  var cell = super.createAggrGroupCell( row);
   // Make sure only icon and no text is displayed
   cell.text = null;
   return cell;
-};
+}
+}

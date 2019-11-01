@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormMenuAdapter = function() {
-  scout.FormMenuAdapter.parent.call(this);
-};
-scout.inherits(scout.FormMenuAdapter, scout.MenuAdapter);
+import {MenuAdapter} from '../index';
+
+export default class FormMenuAdapter extends MenuAdapter {
+
+constructor() {
+  super();
+}
+
+}

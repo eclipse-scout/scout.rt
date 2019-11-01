@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormFieldLayout} from '../../../index';
+import * as $ from 'jquery';
 
-scout.BrowserFieldLayout = function(browserField) {
-  scout.BrowserFieldLayout.parent.call(this, browserField);
+
+export default class BrowserFieldLayout extends FormFieldLayout {
+
+constructor(browserField) {
+  super( browserField);
   this.browserField = browserField;
-};
-scout.inherits(scout.BrowserFieldLayout, scout.FormFieldLayout);
+}
 
-scout.BrowserFieldLayout.prototype.preferredLayoutSize = function($container, options) {
-  var prefSize = scout.BrowserFieldLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+
+preferredLayoutSize($container, options) {
+  var prefSize = super.preferredLayoutSize( $container, options);
   var sandboxPermissions = this.browserField.sandboxPermissions;
   if (!this.browserField.sandboxEnabled || (sandboxPermissions && sandboxPermissions.indexOf('allow-same-origin') > -1)) {
     if (this.browserField.$field.contents().attr('readyState') !== 'loading') {
@@ -28,4 +33,5 @@ scout.BrowserFieldLayout.prototype.preferredLayoutSize = function($container, op
     $.log.isInfoEnabled() && $.log.info('Could not read height of sandboxed iframe content if permission \'allow-same-origin\' is not set.');
   }
   return prefSize;
-};
+}
+}

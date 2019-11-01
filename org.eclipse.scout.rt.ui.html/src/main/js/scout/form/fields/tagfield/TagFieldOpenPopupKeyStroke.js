@@ -8,23 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagFieldOpenPopupKeyStroke = function(tagField) {
-  scout.TagFieldOpenPopupKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+
+export default class TagFieldOpenPopupKeyStroke extends KeyStroke {
+
+constructor(tagField) {
+  super();
   this.field = tagField;
-  this.which = [scout.keys.ENTER, scout.keys.SPACE];
+  this.which = [keys.ENTER, keys.SPACE];
   this.renderingHints.render = false;
   this.preventDefault = false;
-};
-scout.inherits(scout.TagFieldOpenPopupKeyStroke, scout.KeyStroke);
+}
 
-scout.TagFieldOpenPopupKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldOpenPopupKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
   return this.field.tagBar && this.field.tagBar.isOverflowIconFocused();
-};
+}
 
-scout.TagFieldOpenPopupKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.tagBar.openOverflowPopup();
-};
+}
+}

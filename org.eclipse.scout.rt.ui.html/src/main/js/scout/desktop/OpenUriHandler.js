@@ -8,65 +8,73 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OpenUriHandler = function() {};
+import {Desktop} from '../index';
+import {Device} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {PopupBlockerHandler} from '../index';
 
-scout.OpenUriHandler.prototype.init = function(model) {
+export default class OpenUriHandler {
+
+constructor() {};
+
+init(model) {
   this.session = model.session;
-};
+}
 
-scout.OpenUriHandler.prototype.openUri = function(uri, action) {
+openUri(uri, action) {
   $.log.isDebugEnabled() && $.log.debug('(OpenUriHandler#openUri) uri=' + uri + ' action=' + action);
   if (!uri) {
     return;
   }
-  action = scout.nvl(action, scout.Desktop.UriAction.OPEN);
+  action = scout.nvl(action, Desktop.UriAction.OPEN);
 
-  if (action === scout.Desktop.UriAction.DOWNLOAD) {
+  if (action === Desktop.UriAction.DOWNLOAD) {
     this.handleUriActionDownload(uri);
-  } else if (action === scout.Desktop.UriAction.OPEN) {
+  } else if (action === Desktop.UriAction.OPEN) {
     this.handleUriActionOpen(uri);
-  } else if (action === scout.Desktop.UriAction.NEW_WINDOW) {
+  } else if (action === Desktop.UriAction.NEW_WINDOW) {
     this.handleUriActionNewWindow(uri);
-  } else if (action === scout.Desktop.UriAction.POPUP_WINDOW) {
+  } else if (action === Desktop.UriAction.POPUP_WINDOW) {
     this.handleUriActionPopupWindow(uri);
-  } else if (action === scout.Desktop.UriAction.SAME_WINDOW) {
+  } else if (action === Desktop.UriAction.SAME_WINDOW) {
     this.handleUriActionSameWindow(uri);
   }
-};
+}
 
-scout.OpenUriHandler.prototype.handleUriActionDownload = function(uri) {
-  if (scout.device.isIos()) {
+handleUriActionDownload(uri) {
+  if (Device.get().isIos()) {
     // The iframe trick does not work for ios
     // Since the file cannot be stored on the file system it will be shown in the browser if possible
     // -> create a new window to not replace the existing content.
     // Drawback: Popup-Blocker will show up
     // Opening in new window does not work in standalone mode because the window will be opened in safari which creates a new http session.
     // Because the downloads are linked to the http session they cannot be downloaded using safari
-    if (scout.device.isStandalone()) {
+    if (Device.get().isStandalone()) {
       this.openUriInSameWindow(uri);
     } else {
       this.openUriAsNewWindow(uri);
     }
-  } else if (scout.device.browser === scout.Device.Browser.CHROME) {
+  } else if (Device.get().browser === Device.Browser.CHROME) {
     // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
     this.openUriInSameWindow(uri);
   } else {
     this.openUriInIFrame(uri);
   }
-};
+}
 
-scout.OpenUriHandler.prototype.isUriWithExternallyHandledProtocol = function(uri) {
+isUriWithExternallyHandledProtocol(uri) {
   return /^(callto|facetime|fax|geo|mailto|maps|notes|sip|skype|tel|google.navigation):/.test(uri);
-};
+}
 
-scout.OpenUriHandler.prototype.handleUriActionOpen = function(uri) {
-  if (scout.device.isIos()) {
+handleUriActionOpen(uri) {
+  if (Device.get().isIos()) {
     // Open in same window.
     // Don't call _openUriInIFrame here, if action is set to open, an url is expected to be opened in the same window
     // Additionally, some url types require to be opened in the same window like tel or mailto, at least on mobile devices
     this.openUriInSameWindow(uri);
   } else if (this.isUriWithExternallyHandledProtocol(uri)) {
-    if (scout.device.browser === scout.Device.Browser.CHROME) {
+    if (Device.get().browser === Device.Browser.CHROME) {
       // "Hidden iframe"-solution is not working in Chromium (https://bugs.chromium.org/p/chromium/issues/detail?id=663325)
       this.openUriInSameWindow(uri);
     } else {
@@ -76,25 +84,25 @@ scout.OpenUriHandler.prototype.handleUriActionOpen = function(uri) {
   } else {
     this.openUriAsNewWindow(uri);
   }
-};
+}
 
-scout.OpenUriHandler.prototype.handleUriActionNewWindow = function(uri) {
+handleUriActionNewWindow(uri) {
   this.openUriAsNewWindow(uri);
-};
+}
 
-scout.OpenUriHandler.prototype.handleUriActionPopupWindow = function(uri) {
+handleUriActionPopupWindow(uri) {
   this.openUriAsPopupWindow(uri);
-};
+}
 
-scout.OpenUriHandler.prototype.handleUriActionSameWindow = function(uri) {
+handleUriActionSameWindow(uri) {
   this.openUriInSameWindow(uri);
-};
+}
 
-scout.OpenUriHandler.prototype.openUriInSameWindow = function(uri) {
+openUriInSameWindow(uri) {
   window.location.assign(uri);
-};
+}
 
-scout.OpenUriHandler.prototype.openUriInIFrame = function(uri) {
+openUriInIFrame(uri) {
   // Create a hidden iframe and set the URI as src attribute value
   var $iframe = this.session.$entryPoint.appendElement('<iframe>', 'download-frame')
     .attr('tabindex', -1)
@@ -104,18 +112,19 @@ scout.OpenUriHandler.prototype.openUriInIFrame = function(uri) {
   setTimeout(function() {
     $iframe.remove();
   }, 10 * 1000);
-};
+}
 
-scout.OpenUriHandler.prototype.openUriAsNewWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
-  if (scout.device.isInternetExplorer()) {
+openUriAsNewWindow(uri) {
+  var popupBlockerHandler = new PopupBlockerHandler(this.session);
+  if (Device.get().isInternetExplorer()) {
     popupBlockerHandler.openWindow(uri, null, 'location=yes,toolbar=yes,menubar=yes,resizable=yes,scrollbars=yes');
   } else {
     popupBlockerHandler.openWindow(uri);
   }
-};
+}
 
-scout.OpenUriHandler.prototype.openUriAsPopupWindow = function(uri) {
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+openUriAsPopupWindow(uri) {
+  var popupBlockerHandler = new PopupBlockerHandler(this.session);
   popupBlockerHandler.openWindow(uri, null, 'location=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');
-};
+}
+}

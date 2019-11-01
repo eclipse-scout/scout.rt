@@ -8,98 +8,115 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.router = {
+import {EventSupport} from '../index';
+import {strings} from '../index';
+import {router} from '../index';
+import * as $ from 'jquery';
 
-  routes: [], // array with Routes
-  events: new scout.EventSupport(),
-  currentRoute: null,
-  defaultLocation: null,
 
-  /**
-   * Default location is used, when no route is set in the URL when routes are activated initially.
-   * Typically this points to your 'home' page.
-   */
-  setDefaultLocation: function(location) {
-    this.defaultLocation = '#' + location;
-  },
 
-  prepare: function($a, location) {
-    if (!scout.strings.startsWith(location, '#')) {
-      location = '#' + location;
-    }
-    $a
-      .attr('href', location)
-      .on('mousedown', function(event) {
-        scout.router.activate(location);
-        return false; // prevent default
-      });
+let routes = []; // array with Routes
+let events = new EventSupport();
+let currentRoute = null;
+let defaultLocation = null;
 
-  },
+/**
+ * Default location is used, when no route is set in the URL when routes are activated initially.
+ * Typically this points to your 'home' page.
+ */
+export function setDefaultLocation(location) {
+  defaultLocation = '#' + location;
+}
 
-  activate: function(location) {
-    if (!location) {
-      var regexp = new RegExp('[^/]*$'); // match everything after last slash
-      var matches = regexp.exec(document.location.href);
-      location = matches[0];
-    }
+export function prepare($a, location) {
+  if (!strings.startsWith(location, '#')) {
+    location = '#' + location;
+  }
+  $a
+    .attr('href', location)
+    .on('mousedown', function(event) {
+      activate(location);
+      return false; // prevent default
+    });
 
-    // no route is set in the URL
-    if (scout.strings.empty(location) || '/' === location) {
-      location = this.defaultLocation;
-    }
+}
 
-    var i, route = null;
-    for (i = 0; i < this.routes.length; i++) {
-      route = this.routes[i];
-      if (route.matches(location)) {
-
-        if (route === this.currentRoute && route.location === location) {
-          $.log.isDebugEnabled() && $.log.debug('Route has not changed - do not activate route');
-          return;
-        }
-
-        // deactivate old route
-        if (this.currentRoute) {
-          this.currentRoute.deactivate();
-        }
-
-        // activate new route
-        this.currentRoute = route;
-        this.currentRoute.activate(location);
-
-        window.location.replace(location);
-        $.log.isInfoEnabled() && $.log.info('router: activated route for location=', location);
-
-        this.events.trigger('routeChange', {
-          route: route
-        });
-        return;
-      }
-    }
-    $.log.warn('router: no route registered for location=', location);
-  },
-
-  register: function(route) {
-    this.routes.push(route);
-  },
-
-  on: function(event, handler) {
-    this.events.on(event, handler);
-  },
-
-  /**
-   * Updates the location (URL) field in the browser.
-   *
-   * @param {string} routeRef a string which identifies a route.
-   */
-  updateLocation: function(routeRef) {
-    var location = '#' + routeRef;
-    window.location.replace(location);
+export function activate(location) {
+  if (!location) {
+    var regexp = new RegExp('[^/]*$'); // match everything after last slash
+    var matches = regexp.exec(document.location.href);
+    location = matches[0];
   }
 
+  // no route is set in the URL
+  if (strings.empty(location) || '/' === location) {
+    location = defaultLocation;
+  }
+
+  var i, route = null;
+  for (i = 0; i < routes.length; i++) {
+    route = routes[i];
+    if (route.matches(location)) {
+
+      if (route === currentRoute && route.location === location) {
+        $.log.isDebugEnabled() && $.log.debug('Route has not changed - do not activate route');
+        return;
+      }
+
+      // deactivate old route
+      if (currentRoute) {
+        currentRoute.deactivate();
+      }
+
+      // activate new route
+      currentRoute = route;
+      currentRoute.activate(location);
+
+      window.location.replace(location);
+      $.log.isInfoEnabled() && $.log.info('router: activated route for location=', location);
+
+      events.trigger('routeChange', {
+        route: route
+      });
+      return;
+    }
+  }
+  $.log.warn('router: no route registered for location=', location);
+}
+
+export function register(route) {
+  routes.push(route);
+}
+
+export function on(event, handler) {
+  events.on(event, handler);
+}
+
+/**
+ * Updates the location (URL) field in the browser.
+ *
+ * @param {string} routeRef a string which identifies a route.
+ */
+export function updateLocation(routeRef) {
+  var location = '#' + routeRef;
+  window.location.replace(location);
+}
+
+
+export default {
+  activate,
+  currentRoute,
+  defaultLocation,
+  events,
+  on,
+  prepare,
+  register,
+  routes,
+  setDefaultLocation,
+  updateLocation
 };
 
 window.addEventListener('popstate', function(event) {
-  scout.router.activate(null);
+  router.activate(null);
   return false;
 });

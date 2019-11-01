@@ -8,9 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationPageDownKeyStroke = function(table) {
-  scout.TableNavigationPageDownKeyStroke.parent.call(this, table);
-  this.which = [scout.keys.PAGE_DOWN];
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+import {arrays} from '../../index';
+
+export default class TableNavigationPageDownKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
+  this.which = [keys.PAGE_DOWN];
   this.renderingHints.text = 'PgDn';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var viewport = this._viewportInfo();
@@ -18,15 +24,15 @@ scout.TableNavigationPageDownKeyStroke = function(table) {
       return viewport.lastRow.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationPageDownKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var table = this.field,
     viewport = this._viewportInfo(),
     rows = table.visibleRows,
     selectedRows = table.selectedRows,
-    lastSelectedRow = scout.arrays.last(selectedRows),
+    lastSelectedRow = arrays.last(selectedRows),
     lastActionRow = table.selectionHandler.lastActionRow,
     lastActionRowIndex = -1,
     newSelectedRows;
@@ -64,11 +70,12 @@ scout.TableNavigationPageDownKeyStroke.prototype.handle = function(event) {
   if (event.shiftKey && selectedRows.length > 0) {
     // Using lastActionRow instead of lastSelectedRow is essential if the user does a multi selection using ctrl and presses shift-pagedown afterwards
     newSelectedRows = rows.slice(lastActionRowIndex + 1, rows.indexOf(viewport.lastRow) + 1);
-    newSelectedRows = scout.arrays.union(selectedRows, newSelectedRows);
+    newSelectedRows = arrays.union(selectedRows, newSelectedRows);
   } else {
     newSelectedRows = [viewport.lastRow];
   }
 
   table.selectionHandler.lastActionRow = viewport.lastRow;
   table.selectRows(newSelectedRows, true);
-};
+}
+}

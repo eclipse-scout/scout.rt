@@ -8,28 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileField = function() {
-  scout.TileField.parent.call(this);
+import {EventDelegator} from '../../../index';
+import {FormField} from '../../../index';
+
+export default class TileField extends FormField {
+
+constructor() {
+  super();
   this.eventDelegator = null;
   this._addWidgetProperties(['tileGrid']);
-};
-scout.inherits(scout.TileField, scout.FormField);
+}
 
-scout.TileField.prototype._init = function(model) {
-  scout.TileField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this._setTileGrid(this.tileGrid);
-};
+}
 
 /**
  * @override
  */
-scout.TileField.prototype._createLoadingSupport = function() {
+_createLoadingSupport() {
   // Loading is delegated to tileGrid
   return null;
-};
+}
 
-scout.TileField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'tile-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -37,18 +42,18 @@ scout.TileField.prototype._render = function() {
   if (this.tileGrid) {
     this._renderTileGrid();
   }
-};
+}
 
-scout.TileField.prototype._renderProperties = function() {
-  scout.TileField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderDropType();
-};
+}
 
-scout.TileField.prototype.setTileGrid = function(tileGrid) {
+setTileGrid(tileGrid) {
   this.setProperty('tileGrid', tileGrid);
-};
+}
 
-scout.TileField.prototype._setTileGrid = function(tileGrid) {
+_setTileGrid(tileGrid) {
   if (this.tileGrid) {
     if (this.eventDelegator) {
       this.eventDelegator.destroy();
@@ -57,35 +62,36 @@ scout.TileField.prototype._setTileGrid = function(tileGrid) {
   }
   this._setProperty('tileGrid', tileGrid);
   if (tileGrid) {
-    this.eventDelegator = scout.EventDelegator.create(this, tileGrid, {
+    this.eventDelegator = EventDelegator.create(this, tileGrid, {
       delegateProperties: ['loading']
     });
     tileGrid.setLoading(this.loading);
     tileGrid.setScrollTop(this.scrollTop);
   }
-};
+}
 
-scout.TileField.prototype._renderTileGrid = function() {
+_renderTileGrid() {
   if (!this.tileGrid) {
     return;
   }
   this.tileGrid.render();
   this.addField(this.tileGrid.$container);
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileField.prototype._removeTileGrid = function() {
+_removeTileGrid() {
   if (!this.tileGrid) {
     return;
   }
   this.tileGrid.remove();
   this._removeField();
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.TileField.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return this.tileGrid;
-};
+}
+}

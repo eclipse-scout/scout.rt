@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Image = function() {
-  scout.Image.parent.call(this);
+import {ImageLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+
+export default class Image extends Widget {
+
+constructor() {
+  super();
   this.autoFit = false;
   this.imageUrl = null;
   this.prepend = false;
-};
-scout.inherits(scout.Image, scout.Widget);
+}
 
-scout.Image.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.makeElement('<img>', 'image')
     .on('load', this._onImageLoad.bind(this))
     .on('error', this._onImageError.bind(this));
@@ -27,57 +33,58 @@ scout.Image.prototype._render = function() {
     this.$container.appendTo(this.$parent);
   }
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ImageLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new ImageLayout(this));
   this.htmlComp.pixelBasedSizing = false;
-};
+}
 
-scout.Image.prototype._renderProperties = function() {
-  scout.Image.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderImageUrl();
   this._renderAutoFit();
-};
+}
 
-scout.Image.prototype._remove = function() {
-  scout.Image.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.htmlComp = null;
-};
+}
 
-scout.Image.prototype.setImageUrl = function(imageUrl) {
+setImageUrl(imageUrl) {
   this.setProperty('imageUrl', imageUrl);
-};
+}
 
-scout.Image.prototype._renderImageUrl = function() {
+_renderImageUrl() {
   this.$container.attr('src', this.imageUrl);
 
   // Hide <img> when it has no content (event 'load' will not fire)
   if (!this.imageUrl) {
     this.$container.addClass('empty').removeClass('broken');
   }
-};
+}
 
-scout.Image.prototype.setAutoFit = function(autoFit) {
+setAutoFit(autoFit) {
   this.setProperty('autoFit', autoFit);
-};
+}
 
-scout.Image.prototype._renderAutoFit = function() {
+_renderAutoFit() {
   this.$container.toggleClass('autofit', this.autoFit);
-};
+}
 
-scout.Image.prototype._onImageLoad = function(event) {
+_onImageLoad(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
   this.$container.removeClass('empty broken');
   this.invalidateLayoutTree();
   this.trigger('load');
-};
+}
 
-scout.Image.prototype._onImageError = function(event) {
+_onImageError(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
   this.$container.addClass('empty broken');
   this.invalidateLayoutTree();
   this.trigger('error');
-};
+}
+}

@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridGridConfig = function() {
-  scout.TileGridGridConfig.parent.call(this);
-};
-scout.inherits(scout.TileGridGridConfig, scout.LogicalGridConfig);
+import {LogicalGridConfig} from '../index';
 
-scout.TileGridGridConfig.prototype.getGridWidgets = function() {
+export default class TileGridGridConfig extends LogicalGridConfig {
+
+constructor() {
+  super();
+}
+
+
+getGridWidgets() {
   return this.widget.filteredTiles;
-};
+}
+}

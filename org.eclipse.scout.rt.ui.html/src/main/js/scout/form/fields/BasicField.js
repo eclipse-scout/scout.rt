@@ -8,26 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ValueField} from '../../index';
+
 /**
  * Common base class for ValueFields having an HTML input field.
  */
-scout.BasicField = function() {
-  scout.BasicField.parent.call(this);
+export default class BasicField extends ValueField {
+
+constructor() {
+  super();
   this.disabledCopyOverlay = true;
   this._displayTextModifiedTimeoutId = null;
   this.updateDisplayTextOnModify = false;
   this.updateDisplayTextOnModifyDelay = 250; // in milliseconds
-};
-scout.inherits(scout.BasicField, scout.ValueField);
+}
 
-scout.BasicField.prototype.addField = function($field) {
-  scout.BasicField.parent.prototype.addField.call(this, $field);
+
+addField($field) {
+  super.addField( $field);
   if ($field) {
     $field.on('input', this._onFieldInput.bind(this));
   }
-};
+}
 
-scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplayTextOnModify) {
+setUpdateDisplayTextOnModify(updateDisplayTextOnModify) {
   // Execute pending "accept input while typing" function _before_ updating the "updateDisplayTextOnModify" property
   if (this._displayTextModifiedTimeoutId !== null) {
     // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
@@ -36,67 +40,67 @@ scout.BasicField.prototype.setUpdateDisplayTextOnModify = function(updateDisplay
   }
 
   this.setProperty('updateDisplayTextOnModify', updateDisplayTextOnModify);
-};
+}
 
-scout.BasicField.prototype.setUpdateDisplayTextOnModifyDelay = function(delay) {
+setUpdateDisplayTextOnModifyDelay(delay) {
   this.setProperty('updateDisplayTextOnModifyDelay', delay);
-};
+}
 
-scout.BasicField.prototype._clear = function() {
+_clear() {
   this.$field.val('');
-};
+}
 
-scout.BasicField.prototype._onFieldInput = function() {
+_onFieldInput() {
   this._updateHasText();
   if (this.updateDisplayTextOnModify) {
     this._onDisplayTextModified();
   }
-};
+}
 
 /**
  * Called when the property 'updateDisplayTextOnModified' is TRUE and the display text (field's input
  * value) has been modified by a user action, e.g. a key or paste event. If the property is FALSE, this
  * method is _never_ called. Uses the debounce pattern.
  */
-scout.BasicField.prototype._onDisplayTextModified = function() {
+_onDisplayTextModified() {
   clearTimeout(this._displayTextModifiedTimeoutId);
   if (this.updateDisplayTextOnModifyDelay) {
     this._displayTextModifiedTimeoutId = setTimeout(this._acceptInputWhileTyping.bind(this), this.updateDisplayTextOnModifyDelay);
   } else {
     this._acceptInputWhileTyping();
   }
-};
+}
 
-scout.BasicField.prototype._acceptInputWhileTyping = function() {
+_acceptInputWhileTyping() {
   this._displayTextModifiedTimeoutId = null;
   if (this.rendered) { // Check needed because field may have been removed in the meantime
     this.acceptInput(true);
   }
-};
+}
 
-scout.BasicField.prototype.acceptInput = function(whileTyping) {
+acceptInput(whileTyping) {
   if (this._displayTextModifiedTimeoutId !== null) {
     // Cancel pending "acceptInput(true)" call (see _onDisplayTextModified) and execute it now
     clearTimeout(this._displayTextModifiedTimeoutId);
     this._displayTextModifiedTimeoutId = null;
   }
-  scout.BasicField.parent.prototype.acceptInput.call(this, whileTyping);
-};
+  super.acceptInput( whileTyping);
+}
 
-scout.BasicField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   this.$field.val(this.displayText);
-  scout.BasicField.parent.prototype._renderDisplayText.call(this);
-};
+  super._renderDisplayText();
+}
 
-scout.BasicField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.$field.val();
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
-  var displayTextChanged = scout.BasicField.parent.prototype._checkDisplayTextChanged.call(this, displayText, whileTyping);
+_checkDisplayTextChanged(displayText, whileTyping) {
+  var displayTextChanged = super._checkDisplayTextChanged( displayText, whileTyping);
 
   if (whileTyping) {
     if (this.updateDisplayTextOnModify && displayTextChanged) {
@@ -118,4 +122,5 @@ scout.BasicField.prototype._checkDisplayTextChanged = function(displayText, whil
   }
 
   return displayTextChanged;
-};
+}
+}

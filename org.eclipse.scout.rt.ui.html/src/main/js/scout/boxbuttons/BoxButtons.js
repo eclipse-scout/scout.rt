@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * Button utility class for a set of buttons, where each button has an option value.
  *
@@ -18,7 +22,9 @@
  * @param onClickHandler
  *          optional, global onClickHandler to attach to each button without a specific clickHandler
  */
-scout.BoxButtons = function($parent, onClickHandler) {
+export default class BoxButtons {
+
+constructor($parent, onClickHandler) {
   if (!$parent) {
     throw new Error('Missing $parent');
   }
@@ -28,7 +34,7 @@ scout.BoxButtons = function($parent, onClickHandler) {
   this._onClickHandler = onClickHandler;
 
   this._$buttons = [];
-};
+}
 
 /**
  * @param opts
@@ -47,7 +53,7 @@ scout.BoxButtons = function($parent, onClickHandler) {
  *          [option]   optional,  a string that is assigned to be button and is passed
  *                                to the global onClickHandler as an argument.
  */
-scout.BoxButtons.prototype.addButton = function(opts) {
+addButton(opts) {
   opts = opts || {};
 
   var $button = this._$parent.appendDiv()
@@ -60,7 +66,7 @@ scout.BoxButtons.prototype.addButton = function(opts) {
     $button.addClass('needsclick');
   }
 
-  if (!scout.device.supportsTouch()) {
+  if (!Device.get().supportsTouch()) {
     $button.attr('tabindex', opts.tabIndex || '0');
   }
 
@@ -79,17 +85,17 @@ scout.BoxButtons.prototype.addButton = function(opts) {
 
   this._$buttons.push($button);
   return $button;
-};
+}
 
-scout.BoxButtons.prototype._onClick = function(event) {
+_onClick(event) {
   var $button = $(event.target);
   if ($.suppressEventIfDisabled(event, $button)) {
     return;
   }
   this._onClickHandler(event, $button.data('buttonOption'));
-};
+}
 
-scout.BoxButtons.prototype.updateButtonWidths = function(availableWidth) {
+updateButtonWidths(availableWidth) {
   // Find all visible buttons
   var $visibleButtons = [];
   this._$buttons.forEach(function($button) {
@@ -113,8 +119,9 @@ scout.BoxButtons.prototype.updateButtonWidths = function(availableWidth) {
     }
     $button.outerWidth(w);
   });
-};
+}
 
-scout.BoxButtons.prototype.buttonCount = function() {
+buttonCount() {
   return this._$buttons.length;
-};
+}
+}

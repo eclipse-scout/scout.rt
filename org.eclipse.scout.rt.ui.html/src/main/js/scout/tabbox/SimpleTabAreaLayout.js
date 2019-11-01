@@ -8,22 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SimpleTabAreaLayout = function(tabArea) {
-  scout.SimpleTabAreaLayout.parent.call(this);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {Dimension} from '../index';
+
+export default class SimpleTabAreaLayout extends AbstractLayout {
+
+constructor(tabArea) {
+  super();
   this.tabArea = tabArea;
   this._$overflowTab = null;
   this._overflowTabsIndizes = [];
-};
-scout.inherits(scout.SimpleTabAreaLayout, scout.AbstractLayout);
+}
 
-scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE = 220;
-scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL = 130;
-scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH = 30;
+
+static TAB_WIDTH_LARGE = 220;
+static TAB_WIDTH_SMALL = 130;
+static OVERFLOW_MENU_WIDTH = 30;
 
 /**
  * @override AbstractLayout.js
  */
-scout.SimpleTabAreaLayout.prototype.layout = function($container) {
+layout($container) {
   var tabWidth,
     htmlContainer = this.tabArea.htmlComp,
     containerSize = htmlContainer.size({
@@ -45,7 +53,7 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
 
   // All tabs in container
   if (smallPrefSize.width <= containerSize.width) {
-    tabWidth = Math.min(scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, containerSize.width / numTabs);
+    tabWidth = Math.min(SimpleTabAreaLayout.TAB_WIDTH_LARGE, containerSize.width / numTabs);
     // 2nd - all Tabs fit when they have small size
     $tabs.each(function() {
       $(this).outerWidth(tabWidth);
@@ -54,10 +62,10 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   }
 
   // Not all tabs fit in container -> put tabs into overflow menu
-  containerSize.width -= scout.SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH;
+  containerSize.width -= SimpleTabAreaLayout.OVERFLOW_MENU_WIDTH;
 
   // check how many tabs fit into remaining containerSize.width
-  var numVisibleTabs = Math.floor(containerSize.width / scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL),
+  var numVisibleTabs = Math.floor(containerSize.width / SimpleTabAreaLayout.TAB_WIDTH_SMALL),
     numOverflowTabs = numTabs - numVisibleTabs;
 
   var i = 0,
@@ -88,7 +96,7 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
   this._$overflowTab.appendDiv('num-tabs').text(numOverflowTabs);
 
   var that = this;
-  tabWidth = scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL;
+  tabWidth = SimpleTabAreaLayout.TAB_WIDTH_SMALL;
   i = 0;
   $tabs.each(function() {
     if (i >= leftEnd && i <= rightEnd) {
@@ -99,22 +107,22 @@ scout.SimpleTabAreaLayout.prototype.layout = function($container) {
     }
     i++;
   });
-};
+}
 
-scout.SimpleTabAreaLayout.prototype.smallPrefSize = function() {
+smallPrefSize() {
   var numTabs = this.tabArea.getTabs().length;
-  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_SMALL, this.tabArea.htmlComp.$comp.outerHeight(true));
-};
+  return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_SMALL, this.tabArea.htmlComp.$comp.outerHeight(true));
+}
 
-scout.SimpleTabAreaLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var numTabs = this.tabArea.getTabs().length;
-  return new scout.Dimension(numTabs * scout.SimpleTabAreaLayout.TAB_WIDTH_LARGE, scout.graphics.prefSize(this.tabArea.htmlComp.$comp, {
+  return new Dimension(numTabs * SimpleTabAreaLayout.TAB_WIDTH_LARGE, graphics.prefSize(this.tabArea.htmlComp.$comp, {
     includeMargin: true,
     useCssSize: true
   }).height);
-};
+}
 
-scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
+_onMouseDownOverflow(event) {
   var menu, tab, popup,
     tabArea = this.tabArea,
     overflowMenus = [];
@@ -143,4 +151,5 @@ scout.SimpleTabAreaLayout.prototype._onMouseDownOverflow = function(event) {
     }
   });
   popup.open();
-};
+}
+}

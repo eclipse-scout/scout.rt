@@ -8,17 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from './index';
+import {TypeDescriptor} from './index';
+import {objects} from './index';
+import * as $ from 'jquery';
+import {Outline} from './index';
+
 /**
  * @singleton
  */
-scout.ObjectFactory = function() {
+export default class ObjectFactory {
+
+constructor() {
   // use createUniqueId() to generate a new ID
   this.uniqueIdSeqNo = 0;
   this._registry = {};
-};
+}
 
-scout.ObjectFactory.NAMESPACE_SEPARATOR = '.';
-scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ':';
+static NAMESPACE_SEPARATOR = '.';
+static MODEL_VARIANT_SEPARATOR = ':';
 
 /**
  * Creates an object from the given objectType. Only the constructor is called.
@@ -39,7 +47,7 @@ scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ':';
  *    Examples: ":Offline", ":Horizontal"
  *
  * Full examples:
- *   Object type: Outline                                      -> Constructor: scout.Outline
+ *   Object type: Outline                                      -> Constructor: Outline
  *   Object type: myNamespace.Outline                          -> Constructor: myNamespace.Outline
  *   Object type: Outline:MyVariant                            -> Constructor: scout.MyVariantOutline
  *   Object type: myNamespace.Outline:MyVariant                -> Constructor: myNamespace.MyVariantOutline
@@ -62,7 +70,7 @@ scout.ObjectFactory.MODEL_VARIANT_SEPARATOR = ':';
  *                               - variantLenient = Flag to allow a second attempt to resolve the class
  *                                 without variant (see description above).
  */
-scout.ObjectFactory.prototype._createObjectByType = function(objectType, options) {
+_createObjectByType(objectType, options) {
   if (typeof objectType !== 'string') {
     throw new Error('missing or invalid object type');
   }
@@ -78,9 +86,9 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
     return scoutObject;
   } else {
     // 2. - Resolve class by name
-    return scout.TypeDescriptor.newInstance(objectType, options);
+    return TypeDescriptor.newInstance(objectType, options);
   }
-};
+}
 
 /**
  * Creates and initializes a new Scout object. When the created object has an init function, the
@@ -112,11 +120,11 @@ scout.ObjectFactory.prototype._createObjectByType = function(objectType, options
  *                                          to allow the init() function to copy the attribute from the model
  *                                          to the scoutObject.
  */
-scout.ObjectFactory.prototype.create = function(objectType, model, options) {
+create(objectType, model, options) {
   // Normalize arguments
   if (typeof objectType === 'string') {
     options = options || {};
-  } else if (scout.objects.isPlainObject(objectType)) {
+  } else if (objects.isPlainObject(objectType)) {
     options = model || {};
     model = objectType;
     if (!model.objectType) {
@@ -130,7 +138,7 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
 
   // Create object
   var scoutObject = this._createObjectByType(objectType, options);
-  if (scout.objects.isFunction(scoutObject.init)) {
+  if (objects.isFunction(scoutObject.init)) {
     if (model) {
       if (model.id === undefined && scout.nvl(options.ensureUniqueId, true)) {
         model.id = this.createUniqueId();
@@ -149,41 +157,42 @@ scout.ObjectFactory.prototype.create = function(objectType, model, options) {
   }
 
   return scoutObject;
-};
+}
 
 /**
  * Returns a new unique ID to be used for Widgets/Adapters created by the UI
  * without a model delivered by the server-side client.
  * @return string ID with prefix 'ui'
  */
-scout.ObjectFactory.prototype.createUniqueId = function() {
+createUniqueId() {
   return 'ui' + (++this.uniqueIdSeqNo).toString();
-};
+}
 
-scout.ObjectFactory.prototype.register = function(objectType, createFunc) {
+register(objectType, createFunc) {
   $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) registered create-function for objectType ' + objectType);
   this._registry[objectType] = createFunc;
-};
+}
 
-scout.ObjectFactory.prototype.unregister = function(objectType) {
+unregister(objectType) {
   $.log.isDebugEnabled() && $.log.debug('(ObjectFactory) unregistered objectType ' + objectType);
   delete this._registry[objectType];
-};
+}
 
-scout.ObjectFactory.prototype.get = function(objectType) {
+get(objectType) {
   return this._registry[objectType];
-};
+}
 
 /**
  * Cannot init ObjectFactory until Log4Javascript is initialized.
  * That's why we call this method in the scout._init method.
  */
-scout.ObjectFactory.prototype.init = function() {
+init() {
   for (var objectType in scout.objectFactories) {
     if (scout.objectFactories.hasOwnProperty(objectType)) {
       this.register(objectType, scout.objectFactories[objectType]);
     }
   }
-};
+}
+}
 
-scout.objectFactory = new scout.ObjectFactory(scout.objectFactories);
+scout.objectFactory = new ObjectFactory(scout.objectFactories);

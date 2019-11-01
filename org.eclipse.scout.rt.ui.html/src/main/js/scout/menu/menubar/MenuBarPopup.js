@@ -8,58 +8,62 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ContextMenuPopup} from '../../index';
+
 /**
  * The MenuBarPopup is a special Popup that is used in the menu-bar. It is tightly coupled with a menu-item and shows a header
  * which has a different size than the popup-body.
  */
-scout.MenuBarPopup = function() {
-  scout.MenuBarPopup.parent.call(this);
+export default class MenuBarPopup extends ContextMenuPopup {
+
+constructor() {
+  super();
   this.menu = null;
   this.$headBlueprint = null;
   this.ignoreEvent = null;
   this._headVisible = true;
   this.parentMenuPropertyChangeHandler = this._onParentMenuPropertyChange.bind(this);
-};
-scout.inherits(scout.MenuBarPopup, scout.ContextMenuPopup);
+}
 
-scout.MenuBarPopup.prototype._init = function(options) {
+
+_init(options) {
   options.$anchor = options.menu.$container;
-  scout.MenuBarPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.$headBlueprint = this.menu.$container;
-};
+}
 
 /**
  * @override ContextMenuPopup.js
  */
-scout.MenuBarPopup.prototype._getMenuItems = function() {
+_getMenuItems() {
   return this.menu.childActions || this.menu.menus;
-};
+}
 
 /**
  * @override Popup.js
  */
-scout.MenuBarPopup.prototype.close = function(event) {
+close(event) {
   if (!event || !this.ignoreEvent || event.originalEvent !== this.ignoreEvent.originalEvent) {
-    scout.MenuBarPopup.parent.prototype.close.call(this, event);
+    super.close( event);
   }
-};
+}
 
-scout.MenuBarPopup.prototype._render = function() {
-  scout.MenuBarPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.menu.on('propertyChange', this.parentMenuPropertyChangeHandler);
-};
+}
 
-scout.MenuBarPopup.prototype._remove = function() {
+_remove() {
   this.menu.off('propertyChange', this.parentMenuPropertyChangeHandler);
-  scout.MenuBarPopup.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
 /**
  * @override PopupWithHead.js
  */
-scout.MenuBarPopup.prototype._renderHead = function() {
-  scout.MenuBarPopup.parent.prototype._renderHead.call(this);
+_renderHead() {
+  super._renderHead();
 
   if (this.menu.$container.parent().hasClass('main-menubar')) {
     this.$head.addClass('in-main-menubar');
@@ -70,9 +74,9 @@ scout.MenuBarPopup.prototype._renderHead = function() {
   }
   this._copyCssClassToHead('unfocusable');
   this._copyCssClassToHead('button');
-};
+}
 
-scout.MenuBarPopup.prototype._onParentMenuPropertyChange = function(event) {
+_onParentMenuPropertyChange(event) {
   this.session.layoutValidator.schedulePostValidateFunction(function() {
     // Because this post layout validation function is executed asynchronously,
     // we have to check again if the popup is still rendered.
@@ -82,4 +86,5 @@ scout.MenuBarPopup.prototype._onParentMenuPropertyChange = function(event) {
     this.rerenderHead();
     this.position();
   }.bind(this));
-};
+}
+}

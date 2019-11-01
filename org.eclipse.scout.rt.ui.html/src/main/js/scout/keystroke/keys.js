@@ -8,7 +8,7 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-scout.keys = {
+const keys = {
   BACKSPACE: 8,
   TAB: 9,
   ENTER: 13,
@@ -217,3 +217,5 @@ scout.keys = {
   }
 };
 
+
+export default keys;

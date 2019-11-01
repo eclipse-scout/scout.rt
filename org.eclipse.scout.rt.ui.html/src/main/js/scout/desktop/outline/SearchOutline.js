@@ -8,44 +8,54 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SearchOutline = function() {
-  scout.SearchOutline.parent.call(this);
+import {InputFieldKeyStrokeContext} from '../../index';
+import {scout} from '../../index';
+import {keyStrokeModifier} from '../../index';
+import {Outline} from '../../index';
+import {SearchOutlineLayout} from '../../index';
+import {keys} from '../../index';
+import * as $ from 'jquery';
+
+export default class SearchOutline extends Outline {
+
+constructor() {
+  super();
   this.hasText = false;
   this.$searchPanel = null;
   this.$clearIcon = null;
   this.$searchStatus = null;
   this.$queryField = null;
-};
-scout.inherits(scout.SearchOutline, scout.Outline);
+}
+
 
 /**
  * @override Tree.js
  */
-scout.SearchOutline.prototype._initKeyStrokeContext = function() {
-  scout.SearchOutline.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.searchFieldKeyStrokeContext = this._createKeyStrokeContextForSearchField();
-};
+}
 
-scout.SearchOutline.prototype._createKeyStrokeContextForSearchField = function() {
-  var keyStrokeContext = new scout.InputFieldKeyStrokeContext();
+_createKeyStrokeContextForSearchField() {
+  var keyStrokeContext = new InputFieldKeyStrokeContext();
   keyStrokeContext.$scopeTarget = function() {
     return this.$searchPanel;
   }.bind(this);
   keyStrokeContext.$bindTarget = function() {
     return this.$queryField;
   }.bind(this);
-  keyStrokeContext.registerStopPropagationKeys(scout.keyStrokeModifier.NONE, [
-    scout.keys.ENTER, scout.keys.BACKSPACE
+  keyStrokeContext.registerStopPropagationKeys(keyStrokeModifier.NONE, [
+    keys.ENTER, keys.BACKSPACE
   ]);
   return keyStrokeContext;
-};
+}
 
-scout.SearchOutline.prototype._render = function() {
-  scout.SearchOutline.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   // Override layout
-  this.htmlComp.setLayout(new scout.SearchOutlineLayout(this));
+  this.htmlComp.setLayout(new SearchOutlineLayout(this));
 
   this.$container.addClass('search-outline');
   this.$searchPanel = this.$container.prependDiv('search-outline-panel');
@@ -58,34 +68,34 @@ scout.SearchOutline.prototype._render = function() {
   this.$searchStatus = this.$searchPanel.appendDiv('search-outline-status')
     .on('mousedown', this._onTitleMouseDown.bind(this));
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
-};
+}
 
-scout.SearchOutline.prototype._remove = function() {
+_remove() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this.$searchPanel.remove();
-  scout.SearchOutline.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.SearchOutline.prototype._renderProperties = function() {
-  scout.SearchOutline.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSearchQuery();
   this._renderSearchStatus();
   this._updateHasText();
-};
+}
 
-scout.SearchOutline.prototype._renderTitle = function() {
-  scout.SearchOutline.parent.prototype._renderTitle.call(this);
+_renderTitle() {
+  super._renderTitle();
   // Move before search panel
   if (this.titleVisible) {
     this.$title.insertBefore(this.$searchPanel);
   }
-};
+}
 
-scout.SearchOutline.prototype._renderSearchQuery = function() {
+_renderSearchQuery() {
   this.$queryField.val(this.searchQuery);
-};
+}
 
-scout.SearchOutline.prototype._renderSearchStatus = function() {
+_renderSearchStatus() {
   var animate = this.rendered;
 
   if (this.searchStatus && !this.$searchStatus.isVisible()) {
@@ -109,19 +119,19 @@ scout.SearchOutline.prototype._renderSearchStatus = function() {
   }
   this.$searchStatus.textOrNbsp(this.searchStatus);
   this.$searchPanel.toggleClass('has-status', !!this.searchStatus);
-};
+}
 
-scout.SearchOutline.prototype.focusQueryField = function() {
+focusQueryField() {
   this.validateFocus();
-};
+}
 
-scout.SearchOutline.prototype._triggerSearch = function() {
+_triggerSearch() {
   this.trigger('search', {
     query: scout.nvl(this.searchQuery, '')
   });
-};
+}
 
-scout.SearchOutline.prototype._createOnQueryFieldInputFunction = function(event) {
+_createOnQueryFieldInputFunction(event) {
   var debounceFunction = $.debounce(this._search.bind(this));
   var fn = function(event) {
     this._updateHasText();
@@ -129,9 +139,9 @@ scout.SearchOutline.prototype._createOnQueryFieldInputFunction = function(event)
     debounceFunction();
   };
   return fn;
-};
+}
 
-scout.SearchOutline.prototype._onClearIconMouseDown = function(event) {
+_onClearIconMouseDown(event) {
   this.$queryField.val('');
   this._updateHasText();
   this._search();
@@ -139,16 +149,16 @@ scout.SearchOutline.prototype._onClearIconMouseDown = function(event) {
   this.$queryField.focus();
   // stay in field when x is pressed
   event.preventDefault();
-};
+}
 
-scout.SearchOutline.prototype._onQueryFieldKeyPress = function(event) {
-  if (event.which === scout.keys.ENTER) {
+_onQueryFieldKeyPress(event) {
+  if (event.which === keys.ENTER) {
     this._setSearchQuery(this.$queryField.val());
     this._triggerSearch();
   }
-};
+}
 
-scout.SearchOutline.prototype._search = function(event) {
+_search(event) {
   // Don't send query if value did not change (may happen when _createOnQueryFieldInputFunction is executed after _onQueryFieldKeyPress)
   var searchQuery = this.$queryField.val();
   if (this.searchQuery !== searchQuery) {
@@ -156,22 +166,22 @@ scout.SearchOutline.prototype._search = function(event) {
     this._setSearchQuery(searchQuery);
     this._triggerSearch();
   }
-};
+}
 
-scout.SearchOutline.prototype._setSearchQuery = function(searchQuery) {
+_setSearchQuery(searchQuery) {
   this.searchQuery = searchQuery;
-};
+}
 
-scout.SearchOutline.prototype._updateHasText = function() {
+_updateHasText() {
   this.$queryField.toggleClass('has-text', !!this.$queryField.val());
-};
+}
 
 /**
  * Focus and select content AFTER the search outline was rendered (and therefore the query field filled).
  *
  * @override Outline.js
  */
-scout.SearchOutline.prototype.validateFocus = function() {
+validateFocus() {
   if (!this.rendered) {
     return;
   }
@@ -179,4 +189,5 @@ scout.SearchOutline.prototype.validateFocus = function() {
   if (this.session.focusManager.requestFocus(elementToFocus)) {
     elementToFocus.select();
   }
-};
+}
+}

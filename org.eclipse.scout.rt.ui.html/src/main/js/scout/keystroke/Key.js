@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Key = function(keyStroke, which) {
+import {keys} from '../index';
+
+export default class Key {
+
+constructor(keyStroke, which) {
   this.keyStroke = keyStroke;
   this.which = which;
 
@@ -17,19 +21,19 @@ scout.Key = function(keyStroke, which) {
   this.shift = keyStroke.shift;
 
   this.keyStrokeMode = keyStroke.keyStrokeMode;
-};
+}
 
-scout.Key.prototype.render = function($drawingArea, event) {
+render($drawingArea, event) {
   this.$drawingArea = this.keyStroke.renderKeyBox($drawingArea, event);
   return !!this.$drawingArea;
-};
+}
 
-scout.Key.prototype.remove = function() {
+remove() {
   this.keyStroke.removeKeyBox(this.$drawingArea);
   this.$drawingArea = null;
-};
+}
 
-scout.Key.prototype.toKeyStrokeString = function() {
+toKeyStrokeString() {
   var keyStroke = '';
   if (this.ctrl) {
     keyStroke += 'Ctrl-';
@@ -40,10 +44,11 @@ scout.Key.prototype.toKeyStrokeString = function() {
   if (this.shift) {
     keyStroke += 'Shift-';
   }
-  var key = scout.keys.codesToKeys[this.which];
+  var key = keys.codesToKeys[this.which];
   if (key === undefined) {
     key = this.which;
   }
   keyStroke += key;
   return keyStroke;
-};
+}
+}

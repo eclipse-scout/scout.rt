@@ -8,8 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Scrollbar = function() {
-  scout.Scrollbar.parent.call(this);
+import {graphics} from '../index';
+import {Insets} from '../index';
+import {Widget} from '../index';
+import {events} from '../index';
+import {scrollbars} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class Scrollbar extends Widget {
+
+constructor() {
+  super();
 
   // jQuery Elements
   this.$container = null; // Scrollbar <div>
@@ -30,7 +40,7 @@ scout.Scrollbar = function() {
   this._dir = 'top'; // x: 'left'
   this._dirReverse = 'bottom'; // x: 'right'
   this._scrollDir = 'scrollTop'; // x: 'scrollLeft
-  this._thumbClipping = new scout.Insets(0, 0, 0, 0);
+  this._thumbClipping = new Insets(0, 0, 0, 0);
 
   // Event Handling
   this._onScrollHandler = this._onScroll.bind(this);
@@ -45,10 +55,10 @@ scout.Scrollbar = function() {
   // Fix Scrollbar
   this._fixScrollbarHandler = this._fixScrollbar.bind(this);
   this._unfixScrollbarHandler = this._unfixScrollbar.bind(this);
-};
-scout.inherits(scout.Scrollbar, scout.Widget);
+}
 
-scout.Scrollbar.prototype._render = function() {
+
+_render() {
   this._ensureParentPosition();
 
   // Create scrollbar and thumb
@@ -75,7 +85,7 @@ scout.Scrollbar.prototype._render = function() {
   // Install listeners
   var scrollbars = this.$parent.data('scrollbars');
   if (!scrollbars) {
-    throw new Error('Data "scrollbars" missing in ' + scout.graphics.debugOutput(this.$parent) + '\nAncestors: ' + this.ancestorsToString(1));
+    throw new Error('Data "scrollbars" missing in ' + graphics.debugOutput(this.$parent) + '\nAncestors: ' + this.ancestorsToString(1));
   }
   this.$parent
     .on('DOMMouseScroll mousewheel', this._onScrollWheelHandler)
@@ -91,9 +101,9 @@ scout.Scrollbar.prototype._render = function() {
   // an update whenever a parent div is scrolled ore resized.
   this._$ancestors = this.$container.parents('div')
     .on('scroll resize', this._onAncestorScrollOrResizeHandler);
-};
+}
 
-scout.Scrollbar.prototype._remove = function() {
+_remove() {
   // Uninstall listeners
   var scrollbars = this.$parent.data('scrollbars');
   this.$parent
@@ -109,15 +119,15 @@ scout.Scrollbar.prototype._remove = function() {
   this._$ancestors.off('scroll resize', this._onAncestorScrollOrResizeHandler);
   this._$ancestors = null;
 
-  scout.Scrollbar.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Scrollbar.prototype._renderOnAttach = function() {
-  scout.Scrollbar.parent.prototype._renderOnAttach.call(this);
+_renderOnAttach() {
+  super._renderOnAttach();
   this._ensureParentPosition();
-};
+}
 
-scout.Scrollbar.prototype._ensureParentPosition = function() {
+_ensureParentPosition() {
   // Container with JS scrollbars must have either relative or absolute position
   // otherwise we cannot determine the correct dimension of the scrollbars
   if (this.$parent && this.$parent.isAttached()) {
@@ -126,31 +136,31 @@ scout.Scrollbar.prototype._ensureParentPosition = function() {
       this.$parent.css('position', 'relative');
     }
   }
-};
+}
 
 /**
  * scroll by "diff" in px (positive and negative)
  */
-scout.Scrollbar.prototype.scroll = function(diff) {
+scroll(diff) {
   var posOld = Math.max(0, this.$parent[this._scrollDir]());
   this._scrollToAbsolutePoint(posOld + diff);
-};
+}
 
 /**
  * scroll to absolute point (expressed as absolute point in px)
  */
-scout.Scrollbar.prototype._scrollToAbsolutePoint = function(absolutePoint) {
+_scrollToAbsolutePoint(absolutePoint) {
   var scrollPos = Math.min(
     (this._scrollSize - this._offsetSize + 1), // scrollPos can't be larger than the start of last page. Add +1 because at least chrome has issues to scroll to the very bottom if scrollTop is fractional
     Math.max(0, Math.round(absolutePoint))); // scrollPos can't be negative
 
   this.$parent[this._scrollDir](scrollPos);
-};
+}
 
 /**
  * do not use this internal method (triggered by scroll event)
  */
-scout.Scrollbar.prototype.update = function() {
+update() {
   if (!this.rendered) {
     return;
   }
@@ -200,9 +210,9 @@ scout.Scrollbar.prototype.update = function() {
   // Always update both to make sure every scrollbar (x and y) is positioned correctly
   this.$container.cssRight(-1 * scrollLeft);
   this.$container.cssBottom(-1 * scrollTop);
-};
+}
 
-scout.Scrollbar.prototype._resetClipping = function() {
+_resetClipping() {
   // Only reset dimension and position for the secondary axis,
   // for the scroll-axis these properties are set during update()
   if (this.axis === 'y') {
@@ -215,19 +225,19 @@ scout.Scrollbar.prototype._resetClipping = function() {
       .css('top', '');
   }
   this._$thumb.removeClass('clipped-left clipped-right clipped-top clipped-bottom');
-  this._thumbClipping = new scout.Insets(0, 0, 0, 0);
-};
+  this._thumbClipping = new Insets(0, 0, 0, 0);
+}
 
 /**
  * Make sure scrollbar does not appear outside an ancestor when fixed
  */
-scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
+_clipWhenOverlappingAncestor() {
   this._resetClipping();
 
   // Clipping is only needed when scrollbar has a fixed position.
   // Otherwise the over-size is handled by 'overflow: hidden;'.
   if (this.$container.css('position') === 'fixed') {
-    var thumbBounds = scout.graphics.offsetBounds(this._$thumb);
+    var thumbBounds = graphics.offsetBounds(this._$thumb);
     var thumbWidth = thumbBounds.width;
     var thumbHeight = thumbBounds.height;
     var thumbEndX = thumbBounds.x + thumbBounds.width;
@@ -241,7 +251,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
     // because ancestor-divs themselves may be scrolled.
     this.$container.parents('div').each(function() {
       var $ancestor = $(this);
-      var ancestorBounds = scout.graphics.offsetBounds($ancestor);
+      var ancestorBounds = graphics.offsetBounds($ancestor);
       if ($ancestor.css('overflow-x') !== 'visible') {
         if (ancestorBounds.x > biggestAncestorBeginX) {
           biggestAncestorBeginX = ancestorBounds.x;
@@ -273,7 +283,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
       thumbWidth -= clipLeft;
       this._$thumb
         .css('width', thumbWidth)
-        .css('left', scout.graphics.bounds(this._$thumb).x + clipLeft)
+        .css('left', graphics.bounds(this._$thumb).x + clipLeft)
         .addClass('clipped-left');
     }
 
@@ -283,7 +293,7 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
       thumbHeight -= clipTop;
       this._$thumb
         .css('height', thumbHeight)
-        .css('top', scout.graphics.bounds(this._$thumb).y + clipTop)
+        .css('top', graphics.bounds(this._$thumb).y + clipTop)
         .addClass('clipped-top');
     }
 
@@ -303,33 +313,33 @@ scout.Scrollbar.prototype._clipWhenOverlappingAncestor = function() {
         .addClass('clipped-bottom');
     }
 
-    this._thumbClipping = new scout.Insets(clipTop, clipRight, clipBottom, clipLeft);
+    this._thumbClipping = new Insets(clipTop, clipRight, clipBottom, clipLeft);
   }
-};
+}
 
 /**
  * Resets thumb size and scrollbar position to make sure it does not extend the scrollSize
  */
-scout.Scrollbar.prototype.reset = function() {
+reset() {
   this._$thumb.css(this._dim.toLowerCase(), 0);
   this.$container.cssRight(0);
   this.$container.cssBottom(0);
-};
+}
 
 /*
  * EVENT HANDLING
  */
 
-scout.Scrollbar.prototype._onScroll = function(event) {
+_onScroll(event) {
   this.update();
-};
+}
 
-scout.Scrollbar.prototype._onTouchStart = function(event) {
+_onTouchStart(event) {
   // In hybrid mode scroll bar is moved by the scroll event.
   // On a mobile device scroll events are fired delayed so the update will be delayed as well.
   // This will lead to flickering and could be prevented by calling fixScrollbar. But unfortunately calling fix will stop the scroll pane from scrolling immediately, at least in Edge.
   // In order to reduce the flickering the current approach is to hide the scrollbars while scrolling (only in this specific hybrid touch scrolling)
-  scout.events.onScrollStartEndDuringTouch(this.$parent, function() {
+  events.onScrollStartEndDuringTouch(this.$parent, function() {
     if (!this.rendered) {
       return;
     }
@@ -340,9 +350,9 @@ scout.Scrollbar.prototype._onTouchStart = function(event) {
     }
     this.$container.css('opacity', '');
   }.bind(this));
-};
+}
 
-scout.Scrollbar.prototype._onScrollWheel = function(event) {
+_onScrollWheel(event) {
   if (!this.$container.isVisible()) {
     return true; // ignore scroll wheel event if there is no scroll bar visible
   }
@@ -360,9 +370,9 @@ scout.Scrollbar.prototype._onScrollWheel = function(event) {
   this.notifyAfterScroll();
 
   return false;
-};
+}
 
-scout.Scrollbar.prototype._onScrollbarMouseDown = function(event) {
+_onScrollbarMouseDown(event) {
   this.notifyBeforeScroll();
 
   var clickableAreaSize = this.$container[this._dim.toLowerCase()]();
@@ -387,9 +397,9 @@ scout.Scrollbar.prototype._onScrollbarMouseDown = function(event) {
   }
 
   this.notifyAfterScroll();
-};
+}
 
-scout.Scrollbar.prototype._onThumbMouseDown = function(event) {
+_onThumbMouseDown(event) {
   // ignore event if container is too small for thumb movement
   if (this._isContainerTooSmallForThumb()) {
     return true; // let _onScrollbarMouseDown handle the click event
@@ -412,9 +422,9 @@ scout.Scrollbar.prototype._onThumbMouseDown = function(event) {
 
     return false;
   }
-};
+}
 
-scout.Scrollbar.prototype._onDocumentMousemove = function(event) {
+_onDocumentMousemove(event) {
   // Scrollbar may be removed in the meantime
   if (!this.rendered) {
     return;
@@ -438,9 +448,9 @@ scout.Scrollbar.prototype._onDocumentMousemove = function(event) {
 
   var posNew = (percentage * (this._scrollSize - this._offsetSize));
   this._scrollToAbsolutePoint(posNew);
-};
+}
 
-scout.Scrollbar.prototype._onDocumentMouseUp = function(event) {
+_onDocumentMouseUp(event) {
   var $document = $(event.currentTarget);
   $document.off('mousemove', this._onDocumentMousemoveHandler);
   if (this.rendered) {
@@ -448,15 +458,15 @@ scout.Scrollbar.prototype._onDocumentMouseUp = function(event) {
   }
   this.notifyAfterScroll();
   return false;
-};
+}
 
-scout.Scrollbar.prototype.notifyBeforeScroll = function() {
+notifyBeforeScroll() {
   this.trigger('scrollStart');
-};
+}
 
-scout.Scrollbar.prototype.notifyAfterScroll = function() {
+notifyAfterScroll() {
   this.trigger('scrollEnd');
-};
+}
 
 /*
  * Fix Scrollbar
@@ -466,21 +476,21 @@ scout.Scrollbar.prototype.notifyAfterScroll = function() {
  * Sets the position to fixed and updates left and top position
  * (This is necessary to prevent flickering in IE)
  */
-scout.Scrollbar.prototype._fixScrollbar = function() {
-  scout.scrollbars.fix(this.$container);
+_fixScrollbar() {
+  scrollbars.fix(this.$container);
   this.update();
-};
+}
 
 /**
  * Reverts the changes made by _fixScrollbar
  */
-scout.Scrollbar.prototype._unfixScrollbar = function() {
+_unfixScrollbar() {
   // true = do it immediately without a timeout.
   // This is important because scrollTop may be set during layout but before the element is positioned correctly (e.g. popup)
   // which could have the effect that the scroll bar is drown outside the widget
-  scout.scrollbars.unfix(this.$container, null, true);
+  scrollbars.unfix(this.$container, null, true);
   this.update();
-};
+}
 
 /*
  * INTERNAL METHODS
@@ -489,8 +499,9 @@ scout.Scrollbar.prototype._unfixScrollbar = function() {
 /**
  * If the thumb gets bigger than its container this method will return true, otherwise false
  */
-scout.Scrollbar.prototype._isContainerTooSmallForThumb = function() {
+_isContainerTooSmallForThumb() {
   var thumbSize = this._$thumb['outer' + this._dim](true);
   var thumbMovableAreaSize = this.$container[this._dim.toLowerCase()]();
   return thumbSize >= thumbMovableAreaSize;
-};
+}
+}

@@ -8,12 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ErrorHandler = function() {
+import {strings} from './index';
+import {AjaxError} from './index';
+import {scout} from './index';
+import {NullLogger} from './index';
+import * as $ from 'jquery';
+import {App} from './index';
+
+export default class ErrorHandler {
+
+constructor() {
   this.logError = true;
   this.displayError = true;
   this.sendError = false;
   this.windowErrorHandler = this._onWindowError.bind(this);
-};
+}
 
 /**
  * Use this constant to configure whether or not all instances of the ErrorHandler should write
@@ -21,15 +30,15 @@ scout.ErrorHandler = function() {
  * value to false, because the ErrorHandler also calls $.log.error and thus the appender has
  * already written the message to the console. We don't want to see it twice.
  */
-scout.ErrorHandler.CONSOLE_OUTPUT = true;
+static CONSOLE_OUTPUT = true;
 
-scout.ErrorHandler.prototype.init = function(options) {
+init(options) {
   $.extend(this, options);
-};
+}
 
 // Signature matches the "window.onerror" event handler
 // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
-scout.ErrorHandler.prototype._onWindowError = function(errorMessage, fileName, lineNumber, columnNumber, error) {
+_onWindowError(errorMessage, fileName, lineNumber, columnNumber, error) {
   try {
     if (error instanceof Error) {
       this.handle(error);
@@ -45,7 +54,7 @@ scout.ErrorHandler.prototype._onWindowError = function(errorMessage, fileName, l
   } catch (err) {
     throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
   }
-};
+}
 
 /**
  * Handles unexpected JavaScript errors. The arguments are first analyzed and then handled.
@@ -59,7 +68,7 @@ scout.ErrorHandler.prototype._onWindowError = function(errorMessage, fileName, l
  *
  * @return {object} the analyzed errorInfo
  */
-scout.ErrorHandler.prototype.handle = function() {
+handle() {
   var args = arguments;
   if (args.length === 1 && args[0] && (String(args[0]) === '[object Arguments]' || Array.isArray(args[0]))) {
     args = args[0];
@@ -67,7 +76,7 @@ scout.ErrorHandler.prototype.handle = function() {
   var errorInfo = this.analyzeError.apply(this, args);
   this.handleErrorInfo(errorInfo);
   return errorInfo;
-};
+}
 
 /**
  * Returns an "errorInfo" object for the given arguments. The following cases are handled:
@@ -76,7 +85,7 @@ scout.ErrorHandler.prototype.handle = function() {
  * 3. Nothing                 (code: 'P3')
  * 4. Everything else         (code: 'P4')
  */
-scout.ErrorHandler.prototype.analyzeError = function(error) {
+analyzeError(error) {
   var errorInfo = {
     code: null,
     message: null,
@@ -91,7 +100,7 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
     errorInfo.code = this.getJsErrorCode(error);
     errorInfo.message = String(error.message || error);
     if (error.fileName) {
-      errorInfo.location = error.fileName + scout.strings.join('', scout.strings.box(':', error.lineNumber), scout.strings.box(':', error.columnNumber));
+      errorInfo.location = error.fileName + strings.join('', strings.box(':', error.lineNumber), strings.box(':', error.columnNumber));
     }
     if (error.stack) {
       errorInfo.stack = String(error.stack);
@@ -111,10 +120,10 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
       errorInfo.log += '\n----- Additional debug information: -----\n' + errorInfo.debugInfo;
     }
 
-  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof scout.AjaxError) {
+  } else if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof AjaxError) {
     // 2. jQuery $.ajax() error (arguments: jqXHR, textStatus, errorThrown, requestOptions)
     var jqXHR, errorThrown, requestOptions;
-    if (error instanceof scout.AjaxError) {
+    if (error instanceof AjaxError) {
       jqXHR = error.jqXHR;
       errorThrown = error.errorThrown;
       requestOptions = error.requestOptions; // scout extension
@@ -125,11 +134,11 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
       requestOptions = args[3]; // scout extension
     }
 
-    var ajaxRequest = (requestOptions ? scout.strings.join(' ', requestOptions.type, requestOptions.url) : '');
-    var ajaxStatus = (jqXHR.status ? scout.strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
+    var ajaxRequest = (requestOptions ? strings.join(' ', requestOptions.type, requestOptions.url) : '');
+    var ajaxStatus = (jqXHR.status ? strings.join(' ', jqXHR.status, errorThrown) : 'Connection error');
 
     errorInfo.code = 'X' + (jqXHR.status || '0');
-    errorInfo.message = 'AJAX call' + scout.strings.box(' "', ajaxRequest, '"') + ' failed' + scout.strings.box(' [', ajaxStatus, ']');
+    errorInfo.message = 'AJAX call' + strings.box(' "', ajaxRequest, '"') + ' failed' + strings.box(' [', ajaxStatus, ']');
     errorInfo.log = errorInfo.message;
     if (jqXHR.responseText) {
       errorInfo.debugInfo = 'Response text:\n' + jqXHR.responseText;
@@ -159,7 +168,7 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
   }
 
   return errorInfo;
-};
+}
 
 /**
  * Expects an object as returned by analyzeError() and handles it:
@@ -167,14 +176,14 @@ scout.ErrorHandler.prototype.analyzeError = function(error) {
  * - If there is a scout session and the flag "displayError" is set, the error is shown in a a message box.
  * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
  */
-scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
+handleErrorInfo(errorInfo) {
   if (this.logError && errorInfo.log) {
     $.log.error(errorInfo.log);
 
     // Note: when the null-logger is active it has already written the error to the console
     // when the $.log.error function has been called above, so we don't have to log again here.
-    var writeToConsole = scout.ErrorHandler.CONSOLE_OUTPUT;
-    if ($.log instanceof scout.NullLogger) {
+    var writeToConsole = ErrorHandler.CONSOLE_OUTPUT;
+    if ($.log instanceof NullLogger) {
       writeToConsole = false;
     }
     if (writeToConsole && window && window.console) {
@@ -189,8 +198,8 @@ scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
   // Note: The error handler is installed globally and we cannot tell in which scout session the error happened.
   // We simply use the first scout session to display the message box and log the error. This is not ideal in the
   // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-  if (scout.sessions.length > 0) {
-    var session = scout.sessions[0];
+  if (App.get().sessions.length > 0) {
+    var session = App.get().sessions[0];
     if (this.displayError) {
       this._showMessageBox(session, errorInfo.message, errorInfo.code, errorInfo.log);
     }
@@ -198,7 +207,7 @@ scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
       this._sendErrorMessage(session, errorInfo.log);
     }
   }
-};
+}
 
 /**
  * Generate a "cool looking" error code from the JS error object, that
@@ -206,7 +215,7 @@ scout.ErrorHandler.prototype.handleErrorInfo = function(errorInfo) {
  * that a JS runtime error has occurred. (In contrast, fatal errors from
  * the server have numeric error codes.)
  */
-scout.ErrorHandler.prototype.getJsErrorCode = function(error) {
+getJsErrorCode(error) {
   if (error) {
     if (error.name === 'EvalError') {
       return 'E1';
@@ -231,12 +240,12 @@ scout.ErrorHandler.prototype.getJsErrorCode = function(error) {
     }
   }
   return 'J0';
-};
+}
 
-scout.ErrorHandler.prototype._showMessageBox = function(session, errorMessage, errorCode, logMessage) {
+_showMessageBox(session, errorMessage, errorCode, logMessage) {
   var options = {
     header: session.optText('ui.UnexpectedProblem', 'Internal UI Error'),
-    body: scout.strings.join('\n\n',
+    body: strings.join('\n\n',
       session.optText('ui.InternalUiErrorMsg', errorMessage, ' (' + session.optText('ui.ErrorCodeX', 'Code ' + errorCode, errorCode) + ')'),
       session.optText('ui.UiInconsistentMsg', '')),
     yesButtonText: session.optText('ui.Reload', 'Reload'),
@@ -246,8 +255,9 @@ scout.ErrorHandler.prototype._showMessageBox = function(session, errorMessage, e
   };
 
   session.showFatalMessage(options, errorCode);
-};
+}
 
-scout.ErrorHandler.prototype._sendErrorMessage = function(session, logMessage) {
+_sendErrorMessage(session, logMessage) {
   session.sendLogRequest(logMessage);
-};
+}
+}

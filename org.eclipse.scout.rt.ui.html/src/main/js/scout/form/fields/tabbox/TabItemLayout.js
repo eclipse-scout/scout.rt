@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabItemLayout = function(tabItem) {
-  scout.TabItemLayout.parent.call(this, tabItem);
-};
-scout.inherits(scout.TabItemLayout, scout.GroupBoxLayout);
+import {GroupBoxLayout} from '../../../index';
+import {MenuBarLayout} from '../../../index';
 
-scout.TabItemLayout.prototype._layoutStatus = function() {
+export default class TabItemLayout extends GroupBoxLayout {
+
+constructor(tabItem) {
+  super( tabItem);
+}
+
+
+_layoutStatus() {
   // NOP: $status width is set in TabItem.addStatus()
-};
+}
 
-scout.TabItemLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
-  var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+_menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+  var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
   var tabBox = this.groupBox.parent;
   menuBarSize.width = tabBox.header.$container.outerWidth();
   return menuBarSize;
-};
+}
 
-scout.TabItemLayout.prototype._titleHeight = function() {
+_titleHeight() {
   return 0;
-};
+}
+}

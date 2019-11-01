@@ -8,54 +8,79 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooser = function() {
-  scout.FileChooser.parent.call(this);
+import {Device} from '../index';
+import {ClickActiveElementKeyStroke} from '../index';
+import {Form} from '../index';
+import {Event} from '../index';
+import {HtmlComponent} from '../index';
+import {Status} from '../index';
+import {dragAndDrop} from '../index';
+import {keys} from '../index';
+import {FormLayout} from '../index';
+import {KeyStrokeContext} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {CloseKeyStroke} from '../index';
+import {scrollbars} from '../index';
+import {FileInput} from '../index';
+import {MessageBoxes} from '../index';
+import {GlassPaneRenderer} from '../index';
+import {BoxButtons} from '../index';
+import {Widget} from '../index';
+import {FocusAdjacentElementKeyStroke} from '../index';
+import {FocusRule} from '../index';
+import {arrays} from '../index';
+
+export default class FileChooser extends Widget {
+
+constructor() {
+  super();
   this.displayParent = null;
   this.files = [];
   this._glassPaneRenderer;
-  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
-};
-scout.inherits(scout.FileChooser, scout.Widget);
+  this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+}
 
-scout.FileChooser.prototype._init = function(model) {
-  scout.FileChooser.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setDisplayParent(this.displayParent);
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+  this._glassPaneRenderer = new GlassPaneRenderer(this);
   this.fileInput = scout.create('FileInput', {
     parent: this,
     acceptTypes: this.acceptTypes,
     maximumUploadSize: this.maximumUploadSize,
     multiSelect: this.multiSelect,
-    visible: !scout.device.supportsFile()
+    visible: !Device.get().supportsFile()
   });
   this.fileInput.on('change', this._onFileChange.bind(this));
-};
+}
 
 /**
  * @override
  */
-scout.FileChooser.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.FileChooser.prototype._initKeyStrokeContext = function() {
-  scout.FileChooser.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.FocusAdjacentElementKeyStroke(this.session, this),
-    new scout.ClickActiveElementKeyStroke(this, [
-      scout.keys.SPACE, scout.keys.ENTER
+    new FocusAdjacentElementKeyStroke(this.session, this),
+    new ClickActiveElementKeyStroke(this, [
+      keys.SPACE, keys.ENTER
     ]),
-    new scout.CloseKeyStroke(this, function() {
+    new CloseKeyStroke(this, function() {
       return this.$cancelButton;
     }.bind(this))
   ]);
-};
+}
 
-scout.FileChooser.prototype._render = function() {
+_render() {
   // Render modality glasspanes (must precede adding the file chooser to the DOM)
   this._glassPaneRenderer.renderGlassPanes();
   this.$container = this.$parent.appendDiv('file-chooser')
@@ -93,7 +118,7 @@ scout.FileChooser.prototype._render = function() {
 
   // Buttons
   this.$buttons = this.$container.appendDiv('file-chooser-buttons');
-  var boxButtons = new scout.BoxButtons(this.$buttons);
+  var boxButtons = new BoxButtons(this.$buttons);
   if (!this.fileInput.legacy) {
     this.$addFileButton = boxButtons.addButton({
       text: this.session.text('ui.Browse'),
@@ -111,8 +136,8 @@ scout.FileChooser.prototype._render = function() {
     onClick: this._onCancelButtonClicked.bind(this)
   });
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.FormLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new FormLayout(this));
 
   this.$container.addClassForAnimation('animate-open');
   // Prevent resizing when file chooser is dragged off the viewport
@@ -126,75 +151,75 @@ scout.FileChooser.prototype._render = function() {
   boxButtons.updateButtonWidths(this.$container.width());
   // Now that all texts, paddings, widths etc. are set, we can calculate the position
   this._position();
-};
+}
 
-scout.FileChooser.prototype._renderProperties = function() {
-  scout.FileChooser.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   if (this.fileInput.legacy) {
     // Files may not be set into native control -> clear list in order to be sync again
     this.setFiles([]);
   }
   this._renderFiles();
-};
+}
 
-scout.FileChooser.prototype._postRender = function() {
-  scout.FileChooser.parent.prototype._postRender.call(this);
+_postRender() {
+  super._postRender();
   this._installFocusContext();
-};
+}
 
-scout.FileChooser.prototype._remove = function() {
+_remove() {
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
-  scout.FileChooser.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.FileChooser.prototype._installFocusContext = function() {
-  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
-};
+_installFocusContext() {
+  this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
+}
 
-scout.FileChooser.prototype._uninstallFocusContext = function() {
+_uninstallFocusContext() {
   this.session.focusManager.uninstallFocusContext(this.$container);
-};
+}
 
 /**
  * @override
  */
-scout.FileChooser.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$files;
-};
+}
 
-scout.FileChooser.prototype._position = function() {
+_position() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
-};
+}
 
-scout.FileChooser.prototype.setDisplayParent = function(displayParent) {
+setDisplayParent(displayParent) {
   this.setProperty('displayParent', displayParent);
-};
+}
 
-scout.FileChooser.prototype._setDisplayParent = function(displayParent) {
+_setDisplayParent(displayParent) {
   this._setProperty('displayParent', displayParent);
   if (displayParent) {
     this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
-};
+}
 
-scout.FileChooser.prototype.setMaximumUploadSize = function(maximumUploadSize) {
+setMaximumUploadSize(maximumUploadSize) {
   this.setProperty('maximumUploadSize', maximumUploadSize);
   this.fileInput.setMaximumUploadSize(maximumUploadSize);
-};
+}
 
 /**
  * Renders the file chooser and links it with the display parent.
  */
-scout.FileChooser.prototype.open = function() {
+open() {
   this.setDisplayParent(this.displayParent || this.session.desktop);
   this.displayParent.fileChooserController.registerAndRender(this);
-};
+}
 
 /**
  * Destroys the file chooser and unlinks it from the display parent.
  */
-scout.FileChooser.prototype.close = function() {
+close() {
   if (!this.rendered) {
     this.cancel();
     return;
@@ -202,45 +227,45 @@ scout.FileChooser.prototype.close = function() {
   if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
     this.$cancelButton.click();
   }
-};
+}
 
-scout.FileChooser.prototype.cancel = function() {
-  var event = new scout.Event();
+cancel() {
+  var event = new Event();
   this.trigger('cancel', event);
   if (!event.defaultPrevented) {
     this._close();
   }
-};
+}
 
 /**
  * Destroys the file chooser and unlinks it from the display parent.
  */
-scout.FileChooser.prototype._close = function() {
+_close() {
   if (this.displayParent) {
     this.displayParent.fileChooserController.unregisterAndRemove(this);
   }
   this.destroy();
-};
+}
 
-scout.FileChooser.prototype.browse = function() {
+browse() {
   this.fileInput.browse();
-};
+}
 
-scout.FileChooser.prototype.setAcceptTypes = function(acceptTypes) {
+setAcceptTypes(acceptTypes) {
   this.setProperty('acceptTypes', acceptTypes);
   this.fileInput.setAcceptTypes(acceptTypes);
-};
+}
 
-scout.FileChooser.prototype.setMultiSelect = function(multiSelect) {
+setMultiSelect(multiSelect) {
   this.setProperty('multiSelect', multiSelect);
   this.fileInput.setMultiSelect(multiSelect);
-};
+}
 
-scout.FileChooser.prototype.addFiles = function(files) {
+addFiles(files) {
   if (files instanceof FileList) {
-    files = scout.FileInput.fileListToArray(files);
+    files = FileInput.fileListToArray(files);
   }
-  files = scout.arrays.ensure(files);
+  files = arrays.ensure(files);
   if (files.length === 0) {
     return;
   }
@@ -251,40 +276,40 @@ scout.FileChooser.prototype.addFiles = function(files) {
     // copy so that parameter stays untouched
     files = files.slice();
     // append new files to existing ones
-    scout.arrays.insertAll(files, this.files, 0);
+    arrays.insertAll(files, this.files, 0);
     this.setFiles(files);
   }
-};
+}
 
-scout.FileChooser.prototype.removeFile = function(file) {
+removeFile(file) {
   var files = this.files.slice();
-  scout.arrays.remove(files, file);
+  arrays.remove(files, file);
   this.setFiles(files);
   // Clear the input, otherwise user could not choose the file which he has removed previously
   this.fileInput.clear();
-};
+}
 
-scout.FileChooser.prototype.setFiles = function(files) {
+setFiles(files) {
   if (files instanceof FileList) {
-    files = scout.FileInput.fileListToArray(files);
+    files = FileInput.fileListToArray(files);
   }
-  files = scout.arrays.ensure(files);
+  files = arrays.ensure(files);
 
   try {
     this.fileInput.validateMaximumUploadSize(files);
   } catch (errorMessage) {
-    scout.MessageBoxes.createOk(this)
+    MessageBoxes.createOk(this)
       .withHeader(this.session.text('ui.FileSizeLimitTitle'))
       .withBody(errorMessage)
-      .withSeverity(scout.Status.Severity.ERROR)
+      .withSeverity(Status.Severity.ERROR)
       .buildAndOpen();
     return;
   }
 
   this.setProperty('files', files);
-};
+}
 
-scout.FileChooser.prototype._renderFiles = function() {
+_renderFiles() {
   var files = this.files;
 
   if (!this.fileInput.legacy) {
@@ -301,60 +326,61 @@ scout.FileChooser.prototype._renderFiles = function() {
       $remove.append($removeLink);
       $remove.appendTextNode(')');
     }, this);
-    scout.scrollbars.update(this.$files);
+    scrollbars.update(this.$files);
   }
   this.$uploadButton.setEnabled(files.length > 0);
-};
+}
 
-scout.FileChooser.prototype._onDragEnterOrOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
-};
+_onDragEnterOrOver(event) {
+  dragAndDrop.verifyDataTransferTypesScoutTypes(event, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER);
+}
 
-scout.FileChooser.prototype._onDrop = function(event) {
-  if (scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+_onDrop(event) {
+  if (dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
     $.suppressEvent(event);
     this.addFiles(event.originalEvent.dataTransfer.files);
   }
-};
+}
 
-scout.FileChooser.prototype._onUploadButtonClicked = function(event) {
+_onUploadButtonClicked(event) {
   this.trigger('upload');
-};
+}
 
-scout.FileChooser.prototype._onCancelButtonClicked = function(event) {
+_onCancelButtonClicked(event) {
   this.cancel();
-};
+}
 
-scout.FileChooser.prototype._onAddFileButtonClicked = function(event) {
+_onAddFileButtonClicked(event) {
   this.browse();
-};
+}
 
-scout.FileChooser.prototype._onFileChange = function(event) {
+_onFileChange(event) {
   this.addFiles(event.files);
-};
+}
 
-scout.FileChooser.prototype._onMouseDown = function(event, option) {
+_onMouseDown(event, option) {
   // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
   var parent = this.findParent(function(p) {
-    return p instanceof scout.Form && p.isDialog();
+    return p instanceof Form && p.isDialog();
   });
   if (parent) {
     parent.activate();
   }
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.FileChooser.prototype._attach = function() {
+_attach() {
   this.$parent.append(this.$container);
-  scout.FileChooser.parent.prototype._attach.call(this);
-};
+  super._attach();
+}
 
 /**
  * @override Widget.js
  */
-scout.FileChooser.prototype._detach = function() {
+_detach() {
   this.$container.detach();
-  scout.FileChooser.parent.prototype._detach.call(this);
-};
+  super._detach();
+}
+}

@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LayoutValidator = function() {
+import {arrays} from '../index';
+
+export default class LayoutValidator {
+
+constructor() {
   this._invalidComponents = [];
   this._validateTimeoutId = null;
   this._postValidateFunctions = [];
-};
+}
 
-scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
+invalidateTree(htmlComp) {
   var validateRoot,
     htmlParent = htmlComp,
     htmlSource = htmlComp;
@@ -35,9 +39,9 @@ scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
   }
 
   this.invalidate(validateRoot);
-};
+}
 
-scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
+invalidate(htmlComp) {
   var position = 0;
   // Don't insert if already inserted...
   // Info: when component is already in list but no one triggers validation,
@@ -57,53 +61,54 @@ scout.LayoutValidator.prototype.invalidate = function(htmlComp) {
   }, this);
 
   // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
-  scout.arrays.insert(this._invalidComponents, htmlComp, position);
+  arrays.insert(this._invalidComponents, htmlComp, position);
 
   this._scheduleValidation();
-};
+}
 
-scout.LayoutValidator.prototype._scheduleValidation = function() {
+_scheduleValidation() {
   if (this._validateTimeoutId === null) {
     this._validateTimeoutId = setTimeout(function() {
       this.validate();
     }.bind(this));
   }
-};
+}
 
 /**
  * Layouts all invalid components (as long as they haven't been removed).
  */
-scout.LayoutValidator.prototype.validate = function() {
+validate() {
   clearTimeout(this._validateTimeoutId);
   this._validateTimeoutId = null;
   this._invalidComponents.slice().forEach(function(comp) {
     if (comp.validateLayout()) {
-      scout.arrays.remove(this._invalidComponents, comp);
+      arrays.remove(this._invalidComponents, comp);
     }
   }, this);
   this._postValidateFunctions.slice().forEach(function(func) {
     func();
-    scout.arrays.remove(this._postValidateFunctions, func);
+    arrays.remove(this._postValidateFunctions, func);
   }, this);
-};
+}
 
 /**
  * Removes those components from this._invalidComponents which have the given container as ancestor.
  * The idea is to remove all components whose ancestor is about to be removed from the DOM.
  */
-scout.LayoutValidator.prototype.cleanupInvalidComponents = function($parentContainer) {
+cleanupInvalidComponents($parentContainer) {
   this._invalidComponents.slice().forEach(function(comp) {
     if (comp.$comp.closest($parentContainer).length > 0) {
-      scout.arrays.remove(this._invalidComponents, comp);
+      arrays.remove(this._invalidComponents, comp);
     }
   }, this);
-};
+}
 
 /**
  * Runs the given function at the end of validate().
  */
-scout.LayoutValidator.prototype.schedulePostValidateFunction = function(func) {
+schedulePostValidateFunction(func) {
   if (func) {
     this._postValidateFunctions.push(func);
   }
-};
+}
+}

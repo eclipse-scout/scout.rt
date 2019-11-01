@@ -8,22 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Form} from '../index';
+import {Desktop} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+import {DialogLayout} from '../index';
+import {Outline} from '../index';
+
 /**
  * Controller with functionality to register and render views and dialogs.
  *
  * The forms are put into the list 'views' and 'dialogs' contained in 'displayParent'.
  */
-scout.FormController = function(model) {
+export default class FormController {
+
+constructor(model) {
   this.displayParent = model.displayParent;
   this.session = model.session;
-};
+}
 
 /**
  * Adds the given view or dialog to this controller and renders it.
  * position is only used if form is a view. this position determines at which position the tab is placed.
  * if select view is set the view rendered in _renderView is also selected.
  */
-scout.FormController.prototype.registerAndRender = function(form, position, selectView) {
+registerAndRender(form, position, selectView) {
   scout.assertProperty(form, 'displayParent');
   if (form.isPopupWindow()) {
     this._renderPopupWindow(form);
@@ -32,16 +41,16 @@ scout.FormController.prototype.registerAndRender = function(form, position, sele
   } else {
     this._renderDialog(form, true);
   }
-};
+}
 
-scout.FormController.prototype._renderPopupWindow = function(formAdapterId, position) {
+_renderPopupWindow(formAdapterId, position) {
   throw new Error('popup window only supported by DesktopFormController');
-};
+}
 
 /**
  * Removes the given view or dialog from this controller and DOM. However, the form's adapter is not destroyed. That only happens once the Form is closed.
  */
-scout.FormController.prototype.unregisterAndRemove = function(form) {
+unregisterAndRemove(form) {
   if (!form) {
     return;
   }
@@ -53,76 +62,76 @@ scout.FormController.prototype.unregisterAndRemove = function(form) {
   } else {
     this._removeDialog(form);
   }
-};
+}
 
-scout.FormController.prototype._removePopupWindow = function(form) {
+_removePopupWindow(form) {
   throw new Error('popup window only supported by DesktopFormController');
-};
+}
 
 /**
  * Renders all dialogs and views registered with this controller.
  */
-scout.FormController.prototype.render = function() {
+render() {
   this._renderViews();
 
   this._renderDialogs();
-};
+}
 
-scout.FormController.prototype._renderViews = function() {
+_renderViews() {
   this.displayParent.views.forEach(function(view, position) {
     view.setDisplayParent(this.displayParent);
     this._renderView(view, false, position, false);
   }.bind(this));
-};
+}
 
-scout.FormController.prototype._renderDialogs = function() {
+_renderDialogs() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.setDisplayParent(this.displayParent);
     this._renderDialog(dialog, false);
   }.bind(this));
-};
+}
 
 /**
  * Removes all dialogs and views registered with this controller.
  */
-scout.FormController.prototype.remove = function() {
+remove() {
   this.displayParent.dialogs.forEach(function(dialog) {
     this._removeDialog(dialog, false);
   }.bind(this));
   this.displayParent.views.forEach(function(view, position) {
     this._removeView(view, false);
   }.bind(this));
-};
+}
 
 /**
  * Activates the given view or dialog.
  */
-scout.FormController.prototype.activateForm = function(form) {
+activateForm(form) {
   var displayParent = this.displayParent;
   while (displayParent) {
-    if (displayParent instanceof scout.Outline) {
+    if (displayParent instanceof Outline) {
       this.session.desktop.setOutline(displayParent);
       break;
     }
     displayParent = displayParent.displayParent;
   }
 
-  if (form.displayHint === scout.Form.DisplayHint.VIEW) {
+  if (form.displayHint === Form.DisplayHint.VIEW) {
     this._activateView(form);
   } else {
     this._activateDialog(form);
   }
-};
+}
 
-scout.FormController.prototype.acceptView = function(view, register, position, selectView) {
+acceptView(view, register, position, selectView) {
   // Only render view if 'displayParent' is rendered yet; if not, the view will be rendered once 'displayParent' is rendered.
   return this.displayParent.rendered;
-};
+}
 
-scout.FormController.prototype._renderView = function(view, register, position, selectView) {
+_renderView(view, register, position, selectView) {
   if (register) {
     if (position !== undefined) {
-      scout.arrays.insert(this.displayParent.views, view, position);
+      arrays.insert(this.displayParent.views, view, position);
     } else {
       this.displayParent.views.push(view);
     }
@@ -141,7 +150,7 @@ scout.FormController.prototype._renderView = function(view, register, position, 
   if (view.rendered) {
     return false;
   }
-  if (this.session.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT && !this.session.desktop.bench) {
+  if (this.session.desktop.displayStyle === Desktop.DisplayStyle.COMPACT && !this.session.desktop.bench) {
     // Show bench and hide navigation if this is the first view to be shown
     this.session.desktop.sendOutlineToBack();
     this.session.desktop.switchToBench();
@@ -151,14 +160,14 @@ scout.FormController.prototype._renderView = function(view, register, position, 
     return;
   }
   this.session.desktop.bench.addView(view, selectView);
-};
+}
 
-scout.FormController.prototype.acceptDialog = function(dialog) {
+acceptDialog(dialog) {
   // Only render dialog if 'displayParent' is rendered yet; if not, the dialog will be rendered once 'displayParent' is rendered.
   return this.displayParent.rendered;
-};
+}
 
-scout.FormController.prototype._renderDialog = function(dialog, register) {
+_renderDialog(dialog, register) {
   var desktop = this.session.desktop;
   if (register) {
     this.displayParent.dialogs.push(dialog);
@@ -201,47 +210,47 @@ scout.FormController.prototype._renderDialog = function(dialog, register) {
       dialog.detach();
     }
   }
-};
+}
 
-scout.FormController.prototype._findFormToActivateAfterDialogRemove = function() {
+_findFormToActivateAfterDialogRemove() {
   if (this.displayParent.dialogs.length > 0) {
     return this.displayParent.dialogs[this.displayParent.dialogs.length - 1];
   }
-  if (this.displayParent instanceof scout.Form && !this.displayParent.detailForm) {
+  if (this.displayParent instanceof Form && !this.displayParent.detailForm) {
     // activate display parent, but not if it is the detail form
     return this.displayParent;
   }
   var desktop = this.session.desktop;
   if (desktop.bench) {
     var form = desktop.bench.activeViews()[0];
-    if (form instanceof scout.Form && !form.detailForm) {
+    if (form instanceof Form && !form.detailForm) {
       return form;
     }
   }
-};
+}
 
-scout.FormController.prototype._removeView = function(view, unregister) {
+_removeView(view, unregister) {
   unregister = scout.nvl(unregister, true);
   if (unregister) {
-    scout.arrays.remove(this.displayParent.views, view);
+    arrays.remove(this.displayParent.views, view);
   }
   // in COMPACT case views are already removed.
   if (this.session.desktop.bench) {
     this.session.desktop.bench.removeView(view);
   }
-};
+}
 
-scout.FormController.prototype._removeDialog = function(dialog, unregister) {
+_removeDialog(dialog, unregister) {
   unregister = scout.nvl(unregister, true);
   if (unregister) {
-    scout.arrays.remove(this.displayParent.dialogs, dialog);
+    arrays.remove(this.displayParent.dialogs, dialog);
   }
   if (dialog.rendered) {
     dialog.remove();
   }
-};
+}
 
-scout.FormController.prototype._activateView = function(view) {
+_activateView(view) {
   var bench = this.session.desktop.bench;
   if (bench) {
     // Bench may be null (e.g. in mobile mode). This may probably only happen if the form is not really a view, because otherwise the bench would already be open.
@@ -249,14 +258,14 @@ scout.FormController.prototype._activateView = function(view) {
     // So this null check is actually a workaround because a better solution would be to never call this function for fake views, but currently it is not possible to identify them easily.
     bench.activateView(view);
   }
-};
+}
 
-scout.FormController.prototype._activateDialog = function(dialog) {
+_activateDialog(dialog) {
   // If the display-parent is a view-form --> activate it always.
   // If it is another dialog --> activate it only if the dialog to activate is modal
-  if (dialog.displayParent instanceof scout.Form &&
-    (dialog.displayParent.displayHint === scout.Form.DisplayHint.VIEW ||
-      (dialog.displayParent.displayHint === scout.Form.DisplayHint.DIALOG && dialog.modal))) {
+  if (dialog.displayParent instanceof Form &&
+    (dialog.displayParent.displayHint === Form.DisplayHint.VIEW ||
+      (dialog.displayParent.displayHint === Form.DisplayHint.DIALOG && dialog.modal))) {
     this.activateForm(dialog.displayParent);
   }
 
@@ -278,23 +287,23 @@ scout.FormController.prototype._activateDialog = function(dialog) {
     //         - and not a descendant of the dialog to activate
     //         - and their display parent is not the desktop
     var siblingWidget = scout.widget(sibling);
-    return siblingWidget instanceof scout.Form &&
+    return siblingWidget instanceof Form &&
       (!siblingWidget.modal ||
         (!dialog.has(siblingWidget) && siblingWidget.displayParent !== this.session.desktop));
   }, this);
 
   // All descendants of the so far determined movableSiblings are movable as well. (E.g. MessageBox, FileChooser)
   var movableSiblingsDescendants = siblings.filter(function(sibling) {
-    return scout.arrays.find(movableSiblings, function(movableSibling) {
+    return arrays.find(movableSiblings, function(movableSibling) {
       var siblingWidget = scout.widget(sibling);
-      return !(siblingWidget instanceof scout.Form) && // all movable forms are already captured by the filter above
+      return !(siblingWidget instanceof Form) && // all movable forms are already captured by the filter above
         scout.widget(movableSibling).has(siblingWidget);
     });
   });
   movableSiblings = movableSiblings.concat(movableSiblingsDescendants);
 
   this.session.desktop.moveOverlaysBehindAndFocus(movableSiblings, dialog.$container);
-};
+}
 
 /**
  * Attaches all dialogs to their original DOM parents.
@@ -302,11 +311,11 @@ scout.FormController.prototype._activateDialog = function(dialog) {
  *
  * This method has no effect if already attached.
  */
-scout.FormController.prototype.attachDialogs = function() {
+attachDialogs() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.attach();
   }, this);
-};
+}
 
 /**
  * Detaches all dialogs from their DOM parents. Thereby, modality glassPanes are not detached.
@@ -314,13 +323,13 @@ scout.FormController.prototype.attachDialogs = function() {
  *
  * This method has no effect if already detached.
  */
-scout.FormController.prototype.detachDialogs = function() {
+detachDialogs() {
   this.displayParent.dialogs.forEach(function(dialog) {
     dialog.detach();
   }, this);
-};
+}
 
-scout.FormController.prototype._layoutDialog = function(dialog) {
+_layoutDialog(dialog) {
   var cacheBounds, position;
   dialog.htmlComp.validateLayout();
 
@@ -328,7 +337,7 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   if (cacheBounds) {
     position = cacheBounds.point();
   } else {
-    position = scout.DialogLayout.positionContainerInWindow(dialog.$container);
+    position = DialogLayout.positionContainerInWindow(dialog.$container);
   }
 
   dialog.$container.cssPosition(position);
@@ -342,4 +351,5 @@ scout.FormController.prototype._layoutDialog = function(dialog) {
   // If not validated anew, focus on single-button forms is not gained.
   // Maybe, this is the same problem as in BusyIndicator.js
   this.session.focusManager.validateFocus();
-};
+}
+}

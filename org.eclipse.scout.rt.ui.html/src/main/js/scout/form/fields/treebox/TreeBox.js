@@ -8,56 +8,64 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeBox = function() {
-  scout.TreeBox.parent.call(this);
+import {LookupBox} from '../../../index';
+import {TreeBoxLayout} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class TreeBox extends LookupBox {
+
+constructor() {
+  super();
   this.tree = null;
   this._addWidgetProperties(['tree', 'filterBox']);
-};
-scout.inherits(scout.TreeBox, scout.LookupBox);
+}
 
-scout.TreeBox.prototype._init = function(model) {
-  scout.TreeBox.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.tree.on('nodesChecked', this._onTreeNodesChecked.bind(this));
   this.tree.setScrollTop(this.scrollTop);
-};
+}
 
-scout.TreeBox.prototype._initStructure = function(value) {
+_initStructure(value) {
   if (!this.tree) {
     this.tree = this._createDefaultTreeBoxTree();
   }
-};
+}
 
-scout.TreeBox.prototype._initValue = function(value) {
+_initValue(value) {
   if (!this.tree) {
     this.tree = this._createDefaultTreeBoxTree();
   }
-  scout.TreeBox.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
-scout.TreeBox.prototype._render = function() {
-  scout.TreeBox.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('tree-box');
-};
+}
 
-scout.TreeBox.prototype._createFieldContainerLayout = function() {
-  return new scout.TreeBoxLayout(this, this.tree, this.filterBox);
-};
+_createFieldContainerLayout() {
+  return new TreeBoxLayout(this, this.tree, this.filterBox);
+}
 
-scout.TreeBox.prototype._renderStructure = function($fieldContainer) {
+_renderStructure($fieldContainer) {
   this.tree.render(this.$fieldContainer);
   this.addField(this.tree.$container);
-};
+}
 
-scout.TreeBox.prototype._onTreeNodesChecked = function(event) {
+_onTreeNodesChecked(event) {
   this._syncTreeToValue();
-};
+}
 
-scout.TreeBox.prototype._syncTreeToValue = function() {
+_syncTreeToValue() {
   if (!this.lookupCall || this._valueSyncing) {
     return;
   }
   this._valueSyncing = true;
-  var valueArray = scout.objects.values(this.tree.nodesMap).filter(function(node) {
+  var valueArray = objects.values(this.tree.nodesMap).filter(function(node) {
     return node.checked;
   }).map(function(node) {
     return node.id;
@@ -65,14 +73,14 @@ scout.TreeBox.prototype._syncTreeToValue = function() {
 
   this.setValue(valueArray);
   this._valueSyncing = false;
-};
+}
 
-scout.TreeBox.prototype._valueChanged = function() {
-  scout.TreeBox.parent.prototype._valueChanged.call(this);
+_valueChanged() {
+  super._valueChanged();
   this._syncValueToTree(this.value);
-};
+}
 
-scout.TreeBox.prototype._syncValueToTree = function(newValue) {
+_syncValueToTree(newValue) {
   if (!this.lookupCall || this._valueSyncing || !this.initialized) {
     return;
   }
@@ -83,7 +91,7 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
     checkChildren: false
   };
   try {
-    if (scout.arrays.empty(newValue)) {
+    if (arrays.empty(newValue)) {
       this.uncheckAll(opts);
     } else {
       // if lookup was not executed yet: do it now.
@@ -93,8 +101,8 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
       }
 
       this.uncheckAll(opts);
-      scout.objects.values(this.tree.nodesMap).forEach(function(node) {
-        if (scout.arrays.containsAny(newValue, node.id)) {
+      objects.values(this.tree.nodesMap).forEach(function(node) {
+        if (arrays.containsAny(newValue, node.id)) {
           this.tree.checkNode(node, true, opts);
         }
       }, this);
@@ -104,23 +112,23 @@ scout.TreeBox.prototype._syncValueToTree = function(newValue) {
   } finally {
     this._valueSyncing = false;
   }
-};
+}
 
-scout.TreeBox.prototype.uncheckAll = function(options) {
+uncheckAll(options) {
   for (var nodeId in this.tree.nodesMap) {
     if (this.tree.nodesMap.hasOwnProperty(nodeId)) {
       this.tree.uncheckNode(this.tree.nodesMap[nodeId], options);
     }
   }
-};
+}
 
-scout.TreeBox.prototype._lookupByAllDone = function(result) {
-  if (scout.TreeBox.parent.prototype._lookupByAllDone.call(this, result)) {
+_lookupByAllDone(result) {
+  if (super._lookupByAllDone( result)) {
     this._populateTree(result);
   }
-};
+}
 
-scout.TreeBox.prototype._populateTree = function(result) {
+_populateTree(result) {
   var topLevelNodes = [];
 
   this._poulateTreeRecursive(null, topLevelNodes, result.lookupRows);
@@ -129,9 +137,9 @@ scout.TreeBox.prototype._populateTree = function(result) {
   this.tree.insertNodes(topLevelNodes);
 
   this._syncValueToTree(this.value);
-};
+}
 
-scout.TreeBox.prototype._poulateTreeRecursive = function(parentKey, nodesArray, lookupRows) {
+_poulateTreeRecursive(parentKey, nodesArray, lookupRows) {
   var node;
   lookupRows.forEach(function(lookupRow) {
     if (lookupRow.parentKey === parentKey) {
@@ -141,24 +149,24 @@ scout.TreeBox.prototype._poulateTreeRecursive = function(parentKey, nodesArray, 
       nodesArray.push(node);
     }
   }, this);
-};
+}
 
 /**
  * Returns a lookup row for each node currently checked.
  */
-scout.TreeBox.prototype.getCheckedLookupRows = function() {
-  if (this.value === null || scout.arrays.empty(this.value) || this.tree.nodes.length === 0) {
+getCheckedLookupRows() {
+  if (this.value === null || arrays.empty(this.value) || this.tree.nodes.length === 0) {
     return [];
   }
 
-  return scout.objects.values(this.tree.nodesMap).filter(function(node) {
+  return objects.values(this.tree.nodesMap).filter(function(node) {
     return node.checked;
   }).map(function(node) {
     return node.lookupRow;
   });
-};
+}
 
-scout.TreeBox.prototype._createNode = function(lookupRow) {
+_createNode(lookupRow) {
   var
     node = scout.create('TreeNode', {
       parent: this.tree,
@@ -193,18 +201,19 @@ scout.TreeBox.prototype._createNode = function(lookupRow) {
   }
 
   return node;
-};
+}
 
-scout.TreeBox.prototype._createDefaultTreeBoxTree = function() {
+_createDefaultTreeBoxTree() {
   return scout.create('Tree', {
     parent: this,
     checkable: true
   });
-};
+}
 
 /**
  * @override
  */
-scout.TreeBox.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return this.tree;
-};
+}
+}

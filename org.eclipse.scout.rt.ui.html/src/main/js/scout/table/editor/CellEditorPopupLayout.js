@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CellEditorPopupLayout = function(cellEditorPopup) {
-  scout.CellEditorPopupLayout.parent.call(this);
+import {AbstractLayout} from '../../index';
+import {Dimension} from '../../index';
+import {graphics} from '../../index';
+
+export default class CellEditorPopupLayout extends AbstractLayout {
+
+constructor(cellEditorPopup) {
+  super();
   this.cellEditorPopup = cellEditorPopup;
   this._field = cellEditorPopup.cell.field;
   this._htmlContainer = cellEditorPopup.htmlComp;
-};
-scout.inherits(scout.CellEditorPopupLayout, scout.AbstractLayout);
+}
 
-scout.CellEditorPopupLayout.prototype.layout = function($container) {
+
+layout($container) {
   var size,
     htmlField = this._field.htmlComp;
 
@@ -26,18 +32,18 @@ scout.CellEditorPopupLayout.prototype.layout = function($container) {
     .subtract(this._htmlContainer.insets())
     .subtract(htmlField.margins());
   htmlField.setSize(size);
-};
+}
 
-scout.CellEditorPopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var cellBounds, rowBounds, margin,
     $row = this.cellEditorPopup.row.$row,
     $cell = this.cellEditorPopup.$anchor;
 
-  cellBounds = scout.graphics.bounds($cell, {
+  cellBounds = graphics.bounds($cell, {
     exact: true
   });
   cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
-  rowBounds = scout.graphics.bounds($row, {
+  rowBounds = graphics.bounds($row, {
     exact: true
   });
   rowBounds.y += $row.cssMarginY(); // row has a negative top margin
@@ -46,5 +52,6 @@ scout.CellEditorPopupLayout.prototype.preferredLayoutSize = function($container)
     // extend the width if the popup has a negative margin (used for the first cell)
     cellBounds.width = cellBounds.width + -margin;
   }
-  return new scout.Dimension(cellBounds.width, rowBounds.height);
-};
+  return new Dimension(cellBounds.width, rowBounds.height);
+}
+}

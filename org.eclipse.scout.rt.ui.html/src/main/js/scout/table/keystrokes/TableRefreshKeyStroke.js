@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableRefreshKeyStroke = function(table) {
-  scout.TableRefreshKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableRefreshKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
-  this.which = [scout.keys.F5];
+  this.which = [keys.F5];
   this.renderingHints.offset = 14;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.footer ? this.field.footer._$infoLoad.find('.table-info-button') : null;
   }.bind(this);
-};
-scout.inherits(scout.TableRefreshKeyStroke, scout.KeyStroke);
+}
 
-scout.TableRefreshKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableRefreshKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && this.field.hasReloadHandler;
-};
+}
 
-scout.TableRefreshKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.reload();
-};
+}
+}

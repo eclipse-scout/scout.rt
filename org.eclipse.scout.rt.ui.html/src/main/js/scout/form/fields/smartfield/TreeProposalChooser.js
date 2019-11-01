@@ -8,12 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeProposalChooser = function() {
-  scout.TreeProposalChooser.parent.call(this);
-};
-scout.inherits(scout.TreeProposalChooser, scout.ProposalChooser);
+import {ProposalChooser} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import {LookupRow} from '../../../index';
+import {arrays} from '../../../index';
+import {Tree} from '../../../index';
 
-scout.TreeProposalChooser.prototype._createModel = function() {
+export default class TreeProposalChooser extends ProposalChooser {
+
+constructor() {
+  super();
+}
+
+
+_createModel() {
   var tree = scout.create('Tree', {
     parent: this,
     requestFocusOnNodeControlMouseDown: false,
@@ -21,43 +30,43 @@ scout.TreeProposalChooser.prototype._createModel = function() {
   });
   tree.on('nodeClick', this._onNodeClick.bind(this));
   return tree;
-};
+}
 
-scout.TreeProposalChooser.prototype._onNodeClick = function(event) {
+_onNodeClick(event) {
   this.triggerLookupRowSelected(event.node);
-};
+}
 
-scout.TreeProposalChooser.prototype.selectedRow = function() {
+selectedRow() {
   return this.model.selectedNode();
-};
+}
 
-scout.TreeProposalChooser.prototype.isBrowseLoadIncremental = function() {
+isBrowseLoadIncremental() {
   return this.smartField.browseLoadIncremental;
-};
+}
 
-scout.TreeProposalChooser.prototype.getSelectedLookupRow = function() {
+getSelectedLookupRow() {
   var selectedNode = this.model.selectedNode();
   if (!selectedNode) {
     return null;
   }
   return selectedNode.lookupRow;
-};
+}
 
-scout.TreeProposalChooser.prototype.selectFirstLookupRow = function() {
+selectFirstLookupRow() {
   if (this.model.nodes.length) {
     this.model.selectNode(this.model.nodes[0]);
   }
-};
+}
 
-scout.TreeProposalChooser.prototype.clearSelection = function() {
+clearSelection() {
   this.model.deselectAll();
-};
+}
 
 /**
- * @param {scout.LookupRow[]} lookupRows
+ * @param {LookupRow[]} lookupRows
  * @param {boolean} appendResult whether or not we must delete the tree
  */
-scout.TreeProposalChooser.prototype.setLookupResult = function(result) {
+setLookupResult(result) {
   var treeNodes, treeNodesFlat,
     lookupRows = result.lookupRows,
     appendResult = scout.nvl(result.appendResult, false);
@@ -92,9 +101,9 @@ scout.TreeProposalChooser.prototype.setLookupResult = function(result) {
   }
 
   this._selectProposal(result, treeNodesFlat);
-};
+}
 
-scout.TreeProposalChooser.prototype._expandAllParentNodes = function(treeNodesFlat) {
+_expandAllParentNodes(treeNodesFlat) {
   // when tree node is a leaf or children are not loaded yet
   var leafs = treeNodesFlat.reduce(function(aggr, treeNode) {
     if (treeNode.leaf || !treeNode.childNodesLoaded && treeNode.childNodes.length === 0) {
@@ -114,29 +123,29 @@ scout.TreeProposalChooser.prototype._expandAllParentNodes = function(treeNodesFl
       treeNode = treeNode.parentNode;
     }
   }
-};
+}
 
-scout.TreeProposalChooser.prototype.trySelectCurrentValue = function() {
+trySelectCurrentValue() {
   var currentValue = this.smartField.getValueForSelection();
-  if (scout.objects.isNullOrUndefined(currentValue)) {
+  if (objects.isNullOrUndefined(currentValue)) {
     return;
   }
-  var allTreeNodes = scout.objects.values(this.model.nodesMap);
-  var treeNode = scout.arrays.find(allTreeNodes, function(node) {
+  var allTreeNodes = objects.values(this.model.nodesMap);
+  var treeNode = arrays.find(allTreeNodes, function(node) {
     return node.lookupRow.key === currentValue;
   });
   if (treeNode) {
     this.model.selectNode(treeNode);
   }
-};
+}
 
-scout.TreeProposalChooser.prototype.selectFirstLookupRow = function() {
+selectFirstLookupRow() {
   if (this.model.nodes.length) {
     this.model.selectNode(this.model.nodes[0]);
   }
-};
+}
 
-scout.TreeProposalChooser.prototype._createTreeNode = function(lookupRow) {
+_createTreeNode(lookupRow) {
   var
     initialLeaf = true,
     expandAll = this.smartField.browseAutoExpandAll,
@@ -168,7 +177,7 @@ scout.TreeProposalChooser.prototype._createTreeNode = function(lookupRow) {
     lookupRow: lookupRow,
     leaf: initialLeaf
   });
-};
+}
 
 /**
  * This function is required in the 'accept input' case to find out
@@ -181,22 +190,22 @@ scout.TreeProposalChooser.prototype._createTreeNode = function(lookupRow) {
  *
  * @returns the number of leafs in the current tree model.
  */
-scout.TreeProposalChooser.prototype.findLeafs = function() {
+findLeafs() {
   var leafs = [];
-  scout.Tree.visitNodes(function(node, parentNode) {
+  Tree.visitNodes(function(node, parentNode) {
     if (node.leaf || !node.childNodes.length) {
       leafs.push(node);
     }
   }, this.model.nodes);
   return leafs;
-};
+}
 
 /**
  * This function creates a sub-tree from a list of flat tree nodes. It sets the parent/child references
  * between the nodes and returns the top-level nodes of the sub-tree. This subtree is not yet attached
  * to the real tree (= this.model).
  */
-scout.TreeProposalChooser.prototype._flatListToSubTree = function(treeNodesFlat) {
+_flatListToSubTree(treeNodesFlat) {
   // 1. put all nodes with the same parent in a map (key=parentId, value=[nodes])
   var nodesMap = {};
   treeNodesFlat.forEach(function(treeNode) {
@@ -218,12 +227,12 @@ scout.TreeProposalChooser.prototype._flatListToSubTree = function(treeNodesFlat)
   }.bind(this));
 
   return rootNodes;
-};
+}
 
 /**
  * This functions appends a tree node to a parent node and sets the required flags on the parent node.
  */
-scout.TreeProposalChooser.prototype._appendChildNode = function(parentNode, treeNode) {
+_appendChildNode(parentNode, treeNode) {
   if (!parentNode.childNodes) {
     parentNode.childNodes = [];
   }
@@ -232,8 +241,9 @@ scout.TreeProposalChooser.prototype._appendChildNode = function(parentNode, tree
   parentNode.childNodes.push(treeNode);
   parentNode.leaf = false;
   parentNode.childrenLoaded = true;
-};
+}
 
-scout.TreeProposalChooser.prototype.clearLookupRows = function() {
+clearLookupRows() {
   this.model.deleteAllNodes();
-};
+}
+}

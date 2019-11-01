@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {LoadingSupport} from '../index';
+
 /**
  * This class provides loading support functionality for widgets that simple want to add a CSS class 'loading'
  * when they're in loading state.
  */
-scout.SimpleLoadingSupport = function(options) {
-  scout.SimpleLoadingSupport.parent.call(this, options);
-};
-scout.inherits(scout.SimpleLoadingSupport, scout.LoadingSupport);
+export default class SimpleLoadingSupport extends LoadingSupport {
 
-scout.SimpleLoadingSupport.prototype._renderLoadingIndicator = function() {
+constructor(options) {
+  super( options);
+}
+
+
+_renderLoadingIndicator() {
   if (this.widget.rendered || this.widget.rendering) {
     this.$container.addClass('loading');
   }
-};
+}
 
-scout.SimpleLoadingSupport.prototype._removeLoadingIndicator = function() {
+_removeLoadingIndicator() {
   if (this.widget.rendered || this.widget.rendering) {
     this.$container.removeClass('loading');
   }
-};
+}
+}

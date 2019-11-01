@@ -8,17 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileTableHeaderSortByLookupCall = function() {
-  scout.TileTableHeaderSortByLookupCall.parent.call(this);
+import {icons} from '../index';
+import {StaticLookupCall} from '../index';
+import {scout} from '../index';
+
+export default class TileTableHeaderSortByLookupCall extends StaticLookupCall {
+
+constructor() {
+  super();
   this.table = null;
-};
-scout.inherits(scout.TileTableHeaderSortByLookupCall, scout.StaticLookupCall);
+}
 
-scout.TileTableHeaderSortByLookupCall.prototype._init = function(model) {
-  scout.TileTableHeaderSortByLookupCall.parent.prototype._init.call(this, model);
-};
 
-scout.TileTableHeaderSortByLookupCall.prototype._data = function() {
+_init(model) {
+  super._init( model);
+}
+
+_data() {
   var lookupRows = [];
   this.table.visibleColumns().forEach(function(column) {
     if (column.isSortingPossible()) {
@@ -26,23 +32,24 @@ scout.TileTableHeaderSortByLookupCall.prototype._data = function() {
           column: column,
           asc: true
         }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.ascending') + ')',
-        scout.icons.LONG_ARROW_UP_BOLD
+        icons.LONG_ARROW_UP_BOLD
       ]);
       lookupRows.push([{
           column: column,
           asc: false
         }, scout.nvl(column.text, column.headerTooltipText) + ' (' + this.session.text('ui.descending') + ')',
-        scout.icons.LONG_ARROW_DOWN_BOLD
+        icons.LONG_ARROW_DOWN_BOLD
       ]);
     }
   }, this);
   return lookupRows;
-};
+}
 
-scout.TileTableHeaderSortByLookupCall.prototype._dataToLookupRow = function(data) {
+_dataToLookupRow(data) {
   return scout.create('LookupRow', {
     key: data[0],
     text: data[1],
     iconId: data[2]
   });
-};
+}
+}

@@ -8,8 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopNavigation = function() {
-  scout.DesktopNavigation.parent.call(this);
+import {Widget} from '../../index';
+import {Desktop} from '../../index';
+import {CollapseHandle} from '../../index';
+import {HtmlComponent} from '../../index';
+import {Tree} from '../../index';
+import {SingleLayout} from '../../index';
+import {scout} from '../../index';
+import {DesktopNavigationLayout} from '../../index';
+import {styles} from '../../index';
+
+export default class DesktopNavigation extends Widget {
+
+constructor() {
+  super();
   this.$body = null;
   this.layoutData = {};
   this.toolBoxVisible = false;
@@ -17,18 +29,18 @@ scout.DesktopNavigation = function() {
   this._outlinePropertyChangeHandler = this._onOutlinePropertyChange.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
   this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
-};
-scout.inherits(scout.DesktopNavigation, scout.Widget);
+}
 
-scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = null; // Configured in sizes.css
-scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
-scout.DesktopNavigation.MIN_WIDTH = null; // Configured in sizes.css
 
-scout.DesktopNavigation.prototype._init = function(model) {
-  scout.DesktopNavigation.parent.prototype._init.call(this, model);
-  scout.DesktopNavigation.MIN_WIDTH = scout.styles.getSize('desktop-navigation', 'min-width', 'minWidth', 49);
-  scout.DesktopNavigation.DEFAULT_STYLE_WIDTH = scout.styles.getSize('desktop-navigation', 'width', 'width', 290);
-  scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH = scout.styles.getSize('desktop-navigation-breadcrumb', 'width', 'width', 240);
+static DEFAULT_STYLE_WIDTH = null; // Configured in sizes.css
+static BREADCRUMB_STYLE_WIDTH = null; // Configured in sizes.css
+static MIN_WIDTH = null; // Configured in sizes.css
+
+_init(model) {
+  super._init( model);
+  DesktopNavigation.MIN_WIDTH = styles.getSize('desktop-navigation', 'min-width', 'minWidth', 49);
+  DesktopNavigation.DEFAULT_STYLE_WIDTH = styles.getSize('desktop-navigation', 'width', 'width', 290);
+  DesktopNavigation.BREADCRUMB_STYLE_WIDTH = styles.getSize('desktop-navigation-breadcrumb', 'width', 'width', 240);
   this.desktop = this.parent;
   this.updateHandleVisibility();
   this._setOutline(model.outline);
@@ -39,48 +51,48 @@ scout.DesktopNavigation.prototype._init = function(model) {
   });
   this.viewButtonBox.on('propertyChange', this._viewButtonBoxPropertyChangeHandler);
   this._updateSingleViewButton();
-};
+}
 
-scout.DesktopNavigation.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('desktop-navigation');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.DesktopNavigationLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new DesktopNavigationLayout(this));
   this.htmlComp.layoutData = this.layoutData;
 
   this.$body = this.$container.appendDiv('navigation-body')
     .on('mousedown', this._onNavigationBodyMouseDown.bind(this));
-  this.htmlCompBody = scout.HtmlComponent.install(this.$body, this.session);
-  this.htmlCompBody.setLayout(new scout.SingleLayout());
+  this.htmlCompBody = HtmlComponent.install(this.$body, this.session);
+  this.htmlCompBody.setLayout(new SingleLayout());
 
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-};
+}
 
-scout.DesktopNavigation.prototype._remove = function() {
+_remove() {
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
-  scout.DesktopNavigation.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.DesktopNavigation.prototype._renderProperties = function() {
-  scout.DesktopNavigation.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderViewButtonBox();
   this._renderToolBoxVisible();
   this._renderOutline();
   this._renderHandleVisible();
   this._renderSingleViewButton();
-};
+}
 
-scout.DesktopNavigation.prototype._renderViewButtonBox = function() {
+_renderViewButtonBox() {
   this.viewButtonBox.render();
-};
+}
 
-scout.DesktopNavigation.prototype._removeOutline = function() {
+_removeOutline() {
   if (!this.outline) {
     return;
   }
   this.outline.remove();
-};
+}
 
-scout.DesktopNavigation.prototype._renderOutline = function() {
+_renderOutline() {
   if (!this.outline) {
     return;
   }
@@ -92,13 +104,13 @@ scout.DesktopNavigation.prototype._renderOutline = function() {
     this.outline.validateLayoutTree();
     this.outline.validateFocus();
   }
-};
+}
 
-scout.DesktopNavigation.prototype.setOutline = function(outline) {
+setOutline(outline) {
   this.setProperty('outline', outline);
-};
+}
 
-scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
+_setOutline(newOutline) {
   var oldOutline = this.outline;
   if (this.outline) {
     this.outline.off('propertyChange', this._outlinePropertyChangeHandler);
@@ -110,7 +122,7 @@ scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
   if (this.outline) {
     this.outline.setIconVisible(this.singleViewButton);
     this.outline.setParent(this);
-    this.outline.setBreadcrumbTogglingThreshold(scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
+    this.outline.setBreadcrumbTogglingThreshold(DesktopNavigation.BREADCRUMB_STYLE_WIDTH);
     // if both have breadcrumb-toggling enabled: make sure new outline uses same display style as old
     if (this.outline.toggleBreadcrumbStyleEnabled && oldOutline && oldOutline.toggleBreadcrumbStyleEnabled &&
       oldOutline.displayStyle) {
@@ -120,10 +132,10 @@ scout.DesktopNavigation.prototype._setOutline = function(newOutline) {
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
     this._updateHandle();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._updateSingleViewButton = function() {
-  if (this.desktop.displayStyle === scout.Desktop.DisplayStyle.COMPACT) {
+_updateSingleViewButton() {
+  if (this.desktop.displayStyle === Desktop.DisplayStyle.COMPACT) {
     // There is not enough space to move the title up due to the toolbar -> Never switch to that mode in compact mode
     this.setSingleViewButton(false);
     return;
@@ -139,68 +151,68 @@ scout.DesktopNavigation.prototype._updateSingleViewButton = function() {
   } else {
     this.setSingleViewButton(false);
   }
-};
+}
 
-scout.DesktopNavigation.prototype.setSingleViewButton = function(singleViewButton) {
+setSingleViewButton(singleViewButton) {
   this.setProperty('singleViewButton', singleViewButton);
   if (this.outline) {
     this.outline.setIconVisible(this.singleViewButton);
   }
   this.viewButtonBox.setMenuTabVisible(!singleViewButton);
-};
+}
 
-scout.DesktopNavigation.prototype._renderSingleViewButton = function() {
+_renderSingleViewButton() {
   this.$container.toggleClass('single-view-button', this.singleViewButton);
   this.invalidateLayoutTree();
-};
+}
 
-scout.DesktopNavigation.prototype.sendToBack = function() {
+sendToBack() {
   if (this.viewButtonBox) {
     this.viewButtonBox.sendToBack();
   }
   if (this.outline) {
     this.outline.sendToBack();
   }
-};
+}
 
-scout.DesktopNavigation.prototype.bringToFront = function() {
+bringToFront() {
   if (this.viewButtonBox) {
     this.viewButtonBox.bringToFront();
   }
   if (this.outline) {
     this.outline.bringToFront();
   }
-};
+}
 
-scout.DesktopNavigation.prototype.setToolBoxVisible = function(toolBoxVisible) {
+setToolBoxVisible(toolBoxVisible) {
   this.setProperty('toolBoxVisible', toolBoxVisible);
-};
+}
 
-scout.DesktopNavigation.prototype.setHandleVisible = function(visible) {
+setHandleVisible(visible) {
   this.setProperty('handleVisible', visible);
-};
+}
 
-scout.DesktopNavigation.prototype._updateHandle = function() {
+_updateHandle() {
   if (this.handle) {
     this.handle.setRightVisible(this.outline && this.outline.toggleBreadcrumbStyleEnabled &&
-      this.desktop.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB);
+      this.desktop.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB);
   }
-};
+}
 
-scout.DesktopNavigation.prototype.updateHandleVisibility = function() {
+updateHandleVisibility() {
   // Don't show handle if desktop says handle must not be visible
   this.setHandleVisible(this.desktop.navigationHandleVisible);
-};
+}
 
-scout.DesktopNavigation.prototype._renderToolBoxVisible = function() {
+_renderToolBoxVisible() {
   if (this.toolBoxVisible) {
     this._renderToolBox();
   } else {
     this._removeToolBox();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._renderToolBox = function() {
+_renderToolBox() {
   if (this.toolBox) {
     return;
   }
@@ -209,33 +221,33 @@ scout.DesktopNavigation.prototype._renderToolBox = function() {
     menus: this.desktop.menus
   });
   this.toolBox.render();
-};
+}
 
-scout.DesktopNavigation.prototype._removeToolBox = function() {
+_removeToolBox() {
   if (!this.toolBox) {
     return;
   }
   this.toolBox.destroy();
   this.toolBox = null;
-};
+}
 
-scout.DesktopNavigation.prototype._renderHandleVisible = function() {
+_renderHandleVisible() {
   if (this.handleVisible) {
     this._renderHandle();
   } else {
     this._removeHandle();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._createHandle = function() {
+_createHandle() {
   return scout.create('DesktopNavigationHandle', {
     parent: this,
     rightVisible: false,
-    horizontalAlignment: scout.CollapseHandle.HorizontalAlignment.RIGHT
+    horizontalAlignment: CollapseHandle.HorizontalAlignment.RIGHT
   });
-};
+}
 
-scout.DesktopNavigation.prototype._renderHandle = function() {
+_renderHandle() {
   if (this.handle) {
     return;
   }
@@ -244,42 +256,43 @@ scout.DesktopNavigation.prototype._renderHandle = function() {
   this.handle.addCssClass('navigation-open');
   this.handle.on('action', this._onHandleAction.bind(this));
   this._updateHandle();
-};
+}
 
-scout.DesktopNavigation.prototype._removeHandle = function() {
+_removeHandle() {
   if (!this.handle) {
     return;
   }
   this.handle.destroy();
   this.handle = null;
-};
+}
 
-scout.DesktopNavigation.prototype._onNavigationBodyMouseDown = function(event) {
+_onNavigationBodyMouseDown(event) {
   this.desktop.bringOutlineToFront();
-};
+}
 
-scout.DesktopNavigation.prototype._onViewButtonBoxPropertyChange = function(event) {
+_onViewButtonBoxPropertyChange(event) {
   if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
     this._updateSingleViewButton();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._onOutlinePropertyChange = function(event) {
+_onOutlinePropertyChange(event) {
   if (event.propertyName === 'displayStyle') {
     this._updateHandle();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._onDesktopPropertyChange = function(event) {
+_onDesktopPropertyChange(event) {
   if (event.propertyName === 'navigationHandleVisible') {
     this.updateHandleVisibility();
   }
-};
+}
 
-scout.DesktopNavigation.prototype._onHandleAction = function(event) {
+_onHandleAction(event) {
   if (event.left) {
     this.desktop.shrinkNavigation();
   } else {
     this.desktop.enlargeNavigation();
   }
-};
+}
+}

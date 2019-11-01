@@ -8,8 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileAccordion = function() {
-  scout.TileAccordion.parent.call(this);
+import {objects} from '../../index';
+import {scout} from '../../index';
+import {Tile} from '../../index';
+import {TileAccordionSelectionHandler} from '../../index';
+import {arrays} from '../../index';
+import {EventDelegator} from '../../index';
+import {Accordion} from '../../index';
+import {Group} from '../../index';
+
+export default class TileAccordion extends Accordion {
+
+constructor() {
+  super();
   this.exclusiveExpand = false;
   this.gridColumnCount = null;
   this.multiSelect = null;
@@ -18,28 +29,28 @@ scout.TileAccordion = function() {
   this.tileComparator = null;
   this.tileFilters = [];
   this.tileGridLayoutConfig = null;
-  this.tileGridSelectionHandler = new scout.TileAccordionSelectionHandler(this);
+  this.tileGridSelectionHandler = new TileAccordionSelectionHandler(this);
   this.withPlaceholders = null;
   this.virtual = null;
   this._selectionUpdateLocked = false;
   this._tileGridPropertyChangeHandler = this._onTileGridPropertyChange.bind(this);
   this._groupBodyHeightChangeHandler = this._onGroupBodyHeightChange.bind(this);
-};
-scout.inherits(scout.TileAccordion, scout.Accordion);
+}
+
 
 /**
  * @override
  */
-scout.TileAccordion.prototype._render = function() {
-  scout.TileAccordion.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('tile-accordion');
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordion.prototype._initGroup = function(group) {
-  scout.TileAccordion.parent.prototype._initGroup.call(this, group);
+_initGroup(group) {
+  super._initGroup( group);
   group.body.setSelectionHandler(this.tileGridSelectionHandler);
 
   // Copy properties from accordion to new group. If the properties are not set yet, copy them from the group to the accordion
@@ -96,31 +107,31 @@ scout.TileAccordion.prototype._initGroup = function(group) {
   this._handleCollapsed(group);
 
   // Delegate events so that consumers don't need to attach a listener to each tile grid by themselves
-  group.body.__tileAccordionEventDelegator = scout.EventDelegator.create(group.body, this, {
+  group.body.__tileAccordionEventDelegator = EventDelegator.create(group.body, this, {
     delegateEvents: ['tileClick', 'tileAction']
   });
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordion.prototype._deleteGroup = function(group) {
+_deleteGroup(group) {
   if (group.body) {
     group.body.off('propertyChange', this._tileGridPropertyChangeHandler);
     group.body.__tileAccordionEventDelegator.destroy();
     group.body.__tileAccordionEventDelegator = null;
   }
-  scout.TileAccordion.parent.prototype._deleteGroup.call(this, group);
-};
+  super._deleteGroup( group);
+}
 
 /**
  * @override
  */
-scout.TileAccordion.prototype.setGroups = function(groups) {
+setGroups(groups) {
   var oldTileCount = this.getTileCount();
   var oldFilteredTileCount = this.getFilteredTileCount();
   var oldSelectedTileCount = this.getSelectedTileCount();
-  scout.TileAccordion.parent.prototype.setGroups.call(this, groups);
+  super.setGroups( groups);
 
   var tileCount = this.getTileCount();
   var filteredTileCount = this.getFilteredTileCount();
@@ -137,68 +148,68 @@ scout.TileAccordion.prototype.setGroups = function(groups) {
   if (selectedTileCount !== oldSelectedTileCount) {
     this.triggerPropertyChange('selectedTiles', null, null);
   }
-};
+}
 
-scout.TileAccordion.prototype.setGridColumnCount = function(gridColumnCount) {
+setGridColumnCount(gridColumnCount) {
   this.groups.forEach(function(group) {
     group.body.setGridColumnCount(gridColumnCount);
   });
   this.setProperty('gridColumnCount', gridColumnCount);
-};
+}
 
-scout.TileAccordion.prototype.setTileGridLayoutConfig = function(layoutConfig) {
+setTileGridLayoutConfig(layoutConfig) {
   this.groups.forEach(function(group) {
     group.body.setLayoutConfig(layoutConfig);
     layoutConfig = group.body.layoutConfig; // May be converted from plain object to TileGridLayoutConfig
   });
   this.setProperty('tileGridLayoutConfig', layoutConfig);
-};
+}
 
-scout.TileAccordion.prototype.setWithPlaceholders = function(withPlaceholders) {
+setWithPlaceholders(withPlaceholders) {
   this.groups.forEach(function(group) {
     group.body.setWithPlaceholders(withPlaceholders);
   });
   this.setProperty('withPlaceholders', withPlaceholders);
-};
+}
 
-scout.TileAccordion.prototype.setVirtual = function(virtual) {
+setVirtual(virtual) {
   this.groups.forEach(function(group) {
     group.body.setVirtual(virtual);
   });
   this.setProperty('virtual', virtual);
-};
+}
 
-scout.TileAccordion.prototype.setSelectable = function(selectable) {
+setSelectable(selectable) {
   this.groups.forEach(function(group) {
     group.body.setSelectable(selectable);
   });
   this.setProperty('selectable', selectable);
-};
+}
 
-scout.TileAccordion.prototype.setMultiSelect = function(multiSelect) {
+setMultiSelect(multiSelect) {
   this.groups.forEach(function(group) {
     group.body.setMultiSelect(multiSelect);
   });
   this.setProperty('multiSelect', multiSelect);
-};
+}
 
-scout.TileAccordion.prototype.getGroupById = function(id) {
-  return scout.arrays.find(this.groups, function(group) {
+getGroupById(id) {
+  return arrays.find(this.groups, function(group) {
     return group.id === id;
   });
-};
+}
 
-scout.TileAccordion.prototype.getGroupByTile = function(tile) {
+getGroupByTile(tile) {
   return tile.findParent(function(parent) {
-    return parent instanceof scout.Group;
+    return parent instanceof Group;
   });
-};
+}
 
 /**
  * Distribute the tiles to the corresponding groups and returns an object with group id as key and array of tiles as value.
  * Always returns all current groups even if the given tiles may not be distributed to all groups.
  */
-scout.TileAccordion.prototype._groupTiles = function(tiles) {
+_groupTiles(tiles) {
   // Create a map of groups, key is the id, value is an array of tiles
   var tilesPerGroup = {};
   this.groups.forEach(function(group) {
@@ -218,38 +229,38 @@ scout.TileAccordion.prototype._groupTiles = function(tiles) {
   }, this);
 
   return tilesPerGroup;
-};
+}
 
-scout.TileAccordion.prototype.deleteTile = function(tile) {
+deleteTile(tile) {
   this.deleteTiles([tile]);
-};
+}
 
-scout.TileAccordion.prototype.deleteTiles = function(tilesToDelete, appendPlaceholders) {
-  tilesToDelete = scout.arrays.ensure(tilesToDelete);
+deleteTiles(tilesToDelete, appendPlaceholders) {
+  tilesToDelete = arrays.ensure(tilesToDelete);
   if (tilesToDelete.length === 0) {
     return;
   }
   var tiles = this.getTiles();
-  scout.arrays.removeAll(tiles, tilesToDelete);
+  arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles, appendPlaceholders);
-};
+}
 
-scout.TileAccordion.prototype.deleteAllTiles = function() {
+deleteAllTiles() {
   this.setTiles([]);
-};
+}
 
 /**
  * Distributes the given tiles to their corresponding groups.
  * <p>
  * If the list contains new tiles not assigned to a group yet, an exception will be thrown.
  */
-scout.TileAccordion.prototype.setTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
-  if (scout.objects.equals(this.getTiles(), tiles)) {
+setTiles(tiles) {
+  tiles = arrays.ensure(tiles);
+  if (objects.equals(this.getTiles(), tiles)) {
     return;
   }
 
-  // Ensure given tiles are real tiles (of type scout.Tile)
+  // Ensure given tiles are real tiles (of type Tile)
   tiles = this._createChildren(tiles);
 
   // Distribute the tiles to the corresponding groups (result may contain groups without tiles)
@@ -260,106 +271,106 @@ scout.TileAccordion.prototype.setTiles = function(tiles) {
     var group = this.getGroupById(id);
     group.body.setTiles(tilesPerGroup[id]);
   }
-};
+}
 
-scout.TileAccordion.prototype.getTiles = function() {
+getTiles() {
   var tiles = [];
   this.groups.forEach(function(group) {
-    scout.arrays.pushAll(tiles, group.body.tiles);
+    arrays.pushAll(tiles, group.body.tiles);
   });
   return tiles;
-};
+}
 
-scout.TileAccordion.prototype.getTileCount = function() {
+getTileCount() {
   var count = 0;
   this.groups.forEach(function(group) {
     count += group.body.tiles.length;
   });
   return count;
-};
+}
 
-scout.TileAccordion.prototype.addTileFilter = function(filter) {
+addTileFilter(filter) {
   var filters = this.tileFilters.slice();
   if (filters.indexOf(filter) >= 0) {
     return;
   }
   filters.push(filter);
   this.setTileFilters(filters);
-};
+}
 
-scout.TileAccordion.prototype.removeTileFilter = function(filter) {
+removeTileFilter(filter) {
   var filters = this.tileFilters.slice();
-  if (!scout.arrays.remove(filters, filter)) {
+  if (!arrays.remove(filters, filter)) {
     return;
   }
   this.setTileFilters(filters);
-};
+}
 
-scout.TileAccordion.prototype.setTileFilters = function(filters) {
-  filters = scout.arrays.ensure(filters);
+setTileFilters(filters) {
+  filters = arrays.ensure(filters);
   this.groups.forEach(function(group) {
     group.body.setFilters(filters);
   });
   this.setProperty('tileFilters', filters.slice());
-};
+}
 
-scout.TileAccordion.prototype.filterTiles = function() {
+filterTiles() {
   this.groups.forEach(function(group) {
     group.body.filter();
   });
-};
+}
 
-scout.TileAccordion.prototype.getFilteredTiles = function() {
+getFilteredTiles() {
   var tiles = [];
   this.groups.forEach(function(group) {
-    scout.arrays.pushAll(tiles, group.body.filteredTiles);
+    arrays.pushAll(tiles, group.body.filteredTiles);
   });
   return tiles;
-};
+}
 
-scout.TileAccordion.prototype.getFilteredTileCount = function() {
+getFilteredTileCount() {
   var count = 0;
   this.groups.forEach(function(group) {
     count += group.body.filteredTiles.length;
   });
   return count;
-};
+}
 
 /**
  * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are returned.
  */
-scout.TileAccordion.prototype.getVisibleTiles = function() {
+getVisibleTiles() {
   var tiles = [];
   this.expandedGroups().forEach(function(group) {
-    scout.arrays.pushAll(tiles, group.body.filteredTiles);
+    arrays.pushAll(tiles, group.body.filteredTiles);
   });
   return tiles;
-};
+}
 
 /**
  * Compared to #getFilteredTiles(), this function considers the collapsed state of the group as well, meaning only filtered tiles of expanded groups are counted.
  */
-scout.TileAccordion.prototype.getVisibleTileCount = function() {
+getVisibleTileCount() {
   var count = 0;
   this.expandedGroups().forEach(function(group) {
     count += group.body.filteredTiles.length;
   });
   return count;
-};
+}
 
-scout.TileAccordion.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
+findVisibleTileIndexAt(x, y, startIndex, reverse) {
   startIndex = scout.nvl(startIndex, 0);
-  return scout.arrays.findIndexFrom(this.getVisibleTiles(), startIndex, function(tile, i) {
+  return arrays.findIndexFrom(this.getVisibleTiles(), startIndex, function(tile, i) {
     return this.getVisibleGridX(tile) === x && this.getVisibleGridY(tile) === y;
   }.bind(this), reverse);
-};
+}
 
 /**
  * Selects the given tiles and deselects the previously selected ones.
  */
-scout.TileAccordion.prototype.selectTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
-  // Ensure given tiles are real tiles (of type scout.Tile)
+selectTiles(tiles) {
+  tiles = arrays.ensure(tiles);
+  // Ensure given tiles are real tiles (of type Tile)
   tiles = this._createChildren(tiles);
 
   // Split tiles into separate lists for each group (result may contain groups without tiles)
@@ -370,86 +381,86 @@ scout.TileAccordion.prototype.selectTiles = function(tiles) {
     var group = this.getGroupById(id);
     group.body.selectTiles(tilesPerGroup[id]);
   }
-};
+}
 
-scout.TileAccordion.prototype.selectTile = function(tile) {
+selectTile(tile) {
   this.selectTiles([tile]);
-};
+}
 
 /**
  * Selects all tiles. As for every selection operation: only considers filtered tiles and tiles of expanded groups
  */
-scout.TileAccordion.prototype.selectAllTiles = function() {
+selectAllTiles() {
   this.selectTiles(this.getVisibleTiles());
-};
+}
 
-scout.TileAccordion.prototype.deselectTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
+deselectTiles(tiles) {
+  tiles = arrays.ensure(tiles);
   var selectedTiles = this.getSelectedTiles().slice();
-  if (scout.arrays.removeAll(selectedTiles, tiles)) {
+  if (arrays.removeAll(selectedTiles, tiles)) {
     this.selectTiles(selectedTiles);
   }
-};
+}
 
-scout.TileAccordion.prototype.deselectTile = function(tile) {
+deselectTile(tile) {
   this.deselectTiles([tile]);
-};
+}
 
-scout.TileAccordion.prototype.deselectAllTiles = function() {
+deselectAllTiles() {
   this.selectTiles([]);
-};
+}
 
-scout.TileAccordion.prototype.addTilesToSelection = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
+addTilesToSelection(tiles) {
+  tiles = arrays.ensure(tiles);
   this.selectTiles(this.getSelectedTiles().concat(tiles));
-};
+}
 
-scout.TileAccordion.prototype.addTileToSelection = function(tile) {
+addTileToSelection(tile) {
   this.addTilesToSelection([tile]);
-};
+}
 
-scout.TileAccordion.prototype.getSelectedTiles = function() {
+getSelectedTiles() {
   var selectedTiles = [];
   this.groups.forEach(function(group) {
-    scout.arrays.pushAll(selectedTiles, group.body.selectedTiles);
+    arrays.pushAll(selectedTiles, group.body.selectedTiles);
   });
   return selectedTiles;
-};
+}
 
-scout.TileAccordion.prototype.getSelectedTile = function() {
+getSelectedTile() {
   return this.getSelectedTiles()[0];
-};
+}
 
-scout.TileAccordion.prototype.getSelectedTileCount = function() {
+getSelectedTileCount() {
   var count = 0;
   this.groups.forEach(function(group) {
     count += group.body.selectedTiles.length;
   });
   return count;
-};
+}
 
-scout.TileAccordion.prototype.toggleSelection = function() {
+toggleSelection() {
   if (this.getSelectedTileCount() === this.getVisibleTileCount()) {
     this.deselectAllTiles();
   } else {
     this.selectAllTiles();
   }
-};
+}
 
-scout.TileAccordion.prototype.setTileComparator = function(comparator) {
+setTileComparator(comparator) {
   this.groups.forEach(function(group) {
     group.body.setComparator(comparator);
   });
   this.setProperty('tileComparator', comparator);
-};
+}
 
-scout.TileAccordion.prototype.sortTiles = function() {
+sortTiles() {
   this.groups.forEach(function(group) {
     group.body.sort();
   });
-};
+}
 
-scout.TileAccordion.prototype.setFocusedTile = function(tile) {
+setFocusedTile(tile) {
   var groupForTile = null;
   if (tile !== null) {
     groupForTile = this.getGroupByTile(tile);
@@ -461,9 +472,9 @@ scout.TileAccordion.prototype.setFocusedTile = function(tile) {
       group.body.setFocusedTile(null);
     }
   });
-};
+}
 
-scout.TileAccordion.prototype.getFocusedTile = function() {
+getFocusedTile() {
   var focusedTile = null;
   this.groups.some(function(group) {
     if (group.body.focusedTile) {
@@ -472,44 +483,44 @@ scout.TileAccordion.prototype.getFocusedTile = function() {
     }
   });
   return focusedTile;
-};
+}
 
-scout.TileAccordion.prototype.getVisibleGridRowCount = function() {
+getVisibleGridRowCount() {
   return this.expandedGroups().reduce(function(acc, group) {
     return acc + group.body.logicalGrid.gridRows;
   }, 0);
-};
+}
 
-scout.TileAccordion.prototype.getVisibleGridX = function(tile) {
+getVisibleGridX(tile) {
   return tile.gridData.x;
-};
+}
 
-scout.TileAccordion.prototype.getVisibleGridY = function(tile) {
+getVisibleGridY(tile) {
   var group = this.getGroupByTile(tile);
   var yCorr = this.getVisibleRowByGroup(group);
   return tile.gridData.y + yCorr;
-};
+}
 
-scout.TileAccordion.prototype.getGroupByVisibleRow = function(rowToFind) {
+getGroupByVisibleRow(rowToFind) {
   if (rowToFind < 0 || rowToFind >= this.getVisibleGridRowCount()) {
     return null;
   }
   var currentIndex = 0;
-  return scout.arrays.find(this.expandedGroups(), function(group) {
+  return arrays.find(this.expandedGroups(), function(group) {
     var rowCount = group.body.logicalGrid.gridRows;
     if (currentIndex <= rowToFind && rowToFind < currentIndex + rowCount) {
       return true;
     }
     currentIndex += rowCount;
   });
-};
+}
 
 /**
  * @returns the index of the row where the group is located.<p>
  *          Example: There are 3 rows and 2 groups. The first group contains 2 rows, the second 1 row.
  *          The index of the first group is 0, the index of the second group is 2.
  */
-scout.TileAccordion.prototype.getVisibleRowByGroup = function(groupToFind) {
+getVisibleRowByGroup(groupToFind) {
   var currentIndex = 0;
   var found = this.expandedGroups().some(function(group) {
     var rowCount = group.body.logicalGrid.gridRows;
@@ -522,15 +533,15 @@ scout.TileAccordion.prototype.getVisibleRowByGroup = function(groupToFind) {
     return -1;
   }
   return currentIndex;
-};
+}
 
-scout.TileAccordion.prototype.expandedGroups = function() {
+expandedGroups() {
   return this.groups.filter(function(group) {
     return !group.collapsed;
   });
-};
+}
 
-scout.TileAccordion.prototype._handleSelectionChanged = function(tileGrid) {
+_handleSelectionChanged(tileGrid) {
   if (this._selectionUpdateLocked) {
     // Don't execute when deselecting other tiles to minimize the amount of property change events
     return;
@@ -551,9 +562,9 @@ scout.TileAccordion.prototype._handleSelectionChanged = function(tileGrid) {
     });
     this._selectionUpdateLocked = false;
   }
-};
+}
 
-scout.TileAccordion.prototype._onTileGridPropertyChange = function(event) {
+_onTileGridPropertyChange(event) {
   // Trigger artificial property changes with newValue set to null.
   // Reason: these property changes are fired for each grid. Creating the compound arrays using getFilteredTiles() etc.
   // costs some time (even if only some ms) but may not be necessary at all. The consumer can still call these functions by himself.
@@ -566,18 +577,18 @@ scout.TileAccordion.prototype._onTileGridPropertyChange = function(event) {
   } else if (event.propertyName === 'tiles') {
     this.triggerPropertyChange('tiles', null, null);
   }
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordion.prototype._onGroupCollapsedChange = function(event) {
-  scout.TileAccordion.parent.prototype._onGroupCollapsedChange.call(this, event);
+_onGroupCollapsedChange(event) {
+  super._onGroupCollapsedChange( event);
 
   this._handleCollapsed(event.source);
-};
+}
 
-scout.TileAccordion.prototype._handleCollapsed = function(group) {
+_handleCollapsed(group) {
   if (group.collapsed) {
     // Deselect tiles of a collapsed group (this will also set focusedTile to null) -> actions on invisible elements is confusing, and key strokes only operate on visible elements, too
     group.body.deselectAllTiles();
@@ -586,9 +597,9 @@ scout.TileAccordion.prototype._handleCollapsed = function(group) {
     group.on('bodyHeightChange', this._groupBodyHeightChangeHandler);
     group.one('bodyHeightChangeDone', this._onGroupBodyHeightChangeDone.bind(this));
   }
-};
+}
 
-scout.TileAccordion.prototype._onGroupBodyHeightChange = function(event) {
+_onGroupBodyHeightChange(event) {
   this.groups.forEach(function(group) {
     if (event.source === group || group.bodyAnimating) {
       // No need to layout body for the group which is already expanding / collapsing since it does it anyway
@@ -601,19 +612,20 @@ scout.TileAccordion.prototype._onGroupBodyHeightChange = function(event) {
       group.body.scrolling = false;
     }
   });
-};
+}
 
-scout.TileAccordion.prototype._onGroupBodyHeightChangeDone = function(event) {
+_onGroupBodyHeightChangeDone(event) {
   event.source.off('bodyHeightChange', this._groupBodyHeightChangeHandler);
-};
+}
 
 /**
  * @returns the first fully visible tile at the scrollTop.
  */
-scout.TileAccordion.prototype._tileAtScrollTop = function(scrollTop) {
-  return scout.arrays.find(this.getTiles().filter(function(tile) {
+_tileAtScrollTop(scrollTop) {
+  return arrays.find(this.getTiles().filter(function(tile) {
     return tile.rendered;
   }), function(tile) {
     return tile.$container.position().top >= scrollTop;
   }, this);
-};
+}
+}

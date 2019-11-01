@@ -8,57 +8,67 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarComponent = function() {
-  scout.CalendarComponent.parent.call(this);
+import {dates} from '../index';
+import {Popup} from '../index';
+import {Range} from '../index';
+import {strings} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class CalendarComponent extends Widget {
+
+constructor() {
+  super();
 
   /**
    * Selected is a GUI only property (the model doesn't have it)
    */
   this.selected = false;
   this._$parts = [];
-};
-scout.inherits(scout.CalendarComponent, scout.Widget);
+}
+
 
 /**
  * If day of a month is smaller than 100px, the components get the class compact
  */
-scout.CalendarComponent.MONTH_COMPACT_THRESHOLD = 100;
+static MONTH_COMPACT_THRESHOLD = 100;
 
-scout.CalendarComponent.prototype._init = function(model) {
-  scout.CalendarComponent.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   this._syncCoveredDaysRange(this.coveredDaysRange);
-};
+}
 
-scout.CalendarComponent.prototype._syncCoveredDaysRange = function(coveredDaysRange) {
+_syncCoveredDaysRange(coveredDaysRange) {
   if (coveredDaysRange) {
-    this.coveredDaysRange = new scout.Range(
-      scout.dates.parseJsonDate(coveredDaysRange.from),
-      scout.dates.parseJsonDate(coveredDaysRange.to));
+    this.coveredDaysRange = new Range(
+      dates.parseJsonDate(coveredDaysRange.from),
+      dates.parseJsonDate(coveredDaysRange.to));
   }
-};
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.CalendarComponent.prototype._remove = function() {
+_remove() {
   // remove $parts because they're not children of this.$container
   this._$parts.forEach(function($part) {
     $part.remove();
   });
-  scout.CalendarComponent.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.CalendarComponent.prototype._startLoopDay = function() {
+_startLoopDay() {
   // start date is either beginning of the component or beginning of viewRange
-  if (scout.dates.compare(this.coveredDaysRange.from, this.parent.viewRange.from) > 0) {
+  if (dates.compare(this.coveredDaysRange.from, this.parent.viewRange.from) > 0) {
     return this.coveredDaysRange.from;
   } else {
     return this.parent.viewRange.from;
   }
-};
+}
 
-scout.CalendarComponent.prototype._render = function() {
+_render() {
   var partDay, $day, $part;
   if (!this.coveredDaysRange) {
     // coveredDaysRange is not set on current CalendarComponent. Cannot show calendar component without from and to values.
@@ -66,18 +76,18 @@ scout.CalendarComponent.prototype._render = function() {
   }
 
   var loopDay = this._startLoopDay();
-  var lastComponentDay = scout.dates.shift(this.coveredDaysRange.to, 0, 0, 1);
-  if (scout.dates.compare(loopDay, lastComponentDay) > 0) {
+  var lastComponentDay = dates.shift(this.coveredDaysRange.to, 0, 0, 1);
+  if (dates.compare(loopDay, lastComponentDay) > 0) {
     // start day for the while loop is greater then the exit condition
     return;
   }
 
-  while (!scout.dates.isSameDay(loopDay, lastComponentDay)) {
+  while (!dates.isSameDay(loopDay, lastComponentDay)) {
     partDay = loopDay;
-    loopDay = scout.dates.shift(loopDay, 0, 0, 1); // increase day for loop
+    loopDay = dates.shift(loopDay, 0, 0, 1); // increase day for loop
 
     // check if day is in visible view range
-    if (scout.dates.compare(partDay, this.parent.viewRange.to) > 0) {
+    if (dates.compare(partDay, this.parent.viewRange.to) > 0) {
       // break condition, partDay is now out of range.
       break;
     }
@@ -109,7 +119,7 @@ scout.CalendarComponent.prototype._render = function() {
 
     if (this.parent._isMonth()) {
       $part.addClass('component-month')
-        .toggleClass('compact', $day.width() < scout.CalendarComponent.MONTH_COMPACT_THRESHOLD);
+        .toggleClass('compact', $day.width() < CalendarComponent.MONTH_COMPACT_THRESHOLD);
     } else {
       if (this.fullDay) {
         // Full day tasks are rendered in the topGrid
@@ -120,19 +130,19 @@ scout.CalendarComponent.prototype._render = function() {
         $part.addClass('component-task');
       } else {
         var
-          fromDate = scout.dates.parseJsonDate(this.fromDate),
-          toDate = scout.dates.parseJsonDate(this.toDate),
+          fromDate = dates.parseJsonDate(this.fromDate),
+          toDate = dates.parseJsonDate(this.toDate),
           partFrom = this._getHours(this.fromDate),
           partTo = this._getHours(this.toDate);
 
         // position and height depending on start and end date
         $part.addClass('component-day');
-        if (scout.dates.isSameDay(scout.dates.trunc(this.coveredDaysRange.from), scout.dates.trunc(this.coveredDaysRange.to))) {
+        if (dates.isSameDay(dates.trunc(this.coveredDaysRange.from), dates.trunc(this.coveredDaysRange.to))) {
           this._partPosition($part, partFrom, partTo);
-        } else if (scout.dates.isSameDay(partDay, fromDate)) {
+        } else if (dates.isSameDay(partDay, fromDate)) {
           this._partPosition($part, partFrom, 25) // 25: indicate that it takes longer than that day
             .addClass('component-open-bottom');
-        } else if (scout.dates.isSameDay(partDay, toDate)) {
+        } else if (dates.isSameDay(partDay, toDate)) {
           // Start at zero: No need to indicate that it starts earlier since indicator needs no extra space
           this._partPosition($part, 0, partTo)
             .addClass('component-open-top');
@@ -145,69 +155,69 @@ scout.CalendarComponent.prototype._render = function() {
       }
     }
   }
-};
+}
 
-scout.CalendarComponent.prototype._getHours = function(date) {
-  var d = scout.dates.parseJsonDate(date);
+_getHours(date) {
+  var d = dates.parseJsonDate(date);
   return d.getHours() + d.getMinutes() / 60;
-};
+}
 
-scout.CalendarComponent.prototype._findDayInGrid = function(date, $grid) {
+_findDayInGrid(date, $grid) {
   return $grid.find('.calendar-day').filter(
     function(i, elem) {
-      return scout.dates.isSameDay($(this).data('date'), date);
+      return dates.isSameDay($(this).data('date'), date);
     }).eq(0);
-};
+}
 
-scout.CalendarComponent.prototype._isTask = function() {
+_isTask() {
   return !this.parent._isMonth() && this.fullDay;
-};
+}
 
-scout.CalendarComponent.prototype._arrangeTask = function(taskOffset) {
+_arrangeTask(taskOffset) {
   this._$parts.forEach(function($part) {
     $part.css('top', taskOffset + 'px');
   });
-};
+}
 
-scout.CalendarComponent.prototype._isDayPart = function() {
+_isDayPart() {
   return !this.parent._isMonth() && !this.fullDay;
-};
+}
 
-scout.CalendarComponent.prototype._getHourRange = function(day) {
-  var hourRange = new scout.Range(this._getHours(this.fromDate), this._getHours(this.toDate));
-  var dateRange = new scout.Range(scout.dates.parseJsonDate(this.fromDate), scout.dates.parseJsonDate(this.toDate));
+_getHourRange(day) {
+  var hourRange = new Range(this._getHours(this.fromDate), this._getHours(this.toDate));
+  var dateRange = new Range(dates.parseJsonDate(this.fromDate), dates.parseJsonDate(this.toDate));
 
-  if (scout.dates.isSameDay(day, dateRange.from) && scout.dates.isSameDay(day, dateRange.to)) {
-    return new scout.Range(hourRange.from, hourRange.to);
-  } else if (scout.dates.isSameDay(day, dateRange.from)) {
-    return new scout.Range(hourRange.from, 24);
-  } else if (scout.dates.isSameDay(day, dateRange.to)) {
-    return new scout.Range(0, hourRange.to);
+  if (dates.isSameDay(day, dateRange.from) && dates.isSameDay(day, dateRange.to)) {
+    return new Range(hourRange.from, hourRange.to);
+  } else if (dates.isSameDay(day, dateRange.from)) {
+    return new Range(hourRange.from, 24);
+  } else if (dates.isSameDay(day, dateRange.to)) {
+    return new Range(0, hourRange.to);
   }
-  return new scout.Range(0, 24);
-};
+  return new Range(0, 24);
+}
 
-scout.CalendarComponent.prototype.getPartDayPosition = function(day) {
+getPartDayPosition(day) {
   return this._getDisplayDayPosition(this._getHourRange(day));
-};
+}
 
-scout.CalendarComponent.prototype._getDisplayDayPosition = function(range) {
+_getDisplayDayPosition(range) {
   // Doesn't support minutes yet...
-  var preferredRange = new scout.Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
+  var preferredRange = new Range(this.parent._dayPosition(range.from, 0), this.parent._dayPosition(range.to, 0));
   // Fixed number of divisions...
   var minRangeSize = Math.round(100 * 100 / 24 / this.parent.numberOfHourDivisions) / 100; // Round to two digits
   if (preferredRange.size() < minRangeSize) {
-    return new scout.Range(preferredRange.from, preferredRange.from + minRangeSize);
+    return new Range(preferredRange.from, preferredRange.from + minRangeSize);
   }
   return preferredRange;
-};
+}
 
-scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
+_partPosition($part, y1, y2) {
   // Compensate open bottom (height: square of 16px, rotated 45°, approx. 23px = sqrt(16^2 + 16^2)
   var compensateBottom = y2 === 25 ? 23 : 0;
   y2 = Math.min(24, y2);
 
-  var range = new scout.Range(y1, y2);
+  var range = new Range(y1, y2);
   var r = this._getDisplayDayPosition(range);
 
   // Convert to %, rounded to two decimal places
@@ -216,24 +226,24 @@ scout.CalendarComponent.prototype._partPosition = function($part, y1, y2) {
   return $part
     .css('top', r.from + '%')
     .css('height', r.to - r.from - compensateBottom + '%');
-};
+}
 
-scout.CalendarComponent.prototype._renderProperties = function() {
-  scout.CalendarComponent.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSelected();
-};
+}
 
-scout.CalendarComponent.prototype._renderSelected = function() {
+_renderSelected() {
   this._$parts.forEach(function($part) {
     $part.toggleClass('comp-selected', this.selected);
   }, this);
-};
+}
 
-scout.CalendarComponent.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.CalendarComponent.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   var $part = $(event.delegateTarget);
 
   this.parent._selectedComponentChanged(this, $part.data('partDay'));
@@ -243,8 +253,8 @@ scout.CalendarComponent.prototype._onMouseDown = function(event) {
     closeOnAnchorMouseDown: true,
     closeOnMouseDownOutside: true,
     closeOnOtherPopupOpen: true,
-    horizontalAlignment: scout.Popup.Alignment.LEFT,
-    verticalAlignment: scout.Popup.Alignment.CENTER,
+    horizontalAlignment: Popup.Alignment.LEFT,
+    verticalAlignment: Popup.Alignment.CENTER,
     trimWidth: false,
     trimHeight: false,
     horizontalSwitch: true,
@@ -263,27 +273,27 @@ scout.CalendarComponent.prototype._onMouseDown = function(event) {
     }
   });
   popup.open();
-};
+}
 
-scout.CalendarComponent.prototype._onContextMenu = function(event) {
+_onContextMenu(event) {
   this.parent._showContextMenu(event, 'Calendar.CalendarComponent');
-};
+}
 
-scout.CalendarComponent.prototype._format = function(date, pattern) {
-  return scout.dates.format(date, this.session.locale, pattern);
-};
+_format(date, pattern) {
+  return dates.format(date, this.session.locale, pattern);
+}
 
-scout.CalendarComponent.prototype._description = function() {
+_description() {
   var descParts = [],
     range = null,
     text = '',
-    fromDate = scout.dates.parseJsonDate(this.fromDate),
-    toDate = scout.dates.parseJsonDate(this.toDate);
+    fromDate = dates.parseJsonDate(this.fromDate),
+    toDate = dates.parseJsonDate(this.toDate);
 
   // subject
-  if (scout.strings.hasText(this.item.subject)) {
+  if (strings.hasText(this.item.subject)) {
     descParts.push({
-      text: scout.strings.encode(this.item.subject),
+      text: strings.encode(this.item.subject),
       cssClass: 'calendar-component-title'
     });
   }
@@ -291,13 +301,13 @@ scout.CalendarComponent.prototype._description = function() {
   // time-range
   if (this.fullDay) {
     // NOP
-  } else if (scout.dates.isSameDay(fromDate, toDate)) {
+  } else if (dates.isSameDay(fromDate, toDate)) {
     range = this.session.text('ui.FromXToY', this._format(fromDate, 'HH:mm'), this._format(toDate, 'HH:mm'));
   } else {
     range = this.session.text('ui.FromXToY', this._format(fromDate, 'EEEE HH:mm '), this._format(toDate, 'EEEE HH:mm'));
   }
 
-  if (scout.strings.hasText(range)) {
+  if (strings.hasText(range)) {
     descParts.push({
       text: range,
       cssClass: 'calendar-component-intro'
@@ -305,9 +315,9 @@ scout.CalendarComponent.prototype._description = function() {
   }
 
   // description
-  if (scout.strings.hasText(this.item.description)) {
+  if (strings.hasText(this.item.description)) {
     descParts.push({
-      text: scout.strings.nl2br(this.item.description)
+      text: strings.nl2br(this.item.description)
     });
   }
 
@@ -317,4 +327,5 @@ scout.CalendarComponent.prototype._description = function() {
   });
 
   return text;
-};
+}
+}

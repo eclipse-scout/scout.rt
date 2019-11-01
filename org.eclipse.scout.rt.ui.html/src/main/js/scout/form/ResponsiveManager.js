@@ -8,48 +8,54 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ResponsiveManager = function() {
+import {scout} from '../index';
+import {App} from '../index';
+
+let instance;
+export default class ResponsiveManager {
+
+constructor() {
   this.active = true;
   this.globalState = null;
 
   this._responsiveHandlers = [];
-};
+}
 
-scout.ResponsiveManager.ResponsiveState = {
+static ResponsiveState = {
   NORMAL: 'normal',
   CONDENSED: 'condensed',
   COMPACT: 'compact'
 };
 
-scout.ResponsiveManager.prototype.init = function() {};
+init() {};
 
-scout.ResponsiveManager.prototype.destroy = function() {
+destroy() {
   this._responsiveHandlers.forEach(function(handler) {
     handler.destroy();
   }.bind(this));
-};
+}
 
 /**
  * Sets the responsive manager to active or inactive globally. Default is active.
  */
-scout.ResponsiveManager.prototype.setActive = function(active) {
+setActive(active) {
   this.active = active;
-};
+}
 
 /**
  * Set a global responsive state. This state will always be set. Resizing will no longer result in a different responsive state.
  *
- * @param {string} responsive state (scout.ResponsiveManager.ResponsiveState)
+ * @param {string} responsive state (ResponsiveManager.ResponsiveState)
  */
-scout.ResponsiveManager.prototype.setGlobalState = function(globalState) {
+setGlobalState(globalState) {
   this.globalState = globalState;
-};
+}
 
 /**
  * Checks if the form is smaller than the preferred width of the form. If this is reached, the fields will
  * be transformed to ensure better readability.
  */
-scout.ResponsiveManager.prototype.handleResponsive = function(target, width) {
+handleResponsive(target, width) {
   if (!this.active) {
     return false;
   }
@@ -62,23 +68,23 @@ scout.ResponsiveManager.prototype.handleResponsive = function(target, width) {
   var state = target.responsiveHandler.state;
   if (this.globalState) {
     newState = this.globalState;
-  } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(scout.ResponsiveManager.ResponsiveState.COMPACT)) {
-    newState = scout.ResponsiveManager.ResponsiveState.COMPACT;
+  } else if (width < target.responsiveHandler.getCompactThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.COMPACT)) {
+    newState = ResponsiveManager.ResponsiveState.COMPACT;
   } else {
-    if (state === scout.ResponsiveManager.ResponsiveState.COMPACT) {
-      target.responsiveHandler.transform(scout.ResponsiveManager.ResponsiveState.CONDENSED);
+    if (state === ResponsiveManager.ResponsiveState.COMPACT) {
+      target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.CONDENSED);
     }
-    if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(scout.ResponsiveManager.ResponsiveState.CONDENSED)) {
-      newState = scout.ResponsiveManager.ResponsiveState.CONDENSED;
+    if (width < target.responsiveHandler.getCondensedThreshold() && target.responsiveHandler.acceptState(ResponsiveManager.ResponsiveState.CONDENSED)) {
+      newState = ResponsiveManager.ResponsiveState.CONDENSED;
     } else {
-      newState = scout.ResponsiveManager.ResponsiveState.NORMAL;
+      newState = ResponsiveManager.ResponsiveState.NORMAL;
     }
   }
 
   return target.responsiveHandler.transform(newState);
-};
+}
 
-scout.ResponsiveManager.prototype.reset = function(target, force) {
+reset(target, force) {
   if (!this.active) {
     return;
   }
@@ -87,30 +93,35 @@ scout.ResponsiveManager.prototype.reset = function(target, force) {
     return false;
   }
 
-  target.responsiveHandler.transform(scout.ResponsiveManager.ResponsiveState.NORMAL, force);
-};
+  target.responsiveHandler.transform(ResponsiveManager.ResponsiveState.NORMAL, force);
+}
 
-scout.ResponsiveManager.prototype.registerHandler = function(target, handler) {
+registerHandler(target, handler) {
   if (target.responsiveHandler) {
     target.responsiveHandler.destroy();
   }
   target.responsiveHandler = handler;
-};
+}
 
-scout.ResponsiveManager.prototype.unregisterHandler = function(target) {
+unregisterHandler(target) {
   if (target.responsiveHandler) {
     target.responsiveHandler.destroy();
     target.responsiveHandler = null;
   }
-};
+}
 
-scout.responsiveManager = new scout.ResponsiveManager();
+static get() {
+  return instance;
+}
+}
 
-scout.addAppListener('prepare', function() {
-  if (scout.responsiveManager) {
+
+
+App.addListener('prepare', function() {
+  if (instance) {
     // if it was created before the app itself, use it instead of creating a new one
     return;
   }
-  scout.responsiveManager = scout.create('ResponsiveManager');
-  scout.responsiveManager.init();
+  instance = scout.create('ResponsiveManager');
+  instance.init();
 });

@@ -8,30 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BenchRowLayoutData = function(model) {
-  scout.BenchRowLayoutData.parent.call(this, model);
+import {FlexboxLayoutData} from '../../../index';
+
+export default class BenchRowLayoutData extends FlexboxLayoutData {
+
+constructor(model) {
+  super( model);
   this._ensureRows();
-};
-scout.inherits(scout.BenchRowLayoutData, scout.FlexboxLayoutData);
+}
 
-scout.BenchRowLayoutData.prototype._prepare = function() {
-  scout.BenchRowLayoutData.parent.prototype._prepare.call(this);
+
+_prepare() {
+  super._prepare();
   this.rows = [null, null, null];
-};
+}
 
-scout.BenchRowLayoutData.prototype.getRows = function() {
+getRows() {
   return this.rows;
-};
+}
 
-scout.BenchRowLayoutData.prototype._ensureRows = function() {
+_ensureRows() {
   this.rows = this.rows.map(function(row, i) {
-    return new scout.FlexboxLayoutData(row).withOrder(i * 2);
+    return new FlexboxLayoutData(row).withOrder(i * 2);
   });
-};
+}
 
-scout.BenchRowLayoutData.prototype.updateVisibilities = function(rows) {
+updateVisibilities(rows) {
   rows.forEach(function(row, index) {
     this.rows[index].visible = row.rendered;
 
   }.bind(this));
-};
+}
+}

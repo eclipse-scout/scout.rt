@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuNavigationUpKeyStroke = function(popup, menuItemClass) {
-  scout.MenuNavigationUpKeyStroke.parent.call(this, popup);
-  this._menuItemClass = menuItemClass;
-  this.which = [scout.keys.UP];
-  this.renderingHints.render = false;
-};
-scout.inherits(scout.MenuNavigationUpKeyStroke, scout.MenuNavigationKeyStroke);
+import {keys} from '../index';
+import {MenuNavigationKeyStroke} from '../index';
+import {menuNavigationKeyStrokes} from '../index';
 
-scout.MenuNavigationUpKeyStroke.prototype.handle = function(event) {
-  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+export default class MenuNavigationUpKeyStroke extends MenuNavigationKeyStroke {
+
+constructor(popup, menuItemClass) {
+  super( popup);
+  this._menuItemClass = menuItemClass;
+  this.which = [keys.UP];
+  this.renderingHints.render = false;
+}
+
+
+handle(event) {
+  var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
   if (menuItems.$selected.length > 0) {
-    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.prevAll(':visible').first());
+    menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$selected.prevAll(':visible').first());
   } else {
-    scout.menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.last());
+    menuNavigationKeyStrokes._changeSelection.call(this, menuItems.$selected, menuItems.$allVisible.last());
   }
-};
+}
+}

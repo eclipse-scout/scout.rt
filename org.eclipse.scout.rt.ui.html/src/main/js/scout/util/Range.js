@@ -8,31 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Range = function(from, to) {
+import {arrays} from '../index';
+
+export default class Range {
+
+constructor(from, to) {
   this.from = from;
   this.to = to;
-};
+}
 
-scout.Range.prototype.equals = function(other) {
+equals(other) {
   return this.from === other.from && this.to === other.to;
-};
+}
 
 /**
  * Subtracts the given range and returns an array of the remaining ranges.
  */
-scout.Range.prototype.subtract = function(other) {
+subtract(other) {
   // other is empty
   if (other.size() === 0) {
-    return [new scout.Range(this.from, this.to)];
+    return [new Range(this.from, this.to)];
   }
   // other is greater
   if (this.from >= other.from && this.to <= other.to) {
-    return [new scout.Range(0, 0)];
+    return [new Range(0, 0)];
   }
   // other is contained completely
   if (other.from >= this.from && other.to <= this.to) {
-    var range1 = new scout.Range(this.from, other.from);
-    var range2 = new scout.Range(other.to, this.to);
+    var range1 = new Range(this.from, other.from);
+    var range2 = new Range(other.to, this.to);
     if (range1.size() === 0) {
       return [range2];
     }
@@ -43,20 +47,20 @@ scout.Range.prototype.subtract = function(other) {
   }
   // other overlaps on the bottom
   if (other.from > this.from && other.from < this.to) {
-    return [new scout.Range(this.from, other.from)];
+    return [new Range(this.from, other.from)];
   }
   // other overlaps on the top
   if (this.from > other.from && this.from < other.to) {
-    return [new scout.Range(other.to, this.to)];
+    return [new Range(other.to, this.to)];
   }
   // other is outside
-  return [new scout.Range(this.from, this.to)];
-};
+  return [new Range(this.from, this.to)];
+}
 
 /**
  * Subtracts every given range and returns an array of the remaining ranges.
  */
-scout.Range.prototype.subtractAll = function(others) {
+subtractAll(others) {
   var other = others.shift();
   var remains = [this];
   var newRemains = [];
@@ -73,47 +77,47 @@ scout.Range.prototype.subtractAll = function(others) {
   });
   // If nothing is left add one empty range to be consistent with .subtract()
   if (remains.length === 0) {
-    remains.push(new scout.Range(0, 0));
+    remains.push(new Range(0, 0));
   }
 
   function subtract(remainingElem) {
-    scout.arrays.pushAll(newRemains, remainingElem.subtract(other));
+    arrays.pushAll(newRemains, remainingElem.subtract(other));
   }
   return remains;
-};
+}
 
-scout.Range.prototype.shrink = function(other) {
+shrink(other) {
   // other is empty
   if (other.size() === 0) {
-    return new scout.Range(this.from, this.to);
+    return new Range(this.from, this.to);
   }
   // other is greater
   if (this.from >= other.from && this.to <= other.to) {
-    return new scout.Range(0, 0);
+    return new Range(0, 0);
   }
   // other is contained completely
   if (other.from >= this.from && other.to <= this.to) {
-    return new scout.Range(this.from, other.to);
+    return new Range(this.from, other.to);
   }
   // other overlaps on the bottom
   if (other.from >= this.from && other.from < this.to) {
-    return new scout.Range(this.from, other.from);
+    return new Range(this.from, other.from);
   }
   // other overlaps on the top
   if (this.from > other.from && this.from < other.to) {
-    return new scout.Range(other.to, this.to);
+    return new Range(other.to, this.to);
   }
   if (other.to < this.from) {
-    return new scout.Range(this.from - other.size() - 1, this.to - other.size() - 1);
+    return new Range(this.from - other.size() - 1, this.to - other.size() - 1);
   }
   // other is outside
-  return new scout.Range(this.from, this.to);
-};
+  return new Range(this.from, this.to);
+}
 
-scout.Range.prototype.union = function(other) {
+union(other) {
   if (this.to < other.from || other.to < this.from) {
-    var range1 = new scout.Range(this.from, this.to);
-    var range2 = new scout.Range(other.from, other.to);
+    var range1 = new Range(this.from, this.to);
+    var range2 = new Range(other.from, other.to);
     if (range1.size() === 0) {
       return [range2];
     }
@@ -122,13 +126,13 @@ scout.Range.prototype.union = function(other) {
     }
     return [range1, range2];
   }
-  return [new scout.Range(Math.min(this.from, other.from), Math.max(this.to, other.to))];
-};
+  return [new Range(Math.min(this.from, other.from), Math.max(this.to, other.to))];
+}
 
-scout.Range.prototype.add = function(other) {
+add(other) {
   if (this.to < other.from || other.to < this.from) {
-    var range1 = new scout.Range(this.from, this.to);
-    var range2 = new scout.Range(other.from, other.to);
+    var range1 = new Range(this.from, this.to);
+    var range2 = new Range(other.from, other.to);
     if (range1.size() === 0) {
       return range2;
     }
@@ -137,26 +141,27 @@ scout.Range.prototype.add = function(other) {
     }
     throw new Error('Range to add has to border on the existing range. ' + this + ', ' + other);
   }
-  return new scout.Range(Math.min(this.from, other.from), Math.max(this.to, other.to));
-};
+  return new Range(Math.min(this.from, other.from), Math.max(this.to, other.to));
+}
 
-scout.Range.prototype.intersect = function(other) {
+intersect(other) {
   if (this.to <= other.from || other.to <= this.from) {
-    return new scout.Range(0, 0);
+    return new Range(0, 0);
   }
-  return new scout.Range(Math.max(this.from, other.from), Math.min(this.to, other.to));
-};
+  return new Range(Math.max(this.from, other.from), Math.min(this.to, other.to));
+}
 
-scout.Range.prototype.size = function(other) {
+size(other) {
   return this.to - this.from;
-};
+}
 
-scout.Range.prototype.contains = function(value) {
+contains(value) {
   return this.from <= value && value < this.to;
-};
+}
 
-scout.Range.prototype.toString = function() {
+toString() {
   return 'scout.Range[' +
     'from=' + (this.from === null ? 'null' : this.from) +
     ' to=' + (this.to === null ? 'null' : this.to) + ']';
-};
+}
+}

@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetFieldLayout = function(formField) {
-  scout.WidgetFieldLayout.parent.call(this, formField);
-};
-scout.inherits(scout.WidgetFieldLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../index';
+import {scrollbars} from '../../index';
 
-scout.WidgetFieldLayout.prototype.layout = function($container) {
-  scout.WidgetFieldLayout.parent.prototype.layout.call(this, $container);
-  scout.scrollbars.update(this.$fieldContainer);
-};
+export default class WidgetFieldLayout extends FormFieldLayout {
+
+constructor(formField) {
+  super( formField);
+}
+
+
+layout($container) {
+  super.layout( $container);
+  scrollbars.update(this.$fieldContainer);
+}
+}

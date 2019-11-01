@@ -8,46 +8,54 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartColumn = function() {
-  scout.SmartColumn.parent.call(this);
+import {SmartField} from '../../index';
+import {LookupCall} from '../../index';
+import {strings} from '../../index';
+import {scout} from '../../index';
+import {Column} from '../../index';
+
+export default class SmartColumn extends Column {
+
+constructor() {
+  super();
   this.codeType = null;
   this.lookupCall = null;
   this.browseHierarchy = false;
-  this.browseMaxRowCount = scout.SmartField.DEFAULT_BROWSE_MAX_COUNT;
+  this.browseMaxRowCount = SmartField.DEFAULT_BROWSE_MAX_COUNT;
   this.browseAutoExpandAll = true;
   this.browseLoadIncremental = false;
   this.activeFilterEnabled = false;
-};
-scout.inherits(scout.SmartColumn, scout.Column);
+}
+
 
 /**
  * @override
  */
-scout.SmartColumn.prototype._init = function(model) {
-  scout.SmartColumn.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this._setLookupCall(this.lookupCall);
   this._setCodeType(this.codeType);
-};
+}
 
-scout.SmartColumn.prototype.setLookupCall = function(lookupCall) {
+setLookupCall(lookupCall) {
   if (this.lookupCall === lookupCall) {
     return;
   }
   this._setLookupCall(lookupCall);
-};
+}
 
-scout.SmartColumn.prototype._setLookupCall = function(lookupCall) {
-  this.lookupCall = scout.LookupCall.ensure(lookupCall, this.session);
-};
+_setLookupCall(lookupCall) {
+  this.lookupCall = LookupCall.ensure(lookupCall, this.session);
+}
 
-scout.SmartColumn.prototype.setCodeType = function(codeType) {
+setCodeType(codeType) {
   if (this.codeType === codeType) {
     return;
   }
   this._setCodeType(codeType);
-};
+}
 
-scout.SmartColumn.prototype._setCodeType = function(codeType) {
+_setCodeType(codeType) {
   this.codeType = codeType;
   if (!codeType) {
     return;
@@ -56,36 +64,36 @@ scout.SmartColumn.prototype._setCodeType = function(codeType) {
     session: this.session,
     codeType: codeType
   });
-};
+}
 
-scout.SmartColumn.prototype.setBrowseHierarchy = function(browseHierarchy) {
+setBrowseHierarchy(browseHierarchy) {
   this.browseHierarchy = browseHierarchy;
-};
+}
 
-scout.SmartColumn.prototype.setBrowseMaxRowCount = function(browseMaxRowCount) {
+setBrowseMaxRowCount(browseMaxRowCount) {
   this.browseMaxRowCount = browseMaxRowCount;
-};
+}
 
-scout.SmartColumn.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
+setBrowseAutoExpandAll(browseAutoExpandAll) {
   this.browseAutoExpandAll = browseAutoExpandAll;
-};
+}
 
-scout.SmartColumn.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
+setBrowseLoadIncremental(browseLoadIncremental) {
   this.browseLoadIncremental = browseLoadIncremental;
-};
+}
 
-scout.SmartColumn.prototype.setActiveFilterEnabled = function(activeFilterEnabled) {
+setActiveFilterEnabled(activeFilterEnabled) {
   this.activeFilterEnabled = activeFilterEnabled;
-};
+}
 
-scout.SmartColumn.prototype._formatValue = function(value) {
+_formatValue(value) {
   if (!this.lookupCall) {
-    return scout.strings.nvl(value) + '';
+    return strings.nvl(value) + '';
   }
   return this.lookupCall.textByKey(value);
-};
+}
 
-scout.SmartColumn.prototype._createEditor = function() {
+_createEditor() {
   var field = scout.create('SmartField', {
     parent: this.table,
     codeType: this.codeType,
@@ -109,4 +117,5 @@ scout.SmartColumn.prototype._createEditor = function() {
   }.bind(this));
 
   return field;
-};
+}
+}

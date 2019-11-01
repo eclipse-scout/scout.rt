@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.VirtualKeyStrokeEvent = function(which, ctrl, alt, shift, keyStrokeMode, target) {
+export default class VirtualKeyStrokeEvent {
+
+constructor(which, ctrl, alt, shift, keyStrokeMode, target) {
   this.which = which;
   this.ctrlKey = ctrl;
   this.metaKey = false;
@@ -20,32 +22,33 @@ scout.VirtualKeyStrokeEvent = function(which, ctrl, alt, shift, keyStrokeMode, t
   this._propagationStopped = false;
   this._immediatePropagationStopped = false;
   this._defaultPrevented = false;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.stopPropagation = function() {
+stopPropagation() {
   this._propagationStopped = true;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.stopImmediatePropagation = function() {
+stopImmediatePropagation() {
   this._immediatePropagationStopped = true;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.preventDefault = function() {
+preventDefault() {
   this._defaultPrevented = true;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.isPropagationStopped = function() {
+isPropagationStopped() {
   return this._propagationStopped;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.isImmediatePropagationStopped = function() {
+isImmediatePropagationStopped() {
   return this._immediatePropagationStopped;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.isDefaultPrevented = function() {
+isDefaultPrevented() {
   return this._defaultPrevented;
-};
+}
 
-scout.VirtualKeyStrokeEvent.prototype.isAnyPropagationStopped = function() {
+isAnyPropagationStopped() {
   return this._propagationStopped || this._immediatePropagationStopped;
-};
+}
+}

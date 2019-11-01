@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NotificationAdapter = function() {
-  scout.NotificationAdapter.parent.call(this);
-};
-scout.inherits(scout.NotificationAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class NotificationAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

@@ -8,13 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HorizontalGrid = function(options) {
-  scout.HorizontalGrid.parent.call(this, options);
-};
-scout.inherits(scout.HorizontalGrid, scout.AbstractGrid);
+import {HorizontalGridMatrix} from '../../index';
+import {AbstractGrid} from '../../index';
 
-scout.HorizontalGrid.prototype.layoutAllDynamic = function(widgets) {
-  var matrix = new scout.HorizontalGridMatrix(this.getGridColumnCount());
+export default class HorizontalGrid extends AbstractGrid {
+
+constructor(options) {
+  super( options);
+}
+
+
+layoutAllDynamic(widgets) {
+  var matrix = new HorizontalGridMatrix(this.getGridColumnCount());
   matrix.computeGridData(widgets);
   this.gridRows = matrix.getRowCount();
-};
+}
+}

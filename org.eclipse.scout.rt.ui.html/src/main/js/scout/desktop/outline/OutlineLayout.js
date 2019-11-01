@@ -8,17 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineLayout = function(outline) {
-  scout.OutlineLayout.parent.call(this, outline);
-  this.outline = outline;
-};
-scout.inherits(scout.OutlineLayout, scout.TreeLayout);
+import {TreeLayout} from '../../index';
+import {Dimension} from '../../index';
+import {graphics} from '../../index';
 
-scout.OutlineLayout.prototype._layout = function($container) {
+export default class OutlineLayout extends TreeLayout {
+
+constructor(outline) {
+  super( outline);
+  this.outline = outline;
+}
+
+
+_layout($container) {
   var containerSize,
     htmlContainer = this.outline.htmlComp;
 
-  scout.OutlineLayout.parent.prototype._layout.call(this, $container);
+  super._layout( $container);
 
   containerSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets());
@@ -33,7 +39,7 @@ scout.OutlineLayout.prototype._layout = function($container) {
         pageHtmlComp.$comp.cssWidth(containerSize.width);
 
         var prefSize = pageHtmlComp.prefSize();
-        pageHtmlComp.setSize(new scout.Dimension(containerSize.width, prefSize.height));
+        pageHtmlComp.setSize(new Dimension(containerSize.width, prefSize.height));
         selectedNode.height = prefSize.height + pageHtmlComp.margins().vertical();
       }
     }
@@ -61,12 +67,13 @@ scout.OutlineLayout.prototype._layout = function($container) {
   this.outline.titleMenuBar.validateLayout();
   this.outline.nodeMenuBar.validateLayout();
   this.outline.detailMenuBar.validateLayout();
-};
+}
 
-scout.OutlineLayout.prototype._setDataHeight = function(heightOffset) {
+_setDataHeight(heightOffset) {
   var titleSize = null;
   if (this.outline.titleVisible) {
-    titleSize = scout.graphics.size(this.outline.$title, true);
+    titleSize = graphics.size(this.outline.$title, true);
   }
-  scout.OutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset + (titleSize === null ? 0 : titleSize.height));
-};
+  super._setDataHeight( heightOffset + (titleSize === null ? 0 : titleSize.height));
+}
+}

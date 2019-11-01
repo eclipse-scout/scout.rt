@@ -8,8 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Planner = function() {
-  scout.Planner.parent.call(this);
+import {MenuBar} from '../index';
+import {dates} from '../index';
+import {menus as menus_1} from '../index';
+import {objects} from '../index';
+import {HtmlComponent} from '../index';
+import {KeyStrokeContext} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {TooltipSupport} from '../index';
+import {graphics} from '../index';
+import {defaultValues} from '../index';
+import {scrollbars} from '../index';
+import {DateFormat} from '../index';
+import {tooltips} from '../index';
+import {Range} from '../index';
+import {strings} from '../index';
+import {DateRange} from '../index';
+import {PlannerMenuItemsOrder} from '../index';
+import {PlannerLayout} from '../index';
+import {Widget} from '../index';
+import {styles} from '../index';
+import {arrays} from '../index';
+
+export default class Planner extends Widget {
+
+constructor() {
+  super();
 
   this.activityMap = [];
   this.activitySelectable = false;
@@ -20,8 +45,8 @@ scout.Planner = function() {
   this.label;
   this.resources = [];
   this.resourceMap = [];
-  this.selectionMode = scout.Planner.SelectionMode.MULTI_RANGE;
-  this.selectionRange = new scout.DateRange();
+  this.selectionMode = Planner.SelectionMode.MULTI_RANGE;
+  this.selectionRange = new DateRange();
   this.selectedResources = [];
   this.viewRange = {};
 
@@ -47,10 +72,10 @@ scout.Planner = function() {
 
   this.yearPanelVisible = false;
   this._addWidgetProperties(['menus']);
-};
-scout.inherits(scout.Planner, scout.Widget);
+}
 
-scout.Planner.Direction = {
+
+static Direction = {
   BACKWARD: -1,
   FORWARD: 1
 };
@@ -59,7 +84,7 @@ scout.Planner.Direction = {
  * Enum providing display-modes for planner (extends calendar).
  * @see IPlannerDisplayMode.java
  */
-scout.Planner.DisplayMode = {
+static DisplayMode = {
   DAY: 1,
   WEEK: 2,
   MONTH: 3,
@@ -68,23 +93,23 @@ scout.Planner.DisplayMode = {
   YEAR: 6
 };
 
-scout.Planner.SelectionMode = {
+static SelectionMode = {
   NONE: 0,
   SINGLE_RANGE: 1,
   MULTI_RANGE: 2
 };
 
-scout.Planner.RANGE_SELECTION_MOVE_THRESHOLD = 10;
+static RANGE_SELECTION_MOVE_THRESHOLD = 10;
 
 /**
  * @override
  */
-scout.Planner.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
-scout.Planner.prototype._init = function(model) {
-  scout.Planner.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this._yearPanel = scout.create('YearPanel', {
     parent: this,
     alwaysSelectFirstDay: true
@@ -100,8 +125,8 @@ scout.Planner.prototype._init = function(model) {
   this._header.on('displayModeClick', this._onDisplayModeClick.bind(this));
   this.menuBar = scout.create('MenuBar', {
     parent: this,
-    position: scout.MenuBar.Position.BOTTOM,
-    menuOrder: new scout.PlannerMenuItemsOrder(this.session, 'Planner')
+    position: MenuBar.Position.BOTTOM,
+    menuOrder: new PlannerMenuItemsOrder(this.session, 'Planner')
   });
   for (var i = 0; i < this.resources.length; i++) {
     this._initResource(this.resources[i]);
@@ -115,32 +140,32 @@ scout.Planner.prototype._init = function(model) {
   this._setMenus(this.menus);
   this._setDisplayModeOptions(this.displayModeOptions);
 
-  this._tooltipSupport = new scout.TooltipSupport({
+  this._tooltipSupport = new TooltipSupport({
     parent: this,
     arrowPosition: 50
   });
-};
+}
 
-scout.Planner.prototype._initResource = function(resource) {
-  scout.defaultValues.applyTo(resource, 'Resource');
+_initResource(resource) {
+  defaultValues.applyTo(resource, 'Resource');
   resource.activities.forEach(function(activity) {
     this._initActivity(activity);
   }, this);
   this.resourceMap[resource.id] = resource;
-};
+}
 
-scout.Planner.prototype._initActivity = function(activity) {
-  activity.beginTime = scout.dates.parseJsonDate(activity.beginTime);
-  activity.endTime = scout.dates.parseJsonDate(activity.endTime);
-  scout.defaultValues.applyTo(activity, 'Activity');
+_initActivity(activity) {
+  activity.beginTime = dates.parseJsonDate(activity.beginTime);
+  activity.endTime = dates.parseJsonDate(activity.endTime);
+  defaultValues.applyTo(activity, 'Activity');
   this.activityMap[activity.id] = activity;
-};
+}
 
-scout.Planner.prototype._render = function() {
+_render() {
   // basics, layout etc.
   this.$container = this.$parent.appendDiv('planner');
-  var layout = new scout.PlannerLayout(this);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  var layout = new PlannerLayout(this);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
 
   // main elements
@@ -154,7 +179,7 @@ scout.Planner.prototype._render = function() {
   this.$scale = this.$container.appendDiv('planner-scale');
   this.menuBar.render();
 
-  scout.tooltips.install(this.$grid, {
+  tooltips.install(this.$grid, {
     parent: this,
     selector: '.planner-activity',
     text: function($comp) {
@@ -169,10 +194,10 @@ scout.Planner.prototype._render = function() {
   this._installScrollbars();
   this._gridScrollHandler = this._onGridScroll.bind(this);
   this.$grid.on('scroll', this._gridScrollHandler);
-};
+}
 
-scout.Planner.prototype._renderProperties = function() {
-  scout.Planner.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
 
   this._renderViewRange();
   this._renderHeaderVisible();
@@ -182,59 +207,59 @@ scout.Planner.prototype._renderProperties = function() {
   this._renderSelectedResources();
   // render with setTimeout because the planner needs to be layouted first
   setTimeout(this._renderSelectionRange.bind(this));
-};
+}
 
 /**
  * @override
  */
-scout.Planner.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$grid;
-};
+}
 
 /* -- basics, events -------------------------------------------- */
 
-scout.Planner.prototype._onPreviousClick = function(event) {
-  this._navigateDate(scout.Planner.Direction.BACKWARD);
-};
+_onPreviousClick(event) {
+  this._navigateDate(Planner.Direction.BACKWARD);
+}
 
-scout.Planner.prototype._onNextClick = function(event) {
-  this._navigateDate(scout.Planner.Direction.FORWARD);
-};
+_onNextClick(event) {
+  this._navigateDate(Planner.Direction.FORWARD);
+}
 
-scout.Planner.prototype._navigateDate = function(direction) {
-  var viewRange = new scout.DateRange(this.viewRange.from, this.viewRange.to),
-    displayMode = scout.Planner.DisplayMode;
+_navigateDate(direction) {
+  var viewRange = new DateRange(this.viewRange.from, this.viewRange.to),
+    displayMode = Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
-    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction);
-    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction);
+    viewRange.from = dates.shift(this.viewRange.from, 0, 0, direction);
+    viewRange.to = dates.shift(this.viewRange.to, 0, 0, direction);
   } else if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK)) {
-    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 0, direction * 7);
-    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
-    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 0, direction * 7);
+    viewRange.from = dates.shift(this.viewRange.from, 0, 0, direction * 7);
+    viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
+    viewRange.to = dates.shift(this.viewRange.to, 0, 0, direction * 7);
   } else if (this.displayMode === displayMode.MONTH) {
-    viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
-    viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+    viewRange.from = dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
+    viewRange.to = dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === displayMode.CALENDAR_WEEK) {
-    viewRange.from = scout.dates.shift(this.viewRange.from, 0, direction, 0);
-    viewRange.from = scout.dates.ensureMonday(viewRange.from, -1 * direction);
-    viewRange.to = scout.dates.shift(this.viewRange.to, 0, direction, 0);
+    viewRange.from = dates.shift(this.viewRange.from, 0, direction, 0);
+    viewRange.from = dates.ensureMonday(viewRange.from, -1 * direction);
+    viewRange.to = dates.shift(this.viewRange.to, 0, direction, 0);
   } else if (this.displayMode === displayMode.YEAR) {
-    viewRange.from = scout.dates.shift(this.viewRange.from, 0, 3 * direction, 0);
-    viewRange.to = scout.dates.shift(this.viewRange.to, 0, 3 * direction, 0);
+    viewRange.from = dates.shift(this.viewRange.from, 0, 3 * direction, 0);
+    viewRange.to = dates.shift(this.viewRange.to, 0, 3 * direction, 0);
   }
 
   this.setViewRange(viewRange);
-};
+}
 
-scout.Planner.prototype._onTodayClick = function(event) {
+_onTodayClick(event) {
   var today = new Date(),
     year = today.getFullYear(),
     month = today.getMonth(),
     date = today.getDate(),
     day = (today.getDay() + 6) % 7,
-    displayMode = scout.Planner.DisplayMode;
+    displayMode = Planner.DisplayMode;
 
   if (this.displayMode === displayMode.DAY) {
     today = new Date(year, month, date);
@@ -245,22 +270,22 @@ scout.Planner.prototype._onTodayClick = function(event) {
   }
 
   this.setViewRangeFrom(today);
-};
+}
 
-scout.Planner.prototype._onDisplayModeClick = function(event) {
+_onDisplayModeClick(event) {
   var displayMode = event.displayMode;
   this.setDisplayMode(displayMode);
-};
+}
 
-scout.Planner.prototype._onYearClick = function(event) {
+_onYearClick(event) {
   this.setYearPanelVisible(!this.yearPanelVisible);
-};
+}
 
-scout.Planner.prototype._onYearPanelDateSelect = function(event) {
+_onYearPanelDateSelect(event) {
   this.setViewRangeFrom(event.date);
-};
+}
 
-scout.Planner.prototype._onResourceTitleMouseDown = function(event) {
+_onResourceTitleMouseDown(event) {
   var $resource = $(event.target).parent();
   if ($resource.isSelected()) {
     if (event.which === 3 || event.which === 1 && event.ctrlKey) {
@@ -271,21 +296,21 @@ scout.Planner.prototype._onResourceTitleMouseDown = function(event) {
   this.startRow = $resource.data('resource');
   this.lastRow = this.startRow;
   this._select();
-};
+}
 
-scout.Planner.prototype._onResourceTitleContextMenu = function(event) {
+_onResourceTitleContextMenu(event) {
   this._showContextMenu(event, 'Planner.Resource');
-};
+}
 
-scout.Planner.prototype._onRangeSelectorContextMenu = function(event) {
+_onRangeSelectorContextMenu(event) {
   this._showContextMenu(event, 'Planner.Range');
-};
+}
 
-scout.Planner.prototype._onActivityContextMenu = function(event) {
+_onActivityContextMenu(event) {
   this._showContextMenu(event, 'Planner.Activity');
-};
+}
 
-scout.Planner.prototype._showContextMenu = function(event, allowedType) {
+_showContextMenu(event, allowedType) {
   event.preventDefault();
   event.stopPropagation();
   var func = function func(event, allowedType) {
@@ -310,57 +335,57 @@ scout.Planner.prototype._showContextMenu = function(event, allowedType) {
   }.bind(this);
 
   this.session.onRequestsDone(func, event, allowedType);
-};
+}
 
-scout.Planner.prototype._onGridScroll = function() {
+_onGridScroll() {
   this._reconcileScrollPos();
-};
+}
 
-scout.Planner.prototype._reconcileScrollPos = function() {
+_reconcileScrollPos() {
   // When scrolling horizontally scroll scale as well
   var scrollLeft = this.$grid.scrollLeft();
   this.$scale.scrollLeft(scrollLeft);
-};
+}
 
-scout.Planner.prototype._renderRange = function() {
+_renderRange() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
   var text,
     toDate = new Date(this.viewRange.to.valueOf() - 1),
     toText = this.session.text('ui.to'),
-    displayMode = scout.Planner.DisplayMode;
+    displayMode = Planner.DisplayMode;
 
   // find range text
-  if (scout.dates.isSameDay(this.viewRange.from, toDate)) {
+  if (dates.isSameDay(this.viewRange.from, toDate)) {
     text = this._dateFormat(this.viewRange.from, 'd. MMMM yyyy');
   } else if (this.viewRange.from.getMonth() === toDate.getMonth() && this.viewRange.from.getFullYear() === toDate.getFullYear()) {
-    text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
+    text = strings.join(' ', this._dateFormat(this.viewRange.from, 'd.'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
   } else if (this.viewRange.from.getFullYear() === toDate.getFullYear()) {
     if (this.displayMode === displayMode.YEAR) {
-      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
+      text = strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
     } else {
-      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
+      text = strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
     }
   } else {
     if (this.displayMode === displayMode.YEAR) {
-      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM yyyy'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
+      text = strings.join(' ', this._dateFormat(this.viewRange.from, 'MMMM yyyy'), toText, this._dateFormat(toDate, 'MMMM yyyy'));
     } else {
-      text = scout.strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
+      text = strings.join(' ', this._dateFormat(this.viewRange.from, 'd.  MMMM yyyy'), toText, this._dateFormat(toDate, 'd. MMMM yyyy'));
     }
   }
 
   // set text
   $('.planner-select', this._header.$range).text(text);
-};
+}
 
-scout.Planner.prototype._renderScale = function() {
+_renderScale() {
   if (!this.viewRange.from || !this.viewRange.to) {
     return;
   }
   var width,
     that = this,
-    displayMode = scout.Planner.DisplayMode;
+    displayMode = Planner.DisplayMode;
 
   // empty scale
   this.$scale.empty();
@@ -427,8 +452,8 @@ scout.Planner.prototype._renderScale = function() {
         end = new Date(end);
         var fullRangeMillis = end - begin;
         // remove day component from range for scaling
-        var dayDiffTBegin = scout.dates.compareDays(t, begin);
-        var dayDIffEndBegin = scout.dates.compareDays(end, begin);
+        var dayDiffTBegin = dates.compareDays(t, begin);
+        var dayDIffEndBegin = dates.compareDays(end, begin);
         var dayComponentMillis = dayDiffTBegin * 3600000 * 24;
         var rangeScaling = (24 / (lastHour - firstHour + 1));
         // re-add day component
@@ -451,7 +476,7 @@ scout.Planner.prototype._renderScale = function() {
     this.transformWidth = function(begin, end, firstHour, lastHour, interval) {
       return function(t0, t1) {
         var fullRangeMillis = end - begin;
-        var selectionRange = new scout.Range(new Date(t0), new Date(t1));
+        var selectionRange = new Range(new Date(t0), new Date(t1));
         var hiddenRanges = this._findHiddenRangesInWeekMode();
         var selectedRangeMillis = selectionRange.subtractAll(hiddenRanges).reduce(function(acc, range) {
           return acc + range.size();
@@ -473,13 +498,13 @@ scout.Planner.prototype._renderScale = function() {
       };
     }(this.beginScale, this.endScale);
   }
-};
+}
 
 /**
  * Returns every hidden range of the view range created by first and last our of day.
  */
-scout.Planner.prototype._findHiddenRangesInWeekMode = function() {
-  if (!scout.isOneOf(this.displayMode, scout.Planner.DisplayMode.WORK_WEEK, scout.Planner.DisplayMode.WEEK)) {
+_findHiddenRangesInWeekMode() {
+  if (!scout.isOneOf(this.displayMode, Planner.DisplayMode.WORK_WEEK, Planner.DisplayMode.WEEK)) {
     return [];
   }
   var ranges = [];
@@ -490,12 +515,12 @@ scout.Planner.prototype._findHiddenRangesInWeekMode = function() {
   var hiddenRange;
   while (currentDate < this.viewRange.to) {
     // Start of day range
-    hiddenRange = new scout.Range(new Date(currentDate.valueOf()), scout.dates.shiftTime(currentDate, firstHourOfDay));
+    hiddenRange = new Range(new Date(currentDate.valueOf()), dates.shiftTime(currentDate, firstHourOfDay));
     if (hiddenRange.size() > 0) {
       ranges.push(hiddenRange);
     }
     // End of day range
-    hiddenRange = new scout.Range(scout.dates.shiftTime(currentDate, lastHourOfDay + 1), scout.dates.shiftTime(currentDate, 24));
+    hiddenRange = new Range(dates.shiftTime(currentDate, lastHourOfDay + 1), dates.shiftTime(currentDate, 24));
     if (hiddenRange.size() > 0) {
       ranges.push(hiddenRange);
     }
@@ -504,9 +529,9 @@ scout.Planner.prototype._findHiddenRangesInWeekMode = function() {
     currentDate.setDate(currentDate.getDate() + 1);
   }
   return ranges;
-};
+}
 
-scout.Planner.prototype._renderDayScale = function() {
+_renderDayScale() {
   var newLargeGroup, $divLarge, $divSmall,
     first = true;
   var loop = new Date(this.viewRange.from.valueOf());
@@ -539,16 +564,16 @@ scout.Planner.prototype._renderDayScale = function() {
       }
 
       // increase variables
-      loop = scout.dates.shiftTime(loop, 0, interval, 0);
+      loop = dates.shiftTime(loop, 0, interval, 0);
       this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
       first = false;
     } else {
-      loop = scout.dates.shiftTime(loop, 0, interval, 0);
+      loop = dates.shiftTime(loop, 0, interval, 0);
     }
   }
-};
+}
 
-scout.Planner.prototype._renderWeekScale = function() {
+_renderWeekScale() {
   var newLargeGroup, $divLarge, $divSmall,
     first = true;
   var loop = new Date(this.viewRange.from.valueOf());
@@ -590,7 +615,7 @@ scout.Planner.prototype._renderWeekScale = function() {
     }
 
     // increase variables
-    loop = scout.dates.shiftTime(loop, 0, interval, 0, 0);
+    loop = dates.shiftTime(loop, 0, interval, 0, 0);
     this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
     first = false;
 
@@ -601,9 +626,9 @@ scout.Planner.prototype._renderWeekScale = function() {
       loop.setDate(loop.getDate() + 1);
     }
   }
-};
+}
 
-scout.Planner.prototype._renderMonthScale = function() {
+_renderMonthScale() {
   var newLargeGroup, $divLarge, $divSmall,
     first = true;
   var loop = new Date(this.viewRange.from.valueOf());
@@ -632,13 +657,13 @@ scout.Planner.prototype._renderMonthScale = function() {
       $divSmall.addClass('label-invisible');
     }
 
-    loop = scout.dates.shift(loop, 0, 0, 1);
+    loop = dates.shift(loop, 0, 0, 1);
     this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
     first = false;
   }
-};
+}
 
-scout.Planner.prototype._renderCalendarWeekScale = function() {
+_renderCalendarWeekScale() {
   var newLargeGroup, $divLarge, $divSmall,
     first = true;
   var loop = new Date(this.viewRange.from.valueOf());
@@ -670,22 +695,22 @@ scout.Planner.prototype._renderCalendarWeekScale = function() {
     }
 
     $divSmall = this.$timelineSmall
-      .appendDiv('scale-item', scout.dates.weekInYear(loop))
+      .appendDiv('scale-item', dates.weekInYear(loop))
       .data('date-from', new Date(loop.valueOf()))
       .data('tooltipText', this._scaleTooltipText.bind(this));
     this._tooltipSupport.install($divSmall);
 
     // hide label
-    if (scout.dates.weekInYear(loop) % labelPeriod !== 0) {
+    if (dates.weekInYear(loop) % labelPeriod !== 0) {
       $divSmall.addClass('label-invisible');
     }
 
     loop.setDate(loop.getDate() + 7);
     this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
   }
-};
+}
 
-scout.Planner.prototype._renderYearScale = function() {
+_renderYearScale() {
   var newLargeGroup, $divLarge, $divSmall,
     first = true;
   var loop = new Date(this.viewRange.from.valueOf());
@@ -710,22 +735,22 @@ scout.Planner.prototype._renderYearScale = function() {
       $divSmall.addClass('label-invisible');
     }
 
-    loop = scout.dates.shift(loop, 0, 1, 0);
+    loop = dates.shift(loop, 0, 1, 0);
     this._incrementTimelineScaleItems($divLarge, $divSmall, loop, newLargeGroup);
     first = false;
   }
-};
+}
 
-scout.Planner.prototype._incrementTimelineScaleItems = function($largeComp, $smallComp, newDate, newLargeGroup) {
+_incrementTimelineScaleItems($largeComp, $smallComp, newDate, newLargeGroup) {
   $largeComp.data('count', $largeComp.data('count') + 1);
 
   $smallComp.data('date-to', new Date(newDate.valueOf()))
     .data('first', newLargeGroup);
-};
+}
 
 /* -- scale events --------------------------------------------------- */
 
-scout.Planner.prototype._scaleTooltipText = function($scale) {
+_scaleTooltipText($scale) {
   var toText = ' ' + this.session.text('ui.to') + ' ',
     from = new Date($scale.data('date-from').valueOf()),
     to = new Date($scale.data('date-to').valueOf() - 1);
@@ -737,17 +762,17 @@ scout.Planner.prototype._scaleTooltipText = function($scale) {
   } else {
     return this._dateFormat(from, 'd. MMMM yyyy') + toText + this._dateFormat(to, 'd. MMMM yyyy');
   }
-};
+}
 
 /* --  render resources, activities --------------------------------- */
 
-scout.Planner.prototype._removeAllResources = function() {
+_removeAllResources() {
   this.resources.forEach(function(resource) {
     resource.$resource.remove();
   });
-};
+}
 
-scout.Planner.prototype._renderResources = function(resources) {
+_renderResources(resources) {
   var i, resource,
     resourcesHtml = '';
 
@@ -767,49 +792,49 @@ scout.Planner.prototype._renderResources = function(resources) {
     this._linkResource($element, resource);
     this._linkActivitiesForResource(resource);
   }.bind(this));
-};
+}
 
-scout.Planner.prototype._linkResource = function($resource, resource) {
+_linkResource($resource, resource) {
   $resource.data('resource', resource);
   resource.$resource = $resource;
   resource.$cells = $resource.children('.resource-cells');
-};
+}
 
-scout.Planner.prototype._linkActivity = function($activity, activity) {
+_linkActivity($activity, activity) {
   $activity.data('activity', activity);
   activity.$activity = $activity;
-};
+}
 
-scout.Planner.prototype._rerenderActivities = function(resources) {
+_rerenderActivities(resources) {
   resources = resources || this.resources;
   resources.forEach(function(resource) {
     this._removeActivititesForResource(resource);
     this._renderActivititesForResource(resource);
   }, this);
-};
+}
 
-scout.Planner.prototype._buildResourceHtml = function(resource) {
+_buildResourceHtml(resource) {
   var resourceHtml = '<div class="planner-resource" data-id="' + resource.id + '">';
-  resourceHtml += '<div class="resource-title">' + scout.strings.encode(resource.resourceCell.text || '') + '</div>';
+  resourceHtml += '<div class="resource-title">' + strings.encode(resource.resourceCell.text || '') + '</div>';
   resourceHtml += '<div class="resource-cells">' + this._buildActivitiesHtml(resource) + '</div>';
   resourceHtml += '</div>';
   return resourceHtml;
-};
+}
 
-scout.Planner.prototype._renderActivititesForResource = function(resource) {
+_renderActivititesForResource(resource) {
   resource.$cells.html(this._buildActivitiesHtml(resource));
   this._linkActivitiesForResource(resource);
-};
+}
 
-scout.Planner.prototype._linkActivitiesForResource = function(resource) {
+_linkActivitiesForResource(resource) {
   resource.$cells.children('.planner-activity').each(function(index, element) {
     var $element = $(element);
     var activity = this._activityById($element.attr('data-id'));
     this._linkActivity($element, activity);
   }.bind(this));
-};
+}
 
-scout.Planner.prototype._buildActivitiesHtml = function(resource) {
+_buildActivitiesHtml(resource) {
   var activitiesHtml = '';
   resource.activities.forEach(function(activity) {
     if (activity.beginTime.valueOf() >= this.endScale ||
@@ -820,22 +845,22 @@ scout.Planner.prototype._buildActivitiesHtml = function(resource) {
     activitiesHtml += this._buildActivityHtml(activity);
   }, this);
   return activitiesHtml;
-};
+}
 
-scout.Planner.prototype._removeActivititesForResource = function(resource) {
+_removeActivititesForResource(resource) {
   resource.activities.forEach(function(activity) {
     if (activity.$activity) {
       activity.$activity.remove();
       activity.$activity = null;
     }
   }, this);
-};
+}
 
-scout.Planner.prototype._buildActivityHtml = function(activity) {
+_buildActivityHtml(activity) {
   var level = 100 - Math.min(activity.level * 100, 100),
-    backgroundColor = scout.styles.modelToCssColor(activity.backgroundColor),
-    foregroundColor = scout.styles.modelToCssColor(activity.foregroundColor),
-    levelColor = scout.styles.modelToCssColor(activity.levelColor),
+    backgroundColor = styles.modelToCssColor(activity.backgroundColor),
+    foregroundColor = styles.modelToCssColor(activity.foregroundColor),
+    levelColor = styles.modelToCssColor(activity.levelColor),
     begin = activity.beginTime.valueOf(),
     end = activity.endTime.valueOf();
 
@@ -862,24 +887,24 @@ scout.Planner.prototype._buildActivityHtml = function(activity) {
   // The background-color represents the fill level and not the image. This makes it easier to change the color using a css class
   // In order to change the background rather than the fill, use the planner-activity-level css class
   var activityLevelCssClass = 'planner-activity-level' + (activity.cssClass ? (' ' + activity.cssClass) : '');
-  var activityEmptyColor = scout.styles.get(activityLevelCssClass, 'background-color').backgroundColor;
+  var activityEmptyColor = styles.get(activityLevelCssClass, 'background-color').backgroundColor;
   activityStyle += ' background-image: ' + 'linear-gradient(to bottom, ' + activityEmptyColor + ' 0%, ' + activityEmptyColor + ' ' + level + '%, transparent ' + level + '%, transparent 100% );';
 
   var activityHtml = '<div';
   activityHtml += ' class="' + activityCssClass + '"';
   activityHtml += ' style="' + activityStyle + '"';
   activityHtml += ' data-id="' + activity.id + '"';
-  activityHtml += '>' + scout.strings.encode(activity.text || '') + '</div>';
+  activityHtml += '>' + strings.encode(activity.text || '') + '</div>';
   return activityHtml;
-};
+}
 
 /* -- selector -------------------------------------------------- */
 
-scout.Planner.prototype._onCellMouseDown = function(event) {
+_onCellMouseDown(event) {
   var $activity,
     $resource,
     $target = $(event.target),
-    selectionMode = scout.Planner.SelectionMode,
+    selectionMode = Planner.SelectionMode,
     opensContextMenu = (event.which === 3 || event.which === 1 && event.ctrlKey);
 
   if (this.activitySelectable) {
@@ -896,7 +921,7 @@ scout.Planner.prototype._onCellMouseDown = function(event) {
       $resource = $activity.parent().parent();
       this.selectResources([$resource.data('resource')]);
       this.selectActivity($activity.data('activity'));
-      this.selectRange(new scout.DateRange());
+      this.selectRange(new DateRange());
     } else {
       this.selectActivity(null);
     }
@@ -923,9 +948,9 @@ scout.Planner.prototype._onCellMouseDown = function(event) {
   $target.document()
     .on('mousemove', this._cellMousemoveHandler)
     .one('mouseup', this._onDocumentMouseUp.bind(this));
-};
+}
 
-scout.Planner.prototype._startRangeSelection = function(pageX, pageY) {
+_startRangeSelection(pageX, pageY) {
   // init selector
   this.startRow = this._findRow(pageY);
   this.lastRow = this.startRow;
@@ -937,29 +962,29 @@ scout.Planner.prototype._startRangeSelection = function(pageX, pageY) {
   // draw
   this._select(true);
   this._rangeSelectionStarted = true;
-};
+}
 
 /**
  * @returns true if the range selection may be started, false if not
  */
-scout.Planner.prototype._prepareRangeSelectionByMousemove = function(mousedownEvent, mousemoveEvent) {
+_prepareRangeSelectionByMousemove(mousedownEvent, mousemoveEvent) {
   var moveX = mousedownEvent.pageX - mousemoveEvent.pageX;
   var moveY = mousedownEvent.pageY - mousemoveEvent.pageY;
-  var moveThreshold = scout.Planner.RANGE_SELECTION_MOVE_THRESHOLD;
+  var moveThreshold = Planner.RANGE_SELECTION_MOVE_THRESHOLD;
   if (Math.abs(moveX) >= moveThreshold) {
     // Accept if x movement is big enough
     return true;
   }
   var mousedownRow = this._findRow(mousedownEvent.pageY);
   var mousemoveRow = this._findRow(mousemoveEvent.pageY);
-  if (Math.abs(moveY) >= moveThreshold && this.selectionMode === scout.Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow) {
+  if (Math.abs(moveY) >= moveThreshold && this.selectionMode === Planner.SelectionMode.MULTI_RANGE && mousedownRow !== mousemoveRow) {
     // Accept if y movement is big enough AND the row changed. No need to switch into range selection mode if cursor is still on the same row
     return true;
   }
   return false;
-};
+}
 
-scout.Planner.prototype._onCellMousemove = function(mousedownEvent, event) {
+_onCellMousemove(mousedownEvent, event) {
   if (this.selectedActivity && !this._rangeSelectionStarted) {
     // If an activity was selected, switch to range selection if the user moves the mouse
     if (!this._prepareRangeSelectionByMousemove(mousedownEvent, event)) {
@@ -978,9 +1003,9 @@ scout.Planner.prototype._onCellMousemove = function(mousedownEvent, event) {
   }
 
   this._select(true);
-};
+}
 
-scout.Planner.prototype._onResizeMouseDown = function(event) {
+_onResizeMouseDown(event) {
   var swap,
     $target = $(event.target);
 
@@ -988,8 +1013,8 @@ scout.Planner.prototype._onResizeMouseDown = function(event) {
   this.lastRow = this.selectedResources[this.selectedResources.length - 1];
 
   // Get the start and last range based on the clicked resize handle. If the ranges cannot be determined it likely means that the selectionRange is out of the current viewRange or dayRange (set by firstHourOfDay, lastHourOfDay)
-  this.startRange = scout.nvl(this._findScaleByFromDate(this.selectionRange.from), new scout.Range(this.selectionRange.from.getTime(), this.selectionRange.from.getTime()));
-  this.lastRange = scout.nvl(this._findScaleByToDate(this.selectionRange.to), new scout.Range(this.selectionRange.to.getTime(), this.selectionRange.to.getTime()));
+  this.startRange = scout.nvl(this._findScaleByFromDate(this.selectionRange.from), new Range(this.selectionRange.from.getTime(), this.selectionRange.from.getTime()));
+  this.lastRange = scout.nvl(this._findScaleByToDate(this.selectionRange.to), new Range(this.selectionRange.to.getTime(), this.selectionRange.to.getTime()));
 
   // Swap start and last range if resize-left is clicked
   if ($target.hasClass('selector-resize-left')) {
@@ -1006,9 +1031,9 @@ scout.Planner.prototype._onResizeMouseDown = function(event) {
     .one('mouseup', this._onDocumentMouseUp.bind(this));
 
   return false;
-};
+}
 
-scout.Planner.prototype._onResizeMousemove = function(event) {
+_onResizeMousemove(event) {
   if (!this.rendered) {
     // planner may be removed in the meantime
     return;
@@ -1018,9 +1043,9 @@ scout.Planner.prototype._onResizeMousemove = function(event) {
     this.lastRange = lastRange;
   }
   this._select(true);
-};
+}
 
-scout.Planner.prototype._onDocumentMouseUp = function(event) {
+_onDocumentMouseUp(event) {
   var $target = $(event.target);
   $target.body().removeClass('col-resize');
   if (this._cellMousemoveHandler) {
@@ -1039,9 +1064,9 @@ scout.Planner.prototype._onDocumentMouseUp = function(event) {
   if (this.rendered) {
     this._select();
   }
-};
+}
 
-scout.Planner.prototype._select = function(whileSelecting) {
+_select(whileSelecting) {
   if (!this.startRow || !this.lastRow) {
     return;
   }
@@ -1050,7 +1075,7 @@ scout.Planner.prototype._select = function(whileSelecting) {
     $lastRow = this.lastRow.$resource;
 
   // in case of single selection
-  if (this.selectionMode === scout.Planner.SelectionMode.SINGLE_RANGE) {
+  if (this.selectionMode === Planner.SelectionMode.SINGLE_RANGE) {
     this.lastRow = this.startRow;
     $lastRow = this.startRow.$resource;
   }
@@ -1079,13 +1104,13 @@ scout.Planner.prototype._select = function(whileSelecting) {
     var from = Math.min(this.lastRange.from, this.startRange.from),
       to = Math.max(this.lastRange.to, this.startRange.to);
 
-    var selectionRange = new scout.DateRange(new Date(from), new Date(to));
+    var selectionRange = new DateRange(new Date(from), new Date(to));
     selectionRange = this._adjustSelectionRange(selectionRange);
     this.selectRange(selectionRange, !whileSelecting);
   }
-};
+}
 
-scout.Planner.prototype._adjustSelectionRange = function(range) {
+_adjustSelectionRange(range) {
   var from = range.from.getTime();
   var to = range.to.getTime();
 
@@ -1096,7 +1121,7 @@ scout.Planner.prototype._adjustSelectionRange = function(range) {
     minSelectionDuration = options.minSelectionIntervalCount * options.interval * 60000;
   }
   var lastHourOfDay = options.lastHourOfDay;
-  var endOfDay = scout.dates.shiftTime(scout.dates.trunc(range.from), lastHourOfDay + 1);
+  var endOfDay = dates.shiftTime(dates.trunc(range.from), lastHourOfDay + 1);
   var viewRange = this._visibleViewRange();
   if (this.lastRange.from < this.startRange.from) {
     // Selecting to left
@@ -1113,7 +1138,7 @@ scout.Planner.prototype._adjustSelectionRange = function(range) {
     if (from + minSelectionDuration <= viewRange.to.getTime()) {
       // extend to right side
       to = Math.max(to, Math.max(from + minSelectionDuration, viewRange.from.getTime()));
-      if (to >= endOfDay.getTime() && new scout.Range(from, to).size() === minSelectionDuration) {
+      if (to >= endOfDay.getTime() && new Range(from, to).size() === minSelectionDuration) {
         // extend to left side when clicking at the end of a day
         to = endOfDay.getTime();
         from = Math.min(from, to - minSelectionDuration);
@@ -1124,12 +1149,12 @@ scout.Planner.prototype._adjustSelectionRange = function(range) {
       from = Math.min(from, to - minSelectionDuration);
     }
   }
-  return new scout.DateRange(new Date(from), new Date(to));
-};
+  return new DateRange(new Date(from), new Date(to));
+}
 
-scout.Planner.prototype._findRow = function(y) {
+_findRow(y) {
   var $row,
-    gridBounds = scout.graphics.offsetBounds(this.$grid),
+    gridBounds = graphics.offsetBounds(this.$grid),
     x = gridBounds.x + 10;
 
   y = Math.min(Math.max(y, 0), gridBounds.y + gridBounds.height - 1);
@@ -1138,76 +1163,76 @@ scout.Planner.prototype._findRow = function(y) {
     return $row.data('resource');
   }
   return null;
-};
+}
 
-scout.Planner.prototype._findScale = function(x) {
+_findScale(x) {
   var $scaleItem,
-    gridBounds = scout.graphics.offsetBounds(this.$grid),
+    gridBounds = graphics.offsetBounds(this.$grid),
     y = this.$scale.offset().top + this.$scale.height() * 0.75;
 
   x = Math.min(Math.max(x, 0), gridBounds.x + gridBounds.width - 1);
   $scaleItem = this.$container.elementFromPoint(x, y, '.scale-item');
   if ($scaleItem.length > 0) {
-    return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
+    return new DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
   }
   return null;
-};
+}
 
-scout.Planner.prototype._findScaleByFromDate = function(from) {
+_findScaleByFromDate(from) {
   return this._findScaleByFunction(function(i, elem) {
     var $scaleItem = $(elem);
     if ($scaleItem.data('date-from').getTime() === from.getTime()) {
       return true;
     }
   });
-};
+}
 
-scout.Planner.prototype._findScaleByToDate = function(to) {
+_findScaleByToDate(to) {
   return this._findScaleByFunction(function(i, elem) {
     var $scaleItem = $(elem);
     if ($scaleItem.data('date-to').getTime() === to.getTime()) {
       return true;
     }
   });
-};
+}
 
-scout.Planner.prototype._findScaleByFunction = function(func) {
+_findScaleByFunction(func) {
   var $scaleItem = this.$timelineSmall.children('.scale-item').filter(func);
   if (!$scaleItem.length) {
     return null;
   }
-  return new scout.DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
-};
+  return new DateRange($scaleItem.data('date-from').valueOf(), $scaleItem.data('date-to').valueOf());
+}
 
 /**
  * @returns the visible view range (the difference to this.viewRange is that first and last hourOfDay are considered).
  */
-scout.Planner.prototype._visibleViewRange = function() {
+_visibleViewRange() {
   var $items = this.$timelineSmall.children('.scale-item');
-  return new scout.Range($items.first().data('date-from'), $items.last().data('date-to'));
-};
+  return new Range($items.first().data('date-from'), $items.last().data('date-to'));
+}
 
 /* -- helper ---------------------------------------------------- */
 
-scout.Planner.prototype._dateFormat = function(date, pattern) {
+_dateFormat(date, pattern) {
   var d = new Date(date.valueOf()),
-    dateFormat = new scout.DateFormat(this.session.locale, pattern);
+    dateFormat = new DateFormat(this.session.locale, pattern);
 
   return dateFormat.format(d);
-};
+}
 
-scout.Planner.prototype._renderViewRange = function() {
+_renderViewRange() {
   this._renderRange();
   this._renderScale();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Planner.prototype._renderHeaderVisible = function() {
+_renderHeaderVisible() {
   this._header.setVisible(this.headerVisible);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Planner.prototype._renderYearPanelVisible = function(animated) {
+_renderYearPanelVisible(animated) {
   var yearPanelWidth;
   if (this.yearPanelVisible) {
     this._yearPanel.renderContent();
@@ -1227,9 +1252,9 @@ scout.Planner.prototype._renderYearPanelVisible = function(animated) {
     progress: this._onYearPanelWidthChange.bind(this),
     complete: this._afterYearPanelWidthChange.bind(this)
   });
-};
+}
 
-scout.Planner.prototype._onYearPanelWidthChange = function() {
+_onYearPanelWidthChange() {
   if (!this._yearPanel.$container) {
     // If container has been removed in the meantime (e.g. user navigates away while animation is in progress)
     return;
@@ -1238,59 +1263,59 @@ scout.Planner.prototype._onYearPanelWidthChange = function() {
   this.$grid.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
   this.$scale.css('width', 'calc(100% - ' + yearPanelWidth + 'px)');
   this.revalidateLayout();
-};
+}
 
-scout.Planner.prototype._afterYearPanelWidthChange = function() {
+_afterYearPanelWidthChange() {
   if (!this.yearPanelVisible) {
     this._yearPanel.removeContent();
   }
-};
+}
 
-scout.Planner.prototype._setMenus = function(menus) {
+_setMenus(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
   this._updateMenuBar();
-};
+}
 
-scout.Planner.prototype._updateMenuBar = function() {
+_updateMenuBar() {
   var menuItems = this._filterMenus(['Planner.EmptySpace', 'Planner.Resource', 'Planner.Activity', 'Planner.Range'], false, true);
   this.menuBar.setMenuItems(menuItems);
-};
+}
 
-scout.Planner.prototype._removeMenus = function() {
+_removeMenus() {
   // menubar takes care about removal
-};
+}
 
-scout.Planner.prototype._filterMenus = function(allowedTypes, onlyVisible, enableDisableKeyStroke) {
+_filterMenus(allowedTypes, onlyVisible, enableDisableKeyStroke) {
   allowedTypes = allowedTypes || [];
   if (allowedTypes.indexOf('Planner.Resource') > -1 && this.selectedResources.length === 0) {
-    scout.arrays.remove(allowedTypes, 'Planner.Resource');
+    arrays.remove(allowedTypes, 'Planner.Resource');
   }
   if (allowedTypes.indexOf('Planner.Activity') > -1 && !this.selectedActivity) {
-    scout.arrays.remove(allowedTypes, 'Planner.Activity');
+    arrays.remove(allowedTypes, 'Planner.Activity');
   }
   if (allowedTypes.indexOf('Planner.Range') > -1 && !this.selectionRange.from && !this.selectionRange.to) {
-    scout.arrays.remove(allowedTypes, 'Planner.Range');
+    arrays.remove(allowedTypes, 'Planner.Range');
   }
-  return scout.menus.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
-};
+  return menus_1.filter(this.menus, allowedTypes, onlyVisible, enableDisableKeyStroke);
+}
 
-scout.Planner.prototype.setDisplayModeOptions = function(displayModeOptions) {
+setDisplayModeOptions(displayModeOptions) {
   this.setProperty('displayModeOptions', displayModeOptions);
-};
+}
 
-scout.Planner.prototype._setDisplayModeOptions = function(displayModeOptions) {
+_setDisplayModeOptions(displayModeOptions) {
   if (displayModeOptions) {
     this._adjustHours(displayModeOptions);
   }
   this.displayModeOptions = displayModeOptions;
-};
+}
 
 /**
  * Make sure configured our is between 0 and 23.
  */
-scout.Planner.prototype._adjustHours = function(optionsMap) {
-  scout.objects.values(optionsMap).forEach(function(options) {
+_adjustHours(optionsMap) {
+  objects.values(optionsMap).forEach(function(options) {
     if (options.firstHourOfDay) {
       options.firstHourOfDay = validHour(options.firstHourOfDay);
     }
@@ -1308,48 +1333,48 @@ scout.Planner.prototype._adjustHours = function(optionsMap) {
     }
     return hour;
   }
-};
+}
 
-scout.Planner.prototype._renderDisplayModeOptions = function() {
+_renderDisplayModeOptions() {
   this._renderRange();
   this._renderScale();
   this._select(); // adjust selection if minSelectionIntervalCount has changed
   this.invalidateLayoutTree();
-};
+}
 
-scout.Planner.prototype._renderAvailableDisplayModes = function() {
+_renderAvailableDisplayModes() {
   // done by PlannerHeader.js
-};
+}
 
-scout.Planner.prototype._renderDisplayMode = function() {
+_renderDisplayMode() {
   // done by PlannerHeader.js
-};
+}
 
-scout.Planner.prototype._setViewRange = function(viewRange) {
-  viewRange = scout.DateRange.ensure(viewRange);
+_setViewRange(viewRange) {
+  viewRange = DateRange.ensure(viewRange);
   this._setProperty('viewRange', viewRange);
   this._yearPanel.setViewRange(this.viewRange);
   this._yearPanel.selectDate(this.viewRange.from);
-};
+}
 
-scout.Planner.prototype._setDisplayMode = function(displayMode) {
+_setDisplayMode(displayMode) {
   this._setProperty('displayMode', displayMode);
   this._yearPanel.setDisplayMode(this.displayMode);
   this._header.setDisplayMode(this.displayMode);
-};
+}
 
-scout.Planner.prototype._setAvailableDisplayModes = function(availableDisplayModes) {
+_setAvailableDisplayModes(availableDisplayModes) {
   this._setProperty('availableDisplayModes', availableDisplayModes);
   this._header.setAvailableDisplayModes(this.availableDisplayModes);
-};
+}
 
-scout.Planner.prototype._setSelectionRange = function(selectionRange) {
-  selectionRange = scout.DateRange.ensure(selectionRange);
+_setSelectionRange(selectionRange) {
+  selectionRange = DateRange.ensure(selectionRange);
   this._setProperty('selectionRange', selectionRange);
   this.session.onRequestsDone(this._updateMenuBar.bind(this));
-};
+}
 
-scout.Planner.prototype._setSelectedResources = function(selectedResources) {
+_setSelectedResources(selectedResources) {
   if (typeof selectedResources[0] === 'string') {
     selectedResources = this._resourcesByIds(selectedResources);
   }
@@ -1358,28 +1383,28 @@ scout.Planner.prototype._setSelectedResources = function(selectedResources) {
   }
   this._setProperty('selectedResources', selectedResources);
   this.session.onRequestsDone(this._updateMenuBar.bind(this));
-};
+}
 
-scout.Planner.prototype._removeSelectedResources = function() {
+_removeSelectedResources() {
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(false);
   });
-};
+}
 
-scout.Planner.prototype._renderSelectedResources = function() {
+_renderSelectedResources() {
   this.selectedResources.forEach(function(resource) {
     resource.$resource.select(true);
   });
-};
+}
 
-scout.Planner.prototype._renderActivitySelectable = function() {
+_renderActivitySelectable() {
   if (this.selectedActivity && this.selectedActivity.$activity) {
     this.selectedActivity.$activity.toggleClass('selected', this.activitySelectable);
   }
-};
+}
 
-scout.Planner.prototype._renderSelectionMode = function() {
-  if (this.selectionMode === scout.Planner.SelectionMode.NONE) {
+_renderSelectionMode() {
+  if (this.selectionMode === Planner.SelectionMode.NONE) {
     if (this.$selector) {
       this.$selector.remove();
       this.$highlight.remove();
@@ -1387,9 +1412,9 @@ scout.Planner.prototype._renderSelectionMode = function() {
   } else {
     this._renderSelectionRange();
   }
-};
+}
 
-scout.Planner.prototype._renderSelectionRange = function() {
+_renderSelectionRange() {
   var $startRow, $lastRow,
     from = this.selectionRange.from,
     to = this.selectionRange.to,
@@ -1431,9 +1456,9 @@ scout.Planner.prototype._renderSelectionRange = function() {
   this.$highlight
     .cssLeft(left)
     .cssWidth(width);
-};
+}
 
-scout.Planner.prototype._setSelectedActivity = function(selectedActivity) {
+_setSelectedActivity(selectedActivity) {
   if (typeof selectedActivity === 'string') {
     selectedActivity = this._activityById(selectedActivity);
   }
@@ -1442,53 +1467,53 @@ scout.Planner.prototype._setSelectedActivity = function(selectedActivity) {
   }
   this._setProperty('selectedActivity', selectedActivity);
   this.session.onRequestsDone(this._updateMenuBar.bind(this));
-};
+}
 
-scout.Planner.prototype._removeSelectedActivity = function() {
+_removeSelectedActivity() {
   if (this.selectedActivity && this.selectedActivity.$activity) {
     this.selectedActivity.$activity.removeClass('selected');
   }
-};
+}
 
-scout.Planner.prototype._renderSelectedActivity = function() {
+_renderSelectedActivity() {
   if (this.selectedActivity && this.selectedActivity.$activity) {
     this.selectedActivity.$activity.addClass('selected');
   }
-};
+}
 
-scout.Planner.prototype._renderLabel = function() {
+_renderLabel() {
   var label = this.label || '';
   if (this.$scaleTitle) {
     this.$scaleTitle.text(label);
   }
-};
+}
 
-scout.Planner.prototype._resourcesByIds = function(ids) {
+_resourcesByIds(ids) {
   return ids.map(this._resourceById.bind(this));
-};
+}
 
-scout.Planner.prototype._activityById = function(id) {
+_activityById(id) {
   return this.activityMap[id];
-};
+}
 
-scout.Planner.prototype._resourceById = function(id) {
+_resourceById(id) {
   return this.resourceMap[id];
-};
+}
 
-scout.Planner.prototype.setDisplayMode = function(displayMode) {
+setDisplayMode(displayMode) {
   this.setProperty('displayMode', displayMode);
   this.startRange = null;
   this.lastRange = null;
-};
+}
 
-scout.Planner.prototype.layoutYearPanel = function() {
+layoutYearPanel() {
   if (this.yearPanelVisible) {
-    scout.scrollbars.update(this._yearPanel.$yearList);
+    scrollbars.update(this._yearPanel.$yearList);
     this._yearPanel._scrollYear();
   }
-};
+}
 
-scout.Planner.prototype.setYearPanelVisible = function(visible) {
+setYearPanelVisible(visible) {
   if (this.yearPanelVisible === visible) {
     return;
   }
@@ -1496,18 +1521,18 @@ scout.Planner.prototype.setYearPanelVisible = function(visible) {
   if (this.rendered) {
     this._renderYearPanelVisible(true);
   }
-};
+}
 
-scout.Planner.prototype.setViewRangeFrom = function(date) {
+setViewRangeFrom(date) {
   var diff = this.viewRange.to.getTime() - this.viewRange.from.getTime(),
-    viewRange = new scout.DateRange(this.viewRange.from, this.viewRange.to);
+    viewRange = new DateRange(this.viewRange.from, this.viewRange.to);
 
   viewRange.from = date;
   viewRange.to = new Date(date.getTime() + diff);
   this.setViewRange(viewRange);
-};
+}
 
-scout.Planner.prototype.setViewRange = function(viewRange) {
+setViewRange(viewRange) {
   if (this.viewRange === viewRange) {
     return;
   }
@@ -1519,25 +1544,25 @@ scout.Planner.prototype.setViewRange = function(viewRange) {
     this._renderSelectedActivity();
     this.validateLayoutTree();
   }
-};
+}
 
-scout.Planner.prototype.selectRange = function(range) {
+selectRange(range) {
   if (range && range.equals(this.selectionRange)) {
     return;
   }
   this.setProperty('selectionRange', range);
-};
+}
 
-scout.Planner.prototype.selectActivity = function(activity) {
+selectActivity(activity) {
   this.setProperty('selectedActivity', activity);
-};
+}
 
-scout.Planner.prototype.selectResources = function(resources) {
-  if (scout.arrays.equals(resources, this.selectedResources)) {
+selectResources(resources) {
+  if (arrays.equals(resources, this.selectedResources)) {
     return;
   }
 
-  resources = scout.arrays.ensure(resources);
+  resources = arrays.ensure(resources);
   // Make a copy so that original array stays untouched
   resources = resources.slice();
   this.setProperty('selectedResources', resources);
@@ -1549,23 +1574,23 @@ scout.Planner.prototype.selectResources = function(resources) {
     // Render selection range as well for the case if selectedRange does not change but selected resources do
     this._renderSelectionRange();
   }
-};
+}
 
 /**
  * Returns true if a deselection happened. False if the given resources were not selected at all.
  */
-scout.Planner.prototype.deselectResources = function(resources) {
+deselectResources(resources) {
   var deselected = false;
-  resources = scout.arrays.ensure(resources);
+  resources = arrays.ensure(resources);
   var selectedResources = this.selectedResources.slice(); // copy
-  if (scout.arrays.removeAll(selectedResources, resources)) {
+  if (arrays.removeAll(selectedResources, resources)) {
     this.selectResources(selectedResources);
     deselected = true;
   }
   return deselected;
-};
+}
 
-scout.Planner.prototype.insertResources = function(resources) {
+insertResources(resources) {
   // Update model
   resources.forEach(function(resource) {
     this._initResource(resource);
@@ -1578,15 +1603,15 @@ scout.Planner.prototype.insertResources = function(resources) {
     this._renderResources(resources);
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Planner.prototype.deleteResources = function(resources) {
+deleteResources(resources) {
   if (this.deselectResources(resources)) {
-    this.selectRange(new scout.DateRange());
+    this.selectRange(new DateRange());
   }
   resources.forEach(function(resource) {
     // Update model
-    scout.arrays.remove(this.resources, resource);
+    arrays.remove(this.resources, resource);
     delete this.resourceMap[resource.id];
 
     resource.activities.forEach(function(activity) {
@@ -1601,9 +1626,9 @@ scout.Planner.prototype.deleteResources = function(resources) {
   }.bind(this));
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.Planner.prototype.deleteAllResources = function() {
+deleteAllResources() {
   // Update HTML
   if (this.rendered) {
     this._removeAllResources();
@@ -1615,10 +1640,10 @@ scout.Planner.prototype.deleteAllResources = function() {
   this.resourceMap = {};
   this.activityMap = {};
   this.selectResources([]);
-  this.selectRange(new scout.DateRange());
-};
+  this.selectRange(new DateRange());
+}
 
-scout.Planner.prototype.updateResources = function(resources) {
+updateResources(resources) {
   resources.forEach(function(updatedResource) {
     var oldResource = this.resourceMap[updatedResource.id];
     if (!oldResource) {
@@ -1627,8 +1652,8 @@ scout.Planner.prototype.updateResources = function(resources) {
 
     // Replace old resource
     this._initResource(updatedResource);
-    scout.arrays.replace(this.resources, oldResource, updatedResource);
-    scout.arrays.replace(this.selectedResources, oldResource, updatedResource);
+    arrays.replace(this.resources, oldResource, updatedResource);
+    arrays.replace(this.selectedResources, oldResource, updatedResource);
 
     // Replace old $resource
     if (this.rendered && oldResource.$resource) {
@@ -1639,4 +1664,5 @@ scout.Planner.prototype.updateResources = function(resources) {
       this._linkActivitiesForResource(updatedResource);
     }
   }.bind(this));
-};
+}
+}

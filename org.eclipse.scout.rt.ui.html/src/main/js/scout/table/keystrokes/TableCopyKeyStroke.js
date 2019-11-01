@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableCopyKeyStroke = function(table) {
-  scout.TableCopyKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableCopyKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
-  this.which = [scout.keys.C];
+  this.which = [keys.C];
   this.ctrl = true;
   this.renderingHints.render = false;
-};
-scout.inherits(scout.TableCopyKeyStroke, scout.KeyStroke);
+}
 
-scout.TableCopyKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.exportToClipboard();
-};
+}
+}

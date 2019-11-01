@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RowLayout = function(options) {
-  scout.RowLayout.parent.call(this);
+import {AbstractLayout} from '../index';
+import {Dimension} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class RowLayout extends AbstractLayout {
+
+constructor(options) {
+  super();
   options = options || {};
   this.pixelBasedSizing = scout.nvl(options.pixelBasedSizing, true);
   this.stretch = scout.nvl(options.stretch, true);
@@ -23,17 +31,17 @@ scout.RowLayout = function(options) {
   // +-----------------+
   // |                 |
   // +-----------------+
-};
-scout.inherits(scout.RowLayout, scout.AbstractLayout);
+}
 
-scout.RowLayout.prototype.layout = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container);
+
+layout($container) {
+  var htmlComp = HtmlComponent.get($container);
   var containerSize = htmlComp.availableSize()
     .subtract(htmlComp.insets());
 
   $container.children().each(function(index, elem) {
     var $elem = $(elem);
-    var htmlChild = scout.HtmlComponent.optGet($elem);
+    var htmlChild = HtmlComponent.optGet($elem);
     if (!htmlChild || !$elem.isVisible()) {
       return;
     }
@@ -52,16 +60,16 @@ scout.RowLayout.prototype.layout = function($container) {
 
     htmlChild.setSize(prefSize);
   }.bind(this));
-};
+}
 
-scout.RowLayout.prototype.preferredLayoutSize = function($container, options) {
-  var prefSize = new scout.Dimension(),
-    htmlContainer = scout.HtmlComponent.get($container),
+preferredLayoutSize($container, options) {
+  var prefSize = new Dimension(),
+    htmlContainer = HtmlComponent.get($container),
     maxWidth = 0;
 
   $container.children().each(function(index, elem) {
     var $elem = $(elem);
-    var htmlChild = scout.HtmlComponent.optGet($elem);
+    var htmlChild = HtmlComponent.optGet($elem);
     if (!htmlChild || !$elem.isVisible()) {
       return;
     }
@@ -74,4 +82,5 @@ scout.RowLayout.prototype.preferredLayoutSize = function($container, options) {
 
   prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
-};
+}
+}

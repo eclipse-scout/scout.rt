@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlaceholderField = function() {
-  scout.PlaceholderField.parent.call(this);
-};
-scout.inherits(scout.PlaceholderField, scout.FormField);
+import {FormField} from '../../../index';
 
-scout.PlaceholderField.prototype._render = function() {
+export default class PlaceholderField extends FormField {
+
+constructor() {
+  super();
+}
+
+
+_render() {
   this.addContainer(this.$parent, 'placeholder-field');
-};
+}
+}

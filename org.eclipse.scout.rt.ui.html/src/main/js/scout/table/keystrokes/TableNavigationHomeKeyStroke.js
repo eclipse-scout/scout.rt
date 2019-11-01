@@ -8,9 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationHomeKeyStroke = function(table) {
-  scout.TableNavigationHomeKeyStroke.parent.call(this, table);
-  this.which = [scout.keys.HOME];
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+import {arrays} from '../../index';
+
+export default class TableNavigationHomeKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
+  this.which = [keys.HOME];
   this.renderingHints.text = 'Home';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var viewport = this._viewportInfo();
@@ -18,13 +24,13 @@ scout.TableNavigationHomeKeyStroke = function(table) {
       return viewport.firstRow.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationHomeKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var table = this.field,
     rows = table.visibleRows,
-    firstRow = scout.arrays.first(rows),
+    firstRow = arrays.first(rows),
     selectedRows = table.selectedRows,
     newSelectedRows = [],
     lastActionRow = table.selectionHandler.lastActionRow,
@@ -36,15 +42,16 @@ scout.TableNavigationHomeKeyStroke.prototype.handle = function(event) {
     }
     // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
     if (lastActionRowIndex < 0) {
-      lastActionRow = scout.arrays.first(selectedRows);
+      lastActionRow = arrays.first(selectedRows);
       lastActionRowIndex = rows.indexOf(lastActionRow);
     }
     newSelectedRows = rows.slice(0, lastActionRowIndex);
-    newSelectedRows = scout.arrays.union(newSelectedRows, selectedRows);
+    newSelectedRows = arrays.union(newSelectedRows, selectedRows);
   } else {
     newSelectedRows = firstRow;
   }
   table.selectionHandler.lastActionRow = firstRow;
   table.selectRows(newSelectedRows);
   table.scrollTo(firstRow);
-};
+}
+}

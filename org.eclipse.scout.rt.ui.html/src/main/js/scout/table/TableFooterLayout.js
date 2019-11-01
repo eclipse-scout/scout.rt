@@ -8,24 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableFooterLayout = function(tableFooter) {
-  scout.TableFooterLayout.parent.call(this);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
+import * as $ from 'jquery';
+
+export default class TableFooterLayout extends AbstractLayout {
+
+constructor(tableFooter) {
+  super();
   this._tableFooter = tableFooter;
-};
-scout.inherits(scout.TableFooterLayout, scout.AbstractLayout);
+}
+
 
 /**
  * @override
  */
-scout.TableFooterLayout.prototype.layout = function($container) {
+layout($container) {
   var contentFits, controlsWidth, infoWidth,
     $controls = this._tableFooter._$controls,
     $info = this._tableFooter._$info,
     $infoItems = $info.find('.table-info-item'),
-    containerWidth = scout.graphics.size($container).width;
+    containerWidth = graphics.size($container).width;
 
-  controlsWidth = scout.graphics.size($controls, true).width;
-  infoWidth = scout.graphics.size($info).width;
+  controlsWidth = graphics.size($controls, true).width;
+  infoWidth = graphics.size($info).width;
 
   // Remove width to make sure elements are as width as they want to be
   $infoItems.each(function() {
@@ -43,7 +49,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     this._tableFooter._compactStyle = false;
     this._tableFooter._renderInfo();
   }
-  infoWidth = scout.graphics.size($info).width;
+  infoWidth = graphics.size($info).width;
   if (controlsWidth + infoWidth <= containerWidth) {
     // Make sure table info tooltip is not shown anymore (only available in compact style)
     if (this._tableFooter._tableInfoTooltip) {
@@ -57,7 +63,7 @@ scout.TableFooterLayout.prototype.layout = function($container) {
     this._tableFooter._compactStyle = true;
     this._tableFooter._renderInfo();
 
-    infoWidth = scout.graphics.size($info).width;
+    infoWidth = graphics.size($info).width;
     if (controlsWidth + infoWidth <= containerWidth) {
       contentFits = true;
     }
@@ -80,9 +86,9 @@ scout.TableFooterLayout.prototype.layout = function($container) {
   this._tableFooter.table.tableControls.forEach(function(control) {
     control.revalidateLayout();
   });
-};
+}
 
-scout.TableFooterLayout.prototype._setInfoItemsSize = function($infoItems, animated) {
+_setInfoItemsSize($infoItems, animated) {
   $infoItems.each(function() {
     var $item = $(this);
     if ($item.isVisible() && !$item.data('hiding')) {
@@ -98,4 +104,5 @@ scout.TableFooterLayout.prototype._setInfoItemsSize = function($infoItems, anima
       }
     }
   });
-};
+}
+}

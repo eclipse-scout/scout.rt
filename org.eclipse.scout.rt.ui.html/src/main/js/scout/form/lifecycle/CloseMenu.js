@@ -8,29 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CloseMenu = function() {
-  scout.CloseMenu.parent.call(this);
+import {Menu} from '../../index';
+import {Action} from '../../index';
+import {Button} from '../../index';
+import {scout} from '../../index';
+import {Form} from '../../index';
+import {Event} from '../../index';
 
-  this.actionStyle = scout.Action.ActionStyle.BUTTON;
+export default class CloseMenu extends Menu {
+
+constructor() {
+  super();
+
+  this.actionStyle = Action.ActionStyle.BUTTON;
   this.keyStroke = 'esc';
-  this.systemType = scout.Button.SystemType.CLOSE;
+  this.systemType = Button.SystemType.CLOSE;
   this.inheritAccessibility = false;
-};
-scout.inherits(scout.CloseMenu, scout.Menu);
+}
 
-scout.CloseMenu.prototype._init = function(model) {
-  scout.CloseMenu.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.text = scout.nvl(this.text, this.session.text('CloseButton'));
-};
+}
 
-scout.CloseMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
+getForm() {
+  return Form.findForm(this);
+}
 
-scout.CloseMenu.prototype._doAction = function() {
-  var event = new scout.Event();
+_doAction() {
+  var event = new Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
     this.getForm().close();
   }
-};
+}
+}

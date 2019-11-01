@@ -12,9 +12,11 @@
 /**
  * @see: org.eclipse.scout.rt.client.ui.form.fields.smartfield.result.IQueryParam.QueryBy
  */
-scout.QueryBy = {
+const QueryBy = {
   ALL: 'ALL',
   TEXT: 'TEXT',
   KEY: 'KEY',
   REC: 'REC'
 };
+
+export default QueryBy;

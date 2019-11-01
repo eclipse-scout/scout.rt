@@ -8,8 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StringField = function() {
-  scout.StringField.parent.call(this);
+import {fields} from '../../../index';
+import {Status} from '../../../index';
+import {StringFieldLayout} from '../../../index';
+import {StringFieldCtrlEnterKeyStroke} from '../../../index';
+import {texts} from '../../../index';
+import {strings} from '../../../index';
+import {scout} from '../../../index';
+import {InputFieldKeyStrokeContext} from '../../../index';
+import {BasicField} from '../../../index';
+import {StringFieldEnterKeyStroke} from '../../../index';
+import {objects} from '../../../index';
+import {arrays} from '../../../index';
+import {Scrollbar} from '../../../index';
+
+export default class StringField extends BasicField {
+
+constructor() {
+  super();
 
   this.format;
   this.hasAction = false;
@@ -25,46 +41,46 @@ scout.StringField = function() {
   this.wrapText = false;
 
   this._onSelectionChangingActionHandler = this._onSelectionChangingAction.bind(this);
-};
-scout.inherits(scout.StringField, scout.BasicField);
+}
 
-scout.StringField.Format = {
+
+static Format = {
   LOWER: 'a' /* IStringField.FORMAT_LOWER */ ,
   UPPER: 'A' /* IStringField.FORMAT_UPPER */
 };
 
-scout.StringField.TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
+static TRIM_REGEXP = new RegExp('^(\\s*)(.*?)(\\s*)$');
 
 /**
  * Resolves the text key if value contains one.
  * This cannot be done in _init because the value field would call _setValue first
  */
-scout.StringField.prototype._initValue = function(value) {
-  value = scout.texts.resolveText(value, this.session.locale.languageTag);
-  scout.StringField.parent.prototype._initValue.call(this, value);
-};
+_initValue(value) {
+  value = texts.resolveText(value, this.session.locale.languageTag);
+  super._initValue( value);
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.StringField.prototype._initKeyStrokeContext = function() {
-  scout.StringField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.StringFieldEnterKeyStroke(this),
-    new scout.StringFieldCtrlEnterKeyStroke(this)
+    new StringFieldEnterKeyStroke(this),
+    new StringFieldCtrlEnterKeyStroke(this)
   ]);
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.StringField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new InputFieldKeyStrokeContext();
+}
 
-scout.StringField.prototype._render = function() {
-  this.addContainer(this.$parent, 'string-field', new scout.StringFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'string-field', new StringFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
 
@@ -73,15 +89,15 @@ scout.StringField.prototype._render = function() {
     $field = this._makeMultilineField();
     this.$container.addClass('multiline');
   } else {
-    $field = scout.fields.makeTextField(this.$parent);
+    $field = fields.makeTextField(this.$parent);
   }
   $field.on('paste', this._onFieldPaste.bind(this));
 
   this.addField($field);
   this.addStatus();
-};
+}
 
-scout.StringField.prototype._makeMultilineField = function() {
+_makeMultilineField() {
   var mouseDownHandler = function() {
     this.mouseClicked = true;
   }.bind(this);
@@ -106,10 +122,10 @@ scout.StringField.prototype._makeMultilineField = function() {
       this.$field.on('mousedown', mouseDownHandler);
     }.bind(this))
     .addDeviceClass();
-};
+}
 
-scout.StringField.prototype._onFieldBlur = function() {
-  scout.StringField.parent.prototype._onFieldBlur.call(this);
+_onFieldBlur() {
+  super._onFieldBlur();
   if (this.multilineText) {
     this._updateSelection();
   }
@@ -117,9 +133,9 @@ scout.StringField.prototype._onFieldBlur = function() {
     // Restore obfuscated display text.
     this.$field.val(this.displayText);
   }
-};
+}
 
-scout.StringField.prototype._onMouseWheel = function(event) {
+_onMouseWheel(event) {
   event = event.originalEvent || this.$container.window(true).event.originalEvent;
   var delta = event.wheelDelta ? -event.wheelDelta : event.detail;
   var scrollTop = this.$field[0].scrollTop;
@@ -133,12 +149,12 @@ scout.StringField.prototype._onMouseWheel = function(event) {
     this.$field[0].scrollTop = maxScrollTop; // Ensure it is really at the bottom (not -1px above)
     return;
   }
-  // Don't allow others to scroll (e.g. scout.Scrollbar) while scrolling in the text area
+  // Don't allow others to scroll (e.g. Scrollbar) while scrolling in the text area
   event.stopPropagation();
-};
+}
 
-scout.StringField.prototype._renderProperties = function() {
-  scout.StringField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
 
   this._renderInputMasked();
   this._renderWrapText();
@@ -151,29 +167,29 @@ scout.StringField.prototype._renderProperties = function() {
   // be set to <textarea>s in IE. Instead, the selection is rendered when the focus has entered
   // the field, see _render(). #168648
   this._renderDropType();
-};
+}
 
 /**
  * Adds a click handler instead of a mouse down handler because it executes an action.
  * @override
  */
-scout.StringField.prototype.addIcon = function() {
-  this.$icon = scout.fields.appendIcon(this.$container)
+addIcon() {
+  this.$icon = fields.appendIcon(this.$container)
     .on('click', this._onIconClick.bind(this));
-};
+}
 
 /**
  * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
  */
-scout.StringField.prototype.isClearable = function() {
-  return scout.StringField.parent.prototype.isClearable.call(this) && !this.multilineText;
-};
+isClearable() {
+  return super.isClearable() && !this.multilineText;
+}
 
-scout.StringField.prototype.setMaxLength = function(maxLength) {
+setMaxLength(maxLength) {
   this.setProperty('maxLength', maxLength);
-};
+}
 
-scout.StringField.prototype._renderMaxLength = function() {
+_renderMaxLength() {
   // Check if "maxLength" attribute is supported by browser
   if (this.$field[0].maxLength) {
     this.$field.attr('maxlength', this.maxLength);
@@ -196,33 +212,33 @@ scout.StringField.prototype._renderMaxLength = function() {
       this.$field.val(text.slice(0, this.maxLength));
     }
   }
-};
+}
 
-scout.StringField.prototype.setSelectionStart = function(selectionStart) {
+setSelectionStart(selectionStart) {
   this.setProperty('selectionStart', selectionStart);
-};
+}
 
-scout.StringField.prototype._renderSelectionStart = function() {
+_renderSelectionStart() {
   if (scout.nvl(this.selectionStart, null) !== null) {
     this.$field[0].selectionStart = this.selectionStart;
   }
-};
+}
 
-scout.StringField.prototype.setSelectionEnd = function(selectionEnd) {
+setSelectionEnd(selectionEnd) {
   this.setProperty('selectionEnd', selectionEnd);
-};
+}
 
-scout.StringField.prototype._renderSelectionEnd = function() {
+_renderSelectionEnd() {
   if (scout.nvl(this.selectionEnd, null) !== null) {
     this.$field[0].selectionEnd = this.selectionEnd;
   }
-};
+}
 
-scout.StringField.prototype.setSelectionTrackingEnabled = function(selectionTrackingEnabled) {
+setSelectionTrackingEnabled(selectionTrackingEnabled) {
   this.setProperty('selectionTrackingEnabled', selectionTrackingEnabled);
-};
+}
 
-scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
+_renderSelectionTrackingEnabled() {
   this.$field
     .off('select', this._onSelectionChangingActionHandler)
     .off('mousedown', this._onSelectionChangingActionHandler)
@@ -234,20 +250,20 @@ scout.StringField.prototype._renderSelectionTrackingEnabled = function() {
       .on('keydown', this._onSelectionChangingActionHandler)
       .on('input', this._onSelectionChangingActionHandler);
   }
-};
+}
 
-scout.StringField.prototype.setInputMasked = function(inputMasked) {
+setInputMasked(inputMasked) {
   this.setProperty('inputMasked', inputMasked);
-};
+}
 
-scout.StringField.prototype._renderInputMasked = function() {
+_renderInputMasked() {
   if (this.multilineText) {
     return;
   }
   this.$field.attr('type', (this.inputMasked ? 'password' : 'text'));
-};
+}
 
-scout.StringField.prototype._renderInputObfuscated = function() {
+_renderInputObfuscated() {
   if (this.inputObfuscated && this.focused) {
     // If a new display text is set (e.g. because value in model changed) and field is focused,
     // do not display new display text but clear content (as in _onFieldFocus).
@@ -255,13 +271,13 @@ scout.StringField.prototype._renderInputObfuscated = function() {
     // (inputObfuscated flag might be still in the old state in _renderDisplayText).
     this.$field.val('');
   }
-};
+}
 
-scout.StringField.prototype.setHasAction = function(hasAction) {
+setHasAction(hasAction) {
   this.setProperty('hasAction', hasAction);
-};
+}
 
-scout.StringField.prototype._renderHasAction = function() {
+_renderHasAction() {
   if (this.hasAction) {
     if (!this.$icon) {
       this.addIcon();
@@ -272,54 +288,54 @@ scout.StringField.prototype._renderHasAction = function() {
     this.$container.removeClass('has-icon');
   }
   this.revalidateLayout();
-};
+}
 
-scout.StringField.prototype.setFormatUpper = function(formatUpper) {
+setFormatUpper(formatUpper) {
   if (formatUpper) {
-    this.setFormat(scout.StringField.Format.UPPER);
+    this.setFormat(StringField.Format.UPPER);
   } else {
     this.setFormat(null);
   }
-};
+}
 
-scout.StringField.prototype.setFormatLower = function(formatLower) {
+setFormatLower(formatLower) {
   if (formatLower) {
-    this.setFormat(scout.StringField.Format.LOWER);
+    this.setFormat(StringField.Format.LOWER);
   } else {
     this.setFormat(null);
   }
-};
+}
 
-scout.StringField.prototype.setFormat = function(format) {
+setFormat(format) {
   this.setProperty('format', format);
-};
+}
 
-scout.StringField.prototype._renderFormat = function() {
-  if (this.format === scout.StringField.Format.LOWER) {
+_renderFormat() {
+  if (this.format === StringField.Format.LOWER) {
     this.$field.css('text-transform', 'lowercase');
-  } else if (this.format === scout.StringField.Format.UPPER) {
+  } else if (this.format === StringField.Format.UPPER) {
     this.$field.css('text-transform', 'uppercase');
   } else {
     this.$field.css('text-transform', '');
   }
-};
+}
 
-scout.StringField.prototype.setSpellCheckEnabled = function(spellCheckEnabled) {
+setSpellCheckEnabled(spellCheckEnabled) {
   this.setProperty('spellCheckEnabled', spellCheckEnabled);
-};
+}
 
-scout.StringField.prototype._renderSpellCheckEnabled = function() {
+_renderSpellCheckEnabled() {
   if (this.spellCheckEnabled) {
     this.$field.attr('spellcheck', 'true');
   } else {
     this.$field.attr('spellcheck', 'false');
   }
-};
+}
 
 /**
  * @override
  */
-scout.StringField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   if (this.inputObfuscated && this.focused) {
     // If a new display text is set (e.g. because value in model changed) and field is focused,
     // do not display new display text but clear content (as in _onFieldFocus).
@@ -329,14 +345,14 @@ scout.StringField.prototype._renderDisplayText = function() {
     return;
   }
 
-  var displayText = scout.strings.nvl(this.displayText);
-  var oldDisplayText = scout.strings.nvl(this.$field.val());
+  var displayText = strings.nvl(this.displayText);
+  var oldDisplayText = strings.nvl(this.$field.val());
   var oldSelection = this._getSelection();
-  scout.StringField.parent.prototype._renderDisplayText.call(this);
+  super._renderDisplayText();
   // Try to keep the current selection for cases where the old and new display
   // text only differ because of the automatic trimming.
   if (this.trimText && oldDisplayText !== displayText) {
-    var matches = oldDisplayText.match(scout.StringField.TRIM_REGEXP);
+    var matches = oldDisplayText.match(StringField.TRIM_REGEXP);
     if (matches && matches[2] === displayText) {
       this._setSelection({
         start: Math.max(oldSelection.start - matches[1].length, 0),
@@ -344,17 +360,17 @@ scout.StringField.prototype._renderDisplayText = function() {
       });
     }
   }
-};
+}
 
-scout.StringField.prototype.insertText = function(text) {
+insertText(text) {
   if (!this.rendered) {
     this._postRenderActions.push(this.insertText.bind(this, text));
     return;
   }
   this._insertText(text);
-};
+}
 
-scout.StringField.prototype._insertText = function(textToInsert) {
+_insertText(textToInsert) {
   if (!textToInsert) {
     return;
   }
@@ -376,53 +392,53 @@ scout.StringField.prototype._insertText = function(textToInsert) {
     this.acceptInput(true);
   }
   this.acceptInput();
-};
+}
 
-scout.StringField.prototype._applyTextToSelection = function(text, textToInsert, selection) {
+_applyTextToSelection(text, textToInsert, selection) {
   if (this.inputObfuscated) {
     // Use empty text when input is obfuscated, otherwise text will be added to obfuscated text
     text = '';
   }
   return text.slice(0, selection.start) + textToInsert + text.slice(selection.end);
-};
+}
 
-scout.StringField.prototype.setWrapText = function(wrapText) {
+setWrapText(wrapText) {
   this.setProperty('wrapText', wrapText);
-};
+}
 
-scout.StringField.prototype._renderWrapText = function() {
+_renderWrapText() {
   this.$field.attr('wrap', this.wrapText ? 'soft' : 'off');
-};
+}
 
-scout.StringField.prototype.setTrimText = function(trimText) {
+setTrimText(trimText) {
   this.setProperty('trimText', trimText);
-};
+}
 
-scout.StringField.prototype._renderTrimText = function() {
+_renderTrimText() {
   // nop, property used in _validateDisplayText()
-};
+}
 
-scout.StringField.prototype._renderGridData = function() {
-  scout.StringField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this.updateInnerAlignment({
     useHorizontalAlignment: (this.multilineText ? false : true)
   });
-};
+}
 
-scout.StringField.prototype._renderGridDataHints = function() {
-  scout.StringField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.StringField.prototype._onIconClick = function(event) {
+_onIconClick(event) {
   this.acceptInput();
   this.$field.focus();
   this.trigger('action');
-};
+}
 
-scout.StringField.prototype._onSelectionChangingAction = function(event) {
+_onSelectionChangingAction(event) {
   if (event.type === 'mousedown') {
     this.$field.window().one('mouseup.stringfield', function() {
       // For some reason, when clicking side an existing selection (which clears the selection), the old
@@ -436,9 +452,9 @@ scout.StringField.prototype._onSelectionChangingAction = function(event) {
   } else {
     this._updateSelection();
   }
-};
+}
 
-scout.StringField.prototype._getSelection = function() {
+_getSelection() {
   var start = scout.nvl(this.$field[0].selectionStart, null);
   var end = scout.nvl(this.$field[0].selectionEnd, null);
   if (start === null || end === null) {
@@ -449,9 +465,9 @@ scout.StringField.prototype._getSelection = function() {
     start: start,
     end: end
   };
-};
+}
 
-scout.StringField.prototype._setSelection = function(selectionStart, selectionEnd) {
+_setSelection(selectionStart, selectionEnd) {
   if (typeof selectionStart === 'number') {
     selectionEnd = scout.nvl(selectionEnd, selectionStart);
   } else if (typeof selectionStart === 'object') {
@@ -461,9 +477,9 @@ scout.StringField.prototype._setSelection = function(selectionStart, selectionEn
   this.$field[0].selectionStart = selectionStart;
   this.$field[0].selectionEnd = selectionEnd;
   this._updateSelection();
-};
+}
 
-scout.StringField.prototype._updateSelection = function() {
+_updateSelection() {
   var oldSelectionStart = this.selectionStart;
   var oldSelectionEnd = this.selectionEnd;
   this.selectionStart = this.$field[0].selectionStart;
@@ -474,61 +490,61 @@ scout.StringField.prototype._updateSelection = function() {
       this.triggerSelectionChange();
     }
   }
-};
+}
 
-scout.StringField.prototype.triggerSelectionChange = function() {
+triggerSelectionChange() {
   this.trigger('selectionChange', {
     selectionStart: this.selectionStart,
     selectionEnd: this.selectionEnd
   });
-};
+}
 
-scout.StringField.prototype._validateValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_validateValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return value;
   }
-  value = scout.strings.asString(value);
+  value = strings.asString(value);
   if (this.trimText) {
     value = value.trim();
   }
-  return scout.StringField.parent.prototype._validateValue(value);
-};
+  return super._validateValue(value);
+}
 
 /**
  * @override ValueField.js
  */
-scout.StringField.prototype._clear = function() {
-  scout.StringField.parent.prototype._clear.call(this);
+_clear() {
+  super._clear();
 
   // Disable obfuscation when user clicks on clear icon.
   this.inputObfuscated = false;
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.StringField.prototype._updateEmpty = function() {
-  this.empty = scout.strings.empty(this.value);
-};
+_updateEmpty() {
+  this.empty = strings.empty(this.value);
+}
 
 /**
  * @override ValueField.js
  */
-scout.StringField.prototype.acceptInput = function(whileTyping) {
+acceptInput(whileTyping) {
   var displayText = scout.nvl(this._readDisplayText(), '');
   if (this.inputObfuscated && displayText !== '') {
     // Disable obfuscation if user has typed text (on focus, field will be cleared if obfuscated, so any typed text is new text).
     this.inputObfuscated = false;
   }
 
-  scout.StringField.parent.prototype.acceptInput.call(this, whileTyping);
-};
+  super.acceptInput( whileTyping);
+}
 
 /**
  * @override BasicField.js
  */
-scout.StringField.prototype._onFieldFocus = function(event) {
-  scout.StringField.parent.prototype._onFieldFocus.call(this, event);
+_onFieldFocus(event) {
+  super._onFieldFocus( event);
 
   if (this.inputObfuscated) {
     this.$field.val('');
@@ -543,18 +559,18 @@ scout.StringField.prototype._onFieldFocus = function(event) {
       $field.selectionEnd = 0;
     }.bind(this));
   }
-};
+}
 
 /**
  * Get clipboard data, different strategies for browsers.
  * Must use a callback because this is required by Chrome's clipboard API.
  */
-scout.StringField.prototype._getClipboardData = function(event, doneHandler) {
+_getClipboardData(event, doneHandler) {
   var data = event.originalEvent.clipboardData || this.$container.window(true).clipboardData;
   if (data) {
     // Chrome, Firefox
     if (data.items && data.items.length) {
-      var item = scout.arrays.find(data.items, function(item) {
+      var item = arrays.find(data.items, function(item) {
         return item.type === 'text/plain';
       });
       if (item) {
@@ -570,9 +586,9 @@ scout.StringField.prototype._getClipboardData = function(event, doneHandler) {
   }
 
   // Can't access clipboard -> don't call done handler
-};
+}
 
-scout.StringField.prototype._onFieldPaste = function(event) {
+_onFieldPaste(event) {
   // must store text and selection because when the callback is executed, the clipboard content has already been applied to the input field
   var text = this.$field.val();
   var selection = this._getSelection();
@@ -589,21 +605,21 @@ scout.StringField.prototype._onFieldPaste = function(event) {
     }
 
   }.bind(this));
-};
+}
 
-scout.StringField.prototype._showNotification = function(textKey) {
+_showNotification(textKey) {
   scout.create('DesktopNotification', {
     parent: this,
-    severity: scout.Status.Severity.WARNING,
+    severity: Status.Severity.WARNING,
     message: this.session.text(textKey)
   }).show();
-};
+}
 
 /**
  * @override BasicField.js
  */
-scout.StringField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
-  var displayTextChanged = scout.StringField.parent.prototype._checkDisplayTextChanged.call(this, displayText, whileTyping);
+_checkDisplayTextChanged(displayText, whileTyping) {
+  var displayTextChanged = super._checkDisplayTextChanged( displayText, whileTyping);
 
   // Display text hasn't changed if input is obfuscated and current display text is empty (because field will be cleared if user focuses obfuscated text field).
   if (displayTextChanged && this.inputObfuscated && displayText === '') {
@@ -611,4 +627,5 @@ scout.StringField.prototype._checkDisplayTextChanged = function(displayText, whi
   }
 
   return displayTextChanged;
-};
+}
+}

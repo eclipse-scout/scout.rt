@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {scout} from '../index';
+
 /**
  * @param {object} options The following properties are supported:
  *  widget                  Widget that created the loading support
@@ -15,7 +18,9 @@
  *                          set the $container of the widget is used by default (see _ensureContainer).
  *  [loadingIndicatorDelay] if not set: 250 ms
  */
-scout.LoadingSupport = function(options) {
+export default class LoadingSupport {
+
+constructor(options) {
   scout.assertParameter('widget', options.widget);
 
   this.widget = options.widget;
@@ -24,14 +29,14 @@ scout.LoadingSupport = function(options) {
 
   this._$loadingIndicator = null;
   this._loadingIndicatorTimeoutId = null;
-};
+}
 
-scout.LoadingSupport.prototype.setLoadingIndicatorDelay = function(loadingIndicatorDelay) {
+setLoadingIndicatorDelay(loadingIndicatorDelay) {
   this.loadingIndicatorDelay = loadingIndicatorDelay;
-};
+}
 
-scout.LoadingSupport.prototype._ensure$Container = function() {
-  if (scout.objects.isFunction(this.options$Container)) {
+_ensure$Container() {
+  if (objects.isFunction(this.options$Container)) {
     // resolve function provided by options.$container that returns a jQuery element
     this.$container = this.options$Container();
   } else if (this.options$Container) {
@@ -41,9 +46,9 @@ scout.LoadingSupport.prototype._ensure$Container = function() {
     // default: when no options.$container is not set, use jQuery element of widget
     this.$container = this.widget.$container;
   }
-};
+}
 
-scout.LoadingSupport.prototype.renderLoading = function() {
+renderLoading() {
   // Clear any pending loading function
   clearTimeout(this._loadingIndicatorTimeoutId);
   this._ensure$Container();
@@ -60,9 +65,9 @@ scout.LoadingSupport.prototype.renderLoading = function() {
     // remove loading indicator
     this._removeLoadingIndicator();
   }
-};
+}
 
-scout.LoadingSupport.prototype._renderLoadingIndicator = function() {
+_renderLoadingIndicator() {
   if (this._$loadingIndicator || !this.widget.rendered && !this.widget.rendering) {
     return;
   }
@@ -71,9 +76,9 @@ scout.LoadingSupport.prototype._renderLoadingIndicator = function() {
   this.$container.addClass('loading');
   // Create loading indicator
   this._$loadingIndicator = this.$container.appendDiv('loading-indicator');
-};
+}
 
-scout.LoadingSupport.prototype._removeLoadingIndicator = function() {
+_removeLoadingIndicator() {
   if (!this._$loadingIndicator) {
     return;
   }
@@ -86,11 +91,12 @@ scout.LoadingSupport.prototype._removeLoadingIndicator = function() {
       this.widget.invalidateLayoutTree();
     }
   }.bind(this));
-};
+}
 
-scout.LoadingSupport.prototype.remove = function() {
+remove() {
   if (this._$loadingIndicator) {
     this._$loadingIndicator.remove();
     this._$loadingIndicator = null;
   }
-};
+}
+}

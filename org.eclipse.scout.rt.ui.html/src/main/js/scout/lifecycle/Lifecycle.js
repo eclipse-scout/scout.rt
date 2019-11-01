@@ -8,6 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {MessageBoxes} from '../index';
+import {objects} from '../index';
+import {Status} from '../index';
+import {EventSupport} from '../index';
+import {MessageBox} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * Abstract base class for validation lifecycles as used for forms.
  * A subclass must set the properties, in order to display messages:
@@ -19,7 +27,9 @@
  * @constructor
  * @abstract
  */
-scout.Lifecycle = function() {
+export default class Lifecycle {
+
+constructor() {
   this.emptyMandatoryElementsTextKey = null;
   this.emptyMandatoryElementsText = null;
 
@@ -30,57 +40,57 @@ scout.Lifecycle = function() {
   this.askIfNeedSave = true;
   this.askIfNeedSaveText = null; // Java: cancelVerificationText
 
-  this.events = new scout.EventSupport();
+  this.events = new EventSupport();
   this.handlers = {
     'load': this._defaultLoad.bind(this),
     'save': this._defaultSave.bind(this)
   };
-};
+}
 
 // Info: doExportXml, doImportXml, doSaveWithoutMarkerChange is not supported in Html UI
 
-scout.Lifecycle.prototype.init = function(model) {
+init(model) {
   scout.assertParameter('widget', model.widget);
   $.extend(this, model);
-  if (scout.objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
+  if (objects.isNullOrUndefined(this.emptyMandatoryElementsText)) {
     this.emptyMandatoryElementsText = this.session().text(this.emptyMandatoryElementsTextKey);
   }
-  if (scout.objects.isNullOrUndefined(this.invalidElementsText)) {
+  if (objects.isNullOrUndefined(this.invalidElementsText)) {
     this.invalidElementsText = this.session().text(this.invalidElementsTextKey);
   }
-  if (scout.objects.isNullOrUndefined(this.askIfNeedSaveText)) {
+  if (objects.isNullOrUndefined(this.askIfNeedSaveText)) {
     this.askIfNeedSaveText = this.session().text(this.saveChangesQuestionTextKey);
   }
-};
+}
 
-scout.Lifecycle.prototype.load = function() {
+load() {
   return this._load().then(function() {
     this.markAsSaved();
     this.events.trigger('postLoad');
   }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._load = function() {
+_load() {
   return this.handlers.load()
     .then(function(status) {
       this.events.trigger('load');
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._defaultLoad = function() {
+_defaultLoad() {
   return $.resolvedPromise();
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype.ok = function() {
+ok() {
   // 1.) validate form
   return this._whenInvalid(this._validate)
     .then(function(invalid) {
@@ -104,12 +114,12 @@ scout.Lifecycle.prototype.ok = function() {
           return this.close();
         }.bind(this));
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype.cancel = function() {
+cancel() {
   var showMessageBox = this.requiresSave() && this.askIfNeedSave;
   if (showMessageBox) {
     return this._showYesNoCancelMessageBox(
@@ -119,39 +129,39 @@ scout.Lifecycle.prototype.cancel = function() {
   } else {
     return this.close();
   }
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype.reset = function() {
+reset() {
   this._reset();
 
   // reload the state
   return this.load().then(function() {
     this.events.trigger('reset');
   }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype.close = function() {
+close() {
   return this._close();
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._close = function() {
+_close() {
   this.events.trigger('close');
   return $.resolvedPromise();
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype.save = function() {
+save() {
   // 1.) validate form
   return this._whenInvalid(this._validate)
     .then(function(invalid) {
@@ -171,41 +181,41 @@ scout.Lifecycle.prototype.save = function() {
           this.markAsSaved();
         }.bind(this));
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._save = function() {
+_save() {
   return this.handlers.save()
     .then(function(status) {
       this.events.trigger('save');
       return status;
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._defaultSave = function() {
+_defaultSave() {
   return $.resolvedPromise();
-};
+}
 
-scout.Lifecycle.prototype.markAsSaved = function() {
+markAsSaved() {
   // NOP
-};
+}
 
 /**
  * Override this function to check if any data has changed and saving is required.
  * @returns {boolean}
  */
-scout.Lifecycle.prototype.requiresSave = function() {
+requiresSave() {
   return false;
-};
+}
 
-scout.Lifecycle.prototype.setAskIfNeedSave = function(askIfNeedSave) {
+setAskIfNeedSave(askIfNeedSave) {
   this.askIfNeedSave = askIfNeedSave;
-};
+}
 
 /**
  * Helper function to deal with functions that return a Status object.
@@ -213,13 +223,13 @@ scout.Lifecycle.prototype.setAskIfNeedSave = function(askIfNeedSave) {
  *
  * @returns {Promise} If the resulting promise is resolved with "true", the life cycle is considered invalid.
  *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
- *                    If the status returned by 'func' is absent or scout.Status.Severity.OK, a promise resolved with
+ *                    If the status returned by 'func' is absent or Status.Severity.OK, a promise resolved with
  *                    "false" is returned. Otherwise, the promise returned by _showStatusMessageBox() is returned.
  */
-scout.Lifecycle.prototype._whenInvalid = function(func) {
+_whenInvalid(func) {
   return func.call(this)
     .then(function(status) {
-      if (!status || status.severity === scout.Status.Severity.OK) {
+      if (!status || status.severity === Status.Severity.OK) {
         return $.resolvedPromise(false); // invalid=false
       }
       return this._showStatusMessageBox(status);
@@ -230,37 +240,37 @@ scout.Lifecycle.prototype._whenInvalid = function(func) {
 
   // See ValueField#_createInvalidValueStatus, has similar code to transfor error to status
   function errorToStatus(error) {
-    if (error instanceof scout.Status) {
+    if (error instanceof Status) {
       return error;
     }
     if (typeof error === 'string') {
-      return scout.Status.error({
+      return Status.error({
         message: error
       });
     }
-    return scout.Status.error({
+    return Status.error({
       message: error.message
     });
   }
-};
+}
 
-scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesAction, noAction) {
-  return scout.MessageBoxes.create(this.widget)
-    .withSeverity(scout.Status.Severity.WARNING)
+_showYesNoCancelMessageBox(message, yesAction, noAction) {
+  return MessageBoxes.create(this.widget)
+    .withSeverity(Status.Severity.WARNING)
     .withHeader(message)
     .withYes()
     .withNo()
     .withCancel()
     .buildAndOpen()
     .then(function(option) {
-      if (option === scout.MessageBox.Buttons.YES) {
+      if (option === MessageBox.Buttons.YES) {
         return yesAction();
-      } else if (option === scout.MessageBox.Buttons.NO) {
+      } else if (option === MessageBox.Buttons.NO) {
         return noAction();
       }
       return $.resolvedPromise();
     });
-};
+}
 
 /**
  * @param status
@@ -268,44 +278,44 @@ scout.Lifecycle.prototype._showYesNoCancelMessageBox = function(message, yesActi
  *                    Otherwise, the life cycle is considered valid and the store/save operation continues.
  *                    By default, a promise that is resolved with "true" is returned.
  */
-scout.Lifecycle.prototype._showStatusMessageBox = function(status) {
-  return scout.MessageBoxes.createOk(this.widget)
+_showStatusMessageBox(status) {
+  return MessageBoxes.createOk(this.widget)
     .withSeverity(status.severity)
     .withBody(status.message, true)
     .buildAndOpen()
     .then(function(option) {
-      var invalid = (status.severity === scout.Status.Severity.ERROR);
+      var invalid = (status.severity === Status.Severity.ERROR);
       return $.resolvedPromise(invalid);
     });
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.Lifecycle.prototype._validate = function() {
+_validate() {
   var status = this._validateElements();
   if (status.isValid()) {
     status = this._validateWidget();
   }
   return $.resolvedPromise(status);
-};
+}
 
 /**
  * Validates all elements (i.e form-fields) covered by the lifecycle and checks for missing or invalid elements.
  *
- * @return scout.Status
+ * @return Status
  */
-scout.Lifecycle.prototype._validateElements = function() {
+_validateElements() {
   var elements = this._invalidElements();
-  var status = new scout.Status();
+  var status = new Status();
   if (elements.missingElements.length === 0 && elements.invalidElements.length === 0) {
-    status.severity = scout.Status.Severity.OK;
+    status.severity = Status.Severity.OK;
   } else {
-    status.severity = scout.Status.Severity.ERROR;
+    status.severity = Status.Severity.ERROR;
     status.message = this._createInvalidElementsMessageHtml(elements.missingElements, elements.invalidElements);
   }
   return status;
-};
+}
 
 /**
  * Validates the widget (i.e. form) associated with this lifecycle. This function is only called when there are
@@ -313,11 +323,11 @@ scout.Lifecycle.prototype._validateElements = function() {
  * with a specific element or field. For instance you could validate if an internal member variable of a Lifecycle
  * or Form is set.
  *
- * @return scout.Status
+ * @return Status
  */
-scout.Lifecycle.prototype._validateWidget = function() {
-  return scout.Status.ok();
-};
+_validateWidget() {
+  return Status.ok();
+}
 
 /**
  * Override this function to check for invalid elements on the parent which prevent
@@ -328,17 +338,17 @@ scout.Lifecycle.prototype._validateWidget = function() {
  * missingElements: Elements which should have a value
  * invalidElements: Elements which have an invalid value
  */
-scout.Lifecycle.prototype._invalidElements = function() {
+_invalidElements() {
   return {
     missingElements: [],
     invalidElements: []
   };
-};
+}
 
 /**
  * Creates a HTML message used to display missing and invalid fields in a message box.
  */
-scout.Lifecycle.prototype._createInvalidElementsMessageHtml = function(missing, invalid) {
+_createInvalidElementsMessageHtml(missing, invalid) {
   var $div = $('<div>'),
     hasMissing = missing.length > 0,
     hasInvalid = invalid.length > 0;
@@ -362,53 +372,54 @@ scout.Lifecycle.prototype._createInvalidElementsMessageHtml = function(missing, 
       $ul.appendElement('<li>').text(elementTextFunc.call(this, element));
     }, this);
   }
-};
+}
 
 /**
  * Override this function to retrieve the text of an invalid element
  * @param element
  * @returns {String}
  */
-scout.Lifecycle.prototype._invalidElementText = function(element) {
+_invalidElementText(element) {
   return '';
-};
+}
 
 /**
  * Override this function to retrieve the text of an missing mandatory element
  * @param element
  * @returns {String}
  */
-scout.Lifecycle.prototype._missingElementText = function(element) {
+_missingElementText(element) {
   return '';
-};
+}
 
-scout.Lifecycle.prototype.session = function() {
+session() {
   return this.widget.session;
-};
+}
 
 /**
  * Register a handler function for save actions.
- * All handler functions must return a scout.Status. In case of an error a Status object with severity error must be returned.
+ * All handler functions must return a Status. In case of an error a Status object with severity error must be returned.
  * Note: in contrast to events, handlers can control the flow of the lifecycle. They also have a return value where events have none.
  *   Only one handler can be registered for each type.
  */
-scout.Lifecycle.prototype.handle = function(type, func) {
+handle(type, func) {
   var supportedTypes = ['load', 'save'];
   if (supportedTypes.indexOf(type) === -1) {
     throw new Error('Cannot register handler for unsupported type \'' + type + '\'');
   }
   this.handlers[type] = func;
-};
+}
 
 /**
  * Register an event handler for the given type.
  * Event handlers don't have a return value. They do not have any influence on the lifecycle flow. There can be multiple event
  * handler for each type.
  */
-scout.Lifecycle.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.Lifecycle.prototype.off = function(type, func) {
+off(type, func) {
   return this.events.off(type, func);
-};
+}
+}

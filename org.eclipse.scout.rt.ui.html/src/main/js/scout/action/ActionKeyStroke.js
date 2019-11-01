@@ -8,8 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ActionKeyStroke = function(action) {
-  scout.ActionKeyStroke.parent.call(this);
+import {KeyStroke} from '../index';
+
+export default class ActionKeyStroke extends KeyStroke {
+
+constructor(action) {
+  super();
   this.field = action;
   this.parseAndSetKeyStroke(action.keyStroke);
   this.keyStrokeFirePolicy = action.keyStrokeFirePolicy;
@@ -17,16 +21,17 @@ scout.ActionKeyStroke = function(action) {
   // If one action is executed, don't execute other actions by default
   this.stopPropagation = true;
   this.stopImmediatePropagation = true;
-};
-scout.inherits(scout.ActionKeyStroke, scout.KeyStroke);
+}
 
-scout.ActionKeyStroke.prototype._isEnabled = function() {
+
+_isEnabled() {
   if (!this.which.length) {
     return false; // actions without a keystroke are not enabled.
   }
-  return scout.ActionKeyStroke.parent.prototype._isEnabled.call(this);
-};
+  return super._isEnabled();
+}
 
-scout.ActionKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.doAction();
-};
+}
+}

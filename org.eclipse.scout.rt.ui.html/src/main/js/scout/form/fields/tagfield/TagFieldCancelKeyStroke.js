@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagFieldCancelKeyStroke = function(field) {
-  scout.TagFieldCancelKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+
+export default class TagFieldCancelKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.ESC];
+  this.which = [keys.ESC];
   this.stopPropagation = true;
   this.preventInvokeAcceptInputOnActiveValueField = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
-};
-scout.inherits(scout.TagFieldCancelKeyStroke, scout.KeyStroke);
+}
 
-scout.TagFieldCancelKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldCancelKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -30,8 +35,9 @@ scout.TagFieldCancelKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
-scout.TagFieldCancelKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.closeChooserPopup();
-};
+}
+}

@@ -8,13 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DetailTableTreeFilter = function() { //
-};
+export default class DetailTableTreeFilter {
+
+constructor() { //
+}
 
 /**
  * Must correspond with logic in P_TableFilterBasedTreeNodeFilter
  */
-scout.DetailTableTreeFilter.prototype.accept = function(node) {
+accept(node) {
   if (!node.parentNode) {
     // top level nodes may not be filtered
     return true;
@@ -33,4 +35,5 @@ scout.DetailTableTreeFilter.prototype.accept = function(node) {
     return true;
   }
   return node.row.filterAccepted;
-};
+}
+}

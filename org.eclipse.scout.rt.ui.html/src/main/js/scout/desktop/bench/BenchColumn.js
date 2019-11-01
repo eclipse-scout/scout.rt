@@ -8,8 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BenchColumn = function() {
-  scout.BenchColumn.parent.call(this);
+import {Widget} from '../../index';
+import {widgets} from '../../index';
+import {HtmlComponent} from '../../index';
+import {strings} from '../../index';
+import {Splitter} from '../../index';
+import {scout} from '../../index';
+import {SimpleTabBox} from '../../index';
+import {FlexboxLayout} from '../../index';
+import {FlexboxLayoutData} from '../../index';
+import {arrays} from '../../index';
+
+export default class BenchColumn extends Widget {
+
+constructor() {
+  super();
   this.tabBoxes = [];
   this._widgetToTabBox = {}; // [key=viewId, value=SimpleTabBox instance]
   this.components = null;
@@ -21,79 +34,79 @@ scout.BenchColumn = function() {
   this._viewRemoveHandler = this._onViewRemove.bind(this);
   this._viewActivateHandler = this._onViewActivate.bind(this);
   this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
-};
-scout.inherits(scout.BenchColumn, scout.Widget);
+}
 
-scout.BenchColumn.TAB_BOX_INDEX = {
+
+static TAB_BOX_INDEX = {
   TOP: 0,
   CENTER: 1,
   BOTTOM: 2
 };
 
-scout.BenchColumn.TAB_BOX_CLASSES = [
+static TAB_BOX_CLASSES = [
   'north',
   'center',
   'south'
 ];
 
-scout.BenchColumn.prototype._init = function(model) {
-  scout.BenchColumn.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.layoutData = model.layoutData;
   this.layoutCacheKey = model.cacheKey;
   this.cssClass = model.cssClass;
   this._createTabBoxes();
-};
+}
 
 /**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
  * form as a parent the container of the group-box.
  */
-scout.BenchColumn.prototype._keyStrokeBindTarget = function() {
+_keyStrokeBindTarget() {
   return this.$container;
-};
+}
 
-scout.BenchColumn.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('bench-column');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 
   this.htmlComp.layoutData = this.getLayoutData();
-};
+}
 
-scout.BenchColumn.prototype._renderProperties = function() {
-  scout.BenchColumn.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderTabBoxes();
   this._revalidateSplitters();
-};
+}
 
-scout.BenchColumn.prototype._renderTabBoxes = function() {
+_renderTabBoxes() {
   this.visibleTabBoxes().forEach(function(tabBox) {
     this._renderTabBox(tabBox);
   }.bind(this));
   this.updateFirstLastMarker();
-};
+}
 
-scout.BenchColumn.prototype._renderTabBox = function(tabBox) {
+_renderTabBox(tabBox) {
   if (!tabBox.rendered) {
     tabBox.render();
   }
-};
+}
 
-scout.BenchColumn.prototype.postRender = function() {
+postRender() {
   this.tabBoxes.forEach(function(tabBox) {
     tabBox.postRender();
   });
-};
+}
 
-scout.BenchColumn.prototype._createLayout = function() {
-  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.COLUMN, this.layoutCacheKey);
-};
+_createLayout() {
+  return new FlexboxLayout(FlexboxLayout.Direction.COLUMN, this.layoutCacheKey);
+}
 
-scout.BenchColumn.prototype.updateLayoutData = function(layoutData, cacheKey) {
+updateLayoutData(layoutData, cacheKey) {
   if (this.getLayoutData() === layoutData) {
     return;
   }
@@ -111,47 +124,47 @@ scout.BenchColumn.prototype.updateLayoutData = function(layoutData, cacheKey) {
     this.htmlComp.layout.reset();
     this.htmlComp.invalidateLayoutTree();
   }
-};
+}
 
-scout.BenchColumn.prototype.setLayoutData = function(layoutData) {
-  scout.BenchColumn.parent.prototype.setLayoutData.call(this, layoutData);
+setLayoutData(layoutData) {
+  super.setLayoutData( layoutData);
   this.layoutData = layoutData;
-};
+}
 
-scout.BenchColumn.prototype.getLayoutData = function() {
+getLayoutData() {
   return this.layoutData;
-};
+}
 
-scout.BenchColumn.prototype._onViewAdd = function(event) {
+_onViewAdd(event) {
   this.trigger('viewAdd', {
     view: event.view
   });
-};
+}
 
-scout.BenchColumn.prototype._onViewRemove = function(event) {
+_onViewRemove(event) {
   this.trigger('viewRemove', {
     view: event.view
   });
-};
+}
 
-scout.BenchColumn.prototype._onViewActivate = function(event) {
+_onViewActivate(event) {
   this.trigger('viewActivate', {
     view: event.view
   });
-};
+}
 
-scout.BenchColumn.prototype._onViewDeactivate = function(event) {
+_onViewDeactivate(event) {
   this.trigger('viewDeactivate', {
     view: event.view
   });
-};
+}
 
-scout.BenchColumn.prototype.activateView = function(view) {
+activateView(view) {
   var tabBox = this.getTabBox(view.displayViewId);
   tabBox.activateView(view);
-};
+}
 
-scout.BenchColumn.prototype._createTabBoxes = function() {
+_createTabBoxes() {
   var rowLayoutDatas = [];
   if (this.layoutData) {
     rowLayoutDatas = this.layoutData.getRows();
@@ -159,7 +172,7 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
   for (var i = 0; i < 3; i++) {
     var tabBox = scout.create('SimpleTabBox', {
       parent: this,
-      cssClass: scout.strings.join(' ', 'view-tab-box', scout.BenchColumn.TAB_BOX_CLASSES[i]),
+      cssClass: strings.join(' ', 'view-tab-box', BenchColumn.TAB_BOX_CLASSES[i]),
       controller: scout.create('DesktopTabBoxController')
     });
     tabBox.setLayoutData(rowLayoutDatas[i]);
@@ -169,13 +182,13 @@ scout.BenchColumn.prototype._createTabBoxes = function() {
     tabBox.on('viewDeactivate', this._viewDeactivateHandler);
     this.tabBoxes.push(tabBox);
   }
-};
+}
 
-scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
+_revalidateSplitters(clearPosition) {
   // remove old splitters
   if (this.components) {
     this.components.forEach(function(comp) {
-      if (comp instanceof scout.Splitter) {
+      if (comp instanceof Splitter) {
         comp.destroy();
       }
     });
@@ -192,7 +205,7 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
           maxRatio: 1
         });
         splitter.render();
-        splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
+        splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
         arr.push(splitter);
       }
@@ -201,7 +214,7 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
     }.bind(this), []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
-      return comp instanceof scout.SimpleTabBox;
+      return comp instanceof SimpleTabBox;
     })
     .reduce(function(c1, c2, index) {
       if (index > 0) {
@@ -210,14 +223,14 @@ scout.BenchColumn.prototype._revalidateSplitters = function(clearPosition) {
       return c2;
     }, undefined);
   this._updateSplitterMovable();
-};
+}
 
-scout.BenchColumn.prototype._updateSplitterMovable = function() {
+_updateSplitterMovable() {
   if (!this.components) {
     return;
   }
   this.components.forEach(function(c, i) {
-    if (c instanceof scout.Splitter) {
+    if (c instanceof Splitter) {
       var componentsBefore = this.components.slice(0, i).reverse();
       var componentsAfter = this.components.slice(i + 1);
       // shrink
@@ -250,18 +263,18 @@ scout.BenchColumn.prototype._updateSplitterMovable = function() {
 
     }
   }.bind(this));
-};
+}
 
-scout.BenchColumn.prototype._onSplitterMove = function(event) {
+_onSplitterMove(event) {
   var splitter = event.source;
   var diff = event.position - splitter.htmlComp.location().y - splitter.htmlComp.margins().top - splitter.htmlComp.insets().top;
   splitter.getLayoutData().diff = diff;
   this.revalidateLayout();
   splitter.getLayoutData().diff = null;
   event.preventDefault();
-};
+}
 
-scout.BenchColumn.prototype.addView = function(view, bringToFront) {
+addView(view, bringToFront) {
   var tabBox = this.getTabBox(view.displayViewId);
   this._widgetToTabBox[view.id] = tabBox;
 
@@ -280,29 +293,29 @@ scout.BenchColumn.prototype.addView = function(view, bringToFront) {
     // but not initially while desktop gets rendered because it will be done at the end anyway
     this.htmlComp.validateLayoutTree();
   }
-};
+}
 
-scout.BenchColumn.prototype.getTabBox = function(displayViewId) {
+getTabBox(displayViewId) {
   var tabBox;
   switch (displayViewId) {
     case 'NW':
     case 'N':
     case 'NE':
-      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.TOP];
+      tabBox = this.tabBoxes[BenchColumn.TAB_BOX_INDEX.TOP];
       break;
     case 'SW':
     case 'S':
     case 'SE':
-      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.BOTTOM];
+      tabBox = this.tabBoxes[BenchColumn.TAB_BOX_INDEX.BOTTOM];
       break;
     default:
-      tabBox = this.tabBoxes[scout.BenchColumn.TAB_BOX_INDEX.CENTER];
+      tabBox = this.tabBoxes[BenchColumn.TAB_BOX_INDEX.CENTER];
       break;
   }
   return tabBox;
-};
+}
 
-scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
+removeView(view, showSiblingView) {
   var tabBox = this._widgetToTabBox[view.id];
   if (tabBox) {
     this._removeViewInProgress++;
@@ -321,43 +334,44 @@ scout.BenchColumn.prototype.removeView = function(view, showSiblingView) {
       this.htmlComp.validateLayoutTree();
     }
   }
-};
+}
 
-scout.BenchColumn.prototype.viewCount = function() {
+viewCount() {
   return this.tabBoxes.map(function(tabBox) {
     return tabBox.viewCount();
   }).reduce(function(c1, c2) {
     return c1 + c2;
   }, 0);
-};
+}
 
-scout.BenchColumn.prototype.hasView = function(view) {
+hasView(view) {
   return this.tabBoxes.filter(function(tabBox) {
     return tabBox.hasView(view);
   }).length > 0;
-};
+}
 
-scout.BenchColumn.prototype.hasViews = function() {
+hasViews() {
   return this.viewCount() > 0;
-};
+}
 
-scout.BenchColumn.prototype.getViews = function(displayViewId) {
+getViews(displayViewId) {
   return this.tabBoxes.reduce(function(arr, tabBox) {
-    scout.arrays.pushAll(arr, tabBox.getViews(displayViewId));
+    arrays.pushAll(arr, tabBox.getViews(displayViewId));
     return arr;
   }, []);
-};
+}
 
-scout.BenchColumn.prototype.getComponents = function() {
+getComponents() {
   return this.components;
-};
+}
 
-scout.BenchColumn.prototype.visibleTabBoxes = function() {
+visibleTabBoxes() {
   return this.tabBoxes.filter(function(tabBox) {
     return tabBox.hasViews();
   });
-};
+}
 
-scout.BenchColumn.prototype.updateFirstLastMarker = function() {
-  scout.widgets.updateFirstLastMarker(this.visibleTabBoxes());
-};
+updateFirstLastMarker() {
+  widgets.updateFirstLastMarker(this.visibleTabBoxes());
+}
+}

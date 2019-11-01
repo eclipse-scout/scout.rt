@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LoginBox = function() {
-  scout.LoginBox.parent.call(this);
+import {Device} from '../index';
+import {TextMap} from '../index';
+import {strings} from '../index';
+import {Box} from '../index';
+import * as $ from 'jquery';
+
+export default class LoginBox extends Box {
+
+constructor() {
+  super();
 
   this.ajaxOptions = {
     type: 'POST'
@@ -17,11 +25,11 @@ scout.LoginBox = function() {
   this.authUrl = 'auth';
   this.onPostDoneFunc = this.redirect.bind(this);
   this.redirectUrl = null;
-  this.logoUrl = 'res/logo.png';
+  this.logoUrl = 'logo.png';
   this.userDataKey = 'user';
   this.passwordDataKey = 'password';
   this.additionalData = {};
-  this.prepareRedirectUrlFunc = scout.LoginBox.prepareRedirectUrl;
+  this.prepareRedirectUrlFunc = LoginBox.prepareRedirectUrl;
   this.messageKey = null;
   this.texts = {
     'ui.Login': 'Login',
@@ -29,18 +37,18 @@ scout.LoginBox = function() {
     'ui.User': 'Username',
     'ui.Password': 'Password'
   };
-};
-scout.inherits(scout.LoginBox, scout.Box);
+}
 
-scout.LoginBox.prototype.init = function(options) {
+
+init(options) {
   options = options || {};
-  options.texts = new scout.TextMap($.extend(this.texts, options.texts));
+  options.texts = new TextMap($.extend(this.texts, options.texts));
   options.ajaxOptions = $.extend(this.ajaxOptions, options.ajaxOptions);
   $.extend(this, options);
-};
+}
 
-scout.LoginBox.prototype._render = function() {
-  scout.LoginBox.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this.$container.addClass('login-box');
   this.$content.addClass('login-box-content ');
@@ -52,7 +60,7 @@ scout.LoginBox.prototype._render = function() {
   if (this.messageKey) {
     this.$message = $('<div>')
       .attr('id', 'message-box')
-      .html(scout.strings.nl2br(this.texts.get(this.messageKey)))
+      .html(strings.nl2br(this.texts.get(this.messageKey)))
       .appendTo(this.$form);
   }
   this.$user = $('<input>')
@@ -74,23 +82,23 @@ scout.LoginBox.prototype._render = function() {
     .appendTo(this.$form);
 
   this.$user.focus();
-};
+}
 
-scout.LoginBox.prototype._resetButtonText = function() {
+_resetButtonText() {
   this.$button
     .text(this.texts.get('ui.Login'))
     .removeClass('login-error');
-};
+}
 
-scout.LoginBox.prototype.data = function() {
+data() {
   var data = {};
   data[this.userDataKey] = this.$user.val();
   data[this.passwordDataKey] = this.$password.val();
   $.extend(data, this.additionalData);
   return data;
-};
+}
 
-scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
+_onLoginFormSubmit(event) {
   // Prevent default submit action
   event.preventDefault();
 
@@ -102,7 +110,7 @@ scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
     .setEnabled(false);
   this.$user.off('input.resetLoginError');
   this.$password.off('input.resetLoginError');
-  if (scout.device.supportsCssAnimation()) {
+  if (Device.get().supportsCssAnimation()) {
     this.$button
       .html('')
       .append($('<div>').addClass('login-button-loading'));
@@ -115,9 +123,9 @@ scout.LoginBox.prototype._onLoginFormSubmit = function(event) {
   $.ajax(options)
     .done(this._onPostDone.bind(this))
     .fail(this._onPostFail.bind(this));
-};
+}
 
-scout.LoginBox.prototype.redirect = function(data) {
+redirect(data) {
   // Calculate target URL
   var url = this.redirectUrl;
   if (!url) {
@@ -132,19 +140,19 @@ scout.LoginBox.prototype.redirect = function(data) {
   } else {
     window.location.reload();
   }
-};
+}
 
-scout.LoginBox.prototype._onPostDone = function(data) {
+_onPostDone(data) {
   this.remove();
   this.onPostDoneFunc.call(this, data);
-};
+}
 
-scout.LoginBox.prototype._onPostFail = function(jqXHR, textStatus, errorThrown) {
+_onPostFail(jqXHR, textStatus, errorThrown) {
   // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
   setTimeout(this._onPostFailImpl.bind(this, jqXHR, textStatus, errorThrown), 300);
-};
+}
 
-scout.LoginBox.prototype._onPostFailImpl = function(jqXHR, textStatus, errorThrown) {
+_onPostFailImpl(jqXHR, textStatus, errorThrown) {
   this.$button
     .setEnabled(true)
     .html('')
@@ -163,15 +171,16 @@ scout.LoginBox.prototype._onPostFailImpl = function(jqXHR, textStatus, errorThro
     this.$password
       .one('input.resetLoginError', this._resetButtonText.bind(this));
   }.bind(this));
-};
+}
 
 // ----- Helper functions -----
 
-scout.LoginBox.prepareRedirectUrl = function(url) {
+static prepareRedirectUrl(url) {
   var urlParts = /^([^?#]*)(\?[^#]*)?(#.*)?$/.exec(url || ''); // $1 = baseUrl, $2 = queryPart, $3 = hashPart
   var filteredBaseUrl = urlParts[1]
     .replace(/login.html$/, '')
     .replace(/login$/, '')
     .replace(/logout$/, '');
   return filteredBaseUrl + (urlParts[2] ? urlParts[2] : '') + (urlParts[3] ? urlParts[3] : '');
-};
+}
+}

@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {strings} from '../index';
+
 
 /**
  * A NullLogger instance is installed when Log4Javascript is not active (the popup
@@ -15,64 +18,66 @@
  * because otherwise some errors are hard to track. This is true especially for errors
  * that occur in a Promise. A developer should at least log these errors.
  */
-scout.NullLogger = function() {
-};
+export default class NullLogger {
 
-scout.NullLogger.prototype.trace = function() {
+constructor() {
+}
+
+trace() {
   // NOP - don't log trace, we don't want to spam the browser console
-};
+}
 
-scout.NullLogger.prototype.debug = function() {
+debug() {
   // NOP - don't log debug, we don't want to spam the browser console
-};
+}
 
-scout.NullLogger.prototype.info = function() {
-  this._log('info', scout.objects.argumentsToArray(arguments));
-};
+info() {
+  this._log('info', objects.argumentsToArray(arguments));
+}
 
-scout.NullLogger.prototype.warn = function() {
-  this._log('warn', scout.objects.argumentsToArray(arguments));
-};
+warn() {
+  this._log('warn', objects.argumentsToArray(arguments));
+}
 
-scout.NullLogger.prototype.error = function(logArgs) {
-  this._log('error', scout.objects.argumentsToArray(arguments));
-};
+error(logArgs) {
+  this._log('error', objects.argumentsToArray(arguments));
+}
 
-scout.NullLogger.prototype.fatal = function(logArgs) {
-  this._log('fatal', scout.objects.argumentsToArray(arguments));
-};
+fatal(logArgs) {
+  this._log('fatal', objects.argumentsToArray(arguments));
+}
 
-scout.NullLogger.prototype.isEnabledFor = function() {
+isEnabledFor() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isTraceEnabled = function() {
+isTraceEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isDebugEnabled = function() {
+isDebugEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isInfoEnabled = function() {
+isInfoEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isWarnEnabled = function() {
+isWarnEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isErrorEnabled = function() {
+isErrorEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype.isFatalEnabled = function() {
+isFatalEnabled() {
   return false;
-};
+}
 
-scout.NullLogger.prototype._log = function(level, logArgs) {
+_log(level, logArgs) {
   // check if console is available
-  var myConsole = scout.objects.optProperty(window, 'console');
+  var myConsole = objects.optProperty(window, 'console');
   if (!myConsole) {
     return;
   }
@@ -102,12 +107,13 @@ scout.NullLogger.prototype._log = function(level, logArgs) {
     // but some restrictive security settings in Internet Explorer may cause an Error when the function
     // is called. Our logger should not produce additional errors #249626.
   }
-};
+}
 
-scout.NullLogger.prototype._formatTime = function() {
+_formatTime() {
   var date = new Date();
-  return scout.strings.padZeroLeft(date.getHours(), 2) + ':' +
-    scout.strings.padZeroLeft(date.getMinutes(), 2) + ':' +
-    scout.strings.padZeroLeft(date.getSeconds(), 2) + '.' +
-    scout.strings.padZeroLeft(date.getMilliseconds(), 3);
-};
+  return strings.padZeroLeft(date.getHours(), 2) + ':' +
+    strings.padZeroLeft(date.getMinutes(), 2) + ':' +
+    strings.padZeroLeft(date.getSeconds(), 2) + '.' +
+    strings.padZeroLeft(date.getMilliseconds(), 3);
+}
+}

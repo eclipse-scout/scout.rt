@@ -8,48 +8,55 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SliderField = function() {
-  scout.SliderField.parent.call(this);
-  this.slider;
-};
-scout.inherits(scout.SliderField, scout.ValueField);
+import {ValueField} from '../../../index';
+import {scout} from '../../../index';
+import * as $ from 'jquery';
 
-scout.SliderField.prototype._init = function(model) {
-  scout.SliderField.parent.prototype._init.call(this, model);
+export default class SliderField extends ValueField {
+
+constructor() {
+  super();
+  this.slider;
+}
+
+
+_init(model) {
+  super._init( model);
   var sliderOptions = $.extend({
     parent: this
   }, model);
   this.slider = scout.create('Slider', sliderOptions);
-};
+}
 
-scout.SliderField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'slider-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderSlider();
-};
+}
 
-scout.SliderField.prototype._renderSlider = function() {
+_renderSlider() {
   this.slider.render();
   this.addField(this.slider.$container);
-};
+}
 
-scout.SliderField.prototype._readDisplayText = function() {
+_readDisplayText() {
   // Use the inner slider's value as display text, as the user cannot enter the value manually.
   // This value is already guaranteed to be a valid number (see Slider.js, _onValueChange). We
   // convert it to a string to match the expected data type for a display text.
   return String(this.slider.value);
-};
+}
 
-scout.SliderField.prototype._parseValue = function(displayText) {
+_parseValue(displayText) {
   // Convert display text back to number
   return Number(displayText);
-};
+}
 
-scout.SliderField.prototype.setValue = function(value) {
+setValue(value) {
   this.slider.setValue(value);
-};
+}
 
-scout.SliderField.prototype.getValue = function() {
+getValue() {
   return this.slider.value;
-};
+}
+}

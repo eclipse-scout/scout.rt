@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuDestinations = {
+const MenuDestinations = {
   MENU_BAR: 1,
   CONTEXT_MENU: 2,
   HEADER: 3
 };
+
+export default MenuDestinations;

@@ -8,14 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableLayout = function(table) {
-  scout.TableLayout.parent.call(this);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {MenuBarLayout} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+import {Dimension} from '../index';
+
+export default class TableLayout extends AbstractLayout {
+
+constructor(table) {
+  super();
   this.table = table;
   this._dataHeightPositive = false;
-};
-scout.inherits(scout.TableLayout, scout.AbstractLayout);
+}
 
-scout.TableLayout.prototype.layout = function($container) {
+
+layout($container) {
   var menuBarHeight = 0,
     footerHeight = 0,
     headerHeight = 0,
@@ -24,7 +34,7 @@ scout.TableLayout.prototype.layout = function($container) {
     controlContainerInsets,
     tileAccordion = this.table.tableTileGridMediator ? this.table.tableTileGridMediator.tileAccordion : null,
     $data = this.table.$data,
-    dataMargins = scout.graphics.margins(scout.nvl($data, this.table.$container)),
+    dataMargins = graphics.margins(scout.nvl($data, this.table.$container)),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = this.table.menuBar,
     footer = this.table.footer,
@@ -38,22 +48,22 @@ scout.TableLayout.prototype.layout = function($container) {
     }).subtract(htmlContainer.insets());
 
   if (this.table.menuBarVisible && menuBar.visible) {
-    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container);
-    var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    var htmlMenuBar = HtmlComponent.get(menuBar.$container);
+    var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     menuBarHeight = menuBarSize.height;
   }
   if (header) {
-    headerHeight = scout.graphics.size(header.$container).height;
+    headerHeight = graphics.size(header.$container).height;
     if (header.menuBar) {
       header.menuBar.validateLayout();
     }
   }
   if (footer) {
     // Layout table footer and add size of footer (including the control content) to 'height'
-    footerHeight = scout.graphics.size(footer.$container).height;
+    footerHeight = graphics.size(footer.$container).height;
     controlContainerHeight = footer.computeControlContainerHeight(this.table, footer.selectedControl, !this._dataHeightPositive);
-    controlContainerInsets = scout.graphics.insets(footer.$controlContainer);
+    controlContainerInsets = graphics.insets(footer.$controlContainer);
     if (!footer.animating) { // closing or opening: height is about to be changed
       footer.$controlContainer.cssHeight(controlContainerHeight);
       footer.$controlContent.outerHeight(controlContainerHeight - controlContainerInsets.vertical());
@@ -76,7 +86,7 @@ scout.TableLayout.prototype.layout = function($container) {
     this._dataHeightPositive = $data.height() > 0;
   } else {
     if (tileAccordion && tileAccordion.htmlComp) {
-      tileAccordion.htmlComp.setSize(new scout.Dimension(containerSize.width, dataHeight));
+      tileAccordion.htmlComp.setSize(new Dimension(containerSize.width, dataHeight));
       this._dataHeightPositive = dataHeight > 0;
     }
   }
@@ -112,9 +122,9 @@ scout.TableLayout.prototype.layout = function($container) {
 
     this.table.updateScrollbars();
   }
-};
+}
 
-scout.TableLayout.prototype._layoutColumns = function(widthHint) {
+_layoutColumns(widthHint) {
   this._autoOptimizeColumnsWidths();
 
   var htmlContainer = this.table.htmlComp;
@@ -128,23 +138,23 @@ scout.TableLayout.prototype._layoutColumns = function(widthHint) {
     this._autoResizeColumns(widthHint);
     this.table.columnLayoutDirty = false;
   }
-};
+}
 
 /**
  * Resizes all visible columns with autoOptimizeWidth set to true, if necessary (means if autoOptimizeWidthRequired is true)
  */
-scout.TableLayout.prototype._autoOptimizeColumnsWidths = function() {
+_autoOptimizeColumnsWidths() {
   this.table.visibleColumns().forEach(function(column) {
     if (column.autoOptimizeWidth && column.autoOptimizeWidthRequired) {
       this.table.resizeToFit(column, column.autoOptimizeMaxWidth);
     }
   }, this);
-};
+}
 
 /**
  * Resizes the visible columns to make them use all the available space.
  */
-scout.TableLayout.prototype._autoResizeColumns = function(widthHint) {
+_autoResizeColumns(widthHint) {
   var newWidth, weight,
     relevantColumns = [],
     currentWidth = 0,
@@ -192,7 +202,7 @@ scout.TableLayout.prototype._autoResizeColumns = function(widthHint) {
   // Resize them to their minimal width
   minWidthColumns.forEach(function(column, index) {
     var minWidth = Math.max(column.minWidth, column.initialWidth);
-    scout.arrays.remove(relevantColumns, column);
+    arrays.remove(relevantColumns, column);
 
     newWidth = minWidth;
     totalInitialWidth -= column.initialWidth;
@@ -225,14 +235,15 @@ scout.TableLayout.prototype._autoResizeColumns = function(widthHint) {
       this.table.resizeColumn(column, newWidth);
     }
   }.bind(this));
-};
+}
 
-scout.TableLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   // If autoResizeColumns and text wrap is enabled, the height of the table depends on the width
   this._layoutColumns(options.widthHint);
 
   // If table was not visible during renderViewport, the rows are not rendered yet (see _renderViewport)
   // -> make sure rows are rendered otherwise preferred height cannot be determined
   this.table._renderViewport();
-  return scout.TableLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
-};
+  return super.preferredLayoutSize( $container, options);
+}
+}

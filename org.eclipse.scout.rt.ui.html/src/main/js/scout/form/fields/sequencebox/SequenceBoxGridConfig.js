@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SequenceBoxGridConfig = function() {
-  scout.SequenceBoxGridConfig.parent.call(this);
-};
-scout.inherits(scout.SequenceBoxGridConfig, scout.LogicalGridConfig);
+import {LogicalGridConfig} from '../../../index';
 
-scout.SequenceBoxGridConfig.prototype.getGridColumnCount = function() {
+export default class SequenceBoxGridConfig extends LogicalGridConfig {
+
+constructor() {
+  super();
+}
+
+
+getGridColumnCount() {
   return this.widget.fields.length;
-};
+}
 
-scout.SequenceBoxGridConfig.prototype.getGridWidgets = function() {
+getGridWidgets() {
   return this.widget.fields;
-};
+}
+}

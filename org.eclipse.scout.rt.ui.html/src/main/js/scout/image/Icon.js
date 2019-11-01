@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Image} from '../index';
+import {IconDesc} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import {scout} from '../index';
+
 /**
  * Widget representing an icon. It may be a font icon or an image icon. Depending on the type, either a span or an img tag will be rendered.
  * <p>
- * See also jquery-scout.icon/appendIcon. Main difference to these implementations is that the image loading will invalidate the layout by using {@link scout.Image}.
+ * See also jquery-scout.icon/appendIcon. Main difference to these implementations is that the image loading will invalidate the layout by using {@link Image}.
  */
-scout.Icon = function() {
-  scout.Icon.parent.call(this);
+export default class Icon extends Widget {
 
-  /** @type {scout.IconDesc} */
+constructor() {
+  super();
+
+  /** @type {IconDesc} */
   this.iconDesc = null;
 
   /**
@@ -25,33 +33,33 @@ scout.Icon = function() {
    */
   this.image = null;
   this.prepend = false;
-};
-scout.inherits(scout.Icon, scout.Widget);
+}
 
-scout.Icon.prototype._init = function(model) {
-  scout.Icon.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setIconDesc(this.iconDesc);
-};
+}
 
-scout.Icon.prototype._renderProperties = function() {
-  scout.Icon.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderIconDesc();
-};
+}
 
 /**
- * Accepts either an iconId as string or an {@link scout.IconDesc}.
- * @param {(string|scout.IconDesc)} icon
+ * Accepts either an iconId as string or an {@link IconDesc}.
+ * @param {(string|IconDesc)} icon
  */
-scout.Icon.prototype.setIconDesc = function(iconDesc) {
+setIconDesc(iconDesc) {
   this.setProperty('iconDesc', iconDesc);
-};
+}
 
-scout.Icon.prototype._setIconDesc = function(iconDesc) {
-  iconDesc = scout.IconDesc.ensure(iconDesc);
+_setIconDesc(iconDesc) {
+  iconDesc = IconDesc.ensure(iconDesc);
   this._setProperty('iconDesc', iconDesc);
-};
+}
 
-scout.Icon.prototype._renderIconDesc = function() {
+_renderIconDesc() {
   this._removeFontIcon();
   this._removeImageIcon();
 
@@ -62,25 +70,25 @@ scout.Icon.prototype._renderIconDesc = function() {
   }
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.Icon.prototype._renderFontIcon = function() {
+_renderFontIcon() {
   this.$container = this.$parent.appendIcon(this.iconDesc);
   if (this.prepend) {
     this.$container.prependTo(this.$parent);
   }
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.Icon.prototype._removeFontIcon = function() {
+_removeFontIcon() {
   if (this.$container) {
     this.$container.remove();
     this.$container = null;
   }
-};
+}
 
-scout.Icon.prototype._renderImageIcon = function() {
+_renderImageIcon() {
   if (this.image) {
     return;
   }
@@ -101,20 +109,21 @@ scout.Icon.prototype._renderImageIcon = function() {
   }.bind(this));
   this.$container = this.image.$container;
   this.htmlComp = this.image.htmlComp;
-};
+}
 
-scout.Icon.prototype._removeImageIcon = function() {
+_removeImageIcon() {
   if (this.image) {
     this.image.destroy();
     this.image = null;
   }
-};
+}
 
 /**
  * Delegates to this.image.setAutoFit, but only if Icon is an image. This method has no effect when icon is a font-icon.
  */
-scout.Icon.prototype.setAutoFit = function(autoFit) {
+setAutoFit(autoFit) {
   if (this.image) {
     this.image.setAutoFit(autoFit);
   }
-};
+}
+}

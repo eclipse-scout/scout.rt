@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartFieldPopup = function() {
-  scout.SmartFieldPopup.parent.call(this);
-  this.animateRemoval = scout.SmartFieldPopup.hasPopupAnimation();
-};
-scout.inherits(scout.SmartFieldPopup, scout.Popup);
+import {Popup} from '../../../index';
+import {SmartFieldPopupLayout} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {FormField} from '../../../index';
 
-scout.SmartFieldPopup.prototype._init = function(options) {
+export default class SmartFieldPopup extends Popup {
+
+constructor() {
+  super();
+  this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
+}
+
+
+_init(options) {
   options.withFocusContext = false;
-  scout.SmartFieldPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.smartField = this.parent;
   this.proposalChooser = this._createProposalChooser();
@@ -26,69 +34,69 @@ scout.SmartFieldPopup.prototype._init = function(options) {
 
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
-};
+}
 
-scout.SmartFieldPopup.prototype._createProposalChooser = function() {
+_createProposalChooser() {
   var objectType = this.smartField.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
   return scout.create(objectType, {
     parent: this
   });
-};
+}
 
-scout.SmartFieldPopup.prototype._createLayout = function() {
-  return new scout.SmartFieldPopupLayout(this, this.proposalChooser);
-};
+_createLayout() {
+  return new SmartFieldPopupLayout(this, this.proposalChooser);
+}
 
-scout.SmartFieldPopup.prototype._render = function() {
+_render() {
   var cssClass = this.smartField.cssClassName() + '-popup';
-  scout.SmartFieldPopup.parent.prototype._render.call(this);
+  super._render();
   this.$container
     .addClass(cssClass)
     .on('mousedown', this._onContainerMouseDown.bind(this));
-  this.$container.toggleClass('alternative', this.smartField.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
+  this.$container.toggleClass('alternative', this.smartField.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
   this.proposalChooser.render();
-};
+}
 
-scout.SmartFieldPopup.prototype.setLookupResult = function(result) {
+setLookupResult(result) {
   this._setProperty('lookupResult', result);
   this.proposalChooser.setLookupResult(result);
-};
+}
 
 /**
  * @returns the selected lookup row from the proposal chooser. If the row is disabled this function returns null.
  */
-scout.SmartFieldPopup.prototype.getSelectedLookupRow = function() {
+getSelectedLookupRow() {
   var lookupRow = this.proposalChooser.getSelectedLookupRow();
   if (lookupRow && lookupRow.enabled) {
     return lookupRow;
   } else {
     return null;
   }
-};
+}
 
-scout.SmartFieldPopup.prototype.setStatus = function(status) {
+setStatus(status) {
   this.proposalChooser.setStatus(status);
-};
+}
 
-scout.SmartFieldPopup.prototype.selectFirstLookupRow = function() {
+selectFirstLookupRow() {
   this.proposalChooser.selectFirstLookupRow();
-};
+}
 
-scout.SmartFieldPopup.prototype.selectLookupRow = function() {
+selectLookupRow() {
   this.proposalChooser.triggerLookupRowSelected();
-};
+}
 
 /**
  * Delegates the key event to the proposal chooser.
  */
-scout.SmartFieldPopup.prototype.delegateKeyEvent = function(event) {
+delegateKeyEvent(event) {
   event.originalEvent.smartFieldEvent = true;
   this.proposalChooser.delegateKeyEvent(event);
-};
+}
 
-scout.SmartFieldPopup.prototype._triggerEvent = function(event) {
+_triggerEvent(event) {
   this.trigger(event.type, event);
-};
+}
 
 /**
  * This event handler is called before the mousedown handler on the _document_ is triggered
@@ -96,29 +104,29 @@ scout.SmartFieldPopup.prototype._triggerEvent = function(event) {
  * should stay open when the SmartField popup is closed. It also prevents the focus blur
  * event on the SmartField input-field.
  */
-scout.SmartFieldPopup.prototype._onContainerMouseDown = function(event) {
+_onContainerMouseDown(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
   return false;
-};
+}
 
 // when smart-field is removed, also remove popup. Don't animate removal in that case
-scout.SmartFieldPopup.prototype._onRemoveSmartField = function(event) {
+_onRemoveSmartField(event) {
   this.animateRemoval = false;
   this.remove();
-};
+}
 
 /**
  * @override because the icon is not in the $anchor container.
  */
-scout.SmartFieldPopup.prototype._isMouseDownOnAnchor = function(event) {
+_isMouseDownOnAnchor(event) {
   return this.field.$field.isOrHas(event.target) || this.field.$icon.isOrHas(event.target) || (this.field.$clearIcon && this.field.$clearIcon.isOrHas(event.target));
-};
+}
 
-scout.SmartFieldPopup.prototype._onAnimationEnd = function() {
+_onAnimationEnd() {
   this.proposalChooser.updateScrollbars();
-};
+}
 
 //--- static helpers --- //
 
@@ -127,6 +135,7 @@ scout.SmartFieldPopup.prototype._onAnimationEnd = function() {
  * it comes to rendering the popup and the additional CSS animation causes the popup
  * to flicker. Every other browser (including Edge) that supports CSS animation is fine.
  */
-scout.SmartFieldPopup.hasPopupAnimation = function() {
-  return scout.device.supportsCssAnimation() && !scout.device.isInternetExplorer();
-};
+static hasPopupAnimation() {
+  return Device.get().supportsCssAnimation() && !Device.get().isInternetExplorer();
+}
+}

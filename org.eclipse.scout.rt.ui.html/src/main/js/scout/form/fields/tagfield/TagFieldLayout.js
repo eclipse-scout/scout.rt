@@ -8,12 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagFieldLayout = function(field) {
-  scout.TagFieldLayout.parent.call(this, field);
-};
-scout.inherits(scout.TagFieldLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../../index';
 
-scout.TagFieldLayout.prototype._$elementForIconLayout = function() {
+export default class TagFieldLayout extends FormFieldLayout {
+
+constructor(field) {
+  super( field);
+}
+
+
+_$elementForIconLayout() {
   // The field container has the border and not the input ($field) element
   return this.formField.$fieldContainer;
-};
+}
+}

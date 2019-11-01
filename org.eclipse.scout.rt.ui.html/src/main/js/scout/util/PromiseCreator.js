@@ -8,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+
 
 /**
  * The PromiseCreator is used to work with code that creates a lot of promises.
@@ -19,34 +21,36 @@
  *
  * @constructor
  */
-scout.PromiseCreator = function(items) {
+export default class PromiseCreator {
+
+constructor(items) {
   this.results = [];
   this.error = null;
 
   this.items = items;
   this.currentItem = 0;
   this.aborted = false;
-};
+}
 
-scout.PromiseCreator.prototype.hasNext = function() {
+hasNext() {
   if (this.error || this.aborted) {
     return false;
   }
   return this.currentItem < this.items.length;
-};
+}
 
-scout.PromiseCreator.prototype.next = function() {
+next() {
   var thisItem = this.currentItem;
   return this.createPromise()
     .done(function() {
-      this._addResults.apply(this, [thisItem, scout.objects.argumentsToArray(arguments)]);
+      this._addResults.apply(this, [thisItem, objects.argumentsToArray(arguments)]);
     }.bind(this))
     .fail(function() {
       this.error = arguments.length > 0 ? arguments : new Error('Promise execution failed');
     }.bind(this));
-};
+}
 
-scout.PromiseCreator.prototype.createPromise = function() {
+createPromise() {
   if (this.currentItem >= this.items.length) {
     throw new Error('items out of bounds');
   }
@@ -54,21 +58,22 @@ scout.PromiseCreator.prototype.createPromise = function() {
   var promise = this._createPromise();
   this.currentItem++;
   return promise;
-};
+}
 
-scout.PromiseCreator.prototype._createPromise = function() {
+_createPromise() {
   return this.items[this.currentItem]();
-};
+}
 
-scout.PromiseCreator.prototype._addResults = function(index, result) {
+_addResults(index, result) {
   if (result.length === 0) {
     result = undefined;
   } else if (result.length === 1) {
     result = result[0];
   }
   this.results[index] = result;
-};
+}
 
-scout.PromiseCreator.prototype.abort = function() {
+abort() {
   this.aborted = true;
-};
+}
+}

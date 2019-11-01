@@ -8,30 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+
 /**
  * JavaScript port from java.util.TreeSet.
  */
-scout.TreeSet = function() {
-  this.array = [];
-  this.properties = scout.objects.createMap();
-};
+export default class TreeSet {
 
-scout.TreeSet.prototype.add = function(value) {
+constructor() {
+  this.array = [];
+  this.properties = objects.createMap();
+}
+
+add(value) {
   if (!this.contains(value)) {
     this.array.push(value);
     this.array.sort();
     this.properties[value] = true;
   }
-};
+}
 
-scout.TreeSet.prototype.size = function() {
+size() {
   return this.array.length;
-};
+}
 
-scout.TreeSet.prototype.contains = function(value) {
+contains(value) {
   return (value in this.properties);
-};
+}
 
-scout.TreeSet.prototype.last = function() {
+last() {
   return this.array[this.array.length - 1];
-};
+}
+}

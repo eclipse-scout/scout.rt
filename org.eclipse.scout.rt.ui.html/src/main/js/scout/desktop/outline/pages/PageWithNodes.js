@@ -8,21 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {MenuBar} from '../../../index';
+import {scout} from '../../../index';
+import {Page} from '../../../index';
+import * as $ from 'jquery';
+
 /**
  * @class
- * @extends scout.Page
+ * @extends Page
  */
-scout.PageWithNodes = function() {
-  scout.PageWithNodes.parent.call(this);
+export default class PageWithNodes extends Page {
 
-  this.nodeType = scout.Page.NodeType.NODES;
-};
-scout.inherits(scout.PageWithNodes, scout.Page);
+constructor() {
+  super();
+
+  this.nodeType = Page.NodeType.NODES;
+}
+
 
 /**
  * @override Page.js
  */
-scout.PageWithNodes.prototype._createTable = function() {
+_createTable() {
   var nodeColumn = scout.create('Column', {
     id: 'NodeColumn',
     session: this.session
@@ -34,32 +41,32 @@ scout.PageWithNodes.prototype._createTable = function() {
     headerVisible: false,
     columns: [nodeColumn]
   });
-  table.menuBar.setPosition(scout.MenuBar.Position.TOP);
+  table.menuBar.setPosition(MenuBar.Position.TOP);
   table.on('rowAction', this._onDetailTableRowAction.bind(this));
   return table;
-};
+}
 
-scout.PageWithNodes.prototype._onDetailTableRowAction = function(event) {
+_onDetailTableRowAction(event) {
   this.getOutline().mediator.onTableRowAction(event, this);
-};
+}
 
-scout.PageWithNodes.prototype._rebuildDetailTable = function(childPages) {
+_rebuildDetailTable(childPages) {
   var table = this.detailTable;
   this._unlinkAllTableRows(table.rows);
   table.deleteAllRows();
   var rows = this._createTableRowsForChildPages(childPages);
   table.insertRows(rows);
-};
+}
 
-scout.PageWithNodes.prototype._unlinkAllTableRows = function(rows) {
+_unlinkAllTableRows(rows) {
   rows.forEach(function(row) {
     if (row.page) {
       row.page.unlinkWithRow(row);
     }
   });
-};
+}
 
-scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPages) {
+_createTableRowsForChildPages(childPages) {
   return childPages.map(function(childPage) {
     var row = scout.create('TableRow', {
       parent: this.detailTable,
@@ -68,12 +75,12 @@ scout.PageWithNodes.prototype._createTableRowsForChildPages = function(childPage
     childPage.linkWithRow(row);
     return row;
   }, this);
-};
+}
 
 /**
  * @override TreeNode.js
  */
-scout.PageWithNodes.prototype.loadChildren = function() {
+loadChildren() {
   this.childrenLoaded = false;
   return this._createChildPages().done(function(childPages) {
     this._rebuildDetailTable(childPages);
@@ -82,12 +89,13 @@ scout.PageWithNodes.prototype.loadChildren = function() {
     }
     this.childrenLoaded = true;
   }.bind(this));
-};
+}
 
 /**
  * Override this method to create child pages for this page. The default impl. returns an empty array.
  * @return {$.Deferred}
  */
-scout.PageWithNodes.prototype._createChildPages = function() {
+_createChildPages() {
   return $.resolvedDeferred(this.childNodes);
-};
+}
+}

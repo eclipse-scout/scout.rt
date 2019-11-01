@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Reconnector = function(session) {
+import * as $ from 'jquery';
+
+export default class Reconnector {
+
+constructor(session) {
   this.session = session;
   this.started = false;
 
@@ -18,9 +22,9 @@ scout.Reconnector = function(session) {
   this.interval = 3000; // ms
   // Minimal assumed ping duration (to prevent flickering of the reconnect notification when AJAX call fails very fast)
   this.minPingDuration = 1000; // ms
-};
+}
 
-scout.Reconnector.prototype.start = function() {
+start() {
   if (this.started) {
     return;
   }
@@ -28,16 +32,16 @@ scout.Reconnector.prototype.start = function() {
   $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] start');
   this.started = true;
   this._schedulePing(this.initialDelay);
-};
+}
 
-scout.Reconnector.prototype.stop = function() {
+stop() {
   this.started = false;
-};
+}
 
-scout.Reconnector.prototype._schedulePing = function(delay) {
+_schedulePing(delay) {
   $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] schedule ping() in ' + delay + ' ms');
   setTimeout(this._ping.bind(this), delay);
-};
+}
 
 //
 //   [START]
@@ -50,7 +54,7 @@ scout.Reconnector.prototype._schedulePing = function(delay) {
 //      |                   |
 //      +-------------------+
 //
-scout.Reconnector.prototype._ping = function() {
+_ping() {
   this.session.onReconnecting();
 
   var pingAjaxOptions = this.session.defaultAjaxOptions({
@@ -62,15 +66,15 @@ scout.Reconnector.prototype._ping = function() {
   $.ajax(pingAjaxOptions)
     .done(this._onPingDone.bind(this))
     .fail(this._onPingFail.bind(this));
-};
+}
 
-scout.Reconnector.prototype._onPingDone = function(data, textStatus, jqXHR) {
+_onPingDone(data, textStatus, jqXHR) {
   $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
   this.session.onReconnectingSucceeded();
   this.stop();
-};
+}
 
-scout.Reconnector.prototype._onPingFail = function(jqXHR, textStatus, errorThrown) {
+_onPingFail(jqXHR, textStatus, errorThrown) {
   var handleFailedPing = function handleFailedPing() {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
     this.session.onReconnectingFailed();
@@ -84,4 +88,5 @@ scout.Reconnector.prototype._onPingFail = function(jqXHR, textStatus, errorThrow
   } else {
     handleFailedPing();
   }
-};
+}
+}

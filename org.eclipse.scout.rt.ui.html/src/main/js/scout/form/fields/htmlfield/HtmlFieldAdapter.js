@@ -8,32 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HtmlFieldAdapter = function() {
-  scout.HtmlFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.HtmlFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
 
-scout.HtmlFieldAdapter.prototype._initProperties = function(model) {
+export default class HtmlFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_initProperties(model) {
   if (model.scrollToEnd !== undefined) {
     // ignore pseudo property initially (to prevent the function StringField#scrollToEnd() to be replaced)
     delete model.scrollToEnd;
   }
-};
+}
 
-scout.HtmlFieldAdapter.prototype._syncScrollToEnd = function() {
+_syncScrollToEnd() {
   this.widget.scrollToBottom();
-};
+}
 
-scout.HtmlFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.HtmlFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.HtmlFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

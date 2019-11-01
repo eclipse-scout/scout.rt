@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileTableHeaderGroupByLookupCall = function() {
-  scout.TileTableHeaderGroupByLookupCall.parent.call(this);
+import {StaticLookupCall} from '../index';
+import {scout} from '../index';
+
+export default class TileTableHeaderGroupByLookupCall extends StaticLookupCall {
+
+constructor() {
+  super();
   this.table = null;
-};
-scout.inherits(scout.TileTableHeaderGroupByLookupCall, scout.StaticLookupCall);
+}
 
-scout.TileTableHeaderGroupByLookupCall.prototype._init = function(model) {
-  scout.TileTableHeaderGroupByLookupCall.parent.prototype._init.call(this, model);
-};
 
-scout.TileTableHeaderGroupByLookupCall.prototype._data = function() {
+_init(model) {
+  super._init( model);
+}
+
+_data() {
   var lookupRows = [];
   lookupRows.push([null, this.session.text('NoGrouping'), 'BOLD']);
   this.table.visibleColumns().forEach(function(column) {
@@ -27,12 +32,13 @@ scout.TileTableHeaderGroupByLookupCall.prototype._data = function() {
     }
   }, this);
   return lookupRows;
-};
+}
 
-scout.TileTableHeaderGroupByLookupCall.prototype._dataToLookupRow = function(data) {
+_dataToLookupRow(data) {
   return scout.create('LookupRow', {
     key: data[0],
     text: data[1],
     font: data[2]
   });
-};
+}
+}

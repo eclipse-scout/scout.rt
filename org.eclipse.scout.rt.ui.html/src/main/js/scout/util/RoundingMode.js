@@ -13,7 +13,7 @@
  *
  * @see RoundingMode.java
  */
-scout.numbers.RoundingMode = {
+const RoundingMode = {
   UP: 'UP',
   DOWN: 'DOWN',
   CEILING: 'CEILING',
@@ -23,3 +23,5 @@ scout.numbers.RoundingMode = {
   HALF_EVEN: 'HALF_EVEN',
   UNNECESSARY: 'UNNECESSARY'
 };
+
+export default RoundingMode;

@@ -8,38 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ValueField} from '../../../index';
+import {AppLinkKeyStroke} from '../../../index';
+import * as $ from 'jquery';
+
 /**
  * Base class for fields where the value should be visualized.
  */
-scout.BeanField = function() {
-  scout.BeanField.parent.call(this);
+export default class BeanField extends ValueField {
+
+constructor() {
+  super();
 
   this.preventInitialFocus = true;
-};
-scout.inherits(scout.BeanField, scout.ValueField);
+}
 
-scout.BeanField.prototype._render = function() {
+
+_render() {
   this.addContainer(this.$parent, 'bean-field');
   this.addLabel();
   this.addField(this.$parent.makeDiv());
   this.addStatus();
-};
+}
 
-scout.BeanField.prototype._renderProperties = function() {
-  scout.BeanField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderValue();
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.BeanField.prototype._initKeyStrokeContext = function() {
-  scout.BeanField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
-};
+  this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
+}
 
-scout.BeanField.prototype._formatValue = function(value) {
+_formatValue(value) {
   // The value cannot be changed by the user, therefore we always return the initial displayText property.
   //
   // Strange things happen, if an other value is returned... Example:
@@ -57,37 +63,38 @@ scout.BeanField.prototype._formatValue = function(value) {
   //   bf.setValue({...}) --> should not update displayText property
   //   bf.acceptInput() --> should not do anything
   return this.displayText;
-};
+}
 
-scout.BeanField.prototype._parseValue = function(displayText) {
+_parseValue(displayText) {
   // DisplayText cannot be converted to value, use original value (see comment in _formatValue).
   return this.value;
-};
+}
 
-scout.BeanField.prototype._readDisplayText = function() {
+_readDisplayText() {
   // DisplayText cannot be changed, therefore it must be equal to the current value (see comment in _formatValue)
   return this.displayText;
-};
+}
 
 /**
  * @override
  */
-scout.BeanField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   // nop
-};
+}
 
-scout.BeanField.prototype._renderValue = function() {
+_renderValue() {
   // to be implemented by the subclass
-};
+}
 
-scout.BeanField.prototype.triggerAppLinkAction = function(ref) {
+triggerAppLinkAction(ref) {
   this.trigger('appLinkAction', {
     ref: ref
   });
-};
+}
 
-scout.BeanField.prototype._onAppLinkAction = function(event) {
+_onAppLinkAction(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
-};
+}
+}

@@ -8,27 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridAdapter = function() {
-  scout.TileGridAdapter.parent.call(this);
+import {objects} from '../index';
+import {ModelAdapter} from '../index';
+import {scout} from '../index';
+
+export default class TileGridAdapter extends ModelAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['selectedTiles']);
   this._tileFilter = null;
-};
-scout.inherits(scout.TileGridAdapter, scout.ModelAdapter);
+}
 
-scout.TileGridAdapter.prototype._syncSelectedTiles = function(tiles) {
+
+_syncSelectedTiles(tiles) {
   // TileGrid.js won't modify the selectedTiles array while processing the response -> ignore every selectedTiles property change
   this.addFilterForPropertyName('selectedTiles');
   this.widget.selectTiles(tiles);
-};
+}
 
-scout.TileGridAdapter.prototype._syncTiles = function(tiles) {
+_syncTiles(tiles) {
   this.addFilterForPropertyName('selectedTiles');
   this.widget.setTiles(tiles);
-};
+}
 
-scout.TileGridAdapter.prototype._initProperties = function(model) {
-  scout.TileGridAdapter.parent.prototype._initProperties.call(this, model);
-  if (!scout.objects.isNullOrUndefined(model.filteredTiles)) {
+_initProperties(model) {
+  super._initProperties( model);
+  if (!objects.isNullOrUndefined(model.filteredTiles)) {
     // If filteredTiles is set a server side filter is active -> add a tile filter on JS side as well
     this.tileFilter = scout.create('RemoteTileFilter', {
       tileIds: model.filteredTiles
@@ -37,13 +43,13 @@ scout.TileGridAdapter.prototype._initProperties = function(model) {
   }
   // filtered tiles are set by TileGrid.js as soon a applyFilters is called -> don't override with the values sent by the server
   delete model.filteredTiles;
-};
+}
 
-scout.TileGridAdapter.prototype._syncFilteredTiles = function(tileIds) {
+_syncFilteredTiles(tileIds) {
   // If filteredTiles property changes on the fly, create or remove the filter accordingly
   // -> If filteredTiles is null, no server side filter is active
   // -> If filteredTiles is an empty array, the server side filter rejects every tile
-  if (!scout.objects.isNullOrUndefined(tileIds)) {
+  if (!objects.isNullOrUndefined(tileIds)) {
     if (!this.tileFilter) {
       this.tileFilter = scout.create('RemoteTileFilter');
       this.widget.addFilter(this.tileFilter);
@@ -54,29 +60,30 @@ scout.TileGridAdapter.prototype._syncFilteredTiles = function(tileIds) {
     this.tileFilter = null;
   }
   this.widget.filter();
-};
+}
 
-scout.TileGridAdapter.prototype._onWidgetTileClick = function(event) {
+_onWidgetTileClick(event) {
   var data = {
     tile: event.tile.id,
     mouseButton: event.mouseButton
   };
   this._send('tileClick', data);
-};
+}
 
-scout.TileGridAdapter.prototype._onWidgetTileAction = function(event) {
+_onWidgetTileAction(event) {
   var data = {
     tile: event.tile.id
   };
   this._send('tileAction', data);
-};
+}
 
-scout.TileGridAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'tileClick') {
     this._onWidgetTileClick(event);
   } else if (event.type === 'tileAction') {
     this._onWidgetTileAction(event);
   } else {
-    scout.TileGridAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

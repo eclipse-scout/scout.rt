@@ -8,66 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabItem = function() {
-  scout.TabItem.parent.call(this);
+import {TabItemLayout} from '../../../index';
+import {GroupBox} from '../../../index';
+
+export default class TabItem extends GroupBox {
+
+constructor() {
+  super();
   this.marked = false;
-};
-scout.inherits(scout.TabItem, scout.GroupBox);
+}
 
-scout.TabItem.prototype._init = function(model) {
-  scout.TabItem.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setMenusVisible(this.menusVisible);
-};
+}
 
-scout.TabItem.prototype._createLayout = function() {
-  return new scout.TabItemLayout(this);
-};
+_createLayout() {
+  return new TabItemLayout(this);
+}
 
 /**
  * @override GroupBox.js
  *
  * handled by Tab.js
  */
-scout.TabItem.prototype._computeTitleVisible = function(labelVisible) {
+_computeTitleVisible(labelVisible) {
   return false;
-};
+}
 
 /**
  * @override GroupBox.js
  *
  * handled by Tab.js
  */
-scout.TabItem.prototype.addStatus = function() {
+addStatus() {
   // void
-};
+}
 /**
  * @override GroupBox.js
  *
  * handled by Tab.js
  */
-scout.TabItem.prototype._computeStatusVisible = function() {
+_computeStatusVisible() {
   return false;
-};
+}
 
-scout.TabItem.prototype.setMarked = function(marked) {
+setMarked(marked) {
   this.setProperty('marked', marked);
-};
+}
 
-scout.TabItem.prototype._setMenusVisible = function() {
+_setMenusVisible() {
   // Always invisible because menus are displayed in menu bar and not with status icon
   // Actually not needed at the moment because only value fields have menus (at least at the java model).
   // But actually we should change this so that menus are possible for every form field
   // TODO [7.0] cgu: remove this comment if java model supports form field menus
   this._setProperty('menusVisible', false);
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.TabItem.prototype.focus = function() {
+focus() {
   if (this.parent.selectedTab !== this) {
     this.parent.setSelectedTab(this);
   }
   // ensure the focus is on the tab
   this.parent.focusTab(this);
-};
+}
+}

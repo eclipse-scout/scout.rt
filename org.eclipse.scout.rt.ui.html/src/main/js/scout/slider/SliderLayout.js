@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SliderLayout = function(slider) {
-  scout.SliderLayout.parent.call(this);
-  this.slider = slider;
-};
-scout.inherits(scout.SliderLayout, scout.AbstractLayout);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
 
-scout.SliderLayout.prototype.layout = function($container) {
-  var size = scout.graphics.size($container);
+export default class SliderLayout extends AbstractLayout {
+
+constructor(slider) {
+  super();
+  this.slider = slider;
+}
+
+
+layout($container) {
+  var size = graphics.size($container);
   this.slider.$sliderInput.css('height', size.height);
   this.slider.$sliderValue.css('height', size.height);
-};
+}
+}

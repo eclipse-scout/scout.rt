@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AlphanumericSortingStringColumn = function() {
-  scout.AlphanumericSortingStringColumn.parent.call(this);
-  this.comparator = scout.comparators.ALPHANUMERIC;
-};
-scout.inherits(scout.AlphanumericSortingStringColumn, scout.Column);
+import {comparators} from '../../index';
+import {Column} from '../../index';
+
+export default class AlphanumericSortingStringColumn extends Column {
+
+constructor() {
+  super();
+  this.comparator = comparators.ALPHANUMERIC;
+}
+
+}

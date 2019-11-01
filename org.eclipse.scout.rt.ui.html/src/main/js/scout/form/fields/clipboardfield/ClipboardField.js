@@ -8,60 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ClipboardField = function() {
-  scout.ClipboardField.parent.call(this);
+import {ValueField} from '../../../index';
+import {strings} from '../../../index';
+import {keys} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {InputFieldKeyStrokeContext} from '../../../index';
+import {dragAndDrop} from '../../../index';
+import {mimeTypes} from '../../../index';
+import * as $ from 'jquery';
+
+export default class ClipboardField extends ValueField {
+
+constructor() {
+  super();
 
   this.dropType = 0;
-  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+  this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this._fileUploadWaitRetryCountTimeout = 99;
   this._fullSelectionLength = 0;
-};
-scout.inherits(scout.ClipboardField, scout.ValueField);
+}
+
 
 // Keys that don't alter the content of a text field and are therefore always allowed in the clipboard field
-scout.ClipboardField.NON_DESTRUCTIVE_KEYS = [
+static NON_DESTRUCTIVE_KEYS = [
   // Default form handling
-  scout.keys.ESC,
-  scout.keys.ENTER,
-  scout.keys.TAB,
+  keys.ESC,
+  keys.ENTER,
+  keys.TAB,
   // Navigate and mark text
-  scout.keys.PAGE_UP,
-  scout.keys.PAGE_DOWN,
-  scout.keys.END,
-  scout.keys.HOME,
-  scout.keys.LEFT,
-  scout.keys.UP,
-  scout.keys.RIGHT,
-  scout.keys.DOWN,
+  keys.PAGE_UP,
+  keys.PAGE_DOWN,
+  keys.END,
+  keys.HOME,
+  keys.LEFT,
+  keys.UP,
+  keys.RIGHT,
+  keys.DOWN,
   // Browser hotkeys (e.g. developer tools)
-  scout.keys.F1,
-  scout.keys.F2,
-  scout.keys.F3,
-  scout.keys.F4,
-  scout.keys.F5,
-  scout.keys.F6,
-  scout.keys.F7,
-  scout.keys.F8,
-  scout.keys.F9,
-  scout.keys.F10,
-  scout.keys.F11,
-  scout.keys.F12
+  keys.F1,
+  keys.F2,
+  keys.F3,
+  keys.F4,
+  keys.F5,
+  keys.F6,
+  keys.F7,
+  keys.F8,
+  keys.F9,
+  keys.F10,
+  keys.F11,
+  keys.F12
 ];
 
 // Keys that always alter the content of a text field, independent from the modifier keys
-scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS = [
-  scout.keys.BACKSPACE,
-  scout.keys.DELETE
+static ALWAYS_DESTRUCTIVE_KEYS = [
+  keys.BACKSPACE,
+  keys.DELETE
 ];
 
 /**
  * @override Widget.js
  */
-scout.ClipboardField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new InputFieldKeyStrokeContext();
+}
 
-scout.ClipboardField.prototype._render = function() {
+_render() {
   // We don't use makeDiv() here intentionally because the DIV created must
   // not have the 'unselectable' attribute. Otherwise clipboard-field will
   // not work in IE9.
@@ -79,16 +91,16 @@ scout.ClipboardField.prototype._render = function() {
     .on('paste', this._onPaste.bind(this))
     .on('copy', this._onCopy.bind(this))
     .on('cut', this._onCopy.bind(this));
-};
+}
 
-scout.ClipboardField.prototype._renderProperties = function() {
-  scout.ClipboardField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderDropType();
-};
+}
 
-scout.ClipboardField.prototype._createDragAndDropHandler = function() {
-  return scout.dragAndDrop.handler(this, {
-    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+_createDragAndDropHandler() {
+  return dragAndDrop.handler(this, {
+    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -99,9 +111,9 @@ scout.ClipboardField.prototype._createDragAndDropHandler = function() {
       return this.allowedMimeTypes;
     }.bind(this)
   });
-};
+}
 
-scout.ClipboardField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   var displayText = this.displayText;
   var img;
   this.$field.children().each(function(idx, elem) {
@@ -110,8 +122,8 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
     }
   });
 
-  if (scout.strings.hasText(displayText)) {
-    this.$field.html(scout.strings.nl2br(displayText, true));
+  if (strings.hasText(displayText)) {
+    this.$field.html(strings.nl2br(displayText, true));
     this._installScrollbars();
 
     setTimeout(function() {
@@ -127,7 +139,7 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
   if (img) {
     this.$field.prepend(img);
   }
-};
+}
 
 // Because a <div> is used as field, jQuery's val() used in ValueField.js is not working here, so
 // the content of displayText variable is used instead.
@@ -136,11 +148,11 @@ scout.ClipboardField.prototype._renderDisplayText = function() {
 // So instead of reading the effective displayText from the field, the internal displayText value
 // will be reused without actual reading. Parsing of pasted content is handled onPaste() and stored
 // in this.displayText.)
-scout.ClipboardField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.displayText;
-};
+}
 
-scout.ClipboardField.prototype._getSelection = function() {
+_getSelection() {
   var selection, myWindow = this.$container.window(true);
   if (myWindow.getSelection) {
     selection = myWindow.getSelection();
@@ -151,27 +163,27 @@ scout.ClipboardField.prototype._getSelection = function() {
     return null;
   }
   return selection;
-};
+}
 
-scout.ClipboardField.prototype._onKeyDown = function(event) {
-  if (scout.isOneOf(event.which, scout.ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
+_onKeyDown(event) {
+  if (scout.isOneOf(event.which, ClipboardField.ALWAYS_DESTRUCTIVE_KEYS)) {
     return false; // never allowed
   }
-  if (event.ctrlKey || event.altKey || event.metaKey || scout.isOneOf(event.which, scout.ClipboardField.NON_DESTRUCTIVE_KEYS)) {
+  if (event.ctrlKey || event.altKey || event.metaKey || scout.isOneOf(event.which, ClipboardField.NON_DESTRUCTIVE_KEYS)) {
     return; // allow bubble to other event handlers
   }
   // do not allow to enter something manually
   return false;
-};
+}
 
-scout.ClipboardField.prototype._onInput = function(event) {
+_onInput(event) {
   // if the user somehow managed to fire to input something (e.g. "delete" menu in FF & IE), just reset the value to the previous content
   this._renderDisplayText();
   return false;
-};
+}
 
-scout.ClipboardField.prototype._onCopy = function(event) {
-  if (scout.device.isIos() && this._onIosCopy(event) === false) {
+_onCopy(event) {
+  if (Device.get().isIos() && this._onIosCopy(event) === false) {
     return;
   }
 
@@ -222,9 +234,9 @@ scout.ClipboardField.prototype._onCopy = function(event) {
   this._installScrollbars();
 
   return false;
-};
+}
 
-scout.ClipboardField.prototype._onIosCopy = function(event) {
+_onIosCopy(event) {
   // Setting custom clipboard data is not possible with iOS due to a WebKit bug.
   // The default behavior copies rich text. Since it is not expected to copy the style of the clipboard field, temporarily set color and background-color
   // https://bugs.webkit.org/show_bug.cgi?id=176980
@@ -237,9 +249,9 @@ scout.ClipboardField.prototype._onIosCopy = function(event) {
     this.$field.attrOrRemove('style', oldStyle);
   }.bind(this));
   return false;
-};
+}
 
-scout.ClipboardField.prototype._onPaste = function(event) {
+_onPaste(event) {
   if (this.readOnly) {
     // Prevent pasting in "copy" mode
     return false;
@@ -267,7 +279,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
   if (textContent) {
     if (window.Blob) {
       filesArgument.push(new Blob([textContent], {
-        type: scout.mimeTypes.TEXT_PLAIN
+        type: mimeTypes.TEXT_PLAIN
       }));
       contentCount++;
     } else {
@@ -279,14 +291,14 @@ scout.ClipboardField.prototype._onPaste = function(event) {
 
   if (contentCount === 0 && dataTransfer.items) {
     Array.prototype.forEach.call(dataTransfer.items, function(item) {
-      if (item.type === scout.mimeTypes.TEXT_PLAIN) {
+      if (item.type === mimeTypes.TEXT_PLAIN) {
         item.getAsString(function(str) {
           filesArgument.push(new Blob([str], {
-            type: scout.mimeTypes.TEXT_PLAIN
+            type: mimeTypes.TEXT_PLAIN
           }));
           contentCount++;
         });
-      } else if (scout.isOneOf(item.type, [scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF])) {
+      } else if (scout.isOneOf(item.type, [mimeTypes.IMAGE_PNG, mimeTypes.IMAGE_JPG, mimeTypes.IMAGE_JPEG, mimeTypes.IMAGE_GIF])) {
         var file = item.getAsFile();
         if (file) {
           // When pasting an image from the clipboard, Chrome and Firefox create a File object with
@@ -375,7 +387,7 @@ scout.ClipboardField.prototype._onPaste = function(event) {
           var srcAttr = $(elem).attr('src');
           var srcDataMatch = /^data:(.*);base64,(.*)/.exec(srcAttr);
           var mimeType = srcDataMatch && srcDataMatch[1];
-          if (scout.isOneOf(mimeType, scout.mimeTypes.IMAGE_PNG, scout.mimeTypes.IMAGE_JPG, scout.mimeTypes.IMAGE_JPEG, scout.mimeTypes.IMAGE_GIF)) {
+          if (scout.isOneOf(mimeType, mimeTypes.IMAGE_PNG, mimeTypes.IMAGE_JPG, mimeTypes.IMAGE_JPEG, mimeTypes.IMAGE_GIF)) {
             var encData = window.atob(srcDataMatch[2]); // base64 decode
             var byteNumbers = [];
             for (var i = 0; i < encData.length; i++) {
@@ -396,10 +408,10 @@ scout.ClipboardField.prototype._onPaste = function(event) {
       } else {
         // try to read nativly pasted text from field
         var nativePasteContent = this.$field.text();
-        if (scout.strings.hasText(nativePasteContent)) {
+        if (strings.hasText(nativePasteContent)) {
           this.setDisplayText(nativePasteContent);
           filesArgument.push(new Blob([nativePasteContent], {
-            type: scout.mimeTypes.TEXT_PLAIN
+            type: mimeTypes.TEXT_PLAIN
           }));
         } else {
           restoreOldHtmlContent();
@@ -420,4 +432,5 @@ scout.ClipboardField.prototype._onPaste = function(event) {
     // trigger other actions to catch content
     return true;
   }
-};
+}
+}

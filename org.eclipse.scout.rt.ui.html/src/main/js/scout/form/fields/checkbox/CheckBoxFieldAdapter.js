@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CheckBoxFieldAdapter = function() {
-  scout.CheckBoxFieldAdapter.parent.call(this);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class CheckBoxFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['value']);
-};
-scout.inherits(scout.CheckBoxFieldAdapter, scout.ValueFieldAdapter);
+}
+
+}

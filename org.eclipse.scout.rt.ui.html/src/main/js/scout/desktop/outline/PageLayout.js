@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PageLayout = function(outline, page) {
-  scout.PageLayout.parent.call(this);
+import {AbstractLayout} from '../../index';
+import {Dimension} from '../../index';
+import {graphics} from '../../index';
+
+export default class PageLayout extends AbstractLayout {
+
+constructor(outline, page) {
+  super();
   this.outline = outline;
   this.page = page;
-};
-scout.inherits(scout.PageLayout, scout.AbstractLayout);
+}
 
-scout.PageLayout.prototype.layout = function($container) {
+
+layout($container) {
   var containerSize, detailMenuBarSize,
     htmlContainer = this.page.htmlComp,
     $text = this.page.$text,
@@ -38,7 +44,7 @@ scout.PageLayout.prototype.layout = function($container) {
 
   if (detailMenuBar.visible) {
     detailMenuBarHeight = detailMenuBar.htmlComp.prefSize().height;
-    detailMenuBarSize = new scout.Dimension(containerSize.width, detailMenuBarHeight)
+    detailMenuBarSize = new Dimension(containerSize.width, detailMenuBarHeight)
       .subtract(detailMenuBar.htmlComp.margins());
     detailMenuBar.htmlComp.setSize(detailMenuBarSize);
   }
@@ -48,20 +54,20 @@ scout.PageLayout.prototype.layout = function($container) {
       iconHeight = $icon.outerHeight(true);
     }
     titleHeight = Math.max($text.outerHeight(true), iconHeight);
-    this.outline.detailContent.htmlComp.setSize(new scout.Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
+    this.outline.detailContent.htmlComp.setSize(new Dimension(containerSize.width, containerSize.height - titleHeight - detailMenuBarHeight));
   }
-};
+}
 
-scout.PageLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var prefSize, containerSize, textHeight,
     iconHeight = 0,
     htmlContainer = this.page.htmlComp,
-    detailContentPrefSize = new scout.Dimension(),
+    detailContentPrefSize = new Dimension(),
     $text = this.page.$text,
     $icon = this.page.$icon(),
     titlePrefHeight = 0,
     detailMenuBar = this.outline.detailMenuBar,
-    detailMenuBarPrefSize = new scout.Dimension(),
+    detailMenuBarPrefSize = new Dimension(),
     nodeMenuBar = this.outline.nodeMenuBar,
     nodeMenuBarWidth = 0;
 
@@ -73,7 +79,7 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
   }
 
   // needs a width to be able to calculate the pref height -> container width needs to be correct already
-  textHeight = scout.graphics.prefSize($text, {
+  textHeight = graphics.prefSize($text, {
     includeMargin: true,
     widthHint: containerSize.width - nodeMenuBarWidth
   }).height;
@@ -91,7 +97,8 @@ scout.PageLayout.prototype.preferredLayoutSize = function($container) {
     detailContentPrefSize = this.outline.detailContent.htmlComp.prefSize();
   }
 
-  prefSize = new scout.Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
+  prefSize = new Dimension(Math.max(detailContentPrefSize.width, detailMenuBarPrefSize.width), titlePrefHeight + detailMenuBarPrefSize.height + detailContentPrefSize.height);
   prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
-};
+}
+}

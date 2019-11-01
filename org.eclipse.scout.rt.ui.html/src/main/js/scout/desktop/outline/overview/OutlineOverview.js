@@ -8,42 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineOverview = function() {
-  scout.OutlineOverview.parent.call(this);
-  this.outline = null;
-};
-scout.inherits(scout.OutlineOverview, scout.Widget);
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {Widget} from '../../../index';
+import {Outline} from '../../../index';
 
-scout.OutlineOverview.prototype._init = function(model) {
-  scout.OutlineOverview.parent.prototype._init.call(this, model);
-  if (!this.outline && this.parent instanceof scout.Outline) {
+export default class OutlineOverview extends Widget {
+
+constructor() {
+  super();
+  this.outline = null;
+}
+
+
+_init(model) {
+  super._init( model);
+  if (!this.outline && this.parent instanceof Outline) {
     this.outline = this.parent;
   }
-  scout.assertProperty(this, 'outline', scout.Outline);
-};
+  scout.assertProperty(this, 'outline', Outline);
+}
 
-scout.OutlineOverview.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('outline-overview');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.$content = this.$container.appendDiv('outline-overview-content');
   this.$content.appendDiv('outline-overview-icon').icon(this.outline.iconId);
   this.$content.appendDiv('outline-overview-title').text(this.outline.title);
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.OutlineOverview.prototype._attach = function() {
+_attach() {
   this.$parent.append(this.$container);
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.size());
-  scout.OutlineOverview.parent.prototype._attach.call(this);
-};
+  super._attach();
+}
 
 /**
  * @override Widget.js
  */
-scout.OutlineOverview.prototype._detach = function() {
+_detach() {
   this.$container.detach();
-  scout.OutlineOverview.parent.prototype._detach.call(this);
-};
+  super._detach();
+}
+}

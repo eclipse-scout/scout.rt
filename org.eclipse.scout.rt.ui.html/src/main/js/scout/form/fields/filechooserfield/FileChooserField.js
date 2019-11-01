@@ -8,18 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooserField = function() {
-  scout.FileChooserField.parent.call(this);
+import {FileChooserFieldDeleteKeyStroke} from '../../../index';
+import {ValueField} from '../../../index';
+import {FileInput} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import {arrays} from '../../../index';
+import {FileChooserFieldBrowseKeyStroke} from '../../../index';
+
+export default class FileChooserField extends ValueField {
+
+constructor() {
+  super();
 
   this.fileInput = null;
 
   this.acceptTypes = null;
-  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
-};
-scout.inherits(scout.FileChooserField, scout.ValueField);
+  this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+}
 
-scout.FileChooserField.prototype._init = function(model) {
-  scout.FileChooserField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this.fileInput.on('change', this._onFileChange.bind(this));
   this.on('propertyChange', function(event) {
@@ -28,13 +38,13 @@ scout.FileChooserField.prototype._init = function(model) {
       this.fileInput.setEnabled(event.newValue);
     }
   }.bind(this));
-};
+}
 
 /**
  * Initializes the file input before calling set value.
  * This cannot be done in _init because the value field would call _setValue first
  */
-scout.FileChooserField.prototype._initValue = function(value) {
+_initValue(value) {
   this.fileInput = scout.create('FileInput', {
     parent: this,
     acceptTypes: this.acceptTypes,
@@ -43,114 +53,115 @@ scout.FileChooserField.prototype._initValue = function(value) {
     maximumUploadSize: this.maximumUploadSize
   });
 
-  scout.FileChooserField.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
-scout.FileChooserField.prototype._initKeyStrokeContext = function() {
-  scout.FileChooserField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   if (!this.fileInput.legacy) {
-    this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldBrowseKeyStroke(this));
-    this.keyStrokeContext.registerKeyStroke(new scout.FileChooserFieldDeleteKeyStroke(this));
+    this.keyStrokeContext.registerKeyStroke(new FileChooserFieldBrowseKeyStroke(this));
+    this.keyStrokeContext.registerKeyStroke(new FileChooserFieldDeleteKeyStroke(this));
   }
-};
+}
 
-scout.FileChooserField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'file-chooser-field has-icon');
   this.addLabel();
   this.addMandatoryIndicator();
   this._renderFileInput();
   this.addIcon();
   this.addStatus();
-};
+}
 
-scout.FileChooserField.prototype._renderFileInput = function() {
+_renderFileInput() {
   this.fileInput.render();
   this.addField(this.fileInput.$container);
-};
+}
 
-scout.FileChooserField.prototype.setDisplayText = function(text) {
-  scout.FileChooserField.parent.prototype.setDisplayText.call(this, text);
+setDisplayText(text) {
+  super.setDisplayText( text);
   this.fileInput.setText(text);
   if (!text) {
     this.fileInput.clear();
   }
-};
+}
 
 /**
  * @override
  */
-scout.FileChooserField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.fileInput.text;
-};
+}
 
-scout.FileChooserField.prototype.setAcceptTypes = function(acceptTypes) {
+setAcceptTypes(acceptTypes) {
   this.setProperty('acceptTypes', acceptTypes);
   this.fileInput.setAcceptTypes(acceptTypes);
-};
+}
 
-scout.FileChooserField.prototype._renderEnabled = function() {
-  scout.FileChooserField.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this.$field.setTabbable(this.enabledComputed);
-};
+}
 
-scout.FileChooserField.prototype._renderPlaceholder = function() {
+_renderPlaceholder() {
   var $field = this.fileInput.$text;
   if ($field) {
     $field.placeholder(this.label);
   }
-};
+}
 
-scout.FileChooserField.prototype._removePlaceholder = function() {
+_removePlaceholder() {
   var $field = this.fileInput.$text;
   if ($field) {
     $field.placeholder('');
   }
-};
+}
 
-scout.FileChooserField.prototype.setMaximumUploadSize = function(maximumUploadSize) {
+setMaximumUploadSize(maximumUploadSize) {
   this.setProperty('maximumUploadSize', maximumUploadSize);
   this.fileInput.setMaximumUploadSize(maximumUploadSize);
-};
+}
 
-scout.FileChooserField.prototype._clear = function() {
+_clear() {
   this.fileInput.clear();
-};
+}
 
-scout.FileChooserField.prototype._onIconMouseDown = function(event) {
-  scout.FileChooserField.parent.prototype._onIconMouseDown.call(this, event);
+_onIconMouseDown(event) {
+  super._onIconMouseDown( event);
   this.activate();
-};
+}
 
-scout.FileChooserField.prototype._onFileChange = function(event) {
-  var file = scout.arrays.first(event.files);
-  if (scout.objects.isNullOrUndefined(file)) {
+_onFileChange(event) {
+  var file = arrays.first(event.files);
+  if (objects.isNullOrUndefined(file)) {
     this.acceptInput(false);
   }
   this.setValue(file);
-};
+}
 
 /**
  * @override
  */
-scout.FileChooserField.prototype.activate = function() {
+activate() {
   if (!this.enabledComputed || !this.rendered) {
     return;
   }
   this.$field.focus();
   this.fileInput.browse();
-};
+}
 
 /**
  * @override
  */
-scout.FileChooserField.prototype._validateValue = function(value) {
+_validateValue(value) {
   this.fileInput.validateMaximumUploadSize(value);
   return value;
-};
+}
 
 /**
  * @override
  */
-scout.FileChooserField.prototype._formatValue = function(value) {
+_formatValue(value) {
   return !value ? '' : value.name;
-};
+}
+}

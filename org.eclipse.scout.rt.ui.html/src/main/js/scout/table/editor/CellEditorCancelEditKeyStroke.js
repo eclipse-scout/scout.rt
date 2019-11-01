@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CellEditorCancelEditKeyStroke = function(popup) {
-  scout.CellEditorCancelEditKeyStroke.parent.call(this);
-  this.field = popup;
-  this.which = [scout.keys.ESC];
-  this.stopPropagation = true;
-};
-scout.inherits(scout.CellEditorCancelEditKeyStroke, scout.KeyStroke);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
 
-scout.CellEditorCancelEditKeyStroke.prototype.handle = function(event) {
+export default class CellEditorCancelEditKeyStroke extends KeyStroke {
+
+constructor(popup) {
+  super();
+  this.field = popup;
+  this.which = [keys.ESC];
+  this.stopPropagation = true;
+}
+
+
+handle(event) {
   this.field.cancelEdit();
-};
+}
+}

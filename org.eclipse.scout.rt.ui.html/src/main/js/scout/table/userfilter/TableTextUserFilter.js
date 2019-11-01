@@ -8,28 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableTextUserFilter = function() {
-  scout.TableTextUserFilter.parent.call(this);
-  this.filterType = scout.TableTextUserFilter.TYPE;
-};
-scout.inherits(scout.TableTextUserFilter, scout.TableUserFilter);
+import {TableUserFilter} from '../../index';
 
-scout.TableTextUserFilter.TYPE = 'text';
+export default class TableTextUserFilter extends TableUserFilter {
+
+constructor() {
+  super();
+  this.filterType = TableTextUserFilter.TYPE;
+}
+
+
+static TYPE = 'text';
 
 /**
  * @override TableUserFilter.js
  */
-scout.TableTextUserFilter.prototype.createFilterAddedEventData = function() {
-  var data = scout.TableTextUserFilter.parent.prototype.createFilterAddedEventData.call(this);
+createFilterAddedEventData() {
+  var data = super.createFilterAddedEventData();
   data.text = this.text;
   return data;
-};
+}
 
-scout.TableTextUserFilter.prototype.createLabel = function() {
+createLabel() {
   return this.text;
-};
+}
 
-scout.TableTextUserFilter.prototype.accept = function(row) {
+accept(row) {
   var rowText = this.table.visibleColumns().reduce(function(acc, column) {
     return acc + column.cellTextForTextFilter(row) + ' ';
   }, '');
@@ -39,4 +43,5 @@ scout.TableTextUserFilter.prototype.accept = function(row) {
   }
   rowText = rowText.trim().toLowerCase();
   return rowText.indexOf(this._cachedTextLowerCase) > -1;
-};
+}
+}

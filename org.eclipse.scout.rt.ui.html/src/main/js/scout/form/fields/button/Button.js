@@ -8,11 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Button = function() {
-  scout.Button.parent.call(this);
+import {icons} from '../../../index';
+import {KeyStrokeContext} from '../../../index';
+import {ButtonKeyStroke} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {ButtonLayout} from '../../../index';
+import {LoadingSupport} from '../../../index';
+import {styles} from '../../../index';
+import {tooltips} from '../../../index';
+import {FormField} from '../../../index';
+
+export default class Button extends FormField {
+
+constructor() {
+  super();
 
   this.defaultButton = false;
-  this.displayStyle = scout.Button.DisplayStyle.DEFAULT;
+  this.displayStyle = Button.DisplayStyle.DEFAULT;
   this.gridDataHints.fillHorizontal = false;
   this.htmlEnabled = false;
   this.iconId = null;
@@ -20,18 +33,18 @@ scout.Button = function() {
   this.processButton = true;
   this.selected = false;
   this.statusVisible = false;
-  this.systemType = scout.Button.SystemType.NONE;
+  this.systemType = Button.SystemType.NONE;
   this.preventDoubleClick = false;
   this.stackable = true;
   this.shrinkable = false;
 
   this.$buttonLabel = null;
-  this.buttonKeyStroke = new scout.ButtonKeyStroke(this, null);
+  this.buttonKeyStroke = new ButtonKeyStroke(this, null);
   this._addCloneProperties(['defaultButton', 'displayStyle', 'iconId', 'keyStroke', 'processButton', 'selected', 'systemType', 'preventDoubleClick', 'stackable', 'shrinkable']);
-};
-scout.inherits(scout.Button, scout.FormField);
+}
 
-scout.Button.SystemType = {
+
+static SystemType = {
   NONE: 0,
   CANCEL: 1,
   CLOSE: 2,
@@ -41,32 +54,32 @@ scout.Button.SystemType = {
   SAVE_WITHOUT_MARKER_CHANGE: 6
 };
 
-scout.Button.DisplayStyle = {
+static DisplayStyle = {
   DEFAULT: 0,
   TOGGLE: 1,
   RADIO: 2,
   LINK: 3
 };
 
-scout.Button.SUBMENU_ICON = scout.icons.ANGLE_DOWN_BOLD;
+static SUBMENU_ICON = icons.ANGLE_DOWN_BOLD;
 
-scout.Button.prototype._init = function(model) {
-  scout.Button.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.resolveIconIds(['iconId']);
   this._setKeyStroke(this.keyStroke);
   this._setKeyStrokeScope(this.keyStrokeScope);
   this._setInheritAccessibility(this.inheritAccessibility && !this._isIgnoreAccessibilityFlags());
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype._initKeyStrokeContext = function() {
-  scout.Button.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this._initDefaultKeyStrokes();
 
-  this.formKeyStrokeContext = new scout.KeyStrokeContext();
+  this.formKeyStrokeContext = new KeyStrokeContext();
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.buttonKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
@@ -81,38 +94,38 @@ scout.Button.prototype._initKeyStrokeContext = function() {
     // use desktop otherwise
     return this.session.desktop.$container;
   }.bind(this);
-};
+}
 
-scout.Button.prototype._isIgnoreAccessibilityFlags = function() {
-  return this.systemType === scout.Button.SystemType.CANCEL || this.systemType === scout.Button.SystemType.CLOSE;
-};
+_isIgnoreAccessibilityFlags() {
+  return this.systemType === Button.SystemType.CANCEL || this.systemType === Button.SystemType.CLOSE;
+}
 
-scout.Button.prototype._initDefaultKeyStrokes = function() {
+_initDefaultKeyStrokes() {
   this.keyStrokeContext.registerKeyStroke([
-    new scout.ButtonKeyStroke(this, 'ENTER'),
-    new scout.ButtonKeyStroke(this, 'SPACE')
+    new ButtonKeyStroke(this, 'ENTER'),
+    new ButtonKeyStroke(this, 'SPACE')
   ]);
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this,
     $container: function() {
       return this.$field;
     }.bind(this)
   });
-};
+}
 
 /**
  * The button form-field has no label and no status. Additionally it also has no container.
  * Container and field are the same thing.
  */
-scout.Button.prototype._render = function() {
+_render() {
   var $button;
-  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
+  if (this.displayStyle === Button.DisplayStyle.LINK) {
     // Render as link-button/ menu-item.
     // This is a bit weird: the model defines a button, but in the UI it behaves like a menu-item.
     // Probably it would be more reasonable to change the configuration (which would lead to additional
@@ -127,11 +140,11 @@ scout.Button.prototype._render = function() {
       .addClass('button');
     this.$buttonLabel = $button.appendSpan('button-label');
 
-    if (scout.device.supportsTouch()) {
+    if (Device.get().supportsTouch()) {
       $button.setTabbable(false);
     }
   }
-  this.addContainer(this.$parent, 'button-field', new scout.ButtonLayout(this));
+  this.addContainer(this.$parent, 'button-field', new ButtonLayout(this));
   this.addField($button);
   // TODO [10.0] cgu: should we add a label? -> would make it possible to control the space left of the button using labelVisible, like it is possible with checkboxes
   this.addStatus();
@@ -144,7 +157,7 @@ scout.Button.prototype._render = function() {
       this.keyStrokeContext.registerKeyStroke(menu);
     }, this);
     if (this.label || !this.iconId) { // no indicator when _only_ the icon is visible
-      var icon = scout.icons.parseIconId(scout.Button.SUBMENU_ICON);
+      var icon = icons.parseIconId(Button.SUBMENU_ICON);
       this.$submenuIcon = (this.$link || $button)
         .appendSpan('submenu-icon')
         .text(icon.iconCharacter);
@@ -152,72 +165,72 @@ scout.Button.prototype._render = function() {
   }
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
 
-  scout.tooltips.installForEllipsis(this.$buttonLabel, {
+  tooltips.installForEllipsis(this.$buttonLabel, {
     parent: this
   });
-};
+}
 
-scout.Button.prototype._remove = function() {
-  scout.Button.parent.prototype._remove.call(this);
-  scout.tooltips.uninstall(this.$buttonLabel);
+_remove() {
+  super._remove();
+  tooltips.uninstall(this.$buttonLabel);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
   this.$submenuIcon = null;
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype._renderProperties = function() {
-  scout.Button.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderIconId();
   this._renderSelected();
   this._renderDefaultButton();
-};
+}
 
-scout.Button.prototype._renderForegroundColor = function() {
-  scout.Button.parent.prototype._renderForegroundColor.call(this);
+_renderForegroundColor() {
+  super._renderForegroundColor();
   // Color button label as well, otherwise the color would not be visible because button label has already a color set using css
-  scout.styles.legacyForegroundColor(this, this.$buttonLabel);
-  scout.styles.legacyForegroundColor(this, this.get$Icon());
-  scout.styles.legacyForegroundColor(this, this.$submenuIcon);
-};
+  styles.legacyForegroundColor(this, this.$buttonLabel);
+  styles.legacyForegroundColor(this, this.get$Icon());
+  styles.legacyForegroundColor(this, this.$submenuIcon);
+}
 
-scout.Button.prototype._renderBackgroundColor = function() {
-  scout.Button.parent.prototype._renderBackgroundColor.call(this);
-  scout.styles.legacyBackgroundColor(this, this.$fieldContainer);
-};
+_renderBackgroundColor() {
+  super._renderBackgroundColor();
+  styles.legacyBackgroundColor(this, this.$fieldContainer);
+}
 
-scout.Button.prototype._renderFont = function() {
-  scout.Button.parent.prototype._renderFont.call(this);
-  scout.styles.legacyFont(this, this.$buttonLabel);
+_renderFont() {
+  super._renderFont();
+  styles.legacyFont(this, this.$buttonLabel);
   // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @returns {Boolean}
  *          <code>true</code> if the action has been performed or <code>false</code> if it
  *          has not been performed (e.g. when the button is not enabled).
  */
-scout.Button.prototype.doAction = function() {
+doAction() {
   if (!this.enabledComputed || !this.visible) {
     return false;
   }
 
-  if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
+  if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
     this.setSelected(!this.selected);
   } else if (this.menus.length > 0) {
     this.togglePopup();
   }
   this._doAction();
   return true;
-};
+}
 
-scout.Button.prototype._doAction = function() {
+_doAction() {
   this.trigger('click');
-};
+}
 
-scout.Button.prototype.togglePopup = function() {
+togglePopup() {
   if (this.popup) {
     this.popup.close();
   } else {
@@ -226,9 +239,9 @@ scout.Button.prototype.togglePopup = function() {
       this.popup = null;
     }.bind(this));
   }
-};
+}
 
-scout.Button.prototype._openPopup = function() {
+_openPopup() {
   var popup = scout.create('ContextMenuPopup', {
     parent: this,
     menuItems: this.menus,
@@ -238,54 +251,54 @@ scout.Button.prototype._openPopup = function() {
   });
   popup.open();
   return popup;
-};
+}
 
-scout.Button.prototype._doActionTogglesSubMenu = function() {
+_doActionTogglesSubMenu() {
   return false;
-};
+}
 
-scout.Button.prototype.setDefaultButton = function(defaultButton) {
+setDefaultButton(defaultButton) {
   this.setProperty('defaultButton', defaultButton);
-};
+}
 
-scout.Button.prototype._renderDefaultButton = function() {
+_renderDefaultButton() {
   this.$field.toggleClass('default', this.defaultButton);
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype._renderEnabled = function() {
-  scout.Button.parent.prototype._renderEnabled.call(this);
-  if (this.displayStyle === scout.Button.DisplayStyle.LINK) {
+_renderEnabled() {
+  super._renderEnabled();
+  if (this.displayStyle === Button.DisplayStyle.LINK) {
     this.$link.setEnabled(this.enabledComputed);
-    this.$field.setTabbable(this.enabledComputed && !scout.device.supportsTouch());
+    this.$field.setTabbable(this.enabledComputed && !Device.get().supportsTouch());
   }
-};
+}
 
-scout.Button.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.Button.prototype._renderSelected = function() {
-  if (this.displayStyle === scout.Button.DisplayStyle.TOGGLE) {
+_renderSelected() {
+  if (this.displayStyle === Button.DisplayStyle.TOGGLE) {
     this.$field.toggleClass('selected', this.selected);
   }
-};
+}
 
-scout.Button.prototype.setHtmlEnabled = function(htmlEnabled) {
+setHtmlEnabled(htmlEnabled) {
   this.setProperty('htmlEnabled', htmlEnabled);
-};
+}
 
-scout.Button.prototype._renderHtmlEnabled = function() {
+_renderHtmlEnabled() {
   // Render the label again when html enabled changes dynamically
   this._renderLabel();
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype._renderLabel = function() {
+_renderLabel() {
   if (this.htmlEnabled) {
     this.$buttonLabel.html(this.label || '');
   } else {
@@ -295,16 +308,16 @@ scout.Button.prototype._renderLabel = function() {
 
   // Invalidate layout because button may now be longer or shorter
   this.invalidateLayoutTree();
-};
+}
 
-scout.Button.prototype.setIconId = function(iconId) {
+setIconId(iconId) {
   this.setProperty('iconId', iconId);
-};
+}
 
 /**
  * Adds an image or font-based icon to the button by adding either an IMG or SPAN element to the button.
  */
-scout.Button.prototype._renderIconId = function() {
+_renderIconId() {
   var $iconTarget = this.$link || this.$fieldContainer;
   $iconTarget.icon(this.iconId);
   var $icon = $iconTarget.data('$icon');
@@ -321,7 +334,7 @@ scout.Button.prototype._renderIconId = function() {
         .on('error', updateButtonLayoutAfterImageLoaded.bind(this, false));
     }
     if (!this.rendered) {
-      scout.styles.legacyForegroundColor(this, $icon);
+      styles.legacyForegroundColor(this, $icon);
     }
   }
 
@@ -336,29 +349,29 @@ scout.Button.prototype._renderIconId = function() {
     $icon.toggleClass('broken', !success);
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Button.prototype.get$Icon = function() {
+get$Icon() {
   var $iconTarget = this.$link || this.$fieldContainer;
   return $iconTarget.children('.icon');
-};
+}
 
-scout.Button.prototype._updateLabelAndIconStyle = function() {
+_updateLabelAndIconStyle() {
   var hasText = !!this.label;
   this.$buttonLabel.setVisible(hasText || !this.iconId);
   this.get$Icon().toggleClass('with-label', hasText);
-};
+}
 
-scout.Button.prototype.setKeyStroke = function(keyStroke) {
+setKeyStroke(keyStroke) {
   this.setProperty('keyStroke', keyStroke);
-};
+}
 
-scout.Button.prototype._setKeyStroke = function(keyStroke) {
+_setKeyStroke(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.buttonKeyStroke.parseAndSetKeyStroke(this.keyStroke);
-};
+}
 
-scout.Button.prototype._setKeyStrokeScope = function(keyStrokeScope) {
+_setKeyStrokeScope(keyStrokeScope) {
   if (typeof keyStrokeScope === 'string') {
     keyStrokeScope = this._resolveKeyStrokeScope(keyStrokeScope);
     if (!keyStrokeScope) {
@@ -368,9 +381,9 @@ scout.Button.prototype._setKeyStrokeScope = function(keyStrokeScope) {
   }
 
   this._setProperty('keyStrokeScope', keyStrokeScope);
-};
+}
 
-scout.Button.prototype._resolveKeyStrokeScope = function(keyStrokeScope) {
+_resolveKeyStrokeScope(keyStrokeScope) {
   // Basically, the desktop could be used to find the scope, but that would mean to traverse the whole widget tree.
   // To make it faster the form is used instead but that limits the resolving to the form.
   // This should be acceptable because the scope can still be set explicitly without using an id.
@@ -389,9 +402,9 @@ scout.Button.prototype._resolveKeyStrokeScope = function(keyStrokeScope) {
     throw new Error('Could not resolve keyStrokeScope ' + keyStrokeScope + ' using form ' + form);
   }
   return keyStrokeScope;
-};
+}
 
-scout.Button.prototype._onClick = function(event) {
+_onClick(event) {
   if (event.which !== 1) {
     return; // Other button than left mouse button --> nop
   }
@@ -402,45 +415,46 @@ scout.Button.prototype._onClick = function(event) {
   if (this.enabledComputed) {
     this.doAction();
   }
-};
+}
 
-scout.Button.prototype.setStackable = function(stackable) {
+setStackable(stackable) {
   this.setProperty('stackable', stackable);
-};
+}
 
-scout.Button.prototype.setShrinkable = function(shrinkable) {
+setShrinkable(shrinkable) {
   this.setProperty('shrinkable', shrinkable);
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (this.adaptedBy) {
     return this.adaptedBy.getFocusableElement();
   } else {
-    return scout.Button.parent.prototype.getFocusableElement.call(this);
+    return super.getFocusableElement();
   }
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype.isFocusable = function() {
+isFocusable() {
   if (this.adaptedBy) {
     return this.adaptedBy.isFocusable();
   } else {
-    return scout.Button.parent.prototype.isFocusable.call(this);
+    return super.isFocusable();
   }
-};
+}
 
 /**
  * @override
  */
-scout.Button.prototype.focus = function() {
+focus() {
   if (this.adaptedBy) {
     return this.adaptedBy.focus();
   } else {
-    return scout.Button.parent.prototype.focus.call(this);
+    return super.focus();
   }
-};
+}
+}

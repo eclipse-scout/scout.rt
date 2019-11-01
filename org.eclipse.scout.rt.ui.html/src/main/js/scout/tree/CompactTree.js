@@ -8,36 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CompactTree = function() {
-  scout.CompactTree.parent.call(this);
+import {Tree} from '../index';
+import {CompactTreeRightKeyStroke} from '../index';
+import {HtmlComponent} from '../index';
+import {Range} from '../index';
+import {CompactTreeUpKeyStroke} from '../index';
+import {CompactTreeDownKeyStroke} from '../index';
+import {MenuItemsOrder} from '../index';
+import {CompactTreeLeftKeyStroke} from '../index';
+import {TreeLayout} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class CompactTree extends Tree {
+
+constructor() {
+  super();
   this.$nodesContainer;
   this._scrolldirections = 'y';
-};
-scout.inherits(scout.CompactTree, scout.Tree);
+}
+
 
 /**
  * @override Tree.js
  */
-scout.CompactTree.prototype._initTreeKeyStrokeContext = function() {
+_initTreeKeyStrokeContext() {
   this.keyStrokeContext.registerKeyStroke([
-    new scout.CompactTreeUpKeyStroke(this),
-    new scout.CompactTreeDownKeyStroke(this),
-    new scout.CompactTreeLeftKeyStroke(this),
-    new scout.CompactTreeRightKeyStroke(this)
+    new CompactTreeUpKeyStroke(this),
+    new CompactTreeDownKeyStroke(this),
+    new CompactTreeLeftKeyStroke(this),
+    new CompactTreeRightKeyStroke(this)
   ]);
-};
+}
 
-scout.CompactTree.prototype._createTreeNode = function(nodeModel) {
+_createTreeNode(nodeModel) {
   nodeModel = scout.nvl(nodeModel, {});
   nodeModel.parent = this;
   return scout.create('CompactTreeNode', nodeModel);
-};
+}
 
-scout.CompactTree.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('compact-tree');
 
-  var layout = new scout.TreeLayout(this);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  var layout = new TreeLayout(this);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(layout);
 
   this.$data = this.$container.appendDiv('tree-data');
@@ -46,7 +60,7 @@ scout.CompactTree.prototype._render = function() {
   });
   this.menuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.MenuItemsOrder(this.session, 'Tree')
+    menuOrder: new MenuItemsOrder(this.session, 'Tree')
   });
   this.menuBar.render();
 
@@ -54,27 +68,27 @@ scout.CompactTree.prototype._render = function() {
   this._updateNodeDimensions();
   this._renderViewport();
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype._calculateCurrentViewRange = function() {
+_calculateCurrentViewRange() {
   this.viewRangeSize = this.visibleNodesFlat.length;
-  return new scout.Range(0, Math.max(this.visibleNodesFlat.length, 0));
-};
+  return new Range(0, Math.max(this.visibleNodesFlat.length, 0));
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype.calculateViewRangeSize = function() {
+calculateViewRangeSize() {
   return this.visibleNodesFlat.length;
-};
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
+_insertNodeInDOMAtPlace(node, index) {
   var visibleNodeBefore = this.visibleNodesFlat[index - 1];
   var n;
   if (!visibleNodeBefore) {
@@ -89,14 +103,14 @@ scout.CompactTree.prototype._insertNodeInDOMAtPlace = function(node, index) {
     }
     node.$node.insertAfter(n);
   }
-};
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype.selectNodes = function(nodes, debounceSend) {
+selectNodes(nodes, debounceSend) {
   var selectedSectionNodes = [];
-  nodes = scout.arrays.ensure(nodes);
+  nodes = arrays.ensure(nodes);
   nodes.forEach(function(node) {
     // If a section is selected, automatically change selection to first section-node
     if (node.isSection()) {
@@ -108,19 +122,20 @@ scout.CompactTree.prototype.selectNodes = function(nodes, debounceSend) {
     }
   }, this);
 
-  scout.CompactTree.parent.prototype.selectNodes.call(this, selectedSectionNodes);
-};
+  super.selectNodes( selectedSectionNodes);
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype._renderExpansion = function(node) {
+_renderExpansion(node) {
   // nop (not supported by CompactTree)
-};
+}
 
 /**
  * @override
  */
-scout.CompactTree.prototype._updateItemPath = function() {
+_updateItemPath() {
   // nop (not supported by CompactTree)
-};
+}
+}

@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlaceholderTile = function() {
-  scout.PlaceholderTile.parent.call(this);
-  this.cssClass = 'placeholder-tile';
-  this.displayStyle = scout.Tile.DisplayStyle.PLAIN;
-};
-scout.inherits(scout.PlaceholderTile, scout.Tile);
+import {Tile} from '../index';
 
-scout.PlaceholderTile.prototype._setSelectable = function(selectable) {
+export default class PlaceholderTile extends Tile {
+
+constructor() {
+  super();
+  this.cssClass = 'placeholder-tile';
+  this.displayStyle = Tile.DisplayStyle.PLAIN;
+}
+
+
+_setSelectable(selectable) {
   // Placeholder tiles should not be selectable
-  scout.PlaceholderTile.parent.prototype._setSelectable.call(this, false);
-};
+  super._setSelectable( false);
+}
+}

@@ -8,18 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuNavigationExecKeyStroke = function(popup, menuItemClass) {
-  scout.MenuNavigationExecKeyStroke.parent.call(this, popup);
+import {keys} from '../index';
+import {MenuNavigationKeyStroke} from '../index';
+import {menuNavigationKeyStrokes} from '../index';
+
+export default class MenuNavigationExecKeyStroke extends MenuNavigationKeyStroke {
+
+constructor(popup, menuItemClass) {
+  super( popup);
   this._menuItemClass = menuItemClass;
   this.stopImmediatePropagation = true;
-  this.which = [scout.keys.ENTER, scout.keys.SPACE];
+  this.which = [keys.ENTER, keys.SPACE];
   this.renderingHints.render = false;
-};
-scout.inherits(scout.MenuNavigationExecKeyStroke, scout.MenuNavigationKeyStroke);
+}
 
-scout.MenuNavigationExecKeyStroke.prototype.handle = function(event) {
-  var $menuItem = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
+
+handle(event) {
+  var $menuItem = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass).$selected;
   if ($menuItem.length > 0) {
     $menuItem.data('widget').doAction();
   }
-};
+}
+}

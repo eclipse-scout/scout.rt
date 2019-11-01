@@ -8,24 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AggregateTableControlAdapter = function() {
-  scout.AggregateTableControlAdapter.parent.call(this);
-};
-scout.inherits(scout.AggregateTableControlAdapter, scout.TableControlAdapter);
+import {AggregateTableControl} from '../../index';
+import {objects} from '../../index';
+import {scout} from '../../index';
+import {App} from '../../index';
+import {TableControlAdapter} from '../../index';
 
-scout.AggregateTableControlAdapter.modifyAggregateTableControlPrototype = function() {
-  if (!scout.app.remote) {
+export default class AggregateTableControlAdapter extends TableControlAdapter {
+
+constructor() {
+  super();
+}
+
+
+static modifyAggregateTableControlPrototype() {
+  if (!App.get().remote) {
     return;
   }
 
   // _onTableColumnStructureChanged
-  scout.objects.replacePrototypeFunction(scout.AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
+  objects.replacePrototypeFunction(AggregateTableControl, '_onTableColumnStructureChanged', function(vararg) {
     if (this.modelAdapter) {
       this._updateEnabledAndSelectedState();
     } else {
       this._onTableColumnStructureChangedOrig();
     }
   }, true);
-};
+}
+}
 
-scout.addAppListener('bootstrap', scout.AggregateTableControlAdapter.modifyAggregateTableControlPrototype);
+App.addListener('bootstrap', AggregateTableControlAdapter.modifyAggregateTableControlPrototype);

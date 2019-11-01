@@ -8,24 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableToggleRowKeyStroke = function(table) {
-  scout.TableToggleRowKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableToggleRowKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
 
-  this.which = [scout.keys.SPACE];
+  this.which = [keys.SPACE];
   this.stopPropagation = true;
   this.renderingHints.render = false;
-};
-scout.inherits(scout.TableToggleRowKeyStroke, scout.KeyStroke);
+}
 
-scout.TableToggleRowKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableToggleRowKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted &&
     this.field.checkable &&
     this.field.selectedRows.length;
-};
+}
 
-scout.TableToggleRowKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var selectedRows = this.field.selectedRows.filter(function(row) {
     return row.enabled;
   });
@@ -36,4 +41,5 @@ scout.TableToggleRowKeyStroke.prototype.handle = function(event) {
   selectedRows.forEach(function(row) {
     this.field.checkRow(row, checked);
   }, this);
-};
+}
+}

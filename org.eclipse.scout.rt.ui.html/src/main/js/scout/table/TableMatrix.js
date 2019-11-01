@@ -8,16 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableMatrix = function(table, session) {
+import {NumberColumn} from '../index';
+import {DateColumn} from '../index';
+import {DateFormat} from '../index';
+import {IconColumn} from '../index';
+import {dates} from '../index';
+import {comparators} from '../index';
+import {BooleanColumn} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class TableMatrix {
+
+constructor(table, session) {
   this.session = session;
   this.locale = session.locale;
   this._allData = [];
   this._allAxis = [];
   this._rows = table.rows;
   this._table = table;
-};
+}
 
-scout.TableMatrix.DateGroup = {
+static DateGroup = {
   NONE: 0,
   YEAR: 256,
   MONTH: 257,
@@ -25,7 +37,7 @@ scout.TableMatrix.DateGroup = {
   DATE: 259
 };
 
-scout.TableMatrix.NumberGroup = {
+static NumberGroup = {
   COUNT: -1,
   SUM: 1,
   AVG: 2
@@ -34,7 +46,7 @@ scout.TableMatrix.NumberGroup = {
 /**
  * add data axis
  */
-scout.TableMatrix.prototype.addData = function(data, dataGroup) {
+addData(data, dataGroup) {
   var dataAxis = [],
     locale = this.locale;
 
@@ -50,14 +62,14 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
   };
 
   // count, sum, avg
-  if (dataGroup === scout.TableMatrix.NumberGroup.COUNT) {
+  if (dataGroup === TableMatrix.NumberGroup.COUNT) {
     dataAxis.norm = function(f) {
       return 1;
     };
     dataAxis.group = function(array) {
       return array.length;
     };
-  } else if (dataGroup === scout.TableMatrix.NumberGroup.SUM) {
+  } else if (dataGroup === TableMatrix.NumberGroup.SUM) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -70,7 +82,7 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
         return a + b;
       });
     };
-  } else if (dataGroup === scout.TableMatrix.NumberGroup.AVG) {
+  } else if (dataGroup === TableMatrix.NumberGroup.AVG) {
     dataAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -95,10 +107,10 @@ scout.TableMatrix.prototype.addData = function(data, dataGroup) {
   }
 
   return dataAxis;
-};
+}
 
 //add x or y Axis
-scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
+addAxis(axis, axisGroup) {
   var keyAxis = [],
     locale = this.locale,
     session = this.session,
@@ -154,8 +166,8 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   };
 
   // norm and format depends of datatype and group functionality
-  if (axis instanceof scout.DateColumn) {
-    if (axisGroup === scout.TableMatrix.DateGroup.NONE) {
+  if (axis instanceof DateColumn) {
+    if (axisGroup === TableMatrix.DateGroup.NONE) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -169,14 +181,14 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         } else {
           var format = axis.format;
           if (format) {
-            format = scout.DateFormat.ensure(locale, format);
+            format = DateFormat.ensure(locale, format);
           } else {
             format = locale.dateFormat;
           }
           return format.format(new Date(n));
         }
       };
-    } else if (axisGroup === scout.TableMatrix.DateGroup.YEAR) {
+    } else if (axisGroup === TableMatrix.DateGroup.YEAR) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -191,7 +203,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return String(n);
         }
       };
-    } else if (axisGroup === scout.TableMatrix.DateGroup.MONTH) {
+    } else if (axisGroup === TableMatrix.DateGroup.MONTH) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -206,7 +218,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return locale.dateFormatSymbols.months[n];
         }
       };
-    } else if (axisGroup === scout.TableMatrix.DateGroup.WEEKDAY) {
+    } else if (axisGroup === TableMatrix.DateGroup.WEEKDAY) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
@@ -222,23 +234,23 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
           return locale.dateFormatSymbols.weekdaysOrdered[n];
         }
       };
-    } else if (axisGroup === scout.TableMatrix.DateGroup.DATE) {
+    } else if (axisGroup === TableMatrix.DateGroup.DATE) {
       keyAxis.norm = function(f) {
         if (f === null || f === '') {
           return null;
         } else {
-          return scout.dates.trunc(f).getTime();
+          return dates.trunc(f).getTime();
         }
       };
       keyAxis.format = function(n) {
         if (n === null) {
           return emptyCell;
         } else {
-          return scout.dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
+          return dates.format(new Date(n), locale, locale.dateFormatPatternDefault);
         }
       };
     }
-  } else if (axis instanceof scout.NumberColumn) {
+  } else if (axis instanceof NumberColumn) {
     keyAxis.norm = function(f) {
       if (isNaN(f) || f === null || f === '') {
         return null;
@@ -253,7 +265,7 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         return axis.decimalFormat.format(n);
       }
     };
-  } else if (axis instanceof scout.BooleanColumn) {
+  } else if (axis instanceof BooleanColumn) {
     keyAxis.norm = function(f) {
       if (!f) {
         return 0;
@@ -268,11 +280,11 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
         return getText('ui.BooleanColumnGroupingTrue');
       }
     };
-  } else if (axis instanceof scout.IconColumn) {
+  } else if (axis instanceof IconColumn) {
     keyAxis.textIsIcon = true;
   } else {
     keyAxis.reorder = function() {
-      var comparator = scout.comparators.TEXT;
+      var comparator = comparators.TEXT;
       comparator.install(session);
 
       keyAxis.sort(function(a, b) {
@@ -290,12 +302,12 @@ scout.TableMatrix.prototype.addAxis = function(axis, axisGroup) {
   }
 
   return keyAxis;
-};
+}
 
 /**
  * @returns a cube containing the results
  */
-scout.TableMatrix.prototype.calculate = function() {
+calculate() {
   var cube = {},
     r, v, k, data, key, normData, normKey;
 
@@ -383,8 +395,8 @@ scout.TableMatrix.prototype.calculate = function() {
   for (k = 0; k < this._allAxis.length; k++) {
     key = this._allAxis[k];
 
-    key.min = scout.arrays.min(key);
-    key.max = scout.arrays.max(key);
+    key.min = arrays.min(key);
+    key.max = arrays.max(key);
 
     // null value should be handled as first value (in charts)
     if (key.indexOf(null) !== -1) {
@@ -406,9 +418,9 @@ scout.TableMatrix.prototype.calculate = function() {
   };
 
   return cube;
-};
+}
 
-scout.TableMatrix.prototype.columnCount = function(filterNumberColumns) {
+columnCount(filterNumberColumns) {
   var c, column, r, row, cellValue,
     columns = this.columns(filterNumberColumns),
     colCount = [],
@@ -430,33 +442,34 @@ scout.TableMatrix.prototype.columnCount = function(filterNumberColumns) {
     count++;
   }
   return colCount;
-};
+}
 
-scout.TableMatrix.prototype.isEmpty = function() {
+isEmpty() {
   return this._rows.length === 0 || this.columns().length === 0;
-};
+}
 
 /**
- * @returns valid columns for table-matrix (not instance of scout.NumberColumn and not guiOnly)
- * @param filterNumberColumns whether or not to filter scout.NumberColumn, default is true
+ * @returns valid columns for table-matrix (not instance of NumberColumn and not guiOnly)
+ * @param filterNumberColumns whether or not to filter NumberColumn, default is true
  */
-scout.TableMatrix.prototype.columns = function(filterNumberColumns) {
+columns(filterNumberColumns) {
   filterNumberColumns = scout.nvl(filterNumberColumns, true);
   return this._table.visibleColumns().filter(function(column) {
     if (column.guiOnly) {
       return false;
     }
-    if (filterNumberColumns && column instanceof scout.NumberColumn) {
+    if (filterNumberColumns && column instanceof NumberColumn) {
       return false;
     }
     return true;
   });
-};
+}
 
 /**
  * Table rows and columns are not always in a consistent state.
  * @returns {boolean} true, if table is in a valid, consistent state
  * */
-scout.TableMatrix.prototype.isMatrixValid = function() {
+isMatrixValid() {
   return this._table.rows.length === 0 || this.columns(false).length === this._table.rows[0].cells.length;
-};
+}
+}

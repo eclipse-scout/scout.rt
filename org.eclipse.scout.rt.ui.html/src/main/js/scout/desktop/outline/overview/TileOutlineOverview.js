@@ -8,48 +8,55 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileOutlineOverview = function() {
-  scout.TileOutlineOverview.parent.call(this);
+import {TileOutlineOverviewLayout} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {OutlineOverview} from '../../../index';
+
+export default class TileOutlineOverview extends OutlineOverview {
+
+constructor() {
+  super();
   this.pageTileGrid = null;
   this.scrollable = true;
   this._addWidgetProperties(['pageTileGrid']);
-};
-scout.inherits(scout.TileOutlineOverview, scout.OutlineOverview);
+}
 
-scout.TileOutlineOverview.prototype._init = function(model) {
-  scout.TileOutlineOverview.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   if (!this.pageTileGrid) {
     this.pageTileGrid = this._createPageTileGrid();
   }
-};
+}
 
-scout.TileOutlineOverview.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tile-outline-overview');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TileOutlineOverviewLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new TileOutlineOverviewLayout(this));
   this.$content = this.$container.appendDiv('tile-outline-overview-content');
-  this.contentHtmlComp = scout.HtmlComponent.install(this.$content, this.session);
+  this.contentHtmlComp = HtmlComponent.install(this.$content, this.session);
   this.$title = this.$content.appendDiv('tile-outline-overview-title').text(this.outline.title);
-};
+}
 
-scout.TileOutlineOverview.prototype._renderProperties = function() {
-  scout.TileOutlineOverview.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderPageTileGrid();
   this._renderScrollable();
-};
+}
 
-scout.TileOutlineOverview.prototype._renderPageTileGrid = function() {
+_renderPageTileGrid() {
   this.pageTileGrid.render(this.$content);
-};
+}
 
-scout.TileOutlineOverview.prototype._createPageTileGrid = function() {
+_createPageTileGrid() {
   return scout.create('PageTileGrid', {
     parent: this,
     outline: this.outline
   });
-};
+}
 
-scout.TileOutlineOverview.prototype._renderScrollable = function() {
+_renderScrollable() {
   if (this.scrollable) {
     this._installScrollbars({
       axis: 'y'
@@ -57,4 +64,5 @@ scout.TileOutlineOverview.prototype._renderScrollable = function() {
   } else {
     this._uninstallScrollbars();
   }
-};
+}
+}

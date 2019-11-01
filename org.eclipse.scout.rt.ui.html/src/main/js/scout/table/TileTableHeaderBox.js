@@ -8,8 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileTableHeaderBox = function() {
-  scout.TileTableHeaderBox.parent.call(this);
+import {GroupBox} from '../index';
+import {SmartField} from '../index';
+import {ValueField} from '../index';
+import {FormField} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class TileTableHeaderBox extends GroupBox {
+
+constructor() {
+  super();
 
   this.table = null;
   this.labelVisible = false;
@@ -25,22 +34,22 @@ scout.TileTableHeaderBox = function() {
   this._tableGroupHandler = this._onTableGroup.bind(this);
   this._tableSortHandler = this._onTableSort.bind(this);
   this._destroyHandler = this._uninstallListeners.bind(this);
-};
-scout.inherits(scout.TileTableHeaderBox, scout.GroupBox);
+}
 
-scout.TileTableHeaderBox.prototype._installListeners = function() {
+
+_installListeners() {
   this.table.on('group', this._tableGroupHandler);
   this.table.on('sort', this._tableSortHandler);
   this.table.one('destroy', this._destroyHandler);
-};
+}
 
-scout.TileTableHeaderBox.prototype._uninstallListeners = function() {
+_uninstallListeners() {
   this.table.off('group', this._tableGroupHandler);
   this.table.off('sort', this._tableSortHandler);
-};
+}
 
-scout.TileTableHeaderBox.prototype._init = function(model) {
-  scout.TileTableHeaderBox.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   this.table = this.parent;
   this._installListeners();
@@ -56,13 +65,13 @@ scout.TileTableHeaderBox.prototype._init = function(model) {
   this.groupByField = scout.create('SmartField', {
     parent: this,
     label: this.session.text('GroupBy'),
-    labelPosition: scout.FormField.LabelPosition.ON_FIELD,
-    clearable: scout.ValueField.Clearable.ALWAYS,
+    labelPosition: FormField.LabelPosition.ON_FIELD,
+    clearable: ValueField.Clearable.ALWAYS,
     statusVisible: false,
-    displayStyle: scout.SmartField.DisplayStyle.DROPDOWN
+    displayStyle: SmartField.DisplayStyle.DROPDOWN
   });
   this.groupByField.setLookupCall(this._createGroupByLookupCall());
-  this.groupByField.setVisible(!scout.arrays.empty(this.groupByField.lookupCall.data));
+  this.groupByField.setVisible(!arrays.empty(this.groupByField.lookupCall.data));
   this.groupByField.on('propertyChange', this._onGroupingChange.bind(this));
 
   this.insertField(this.groupByField);
@@ -71,44 +80,44 @@ scout.TileTableHeaderBox.prototype._init = function(model) {
   this.sortByField = scout.create('SmartField', {
     parent: this,
     label: this.session.text('SortBy'),
-    labelPosition: scout.FormField.LabelPosition.ON_FIELD,
-    clearable: scout.ValueField.Clearable.ALWAYS,
+    labelPosition: FormField.LabelPosition.ON_FIELD,
+    clearable: ValueField.Clearable.ALWAYS,
     statusVisible: false,
-    displayStyle: scout.SmartField.DisplayStyle.DROPDOWN
+    displayStyle: SmartField.DisplayStyle.DROPDOWN
   });
   this.sortByField.setLookupCall(this._createSortByLookupCall());
-  this.sortByField.setVisible(!scout.arrays.empty(this.sortByField.lookupCall.data));
+  this.sortByField.setVisible(!arrays.empty(this.sortByField.lookupCall.data));
   this.sortByField.on('propertyChange', this._onSortingChange.bind(this));
 
   this.insertField(this.sortByField);
 
   // it's okay to sync the fields here, _onGroupingChange/_onSortingChange will return early since the tileMode property is not set yet at this point
   this._syncSortingGroupingFields();
-};
+}
 
-scout.TileTableHeaderBox.prototype._findSortByLookupRowForKey = function(key) {
+_findSortByLookupRowForKey(key) {
   return this.sortByField.lookupCall.data.map(function(lookupRow) {
     return lookupRow[0];
   }).find(function(rowKey) {
     return rowKey.column === key.column && rowKey.asc === key.asc;
   }, this);
-};
+}
 
-scout.TileTableHeaderBox.prototype._createGroupByLookupCall = function() {
+_createGroupByLookupCall() {
   return scout.create('TileTableHeaderGroupByLookupCall', {
     session: this.session,
     table: this.table
   });
-};
+}
 
-scout.TileTableHeaderBox.prototype._createSortByLookupCall = function() {
+_createSortByLookupCall() {
   return scout.create('TileTableHeaderSortByLookupCall', {
     session: this.session,
     table: this.table
   });
-};
+}
 
-scout.TileTableHeaderBox.prototype._onGroupingChange = function(event) {
+_onGroupingChange(event) {
   if (!this.table.tileMode) {
     return;
   }
@@ -125,9 +134,9 @@ scout.TileTableHeaderBox.prototype._onGroupingChange = function(event) {
     }
     this.isGrouping = false;
   }
-};
+}
 
-scout.TileTableHeaderBox.prototype._onSortingChange = function(event) {
+_onSortingChange(event) {
   if (!this.table.tileMode) {
     return;
   }
@@ -143,10 +152,10 @@ scout.TileTableHeaderBox.prototype._onSortingChange = function(event) {
     }
     this.isSorting = false;
   }
-};
+}
 
-scout.TileTableHeaderBox.prototype._syncSortingGroupingFields = function() {
-  var primaryGroupingColumn = scout.arrays.find(this.table.visibleColumns(), function(column) {
+_syncSortingGroupingFields() {
+  var primaryGroupingColumn = arrays.find(this.table.visibleColumns(), function(column) {
     return column.grouped && column.sortIndex === 0;
   });
   if (primaryGroupingColumn) {
@@ -155,7 +164,7 @@ scout.TileTableHeaderBox.prototype._syncSortingGroupingFields = function() {
     this.groupByField.setValue(null);
   }
 
-  var primarySortingColumn = scout.arrays.find(this.table.visibleColumns(), function(column) {
+  var primarySortingColumn = arrays.find(this.table.visibleColumns(), function(column) {
     return column.sortActive && column.sortIndex === 0;
   });
 
@@ -167,16 +176,17 @@ scout.TileTableHeaderBox.prototype._syncSortingGroupingFields = function() {
   } else {
     this.sortByField.setValue(null);
   }
-};
+}
 
-scout.TileTableHeaderBox.prototype._onTableGroup = function(event) {
+_onTableGroup(event) {
   if (!this.isGrouping) {
     this._syncSortingGroupingFields();
   }
-};
+}
 
-scout.TileTableHeaderBox.prototype._onTableSort = function(event) {
+_onTableSort(event) {
   if (!this.isSorting) {
     this._syncSortingGroupingFields();
   }
-};
+}
+}

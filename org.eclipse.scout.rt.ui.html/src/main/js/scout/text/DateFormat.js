@@ -8,6 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {dates} from '../index';
+import {numbers} from '../index';
+import {DateFormatPatternType} from '../index';
+import {DateFormatPatternDefinition} from '../index';
+import {strings} from '../index';
+import {scout} from '../index';
+
 /**
  * Custom JavaScript Date Format
  *
@@ -29,7 +36,9 @@
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-scout.DateFormat = function(locale, pattern, options) { // NOSONAR
+export default class DateFormat {
+
+constructor(locale, pattern, options) { // NOSONAR
   options = options || {};
 
   /*jshint sub:true*/
@@ -40,8 +49,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
 
   this.symbols = locale.dateFormatSymbols;
   this.symbols.firstDayOfWeek = 1; // monday // TODO [7.0] cgu: deliver from server
-  this.symbols.weekdaysOrdered = scout.dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
-  this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
+  this.symbols.weekdaysOrdered = dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
+  this.symbols.weekdaysShortOrdered = dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.symbols.monthsToNumber;
   this.symbols.monthsShortToNumber;
 
@@ -82,12 +91,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
   //   (e.g. MMMM) to short (e.g. M).
   this._patternDefinitions = [
     // --- Year ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.YEAR,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.YEAR,
       terms: ['yyyy'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4);
+        return strings.padZeroLeft(formatContext.inputDate.getFullYear(), 4).slice(-4);
       },
       parseRegExp: /^(\d{4})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -95,8 +104,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.dateInfo.year = Number(match);
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.YEAR,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.YEAR,
       terms: ['yyy', 'yy', 'y'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -107,7 +116,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           return year.slice(-length);
         }
         // Return max. 2 digits with zero padding
-        return scout.strings.padZeroLeft(year, length).slice(-length);
+        return strings.padZeroLeft(year, length).slice(-length);
       },
       parseRegExp: /^(\d{1,3})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -119,8 +128,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         var startYear = (parseContext.startDate || new Date()).getFullYear();
         // Construct a new year using the startYear's century and the entered 'short year'
         var year = Number(
-          scout.strings.padZeroLeft(startYear, 4).substr(0, 2) +
-          scout.strings.padZeroLeft(match, 2));
+          strings.padZeroLeft(startYear, 4).substr(0, 2) +
+          strings.padZeroLeft(match, 2));
         // Ensure max. 50 years distance between 'startYear' and 'year'
         var distance = year - startYear;
         if (distance <= -50) {
@@ -133,8 +142,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Month ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MONTH,
       terms: ['MMMM'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -147,7 +156,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           if (!symbol) {
             continue; // Ignore empty symbols (otherwise, pattern would match everything)
           }
-          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
             parseContext.dateInfo.month = i;
@@ -160,7 +169,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         if (parseContext.analyze) {
           for (i = 0; i < this.dateFormat.symbols.months.length; i++) {
             symbol = this.dateFormat.symbols.months[i];
-            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
             m = re.exec(symbol);
             if (m) { // match found
               parseContext.dateInfo.month = i;
@@ -173,8 +182,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MONTH,
       terms: ['MMM'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -187,7 +196,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           if (!symbol) {
             continue; // Ignore empty symbols (otherwise, pattern would match everything)
           }
-          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
             parseContext.dateInfo.month = i;
@@ -200,7 +209,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         if (parseContext.analyze) {
           for (i = 0; i < this.dateFormat.symbols.monthsShort.length; i++) {
             symbol = this.dateFormat.symbols.monthsShort[i];
-            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
             m = re.exec(symbol);
             if (m) { // match found
               parseContext.dateInfo.month = i;
@@ -213,12 +222,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MONTH,
       terms: ['MM'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
+        return strings.padZeroLeft(formatContext.inputDate.getMonth() + 1, 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -246,7 +255,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
               }
             }
             parseContext.dateInfo.month = month;
-            parseContext.matchInfo.month = scout.strings.padZeroLeft(String(month + 1), 2);
+            parseContext.matchInfo.month = strings.padZeroLeft(String(month + 1), 2);
             parseContext.inputString = '';
             return '0';
           }
@@ -254,8 +263,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MONTH,
       terms: ['M'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -269,12 +278,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Week in year ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.WEEK_IN_YEAR,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.WEEK_IN_YEAR,
       terms: ['ww'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(scout.dates.weekInYear(formatContext.inputDate), 2);
+        return strings.padZeroLeft(dates.weekInYear(formatContext.inputDate), 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -282,12 +291,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.hints.weekInYear = Number(match);
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.WEEK_IN_YEAR,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.WEEK_IN_YEAR,
       terms: ['w'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return String(scout.dates.weekInYear(formatContext.inputDate));
+        return String(dates.weekInYear(formatContext.inputDate));
       },
       parseRegExp: /^(\d{1,2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -296,12 +305,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Day in month ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.DAY_IN_MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.DAY_IN_MONTH,
       terms: ['dd'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getDate(), 2);
+        return strings.padZeroLeft(formatContext.inputDate.getDate(), 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -322,8 +331,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.DAY_IN_MONTH,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.DAY_IN_MONTH,
       terms: ['d'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -336,8 +345,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Weekday ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.WEEKDAY,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.WEEKDAY,
       terms: ['EEEE'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -350,7 +359,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           if (!symbol) {
             continue; // Ignore empty symbols (otherwise, pattern would match everything)
           }
-          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
             parseContext.matchInfo.weekday = m[1];
@@ -363,7 +372,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         if (parseContext.analyze) {
           for (i = 0; i < this.dateFormat.symbols.weekdays.length; i++) {
             symbol = this.dateFormat.symbols.weekdays[i];
-            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
             m = re.exec(symbol);
             if (m) { // match found
               parseContext.matchInfo.weekday = symbol;
@@ -376,8 +385,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.WEEKDAY,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.WEEKDAY,
       terms: ['EEE', 'EE', 'E'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -390,7 +399,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           if (!symbol) {
             continue; // Ignore empty symbols (otherwise, pattern would match everything)
           }
-          re = new RegExp('^(' + scout.strings.quote(symbol) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(symbol) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
             parseContext.matchInfo.weekday = m[1];
@@ -403,7 +412,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         if (parseContext.analyze) {
           for (i = 0; i < this.dateFormat.symbols.weekdaysShort.length; i++) {
             symbol = this.dateFormat.symbols.weekdaysShort[i];
-            re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+            re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
             m = re.exec(symbol);
             if (m) { // match found
               parseContext.matchInfo.weekday = symbol;
@@ -417,12 +426,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Hour (24h) ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.HOUR_24,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.HOUR_24,
       terms: ['HH'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getHours(), 2);
+        return strings.padZeroLeft(formatContext.inputDate.getHours(), 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -430,8 +439,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.matchInfo.hours = match;
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.HOUR_24,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.HOUR_24,
       terms: ['H'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -444,15 +453,15 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Hour (12h) ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.HOUR_12,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.HOUR_12,
       terms: ['hh'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
         if (formatContext.inputDate.getHours() % 12 === 0) {
           return '12'; // there is no hour '0' in 12-hour format
         }
-        return scout.strings.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
+        return strings.padZeroLeft(formatContext.inputDate.getHours() % 12, 2);
       },
       parseRegExp: /^(10|11|12|0[1-9])(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -472,8 +481,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.HOUR_12,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.HOUR_12,
       terms: ['h'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -489,8 +498,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- AM/PM marker ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.AM_PM,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.AM_PM,
       terms: ['a'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -500,7 +509,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return this.dateFormat.symbols.pm;
       },
       parseFunction: function(parseContext, acceptedTerm) {
-        var re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
+        var re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.am) + ')(.*)$', 'i');
         var m = re.exec(parseContext.inputString);
         parseContext.matchInfo.ampm = null;
         if (m) { // match found
@@ -510,7 +519,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
           parseContext.dateInfo.hours = parseContext.dateInfo.hours % 12;
           return m[1];
         } else {
-          re = new RegExp('^(' + scout.strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(this.dateFormat.symbols.pm) + ')(.*)$', 'i');
           m = re.exec(parseContext.inputString);
           if (m) { // match found
             parseContext.matchInfo.ampm = m[1];
@@ -522,7 +531,7 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         }
         // No match found so far. In analyze mode, check prefixes.
         if (parseContext.analyze) {
-          re = new RegExp('^(' + scout.strings.quote(parseContext.inputString) + ')(.*)$', 'i');
+          re = new RegExp('^(' + strings.quote(parseContext.inputString) + ')(.*)$', 'i');
           m = re.exec(this.dateFormat.symbols.am);
           if (m) {
             parseContext.matchInfo.ampm = this.dateFormat.symbols.am;
@@ -544,12 +553,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Minute ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MINUTE,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MINUTE,
       terms: ['mm'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
+        return strings.padZeroLeft(formatContext.inputDate.getMinutes(), 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -571,8 +580,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         return null; // no match found
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MINUTE,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MINUTE,
       terms: ['m'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -585,12 +594,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Second ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.SECOND,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.SECOND,
       terms: ['ss'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
+        return strings.padZeroLeft(formatContext.inputDate.getSeconds(), 2);
       },
       parseRegExp: /^(\d{2})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -598,8 +607,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.matchInfo.seconds = match;
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.SECOND,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.SECOND,
       terms: ['s'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -612,12 +621,12 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
       }
     }),
     // --- Millisecond ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MILLISECOND,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MILLISECOND,
       terms: ['SSS'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
-        return scout.strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
+        return strings.padZeroLeft(formatContext.inputDate.getMilliseconds(), 3);
       },
       parseRegExp: /^(\d{3})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -625,8 +634,8 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
         parseContext.matchInfo.milliseconds = match;
       }
     }),
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.MILLISECOND,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.MILLISECOND,
       terms: ['S'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
@@ -640,14 +649,14 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
     }),
 
     // --- Time zone ---
-    new scout.DateFormatPatternDefinition({
-      type: scout.DateFormatPatternType.TIMEZONE,
+    new DateFormatPatternDefinition({
+      type: DateFormatPatternType.TIMEZONE,
       terms: ['Z'],
       dateFormat: this,
       formatFunction: function(formatContext, acceptedTerm) {
         var offset = Math.abs(formatContext.inputDate.getTimezoneOffset()),
           isNegative = offset !== formatContext.inputDate.getTimezoneOffset();
-        return (isNegative ? '-' : '+') + scout.strings.padZeroLeft(Math.floor(offset / 60), 2) + scout.strings.padZeroLeft(offset % 60, 2);
+        return (isNegative ? '-' : '+') + strings.padZeroLeft(Math.floor(offset / 60), 2) + strings.padZeroLeft(offset % 60, 2);
       },
       parseRegExp: /^([+|-]\d{4})(.*)$/,
       applyMatchFunction: function(parseContext, match, acceptedTerm) {
@@ -675,9 +684,9 @@ scout.DateFormat = function(locale, pattern, options) { // NOSONAR
   }
 
   this._compile();
-};
+}
 
-scout.DateFormat.prototype._compile = function() {
+_compile() {
   var i, j, patternDefinitions, patternDefinition, re, m, term, termAccepted, analyseFunctions;
 
   // Build format, parse and analyze functions for all terms in the DateFormat's pattern.
@@ -727,25 +736,25 @@ scout.DateFormat.prototype._compile = function() {
       this._analyzeFunctions.push([constantStringParseFunction]);
     }
   }
-};
+}
 
 /**
  * Returns a format function for constant terms (e.g. all parts of a pattern that don't
  * have a DateFormatPatternDefinition).
  */
-scout.DateFormat.prototype._createConstantStringFormatFunction = function(term) {
+_createConstantStringFormatFunction(term) {
   return function(formatContext) {
     formatContext.formattedString += term;
   };
-};
+}
 
 /**
  * Returns a parse function for constant terms (e.g. all parts of a pattern that don't
  * have a DateFormatPatternDefinition).
  */
-scout.DateFormat.prototype._createConstantStringParseFunction = function(term) {
+_createConstantStringParseFunction(term) {
   return function(parseContext) {
-    if (scout.strings.startsWith(parseContext.inputString, term)) {
+    if (strings.startsWith(parseContext.inputString, term)) {
       parseContext.inputString = parseContext.inputString.substr(term.length);
       parseContext.parsedPattern += term;
       return true;
@@ -756,7 +765,7 @@ scout.DateFormat.prototype._createConstantStringParseFunction = function(term) {
     }
     return false;
   };
-};
+}
 
 /**
  * Formats the given date according to the date pattern. If the date is missing, the
@@ -768,7 +777,7 @@ scout.DateFormat.prototype._createConstantStringParseFunction = function(term) {
  *          the parameter is true, 3 are used. This is mainly useful, when an "analyzed"
  *          date should be formatted again using the "parsedPattern".
  */
-scout.DateFormat.prototype.format = function(date, exactLength) {
+format(date, exactLength) {
   if (!date) {
     return '';
   }
@@ -782,7 +791,7 @@ scout.DateFormat.prototype.format = function(date, exactLength) {
     formatFunction(formatContext);
   }
   return formatContext.formattedString;
-};
+}
 
 /**
  * Analyzes the given string and returns an information object with all recognized information
@@ -831,7 +840,7 @@ scout.DateFormat.prototype.format = function(date, exactLength) {
  *   Boolean that indicates if analyzing the input was successful (e.g. if the pattern could be parsed
  *   and a date could be predicted).
  */
-scout.DateFormat.prototype.analyze = function(text, startDate) {
+analyze(text, startDate) {
   var analyzeInfo = this._createAnalyzeInfo(text);
   if (!text) {
     return analyzeInfo;
@@ -873,7 +882,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
   // Try to generate a valid predicted date with the information retrieved so far
   startDate = this._prepareStartDate(startDate);
   if (parseContext.hints.weekday !== undefined) {
-    startDate = scout.dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
+    startDate = dates.shiftToNextDayOfType(startDate, parseContext.hints.weekday);
   }
   var predictedDate = this._dateInfoToDate(parseContext.dateInfo, startDate);
 
@@ -886,7 +895,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
   analyzeInfo.predictedDate = predictedDate;
   analyzeInfo.error = (!predictedDate);
   return analyzeInfo;
-};
+}
 
 /**
  * Parses the given text with the current date format. If the text does not match exactly
@@ -895,7 +904,7 @@ scout.DateFormat.prototype.analyze = function(text, startDate) {
  * The argument 'startDate' is optional. It may set the date where parsed information should
  * be applied to (e.g. relevant for 2-digit years).
  */
-scout.DateFormat.prototype.parse = function(text, startDate) {
+parse(text, startDate) {
   if (!text) {
     return null;
   }
@@ -932,9 +941,9 @@ scout.DateFormat.prototype.parse = function(text, startDate) {
 
   // Return valid date
   return date;
-};
+}
 
-scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
+_dateInfoToDate(dateInfo, startDate) {
   if (!dateInfo) {
     return null;
   }
@@ -962,7 +971,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
     }
     // If day is "29" or "30" and month is february, use next month (except day is "29" and the year is a leap year)
     else if (dateInfo.day >= 29 && validMonth === 1) {
-      if (dateInfo.day > 29 || !scout.dates.isLeapYear(validYear)) {
+      if (dateInfo.day > 29 || !dates.isLeapYear(validYear)) {
         validMonth = validMonth + 1;
       }
     }
@@ -970,7 +979,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
 
   // ensure valid day for selected month for dateInfo without day
   if (!dateInfo.day && dateInfo.month) {
-    var lastOfMonth = scout.dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
+    var lastOfMonth = dates.shift(new Date(validYear, dateInfo.month + 1, 1), 0, 0, -1);
     validDay = Math.min(lastOfMonth.getDate(), startDate.getDate());
   }
 
@@ -1013,7 +1022,7 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   }
 
   // Adjust time zone
-  if (scout.numbers.isNumber(dateInfo.timezone)) {
+  if (numbers.isNumber(dateInfo.timezone)) {
     result.setMinutes(result.getMinutes() - result.getTimezoneOffset() + dateInfo.timezone);
   }
 
@@ -1024,19 +1033,19 @@ scout.DateFormat.prototype._dateInfoToDate = function(dateInfo, startDate) {
   function isValid(value, expectedValue) {
     return (expectedValue === undefined || expectedValue === value);
   }
-};
+}
 
 /**
  * Returns the date where parsed information should be applied to. The given
  * startDate is used when specified, otherwise a new date is created (today).
  */
-scout.DateFormat.prototype._prepareStartDate = function(startDate) {
+_prepareStartDate(startDate) {
   if (startDate) {
     // It is important that we don't alter the argument 'startDate', but create an independent copy!
     return new Date(startDate.getTime());
   }
-  return scout.dates.trunc(new Date()); // clear time
-};
+  return dates.trunc(new Date()); // clear time
+}
 
 /**
  * Returns the "format context", an object that is initially filled with the input date and is then
@@ -1058,13 +1067,13 @@ scout.DateFormat.prototype._prepareStartDate = function(startDate) {
  *   format the year using 2 digits by default. If the parameter is true, 3 are used. This is mainly
  *   useful, when an "analyzed" date should be formatted again using the "parsedPattern".
  */
-scout.DateFormat.prototype._createFormatContext = function(inputDate) {
+_createFormatContext(inputDate) {
   return {
     inputDate: inputDate,
     formattedString: '',
     exactLength: false
   };
-};
+}
 
 /**
  * Returns the "parse context", an object that is initially filled with the input string and is then
@@ -1108,7 +1117,7 @@ scout.DateFormat.prototype._createFormatContext = function(inputDate) {
  *   A date to be used as reference for date calculations. Is used for example when mapping a 2-digit
  *   year to a 4-digit year.
  */
-scout.DateFormat.prototype._createParseContext = function(inputText) {
+_createParseContext(inputText) {
   return {
     inputString: inputText,
     dateInfo: {},
@@ -1118,12 +1127,12 @@ scout.DateFormat.prototype._createParseContext = function(inputText) {
     analyze: false,
     startDate: null
   };
-};
+}
 
 /**
  * @see analyze()
  */
-scout.DateFormat.prototype._createAnalyzeInfo = function(inputText) {
+_createAnalyzeInfo(inputText) {
   return {
     inputString: inputText,
     dateInfo: {},
@@ -1134,14 +1143,15 @@ scout.DateFormat.prototype._createAnalyzeInfo = function(inputText) {
     predictedDate: null,
     error: false
   };
-};
+}
 
-scout.DateFormat.ensure = function(locale, format) {
+static ensure(locale, format) {
   if (!format) {
     return format;
   }
-  if (format instanceof scout.DateFormat) {
+  if (format instanceof DateFormat) {
     return format;
   }
-  return new scout.DateFormat(locale, format);
-};
+  return new DateFormat(locale, format);
+}
+}

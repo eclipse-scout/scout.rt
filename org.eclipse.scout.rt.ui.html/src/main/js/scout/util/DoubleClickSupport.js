@@ -8,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from '../index';
+
 /**
  * Simple helper to determine if two consecutive 'mousedown' events should be considered as a double click.
  *
@@ -25,7 +27,9 @@
  *   Maximum distance (in both directions) between two consecutive mousedown events to consider as
  *   a double click event. If the distance is larger than this value, doubleClicked() will return false.
  */
-scout.DoubleClickSupport = function(options) {
+export default class DoubleClickSupport {
+
+constructor(options) {
   options = options || {};
 
   this._lastPosX;
@@ -35,9 +39,9 @@ scout.DoubleClickSupport = function(options) {
   this._maxDoubleClickInterval = options.maxDoubleClickInterval || 500; // ms
   this._maxDoubleClickDistance = options.maxDoubleClickDistance || 10; // px
   this._doubleClicked = false;
-};
+}
 
-scout.DoubleClickSupport.prototype.mousedown = function(event) {
+mousedown(event) {
   if (event && event.type === 'mousedown') {
     var posX = scout.nvl(event.pageX, 0);
     var posY = scout.nvl(event.pageY, 0);
@@ -58,8 +62,9 @@ scout.DoubleClickSupport.prototype.mousedown = function(event) {
     this._lastTimestamp = timestamp;
     this._doubleClicked = isDoubleClick;
   }
-};
+}
 
-scout.DoubleClickSupport.prototype.doubleClicked = function() {
+doubleClicked() {
   return this._doubleClicked;
-};
+}
+}

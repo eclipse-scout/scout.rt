@@ -8,7 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.KeyStroke = function() {
+import {Key} from '../index';
+import {keys} from '../index';
+import {HAlign} from '../index';
+import {Action} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class KeyStroke {
+
+constructor() {
   this.field = null; // optional model field
 
   this.which = []; // keys which this keystroke is bound to. Typically, this is a single key, but may be multiple keys if handling the same action (e.g. ENTER and SPACE on a button).
@@ -18,10 +27,10 @@ scout.KeyStroke = function() {
   this.preventDefault = true;
   this.stopPropagation = false;
   this.stopImmediatePropagation = false;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
   this.repeatable = false; // whether or not the handle method is called multiple times while a key is pressed
   this._handleExecuted = false; // internal flag to remember whether or not the handle method has been executed (reset on keyup)
-  this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
+  this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
   this.enabledByFilter = true;
 
   // Hints to control rendering of the key(s).
@@ -35,7 +44,7 @@ scout.KeyStroke = function() {
     }.bind(this),
     gap: 4,
     offset: 4,
-    hAlign: scout.HAlign.LEFT,
+    hAlign: HAlign.LEFT,
     text: null,
     $drawingArea: function($drawingArea, event) {
       return $drawingArea;
@@ -52,23 +61,23 @@ scout.KeyStroke = function() {
    * either triggered by previous property or by KeyStrokeContext
    */
   this.preventInvokeAcceptInputOnActiveValueField = false;
-};
+}
 
 /**
  * Parses the given keystroke name into the key parts like 'ctrl', 'shift', 'alt' and 'which'.
  */
-scout.KeyStroke.prototype.parseAndSetKeyStroke = function(keyStrokeName) {
+parseAndSetKeyStroke(keyStrokeName) {
   this.alt = this.ctrl = this.shift = false;
   this.which = [];
   if (keyStrokeName) {
-    $.extend(this, scout.KeyStroke.parseKeyStroke(keyStrokeName));
+    $.extend(this, KeyStroke.parseKeyStroke(keyStrokeName));
   }
-};
+}
 
 /**
  * Returns true if this event is handled by this keystroke, and if so sets the propagation flags accordingly.
  */
-scout.KeyStroke.prototype.accept = function(event) {
+accept(event) {
   if (!this._isEnabled()) {
     return false;
   }
@@ -82,16 +91,16 @@ scout.KeyStroke.prototype.accept = function(event) {
   this._applyPropagationFlags(event);
   //only accept on correct event type -> keyup or keydown. But propagation flags should be set to prevent execution of upper keyStrokes.
   return event.type === this.keyStrokeMode;
-};
+}
 
 /**
  * Method invoked to handle the given keystroke event, and is only called if the event was accepted by 'KeyStroke.accept(event)'.
  */
-scout.KeyStroke.prototype.handle = function(event) {
+handle(event) {
   throw new Error('keystroke event not handled: ' + event);
-};
+}
 
-scout.KeyStroke.prototype.invokeHandle = function(event) {
+invokeHandle(event) {
   // if key stroke is repeatable, handle is called each time the key event occurs
   // which means it is executed multiple times while a key is pressed.
   if (this.repeatable) {
@@ -104,7 +113,7 @@ scout.KeyStroke.prototype.invokeHandle = function(event) {
   if (!this._handleExecuted) {
     this.handle(event);
 
-    if (event.type === scout.KeyStroke.Mode.DOWN) {
+    if (event.type === KeyStroke.Mode.DOWN) {
       this._handleExecuted = true;
 
       // Reset handleExecuted on the next key up event
@@ -121,12 +130,12 @@ scout.KeyStroke.prototype.invokeHandle = function(event) {
       $window[0].addEventListener('keyup', keyUpHandler, true);
     }
   }
-};
+}
 
 /**
  * Method invoked in the context of accepting a keystroke, and returns true if the keystroke is accessible to the user.
  */
-scout.KeyStroke.prototype._isEnabled = function() {
+_isEnabled() {
   // Hint: do not check for which.length because there are keystrokes without a which, e.g. RangeKeyStroke.js
 
   if (this.field) {
@@ -140,19 +149,19 @@ scout.KeyStroke.prototype._isEnabled = function() {
     }
   }
   return true;
-};
+}
 
 /**
  * Method invoked in the context of accepting a keystroke, and returns true if the event matches this keystroke.
  */
-scout.KeyStroke.prototype._accept = function(event) {
-  return scout.KeyStroke.acceptEvent(this, event);
-};
+_accept(event) {
+  return KeyStroke.acceptEvent(this, event);
+}
 
 /**
  * Method invoked in the context of accepting a keystroke, and sets the propagation flags accordingly.
  */
-scout.KeyStroke.prototype._applyPropagationFlags = function(event) {
+_applyPropagationFlags(event) {
   if (this.stopPropagation) {
     event.stopPropagation();
   }
@@ -162,23 +171,23 @@ scout.KeyStroke.prototype._applyPropagationFlags = function(event) {
   if (this.preventDefault) {
     event.preventDefault();
   }
-};
+}
 
 /**
  * Returns the key(s) associated with this keystroke. Typically, this is a single key, but may be multiple if this keystroke is associated with multiple keys, e.g. ENTER and SPACE on a button.
  */
-scout.KeyStroke.prototype.keys = function() {
+keys() {
   return this.which.map(function(which) {
-    return new scout.Key(this, which);
+    return new Key(this, which);
   }, this);
-};
+}
 
 /**
  * Renders the visual representation of this keystroke, with the 'which' as given by the event.
  *
  * @return $drawingArea on which the key was finally rendered.
  */
-scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
+renderKeyBox($drawingArea, event) {
   $drawingArea = this.renderingHints.$drawingArea($drawingArea, event);
   if (!$drawingArea || !$drawingArea.length) {
     return null;
@@ -187,12 +196,12 @@ scout.KeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
   var $keyBox = this._renderKeyBox($drawingArea, event.which);
   this._postRenderKeyBox($drawingArea, $keyBox);
   return $drawingArea;
-};
+}
 
-scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
+_renderKeyBox($parent, keyCode) {
   var $existingKeyBoxes = $('.key-box', $parent);
-  var text = this.renderingHints.text || scout.keys.codesToKeys[keyCode];
-  var align = this.renderingHints.hAlign === scout.HAlign.RIGHT ? 'right' : 'left';
+  var text = this.renderingHints.text || keys.codesToKeys[keyCode];
+  var align = this.renderingHints.hAlign === HAlign.RIGHT ? 'right' : 'left';
   var offset = this.renderingHints.offset;
   $existingKeyBoxes = $existingKeyBoxes.filter(function() {
     if (align === 'right') {
@@ -202,7 +211,7 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
   });
   if ($existingKeyBoxes.length > 0) {
     var $boxLastAdded = $existingKeyBoxes.first();
-    if (this.renderingHints.hAlign === scout.HAlign.RIGHT) {
+    if (this.renderingHints.hAlign === HAlign.RIGHT) {
       offset = $parent.outerWidth() - $boxLastAdded.position().left + this.renderingHints.gap;
     } else {
       offset = $boxLastAdded.position().left + this.renderingHints.gap + $boxLastAdded.outerWidth();
@@ -233,24 +242,24 @@ scout.KeyStroke.prototype._renderKeyBox = function($parent, keyCode) {
       .toggleClass('disabled', !this.enabledByFilter)
       .addClass(align);
   }
-};
+}
 
 /**
  * Method invoked after this keystroke was rendered, and is typically overwritten to reposition the visual representation.
  */
-scout.KeyStroke.prototype._postRenderKeyBox = function($drawingArea) {};
+_postRenderKeyBox($drawingArea) {};
 
 /**
  * Removes the visual representation of this keystroke.
  */
-scout.KeyStroke.prototype.removeKeyBox = function($drawingArea) {
+removeKeyBox($drawingArea) {
   if ($drawingArea) {
     $('.key-box', $drawingArea).remove();
     $('.key-box-additional', $drawingArea).remove();
   }
-};
+}
 
-scout.KeyStroke.Mode = {
+static Mode = {
   UP: 'keyup',
   DOWN: 'keydown'
 };
@@ -264,7 +273,7 @@ scout.KeyStroke.Mode = {
  *     for Key.js and KeyStroke.js
  * @see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
  */
-scout.KeyStroke.parseKeyStroke = function(keyStrokeName) {
+static parseKeyStroke(keyStrokeName) {
   if (!keyStrokeName) {
     return null;
   }
@@ -284,25 +293,26 @@ scout.KeyStroke.parseKeyStroke = function(keyStrokeName) {
     } else if (part === 'shift') {
       keyStrokeObj.shift = true;
     } else {
-      var key = scout.keys[part.toUpperCase()];
+      var key = keys[part.toUpperCase()];
       keyStrokeObj.which = key && [key];
     }
   });
 
   return keyStrokeObj;
-};
+}
 
-scout.KeyStroke.acceptEvent = function(keyStroke, event) {
+static acceptEvent(keyStroke, event) {
   if (!keyStroke) {
     return false;
   }
   //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
-  return scout.KeyStroke._acceptModifier(keyStroke.ctrl, (event.ctrlKey || event.metaKey)) &&
-    scout.KeyStroke._acceptModifier(keyStroke.alt, event.altKey) &&
-    scout.KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey) &&
+  return KeyStroke._acceptModifier(keyStroke.ctrl, (event.ctrlKey || event.metaKey)) &&
+    KeyStroke._acceptModifier(keyStroke.alt, event.altKey) &&
+    KeyStroke._acceptModifier(keyStroke.shift, event.shiftKey) &&
     scout.isOneOf(event.which, keyStroke.which);
-};
+}
 
-scout.KeyStroke._acceptModifier = function(modifier, eventModifier) {
+static _acceptModifier(modifier, eventModifier) {
   return modifier === undefined || modifier === eventModifier;
-};
+}
+}

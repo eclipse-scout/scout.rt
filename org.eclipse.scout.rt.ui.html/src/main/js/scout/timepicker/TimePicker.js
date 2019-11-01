@@ -8,8 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TimePicker = function() {
-  scout.TimePicker.parent.call(this);
+import {Device} from '../index';
+import {scrollbars} from '../index';
+import {dates} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+
+export default class TimePicker extends Widget {
+
+constructor() {
+  super();
 
   // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
   // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
@@ -19,29 +28,29 @@ scout.TimePicker = function() {
   this.resolution = null;
   this.$scrollable = null;
 
-  this.touch = scout.device.supportsTouch();
-};
-scout.inherits(scout.TimePicker, scout.Widget);
+  this.touch = Device.get().supportsTouch();
+}
 
-scout.TimePicker.prototype._init = function(options) {
-  scout.TimePicker.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.resolution = options.timeResolution;
-};
+}
 
-scout.TimePicker.prototype._render = function() {
+_render() {
   this.$container = this.$parent
     .appendDiv('time-picker')
     .toggleClass('touch', this.touch);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
   this._renderTimeSelection();
   this._installScrollbars();
-};
+}
 
-scout.TimePicker.prototype._renderTimeSelection = function() {
+_renderTimeSelection() {
   var i,
-    date = scout.dates.trunc(new Date()),
-    now = scout.dates.ceil(new Date(), this.resolution),
+    date = dates.trunc(new Date()),
+    now = dates.ceil(new Date(), this.resolution),
     currentHours = 0,
     $hourRow,
     $time;
@@ -56,15 +65,15 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
       .data('time', new Date(date))
       .on('click', this._onTimeClick.bind(this));
     $time.appendSpan('text')
-      .text(scout.dates.format(date, this.session.locale, 'HH'));
+      .text(dates.format(date, this.session.locale, 'HH'));
 
     while (currentHours === date.getHours()) {
       $time = $hourRow.appendDiv('cell minutes')
         .data('time', new Date(date))
         .on('click', this._onTimeClick.bind(this));
 
-      $time.appendSpan('text').text(scout.dates.format(date, this.session.locale, ':mm'));
-      if (scout.dates.isSameTime(now, date)) {
+      $time.appendSpan('text').text(dates.format(date, this.session.locale, ':mm'));
+      if (dates.isSameTime(now, date)) {
         $time.addClass('now');
       }
       date.setMinutes(date.getMinutes() + this.resolution);
@@ -72,35 +81,35 @@ scout.TimePicker.prototype._renderTimeSelection = function() {
   }
   $box.appendTo(this.$container);
   return $box;
-};
+}
 
 /**
  * @override
  */
-scout.TimePicker.prototype._installScrollbars = function(options) {
+_installScrollbars(options) {
   this._uninstallScrollbars();
 
-  scout.TimePicker.parent.prototype._installScrollbars.call(this, {
+  super._installScrollbars( {
     axis: 'y'
   });
-};
+}
 
-scout.TimePicker.prototype.preselectTime = function(time) {
+preselectTime(time) {
   if (time) {
     // Clear selection when a date is preselected
     this.setSelectedTime(null);
   }
   this.setPreselectedTime(time);
-};
+}
 
 /**
  * @internal, use preselectDate to preselect a date
  */
-scout.TimePicker.prototype.setPreselectedTime = function(preselectedTime) {
+setPreselectedTime(preselectedTime) {
   this.setProperty('preselectedTime', preselectedTime);
-};
+}
 
-scout.TimePicker.prototype._renderPreselectedTime = function() {
+_renderPreselectedTime() {
   var $scrollTo;
   this.$container.find('.cell').each(function(i, elem) {
     var $time = $(elem),
@@ -110,33 +119,33 @@ scout.TimePicker.prototype._renderPreselectedTime = function() {
       if ($time.hasClass('hours') && this.preselectedTime.getHours() === time.getHours()) {
         $time.addClass('preselected');
         $scrollTo = $time;
-      } else if ($time.hasClass('minutes') && scout.dates.isSameTime(this.preselectedTime, time)) {
+      } else if ($time.hasClass('minutes') && dates.isSameTime(this.preselectedTime, time)) {
         $time.addClass('preselected');
         $scrollTo = $time;
       }
     }
   }.bind(this));
   if ($scrollTo) {
-    scout.scrollbars.scrollTo(this.$container, $scrollTo, 'center');
+    scrollbars.scrollTo(this.$container, $scrollTo, 'center');
   }
-};
+}
 
-scout.TimePicker.prototype.selectTime = function(time) {
+selectTime(time) {
   if (time) {
     // Clear selection when a date is preselected
     this.setPreselectedTime(null);
   }
   this.setSelectedTime(time);
-};
+}
 
 /**
  * @internal, use selectDate to select a date
  */
-scout.TimePicker.prototype.setSelectedTime = function(selectedTime) {
+setSelectedTime(selectedTime) {
   this.setProperty('selectedTime', selectedTime);
-};
+}
 
-scout.TimePicker.prototype._renderSelectedTime = function() {
+_renderSelectedTime() {
 
   var $scrollTo;
   this.$container.find('.cell').each(function(i, elem) {
@@ -147,35 +156,35 @@ scout.TimePicker.prototype._renderSelectedTime = function() {
       if ($time.hasClass('hours') && this.selectedTime.getHours() === time.getHours()) {
         $time.addClass('selected');
         $scrollTo = $time;
-      } else if ($time.hasClass('minutes') && scout.dates.isSameTime(this.selectedTime, time)) {
+      } else if ($time.hasClass('minutes') && dates.isSameTime(this.selectedTime, time)) {
         $time.addClass('selected');
         $scrollTo = $time;
       }
     }
   }.bind(this));
   if ($scrollTo) {
-    scout.scrollbars.scrollTo(this.$container, $scrollTo, 'center');
+    scrollbars.scrollTo(this.$container, $scrollTo, 'center');
   }
-};
+}
 
-scout.TimePicker.prototype.shiftViewDate = function(years, months, days) {
+shiftViewDate(years, months, days) {
   var date = this.viewDate;
-  date = scout.dates.shift(date, years, months, days);
+  date = dates.shift(date, years, months, days);
   this.showDate(date);
-};
+}
 
-scout.TimePicker.prototype.shiftSelectedTime = function(hourUnits, minuteUnits, secondUnits) {
+shiftSelectedTime(hourUnits, minuteUnits, secondUnits) {
   var time = this.preselectedTime;
   if (this.selectedTime) {
-    time = scout.dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
+    time = dates.shiftTime(this.selectedTime, hourUnits, minuteUnits * this.resolution, secondUnits);
   }
   if (!time) {
     return; // do nothing when no date was found
   }
   this.selectTime(this._snapToTimeGrid(time));
-};
+}
 
-scout.TimePicker.prototype._snapToTimeGrid = function(time) {
+_snapToTimeGrid(time) {
   if (!time) {
     return time;
   }
@@ -184,42 +193,42 @@ scout.TimePicker.prototype._snapToTimeGrid = function(time) {
   time.setMinutes(min);
   return time;
 
-};
+}
 
-scout.TimePicker.prototype._findNextAllowedDate = function(years, months, days) {
+_findNextAllowedDate(years, months, days) {
   var i, date,
     sum = years + months + days,
     dir = sum > 0 ? 1 : -1,
-    now = this.selectedDate || scout.dates.trunc(new Date());
+    now = this.selectedDate || dates.trunc(new Date());
 
   // if we shift by year or month, shift the 'now' date and then use that date as starting point
   // to find the next allowed date.
   if (years !== 0) {
-    now = scout.dates.shift(now, years, 0, 0);
+    now = dates.shift(now, years, 0, 0);
   } else if (months !== 0) {
-    now = scout.dates.shift(now, 0, months, 0);
+    now = dates.shift(now, 0, months, 0);
   }
 
   if (dir === 1) { // find next allowed date, starting from currently selected date
     for (i = 0; i < this.allowedDates.length; i++) {
       date = this.allowedDates[i];
-      if (scout.dates.compare(now, date) < 0) {
+      if (dates.compare(now, date) < 0) {
         return date;
       }
     }
   } else if (dir === -1) { // find previous allowed date, starting from currently selected date
     for (i = this.allowedDates.length - 1; i >= 0; i--) {
       date = this.allowedDates[i];
-      if (scout.dates.compare(now, date) > 0) {
+      if (dates.compare(now, date) > 0) {
         return date;
       }
     }
   }
 
   return null;
-};
+}
 
-scout.TimePicker.prototype._isDateAllowed = function(date) {
+_isDateAllowed(date) {
   // when allowedDates is empty or not set, any date is allowed
   if (!this.allowedDates || this.allowedDates.length === 0) {
     return true;
@@ -231,27 +240,28 @@ scout.TimePicker.prototype._isDateAllowed = function(date) {
     allowedDateAsTimestamp = allowedDate.getTime();
     return allowedDateAsTimestamp === dateAsTimestamp;
   });
-};
+}
 
-scout.TimePicker.prototype._onNavigationMouseDown = function(event) {
+_onNavigationMouseDown(event) {
   var $target = $(event.currentTarget);
   var diff = $target.data('shift');
   this.shiftViewDate(0, diff, 0);
-};
+}
 
-scout.TimePicker.prototype._onTimeClick = function(event) {
+_onTimeClick(event) {
   var $target = $(event.currentTarget);
   var time = new Date($target.data('time'));
   this.selectTime(time);
   this.trigger('timeSelect', {
     time: time
   });
-};
+}
 
-scout.TimePicker.prototype._onMouseWheel = function(event) {
+_onMouseWheel(event) {
   event = event.originalEvent || this.$container.window(true).event.originalEvent;
   var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
   var diff = (wheelData >= 0 ? -1 : 1);
   this.shiftViewDate(0, diff, 0);
   event.preventDefault();
-};
+}
+}

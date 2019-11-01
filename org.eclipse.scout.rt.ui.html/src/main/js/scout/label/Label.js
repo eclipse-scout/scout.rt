@@ -1,48 +1,57 @@
-scout.Label = function() {
-  scout.Label.parent.call(this);
+import {HtmlComponent} from '../index';
+import {AppLinkKeyStroke} from '../index';
+import {strings} from '../index';
+import {KeyStrokeContext} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+
+export default class Label extends Widget {
+
+constructor() {
+  super();
   this.value = null;
   this.htmlEnabled = false;
   this.scrollable = false;
-};
-scout.inherits(scout.Label, scout.Widget);
+}
+
 
 /**
  * @override
  */
-scout.Label.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.Label.prototype._initKeyStrokeContext = function() {
-  scout.Label.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
-};
+  this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
+}
 
-scout.Label.prototype._init = function(model) {
-  scout.Label.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.resolveTextKeys(['value']);
-};
+}
 
-scout.Label.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv();
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.Label.prototype._renderProperties = function() {
-  scout.Label.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderValue();
   this._renderScrollable();
-};
+}
 
-scout.Label.prototype.setValue = function(value) {
+setValue(value) {
   this.setProperty('value', value);
-};
+}
 
-scout.Label.prototype._renderValue = function() {
+_renderValue() {
   var value = this.value || '';
   if (this.htmlEnabled) {
     this.$container.html(value);
@@ -55,7 +64,7 @@ scout.Label.prototype._renderValue = function() {
       .on('load', this._onImageLoad.bind(this))
       .on('error', this._onImageError.bind(this));
   } else {
-    this.$container.html(scout.strings.nl2br(value));
+    this.$container.html(strings.nl2br(value));
   }
 
   // Because this method replaces the content, the scroll bars might have to be added or removed
@@ -65,45 +74,46 @@ scout.Label.prototype._renderValue = function() {
   }
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.Label.prototype.setHtmlEnabled = function(htmlEnabled) {
+setHtmlEnabled(htmlEnabled) {
   this.setProperty('htmlEnabled', htmlEnabled);
-};
+}
 
-scout.Label.prototype._renderHtmlEnabled = function() {
+_renderHtmlEnabled() {
   // Render the value again when html enabled changes dynamically
   this._renderValue();
-};
+}
 
-scout.Label.prototype.setScrollable = function(scrollable) {
+setScrollable(scrollable) {
   this.setProperty('scrollable', scrollable);
-};
+}
 
-scout.Label.prototype._renderScrollable = function() {
+_renderScrollable() {
   if (this.scrollable) {
     this._installScrollbars();
   } else {
     this._uninstallScrollbars();
   }
-};
+}
 
-scout.Label.prototype._onAppLinkAction = function(event) {
+_onAppLinkAction(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
-};
+}
 
-scout.Label.prototype.triggerAppLinkAction = function(ref) {
+triggerAppLinkAction(ref) {
   this.trigger('appLinkAction', {
     ref: ref
   });
-};
+}
 
-scout.Label.prototype._onImageLoad = function(event) {
+_onImageLoad(event) {
   this.invalidateLayoutTree();
-};
+}
 
-scout.Label.prototype._onImageError = function(event) {
+_onImageError(event) {
   this.invalidateLayoutTree();
-};
+}
+}

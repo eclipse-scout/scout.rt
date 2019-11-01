@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DateColumnUserFilter = function() {
-  scout.DateColumnUserFilter.parent.call(this);
+import {ColumnUserFilter} from '../../index';
+import {dates} from '../../index';
+import {TableMatrix} from '../../index';
+import * as $ from 'jquery';
+
+export default class DateColumnUserFilter extends ColumnUserFilter {
+
+constructor() {
+  super();
 
   this.dateFrom;
   this.dateFromField;
@@ -17,52 +24,52 @@ scout.DateColumnUserFilter = function() {
   this.dateToField;
 
   this.hasFilterFields = true;
-};
-scout.inherits(scout.DateColumnUserFilter, scout.ColumnUserFilter);
+}
+
 
 /**
  * @override TableUserFilter.js
  */
-scout.DateColumnUserFilter.prototype._init = function(model) {
-  scout.DateColumnUserFilter.parent.prototype._init.call(this, model);
-  this.dateFrom = scout.dates.parseJsonDate(this.dateFrom);
-  this.dateTo = scout.dates.parseJsonDate(this.dateTo);
-};
+_init(model) {
+  super._init( model);
+  this.dateFrom = dates.parseJsonDate(this.dateFrom);
+  this.dateTo = dates.parseJsonDate(this.dateTo);
+}
 
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.axisGroup = function() {
+axisGroup() {
   if (this.column.hasDate) {
     // Default grouping for date columns is year
-    return scout.TableMatrix.DateGroup.YEAR;
+    return TableMatrix.DateGroup.YEAR;
   } else {
     // No grouping for time columns
-    return scout.TableMatrix.DateGroup.NONE;
+    return TableMatrix.DateGroup.NONE;
   }
-};
+}
 
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.createFilterAddedEventData = function() {
-  var data = scout.DateColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
-  data.dateFrom = scout.dates.toJsonDate(this.dateFrom);
-  data.dateTo = scout.dates.toJsonDate(this.dateTo);
+createFilterAddedEventData() {
+  var data = super.createFilterAddedEventData();
+  data.dateFrom = dates.toJsonDate(this.dateFrom);
+  data.dateTo = dates.toJsonDate(this.dateTo);
   return data;
-};
+}
 
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.fieldsFilterActive = function() {
+fieldsFilterActive() {
   return this.dateFrom || this.dateTo;
-};
+}
 
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
+acceptByFields(key, normKey, row) {
   // if date is empty and dateFrom/dateTo is set, the row should never match
   if (!key) {
     return false;
@@ -72,7 +79,7 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
     keyValue = key.valueOf(),
     fromValue = this.dateFrom ? this.dateFrom.valueOf() : null,
     // Shift the toValue to 1ms before midnight/next day. Thus any time of the selected day is accepted.
-    toValue = this.dateTo ? scout.dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
+    toValue = this.dateTo ? dates.shift(this.dateTo, 0, 0, 1).valueOf() - 1 : null;
 
   if (fromValue && toValue) {
     return keyValue >= fromValue && keyValue <= toValue;
@@ -84,19 +91,19 @@ scout.DateColumnUserFilter.prototype.acceptByFields = function(key, normKey, row
 
   // acceptByFields is only called when filter fields are active
   throw new Error('illegal state');
-};
+}
 
 /**
  * @implements ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.filterFieldsTitle = function() {
+filterFieldsTitle() {
   return this.session.text('ui.DateRange');
-};
+}
 
 /**
  * @override ColumnUserFilter.js
  */
-scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+addFilterFields(groupBox) {
   this.dateFromField = groupBox.addFilterField('DateField', 'ui.from');
   this.dateFromField.setValue(this.dateFrom);
   this.dateFromField.on('propertyChange', this._onPropertyChange.bind(this));
@@ -104,9 +111,9 @@ scout.DateColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.dateToField = groupBox.addFilterField('DateField', 'ui.to');
   this.dateToField.setValue(this.dateTo);
   this.dateToField.on('propertyChange', this._onPropertyChange.bind(this));
-};
+}
 
-scout.DateColumnUserFilter.prototype._onPropertyChange = function(event) {
+_onPropertyChange(event) {
   if (event.propertyName !== 'value') {
     return;
   }
@@ -114,14 +121,14 @@ scout.DateColumnUserFilter.prototype._onPropertyChange = function(event) {
   this.dateTo = this.dateToField.value;
   $.log.isDebugEnabled() && $.log.debug('(DateColumnUserFilter#_onAcceptInput) dateFrom=' + this.dateFrom + ' dateTo=' + this.dateTo);
   this.triggerFilterFieldsChanged(event);
-};
+}
 
-scout.DateColumnUserFilter.prototype.modifyFilterFields = function() {
+modifyFilterFields() {
   this.dateFromField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
   this.dateToField.$field.on('input', '', $.debounce(this._onInput.bind(this)));
-};
+}
 
-scout.DateColumnUserFilter.prototype._onInput = function(event) {
+_onInput(event) {
   if (!this.dateFromField.rendered) {
     // popup has been closed in the mean time
     return;
@@ -129,4 +136,5 @@ scout.DateColumnUserFilter.prototype._onInput = function(event) {
   this.dateFrom = this.dateFromField.value;
   this.dateTo = this.dateToField.value;
   this.triggerFilterFieldsChanged(event);
-};
+}
+}

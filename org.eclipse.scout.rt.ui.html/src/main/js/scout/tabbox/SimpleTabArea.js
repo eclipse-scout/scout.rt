@@ -8,77 +8,83 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SimpleTabArea = function() {
-  scout.SimpleTabArea.parent.call(this);
+import {SimpleTabAreaLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+
+export default class SimpleTabArea extends Widget {
+
+constructor() {
+  super();
   this.tabs = [];
   this._selectedViewTab = null;
-};
-scout.inherits(scout.SimpleTabArea, scout.Widget);
+}
 
-scout.SimpleTabArea.prototype._init = function(model) {
-  scout.SimpleTabArea.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this._tabClickHandler = this._onTabClick.bind(this);
-};
+}
 
-scout.SimpleTabArea.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('simple-tab-area');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SimpleTabAreaLayout(this));
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new SimpleTabAreaLayout(this));
+}
 
-scout.SimpleTabArea.prototype._renderProperties = function() {
-  scout.SimpleTabArea.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderTabs();
-};
+}
 
-scout.SimpleTabArea.prototype._renderTabs = function() {
+_renderTabs() {
   // reverse since tab.renderAfter() called without sibling=true argument (see _renderTab)
   // will _prepend_ themselves into the container.
   this.tabs.slice().reverse()
     .forEach(function(tab) {
       this._renderTab(tab);
     }.bind(this));
-};
+}
 
-scout.SimpleTabArea.prototype._renderTab = function(tab) {
+_renderTab(tab) {
   tab.renderAfter(this.$container);
-};
+}
 
-scout.SimpleTabArea.prototype._renderVisible = function() {
+_renderVisible() {
   if (this.visible && this.tabs.length > 0) {
     this.attach();
   } else {
     this.detach();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.SimpleTabArea.prototype._attach = function() {
+_attach() {
   this.$parent.prepend(this.$container);
   // If the parent was resized while this view was detached, the view has a wrong size.
   this.invalidateLayoutTree(false);
-  scout.SimpleTabArea.parent.prototype._attach.call(this);
-};
+  super._attach();
+}
 
 /**
  * @override Widget.js
  */
-scout.SimpleTabArea.prototype._detach = function() {
+_detach() {
   this.$container.detach();
-  scout.SimpleTabArea.parent.prototype._detach.call(this);
+  super._detach();
   this.invalidateLayoutTree(false);
-};
+}
 
-scout.SimpleTabArea.prototype._onTabClick = function(event) {
+_onTabClick(event) {
   this.selectTab(event.source);
-};
+}
 
-scout.SimpleTabArea.prototype.getTabs = function() {
+getTabs() {
   return this.tabs;
-};
+}
 
-scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
+selectTab(viewTab) {
   if (this._selectedViewTab === viewTab) {
     return;
   }
@@ -94,9 +100,9 @@ scout.SimpleTabArea.prototype.selectTab = function(viewTab) {
   if (viewTab && viewTab.rendered && !viewTab.$container.isVisible()) {
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.SimpleTabArea.prototype.deselectTab = function(viewTab) {
+deselectTab(viewTab) {
   if (!viewTab) {
     return;
   }
@@ -104,13 +110,13 @@ scout.SimpleTabArea.prototype.deselectTab = function(viewTab) {
     return;
   }
   this._selectedViewTab.deselect();
-};
+}
 
-scout.SimpleTabArea.prototype.getSelectedTab = function() {
+getSelectedTab() {
   return this._selectedViewTab;
-};
+}
 
-scout.SimpleTabArea.prototype.addTab = function(tab, sibling) {
+addTab(tab, sibling) {
   var insertPosition = -1;
   if (sibling) {
     insertPosition = this.tabs.indexOf(sibling);
@@ -122,9 +128,9 @@ scout.SimpleTabArea.prototype.addTab = function(tab, sibling) {
     tab.renderAfter(this.$container, sibling);
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.SimpleTabArea.prototype.destroyTab = function(tab) {
+destroyTab(tab) {
   var index = this.tabs.indexOf(tab);
   if (index > -1) {
     this.tabs.splice(index, 1);
@@ -133,4 +139,5 @@ scout.SimpleTabArea.prototype.destroyTab = function(tab) {
     this._renderVisible();
     this.invalidateLayoutTree();
   }
-};
+}
+}

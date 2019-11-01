@@ -8,8 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DatePicker = function() {
-  scout.DatePicker.parent.call(this);
+import {graphics} from '../index';
+import {Device} from '../index';
+import {DateFormat} from '../index';
+import {dates} from '../index';
+import {objects} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import {events} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class DatePicker extends Widget {
+
+constructor() {
+  super();
 
   // Preselected date can only be set if selectedDate is null. The preselected date is rendered differently, but
   // has no function otherwise. (It is used to indicate the day that will be selected when the user presses
@@ -25,20 +39,20 @@ scout.DatePicker = function() {
   // Only the this.currentMonth is visible, the others are needed for the swipe animation.
   // The month is an object with the properties viewDate, rendered and $container
   this.months = [];
-  this.touch = scout.device.supportsTouch();
-};
-scout.inherits(scout.DatePicker, scout.Widget);
+  this.touch = Device.get().supportsTouch();
+}
 
-scout.DatePicker.prototype._init = function(options) {
-  scout.DatePicker.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this._setDateFormat(this.dateFormat);
-};
+}
 
-scout.DatePicker.prototype._render = function() {
+_render() {
   this.$container = this.$parent
     .appendDiv('date-picker')
     .toggleClass('touch', this.touch);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
   this._$header = this._append$Header();
   this._$header
@@ -48,40 +62,40 @@ scout.DatePicker.prototype._render = function() {
   this.$container.appendDiv('date-picker-separator');
   this.$scrollable = this.$container.appendDiv('date-picker-scrollable');
   this._registerSwipeHandlers();
-};
+}
 
-scout.DatePicker.prototype._setDateFormat = function(dateFormat) {
+_setDateFormat(dateFormat) {
   if (!dateFormat) {
     dateFormat = this.session.locale.dateFormatPatternDefault;
   }
-  dateFormat = scout.DateFormat.ensure(this.session.locale, dateFormat);
+  dateFormat = DateFormat.ensure(this.session.locale, dateFormat);
   this._setProperty('dateFormat', dateFormat);
-};
+}
 
-scout.DatePicker.prototype.prependMonth = function(month) {
+prependMonth(month) {
   var months = this.months.slice();
-  scout.arrays.insert(months, month, 0);
+  arrays.insert(months, month, 0);
   this.setMonths(months);
-};
+}
 
-scout.DatePicker.prototype.appendMonth = function(month) {
+appendMonth(month) {
   var months = this.months.slice();
   months.push(month);
   this.setMonths(months);
-};
+}
 
 /**
  * Resets the month boxes. Always render 3 months to make swiping more smooth (especially on mobile devices).
  */
-scout.DatePicker.prototype.resetMonths = function(viewDate) {
+resetMonths(viewDate) {
   viewDate = viewDate || this.viewDate;
-  var prevDate = scout.dates.shift(viewDate, 0, -1, 0);
-  var nextDate = scout.dates.shift(viewDate, 0, 1, 0);
+  var prevDate = dates.shift(viewDate, 0, -1, 0);
+  var nextDate = dates.shift(viewDate, 0, 1, 0);
   this.setMonths([prevDate, viewDate, nextDate]);
-};
+}
 
-scout.DatePicker.prototype.setMonths = function(months) {
-  months = scout.arrays.ensure(months);
+setMonths(months) {
+  months = arrays.ensure(months);
   months = months.map(function(month) {
     var viewDate = month;
     if (!(month instanceof Date)) {
@@ -108,9 +122,9 @@ scout.DatePicker.prototype.setMonths = function(months) {
     }, this);
   }
   this.setProperty('months', months);
-};
+}
 
-scout.DatePicker.prototype._renderMonths = function() {
+_renderMonths() {
   // Render the months if needed
   this.months.forEach(function(month) {
     if (!month.rendered) {
@@ -118,7 +132,7 @@ scout.DatePicker.prototype._renderMonths = function() {
 
       // move month to correct position in DOM.
       // Current month must not be moved, otherwise click event gets lost.
-      if (this.currentMonth && scout.dates.compare(month.viewDate, this.currentMonth.viewDate) < 0) {
+      if (this.currentMonth && dates.compare(month.viewDate, this.currentMonth.viewDate) < 0) {
         month.$container.insertBefore(this.currentMonth.$container);
       }
     }
@@ -130,24 +144,24 @@ scout.DatePicker.prototype._renderMonths = function() {
   if (this.currentMonth) {
     this.$scrollable.cssLeft(this._scrollableLeftForMonth(this.currentMonth));
   }
-};
+}
 
-scout.DatePicker.prototype._findMonthByViewDate = function(viewDate) {
-  return scout.arrays.find(this.months, function(month) {
-    return scout.dates.compareMonths(month.viewDate, viewDate) === 0;
+_findMonthByViewDate(viewDate) {
+  return arrays.find(this.months, function(month) {
+    return dates.compareMonths(month.viewDate, viewDate) === 0;
   });
-};
+}
 
 /**
  * @returns the x coordinate of the scrollable if the given month should be displayed
  */
-scout.DatePicker.prototype._scrollableLeftForMonth = function(month) {
-  var scrollableInsets = scout.graphics.insets(this.$scrollable);
-  var monthMargins = scout.graphics.margins(month.$container);
+_scrollableLeftForMonth(month) {
+  var scrollableInsets = graphics.insets(this.$scrollable);
+  var monthMargins = graphics.margins(month.$container);
   return -1 * (month.$container.position().left - monthMargins.left - scrollableInsets.left);
-};
+}
 
-scout.DatePicker.prototype._renderMonth = function(month) {
+_renderMonth(month) {
   if (month.rendered) {
     return;
   }
@@ -165,22 +179,22 @@ scout.DatePicker.prototype._renderMonth = function(month) {
 
   month.$container = $box;
   month.rendered = true;
-};
+}
 
 /**
  * @internal, use showDate, selectDate, shiftViewDate, etc. to change the view date
  */
-scout.DatePicker.prototype.setViewDate = function(viewDate, animated) {
-  if (scout.objects.equals(this.viewDate, viewDate)) {
+setViewDate(viewDate, animated) {
+  if (objects.equals(this.viewDate, viewDate)) {
     return;
   }
   this._setProperty('viewDate', viewDate);
   if (this.rendered) {
     this._renderViewDate(animated);
   }
-};
+}
 
-scout.DatePicker.prototype._renderViewDate = function(animated) {
+_renderViewDate(animated) {
   var month = this._findMonthByViewDate(this.viewDate);
   var newLeft = this._scrollableLeftForMonth(month);
   if (!this.currentMonth) {
@@ -206,25 +220,25 @@ scout.DatePicker.prototype._renderViewDate = function(animated) {
         this.resetMonths();
       }.bind(this));
   }
-};
+}
 
-scout.DatePicker.prototype.preselectDate = function(date, animated) {
+preselectDate(date, animated) {
   this.showDate(date, animated);
   if (date) {
     // Clear selection when a date is preselected
     this.setSelectedDate(null);
   }
   this.setPreselectedDate(date);
-};
+}
 
 /**
  * @internal, use preselectDate to preselect a date
  */
-scout.DatePicker.prototype.setPreselectedDate = function(preselectedDate) {
+setPreselectedDate(preselectedDate) {
   this.setProperty('preselectedDate', preselectedDate);
-};
+}
 
-scout.DatePicker.prototype._renderPreselectedDate = function() {
+_renderPreselectedDate() {
   if (!this.currentMonth) {
     return;
   }
@@ -232,29 +246,29 @@ scout.DatePicker.prototype._renderPreselectedDate = function() {
   $box.find('.date-picker-day').each(function(i, elem) {
     var $day = $(elem);
     $day.removeClass('preselected');
-    if (scout.dates.isSameDay(this.preselectedDate, $day.data('date'))) {
+    if (dates.isSameDay(this.preselectedDate, $day.data('date'))) {
       $day.addClass('preselected');
     }
   }.bind(this));
-};
+}
 
-scout.DatePicker.prototype.selectDate = function(date, animated) {
+selectDate(date, animated) {
   this.showDate(date, animated);
   if (date) {
     // Clear preselection when a date is selected
     this.setPreselectedDate(null);
   }
   this.setSelectedDate(date);
-};
+}
 
 /**
  * @internal, use selectDate to select a date
  */
-scout.DatePicker.prototype.setSelectedDate = function(selectedDate) {
+setSelectedDate(selectedDate) {
   this.setProperty('selectedDate', selectedDate);
-};
+}
 
-scout.DatePicker.prototype._renderSelectedDate = function() {
+_renderSelectedDate() {
   if (!this.currentMonth) {
     return;
   }
@@ -262,21 +276,21 @@ scout.DatePicker.prototype._renderSelectedDate = function() {
   $box.find('.date-picker-day').each(function(i, elem) {
     var $day = $(elem);
     $day.removeClass('selected');
-    if (scout.dates.isSameDay(this.selectedDate, $day.data('date'))) {
+    if (dates.isSameDay(this.selectedDate, $day.data('date'))) {
       $day.addClass('selected');
     }
   }.bind(this));
-};
+}
 
 /**
  * Shows the month which contains the given date.
  * @param {Date} date
  * @param {boolean} [animated] - Default is true
  */
-scout.DatePicker.prototype.showDate = function(viewDate, animated) {
+showDate(viewDate, animated) {
   var viewDateDiff = 0;
   if (this.viewDate) {
-    viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
+    viewDateDiff = dates.compareMonths(viewDate, this.viewDate);
   }
 
   if (this.currentMonth && viewDateDiff) {
@@ -295,22 +309,22 @@ scout.DatePicker.prototype.showDate = function(viewDate, animated) {
     }
   }
   this.setViewDate(viewDate, animated);
-};
+}
 
-scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
+shiftViewDate(years, months, days) {
   var date = this.viewDate;
-  date = scout.dates.shift(date, years, months, days);
+  date = dates.shift(date, years, months, days);
   this.showDate(date);
-};
+}
 
-scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
+shiftSelectedDate(years, months, days) {
   var date = this.preselectedDate;
 
   if (this.selectedDate) {
     if (this.allowedDates) {
       date = this._findNextAllowedDate(years, months, days);
     } else {
-      date = scout.dates.shift(this.selectedDate, years, months, days);
+      date = dates.shift(this.selectedDate, years, months, days);
     }
   }
 
@@ -319,42 +333,42 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   }
 
   this.selectDate(date, true);
-};
+}
 
-scout.DatePicker.prototype._findNextAllowedDate = function(years, months, days) {
+_findNextAllowedDate(years, months, days) {
   var i, date,
     sum = years + months + days,
     dir = sum > 0 ? 1 : -1,
-    now = this.selectedDate || scout.dates.trunc(new Date());
+    now = this.selectedDate || dates.trunc(new Date());
 
   // if we shift by year or month, shift the 'now' date and then use that date as starting point
   // to find the next allowed date.
   if (years !== 0) {
-    now = scout.dates.shift(now, years, 0, 0);
+    now = dates.shift(now, years, 0, 0);
   } else if (months !== 0) {
-    now = scout.dates.shift(now, 0, months, 0);
+    now = dates.shift(now, 0, months, 0);
   }
 
   if (dir === 1) { // find next allowed date, starting from currently selected date
     for (i = 0; i < this.allowedDates.length; i++) {
       date = this.allowedDates[i];
-      if (scout.dates.compare(now, date) < 0) {
+      if (dates.compare(now, date) < 0) {
         return date;
       }
     }
   } else if (dir === -1) { // find previous allowed date, starting from currently selected date
     for (i = this.allowedDates.length - 1; i >= 0; i--) {
       date = this.allowedDates[i];
-      if (scout.dates.compare(now, date) > 0) {
+      if (dates.compare(now, date) > 0) {
         return date;
       }
     }
   }
 
   return null;
-};
+}
 
-scout.DatePicker.prototype._isDateAllowed = function(date) {
+_isDateAllowed(date) {
   // when allowedDates is empty or not set, any date is allowed
   if (!this.allowedDates || this.allowedDates.length === 0) {
     return true;
@@ -366,9 +380,9 @@ scout.DatePicker.prototype._isDateAllowed = function(date) {
     allowedDateAsTimestamp = allowedDate.getTime();
     return allowedDateAsTimestamp === dateAsTimestamp;
   });
-};
+}
 
-scout.DatePicker.prototype._build$DateBox = function(viewDate) {
+_build$DateBox(viewDate) {
   var cl, i, day, dayEnabled, dayInMonth, $day,
     now = new Date(),
     start = new Date(viewDate),
@@ -409,15 +423,15 @@ scout.DatePicker.prototype._build$DateBox = function(viewDate) {
       cl = (start.getMonth() !== viewDate.getMonth() ? ' date-picker-out' : '');
     }
 
-    if (scout.dates.isSameDay(start, now)) {
+    if (dates.isSameDay(start, now)) {
       cl += ' date-picker-now';
     }
 
-    if (scout.dates.isSameDay(this.selectedDate, start)) {
+    if (dates.isSameDay(this.selectedDate, start)) {
       cl += ' selected';
     }
 
-    if (scout.dates.isSameDay(this.preselectedDate, start)) {
+    if (dates.isSameDay(this.preselectedDate, start)) {
       cl += ' preselected';
     }
 
@@ -444,9 +458,9 @@ scout.DatePicker.prototype._build$DateBox = function(viewDate) {
   }
 
   return $box;
-};
+}
 
-scout.DatePicker.prototype._append$Header = function() {
+_append$Header() {
   var headerHtml =
     '<div class="date-picker-header">' +
     '  <div class="date-picker-left-y" data-shift="-12"></div>' +
@@ -458,18 +472,18 @@ scout.DatePicker.prototype._append$Header = function() {
   return this.$container
     .appendElement(headerHtml)
     .toggleClass('touch', this.touch);
-};
+}
 
-scout.DatePicker.prototype._updateHeader = function(viewDate) {
+_updateHeader(viewDate) {
   this._$header.find('.date-picker-header-month').text(this._createHeaderText(viewDate));
-};
+}
 
-scout.DatePicker.prototype._createHeaderText = function(viewDate) {
+_createHeaderText(viewDate) {
   var months = this.dateFormat.symbols.months;
   return months[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
-};
+}
 
-scout.DatePicker.prototype._registerSwipeHandlers = function() {
+_registerSwipeHandlers() {
   var $window = this.$scrollable.window();
 
   this.$scrollable.on('touchmove', function(event) {
@@ -477,8 +491,8 @@ scout.DatePicker.prototype._registerSwipeHandlers = function() {
     event.preventDefault();
   });
 
-  this.$scrollable.on(scout.events.touchdown(this.touch), function(event) {
-    var origPageX = scout.events.pageX(event);
+  this.$scrollable.on(events.touchdown(this.touch), function(event) {
+    var origPageX = events.pageX(event);
     var moveX = 0;
 
     // stop pending animations, otherwise the months may be removed by the animation stop handler before touchend is executed
@@ -486,16 +500,16 @@ scout.DatePicker.prototype._registerSwipeHandlers = function() {
 
     // Prepare months. On the first swipe the 3 boxes are already rendered, so nothing happens when setMonths is called.
     // But on a subsequent swipe (while the pane is still moving) the next month needs to be rendered.
-    var prevDate = scout.dates.shift(this.viewDate, 0, -1, 0);
-    var nextDate = scout.dates.shift(this.viewDate, 0, 1, 0);
+    var prevDate = dates.shift(this.viewDate, 0, -1, 0);
+    var nextDate = dates.shift(this.viewDate, 0, 1, 0);
     this.setMonths([prevDate, this.viewDate, nextDate]);
     var scrollableLeft = this.$scrollable.position().left;
 
     this.swiped = false;
     var started = true;
 
-    $window.on(scout.events.touchmove(this.touch, 'datepickerDrag'), function(event) {
-      var pageX = scout.events.pageX(event);
+    $window.on(events.touchmove(this.touch, 'datepickerDrag'), function(event) {
+      var pageX = events.pageX(event);
       moveX = pageX - origPageX;
       var newScrollableLeft = scrollableLeft + moveX;
       var minX = this.$container.width() - this.$scrollable.outerWidth();
@@ -509,7 +523,7 @@ scout.DatePicker.prototype._registerSwipeHandlers = function() {
       }
     }.bind(this));
 
-    $window.on(scout.events.touchendcancel(this.touch, 'datepickerDrag'), function(event) {
+    $window.on(events.touchendcancel(this.touch, 'datepickerDrag'), function(event) {
       $window.off('.datepickerDrag');
       if (!started) {
         // On iOS touchcancel and touchend are fired right after each other when swiping twice very fast -> Ignore the second event
@@ -536,15 +550,15 @@ scout.DatePicker.prototype._registerSwipeHandlers = function() {
       }
     }.bind(this));
   }.bind(this));
-};
+}
 
-scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
+_onNavigationMouseDown(event) {
   var $target = $(event.currentTarget);
   var diff = $target.data('shift');
   this.shiftViewDate(0, diff, 0);
-};
+}
 
-scout.DatePicker.prototype._onDayClick = function(event) {
+_onDayClick(event) {
   if (this.swiped) {
     // Don't handle on a swipe action
     return;
@@ -555,12 +569,13 @@ scout.DatePicker.prototype._onDayClick = function(event) {
   this.trigger('dateSelect', {
     date: date
   });
-};
+}
 
-scout.DatePicker.prototype._onMouseWheel = function(event) {
+_onMouseWheel(event) {
   event = event.originalEvent || this.$container.window(true).event.originalEvent;
   var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
   var diff = (wheelData >= 0 ? -1 : 1);
   this.shiftViewDate(0, diff, 0);
   event.preventDefault();
-};
+}
+}

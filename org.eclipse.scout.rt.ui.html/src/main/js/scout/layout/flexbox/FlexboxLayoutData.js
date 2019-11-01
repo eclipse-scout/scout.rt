@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FlexboxLayoutData = function(model) {
+import * as $ from 'jquery';
+
+export default class FlexboxLayoutData {
+
+constructor(model) {
   this._prepare();
   // inital
   this.relative = true;
@@ -21,26 +25,26 @@ scout.FlexboxLayoutData = function(model) {
   this.sizePx; /*current display size in pixel*/
   this.initialPx; /*initial in pixel */
   this.delta;
-};
+}
 
-scout.FlexboxLayoutData.prototype._prepare = function() {
+_prepare() {
   // nop. may be overridden by sub classes
-};
+}
 
-scout.FlexboxLayoutData.prototype.withOrder = function(order) {
+withOrder(order) {
   this.order = order;
   return this;
-};
+}
 
-scout.FlexboxLayoutData.prototype.acceptDelta = function(delta, apply) {
+acceptDelta(delta, apply) {
   if (delta > 0) {
     return this._grow(delta, apply);
   } else {
     return this._shrink(delta, apply);
   }
-};
+}
 
-scout.FlexboxLayoutData.prototype.validate = function(size) {
+validate(size) {
   if (this.grow === 0) {
     size = Math.min(this.initialPx, size);
   }
@@ -48,9 +52,9 @@ scout.FlexboxLayoutData.prototype.validate = function(size) {
     size = Math.max(this.initialPx, size);
   }
   return size;
-};
+}
 
-scout.FlexboxLayoutData.prototype._grow = function(delta, apply) {
+_grow(delta, apply) {
   var maxDelta = 0,
     consumedDelta = 0;
   if (this.grow > 0) {
@@ -63,9 +67,9 @@ scout.FlexboxLayoutData.prototype._grow = function(delta, apply) {
     this.sizePx = this.sizePx + consumedDelta;
   }
   return delta - consumedDelta;
-};
+}
 
-scout.FlexboxLayoutData.prototype._shrink = function(delta, apply) {
+_shrink(delta, apply) {
   var maxDelta = 0,
     consumedDelta = 0;
   if (this.shrink > 0) {
@@ -79,14 +83,15 @@ scout.FlexboxLayoutData.prototype._shrink = function(delta, apply) {
     this.sizePx = this.sizePx + consumedDelta;
   }
   return delta - consumedDelta;
-};
+}
 
 /*Static functions*/
-scout.FlexboxLayoutData.fixed = function(size) {
-  var layoutData = new scout.FlexboxLayoutData();
+static fixed(size) {
+  var layoutData = new FlexboxLayoutData();
   layoutData.relative = false;
   layoutData.initial = size || -1;
   layoutData.grow = 0;
   layoutData.shrink = 0;
   return layoutData;
-};
+}
+}

@@ -8,69 +8,75 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewButton = function() {
-  scout.ViewButton.parent.call(this);
+import {Action} from '../../index';
+import {ViewButtonActionKeyStroke} from '../../index';
+
+export default class ViewButton extends Action {
+
+constructor() {
+  super();
   this.showTooltipWhenSelected = false;
   this.displayStyle = 'TAB';
   this._renderedAsMenu = false;
-};
-scout.inherits(scout.ViewButton, scout.Action);
+}
 
-scout.ViewButton.prototype.renderAsMenuItem = function($parent) {
+
+renderAsMenuItem($parent) {
   this._renderedAsMenu = true;
-  scout.ViewButton.parent.prototype.render.call(this, $parent);
-};
-scout.ViewButton.prototype.renderAsTab = function($parent) {
+  super.render( $parent);
+}
+renderAsTab($parent) {
   this._renderedAsMenu = false;
-  scout.ViewButton.parent.prototype.render.call(this, $parent);
-};
+  super.render( $parent);
+}
 
-scout.ViewButton.prototype._render = function() {
+_render() {
   if (this._renderedAsMenu) {
     this._renderAsMenuItem();
   } else {
     this._renderAsTab();
   }
-};
+}
 
-scout.ViewButton.prototype._renderAsMenuItem = function() {
+_renderAsMenuItem() {
   this.$container = this.$parent.appendDiv('view-menu-item')
     .on('click', this._onMouseEvent.bind(this));
-};
+}
 
-scout.ViewButton.prototype._renderAsTab = function() {
+_renderAsTab() {
   this.$container = this.$parent.appendDiv('view-button-tab')
     .on('mousedown', this._onMouseEvent.bind(this));
-};
+}
 
 /**
  * @override Action.js
  */
-scout.ViewButton.prototype._renderText = function() {
+_renderText() {
   if (this._renderedAsMenu) {
-    scout.ViewButton.parent.prototype._renderText.call(this);
+    super._renderText();
   }
-};
+}
 
-scout.ViewButton.prototype.setDisplayStyle = function(displayStyle) {
+setDisplayStyle(displayStyle) {
   this.setProperty('displayStyle', displayStyle);
-};
+}
 
-scout.ViewButton.prototype.last = function() {
+last() {
   this.$container.addClass('last');
-};
+}
 
-scout.ViewButton.prototype.tab = function() {
+tab() {
   this.$container.addClass('view-tab');
-};
+}
 
-scout.ViewButton.prototype._onMouseEvent = function(event) {
+_onMouseEvent(event) {
   this.doAction();
-};
+}
 
 /**
  * @override Action.js
  */
-scout.ViewButton.prototype._createActionKeyStroke = function() {
-  return new scout.ViewButtonActionKeyStroke(this);
-};
+_createActionKeyStroke() {
+  return new ViewButtonActionKeyStroke(this);
+}
+}

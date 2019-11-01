@@ -8,12 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Widget} from '../../index';
+import {graphics} from '../../index';
+import {CompositeField} from '../../index';
+import {objects} from '../../index';
+import {FormField} from '../../index';
+
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData.
  * Merged with the base class LogicalGridData (for the default values). We don't need the base
  * class standalone, since we only used LGL for the group-box body in Html UI.
  */
-scout.LogicalGridData = function(vararg) {
+export default class LogicalGridData {
+
+constructor(vararg) {
   this.gridx = 0;
   this.gridy = 0;
   this.gridw = 1;
@@ -29,18 +37,18 @@ scout.LogicalGridData = function(vararg) {
   this.fillHorizontal = true;
   this.fillVertical = true;
 
-  if (vararg instanceof scout.LogicalGridData) {
+  if (vararg instanceof LogicalGridData) {
     // copy properties from LGD template
-    scout.objects.copyProperties(vararg, this);
-  } else if (vararg instanceof scout.Widget) {
+    objects.copyProperties(vararg, this);
+  } else if (vararg instanceof Widget) {
     // work with widget / validate
     this.widget = vararg;
   } else {
     // NOP - default CTOR
   }
-};
+}
 
-scout.LogicalGridData.prototype.validate = function() {
+validate() {
   if (!this.widget) {
     return;
   }
@@ -71,14 +79,14 @@ scout.LogicalGridData.prototype.validate = function() {
   this.heightHint = data.heightInPixel;
 
   // when having the label on top, the row height has to be increased
-  if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === scout.FormField.LabelPosition.TOP) {
-    this.logicalRowHeightAddition = scout.graphics.prefSize(this.widget.$label, true).height;
+  if (this.widget.labelVisible && this.widget.$label && this.widget.labelPosition === FormField.LabelPosition.TOP) {
+    this.logicalRowHeightAddition = graphics.prefSize(this.widget.$label, true).height;
   } else {
     this.logicalRowHeightAddition = 0;
   }
-};
+}
 
-scout.LogicalGridData.prototype._inheritWeightY = function() {
+_inheritWeightY() {
   var d = this._inheritWeightYRec(this.widget);
   if (d === null) {
     var data = this.widget.gridData;
@@ -89,16 +97,16 @@ scout.LogicalGridData.prototype._inheritWeightY = function() {
     }
   }
   return d;
-};
+}
 
-scout.LogicalGridData.prototype._inheritWeightYRec = function(widget) {
+_inheritWeightYRec(widget) {
   var found = false,
     sumWy = 0;
 
   // The children may have a dirty grid -> make sure the grid is valid before reading any grid data properties
   widget.validateLogicalGrid();
 
-  if (widget instanceof scout.CompositeField) {
+  if (widget instanceof CompositeField) {
     var i, inheritWeightY, child, children = widget.getFields();
     for (i = 0; i < children.length; i++) {
       child = children[i];
@@ -124,8 +132,9 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(widget) {
     return sumWy;
   }
   return null;
-};
+}
 
-scout.LogicalGridData.prototype.isValidateRoot = function() {
+isValidateRoot() {
   return !this.useUiHeight && !this.useUiWidth && this.fillVertical && this.fillHorizontal;
-};
+}
+}

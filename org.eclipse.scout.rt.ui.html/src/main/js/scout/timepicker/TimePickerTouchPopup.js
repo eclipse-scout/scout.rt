@@ -8,45 +8,51 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TimePickerTouchPopup = function() {
-  scout.TimePickerTouchPopup.parent.call(this);
-};
-scout.inherits(scout.TimePickerTouchPopup, scout.TouchPopup);
+import {TimePickerTouchPopupLayout} from '../index';
+import {TouchPopup} from '../index';
+import {scout} from '../index';
 
-scout.TimePickerTouchPopup.prototype._init = function(options) {
-  scout.TimePickerTouchPopup.parent.prototype._init.call(this, options);
+export default class TimePickerTouchPopup extends TouchPopup {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
   this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
-};
+}
 
 /**
  * @override TouchPopup.js
  */
-scout.TimePickerTouchPopup.prototype._initWidget = function(options) {
+_initWidget(options) {
   this._widget = scout.create('TimePicker', {
     parent: this,
     timeResolution: options.timeResolution
   });
-};
+}
 
-scout.TimePickerTouchPopup.prototype._render = function() {
-  scout.TimePickerTouchPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this._field.$container.addClass('time');
-};
+}
 /**
  * @implements DatePickerPopup
  */
-scout.TimePickerTouchPopup.prototype.getTimePicker = function() {
+getTimePicker() {
   return this._widget;
-};
+}
 
 /**
  * @override
  */
-scout.TimePickerTouchPopup.prototype._createLayout = function() {
-  return new scout.TimePickerTouchPopupLayout(this);
-};
+_createLayout() {
+  return new TimePickerTouchPopupLayout(this);
+}
 
-scout.TimePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
+_onFieldAcceptInput(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
   this._touchField.setErrorStatus(event.errorStatus);
@@ -54,4 +60,5 @@ scout.TimePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
     this._touchField.setValue(event.value);
   }
   this._touchField._triggerAcceptInput();
-};
+}
+}

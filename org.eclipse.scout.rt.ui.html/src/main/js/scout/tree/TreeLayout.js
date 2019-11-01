@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeLayout = function(tree) {
-  scout.TreeLayout.parent.call(this);
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {AbstractLayout} from '../index';
+import {MenuBarLayout} from '../index';
+
+export default class TreeLayout extends AbstractLayout {
+
+constructor(tree) {
+  super();
   this.tree = tree;
   this.nodeDimensionsDirty = false;
-};
-scout.inherits(scout.TreeLayout, scout.AbstractLayout);
+}
 
-scout.TreeLayout.prototype.layout = function($container) {
+
+layout($container) {
   this._layout($container);
-  scout.scrollbars.update(this.tree.$data);
-};
+  scrollbars.update(this.tree.$data);
+}
 
-scout.TreeLayout.prototype._layout = function($container) {
+_layout($container) {
   var menuBarSize, containerSize, heightOffset,
     menuBar = this.tree.menuBar,
     htmlMenuBar = menuBar.htmlComp,
@@ -37,7 +44,7 @@ scout.TreeLayout.prototype._layout = function($container) {
 
   heightOffset = 0;
   if (menuBar.$container.isVisible()) {
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     heightOffset += menuBarSize.height;
   }
@@ -74,17 +81,17 @@ scout.TreeLayout.prototype._layout = function($container) {
   if (!htmlContainer.layouted) {
     this.tree._renderScrollTop();
   }
-};
+}
 
-scout.TreeLayout.prototype._setDataHeight = function(heightOffset) {
+_setDataHeight(heightOffset) {
   var $data = this.tree.$data;
 
   heightOffset += $data.cssMarginTop() + $data.cssMarginBottom();
 
   $data.css('height', (heightOffset === 0 ? '100%' : 'calc(100% - ' + heightOffset + 'px)'));
-};
+}
 
-scout.TreeLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   // Make sure viewport is up to date before calculating pref size.
   // This is necessary because the tree does not render the view port on any change (like insert or delete nodes). Instead it just invalidates the layout.
   this.tree._renderViewport();
@@ -94,5 +101,6 @@ scout.TreeLayout.prototype.preferredLayoutSize = function($container, options) {
   if (!this.tree.htmlComp.layouted) {
     this.nodeDimensionsDirty = true;
   }
-  return scout.graphics.prefSize($container, options);
-};
+  return graphics.prefSize($container, options);
+}
+}

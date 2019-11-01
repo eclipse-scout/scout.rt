@@ -8,7 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Widget = function() {
+import {LoadingSupport} from '../index';
+import {LogicalGrid} from '../index';
+import {KeyStrokeContext} from '../index';
+import {widgets} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {EventDelegator} from '../index';
+import {filters} from '../index';
+import {icons} from '../index';
+import {texts} from '../index';
+import {DeferredGlassPaneTarget} from '../index';
+import {Device} from '../index';
+import {Form} from '../index';
+import {Desktop} from '../index';
+import {Event} from '../index';
+import {objects} from '../index';
+import {EventSupport} from '../index';
+import {inspector} from '../index';
+import {focusUtils} from '../index';
+import {graphics} from '../index';
+import {TreeVisitResult} from '../index';
+import {scrollbars} from '../index';
+import {strings} from '../index';
+import {LogicalGridLayout} from '../index';
+import {models} from '../index';
+import {arrays} from '../index';
+
+export default class Widget {
+
+constructor() {
   this.session = null;
 
   /**
@@ -50,7 +79,7 @@ scout.Widget = function() {
    */
   this.enabledComputed = true;
   this.inheritAccessibility = true;
-  this.disabledStyle = scout.Widget.DisabledStyle.DEFAULT;
+  this.disabledStyle = Widget.DisabledStyle.DEFAULT;
   this.visible = true;
   this.focused = false;
   this.loading = false;
@@ -81,7 +110,7 @@ scout.Widget = function() {
   });
   this.loadingSupport = this._createLoadingSupport();
   this.keyStrokeContext = this._createKeyStrokeContext();
-  // Widgets using scout.LogicalGridLayout may have a grid to calculate the grid data of the children
+  // Widgets using LogicalGridLayout may have a grid to calculate the grid data of the children
   this.logicalGrid;
 
   // focus tracking
@@ -90,17 +119,17 @@ scout.Widget = function() {
   this._storedFocusedWidget = null;
 
   this._glassPaneContributions = [];
-};
+}
 
 /**
  * Enum used to define different styles used when the field is disabled.
  */
-scout.Widget.DisabledStyle = {
+static DisabledStyle = {
   DEFAULT: 0,
   READ_ONLY: 1
 };
 
-scout.Widget.prototype.init = function(model) {
+init(model) {
   var staticModel = this._jsonModel();
   if (staticModel) {
     model = $.extend({}, staticModel, model);
@@ -112,23 +141,23 @@ scout.Widget.prototype.init = function(model) {
   this.recomputeEnabled();
   this.initialized = true;
   this.trigger('init');
-};
+}
 
 /**
  * Default implementation simply returns the unmodified model. A Subclass
  * may override this method to alter the JSON model before the widgets
  * are created out of the widgetProperties in the model.
  */
-scout.Widget.prototype._prepareModel = function(model) {
+_prepareModel(model) {
   return model;
-};
+}
 
 /**
  * @param options
  * - parent (required): The parent widget
  * - session (optional): If not specified the session of the parent is used
  */
-scout.Widget.prototype._init = function(model) {
+_init(model) {
   if (!model.parent) {
     throw new Error('Parent expected: ' + this);
   }
@@ -154,27 +183,27 @@ scout.Widget.prototype._init = function(model) {
   this._setCssClass(this.cssClass);
   this._setLogicalGrid(this.logicalGrid);
   this._setEnabled(this.enabled);
-};
+}
 
 /**
  * This function sets the property value. Override this function when you need special init behavior for certain properties.
  * For instance you could not simply set the property value, but extend an already existing value.
  */
-scout.Widget.prototype._initProperty = function(propertyName, value) {
+_initProperty(propertyName, value) {
   this[propertyName] = value;
-};
+}
 
 /**
  * Default implementation simply returns undefined. A Subclass
- * may override this method to load or extend a JSON model with scout.models.getModel or scout.models.extend.
+ * may override this method to load or extend a JSON model with models.getModel or models.extend.
  */
-scout.Widget.prototype._jsonModel = function() {};
+_jsonModel() {};
 
 /**
  * Creates the widgets using the given models, or returns the widgets if the given models already are widgets.
- * @returns {scout.Widget[]|scout.Widget}an array of created widgets if models was an array. Or the created widget if models is not an array.
+ * @returns {Widget[]|Widget}an array of created widgets if models was an array. Or the created widget if models is not an array.
  */
-scout.Widget.prototype._createChildren = function(models) {
+_createChildren(models) {
   if (!models) {
     return null;
   }
@@ -188,16 +217,16 @@ scout.Widget.prototype._createChildren = function(models) {
     widgets[i] = this._createChild(model);
   }, this);
   return widgets;
-};
+}
 
 /**
- * Calls {@link scout.create} for the given model, or if model is already a scout.Widget simply returns the widget.
+ * Calls {@link scout.create} for the given model, or if model is already a Widget simply returns the widget.
  *
- * @param model {Object|scout.Widget}
- * @returns {scout.Widget}
+ * @param model {Object|Widget}
+ * @returns {Widget}
  */
-scout.Widget.prototype._createChild = function(model) {
-  if (model instanceof scout.Widget) {
+_createChild(model) {
+  if (model instanceof Widget) {
     return model;
   }
   if (typeof model === 'string') {
@@ -210,9 +239,9 @@ scout.Widget.prototype._createChild = function(model) {
   }
   model.parent = this;
   return scout.create(model);
-};
+}
 
-scout.Widget.prototype._initKeyStrokeContext = function() {
+_initKeyStrokeContext() {
   if (!this.keyStrokeContext) {
     return;
   }
@@ -222,9 +251,9 @@ scout.Widget.prototype._initKeyStrokeContext = function() {
   this.keyStrokeContext.$bindTarget = function() {
     return this.$container;
   }.bind(this);
-};
+}
 
-scout.Widget.prototype.destroy = function() {
+destroy() {
   if (this.destroyed) {
     // Already destroyed, do nothing
     return;
@@ -255,43 +284,43 @@ scout.Widget.prototype.destroy = function() {
   this.destroying = false;
   this.destroyed = true;
   this.trigger('destroy');
-};
+}
 
 /**
  * Override this function to do clean-up (like removing listeners) when the widget is destroyed.
  * The default impl. does nothing.
  */
-scout.Widget.prototype._destroy = function() {
+_destroy() {
   // NOP
-};
+}
 
 /**
  * @param widgets may be an object or array of objects
  */
-scout.Widget.prototype._destroyChildren = function(widgets) {
+_destroyChildren(widgets) {
   if (!widgets) {
     return;
   }
 
-  widgets = scout.arrays.ensure(widgets);
+  widgets = arrays.ensure(widgets);
   widgets.forEach(function(widget, i) {
     this._destroyChild(widget);
   }, this);
-};
+}
 
-scout.Widget.prototype._destroyChild = function(child) {
+_destroyChild(child) {
   if (child.owner !== this) {
     return;
   }
   child.destroy();
-};
+}
 
 /**
  * @param [$parent] The jQuery element which is used as $parent when rendering this widget.
  * It will be put onto the widget and is therefore accessible as this.$parent in the _render method.
  * If not specified, the $container of the parent is used.
  */
-scout.Widget.prototype.render = function($parent) {
+render($parent) {
   $.log.isTraceEnabled() && $.log.trace('Rendering widget: ' + this);
   if (!this.initialized) {
     throw new Error('Not initialized: ' + this);
@@ -315,7 +344,7 @@ scout.Widget.prototype.render = function($parent) {
   this.trigger('render');
   this.restoreFocus();
   this._postRender();
-};
+}
 
 /**
  * This method creates the UI through DOM manipulation. At this point we should not apply model
@@ -323,15 +352,15 @@ scout.Widget.prototype.render = function($parent) {
  * apply model values to the UI here, since this is done in the _renderProperties method later.
  * The default impl. does nothing.
  */
-scout.Widget.prototype._render = function() {
+_render() {
   // NOP
-};
+}
 
 /**
  * This method calls the UI setter methods after the _render method has been executed.
  * Here values of the model are applied to the DOM / UI.
  */
-scout.Widget.prototype._renderProperties = function() {
+_renderProperties() {
   this._renderTrackFocus();
   this._renderEnabled();
   this._renderVisible();
@@ -340,21 +369,21 @@ scout.Widget.prototype._renderProperties = function() {
   this._renderLoading();
   this._renderScrollTop();
   this._renderScrollLeft();
-};
+}
 
 /**
  * Method invoked once rendering completed and 'rendered' flag is set to 'true'.<p>
  * By default executes every action of this._postRenderActions
  */
-scout.Widget.prototype._postRender = function() {
+_postRender() {
   var actions = this._postRenderActions;
   this._postRenderActions = [];
   actions.forEach(function(action) {
     action();
   });
-};
+}
 
-scout.Widget.prototype.remove = function() {
+remove() {
   if (!this.rendered || this._isRemovalPrevented()) {
     return;
   }
@@ -363,21 +392,21 @@ scout.Widget.prototype.remove = function() {
   } else {
     this._removeInternal();
   }
-};
+}
 
 /**
  * Will be called by {@link #remove()}. If true is returned, the widget won't be removed.<p>
  * By default it just delegates to {@link #_isRemovalPending}. May be overridden to customize it.
  */
-scout.Widget.prototype._isRemovalPrevented = function() {
+_isRemovalPrevented() {
   return this._isRemovalPending();
-};
+}
 
 /**
  * Returns true if the removal of this or an ancestor widget is pending. Checking the ancestor is omitted if the parent is being removed.
  * This may be used to prevent a removal if an ancestor will be removed (e.g by an animation)
  */
-scout.Widget.prototype._isRemovalPending = function() {
+_isRemovalPending() {
   if (this.removalPending) {
     return true;
   }
@@ -393,9 +422,9 @@ scout.Widget.prototype._isRemovalPending = function() {
     parent = parent.parent;
   }
   return false;
-};
+}
 
-scout.Widget.prototype._removeInternal = function() {
+_removeInternal() {
   if (!this.rendered) {
     return;
   }
@@ -432,14 +461,14 @@ scout.Widget.prototype._removeInternal = function() {
   this.attached = false;
   this.removing = false;
   this.trigger('remove');
-};
+}
 
 /**
  * Adds class 'animate-remove' to container which can be used to trigger the animation.
  * After the animation is executed, the element gets removed using this._removeInternal.
  */
-scout.Widget.prototype._removeAnimated = function() {
-  if (!scout.device.supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
+_removeAnimated() {
+  if (!Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
     // Cannot remove animated, remove regularly
     this._removeInternal();
     return;
@@ -472,34 +501,34 @@ scout.Widget.prototype._removeAnimated = function() {
   // If the parent is being removed while the animation is running, the animationEnd event will never fire
   // -> Make sure remove is called nevertheless. Important: remove it before the parent is removed to maintain the regular remove order
   this.parent.one('removing', this._parentRemovingWhileAnimatingHandler);
-};
+}
 
-scout.Widget.prototype._onParentRemovingWhileAnimating = function() {
+_onParentRemovingWhileAnimating() {
   this._removeInternal();
-};
+}
 
-scout.Widget.prototype._renderInspectorInfo = function() {
+_renderInspectorInfo() {
   if (!this.session.inspector) {
     return;
   }
-  scout.inspector.applyInfo(this);
-};
+  inspector.applyInfo(this);
+}
 
 /**
  * Links $container with the widget.
  */
-scout.Widget.prototype._linkWithDOM = function() {
+_linkWithDOM() {
   if (this.$container) {
     this.$container.data('widget', this);
   }
-};
+}
 
 /**
  * Called right before _remove is called.
  * Default calls LayoutValidator.cleanupInvalidComponents to make sure that child components are removed from the invalid components list.
  * Also uninstalls key stroke context, loading support and scrollbars.
  */
-scout.Widget.prototype._cleanup = function() {
+_cleanup() {
   this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.keyStrokeContext);
   if (this.loadingSupport) {
@@ -509,16 +538,16 @@ scout.Widget.prototype._cleanup = function() {
   if (this.$container) {
     this.session.layoutValidator.cleanupInvalidComponents(this.$container);
   }
-};
+}
 
-scout.Widget.prototype._remove = function() {
+_remove() {
   if (this.$container) {
     this.$container.remove();
     this.$container = null;
   }
-};
+}
 
-scout.Widget.prototype.setOwner = function(owner) {
+setOwner(owner) {
   scout.assertParameter('owner', owner);
   if (owner === this.owner) {
     return;
@@ -530,9 +559,9 @@ scout.Widget.prototype.setOwner = function(owner) {
   }
   this.owner = owner;
   this.owner._addChild(this);
-};
+}
 
-scout.Widget.prototype.setParent = function(parent) {
+setParent(parent) {
   scout.assertParameter('parent', parent);
   if (parent === this.parent) {
     return;
@@ -574,22 +603,22 @@ scout.Widget.prototype.setParent = function(parent) {
     this.recomputeEnabled(this.parent.enabledComputed);
   }
   this.parent.one('destroy', this._parentDestroyHandler);
-};
+}
 
-scout.Widget.prototype._addChild = function(child) {
+_addChild(child) {
   $.log.isTraceEnabled() && $.log.trace('addChild(' + child + ') to ' + this);
-  scout.arrays.pushSet(this.children, child);
-};
+  arrays.pushSet(this.children, child);
+}
 
-scout.Widget.prototype._removeChild = function(child) {
+_removeChild(child) {
   $.log.isTraceEnabled() && $.log.trace('removeChild(' + child + ') from ' + this);
-  scout.arrays.remove(this.children, child);
-};
+  arrays.remove(this.children, child);
+}
 
 /**
- * @returns {scout.Widget[]} a list of all ancestors
+ * @returns {Widget[]} a list of all ancestors
  */
-scout.Widget.prototype.ancestors = function() {
+ancestors() {
   var ancestors = [];
   var parent = this.parent;
   while (parent) {
@@ -597,22 +626,22 @@ scout.Widget.prototype.ancestors = function() {
     parent = parent.parent;
   }
   return ancestors;
-};
+}
 
 /**
  * @returns {boolean} true if the given widget is the same as this or a descendant
  */
-scout.Widget.prototype.isOrHas = function(widget) {
+isOrHas(widget) {
   if (widget === this) {
     return true;
   }
   return this.has(widget);
-};
+}
 
 /**
  * @returns {boolean} true if the given widget is a descendant
  */
-scout.Widget.prototype.has = function(widget) {
+has(widget) {
   while (widget) {
     if (widget.parent === this) {
       return true;
@@ -621,34 +650,34 @@ scout.Widget.prototype.has = function(widget) {
   }
 
   return false;
-};
+}
 
 /**
- * @returns {scout.Form} the form the widget belongs to (returns the first parent which is a {@link scout.Form}.
+ * @returns {Form} the form the widget belongs to (returns the first parent which is a {@link Form}.
  */
-scout.Widget.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
+getForm() {
+  return Form.findForm(this);
+}
 
 /**
- * @returns {scout.Form} the first form which is not an inner form of a wrapped form field
+ * @returns {Form} the first form which is not an inner form of a wrapped form field
  */
-scout.Widget.prototype.findNonWrappedForm = function() {
-  return scout.Form.findNonWrappedForm(this);
-};
+findNonWrappedForm() {
+  return Form.findNonWrappedForm(this);
+}
 
 /**
  * @returns the desktop linked to the current session.
  * If desktop is still initializing it might not be available yet, in that case it searches the parent hierarchy for it.
  */
-scout.Widget.prototype.findDesktop = function() {
+findDesktop() {
   if (this.session.desktop) {
     return this.session.desktop;
   }
   return this.findParent(function(parent) {
-    return parent instanceof scout.Desktop;
+    return parent instanceof Desktop;
   });
-};
+}
 
 /**
  * Changes the enabled property of this form field to the given value.
@@ -662,7 +691,7 @@ scout.Widget.prototype.findDesktop = function() {
  *          (optional) If true the enabled property of all child form fields (recursive)
  *          are updated to same value as well. Default is false.
  */
-scout.Widget.prototype.setEnabled = function(enabled, updateParents, updateChildren) {
+setEnabled(enabled, updateParents, updateChildren) {
   this.setProperty('enabled', enabled);
 
   if (enabled && updateParents && this.parent) {
@@ -674,16 +703,16 @@ scout.Widget.prototype.setEnabled = function(enabled, updateParents, updateChild
       field.setEnabled(enabled);
     });
   }
-};
+}
 
-scout.Widget.prototype._setEnabled = function(enabled) {
+_setEnabled(enabled) {
   this._setProperty('enabled', enabled);
   if (this.initialized) {
     this.recomputeEnabled();
   }
-};
+}
 
-scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
+recomputeEnabled(parentEnabled) {
   if (parentEnabled === undefined) {
     parentEnabled = true;
     if (this.parent && this.parent.initialized && this.parent.enabledComputed !== undefined) {
@@ -693,9 +722,9 @@ scout.Widget.prototype.recomputeEnabled = function(parentEnabled) {
 
   var enabledComputed = this._computeEnabled(this.inheritAccessibility, parentEnabled);
   this._updateEnabledComputed(enabledComputed);
-};
+}
 
-scout.Widget.prototype._updateEnabledComputed = function(enabledComputed, enabledComputedForChildren) {
+_updateEnabledComputed(enabledComputed, enabledComputedForChildren) {
   if (this.enabledComputed === enabledComputed && enabledComputedForChildren === undefined) {
     // no change for this instance. there is no need to propagate to children
     // exception: the enabledComputed for the children differs from the one for me. In this case the propagation is necessary.
@@ -715,81 +744,81 @@ scout.Widget.prototype._updateEnabledComputed = function(enabledComputed, enable
       child.recomputeEnabled(computedStateForChildren);
     }
   });
-};
+}
 
-scout.Widget.prototype._computeEnabled = function(inheritAccessibility, parentEnabled) {
+_computeEnabled(inheritAccessibility, parentEnabled) {
   return this.enabled && (inheritAccessibility ? parentEnabled : true);
-};
+}
 
-scout.Widget.prototype._renderEnabled = function() {
+_renderEnabled() {
   if (!this.$container) {
     return;
   }
   this.$container.setEnabled(this.enabledComputed);
   this._renderDisabledStyle();
-};
+}
 
-scout.Widget.prototype.setInheritAccessibility = function(inheritAccessibility) {
+setInheritAccessibility(inheritAccessibility) {
   this.setProperty('inheritAccessibility', inheritAccessibility);
-};
+}
 
-scout.Widget.prototype._setInheritAccessibility = function(inheritAccessibility) {
+_setInheritAccessibility(inheritAccessibility) {
   this._setProperty('inheritAccessibility', inheritAccessibility);
   if (this.initialized) {
     this.recomputeEnabled();
   }
-};
+}
 
-scout.Widget.prototype.setDisabledStyle = function(disabledStyle) {
+setDisabledStyle(disabledStyle) {
   this.setProperty('disabledStyle', disabledStyle);
 
   this.children.forEach(function(child) {
     child.setDisabledStyle(disabledStyle);
   });
-};
+}
 
-scout.Widget.prototype._renderDisabledStyle = function() {
+_renderDisabledStyle() {
   this._renderDisabledStyleInternal(this.$container);
-};
+}
 
 /**
  * This function is used by subclasses to render the read-only class for a given $field.
  * Some fields like DateField have two input fields and thus cannot use the this.$field property.
  */
-scout.Widget.prototype._renderDisabledStyleInternal = function($element) {
+_renderDisabledStyleInternal($element) {
   if (!$element) {
     return;
   }
   if (this.enabledComputed) {
     $element.removeClass('read-only');
   } else {
-    $element.toggleClass('read-only', this.disabledStyle === scout.Widget.DisabledStyle.READ_ONLY);
+    $element.toggleClass('read-only', this.disabledStyle === Widget.DisabledStyle.READ_ONLY);
   }
-};
+}
 
-scout.Widget.prototype.setVisible = function(visible) {
+setVisible(visible) {
   this.setProperty('visible', visible);
-};
+}
 
 /**
  * @returns whether the widget is visible or not. May depend on other conditions than the visible property only
  */
-scout.Widget.prototype.isVisible = function() {
+isVisible() {
   return this.visible;
-};
+}
 
-scout.Widget.prototype._renderVisible = function() {
+_renderVisible() {
   if (!this.$container) {
     return;
   }
   this.$container.setVisible(this.isVisible());
   this.invalidateParentLogicalGrid();
-};
+}
 
 /**
  * @returns {boolean} true if every parent within the hierarchy is visible.
  */
-scout.Widget.prototype.isEveryParentVisible = function() {
+isEveryParentVisible() {
   var parent = this.parent;
   while (parent) {
     if (!parent.isVisible()) {
@@ -799,107 +828,107 @@ scout.Widget.prototype.isEveryParentVisible = function() {
   }
 
   return true;
-};
+}
 
 /**
  * This function does not set the focus to the field. It toggles the 'focused' class on the field container if present.
  * Objects using widget as prototype must call this function onBlur and onFocus to ensure the class gets toggled.
  *
- *  Use scout.Widget.focus to set the focus to the widget.
+ *  Use Widget.focus to set the focus to the widget.
  */
-scout.Widget.prototype.setFocused = function(focused) {
+setFocused(focused) {
   this.setProperty('focused', focused);
-};
+}
 
-scout.Widget.prototype._renderFocused = function() {
+_renderFocused() {
   if (this.$container) {
     this.$container.toggleClass('focused', this.focused);
   }
-};
+}
 
-scout.Widget.prototype._setCssClass = function(cssClass) {
+_setCssClass(cssClass) {
   if (this.rendered) {
     this._removeCssClass();
   }
   this._setProperty('cssClass', cssClass);
-};
+}
 
-scout.Widget.prototype._removeCssClass = function() {
+_removeCssClass() {
   if (!this.$container) {
     return;
   }
   this.$container.removeClass(this.cssClass);
-};
+}
 
-scout.Widget.prototype._renderCssClass = function() {
+_renderCssClass() {
   if (!this.$container) {
     return;
   }
   this.$container.addClass(this.cssClass);
-};
+}
 
-scout.Widget.prototype.setCssClass = function(cssClass) {
+setCssClass(cssClass) {
   this.setProperty('cssClass', cssClass);
-};
+}
 
-scout.Widget.prototype.addCssClass = function(cssClass) {
+addCssClass(cssClass) {
   var cssClasses = this.cssClassAsArray();
-  var cssClassesToAdd = scout.Widget.cssClassAsArray(cssClass);
+  var cssClassesToAdd = Widget.cssClassAsArray(cssClass);
   cssClassesToAdd.forEach(function(newCssClass) {
     if (cssClasses.indexOf(newCssClass) >= 0) {
       return;
     }
     cssClasses.push(newCssClass);
   }, this);
-  this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
-};
+  this.setProperty('cssClass', arrays.format(cssClasses, ' '));
+}
 
-scout.Widget.prototype.removeCssClass = function(cssClass) {
+removeCssClass(cssClass) {
   var cssClasses = this.cssClassAsArray();
-  var cssClassesToRemove = scout.Widget.cssClassAsArray(cssClass);
-  if (scout.arrays.removeAll(cssClasses, cssClassesToRemove)) {
-    this.setProperty('cssClass', scout.arrays.format(cssClasses, ' '));
+  var cssClassesToRemove = Widget.cssClassAsArray(cssClass);
+  if (arrays.removeAll(cssClasses, cssClassesToRemove)) {
+    this.setProperty('cssClass', arrays.format(cssClasses, ' '));
   }
-};
+}
 
-scout.Widget.prototype.toggleCssClass = function(cssClass, condition) {
+toggleCssClass(cssClass, condition) {
   if (condition) {
     this.addCssClass(cssClass);
   } else {
     this.removeCssClass(cssClass);
   }
-};
+}
 
-scout.Widget.prototype.cssClassAsArray = function() {
-  return scout.Widget.cssClassAsArray(this.cssClass);
-};
+cssClassAsArray() {
+  return Widget.cssClassAsArray(this.cssClass);
+}
 
 /**
  * Creates nothing by default. If a widget needs loading support, override this method and return a loading support.
- * @returns {scout.LoadingSupport}
+ * @returns {LoadingSupport}
  */
-scout.Widget.prototype._createLoadingSupport = function() {
+_createLoadingSupport() {
   return null;
-};
+}
 
-scout.Widget.prototype.setLoading = function(loading) {
+setLoading(loading) {
   this.setProperty('loading', loading);
-};
+}
 
-scout.Widget.prototype.isLoading = function() {
+isLoading() {
   return this.loading;
-};
+}
 
-scout.Widget.prototype._renderLoading = function() {
+_renderLoading() {
   if (!this.loadingSupport) {
     return;
   }
   this.loadingSupport.renderLoading();
-};
+}
 
 //--- Layouting / HtmlComponent methods ---
 
-scout.Widget.prototype.pack = function() {
+pack() {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -907,9 +936,9 @@ scout.Widget.prototype.pack = function() {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.pack();
-};
+}
 
-scout.Widget.prototype.invalidateLayout = function() {
+invalidateLayout() {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -917,9 +946,9 @@ scout.Widget.prototype.invalidateLayout = function() {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.invalidateLayout();
-};
+}
 
-scout.Widget.prototype.validateLayout = function() {
+validateLayout() {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -927,9 +956,9 @@ scout.Widget.prototype.validateLayout = function() {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.validateLayout();
-};
+}
 
-scout.Widget.prototype.revalidateLayout = function() {
+revalidateLayout() {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -937,12 +966,12 @@ scout.Widget.prototype.revalidateLayout = function() {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.revalidateLayout();
-};
+}
 
 /**
  * @param [invalidateParents] optional, default is true
  */
-scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
+invalidateLayoutTree(invalidateParents) {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -950,9 +979,9 @@ scout.Widget.prototype.invalidateLayoutTree = function(invalidateParents) {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.invalidateLayoutTree(invalidateParents);
-};
+}
 
-scout.Widget.prototype.validateLayoutTree = function() {
+validateLayoutTree() {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -960,9 +989,9 @@ scout.Widget.prototype.validateLayoutTree = function() {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.validateLayoutTree();
-};
+}
 
-scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
+revalidateLayoutTree(invalidateParents) {
   if (!this.rendered || this.removing) {
     return;
   }
@@ -970,7 +999,7 @@ scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.revalidateLayoutTree(invalidateParents);
-};
+}
 
 /**
  * The layout data contains hints for the layout of the parent container to layout this individual child widget inside the container.<br>
@@ -979,7 +1008,7 @@ scout.Widget.prototype.revalidateLayoutTree = function(invalidateParents) {
  * Example: The parent container uses a LogicalGridLayout to layout its children. Every child has a LogicalGridLayoutData to tell the layout how this specific child should be layouted.
  * The parent may have a LogicalGridLayoutConfig to specify constraints which affect either only the container or every child in the container.
  */
-scout.Widget.prototype.setLayoutData = function(layoutData) {
+setLayoutData(layoutData) {
   if (!this.rendered) {
     return;
   }
@@ -987,25 +1016,25 @@ scout.Widget.prototype.setLayoutData = function(layoutData) {
     throw new Error('Function expects a htmlComp property');
   }
   this.htmlComp.layoutData = layoutData;
-};
+}
 
 /**
  * If the widget uses a logical grid layout, the grid may be validated using this method.
  * <p>
  * If the grid is not dirty, nothing happens.
  */
-scout.Widget.prototype.validateLogicalGrid = function() {
+validateLogicalGrid() {
   if (this.logicalGrid) {
     this.logicalGrid.validate(this);
   }
-};
+}
 
 /**
  * Marks the logical grid as dirty.<br>
  * Does nothing, if there is no logical grid.
  * @param {boolean} [invalidateLayout] true, to invalidate the layout afterwards, false if not. Default is true.
  */
-scout.Widget.prototype.invalidateLogicalGrid = function(invalidateLayout) {
+invalidateLogicalGrid(invalidateLayout) {
   if (!this.initialized) {
     return;
   }
@@ -1016,13 +1045,13 @@ scout.Widget.prototype.invalidateLogicalGrid = function(invalidateLayout) {
   if (scout.nvl(invalidateLayout, true)) {
     this.invalidateLayoutTree();
   }
-};
+}
 
 /**
  * Invalidates the logical grid of the parent widget. Typically done when the visibility of the widget changes.
  * @param {boolean} [invalidateLayout] true, to invalidate the layout of the parent of this.htmlComp, false if not. Default is true.
  */
-scout.Widget.prototype.invalidateParentLogicalGrid = function(invalidateLayout) {
+invalidateParentLogicalGrid(invalidateLayout) {
   if (!this.rendered || !this.htmlComp) {
     return;
   }
@@ -1033,94 +1062,94 @@ scout.Widget.prototype.invalidateParentLogicalGrid = function(invalidateLayout) 
       htmlCompParent.invalidateLayoutTree();
     }
   }
-};
+}
 
-scout.Widget.prototype.revalidateLogicalGrid = function(invalidateLayout) {
+revalidateLogicalGrid(invalidateLayout) {
   this.invalidateLogicalGrid(invalidateLayout);
   this.validateLogicalGrid();
-};
+}
 
-scout.Widget.prototype.setLogicalGrid = function(logicalGrid) {
+setLogicalGrid(logicalGrid) {
   this.setProperty('logicalGrid', logicalGrid);
-};
+}
 
 /**
- * @param logicalGrid an instance of {@link scout.LogicalGrid} or a string representing the object type of a logical grid.
+ * @param logicalGrid an instance of {@link LogicalGrid} or a string representing the object type of a logical grid.
  */
-scout.Widget.prototype._setLogicalGrid = function(logicalGrid) {
+_setLogicalGrid(logicalGrid) {
   if (typeof logicalGrid === 'string') {
     logicalGrid = scout.create(logicalGrid);
   }
   this._setProperty('logicalGrid', logicalGrid);
   this.invalidateLogicalGrid();
-};
+}
 
 //--- Event handling methods ---
-scout.Widget.prototype._createEventSupport = function() {
-  return new scout.EventSupport();
-};
+_createEventSupport() {
+  return new EventSupport();
+}
 
-scout.Widget.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
-};
+}
 
-scout.Widget.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.Widget.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.Widget.prototype.off = function(type, func) {
+off(type, func) {
   this.events.off(type, func);
-};
+}
 
-scout.Widget.prototype.addListener = function(listener) {
+addListener(listener) {
   this.events.addListener(listener);
-};
+}
 
-scout.Widget.prototype.removeListener = function(listener) {
+removeListener(listener) {
   this.events.removeListener(listener);
-};
+}
 
 /**
  * Adds an event handler using {@link #one()} and returns a promise.
  * The promise is resolved as soon as the event is triggered.
  */
-scout.Widget.prototype.when = function(type) {
+when(type) {
   return this.events.when(type);
-};
+}
 
 /**
  * @param $element (optional) element from which the entryPoint will be resolved. If not set this.parent.$container is used.
  * @returns the entry-point for this Widget. If the widget is part of the main-window it returns this.session.$entryPoint,
  * for popup-window this function will return the body of the document in the popup window.
  */
-scout.Widget.prototype.entryPoint = function($element) {
+entryPoint($element) {
   $element = scout.nvl($element, this.parent.$container);
   if (!$element.length) {
     throw new Error('Cannot resolve entryPoint, $element.length is 0 or undefined');
   }
   return $element.entryPoint();
-};
+}
 
-scout.Widget.prototype.window = function(domElement) {
+window(domElement) {
   var $el = this.$container || this.$parent;
   return $el ? $el.window(domElement) : (domElement ? null : $(null));
-};
+}
 
-scout.Widget.prototype.document = function(domElement) {
+document(domElement) {
   var $el = this.$container || this.$parent;
   return $el ? $el.document(domElement) : (domElement ? null : $(null));
-};
+}
 
 /**
  * This method attaches the detached $container to the DOM.
  */
-scout.Widget.prototype.attach = function() {
+attach() {
   if (this.attached || !this.rendered) {
     return;
   }
@@ -1131,7 +1160,7 @@ scout.Widget.prototype.attach = function() {
   this._postAttach();
   this._onAttach();
   this._triggerChildrenOnAttach(this);
-};
+}
 
 /**
  * Override this method to do something when Widget is attached again. Typically
@@ -1142,50 +1171,50 @@ scout.Widget.prototype.attach = function() {
  *   itself must _not_ attach its own $container. That's why we should only
  *   attach when event.target is === this.
  */
-scout.Widget.prototype._attach = function() {
+_attach() {
   // NOP
-};
+}
 
 /**
  * Override this method to do something after this widget is attached.
  * This function is not called on any child of the attached widget.
  */
-scout.Widget.prototype._postAttach = function() {
+_postAttach() {
   // NOP
-};
+}
 
-scout.Widget.prototype._triggerChildrenOnAttach = function(parent) {
+_triggerChildrenOnAttach(parent) {
   this.children.forEach(function(child) {
     child._onAttach();
     child._triggerChildrenOnAttach(parent);
   });
-};
+}
 
 /**
  * Override this method to do something after this widget or any parent of it is attached.
  * This function is called whether or not the widget is rendered.
  */
-scout.Widget.prototype._onAttach = function() {
+_onAttach() {
   if (this.rendered) {
     this._renderOnAttach();
   }
-};
+}
 
 /**
  * Override this method to do something after this widget or any parent of it is attached.
  * This function is only called when this widget is rendered.
  */
-scout.Widget.prototype._renderOnAttach = function() {
+_renderOnAttach() {
   this._renderScrollTop();
   this._renderScrollLeft();
-};
+}
 
 /**
  * This method calls detach() on all child-widgets. It is used to store some data
  * before a DOM element is detached and propagate the detach "event" to all child-
  * widgets, because when a DOM element is detached - child elements are not notified
  */
-scout.Widget.prototype.detach = function() {
+detach() {
   if (this.rendering) {
     // Defer the execution of detach. If it was detached while rendering the attached flag would be wrong.
     this._postRenderActions.push(this.detach.bind(this));
@@ -1199,13 +1228,13 @@ scout.Widget.prototype.detach = function() {
   this._triggerChildrenOnDetach(this);
   this._detach();
   this.attached = false;
-};
+}
 
 /**
  * This function is called before a widget gets detached. The function is only called on the detached widget and NOT on
  * any of its children.
  */
-scout.Widget.prototype._beforeDetach = function(parent) {
+_beforeDetach(parent) {
   if (!this.$container) {
     return;
   }
@@ -1218,89 +1247,89 @@ scout.Widget.prototype._beforeDetach = function(parent) {
     this._uninstallFocusContext();
   } else if (isFocused) {
     // exclude the container or any of its child elements to gain focus
-    focusManager.validateFocus(scout.filters.outsideFilter(this.$container));
+    focusManager.validateFocus(filters.outsideFilter(this.$container));
   }
-};
+}
 
-scout.Widget.prototype._triggerChildrenOnDetach = function() {
+_triggerChildrenOnDetach() {
   this.children.forEach(function(child) {
     child._onDetach();
     child._triggerChildrenOnDetach(parent);
   });
-};
+}
 
 /**
  * This function is called before a widget or any of its parent getting detached.
  * This function is thought to be overridden.
  */
-scout.Widget.prototype._onDetach = function() {
+_onDetach() {
   if (this.rendered) {
     this._renderOnDetach();
   }
-};
+}
 
-scout.Widget.prototype._renderOnDetach = function() {
+_renderOnDetach() {
   // NOP
-};
+}
 
 /**
  * Override this method to do something when Widget is detached. Typically you
  * will call this.$container.detach(). The default
  * implementation sets this.attached to false.
  */
-scout.Widget.prototype._detach = function() {};
+_detach() {};
 
-scout.Widget.prototype._uninstallFocusContext = function() {
+_uninstallFocusContext() {
   // NOP
-};
+}
 
-scout.Widget.prototype._installFocusContext = function() {
+_installFocusContext() {
   // NOP
-};
+}
 
 /**
- * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default scout.KeyStrokeContext.
- * @returns {scout.KeyStrokeContext}
+ * Does nothing by default. If a widget needs keystroke support override this method and return a keystroke context, e.g. the default KeyStrokeContext.
+ * @returns {KeyStrokeContext}
  */
-scout.Widget.prototype._createKeyStrokeContext = function() {
+_createKeyStrokeContext() {
   return null;
-};
+}
 
-scout.Widget.prototype.updateKeyStrokes = function(newKeyStrokes, oldKeyStrokes) {
+updateKeyStrokes(newKeyStrokes, oldKeyStrokes) {
   this.unregisterKeyStrokes(oldKeyStrokes);
   this.registerKeyStrokes(newKeyStrokes);
-};
+}
 
-scout.Widget.prototype.registerKeyStrokes = function(keyStrokes) {
+registerKeyStrokes(keyStrokes) {
   this.keyStrokeContext.registerKeyStrokes(keyStrokes);
-};
+}
 
-scout.Widget.prototype.unregisterKeyStrokes = function(keyStrokes) {
+unregisterKeyStrokes(keyStrokes) {
   this.keyStrokeContext.unregisterKeyStrokes(keyStrokes);
-};
+}
 
 /**
  * Triggers a property change for a single property. The event is only triggered when
  * old and new value are the same.
  */
-scout.Widget.prototype.triggerPropertyChange = function(propertyName, oldValue, newValue) {
+triggerPropertyChange(propertyName, oldValue, newValue) {
   scout.assertParameter('propertyName', propertyName);
-  var event = new scout.Event({
+  var event = new Event({
     propertyName: propertyName,
     oldValue: oldValue,
     newValue: newValue
   });
   this.trigger('propertyChange', event);
   return event;
-};
+}
 
 /**
  * Sets the value of the property 'propertyName' to 'newValue' and then fires a propertyChange event for that property.
  */
-scout.Widget.prototype._setProperty = function(propertyName, newValue) {
+_setProperty(propertyName, newValue) {
   scout.assertParameter('propertyName', propertyName);
   var oldValue = this[propertyName];
-  if (scout.objects.equals(oldValue, newValue)) {
+  if (objects.equals(oldValue, newValue)) {
     return;
   }
   this[propertyName] = newValue;
@@ -1309,7 +1338,7 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
     // Revert to old value if property change should be prevented
     this[propertyName] = oldValue;
   }
-};
+}
 
 /**
  * Sets a new value for a specific property. If the new value is the same value as the old one, nothing is performed.
@@ -1321,8 +1350,8 @@ scout.Widget.prototype._setProperty = function(propertyName, newValue) {
  * 3. Model update: If there is a custom set function (e.g. _setXY where XY is the property name), it will be called. Otherwise the default set function _setProperty is called.
  * 4. DOM rendering: If the widget is rendered and there is a custom render function (e.g. _renderXY where XY is the property name), it will be called. Otherwise nothing happens.
  */
-scout.Widget.prototype.setProperty = function(propertyName, value) {
-  if (scout.objects.equals(this[propertyName], value)) {
+setProperty(propertyName, value) {
+  if (objects.equals(this[propertyName], value)) {
     return;
   }
 
@@ -1334,16 +1363,16 @@ scout.Widget.prototype.setProperty = function(propertyName, value) {
   if (this.rendered) {
     this._callRenderProperty(propertyName);
   }
-};
+}
 
-scout.Widget.prototype._prepareProperty = function(propertyName, value) {
+_prepareProperty(propertyName, value) {
   if (!this.isWidgetProperty(propertyName)) {
     return value;
   }
   return this._prepareWidgetProperty(propertyName, value);
-};
+}
 
-scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) {
+_prepareWidgetProperty(propertyName, widgets) {
   // Create new child widget(s)
   widgets = this._createChildren(widgets);
 
@@ -1351,7 +1380,7 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
   if (oldWidgets && Array.isArray(widgets)) {
     // If new value is an array, old value has to be one as well
     // Only destroy those which are not in the new array
-    oldWidgets = scout.arrays.diff(oldWidgets, widgets);
+    oldWidgets = arrays.diff(oldWidgets, widgets);
   }
 
   if (!this.isPreserveOnPropertyChangeProperty(propertyName)) {
@@ -1363,13 +1392,13 @@ scout.Widget.prototype._prepareWidgetProperty = function(propertyName, widgets) 
   }
 
   return widgets;
-};
+}
 
 /**
  * Does nothing if the property is not a widget property.<p>
  * If it is a widget property, it removes the existing widgets. Render has to be implemented by the widget itself.
  */
-scout.Widget.prototype._callRemoveProperty = function(propertyName) {
+_callRemoveProperty(propertyName) {
   if (!this.isWidgetProperty(propertyName)) {
     return;
   }
@@ -1380,56 +1409,56 @@ scout.Widget.prototype._callRemoveProperty = function(propertyName) {
   if (!widgets) {
     return;
   }
-  var removeFuncName = '_remove' + scout.strings.toUpperCaseFirstLetter(propertyName);
+  var removeFuncName = '_remove' + strings.toUpperCaseFirstLetter(propertyName);
   if (this[removeFuncName]) {
     this[removeFuncName]();
   } else {
     this._internalRemoveWidgets(widgets);
   }
-};
+}
 
 /**
  * Removes the given widgets
  */
-scout.Widget.prototype._internalRemoveWidgets = function(widgets) {
-  widgets = scout.arrays.ensure(widgets);
+_internalRemoveWidgets(widgets) {
+  widgets = arrays.ensure(widgets);
   widgets.forEach(function(widget) {
     widget.remove();
   });
-};
+}
 
-scout.Widget.prototype._callSetProperty = function(propertyName, value) {
-  var setFuncName = '_set' + scout.strings.toUpperCaseFirstLetter(propertyName);
+_callSetProperty(propertyName, value) {
+  var setFuncName = '_set' + strings.toUpperCaseFirstLetter(propertyName);
   if (this[setFuncName]) {
     this[setFuncName](value);
   } else {
     this._setProperty(propertyName, value);
   }
-};
+}
 
-scout.Widget.prototype._callRenderProperty = function(propertyName) {
-  var renderFuncName = '_render' + scout.strings.toUpperCaseFirstLetter(propertyName);
+_callRenderProperty(propertyName) {
+  var renderFuncName = '_render' + strings.toUpperCaseFirstLetter(propertyName);
   if (!this[renderFuncName]) {
     return;
   }
   this[renderFuncName]();
-};
+}
 
 /**
  * Sets this widget as parent of the given widget(s).
  *
  * @param widgets may be a widget or array of widgets
  */
-scout.Widget.prototype.link = function(widgets) {
+link(widgets) {
   if (!widgets) {
     return;
   }
 
-  widgets = scout.arrays.ensure(widgets);
+  widgets = arrays.ensure(widgets);
   widgets.forEach(function(child, i) {
     child.setParent(this);
   }, this);
-};
+}
 
 /**
  * Method required for widgets which are supposed to be directly covered by a glasspane.<p>
@@ -1438,13 +1467,13 @@ scout.Widget.prototype.link = function(widgets) {
  * If the widget is not rendered yet, a scout.DerredGlassPaneTarget is returned.<br>
  * In both cases the method _glassPaneTargets is called which may be overridden by the actual widget.
  */
-scout.Widget.prototype.glassPaneTargets = function(element) {
+glassPaneTargets(element) {
   var resolveGlassPanes = function(element) {
     // contributions
-    var targets = scout.arrays.flatMap(this._glassPaneContributions, function(cont) {
+    var targets = arrays.flatMap(this._glassPaneContributions, function(cont) {
       var $elements = cont(element);
       if ($elements) {
-        return scout.arrays.ensure($elements);
+        return arrays.ensure($elements);
       }
       return [];
     }.bind(this));
@@ -1455,46 +1484,46 @@ scout.Widget.prototype.glassPaneTargets = function(element) {
     return resolveGlassPanes(element);
   }
 
-  return scout.DeferredGlassPaneTarget.createFor(this, resolveGlassPanes.bind(this, element));
-};
+  return DeferredGlassPaneTarget.createFor(this, resolveGlassPanes.bind(this, element));
+}
 
-scout.Widget.prototype._glassPaneTargets = function(element) {
+_glassPaneTargets(element) {
   return [this.$container];
-};
+}
 
-scout.Widget.prototype.addGlassPaneContribution = function(contribution) {
+addGlassPaneContribution(contribution) {
   this._glassPaneContributions.push(contribution);
   this.trigger('glassPaneContributionAdded', {
     contribution: contribution
   });
-};
+}
 
 /**
  * @param [contribution] a function which returns glass pane targets (jQuery elements)
  */
-scout.Widget.prototype.removeGlassPaneContribution = function(contribution) {
-  scout.arrays.remove(this._glassPaneContributions, contribution);
+removeGlassPaneContribution(contribution) {
+  arrays.remove(this._glassPaneContributions, contribution);
   this.trigger('glassPaneContributionRemoved', {
     contribution: contribution
   });
-};
+}
 
-scout.Widget.prototype.toString = function() {
+toString() {
   var attrs = '';
   attrs += 'id=' + this.id;
   attrs += ' objectType=' + this.objectType;
   attrs += ' rendered=' + this.rendered;
   if (this.$container) {
-    attrs += ' $container=' + scout.graphics.debugOutput(this.$container);
+    attrs += ' $container=' + graphics.debugOutput(this.$container);
   }
   return 'Widget[' + attrs.trim() + ']';
-};
+}
 
 /**
  * Returns the ancestors as string delimited by '\n'.
  * @param [count] the number of ancestors to be processed. Default is -1 which means all.
  */
-scout.Widget.prototype.ancestorsToString = function(count) {
+ancestorsToString(count) {
   var str = '',
     ancestors = this.ancestors();
 
@@ -1509,25 +1538,25 @@ scout.Widget.prototype.ancestorsToString = function(count) {
     str += ancestor.toString();
   });
   return str;
-};
+}
 
-scout.Widget.prototype.resolveTextKeys = function(properties) {
+resolveTextKeys(properties) {
   properties.forEach(function(property) {
-    scout.texts.resolveTextProperty(this, property);
+    texts.resolveTextProperty(this, property);
   }, this);
-};
+}
 
-scout.Widget.prototype.resolveIconIds = function(properties) {
+resolveIconIds(properties) {
   properties.forEach(function(property) {
-    scout.icons.resolveIconProperty(this, property);
+    icons.resolveIconProperty(this, property);
   }, this);
-};
+}
 
-scout.Widget.prototype.resolveConsts = function(configs) {
+resolveConsts(configs) {
   configs.forEach(function(config) {
-    scout.objects.resolveConstProperty(this, config);
+    objects.resolveConstProperty(this, config);
   }, this);
-};
+}
 
 /**
  * A so called widget property is a property with a widget as value incl. automatic resolution of that widget.
@@ -1537,21 +1566,21 @@ scout.Widget.prototype.resolveConsts = function(configs) {
  * <p>
  * If only the resolve operations without the lifecycle actions should be performed, you need to add the property to the list _preserveOnPropertyChangeProperties as well.
  */
-scout.Widget.prototype._addWidgetProperties = function(properties) {
+_addWidgetProperties(properties) {
   this._addProperties('_widgetProperties', properties);
-};
+}
 
-scout.Widget.prototype.isWidgetProperty = function(propertyName) {
+isWidgetProperty(propertyName) {
   return this._widgetProperties.indexOf(propertyName) > -1;
-};
+}
 
-scout.Widget.prototype._addCloneProperties = function(properties) {
+_addCloneProperties(properties) {
   this._addProperties('_cloneProperties', properties);
-};
+}
 
-scout.Widget.prototype.isCloneProperty = function(propertyName) {
+isCloneProperty(propertyName) {
   return this._cloneProperties.indexOf(propertyName) > -1;
-};
+}
 
 /**
  * Properties in this list won't be affected by the automatic lifecycle actions performed for regular widget properties.
@@ -1560,25 +1589,25 @@ scout.Widget.prototype.isCloneProperty = function(propertyName) {
  * <p>
  * The typical use case for such properties is referencing another widget without taking care of that widget.
  */
-scout.Widget.prototype._addPreserveOnPropertyChangeProperties = function(properties) {
+_addPreserveOnPropertyChangeProperties(properties) {
   this._addProperties('_preserveOnPropertyChangeProperties', properties);
-};
+}
 
-scout.Widget.prototype.isPreserveOnPropertyChangeProperty = function(propertyName) {
+isPreserveOnPropertyChangeProperty(propertyName) {
   return this._preserveOnPropertyChangeProperties.indexOf(propertyName) > -1;
-};
+}
 
-scout.Widget.prototype._addProperties = function(propertyName, properties) {
-  properties = scout.arrays.ensure(properties);
+_addProperties(propertyName, properties) {
+  properties = arrays.ensure(properties);
   properties.forEach(function(property) {
     if (this[propertyName].indexOf(property) > -1) {
       throw new Error(propertyName + ' already contains the property ' + property);
     }
     this[propertyName].push(property);
   }, this);
-};
+}
 
-scout.Widget.prototype._eachProperty = function(model, func) {
+_eachProperty(model, func) {
   var propertyName, value, i;
 
   // Loop through primitive properties
@@ -1600,35 +1629,35 @@ scout.Widget.prototype._eachProperty = function(model, func) {
 
     func(propertyName, value, true);
   }
-};
+}
 
-scout.Widget.prototype._removeWidgetProperties = function(properties) {
+_removeWidgetProperties(properties) {
   if (Array.isArray(properties)) {
-    scout.arrays.removeAll(this._widgetProperties, properties);
+    arrays.removeAll(this._widgetProperties, properties);
   } else {
-    scout.arrays.remove(this._widgetProperties, properties);
+    arrays.remove(this._widgetProperties, properties);
   }
-};
+}
 
 /**
  * Clones the widget and mirrors the events, see this.clone() and this.mirror() for details.
  */
-scout.Widget.prototype.cloneAndMirror = function(model) {
+cloneAndMirror(model) {
   return this.clone(model, {
     delegateAllPropertiesToClone: true
   });
-};
+}
 
 /**
  * @returns the original widget from which this one was cloned. If it is not a clone, itself is returned.
  */
-scout.Widget.prototype.original = function() {
+original() {
   var original = this;
   while (original.cloneOf) {
     original = original.cloneOf;
   }
   return original;
-};
+}
 
 /**
  * Clones the widget and returns the clone. Only the properties defined in this._cloneProperties are copied to the clone.
@@ -1659,12 +1688,12 @@ scout.Widget.prototype.original = function() {
  * @param options Options used for the clone widgets. See above.
  *
  */
-scout.Widget.prototype.clone = function(model, options) {
+clone(model, options) {
   var clone, cloneModel;
   model = model || {};
   options = options || {};
 
-  cloneModel = scout.objects.extractProperties(this, model, this._cloneProperties);
+  cloneModel = objects.extractProperties(this, model, this._cloneProperties);
   clone = scout.create(this.objectType, cloneModel);
   clone.cloneOf = this;
   this._mirror(clone, options);
@@ -1679,13 +1708,13 @@ scout.Widget.prototype.clone = function(model, options) {
   }
 
   return clone;
-};
+}
 
-scout.Widget.prototype._deepCloneProperties = function(clone, properties, options) {
+_deepCloneProperties(clone, properties, options) {
   if (!properties) {
     return clone;
   }
-  properties = scout.arrays.ensure(properties);
+  properties = arrays.ensure(properties);
   properties.forEach(function(property) {
     var propertyValue = this[property],
       clonedProperty = null;
@@ -1717,22 +1746,22 @@ scout.Widget.prototype._deepCloneProperties = function(clone, properties, option
     }
     clone[property] = clonedProperty;
   }.bind(this));
-};
+}
 
 /**
  * Delegates every property change event from the original widget to this cloned widget by calling the appropriate setter.
  * If no target is set it works only if this widget is a clone.
  */
-scout.Widget.prototype.mirror = function(options, target) {
+mirror(options, target) {
   target = target || this.cloneOf;
   if (!target) {
     throw new Error('No target for mirroring.');
   }
   this._mirror(target, options);
-};
+}
 
-scout.Widget.prototype._mirror = function(clone, options) {
-  var eventDelegator = scout.arrays.find(this.eventDelegators, function(eventDelegator) {
+_mirror(clone, options) {
+  var eventDelegator = arrays.find(this.eventDelegators, function(eventDelegator) {
     return eventDelegator.clone === clone;
   });
   if (eventDelegator) {
@@ -1741,11 +1770,11 @@ scout.Widget.prototype._mirror = function(clone, options) {
   options = options || {};
   eventDelegator = {
     clone: clone,
-    originalToClone: scout.EventDelegator.create(this, clone, {
+    originalToClone: EventDelegator.create(this, clone, {
       delegateProperties: options.delegatePropertiesToClone,
       delegateAllProperties: options.delegateAllPropertiesToClone
     }),
-    cloneToOriginal: scout.EventDelegator.create(clone, this, {
+    cloneToOriginal: EventDelegator.create(clone, this, {
       delegateProperties: options.delegatePropertiesToOriginal,
       delegateAllProperties: options.delegateAllPropertiesToOriginal,
       excludeProperties: options.excludePropertiesToOriginal,
@@ -1756,18 +1785,18 @@ scout.Widget.prototype._mirror = function(clone, options) {
   clone.one('destroy', function() {
     this._unmirror(clone);
   }.bind(this));
-};
+}
 
-scout.Widget.prototype.unmirror = function(target) {
+unmirror(target) {
   target = target || this.cloneOf;
   if (!target) {
     throw new Error('No target for unmirroring.');
   }
   this._unmirror(target);
-};
+}
 
-scout.Widget.prototype._unmirror = function(target) {
-  var eventDelegatorIndex = scout.arrays.findIndex(this.eventDelegators, function(eventDelegator) {
+_unmirror(target) {
+  var eventDelegatorIndex = arrays.findIndex(this.eventDelegators, function(eventDelegator) {
       return eventDelegator.clone === target;
     }),
     eventDelegator = (eventDelegatorIndex > -1) ? (this.eventDelegators.splice(eventDelegatorIndex, 1)[0]) : null;
@@ -1780,34 +1809,34 @@ scout.Widget.prototype._unmirror = function(target) {
   if (eventDelegator.cloneToOriginal) {
     eventDelegator.cloneToOriginal.destroy();
   }
-};
+}
 
-scout.Widget.prototype._onParentDestroy = function(event) {
+_onParentDestroy(event) {
   if (this.destroyed) {
     return;
   }
   // If the parent is destroyed but the widget not make sure it gets a new parent
   // This ensures the old one may be properly garbage collected
   this.setParent(this.owner);
-};
+}
 
-scout.Widget.prototype.callSetter = function(propertyName, value) {
-  var setterFuncName = 'set' + scout.strings.toUpperCaseFirstLetter(propertyName);
+callSetter(propertyName, value) {
+  var setterFuncName = 'set' + strings.toUpperCaseFirstLetter(propertyName);
   if (this[setterFuncName]) {
     this[setterFuncName](value);
   } else {
     this.setProperty(propertyName, value);
   }
-};
+}
 
 /**
  * Traverses the object-tree (children) of this widget and searches for a widget with the given ID.
  * Returns the widget with the requested ID or null if no widget has been found.
  *
  * @param widgetId
- * @returns {scout.Widget} the found widget for the given id
+ * @returns {Widget} the found widget for the given id
  */
-scout.Widget.prototype.widget = function(widgetId) {
+widget(widgetId) {
   if (predicate(this)) {
     return this;
   }
@@ -1818,7 +1847,7 @@ scout.Widget.prototype.widget = function(widgetId) {
       return widget;
     }
   }
-};
+}
 
 /**
  * Similar to widget(), but uses "breadth-first" strategy, i.e. it checks all children of the
@@ -1859,7 +1888,7 @@ scout.Widget.prototype.widget = function(widgetId) {
  *          If true, the entire tree is traversed.
  * @return the first found widget, or null if no widget was found.
  */
-scout.Widget.prototype.nearestWidget = function(widgetId, deep) {
+nearestWidget(widgetId, deep) {
   if (this.id === widgetId) {
     return this;
   }
@@ -1879,12 +1908,12 @@ scout.Widget.prototype.nearestWidget = function(widgetId, deep) {
     }
   }
   return null;
-};
+}
 
 /**
  * @returns the first parent for which the given function returns true.
  */
-scout.Widget.prototype.findParent = function(predicate) {
+findParent(predicate) {
   var parent = this.parent;
   while (parent) {
     if (predicate(parent)) {
@@ -1893,12 +1922,12 @@ scout.Widget.prototype.findParent = function(predicate) {
     parent = parent.parent;
   }
   return parent;
-};
+}
 
 /**
- * @returns {scout.Widget} the first child for which the given function returns true.
+ * @returns {Widget} the first child for which the given function returns true.
  */
-scout.Widget.prototype.findChild = function(predicate) {
+findChild(predicate) {
   var foundChild = null;
   this.visitChildren(function(child) {
     if (predicate(child)) {
@@ -1907,13 +1936,13 @@ scout.Widget.prototype.findChild = function(predicate) {
     }
   });
   return foundChild;
-};
+}
 
-scout.Widget.prototype.setTrackFocus = function(trackFocus) {
+setTrackFocus(trackFocus) {
   this.setProperty('trackFocus', trackFocus);
-};
+}
 
-scout.Widget.prototype._renderTrackFocus = function() {
+_renderTrackFocus() {
   if (!this.$container) {
     return;
   }
@@ -1922,21 +1951,21 @@ scout.Widget.prototype._renderTrackFocus = function() {
   } else {
     this.$container.off('focusin', this._focusInListener);
   }
-};
+}
 
-scout.Widget.prototype.restoreFocus = function() {
+restoreFocus() {
   if (this._$lastFocusedElement) {
     this.session.focusManager.requestFocus(this._$lastFocusedElement);
   } else if (this._storedFocusedWidget) {
     this._storedFocusedWidget.focus();
     this._storedFocusedWidget = null;
   }
-};
+}
 
 /**
  * Method invoked once a 'focusin' event is fired by this context's $container or one of its child controls.
  */
-scout.Widget.prototype._onFocusIn = function(event) {
+_onFocusIn(event) {
   // do not track focus events during rendering to avoid initial focus to be restored.
   if (this.rendering) {
     return;
@@ -1945,7 +1974,7 @@ scout.Widget.prototype._onFocusIn = function(event) {
   if (this.$container.has($target)) {
     this._$lastFocusedElement = $target;
   }
-};
+}
 
 /**
  * Tries to set the focus on the widget.
@@ -1953,19 +1982,19 @@ scout.Widget.prototype._onFocusIn = function(event) {
  * By default the focus is set on the container but this may vary from widget to widget.
  * @returns {boolean} true if the element could be focused, false if not
  */
-scout.Widget.prototype.focus = function() {
+focus() {
   if (!this.rendered) {
     this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
   }
 
   return this.session.focusManager.requestFocus(this.getFocusableElement());
-};
+}
 
 /**
  * Calls {@link focus()} and prevents the default behavior of the event if the focusing was successful.
  */
-scout.Widget.prototype.focusAndPreventDefault = function(event) {
+focusAndPreventDefault(event) {
   if (this.focus()) {
     // Preventing blur is bad for touch devices because it prevents that the keyboard can close.
     // In that case focus() will return false because focus manager is disabled.
@@ -1973,19 +2002,19 @@ scout.Widget.prototype.focusAndPreventDefault = function(event) {
     return true;
   }
   return false;
-};
+}
 
 /**
  * @returns whether the widget is the currently active element
  */
-scout.Widget.prototype.isFocused = function() {
-  return this.rendered && scout.focusUtils.isActiveElement(this.getFocusableElement());
-};
+isFocused() {
+  return this.rendered && focusUtils.isActiveElement(this.getFocusableElement());
+}
 
 /**
  * @return {boolean} true if the element is focusable, false if not.
  */
-scout.Widget.prototype.isFocusable = function() {
+isFocusable() {
   if (!this.rendered || !this.visible) {
     return false;
   }
@@ -1994,20 +2023,20 @@ scout.Widget.prototype.isFocusable = function() {
     return $.ensure(elem).is(':focusable');
   }
   return false;
-};
+}
 
 /**
  * This method returns the HtmlElement to be used when {@link #focus()} is called.
  * It can be overridden, in case the widget needs to return something other than this.$container[0].
  */
-scout.Widget.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (this.rendered && this.$container) {
     return this.$container[0];
   }
   return null;
-};
+}
 
-scout.Widget.prototype._installScrollbars = function(options) {
+_installScrollbars(options) {
   var $scrollable = this.get$Scrollable();
   if (!$scrollable) {
     throw new Error('Scrollable is not defined, cannot install scrollbars');
@@ -2021,16 +2050,16 @@ scout.Widget.prototype._installScrollbars = function(options) {
     parent: this
   };
   options = $.extend({}, defaults, options);
-  scout.scrollbars.install($scrollable, options);
+  scrollbars.install($scrollable, options);
   $scrollable.on('scroll', this._scrollHandler);
-};
+}
 
-scout.Widget.prototype._uninstallScrollbars = function() {
+_uninstallScrollbars() {
   var $scrollable = this.get$Scrollable();
   if (!$scrollable || !$scrollable.data('scrollable')) {
     return;
   }
-  scout.scrollbars.uninstall($scrollable, this.session);
+  scrollbars.uninstall($scrollable, this.session);
   $scrollable.off('scroll', this._scrollHandler);
   if (!this.removing) {
     // If scrollbars are removed on the fly and not because the widget is removing, reset scroll positions to initial state
@@ -2042,15 +2071,15 @@ scout.Widget.prototype._uninstallScrollbars = function() {
       this.scrollLeft = null;
     }
   }
-};
+}
 
-scout.Widget.prototype._onScroll = function() {
+_onScroll() {
   var $scrollable = this.get$Scrollable();
   this.scrollTop = $scrollable[0].scrollTop;
   this.scrollLeft = $scrollable[0].scrollLeft;
-};
+}
 
-scout.Widget.prototype.setScrollTop = function(scrollTop) {
+setScrollTop(scrollTop) {
   if (this.getDelegateScrollable()) {
     this.getDelegateScrollable().setScrollTop(scrollTop);
     return;
@@ -2062,9 +2091,9 @@ scout.Widget.prototype.setScrollTop = function(scrollTop) {
   if (this.rendered) {
     this._renderScrollTop();
   }
-};
+}
 
-scout.Widget.prototype._renderScrollTop = function() {
+_renderScrollTop() {
   var $scrollable = this.get$Scrollable();
   if (!$scrollable || this.scrollTop === null) {
     // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollTop must not be done while rendering because it would provoke a reflow
@@ -2076,10 +2105,10 @@ scout.Widget.prototype._renderScrollTop = function() {
     this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollTop.bind(this));
     return;
   }
-  scout.scrollbars.scrollTop($scrollable, this.scrollTop);
-};
+  scrollbars.scrollTop($scrollable, this.scrollTop);
+}
 
-scout.Widget.prototype.setScrollLeft = function(scrollLeft) {
+setScrollLeft(scrollLeft) {
   if (this.getDelegateScrollable()) {
     this.getDelegateScrollable().setScrollLeft(scrollLeft);
     return;
@@ -2091,9 +2120,9 @@ scout.Widget.prototype.setScrollLeft = function(scrollLeft) {
   if (this.rendered) {
     this._renderScrollLeft();
   }
-};
+}
 
-scout.Widget.prototype._renderScrollLeft = function() {
+_renderScrollLeft() {
   var $scrollable = this.get$Scrollable();
   if (!$scrollable || this.scrollLeft === null) {
     // Don't do anything for non scrollable elements. Also, reading $scrollable[0].scrollLeft must not be done while rendering because it would provoke a reflow
@@ -2105,8 +2134,8 @@ scout.Widget.prototype._renderScrollLeft = function() {
     this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollLeft.bind(this));
     return;
   }
-  scout.scrollbars.scrollLeft($scrollable, this.scrollLeft);
-};
+  scrollbars.scrollLeft($scrollable, this.scrollLeft);
+}
 
 /**
  * Returns the jQuery element which is supposed to be scrollable. This element will be used by the scroll functions like {@link #_installScrollbars}, {@link #setScrollTop}, {@link #setScrollLeft}, {@link #scrollToBottom} etc..
@@ -2114,20 +2143,20 @@ scout.Widget.prototype._renderScrollLeft = function() {
  * If the widget is mainly a wrapper for a scrollable widget and does not have a scrollable element by itself, you can use @{link #getDelegateScrollable} instead.
  * @return {$}
  */
-scout.Widget.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$container;
-};
+}
 
 /**
  * If the widget is mainly a wrapper for another widget, it is often the case that the other widget is scrollable and not the wrapper.
  * In that case implement this method and return the other widget so that the calls to the scroll functions can be delegated.
- * @return {scout.Widget}
+ * @return {Widget}
  */
-scout.Widget.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return null;
-};
+}
 
-scout.Widget.prototype.scrollToTop = function() {
+scrollToTop() {
   if (this.getDelegateScrollable()) {
     this.getDelegateScrollable().scrollToTop();
     return;
@@ -2140,10 +2169,10 @@ scout.Widget.prototype.scrollToTop = function() {
     this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
     return;
   }
-  scout.scrollbars.scrollTop($scrollable, 0);
-};
+  scrollbars.scrollTop($scrollable, 0);
+}
 
-scout.Widget.prototype.scrollToBottom = function() {
+scrollToBottom() {
   if (this.getDelegateScrollable()) {
     this.getDelegateScrollable().scrollToBottom();
     return;
@@ -2156,13 +2185,13 @@ scout.Widget.prototype.scrollToBottom = function() {
     this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
     return;
   }
-  scout.scrollbars.scrollToBottom($scrollable);
-};
+  scrollbars.scrollToBottom($scrollable);
+}
 
 /**
  * Brings the widget into view by scrolling the first scrollable parent.
  */
-scout.Widget.prototype.reveal = function(options) {
+reveal(options) {
   if (!this.rendered) {
     return;
   }
@@ -2171,8 +2200,8 @@ scout.Widget.prototype.reveal = function(options) {
     // No scrollable parent found -> scrolling is not possible
     return;
   }
-  scout.scrollbars.scrollTo($scrollParent, this.$container, options);
-};
+  scrollbars.scrollTo($scrollParent, this.$container, options);
+}
 
 /**
  * Visits every child of this widget in pre-order (top-down).<br>
@@ -2185,41 +2214,41 @@ scout.Widget.prototype.reveal = function(options) {
  * In order to abort visiting, the visitor can return true.
  * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
  */
-scout.Widget.prototype.visitChildren = function(visitor) {
+visitChildren(visitor) {
   for (var i = 0; i < this.children.length; i++) {
     var child = this.children[i];
     if (child.parent === this) {
       var treeVisitResult = visitor(child);
-      if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
+      if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
         // Visitor wants to abort the visiting
-        return scout.TreeVisitResult.TERMINATE;
-      } else if (treeVisitResult !== scout.TreeVisitResult.SKIP_SUBTREE) {
+        return TreeVisitResult.TERMINATE;
+      } else if (treeVisitResult !== TreeVisitResult.SKIP_SUBTREE) {
         treeVisitResult = child.visitChildren(visitor);
-        if (treeVisitResult === true || treeVisitResult === scout.TreeVisitResult.TERMINATE) {
-          return scout.TreeVisitResult.TERMINATE;
+        if (treeVisitResult === true || treeVisitResult === TreeVisitResult.TERMINATE) {
+          return TreeVisitResult.TERMINATE;
         }
       }
     }
   }
-};
+}
 
 /**
  * @returns {boolean} Whether or not the widget is rendered (or rendering) and the DOM $container isAttached()
  */
-scout.Widget.prototype.isAttachedAndRendered = function() {
+isAttachedAndRendered() {
   return (this.rendered || this.rendering) && this.$container.isAttached();
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @deprecated use {@link scout.widgets.get}
+ * @deprecated use {@link widgets.get}
  */
-scout.Widget.getWidgetFor = function($elem) {
-  return scout.widgets.get($elem);
-};
+static getWidgetFor($elem) {
+  return widgets.get($elem);
+}
 
-scout.Widget.cssClassAsArray = function(cssClass) {
+static cssClassAsArray(cssClass) {
   var cssClasses = [],
     cssClassesStr = cssClass || '';
 
@@ -2228,4 +2257,5 @@ scout.Widget.cssClassAsArray = function(cssClass) {
     cssClasses = cssClassesStr.split(' ');
   }
   return cssClasses;
-};
+}
+}

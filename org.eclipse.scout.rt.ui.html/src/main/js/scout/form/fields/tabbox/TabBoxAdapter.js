@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabBoxAdapter = function() {
-  scout.TabBoxAdapter.parent.call(this);
+import {CompositeFieldAdapter} from '../../../index';
+
+export default class TabBoxAdapter extends CompositeFieldAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['selectedTab']);
-};
-scout.inherits(scout.TabBoxAdapter, scout.CompositeFieldAdapter);
+}
+
 
 /**
  * @override ModelAdapter.js
  */
-scout.TabBoxAdapter.prototype.exportAdapterData = function(adapterData) {
-  adapterData = scout.TabBoxAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+exportAdapterData(adapterData) {
+  adapterData = super.exportAdapterData( adapterData);
   delete adapterData.selectedTab;
   return adapterData;
-};
+}
+}

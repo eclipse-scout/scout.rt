@@ -8,15 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Point} from '../index';
+import {Dimension} from '../index';
+import {Insets} from '../index';
+import {NullLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {graphics} from '../index';
+
 /**
  * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.
  */
-scout.HtmlComponent = function($comp, session) {
+export default class HtmlComponent {
+
+constructor($comp, session) {
   if (!session) {
     throw new Error('session must be defined for ' + this.debug());
   }
   this.$comp = $comp;
-  this.layout = new scout.NullLayout();
+  this.layout = new NullLayout();
   this.layoutData = null;
   this.valid = false;
 
@@ -48,34 +58,34 @@ scout.HtmlComponent = function($comp, session) {
    */
   this.prefSizeCached = {};
   this.session = session;
-};
+}
 
 /**
  * Returns the parent or $comp or null when $comp has no parent.
  * Creates a new instance of HtmlComponent if the parent DOM element has no linked instance yet.
  */
-scout.HtmlComponent.prototype.getParent = function() {
+getParent() {
   var $parent = this.$comp.parent();
   if ($parent.length === 0) {
     return null;
   } else {
-    return scout.HtmlComponent.optGet($parent);
+    return HtmlComponent.optGet($parent);
   }
-};
+}
 
 /**
  * @returns {boolean} true if the given htmlComponent is an ancestor, false if not
  */
-scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
+isDescendantOf(htmlComp) {
   var $parent = this.$comp.parent();
   while ($parent.length > 0) {
-    if (scout.HtmlComponent.optGet($parent) === htmlComp) {
+    if (HtmlComponent.optGet($parent) === htmlComp) {
       return true;
     }
     $parent = $parent.parent();
   }
   return false;
-};
+}
 
 /**
  * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
@@ -89,7 +99,7 @@ scout.HtmlComponent.prototype.isDescendantOf = function(htmlComp) {
  *
  * @param (options) may contain the options of the above table
  */
-scout.HtmlComponent.prototype.availableSize = function(options) {
+availableSize(options) {
   options = options || {};
   var size = this.size({
     exact: options.exact
@@ -106,27 +116,27 @@ scout.HtmlComponent.prototype.availableSize = function(options) {
   }
 
   return size;
-};
+}
 
 /**
  * Invalidates the component (sets the valid property to false and calls layout.invalidate()).
- * @param {scout.HtmlComponent} [htmlSource] The component the invalidation originated from.
+ * @param {HtmlComponent} [htmlSource] The component the invalidation originated from.
  *        Is always set if the invalidation is triggered by using invalidateLayoutTree, may be undefined otherwise.
  */
-scout.HtmlComponent.prototype.invalidateLayout = function(htmlSource) {
+invalidateLayout(htmlSource) {
   this.valid = false;
   this.prefSizeCached = {};
   if (this.layout) {
     this.layout.invalidate(htmlSource);
   }
-};
+}
 
 /**
  * Calls the layout of the component to layout its children but only if the component is not valid.
  * @exception when component has no layout
  * @return {boolean} true if validation was successful, false if it could not be executed (e.g. because the element is invisible or detached)
  */
-scout.HtmlComponent.prototype.validateLayout = function() {
+validateLayout() {
   if (!this.layout) {
     throw new Error('Called layout() but component has no layout');
   }
@@ -151,20 +161,20 @@ scout.HtmlComponent.prototype.validateLayout = function() {
     this.valid = true;
   }
   return true;
-};
+}
 
 /**
  * Performs invalidateLayout() and validateLayout() subsequently.
  */
-scout.HtmlComponent.prototype.revalidateLayout = function() {
+revalidateLayout() {
   this.invalidateLayout();
   this.validateLayout();
-};
+}
 
 /**
  * Invalidates the component-tree up to the next validate root, but only if invalidateParents is set to true.
  */
-scout.HtmlComponent.prototype.invalidateLayoutTree = function(invalidateParents) {
+invalidateLayoutTree(invalidateParents) {
   if (this.suppressInvalidate) {
     return;
   }
@@ -174,25 +184,25 @@ scout.HtmlComponent.prototype.invalidateLayoutTree = function(invalidateParents)
     this.invalidateLayout();
     this.session.layoutValidator.invalidate(this);
   }
-};
+}
 
 /**
  * Layouts all invalid components
  */
-scout.HtmlComponent.prototype.validateLayoutTree = function() {
+validateLayoutTree() {
   this.session.layoutValidator.validate();
-};
+}
 
 /**
  * Performs invalidateLayoutTree() and validateLayoutTree() subsequently.
  */
-scout.HtmlComponent.prototype.revalidateLayoutTree = function(invalidateParents) {
+revalidateLayoutTree(invalidateParents) {
   if (this.suppressInvalidate) {
     return;
   }
   this.invalidateLayoutTree(invalidateParents);
   this.validateLayoutTree();
-};
+}
 
 /**
  * Marks the end of the parent invalidation. <p>
@@ -200,7 +210,7 @@ scout.HtmlComponent.prototype.revalidateLayoutTree = function(invalidateParents)
  * Example: It is not necessary to relayout the whole form if just the label of a form field gets invisible.
  * Only the form field container needs to be relayouted. In this case the form field container is the validate root.
  */
-scout.HtmlComponent.prototype.isValidateRoot = function() {
+isValidateRoot() {
   if (this.validateRoot) {
     return true;
   }
@@ -208,17 +218,17 @@ scout.HtmlComponent.prototype.isValidateRoot = function() {
     return false;
   }
   return this.layoutData.isValidateRoot();
-};
+}
 
 /**
  * Sets the given layout.
  */
-scout.HtmlComponent.prototype.setLayout = function(layout) {
+setLayout(layout) {
   this.layout = layout;
   if (layout.cssClass) {
     this.$comp.addClass(layout.cssClass);
   }
-};
+}
 
 /**
  * Returns the preferred size of the component, insets included, margin excluded<p>
@@ -235,12 +245,12 @@ scout.HtmlComponent.prototype.setLayout = function(layout) {
  *
  * @param (options) an optional options object. Short-hand version: If a boolean is passed instead of an object, the value is automatically converted to the option "includeMargin".
  *                  May contain the options of the above table. All other options are passed as they are to the layout when @{link layout.preferredLayoutSize()} is called.
- *                  Possible options may be found at @{link scout.graphics.prefSize()}, but it depends on the actual layout if these options have an effect or not.
+ *                  Possible options may be found at @{link graphics.prefSize()}, but it depends on the actual layout if these options have an effect or not.
  * @exception When component has no layout
  */
-scout.HtmlComponent.prototype.prefSize = function(options) {
+prefSize(options) {
   if (!this.isVisible()) {
-    return new scout.Dimension(0, 0);
+    return new Dimension(0, 0);
   }
 
   if (typeof options === 'boolean') {
@@ -267,8 +277,8 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
     return prefSizeCached;
   }
 
-  var minSize = scout.graphics.cssMinSize(this.$comp);
-  var maxSize = scout.graphics.cssMaxSize(this.$comp);
+  var minSize = graphics.cssMinSize(this.$comp);
+  var maxSize = graphics.cssMaxSize(this.$comp);
   if (options.widthHint || options.heightHint) {
     this._adjustSizeHintsForPrefSize(options, minSize, maxSize);
   }
@@ -282,23 +292,23 @@ scout.HtmlComponent.prototype.prefSize = function(options) {
     prefSize = prefSize.add(this.margins());
   }
   return prefSize;
-};
+}
 
-scout.HtmlComponent.prototype.computePrefSizeKey = function(options) {
+computePrefSizeKey(options) {
   return 'wHint' + scout.nvl(options.widthHint, '-1') + 'hHint' + scout.nvl(options.heightHint, '-1') + 'wOnly' + scout.nvl(options.widthOnly, '-1');
-};
+}
 
 /**
  * Remove padding, border and margin from the width and heightHint so that the actual layout does not need to take care of it.
  * Also makes sure the hints consider the min and max size set by CSS.
  */
-scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options, minSize, maxSize) {
+_adjustSizeHintsForPrefSize(options, minSize, maxSize) {
   var removeMargins = scout.nvl(options.removeMarginFromHints, true);
   options.removeMarginFromHints = null;
   if (!options.widthHint && !options.heightHint) {
     return;
   }
-  var margins = removeMargins ? this.margins() : new scout.Insets();
+  var margins = removeMargins ? this.margins() : new Insets();
   var insets = this.insets();
   if (options.widthHint) {
     // The order is important! Box-sizing: border-box is expected.
@@ -314,48 +324,48 @@ scout.HtmlComponent.prototype._adjustSizeHintsForPrefSize = function(options, mi
     options.heightHint = Math.min(options.heightHint, maxSize.height);
     options.heightHint -= insets.vertical();
   }
-};
+}
 
 /**
  * The html element may define a min or max height/height -> adjust the pref size accordingly
  */
-scout.HtmlComponent.prototype._adjustPrefSizeWithMinMaxSize = function(prefSize, minSize, maxSize) {
-  minSize = minSize || scout.graphics.cssMinSize(this.$comp);
-  maxSize = maxSize || scout.graphics.cssMaxSize(this.$comp);
+_adjustPrefSizeWithMinMaxSize(prefSize, minSize, maxSize) {
+  minSize = minSize || graphics.cssMinSize(this.$comp);
+  maxSize = maxSize || graphics.cssMaxSize(this.$comp);
   prefSize.height = Math.max(prefSize.height, minSize.height);
   prefSize.height = Math.min(prefSize.height, maxSize.height);
   prefSize.width = Math.max(prefSize.width, minSize.width);
   prefSize.width = Math.min(prefSize.width, maxSize.width);
-};
+}
 
 /**
  * Returns the inset-dimensions of the component (padding and border, no margin).
  */
-scout.HtmlComponent.prototype.insets = function(options) {
-  return scout.graphics.insets(this.$comp, options);
-};
+insets(options) {
+  return graphics.insets(this.$comp, options);
+}
 
-scout.HtmlComponent.prototype.margins = function() {
-  return scout.graphics.margins(this.$comp);
-};
+margins() {
+  return graphics.margins(this.$comp);
+}
 
-scout.HtmlComponent.prototype.borders = function() {
-  return scout.graphics.borders(this.$comp);
-};
+borders() {
+  return graphics.borders(this.$comp);
+}
 
 /**
  * Returns the size of the component, insets included.
  * @param options, see {@link scout.graphics#size} for details.
  */
-scout.HtmlComponent.prototype.size = function(options) {
-  return scout.graphics.size(this.$comp, options);
-};
+size(options) {
+  return graphics.size(this.$comp, options);
+}
 
 /**
  * Sets the size of the component, insets included. Which means: the method subtracts the components insets
  * from the given size before setting the width/height of the component.
  */
-scout.HtmlComponent.prototype.setSize = function(size) {
+setSize(size) {
   if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
@@ -365,40 +375,40 @@ scout.HtmlComponent.prototype.setSize = function(size) {
     this.invalidateLayout();
   }
   if (this.pixelBasedSizing) {
-    scout.graphics.setSize(this.$comp, size);
+    graphics.setSize(this.$comp, size);
   }
   this.validateLayout();
-};
+}
 
-scout.HtmlComponent.prototype.bounds = function(options) {
-  return scout.graphics.bounds(this.$comp, options);
-};
+bounds(options) {
+  return graphics.bounds(this.$comp, options);
+}
 
-scout.HtmlComponent.prototype.position = function() {
-  return scout.graphics.position(this.$comp);
-};
+position() {
+  return graphics.position(this.$comp);
+}
 
-scout.HtmlComponent.prototype.offsetBounds = function(options) {
-  return scout.graphics.offsetBounds(this.$comp, options);
-};
+offsetBounds(options) {
+  return graphics.offsetBounds(this.$comp, options);
+}
 
-scout.HtmlComponent.prototype.offset = function() {
-  return scout.graphics.offset(this.$comp);
-};
+offset() {
+  return graphics.offset(this.$comp);
+}
 
 /**
- * Delegation to scout.graphics.setLocation
- * @param location scout.Point
+ * Delegation to graphics.setLocation
+ * @param location Point
  */
-scout.HtmlComponent.prototype.setLocation = function(location) {
-  scout.graphics.setLocation(this.$comp, location);
-};
+setLocation(location) {
+  graphics.setLocation(this.$comp, location);
+}
 
-scout.HtmlComponent.prototype.location = function() {
-  return scout.graphics.location(this.$comp);
-};
+location() {
+  return graphics.location(this.$comp);
+}
 
-scout.HtmlComponent.prototype.setBounds = function(bounds) {
+setBounds(bounds) {
   if (!this.isAttachedAndVisible()) {
     // don't invalidate the layout if component is invisible because sizes may not be read correctly and therefore prefSize will be wrong
     return;
@@ -408,48 +418,48 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
     this.invalidateLayout();
   }
   if (this.pixelBasedSizing) {
-    scout.graphics.setBounds(this.$comp, bounds);
+    graphics.setBounds(this.$comp, bounds);
   }
   this.validateLayout();
-};
+}
 
 /**
  * Sets the component to its preferred size.
  */
-scout.HtmlComponent.prototype.pack = function() {
+pack() {
   var preferredSize = this.prefSize();
   this.setSize(preferredSize);
-};
+}
 
 /**
  * Checks whether $comp is in the DOM or has been removed or detached.<br>
  * Also returns false if the $comp does not belong to a window (defaultView) anymore. This may happen if it belonged to a popup window which is now closed
  */
-scout.HtmlComponent.prototype.isAttached = function() {
+isAttached() {
   return this.$comp.isAttached() && this.$comp.window(true);
-};
+}
 
-scout.HtmlComponent.prototype.isVisible = function() {
+isVisible() {
   return this.$comp.isVisible();
-};
+}
 
-scout.HtmlComponent.prototype.isAttachedAndVisible = function() {
+isAttachedAndVisible() {
   return this.isAttached() && this.isVisible();
-};
+}
 
-scout.HtmlComponent.prototype.debug = function() {
-  return scout.graphics.debugOutput(this.$comp);
-};
+debug() {
+  return graphics.debugOutput(this.$comp);
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
  * Creates a new HtmlComponent and links it to the given $comp element, so it can be
- * retrieved again with scout.HtmlComponent.get($comp).
+ * retrieved again with HtmlComponent.get($comp).
  *
- * @memberOf scout.HtmlComponent
+ * @memberOf HtmlComponent
  */
-scout.HtmlComponent.install = function($comp, session) {
+static install($comp, session) {
   if (!$comp) {
     throw new Error('Missing argument "$comp"');
   }
@@ -457,20 +467,20 @@ scout.HtmlComponent.install = function($comp, session) {
     throw new Error('Missing argument "session"');
   }
 
-  var htmlComp = new scout.HtmlComponent($comp, session);
+  var htmlComp = new HtmlComponent($comp, session);
   // link DOM element with the new instance
   $comp.data('htmlComponent', htmlComp);
 
   return htmlComp;
-};
+}
 
 /**
  * Static method to get the HtmlComponent associated with the given DOM $comp.
  * Throws an error when data 'htmlComponent' is not set.
  *
- * @memberOf scout.HtmlComponent
+ * @memberOf HtmlComponent
  */
-scout.HtmlComponent.get = function($comp) {
+static get($comp) {
   var htmlComp = this.optGet($comp);
   if (!htmlComp) {
     var details = '';
@@ -482,11 +492,12 @@ scout.HtmlComponent.get = function($comp) {
     throw new Error('data "htmlComponent" is undefined.' + details);
   }
   return htmlComp;
-};
+}
 
 /**
- * @memberOf scout.HtmlComponent
+ * @memberOf HtmlComponent
  */
-scout.HtmlComponent.optGet = function($comp) {
+static optGet($comp) {
   return $comp && $comp.data('htmlComponent');
-};
+}
+}

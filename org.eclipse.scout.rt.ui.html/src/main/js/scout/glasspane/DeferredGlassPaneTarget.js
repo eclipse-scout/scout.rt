@@ -8,50 +8,54 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Widget} from '../index';
+
 /**
  * Is used to render glasspane after the glasspane targets are set. This case occurs when a child is rendered before a parent is rendered-> on reload page.
  */
-scout.DeferredGlassPaneTarget = function() {
+export default class DeferredGlassPaneTarget {
+
+constructor() {
   this.$glassPaneTargets;
   this.glassPaneRenderer;
-};
+}
 
-scout.DeferredGlassPaneTarget.prototype.ready = function($glassPaneTargets) {
+ready($glassPaneTargets) {
   this.$glassPaneTargets = $glassPaneTargets;
   this.renderWhenReady();
-};
+}
 
-scout.DeferredGlassPaneTarget.prototype.rendererReady = function(glassPaneRenderer) {
+rendererReady(glassPaneRenderer) {
   this.glassPaneRenderer = glassPaneRenderer;
   this.renderWhenReady();
-};
+}
 
-scout.DeferredGlassPaneTarget.prototype.removeGlassPaneRenderer = function(glassPaneRenderer) {
+removeGlassPaneRenderer(glassPaneRenderer) {
   if (this.glassPaneRenderer === glassPaneRenderer) {
     this.glassPaneRenderer = null;
   }
-};
+}
 
-scout.DeferredGlassPaneTarget.prototype.renderWhenReady = function() {
+renderWhenReady() {
   if (this.glassPaneRenderer && this.$glassPaneTargets && this.$glassPaneTargets.length > 0) {
     this.$glassPaneTargets.forEach(function($glassPaneTarget) {
       this.glassPaneRenderer.renderGlassPane($glassPaneTarget);
     }.bind(this));
   }
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @param widget a not rendered scout.Widget
+ * @param widget a not rendered Widget
  * @findGlassPaneTargets function which returns the targets
  */
-scout.DeferredGlassPaneTarget.createFor = function(widget, findGlassPaneTargets) {
+static createFor(widget, findGlassPaneTargets) {
   if (widget.rendered) {
     throw new Error('Don\'t call this function if widget is already rendered.');
   }
 
-  var deferred = new scout.DeferredGlassPaneTarget();
+  var deferred = new DeferredGlassPaneTarget();
   var renderedHandler = function(event) {
     var elements = findGlassPaneTargets();
     deferred.ready(elements);
@@ -62,4 +66,5 @@ scout.DeferredGlassPaneTarget.createFor = function(widget, findGlassPaneTargets)
     widget.off('render', renderedHandler);
   }.bind(widget));
   return [deferred];
-};
+}
+}

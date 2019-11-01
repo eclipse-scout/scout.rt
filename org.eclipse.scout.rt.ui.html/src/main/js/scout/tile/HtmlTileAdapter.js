@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HtmlTileAdapter = function() {
-  scout.HtmlTileAdapter.parent.call(this);
-};
-scout.inherits(scout.HtmlTileAdapter, scout.TileAdapter);
+import {TileAdapter} from '../index';
+
+export default class HtmlTileAdapter extends TileAdapter {
+
+constructor() {
+  super();
+}
+
+}

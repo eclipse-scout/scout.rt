@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeBoxAdapter = function() {
-  scout.TreeBoxAdapter.parent.call(this);
-};
-scout.inherits(scout.TreeBoxAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class TreeBoxAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabAreaLeftKeyStroke = function(tabArea) {
-  scout.TabAreaLeftKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+
+export default class TabAreaLeftKeyStroke extends KeyStroke {
+
+constructor(tabArea) {
+  super();
   this.field = tabArea;
-  this.which = [scout.keys.LEFT];
+  this.which = [keys.LEFT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.TabAreaLeftKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.TabAreaLeftKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.selectPreviousTab(true);
-};
+}
+}

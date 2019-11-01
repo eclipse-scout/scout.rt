@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {strings} from '../index';
+import {TreeNode} from '../index';
+import {styles} from '../index';
+
 /**
  * @class
  */
-scout.CompactTreeNode = function(tree) {
-  scout.CompactTreeNode.parent.call(this, tree);
-};
-scout.inherits(scout.CompactTreeNode, scout.TreeNode);
+export default class CompactTreeNode extends TreeNode {
+
+constructor(tree) {
+  super( tree);
+}
+
 
 /**
  * @override
  */
-scout.CompactTreeNode.prototype.render = function() {
+render() {
   var tree = this.getTree();
 
   if (this.isSection()) {
@@ -43,12 +49,12 @@ scout.CompactTreeNode.prototype.render = function() {
   }
 
   return this.$node;
-};
+}
 
 /**
  * @override
  */
-scout.CompactTreeNode.prototype._decorate = function() {
+_decorate() {
   // This node is not yet rendered, nothing to do
   if (!this.$node) {
     return;
@@ -71,17 +77,18 @@ scout.CompactTreeNode.prototype._decorate = function() {
   $node.addClass(this.cssClass);
   $node.text(this.text);
 
-  scout.styles.legacyStyle(this, $node);
+  styles.legacyStyle(this, $node);
 
-  if (scout.strings.hasText(this.tooltipText)) {
+  if (strings.hasText(this.tooltipText)) {
     $node.attr('title', this.tooltipText);
   }
-};
+}
 
-scout.CompactTreeNode.prototype.isSection = function() {
+isSection() {
   return this.level === 0;
-};
+}
 
-scout.CompactTreeNode.prototype._updateIconWidth = function() {
+_updateIconWidth() {
   // NOP
-};
+}
+}

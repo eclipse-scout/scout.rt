@@ -8,13 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopLayout = function(desktop) {
-  scout.DesktopLayout.parent.call(this);
-  this.desktop = desktop;
-};
-scout.inherits(scout.DesktopLayout, scout.AbstractLayout);
+import {Tree} from '../index';
+import {AbstractLayout} from '../index';
+import {DesktopNavigation} from '../index';
+import {ResponsiveManager} from '../index';
+import {Dimension} from '../index';
 
-scout.DesktopLayout.prototype.layout = function($container) {
+export default class DesktopLayout extends AbstractLayout {
+
+constructor(desktop) {
+  super();
+  this.desktop = desktop;
+}
+
+
+layout($container) {
   var navigationSize, headerSize, htmlHeader, htmlBench, benchSize, htmlNavigation, animationProps,
     navigationWidth = 0,
     headerHeight = 0,
@@ -27,7 +35,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
     containerSize = this.containerSize(),
     fullWidthNavigation = navigation && navigation.htmlComp.layoutData.fullWidth;
 
-  scout.responsiveManager.handleResponsive(desktop, $container.width());
+  ResponsiveManager.get().handleResponsive(desktop, $container.width());
 
   if (navigation) {
     navigationWidth = this.calculateNavigationWidth(containerSize);
@@ -37,7 +45,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
 
     if (desktop.navigationVisible) {
       htmlNavigation = navigation.htmlComp;
-      navigationSize = new scout.Dimension(navigationWidth, containerSize.height)
+      navigationSize = new Dimension(navigationWidth, containerSize.height)
         .subtract(htmlNavigation.margins());
       htmlNavigation.setSize(navigationSize);
     }
@@ -53,7 +61,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
       }
 
       // sizing
-      headerSize = new scout.Dimension(containerSize.width - navigationWidth, headerHeight)
+      headerSize = new Dimension(containerSize.width - navigationWidth, headerHeight)
         .subtract(htmlHeader.margins());
       if (!animated || fullWidthNavigation) {
         htmlHeader.setSize(headerSize);
@@ -79,7 +87,7 @@ scout.DesktopLayout.prototype.layout = function($container) {
       }
 
       // sizing
-      benchSize = new scout.Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
+      benchSize = new Dimension(containerSize.width - navigationWidth, containerSize.height - headerHeight)
         .subtract(htmlBench.margins());
       if (!animated || fullWidthNavigation) {
         htmlBench.setSize(benchSize);
@@ -109,12 +117,12 @@ scout.DesktopLayout.prototype.layout = function($container) {
     // Move to new point (=0, if navigation is invisible)
     animationProps.left = navigationWidth;
   }
-};
+}
 
 /**
  * Used to animate bench and header
  */
-scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size) {
+_animate(animationProps, htmlComp, size) {
   // If animation is already running, stop the existing and don't use timeout to schedule the new to have a smoother transition
   // Concurrent animation of the same element is bad because jquery messes up the overflow style
   if (htmlComp.$comp.is(':animated')) {
@@ -129,18 +137,18 @@ scout.DesktopLayout.prototype._animate = function(animationProps, htmlComp, size
       });
     }.bind(this));
   }
-};
+}
 
-scout.DesktopLayout.prototype.containerSize = function() {
+containerSize() {
   var htmlContainer = this.desktop.htmlComp,
     containerSize = htmlContainer.availableSize({
       exact: true
     });
 
   return containerSize.subtract(htmlContainer.insets());
-};
+}
 
-scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize) {
+calculateNavigationWidth(containerSize) {
   if (!this.desktop.navigationVisible) {
     return 0;
   }
@@ -156,11 +164,12 @@ scout.DesktopLayout.prototype.calculateNavigationWidth = function(containerSize)
   if (!this.desktop.resizing && outline && outline.toggleBreadcrumbStyleEnabled) {
     // If toggleBreadcrumbStyleEnabled is true, BREADCRUMB_STYLE_WIDTH triggers the toggling between the two modes.
     // This code ensures this rule is never violated (necessary if mode is toggled programmatically rather than by the user)
-    if (outline.displayStyle === scout.Tree.DisplayStyle.BREADCRUMB) {
-      splitterPosition = scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH;
-    } else if (Math.floor(splitterPosition) <= scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
-      splitterPosition = scout.DesktopNavigation.DEFAULT_STYLE_WIDTH;
+    if (outline.displayStyle === Tree.DisplayStyle.BREADCRUMB) {
+      splitterPosition = DesktopNavigation.BREADCRUMB_STYLE_WIDTH;
+    } else if (Math.floor(splitterPosition) <= DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
+      splitterPosition = DesktopNavigation.DEFAULT_STYLE_WIDTH;
     }
   }
-  return Math.max(splitterPosition, scout.DesktopNavigation.MIN_WIDTH); // ensure newSize is not negative
-};
+  return Math.max(splitterPosition, DesktopNavigation.MIN_WIDTH); // ensure newSize is not negative
+}
+}

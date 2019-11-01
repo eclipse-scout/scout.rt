@@ -8,14 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormLayout = function(form) {
-  scout.FormLayout.parent.call(this);
-  this.form = form;
-};
-scout.inherits(scout.FormLayout, scout.AbstractLayout);
+import {graphics} from '../index';
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
 
-scout.FormLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+export default class FormLayout extends AbstractLayout {
+
+constructor(form) {
+  super();
+  this.form = form;
+}
+
+
+layout($container) {
+  var htmlContainer = HtmlComponent.get($container),
     htmlRootGb = this._htmlRootGroupBox(),
     rootGbSize;
 
@@ -31,11 +38,11 @@ scout.FormLayout.prototype.layout = function($container) {
 
   $.log.isTraceEnabled() && $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
   htmlRootGb.setSize(rootGbSize);
-};
+}
 
-scout.FormLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = options || {};
-  var htmlContainer = scout.HtmlComponent.get($container),
+  var htmlContainer = HtmlComponent.get($container),
     htmlRootGb = this._htmlRootGroupBox(),
     prefSize;
 
@@ -51,16 +58,17 @@ scout.FormLayout.prototype.preferredLayoutSize = function($container, options) {
   prefSize.height += titleHeight;
 
   return prefSize;
-};
+}
 
-scout.FormLayout.prototype._htmlRootGroupBox = function() {
+_htmlRootGroupBox() {
   var $rootGroupBox = this.form.$container.children('.root-group-box');
-  return scout.HtmlComponent.get($rootGroupBox);
-};
+  return HtmlComponent.get($rootGroupBox);
+}
 
-scout.FormLayout.prototype._titleHeight = function() {
+_titleHeight() {
   if (this.form.$header && this.form.$header.css('position') !== 'absolute') {
-    return scout.graphics.prefSize(this.form.$header, true).height;
+    return graphics.prefSize(this.form.$header, true).height;
   }
   return 0;
-};
+}
+}

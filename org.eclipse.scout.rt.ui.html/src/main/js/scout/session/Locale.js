@@ -8,11 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Locale = function(model) {
-  model = scout.nvl(model, scout.Locale.DEFAULT);
+import {DateFormat} from '../index';
+import {locales} from '../index';
+import {DecimalFormat} from '../index';
+import {scout} from '../index';
+
+export default class Locale {
+
+constructor(model) {
+  model = scout.nvl(model, Locale.DEFAULT);
 
   this.languageTag = model.languageTag;
-  var tags = scout.locales.splitLanguageTag(this.languageTag);
+  var tags = locales.splitLanguageTag(this.languageTag);
   this.language = tags[0];
   this.country = tags[1];
   this.displayLanguage = model.displayLanguage;
@@ -22,7 +29,7 @@ scout.Locale = function(model) {
   this.decimalFormatSymbols = model.decimalFormatSymbols;
 
   if (this.decimalFormatPatternDefault && this.decimalFormatSymbols) {
-    this.decimalFormat = new scout.DecimalFormat(model);
+    this.decimalFormat = new DecimalFormat(model);
   }
 
   this.dateFormatPatternDefault = model.dateFormatPatternDefault;
@@ -30,21 +37,21 @@ scout.Locale = function(model) {
   this.timeFormatPatternDefault = model.timeFormatPatternDefault;
 
   if (this.dateFormatPatternDefault && this.dateFormatSymbols) {
-    this.dateFormat = new scout.DateFormat(model);
+    this.dateFormat = new DateFormat(model);
   }
-};
+}
 
-scout.Locale.ensure = function(locale) {
+static ensure(locale) {
   if (!locale) {
     return locale;
   }
-  if (locale instanceof scout.Locale) {
+  if (locale instanceof Locale) {
     return locale;
   }
-  return new scout.Locale(locale);
-};
+  return new Locale(locale);
+}
 
-scout.Locale.DEFAULT = {
+static DEFAULT = {
   languageTag: 'en-US',
   decimalFormatPatternDefault: '#,##0.###',
   dateFormatPatternDefault: 'MM/dd/yyyy',
@@ -105,3 +112,4 @@ scout.Locale.DEFAULT = {
     pm: 'PM'
   }
 };
+}

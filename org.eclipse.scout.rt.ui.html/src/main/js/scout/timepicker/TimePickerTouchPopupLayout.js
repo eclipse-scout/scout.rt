@@ -8,21 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TimePickerTouchPopupLayout = function(popup) {
-  scout.TimePickerTouchPopupLayout.parent.call(this, popup);
-};
-scout.inherits(scout.TimePickerTouchPopupLayout, scout.TouchPopupLayout);
+import {graphics} from '../index';
+import {TouchPopupLayout} from '../index';
+import {Dimension} from '../index';
 
-scout.TimePickerTouchPopupLayout.prototype.layout = function($container) {
-  scout.TimePickerTouchPopupLayout.parent.prototype.layout.call(this, $container);
+export default class TimePickerTouchPopupLayout extends TouchPopupLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
+
+layout($container) {
+  super.layout( $container);
   var htmlPicker = this.popup.getTimePicker().htmlComp;
   htmlPicker.setSize(this.popup._widgetContainerHtmlComp.size());
-};
+}
 
 /**
  * @override
  */
-scout.TimePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var containerInsets = this.popup.htmlComp.insets(),
     fieldHtmlComp = this.popup._field.htmlComp,
     widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp;
@@ -32,9 +38,10 @@ scout.TimePickerTouchPopupLayout.prototype.preferredLayoutSize = function($conta
   var widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
     .add(widgetContainerHtmlComp.margins());
 
-  var headerHeight = scout.graphics.size(this.popup._$header, true).height;
+  var headerHeight = graphics.size(this.popup._$header, true).height;
   var popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
   var popupWidth = Math.max(fieldPrefSize.width, widgetContainerPrefSize.width);
 
-  return new scout.Dimension(popupWidth, popupHeight);
-};
+  return new Dimension(popupWidth, popupHeight);
+}
+}

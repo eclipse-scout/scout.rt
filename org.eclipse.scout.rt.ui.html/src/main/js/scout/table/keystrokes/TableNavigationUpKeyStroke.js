@@ -8,9 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationUpKeyStroke = function(table) {
-  scout.TableNavigationUpKeyStroke.parent.call(this, table);
-  this.which = [scout.keys.UP];
+import {scout} from '../../index';
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+import {arrays} from '../../index';
+
+export default class TableNavigationUpKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
+  this.which = [keys.UP];
   this.renderingHints.text = '↑';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var row = this.firstRowBeforeSelection();
@@ -18,10 +25,10 @@ scout.TableNavigationUpKeyStroke = function(table) {
       return row.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationUpKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var table = this.field,
     rows = table.visibleRows,
     selectedRows = table.selectedRows,
@@ -38,9 +45,9 @@ scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
     // last action row index maybe < 0 if row got invisible (e.g. due to filtering), or if the user has not made a selection before
     if (lastActionRowIndex < 0) {
       if (rows.length === selectedRows.length) {
-        lastActionRow = scout.arrays.last(rows);
+        lastActionRow = arrays.last(rows);
       } else {
-        lastActionRow = scout.arrays.first(selectedRows);
+        lastActionRow = arrays.first(selectedRows);
       }
       lastActionRowIndex = rows.indexOf(lastActionRow);
     }
@@ -57,23 +64,24 @@ scout.TableNavigationUpKeyStroke.prototype.handle = function(event) {
         // if new action row already is selected, remove last action row from selection
         // use case: rows 2,3,4 are selected, last action row is 4. User presses shift-up -> rows 2,3 need to be the new selection
         newSelectedRows = [];
-        scout.arrays.pushAll(newSelectedRows, selectedRows);
+        arrays.pushAll(newSelectedRows, selectedRows);
         // only unselect when first or last row (but not in the middle of the selection, see #172929)
         var selectionIndizes = table.selectionHandler.getMinMaxSelectionIndizes();
         if (scout.isOneOf(lastActionRowIndex, selectionIndizes[0], selectionIndizes[1])) {
-          scout.arrays.remove(newSelectedRows, lastActionRow);
+          arrays.remove(newSelectedRows, lastActionRow);
         }
       } else {
-        newSelectedRows = scout.arrays.union(newSelectedRows, selectedRows);
+        newSelectedRows = arrays.union(newSelectedRows, selectedRows);
         newActionRow = this._findLastSelectedRowBefore(table, newActionRowIndex);
       }
     }
   } else {
-    newSelectedRows = [scout.arrays.last(rows)];
+    newSelectedRows = [arrays.last(rows)];
     newActionRow = newSelectedRows[0];
   }
 
   table.selectionHandler.lastActionRow = newActionRow;
   table.selectRows(newSelectedRows, true);
   table.scrollTo(newActionRow);
-};
+}
+}

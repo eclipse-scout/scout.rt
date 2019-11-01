@@ -8,26 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DateColumn = function() {
-  scout.DateColumn.parent.call(this);
+import {DateFormat} from '../../index';
+import {scout} from '../../index';
+import {comparators} from '../../index';
+import {dates} from '../../index';
+import {Column} from '../../index';
+
+export default class DateColumn extends Column {
+
+constructor() {
+  super();
   this.format;
   this.groupFormat = 'yyyy';
   this.hasDate = true;
   this.hasTime = false;
   this.filterType = 'DateColumnUserFilter';
-  this.comparator = scout.comparators.NUMERIC;
+  this.comparator = comparators.NUMERIC;
   this.textBased = false;
-};
-scout.inherits(scout.DateColumn, scout.Column);
+}
 
-scout.DateColumn.prototype._init = function(model) {
-  scout.DateColumn.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this._setFormat(this.format);
   this._setGroupFormat(this.groupFormat);
-};
+}
 
-scout.DateColumn.prototype.setFormat = function(format) {
+setFormat(format) {
   if (this.format === format) {
     return;
   }
@@ -38,17 +46,17 @@ scout.DateColumn.prototype.setFormat = function(format) {
       this._updateCellText(row, this.cell(row));
     }.bind(this));
   }
-};
+}
 
-scout.DateColumn.prototype._setFormat = function(format) {
+_setFormat(format) {
   if (!format) {
     format = this._getDefaultFormat(this.session.locale);
   }
-  format = scout.DateFormat.ensure(this.session.locale, format);
+  format = DateFormat.ensure(this.session.locale, format);
   this.format = format;
-};
+}
 
-scout.DateColumn.prototype.setGroupFormat = function(format) {
+setGroupFormat(format) {
   if (this.groupFormat === format) {
     return;
   }
@@ -59,31 +67,31 @@ scout.DateColumn.prototype.setGroupFormat = function(format) {
       this._updateCellText(row, this.cell(row));
     }.bind(this));
   }
-};
+}
 
-scout.DateColumn.prototype._setGroupFormat = function(format) {
+_setGroupFormat(format) {
   if (!format) {
     format = this._getDefaultFormat(this.session.locale);
   }
-  format = scout.DateFormat.ensure(this.session.locale, format);
+  format = DateFormat.ensure(this.session.locale, format);
   this.groupFormat = format;
-};
+}
 
 /**
  * @override Columns.js
  */
-scout.DateColumn.prototype._formatValue = function(value) {
+_formatValue(value) {
   return this.format.format(value);
-};
+}
 
 /**
  * @override Columns.js
  */
-scout.DateColumn.prototype._parseValue = function(text) {
-  return scout.dates.ensure(text);
-};
+_parseValue(text) {
+  return dates.ensure(text);
+}
 
-scout.DateColumn.prototype._getDefaultFormat = function(locale) {
+_getDefaultFormat(locale) {
   if (this.hasDate && this.hasTime) {
     return locale.dateFormatPatternDefault + ' ' + locale.timeFormatPatternDefault;
   }
@@ -91,20 +99,21 @@ scout.DateColumn.prototype._getDefaultFormat = function(locale) {
     return locale.dateFormatPatternDefault;
   }
   return locale.timeFormatPatternDefault;
-};
+}
 
-scout.DateColumn.prototype.cellTextForGrouping = function(row) {
+cellTextForGrouping(row) {
   var val = this.table.cellValue(this, row);
   return this.groupFormat.format(val);
-};
+}
 
 /**
  * @override Column.js
  */
-scout.DateColumn.prototype._createEditor = function() {
+_createEditor() {
   return scout.create('DateField', {
     parent: this.table,
     hasDate: this.hasDate,
     hasTime: this.hasTime
   });
-};
+}
+}

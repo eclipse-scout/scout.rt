@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonGroupLayout = function(widget, layoutConfig) {
-  scout.RadioButtonGroupLayout.parent.call(this, widget, layoutConfig);
-};
-scout.inherits(scout.RadioButtonGroupLayout, scout.LogicalGridLayout);
+import {LogicalGridLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+
+export default class RadioButtonGroupLayout extends LogicalGridLayout {
+
+constructor(widget, layoutConfig) {
+  super( widget, layoutConfig);
+}
+
 
 /**
  * @override LogicalGridLayout.js
  */
-scout.RadioButtonGroupLayout.prototype._initDefaults = function() {
-  scout.RadioButtonGroupLayout.parent.prototype._initDefaults.call(this);
-  this.hgap = scout.htmlEnvironment.smallColumnGap;
-};
+_initDefaults() {
+  super._initDefaults();
+  this.hgap = HtmlEnvironment.get().smallColumnGap;
+}
+}

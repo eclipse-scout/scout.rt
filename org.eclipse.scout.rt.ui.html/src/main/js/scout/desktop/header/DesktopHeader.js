@@ -8,8 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopHeader = function() {
-  scout.DesktopHeader.parent.call(this);
+import {Widget} from '../../index';
+import {Desktop} from '../../index';
+import {HtmlComponent} from '../../index';
+import {Form} from '../../index';
+import {scout} from '../../index';
+import {DesktopHeaderLayout} from '../../index';
+
+export default class DesktopHeader extends Widget {
+
+constructor() {
+  super();
   this.tabArea = null;
   this.toolBoxVisible = true;
   this.viewButtonBox = null;
@@ -18,23 +27,23 @@ scout.DesktopHeader = function() {
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
   this._outlineContentMenuBarPropertyChangeHandler = this._onOutlineContentMenuBarPropertyChange.bind(this);
   this._viewButtonBoxPropertyChangeHandler = this._onViewButtonBoxPropertyChange.bind(this);
-};
-scout.inherits(scout.DesktopHeader, scout.Widget);
+}
 
-scout.DesktopHeader.prototype._init = function(model) {
-  scout.DesktopHeader.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.desktop = this.session.desktop;
   this.updateViewButtonBoxVisibility();
   // create view tab box
   this.tabArea = scout.create('SimpleTabArea', {
     parent: this
   });
-};
+}
 
-scout.DesktopHeader.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('desktop-header');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.DesktopHeaderLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new DesktopHeaderLayout(this));
   this._renderViewButtonBoxVisible();
   this._renderViewTabs();
   this._renderToolBoxVisible();
@@ -46,21 +55,21 @@ scout.DesktopHeader.prototype._render = function() {
     this.outlineContent = this.desktop.bench.outlineContent;
   }
   this._attachOutlineContentMenuBarHandler();
-};
+}
 
-scout.DesktopHeader.prototype._remove = function() {
+_remove() {
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this._detachOutlineContentMenuBarHandler();
   this.outlineContent = null;
-  scout.DesktopHeader.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.DesktopHeader.prototype._renderViewTabs = function() {
+_renderViewTabs() {
   this.tabArea.render();
-};
+}
 
-scout.DesktopHeader.prototype._renderToolBox = function() {
+_renderToolBox() {
   if (this.toolBox) {
     return;
   }
@@ -69,35 +78,35 @@ scout.DesktopHeader.prototype._renderToolBox = function() {
     menus: this.desktop.menus
   });
   this.toolBox.render();
-};
+}
 
-scout.DesktopHeader.prototype._removeToolBox = function() {
+_removeToolBox() {
   if (!this.toolBox) {
     return;
   }
   this.toolBox.destroy();
   this.toolBox = null;
-};
+}
 
-scout.DesktopHeader.prototype._renderToolBoxVisible = function() {
+_renderToolBoxVisible() {
   if (this.toolBoxVisible) {
     this._renderToolBox();
   } else {
     this._removeToolBox();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.DesktopHeader.prototype._renderLogoUrl = function() {
+_renderLogoUrl() {
   if (this.logoUrl) {
     this._renderLogo();
   } else {
     this._removeLogo();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.DesktopHeader.prototype._renderLogo = function() {
+_renderLogo() {
   if (!this.logo) {
     this.logo = scout.create('DesktopLogo', {
       parent: this,
@@ -107,17 +116,17 @@ scout.DesktopHeader.prototype._renderLogo = function() {
   } else {
     this.logo.setUrl(this.logoUrl);
   }
-};
+}
 
-scout.DesktopHeader.prototype._removeLogo = function() {
+_removeLogo() {
   if (!this.logo) {
     return;
   }
   this.logo.destroy();
   this.logo = null;
-};
+}
 
-scout.DesktopHeader.prototype._renderViewButtonBox = function() {
+_renderViewButtonBox() {
   if (this.viewButtonBox) {
     return;
   }
@@ -132,74 +141,74 @@ scout.DesktopHeader.prototype._renderViewButtonBox = function() {
     this.viewButtonBox.sendToBack();
   }
   this.updateViewButtonStyling();
-};
+}
 
-scout.DesktopHeader.prototype._removeViewButtonBox = function() {
+_removeViewButtonBox() {
   if (!this.viewButtonBox) {
     return;
   }
   this.viewButtonBox.off('propertyChange', this._viewButtonBoxPropertyChangeHandler);
   this.viewButtonBox.destroy();
   this.viewButtonBox = null;
-};
+}
 
-scout.DesktopHeader.prototype._renderViewButtonBoxVisible = function() {
+_renderViewButtonBoxVisible() {
   if (this.viewButtonBoxVisible) {
     this._renderViewButtonBox();
   } else {
     this._removeViewButtonBox();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.DesktopHeader.prototype.sendToBack = function() {
+sendToBack() {
   if (this.viewButtonBox) {
     this.viewButtonBox.sendToBack();
   }
   if (this.rendered) {
     this._renderInBackground();
   }
-};
+}
 
-scout.DesktopHeader.prototype.bringToFront = function() {
+bringToFront() {
   if (this.viewButtonBox) {
     this.viewButtonBox.bringToFront();
   }
   if (this.rendered) {
     this._renderInBackground();
   }
-};
+}
 
-scout.DesktopHeader.prototype._renderInBackground = function() {
+_renderInBackground() {
   this.$container.toggleClass('in-background', this.desktop.inBackground);
-};
+}
 
-scout.DesktopHeader.prototype.setLogoUrl = function(logoUrl) {
+setLogoUrl(logoUrl) {
   this.setProperty('logoUrl', logoUrl);
-};
+}
 
-scout.DesktopHeader.prototype.setToolBoxVisible = function(visible) {
+setToolBoxVisible(visible) {
   this.setProperty('toolBoxVisible', visible);
-};
+}
 
-scout.DesktopHeader.prototype.setViewButtonBoxVisible = function(visible) {
+setViewButtonBoxVisible(visible) {
   this.setProperty('viewButtonBoxVisible', visible);
-};
+}
 
-scout.DesktopHeader.prototype.setMenus = function(menus) {
+setMenus(menus) {
   if (this.toolBox) {
     this.toolBox.setMenus(menus);
   }
-};
+}
 
-scout.DesktopHeader.prototype.updateViewButtonBoxVisibility = function() {
+updateViewButtonBoxVisibility() {
   // View buttons are visible in the header if the navigation is not visible
   // If there are no view buttons at all, don't show the box
   // With displayStyle is set to compact, the view buttons should never be visible in the header
-  this.setViewButtonBoxVisible(this.desktop.viewButtons.length > 0 && !this.desktop.navigationVisible && this.desktop.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
-};
+  this.setViewButtonBoxVisible(this.desktop.viewButtons.length > 0 && !this.desktop.navigationVisible && this.desktop.displayStyle !== Desktop.DisplayStyle.COMPACT);
+}
 
-scout.DesktopHeader.prototype._attachOutlineContentMenuBarHandler = function() {
+_attachOutlineContentMenuBarHandler() {
   if (!this.outlineContent) {
     return;
   }
@@ -207,9 +216,9 @@ scout.DesktopHeader.prototype._attachOutlineContentMenuBarHandler = function() {
   if (menuBar) {
     menuBar.on('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
   }
-};
+}
 
-scout.DesktopHeader.prototype._detachOutlineContentMenuBarHandler = function() {
+_detachOutlineContentMenuBarHandler() {
   if (!this.outlineContent) {
     return;
   }
@@ -217,16 +226,16 @@ scout.DesktopHeader.prototype._detachOutlineContentMenuBarHandler = function() {
   if (menuBar) {
     menuBar.off('propertyChange', this._outlineContentMenuBarPropertyChangeHandler);
   }
-};
+}
 
-scout.DesktopHeader.prototype._outlineContentMenuBar = function(outlineContent) {
-  if (outlineContent instanceof scout.Form) {
+_outlineContentMenuBar(outlineContent) {
+  if (outlineContent instanceof Form) {
     return outlineContent.rootGroupBox.menuBar;
   }
   return outlineContent.menuBar;
-};
+}
 
-scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
+updateViewButtonStyling() {
   if (!this.viewButtonBoxVisible || !this.desktop.bench || !this.desktop.bench.outlineContentVisible) {
     return;
   }
@@ -236,48 +245,49 @@ scout.DesktopHeader.prototype.updateViewButtonStyling = function() {
     return;
   }
   var hasMenuBar = false;
-  if (outlineContent instanceof scout.Form && outlineContent.detailForm) {
+  if (outlineContent instanceof Form && outlineContent.detailForm) {
     var rootGroupBox = outlineContent.rootGroupBox;
     hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;
   } else {
     hasMenuBar = outlineContent.menuBar && outlineContent.menuBar.visible;
   }
   this.$container.toggleClass('outline-content-has-menubar', !!hasMenuBar);
-};
+}
 
-scout.DesktopHeader.prototype._onDesktopNavigationVisibleChange = function(event) {
+_onDesktopNavigationVisibleChange(event) {
   // If navigation gets visible: Hide view buttons immediately
   // If navigation gets hidden using animation: Show view buttons when animation ends
   if (this.desktop.navigationVisible) {
     this.updateViewButtonBoxVisibility();
   }
-};
+}
 
-scout.DesktopHeader.prototype._onDesktopAnimationEnd = function(event) {
+_onDesktopAnimationEnd(event) {
   this.updateViewButtonBoxVisibility();
-};
+}
 
-scout.DesktopHeader.prototype.onBenchOutlineContentChange = function(content) {
+onBenchOutlineContentChange(content) {
   this._detachOutlineContentMenuBarHandler();
   this.outlineContent = content;
   this.updateViewButtonStyling();
   this._attachOutlineContentMenuBarHandler();
-};
+}
 
-scout.DesktopHeader.prototype._onDesktopPropertyChange = function(event) {
+_onDesktopPropertyChange(event) {
   if (event.propertyName === 'navigationVisible') {
     this._onDesktopNavigationVisibleChange();
   }
-};
+}
 
-scout.DesktopHeader.prototype._onOutlineContentMenuBarPropertyChange = function(event) {
+_onOutlineContentMenuBarPropertyChange(event) {
   if (event.propertyName === 'visible') {
     this.updateViewButtonStyling();
   }
-};
+}
 
-scout.DesktopHeader.prototype._onViewButtonBoxPropertyChange = function(event) {
+_onViewButtonBoxPropertyChange(event) {
   if (event.propertyName === 'menuButtons' || event.propertyName === 'tabButtons') {
     this.invalidateLayoutTree();
   }
-};
+}
+}

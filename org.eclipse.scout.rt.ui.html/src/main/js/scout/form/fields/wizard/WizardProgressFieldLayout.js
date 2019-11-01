@@ -8,13 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WizardProgressFieldLayout = function(formField) {
-  scout.WizardProgressFieldLayout.parent.call(this, formField);
-};
-scout.inherits(scout.WizardProgressFieldLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../../index';
 
-scout.WizardProgressFieldLayout.prototype.layout = function($container) {
-  scout.WizardProgressFieldLayout.parent.prototype.layout.call(this, $container);
+export default class WizardProgressFieldLayout extends FormFieldLayout {
+
+constructor(formField) {
+  super( formField);
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   // Remember old scroll position, because setting the body width might change it
   var oldScrollLeft = this.formField.$field.scrollLeft();
@@ -30,4 +34,5 @@ scout.WizardProgressFieldLayout.prototype.layout = function($container) {
   this.formField.$field.scrollLeft(oldScrollLeft);
   // But also ensure the current step is visible
   this.formField.scrollToActiveStep();
-};
+}
+}

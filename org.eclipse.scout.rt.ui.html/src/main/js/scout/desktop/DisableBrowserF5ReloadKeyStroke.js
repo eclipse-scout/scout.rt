@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {KeyStroke} from '../index';
+import {keys} from '../index';
+import {Action} from '../index';
+
 /**
  * Global key stroke on the desktop that prevents 'leaking' of the F5 keystroke to the browser.
  *
@@ -21,20 +25,23 @@
  * To reload the page, the general key stroke 'Ctrl-R' ('Command-R' on Macintosh, respectively)
  * should be used instead.
  */
-scout.DisableBrowserF5ReloadKeyStroke = function(desktop) {
-  scout.DisableBrowserF5ReloadKeyStroke.parent.call(this);
+export default class DisableBrowserF5ReloadKeyStroke extends KeyStroke {
+
+constructor(desktop) {
+  super();
   this.field = desktop;
 
-  this.which = [scout.keys.F5];
+  this.which = [keys.F5];
   this.preventDefault = true;
-  this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
+  this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ALWAYS; // ignore glass panes
   this.renderingHints.render = false;
-};
-scout.inherits(scout.DisableBrowserF5ReloadKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.DisableBrowserF5ReloadKeyStroke.prototype.handle = function(event) {
+handle(event) {
   // NOP
-};
+}
+}

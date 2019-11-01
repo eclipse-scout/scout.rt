@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeBoxLayout = function(treeBox, tree, filterBox) {
-  scout.TreeBoxLayout.parent.call(this, treeBox, tree, filterBox);
-};
-scout.inherits(scout.TreeBoxLayout, scout.LookupBoxLayout);
+import {LookupBoxLayout} from '../../../index';
+
+export default class TreeBoxLayout extends LookupBoxLayout {
+
+constructor(treeBox, tree, filterBox) {
+  super( treeBox, tree, filterBox);
+}
+
+}

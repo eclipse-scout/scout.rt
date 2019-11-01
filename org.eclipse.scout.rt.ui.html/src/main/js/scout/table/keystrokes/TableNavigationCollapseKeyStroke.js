@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationCollapseKeyStroke = function(table) {
-  scout.TableNavigationCollapseKeyStroke.parent.call(this, table);
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableNavigationCollapseKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
   this.field = table;
-  this.which = [scout.keys.SUBTRACT, scout.keys.LEFT];
+  this.which = [keys.SUBTRACT, keys.LEFT];
   this.renderingHints.text = '-';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var row = this.field.selectedRows[0];
@@ -19,11 +24,11 @@ scout.TableNavigationCollapseKeyStroke = function(table) {
       return row.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationCollapseKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationCollapseKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableNavigationCollapseKeyStroke.parent.prototype._accept.call(this, event),
+
+_accept(event) {
+  var accepted = super._accept( event),
     selectedRow = this.field.selectedRows[0];
   if (!accepted) {
     return false;
@@ -38,9 +43,9 @@ scout.TableNavigationCollapseKeyStroke.prototype._accept = function(event) {
   }
 
   return !!selectedRow.parentRow;
-};
+}
 
-scout.TableNavigationCollapseKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var table = this.field,
     selectedRow = this.field.selectedRows[0];
   if (!selectedRow) {
@@ -52,4 +57,5 @@ scout.TableNavigationCollapseKeyStroke.prototype.handle = function(event) {
     table.selectRow(selectedRow.parentRow);
     table.selectionHandler.lastActionRow = selectedRow.parentRow;
   }
-};
+}
+}

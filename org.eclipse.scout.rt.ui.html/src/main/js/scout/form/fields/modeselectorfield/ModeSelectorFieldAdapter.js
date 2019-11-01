@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ModeSelectorFieldAdapter = function() {
-  scout.ModeSelectorFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.ModeSelectorFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
 
-scout.ModeSelectorFieldAdapter.prototype._createWidget = function(model) {
+export default class ModeSelectorFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_createWidget(model) {
   this._addModeSelector(model);
-  return scout.ModeSelectorFieldAdapter.parent.prototype._createWidget.call(this, model);
-};
+  return super._createWidget( model);
+}
 
-scout.ModeSelectorFieldAdapter.prototype._addModeSelector = function(model) {
+_addModeSelector(model) {
   model.modeSelector = {
     objectType: 'ModeSelector'
   };
-};
+}
 
-scout.ModeSelectorFieldAdapter.prototype._postCreateWidget = function() {
+_postCreateWidget() {
   this.widget.modeSelector.setModes(this.widget.modes);
   delete this.widget.modes;
-};
+}
+}

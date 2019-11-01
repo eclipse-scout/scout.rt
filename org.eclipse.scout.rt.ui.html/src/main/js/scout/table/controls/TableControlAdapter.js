@@ -8,22 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableControlAdapter = function() {
-  scout.TableControlAdapter.parent.call(this);
-};
-scout.inherits(scout.TableControlAdapter, scout.ActionAdapter);
+import {ActionAdapter} from '../../index';
 
-scout.TableControlAdapter.prototype._goOffline = function() {
+export default class TableControlAdapter extends ActionAdapter {
+
+constructor() {
+  super();
+}
+
+
+_goOffline() {
   if (this.widget.isContentAvailable()) {
     return;
   }
   this._enabledBeforeOffline = this.widget.enabled;
   this.widget.setEnabled(false);
-};
+}
 
-scout.TableControlAdapter.prototype._goOnline = function() {
+_goOnline() {
   if (this.widget.isContentAvailable()) {
     return;
   }
   this.widget.setEnabled(this._enabledBeforeOffline);
-};
+}
+}

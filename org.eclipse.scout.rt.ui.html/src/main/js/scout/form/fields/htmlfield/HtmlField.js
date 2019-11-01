@@ -8,45 +8,52 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HtmlField = function() {
-  scout.HtmlField.parent.call(this);
+import {scrollbars} from '../../../index';
+import {ValueField} from '../../../index';
+import {AppLinkKeyStroke} from '../../../index';
+import * as $ from 'jquery';
+
+export default class HtmlField extends ValueField {
+
+constructor() {
+  super();
   this.scrollBarEnabled = false;
   this.preventInitialFocus = true;
-};
-scout.inherits(scout.HtmlField, scout.ValueField);
+}
+
 
 /**
  * @override FormField.js
  */
-scout.HtmlField.prototype._initKeyStrokeContext = function() {
-  scout.HtmlField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke(new scout.AppLinkKeyStroke(this, this._onAppLinkAction));
-};
+  this.keyStrokeContext.registerKeyStroke(new AppLinkKeyStroke(this, this._onAppLinkAction));
+}
 
-scout.HtmlField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'html-field');
   this.addLabel();
 
   this.addField(this.$parent.makeDiv());
   this.addStatus();
-};
+}
 
-scout.HtmlField.prototype._renderProperties = function() {
-  scout.HtmlField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
 
   this._renderScrollBarEnabled();
   this._renderScrollToAnchor();
-};
+}
 
-scout.HtmlField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.$field.html();
-};
+}
 
 /**
  * @override
  */
-scout.HtmlField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   if (!this.displayText) {
     this.$field.empty();
     return;
@@ -74,28 +81,28 @@ scout.HtmlField.prototype._renderDisplayText = function() {
   }
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.HtmlField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
+setScrollBarEnabled(scrollBarEnabled) {
   this.setProperty('scrollBarEnabled', scrollBarEnabled);
-};
+}
 
-scout.HtmlField.prototype._renderScrollBarEnabled = function() {
+_renderScrollBarEnabled() {
   if (this.scrollBarEnabled) {
     this._installScrollbars();
   } else {
     this._uninstallScrollbars();
   }
-};
+}
 
 /**
  * @deprecated use scrollToBottom instead
  */
-scout.HtmlField.prototype.scrollToEnd = function() {
+scrollToEnd() {
   this.scrollToBottom();
-};
+}
 
-scout.HtmlField.prototype._renderScrollToAnchor = function() {
+_renderScrollToAnchor() {
   if (!this.rendered) {
     this.session.layoutValidator.schedulePostValidateFunction(this._renderScrollToAnchor.bind(this));
     return;
@@ -104,27 +111,28 @@ scout.HtmlField.prototype._renderScrollToAnchor = function() {
   if (this.scrollBarEnabled && anchor && this.$field.find(anchor)) {
     var anchorElem = this.$field.find('#'.concat(anchor));
     if (anchorElem && anchorElem.length > 0) {
-      scout.scrollbars.scrollTo(this.$field, anchorElem);
+      scrollbars.scrollTo(this.$field, anchorElem);
     }
   }
-};
+}
 
-scout.HtmlField.prototype._onAppLinkAction = function(event) {
+_onAppLinkAction(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
-};
+}
 
-scout.HtmlField.prototype.triggerAppLinkAction = function(ref) {
+triggerAppLinkAction(ref) {
   this.trigger('appLinkAction', {
     ref: ref
   });
-};
+}
 
-scout.HtmlField.prototype._onImageLoad = function(event) {
+_onImageLoad(event) {
   this.invalidateLayoutTree();
-};
+}
 
-scout.HtmlField.prototype._onImageError = function(event) {
+_onImageError(event) {
   this.invalidateLayoutTree();
-};
+}
+}

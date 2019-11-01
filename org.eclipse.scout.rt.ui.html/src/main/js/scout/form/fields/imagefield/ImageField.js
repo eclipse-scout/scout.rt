@@ -8,21 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ImageField = function() {
-  scout.ImageField.parent.call(this);
+import {SingleLayout} from '../../../index';
+import {scrollbars} from '../../../index';
+import {ImageFieldLayout} from '../../../index';
+import {FileInput} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {FormField} from '../../../index';
+import {arrays} from '../../../index';
+import * as $ from 'jquery';
+
+export default class ImageField extends FormField {
+
+constructor() {
+  super();
 
   this.autoFit = false;
   this.scrollBarEnabled = false;
   this.uploadEnabled = false;
   this.acceptTypes = null;
-  this.maximumUploadSize = scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
+  this.maximumUploadSize = FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE;
 
   this._clickHandler = null;
-};
-scout.inherits(scout.ImageField, scout.FormField);
+}
 
-scout.ImageField.prototype._init = function(model) {
-  scout.ImageField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this.resolveIconIds(['imageUrl']);
   this.icon = scout.create('Icon', {
@@ -33,69 +46,69 @@ scout.ImageField.prototype._init = function(model) {
   });
   this.icon.on('load', this._onImageLoad.bind(this));
   this.icon.on('error', this._onImageError.bind(this));
-};
+}
 
-scout.ImageField.prototype._render = function() {
-  this.addContainer(this.$parent, 'image-field', new scout.ImageFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'image-field', new ImageFieldLayout(this));
   this.addFieldContainer(this.$parent.makeDiv());
 
   // Complete the layout hierarchy between the image field and the image
-  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
-  htmlComp.setLayout(new scout.SingleLayout());
+  var htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
+  htmlComp.setLayout(new SingleLayout());
   this.icon.render(this.$fieldContainer);
 
   this.addLabel();
   this.addField(this.icon.$container);
   this.addStatus();
-};
+}
 
-scout.ImageField.prototype._renderProperties = function() {
-  scout.ImageField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderScrollBarEnabled();
   this._renderDropType();
   this._renderImageUrl();
   this._renderUploadEnabled();
-};
+}
 
-scout.ImageField.prototype._installDragAndDropHandler = function(event) {
+_installDragAndDropHandler(event) {
   if (this.dragAndDropHandler) {
     return;
   }
   // add drag and drop event listeners to field container, img field might be hidden (e.g. if no image has been set)
   this.dragAndDropHandler = this._createDragAndDropHandler();
   this.dragAndDropHandler.install(this.$fieldContainer);
-};
+}
 
-scout.ImageField.prototype.setImageUrl = function(imageUrl) {
+setImageUrl(imageUrl) {
   this.setProperty('imageUrl', imageUrl);
-};
+}
 
-scout.ImageField.prototype._setImageUrl = function(imageUrl) {
+_setImageUrl(imageUrl) {
   this._setProperty('imageUrl', imageUrl);
   this.icon.setIconDesc(imageUrl);
-};
+}
 
-scout.ImageField.prototype._renderImageUrl = function() {
+_renderImageUrl() {
   var hasImageUrl = !!this.imageUrl;
   this.$fieldContainer.toggleClass('has-image', hasImageUrl);
   this.$container.toggleClass('has-image', hasImageUrl);
-  scout.scrollbars.update(this.$fieldContainer);
-};
+  scrollbars.update(this.$fieldContainer);
+}
 
-scout.ImageField.prototype.setAutoFit = function(autoFit) {
+setAutoFit(autoFit) {
   this.setProperty('autoFit', autoFit);
-};
+}
 
-scout.ImageField.prototype._setAutoFit = function(autoFit) {
+_setAutoFit(autoFit) {
   this._setProperty('autoFit', autoFit);
   this.icon.setAutoFit(autoFit);
-};
+}
 
-scout.ImageField.prototype._renderAutoFit = function() {
-  scout.scrollbars.update(this.$fieldContainer);
-};
+_renderAutoFit() {
+  scrollbars.update(this.$fieldContainer);
+}
 
-scout.ImageField.prototype._renderScrollBarEnabled = function() {
+_renderScrollBarEnabled() {
   // Note: Inner alignment has to be updated _before_ installing the scrollbar, because the inner
   // alignment uses absolute positioning, which confuses the scrollbar calculations.
   this._updateInnerAlignment();
@@ -105,38 +118,38 @@ scout.ImageField.prototype._renderScrollBarEnabled = function() {
   } else {
     this._uninstallScrollbars();
   }
-};
+}
 
 /**
  * @override
  */
-scout.ImageField.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$fieldContainer;
-};
+}
 
-scout.ImageField.prototype._renderGridData = function() {
-  scout.ImageField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this._updateInnerAlignment();
-};
+}
 
-scout.ImageField.prototype._renderGridDataHints = function() {
-  scout.ImageField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this._updateInnerAlignment();
-};
+}
 
-scout.ImageField.prototype._updateInnerAlignment = function() {
+_updateInnerAlignment() {
   // Enable inner alignment only when scrollbars are disabled
   this.updateInnerAlignment({
     useHorizontalAlignment: (!this.scrollBarEnabled),
     useVerticalAlignment: (!this.scrollBarEnabled)
   });
-};
+}
 
-scout.ImageField.prototype.setUploadEnabled = function(uploadEnabled) {
+setUploadEnabled(uploadEnabled) {
   this.setProperty('uploadEnabled', uploadEnabled);
-};
+}
 
-scout.ImageField.prototype._renderUploadEnabled = function() {
+_renderUploadEnabled() {
   var enabled = this.uploadEnabled;
   this.$fieldContainer.toggleClass('clickable', enabled);
   if (enabled) {
@@ -148,7 +161,7 @@ scout.ImageField.prototype._renderUploadEnabled = function() {
       text: this.displayText,
       enabled: this.enabledComputed,
       maximumUploadSize: this.maximumUploadSize,
-      visible: !scout.device.supportsFile()
+      visible: !Device.get().supportsFile()
     });
     this.fileInput.render(this.$fieldContainer);
     this.fileInput.on('change', this._onFileChange.bind(this));
@@ -160,32 +173,32 @@ scout.ImageField.prototype._renderUploadEnabled = function() {
       this.fileInput = null;
     }
   }
-};
+}
 
 /**
  * The browse() function triggers an artificial click event on the INPUT element,
  * this would trigger our own click handler again. We prevent recursion by
  * checking the click target.
  */
-scout.ImageField.prototype._onClickUpload = function(event) {
+_onClickUpload(event) {
   if ($(event.target).isOrHas(this.$field)) {
     this.fileInput.browse();
   }
-};
+}
 
-scout.ImageField.prototype._onFileChange = function(event) {
+_onFileChange(event) {
   this.trigger('fileUpload', {
-    file: scout.arrays.first(event.files)
+    file: arrays.first(event.files)
   });
-};
+}
 
-scout.ImageField.prototype._onImageLoad = function(event) {
+_onImageLoad(event) {
   this._onIconUpdated();
-};
+}
 
-scout.ImageField.prototype._onImageError = function(event) {
+_onImageError(event) {
   this._onIconUpdated();
-};
+}
 
 /**
  * This function is called whenever the icon has updated its $container. Since the $field
@@ -194,7 +207,8 @@ scout.ImageField.prototype._onImageError = function(event) {
  * <p>
  * Override this method if a sub-class of ImageField.js needs to update its DOM too.
  */
-scout.ImageField.prototype._onIconUpdated = function() {
-  scout.scrollbars.update(this.$fieldContainer);
+_onIconUpdated() {
+  scrollbars.update(this.$fieldContainer);
   this.$field = this.icon.$container;
-};
+}
+}

@@ -8,55 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OfflineDesktopNotification = function() {
-  scout.OfflineDesktopNotification.parent.call(this);
+import {Status} from '../../index';
+import {DesktopNotification} from '../../index';
+
+export default class OfflineDesktopNotification extends DesktopNotification {
+
+constructor() {
+  super();
 
   this.connectFailedReset = null;
-};
-scout.inherits(scout.OfflineDesktopNotification, scout.DesktopNotification);
+}
 
-scout.OfflineDesktopNotification.prototype._init = function(model) {
-  scout.OfflineDesktopNotification.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.closable = false;
-  this.duration = scout.DesktopNotification.INFINITE;
-  this.status = new scout.Status({
+  this.duration = DesktopNotification.INFINITE;
+  this.status = new Status({
     message: this.session.text('ui.ConnectionInterrupted'),
-    severity: scout.Status.Severity.ERROR
+    severity: Status.Severity.ERROR
   });
-};
+}
 
-scout.OfflineDesktopNotification.prototype._render = function() {
-  scout.OfflineDesktopNotification.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$content.addClass('offline-message');
   this.$messageText.addClass('offline-message-text');
   this.$loader.text(this.session.text('ui.Reconnecting_'));
-};
+}
 
-scout.OfflineDesktopNotification.prototype.reconnect = function() {
+reconnect() {
   this.setLoading(true);
   if (this.connectFailedReset) {
     clearTimeout(this.connectFailedReset);
   }
   this.$messageText.hide();
-};
+}
 
-scout.OfflineDesktopNotification.prototype.reconnectFailed = function() {
+reconnectFailed() {
   /* remove the connecting state with a small delay. otherwise it cannot be read because its only shown very shortly */
   this.connectFailedReset = setTimeout(function() {
     this.connectFailedReset = null;
     this.setLoading(false);
     this.$messageText.show();
   }.bind(this), 1100 /* this delay must be < Reconnector.interval */ );
-};
+}
 
-scout.OfflineDesktopNotification.prototype.reconnectSucceeded = function() {
+reconnectSucceeded() {
   this.setLoading(false);
   if (this.connectFailedReset) {
     clearTimeout(this.connectFailedReset);
   }
   this.setStatus({
     message: this.session.text('ui.ConnectionReestablished'),
-    severity: scout.Status.Severity.OK
+    severity: Status.Severity.OK
   });
   this.$messageText.show();
-};
+}
+}

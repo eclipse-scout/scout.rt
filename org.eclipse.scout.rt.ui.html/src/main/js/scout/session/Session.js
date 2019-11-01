@@ -8,18 +8,52 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Session = function() {
+import {LayoutValidator} from '../index';
+import {ObjectFactory} from '../index';
+import {AjaxCall} from '../index';
+import {FocusManager} from '../index';
+import {MessageBox} from '../index';
+import * as $ from 'jquery';
+import {Locale} from '../index';
+import {scout} from '../index';
+import {ModelAdapter} from '../index';
+import {texts} from '../index';
+import {TextMap} from '../index';
+import {Device} from '../index';
+import {BackgroundJobPollingSupport} from '../index';
+import {BackgroundJobPollingStatus} from '../index';
+import {FileInput} from '../index';
+import {Reconnector} from '../index';
+import {objects} from '../index';
+import {Status} from '../index';
+import {EventSupport} from '../index';
+import {RemoteEvent} from '../index';
+import {fonts} from '../index';
+import {UserAgent} from '../index';
+import {App} from '../index';
+import {NullWidget} from '../index';
+import {strings} from '../index';
+import {TypeDescriptor} from '../index';
+import {webstorage} from '../index';
+import {URL} from '../index';
+import {arrays} from '../index';
+import {ResponseQueue} from '../index';
+import {comparators} from '../index';
+
+export default class Session {
+
+constructor() {
   this.$entryPoint = null;
   this.partId = 0;
 
-  this.url = new scout.URL();
-  this.userAgent = new scout.UserAgent({
-    deviceType: scout.device.type,
-    touch: scout.device.supportsTouch(),
-    standalone: scout.device.isStandalone()
+  this.url = new URL();
+  this.userAgent = new UserAgent({
+    deviceType: Device.get().type,
+    touch: Device.get().supportsTouch(),
+    standalone: Device.get().isStandalone()
   });
   this.locale = null;
-  this.textMap = new scout.TextMap();
+  this.textMap = new TextMap();
 
   this.ready = false; // true after desktop has been completely rendered
   this.unloading = false; // true when 'beforeOnload' event has been triggered
@@ -28,7 +62,7 @@ scout.Session = function() {
   this.inspector = false;
   this.persistent = false;
   this.desktop = null;
-  this.layoutValidator = new scout.LayoutValidator();
+  this.layoutValidator = new LayoutValidator();
   this.focusManager = null;
   this.keyStrokeManager = null;
 
@@ -40,14 +74,14 @@ scout.Session = function() {
   this.modelAdapterRegistry = {};
   this.ajaxCalls = [];
   this.asyncEvents = [];
-  this.responseQueue = new scout.ResponseQueue(this);
+  this.responseQueue = new ResponseQueue(this);
   this.requestsPendingCounter = 0;
   this.suppressErrors = false;
   this.requestTimeoutCancel = 5000; // ms
   this.requestTimeoutPoll = 75000; // ms, depends on polling interval, will therefore be initialized on startup
   this.requestTimeoutPing = 5000; // ms
-  this.backgroundJobPollingSupport = new scout.BackgroundJobPollingSupport(true);
-  this.reconnector = new scout.Reconnector(this);
+  this.backgroundJobPollingSupport = new BackgroundJobPollingSupport(true);
+  this.reconnector = new Reconnector(this);
   this.processingEvents = false;
 
   // This property is enabled by URL parameter &adapterExportEnabled=1. Default is false
@@ -62,14 +96,14 @@ scout.Session = function() {
   this._queuedRequest = null;
   this.requestSequenceNo = 0;
 
-  this.rootAdapter = new scout.ModelAdapter();
+  this.rootAdapter = new ModelAdapter();
   this.rootAdapter.init({
     session: this,
     id: '1',
     objectType: 'RootAdapter'
   });
 
-  var rootParent = new scout.NullWidget();
+  var rootParent = new NullWidget();
   rootParent.session = this;
   rootParent.initialized = true;
 
@@ -79,10 +113,10 @@ scout.Session = function() {
     objectType: 'NullWidget'
   }, rootParent);
   this.events = this._createEventSupport();
-};
+}
 
 // Corresponds to constants in JsonResponse
-scout.Session.JsonResponseError = {
+static JsonResponseError = {
   STARTUP_FAILED: 5,
   SESSION_TIMEOUT: 10,
   UI_PROCESSING: 20,
@@ -123,7 +157,7 @@ scout.Session.JsonResponseError = {
  *   [ajaxCallOptions]
  *     Optional, properties of this object are copied to all instances of AjaxCall.js.
  */
-scout.Session.prototype.init = function(model) {
+init(model) {
   var options = model || {};
 
   if (!options.$entryPoint) {
@@ -140,8 +174,8 @@ scout.Session.prototype.init = function(model) {
   this.userAgent = scout.nvl(options.userAgent, this.userAgent);
   this.suppressErrors = scout.nvl(options.suppressErrors, this.suppressErrors);
   if (options.locale) {
-    this.locale = scout.Locale.ensure(options.locale);
-    this.textMap = scout.texts.get(this.locale.languageTag);
+    this.locale = Locale.ensure(options.locale);
+    this.textMap = texts.get(this.locale.languageTag);
   }
   if (options.backgroundJobPollingEnabled === false) {
     this.backgroundJobPollingSupport.enabled = false;
@@ -160,37 +194,37 @@ scout.Session.prototype.init = function(model) {
   }
 
   // Install focus management for this session (cannot be created in constructor, because this.$entryPoint is required)
-  this.focusManager = new scout.FocusManager({
+  this.focusManager = new FocusManager({
     session: this,
     active: options.focusManagerActive
   });
   this.keyStrokeManager = scout.create('KeyStrokeManager', {
     session: this
   });
-};
+}
 
-scout.Session.prototype._throwError = function(message) {
+_throwError(message) {
   if (!this.suppressErrors) {
     throw new Error(message);
   }
-};
+}
 
-scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
+unregisterModelAdapter(modelAdapter) {
   delete this.modelAdapterRegistry[modelAdapter.id];
-};
+}
 
-scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
+registerModelAdapter(modelAdapter) {
   if (modelAdapter.id === undefined) {
     throw new Error('modelAdapter.id must be defined');
   }
   this.modelAdapterRegistry[modelAdapter.id] = modelAdapter;
-};
+}
 
-scout.Session.prototype.getModelAdapter = function(id) {
+getModelAdapter(id) {
   return this.modelAdapterRegistry[id];
-};
+}
 
-scout.Session.prototype.getWidget = function(adapterId) {
+getWidget(adapterId) {
   if (!adapterId) {
     return null;
   }
@@ -202,9 +236,9 @@ scout.Session.prototype.getWidget = function(adapterId) {
     return null;
   }
   return adapter.widget;
-};
+}
 
-scout.Session.prototype.getOrCreateWidget = function(adapterId, parent, strict) {
+getOrCreateWidget(adapterId, parent, strict) {
   if (!adapterId) {
     return null;
   }
@@ -224,15 +258,15 @@ scout.Session.prototype.getOrCreateWidget = function(adapterId, parent, strict) 
   }
   var adapter = this.createModelAdapter(adapterData);
   return adapter.createWidget(adapterData, parent);
-};
+}
 
-scout.Session.prototype.createModelAdapter = function(adapterData) {
+createModelAdapter(adapterData) {
   var objectType = adapterData.objectType;
   var createOpts = {};
 
-  var objectInfo = scout.TypeDescriptor.parse(objectType);
+  var objectInfo = TypeDescriptor.parse(objectType);
   if (objectInfo.modelVariant) {
-    objectType = objectInfo.objectType.toString() + 'Adapter' + scout.ObjectFactory.MODEL_VARIANT_SEPARATOR + objectInfo.modelVariant.toString();
+    objectType = objectInfo.objectType.toString() + 'Adapter' + ObjectFactory.MODEL_VARIANT_SEPARATOR + objectInfo.modelVariant.toString();
     // If no adapter exists for the given variant then create an adapter without variant.
     // Mostly variant is only essential for the widget, not the adapter
     createOpts.variantLenient = true;
@@ -248,7 +282,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
   var adapter = scout.create(objectType, adapterModel, createOpts);
   $.log.isTraceEnabled() && $.log.trace('created new adapter ' + adapter);
   return adapter;
-};
+}
 
 /**
  * Sends the request asynchronously and processes the response later.<br>
@@ -256,7 +290,7 @@ scout.Session.prototype.createModelAdapter = function(adapterData) {
  * during the same user interaction, the events are collected and sent in one
  * request at the end of the user interaction
  */
-scout.Session.prototype.sendEvent = function(event, delay) {
+sendEvent(event, delay) {
   delay = delay || 0;
 
   this.asyncEvents = this._coalesceEvents(this.asyncEvents, event);
@@ -275,9 +309,9 @@ scout.Session.prototype.sendEvent = function(event, delay) {
     }
     this._sendNow();
   }.bind(this), this._asyncDelay);
-};
+}
 
-scout.Session.prototype._sendStartupRequest = function() {
+_sendStartupRequest() {
   // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
   var request = this._newRequest({
     startup: true
@@ -288,8 +322,8 @@ scout.Session.prototype._sendStartupRequest = function() {
   if (this.clientSessionId) {
     request.clientSessionId = this.clientSessionId;
   }
-  if (scout.app.version) {
-    request.version = scout.app.version;
+  if (App.get().version) {
+    request.version = App.get().version;
   }
   request.userAgent = this.userAgent;
   request.sessionStartupParams = this._createSessionStartupParams();
@@ -313,10 +347,10 @@ scout.Session.prototype._sendStartupRequest = function() {
   function onAjaxFail(jqXHR, textStatus, errorThrown) {
     this._setApplicationLoading(false);
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
-    var args = scout.objects.argumentsToArray(arguments);
+    var args = objects.argumentsToArray(arguments);
     return $.rejectedPromise.apply($, args);
   }
-};
+}
 
 /**
  * Creates an object to send to the server as "startupParams".
@@ -329,10 +363,10 @@ scout.Session.prototype._sendStartupRequest = function() {
  *
  * Additionally, all query parameters from the URL are put in the resulting object.
  */
-scout.Session.prototype._createSessionStartupParams = function() {
+_createSessionStartupParams() {
   var params = {
     url: this.url.baseUrlRaw,
-    geolocationServiceAvailable: scout.device.supportsGeolocation()
+    geolocationServiceAvailable: Device.get().supportsGeolocation()
   };
 
   // Extract query parameters from URL and put them in the resulting object
@@ -341,16 +375,16 @@ scout.Session.prototype._createSessionStartupParams = function() {
     params[prop] = urlParameterMap[prop];
   }
   return params;
-};
+}
 
-scout.Session.prototype._processStartupResponse = function(data) {
+_processStartupResponse(data) {
   // Handle errors from server
   if (data.error) {
     this._processErrorJsonResponse(data.error);
     return;
   }
 
-  scout.webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+  webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
 
   if (!data.startupData) {
     throw new Error('Missing startupData');
@@ -392,8 +426,8 @@ scout.Session.prototype._processStartupResponse = function(data) {
     this._copyAdapterData(data.adapterData);
   }
 
-  this.locale = new scout.Locale(data.startupData.locale);
-  this.textMap = scout.texts.get(this.locale.languageTag);
+  this.locale = new Locale(data.startupData.locale);
+  this.textMap = texts.get(this.locale.languageTag);
   this.textMap.addAll(data.startupData.textMap);
 
   // Create the desktop
@@ -422,54 +456,54 @@ scout.Session.prototype._processStartupResponse = function(data) {
 
     this.ready = true;
 
-    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
+    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
     if ($.log.isDebugEnabled()) {
-      $.log.isDebugEnabled() && $.log.debug('size of _adapterDataCache after session has been initialized: ' + scout.objects.countOwnProperties(this._adapterDataCache));
-      $.log.isDebugEnabled() && $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + scout.objects.countOwnProperties(this.modelAdapterRegistry));
+      $.log.isDebugEnabled() && $.log.debug('size of _adapterDataCache after session has been initialized: ' + objects.countOwnProperties(this._adapterDataCache));
+      $.log.isDebugEnabled() && $.log.debug('size of modelAdapterRegistry after session has been initialized: ' + objects.countOwnProperties(this.modelAdapterRegistry));
     }
   }.bind(this);
 
   this.render(renderDesktopImpl);
-};
+}
 
-scout.Session.prototype._storeClientSessionIdInStorage = function(clientSessionId) {
-  scout.webstorage.removeItem(sessionStorage, 'scout:clientSessionId');
-  scout.webstorage.removeItem(localStorage, 'scout:clientSessionId');
+_storeClientSessionIdInStorage(clientSessionId) {
+  webstorage.removeItem(sessionStorage, 'scout:clientSessionId');
+  webstorage.removeItem(localStorage, 'scout:clientSessionId');
   var storage = sessionStorage;
   if (this.persistent) {
     storage = localStorage;
   }
-  scout.webstorage.setItem(storage, 'scout:clientSessionId', clientSessionId);
-};
+  webstorage.setItem(storage, 'scout:clientSessionId', clientSessionId);
+}
 
-scout.Session.prototype._getClientSessionIdFromStorage = function() {
-  var id = scout.webstorage.getItem(sessionStorage, 'scout:clientSessionId');
+_getClientSessionIdFromStorage() {
+  var id = webstorage.getItem(sessionStorage, 'scout:clientSessionId');
   if (!id) {
     // If the session is persistent it was stored in the local storage (cannot check for this.persistent here because it is not known yet)
-    id = scout.webstorage.getItem(localStorage, 'scout:clientSessionId');
+    id = webstorage.getItem(localStorage, 'scout:clientSessionId');
   }
   return id;
-};
+}
 
-scout.Session.prototype.render = function(renderFunc) {
+render(renderFunc) {
   // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
-  if (scout.fonts.loadingComplete) {
+  if (fonts.loadingComplete) {
     renderFunc();
   } else {
-    scout.fonts.preloader().then(renderFunc);
+    fonts.preloader().then(renderFunc);
   }
-};
+}
 
-scout.Session.prototype._sendUnloadRequest = function() {
+_sendUnloadRequest() {
   var request = this._newRequest({
     unload: true,
     showBusyIndicator: false
   });
   // Send request
   this._sendRequest(request);
-};
+}
 
-scout.Session.prototype._sendNow = function() {
+_sendNow() {
   if (this.asyncEvents.length === 0) {
     // Nothing to send -> return
     return;
@@ -495,17 +529,17 @@ scout.Session.prototype._sendNow = function() {
   this._sendRequest(request);
   // Remove the events which are sent now from the list, keep the ones which are sent later
   this.asyncEvents = this.asyncEvents.slice(events.length);
-};
+}
 
-scout.Session.prototype._coalesceEvents = function(previousEvents, event) {
+_coalesceEvents(previousEvents, event) {
   if (!event.coalesce) {
     return previousEvents;
   }
   var filter = $.negate(event.coalesce).bind(event);
   return previousEvents.filter(filter);
-};
+}
 
-scout.Session.prototype._sendRequest = function(request) {
+_sendRequest(request) {
   if (!request) {
     return; // nothing to send
   }
@@ -536,9 +570,9 @@ scout.Session.prototype._sendRequest = function(request) {
     ajaxOptions.async = false;
   }
   this._performUserAjaxRequest(ajaxOptions, busyHandling, request);
-};
+}
 
-scout.Session.prototype._handleSendWhenOffline = function(request) {
+_handleSendWhenOffline(request) {
   // No need to queue the request when request does not contain events (e.g. log request, unload request)
   if (!request.events) {
     return;
@@ -560,9 +594,9 @@ scout.Session.prototype._handleSendWhenOffline = function(request) {
     this._queuedRequest = request;
   }
   this.layoutValidator.validate();
-};
+}
 
-scout.Session.prototype.defaultAjaxOptions = function(request) {
+defaultAjaxOptions(request) {
   request = request || this._newRequest();
   var url = this._decorateUrl(this.remoteUrl, request);
 
@@ -589,9 +623,9 @@ scout.Session.prototype.defaultAjaxOptions = function(request) {
     ajaxOptions.timeout = this.requestTimeoutPoll;
   }
   return ajaxOptions;
-};
+}
 
-scout.Session.prototype._decorateUrl = function(url, request) {
+_decorateUrl(url, request) {
   var urlHint = null;
   // Add dummy URL parameter as marker (for debugging purposes)
   if (request.unload) {
@@ -608,12 +642,12 @@ scout.Session.prototype._decorateUrl = function(url, request) {
     urlHint = 'sync';
   }
   if (urlHint) {
-    url = new scout.URL(url).addParameter(urlHint).toString();
+    url = new URL(url).addParameter(urlHint).toString();
   }
   return url;
-};
+}
 
-scout.Session.prototype._getRequestName = function(request, defaultName) {
+_getRequestName(request, defaultName) {
   if (request) {
     if (request.unload) {
       return 'unload';
@@ -630,20 +664,20 @@ scout.Session.prototype._getRequestName = function(request, defaultName) {
     }
   }
   return defaultName;
-};
+}
 
-scout.Session.prototype._requestToJson = function(request) {
+_requestToJson(request) {
   return JSON.stringify(request, function(key, value) {
     // Replacer function that filter certain properties from the resulting JSON string.
     // See https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
     var ignore =
       (this === request && key === 'showBusyIndicator') ||
-      (this instanceof scout.RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce', 'newRequest'));
+      (this instanceof RemoteEvent && scout.isOneOf(key, 'showBusyIndicator', 'coalesce', 'newRequest'));
     return (ignore ? undefined : value);
   });
-};
+}
 
-scout.Session.prototype._callAjax = function(callOptions) {
+_callAjax(callOptions) {
   var defaultOptions = {
     retryIntervals: [100, 500, 500, 500]
   };
@@ -653,9 +687,9 @@ scout.Session.prototype._callAjax = function(callOptions) {
   this.registerAjaxCall(ajaxCall);
   return ajaxCall.call()
     .always(this.unregisterAjaxCall.bind(this, ajaxCall));
-};
+}
 
-scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHandling, request) {
+_performUserAjaxRequest(ajaxOptions, busyHandling, request) {
   if (busyHandling) {
     this.setBusy(true);
   }
@@ -741,42 +775,42 @@ scout.Session.prototype._performUserAjaxRequest = function(ajaxOptions, busyHand
       throw jsError;
     }
   }
-};
+}
 
-scout.Session.prototype.registerAjaxCall = function(ajaxCall) {
+registerAjaxCall(ajaxCall) {
   this.ajaxCalls.push(ajaxCall);
-};
+}
 
-scout.Session.prototype.unregisterAjaxCall = function(ajaxCall) {
-  scout.arrays.remove(this.ajaxCalls, ajaxCall);
-};
+unregisterAjaxCall(ajaxCall) {
+  arrays.remove(this.ajaxCalls, ajaxCall);
+}
 
-scout.Session.prototype.interruptAllAjaxCalls = function() {
+interruptAllAjaxCalls() {
   // Because the error handlers alter the "this.ajaxCalls" array,
   // the loop must operate on a copy of the original array!
   this.ajaxCalls.slice().forEach(function(ajaxCall) {
     ajaxCall.pendingCall && ajaxCall.pendingCall.abort();
   });
-};
+}
 
-scout.Session.prototype.abortAllAjaxCalls = function() {
+abortAllAjaxCalls() {
   // Because the error handlers alter the "this.ajaxCalls" array,
   // the loop must operate on a copy of the original array!
   this.ajaxCalls.slice().forEach(function(ajaxCall) {
     ajaxCall.abort();
   });
-};
+}
 
 /**
  * (Re-)starts background job polling when not started yet or when an error occurred while polling.
  * In the latter case, polling is resumed when a user-initiated request has been successful.
  */
-scout.Session.prototype._resumeBackgroundJobPolling = function() {
-  if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== scout.BackgroundJobPollingStatus.RUNNING) {
+_resumeBackgroundJobPolling() {
+  if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== BackgroundJobPollingStatus.RUNNING) {
     $.log.isInfoEnabled() && $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
     this._pollForBackgroundJobs();
   }
-};
+}
 
 /**
  * Polls the results of jobs running in the background. Note: we cannot use the _sendRequest method here
@@ -784,7 +818,7 @@ scout.Session.prototype._resumeBackgroundJobPolling = function() {
  * the server doesn't return until either a time-out occurs or there's something in the response when
  * a model job is done and no request initiated by a user is running.
  */
-scout.Session.prototype._pollForBackgroundJobs = function() {
+_pollForBackgroundJobs() {
   this.backgroundJobPollingSupport.setRunning();
 
   var request = this._newRequest({
@@ -849,7 +883,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
     this.backgroundJobPollingSupport.setFailed();
     this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
   }
-};
+}
 
 /**
  * Do NOT call this method directly, always use the response queue:
@@ -858,7 +892,7 @@ scout.Session.prototype._pollForBackgroundJobs = function() {
  *
  * Otherwise, the response queue's expected sequence number will get out of sync.
  */
-scout.Session.prototype.processJsonResponseInternal = function(data) {
+processJsonResponseInternal(data) {
   var success = false;
   if (data.error) {
     this._processErrorJsonResponse(data.error);
@@ -867,9 +901,9 @@ scout.Session.prototype.processJsonResponseInternal = function(data) {
     success = true;
   }
   return success;
-};
+}
 
-scout.Session.prototype._processSuccessResponse = function(message) {
+_processSuccessResponse(message) {
   if (message.adapterData) {
     this._copyAdapterData(message.adapterData);
   }
@@ -884,14 +918,14 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   }
 
   if ($.log.isDebugEnabled()) {
-    var cacheSize = scout.objects.countOwnProperties(this._adapterDataCache);
+    var cacheSize = objects.countOwnProperties(this._adapterDataCache);
     $.log.trace('size of _adapterDataCache after response has been processed: ' + cacheSize);
-    cacheSize = scout.objects.countOwnProperties(this.modelAdapterRegistry);
+    cacheSize = objects.countOwnProperties(this.modelAdapterRegistry);
     $.log.trace('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
-};
+}
 
-scout.Session.prototype._copyAdapterData = function(adapterData) {
+_copyAdapterData(adapterData) {
   var count = 0;
   var prop;
 
@@ -902,15 +936,15 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
   if (count > 0) {
     $.log.isTraceEnabled() && $.log.trace('Stored ' + count + ' properties in adapterDataCache');
   }
-};
+}
 
 /**
  * @param textStatus 'timeout', 'abort', 'error' or 'parseerror' (see http://api.jquery.com/jquery.ajax/)
  */
-scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, errorThrown, request) {
+_processErrorResponse(jqXHR, textStatus, errorThrown, request) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-  var offlineError = scout.AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, request);
+  var offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, request);
   if (offlineError) {
     if (this.ready) {
       this.goOffline();
@@ -926,7 +960,7 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
   // Show error message
   var boxOptions = {
     header: this.optText('ui.NetworkError', 'Network error'),
-    body: scout.strings.join(' ', (jqXHR.status || ''), errorThrown),
+    body: strings.join(' ', (jqXHR.status || ''), errorThrown),
     yesButtonText: this.optText('ui.Reload', 'Reload'),
     yesButtonAction: function() {
       scout.reloadPage();
@@ -934,18 +968,18 @@ scout.Session.prototype._processErrorResponse = function(jqXHR, textStatus, erro
     noButtonText: (this.ready ? this.optText('ui.Ignore', 'Ignore') : null)
   };
   this.showFatalMessage(boxOptions, jqXHR.status + '.net');
-};
+}
 
-scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
-  if (jsonError.code === scout.Session.JsonResponseError.VERSION_MISMATCH) {
-    var loopDetection = scout.webstorage.getItem(sessionStorage, 'scout:versionMismatch');
+_processErrorJsonResponse(jsonError) {
+  if (jsonError.code === Session.JsonResponseError.VERSION_MISMATCH) {
+    var loopDetection = webstorage.getItem(sessionStorage, 'scout:versionMismatch');
     if (!loopDetection) {
-      scout.webstorage.setItem(sessionStorage, 'scout:versionMismatch', 'yes');
+      webstorage.setItem(sessionStorage, 'scout:versionMismatch', 'yes');
       // Reload page -> everything should then be up to date
       scout.reloadPage();
       return;
     }
-    scout.webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
+    webstorage.removeItem(sessionStorage, 'scout:versionMismatch');
   }
 
   // Default values for fatal message boxes
@@ -959,30 +993,30 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonError) {
   };
 
   // Customize for specific error codes
-  if (jsonError.code === scout.Session.JsonResponseError.STARTUP_FAILED) {
+  if (jsonError.code === Session.JsonResponseError.STARTUP_FAILED) {
     // there are no texts yet if session startup failed
     boxOptions.header = jsonError.message;
     boxOptions.body = null;
     boxOptions.yesButtonText = 'Retry';
-  } else if (jsonError.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
+  } else if (jsonError.code === Session.JsonResponseError.SESSION_TIMEOUT) {
     boxOptions.header = this.optText('ui.SessionTimeout', boxOptions.header);
     boxOptions.body = this.optText('ui.SessionExpiredMsg', boxOptions.body);
-  } else if (jsonError.code === scout.Session.JsonResponseError.UI_PROCESSING) {
+  } else if (jsonError.code === Session.JsonResponseError.UI_PROCESSING) {
     boxOptions.header = this.optText('ui.UnexpectedProblem', boxOptions.header);
-    boxOptions.body = scout.strings.join('\n\n',
+    boxOptions.body = strings.join('\n\n',
       this.optText('ui.InternalProcessingErrorMsg', boxOptions.body, ' (' + this.optText('ui.ErrorCodeX', 'Code 20', '20') + ')'),
       this.optText('ui.UiInconsistentMsg', ''));
     boxOptions.noButtonText = this.optText('ui.Ignore', 'Ignore');
-  } else if (jsonError.code === scout.Session.JsonResponseError.UNSAFE_UPLOAD) {
+  } else if (jsonError.code === Session.JsonResponseError.UNSAFE_UPLOAD) {
     boxOptions.header = this.optText('ui.UnsafeUpload', boxOptions.header);
     boxOptions.body = this.optText('ui.UnsafeUploadMsg', boxOptions.body);
     boxOptions.yesButtonText = this.optText('ui.Ok', 'Ok');
     boxOptions.yesButtonAction = function() {};
   }
   this.showFatalMessage(boxOptions, jsonError.code);
-};
+}
 
-scout.Session.prototype._fireRequestFinished = function(message) {
+_fireRequestFinished(message) {
   if (!this._deferred) {
     return;
   }
@@ -996,18 +1030,18 @@ scout.Session.prototype._fireRequestFinished = function(message) {
     this._deferred = null;
     this._deferredEventTypes = null;
   }
-};
+}
 
 /**
  * Shows a UI-only message box.
  *
  * @param options
- *          Options for the message box, see scout.MessageBox
+ *          Options for the message box, see MessageBox
  * @param errorCode
  *          If defined, a second call to this method with the same errorCode will
  *          do nothing. Can be used to prevent double messages for the same error.
  */
-scout.Session.prototype.showFatalMessage = function(options, errorCode) {
+showFatalMessage(options, errorCode) {
   if (errorCode) {
     if (this._fatalMessagesOnScreen[errorCode]) {
       return;
@@ -1019,9 +1053,9 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
   options = options || {};
   var model = {
       session: this,
-      parent: this.desktop || new scout.NullWidget(),
+      parent: this.desktop || new NullWidget(),
       iconId: options.iconId,
-      severity: scout.nvl(options.severity, scout.Status.Severity.ERROR),
+      severity: scout.nvl(options.severity, Status.Severity.ERROR),
       header: options.header,
       body: options.body,
       hiddenText: options.hiddenText,
@@ -1045,9 +1079,9 @@ scout.Session.prototype.showFatalMessage = function(options, errorCode) {
     }
   }.bind(this));
   messageBox.render($entryPoint);
-};
+}
 
-scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, maxTotalSize, allowedTypes) {
+uploadFiles(target, files, uploadProperties, maxTotalSize, allowedTypes) {
   var formData = new FormData(),
     totalSize = 0;
 
@@ -1066,7 +1100,7 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   }.bind(this));
 
   // 50 MB as default maximum size
-  maxTotalSize = scout.nvl(maxTotalSize, scout.FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
+  maxTotalSize = scout.nvl(maxTotalSize, FileInput.DEFAULT_MAXIMUM_UPLOAD_SIZE);
 
   // very large files must not be sent to server otherwise the whole system might crash (for all users).
   if (totalSize > maxTotalSize) {
@@ -1099,9 +1133,9 @@ scout.Session.prototype.uploadFiles = function(target, files, uploadProperties, 
   var busyHandling = !this.areRequestsPending();
   this._performUserAjaxRequest(uploadAjaxOptions, busyHandling);
   return true;
-};
+}
 
-scout.Session.prototype.goOffline = function() {
+goOffline() {
   if (this.offline) {
     return; // already offline
   }
@@ -1123,9 +1157,9 @@ scout.Session.prototype.goOffline = function() {
     this.rootAdapter.goOffline();
     this.reconnector.start();
   }.bind(this), 100);
-};
+}
 
-scout.Session.prototype.goOnline = function() {
+goOnline() {
   this.offline = false;
   this.rootAdapter.goOnline();
 
@@ -1134,42 +1168,42 @@ scout.Session.prototype.goOnline = function() {
   });
   this.responseQueue.prepareRequest(request);
   this._sendRequest(request); // implies "_resumeBackgroundJobPolling", and also sends queued request
-};
+}
 
-scout.Session.prototype.onReconnecting = function() {
+onReconnecting() {
   if (this.desktop) {
     this.desktop.onReconnecting();
   }
-};
+}
 
-scout.Session.prototype.onReconnectingSucceeded = function() {
+onReconnectingSucceeded() {
   if (this.desktop) {
     this.desktop.onReconnectingSucceeded();
   }
   this.goOnline();
-};
+}
 
-scout.Session.prototype.onReconnectingFailed = function() {
+onReconnectingFailed() {
   if (this.desktop) {
     this.desktop.onReconnectingFailed();
   }
-};
+}
 
-scout.Session.prototype.listen = function() {
+listen() {
   if (!this._deferred) {
     this._deferred = $.Deferred();
     this._deferredEventTypes = [];
   }
   return this._deferred;
-};
+}
 
 /**
  * Executes the given callback when pending requests are finished, or immediately if there are no requests pending.
  * @param func callback function
  * @param vararg arguments to pass to the callback function
  */
-scout.Session.prototype.onRequestsDone = function(func) {
-  var argumentsArray = Array.prototype.slice.call(arguments);
+onRequestsDone(func) {
+  var argumentsArray = [...arguments].slice();
   argumentsArray.shift(); // remove argument func, remainder: all other arguments
 
   if (this.areRequestsPending() || this.areEventsQueued()) {
@@ -1181,15 +1215,15 @@ scout.Session.prototype.onRequestsDone = function(func) {
   function onEventsProcessed() {
     func.apply(this, argumentsArray);
   }
-};
+}
 
 /**
  * Executes the given callback when all events of the current response are processed. Executes it immediately if no events are being processed.
  * @param func callback function
  * @param vararg arguments to pass to the callback function
  */
-scout.Session.prototype.onEventsProcessed = function(func) {
-  var argumentsArray = Array.prototype.slice.call(arguments);
+onEventsProcessed(func) {
+  var argumentsArray = [...arguments].slice();
   argumentsArray.shift(); // remove argument func, remainder: all other arguments
 
   if (this.processingEvents) {
@@ -1201,27 +1235,27 @@ scout.Session.prototype.onEventsProcessed = function(func) {
   function execFunc() {
     func.apply(this, argumentsArray);
   }
-};
+}
 
-scout.Session.prototype.areEventsQueued = function() {
+areEventsQueued() {
   return this.asyncEvents.length > 0;
-};
+}
 
-scout.Session.prototype.areBusyIndicatedEventsQueued = function() {
+areBusyIndicatedEventsQueued() {
   return this.asyncEvents.some(function(event) {
     return scout.nvl(event.showBusyIndicator, true);
   });
-};
+}
 
-scout.Session.prototype.areResponsesQueued = function() {
+areResponsesQueued() {
   return this.responseQueue.size() > 0;
-};
+}
 
-scout.Session.prototype.areRequestsPending = function() {
+areRequestsPending() {
   return this.requestsPendingCounter > 0;
-};
+}
 
-scout.Session.prototype.setRequestPending = function(pending) {
+setRequestPending(pending) {
   if (pending) {
     this.requestsPendingCounter++;
   } else {
@@ -1233,9 +1267,9 @@ scout.Session.prototype.setRequestPending = function(pending) {
   if (this.inspector) {
     this.$entryPoint.toggleAttr('data-request-pending', pending, 'true');
   }
-};
+}
 
-scout.Session.prototype.setBusy = function(busy) {
+setBusy(busy) {
   if (busy) {
     if (!this._busy) {
       this._renderBusy();
@@ -1247,9 +1281,9 @@ scout.Session.prototype.setBusy = function(busy) {
     }
     this._busy = false;
   }
-};
+}
 
-scout.Session.prototype._renderBusy = function() {
+_renderBusy() {
   if (this._busyIndicatorTimeoutId !== null && this._busyIndicatorTimeoutId !== undefined) {
     // Do not schedule it twice
     return;
@@ -1270,9 +1304,9 @@ scout.Session.prototype._renderBusy = function() {
     this._busyIndicator.on('cancel', this._onCancelProcessing.bind(this));
     this._busyIndicator.render(this.$entryPoint);
   }.bind(this), 500);
-};
+}
 
-scout.Session.prototype._removeBusy = function() {
+_removeBusy() {
   // Clear pending timer
   clearTimeout(this._busyIndicatorTimeoutId);
   this._busyIndicatorTimeoutId = null;
@@ -1282,9 +1316,9 @@ scout.Session.prototype._removeBusy = function() {
     this._busyIndicator.destroy();
     this._busyIndicator = null;
   }
-};
+}
 
-scout.Session.prototype._onCancelProcessing = function(event) {
+_onCancelProcessing(event) {
   var busyIndicator = this._busyIndicator;
   if (!busyIndicator) {
     return; // removed in the mean time
@@ -1297,21 +1331,21 @@ scout.Session.prototype._onCancelProcessing = function(event) {
   }.bind(this), 100);
 
   this._sendCancelRequest();
-};
+}
 
-scout.Session.prototype._sendCancelRequest = function() {
+_sendCancelRequest() {
   var request = this._newRequest({
     cancel: true,
     showBusyIndicator: false
   });
   this._sendRequest(request);
-};
+}
 
 /**
  * Sends a request containing the error message for logging purpose.
  * The request is sent immediately (does not await pending requests)
  */
-scout.Session.prototype.sendLogRequest = function(message) {
+sendLogRequest(message) {
   var request = this._newRequest({
     log: true,
     message: message
@@ -1325,9 +1359,9 @@ scout.Session.prototype.sendLogRequest = function(message) {
 
   // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
   $.ajax(this.defaultAjaxOptions(request));
-};
+}
 
-scout.Session.prototype._newRequest = function(requestData) {
+_newRequest(requestData) {
   var request = $.extend({
     uiSessionId: this.uiSessionId
   }, requestData);
@@ -1337,9 +1371,9 @@ scout.Session.prototype._newRequest = function(requestData) {
     request['#'] = this.requestSequenceNo++;
   }
   return request;
-};
+}
 
-scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
+_setApplicationLoading(applicationLoading) {
   if (applicationLoading) {
     this._applicationLoadingTimeoutId = setTimeout(function() {
       if (!this.desktop || !this.desktop.rendered) {
@@ -1351,20 +1385,20 @@ scout.Session.prototype._setApplicationLoading = function(applicationLoading) {
     this._applicationLoadingTimeoutId = null;
     this._removeApplicationLoading();
   }
-};
+}
 
-scout.Session.prototype._renderApplicationLoading = function() {
+_renderApplicationLoading() {
   var $loadingRoot = $('body').appendDiv('application-loading-root')
     .addClass('application-loading-root')
     .fadeIn();
   $loadingRoot.appendDiv('application-loading01').hide().fadeIn();
   $loadingRoot.appendDiv('application-loading02').hide().fadeIn();
-};
+}
 
-scout.Session.prototype._removeApplicationLoading = function() {
+_removeApplicationLoading() {
   var $loadingRoot = $('body').children('.application-loading-root');
   $loadingRoot.addClass('application-loading-root-fadeout');
-  if (scout.device.supportsCssAnimation()) {
+  if (Device.get().supportsCssAnimation()) {
     $loadingRoot.oneAnimationEnd(function() {
       $loadingRoot.remove();
     });
@@ -1372,9 +1406,9 @@ scout.Session.prototype._removeApplicationLoading = function() {
     // fallback for old browsers that do not support the animation-end event
     $loadingRoot.remove();
   }
-};
+}
 
-scout.Session.prototype._processEvents = function(events) {
+_processEvents(events) {
   var i = 0;
   while (i < events.length) {
     var event = events[i];
@@ -1412,9 +1446,9 @@ scout.Session.prototype._processEvents = function(events) {
     }, this).join(', ') + ']');
   }
   this.trigger('eventsProcessed');
-};
+}
 
-scout.Session.prototype.start = function() {
+start() {
   $.log.isInfoEnabled() && $.log.info('Session starting...');
 
   // After a short time, display a loading animation (will be removed again in _renderDesktop)
@@ -1422,9 +1456,9 @@ scout.Session.prototype.start = function() {
 
   // Send startup request
   return this._sendStartupRequest();
-};
+}
 
-scout.Session.prototype.onModelEvent = function(event) {
+onModelEvent(event) {
   if (event.type === 'localeChanged') {
     this._onLocaleChanged(event);
   } else if (event.type === 'logout') {
@@ -1436,57 +1470,57 @@ scout.Session.prototype.onModelEvent = function(event) {
   } else {
     $.log.warn('Model action "' + event.type + '" is not supported by UI session');
   }
-};
+}
 
-scout.Session.prototype.resetEventFilters = function() {
+resetEventFilters() {
   // NOP
-};
+}
 
-scout.Session.prototype._onLocaleChanged = function(event) {
-  var locale = new scout.Locale(event.locale);
-  var textMap = new scout.TextMap(event.textMap);
+_onLocaleChanged(event) {
+  var locale = new Locale(event.locale);
+  var textMap = new TextMap(event.textMap);
   this.switchLocale(locale, textMap);
-};
+}
 
 /**
- * @param {scout.Locale} the new locale
- * @param {scout.TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
+ * @param {Locale} the new locale
+ * @param {TextMap} [textMap] the new textMap. If not defined, the corresponding textMap for the new locale is used.
  */
-scout.Session.prototype.switchLocale = function(locale, textMap) {
-  scout.assertParameter('locale', locale, scout.Locale);
+switchLocale(locale, textMap) {
+  scout.assertParameter('locale', locale, Locale);
   this.locale = locale;
-  this.textMap = scout.texts.get(locale.languageTag);
+  this.textMap = texts.get(locale.languageTag);
   if (textMap) {
-    scout.objects.copyOwnProperties(textMap, this.textMap);
+    objects.copyOwnProperties(textMap, this.textMap);
   }
-  // TODO [7.0] bsh: inform components to reformat display text? also check Collator in scout.comparators.TEXT
+  // TODO [7.0] bsh: inform components to reformat display text? also check Collator in comparators.TEXT
 
   this.trigger('localeSwitch', {
     locale: this.locale
   });
-};
+}
 
-scout.Session.prototype._renderDesktop = function() {
+_renderDesktop() {
   this.desktop.render(this.$entryPoint);
   this.desktop.invalidateLayoutTree(false);
   this._setApplicationLoading(false);
-};
+}
 
-scout.Session.prototype._onLogout = function(event) {
+_onLogout(event) {
   this.logout(event.redirectUrl);
-};
+}
 
-scout.Session.prototype.logout = function(logoutUrl) {
+logout(logoutUrl) {
   this.loggedOut = true;
   // TODO [7.0] bsh: Check if there is a better solution (e.g. send a flag from server "action" = [ "redirect" | "closeWindow" ])
   if (this.forceNewClientSession) {
     this.desktop.$container.window(true).close();
   } else {
     // remember current url to not lose query parameters (such as debug; however, ignore deeplinks)
-    var url = new scout.URL();
+    var url = new URL();
     url.removeParameter('dl'); //deeplink
     url.removeParameter('i'); //deeplink info
-    scout.webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
+    webstorage.setItem(sessionStorage, 'scout:loginUrl', url.toString());
     // Clear everything and reload the page. We wrap that in setTimeout() to allow other events to be executed normally before.
     setTimeout(function() {
       scout.reloadPage({
@@ -1494,25 +1528,25 @@ scout.Session.prototype.logout = function(logoutUrl) {
       });
     }.bind(this));
   }
-};
+}
 
-scout.Session.prototype._onDisposeAdapter = function(event) {
+_onDisposeAdapter(event) {
   // Model adapter was disposed on server -> dispose it on the UI, too
   var adapter = this.getModelAdapter(event.adapter);
   if (adapter) { // adapter may be null if it was never sent to the UI, e.g. a form that was opened and closed in the same request
     adapter.destroy();
   }
-};
+}
 
-scout.Session.prototype._onReloadPage = function(event) {
+_onReloadPage(event) {
   // Don't clear the body, because other events might be processed before the reload and
   // it could cause errors when all DOM elements are already removed.
   scout.reloadPage({
     clearBody: false
   });
-};
+}
 
-scout.Session.prototype._onWindowBeforeUnload = function() {
+_onWindowBeforeUnload() {
   $.log.isInfoEnabled() && $.log.info('Session before unloading...');
   // TODO [7.0] bsh: Cancel pending requests
 
@@ -1524,9 +1558,9 @@ scout.Session.prototype._onWindowBeforeUnload = function() {
     // reset the flag after a short period of time.
     this.unloading = false;
   }.bind(this), 200);
-};
+}
 
-scout.Session.prototype._onWindowUnload = function() {
+_onWindowUnload() {
   $.log.isInfoEnabled() && $.log.info('Session unloading...');
   this.unloaded = true;
 
@@ -1541,9 +1575,9 @@ scout.Session.prototype._onWindowUnload = function() {
     this._sendUnloadRequest();
   }
   if (this.loggedOut && this.persistent) {
-    scout.webstorage.removeItem(localStorage, 'scout:clientSessionId');
+    webstorage.removeItem(localStorage, 'scout:clientSessionId');
   }
-};
+}
 
 /**
  * Returns the adapter-data sent with the JSON response from the adapter-data cache. Note that this operation
@@ -1551,62 +1585,63 @@ scout.Session.prototype._onWindowUnload = function() {
  * you've requested an element from this cache an adapter for that ID is created and stored in the adapter
  * registry which too exists on this session object.
  */
-scout.Session.prototype._getAdapterData = function(id) {
+_getAdapterData(id) {
   var adapterData = this._adapterDataCache[id];
   var deleteAdapterData = !this.adapterExportEnabled;
   if (deleteAdapterData) {
     delete this._adapterDataCache[id];
   }
   return adapterData;
-};
+}
 
-scout.Session.prototype.getAdapterData = function(id) {
+getAdapterData(id) {
   return this._adapterDataCache[id];
-};
+}
 
-scout.Session.prototype.text = function(textKey) {
-  return scout.TextMap.prototype.get.apply(this.textMap, arguments);
-};
+text(textKey) {
+  return this.textMap.get(...arguments);
+}
 
-scout.Session.prototype.optText = function(textKey, defaultValue) {
-  return scout.TextMap.prototype.optGet.apply(this.textMap, arguments);
-};
+optText(textKey, defaultValue) {
+  return this.textMap.optGet(...arguments);
+}
 
-scout.Session.prototype.textExists = function(textKey) {
+textExists(textKey) {
   return this.textMap.exists(textKey);
-};
+}
 
 //--- Event handling methods ---
-scout.Session.prototype._createEventSupport = function() {
-  return new scout.EventSupport();
-};
+_createEventSupport() {
+  return new EventSupport();
+}
 
-scout.Session.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
-};
+}
 
-scout.Session.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.Session.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.Session.prototype.off = function(type, func) {
+off(type, func) {
   this.events.off(type, func);
-};
+}
 
-scout.Session.prototype.addListener = function(listener) {
+addListener(listener) {
   this.events.addListener(listener);
-};
+}
 
-scout.Session.prototype.removeListener = function(listener) {
+removeListener(listener) {
   this.events.removeListener(listener);
-};
+}
 
-scout.Session.prototype.when = function(type) {
+when(type) {
   return this.events.when(type);
-};
+}
+}

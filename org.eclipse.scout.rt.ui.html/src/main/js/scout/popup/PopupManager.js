@@ -8,39 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupManager = function() {
-  scout.PopupManager.parent.call(this);
+import {Widget} from '../index';
+import {arrays} from '../index';
+
+export default class PopupManager extends Widget {
+
+constructor() {
+  super();
   this.popups = [];
   this._addWidgetProperties(['popups']);
   this._addPreserveOnPropertyChangeProperties(['popups']);
-};
-scout.inherits(scout.PopupManager, scout.Widget);
+}
 
-scout.PopupManager.prototype._init = function(model) {
-  scout.PopupManager.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.session.layoutValidator.schedulePostValidateFunction(function() {
     this._openPopups(this.popups);
   }.bind(this));
-};
+}
 
-scout.PopupManager.prototype.setPopups = function(popups) {
+setPopups(popups) {
   this.setProperty('popups', popups);
-};
+}
 
-scout.PopupManager.prototype._setPopups = function(popups) {
-  this._openPopups(scout.arrays.diff(popups, this.popups));
-  this._destroyPopups(scout.arrays.diff(this.popups, popups));
+_setPopups(popups) {
+  this._openPopups(arrays.diff(popups, this.popups));
+  this._destroyPopups(arrays.diff(this.popups, popups));
   this._setProperty('popups', popups);
-};
+}
 
-scout.PopupManager.prototype._openPopups = function(popups) {
+_openPopups(popups) {
   popups.forEach(function(popup) {
     popup.open(popup.session.$entryPoint);
   });
-};
+}
 
-scout.PopupManager.prototype._destroyPopups = function(popups) {
+_destroyPopups(popups) {
   popups.forEach(function(popup) {
     popup.destroy();
   });
-};
+}
+}

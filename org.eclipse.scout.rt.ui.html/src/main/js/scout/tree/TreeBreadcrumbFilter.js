@@ -8,13 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeBreadcrumbFilter = function(tree) {
-  this.tree = tree;
-};
+export default class TreeBreadcrumbFilter {
 
-scout.TreeBreadcrumbFilter.prototype.accept = function(node) {
+constructor(tree) {
+  this.tree = tree;
+}
+
+accept(node) {
   if (this.tree.selectedNodes.length === 0) {
     return node.parentNode === undefined;
   }
   return this.tree.isNodeInBreadcrumbVisible(node);
-};
+}
+}

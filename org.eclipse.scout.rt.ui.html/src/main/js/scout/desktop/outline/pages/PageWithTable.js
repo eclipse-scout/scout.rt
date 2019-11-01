@@ -8,23 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Status} from '../../../index';
+import {scout} from '../../../index';
+import {Page} from '../../../index';
+import {arrays} from '../../../index';
+import * as $ from 'jquery';
+
 /**
  * @class
- * @extends scout.Page
+ * @extends Page
  */
-scout.PageWithTable = function() {
-  scout.PageWithTable.parent.call(this);
+export default class PageWithTable extends Page {
 
-  this.nodeType = scout.Page.NodeType.TABLE;
+constructor() {
+  super();
+
+  this.nodeType = Page.NodeType.TABLE;
   this.alwaysCreateChildPage = false;
-};
-scout.inherits(scout.PageWithTable, scout.Page);
+}
+
 
 /**
- * @override scout.Page
+ * @override Page
  */
-scout.PageWithTable.prototype._initTable = function(table) {
-  scout.PageWithTable.parent.prototype._initTable.call(this, table);
+_initTable(table) {
+  super._initTable( table);
   table.on('rowsDeleted allRowsDeleted', this._onTableRowsDeleted.bind(this));
   table.on('rowsInserted', this._onTableRowsInserted.bind(this));
   table.on('rowsUpdated', this._onTableRowsUpdated.bind(this));
@@ -32,13 +40,13 @@ scout.PageWithTable.prototype._initTable = function(table) {
   table.on('rowOrderChanged', this._onTableRowOrderChanged.bind(this));
   table.on('reload', this.loadTableData.bind(this));
   table.hasReloadHandler = true;
-};
+}
 
-scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
+_onTableRowsDeleted(event) {
   if (this.leaf) { // when page is a leaf we do nothing at all
     return;
   }
-  var rows = scout.arrays.ensure(event.rows),
+  var rows = arrays.ensure(event.rows),
     childPages = rows.map(function(row) {
       var childPage = row.page;
       childPage.unlinkWithRow(row);
@@ -46,41 +54,41 @@ scout.PageWithTable.prototype._onTableRowsDeleted = function(event) {
     }, this);
 
   this.getOutline().mediator.onTableRowsDeleted(rows, childPages, this);
-};
+}
 
 /**
  * We must set childNodeIndex on each created childPage because it is required to
  * determine the order of nodes in the tree.
  */
-scout.PageWithTable.prototype._onTableRowsInserted = function(event) {
+_onTableRowsInserted(event) {
   if (this.leaf) { // when page is a leaf we do nothing at all
     return;
   }
 
-  var rows = scout.arrays.ensure(event.rows),
+  var rows = arrays.ensure(event.rows),
     childPages = rows.map(function(row) {
       return this._createChildPageInternal(row);
     }, this);
 
   this.getOutline().mediator.onTableRowsInserted(rows, childPages, this);
-};
+}
 
-scout.PageWithTable.prototype._onTableRowsUpdated = function(event) {
+_onTableRowsUpdated(event) {
   this.getOutline().mediator.onTableRowsUpdated(event, this);
-};
+}
 
-scout.PageWithTable.prototype._onTableRowAction = function(event) {
+_onTableRowAction(event) {
   this.getOutline().mediator.onTableRowAction(event, this);
-};
+}
 
-scout.PageWithTable.prototype._onTableRowOrderChanged = function(event) {
+_onTableRowOrderChanged(event) {
   if (event.animating) { // do nothing while row order animation is in progress
     return;
   }
   this.getOutline().mediator.onTableRowOrderChanged(event, this);
-};
+}
 
-scout.PageWithTable.prototype._createChildPageInternal = function(row) {
+_createChildPageInternal(row) {
   var childPage = this.createChildPage(row);
   if (childPage === null && this.alwaysCreateChildPage) {
     childPage = this.createDefaultChildPage(row);
@@ -88,56 +96,56 @@ scout.PageWithTable.prototype._createChildPageInternal = function(row) {
   childPage.linkWithRow(row);
   childPage = childPage.updatePageFromTableRow(row);
   return childPage;
-};
+}
 
 /**
  * Override this method to return a specific Page instance for the given table-row.
  * The default impl. returns null, which means a AutoLeaftPageWithNodes instance will be created for the table-row.
  */
-scout.PageWithTable.prototype.createChildPage = function(row) {
+createChildPage(row) {
   return null;
-};
+}
 
-scout.PageWithTable.prototype.createDefaultChildPage = function(row) {
+createDefaultChildPage(row) {
   return scout.create('AutoLeafPageWithNodes', {
     parent: this.getOutline(),
     row: row
   });
-};
+}
 
 /**
  * @override TreeNode.js
  */
-scout.PageWithTable.prototype.loadChildren = function() {
+loadChildren() {
   // It's allowed to have no table - but we don't have to load data in that case
   if (!this.detailTable) {
     return $.resolvedDeferred();
   }
   return this.loadTableData();
-};
+}
 
-scout.PageWithTable.prototype._createSearchFilter = function() {
-  var firstFormTableControl = scout.arrays.find(this.detailTable.tableControls, function(tableControl) {
+_createSearchFilter() {
+  var firstFormTableControl = arrays.find(this.detailTable.tableControls, function(tableControl) {
     return tableControl.form;
   });
   if (firstFormTableControl) {
     return firstFormTableControl.form.exportData();
   }
   return null;
-};
+}
 
 /**
  * see Java: AbstractPageWithTable#loadChildren that's where the table is reloaded and the tree is rebuilt, called by AbstractTree#P_UIFacade
  * @returns {$.Deferred}
  */
-scout.PageWithTable.prototype.loadTableData = function() {
+loadTableData() {
   this.detailTable.deleteAllRows();
   this.detailTable.setLoading(true);
   return this._loadTableData(this._createSearchFilter())
     .then(this._onLoadTableDataDone.bind(this))
     .catch(this._onLoadTableDataFail.bind(this))
     .then(this._onLoadTableDataAlways.bind(this));
-};
+}
 
 /**
  * Override this method to load table data (rows to be added to table).
@@ -157,9 +165,9 @@ scout.PageWithTable.prototype.loadTableData = function() {
  *
  * @return {$.Deferred}
  */
-scout.PageWithTable.prototype._loadTableData = function(searchFilter) {
+_loadTableData(searchFilter) {
   return $.resolvedDeferred();
-};
+}
 
 /**
  * This method is called when table data load is successful. It should transform the table data
@@ -167,24 +175,24 @@ scout.PageWithTable.prototype._loadTableData = function(searchFilter) {
  *
  * @param tableData data loaded by <code>_loadTableData</code>
  */
-scout.PageWithTable.prototype._onLoadTableDataDone = function(tableData) {
+_onLoadTableDataDone(tableData) {
   var rows = this._transformTableDataToTableRows(tableData);
   if (rows && rows.length > 0) {
     this.detailTable.insertRows(rows);
   }
-};
+}
 
-scout.PageWithTable.prototype._onLoadTableDataFail = function(error) {
-  this.detailTable.setTableStatus(scout.Status.error({
+_onLoadTableDataFail(error) {
+  this.detailTable.setTableStatus(Status.error({
     message: this.session.text('ErrorWhileLoadingData')
   }));
   $.log.error('Failed to load tableData. error=', error);
-};
+}
 
-scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
+_onLoadTableDataAlways() {
   this.childrenLoaded = true;
   this.detailTable.setLoading(false);
-};
+}
 
 /**
  * This method converts the loaded table data, which can be any object, into table rows.
@@ -193,6 +201,7 @@ scout.PageWithTable.prototype._onLoadTableDataAlways = function() {
  * @param tableData
  * @returns
  */
-scout.PageWithTable.prototype._transformTableDataToTableRows = function(tableData) {
+_transformTableDataToTableRows(tableData) {
   return tableData;
-};
+}
+}

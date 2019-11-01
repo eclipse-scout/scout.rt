@@ -8,16 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupLayout = function(popup) {
-  scout.PopupLayout.parent.call(this);
+import {graphics} from '../index';
+import {Rectangle} from '../index';
+import {Popup} from '../index';
+import {AbstractLayout} from '../index';
+import {Insets} from '../index';
+import {scout} from '../index';
+import {Dimension} from '../index';
+
+export default class PopupLayout extends AbstractLayout {
+
+constructor(popup) {
+  super();
   this.popup = popup;
   this.doubleCalcPrefSize = true; // enables popups with a height which depends on the width (= popups with wrapping content)
   this.autoPosition = true;
   this.autoSize = true;
-};
-scout.inherits(scout.PopupLayout, scout.AbstractLayout);
+}
 
-scout.PopupLayout.prototype.layout = function($container) {
+
+layout($container) {
   if (this.popup.isOpeningAnimationRunning()) {
     this.popup.$container.oneAnimationEnd(this.layout.bind(this, $container));
     return;
@@ -33,7 +43,7 @@ scout.PopupLayout.prototype.layout = function($container) {
 
   var htmlComp = this.popup.htmlComp;
   // Read current bounds before calling pref size, because pref size may change position (_calcMaxSize)
-  var currentBounds = scout.graphics.bounds(htmlComp.$comp);
+  var currentBounds = graphics.bounds(htmlComp.$comp);
   var prefSize = this.preferredLayoutSize($container, {
     exact: true,
     onlyWidth: this.doubleCalcPrefSize
@@ -53,15 +63,15 @@ scout.PopupLayout.prototype.layout = function($container) {
   if (htmlComp.layouted && this.popup.animateResize) {
     this._resizeAnimated(currentBounds, prefSize);
   }
-};
+}
 
-scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) {
+_resizeAnimated(currentBounds, prefSize) {
   this._position();
   var htmlComp = this.popup.htmlComp;
   var prefPosition = htmlComp.$comp.position();
 
   // Preferred size are exact, current bounds are rounded -> round preferred size up to make compare work
-  var prefBounds = new scout.Rectangle(prefPosition.left, prefPosition.top, Math.ceil(prefSize.width), Math.ceil(prefSize.height));
+  var prefBounds = new Rectangle(prefPosition.left, prefPosition.top, Math.ceil(prefSize.width), Math.ceil(prefSize.height));
   if (currentBounds.equals(prefBounds)) {
     // Bounds did not change -> do nothing
     return;
@@ -86,19 +96,19 @@ scout.PopupLayout.prototype._resizeAnimated = function(currentBounds, prefSize) 
         this._position();
       }.bind(this)
     });
-};
+}
 
-scout.PopupLayout.prototype._position = function(switchIfNecessary) {
+_position(switchIfNecessary) {
   if (this.autoPosition) {
     this.popup.position(switchIfNecessary);
   }
-};
+}
 
-scout.PopupLayout.prototype._setSize = function(prefSize) {
-  scout.graphics.setSize(this.popup.htmlComp.$comp, prefSize);
-};
+_setSize(prefSize) {
+  graphics.setSize(this.popup.htmlComp.$comp, prefSize);
+}
 
-scout.PopupLayout.prototype.adjustSize = function(prefSize) {
+adjustSize(prefSize) {
   // Consider CSS min/max rules
   this.popup.htmlComp._adjustPrefSizeWithMinMaxSize(prefSize);
 
@@ -107,10 +117,10 @@ scout.PopupLayout.prototype.adjustSize = function(prefSize) {
     return this._adjustSizeWithAnchor(prefSize);
   }
   return this._adjustSize(prefSize);
-};
+}
 
-scout.PopupLayout.prototype._adjustSize = function(prefSize) {
-  var popupSize = new scout.Dimension(),
+_adjustSize(prefSize) {
+  var popupSize = new Dimension(),
     maxSize = this._calcMaxSize();
 
   // Ensure the popup is not larger than max size
@@ -118,14 +128,14 @@ scout.PopupLayout.prototype._adjustSize = function(prefSize) {
   popupSize.height = Math.min(maxSize.height, prefSize.height);
 
   return popupSize;
-};
+}
 
 /**
  * Considers window boundaries.
  *
- * @returns {scout.Dimension}
+ * @returns {Dimension}
  */
-scout.PopupLayout.prototype._calcMaxSize = function() {
+_calcMaxSize() {
   // Position the popup at the desired location before doing any calculations to consider the preferred bounds
   this._position(false);
 
@@ -139,14 +149,14 @@ scout.PopupLayout.prototype._calcMaxSize = function() {
   maxWidth = (windowSize.width - popupMargins.horizontal() - windowPaddingX);
   maxHeight = (windowSize.height - popupMargins.vertical() - windowPaddingY);
 
-  return new scout.Dimension(maxWidth, maxHeight);
-};
+  return new Dimension(maxWidth, maxHeight);
+}
 
-scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
-  var popupSize = new scout.Dimension(),
+_adjustSizeWithAnchor(prefSize) {
+  var popupSize = new Dimension(),
     maxSize = this._calcMaxSizeAroundAnchor(),
     windowSize = this._calcMaxSize(),
-    Alignment = scout.Popup.Alignment,
+    Alignment = Popup.Alignment,
     horizontalAlignment = this.popup.horizontalAlignment,
     verticalAlignment = this.popup.verticalAlignment;
 
@@ -209,14 +219,14 @@ scout.PopupLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
   }
 
   return popupSize;
-};
+}
 
 /**
  * Considers window boundaries.
  *
- * @returns {scout.Insets}
+ * @returns {Insets}
  */
-scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
+_calcMaxSizeAroundAnchor() {
   // Position the popup at the desired location before doing any calculations because positioning adds CSS classes which might change margins
   this._position(false);
 
@@ -229,7 +239,7 @@ scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
     windowSize = this.popup.getWindowSize(),
     horizontalAlignment = this.popup.horizontalAlignment,
     verticalAlignment = this.popup.verticalAlignment,
-    Alignment = scout.Popup.Alignment;
+    Alignment = Popup.Alignment;
 
   if (scout.isOneOf(horizontalAlignment, Alignment.LEFTEDGE, Alignment.RIGHTEDGE)) {
     maxWidthRight = windowSize.width - anchorBounds.x - popupMargins.horizontal() - windowPaddingX;
@@ -247,5 +257,6 @@ scout.PopupLayout.prototype._calcMaxSizeAroundAnchor = function() {
     maxHeightUp = anchorBounds.y - popupMargins.vertical() - windowPaddingY;
   }
 
-  return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
-};
+  return new Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
+}
+}

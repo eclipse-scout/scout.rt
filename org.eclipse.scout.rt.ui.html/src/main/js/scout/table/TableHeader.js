@@ -8,8 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeader = function() {
-  scout.TableHeader.parent.call(this);
+import {Device} from '../index';
+import {MenuBar} from '../index';
+import {inspector} from '../index';
+import {GroupBoxMenuItemsOrder} from '../index';
+import * as $ from 'jquery';
+import {Column} from '../index';
+import {scout} from '../index';
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {Table} from '../index';
+import {MenuDestinations} from '../index';
+import {ColumnUserFilter} from '../index';
+import {tooltips} from '../index';
+import {strings} from '../index';
+import {Widget} from '../index';
+import {styles} from '../index';
+import {arrays} from '../index';
+
+export default class TableHeader extends Widget {
+
+constructor() {
+  super();
 
   this.dragging = false;
   this.headerMenusEnabled = true;
@@ -19,23 +39,23 @@ scout.TableHeader = function() {
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
   this._renderedColumns = [];
-};
-scout.inherits(scout.TableHeader, scout.Widget);
+}
 
-scout.TableHeader.prototype._init = function(options) {
-  scout.TableHeader.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
     tabbable: false,
-    position: scout.MenuBar.Position.BOTTOM,
-    menuOrder: new scout.GroupBoxMenuItemsOrder()
+    position: MenuBar.Position.BOTTOM,
+    menuOrder: new GroupBoxMenuItemsOrder()
   });
   this.menuBar.on('propertyChange', this._onMenuBarPropertyChange.bind(this));
   this.updateMenuBar();
-};
+}
 
-scout.TableHeader.prototype._render = function() {
+_render() {
   this.$container = this.table.$data.beforeDiv('table-header');
 
   // Filler is necessary to make sure the header is always as large as the table data, otherwise horizontal scrolling does not work correctly
@@ -60,9 +80,9 @@ scout.TableHeader.prototype._render = function() {
   this.table.on('filterRemoved', this._tableAddFilterRemovedHandler);
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
-};
+}
 
-scout.TableHeader.prototype._remove = function() {
+_remove() {
   this.table.$data.off('scroll', this._tableDataScrollHandler);
   this.table.off('filterAdded', this._tableAddFilterRemovedHandler);
   this.table.off('filterRemoved', this._tableAddFilterRemovedHandler);
@@ -71,15 +91,15 @@ scout.TableHeader.prototype._remove = function() {
 
   this._removeColumns();
 
-  scout.TableHeader.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.TableHeader.prototype.rerenderColumns = function() {
+rerenderColumns() {
   this._removeColumns();
   this._renderColumns();
-};
+}
 
-scout.TableHeader.prototype._renderColumns = function() {
+_renderColumns() {
   var visibleColumns = this._visibleColumns();
   visibleColumns.forEach(this._renderColumn, this);
   if (visibleColumns.length === 0) {
@@ -87,9 +107,9 @@ scout.TableHeader.prototype._renderColumns = function() {
     this.$filler.css('visibility', 'visible').html('&nbsp;').addClass('empty');
   }
   this._reconcileScrollPos();
-};
+}
 
-scout.TableHeader.prototype._renderColumn = function(column, index) {
+_renderColumn(column, index) {
   var columnWidth = column.width,
     marginLeft = '',
     marginRight = '',
@@ -118,7 +138,7 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
   }
 
   if (this.session.inspector) {
-    scout.inspector.applyInfo(column, $header);
+    inspector.applyInfo(column, $header);
   }
 
   if (isFirstColumn) {
@@ -148,13 +168,13 @@ scout.TableHeader.prototype._renderColumn = function(column, index) {
     column.$separator = $separator;
   }
   this._renderedColumns.push(column);
-};
+}
 
-scout.TableHeader.prototype._removeColumns = function() {
+_removeColumns() {
   this._renderedColumns.slice().forEach(this._removeColumn, this);
-};
+}
 
-scout.TableHeader.prototype._removeColumn = function(column) {
+_removeColumn(column) {
   if (column.$header) {
     column.$header.remove();
     column.$header = null;
@@ -163,10 +183,10 @@ scout.TableHeader.prototype._removeColumn = function(column) {
     column.$separator.remove();
     column.$separator = null;
   }
-  scout.arrays.remove(this._renderedColumns, column);
-};
+  arrays.remove(this._renderedColumns, column);
+}
 
-scout.TableHeader.prototype.resizeHeaderItem = function(column) {
+resizeHeaderItem(column) {
   if (!column) {
     // May be undefined if there are no columns
     return;
@@ -190,7 +210,7 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
     marginLeft = this.table.rowBorderLeftWidth;
   } else if (isLastColumn) {
     marginRight = this.table.rowBorderRightWidth;
-    remainingHeaderSpace = this.$container.width() - this.table.rowWidth + scout.graphics.insets(this.table.$data).right;
+    remainingHeaderSpace = this.$container.width() - this.table.rowWidth + graphics.insets(this.table.$data).right;
 
     if (remainingHeaderSpace < menuBarWidth) {
       adjustment = menuBarWidth;
@@ -216,9 +236,9 @@ scout.TableHeader.prototype.resizeHeaderItem = function(column) {
   if (this.tableHeaderMenu && this.tableHeaderMenu.rendered && this.tableHeaderMenu.column === column) {
     this.tableHeaderMenu.onColumnResized();
   }
-};
+}
 
-scout.TableHeader.prototype._reconcileScrollPos = function() {
+_reconcileScrollPos() {
   // When scrolling horizontally scroll header as well
   var
     scrollLeft = this.table.get$Scrollable().scrollLeft(),
@@ -227,9 +247,9 @@ scout.TableHeader.prototype._reconcileScrollPos = function() {
   this.resizeHeaderItem(lastColumn);
   this.$container.scrollLeft(scrollLeft);
   this.$menuBarContainer.cssRight(-1 * scrollLeft);
-};
+}
 
-scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
+_arrangeHeaderItems($headers) {
   var that = this;
   $headers.each(function() {
     // move to old position and then animate
@@ -243,7 +263,7 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
             return;
           }
           // make sure selected header item is visible
-          scout.scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
+          scrollbars.scrollHorizontalTo(that.table.$data, $headerItem);
 
           // move menu
           if (that.tableHeaderMenu && that.tableHeaderMenu.rendered) {
@@ -252,64 +272,64 @@ scout.TableHeader.prototype._arrangeHeaderItems = function($headers) {
         }
       });
   });
-};
+}
 
-scout.TableHeader.prototype._installHeaderItemTooltip = function(column) {
-  scout.tooltips.install(column.$header, {
+_installHeaderItemTooltip(column) {
+  tooltips.install(column.$header, {
     parent: this,
     text: this._headerItemTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible(),
+    nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible(),
     htmlEnabled: this._headerItemTooltipHtmlEnabled.bind(this)
   });
-};
+}
 
-scout.TableHeader.prototype._installHeaderItemTooltips = function() {
+_installHeaderItemTooltips() {
   this._visibleColumns().forEach(this._installHeaderItemTooltip, this);
-};
+}
 
-scout.TableHeader.prototype._uninstallHeaderItemTooltip = function(column) {
-  scout.tooltips.uninstall(column.$header);
-};
+_uninstallHeaderItemTooltip(column) {
+  tooltips.uninstall(column.$header);
+}
 
-scout.TableHeader.prototype._uninstallHeaderItemTooltips = function() {
+_uninstallHeaderItemTooltips() {
   this._visibleColumns().forEach(this._uninstallHeaderItemTooltip, this);
-};
+}
 
-scout.TableHeader.prototype._headerItemTooltipText = function($col) {
+_headerItemTooltipText($col) {
   var column = $col.data('column');
-  if (column && scout.strings.hasText(column.headerTooltipText)) {
+  if (column && strings.hasText(column.headerTooltipText)) {
     return column.headerTooltipText;
   } else if ($col.isContentTruncated() || ($col.width() + $col.position().left) > $col.parent().width()) {
     $col = $col.clone();
     $col.children('.table-header-item-state').remove();
-    var text = scout.strings.plainText($col.html(), {
+    var text = strings.plainText($col.html(), {
       trim: true
     });
-    if (scout.strings.hasText(text)) {
+    if (strings.hasText(text)) {
       return text;
     }
   }
   return null;
-};
+}
 
-scout.TableHeader.prototype._headerItemTooltipHtmlEnabled = function($col) {
+_headerItemTooltipHtmlEnabled($col) {
   var column = $col.data('column');
   return column.headerTooltipHtmlEnabled;
-};
+}
 
-scout.TableHeader.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {
+setHeaderMenusEnabled(headerMenusEnabled) {
   this.setProperty('headerMenusEnabled', headerMenusEnabled);
-};
+}
 
-scout.TableHeader.prototype._renderHeaderMenusEnabled = function() {
+_renderHeaderMenusEnabled() {
   this._visibleColumns().forEach(function(column) {
     this._decorateHeader(column);
   }, this);
-};
+}
 
-scout.TableHeader.prototype.openHeaderMenu = function(column) {
+openHeaderMenu(column) {
   if (this.tableHeaderMenu) {
     // Make sure existing header menu is closed first
     this.closeHeaderMenu();
@@ -334,32 +354,32 @@ scout.TableHeader.prototype.openHeaderMenu = function(column) {
       menu: this.tableHeaderMenu
     });
   }.bind(this));
-};
+}
 
-scout.TableHeader.prototype.closeHeaderMenu = function() {
+closeHeaderMenu() {
   this.tableHeaderMenu.destroy();
   this.tableHeaderMenu = null;
-};
+}
 
-scout.TableHeader.prototype.onColumnActionsChanged = function(event) {
+onColumnActionsChanged(event) {
   if (this.tableHeaderMenu) {
     this.tableHeaderMenu.onColumnActionsChanged(event);
   }
-};
+}
 
-scout.TableHeader.prototype.findHeaderItems = function() {
+findHeaderItems() {
   return this.$container.find('.table-header-item:not(.filler)');
-};
+}
 
 /**
  * Updates the column headers visualization of the text, sorting and styling state
  * @param [oldColumnState] only necessary when the css class was updated
  */
-scout.TableHeader.prototype.updateHeader = function(column, oldColumnState) {
+updateHeader(column, oldColumnState) {
   this._decorateHeader(column, oldColumnState);
-};
+}
 
-scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
+_decorateHeader(column, oldColumnState) {
   this._renderColumnCssClass(column, oldColumnState);
   this._renderColumnText(column);
   this._renderColumnIconId(column);
@@ -367,40 +387,40 @@ scout.TableHeader.prototype._decorateHeader = function(column, oldColumnState) {
   this._renderColumnLegacyStyle(column);
   this._renderColumnHeaderMenuEnabled(column);
   this._renderColumnHorizontalAlignment(column);
-};
+}
 
-scout.TableHeader.prototype._renderColumnCssClass = function(column, oldColumnState) {
+_renderColumnCssClass(column, oldColumnState) {
   var $header = column.$header;
   if (oldColumnState) {
     $header.removeClass(oldColumnState.headerCssClass);
   }
   $header.addClass(column.headerCssClass);
-};
+}
 
-scout.TableHeader.prototype._renderColumnText = function(column) {
+_renderColumnText(column) {
   var text = column.text,
     $header = column.$header,
     $headerText = $header.children('.table-header-item-text');
 
   if (!column.headerHtmlEnabled) {
-    text = scout.strings.nl2br(text);
+    text = strings.nl2br(text);
   }
   // Make sure empty header is as height as the others to make it properly clickable
   $headerText.htmlOrNbsp(text, 'empty');
   this._updateColumnIconAndTextStyle(column);
-};
+}
 
-scout.TableHeader.prototype._renderColumnIconId = function(column) {
+_renderColumnIconId(column) {
   column.$header.icon(column.headerIconId);
   this._updateColumnIconAndTextStyle(column);
-};
+}
 
-scout.TableHeader.prototype._renderColumnHorizontalAlignment = function(column) {
+_renderColumnHorizontalAlignment(column) {
   column.$header.removeClass('halign-left halign-center halign-right');
-  column.$header.addClass('halign-' + scout.Table.parseHorizontalAlignment(column.horizontalAlignment));
-};
+  column.$header.addClass('halign-' + Table.parseHorizontalAlignment(column.horizontalAlignment));
+}
 
-scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {
+_updateColumnIconAndTextStyle(column) {
   var $icon = column.$header.data('$icon'),
     $text = column.$header.children('.table-header-item-text');
 
@@ -411,17 +431,17 @@ scout.TableHeader.prototype._updateColumnIconAndTextStyle = function(column) {
   $text.setVisible(!($icon && $text.html() === '&nbsp;'));
   // Mark icon-only columns to prevent ellipsis (like IconColumn.js does for table cells)
   column.$header.toggleClass('table-header-item-icon-only', !!(column.headerIconId && !column.text));
-};
+}
 
-scout.TableHeader.prototype._renderColumnLegacyStyle = function(column) {
-  scout.styles.legacyStyle(column, column.$header, 'header');
-};
+_renderColumnLegacyStyle(column) {
+  styles.legacyStyle(column, column.$header, 'header');
+}
 
-scout.TableHeader.prototype._renderColumnHeaderMenuEnabled = function(column) {
+_renderColumnHeaderMenuEnabled(column) {
   column.$header.toggleClass('disabled', !this._isHeaderMenuEnabled(column) || !this.enabledComputed);
-};
+}
 
-scout.TableHeader.prototype._renderColumnState = function(column) {
+_renderColumnState(column) {
   var sortDirection, $state,
     $header = column.$header,
     filtered = this.table.getFilter(column.id);
@@ -459,17 +479,17 @@ scout.TableHeader.prototype._renderColumnState = function(column) {
   $state.appendDiv('right');
 
   this._adjustColumnMinWidth(column);
-};
+}
 
 /**
  * Makes sure state is fully visible by adjusting width (happens if column.minWidth is < DEFAULT_MIN_WIDTH)
  */
-scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
+_adjustColumnMinWidth(column) {
   var filtered = this.table.getFilter(column.id);
   if (column.sortActive || column.grouped || filtered) {
-    if (column.minWidth < scout.Column.DEFAULT_MIN_WIDTH) {
+    if (column.minWidth < Column.DEFAULT_MIN_WIDTH) {
       column.prefMinWidth = column.minWidth;
-      column.minWidth = scout.Column.DEFAULT_MIN_WIDTH;
+      column.minWidth = Column.DEFAULT_MIN_WIDTH;
     }
     if (column.width < column.minWidth) {
       this.table.resizeColumn(column, column.minWidth);
@@ -480,32 +500,32 @@ scout.TableHeader.prototype._adjustColumnMinWidth = function(column) {
       column.minWidth = column.prefMinWidth;
       column.prefMinWidth = null;
       // Resize to old min width, assuming user has not manually changed the size because column is still as width as default_min_width
-      if (column.width === scout.Column.DEFAULT_MIN_WIDTH) {
+      if (column.width === Column.DEFAULT_MIN_WIDTH) {
         this.table.resizeColumn(column, column.minWidth);
       }
     }
   }
-};
+}
 
-scout.TableHeader.prototype.updateMenuBar = function() {
-  var menuItems = this.table._filterMenus(this.table.menus, scout.MenuDestinations.HEADER);
+updateMenuBar() {
+  var menuItems = this.table._filterMenus(this.table.menus, MenuDestinations.HEADER);
   this.menuBar.setMenuItems(menuItems);
-};
+}
 
-scout.TableHeader.prototype._onTableColumnResized = function(event) {
+_onTableColumnResized(event) {
   var column = event.column,
     lastColumn = this._lastVisibleColumn();
   this.resizeHeaderItem(column);
   if (lastColumn !== column) {
     this.resizeHeaderItem(lastColumn);
   }
-};
+}
 
-scout.TableHeader.prototype.onSortingChanged = function() {
+onSortingChanged() {
   this._visibleColumns().forEach(this._renderColumnState, this);
-};
+}
 
-scout.TableHeader.prototype._onTableColumnMoved = function(event) {
+_onTableColumnMoved(event) {
   var
     column = event.column,
     oldPos = event.oldPos,
@@ -556,17 +576,17 @@ scout.TableHeader.prototype._onTableColumnMoved = function(event) {
   } else {
     this._arrangeHeaderItems($headers);
   }
-};
+}
 
-scout.TableHeader.prototype._visibleColumns = function() {
+_visibleColumns() {
   return this.table.visibleColumns();
-};
+}
 
-scout.TableHeader.prototype._lastVisibleColumn = function() {
-  return scout.arrays.last(this._visibleColumns());
-};
+_lastVisibleColumn() {
+  return arrays.last(this._visibleColumns());
+}
 
-scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
+onOrderChanged(oldColumnOrder) {
   var $header, $headerResize;
   var $headers = this.findHeaderItems();
 
@@ -588,16 +608,16 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   this.$container.append(this.$filler);
 
   this._arrangeHeaderItems($headers);
-};
+}
 
 /**
  * Header menus are enabled when property is enabled on the header itself and on the column too.
  */
-scout.TableHeader.prototype._isHeaderMenuEnabled = function(column) {
+_isHeaderMenuEnabled(column) {
   return !!(column.headerMenuEnabled && this.headerMenusEnabled);
-};
+}
 
-scout.TableHeader.prototype._onHeaderItemClick = function(event) {
+_onHeaderItemClick(event) {
   var $headerItem = $(event.currentTarget),
     column = $headerItem.data('column');
 
@@ -614,9 +634,9 @@ scout.TableHeader.prototype._onHeaderItemClick = function(event) {
   }
 
   return false;
-};
+}
 
-scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
+_onHeaderItemMouseDown(event) {
   if (event.button > 0) {
     return; // ignore buttons other than the main (left) mouse button
   }
@@ -740,9 +760,9 @@ scout.TableHeader.prototype._onHeaderItemMouseDown = function(event) {
     // Reinstall tooltips
     that.rendered && that._installHeaderItemTooltips();
   }
-};
+}
 
-scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
+_onSeparatorDblclick(event) {
   if (event.button > 0) {
     return; // ignore buttons other than the main (left) mouse button
   }
@@ -758,9 +778,9 @@ scout.TableHeader.prototype._onSeparatorDblclick = function(event) {
       column = $header.data('column');
     this.table.resizeToFit(column);
   }
-};
+}
 
-scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
+_onSeparatorMouseDown(event) {
   if (event.button > 0) {
     return; // ignore buttons other than the main (left) mouse button
   }
@@ -811,24 +831,25 @@ scout.TableHeader.prototype._onSeparatorMouseDown = function(event) {
       that.table.resizeColumn(column, column.width);
     }
   }
-};
+}
 
-scout.TableHeader.prototype._onTableDataScroll = function() {
-  scout.scrollbars.fix(this.$menuBarContainer);
+_onTableDataScroll() {
+  scrollbars.fix(this.$menuBarContainer);
   this._reconcileScrollPos();
-  this._fixTimeout = scout.scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
-};
+  this._fixTimeout = scrollbars.unfix(this.$menuBarContainer, this._fixTimeout);
+}
 
-scout.TableHeader.prototype._onMenuBarPropertyChange = function(event) {
+_onMenuBarPropertyChange(event) {
   if (this.rendered && event.propertyName === 'visible') {
     this.$menuBarContainer.setVisible(event.newValue);
   }
-};
+}
 
-scout.TableHeader.prototype._onTableAddFilterRemoved = function(event) {
+_onTableAddFilterRemoved(event) {
   var column = event.filter.column;
   // Check for column.$header because column may have been removed in the mean time due to a structure changed event -> don't try to render state
-  if (event.filter.filterType === scout.ColumnUserFilter.TYPE && column.$header) {
+  if (event.filter.filterType === ColumnUserFilter.TYPE && column.$header) {
     this._renderColumnState(column);
   }
-};
+}
+}

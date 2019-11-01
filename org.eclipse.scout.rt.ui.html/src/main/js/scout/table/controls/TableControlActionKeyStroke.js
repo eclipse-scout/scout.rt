@@ -8,17 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableControlActionKeyStroke = function(action) {
-  scout.TableControlActionKeyStroke.parent.call(this, action);
+import {ActionKeyStroke} from '../../index';
+
+export default class TableControlActionKeyStroke extends ActionKeyStroke {
+
+constructor(action) {
+  super( action);
   this.renderingHints.offset = 6;
-};
-scout.inherits(scout.TableControlActionKeyStroke, scout.ActionKeyStroke);
+}
 
-scout.TableControlActionKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.toggle();
-};
+}
 
-scout.TableControlActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+_postRenderKeyBox($drawingArea) {
   if (this.field.iconId) {
     var wIcon = $drawingArea.find('.icon').width();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
@@ -26,4 +30,5 @@ scout.TableControlActionKeyStroke.prototype._postRenderKeyBox = function($drawin
     var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
     $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
-};
+}
+}

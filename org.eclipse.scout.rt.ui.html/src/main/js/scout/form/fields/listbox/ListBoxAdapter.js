@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ListBoxAdapter = function() {
-  scout.ListBoxAdapter.parent.call(this);
-};
-scout.inherits(scout.ListBoxAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class ListBoxAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonAdapter = function() {
-  scout.RadioButtonAdapter.parent.call(this);
+import {ButtonAdapter} from '../../../index';
+
+export default class RadioButtonAdapter extends ButtonAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['selected']);
-};
-scout.inherits(scout.RadioButtonAdapter, scout.ButtonAdapter);
+}
+
+}

@@ -8,8 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Tab = function() {
-  scout.Tab.parent.call(this);
+import {HtmlEnvironment} from '../../../index';
+import {strings} from '../../../index';
+import {Status} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {Widget} from '../../../index';
+import {tooltips} from '../../../index';
+import {FormField} from '../../../index';
+
+export default class Tab extends Widget {
+
+constructor() {
+  super();
 
   this.label = null;
   this.subLabel = null;
@@ -22,11 +34,11 @@ scout.Tab = function() {
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
   this._statusMouseDownHandler = this._onStatusMouseDown.bind(this);
   this._desktopPropertyChangeHandler = this._onDesktopPropertyChange.bind(this);
-};
-scout.inherits(scout.Tab, scout.Widget);
+}
 
-scout.Tab.prototype._init = function(options) {
-  scout.Tab.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.visible = this.tabItem.visible;
   this.label = this.tabItem.label;
   this.subLabel = this.tabItem.subLabel;
@@ -40,37 +52,37 @@ scout.Tab.prototype._init = function(options) {
   this.fieldStatus.on('statusMouseDown', this._statusMouseDownHandler);
 
   this.tabItem.on('propertyChange', this._tabPropertyChangeHandler);
-};
+}
 
-scout.Tab.prototype._destroy = function() {
-  scout.Tab.parent.prototype._destroy.call(this);
+_destroy() {
+  super._destroy();
   this.tabItem.off('propertyChange', this._tabPropertyChangeHandler);
   this.fieldStatus.off('statusMouseDown', this._statusMouseDownHandler);
-};
+}
 
-scout.Tab.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tab-item');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.$title = this.$container.appendDiv('title');
   this.$label = this.$title.appendDiv('label');
-  scout.tooltips.installForEllipsis(this.$label, {
+  tooltips.installForEllipsis(this.$label, {
     parent: this
   });
 
   this.$subLabel = this.$title.appendDiv('sub-label');
-  scout.tooltips.installForEllipsis(this.$subLabel, {
+  tooltips.installForEllipsis(this.$subLabel, {
     parent: this
   });
 
   this.fieldStatus.render();
-  this.fieldStatus.$container.cssWidth(scout.htmlEnvironment.fieldStatusWidth);
+  this.fieldStatus.$container.cssWidth(HtmlEnvironment.get().fieldStatusWidth);
 
   this.$container.on('mousedown', this._onTabMouseDown.bind(this));
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-};
+}
 
-scout.Tab.prototype._renderProperties = function() {
-  scout.Tab.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderVisible();
   this._renderLabel();
   this._renderSubLabel();
@@ -80,57 +92,57 @@ scout.Tab.prototype._renderProperties = function() {
   this._renderOverflown();
   this._renderTooltipText();
   this._renderErrorStatus();
-};
+}
 
 
-scout.Tab.prototype._renderVisible = function() {
-  scout.Tab.parent.prototype._renderVisible.call(this);
+_renderVisible() {
+  super._renderVisible();
   this._updateStatus();
-};
+}
 
-scout.Tab.prototype.setLabel = function(label) {
+setLabel(label) {
   this.setProperty('label', label);
-};
+}
 
-scout.Tab.prototype._renderLabel = function(label) {
+_renderLabel(label) {
   this.$label.textOrNbsp(this.label);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Tab.prototype.setSubLabel = function(subLabel) {
+setSubLabel(subLabel) {
   this.setProperty('subLabel', subLabel);
-};
+}
 
-scout.Tab.prototype._renderSubLabel = function() {
+_renderSubLabel() {
   this.$subLabel.textOrNbsp(this.subLabel);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Tab.prototype.setTooltipText = function(tooltipText) {
+setTooltipText(tooltipText) {
   this.setProperty('tooltipText', tooltipText);
-};
-scout.Tab.prototype._renderTooltipText = function() {
-  this.$container.toggleClass('has-tooltip', scout.strings.hasText(this.tooltipText));
+}
+_renderTooltipText() {
+  this.$container.toggleClass('has-tooltip', strings.hasText(this.tooltipText));
   this._updateStatus();
-};
+}
 
-scout.Tab.prototype.setErrorStatus = function(errorStatus) {
+setErrorStatus(errorStatus) {
   this.setProperty('errorStatus', errorStatus);
-};
+}
 
-scout.Tab.prototype._renderErrorStatus = function() {
+_renderErrorStatus() {
   var hasStatus = !!this.errorStatus,
     statusClass = hasStatus ? 'has-' + this.errorStatus.cssClass() : '';
   this._updateErrorStatusClasses(statusClass, hasStatus);
   this._updateStatus();
-};
+}
 
-scout.Tab.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
-  this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+_updateErrorStatusClasses(statusClass, hasStatus) {
+  this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
   this.$container.addClass(statusClass, hasStatus);
-};
+}
 
-scout.Tab.prototype._updateStatus = function() {
+_updateStatus() {
   var visible = this._computeVisible(),
     status = null,
     autoRemove = true,
@@ -146,67 +158,67 @@ scout.Tab.prototype._updateStatus = function() {
   } else {
     status = scout.create('Status', {
       message: this.tooltipText,
-      severity: scout.Status.Severity.OK
+      severity: Status.Severity.OK
     });
   }
   this.fieldStatus.update(status, null, autoRemove, initialShow);
-};
+}
 
-scout.Tab.prototype._computeVisible = function() {
-  return this.visible && !this.overflown && (this.errorStatus || scout.strings.hasText(this.tooltipText));
-};
+_computeVisible() {
+  return this.visible && !this.overflown && (this.errorStatus || strings.hasText(this.tooltipText));
+}
 
-scout.Tab.prototype.setTabbable = function(tabbable) {
+setTabbable(tabbable) {
   this.setProperty('tabbable', tabbable);
-};
+}
 
-scout.Tab.prototype._renderTabbable = function() {
-  this.$container.setTabbable(this.tabbable && !scout.device.supportsTouch());
-};
+_renderTabbable() {
+  this.$container.setTabbable(this.tabbable && !Device.get().supportsTouch());
+}
 
-scout.Tab.prototype.select = function() {
+select() {
   this.setSelected(true);
-};
+}
 
-scout.Tab.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.Tab.prototype._renderSelected = function() {
+_renderSelected() {
   this.$container.select(this.selected);
-  this.$container.setTabbable(this.selected && !scout.device.supportsTouch());
-};
+  this.$container.setTabbable(this.selected && !Device.get().supportsTouch());
+}
 
-scout.Tab.prototype.setMarked = function(marked) {
+setMarked(marked) {
   this.setProperty('marked', marked);
-};
+}
 
-scout.Tab.prototype._renderMarked = function(marked) {
+_renderMarked(marked) {
   this.$container.toggleClass('marked', this.marked);
-};
+}
 
-scout.Tab.prototype.setOverflown = function(overflown) {
+setOverflown(overflown) {
   this.setProperty('overflown', overflown);
-};
+}
 
-scout.Tab.prototype._renderOverflown = function() {
+_renderOverflown() {
   this.$container.toggleClass('overflown', this.overflown);
   this._updateStatus();
-};
+}
 
-scout.Tab.prototype._remove = function() {
+_remove() {
   this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
-  scout.Tab.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Tab.prototype._onDesktopPropertyChange = function(event) {
+_onDesktopPropertyChange(event) {
   // switching from or to the dense mode requires clearing of the tab's htmlComponent prefSize cache.
   if (event.propertyName === 'dense') {
     this.invalidateLayout();
   }
-};
+}
 
-scout.Tab.prototype._onTabMouseDown = function(event) {
+_onTabMouseDown(event) {
   if (this._preventTabSelection) {
     this._preventTabSelection = false;
     return;
@@ -222,24 +234,24 @@ scout.Tab.prototype._onTabMouseDown = function(event) {
 
   // When the tab is clicked the user wants to execute the action and not see the tooltip
   if (this.$label) {
-    scout.tooltips.cancel(this.$label);
-    scout.tooltips.close(this.$label);
+    tooltips.cancel(this.$label);
+    tooltips.close(this.$label);
   }
   if (this.$subLabel) {
-    scout.tooltips.cancel(this.$subLabel);
-    scout.tooltips.close(this.$subLabel);
+    tooltips.cancel(this.$subLabel);
+    tooltips.close(this.$subLabel);
   }
-};
+}
 
-scout.Tab.prototype._onStatusMouseDown = function(event) {
+_onStatusMouseDown(event) {
   // Prevent switching tabs when status gets clicked
   // Don't use event.preventDefault, otherwise other mouse listener (like tooltip mouse down) will not be executed as well
   this._preventTabSelection = true;
   // Prevent focusing the tab
   event.preventDefault();
-};
+}
 
-scout.Tab.prototype._onTabPropertyChange = function(event) {
+_onTabPropertyChange(event) {
   if (event.propertyName === 'visible') {
     this.setVisible(event.newValue);
   } else if (event.propertyName === 'label') {
@@ -255,4 +267,5 @@ scout.Tab.prototype._onTabPropertyChange = function(event) {
   } else if (event.propertyName === 'tooltipText') {
     this.setTooltipText(event.newValue);
   }
-};
+}
+}

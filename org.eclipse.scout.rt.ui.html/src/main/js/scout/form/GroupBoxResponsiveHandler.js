@@ -8,20 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxResponsiveHandler = function() {
-  scout.GroupBoxResponsiveHandler.parent.call(this);
+import {ResponsiveManager} from '../index';
+import {GridData} from '../index';
+import {HtmlEnvironment} from '../index';
+import {CompositeField} from '../index';
+import {TreeVisitResult} from '../index';
+import {Button} from '../index';
+import {ResponsiveHandler} from '../index';
+import {LabelField} from '../index';
+import {FormField} from '../index';
+import {PlaceholderField} from '../index';
+import {SequenceBox} from '../index';
+import {GroupBox} from '../index';
+import {CheckBoxField} from '../index';
+import {arrays} from '../index';
+
+export default class GroupBoxResponsiveHandler extends ResponsiveHandler {
+
+constructor() {
+  super();
 
   this._initDefaults();
-  this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED, scout.ResponsiveManager.ResponsiveState.COMPACT];
+  this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.CONDENSED, ResponsiveManager.ResponsiveState.COMPACT];
 
   // Event handlers
   this._formFieldAddedHandler = this._onFormFieldAdded.bind(this);
   this._compositeFields = [];
   this._htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-};
-scout.inherits(scout.GroupBoxResponsiveHandler, scout.ResponsiveHandler);
+}
 
-scout.GroupBoxResponsiveHandler.TransformationType = {
+
+static TransformationType = {
   LABEL_POSITION_ON_FIELD: 'labelPositionOnField',
   LABEL_POSITION_ON_TOP: 'labelPositionOnTop',
   LABEL_VISIBILITY: 'labelVisibility',
@@ -33,22 +50,22 @@ scout.GroupBoxResponsiveHandler.TransformationType = {
   FIELD_SCALABLE: 'fieldScalable'
 };
 
-scout.GroupBoxResponsiveHandler.prototype._initDefaults = function() {
-  this.compactThreshold = scout.htmlEnvironment.formColumnWidth;
-};
+_initDefaults() {
+  this.compactThreshold = HtmlEnvironment.get().formColumnWidth;
+}
 
-scout.GroupBoxResponsiveHandler.prototype._onHtmlEnvironmenPropertyChange = function() {
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
-};
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
-  scout.GroupBoxResponsiveHandler.parent.prototype.init.call(this, model);
+init(model) {
+  super.init( model);
 
-  var transformationType = scout.GroupBoxResponsiveHandler.TransformationType;
-  var responsiveState = scout.ResponsiveManager.ResponsiveState;
+  var transformationType = GroupBoxResponsiveHandler.TransformationType;
+  var responsiveState = ResponsiveManager.ResponsiveState;
 
   this._registerTransformation(transformationType.LABEL_POSITION_ON_FIELD, this._transformLabelPositionOnField);
   this._registerTransformation(transformationType.LABEL_POSITION_ON_TOP, this._transformLabelPositionOnTop);
@@ -74,45 +91,45 @@ scout.GroupBoxResponsiveHandler.prototype.init = function(model) {
   this._enableTransformation(responsiveState.COMPACT, transformationType.FIELD_SCALABLE);
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this.widget.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 
   this.widget.visitFields(function(field) {
-    if (field instanceof scout.CompositeField) {
+    if (field instanceof CompositeField) {
       field.on('propertyChange', this._formFieldAddedHandler);
       this._compositeFields.push(field);
     }
   }.bind(this));
 
-  scout.htmlEnvironment.on('propertyChange', this._htmlPropertyChangeHandler);
-};
+  HtmlEnvironment.get().on('propertyChange', this._htmlPropertyChangeHandler);
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype.destroy = function() {
-  scout.GroupBoxResponsiveHandler.parent.prototype.destroy.call(this);
+destroy() {
+  super.destroy();
 
   this._compositeFields.forEach(function(compositeField) {
     compositeField.off('propertyChange', this._formFieldAddedHandler);
   }.bind(this));
 
-  scout.htmlEnvironment.off('propertyChange', this._htmlPropertyChangeHandler);
-};
+  HtmlEnvironment.get().off('propertyChange', this._htmlPropertyChangeHandler);
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype.active = function() {
+active() {
   return this.widget.responsive;
-};
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype.getCondensedThreshold = function() {
+getCondensedThreshold() {
   if (this.condensedThreshold > 0) {
     return this.condensedThreshold;
   }
@@ -120,26 +137,26 @@ scout.GroupBoxResponsiveHandler.prototype.getCondensedThreshold = function() {
   return this.widget.htmlComp.prefSize({
     widthOnly: true
   }).width;
-};
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype._transform = function() {
+_transform() {
   this.widget.visitFields(this._transformWidget.bind(this));
-};
+}
 
 /**
  * @Override
  */
-scout.GroupBoxResponsiveHandler.prototype._transformWidget = function(widget) {
+_transformWidget(widget) {
   // skip group boxes with responsiveness set.
-  if (widget !== this.widget && widget instanceof scout.GroupBox && widget.responsive !== null) {
-    return scout.TreeVisitResult.SKIP_SUBTREE;
+  if (widget !== this.widget && widget instanceof GroupBox && widget.responsive !== null) {
+    return TreeVisitResult.SKIP_SUBTREE;
   }
 
   // skip everything that is not a form field.
-  if (!(widget instanceof scout.FormField)) {
+  if (!(widget instanceof FormField)) {
     return;
   }
 
@@ -153,7 +170,7 @@ scout.GroupBoxResponsiveHandler.prototype._transformWidget = function(widget) {
     }
   }
 
-  scout.GroupBoxResponsiveHandler.parent.prototype._transformWidget.call(this, widget);
+  super._transformWidget( widget);
 
   if (widget.htmlComp) {
     widget.htmlComp.suppressInvalidate = false;
@@ -161,56 +178,56 @@ scout.GroupBoxResponsiveHandler.prototype._transformWidget = function(widget) {
   if (htmlParent) {
     htmlParent.suppressInvalidate = false;
   }
-};
+}
 
 /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
 /**
  * Label Position -> ON_FIELD
  */
-scout.GroupBoxResponsiveHandler.prototype._transformLabelPositionOnField = function(field, apply) {
-  if (field.parent instanceof scout.SequenceBox ||
-    field instanceof scout.CheckBoxField ||
-    field instanceof scout.LabelField) {
+_transformLabelPositionOnField(field, apply) {
+  if (field.parent instanceof SequenceBox ||
+    field instanceof CheckBoxField ||
+    field instanceof LabelField) {
     return;
   }
 
   if (apply) {
     this._storeFieldProperty(field, 'labelPosition', field.labelPosition);
-    field.setLabelPosition(scout.FormField.LabelPosition.ON_FIELD);
+    field.setLabelPosition(FormField.LabelPosition.ON_FIELD);
   } else {
     if (this._hasFieldProperty(field, 'labelPosition')) {
       field.setLabelPosition(this._getFieldProperty(field, 'labelPosition'));
     }
   }
-};
+}
 
 /**
  * Label Position -> ON_TOP
  */
-scout.GroupBoxResponsiveHandler.prototype._transformLabelPositionOnTop = function(field, apply) {
-  if (field.parent instanceof scout.SequenceBox ||
-    field instanceof scout.CheckBoxField ||
-    field instanceof scout.LabelField ||
-    field.labelPosition === scout.FormField.LabelPosition.ON_FIELD) {
+_transformLabelPositionOnTop(field, apply) {
+  if (field.parent instanceof SequenceBox ||
+    field instanceof CheckBoxField ||
+    field instanceof LabelField ||
+    field.labelPosition === FormField.LabelPosition.ON_FIELD) {
     return;
   }
 
   if (apply) {
     this._storeFieldProperty(field, 'labelPosition', field.labelPosition);
-    field.setLabelPosition(scout.FormField.LabelPosition.TOP);
+    field.setLabelPosition(FormField.LabelPosition.TOP);
   } else {
     if (this._hasFieldProperty(field, 'labelPosition')) {
       field.setLabelPosition(this._getFieldProperty(field, 'labelPosition'));
     }
   }
-};
+}
 
 /**
  * Label visibility
  */
-scout.GroupBoxResponsiveHandler.prototype._transformLabelVisibility = function(field, apply) {
-  if (!(field instanceof scout.CheckBoxField)) {
+_transformLabelVisibility(field, apply) {
+  if (!(field instanceof CheckBoxField)) {
     return;
   }
 
@@ -222,37 +239,37 @@ scout.GroupBoxResponsiveHandler.prototype._transformLabelVisibility = function(f
       field.setLabelVisible(this._getFieldProperty(field, 'labelVisible'));
     }
   }
-};
+}
 
 // Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
-scout.GroupBoxResponsiveHandler.prototype.getGridData = function(field) {
-  return new scout.GridData(field.gridDataHints);
-};
+getGridData(field) {
+  return new GridData(field.gridDataHints);
+}
 
 //Scoutjs specific method. This methods will be overridden by GroupBoxAdapter for scout classic case.
-scout.GroupBoxResponsiveHandler.prototype.setGridData = function(field, gridData) {
+setGridData(field, gridData) {
   field.setGridDataHints(gridData);
-};
+}
 
 /**
  * Status position
  */
-scout.GroupBoxResponsiveHandler.prototype._transformStatusPosition = function(field, apply) {
+_transformStatusPosition(field, apply) {
   if (apply) {
     this._storeFieldProperty(field, 'statusPosition', field.statusPosition);
-    field.setStatusPosition(scout.FormField.StatusPosition.TOP);
+    field.setStatusPosition(FormField.StatusPosition.TOP);
   } else {
     if (this._hasFieldProperty(field, 'statusPosition')) {
       field.setStatusPosition(this._getFieldProperty(field, 'statusPosition'));
     }
   }
-};
+}
 
 /**
  * Status visibility
  */
-scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(field, apply) {
-  var ResponsiveState = scout.ResponsiveManager.ResponsiveState;
+_transformStatusVisibility(field, apply) {
+  var ResponsiveState = ResponsiveManager.ResponsiveState;
 
   if (apply) {
     this._storeFieldProperty(field, 'statusVisible', field.statusVisible);
@@ -262,14 +279,14 @@ scout.GroupBoxResponsiveHandler.prototype._transformStatusVisibility = function(
       field.setStatusVisible(this._getFieldProperty(field, 'statusVisible'));
     }
   }
-};
+}
 
 /**
  * Vertical alignment
  */
-scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function(field, apply) {
-  if (!(field instanceof scout.Button && field.displayStyle === scout.Button.DisplayStyle.DEFAULT ||
-      field instanceof scout.CheckBoxField) ||
+_transformVerticalAlignment(field, apply) {
+  if (!(field instanceof Button && field.displayStyle === Button.DisplayStyle.DEFAULT ||
+      field instanceof CheckBoxField) ||
     !field.gridData) {
     return;
   }
@@ -290,13 +307,13 @@ scout.GroupBoxResponsiveHandler.prototype._transformVerticalAlignment = function
   }
 
   this.setGridData(field, gridData);
-};
+}
 
 /**
  * Column count
  */
-scout.GroupBoxResponsiveHandler.prototype._transformGridColumnCount = function(field, apply) {
-  if (!(field instanceof scout.GroupBox)) {
+_transformGridColumnCount(field, apply) {
+  if (!(field instanceof GroupBox)) {
     return;
   }
 
@@ -308,13 +325,13 @@ scout.GroupBoxResponsiveHandler.prototype._transformGridColumnCount = function(f
       field.setGridColumnCount(this._getFieldProperty(field, 'gridColumnCount'));
     }
   }
-};
+}
 
 /**
  * Hide placeholder field
  */
-scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = function(field, apply) {
-  if (!(field instanceof scout.PlaceholderField)) {
+_transformHidePlaceHolderField(field, apply) {
+  if (!(field instanceof PlaceholderField)) {
     return;
   }
 
@@ -326,7 +343,7 @@ scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = funct
       field.setVisible(this._getFieldProperty(field, 'visible'));
     }
   }
-};
+}
 
 /**
  * GroupBox: Makes sure weightX is set to 1 which makes the field scalable.
@@ -337,8 +354,8 @@ scout.GroupBoxResponsiveHandler.prototype._transformHidePlaceHolderField = funct
  * Additionally, since we use a one column layout, setting weightX to 0 might destroy the layout because it affects
  * all the fields in the groupBox.
  */
-scout.GroupBoxResponsiveHandler.prototype._transformFieldScalable = function(field, apply) {
-  if (field.parent instanceof scout.SequenceBox) {
+_transformFieldScalable(field, apply) {
+  if (field.parent instanceof SequenceBox) {
     return;
   }
 
@@ -353,15 +370,16 @@ scout.GroupBoxResponsiveHandler.prototype._transformFieldScalable = function(fie
   }
 
   this.setGridData(field, gridData);
-};
+}
 
 /* --- HANDLERS ------------------------------------------------------------- */
 
-scout.GroupBoxResponsiveHandler.prototype._onFormFieldAdded = function(event) {
-  if (this.state !== scout.ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
-    var newFields = scout.arrays.diff(event.newValue, event.oldValue);
+_onFormFieldAdded(event) {
+  if (this.state !== ResponsiveManager.ResponsiveState.NORMAL && (event.propertyName === 'fields' || event.propertyName === 'tabItems')) {
+    var newFields = arrays.diff(event.newValue, event.oldValue);
     newFields.forEach(function(field) {
       field.visitFields(this._transformWidget.bind(this));
     }.bind(this));
   }
-};
+}
+}

@@ -8,8 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SplitBox = function() {
-  scout.SplitBox.parent.call(this);
+import {SplitBoxCollapseKeyStroke} from '../../../index';
+import {graphics} from '../../../index';
+import {GroupBox} from '../../../index';
+import * as $ from 'jquery';
+import {SplitBoxLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {SplitBoxFirstCollapseKeyStroke} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {CompositeField} from '../../../index';
+import {scout} from '../../../index';
+import {CollapseHandle} from '../../../index';
+import {KeyStroke} from '../../../index';
+import {SplitBoxSecondCollapseKeyStroke} from '../../../index';
+
+export default class SplitBox extends CompositeField {
+
+constructor() {
+  super();
   this._addWidgetProperties(['firstField', 'secondField', 'collapsibleField']);
   this._addPreserveOnPropertyChangeProperties(['collapsibleField']);
 
@@ -22,49 +38,49 @@ scout.SplitBox = function() {
   this.splitterEnabled = true;
   this.splitterPosition = 0.5;
   this.minSplitterPosition;
-  this.splitterPositionType = scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
+  this.splitterPositionType = SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST;
   this.fieldMinimized = false;
   this.minimizeEnabled = true;
 
   this._$splitArea = null;
   this._$splitter = null;
-};
-scout.inherits(scout.SplitBox, scout.CompositeField);
+}
 
-scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST = 'relativeFirst';
-scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND = 'relativeSecond';
-scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
-scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
 
-scout.SplitBox.prototype._init = function(model) {
-  scout.SplitBox.parent.prototype._init.call(this, model);
+static SPLITTER_POSITION_TYPE_RELATIVE_FIRST = 'relativeFirst';
+static SPLITTER_POSITION_TYPE_RELATIVE_SECOND = 'relativeSecond';
+static SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST = 'absoluteFirst';
+static SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND = 'absoluteSecond';
+
+_init(model) {
+  super._init( model);
   this._setToggleCollapseKeyStroke(this.toggleCollapseKeyStroke);
   this._setFirstCollapseKeyStroke(this.firstCollapseKeyStroke);
   this._setSecondCollapseKeyStroke(this.secondCollapseKeyStroke);
   this._updateCollapseHandle();
   this._initResponsive();
-};
+}
 
 /**
  * Set the group boxes of the split box to responsive if not set otherwise.
  */
-scout.SplitBox.prototype._initResponsive = function() {
+_initResponsive() {
   this.getFields().forEach(function(field) {
-    if (field instanceof scout.GroupBox && field.responsive === null) {
+    if (field instanceof GroupBox && field.responsive === null) {
       field.setResponsive(true);
     }
   });
-};
+}
 
-scout.SplitBox.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'split-box');
   // This widget does not support label, mandatoryIndicator and status
 
   // Create split area
   this._$splitArea = this.$parent.makeDiv('split-area');
   this.addField(this._$splitArea);
-  this.htmlSplitArea = scout.HtmlComponent.install(this._$splitArea, this.session);
-  this.htmlSplitArea.setLayout(new scout.SplitBoxLayout(this));
+  this.htmlSplitArea = HtmlComponent.install(this._$splitArea, this.session);
+  this.htmlSplitArea.setLayout(new SplitBoxLayout(this));
   this._$window = this.$parent.window();
   this._$body = this.$parent.body();
 
@@ -115,9 +131,9 @@ scout.SplitBox.prototype._render = function() {
 
       // Get initial area and splitter bounds
       var splitAreaPosition = this._$splitArea.offset();
-      var splitAreaSize = scout.graphics.size(this._$splitArea, true);
+      var splitAreaSize = graphics.size(this._$splitArea, true);
       var splitterPosition = this._$splitter.offset();
-      var splitterSize = scout.graphics.size(this._$splitter, true);
+      var splitterSize = graphics.size(this._$splitter, true);
 
       // Create temporary splitter
       var $tempSplitter = this._$splitArea.appendDiv('temp-splitter')
@@ -153,21 +169,21 @@ scout.SplitBox.prototype._render = function() {
         var maxSplitterPositionLeft;
 
         // Splitter width plus margin on right side, if temporary splitter position is x, the splitter div position is x-splitterOffset
-        var splitterOffset = Math.floor((splitterSize.width + scout.htmlEnvironment.fieldMandatoryIndicatorWidth) / 2);
+        var splitterOffset = Math.floor((splitterSize.width + HtmlEnvironment.get().fieldMandatoryIndicatorWidth) / 2);
 
-        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
+        if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST) {
           minSplitterPositionLeft = scout.nvl(this.minSplitterPosition, 0);
           // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
           maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
           minSplitterPositionLeft = (splitAreaSize.width - splitterSize.width) * scout.nvl(this.minSplitterPosition, 0);
           // allow to move the splitter to right side, leaving minimal space for splitter div without right margin (=total splitter size minus offset)
           maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset;
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           minSplitterPositionLeft = 0;
           // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
           maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - scout.nvl(this.minSplitterPosition, 0);
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
           minSplitterPositionLeft = 0;
           // allow to move the splitter to right side, leaving minimal space for splitter div without right margin, reserving space for minimum splitter size
           maxSplitterPositionLeft = splitAreaSize.width - splitterSize.width + splitterOffset - Math.floor(scout.nvl(this.minSplitterPosition, 0) * (splitAreaSize.width - splitterSize.width));
@@ -188,11 +204,11 @@ scout.SplitBox.prototype._render = function() {
 
         // Normalize target position (available splitter area is (splitAreaSize.width - splitterSize.width))
         newSplitterPosition = (targetSplitterPositionLeft - tempSplitterOffsetX);
-        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+        if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
           newSplitterPosition = newSplitterPosition / (splitAreaSize.width - splitterSize.width);
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
           newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.width - splitterSize.width));
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           newSplitterPosition = splitAreaSize.width - splitterSize.width - newSplitterPosition;
         }
       } else { // "--"
@@ -213,11 +229,11 @@ scout.SplitBox.prototype._render = function() {
         $tempSplitter.cssTop(targetSplitterPositionTop - tempSplitterOffsetY);
         // Normalize target position
         newSplitterPosition = targetSplitterPositionTop - tempSplitterOffsetY;
-        if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
+        if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) {
           newSplitterPosition = newSplitterPosition / (splitAreaSize.height - splitterSize.height);
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) {
           newSplitterPosition = 1 - (newSplitterPosition / (splitAreaSize.height - splitterSize.height));
-        } else if (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
+        } else if (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) {
           newSplitterPosition = splitAreaSize.height - newSplitterPosition - splitterSize.height;
         }
       }
@@ -253,43 +269,43 @@ scout.SplitBox.prototype._render = function() {
       this.htmlSplitArea.invalidateLayoutTree(false);
     }
   }
-};
+}
 
-scout.SplitBox.prototype._renderProperties = function() {
-  scout.SplitBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSplitterPosition();
   this._renderSplitterEnabled();
   this._renderCollapsibleField(); // renders collapsibleField _and_ fieldCollapsed
   this._renderCollapseHandle(); // renders collapseHandle _and_ toggleCollapseKeyStroke _and_ firstCollapseKeyStroke _and_ secondCollapseKeyStroke
   this._renderFieldMinimized();
-};
+}
 
-scout.SplitBox.prototype._setSplitterPosition = function(splitterPosition) {
+_setSplitterPosition(splitterPosition) {
   this._setProperty('splitterPosition', splitterPosition);
   // If splitter position is explicitly set by an event, no recalculation is necessary
   this._oldSplitterPositionType = null;
-};
+}
 
-scout.SplitBox.prototype._renderSplitterPosition = function() {
+_renderSplitterPosition() {
   this.newSplitterPosition(this.splitterPosition, false); // do not update (override) field minimized if new position is set by model
-};
+}
 
-scout.SplitBox.prototype._setSplitterPositionType = function(splitterPositionType) {
+_setSplitterPositionType(splitterPositionType) {
   if (this.rendered && !this._oldSplitterPositionType) {
     this._oldSplitterPositionType = this.splitterPositionType;
     // We need to recalculate the splitter position. Because this requires the proper
     // size of the split box, this can only be done in _renderSplitterPositionType().
   }
   this._setProperty('splitterPositionType', splitterPositionType);
-};
+}
 
-scout.SplitBox.prototype._renderSplitterPositionType = function() {
+_renderSplitterPositionType() {
   if (this._oldSplitterPositionType) {
     // splitterPositionType changed while the split box was rendered --> convert splitterPosition
     // to the target type such that the current position in screen does not change.
     var splitAreaSize = this.htmlSplitArea.size(),
       splitterPosition = this.splitterPosition,
-      splitterSize = scout.graphics.size(this._$splitter, true),
+      splitterSize = graphics.size(this._$splitter, true),
       minSplitterPosition = this.minSplitterPosition,
       totalSize = 0;
     if (this.splitHorizontal) { // "|"
@@ -305,8 +321,8 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     var newIsAbsolute = !newIsRelative;
     if (oldIsRelative && newIsAbsolute) {
       // From relative to absolute
-      if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
-        (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
+      if ((this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND) ||
+        (this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)) {
         splitterPosition = totalSize - (totalSize * splitterPosition); // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = totalSize * splitterPosition;
@@ -317,8 +333,8 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
       }
     } else if (oldIsAbsolute && newIsRelative) {
       // From absolute to relative
-      if ((this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) ||
-        (this._oldSplitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
+      if ((this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND) ||
+        (this._oldSplitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_SECOND && this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST)) {
         splitterPosition = (totalSize - splitterPosition) / totalSize; // changed from first to second field or from second to first field, invert splitter position
       } else {
         splitterPosition = splitterPosition / totalSize;
@@ -342,33 +358,33 @@ scout.SplitBox.prototype._renderSplitterPositionType = function() {
     this._oldSplitterPositionType = null;
     this.newSplitterPosition(splitterPosition, true);
   }
-};
+}
 
-scout.SplitBox.prototype._isSplitterPositionTypeRelative = function(positionType) {
-  return (positionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (positionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
-};
+_isSplitterPositionTypeRelative(positionType) {
+  return (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (positionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND);
+}
 
-scout.SplitBox.prototype._renderSplitterEnabled = function() {
+_renderSplitterEnabled() {
   if (this._$splitter) {
     this._$splitter.setEnabled(this.splitterEnabled);
   }
-};
+}
 
-scout.SplitBox.prototype.setFieldCollapsed = function(collapsed) {
+setFieldCollapsed(collapsed) {
   this.setProperty('fieldCollapsed', collapsed);
   this._updateCollapseHandleButtons();
-};
+}
 
-scout.SplitBox.prototype._renderFieldCollapsed = function() {
+_renderFieldCollapsed() {
   this._renderCollapsibleField();
-};
+}
 
-scout.SplitBox.prototype.setCollapsibleField = function(field) {
+setCollapsibleField(field) {
   this.setProperty('collapsibleField', field);
   this._updateCollapseHandle();
-};
+}
 
-scout.SplitBox.prototype._updateCollapseHandle = function() {
+_updateCollapseHandle() {
   // always unregister key stroke first (although it may have been added by _setToggleCollapseKeyStroke before)
   if (this.toggleCollapseKeyStroke) {
     this.unregisterKeyStrokes(this.toggleCollapseKeyStroke);
@@ -381,9 +397,9 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
   }
 
   if (this.collapsibleField) {
-    var horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
+    var horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
     if (this.collapsibleField !== this.firstField) {
-      horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.RIGHT;
+      horizontalAlignment = CollapseHandle.HorizontalAlignment.RIGHT;
     }
 
     if (!this._collapseHandle) {
@@ -417,9 +433,9 @@ scout.SplitBox.prototype._updateCollapseHandle = function() {
       this._collapseHandle = null;
     }
   }
-};
+}
 
-scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
+_updateCollapseHandleButtons() {
   if (!this._collapseHandle) {
     return;
   }
@@ -427,7 +443,7 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
     collapsed = this.fieldCollapsed,
     minimized = this.fieldMinimized,
     minimizable = this._isMinimizable(),
-    positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+    positionTypeFirstField = ((this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
     positionNotAccordingCollapsibleField = (positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField);
 
   if (positionTypeFirstField) {
@@ -466,34 +482,34 @@ scout.SplitBox.prototype._updateCollapseHandleButtons = function() {
       this.unregisterKeyStrokes(this.secondCollapseKeyStroke);
     }
   }
-};
+}
 
-scout.SplitBox.prototype.getEffectiveSplitterPosition = function() {
+getEffectiveSplitterPosition() {
   if (this._isMinimizable() && this.fieldMinimized) {
     return this.minSplitterPosition;
   } else {
     return this.splitterPosition;
   }
-};
+}
 
-scout.SplitBox.prototype.setMinSplitterPosition = function(minSplitterPosition) {
+setMinSplitterPosition(minSplitterPosition) {
   this.setProperty('minSplitterPosition', minSplitterPosition);
   this._updateCollapseHandleButtons();
-};
+}
 
-scout.SplitBox.prototype._renderMinSplitterPosition = function() {
+_renderMinSplitterPosition() {
   // minimum splitter position is considered automatically when layout is updated
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.SplitBox.prototype.setFieldMinimized = function(minimized) {
+setFieldMinimized(minimized) {
   this.setProperty('fieldMinimized', minimized);
   this._updateCollapseHandleButtons();
-};
+}
 
-scout.SplitBox.prototype._renderFieldMinimized = function() {
+_renderFieldMinimized() {
   this.$container.removeClass('first-field-minimized second-field-minimized');
   if (this.firstField) {
     this.firstField.$container.removeClass('minimized');
@@ -511,29 +527,29 @@ scout.SplitBox.prototype._renderFieldMinimized = function() {
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.SplitBox.prototype.setMinimizeEnabled = function(enabled) {
+setMinimizeEnabled(enabled) {
   this.setProperty('minimizeEnabled', enabled);
   if (this._isMinimizable() && this._isSplitterPositionInMinimalRange(this.splitterPosition)) {
     this.setFieldMinimized(true);
   }
 
   this._updateCollapseHandleButtons();
-};
+}
 
-scout.SplitBox.prototype._renderMinimizeEnabled = function() {
+_renderMinimizeEnabled() {
   // minimize enabled is considered automatically when layout is updated
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.SplitBox.prototype._isMinimizable = function() {
+_isMinimizable() {
   return !!this.minSplitterPosition && this.minimizeEnabled;
-};
+}
 
-scout.SplitBox.prototype._renderCollapsibleField = function() {
+_renderCollapsibleField() {
   this.$container.removeClass('first-field-collapsed second-field-collapsed');
   if (this.firstField) {
     this.firstField.$container.removeClass('collapsed');
@@ -549,51 +565,51 @@ scout.SplitBox.prototype._renderCollapsibleField = function() {
   if (this.rendered) { // don't invalidate layout on initial rendering
     this.htmlSplitArea.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.SplitBox.prototype._setToggleCollapseKeyStroke = function(keyStroke) {
+_setToggleCollapseKeyStroke(keyStroke) {
   if (keyStroke) {
-    if (this.toggleCollapseKeyStroke instanceof scout.KeyStroke) {
+    if (this.toggleCollapseKeyStroke instanceof KeyStroke) {
       this.unregisterKeyStrokes(this.collapseKeyStroke);
     }
-    this.toggleCollapseKeyStroke = new scout.SplitBoxCollapseKeyStroke(this, keyStroke);
+    this.toggleCollapseKeyStroke = new SplitBoxCollapseKeyStroke(this, keyStroke);
     if (this._collapseHandle) {
       this.registerKeyStrokes(this.toggleCollapseKeyStroke);
     }
   }
-};
+}
 
-scout.SplitBox.prototype._setFirstCollapseKeyStroke = function(keyStroke) {
+_setFirstCollapseKeyStroke(keyStroke) {
   if (keyStroke) {
-    if (this.firstCollapseKeyStroke instanceof scout.KeyStroke) {
+    if (this.firstCollapseKeyStroke instanceof KeyStroke) {
       this.unregisterKeyStrokes(this.firstCollapseKeyStroke);
     }
-    this.firstCollapseKeyStroke = new scout.SplitBoxFirstCollapseKeyStroke(this, keyStroke);
+    this.firstCollapseKeyStroke = new SplitBoxFirstCollapseKeyStroke(this, keyStroke);
     if (this._collapseHandle) {
       this.registerKeyStrokes(this.firstCollapseKeyStroke);
     }
   }
-};
+}
 
-scout.SplitBox.prototype._setSecondCollapseKeyStroke = function(keyStroke) {
+_setSecondCollapseKeyStroke(keyStroke) {
   if (keyStroke) {
-    if (this.secondCollapseKeyStroke instanceof scout.KeyStroke) {
+    if (this.secondCollapseKeyStroke instanceof KeyStroke) {
       this.unregisterKeyStrokes(this.secondCollapseKeyStroke);
     }
-    this.secondCollapseKeyStroke = new scout.SplitBoxSecondCollapseKeyStroke(this, keyStroke);
+    this.secondCollapseKeyStroke = new SplitBoxSecondCollapseKeyStroke(this, keyStroke);
     if (this._collapseHandle) {
       this.registerKeyStrokes(this.secondCollapseKeyStroke);
     }
   }
-};
+}
 
-scout.SplitBox.prototype._renderCollapseHandle = function() {
+_renderCollapseHandle() {
   if (this._collapseHandle) {
     this._collapseHandle.render();
   }
-};
+}
 
-scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition, updateFieldMinimizedState) {
+newSplitterPosition(newSplitterPosition, updateFieldMinimizedState) {
   if (this._isSplitterPositionTypeRelative(this.splitterPositionType)) {
     // Ensure range 0..1
     newSplitterPosition = Math.max(0, Math.min(1, newSplitterPosition));
@@ -626,32 +642,32 @@ scout.SplitBox.prototype.newSplitterPosition = function(newSplitterPosition, upd
 
   // Mark layout as invalid
   this.htmlSplitArea.invalidateLayoutTree(false);
-};
+}
 
-scout.SplitBox.prototype._updateFieldMinimized = function() {
+_updateFieldMinimized() {
   if (this._isMinimizable()) {
     this.setFieldMinimized(this._isSplitterPositionInMinimalRange(this.splitterPosition));
   } else {
     this.setFieldMinimized(false);
   }
-};
+}
 
-scout.SplitBox.prototype._isSplitterPositionInMinimalRange = function(newSplitterPosition) {
+_isSplitterPositionInMinimalRange(newSplitterPosition) {
   if (!this._isMinimizable()) {
     return false;
   }
   return newSplitterPosition <= this.minSplitterPosition;
-};
+}
 
-scout.SplitBox.prototype.toggleFieldCollapsed = function() {
+toggleFieldCollapsed() {
   this.setFieldCollapsed(!this.fieldCollapsed);
-};
+}
 
-scout.SplitBox.prototype.collapseHandleButtonPressed = function(event) {
+collapseHandleButtonPressed(event) {
   var collapsed = this.fieldCollapsed,
     minimized = this.fieldMinimized,
     minimizable = this._isMinimizable(),
-    positionTypeFirstField = ((this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === scout.SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
+    positionTypeFirstField = ((this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST) || (this.splitterPositionType === SplitBox.SPLITTER_POSITION_TYPE_ABSOLUTE_FIRST)),
     increaseField = (!!event.left && !positionTypeFirstField) || (!!event.right && positionTypeFirstField);
 
   if ((positionTypeFirstField && this.collapsibleField === this.secondField) || (!positionTypeFirstField && this.collapsibleField === this.firstField)) {
@@ -697,12 +713,12 @@ scout.SplitBox.prototype.collapseHandleButtonPressed = function(event) {
       }
     }
   }
-};
+}
 
 /**
  * @override CompositeField.js
  */
-scout.SplitBox.prototype.getFields = function() {
+getFields() {
   var fields = [];
   if (this.firstField) {
     fields.push(this.firstField);
@@ -711,4 +727,5 @@ scout.SplitBox.prototype.getFields = function() {
     fields.push(this.secondField);
   }
   return fields;
-};
+}
+}

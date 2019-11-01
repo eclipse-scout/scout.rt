@@ -8,96 +8,102 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {TouchPopup} from '../../../index';
+import {scout} from '../../../index';
+
 /**
  * Info: this class must have the same interface as SmartFieldPopup. That's why there's some
  * copy/pasted code here, because we don't have multi inheritance.
  */
-scout.SmartFieldTouchPopup = function() {
-  scout.SmartFieldTouchPopup.parent.call(this);
-};
-scout.inherits(scout.SmartFieldTouchPopup, scout.TouchPopup);
+export default class SmartFieldTouchPopup extends TouchPopup {
 
-scout.SmartFieldTouchPopup.prototype._init = function(options) {
+constructor() {
+  super();
+}
+
+
+_init(options) {
   options.withFocusContext = false;
   options.smartField = options.parent; // alias for parent (required by proposal chooser)
-  scout.SmartFieldTouchPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.setLookupResult(options.lookupResult);
   this.setStatus(options.status);
   this.one('close', this._beforeClosePopup.bind(this));
   this.smartField.on('propertyChange', this._onPropertyChange.bind(this));
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._initWidget = function(options) {
+_initWidget(options) {
   this._widget = this._createProposalChooser();
   this._widget.on('lookupRowSelected', this._triggerEvent.bind(this));
   this._widget.on('activeFilterSelected', this._triggerEvent.bind(this));
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._createProposalChooser = function() {
+_createProposalChooser() {
   var objectType = this.parent.browseHierarchy ? 'TreeProposalChooser' : 'TableProposalChooser';
   return scout.create(objectType, {
     parent: this,
     touch: true,
     smartField: this._field
   });
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._fieldOverrides = function() {
-  var obj = scout.SmartFieldTouchPopup.parent.prototype._fieldOverrides.call(this);
+_fieldOverrides() {
+  var obj = super._fieldOverrides();
   // Make sure proposal chooser does not get cloned, because it would not work (e.g. because selectedRows may not be cloned)
   // It would also generate a loop because field would try to render the chooser and the popup
   // -> The original smart field has to control the chooser
   obj.proposalChooser = null;
   return obj;
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._onMouseDownOutside = function() {
+_onMouseDownOutside() {
   this._acceptInput(); // see: #_beforeClosePopup()
-};
+}
 
 /**
  * Delegates the key event to the proposal chooser.
  */
-scout.SmartFieldTouchPopup.prototype.delegateKeyEvent = function(event) {
+delegateKeyEvent(event) {
   event.originalEvent.smartFieldEvent = true;
   this._widget.delegateKeyEvent(event);
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.getSelectedLookupRow = function() {
+getSelectedLookupRow() {
   return this._widget.getSelectedLookupRow();
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._triggerEvent = function(event) {
+_triggerEvent(event) {
   this.trigger(event.type, event);
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.setLookupResult = function(result) {
+setLookupResult(result) {
   this._widget.setLookupResult(result);
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.setStatus = function(status) {
+setStatus(status) {
   this._widget.setStatus(status);
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.clearLookupRows = function() {
+clearLookupRows() {
   this._widget.clearLookupRows();
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.selectFirstLookupRow = function() {
+selectFirstLookupRow() {
   this._widget.selectFirstLookupRow();
-};
+}
 
-scout.SmartFieldTouchPopup.prototype.selectLookupRow = function() {
+selectLookupRow() {
   this._widget.triggerLookupRowSelected();
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._onPropertyChange = function(event) {
+_onPropertyChange(event) {
   if ('lookupStatus' === event.propertyName) {
     this._field.setLookupStatus(event.newValue);
   }
-};
+}
 
-scout.SmartFieldTouchPopup.prototype._beforeClosePopup = function(event) {
+_beforeClosePopup(event) {
   this.smartField.acceptInputFromField(this._field);
-};
+}
+}

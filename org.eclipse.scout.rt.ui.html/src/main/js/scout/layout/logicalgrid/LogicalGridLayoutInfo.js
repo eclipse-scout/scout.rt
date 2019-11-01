@@ -8,10 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HtmlComponent} from '../../index';
+import {TreeSet} from '../../index';
+import {LogicalGridData} from '../../index';
+import {Rectangle} from '../../index';
+import {Dimension} from '../../index';
+import {arrays} from '../../index';
+import * as $ from 'jquery';
+import {LayoutConstants} from '../../index';
+
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-scout.LogicalGridLayoutInfo = function(model) {
+export default class LogicalGridLayoutInfo {
+
+constructor(model) {
   this.gridDatas = [];
   this.$components = null;
   this.cols = 0;
@@ -34,14 +45,14 @@ scout.LogicalGridLayoutInfo = function(model) {
   // create a modifiable copy of the grid datas
   var i, gd, x, y;
   for (i = 0; i < this.cons.length; i++) {
-    this.gridDatas[i] = new scout.LogicalGridData(this.cons[i]);
+    this.gridDatas[i] = new LogicalGridData(this.cons[i]);
   }
   if (this.$components.length === 0) {
     return;
   }
   // eliminate unused rows and columns
-  var usedCols = new scout.TreeSet();
-  var usedRows = new scout.TreeSet();
+  var usedCols = new TreeSet();
+  var usedRows = new TreeSet();
   // ticket 86645 use member gridDatas instead of param cons
   for (i = 0; i < this.gridDatas.length; i++) {
     gd = this.gridDatas[i];
@@ -97,9 +108,9 @@ scout.LogicalGridLayoutInfo = function(model) {
 
   $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + this.$components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo();
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
+_initializeInfo() {
   var compCount = this.$components.length;
   var uiHeightElements = [];
   for (var i = 0; i < compCount; i++) {
@@ -132,7 +143,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
     }
 
     // Calculate and cache component size
-    var size = new scout.Dimension(0, 0);
+    var size = new Dimension(0, 0);
     // Use explicit width hint, if set
     if (cons.widthHint > 0) {
       size.width = cons.widthHint;
@@ -164,7 +175,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
 
   if (this.widthOnly) {
     // Abort here if only width is of interest
-    this.height = scout.arrays.init(this.rows, [0, 0, 0]);
+    this.height = arrays.init(this.rows, [0, 0, 0]);
     return;
   }
 
@@ -188,13 +199,13 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function() {
 
   // Calculate this.height and this.weightY
   this._initializeRows();
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype._initializeColumns = function() {
+_initializeColumns() {
   var compSize = this.compSize;
   var compCount = compSize.length;
-  var prefWidths = scout.arrays.init(this.cols, 0);
-  var fixedWidths = scout.arrays.init(this.cols, false);
+  var prefWidths = arrays.init(this.cols, 0);
+  var fixedWidths = arrays.init(this.cols, false);
   var i, j, k, prefw, cons;
   for (i = 0; i < compCount; i++) {
     cons = this.gridDatas[i];
@@ -254,7 +265,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function() {
     }
   }
 
-  var lc = scout.LayoutConstants;
+  var lc = LayoutConstants;
   for (i = 0; i < this.cols; i++) {
     this.width[i] = [];
     if (fixedWidths[i]) {
@@ -296,13 +307,13 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function() {
       this.weightX[i] = this.weightX[i] * f;
     }
   }
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype._initializeRows = function() {
+_initializeRows() {
   var compSize = this.compSize;
   var compCount = compSize.length;
-  var prefHeights = scout.arrays.init(this.rows, 0);
-  var fixedHeights = scout.arrays.init(this.rows, false);
+  var prefHeights = arrays.init(this.rows, 0);
+  var fixedHeights = arrays.init(this.rows, false);
   var i, j, k, prefh, cons;
   for (i = 0; i < compCount; i++) {
     cons = this.gridDatas[i];
@@ -362,7 +373,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function() {
     }
   }
 
-  var lc = scout.LayoutConstants;
+  var lc = LayoutConstants;
   for (i = 0; i < this.rows; i++) {
     this.height[i] = [];
     if (fixedHeights[i]) {
@@ -403,19 +414,19 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function() {
       this.weightY[i] = this.weightY[i] * f;
     }
   }
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
+layoutCellBounds(size, insets) {
   var w = this.layoutSizes(size.width - insets.horizontal() - Math.max(0, (this.cols - 1) * this.hgap), this.width, this.weightX);
   var h = this.layoutSizes(size.height - insets.vertical() - Math.max(0, (this.rows - 1) * this.vgap), this.height, this.weightY);
-  this.cellBounds = scout.arrays.init(this.rows, null);
+  this.cellBounds = arrays.init(this.rows, null);
   var y = insets.top,
     r, x, c;
   for (r = 0; r < this.rows; r++) {
     x = insets.left;
-    this.cellBounds[r] = scout.arrays.init(this.cols, null);
+    this.cellBounds[r] = arrays.init(this.cols, null);
     for (c = 0; c < this.cols; c++) {
-      this.cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
+      this.cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
       x += w[c];
       x += this.hgap;
     }
@@ -423,30 +434,30 @@ scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) 
     y += this.vgap;
   }
   return this.cellBounds;
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, weights) {
+layoutSizes(targetSize, sizes, weights) {
   var i;
-  var outSizes = scout.arrays.init(sizes.length, 0);
+  var outSizes = arrays.init(sizes.length, 0);
   if (targetSize <= 0) {
     for (i = 0; i < sizes.length; i++) {
-      outSizes[i] = sizes[i][scout.LayoutConstants.MIN];
+      outSizes[i] = sizes[i][LayoutConstants.MIN];
     }
     return outSizes;
   }
   var sumSize = 0;
-  var tmpWeight = scout.arrays.init(weights.length, 0.0);
+  var tmpWeight = arrays.init(weights.length, 0.0);
   var sumWeight = 0;
   for (i = 0; i < sizes.length; i++) {
-    outSizes[i] = sizes[i][scout.LayoutConstants.PREF];
+    outSizes[i] = sizes[i][LayoutConstants.PREF];
     sumSize += outSizes[i];
     tmpWeight[i] = weights[i];
     /**
      * auto correction: if weight is 0 and min / max sizes are NOT equal then
      * set weight to 1; if weight<eps set it to 0
      */
-    if (tmpWeight[i] < scout.LayoutConstants.EPS) {
-      if (sizes[i][scout.LayoutConstants.MAX] > sizes[i][scout.LayoutConstants.MIN]) {
+    if (tmpWeight[i] < LayoutConstants.EPS) {
+      if (sizes[i][LayoutConstants.MAX] > sizes[i][LayoutConstants.MIN]) {
         tmpWeight[i] = 1;
       } else {
         tmpWeight[i] = 0;
@@ -465,7 +476,7 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
   if (Math.abs(deltaInt) > 0) {
     // setup accumulators
     /*float[]*/
-    var accWeight = scout.arrays.init(tmpWeight.length, 0.0);
+    var accWeight = arrays.init(tmpWeight.length, 0.0);
     var hasTargets;
     if (deltaInt > 0) {
       // expand, if delta is > 0
@@ -473,7 +484,7 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
       while (deltaInt > 0 && hasTargets) {
         hasTargets = false;
         for (i = 0; i < outSizes.length && deltaInt > 0; i++) {
-          if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][scout.LayoutConstants.MAX]) {
+          if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][LayoutConstants.MAX]) {
             hasTargets = true;
             accWeight[i] += tmpWeight[i];
             if (accWeight[i] > 0) {
@@ -490,7 +501,7 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
       while (deltaInt < 0 && hasTargets) {
         hasTargets = false;
         for (i = 0; i < outSizes.length && deltaInt < 0; i++) {
-          if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][scout.LayoutConstants.MIN]) {
+          if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][LayoutConstants.MIN]) {
             hasTargets = true;
             accWeight[i] += tmpWeight[i];
             if (accWeight[i] > 0) {
@@ -504,28 +515,28 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
     }
   }
   return outSizes;
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
+logicalWidthInPixel(cons) {
   var gridW = cons.gridw;
   return (this.columnWidth * gridW) + (this.hgap * Math.max(0, gridW - 1));
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
+logicalHeightInPixel(cons) {
   var gridH = cons.gridh,
     addition = cons.logicalRowHeightAddition || 0;
   return (this.rowHeight * gridH) + (this.vgap * Math.max(0, gridH - 1)) + addition;
-};
+}
 
-scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp, cons, options) {
-  var htmlComp = scout.HtmlComponent.get($comp);
+uiSizeInPixel($comp, cons, options) {
+  var htmlComp = HtmlComponent.get($comp);
   return htmlComp.prefSize(options).add(htmlComp.margins());
-};
+}
 
 /**
  * @returns the width hint for the given gridData
  */
-scout.LogicalGridLayoutInfo.prototype.widthHintForGridData = function(gridData) {
+widthHintForGridData(gridData) {
   if (this.widthHints.length === 0) {
     return null;
   }
@@ -534,4 +545,5 @@ scout.LogicalGridLayoutInfo.prototype.widthHintForGridData = function(gridData) 
     widthHint += this.widthHints[i];
   }
   return widthHint;
-};
+}
+}

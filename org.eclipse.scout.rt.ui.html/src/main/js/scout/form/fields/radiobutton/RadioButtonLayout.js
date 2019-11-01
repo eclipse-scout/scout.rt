@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonLayout = function(radioButton) {
-  scout.RadioButtonLayout.parent.call(this, radioButton);
-  this.radioButton = radioButton;
-};
-scout.inherits(scout.RadioButtonLayout, scout.ButtonLayout);
+import {ButtonLayout} from '../../../index';
 
-scout.RadioButtonLayout.prototype.layout = function($container) {
-  scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
+export default class RadioButtonLayout extends ButtonLayout {
+
+constructor(radioButton) {
+  super( radioButton);
+  this.radioButton = radioButton;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   var $icon = this.radioButton.get$Icon(),
     $circle = this.radioButton.$radioButton,
@@ -24,4 +28,5 @@ scout.RadioButtonLayout.prototype.layout = function($container) {
 
   var labelMaxWidth = $fieldContainer.width() - ($circle.outerWidth(true) + ($icon.length ? $icon.outerWidth(true) : 0));
   $label.css('max-width', labelMaxWidth);
-};
+}
+}

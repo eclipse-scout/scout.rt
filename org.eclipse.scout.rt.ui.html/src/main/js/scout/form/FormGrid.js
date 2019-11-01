@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {GridData} from '../index';
+import {LogicalGrid} from '../index';
+
 /**
  * Dummy grid for the form which actually just creates the actual grid data for the root group box from the hints.
  */
-scout.FormGrid = function() {
-  scout.FormGrid.parent.call(this);
-};
-scout.inherits(scout.FormGrid, scout.LogicalGrid);
+export default class FormGrid extends LogicalGrid {
 
-scout.FormGrid.prototype._validate = function(form) {
+constructor() {
+  super();
+}
+
+
+_validate(form) {
   // The form does not have a real logical grid but needs the gridData anyway (widthInPixel, heightInPixel, see GroupBoxLayout).
   // Grid.w is not relevant for the form, no need to pass a gridColumnCount
-  form.rootGroupBox.gridData = scout.GridData.createFromHints(form.rootGroupBox);
-};
+  form.rootGroupBox.gridData = GridData.createFromHints(form.rootGroupBox);
+}
+}

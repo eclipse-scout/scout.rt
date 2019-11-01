@@ -8,11 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LogicalGridLayoutConfig = function(options) {
-  this._extend(options);
-};
+export default class LogicalGridLayoutConfig {
 
-scout.LogicalGridLayoutConfig.prototype._extend = function(options) {
+constructor(options) {
+  this._extend(options);
+}
+
+_extend(options) {
   // -1 means use the UI defaults
   options = options || {};
   if (options.hgap > -1) {
@@ -30,13 +32,13 @@ scout.LogicalGridLayoutConfig.prototype._extend = function(options) {
   if (options.minWidth > -1) {
     this.minWidth = options.minWidth;
   }
-};
+}
 
-scout.LogicalGridLayoutConfig.prototype.clone = function() {
-  return new scout.LogicalGridLayoutConfig(this);
-};
+clone() {
+  return new LogicalGridLayoutConfig(this);
+}
 
-scout.LogicalGridLayoutConfig.prototype.applyToLayout = function(layout) {
+applyToLayout(layout) {
   layout.layoutConfig = this;
   if (this.hgap !== null && this.hgap !== undefined) {
     layout.hgap = this.hgap;
@@ -53,14 +55,15 @@ scout.LogicalGridLayoutConfig.prototype.applyToLayout = function(layout) {
   if (this.minWidth !== null && this.minWidth !== undefined) {
     layout.minWidth = this.minWidth;
   }
-};
+}
 
-scout.LogicalGridLayoutConfig.ensure = function(layoutConfig) {
+static ensure(layoutConfig) {
   if (!layoutConfig) {
     return layoutConfig;
   }
-  if (layoutConfig instanceof scout.LogicalGridLayoutConfig) {
+  if (layoutConfig instanceof LogicalGridLayoutConfig) {
     return layoutConfig;
   }
-  return new scout.LogicalGridLayoutConfig(layoutConfig);
-};
+  return new LogicalGridLayoutConfig(layoutConfig);
+}
+}

@@ -8,85 +8,93 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagBarOverflowPopup = function() {
-  scout.TagBarOverflowPopup.parent.call(this);
+import {TagFieldDeleteKeyStroke} from '../index';
+import {PopupWithHead} from '../index';
+import {TagBar} from '../index';
+import {TagFieldNavigationKeyStroke} from '../index';
+import {arrays} from '../index';
+
+export default class TagBarOverflowPopup extends PopupWithHead {
+
+constructor() {
+  super();
 
   this._tagBarPropertyChangeListener = null;
 
   // We need not only to return which element receives the initial focus
   // but we must also prepare this element so it can receive the focus
   this.initialFocus = function() {
-    return scout.TagBar.firstTagElement(this.$body)
+    return TagBar.firstTagElement(this.$body)
       .setTabbable(true)
       .addClass('focused')[0];
   };
-};
-scout.inherits(scout.TagBarOverflowPopup, scout.PopupWithHead);
+}
 
-scout.TagBarOverflowPopup.prototype._init = function(options) {
-  scout.TagBarOverflowPopup.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this._tagBarPropertyChangeListener = this._onTagBarPropertyChange.bind(this);
   this.parent.on('propertyChange', this._tagBarPropertyChangeListener);
-};
+}
 
-scout.TagBarOverflowPopup.prototype._initKeyStrokeContext = function() {
-  scout.TagBarOverflowPopup.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   this.keyStrokeContext.registerKeyStrokes([
-    new scout.TagFieldNavigationKeyStroke(this._createFieldAdapter()),
-    new scout.TagFieldDeleteKeyStroke(this._createFieldAdapter())
+    new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
+    new TagFieldDeleteKeyStroke(this._createFieldAdapter())
   ]);
-};
+}
 
-scout.TagBarOverflowPopup.prototype._destroy = function() {
+_destroy() {
   this.parent.off('propertyChange', this._tagBarPropertyChangeListener);
-  scout.TagBarOverflowPopup.parent.prototype._destroy.call(this);
-};
+  super._destroy();
+}
 
-scout.TagBarOverflowPopup.prototype._render = function() {
-  scout.TagBarOverflowPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this.$body.addClass('tag-overflow-popup');
   this._renderTags();
-};
+}
 
-scout.TagBarOverflowPopup.prototype._renderTags = function() {
+_renderTags() {
   var tagBar = this.parent;
   var visibleTags = tagBar.visibleTags();
-  var allTags = scout.arrays.ensure(tagBar.tags);
+  var allTags = arrays.ensure(tagBar.tags);
   var overflowTags = allTags.filter(function(tagText) {
     return visibleTags.indexOf(tagText) === -1;
   });
 
   var clickHandler = tagBar._onTagClick.bind(tagBar);
   var removeHandler = tagBar._onTagRemoveClick.bind(tagBar);
-  scout.TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
+  TagBar.renderTags(this.$body, overflowTags, tagBar.enabledComputed, clickHandler, removeHandler);
 
   if (!this.rendering) {
     this.revalidateLayout();
   }
 
-};
+}
 
-scout.TagBarOverflowPopup.prototype._renderHead = function() {
-  scout.TagBarOverflowPopup.parent.prototype._renderHead.call(this);
+_renderHead() {
+  super._renderHead();
 
   this._copyCssClassToHead('overflow-icon');
   this.$head
     .removeClass('popup-head menu-item')
     .addClass('tag-overflow-popup-head');
-};
+}
 
-scout.TagBarOverflowPopup.prototype._focusFirstTagElement = function() {
-  scout.TagBar.focusFirstTagElement(this.$body);
-};
+_focusFirstTagElement() {
+  TagBar.focusFirstTagElement(this.$body);
+}
 
-scout.TagBarOverflowPopup.prototype._onTagRemoveClick = function(event) {
+_onTagRemoveClick(event) {
   this.parent._onTagRemoveClick(event);
-};
+}
 
-scout.TagBarOverflowPopup.prototype._onTagBarPropertyChange = function(event) {
+_onTagBarPropertyChange(event) {
   if (event.propertyName === 'tags') {
-    var allTags = scout.arrays.ensure(this.parent.tags);
+    var allTags = arrays.ensure(this.parent.tags);
     var visibleTags = this.parent.visibleTags();
     var numTags = allTags.length;
     // close popup when no more tags left or all tags are visible (=no overflow icon)
@@ -97,13 +105,13 @@ scout.TagBarOverflowPopup.prototype._onTagBarPropertyChange = function(event) {
       this._focusFirstTagElement();
     }
   }
-};
+}
 
-scout.TagBarOverflowPopup.prototype._createFieldAdapter = function() {
-  return scout.TagBarOverflowPopup.createFieldAdapter(this);
-};
+_createFieldAdapter() {
+  return TagBarOverflowPopup.createFieldAdapter(this);
+}
 
-scout.TagBarOverflowPopup.createFieldAdapter = function(field) {
+static createFieldAdapter(field) {
   return {
     $container: function() {
       return field.$body;
@@ -127,4 +135,5 @@ scout.TagBarOverflowPopup.createFieldAdapter = function(field) {
       field.parent.parent.removeTag(tag);
     }
   };
-};
+}
+}

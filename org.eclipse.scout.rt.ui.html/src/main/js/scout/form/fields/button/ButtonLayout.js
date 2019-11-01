@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ButtonLayout = function(button) {
-  scout.ButtonLayout.parent.call(this, button);
-  this.button = button;
-};
-scout.inherits(scout.ButtonLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../../index';
+import {graphics} from '../../../index';
 
-scout.ButtonLayout.prototype.layout = function($container) {
-  scout.ButtonLayout.parent.prototype.layout.call(this, $container);
+export default class ButtonLayout extends FormFieldLayout {
+
+constructor(button) {
+  super( button);
+  this.button = button;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   var $icon = this.button.get$Icon(),
     $submenuIcon = this.button.$submenuIcon,
@@ -24,28 +29,29 @@ scout.ButtonLayout.prototype.layout = function($container) {
 
   // Set max width to make it possible to set text-overflow: ellipsis using CSS
   $label.css('max-width', ''); // reset required because .size() operations below might return wrong results when label contains complex HTML
-  var submenuIconWidth = $submenuIcon ? scout.graphics.size($submenuIcon, {
+  var submenuIconWidth = $submenuIcon ? graphics.size($submenuIcon, {
     includeMargin: true,
     exact: true
   }).width : 0;
-  var iconWidth = $icon.length ? scout.graphics.size($icon, {
+  var iconWidth = $icon.length ? graphics.size($icon, {
     includeMargin: true,
     exact: true
   }).width : 0;
   // Round up to make sure ellipsis are not shown unnecessarily when having rounding issues (e.g. in IE 11)
   var labelMaxWidth = Math.ceil($fieldContainer.width() - (submenuIconWidth + iconWidth));
   $label.css('max-width', labelMaxWidth);
-};
+}
 
-scout.ButtonLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var $label = this.button.$buttonLabel;
 
   // Reset max width before calculating pref size
   var maxWidth = $label.css('max-width');
   $label.css('max-width', '');
 
-  var prefSize = scout.ButtonLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+  var prefSize = super.preferredLayoutSize( $container, options);
   $label.css('max-width', maxWidth);
 
   return prefSize;
-};
+}
+}

@@ -8,33 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Route = function() {
+export default class Route {
+
+constructor() {
   this.location = null;
-};
+}
 
 /**
  * @returns {boolean} Whether or not this instance can handle the given location.
  *
  * @param {string} location
  */
-scout.Route.prototype.matches = function(location) {
+matches(location) {
   return false;
-};
+}
 
 /**
  * Called when the route is activated, stores the given location as instance variable.
- * This is useful for the case where a single instance of scout.Route handles multiple locations.
+ * This is useful for the case where a single instance of Route handles multiple locations.
  *
  * @param {string} location
  */
-scout.Route.prototype.activate = function(location) {
+activate(location) {
   this.location = location;
-};
+}
 
 /**
  * Called when route is deactivated because another route is activated. This is the place
  * to perform clean-up operations.
  */
-scout.Route.prototype.deactivate = function() {
+deactivate() {
 
-};
+}
+}

@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.VerticalSmartGrid = function(options) {
-  scout.VerticalSmartGrid.parent.call(this, options);
-};
-scout.inherits(scout.VerticalSmartGrid, scout.AbstractGrid);
+import {VerticalGridMatrix} from '../../index';
+import {AbstractGrid} from '../../index';
 
-scout.VerticalSmartGrid.prototype.layoutAllDynamic = function(widgets) {
+export default class VerticalSmartGrid extends AbstractGrid {
+
+constructor(options) {
+  super( options);
+}
+
+
+layoutAllDynamic(widgets) {
   var cellCount = 0;
   widgets.forEach(function(f) {
-    var hints = scout.AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
+    var hints = AbstractGrid.getGridDataFromHints(f, this.getGridColumnCount());
     cellCount += hints.w * hints.h;
   }.bind(this));
 
   // do the calc
   var rowCount = Math.floor((cellCount + this.getGridColumnCount() - 1) / this.getGridColumnCount());
-  var matrix = new scout.VerticalGridMatrix(this.getGridColumnCount(), rowCount);
+  var matrix = new VerticalGridMatrix(this.getGridColumnCount(), rowCount);
   while (!matrix.computeGridData(widgets)) {
     matrix.resetAll(this.getGridColumnCount(), ++rowCount);
   }
@@ -32,4 +37,5 @@ scout.VerticalSmartGrid.prototype.layoutAllDynamic = function(widgets) {
     f.gridData = matrix.getGridData(f);
   });
   this.gridRows = matrix.getRowCount();
-};
+}
+}

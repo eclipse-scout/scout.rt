@@ -8,24 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupWithHeadLayout = function(popup) {
-  scout.PopupWithHeadLayout.parent.call(this, popup);
-};
-scout.inherits(scout.PopupWithHeadLayout, scout.PopupLayout);
+import {graphics} from '../index';
+import {HtmlComponent} from '../index';
+import {Insets} from '../index';
+import {PopupLayout} from '../index';
 
-scout.PopupWithHeadLayout.prototype._setSize = function(prefSize) {
-  scout.PopupWithHeadLayout.parent.prototype._setSize.call(this, prefSize);
+export default class PopupWithHeadLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
+
+_setSize(prefSize) {
+  super._setSize( prefSize);
 
   var htmlComp = this.popup.htmlComp,
     popupSize = prefSize,
-    htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
+    htmlBody = HtmlComponent.optGet(this.popup.$body);
 
   // While animating the body animation sets the size
   if (!this.popup.bodyAnimating) {
     // Set size of body
     popupSize = popupSize.subtract(htmlComp.insets());
     if (this._headVisible) {
-      var headSize = scout.graphics.size(this.popup.$head, true);
+      var headSize = graphics.size(this.popup.$head, true);
       // Adjust popup size if head changed size
       if (popupSize.width < headSize.width) {
         popupSize.width = headSize.width;
@@ -33,21 +40,21 @@ scout.PopupWithHeadLayout.prototype._setSize = function(prefSize) {
     }
     htmlBody.setSize(popupSize);
   }
-};
+}
 
 /**
  * @override
  */
-scout.PopupWithHeadLayout.prototype._adjustSize = function(prefSize) {
+_adjustSize(prefSize) {
   return this._adjustSizeWithAnchor(prefSize);
-};
+}
 
 /**
  * @override
  */
-scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
+_calcMaxSizeAroundAnchor() {
   if (!this.popup._headVisible) {
-    return scout.PopupWithHeadLayout.parent.prototype._calcMaxSizeAroundAnchor.call(this);
+    return super._calcMaxSizeAroundAnchor();
   }
 
   // Position the popup at the desired location before doing any calculations,
@@ -59,8 +66,8 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
     windowPaddingLeft = this.popup.windowPaddingX,
     windowPaddingRight = this.popup.windowPaddingX,
     windowPaddingY = this.popup.windowPaddingY,
-    popupBounds = scout.graphics.offsetBounds(htmlComp.$comp),
-    popupHeadBounds = scout.graphics.offsetBounds(this.popup.$head),
+    popupBounds = graphics.offsetBounds(htmlComp.$comp),
+    popupHeadBounds = graphics.offsetBounds(this.popup.$head),
     popupMargins = htmlComp.margins(),
     windowSize = this.popup.getWindowSize();
 
@@ -70,10 +77,10 @@ scout.PopupWithHeadLayout.prototype._calcMaxSizeAroundAnchor = function() {
   // head height is irrelevant because popup has a margin as height as the header
   maxHeightUp = (popupBounds.y - popupMargins.vertical() - windowPaddingY);
 
-  return new scout.Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
-};
+  return new Insets(maxHeightUp, maxWidthRight, maxHeightDown, maxWidthLeft);
+}
 
-scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var htmlComp = this.popup.htmlComp,
     htmlBody,
     prefSize;
@@ -87,27 +94,28 @@ scout.PopupWithHeadLayout.prototype.preferredLayoutSize = function($container, o
       height: 'auto'
     });
 
-    htmlBody = scout.HtmlComponent.optGet(this.popup.$body);
+    htmlBody = HtmlComponent.optGet(this.popup.$body);
     if (htmlBody) {
       prefSize = htmlBody.prefSize(options)
         .add(htmlBody.margins());
     } else {
-      prefSize = scout.graphics.prefSize(this.popup.$body, options)
-        .add(scout.graphics.margins(this.popup.$body));
+      prefSize = graphics.prefSize(this.popup.$body, options)
+        .add(graphics.margins(this.popup.$body));
     }
 
     $siblingBodies.removeClass('hidden');
     this.popup.$container.attr('style', popupStyleBackup);
   } else {
-    prefSize = scout.graphics.size(this.popup.$body, options)
-      .add(scout.graphics.margins(this.popup.$body));
+    prefSize = graphics.size(this.popup.$body, options)
+      .add(graphics.margins(this.popup.$body));
   }
 
   if (this.popup._headVisible) {
-    var headSize = scout.graphics.size(this.popup.$head, options)
-      .add(scout.graphics.margins(this.popup.$head));
+    var headSize = graphics.size(this.popup.$head, options)
+      .add(graphics.margins(this.popup.$head));
     prefSize.width = prefSize.width < headSize.width ? headSize.width : prefSize.width;
   }
   prefSize.add(htmlComp.insets());
   return prefSize;
-};
+}
+}

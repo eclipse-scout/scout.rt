@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupAdapter = function() {
-  scout.PopupAdapter.parent.call(this);
-};
-scout.inherits(scout.PopupAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
 
-scout.PopupAdapter.prototype._onWidgetClose = function(event) {
+export default class PopupAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetClose(event) {
   // Do not close the popup immediately, server will send the close event
   event.preventDefault();
   this._send('close');
-};
+}
 
-scout.PopupAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'close') {
     this._onWidgetClose(event);
   } else {
-    scout.PopupAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

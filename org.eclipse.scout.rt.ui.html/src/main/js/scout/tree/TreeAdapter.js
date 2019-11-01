@@ -8,13 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeAdapter = function() {
-  scout.TreeAdapter.parent.call(this);
-  this._addRemoteProperties(['displayStyle']);
-};
-scout.inherits(scout.TreeAdapter, scout.ModelAdapter);
+import {defaultValues} from '../index';
+import {Tree} from '../index';
+import {objects} from '../index';
+import {ModelAdapter} from '../index';
+import {arrays} from '../index';
 
-scout.TreeAdapter.prototype._sendNodesSelected = function(nodeIds, debounceSend) {
+export default class TreeAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+  this._addRemoteProperties(['displayStyle']);
+}
+
+
+_sendNodesSelected(nodeIds, debounceSend) {
   var eventData = {
     nodeIds: nodeIds
   };
@@ -27,38 +35,38 @@ scout.TreeAdapter.prototype._sendNodesSelected = function(nodeIds, debounceSend)
       return this.target === previous.target && this.type === previous.type;
     }
   });
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetNodeClick = function(event) {
+_onWidgetNodeClick(event) {
   this._send('nodeClick', {
     nodeId: event.node.id
   });
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetNodeAction = function(event) {
+_onWidgetNodeAction(event) {
   this._send('nodeAction', {
     nodeId: event.node.id
   });
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetNodesSelected = function(event) {
+_onWidgetNodesSelected(event) {
   var nodeIds = this.widget._nodesToIds(this.widget.selectedNodes);
   this._sendNodesSelected(nodeIds, event.debounce);
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetNodeExpanded = function(event) {
+_onWidgetNodeExpanded(event) {
   this._send('nodeExpanded', {
     nodeId: event.node.id,
     expanded: event.expanded,
     expandedLazy: event.expandedLazy
   });
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetNodesChecked = function(event) {
+_onWidgetNodesChecked(event) {
   this._sendNodesChecked(event.nodes);
-};
+}
 
-scout.TreeAdapter.prototype._sendNodesChecked = function(nodes) {
+_sendNodesChecked(nodes) {
   var data = {
     nodes: []
   };
@@ -71,9 +79,9 @@ scout.TreeAdapter.prototype._sendNodesChecked = function(nodes) {
   }
 
   this._send('nodesChecked', data);
-};
+}
 
-scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'nodesSelected') {
     this._onWidgetNodesSelected(event);
   } else if (event.type === 'nodeClick') {
@@ -85,11 +93,11 @@ scout.TreeAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'nodesChecked') {
     this._onWidgetNodesChecked(event);
   } else {
-    scout.TreeAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.TreeAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
   } else if (event.type === 'nodesUpdated') {
@@ -113,11 +121,11 @@ scout.TreeAdapter.prototype.onModelAction = function(event) {
   } else if (event.type === 'scrollToSelection') {
     this._onScrollToSelection();
   } else {
-    scout.TreeAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
 
-scout.TreeAdapter.prototype._onNodesInserted = function(nodes, parentNodeId) {
+_onNodesInserted(nodes, parentNodeId) {
   var parentNode;
   if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.widget.nodesMap[parentNodeId];
@@ -126,13 +134,13 @@ scout.TreeAdapter.prototype._onNodesInserted = function(nodes, parentNodeId) {
     }
   }
   this.widget.insertNodes(nodes, parentNode);
-};
+}
 
-scout.TreeAdapter.prototype._onNodesUpdated = function(nodes) {
+_onNodesUpdated(nodes) {
   this.widget.updateNodes(nodes);
-};
+}
 
-scout.TreeAdapter.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
+_onNodesDeleted(nodeIds, parentNodeId) {
   var parentNode;
   if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.widget.nodesMap[parentNodeId];
@@ -142,9 +150,9 @@ scout.TreeAdapter.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
   var nodes = this.widget._nodesByIds(nodeIds);
   this.widget.deleteNodes(nodes, parentNode);
-};
+}
 
-scout.TreeAdapter.prototype._onAllChildNodesDeleted = function(parentNodeId) {
+_onAllChildNodesDeleted(parentNodeId) {
   var parentNode;
   if (parentNodeId !== null && parentNodeId !== undefined) {
     parentNode = this.widget.nodesMap[parentNodeId];
@@ -153,27 +161,27 @@ scout.TreeAdapter.prototype._onAllChildNodesDeleted = function(parentNodeId) {
     }
   }
   this.widget.deleteAllChildNodes(parentNode);
-};
+}
 
-scout.TreeAdapter.prototype._onNodesSelected = function(nodeIds) {
+_onNodesSelected(nodeIds) {
   this.addFilterForWidgetEvent(function(widgetEvent) {
     return widgetEvent.type === 'nodesSelected' &&
-      scout.arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
+      arrays.equals(nodeIds, this.widget._nodesToIds(this.widget.selectedNodes));
   }.bind(this));
   var nodes = this.widget._nodesByIds(nodeIds);
   this.widget.selectNodes(nodes);
-};
+}
 
-scout.TreeAdapter.prototype._onNodeExpanded = function(nodeId, event) {
+_onNodeExpanded(nodeId, event) {
   var node = this.widget.nodesMap[nodeId],
     options = {
       lazy: event.expandedLazy
     };
 
-  var affectedNodesMap = scout.objects.createMap();
+  var affectedNodesMap = objects.createMap();
   affectedNodesMap[nodeId] = true;
   if (event.recursive) {
-    scout.Tree.visitNodes(function(n) {
+    Tree.visitNodes(function(n) {
       affectedNodesMap[n.id] = true;
     }, node.childNodes);
   }
@@ -188,12 +196,12 @@ scout.TreeAdapter.prototype._onNodeExpanded = function(nodeId, event) {
   if (event.recursive) {
     this.widget.setNodeExpandedRecursive(node.childNodes, event.expanded, options);
   }
-};
+}
 
-scout.TreeAdapter.prototype._onNodeChanged = function(nodeId, cell) {
+_onNodeChanged(nodeId, cell) {
   var node = this.widget.nodesMap[nodeId];
 
-  scout.defaultValues.applyTo(cell, 'TreeNode');
+  defaultValues.applyTo(cell, 'TreeNode');
   node.text = cell.text;
   node.cssClass = cell.cssClass;
   node.iconId = cell.iconId;
@@ -204,9 +212,9 @@ scout.TreeAdapter.prototype._onNodeChanged = function(nodeId, cell) {
   node.htmlEnabled = cell.htmlEnabled;
 
   this.widget.changeNode(node);
-};
+}
 
-scout.TreeAdapter.prototype._onNodesChecked = function(nodes) {
+_onNodesChecked(nodes) {
   var checkedNodes = [],
     uncheckedNodes = [];
 
@@ -230,18 +238,19 @@ scout.TreeAdapter.prototype._onNodesChecked = function(nodes) {
     checkChildren: false,
     checkOnlyEnabled: false
   });
-};
+}
 
-scout.TreeAdapter.prototype._onChildNodeOrderChanged = function(childNodeIds, parentNodeId) {
+_onChildNodeOrderChanged(childNodeIds, parentNodeId) {
   var parentNode = this.widget._nodeById([parentNodeId]);
   var nodes = this.widget._nodesByIds(childNodeIds);
   this.widget.updateNodeOrder(nodes, parentNode);
-};
+}
 
-scout.TreeAdapter.prototype._onRequestFocus = function() {
+_onRequestFocus() {
   this.widget.focus();
-};
+}
 
-scout.TreeAdapter.prototype._onScrollToSelection = function() {
+_onScrollToSelection() {
   this.widget.revealSelection();
-};
+}
+}

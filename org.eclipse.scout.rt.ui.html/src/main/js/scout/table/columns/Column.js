@@ -8,7 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Column = function() {
+import {strings} from '../../index';
+import {icons} from '../../index';
+import {scout} from '../../index';
+import {Table} from '../../index';
+import {Cell} from '../../index';
+import {TableRow} from '../../index';
+import {ColumnOptimalWidthMeasurer} from '../../index';
+import * as $ from 'jquery';
+import {styles} from '../../index';
+import {GridData} from '../../index';
+import {objects} from '../../index';
+import {comparators} from '../../index';
+import {EventSupport} from '../../index';
+import {FormField} from '../../index';
+import {texts} from '../../index';
+
+export default class Column {
+
+constructor() {
   this.autoOptimizeWidth = false;
   this.autoOptimizeWidthRequired = false; // true if content of the column changed and width has to be optimized
   this.autoOptimizeMaxWidth = -1;
@@ -28,7 +46,7 @@ scout.Column = function() {
   this.index = -1;
   this.initialized = false;
   this.mandatory = false;
-  this.optimalWidthMeasurer = new scout.ColumnOptimalWidthMeasurer(this);
+  this.optimalWidthMeasurer = new ColumnOptimalWidthMeasurer(this);
   this.sortActive = false;
   this.sortAscending = true;
   this.sortIndex = -1;
@@ -37,7 +55,7 @@ scout.Column = function() {
   this.width = 60;
   this.initialWidth = undefined; // the width the column initially has
   this.prefMinWidth = null;
-  this.minWidth = scout.Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
+  this.minWidth = Column.DEFAULT_MIN_WIDTH; // the minimal width the column can have
   this.showSeparator = true;
   this.table = null;
   this.tableNodeColumn = false;
@@ -45,7 +63,7 @@ scout.Column = function() {
   this.text = null;
   this.textWrap = false;
   this.filterType = 'TextColumnUserFilter';
-  this.comparator = scout.comparators.TEXT;
+  this.comparator = comparators.TEXT;
   this.displayable = true;
   this.visible = true;
   this.textBased = true;
@@ -57,12 +75,12 @@ scout.Column = function() {
   this.events = this._createEventSupport();
 
   this._tableColumnsChangedHandler = this._onTableColumnsChanged.bind(this);
-};
+}
 
-scout.Column.DEFAULT_MIN_WIDTH = 60;
-scout.Column.NARROW_MIN_WIDTH = 32; // for columns without text (icon, check box)
+static DEFAULT_MIN_WIDTH = 60;
+static NARROW_MIN_WIDTH = 32; // for columns without text (icon, check box)
 
-scout.Column.prototype.init = function(model) {
+init(model) {
   this.session = model.session;
 
   // Copy all properties from model to this
@@ -74,34 +92,34 @@ scout.Column.prototype.init = function(model) {
   }
   this._init(model);
   this.initialized = true;
-};
+}
 
 /**
  * Override this function in order to implement custom init logic.
  */
-scout.Column.prototype._init = function(model) {
-  scout.texts.resolveTextProperty(this, 'text');
-  scout.texts.resolveTextProperty(this, 'headerTooltipText');
-  scout.icons.resolveIconProperty(this, 'headerIconId');
+_init(model) {
+  texts.resolveTextProperty(this, 'text');
+  texts.resolveTextProperty(this, 'headerTooltipText');
+  icons.resolveIconProperty(this, 'headerIconId');
   this._setTable(this.table);
   this._setDisplayable(this.displayable);
   this._setAutoOptimizeWidth(this.autoOptimizeWidth);
   // no need to call setEditable here. cell propagation is done in _initCell
-};
+}
 
-scout.Column.prototype.destroy = function() {
+destroy() {
   this._destroy();
   this._setTable(null);
-};
+}
 
 /**
  * Override this function in order to implement custom destroy logic.
  */
-scout.Column.prototype._destroy = function(model) {
+_destroy(model) {
   // NOP
-};
+}
 
-scout.Column.prototype._setTable = function(table) {
+_setTable(table) {
   if (this.table) {
     this.table.off('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
   }
@@ -109,7 +127,7 @@ scout.Column.prototype._setTable = function(table) {
   if (this.table) {
     this.table.on('columnMoved columnStructureChanged', this._tableColumnsChangedHandler);
   }
-};
+}
 
 /**
  * Converts the vararg if it is of type string to an object with
@@ -119,31 +137,31 @@ scout.Column.prototype._setTable = function(table) {
  * 'My Company' --> { text: 'MyCompany'; }
  *
  * @see JsonCell.java
- * @param {scout.Cell|string|number|object} vararg either a Cell instance or a scalar value
+ * @param {Cell|string|number|object} vararg either a Cell instance or a scalar value
  */
-scout.Column.prototype.initCell = function(vararg, row) {
+initCell(vararg, row) {
   var cell = this._ensureCell(vararg);
   this._initCell(cell);
 
   // If a text is provided, use that text instead of using formatValue to generate a text based on the value
-  if (scout.objects.isNullOrUndefined(cell.text)) {
+  if (objects.isNullOrUndefined(cell.text)) {
     this._updateCellText(row, cell);
   }
   return cell;
-};
+}
 
 /**
  * Ensures that a Cell instance is returned. When vararg is a scalar value a new Cell instance is created and
  * the value is set as cell.value property.
  *
- * @param {scout.Cell|string|number|object} vararg either a Cell instance or a scalar value
+ * @param {Cell|string|number|object} vararg either a Cell instance or a scalar value
  * @returns {*}
  * @private
  */
-scout.Column.prototype._ensureCell = function(vararg) {
+_ensureCell(vararg) {
   var cell;
 
-  if (vararg instanceof scout.Cell) {
+  if (vararg instanceof Cell) {
     cell = vararg;
 
     // value may be set but may have the wrong type (e.g. text instead of date) -> ensure type
@@ -156,16 +174,16 @@ scout.Column.prototype._ensureCell = function(vararg) {
   }
 
   return cell;
-};
+}
 
 /**
  * Override this method to create a value based on the given scalar value.
  */
-scout.Column.prototype._parseValue = function(scalar) {
+_parseValue(scalar) {
   return scalar;
-};
+}
 
-scout.Column.prototype._updateCellText = function(row, cell) {
+_updateCellText(row, cell) {
   var value = cell.value;
   if (!row) {
     // row is omitted when creating aggregate cells
@@ -179,46 +197,46 @@ scout.Column.prototype._updateCellText = function(row, cell) {
   } else {
     this.setCellText(row, returned, cell);
   }
-};
+}
 
-scout.Column.prototype._formatValue = function(value) {
+_formatValue(value) {
   return scout.nvl(value, '');
-};
+}
 
 /**
  * If cell does not define properties, use column values.
  * Override this function to impl. type specific init cell behavior.
  *
- * @param {scout.Cell} cell
+ * @param {Cell} cell
  */
-scout.Column.prototype._initCell = function(cell) {
+_initCell(cell) {
   cell.cssClass = scout.nvl(cell.cssClass, this.cssClass);
   cell.editable = scout.nvl(cell.editable, this.editable);
   cell.horizontalAlignment = scout.nvl(cell.horizontalAlignment, this.horizontalAlignment);
   cell.htmlEnabled = scout.nvl(cell.htmlEnabled, this.htmlEnabled);
   cell.mandatory = scout.nvl(cell.mandatory, this.mandatory);
   return cell;
-};
+}
 
-scout.Column.prototype.buildCellForRow = function(row) {
+buildCellForRow(row) {
   var cell = this.cell(row);
   return this.buildCell(cell, row);
-};
+}
 
-scout.Column.prototype.buildCellForAggregateRow = function(aggregateRow) {
+buildCellForAggregateRow(aggregateRow) {
   var cell;
   if (this.grouped) {
-    var refRow = (this.table.groupingStyle === scout.Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
+    var refRow = (this.table.groupingStyle === Table.GroupingStyle.TOP ? aggregateRow.nextRow : aggregateRow.prevRow);
     cell = this.createAggrGroupCell(refRow);
   } else {
     var aggregateValue = aggregateRow.contents[this.table.columns.indexOf(this)];
     cell = this.createAggrValueCell(aggregateValue);
   }
   return this.buildCell(cell, {});
-};
+}
 
-scout.Column.prototype.buildCell = function(cell, row) {
-  scout.assertParameter('cell', cell, scout.Cell);
+buildCell(cell, row) {
+  scout.assertParameter('cell', cell, Cell);
 
   var tableNodeColumn = this.table.isTableNodeColumn(this),
     rowPadding = 0;
@@ -241,7 +259,7 @@ scout.Column.prototype.buildCell = function(cell, row) {
   if (!text && !icon) {
     // If every cell of a row is empty the row would collapse, using nbsp makes sure the row is as height as the others even if it is empty
     content = '&nbsp;';
-    cssClass = scout.strings.join(' ', cssClass, 'empty');
+    cssClass = strings.join(' ', cssClass, 'empty');
   } else {
     content = icon + text;
   }
@@ -255,22 +273,22 @@ scout.Column.prototype.buildCell = function(cell, row) {
   }
 
   return this._buildCell(content, style, cssClass);
-};
+}
 
-scout.Column.prototype._buildCell = function(content, style, cssClass) {
+_buildCell(content, style, cssClass) {
   return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
-};
+}
 
-scout.Column.prototype._expandIcon = function(expanded, rowPadding) {
+_expandIcon(expanded, rowPadding) {
   var style = 'padding-left: ' + (rowPadding + this.expandableIconLevel0CellPadding) + 'px';
   var cssClasses = 'table-row-control';
   if (expanded) {
     cssClasses += ' expanded';
   }
   return '<div class="' + cssClasses + '" style="' + style + '"></div>';
-};
+}
 
-scout.Column.prototype._icon = function(iconId, hasText) {
+_icon(iconId, hasText) {
   var cssClass, icon;
   if (!iconId) {
     return;
@@ -279,7 +297,7 @@ scout.Column.prototype._icon = function(iconId, hasText) {
   if (hasText) {
     cssClass += ' with-text';
   }
-  icon = scout.icons.parseIconId(iconId);
+  icon = icons.parseIconId(iconId);
   if (icon.isFontIcon()) {
     cssClass += ' font-icon';
     return '<span class="' + icon.appendCssClass(cssClass) + '">' + icon.iconCharacter + '</span>';
@@ -287,22 +305,22 @@ scout.Column.prototype._icon = function(iconId, hasText) {
     cssClass += ' image-icon';
     return '<img class="' + cssClass + '" src="' + icon.iconUrl + '">';
   }
-};
+}
 
-scout.Column.prototype._text = function(cell) {
+_text(cell) {
   var text = cell.text || '';
 
   if (!cell.htmlEnabled) {
     text = cell.encodedText() || '';
     if (this.table.multilineText) {
-      text = scout.strings.nl2br(text, false);
+      text = strings.nl2br(text, false);
     }
   }
 
   return text;
-};
+}
 
-scout.Column.prototype._cellCssClass = function(cell, tableNode) {
+_cellCssClass(cell, tableNode) {
   var cssClass = 'table-cell';
   if (cell.mandatory) {
     cssClass += ' mandatory';
@@ -316,7 +334,7 @@ scout.Column.prototype._cellCssClass = function(cell, tableNode) {
   if (cell.errorStatus) {
     cssClass += ' has-error';
   }
-  cssClass += ' halign-' + scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
+  cssClass += ' halign-' + Table.parseHorizontalAlignment(cell.horizontalAlignment);
   var visibleColumns = this.table.visibleColumns();
   var overAllColumnPosition = visibleColumns.indexOf(this);
   if (overAllColumnPosition === 0) {
@@ -333,9 +351,9 @@ scout.Column.prototype._cellCssClass = function(cell, tableNode) {
     cssClass += ' ' + cell.cssClass;
   }
   return cssClass;
-};
+}
 
-scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) {
+_cellStyle(cell, tableNodeColumn, rowPadding) {
   var style,
     width = this.width;
 
@@ -347,24 +365,24 @@ scout.Column.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) 
     // calculate padding
     style += ' padding-left: ' + (this.tableNodeLevel0CellPadding + rowPadding) + 'px; ';
   }
-  style += scout.styles.legacyStyle(cell);
+  style += styles.legacyStyle(cell);
   return style;
-};
+}
 
-scout.Column.prototype.onMouseUp = function(event, $row) {
+onMouseUp(event, $row) {
   var row = $row.data('row'),
     cell = this.cell(row);
 
   if (this.isCellEditable(row, cell, event)) {
     this.table.prepareCellEdit(this, row, true);
   }
-};
+}
 
-scout.Column.prototype.isCellEditable = function(row, cell, event) {
+isCellEditable(row, cell, event) {
   return this.table.enabledComputed && row.enabled && cell.editable && !event.ctrlKey && !event.shiftKey;
-};
+}
 
-scout.Column.prototype.startCellEdit = function(row, field) {
+startCellEdit(row, field) {
   var popup,
     $row = row.$row,
     cell = this.cell(row),
@@ -383,109 +401,109 @@ scout.Column.prototype.startCellEdit = function(row, field) {
   popup.$anchor = $cell;
   popup.open(this.table.$data);
   return popup;
-};
+}
 
 /**
  * @returns the cell object for this column from the given row.
  */
-scout.Column.prototype.cell = function(row) {
+cell(row) {
   return this.table.cell(this, row);
-};
+}
 
 /**
  * @returns the cell object for this column from the first selected row in the table.
  */
-scout.Column.prototype.selectedCell = function() {
+selectedCell() {
   var selectedRow = this.table.selectedRow();
   return this.table.cell(this, selectedRow);
-};
+}
 
-scout.Column.prototype.cellValueOrText = function(row) {
+cellValueOrText(row) {
   if (this.textBased) {
     return this.table.cellText(this, row);
   } else {
     return this.table.cellValue(this, row);
   }
-};
+}
 
 /**
  * @returns the cell value to be used for grouping and filtering (chart, column filter).
  */
-scout.Column.prototype.cellValueOrTextForCalculation = function(row) {
+cellValueOrTextForCalculation(row) {
   var cell = this.cell(row);
   var value = this.cellValueOrText(row);
-  if (scout.objects.isNullOrUndefined(value)) {
+  if (objects.isNullOrUndefined(value)) {
     return null;
   }
   return this._preprocessValueOrTextForCalculation(value, cell);
-};
+}
 
-scout.Column.prototype._preprocessValueOrTextForCalculation = function(value, cell) {
+_preprocessValueOrTextForCalculation(value, cell) {
   if (typeof value === 'string') {
     // In case of string columns, value and text are equal -> use _preprocessStringForCalculation to handle html tags and new lines correctly
     return this._preprocessTextForCalculation(value, cell.htmlEnabled);
   }
   return value;
-};
+}
 
-scout.Column.prototype._preprocessTextForCalculation = function(text, htmlEnabled) {
+_preprocessTextForCalculation(text, htmlEnabled) {
   return this._preprocessText(text, {
     removeHtmlTags: htmlEnabled,
     removeNewlines: true,
     trim: true
   });
-};
+}
 
 /**
  * @returns {string} the cell text to be used for table grouping
  */
-scout.Column.prototype.cellTextForGrouping = function(row) {
+cellTextForGrouping(row) {
   var cell = this.cell(row);
   return this._preprocessTextForGrouping(cell.text, cell.htmlEnabled);
-};
+}
 
-scout.Column.prototype._preprocessTextForGrouping = function(text, htmlEnabled) {
+_preprocessTextForGrouping(text, htmlEnabled) {
   return this._preprocessText(text, {
     removeHtmlTags: htmlEnabled,
     trim: true
   });
-};
+}
 
 /**
  * @returns {string} the cell text to be used for the text filter
  */
-scout.Column.prototype.cellTextForTextFilter = function(row) {
+cellTextForTextFilter(row) {
   var cell = this.cell(row);
   return this._preprocessTextForTextFilter(cell.text, cell.htmlEnabled);
-};
+}
 
-scout.Column.prototype._preprocessTextForTextFilter = function(text, htmlEnabled) {
+_preprocessTextForTextFilter(text, htmlEnabled) {
   return this._preprocessText(text, {
     removeHtmlTags: htmlEnabled
   });
-};
+}
 
 /**
  * @returns {string} the cell text to be used for the table row detail.
  */
-scout.Column.prototype.cellTextForRowDetail = function(row) {
+cellTextForRowDetail(row) {
   var cell = this.cell(row);
 
   return this._preprocessText(this._text(cell), {
     removeHtmlTags: cell.htmlEnabled
   });
-};
+}
 
 /**
  * Removes html tags, converts to single line, removes leading and trailing whitespaces.
  */
-scout.Column.prototype._preprocessText = function(text, options) {
+_preprocessText(text, options) {
   if (text === null || text === undefined) {
     return text;
   }
   options = options || {};
   if (options.removeHtmlTags) {
-    text = scout.strings.plainText(text);
+    text = strings.plainText(text);
   }
   if (options.removeNewlines) {
     text = text.replace('\n', ' ');
@@ -494,9 +512,9 @@ scout.Column.prototype._preprocessText = function(text, options) {
     text = text.trim();
   }
   return text;
-};
+}
 
-scout.Column.prototype.setCellValue = function(row, value) {
+setCellValue(row, value) {
   var cell = this.cell(row);
 
   // value may have the wrong type (e.g. text instead of date) -> ensure type
@@ -508,13 +526,13 @@ scout.Column.prototype.setCellValue = function(row, value) {
   }
 
   cell.setValue(value);
-  if (row.status === scout.TableRow.Status.NON_CHANGED) {
-    row.status = scout.TableRow.Status.UPDATED;
+  if (row.status === TableRow.Status.NON_CHANGED) {
+    row.status = TableRow.Status.UPDATED;
   }
   this._updateCellText(row, cell);
-};
+}
 
-scout.Column.prototype.setCellTextDeferred = function(promise, row, cell) {
+setCellTextDeferred(promise, row, cell) {
   promise
     .done(function(text) {
       this.setCellText(row, text, cell);
@@ -527,9 +545,9 @@ scout.Column.prototype.setCellTextDeferred = function(promise, row, cell) {
   // (then) promises always resolve asynchronously which means the text will always be set later after row is initialized and will generate an update row event.
   // To make sure not every cell update will render the viewport (which is an expensive operation), the update is buffered and done as soon as all promises resolve.
   this.table.updateBuffer.pushPromise(promise);
-};
+}
 
-scout.Column.prototype.setCellText = function(row, text, cell) {
+setCellText(row, text, cell) {
   if (!cell) {
     cell = this.cell(row);
   }
@@ -541,16 +559,16 @@ scout.Column.prototype.setCellText = function(row, text, cell) {
   if (row.initialized && this.table) {
     this.table.updateRow(row);
   }
-};
+}
 
-scout.Column.prototype.setCellErrorStatus = function(row, errorStatus, cell) {
+setCellErrorStatus(row, errorStatus, cell) {
   if (!cell) {
     cell = this.cell(row);
   }
   cell.setErrorStatus(errorStatus);
-};
+}
 
-scout.Column.prototype.setHorizontalAlignment = function(hAlign) {
+setHorizontalAlignment(hAlign) {
   if (this.horizontalAlignment === hAlign) {
     return;
   }
@@ -565,9 +583,9 @@ scout.Column.prototype.setHorizontalAlignment = function(hAlign) {
   if (this.table.header) {
     this.table.header.updateHeader(this);
   }
-};
+}
 
-scout.Column.prototype.setEditable = function(editable) {
+setEditable(editable) {
   if (this.editable === editable) {
     return;
   }
@@ -578,9 +596,9 @@ scout.Column.prototype.setEditable = function(editable) {
   }.bind(this));
 
   this.table.updateRows(this.table.rows);
-};
+}
 
-scout.Column.prototype.setMandatory = function(mandatory) {
+setMandatory(mandatory) {
   if (this.mandatory === mandatory) {
     return;
   }
@@ -591,9 +609,9 @@ scout.Column.prototype.setMandatory = function(mandatory) {
   }.bind(this));
 
   this.table.updateRows(this.table.rows);
-};
+}
 
-scout.Column.prototype.setCssClass = function(cssClass) {
+setCssClass(cssClass) {
   if (this.cssClass === cssClass) {
     return;
   }
@@ -605,16 +623,16 @@ scout.Column.prototype.setCssClass = function(cssClass) {
   }, this);
 
   this.table.updateRows(this.table.rows);
-};
+}
 
-scout.Column.prototype.setWidth = function(width) {
+setWidth(width) {
   if (this.width === width) {
     return;
   }
   this.table.resizeColumn(this, width);
-};
+}
 
-scout.Column.prototype.createAggrGroupCell = function(row) {
+createAggrGroupCell(row) {
   var cell = this.cell(row);
   return this.initCell(scout.create('Cell', {
     // value necessary for value based columns (e.g. checkbox column)
@@ -624,57 +642,57 @@ scout.Column.prototype.createAggrGroupCell = function(row) {
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
   }));
-};
+}
 
-scout.Column.prototype.createAggrValueCell = function(value) {
+createAggrValueCell(value) {
   return this.createAggrEmptyCell();
-};
+}
 
-scout.Column.prototype.createAggrEmptyCell = function() {
+createAggrEmptyCell() {
   return this.initCell(scout.create('Cell', {
     empty: true
   }));
-};
+}
 
-scout.Column.prototype.calculateOptimalWidth = function() {
+calculateOptimalWidth() {
   return this.optimalWidthMeasurer.measure();
-};
+}
 
 /**
  * Returns a type specific column user-filter. The default impl. returns a ColumnUserFilter.
  * Sub-classes that must return another type, must simply change the value of the 'filterType' property.
  */
-scout.Column.prototype.createFilter = function(model) {
+createFilter(model) {
   return scout.create(this.filterType, {
     session: this.session,
     table: this.table,
     column: this
   });
-};
+}
 
 /**
  * @returns a field instance used as editor when a cell of this column is in edit mode.
  */
-scout.Column.prototype.createEditor = function(row) {
+createEditor(row) {
   var field = this._createEditor(row);
   var cell = this.cell(row);
   field.setLabelVisible(false);
   field.setValue(cell.value);
-  field.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
-  var hints = new scout.GridData(field.gridDataHints);
+  field.setFieldStyle(FormField.FieldStyle.CLASSIC);
+  var hints = new GridData(field.gridDataHints);
   hints.horizontalAlignment = cell.horizontalAlignment;
   field.setGridDataHints(hints);
   return field;
-};
+}
 
-scout.Column.prototype._createEditor = function() {
+_createEditor() {
   return scout.create('StringField', {
     parent: this.table,
     maxLength: this.maxLength,
     multilineText: this.table.multilineText,
     wrapText: this.textWrap
   });
-};
+}
 
 /**
  * Override this function to install a specific compare function on a column instance.
@@ -682,79 +700,79 @@ scout.Column.prototype._createEditor = function() {
  *
  * @returns whether or not it was possible to install a compare function. If not, client side sorting is disabled.
  */
-scout.Column.prototype.installComparator = function() {
+installComparator() {
   return this.comparator.install(this.session);
-};
+}
 
 /**
  * @returns whether or not it is possible to sort this column.
  * As a side effect a comparator is installed.
  */
-scout.Column.prototype.isSortingPossible = function() {
+isSortingPossible() {
   // If installation fails sorting is still possible (in case of the text comparator just without a collator)
   this.installComparator();
   return true;
-};
+}
 
-scout.Column.prototype.compare = function(row1, row2) {
+compare(row1, row2) {
   var valueA = this.cellValueOrText(row1);
   var valueB = this.cellValueOrText(row2);
   return this.comparator.compare(valueA, valueB);
-};
+}
 
-scout.Column.prototype.isVisible = function() {
+isVisible() {
   return this.displayable && this.visible;
-};
+}
 
-scout.Column.prototype.setVisible = function(visible) {
+setVisible(visible) {
   if (this.visible === visible) {
     return;
   }
   this._setVisible(visible);
-};
+}
 
-scout.Column.prototype._setVisible = function(visible) {
+_setVisible(visible) {
   this.visible = visible;
   if (this.initialized) {
     this.table.onColumnVisibilityChanged(this);
   }
-};
+}
 
-scout.Column.prototype.setDisplayable = function(displayable) {
+setDisplayable(displayable) {
   if (this.displayable === displayable) {
     return;
   }
   this._setDisplayable(displayable);
-};
+}
 
-scout.Column.prototype._setDisplayable = function(displayable) {
+_setDisplayable(displayable) {
   this.displayable = displayable;
   if (this.initialized) {
     this.table.onColumnVisibilityChanged(this);
   }
-};
+}
 
-scout.Column.prototype.setAutoOptimizeWidth = function(autoOptimizeWidth) {
+setAutoOptimizeWidth(autoOptimizeWidth) {
   if (this.autoOptimizeWidth === autoOptimizeWidth) {
     return;
   }
   this._setAutoOptimizeWidth(autoOptimizeWidth);
-};
+}
 
-scout.Column.prototype._setAutoOptimizeWidth = function(autoOptimizeWidth) {
+_setAutoOptimizeWidth(autoOptimizeWidth) {
   this.autoOptimizeWidth = autoOptimizeWidth;
   this.autoOptimizeWidthRequired = autoOptimizeWidth;
   if (this.initialized) {
     this.table.columnLayoutDirty = true;
     this.table.invalidateLayoutTree();
   }
-};
+}
 
-scout.Column.prototype.setMaxLength = function(maxLength) {
+setMaxLength(maxLength) {
   this.maxLength = maxLength;
-};
+}
 
-scout.Column.prototype.setText = function(text) {
+setText(text) {
   if (this.text === text) {
     return;
   }
@@ -762,9 +780,9 @@ scout.Column.prototype.setText = function(text) {
   if (this.table.header) {
     this.table.header.updateHeader(this);
   }
-};
+}
 
-scout.Column.prototype.setHeaderIconId = function(headerIconId) {
+setHeaderIconId(headerIconId) {
   if (this.headerIconId === headerIconId) {
     return;
   }
@@ -772,9 +790,9 @@ scout.Column.prototype.setHeaderIconId = function(headerIconId) {
   if (this.table.header) {
     this.table.header.updateHeader(this);
   }
-};
+}
 
-scout.Column.prototype.setHeaderCssClass = function(headerCssClass) {
+setHeaderCssClass(headerCssClass) {
   if (this.headerCssClass === headerCssClass) {
     return;
   }
@@ -783,9 +801,9 @@ scout.Column.prototype.setHeaderCssClass = function(headerCssClass) {
   if (this.table.header) {
     this.table.header.updateHeader(this, oldState);
   }
-};
+}
 
-scout.Column.prototype.setHeaderHtmlEnabled = function(headerHtmlEnabled) {
+setHeaderHtmlEnabled(headerHtmlEnabled) {
   if (this.headerHtmlEnabled === headerHtmlEnabled) {
     return;
   }
@@ -793,17 +811,17 @@ scout.Column.prototype.setHeaderHtmlEnabled = function(headerHtmlEnabled) {
   if (this.table.header) {
     this.table.header.updateHeader(this);
   }
-};
+}
 
-scout.Column.prototype.setHeaderTooltipText = function(headerTooltipText) {
+setHeaderTooltipText(headerTooltipText) {
   this.headerTooltipText = headerTooltipText;
-};
+}
 
-scout.Column.prototype.setHeaderTooltipHtmlEnabled = function(headerTooltipHtmlEnabled) {
+setHeaderTooltipHtmlEnabled(headerTooltipHtmlEnabled) {
   this.headerTooltipHtmlEnabled = headerTooltipHtmlEnabled;
-};
+}
 
-scout.Column.prototype.setTextWrap = function(textWrap) {
+setTextWrap(textWrap) {
   if (this.textWrap === textWrap) {
     return;
   }
@@ -814,13 +832,13 @@ scout.Column.prototype.setTextWrap = function(textWrap) {
     this.table._redraw();
     this.table.invalidateLayoutTree();
   }
-};
+}
 
-scout.Column.prototype.isContentValid = function(row) {
+isContentValid(row) {
   return this.cell(row).isContentValid();
-};
+}
 
-scout.Column.prototype._onTableColumnsChanged = function(event) {
+_onTableColumnsChanged(event) {
   if (this.table.visibleColumns().indexOf(this) === 0) {
     this.tableNodeLevel0CellPadding = 28;
     this.expandableIconLevel0CellPadding = 13;
@@ -828,43 +846,44 @@ scout.Column.prototype._onTableColumnsChanged = function(event) {
     this.tableNodeLevel0CellPadding = 23;
     this.expandableIconLevel0CellPadding = 8;
   }
-};
+}
 
 //--- Event handling methods ---
-scout.Column.prototype._createEventSupport = function() {
-  return new scout.EventSupport();
-};
+_createEventSupport() {
+  return new EventSupport();
+}
 
-scout.Column.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
-};
+}
 
-scout.Column.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.Column.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.Column.prototype.off = function(type, func) {
+off(type, func) {
   this.events.off(type, func);
-};
+}
 
-scout.Column.prototype.addListener = function(listener) {
+addListener(listener) {
   this.events.addListener(listener);
-};
+}
 
-scout.Column.prototype.removeListener = function(listener) {
+removeListener(listener) {
   this.events.removeListener(listener);
-};
+}
 
 /**
  * Adds an event handler using {@link #one()} and returns a promise.
  * The promise is resolved as soon as the event is triggered.
  */
-scout.Column.prototype.when = function(type) {
+when(type) {
   return this.events.when(type);
-};
+}
+}

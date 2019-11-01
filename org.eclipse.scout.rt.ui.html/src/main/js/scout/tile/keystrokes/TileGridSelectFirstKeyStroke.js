@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridSelectFirstKeyStroke = function(tileGrid) {
-  scout.TileGridSelectFirstKeyStroke.parent.call(this, tileGrid);
-  this.stopPropagation = true;
-  this.which = [scout.keys.HOME];
-};
-scout.inherits(scout.TileGridSelectFirstKeyStroke, scout.TileGridSelectKeyStroke);
+import {TileGridSelectKeyStroke} from '../../index';
+import {keys} from '../../index';
 
-scout.TileGridSelectFirstKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TileGridSelectFirstKeyStroke.parent.prototype._accept.call(this, event);
+export default class TileGridSelectFirstKeyStroke extends TileGridSelectKeyStroke {
+
+constructor(tileGrid) {
+  super( tileGrid);
+  this.stopPropagation = true;
+  this.which = [keys.HOME];
+}
+
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -24,8 +29,9 @@ scout.TileGridSelectFirstKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
-scout.TileGridSelectFirstKeyStroke.prototype._computeNewSelection = function(extend) {
+_computeNewSelection(extend) {
   return this.getSelectionHandler().computeSelectionToFirst(extend);
-};
+}
+}

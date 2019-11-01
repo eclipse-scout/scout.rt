@@ -8,14 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeaderMenu = function() {
-  scout.TableHeaderMenu.parent.call(this);
+import {NumberColumn} from '../index';
+import {Device} from '../index';
+import {TableHeaderMenuGroup} from '../index';
+import {HtmlComponent} from '../index';
+import {Point} from '../index';
+import {scout} from '../index';
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {Table} from '../index';
+import {TableHeaderMenuLayout} from '../index';
+import {Popup} from '../index';
+import {RowLayout} from '../index';
+import {arrays} from '../index';
+
+export default class TableHeaderMenu extends Popup {
+
+constructor() {
+  super();
   this.column = null;
   this.tableHeader = null;
   this.table = null;
   this.filter = null;
-  this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
-  this.filterSortMode = scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
+  this.filterCheckedMode = TableHeaderMenu.CheckedMode.ALL;
+  this.filterSortMode = TableHeaderMenu.SortMode.ALPHABETICALLY;
   this.hasFilterTable = false;
   this.hasFilterFields = false;
 
@@ -56,10 +72,10 @@ scout.TableHeaderMenu = function() {
   // Make sure the actions are not disabled even if the table is disabled
   // To disable the menu use headerEnabled or headerMenusEnabled
   this.inheritAccessibility = false;
-};
-scout.inherits(scout.TableHeaderMenu, scout.Popup);
+}
 
-scout.TableHeaderMenu.CheckedMode = {
+
+static CheckedMode = {
   ALL: {
     checkAll: true,
     text: 'ui.SelectAllFilter'
@@ -70,7 +86,7 @@ scout.TableHeaderMenu.CheckedMode = {
   }
 };
 
-scout.TableHeaderMenu.SortMode = {
+static SortMode = {
   ALPHABETICALLY: {
     text: 'ui.SortAlphabeticallyFilter',
     cssClass: 'table-header-menu-toggle-sort-order-alphabetically'
@@ -81,9 +97,9 @@ scout.TableHeaderMenu.SortMode = {
   }
 };
 
-scout.TableHeaderMenu.prototype._init = function(options) {
+_init(options) {
   options.scrollType = options.scrollType || 'none';
-  scout.TableHeaderMenu.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.tableHeader = options.tableHeader;
   this.column = options.column;
@@ -110,23 +126,23 @@ scout.TableHeaderMenu.prototype._init = function(options) {
     this.table.on('filterRemoved', this._tableFilterHandler);
     this._filterTableRowsCheckedHandler = this._onFilterTableRowsChecked.bind(this);
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._createLayout = function() {
-  return new scout.TableHeaderMenuLayout(this);
-};
+_createLayout() {
+  return new TableHeaderMenuLayout(this);
+}
 
-scout.TableHeaderMenu.prototype._render = function() {
+_render() {
   this.leftGroups = [];
   this.$rightGroups = [];
 
   this.$headerItem.select(true);
 
   this.$container = this.$parent.appendDiv('table-header-menu');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$body = this.$container.appendDiv('table-header-menu-body');
-  scout.HtmlComponent.install(this.$body, this.session);
+  HtmlComponent.install(this.$body, this.session);
   this._installScrollbars({
     axis: 'y'
   });
@@ -135,8 +151,8 @@ scout.TableHeaderMenu.prototype._render = function() {
   // only add right column if filter has a filter-table or filter-fields
   if (this.hasFilterTable || this.hasFilterFields) {
     this.$columnFilters = this.$body.appendDiv('table-header-menu-filters');
-    var htmlColumnFilters = scout.HtmlComponent.install(this.$columnFilters, this.session);
-    htmlColumnFilters.setLayout(new scout.RowLayout());
+    var htmlColumnFilters = HtmlComponent.install(this.$columnFilters, this.session);
+    htmlColumnFilters.setLayout(new RowLayout());
   }
 
   this.tableHeader.$container.on('scroll', this._tableHeaderScrollHandler);
@@ -176,7 +192,7 @@ scout.TableHeaderMenu.prototype._render = function() {
     this.leftGroups.push(this._renderAggregationGroup());
   }
   // Coloring
-  if (this.column instanceof scout.NumberColumn) {
+  if (this.column instanceof NumberColumn) {
     this.leftGroups.push(this._renderColoringGroup());
   }
 
@@ -196,16 +212,16 @@ scout.TableHeaderMenu.prototype._render = function() {
   if (this.table.enabled) {
     this.table.$container.addClass('focused');
   }
-};
+}
 
 /**
  * @override
  */
-scout.TableHeaderMenu.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$body;
-};
+}
 
-scout.TableHeaderMenu.prototype._updateFirstLast = function() {
+_updateFirstLast() {
   addFirstLastClass(this.leftGroups.filter(function(group) {
     return group.isVisible();
   }));
@@ -222,12 +238,12 @@ scout.TableHeaderMenu.prototype._updateFirstLast = function() {
   // work with a model-class (like the button menu groups). Currently this would cause
   // to much work.
   function toggleCssClass(group, cssClass, condition) {
-    var $container = group instanceof scout.TableHeaderMenuGroup ? group.$container : group;
+    var $container = group instanceof TableHeaderMenuGroup ? group.$container : group;
     $container.toggleClass(cssClass, condition);
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._remove = function() {
+_remove() {
   if (this.filterTable) {
     this.filterTable.off('rowsChecked', this._filterTableRowsCheckedHandler);
   }
@@ -236,15 +252,15 @@ scout.TableHeaderMenu.prototype._remove = function() {
   this.table.off('columnMoved', this._onColumnMovedHandler);
   this.table.off('filterAdded', this._tableFilterHandler);
   this.table.off('filterRemoved', this._tableFilterHandler);
-  scout.TableHeaderMenu.parent.prototype._remove.call(this);
+  super._remove();
 
   // table may have been removed in the meantime
   if (this.table.rendered) {
     this.table.$container.removeClass('focused');
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
+_renderMovingGroup() {
   var table = this.table,
     column = this.column,
     pos = table.visibleColumns().indexOf(column);
@@ -296,9 +312,9 @@ scout.TableHeaderMenu.prototype._renderMovingGroup = function() {
 
   this.moveGroup.render(this.$columnActions);
   return this.moveGroup;
-};
+}
 
-scout.TableHeaderMenu.prototype._onColumnMoved = function() {
+_onColumnMoved() {
   var table = this.table,
     column = this.column;
 
@@ -316,13 +332,13 @@ scout.TableHeaderMenu.prototype._onColumnMoved = function() {
 
   this.hierarchyGroup.setVisible(this.table.isTableNodeColumn(column));
   this._updateFirstLast();
-};
+}
 
-scout.TableHeaderMenu.prototype._isColumnActionsGroupVisible = function() {
+_isColumnActionsGroupVisible() {
   return this.table.columnAddable || this.column.removable || this.column.modifiable;
-};
+}
 
-scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
+_renderColumnActionsGroup() {
   var column = this.column,
     menuPopup = this;
 
@@ -365,9 +381,9 @@ scout.TableHeaderMenu.prototype._renderColumnActionsGroup = function() {
       column: column
     });
   }
-};
+}
 
-scout.TableHeaderMenu.prototype.onColumnActionsChanged = function(event) {
+onColumnActionsChanged(event) {
   this.addColumnButton.setVisible(event.addVisible);
   this.removeColumnButton.setVisible(event.removeVisible);
   this.modifyColumnButton.setVisible(event.modifyVisible);
@@ -375,9 +391,9 @@ scout.TableHeaderMenu.prototype.onColumnActionsChanged = function(event) {
     return button.visible;
   });
   this.columnActionsGroup.setVisible(groupVisible);
-};
+}
 
-scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
+_renderSortingGroup() {
   var table = this.table,
     column = this.column,
     menuPopup = this;
@@ -443,9 +459,9 @@ scout.TableHeaderMenu.prototype._renderSortingGroup = function() {
     table.sort(column, direction, multiSort, remove);
     menuPopup._updateSortingSelectedState();
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._updateSortingSelectedState = function() {
+_updateSortingSelectedState() {
   if (!this.table.sortEnabled) {
     return;
   }
@@ -484,9 +500,9 @@ scout.TableHeaderMenu.prototype._updateSortingSelectedState = function() {
 
   this.sortAscAddButton.setVisible(showAddCommands);
   this.sortDescAddButton.setVisible(showAddCommands);
-};
+}
 
-scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
+_renderGroupingGroup() {
   var menuPopup = this,
     table = this.table,
     column = this.column,
@@ -547,9 +563,9 @@ scout.TableHeaderMenu.prototype._renderGroupingGroup = function() {
     menuPopup.close();
     table.groupColumn(column, this.additional, direction, !this.selected);
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
+_renderHierarchyGruop() {
   var table = this.table,
     menuPopup = this;
   this.hierarchyGroup = scout.create('TableHeaderMenuGroup', {
@@ -562,8 +578,8 @@ scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
     parent: this.hierarchyGroup,
     text: '${textKey:ui.CollapseAll}',
     cssClass: 'hierarchy-collapse-all',
-    enabled: !!scout.arrays.find(table.rows, function(row) {
-      return row.expanded && !scout.arrays.empty(row.childRows);
+    enabled: !!arrays.find(table.rows, function(row) {
+      return row.expanded && !arrays.empty(row.childRows);
     })
   });
   collapseAllButton.on('action', function() {
@@ -575,8 +591,8 @@ scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
     parent: this.hierarchyGroup,
     text: '${textKey:ui.ExpandAll}',
     cssClass: 'hierarchy-expand-all',
-    enabled: !!scout.arrays.find(table.rows, function(row) {
-      return !row.expanded && !scout.arrays.empty(row.childRows);
+    enabled: !!arrays.find(table.rows, function(row) {
+      return !row.expanded && !arrays.empty(row.childRows);
     })
   });
   expandAllButton.on('action', function() {
@@ -586,9 +602,9 @@ scout.TableHeaderMenu.prototype._renderHierarchyGruop = function() {
 
   this.hierarchyGroup.render(this.$columnActions);
   return this.hierarchyGroup;
-};
+}
 
-scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
+_renderAggregationGroup() {
   var table = this.table,
     column = this.column,
     aggregation = column.aggregationFunction,
@@ -597,7 +613,7 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
       parent: this,
       textKey: 'ui.Aggregation'
     }),
-    allowedAggregationFunctions = scout.arrays.ensure(column.allowedAggregationFunctions),
+    allowedAggregationFunctions = arrays.ensure(column.allowedAggregationFunctions),
     isAggregationNoneAllowed = allowedAggregationFunctions.indexOf('none') !== -1;
 
   createHeaderMenuButtonForAggregationFunction('${textKey:ui.Sum}', 'sum');
@@ -628,9 +644,9 @@ scout.TableHeaderMenu.prototype._renderAggregationGroup = function() {
     menuPopup.close();
     table.changeAggregation(column, this.aggregation === aggregation ? 'none' : this.aggregation);
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
+_renderColoringGroup() {
   var table = this.table,
     column = this.column,
     menuPopup = this,
@@ -658,7 +674,7 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
   });
   this.colorGradient2Button.on('action', onClick.bind(this.colorGradient2Button));
 
-  if (scout.device.supportsCssGradient()) {
+  if (Device.get().supportsCssGradient()) {
     this.barChartButton = scout.create('TableHeaderMenuButton', {
       parent: group,
       text: '${textKey:ui.withBarChart}',
@@ -679,15 +695,15 @@ scout.TableHeaderMenu.prototype._renderColoringGroup = function() {
     menuPopup.close();
     table.setColumnBackgroundEffect(column, !this.selected ? null : this.backgroundEffect);
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._renderFilterTable = function() {
+_renderFilterTable() {
   var $filterActions;
 
   this.$filterTableGroup = this.$columnFilters
     .appendDiv('table-header-menu-group first');
-  var htmlComp = scout.HtmlComponent.install(this.$filterTableGroup, this.session);
-  htmlComp.setLayout(new scout.RowLayout());
+  var htmlComp = HtmlComponent.install(this.$filterTableGroup, this.session);
+  htmlComp.setLayout(new RowLayout());
 
   $filterActions = this.$filterTableGroup
     .appendDiv('table-header-menu-filter-actions');
@@ -705,7 +721,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   this.$filterTableGroupTitle = this.$filterTableGroup
     .appendDiv('table-header-menu-group-text')
     .text(this._filterByText());
-  scout.HtmlComponent.install(this.$filterTableGroupTitle, this.session);
+  HtmlComponent.install(this.$filterTableGroupTitle, this.session);
 
   this.filterTable = scout.create('Table', {
     parent: this,
@@ -713,7 +729,7 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
     multiSelect: false,
     autoResizeColumns: true,
     checkable: true,
-    checkableStyle: scout.Table.CheckableStyle.TABLE_ROW,
+    checkableStyle: Table.CheckableStyle.TABLE_ROW,
     // column-texts are not visible since header is not visible
     columns: [{
       objectType: 'Column',
@@ -760,12 +776,12 @@ scout.TableHeaderMenu.prototype._renderFilterTable = function() {
   setTimeout(this.filterTable.revealChecked.bind(this.filterTable));
 
   return this.$filterTableGroup;
-};
+}
 
 /**
  * @returns the title-text used for the filter-table
  */
-scout.TableHeaderMenu.prototype._filterByText = function() {
+_filterByText() {
   var text = this.session.text('ui.Filter'),
     numSelected = this.filter.selectedValues.length,
     numFilters = this.filter.availableValues.length;
@@ -776,10 +792,10 @@ scout.TableHeaderMenu.prototype._filterByText = function() {
     text += ' ' + this.session.text('ui.FilterInfoCount', numFilters);
   }
   return text;
-};
+}
 
-scout.TableHeaderMenu.prototype._onFilterCheckedModeClick = function() {
-  var checkedMode = scout.TableHeaderMenu.CheckedMode;
+_onFilterCheckedModeClick() {
+  var checkedMode = TableHeaderMenu.CheckedMode;
   var checkAll = this.filterCheckedMode.checkAll;
   this.filter.selectedValues = [];
   if (this.filterCheckedMode === checkedMode.ALL) {
@@ -792,10 +808,10 @@ scout.TableHeaderMenu.prototype._onFilterCheckedModeClick = function() {
   }
   this.filterTable.checkAll(checkAll);
   this._updateFilterTableActions();
-};
+}
 
-scout.TableHeaderMenu.prototype._onSortModeClick = function() {
-  var sortMode = scout.TableHeaderMenu.SortMode;
+_onSortModeClick() {
+  var sortMode = TableHeaderMenu.SortMode;
   if (this.filterSortMode === sortMode.ALPHABETICALLY) {
     // sort by amount
     this.filterTable.sort(this.filterTable.columns[1], 'desc');
@@ -807,9 +823,9 @@ scout.TableHeaderMenu.prototype._onSortModeClick = function() {
     this.filterSortMode = sortMode.ALPHABETICALLY;
   }
   this._updateFilterTableActions();
-};
+}
 
-scout.TableHeaderMenu.prototype._updateFilterTable = function() {
+_updateFilterTable() {
   if (this.filter.filterActive()) {
     this.table.addFilter(this.filter);
   } else {
@@ -817,54 +833,54 @@ scout.TableHeaderMenu.prototype._updateFilterTable = function() {
   }
   // callback to table
   this.table.filter();
-};
+}
 
-scout.TableHeaderMenu.prototype._updateFilterTableActions = function() {
+_updateFilterTableActions() {
   // checked mode
   this.$filterToggleChecked.text(this.session.text(this.filterCheckedMode.text));
   // sort mode
-  var sortMode = scout.TableHeaderMenu.SortMode;
-  var sortAlphabetically = this.filterSortMode === scout.TableHeaderMenu.SortMode.ALPHABETICALLY;
+  var sortMode = TableHeaderMenu.SortMode;
+  var sortAlphabetically = this.filterSortMode === TableHeaderMenu.SortMode.ALPHABETICALLY;
   this.$filterSortOrder.toggleClass(sortMode.ALPHABETICALLY.cssClass, sortAlphabetically);
   this.$filterSortOrder.toggleClass(sortMode.AMOUNT.cssClass, !sortAlphabetically);
-};
+}
 
-scout.TableHeaderMenu.prototype._renderFilterFields = function() {
+_renderFilterFields() {
   this.filterFieldsGroupBox = scout.create('GroupBox:FilterFields', {
     parent: this,
     column: this.column,
     filter: this.filter
   });
   this.$filterFieldsGroup = this.$columnFilters.appendDiv('table-header-menu-group');
-  var htmlComp = scout.HtmlComponent.install(this.$filterFieldsGroup, this.session);
-  htmlComp.setLayout(new scout.RowLayout());
+  var htmlComp = HtmlComponent.install(this.$filterFieldsGroup, this.session);
+  htmlComp.setLayout(new RowLayout());
   var $filterFieldsText = this.$filterFieldsGroup
     .appendDiv('table-header-menu-group-text')
     .text(this.filter.filterFieldsTitle());
-  htmlComp = scout.HtmlComponent.install($filterFieldsText, this.session);
+  htmlComp = HtmlComponent.install($filterFieldsText, this.session);
   this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
   return this.$filterFieldsGroup;
-};
+}
 
-scout.TableHeaderMenu.prototype.isOpenFor = function($headerItem) {
+isOpenFor($headerItem) {
   return this.rendered && this.belongsTo($headerItem);
-};
+}
 
-scout.TableHeaderMenu.prototype._countColumns = function(propertyName) {
+_countColumns(propertyName) {
   return this.table.visibleColumns().reduce(function(sum, column) {
     return sum + (column[propertyName] ? 1 : 0);
   }, 0);
-};
+}
 
-scout.TableHeaderMenu.prototype._sortColumnCount = function() {
+_sortColumnCount() {
   return this._countColumns('sortActive');
-};
+}
 
-scout.TableHeaderMenu.prototype._groupColumnCount = function() {
+_groupColumnCount() {
   return this._countColumns('grouped');
-};
+}
 
-scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {
+_computeWhitherWidth() {
   var $tableHeaderContainer = this.tableHeader.$container,
     headerItemWidth = this.$headerItem.outerWidth() - this.$headerItem.cssBorderWidthX(),
     containerWidth = this.$container.outerWidth() - this.$container.cssBorderWidthX(),
@@ -879,52 +895,52 @@ scout.TableHeaderMenu.prototype._computeWhitherWidth = function() {
     whitherWidth -= clipLeft;
   }
   return whitherWidth;
-};
+}
 
-scout.TableHeaderMenu.prototype._renderCompact = function() {
+_renderCompact() {
   this.$body.toggleClass('compact', this.compact);
   this.invalidateLayoutTree();
-};
+}
 
-scout.TableHeaderMenu.prototype.setCompact = function(compact) {
+setCompact(compact) {
   this.setProperty('compact', compact);
-};
+}
 
-scout.TableHeaderMenu.prototype._onLocationChange = function(event) {
+_onLocationChange(event) {
   var inView, containerBounds,
-    isLocationInView = scout.scrollbars.isLocationInView,
-    headerItemBounds = scout.graphics.offsetBounds(this.$headerItem),
+    isLocationInView = scrollbars.isLocationInView,
+    headerItemBounds = graphics.offsetBounds(this.$headerItem),
     $tableHeaderContainer = this.tableHeader.$container;
 
   this.$container.setVisible(true);
-  containerBounds = scout.graphics.offsetBounds(this.$container);
+  containerBounds = graphics.offsetBounds(this.$container);
 
   // menu must only be visible if the header item is in view (menu gets repositioned when the table gets scrolled -> make sure it won't be displayed outside of the table)
   // check left side of the header item (necessary if header item is moved outside on the left side of the table)
-  inView = isLocationInView(new scout.Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
+  inView = isLocationInView(new Point(headerItemBounds.x, headerItemBounds.y), $tableHeaderContainer);
   if (!inView) {
     // if left side of the header is not in view, check if right side of the header and the menu, both must be visible)
     // check right side of the header item (necessary if header item is moved outside on the right side of the table)
-    inView = isLocationInView(new scout.Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
+    inView = isLocationInView(new Point(headerItemBounds.x + headerItemBounds.width, headerItemBounds.y + headerItemBounds.height), $tableHeaderContainer);
     // check right side of the menu (necessary if header item is larger than menu, and if header item is moved outside on the left side of the table)
-    inView = inView && isLocationInView(new scout.Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
+    inView = inView && isLocationInView(new Point(containerBounds.x + containerBounds.width, containerBounds.y), $tableHeaderContainer);
   }
   this.$container.setVisible(inView);
 
   // make sure whither is correctly positioned and sized
   // (bounds must be computed after setVisible, if it was hidden before bounds are not correct)
-  containerBounds = scout.graphics.offsetBounds(this.$container);
+  containerBounds = graphics.offsetBounds(this.$container);
   this.$whiter
     // if header is clipped on the left side, position whither at the left of the visible part of the header (same applies for width, see _computeWhitherWidth)
     .cssLeft(Math.max(headerItemBounds.x - containerBounds.x, $tableHeaderContainer.offset().left - containerBounds.x - this.tableHeader.table.$container.cssBorderLeftWidth()))
     .width(this._computeWhitherWidth());
-};
+}
 
-scout.TableHeaderMenu.prototype._onAnchorScroll = function(event) {
+_onAnchorScroll(event) {
   this.position();
-};
+}
 
-scout.TableHeaderMenu.prototype._onFilterTableRowsChecked = function(event) {
+_onFilterTableRowsChecked(event) {
   this.filter.selectedValues = [];
   this.filterTable.rows.forEach(function(row) {
     if (row.checked) {
@@ -932,36 +948,37 @@ scout.TableHeaderMenu.prototype._onFilterTableRowsChecked = function(event) {
     }
   }, this);
   this._updateFilterTable();
-};
+}
 
-scout.TableHeaderMenu.prototype._onFilterTableChanged = function() {
+_onFilterTableChanged() {
   this.$filterTableGroupTitle.text(this._filterByText());
   this._updateFilterTableCheckedMode();
   this._updateFilterTableActions();
-};
+}
 
 // When no filter value is selected, we change the selection mode to ALL
 // since it makes no sense to choose NONE when no value is currently selected
-scout.TableHeaderMenu.prototype._updateFilterTableCheckedMode = function() {
+_updateFilterTableCheckedMode() {
   if (this.filter.selectedValues.length === 0) {
-    this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.ALL;
+    this.filterCheckedMode = TableHeaderMenu.CheckedMode.ALL;
   } else {
-    this.filterCheckedMode = scout.TableHeaderMenu.CheckedMode.NONE;
+    this.filterCheckedMode = TableHeaderMenu.CheckedMode.NONE;
   }
-};
+}
 
-scout.TableHeaderMenu.prototype._onMouseDownOutside = function(event) {
+_onMouseDownOutside(event) {
   // close popup only if source of event is not $headerItem or one of it's children.
   if (this.$headerItem.isOrHas(event.target)) {
     return;
   }
   this.close();
-};
+}
 
 /**
  * Called by table header
  */
-scout.TableHeaderMenu.prototype.onColumnResized = function() {
+onColumnResized() {
   // Adjust whiter with if size gets changed while menu is open (may caused by TableHeader._adjustColumnMinWidth)
   this.$whiter.width(this._computeWhitherWidth());
-};
+}
+}

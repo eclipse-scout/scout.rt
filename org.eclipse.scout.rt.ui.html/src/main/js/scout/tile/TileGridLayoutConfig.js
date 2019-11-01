@@ -8,36 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridLayoutConfig = function(options) {
-  scout.TileGridLayoutConfig.parent.call(this, options);
-};
-scout.inherits(scout.TileGridLayoutConfig, scout.LogicalGridLayoutConfig);
+import {LogicalGridLayoutConfig} from '../index';
 
-scout.TileGridLayoutConfig.prototype._extend = function(options) {
-  scout.TileGridLayoutConfig.parent.prototype._extend.call(this, options);
+export default class TileGridLayoutConfig extends LogicalGridLayoutConfig {
+
+constructor(options) {
+  super( options);
+}
+
+
+_extend(options) {
+  super._extend( options);
   options = options || {};
   if (options.maxWidth > -2) {
     this.maxWidth = options.maxWidth;
   }
-};
+}
 
-scout.TileGridLayoutConfig.prototype.applyToLayout = function(layout) {
-  scout.TileGridLayoutConfig.parent.prototype.applyToLayout.call(this, layout);
+applyToLayout(layout) {
+  super.applyToLayout( layout);
   if (this.maxWidth) {
     layout.maxWidth = this.maxWidth;
   }
-};
+}
 
-scout.TileGridLayoutConfig.prototype.clone = function() {
-  return new scout.TileGridLayoutConfig(this);
-};
+clone() {
+  return new TileGridLayoutConfig(this);
+}
 
-scout.TileGridLayoutConfig.ensure = function(layoutConfig) {
+static ensure(layoutConfig) {
   if (!layoutConfig) {
     return layoutConfig;
   }
-  if (layoutConfig instanceof scout.TileGridLayoutConfig) {
+  if (layoutConfig instanceof TileGridLayoutConfig) {
     return layoutConfig;
   }
-  return new scout.TileGridLayoutConfig(layoutConfig);
-};
+  return new TileGridLayoutConfig(layoutConfig);
+}
+}

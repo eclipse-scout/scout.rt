@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ColorFieldAdapter = function() {
-  scout.ColorFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.ColorFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class ColorFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

@@ -8,52 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormMenu = function() {
-  scout.FormMenu.parent.call(this);
+import {Device} from '../index';
+import {FormMenuActionKeyStroke} from '../index';
+import {Menu} from '../index';
+import {ContextMenuPopup} from '../index';
+import {GroupBox} from '../index';
+import {scout} from '../index';
+
+export default class FormMenu extends Menu {
+
+constructor() {
+  super();
   this.form;
   this.toggleAction = true;
   this._addWidgetProperties('form');
-};
-scout.inherits(scout.FormMenu, scout.Menu);
+}
 
-scout.FormMenu.PopupStyle = {
+
+static PopupStyle = {
   DEFAULT: 'default',
   MOBILE: 'mobile'
 };
 
-scout.FormMenu.prototype._init = function(model) {
-  scout.FormMenu.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   if (!this.popupStyle) {
-    if (this.session.userAgent.deviceType === scout.Device.Type.MOBILE) {
-      this.popupStyle = scout.FormMenu.PopupStyle.MOBILE;
+    if (this.session.userAgent.deviceType === Device.Type.MOBILE) {
+      this.popupStyle = FormMenu.PopupStyle.MOBILE;
     } else {
-      this.popupStyle = scout.FormMenu.PopupStyle.DEFAULT;
+      this.popupStyle = FormMenu.PopupStyle.DEFAULT;
     }
   }
-};
+}
 
-scout.FormMenu.prototype._renderForm = function() {
+_renderForm() {
   if (!this.rendered) {
     // Don't execute initially since _renderSelected will be executed
     return;
   }
   this._renderSelected();
-};
+}
 
 /**
  * @override
  */
-scout.FormMenu.prototype.clone = function(modelOverride, options) {
+clone(modelOverride, options) {
   modelOverride = modelOverride || {};
   // If the FormMenu is put into a context menu it will be cloned.
   // Cloning a form is not possible because it may non clonable components (Table, TabBox, etc.) -> exclude
   // Luckily, it is not necessary to clone it since the form is never shown multiple times at once -> Just use the same instance
   modelOverride.form = this.form;
-  return scout.FormMenu.parent.prototype.clone.call(this, modelOverride, options);
-};
+  return super.clone( modelOverride, options);
+}
 
-scout.FormMenu.prototype._addFormRemoveHandler = function() {
+_addFormRemoveHandler() {
   if (!this.form) {
     return;
   }
@@ -61,12 +70,12 @@ scout.FormMenu.prototype._addFormRemoveHandler = function() {
   this.form.one('remove', function(event) {
     this._onFormRemove(event);
   }.bind(this));
-};
+}
 
 /**
  * Called when the popup form is removed (closed). Either by clicking the FormMenu again (toggle), the menu closed or if the Form closed itself.
  */
-scout.FormMenu.prototype._onFormRemove = function(event) {
+_onFormRemove(event) {
   if (!this.selected) {
     return; // the menu is no longer selected. It was closed by the user (toggle). There is no need to unselect and close the popups
   }
@@ -76,30 +85,30 @@ scout.FormMenu.prototype._onFormRemove = function(event) {
   }
 
   var parentContextMenuPopup = this.findParent(function(p) {
-    return p instanceof scout.ContextMenuPopup;
+    return p instanceof ContextMenuPopup;
   });
   if (parentContextMenuPopup && !(parentContextMenuPopup.destroying || parentContextMenuPopup.removing)) {
     // only explicitly close the popup if it is not already being closed. Otherwise it is removed twice.
     parentContextMenuPopup.close();
   }
-};
+}
 
 /**
  * @override Menu.js
  */
-scout.FormMenu.prototype._openPopup = function() {
-  scout.FormMenu.parent.prototype._openPopup.call(this);
+_openPopup() {
+  super._openPopup();
   this._addFormRemoveHandler();
-};
+}
 
 /**
  * @override Menu.js
  */
-scout.FormMenu.prototype._createPopup = function() {
+_createPopup() {
   // Menu bar should always be on the bottom
-  this.form.rootGroupBox.setMenuBarPosition(scout.GroupBox.MenuBarPosition.BOTTOM);
+  this.form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
 
-  if (this.popupStyle === scout.FormMenu.PopupStyle.MOBILE) {
+  if (this.popupStyle === FormMenu.PopupStyle.MOBILE) {
     return scout.create('MobilePopup', {
       parent: this.session.desktop, // use desktop to make _handleSelectedInEllipsis work (if parent is this and this were not rendered, popup.entryPoint would not work)
       widget: this.form,
@@ -113,18 +122,18 @@ scout.FormMenu.prototype._createPopup = function() {
     horizontalAlignment: this.popupHorizontalAlignment,
     verticalAlignment: this.popupVerticalAlignment
   });
-};
+}
 
 /**
  * @override
  */
-scout.FormMenu.prototype._doActionTogglesPopup = function() {
+_doActionTogglesPopup() {
   return !!this.form;
-};
+}
 
-scout.FormMenu.prototype._handleSelectedInEllipsis = function() {
-  if (this.popupStyle !== scout.FormMenu.PopupStyle.MOBILE) {
-    scout.FormMenu.parent.prototype._handleSelectedInEllipsis.call(this);
+_handleSelectedInEllipsis() {
+  if (this.popupStyle !== FormMenu.PopupStyle.MOBILE) {
+    super._handleSelectedInEllipsis();
     return;
   }
   if (!this._doActionTogglesPopup()) {
@@ -136,11 +145,12 @@ scout.FormMenu.prototype._handleSelectedInEllipsis = function() {
   } else {
     this._closePopup();
   }
-};
+}
 
 /**
  * @override
  */
-scout.FormMenu.prototype._createActionKeyStroke = function() {
-  return new scout.FormMenuActionKeyStroke(this);
-};
+_createActionKeyStroke() {
+  return new FormMenuActionKeyStroke(this);
+}
+}

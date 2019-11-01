@@ -8,13 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupToggleCollapseKeyStroke = function(group) {
-  scout.GroupToggleCollapseKeyStroke.parent.call(this, group);
-  this.field = group;
-  this.which = [scout.keys.SPACE];
-};
-scout.inherits(scout.GroupToggleCollapseKeyStroke, scout.KeyStroke);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
 
-scout.GroupToggleCollapseKeyStroke.prototype.handle = function(event) {
+export default class GroupToggleCollapseKeyStroke extends KeyStroke {
+
+constructor(group) {
+  super( group);
+  this.field = group;
+  this.which = [keys.SPACE];
+}
+
+
+handle(event) {
   this.field.toggleCollapse();
-};
+}
+}

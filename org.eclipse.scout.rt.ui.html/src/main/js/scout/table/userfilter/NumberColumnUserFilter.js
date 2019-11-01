@@ -8,8 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NumberColumnUserFilter = function() {
-  scout.NumberColumnUserFilter.parent.call(this);
+import {objects} from '../../index';
+import {ColumnUserFilter} from '../../index';
+import * as $ from 'jquery';
+
+export default class NumberColumnUserFilter extends ColumnUserFilter {
+
+constructor() {
+  super();
 
   this.numberFrom;
   this.numberFromField;
@@ -17,33 +23,33 @@ scout.NumberColumnUserFilter = function() {
   this.numberToField;
 
   this.hasFilterFields = true;
-};
-scout.inherits(scout.NumberColumnUserFilter, scout.ColumnUserFilter);
+}
+
 
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.createFilterAddedEventData = function() {
-  var data = scout.NumberColumnUserFilter.parent.prototype.createFilterAddedEventData.call(this);
+createFilterAddedEventData() {
+  var data = super.createFilterAddedEventData();
   data.numberFrom = this.numberFrom;
   data.numberTo = this.numberTo;
   return data;
-};
+}
 
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.fieldsFilterActive = function() {
-  return scout.objects.isNumber(this.numberFrom) || scout.objects.isNumber(this.numberTo);
-};
+fieldsFilterActive() {
+  return objects.isNumber(this.numberFrom) || objects.isNumber(this.numberTo);
+}
 
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey, row) {
+acceptByFields(key, normKey, row) {
   var
-    hasFrom = scout.objects.isNumber(this.numberFrom),
-    hasTo = scout.objects.isNumber(this.numberTo);
+    hasFrom = objects.isNumber(this.numberFrom),
+    hasTo = objects.isNumber(this.numberTo);
   if (hasFrom && hasTo) {
     return normKey >= this.numberFrom && normKey <= this.numberTo;
   } else if (hasFrom) {
@@ -51,19 +57,19 @@ scout.NumberColumnUserFilter.prototype.acceptByFields = function(key, normKey, r
   } else if (hasTo) {
     return normKey <= this.numberTo;
   }
-};
+}
 
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.filterFieldsTitle = function() {
+filterFieldsTitle() {
   return this.session.text('ui.NumberRange');
-};
+}
 
 /**
  * @override ColumnUserFilter
  */
-scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
+addFilterFields(groupBox) {
   this.numberFromField = groupBox.addFilterField('NumberField', 'ui.from');
   this.numberFromField.decimalFormat = this.column.decimalFormat;
   this.numberFromField.setValue(this.numberFrom);
@@ -73,9 +79,9 @@ scout.NumberColumnUserFilter.prototype.addFilterFields = function(groupBox) {
   this.numberToField.decimalFormat = this.column.decimalFormat;
   this.numberToField.setValue(this.numberTo);
   this.numberToField.on('propertyChange', this._onPropertyChange.bind(this));
-};
+}
 
-scout.NumberColumnUserFilter.prototype._onPropertyChange = function(event) {
+_onPropertyChange(event) {
   if (event.propertyName !== 'value') {
     return;
   }
@@ -83,4 +89,5 @@ scout.NumberColumnUserFilter.prototype._onPropertyChange = function(event) {
   this.numberTo = this.numberToField.value;
   $.log.isDebugEnabled() && $.log.debug('(NumberColumnUserFilter#_onPropertyChange) numberFrom=' + this.numberFrom + ' numberTo=' + this.numberTo);
   this.triggerFilterFieldsChanged(event);
-};
+}
+}

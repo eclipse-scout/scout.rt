@@ -8,20 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileTableHierarchyFilter = function(model) {
-  scout.TileTableHierarchyFilter.parent.call(this);
+import {TableFilter} from '../index';
+import * as $ from 'jquery';
+
+export default class TileTableHierarchyFilter extends TableFilter {
+
+constructor(model) {
+  super();
   $.extend(this, model);
-};
-scout.inherits(scout.TileTableHierarchyFilter, scout.TableFilter);
+}
 
-scout.TileTableHierarchyFilter.prototype.createKey = function() {
+
+createKey() {
   return 'TileTableHierarchyFilter';
-};
+}
 
-scout.TileTableHierarchyFilter.prototype.accept = function(row) {
+accept(row) {
   return !row.parentRow;
-};
+}
 
-scout.TileTableHierarchyFilter.prototype.createLabel = function() {
+createLabel() {
   return this.table.session.text('ui.TileView');
-};
+}
+}

@@ -18,40 +18,42 @@
  * no grouping character
  * no whitespace
  */
-scout.Calculator = function() {};
+export default class Calculator {
 
-scout.Calculator.prototype.isFormula = function(input) {
+constructor() {};
+
+isFormula(input) {
   return input.match(/^[\d\(\)\+\-\*\/\.]+$/);
-};
+}
 
-scout.Calculator.prototype.evalFormula = function(input) {
+evalFormula(input) {
   this._tokens = input
     .split(/([\d.]+|\(|\)|[\+\-\*\/])/)
     .filter(function(e) {
       return e.length !== 0;
     });
   return this._expr();
-};
+}
 
-scout.Calculator.prototype._next = function() {
+_next() {
   if (this._tokens.length === 0) {
     return undefined;
   }
   return this._tokens[0];
-};
+}
 
-scout.Calculator.prototype._consumeNext = function() {
+_consumeNext() {
   var cur = this._tokens[0];
   this._tokens = this._tokens.slice(1, this._tokens.length);
   return cur;
-};
+}
 
-scout.Calculator.prototype._expr = function() {
+_expr() {
   return this._sum();
-};
+}
 
 //a+b+...
-scout.Calculator.prototype._sum = function() {
+_sum() {
   var v = this._prod();
   while (this._next() === '+' || this._next() === '-') {
     switch (this._consumeNext()) { // NOSONAR
@@ -64,10 +66,10 @@ scout.Calculator.prototype._sum = function() {
     }
   }
   return v;
-};
+}
 
 //a*b*...
-scout.Calculator.prototype._prod = function() {
+_prod() {
   var v = this._unary();
   while (this._next() === '*' || this._next() === '/') {
     switch (this._consumeNext()) { // NOSONAR
@@ -80,10 +82,10 @@ scout.Calculator.prototype._prod = function() {
     }
   }
   return v;
-};
+}
 
 //[+-]123, [+-](a)
-scout.Calculator.prototype._unary = function() {
+_unary() {
   var qualifier = 1;
   if (this._next() === '+') {
     this._consumeNext();
@@ -98,10 +100,10 @@ scout.Calculator.prototype._unary = function() {
   //must be num
   v = this._consumeNext();
   return qualifier * v;
-};
+}
 
 //(a)
-scout.Calculator.prototype._group = function() {
+_group() {
   if (this._next() === '(') {
     this._consumeNext();
     var v = this._expr();
@@ -112,4 +114,5 @@ scout.Calculator.prototype._group = function() {
     return v;
   }
   return undefined;
-};
+}
+}

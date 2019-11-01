@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableUpdateBuffer = function(table) {
+import {Table} from '../index';
+import {objects} from '../index';
+import {arrays} from '../index';
+
+export default class TableUpdateBuffer {
+
+constructor(table) {
   this._rowMap = {};
   this.promises = [];
   this.table = table;
-};
+}
 
 /**
  * The buffer is active if it contains at least one promise. When all promises resolve the buffer will be processed.
  */
-scout.TableUpdateBuffer.prototype.pushPromise = function(promise) {
+pushPromise(promise) {
   this.promises.push(promise);
 
   // Also make sure viewport is not rendered as long as update events are buffered
@@ -26,37 +32,37 @@ scout.TableUpdateBuffer.prototype.pushPromise = function(promise) {
   this.table.setLoading(true);
 
   promise.always(function() {
-    scout.arrays.remove(this.promises, promise);
+    arrays.remove(this.promises, promise);
 
     // process immediately when all promises have resolved
     if (this.promises.length === 0) {
       this.process();
     }
   }.bind(this));
-};
+}
 
-scout.TableUpdateBuffer.prototype.isBuffering = function() {
+isBuffering() {
   return this.promises.length > 0;
-};
+}
 
-scout.TableUpdateBuffer.prototype.buffer = function(rows) {
-  rows = scout.arrays.ensure(rows);
+buffer(rows) {
+  rows = arrays.ensure(rows);
 
   // Don't buffer duplicate rows
   rows.forEach(function(row) {
     this._rowMap[row.id] = row;
   }, this);
-};
+}
 
 /**
- * Calls {@link scout.Table.prototype.updateRows} with the buffered rows and renders the viewport if the rendering was blocked.
+ * Calls {@link Table.prototype.updateRows} with the buffered rows and renders the viewport if the rendering was blocked.
  */
-scout.TableUpdateBuffer.prototype.process = function() {
+process() {
   if (this.table.destroyed) {
     return;
   }
 
-  var rows = scout.objects.values(this._rowMap);
+  var rows = objects.values(this._rowMap);
   this.table.updateRows(rows);
   this._rowMap = {};
 
@@ -66,4 +72,5 @@ scout.TableUpdateBuffer.prototype.process = function() {
   if (this.table._isDataRendered()) {
     this.table._renderViewport();
   }
-};
+}
+}

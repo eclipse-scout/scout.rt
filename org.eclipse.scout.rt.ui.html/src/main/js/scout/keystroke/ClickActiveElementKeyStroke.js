@@ -8,8 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ClickActiveElementKeyStroke = function(field, which) {
-  scout.ClickActiveElementKeyStroke.parent.call(this);
+import {KeyStroke} from '../index';
+
+export default class ClickActiveElementKeyStroke extends KeyStroke {
+
+constructor(field, which) {
+  super();
   this.field = field;
   this.which = which;
   this.stopPropagation = true;
@@ -17,25 +21,26 @@ scout.ClickActiveElementKeyStroke = function(field, which) {
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return event._$activeElement;
   };
-};
-scout.inherits(scout.ClickActiveElementKeyStroke, scout.KeyStroke);
+}
 
-scout.ClickActiveElementKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.ClickActiveElementKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
 
   event._$activeElement = this.field.$container.activeElement();
   return true;
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.ClickActiveElementKeyStroke.prototype.handle = function(event) {
+handle(event) {
   event._$activeElement.trigger({
     type: 'click',
     which: 1
   });
-};
+}
+}

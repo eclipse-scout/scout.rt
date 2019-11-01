@@ -8,25 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuBarLayout = function(menuBar) {
-  scout.MenuBarLayout.parent.call(this);
+import {AbstractLayout} from '../../index';
+import {HtmlComponent} from '../../index';
+import {MenuBar} from '../../index';
+import {scout} from '../../index';
+import {Dimension} from '../../index';
+import {graphics} from '../../index';
+import {arrays} from '../../index';
+
+export default class MenuBarLayout extends AbstractLayout {
+
+constructor(menuBar) {
+  super();
   this._menuBar = menuBar;
 
   this._overflowMenuItems = [];
   this._visibleMenuItems = [];
   this._ellipsis = null;
   this.collapsed = false;
-};
-scout.inherits(scout.MenuBarLayout, scout.AbstractLayout);
+}
 
-scout.MenuBarLayout.prototype.layout = function($container) {
+
+layout($container) {
   var menuItems = this._menuBar.orderedMenuItems.left.concat(this._menuBar.orderedMenuItems.right),
-    htmlContainer = scout.HtmlComponent.get($container),
+    htmlContainer = HtmlComponent.get($container),
     ellipsis;
 
   this.undoShrink(menuItems);
 
-  ellipsis = scout.arrays.find(menuItems, function(menuItem) {
+  ellipsis = arrays.find(menuItems, function(menuItem) {
     return menuItem.ellipsis;
   });
 
@@ -70,12 +80,12 @@ scout.MenuBarLayout.prototype.layout = function($container) {
       menuItem.popup.position();
     }
   });
-};
+}
 
-scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   this._overflowMenuItems = [];
   if (!this._menuBar.isVisible()) {
-    return new scout.Dimension(0, 0);
+    return new Dimension(0, 0);
   }
   var visibleMenuItems = this._menuBar.orderedMenuItems.all.filter(function(menuItem) {
       return menuItem.visible;
@@ -86,8 +96,8 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
       return overflown;
     }),
     overflowableIndexes = [],
-    htmlComp = scout.HtmlComponent.get($container),
-    prefSize = new scout.Dimension(0, 0),
+    htmlComp = HtmlComponent.get($container),
+    prefSize = new Dimension(0, 0),
     prefWidth = Number.MAX_VALUE;
 
   // consider avoid falsy 0 in tabboxes a 0 withHint will be used to calculate the minimum width
@@ -119,7 +129,7 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
   this._setFirstLastMenuMarker(visibleMenuItems);
   prefSize = this._prefSize(visibleMenuItems);
   while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {
-    if (this._menuBar.ellipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+    if (this._menuBar.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
       overflowIndex = overflowableIndexes.splice(-1)[0];
     } else {
       overflowIndex = overflowableIndexes.splice(0, 1)[0] - this._overflowMenuItems.length;
@@ -137,9 +147,9 @@ scout.MenuBarLayout.prototype.preferredLayoutSize = function($container, options
 
   this._visibleMenuItems = visibleMenuItems;
   return prefSize.add(htmlComp.insets());
-};
+}
 
-scout.MenuBarLayout.prototype._minSize = function(visibleMenuItems) {
+_minSize(visibleMenuItems) {
   var prefSize,
     minVisibleMenuItems = visibleMenuItems.filter(function(menuItem) {
       return menuItem.ellisis || !menuItem.stackable;
@@ -147,14 +157,14 @@ scout.MenuBarLayout.prototype._minSize = function(visibleMenuItems) {
   this._setFirstLastMenuMarker(minVisibleMenuItems, true);
   prefSize = this._prefSize(minVisibleMenuItems, true);
   return prefSize;
-};
+}
 
-scout.MenuBarLayout.prototype._prefSize = function(menuItems, considerEllipsis) {
-  var prefSize = new scout.Dimension(0, 0),
-    itemSize = new scout.Dimension(0, 0);
+_prefSize(menuItems, considerEllipsis) {
+  var prefSize = new Dimension(0, 0),
+    itemSize = new Dimension(0, 0);
   considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
   menuItems.forEach(function(menuItem) {
-    itemSize = new scout.Dimension(0, 0);
+    itemSize = new Dimension(0, 0);
     if (menuItem.ellipsis) {
       if (considerEllipsis) {
         itemSize = this._menuItemSize(menuItem);
@@ -166,9 +176,9 @@ scout.MenuBarLayout.prototype._prefSize = function(menuItems, considerEllipsis) 
     prefSize.width += itemSize.width;
   }, this);
   return prefSize;
-};
+}
 
-scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
+_menuItemSize(menuItem) {
   var prefSize,
     classList = menuItem.$container.attr('class');
 
@@ -179,13 +189,13 @@ scout.MenuBarLayout.prototype._menuItemSize = function(menuItem) {
   prefSize = menuItem.htmlComp.prefSize({
     useCssSize: true,
     exact: true
-  }).add(scout.graphics.margins(menuItem.$container));
+  }).add(graphics.margins(menuItem.$container));
 
   menuItem.$container.attrOrRemove('class', classList);
   return prefSize;
-};
+}
 
-scout.MenuBarLayout.prototype._setFirstLastMenuMarker = function(visibleMenuItems, considerEllipsis) {
+_setFirstLastMenuMarker(visibleMenuItems, considerEllipsis) {
   var menuItems = visibleMenuItems;
   considerEllipsis = scout.nvl(considerEllipsis, this._overflowMenuItems.length > 0);
 
@@ -205,12 +215,12 @@ scout.MenuBarLayout.prototype._setFirstLastMenuMarker = function(visibleMenuItem
     menuItems[0].$container.addClass('first');
     menuItems[menuItems.length - 1].$container.addClass('last');
   }
-};
+}
 
 /**
  * Makes the text invisible of all shrinkable menus with an icon
  */
-scout.MenuBarLayout.prototype.shrink = function(menus) {
+shrink(menus) {
   menus.forEach(function(menu) {
     if (menu.textVisibleOrig !== undefined) {
       // already done
@@ -223,9 +233,9 @@ scout.MenuBarLayout.prototype.shrink = function(menus) {
       menu.htmlComp.suppressInvalidate = false;
     }
   }, this);
-};
+}
 
-scout.MenuBarLayout.prototype.undoShrink = function(menus) {
+undoShrink(menus) {
   menus.forEach(function(menu) {
     if (menu.textVisibleOrig === undefined) {
       return;
@@ -236,16 +246,17 @@ scout.MenuBarLayout.prototype.undoShrink = function(menus) {
     menu.htmlComp.suppressInvalidate = false;
     menu.textVisibleOrig = undefined;
   }, this);
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @memberOf scout.MenuBarLayout
+ * @memberOf MenuBarLayout
  */
-scout.MenuBarLayout.size = function(htmlMenuBar, containerSize) {
+static size(htmlMenuBar, containerSize) {
   var menuBarSize = htmlMenuBar.prefSize();
   menuBarSize.width = containerSize.width;
   menuBarSize = menuBarSize.subtract(htmlMenuBar.margins());
   return menuBarSize;
-};
+}
+}

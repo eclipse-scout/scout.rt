@@ -29,7 +29,7 @@
  *
  * @see http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html
  */
-scout.DateFormatPatternType = {
+const DateFormatPatternType = {
   YEAR: 'year',
   MONTH: 'month',
   WEEK_IN_YEAR: 'week_in_year',
@@ -43,3 +43,5 @@ scout.DateFormatPatternType = {
   MILLISECOND: 'millisecond',
   TIMEZONE: 'timezone'
 };
+
+export default DateFormatPatternType;

@@ -8,16 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuNavigationKeyStroke = function(popup) {
-  scout.MenuNavigationKeyStroke.parent.call(this);
-  this.field = popup;
-};
-scout.inherits(scout.MenuNavigationKeyStroke, scout.KeyStroke);
+import {KeyStroke} from '../index';
 
-scout.MenuNavigationKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.MenuNavigationKeyStroke.parent.prototype._accept.call(this, event);
+export default class MenuNavigationKeyStroke extends KeyStroke {
+
+constructor(popup) {
+  super();
+  this.field = popup;
+}
+
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted || this.field.bodyAnimating) {
     return false;
   }
   return accepted;
-};
+}
+}

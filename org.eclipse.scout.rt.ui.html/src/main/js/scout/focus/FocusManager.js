@@ -8,6 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {filters} from '../index';
+import {Device} from '../index';
+import {FocusContext} from '../index';
+import {FocusRule} from '../index';
+import {focusUtils} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
 /**
  * The focus manager ensures proper focus handling based on focus contexts.
  *
@@ -17,12 +26,14 @@
  * which is natively focusable and which is not covert by a glass pane. Furthermore, if a context is unintalled,
  * the previously active focus context is activated and its focus position restored.
  */
-scout.FocusManager = function(options) {
+export default class FocusManager {
+
+constructor(options) {
   var defaults = {
     // Auto focusing of elements is bad with on screen keyboards -> deactivate to prevent unwanted popping up of the keyboard
-    active: !scout.device.supportsTouch(),
+    active: !Device.get().supportsTouch(),
     // Preventing blur is bad on touch devices because every touch on a non input field is supposed to close the keyboard which does not happen if preventDefault is used on mouse down
-    restrictedFocusGain: !scout.device.supportsTouch()
+    restrictedFocusGain: !Device.get().supportsTouch()
   };
   $.extend(this, defaults, options);
 
@@ -44,10 +55,10 @@ scout.FocusManager = function(options) {
   if (this.restrictedFocusGain) {
     this.installTopLevelMouseHandlers($mainEntryPoint);
   }
-  this.installFocusContext($mainEntryPoint, scout.FocusRule.AUTO);
-};
+  this.installFocusContext($mainEntryPoint, FocusRule.AUTO);
+}
 
-scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container) {
+installTopLevelMouseHandlers($container) {
   // Install 'mousedown' on top-level $container to accept or prevent focus gain
   $container.on('mousedown', function(event) {
     if (!this._acceptFocusChangeOnMouseDown($(event.target))) {
@@ -58,7 +69,7 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
     }
     return true;
   }.bind(this));
-};
+}
 
 /**
  * Note: this method is a collection of bugfixes for focus problems which only occur on
@@ -68,8 +79,8 @@ scout.FocusManager.prototype.installTopLevelMouseHandlers = function($container)
  * a lot of specific cases. However: distributing the IE specific bugfix code over several classes
  * wouldn't be much better.
  */
-scout.FocusManager.prototype._handleIEEvent = function(event) {
-  if (!scout.device.isInternetExplorer()) {
+_handleIEEvent(event) {
+  if (!Device.get().isInternetExplorer()) {
     return;
   }
 
@@ -111,7 +122,7 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
     }
     event.preventDefault();
   }
-};
+}
 
 /**
  * Activates or deactivates focus management.
@@ -119,7 +130,7 @@ scout.FocusManager.prototype._handleIEEvent = function(event) {
  * If deactivated, the focus manager still validates the current focus, but never gains focus nor enforces a valid focus position.
  * Once activated, the current focus position is revalidated.
  */
-scout.FocusManager.prototype.activate = function(activate) {
+activate(activate) {
   if (this.active !== activate) {
     this.active = activate;
     if ($.log.isDebugEnabled()) {
@@ -129,19 +140,19 @@ scout.FocusManager.prototype.activate = function(activate) {
       this.validateFocus();
     }
   }
-};
+}
 
 /**
  * Installs a new focus context for the given $container, and sets the $container's initial focus, either by
  * the given rule, or tries to gain focus for the given element.
- * @returns {scout.FocusContext} the installed context.
+ * @returns {FocusContext} the installed context.
  */
-scout.FocusManager.prototype.installFocusContext = function($container, focusRuleOrElement) {
+installFocusContext($container, focusRuleOrElement) {
   var elementToFocus = this.evaluateFocusRule($container, focusRuleOrElement);
 
   // Create and register the focus context.
-  var focusContext = new scout.FocusContext($container, this);
-  if (scout.FocusRule.PREPARE !== focusRuleOrElement) {
+  var focusContext = new FocusContext($container, this);
+  if (FocusRule.PREPARE !== focusRuleOrElement) {
     focusContext.ready();
   }
   this._pushIfAbsendElseMoveTop(focusContext);
@@ -150,38 +161,38 @@ scout.FocusManager.prototype.installFocusContext = function($container, focusRul
     focusContext.validateAndSetFocus(elementToFocus);
   }
   return focusContext;
-};
+}
 
 /**
- * Evaluates the {@link scout.FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
+ * Evaluates the {@link FocusRule} or just returns the given element if focusRuleOrElement is not a focus rule.
  */
-scout.FocusManager.prototype.evaluateFocusRule = function($container, focusRuleOrElement) {
+evaluateFocusRule($container, focusRuleOrElement) {
   var elementToFocus;
-  if (!focusRuleOrElement || focusRuleOrElement === scout.FocusRule.AUTO) {
+  if (!focusRuleOrElement || focusRuleOrElement === FocusRule.AUTO) {
     elementToFocus = this.findFirstFocusableElement($container);
-  } else if (focusRuleOrElement === scout.FocusRule.NONE) {
+  } else if (focusRuleOrElement === FocusRule.NONE) {
     elementToFocus = null;
   } else {
     elementToFocus = focusRuleOrElement;
   }
   return elementToFocus;
-};
+}
 
 /**
  * Uninstalls the focus context for the given $container, and activates the last active context.
  * This method has no effect, if there is no focus context installed for the given $container.
  */
-scout.FocusManager.prototype.uninstallFocusContext = function($container) {
+uninstallFocusContext($container) {
   var focusContext = this.getFocusContext($container);
   if (!focusContext) {
     return;
   }
 
   // Filter to exclude the current focus context's container and any of its child elements to gain focus.
-  var filter = scout.filters.outsideFilter(focusContext.$container);
+  var filter = filters.outsideFilter(focusContext.$container);
 
   // Remove and dispose the current focus context.
-  scout.arrays.remove(this._focusContexts, focusContext);
+  arrays.remove(this._focusContexts, focusContext);
   focusContext.dispose();
 
   // Activate last active focus context.
@@ -189,22 +200,22 @@ scout.FocusManager.prototype.uninstallFocusContext = function($container) {
   if (activeFocusContext) {
     activeFocusContext.validateAndSetFocus(activeFocusContext.lastValidFocusedElement, filter);
   }
-};
+}
 
 /**
  * Returns whether there is a focus context installed for the given $container.
  */
-scout.FocusManager.prototype.isFocusContextInstalled = function($container) {
+isFocusContextInstalled($container) {
   return !!this.getFocusContext($container);
-};
+}
 
 /**
  * Activates the focus context of the given $container or the given focus context and validates the focus so that the previously focused element will be focused again.
- * @param {(scout.FocusContext|$)} focusContextOr$Container
+ * @param {(FocusContext|$)} focusContextOr$Container
  */
-scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Container) {
+activateFocusContext(focusContextOr$Container) {
   var focusContext = focusContextOr$Container;
-  if (!(focusContextOr$Container instanceof scout.FocusContext)) {
+  if (!(focusContextOr$Container instanceof FocusContext)) {
     focusContext = this.getFocusContext(focusContextOr$Container);
   }
   if (!focusContext || this.isElementCovertByGlassPane(focusContext.$container)) {
@@ -212,7 +223,7 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Cont
   }
   this._pushIfAbsendElseMoveTop(focusContext);
   this.validateFocus();
-};
+}
 
 /**
  * Checks if the given element is accessible, meaning not covert by a glasspane.
@@ -220,7 +231,7 @@ scout.FocusManager.prototype.activateFocusContext = function(focusContextOr$Cont
  * @param element a HTMLElement or a jQuery collection
  * @param [filter] if specified, the filter is used to filter the array of glass pane targets
  */
-scout.FocusManager.prototype.isElementCovertByGlassPane = function(element, filter) {
+isElementCovertByGlassPane(element, filter) {
   var targets = this._glassPaneTargets;
   if (filter) {
     targets = this._glassPaneTargets.filter(filter);
@@ -237,31 +248,31 @@ scout.FocusManager.prototype.isElementCovertByGlassPane = function(element, filt
   return targets.some(function($glassPaneTarget) {
     return $(element).closest($glassPaneTarget).length !== 0;
   });
-};
+}
 
 /**
  * Registers the given glasspane target, so that the focus cannot be gained on the given target nor on its child elements.
  */
-scout.FocusManager.prototype.registerGlassPaneTarget = function($glassPaneTarget) {
+registerGlassPaneTarget($glassPaneTarget) {
   this._glassPaneTargets.push($glassPaneTarget);
   this.validateFocus();
-};
+}
 
-scout.FocusManager.prototype.registerGlassPaneDisplayParent = function(displayParent) {
+registerGlassPaneDisplayParent(displayParent) {
   this._glassPaneDisplayParents.push(displayParent);
-};
+}
 
 /**
  * Unregisters the given glasspane target, so that the focus can be gained again for the target or one of its child controls.
  */
-scout.FocusManager.prototype.unregisterGlassPaneTarget = function($glassPaneTarget) {
-  scout.arrays.$remove(this._glassPaneTargets, $glassPaneTarget);
+unregisterGlassPaneTarget($glassPaneTarget) {
+  arrays.$remove(this._glassPaneTargets, $glassPaneTarget);
   this.validateFocus();
-};
+}
 
-scout.FocusManager.prototype.unregisterGlassPaneDisplayParent = function(displayParent) {
-  scout.arrays.remove(this._glassPaneDisplayParents, displayParent);
-};
+unregisterGlassPaneDisplayParent(displayParent) {
+  arrays.remove(this._glassPaneDisplayParents, displayParent);
+}
 
 /**
  * Enforces proper focus on the currently active focus context.
@@ -269,23 +280,23 @@ scout.FocusManager.prototype.unregisterGlassPaneDisplayParent = function(display
  * @param filter
  *        Filter to exclude elements to gain focus.
  */
-scout.FocusManager.prototype.validateFocus = function(filter) {
+validateFocus(filter) {
   var activeContext = this._findActiveContext();
   if (activeContext) {
     activeContext.validateFocus(filter);
   }
-};
+}
 
-scout.FocusManager.prototype.requestFocusIfReady = function(element, filter) {
+requestFocusIfReady(element, filter) {
   return this.requestFocus(element, filter, true);
-};
+}
 
 /**
  * Requests the focus for the given element, but only if being a valid focus location.
  *
  * @return {boolean} true if focus was gained, false otherwise.
  */
-scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfReady) {
+requestFocus(element, filter, onlyIfReady) {
   element = element instanceof $ ? element[0] : element;
   if (!element) {
     return false;
@@ -299,20 +310,20 @@ scout.FocusManager.prototype.requestFocus = function(element, filter, onlyIfRead
     context.validateAndSetFocus(element, filter);
   }
 
-  return scout.focusUtils.isActiveElement(element);
-};
+  return focusUtils.isActiveElement(element);
+}
 
 /**
  * Finds the first focusable element of the given $container, or null if not found.
  */
-scout.FocusManager.prototype.findFirstFocusableElement = function($container, filter) {
+findFirstFocusableElement($container, filter) {
   var firstElement, firstDefaultButton, firstButton, i, candidate, $candidate, $menuParents, $tabParents, $boxButtons,
     $entryPoint = $container.entryPoint(),
     $candidates = $container
     .find(':focusable')
     .addBack(':focusable') /* in some use cases, the container should be focusable as well, e.g. context menu without focusable children */
     .not($entryPoint) /* $entryPoint should never be a focusable candidate. However, if no focusable candidate is found, 'FocusContext.validateAndSetFocus' focuses the $entryPoint as a fallback. */
-    .filter(filter || scout.filters.returnTrue);
+    .filter(filter || filters.returnTrue);
 
   for (i = 0; i < $candidates.length; i++) {
     candidate = $candidates[i];
@@ -358,25 +369,25 @@ scout.FocusManager.prototype.findFirstFocusableElement = function($container, fi
     return firstButton;
   }
   return firstElement;
-};
+}
 
 /**
  * Returns the currently active focus context, or null if not applicable.
  */
-scout.FocusManager.prototype._findActiveContext = function() {
-  return scout.arrays.last(this._focusContexts);
-};
+_findActiveContext() {
+  return arrays.last(this._focusContexts);
+}
 
 /**
  * Returns the focus context which is associated with the given $container, or null if not applicable.
  */
-scout.FocusManager.prototype.getFocusContext = function($container) {
-  return scout.arrays.find(this._focusContexts, function(focusContext) {
+getFocusContext($container) {
+  return arrays.find(this._focusContexts, function(focusContext) {
     return focusContext.$container === $container;
   });
-};
+}
 
-scout.FocusManager.prototype._findFocusContextFor = function($element) {
+_findFocusContextFor($element) {
   $element = $.ensure($element);
   var context = null;
   var distance = Number.MAX_VALUE;
@@ -391,12 +402,12 @@ scout.FocusManager.prototype._findFocusContextFor = function($element) {
     }
   });
   return context;
-};
+}
 
 /**
  * Returns whether to accept a 'mousedown event'.
  */
-scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element) {
+_acceptFocusChangeOnMouseDown($element) {
   // 1. Prevent focus gain when glasspane is clicked.
   //    Even if the glasspane is not focusable, this check is required because the glasspane might be contained in a focusable container
   //    like table. Use case: outline modality with table-page as 'outlineContent'.
@@ -410,7 +421,7 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element) 
   }
 
   // 3. Prevent focus gain on elements excluded to gain focus by mouse, e.g. buttons.
-  if (!scout.focusUtils.isFocusableByMouse($element)) {
+  if (!focusUtils.isFocusableByMouse($element)) {
     return false;
   }
 
@@ -420,22 +431,23 @@ scout.FocusManager.prototype._acceptFocusChangeOnMouseDown = function($element) 
   }
 
   // 5. Allow focus gain on elements with selectable content, e.g. the value of a label field.
-  if (scout.focusUtils.isSelectableText($element)) {
+  if (focusUtils.isSelectableText($element)) {
     return true;
   }
 
   // 6. Allow focus gain on elements with a focusable parent, e.g. when clicking on a row in a table.
-  if (scout.focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
+  if (focusUtils.containsParentFocusableByMouse($element, $element.entryPoint())) {
     return true;
   }
 
   return false;
-};
+}
 
 /**
  * Registers the given focus context, or moves it on top if already registered.
  */
-scout.FocusManager.prototype._pushIfAbsendElseMoveTop = function(focusContext) {
-  scout.arrays.remove(this._focusContexts, focusContext);
+_pushIfAbsendElseMoveTop(focusContext) {
+  arrays.remove(this._focusContexts, focusContext);
   this._focusContexts.push(focusContext);
-};
+}
+}

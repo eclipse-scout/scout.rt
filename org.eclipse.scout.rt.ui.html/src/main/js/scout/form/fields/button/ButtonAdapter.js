@@ -8,23 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ButtonAdapter = function() {
-  scout.ButtonAdapter.parent.call(this);
-  this._addRemoteProperties(['selected']);
-};
-scout.inherits(scout.ButtonAdapter, scout.FormFieldAdapter);
+import {Button} from '../../../index';
+import {FormFieldAdapter} from '../../../index';
 
-scout.ButtonAdapter.prototype._onWidgetClick = function(event) {
-  if (this.widget.displayStyle === scout.Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
+export default class ButtonAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+  this._addRemoteProperties(['selected']);
+}
+
+
+_onWidgetClick(event) {
+  if (this.widget.displayStyle === Button.DisplayStyle.TOGGLE || this.widget.menus.length > 0) {
     return;
   }
   this._send('click');
-};
+}
 
-scout.ButtonAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'click') {
     this._onWidgetClick(event);
   } else {
-    scout.ButtonAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

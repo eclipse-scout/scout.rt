@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LabelFieldAdapter = function() {
-  scout.LabelFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.LabelFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class LabelFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

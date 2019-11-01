@@ -8,31 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ButtonKeyStroke = function(button, keyStroke) {
-  scout.ButtonKeyStroke.parent.call(this);
+import {KeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class ButtonKeyStroke extends KeyStroke {
+
+constructor(button, keyStroke) {
+  super();
   this.field = button;
   this.parseAndSetKeyStroke(keyStroke);
   this.stopPropagation = true;
   this.stopImmediatePropagation = true;
 
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$container;
   }.bind(this);
-};
-scout.inherits(scout.ButtonKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.ButtonKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.ButtonKeyStroke.parent.prototype._accept.call(this, event);
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && this.field.$field.isAttached();
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.ButtonKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.doAction();
-};
+}
+}

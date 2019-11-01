@@ -8,48 +8,56 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenubarBox = function() {
-  scout.MenubarBox.parent.call(this);
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {MenuBar} from '../../index';
+import {MenubarBoxLayout} from '../../index';
+import {arrays} from '../../index';
+
+export default class MenubarBox extends Widget {
+
+constructor() {
+  super();
   this.menuItems = [];
-  this.tooltipPosition = scout.MenuBar.Position.TOP;
+  this.tooltipPosition = MenuBar.Position.TOP;
   this._addWidgetProperties('menuItems');
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
-};
-scout.inherits(scout.MenubarBox, scout.Widget);
+}
 
-scout.MenubarBox.prototype._destroy = function() {
-  scout.MenubarBox.parent.prototype._destroy.call(this);
+
+_destroy() {
+  super._destroy();
   this._removeMenuHandlers();
-};
+}
 
-scout.MenubarBox.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('menubox');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.MenubarBoxLayout(this));
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new MenubarBoxLayout(this));
+}
 
-scout.MenubarBox.prototype._renderProperties = function() {
-  scout.MenubarBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderMenuItems();
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.MenubarBox.prototype._remove = function() {
+_remove() {
   this._removeMenuItems();
-  scout.MenubarBox.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.MenubarBox.prototype.setMenuItems = function(menuItems) {
-  menuItems = scout.arrays.ensure(menuItems);
-  if (!scout.arrays.equals(this.menuItems, menuItems)) {
+setMenuItems(menuItems) {
+  menuItems = arrays.ensure(menuItems);
+  if (!arrays.equals(this.menuItems, menuItems)) {
     this.setProperty('menuItems', menuItems);
   }
-};
+}
 
-scout.MenubarBox.prototype._setMenuItems = function(menuItems) {
+_setMenuItems(menuItems) {
   // remove property listeners of old menu items.
   this._removeMenuHandlers();
 
@@ -57,17 +65,17 @@ scout.MenubarBox.prototype._setMenuItems = function(menuItems) {
   // add property listener of new menus
   this._addMenuHandlers();
   this._updateTooltipPosition();
-};
+}
 
-scout.MenubarBox.prototype._removeMenuItems = function() {
+_removeMenuItems() {
   this._removeMenuHandlers();
   this.menuItems.forEach(function(item) {
     item.overflow = false;
     item.remove();
   }.bind(this));
-};
+}
 
-scout.MenubarBox.prototype._renderMenuItems = function() {
+_renderMenuItems() {
   this.menuItems.forEach(function(item) {
     item.render(this.$container);
     item.$container.addClass('menubar-item');
@@ -76,44 +84,45 @@ scout.MenubarBox.prototype._renderMenuItems = function() {
   if (!this.rendering) {
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.MenubarBox.prototype._addMenuHandlers = function() {
+_addMenuHandlers() {
   this.menuItems.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
   }, this);
-};
+}
 
-scout.MenubarBox.prototype._removeMenuHandlers = function() {
+_removeMenuHandlers() {
   this.menuItems.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
   }, this);
-};
+}
 
-scout.MenubarBox.prototype._renderVisible = function() {
-  scout.MenubarBox.parent.prototype._renderVisible.call(this);
+_renderVisible() {
+  super._renderVisible();
   this.revalidateLayout();
-};
+}
 
-scout.MenubarBox.prototype._onMenuItemPropertyChange = function(event) {
+_onMenuItemPropertyChange(event) {
   if (event.propertyName === 'visible') {
     this.setVisible(this.menuItems.some(function(m) {
       return m.visible && !m.ellipsis;
     }));
   }
-};
+}
 
-scout.MenubarBox.prototype.setTooltipPosition = function(position) {
+setTooltipPosition(position) {
   this.setProperty('tooltipPosition', position);
-};
+}
 
-scout.MenubarBox.prototype._setTooltipPosition = function(position) {
+_setTooltipPosition(position) {
   this._setProperty('tooltipPosition', position);
   this._updateTooltipPosition();
-};
+}
 
-scout.MenubarBox.prototype._updateTooltipPosition = function() {
+_updateTooltipPosition() {
   this.menuItems.forEach(function(item) {
     item.setTooltipPosition(this.tooltipPosition);
   }, this);
-};
+}
+}

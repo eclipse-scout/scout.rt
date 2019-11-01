@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {RoundingMode} from '../index';
+import {numbers} from '../index';
+import {strings} from '../index';
+import {scout} from '../index';
+
 /**
  * Provides formatting of numbers using java format pattern.
  * <p>
@@ -18,7 +23,9 @@
  *   <li>%</li>
  * </ul>
  */
-scout.DecimalFormat = function(locale, options) {
+export default class DecimalFormat {
+
+constructor(locale, options) {
   // format function will use these (defaults)
   this.positivePrefix = '';
   this.positiveSuffix = '';
@@ -37,9 +44,9 @@ scout.DecimalFormat = function(locale, options) {
   options = options || {};
   this.pattern = this.pattern || options.pattern || locale.decimalFormatPatternDefault;
   this.multiplier = options.multiplier || 1;
-  this.roundingMode = options.roundingMode || scout.numbers.RoundingMode.HALF_UP;
+  this.roundingMode = options.roundingMode || RoundingMode.HALF_UP;
 
-  var SYMBOLS = scout.DecimalFormat.PATTERN_SYMBOLS;
+  var SYMBOLS = DecimalFormat.PATTERN_SYMBOLS;
   // Check if there are separate subpatterns for positive and negative numbers ("PositivePattern;NegativePattern")
   var split = this.pattern.split(SYMBOLS.patternSeparator);
   // Use the first subpattern as positive prefix/suffix
@@ -84,10 +91,10 @@ scout.DecimalFormat = function(locale, options) {
   split = this.pattern.split(SYMBOLS.decimalSeparator);
 
   // find digits before and after decimal point
-  this.zeroBefore = scout.strings.count(split[0], SYMBOLS.zeroDigit);
+  this.zeroBefore = strings.count(split[0], SYMBOLS.zeroDigit);
   if (split.length > 1) { // has decimal point?
-    this.zeroAfter = scout.strings.count(split[1], SYMBOLS.zeroDigit);
-    this.allAfter = this.zeroAfter + scout.strings.count(split[1], SYMBOLS.digit);
+    this.zeroAfter = strings.count(split[1], SYMBOLS.zeroDigit);
+    this.allAfter = this.zeroAfter + strings.count(split[1], SYMBOLS.digit);
   }
 
   // Returns an object with the properties 'prefix' and 'suffix', which contain all characters
@@ -114,7 +121,7 @@ scout.DecimalFormat = function(locale, options) {
     }
     return result;
   }
-};
+}
 
 /**
  * Converts the numberString into a number and applies the multiplier.
@@ -122,8 +129,8 @@ scout.DecimalFormat = function(locale, options) {
  * @param evaluateNumberFunction optional function for custom evaluation. The function gets a normalized string and has to return a Number
  * @return Returns a number for the given numberString, if the string can be converted into a number. Throws an Error otherwise
  */
-scout.DecimalFormat.prototype.parse = function(numberString, evaluateNumberFunction) {
-  if (scout.strings.empty(numberString)) {
+parse(numberString, evaluateNumberFunction) {
+  if (strings.empty(numberString)) {
     return null;
   }
   var normalizedNumberString = this.normalize(numberString);
@@ -137,9 +144,9 @@ scout.DecimalFormat.prototype.parse = function(numberString, evaluateNumberFunct
     number /= this.multiplier;
   }
   return number;
-};
+}
 
-scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
+format(number, applyMultiplier) {
   applyMultiplier = scout.nvl(applyMultiplier, true);
   if (number === null || number === undefined) {
     return null;
@@ -181,7 +188,7 @@ scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
   // before decimal point
   var before = Math.floor(number);
   before = (before === 0) ? '' : String(before);
-  before = scout.strings.padZeroLeft(before, this.zeroBefore);
+  before = strings.padZeroLeft(before, this.zeroBefore);
 
   // group digits
   if (this.groupLength) {
@@ -192,12 +199,12 @@ scout.DecimalFormat.prototype.format = function(number, applyMultiplier) {
 
   // put together and return
   return prefix + before + after + suffix;
-};
+}
 
 /**
  * Rounds a number according to the properties of the DecimalFormat.
  */
-scout.DecimalFormat.prototype.round = function(number, applyMultiplier) {
+round(number, applyMultiplier) {
   applyMultiplier = scout.nvl(applyMultiplier, true);
   if (number === null || number === undefined) {
     return null;
@@ -208,18 +215,18 @@ scout.DecimalFormat.prototype.round = function(number, applyMultiplier) {
     number *= this.multiplier;
   }
   // round
-  number = scout.numbers.round(number, this.roundingMode, this.allAfter);
+  number = numbers.round(number, this.roundingMode, this.allAfter);
   // un-apply multiplier
   if (applyMultiplier && this.multiplier !== 1) {
     number /= this.multiplier;
   }
   return number;
-};
+}
 
 /**
  * Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
  */
-scout.DecimalFormat.prototype.normalize = function(numberString) {
+normalize(numberString) {
   if (!numberString) {
     return numberString;
   }
@@ -227,14 +234,14 @@ scout.DecimalFormat.prototype.normalize = function(numberString) {
     .replace(new RegExp('[' + this.groupingChar + ']', 'g'), '')
     .replace(new RegExp('[' + this.decimalSeparatorChar + ']', 'g'), '.')
     .replace(/\s/g, '');
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
  * Literal (not localized!) pattern symbols as defined in http://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
  */
-scout.DecimalFormat.PATTERN_SYMBOLS = {
+static PATTERN_SYMBOLS = {
   digit: '#',
   zeroDigit: '0',
   decimalSeparator: '.',
@@ -243,12 +250,13 @@ scout.DecimalFormat.PATTERN_SYMBOLS = {
   patternSeparator: ';'
 };
 
-scout.DecimalFormat.ensure = function(locale, format) {
+static ensure(locale, format) {
   if (!format) {
     return format;
   }
-  if (format instanceof scout.DecimalFormat) {
+  if (format instanceof DecimalFormat) {
     return format;
   }
-  return new scout.DecimalFormat(locale, format);
-};
+  return new DecimalFormat(locale, format);
+}
+}

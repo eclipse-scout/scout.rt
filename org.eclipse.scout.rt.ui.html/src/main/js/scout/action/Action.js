@@ -8,15 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Action = function() {
-  scout.Action.parent.call(this);
+import {Icon} from '../index';
+import {Device} from '../index';
+import {tooltips} from '../index';
+import {HtmlComponent} from '../index';
+import {KeyStrokeContext} from '../index';
+import {NullLayout} from '../index';
+import {Widget} from '../index';
+import {ActionKeyStroke} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
 
-  this.actionStyle = scout.Action.ActionStyle.DEFAULT;
+export default class Action extends Widget {
+
+constructor() {
+  super();
+
+  this.actionStyle = Action.ActionStyle.DEFAULT;
   this.compact = false;
   this.iconId = null;
   this.horizontalAlignment = -1;
   this.keyStroke = null;
-  this.keyStrokeFirePolicy = scout.Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
+  this.keyStrokeFirePolicy = Action.KeyStrokeFirePolicy.ACCESSIBLE_ONLY;
   this.selected = false;
   /**
    * This property decides whether or not the tabindex attribute is set in the DOM.
@@ -34,15 +47,15 @@ scout.Action = function() {
   this.showTooltipWhenSelected = true;
 
   this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'tabbable', 'text', 'tooltipText', 'toggleAction']);
-};
-scout.inherits(scout.Action, scout.Widget);
+}
 
-scout.Action.ActionStyle = {
+
+static ActionStyle = {
   DEFAULT: 0,
   BUTTON: 1
 };
 
-scout.Action.KeyStrokeFirePolicy = {
+static KeyStrokeFirePolicy = {
   ACCESSIBLE_ONLY: 0,
   ALWAYS: 1
 };
@@ -50,38 +63,38 @@ scout.Action.KeyStrokeFirePolicy = {
 /**
  * @override
  */
-scout.Action.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
-scout.Action.prototype._init = function(model) {
-  scout.Action.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.actionKeyStroke = this._createActionKeyStroke();
   this.resolveConsts([{
     property: 'actionStyle',
-    constType: scout.Action.ActionStyle
+    constType: Action.ActionStyle
   }, {
     property: 'keyStrokeFirePolicy',
-    constType: scout.Action.KeyStrokeFirePolicy
+    constType: Action.KeyStrokeFirePolicy
   }]);
   this.resolveTextKeys(['text', 'tooltipText']);
   this.resolveIconIds(['iconId']);
   this._setKeyStroke(this.keyStroke);
-};
+}
 
-scout.Action.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('action')
     .on('click', this._onClick.bind(this));
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-};
+}
 
-scout.Action.prototype._createLayout = function() {
-  return new scout.NullLayout();
-};
+_createLayout() {
+  return new NullLayout();
+}
 
-scout.Action.prototype._renderProperties = function() {
-  scout.Action.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
 
   this._renderText();
   this._renderIconId();
@@ -90,46 +103,46 @@ scout.Action.prototype._renderProperties = function() {
   this._renderSelected();
   this._renderTabbable();
   this._renderCompact();
-};
+}
 
-scout.Action.prototype._remove = function() {
+_remove() {
   this._removeText();
   this._removeIconId();
-  scout.Action.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Action.prototype.setText = function(text) {
+setText(text) {
   this.setProperty('text', text);
-};
+}
 
-scout.Action.prototype._renderText = function() {
+_renderText() {
   var text = this.text || '';
   if (text && this.textVisible) {
     if (!this.$text) {
       // Create a separate text element to so that setting the text does not remove the icon
       this.$text = this.$container.appendSpan('content text');
-      scout.HtmlComponent.install(this.$text, this.session);
+      HtmlComponent.install(this.$text, this.session);
     }
     this.$text.text(text);
   } else {
     this._removeText();
   }
-};
+}
 
-scout.Action.prototype._removeText = function() {
+_removeText() {
   if (this.$text) {
     this.$text.remove();
     this.$text = null;
   }
-};
+}
 
-scout.Action.prototype.setIconId = function(iconId) {
+setIconId(iconId) {
   this.setProperty('iconId', iconId);
-};
+}
 
-scout.Action.prototype._renderIconId = function() {
+_renderIconId() {
   var iconId = this.iconId || '';
-  // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
+  // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
   if (!iconId) {
     this._removeIconId();
     return;
@@ -147,73 +160,73 @@ scout.Action.prototype._renderIconId = function() {
     this.icon = null;
   }.bind(this));
   this.icon.render();
-};
+}
 
-scout.Action.prototype.get$Icon = function() {
+get$Icon() {
   if (this.icon) {
     return this.icon.$container;
   }
   return $();
-};
+}
 
-scout.Action.prototype._removeIconId = function() {
+_removeIconId() {
   if (this.icon) {
     this.icon.destroy();
   }
-};
+}
 
 /**
  * @override
  */
-scout.Action.prototype._renderEnabled = function() {
-  scout.Action.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   if (this.rendered) { // No need to do this during initial rendering
     this._updateTooltip();
     this._renderTabbable();
   }
-};
+}
 
-scout.Action.prototype.setTooltipText = function(tooltipText) {
+setTooltipText(tooltipText) {
   this.setProperty('tooltipText', tooltipText);
-};
+}
 
-scout.Action.prototype._renderTooltipText = function() {
+_renderTooltipText() {
   this._updateTooltip();
-};
+}
 
 /**
  * Installs or uninstalls tooltip based on tooltipText, selected and enabledComputed.
  */
-scout.Action.prototype._updateTooltip = function() {
+_updateTooltip() {
   if (this._shouldInstallTooltip()) {
-    scout.tooltips.install(this.$container, this._configureTooltip());
+    tooltips.install(this.$container, this._configureTooltip());
   } else {
-    scout.tooltips.uninstall(this.$container);
+    tooltips.uninstall(this.$container);
   }
-};
+}
 
-scout.Action.prototype._shouldInstallTooltip = function() {
+_shouldInstallTooltip() {
   var show = this.tooltipText && this.enabledComputed;
   if (!this.showTooltipWhenSelected && this.selected) {
     show = false;
   }
   return show;
-};
+}
 
-scout.Action.prototype._renderTabbable = function() {
-  this.$container.setTabbable(this.tabbable && this.enabledComputed && !scout.device.supportsTouch());
-};
+_renderTabbable() {
+  this.$container.setTabbable(this.tabbable && this.enabledComputed && !Device.get().supportsTouch());
+}
 
-scout.Action.prototype._renderCompact = function() {
+_renderCompact() {
   this.$container.toggleClass('compact', this.compact);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Action.prototype.setTooltipPosition = function(position) {
+setTooltipPosition(position) {
   this.setProperty('tooltipPosition', position);
-};
+}
 
-scout.Action.prototype._configureTooltip = function() {
+_configureTooltip() {
   return {
     parent: this,
     text: this.tooltipText,
@@ -222,14 +235,14 @@ scout.Action.prototype._configureTooltip = function() {
     arrowPositionUnit: '%',
     tooltipPosition: this.tooltipPosition
   };
-};
+}
 
 /**
  * @return {Boolean}
  *          <code>true</code> if the action has been performed or <code>false</code> if it
  *          has not been performed (e.g. when the button is not enabledComputed).
  */
-scout.Action.prototype.doAction = function() {
+doAction() {
   if (!this.prepareDoAction()) {
     return false;
   }
@@ -239,71 +252,71 @@ scout.Action.prototype.doAction = function() {
   }
   this._doAction();
   return true;
-};
+}
 
-scout.Action.prototype.toggle = function() {
+toggle() {
   if (this.isToggleAction()) {
     this.setSelected(!this.selected);
   }
-};
+}
 
-scout.Action.prototype.setToggleAction = function(toggleAction) {
+setToggleAction(toggleAction) {
   this.setProperty('toggleAction', toggleAction);
-};
+}
 
-scout.Action.prototype.isToggleAction = function() {
+isToggleAction() {
   return this.toggleAction;
-};
+}
 
 /**
  * @returns {Boolean} <code>true</code> if the action may be executed, <code>false</code> if it should be ignored.
  */
-scout.Action.prototype.prepareDoAction = function() {
+prepareDoAction() {
   if (!this.enabledComputed || !this.visible) {
     return false;
   }
 
   return true;
-};
+}
 
-scout.Action.prototype._doAction = function() {
+_doAction() {
   this.trigger('action');
-};
+}
 
-scout.Action.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.Action.prototype._renderSelected = function() {
+_renderSelected() {
   this.$container.toggleClass('selected', this.selected);
   if (this.rendered) { // prevent unnecessary tooltip updates during initial rendering
     this._updateTooltip();
   }
-};
+}
 
-scout.Action.prototype.setKeyStroke = function(keyStroke) {
+setKeyStroke(keyStroke) {
   this.setProperty('keyStroke', keyStroke);
-};
+}
 
-scout.Action.prototype._setKeyStroke = function(keyStroke) {
+_setKeyStroke(keyStroke) {
   this.actionKeyStroke.parseAndSetKeyStroke(keyStroke);
   this._setProperty('keyStroke', keyStroke);
-};
+}
 
-scout.Action.prototype._renderKeyStroke = function() {
+_renderKeyStroke() {
   var keyStroke = this.keyStroke;
   if (keyStroke === undefined) {
     this.$container.removeAttr('data-shortcut');
   } else {
     this.$container.attr('data-shortcut', keyStroke);
   }
-};
+}
 
-scout.Action.prototype.setTabbable = function(tabbable) {
+setTabbable(tabbable) {
   this.setProperty('tabbable', tabbable);
-};
+}
 
-scout.Action.prototype.setTextVisible = function(textVisible) {
+setTextVisible(textVisible) {
   if (this.textVisible === textVisible) {
     return;
   }
@@ -311,9 +324,9 @@ scout.Action.prototype.setTextVisible = function(textVisible) {
   if (this.rendered) {
     this._renderText();
   }
-};
+}
 
-scout.Action.prototype.setCompact = function(compact) {
+setCompact(compact) {
   if (this.compact === compact) {
     return;
   }
@@ -321,17 +334,17 @@ scout.Action.prototype.setCompact = function(compact) {
   if (this.rendered) {
     this._renderCompact();
   }
-};
+}
 
-scout.Action.prototype.setHorizontalAlignment = function(horizontalAlignment) {
+setHorizontalAlignment(horizontalAlignment) {
   this.setProperty('horizontalAlignment', horizontalAlignment);
-};
+}
 
-scout.Action.prototype._createActionKeyStroke = function() {
-  return new scout.ActionKeyStroke(this);
-};
+_createActionKeyStroke() {
+  return new ActionKeyStroke(this);
+}
 
-scout.Action.prototype._allowMouseEvent = function(event) {
+_allowMouseEvent(event) {
   if (event.which !== 1) {
     return false; // Other button than left mouse button --> nop
   }
@@ -339,16 +352,17 @@ scout.Action.prototype._allowMouseEvent = function(event) {
     return false; // More than one consecutive click --> nop
   }
   return true;
-};
+}
 
-scout.Action.prototype._onClick = function(event) {
+_onClick(event) {
   if (!this._allowMouseEvent(event)) {
     return;
   }
 
   // When the action is clicked the user wants to execute the action and not see the tooltip -> cancel the task
   // If it is already displayed it will stay
-  scout.tooltips.cancel(this.$container);
+  tooltips.cancel(this.$container);
 
   this.doAction();
-};
+}
+}

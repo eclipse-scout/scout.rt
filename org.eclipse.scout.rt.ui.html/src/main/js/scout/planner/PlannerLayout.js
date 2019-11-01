@@ -8,13 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerLayout = function(planner) {
-  scout.PlannerLayout.parent.call(this);
-  this.planner = planner;
-};
-scout.inherits(scout.PlannerLayout, scout.AbstractLayout);
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Planner} from '../index';
+import {MenuBarLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
 
-scout.PlannerLayout.prototype.layout = function($container) {
+export default class PlannerLayout extends AbstractLayout {
+
+constructor(planner) {
+  super();
+  this.planner = planner;
+}
+
+
+layout($container) {
   var menuBarSize,
     $header = this.planner._header.$container,
     $scale = this.planner.$scale,
@@ -26,13 +37,13 @@ scout.PlannerLayout.prototype.layout = function($container) {
     yearContainerHeight = 0,
     gridTop = 0,
     scaleTop = 0,
-    htmlMenuBar = scout.HtmlComponent.get(menuBar.$container),
+    htmlMenuBar = HtmlComponent.get(menuBar.$container),
     htmlContainer = this.planner.htmlComp,
     containerSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets());
 
   if (menuBar.$container.isVisible()) {
-    menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+    menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
     htmlMenuBar.setSize(menuBarSize);
     menuBarHeight = menuBarSize.height;
     if (menuBar.position === 'top') {
@@ -41,10 +52,10 @@ scout.PlannerLayout.prototype.layout = function($container) {
   }
 
   if ($header.isVisible()) {
-    scaleTop += scout.graphics.size($header).height;
+    scaleTop += graphics.size($header).height;
   }
   $scale.css('top', scaleTop);
-  gridTop += scaleTop + scout.graphics.size($scale).height;
+  gridTop += scaleTop + graphics.size($scale).height;
   $grid.css('top', gridTop);
 
   yearContainerHeight = scaleTop + $yearContainer.cssMarginY();
@@ -61,14 +72,14 @@ scout.PlannerLayout.prototype.layout = function($container) {
   this._updateMinWidth();
   this._layoutScaleLines();
   // immediate update to prevent flickering, due to reset in layoutScaleLines
-  scout.scrollbars.update(this.planner.$grid, true);
+  scrollbars.update(this.planner.$grid, true);
   this.planner.layoutYearPanel();
-};
+}
 
 /**
  * Min width is necessary for horizontal scrollbar
  */
-scout.PlannerLayout.prototype._updateMinWidth = function() {
+_updateMinWidth() {
   var minWidth = this._minWidth(),
     $scaleTitle = this.planner.$scaleTitle,
     $timeline = this.planner.$timeline;
@@ -83,12 +94,12 @@ scout.PlannerLayout.prototype._updateMinWidth = function() {
   this.planner.resources.forEach(function(resource) {
     resource.$resource.css('min-width', minWidth);
   });
-};
+}
 
 /**
  * Positions the scale lines and set to correct height
  */
-scout.PlannerLayout.prototype._layoutScaleLines = function() {
+_layoutScaleLines() {
   var height, $smallScaleItems, $largeScaleItems, scrollLeft,
     $timelineSmall = this.planner.$timelineSmall,
     $timelineLarge = this.planner.$timelineLarge;
@@ -113,7 +124,7 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
     }
   });
   // also make sure there is no scrollbar anymore which could influence scrollHeight
-  scout.scrollbars.reset(this.planner.$grid);
+  scrollbars.reset(this.planner.$grid);
 
   // Loop again and update height and left
   height = this.planner.$grid[0].scrollHeight;
@@ -132,15 +143,15 @@ scout.PlannerLayout.prototype._layoutScaleLines = function() {
         .cssHeight(height);
     }
   });
-};
+}
 
-scout.PlannerLayout.prototype._minWidth = function() {
+_minWidth() {
   var $scaleItemsLarge = this.planner.$timelineLarge.children('.scale-item'),
     $scaleItemsSmall = this.planner.$timelineSmall.children('.scale-item'),
     numScaleItemsLarge = $scaleItemsLarge.length,
     numScaleItemsSmall = $scaleItemsSmall.length,
-    displayMode = scout.Planner.DisplayMode,
-    cellInsets = scout.graphics.insets($scaleItemsSmall, {
+    displayMode = Planner.DisplayMode,
+    cellInsets = graphics.insets($scaleItemsSmall, {
       includeBorder: false
     }),
     minWidth = numScaleItemsSmall * cellInsets.horizontal(); //no matter what, this width must never be deceeded
@@ -160,4 +171,5 @@ scout.PlannerLayout.prototype._minWidth = function() {
   if (this.planner.displayMode === displayMode.YEAR) {
     return Math.max(minWidth, numScaleItemsSmall * 90);
   }
-};
+}
+}

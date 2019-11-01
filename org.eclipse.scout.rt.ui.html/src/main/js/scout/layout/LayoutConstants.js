@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LayoutConstants = {
+const LayoutConstants = {
   MIN: 0,
   PREF: 1,
   MAX: 2,
   EPS: 1e-6
 };
+
+export default LayoutConstants;

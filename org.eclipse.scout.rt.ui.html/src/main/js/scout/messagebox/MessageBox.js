@@ -8,8 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MessageBox = function() {
-  scout.MessageBox.parent.call(this);
+import {Device} from '../index';
+import {ClickActiveElementKeyStroke} from '../index';
+import {Form} from '../index';
+import {objects} from '../index';
+import {HtmlComponent} from '../index';
+import {Status} from '../index';
+import {keys} from '../index';
+import {KeyStrokeContext} from '../index';
+import {clipboard} from '../index';
+import {CopyKeyStroke} from '../index';
+import {AbortKeyStroke} from '../index';
+import {strings} from '../index';
+import {GlassPaneRenderer} from '../index';
+import {BoxButtons} from '../index';
+import {Widget} from '../index';
+import {MessageBoxLayout} from '../index';
+import {FocusAdjacentElementKeyStroke} from '../index';
+import {FocusRule} from '../index';
+
+export default class MessageBox extends Widget {
+
+constructor() {
+  super();
 
   this.severity = null;
   this.body = null;
@@ -28,48 +49,48 @@ scout.MessageBox = function() {
   this.$cancelButton = null;
   this._$abortButton = null;
   this.displayParent = null;
-};
-scout.inherits(scout.MessageBox, scout.Widget);
+}
 
-scout.MessageBox.Buttons = {
+
+static Buttons = {
   YES: 'yes',
   NO: 'no',
   CANCEL: 'cancel'
 };
 
-scout.MessageBox.prototype._init = function(model) {
-  scout.MessageBox.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this._setDisplayParent(this.displayParent);
-};
+}
 
 /**
  * @override
  */
-scout.MessageBox.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.MessageBox.prototype._initKeyStrokeContext = function() {
-  scout.MessageBox.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.CopyKeyStroke(this),
-    new scout.FocusAdjacentElementKeyStroke(this.session, this),
-    new scout.ClickActiveElementKeyStroke(this, [
-      scout.keys.SPACE, scout.keys.ENTER
+    new CopyKeyStroke(this),
+    new FocusAdjacentElementKeyStroke(this.session, this),
+    new ClickActiveElementKeyStroke(this, [
+      keys.SPACE, keys.ENTER
     ]),
-    new scout.AbortKeyStroke(this, function() {
+    new AbortKeyStroke(this, function() {
       return this._$abortButton;
     }.bind(this))
   ]);
-};
+}
 
-scout.MessageBox.prototype._render = function() {
+_render() {
   // Render modality glasspanes (must precede adding the message box to the DOM)
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+  this._glassPaneRenderer = new GlassPaneRenderer(this);
   this._glassPaneRenderer.renderGlassPanes();
 
   this.$container = this.$parent.appendDiv('messagebox')
@@ -86,26 +107,26 @@ scout.MessageBox.prototype._render = function() {
   this.$buttons = this.$container.appendDiv('messagebox-buttons')
     .on('copy', this._onCopy.bind(this));
 
-  var boxButtons = new scout.BoxButtons(this.$buttons, this._onButtonClick.bind(this));
+  var boxButtons = new BoxButtons(this.$buttons, this._onButtonClick.bind(this));
   this._$abortButton = null; // button to be executed when abort() is called, e.g. when ESCAPE is pressed
   if (this.yesButtonText) {
     this.$yesButton = boxButtons.addButton({
       text: this.yesButtonText,
-      option: scout.MessageBox.Buttons.YES
+      option: MessageBox.Buttons.YES
     });
     this._$abortButton = this.$yesButton;
   }
   if (this.noButtonText) {
     this.$noButton = boxButtons.addButton({
       text: this.noButtonText,
-      option: scout.MessageBox.Buttons.NO
+      option: MessageBox.Buttons.NO
     });
     this._$abortButton = this.$noButton;
   }
   if (this.cancelButtonText) {
     this.$cancelButton = boxButtons.addButton({
       text: this.cancelButtonText,
-      option: scout.MessageBox.Buttons.CANCEL
+      option: MessageBox.Buttons.CANCEL
     });
     this._$abortButton = this.$cancelButton;
   }
@@ -129,93 +150,93 @@ scout.MessageBox.prototype._render = function() {
   this.$container.css('min-width', Math.max(naturalWidth, boxButtons.buttonCount() * 100));
   boxButtons.updateButtonWidths(this.$container.width());
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.MessageBoxLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new MessageBoxLayout(this));
   this.htmlComp.validateLayout();
 
   this.$container.addClassForAnimation('animate-open');
   this.$container.select();
-};
+}
 
-scout.MessageBox.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$content;
-};
+}
 
-scout.MessageBox.prototype._postRender = function() {
-  scout.MessageBox.parent.prototype._postRender.call(this);
+_postRender() {
+  super._postRender();
   this._installFocusContext();
-};
+}
 
-scout.MessageBox.prototype._remove = function() {
+_remove() {
   this._glassPaneRenderer.removeGlassPanes();
   this._uninstallFocusContext();
-  scout.MessageBox.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.MessageBox.prototype._installFocusContext = function() {
-  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
-};
+_installFocusContext() {
+  this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
+}
 
-scout.MessageBox.prototype._uninstallFocusContext = function() {
+_uninstallFocusContext() {
   this.session.focusManager.uninstallFocusContext(this.$container);
-};
+}
 
-scout.MessageBox.prototype._renderIconId = function() {
+_renderIconId() {
   // TODO [7.0] bsh: implement
-};
+}
 
-scout.MessageBox.prototype._renderSeverity = function() {
+_renderSeverity() {
   this.$container.removeClass('severity-error');
-  if (this.severity === scout.Status.Severity.ERROR) {
+  if (this.severity === Status.Severity.ERROR) {
     this.$container.addClass('severity-error');
   }
-};
+}
 
-scout.MessageBox.prototype._renderHeader = function() {
-  this.$header.html(scout.strings.nl2br(this.header));
+_renderHeader() {
+  this.$header.html(strings.nl2br(this.header));
   this.$header.setVisible(this.header);
-};
+}
 
-scout.MessageBox.prototype._renderBody = function() {
-  this.$body.html(scout.strings.nl2br(this.body));
+_renderBody() {
+  this.$body.html(strings.nl2br(this.body));
   this.$body.setVisible(this.body);
-};
+}
 
-scout.MessageBox.prototype._renderHtml = function() {
+_renderHtml() {
   this.$html.html(this.html);
   this.$html.setVisible(this.html);
   // Don't change focus when a link is clicked by mouse
   this.$html.find('a, .app-link')
     .attr('tabindex', '0')
     .unfocusable();
-};
+}
 
-scout.MessageBox.prototype._renderHiddenText = function() {
+_renderHiddenText() {
   if (this.$hiddenText) {
     this.$hiddenText.remove();
   }
   if (this.hiddenText) {
     this.$hiddenText = this.$content.appendElement('<!-- \n' + this.hiddenText.replace(/<!--|-->/g, '') + '\n -->');
   }
-};
+}
 
-scout.MessageBox.prototype._onMouseDown = function() {
+_onMouseDown() {
   // If there is a dialog in the parent-hierarchy activate it in order to bring it on top of other dialogs.
   var parent = this.findParent(function(p) {
-    return p instanceof scout.Form && p.isDialog();
+    return p instanceof Form && p.isDialog();
   });
   if (parent) {
     parent.activate();
   }
-};
+}
 
-scout.MessageBox.prototype._setCopyable = function(copyable) {
+_setCopyable(copyable) {
   this.$header.toggleClass('copyable', copyable);
   this.$body.toggleClass('copyable', copyable);
   this.$html.toggleClass('copyable', copyable);
-};
+}
 
-scout.MessageBox.prototype.copy = function() {
+copy() {
   this._setCopyable(true);
   var myDocument = this.$container.document(true);
   var range = myDocument.createRange();
@@ -224,16 +245,16 @@ scout.MessageBox.prototype.copy = function() {
   selection.removeAllRanges();
   selection.addRange(range);
   myDocument.execCommand('copy');
-};
+}
 
-scout.MessageBox.prototype._onCopy = function(event) {
-  var ie = scout.device.isInternetExplorer();
-  var clipboardData = ie ? this.$container.window(true).clipboardData : scout.objects.optProperty(event, 'originalEvent', 'clipboardData');
+_onCopy(event) {
+  var ie = Device.get().isInternetExplorer();
+  var clipboardData = ie ? this.$container.window(true).clipboardData : objects.optProperty(event, 'originalEvent', 'clipboardData');
 
   if (clipboardData) {
     // Internet Explorer only allows plain text (which must have data-type 'Text')
     if (!ie) {
-      var htmlText = scout.strings.join('<br/>',
+      var htmlText = strings.join('<br/>',
         this.$header[0].outerHTML,
         this.$body[0].outerHTML,
         this.$html[0].outerHTML,
@@ -241,7 +262,7 @@ scout.MessageBox.prototype._onCopy = function(event) {
       clipboardData.setData('text/html', htmlText);
     }
     var dataType = ie ? 'Text' : 'text/plain';
-    var plainText = scout.strings.join('\n\n',
+    var plainText = strings.join('\n\n',
       this.$header.text(),
       this.$body.text(),
       this.$html.text(),
@@ -249,68 +270,69 @@ scout.MessageBox.prototype._onCopy = function(event) {
     clipboardData.setData(dataType, plainText);
     this.$container.window(true).getSelection().removeAllRanges();
     this._setCopyable(false);
-    scout.clipboard.showNotification(this);
+    clipboard.showNotification(this);
     event.preventDefault(); // We want to write our data to the clipboard, not data from any user selection
   }
   // else: do default
-};
+}
 
-scout.MessageBox.prototype._onButtonClick = function(event, option) {
+_onButtonClick(event, option) {
   this.trigger('action', {
     option: option
   });
-};
+}
 
-scout.MessageBox.prototype.setDisplayParent = function(displayParent) {
+setDisplayParent(displayParent) {
   this.setProperty('displayParent', displayParent);
-};
+}
 
-scout.MessageBox.prototype._setDisplayParent = function(displayParent) {
+_setDisplayParent(displayParent) {
   this._setProperty('displayParent', displayParent);
   if (displayParent) {
     this.setParent(this.findDesktop().computeParentForDisplayParent(displayParent));
   }
-};
+}
 
 /**
  * Renders the message box and links it with the display parent.
  */
-scout.MessageBox.prototype.open = function() {
+open() {
   this.setDisplayParent(this.displayParent || this.session.desktop);
   this.displayParent.messageBoxController.registerAndRender(this);
-};
+}
 
 /**
  * Destroys the message box and unlinks it from the display parent.
  */
-scout.MessageBox.prototype.close = function() {
+close() {
   if (this.displayParent) {
     this.displayParent.messageBoxController.unregisterAndRemove(this);
   }
   this.destroy();
-};
+}
 
 /**
  * Aborts the message box by using the default abort button. Used by the ESC key stroke.
  */
-scout.MessageBox.prototype.abort = function() {
+abort() {
   if (this._$abortButton && this.session.focusManager.requestFocus(this._$abortButton)) {
     this._$abortButton.click();
   }
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.MessageBox.prototype._attach = function() {
+_attach() {
   this.$parent.append(this.$container);
-  scout.MessageBox.parent.prototype._attach.call(this);
-};
+  super._attach();
+}
 
 /**
  * @override Widget.js
  */
-scout.MessageBox.prototype._detach = function() {
+_detach() {
   this.$container.detach();
-  scout.MessageBox.parent.prototype._detach.call(this);
-};
+  super._detach();
+}
+}

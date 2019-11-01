@@ -8,28 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AccordionField = function() {
-  scout.AccordionField.parent.call(this);
+import {EventDelegator} from '../../../index';
+import {FormField} from '../../../index';
+
+export default class AccordionField extends FormField {
+
+constructor() {
+  super();
   this.eventDelegator = null;
   this._addWidgetProperties(['accordion']);
-};
-scout.inherits(scout.AccordionField, scout.FormField);
+}
 
-scout.AccordionField.prototype._init = function(model) {
-  scout.AccordionField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this._setAccordion(this.accordion);
-};
+}
 
 /**
  * @override
  */
-scout.AccordionField.prototype._createLoadingSupport = function() {
+_createLoadingSupport() {
   // Loading is delegated to accordion
   return null;
-};
+}
 
-scout.AccordionField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'accordion-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -37,18 +42,18 @@ scout.AccordionField.prototype._render = function() {
   if (this.accordion) {
     this._renderAccordion();
   }
-};
+}
 
-scout.AccordionField.prototype._renderProperties = function() {
-  scout.AccordionField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderDropType();
-};
+}
 
-scout.AccordionField.prototype.setAccordion = function(accordion) {
+setAccordion(accordion) {
   this.setProperty('accordion', accordion);
-};
+}
 
-scout.AccordionField.prototype._setAccordion = function(accordion) {
+_setAccordion(accordion) {
   if (this.accordion) {
     if (this.eventDelegator) {
       this.eventDelegator.destroy();
@@ -57,45 +62,46 @@ scout.AccordionField.prototype._setAccordion = function(accordion) {
   }
   this._setProperty('accordion', accordion);
   if (accordion) {
-    this.eventDelegator = scout.EventDelegator.create(this, accordion, {
+    this.eventDelegator = EventDelegator.create(this, accordion, {
       delegateProperties: ['loading']
     });
     accordion.setLoading(this.loading);
     accordion.setScrollTop(this.scrollTop);
   }
-};
+}
 
-scout.AccordionField.prototype._renderAccordion = function() {
+_renderAccordion() {
   if (!this.accordion) {
     return;
   }
   this.accordion.render();
   this.addField(this.accordion.$container);
   this.invalidateLayoutTree();
-};
+}
 
-scout.AccordionField.prototype._removeAccordion = function() {
+_removeAccordion() {
   if (!this.accordion) {
     return;
   }
   this.accordion.remove();
   this._removeField();
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.AccordionField.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (this.accordion) {
     return this.accordion.getFocusableElement();
   }
   return null;
-};
+}
 
 /**
  * @override
  */
-scout.AccordionField.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return this.accordion;
-};
+}
+}

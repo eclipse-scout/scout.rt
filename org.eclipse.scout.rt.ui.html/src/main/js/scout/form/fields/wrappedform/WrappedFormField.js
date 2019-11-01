@@ -8,37 +8,42 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WrappedFormField = function() {
-  scout.WrappedFormField.parent.call(this);
+import {FormField} from '../../../index';
+import {Form} from '../../../index';
+
+export default class WrappedFormField extends FormField {
+
+constructor() {
+  super();
   this._addWidgetProperties(['innerForm']);
   this.innerForm = null;
   this.initialFocusEnabled = false;
 
   this._formDestroyHandler = this._onInnerFormDestroy.bind(this);
-};
-scout.inherits(scout.WrappedFormField, scout.FormField);
+}
 
-scout.WrappedFormField.prototype._init = function(model) {
-  scout.WrappedFormField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setInnerForm(this.innerForm);
-};
+}
 
-scout.WrappedFormField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'wrapped-form-field');
   this.addLabel();
   this.addStatus();
-};
+}
 
-scout.WrappedFormField.prototype._renderProperties = function() {
-  scout.WrappedFormField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderInnerForm();
-};
+}
 
-scout.WrappedFormField.prototype.setInnerForm = function(innerForm) {
+setInnerForm(innerForm) {
   this.setProperty('innerForm', innerForm);
-};
+}
 
-scout.WrappedFormField.prototype._setInnerForm = function(innerForm) {
+_setInnerForm(innerForm) {
   if (this.innerForm) {
     this.innerForm.off('destroy', this._formDestroyHandler);
   }
@@ -46,17 +51,17 @@ scout.WrappedFormField.prototype._setInnerForm = function(innerForm) {
     innerForm.on('destroy', this._formDestroyHandler);
   }
   this._setProperty('innerForm', innerForm);
-};
+}
 
 /**
  * Will also be called by model adapter on property change event
  */
-scout.WrappedFormField.prototype._renderInnerForm = function() {
+_renderInnerForm() {
   if (!this.innerForm) {
     return;
   }
 
-  this.innerForm.displayHint = scout.Form.DisplayHint.VIEW; // by definition, an inner form is a view.
+  this.innerForm.displayHint = Form.DisplayHint.VIEW; // by definition, an inner form is a view.
   this.innerForm.modal = false; // by definition, an inner form is not modal.
   this.innerForm.renderInitialFocusEnabled = this.initialFocusEnabled; // do not render initial focus of form if disabled.
 
@@ -67,22 +72,23 @@ scout.WrappedFormField.prototype._renderInnerForm = function() {
 
   // required because active element is lost when 'addField' is called.
   this._renderInitialFocusEnabled();
-};
+}
 
-scout.WrappedFormField.prototype._removeInnerForm = function() {
+_removeInnerForm() {
   if (this.innerForm) {
     this.innerForm.remove();
   }
   this._removeField();
-};
+}
 
-scout.WrappedFormField.prototype._onInnerFormDestroy = function(event) {
+_onInnerFormDestroy(event) {
   this._removeInnerForm();
   this._setInnerForm(null);
-};
+}
 
-scout.WrappedFormField.prototype._renderInitialFocusEnabled = function() {
+_renderInitialFocusEnabled() {
   if (this.innerForm && this.initialFocusEnabled) {
     this.innerForm.renderInitialFocus();
   }
-};
+}
+}

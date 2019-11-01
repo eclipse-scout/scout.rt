@@ -8,23 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CheckBoxToggleKeyStroke = function(checkbox) {
-  scout.CheckBoxToggleKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class CheckBoxToggleKeyStroke extends KeyStroke {
+
+constructor(checkbox) {
+  super();
   this.field = checkbox;
-  this.which = [scout.keys.SPACE];
+  this.which = [keys.SPACE];
   this.stopPropagation = true;
   this.stopImmediatePropagation = true;
 
-  this.renderingHints.hAlign = scout.HAlign.LEFT;
+  this.renderingHints.hAlign = HAlign.LEFT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
-};
-scout.inherits(scout.CheckBoxToggleKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.CheckBoxToggleKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.toggleChecked();
-};
+}
+}

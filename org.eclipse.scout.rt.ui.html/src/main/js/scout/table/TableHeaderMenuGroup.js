@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeaderMenuGroup = function() {
-  scout.TableHeaderMenuGroup.parent.call(this);
+import {widgets} from '../index';
+import {Widget} from '../index';
+import {scout} from '../index';
+
+export default class TableHeaderMenuGroup extends Widget {
+
+constructor() {
+  super();
   this.text;
   this.textKey;
   this.cssClass;
   this.visible = true;
   this.last = false;
-};
-scout.inherits(scout.TableHeaderMenuGroup, scout.Widget);
+}
 
-scout.TableHeaderMenuGroup.prototype._init = function(options) {
-  scout.TableHeaderMenuGroup.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.text = scout.nvl(this.text, this.session.text(this.textKey));
-};
+}
 
-scout.TableHeaderMenuGroup.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('table-header-menu-group buttons');
   this.$text = this.$container.appendDiv('table-header-menu-group-text');
   if (this.cssClass) {
@@ -33,31 +39,32 @@ scout.TableHeaderMenuGroup.prototype._render = function() {
   this.children.forEach(function(child) {
     child.render();
   }, this);
-  scout.widgets.updateFirstLastMarker(this.children);
-};
+  widgets.updateFirstLastMarker(this.children);
+}
 
-scout.TableHeaderMenuGroup.prototype.appendText = function(text) {
+appendText(text) {
   this.text = this.session.text(this.textKey) + ' ' + text;
   if (this.rendered) {
     this._renderText();
   }
-};
+}
 
-scout.TableHeaderMenuGroup.prototype.resetText = function() {
+resetText() {
   this.text = this.session.text(this.textKey);
   if (this.rendered) {
     this._renderText();
   }
-};
+}
 
-scout.TableHeaderMenuGroup.prototype._renderText = function() {
+_renderText() {
   this.$text.text(this.text);
-};
+}
 
-scout.TableHeaderMenuGroup.prototype.setLast = function(last) {
+setLast(last) {
   this.setProperty('last', last);
-};
+}
 
-scout.TableHeaderMenuGroup.prototype._renderLast = function() {
+_renderLast() {
   this.$container.toggleClass('last', this.last);
-};
+}
+}

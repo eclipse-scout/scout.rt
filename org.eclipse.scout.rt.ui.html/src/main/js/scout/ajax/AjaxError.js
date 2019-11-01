@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AjaxError = function(model) {
+import * as $ from 'jquery';
+
+export default class AjaxError {
+
+constructor(model) {
   this.jqXHR = null;
   this.textStatus = null;
   this.errorThrown = null;
   this.requestOptions = null;
   $.extend(this, model);
-};
+}
+}

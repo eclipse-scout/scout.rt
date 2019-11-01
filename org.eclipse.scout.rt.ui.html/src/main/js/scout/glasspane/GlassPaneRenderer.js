@@ -8,10 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Device} from '../index';
+import {Form} from '../index';
+import {DeferredGlassPaneTarget} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
 /**
  * Renders glassPanes over the 'glassPaneTargets' of a widget.
  */
-scout.GlassPaneRenderer = function(widget, enabled) {
+export default class GlassPaneRenderer {
+
+constructor(widget, enabled) {
   this._widget = widget;
   this.session = widget.session;
   this._enabled = scout.nvl(enabled, true);
@@ -21,23 +30,23 @@ scout.GlassPaneRenderer = function(widget, enabled) {
   this._registeredDisplayParent = null;
   this._displayParentRenderHandler = this._onDisplayParentRender.bind(this);
   this._glassPaneRemoveHandler = this._onGlassPaneRemove.bind(this);
-};
+}
 
-scout.GlassPaneRenderer.prototype.renderGlassPanes = function() {
+renderGlassPanes() {
   this.findGlassPaneTargets().forEach(function(glassPaneTarget) {
-    if (glassPaneTarget instanceof scout.DeferredGlassPaneTarget) {
+    if (glassPaneTarget instanceof DeferredGlassPaneTarget) {
       glassPaneTarget.rendererReady(this);
       this._deferredGlassPanes.push(glassPaneTarget);
     } else {
       this.renderGlassPane(glassPaneTarget);
     }
   }, this);
-};
+}
 
 /**
  * @param {($|HTMLElement)} $glassPaneTarget
  */
-scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
+renderGlassPane($glassPaneTarget) {
   $glassPaneTarget = $.ensure($glassPaneTarget);
 
   if (this._widget.$container && this._widget.$container[0] === $glassPaneTarget[0]) {
@@ -63,7 +72,7 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
 
   // This is required in touch mode, because FastClick messes up the order
   // of mouse/click events which is especially important for TouchPopups.
-  if (scout.device.supportsTouch()) {
+  if (Device.get().supportsTouch()) {
     $glassPane.addClass('needsclick');
   }
 
@@ -81,9 +90,9 @@ scout.GlassPaneRenderer.prototype.renderGlassPane = function($glassPaneTarget) {
   $glassPane.one('remove', this._glassPaneRemoveHandler);
 
   this._registerDisplayParent();
-};
+}
 
-scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
+removeGlassPanes() {
   // Remove glass-panes
   this._$glassPanes.slice().forEach(function($glassPane) {
     this._removeGlassPane($glassPane);
@@ -96,25 +105,25 @@ scout.GlassPaneRenderer.prototype.removeGlassPanes = function() {
   this._deferredGlassPanes = [];
 
   this._unregisterDisplayParent();
-};
+}
 
-scout.GlassPaneRenderer.prototype._removeGlassPane = function($glassPane) {
+_removeGlassPane($glassPane) {
   var $glassPaneTarget = $glassPane.parent();
   $glassPane.off('remove', this._glassPaneRemoveHandler);
   $glassPane.remove();
-  scout.arrays.$remove(this._$glassPanes, $glassPane);
+  arrays.$remove(this._$glassPanes, $glassPane);
 
   $glassPaneTarget.removeClass('no-hover');
   this.session.focusManager.unregisterGlassPaneTarget($glassPaneTarget);
-};
+}
 
-scout.GlassPaneRenderer.prototype.eachGlassPane = function(func) {
+eachGlassPane(func) {
   this._$glassPanes.forEach(function($glassPane) {
     func($glassPane);
   });
-};
+}
 
-scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
+findGlassPaneTargets() {
   if (!this._enabled) {
     return []; // No glasspanes to be rendered, e.g. for none-modal dialogs.
   }
@@ -125,17 +134,17 @@ scout.GlassPaneRenderer.prototype.findGlassPaneTargets = function() {
   }
 
   return displayParent.glassPaneTargets(this._widget);
-};
+}
 
-scout.GlassPaneRenderer.prototype._resolveDisplayParent = function() {
+_resolveDisplayParent() {
   // Note: This has to be done after rendering, because otherwise session.desktop could be undefined!
   if (!this._resolvedDisplayParent) {
     this._resolvedDisplayParent = this._widget.displayParent || this.session.desktop;
   }
   return this._resolvedDisplayParent;
-};
+}
 
-scout.GlassPaneRenderer.prototype._registerDisplayParent = function() {
+_registerDisplayParent() {
   // if this._resolvedDisplayParent is not yet resolved, do it now
   if (!this._resolvedDisplayParent) {
     this._resolveDisplayParent();
@@ -149,18 +158,18 @@ scout.GlassPaneRenderer.prototype._registerDisplayParent = function() {
       this._registeredDisplayParent.on('render', this._displayParentRenderHandler);
     }
   }
-};
+}
 
-scout.GlassPaneRenderer.prototype._unregisterDisplayParent = function() {
+_unregisterDisplayParent() {
   // if this._registeredDisplayParent is defined, unregister it
   if (this._registeredDisplayParent) {
     this.session.focusManager.unregisterGlassPaneDisplayParent(this._registeredDisplayParent);
     this._registeredDisplayParent.off('render', this._displayParentRenderHandler);
     this._registeredDisplayParent = null;
   }
-};
+}
 
-scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   var $animationTarget = null;
 
   // notify the display parent to handle the mouse down on the glass pane.
@@ -169,7 +178,7 @@ scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
     displayParent._onGlassPaneMouseDown(this._widget, $(event.target));
   }
 
-  if (this._widget instanceof scout.Form && this._widget.isView()) {
+  if (this._widget instanceof Form && this._widget.isView()) {
     // If the blocking widget is a view, the $container cannot be animated (this only works for dialogs). Instead,
     // highlight the view tab (or the overflow item, if the view tab is not visible).
 
@@ -193,13 +202,14 @@ scout.GlassPaneRenderer.prototype._onMouseDown = function(event) {
   }
 
   $.suppressEvent(event);
-};
+}
 
-scout.GlassPaneRenderer.prototype._onDisplayParentRender = function(event) {
+_onDisplayParentRender(event) {
   this.renderGlassPanes();
-};
+}
 
-scout.GlassPaneRenderer.prototype._onGlassPaneRemove = function(event) {
+_onGlassPaneRemove(event) {
   var $glassPane = $(event.target);
   this._removeGlassPane($glassPane);
-};
+}
+}

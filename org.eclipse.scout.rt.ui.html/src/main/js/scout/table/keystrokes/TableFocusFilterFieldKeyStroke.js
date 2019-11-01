@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Key} from '../../index';
+import {scout} from '../../index';
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+import * as $ from 'jquery';
+
 /**
  * Keystroke to move the cursor into field field to table footer.
  *
@@ -16,8 +22,10 @@
  *       b) there is no need to evaluate a concrete key's propagation status when being rendered (because of (a))
  *
  */
-scout.TableFocusFilterFieldKeyStroke = function(table) {
-  scout.TableFocusFilterFieldKeyStroke.parent.call(this);
+export default class TableFocusFilterFieldKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
@@ -26,14 +34,14 @@ scout.TableFocusFilterFieldKeyStroke = function(table) {
 
   this.virtualKeyStrokeWhich = 'a-Z;a-z;0-9';
   this.preventDefault = false; // false so that the key is inserted into the search field.
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.TableFocusFilterFieldKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
+_accept(event) {
   if (!this._isKeyStrokeInRange(event)) {
     return false;
   }
@@ -53,12 +61,12 @@ scout.TableFocusFilterFieldKeyStroke.prototype._accept = function(event) {
   } else {
     return false;
   }
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.TableFocusFilterFieldKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var $filterInput = event._$filterInput;
 
   // Focus the field and move cursor to the end.
@@ -68,19 +76,19 @@ scout.TableFocusFilterFieldKeyStroke.prototype.handle = function(event) {
     var length = scout.nvl($filterInput.val(), '').length;
     $filterInput[0].setSelectionRange(length, length);
   }
-};
+}
 
 /**
  * Returns a virtual key to represent this keystroke.
  */
-scout.TableFocusFilterFieldKeyStroke.prototype.keys = function() {
-  return [new scout.Key(this, this.virtualKeyStrokeWhich)];
-};
+keys() {
+  return [new Key(this, this.virtualKeyStrokeWhich)];
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.TableFocusFilterFieldKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
+renderKeyBox($drawingArea, event) {
   var $filterInput = event._$filterInput;
   var filterInputPosition = $filterInput.position();
   var left = filterInputPosition.left + $filterInput.cssMarginLeft() + 4;
@@ -88,9 +96,9 @@ scout.TableFocusFilterFieldKeyStroke.prototype.renderKeyBox = function($drawingA
     .toggleClass('disabled', !this.enabledByFilter)
     .cssLeft(left);
   return $filterInput.parent();
-};
+}
 
-scout.TableFocusFilterFieldKeyStroke.prototype._isKeyStrokeInRange = function(event) {
+_isKeyStrokeInRange(event) {
   if (event.which === this.virtualKeyStrokeWhich) {
     return true; // the event has this keystroke's 'virtual which part' in case it is rendered.
   }
@@ -98,8 +106,9 @@ scout.TableFocusFilterFieldKeyStroke.prototype._isKeyStrokeInRange = function(ev
   if (event.altKey | event.ctrlKey) { // NOSONAR
     return false;
   }
-  return (event.which >= scout.keys.a && event.which <= scout.keys.z) ||
-    (event.which >= scout.keys.A && event.which <= scout.keys.Z) ||
-    (event.which >= scout.keys['0'] && event.which <= scout.keys['9']) ||
-    (event.which >= scout.keys.NUMPAD_0 && event.which <= scout.keys.NUMPAD_9);
-};
+  return (event.which >= keys.a && event.which <= keys.z) ||
+    (event.which >= keys.A && event.which <= keys.Z) ||
+    (event.which >= keys['0'] && event.which <= keys['9']) ||
+    (event.which >= keys.NUMPAD_0 && event.which <= keys.NUMPAD_9);
+}
+}

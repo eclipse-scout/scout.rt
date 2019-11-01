@@ -8,28 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import * as $ from 'jquery';
+
 /**
  * Used for static pages like login, logout, unsupported-browser and noscript section.
  * Beside custom elements it may contain a header with a logo and a button bar.
  * Note: It does not extend from Widget because widget has too many dependencies which are not needed for this simple use case (login-module does not include these dependencies)
  */
-scout.Box = function() {
-  this.$parent = null;
-};
+export default class Box {
 
-scout.Box.prototype.render = function($parent) {
+constructor() {
+  this.$parent = null;
+}
+
+render($parent) {
   this.$parent = $parent;
   this._render();
   this.rendered = true;
-};
+}
 
-scout.Box.prototype.remove = function() {
+remove() {
   this.$container.remove();
   this.$container = null;
   this.rendered = false;
-};
+}
 
-scout.Box.prototype._render = function() {
+_render() {
   this.$container = $('<div>')
     .addClass('box')
     .appendTo(this.$parent);
@@ -49,4 +53,5 @@ scout.Box.prototype._render = function() {
       .attr('src', this.logoUrl)
       .appendTo(this.$header);
   }
-};
+}
+}

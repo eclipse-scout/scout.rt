@@ -8,26 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ComboMenu = function() {
-  scout.ComboMenu.parent.call(this);
-};
-scout.inherits(scout.ComboMenu, scout.Menu);
+import {HtmlComponent} from '../index';
+import {Menu} from '../index';
 
-scout.ComboMenu.prototype._render = function() {
+export default class ComboMenu extends Menu {
+
+constructor() {
+  super();
+}
+
+
+_render() {
   this.$container = this.$parent.appendDiv('menu-item combo-menu');
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
   }
   this.$container.unfocusable();
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
   this.childActions.forEach(function(childAction) {
     childAction.addCssClass('combo-menu-child');
     childAction.render();
   });
-};
+}
 
 // @override
-scout.ComboMenu.prototype._togglesSubMenu = function() {
+_togglesSubMenu() {
   return false;
-};
+}
+}

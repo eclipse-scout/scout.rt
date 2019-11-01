@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarComponentAdapter = function() {
-  scout.CalendarComponentAdapter.parent.call(this);
-};
-scout.inherits(scout.CalendarComponentAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class CalendarComponentAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

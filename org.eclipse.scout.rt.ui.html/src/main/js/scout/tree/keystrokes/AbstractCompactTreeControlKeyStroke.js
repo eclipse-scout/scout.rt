@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AbstractCompactTreeControlKeyStroke = function(compactProcessTree) {
-  scout.AbstractCompactTreeControlKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+
+export default class AbstractCompactTreeControlKeyStroke extends KeyStroke {
+
+constructor(compactProcessTree) {
+  super();
   this.repeatable = true;
   this.field = compactProcessTree;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.AbstractCompactTreeControlKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.AbstractCompactTreeControlKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.AbstractCompactTreeControlKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -36,13 +40,14 @@ scout.AbstractCompactTreeControlKeyStroke.prototype._accept = function(event) {
   } else {
     return false;
   }
-};
+}
 
-scout.AbstractCompactTreeControlKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.selectNodes(event._nextNode);
   this.field.checkNode(event._nextNode, true);
-};
+}
 
-scout.AbstractCompactTreeControlKeyStroke.prototype._findNextNode = function($currentNode, currentNode) {
+_findNextNode($currentNode, currentNode) {
   throw new Error('method must be overwritten by subclass');
-};
+}
+}

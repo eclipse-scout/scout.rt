@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LookupRow = function() {
+import * as $ from 'jquery';
+
+export default class LookupRow {
+
+constructor() {
   this.key = null;
   this.text = null;
   this.parentKey = null;
@@ -21,52 +25,53 @@ scout.LookupRow = function() {
   this.backgroundColor = null;
   this.foregroundColor = null;
   this.font = null;
-};
+}
 
-scout.LookupRow.prototype.init = function(model) {
+init(model) {
   $.extend(this, model);
-};
+}
 
-scout.LookupRow.prototype.setKey = function(key) {
+setKey(key) {
   this.key = key;
-};
+}
 
-scout.LookupRow.prototype.setText = function(text) {
+setText(text) {
   this.text = text;
-};
+}
 
-scout.LookupRow.prototype.setParentKey = function(parentKey) {
+setParentKey(parentKey) {
   this.parentKey = parentKey;
-};
+}
 
-scout.LookupRow.prototype.setCssClass = function(cssClass) {
+setCssClass(cssClass) {
   this.cssClass = cssClass;
-};
+}
 
-scout.LookupRow.prototype.setAdditionalTableRowData = function(additionalTableRowData) {
+setAdditionalTableRowData(additionalTableRowData) {
   this.additionalTableRowData = additionalTableRowData;
-};
+}
 
-scout.LookupRow.prototype.setIconId = function(iconId) {
+setIconId(iconId) {
   this.iconId = iconId;
-};
+}
 
-scout.LookupRow.prototype.setTooltipText = function(tooltipText) {
+setTooltipText(tooltipText) {
   this.tooltipText = tooltipText;
-};
+}
 
-scout.LookupRow.prototype.setBackgroundColor = function(backgroundColor) {
+setBackgroundColor(backgroundColor) {
   this.backgroundColor = backgroundColor;
-};
+}
 
-scout.LookupRow.prototype.setForegroundColor = function(foregroundColor) {
+setForegroundColor(foregroundColor) {
   this.foregroundColor = foregroundColor;
-};
+}
 
-scout.LookupRow.prototype.setFont = function(font) {
+setFont(font) {
   this.font = font;
-};
+}
 
-scout.LookupRow.prototype.toString = function() {
+toString() {
   return 'scout.LookupRow[key=' + this.key + ' text=' + this.text + ']';
-};
+}
+}

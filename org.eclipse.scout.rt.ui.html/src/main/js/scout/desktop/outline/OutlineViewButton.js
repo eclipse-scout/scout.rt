@@ -8,45 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineViewButton = function() {
-  scout.OutlineViewButton.parent.call(this);
+import {ViewButton} from '../../index';
+
+export default class OutlineViewButton extends ViewButton {
+
+constructor() {
+  super();
   this._addWidgetProperties('outline');
   this._addPreserveOnPropertyChangeProperties(['outline']);
   this._addCloneProperties(['outline']);
-};
-scout.inherits(scout.OutlineViewButton, scout.ViewButton);
+}
 
-scout.OutlineViewButton.prototype._init = function(model) {
-  scout.OutlineViewButton.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setOutline(this.outline);
-};
+}
 
-scout.OutlineViewButton.prototype._setOutline = function(outline) {
+_setOutline(outline) {
   this._setProperty('outline', outline);
   if (this.outline) {
     this.outline.setIconId(this.iconId);
   }
-};
+}
 
-scout.OutlineViewButton.prototype._setIconId = function(iconId) {
+_setIconId(iconId) {
   this._setProperty('iconId', iconId);
   if (this.outline) {
     this.outline.setIconId(this.iconId);
   }
-};
+}
 
 /**
  * @override
  */
-scout.OutlineViewButton.prototype._doAction = function() {
-  scout.OutlineViewButton.parent.prototype._doAction.call(this);
+_doAction() {
+  super._doAction();
   if (this.outline) {
     this.session.desktop.setOutline(this.outline);
     this.session.desktop.bringOutlineToFront();
   }
-};
+}
 
-scout.OutlineViewButton.prototype.onOutlineChange = function(outline) {
+onOutlineChange(outline) {
   var selected = !!outline && this.outline === outline;
   this.setSelected(selected);
-};
+}
+}

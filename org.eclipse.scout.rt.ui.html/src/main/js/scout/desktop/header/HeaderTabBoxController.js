@@ -8,40 +8,48 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DesktopTabBoxController} from '../../index';
+import {SimpleTabArea} from '../../index';
+import {scout} from '../../index';
+import {SimpleTabBox} from '../../index';
+import {SimpleTabBoxController} from '../../index';
+
 /**
- * The {@link {@link scout.HeaderViewTabAreaController}} is used to link the center {@link {@link scout.SimpleTabBox}} (all forms with displayViewId='C')
- * with a {@link {@link scout.SimpleTabArea}} placed in the header.
- * It is an extension of {@link {@link scout.SimpleTabBoxController}}.
+ * The {@link {@link scout.HeaderViewTabAreaController}} is used to link the center {@link {@link SimpleTabBox}} (all forms with displayViewId='C')
+ * with a {@link {@link SimpleTabArea}} placed in the header.
+ * It is an extension of {@link {@link SimpleTabBoxController}}.
  *
- * @see scout.SimpleTabBoxController
+ * @see SimpleTabBoxController
  */
-scout.HeaderTabBoxController = function() {
-  scout.HeaderTabBoxController.parent.call(this);
+export default class HeaderTabBoxController extends DesktopTabBoxController {
+
+constructor() {
+  super();
 
   this.bench = null;
   this._viewsChangedHandler = this._onViewsChanged.bind(this);
 
   this.tabAreaCenter = null;
   this.tabAreaInHeader = false;
-};
-scout.inherits(scout.HeaderTabBoxController, scout.DesktopTabBoxController);
+}
 
-scout.HeaderTabBoxController.prototype.install = function(bench, tabArea) {
+
+install(bench, tabArea) {
   this.bench = scout.assertParameter('bench', bench);
 
   var tabBoxCenter = this.bench.getTabBox('C');
   this.tabAreaCenter = tabBoxCenter.tabArea;
 
-  scout.HeaderTabBoxController.parent.prototype.install.call(this, tabBoxCenter, tabArea);
-};
+  super.install( tabBoxCenter, tabArea);
+}
 
-scout.HeaderTabBoxController.prototype._installListeners = function() {
-  scout.HeaderTabBoxController.parent.prototype._installListeners.call(this);
+_installListeners() {
+  super._installListeners();
   this.bench.on('viewAdd', this._viewsChangedHandler);
   this.bench.on('viewRemove', this._viewsChangedHandler);
-};
+}
 
-scout.HeaderTabBoxController.prototype._onViewsChanged = function() {
+_onViewsChanged() {
   if (this.bench.getViews().some(function(view) {
       return 'C' !== view.displayViewId;
     })) {
@@ -51,17 +59,18 @@ scout.HeaderTabBoxController.prototype._onViewsChanged = function() {
     // has only views in center
     this._setViewTabAreaInHeader(true);
   }
-};
+}
 
-scout.HeaderTabBoxController.prototype._setViewTabAreaInHeader = function(inHeader) {
+_setViewTabAreaInHeader(inHeader) {
   this.tabAreaInHeader = inHeader;
   this.tabAreaCenter.setVisible(!inHeader);
   this.tabArea.setVisible(inHeader);
-};
+}
 
-scout.HeaderTabBoxController.prototype.getTabs = function() {
+getTabs() {
   if (this.tabAreaInHeader) {
     return this.tabArea.getTabs();
   }
   return this.tabAreaCenter.getTabs();
-};
+}
+}

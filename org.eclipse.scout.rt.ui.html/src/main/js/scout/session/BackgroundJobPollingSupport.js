@@ -8,31 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BackgroundJobPollingSupport = function(enabled) {
+import {BackgroundJobPollingStatus} from '../index';
+
+export default class BackgroundJobPollingSupport {
+
+constructor(enabled) {
   this.enabled = !!enabled;
-  this.status = scout.BackgroundJobPollingStatus.STOPPED;
-};
+  this.status = BackgroundJobPollingStatus.STOPPED;
+}
 
-scout.BackgroundJobPollingSupport.prototype.setFailed = function() {
-  this.status = scout.BackgroundJobPollingStatus.FAILURE;
-};
+setFailed() {
+  this.status = BackgroundJobPollingStatus.FAILURE;
+}
 
-scout.BackgroundJobPollingSupport.prototype.setRunning = function() {
-  this.status = scout.BackgroundJobPollingStatus.RUNNING;
-};
+setRunning() {
+  this.status = BackgroundJobPollingStatus.RUNNING;
+}
 
-scout.BackgroundJobPollingSupport.prototype.setStopped = function() {
-  this.status = scout.BackgroundJobPollingStatus.STOPPED;
-};
+setStopped() {
+  this.status = BackgroundJobPollingStatus.STOPPED;
+}
 
-scout.BackgroundJobPollingSupport.prototype.isFailed = function() {
-  return (this.status === scout.BackgroundJobPollingStatus.FAILURE);
-};
+isFailed() {
+  return (this.status === BackgroundJobPollingStatus.FAILURE);
+}
 
-scout.BackgroundJobPollingSupport.prototype.isRunning = function() {
-  return (this.status === scout.BackgroundJobPollingStatus.RUNNING);
-};
+isRunning() {
+  return (this.status === BackgroundJobPollingStatus.RUNNING);
+}
 
-scout.BackgroundJobPollingSupport.prototype.isStopped = function() {
-  return (this.status === scout.BackgroundJobPollingStatus.STOPPED);
-};
+isStopped() {
+  return (this.status === BackgroundJobPollingStatus.STOPPED);
+}
+}

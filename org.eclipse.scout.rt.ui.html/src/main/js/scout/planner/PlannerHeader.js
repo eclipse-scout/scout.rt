@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerHeader = function() {
-  scout.PlannerHeader.parent.call(this);
+import {Planner} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+
+export default class PlannerHeader extends Widget {
+
+constructor() {
+  super();
 
   this.availableDisplayModes = [];
-};
-scout.inherits(scout.PlannerHeader, scout.Widget);
+}
 
-scout.PlannerHeader.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.appendDiv('planner-header');
   this.$range = this.$container.appendDiv('planner-range');
   this.$range.appendDiv('planner-previous').on('click', this._onPreviousClick.bind(this));
@@ -25,14 +31,14 @@ scout.PlannerHeader.prototype._render = function() {
   this.$commands = this.$container.appendDiv('planner-commands');
   this._renderAvailableDisplayModes();
   this._renderDisplayMode();
-};
+}
 
-scout.PlannerHeader.prototype.setAvailableDisplayModes = function(displayModes) {
+setAvailableDisplayModes(displayModes) {
   this.setProperty('availableDisplayModes', displayModes);
-};
+}
 
-scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
-  var displayMode = scout.Planner.DisplayMode;
+_renderAvailableDisplayModes() {
+  var displayMode = Planner.DisplayMode;
   this.$commands.empty();
 
   if (this.availableDisplayModes.length > 1) {
@@ -72,37 +78,38 @@ scout.PlannerHeader.prototype._renderAvailableDisplayModes = function() {
   $modes.first().addClass('first');
   $modes.last().addClass('last');
   this.$commands.appendDiv('planner-toggle-year').on('click', this._onYearClick.bind(this));
-};
+}
 
-scout.PlannerHeader.prototype.setDisplayMode = function(displayMode) {
+setDisplayMode(displayMode) {
   this.setProperty('displayMode', displayMode);
-};
+}
 
-scout.PlannerHeader.prototype._renderDisplayMode = function() {
+_renderDisplayMode() {
   $('.planner-mode', this.$commands).select(false);
   $('[data-mode="' + this.displayMode + '"]', this.$commands).select(true);
-};
+}
 
-scout.PlannerHeader.prototype._onTodayClick = function(event) {
+_onTodayClick(event) {
   this.trigger('todayClick');
-};
+}
 
-scout.PlannerHeader.prototype._onNextClick = function(event) {
+_onNextClick(event) {
   this.trigger('nextClick');
-};
+}
 
-scout.PlannerHeader.prototype._onPreviousClick = function(event) {
+_onPreviousClick(event) {
   this.trigger('previousClick');
-};
+}
 
-scout.PlannerHeader.prototype._onYearClick = function(event) {
+_onYearClick(event) {
   this.trigger('yearClick');
-};
+}
 
-scout.PlannerHeader.prototype._onDisplayModeClick = function(event) {
+_onDisplayModeClick(event) {
   var displayMode = $(event.target).data('mode');
   this.setDisplayMode(displayMode);
   this.trigger('displayModeClick', {
     displayMode: this.displayMode
   });
-};
+}
+}

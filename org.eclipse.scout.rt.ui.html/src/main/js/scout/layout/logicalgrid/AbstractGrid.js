@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {GridData} from '../../index';
+import {LogicalGrid} from '../../index';
+
 /**
  * @abstract
  */
-scout.AbstractGrid = function(options) {
-  scout.AbstractGrid.parent.call(this, options);
+export default class AbstractGrid extends LogicalGrid {
+
+constructor(options) {
+  super( options);
   this.gridRows = 0;
   this.gridColumns = 0;
-};
-scout.inherits(scout.AbstractGrid, scout.LogicalGrid);
+}
+
 
 /**
  * Expects this.gridConfig to be set
  * @override
  */
-scout.AbstractGrid.prototype._validate = function(gridContainer) {
+_validate(gridContainer) {
   // reset old state
   this.gridRows = 0;
   this.gridConfig.setWidget(gridContainer);
@@ -42,7 +47,7 @@ scout.AbstractGrid.prototype._validate = function(gridContainer) {
         notContainingGridXYCount++;
       }
     } else {
-      var gd = scout.GridData.createFromHints(widget, 1);
+      var gd = GridData.createFromHints(widget, 1);
       widget.gridData = gd;
     }
   }.bind(this));
@@ -51,12 +56,12 @@ scout.AbstractGrid.prototype._validate = function(gridContainer) {
   } else {
     this.layoutAllDynamic(widgets);
   }
-};
+}
 
-scout.AbstractGrid.prototype.layoutAllStatic = function(widgets) {
+layoutAllStatic(widgets) {
   var hints = [];
   widgets.forEach(function(v) {
-    hints.push(scout.GridData.createFromHints(v, 1));
+    hints.push(GridData.createFromHints(v, 1));
   });
   var totalGridW = hints.reduce(function(x, y) {
     var y1 = y.x + y.w;
@@ -67,29 +72,30 @@ scout.AbstractGrid.prototype.layoutAllStatic = function(widgets) {
     return y1 > x ? y1 : x;
   }, 0);
   widgets.forEach(function(v) {
-    v.gridData = scout.GridData.createFromHints(v, totalGridW);
+    v.gridData = GridData.createFromHints(v, totalGridW);
   });
   this.gridRows = totalGridH;
   this.gridColumns = totalGridW;
-};
+}
 
-scout.AbstractGrid.prototype.layoutAllDynamic = function(widgets) {
+layoutAllDynamic(widgets) {
   // abstract, must be implemented by sub classes
-};
+}
 
-scout.AbstractGrid.prototype.getGridColumnCount = function() {
+getGridColumnCount() {
   return this.gridColumns;
-};
+}
 
-scout.AbstractGrid.prototype.getGridRowCount = function() {
+getGridRowCount() {
   return this.gridRows;
-};
+}
 
 /**
  * If grid w is greater than column count, grid w will be set to the column count.
  */
-scout.AbstractGrid.getGridDataFromHints = function(widget, groupBoxColumnCount) {
-  var data = scout.GridData.createFromHints(widget, groupBoxColumnCount);
+static getGridDataFromHints(widget, groupBoxColumnCount) {
+  var data = GridData.createFromHints(widget, groupBoxColumnCount);
   data.w = Math.min(groupBoxColumnCount, data.w);
   return data;
-};
+}
+}

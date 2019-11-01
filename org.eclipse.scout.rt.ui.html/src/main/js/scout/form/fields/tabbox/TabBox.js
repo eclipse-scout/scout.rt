@@ -8,33 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {SingleLayout} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {CompositeField} from '../../../index';
+import {scout} from '../../../index';
+import {TabArea} from '../../../index';
+import {TabBoxLayout} from '../../../index';
+import {FormField} from '../../../index';
+import {arrays} from '../../../index';
+import * as $ from 'jquery';
+
 /**
  * Tab-area = where the 1-n tabs are placed (may have multiple runs = lines).
  * Tab-content = where the content of a single tab is displayed.
  */
-scout.TabBox = function() {
-  scout.TabBox.parent.call(this);
+export default class TabBox extends CompositeField {
+
+constructor() {
+  super();
 
   this.gridDataHints.useUiHeight = true;
-  this.gridDataHints.w = scout.FormField.FULL_WIDTH;
+  this.gridDataHints.w = FormField.FULL_WIDTH;
   this.menusVisible = false; // TabBox shows its menus in the tab box header -> don't draw an ellipsis status icon
   this.selectedTab = null;
   this.tabItems = [];
-  this.tabAreaStyle = scout.TabArea.DisplayStyle.DEFAULT;
+  this.tabAreaStyle = TabArea.DisplayStyle.DEFAULT;
 
   this._addWidgetProperties(['tabItems', 'selectedTab']);
   this._addPreserveOnPropertyChangeProperties(['selectedTab']);
   this._$tabContent = null;
 
   this._tabBoxHeaderPropertyChangeHander = this._onTabBoxHeaderPropertyChange.bind(this);
-};
-scout.inherits(scout.TabBox, scout.CompositeField);
+}
+
 
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype._init = function(model) {
-  scout.TabBox.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.header = scout.create('TabBoxHeader', {
     parent: this,
     tabBox: this
@@ -42,65 +54,65 @@ scout.TabBox.prototype._init = function(model) {
 
   this._initProperties(model);
   this.header.on('propertyChange', this._tabBoxHeaderPropertyChangeHander);
-};
+}
 
-scout.TabBox.prototype._initProperties = function(model) {
+_initProperties(model) {
   this._setTabItems(this.tabItems);
   this._setSelectedTab(this.selectedTab);
   this._setTabAreaStyle(this.tabAreaStyle);
-};
+}
 
-scout.TabBox.prototype._destroy = function() {
-  scout.TabBox.parent.prototype._destroy.call(this);
+_destroy() {
+  super._destroy();
   this.header.off('propertyChange', this._tabBoxHeaderPropertyChangeHander);
-};
+}
 
-scout.TabBox.prototype._render = function() {
-  this.addContainer(this.$parent, 'tab-box', new scout.TabBoxLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'tab-box', new TabBoxLayout(this));
 
   this.header.render(this.$container);
   this.addStatus();
 
   this._$tabContent = this.$container.appendDiv('tab-content');
-  var htmlCompContent = scout.HtmlComponent.install(this._$tabContent, this.session);
-  htmlCompContent.setLayout(new scout.SingleLayout());
-};
+  var htmlCompContent = HtmlComponent.install(this._$tabContent, this.session);
+  htmlCompContent.setLayout(new SingleLayout());
+}
 
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype._renderProperties = function() {
-  scout.TabBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSelectedTab();
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype._remove = function() {
-  scout.TabBox.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this._removeSelectedTab();
-};
+}
 
-scout.TabBox.prototype._getCurrentMenus = function() {
+_getCurrentMenus() {
   // handled by the menubar
   return [];
-};
+}
 
-scout.TabBox.prototype._removeMenus = function() {
+_removeMenus() {
   // menubar takes care about removal
-};
+}
 
-scout.TabBox.prototype.deleteTabItem = function(tabItem) {
+deleteTabItem(tabItem) {
   var index = this.tabItems.indexOf(tabItem);
   var newTabItems = this.tabItems.slice();
   if (index >= 0) {
     newTabItems.splice(index, 1);
     this.setTabItems(newTabItems);
   }
-};
+}
 
-scout.TabBox.prototype.insertTabItem = function(tabItem, index) {
+insertTabItem(tabItem, index) {
   if (!tabItem) {
     return;
   }
@@ -108,13 +120,13 @@ scout.TabBox.prototype.insertTabItem = function(tabItem, index) {
   var newTabItems = this.tabItems.slice();
   newTabItems.splice(index, 0, tabItem);
   this.setTabItems(newTabItems);
-};
+}
 
-scout.TabBox.prototype.setTabItems = function(tabItems) {
+setTabItems(tabItems) {
   this.setProperty('tabItems', tabItems);
-};
+}
 
-scout.TabBox.prototype._setTabItems = function(tabItems) {
+_setTabItems(tabItems) {
   tabItems = tabItems || [];
   var tabsToRemove = this.tabItems || [];
   tabsToRemove.filter(function(tabItem) {
@@ -129,102 +141,102 @@ scout.TabBox.prototype._setTabItems = function(tabItems) {
   if (this.tabItems.indexOf(this.selectedTab) < 0) {
     this.setSelectedTab(this.tabItems[0]);
   }
-};
+}
 
-scout.TabBox.prototype._renderTabItems = function(tabItems) {
+_renderTabItems(tabItems) {
   // void only selected tab is rendered
-};
-scout.TabBox.prototype._removeTabItems = function(tabItems) {
+}
+_removeTabItems(tabItems) {
   // void only selected tab is rendered
-};
+}
 
-scout.TabBox.prototype._removeTabContent = function() {
+_removeTabContent() {
   this.tabItems.forEach(function(tabItem) {
     tabItem.remove();
   }, this);
-};
+}
 
-scout.TabBox.prototype.selectTabById = function(tabId) {
+selectTabById(tabId) {
   var tab = this.getTabItem(tabId);
   if (!tab) {
     throw new Error('Tab with ID \'' + tabId + '\' does not exist');
   }
   this.setSelectedTab(tab);
-};
+}
 
-scout.TabBox.prototype.setSelectedTab = function(tabItem) {
+setSelectedTab(tabItem) {
   this.setProperty('selectedTab', tabItem);
-};
+}
 
-scout.TabBox.prototype._setSelectedTab = function(tabItem) {
+_setSelectedTab(tabItem) {
   $.log.isDebugEnabled() && $.log.debug('(TabBox#_selectTab) tab=' + tabItem);
   if (this.selectedTab && this.selectedTab.rendered) {
     this.selectedTab.remove();
   }
   this._setProperty('selectedTab', tabItem);
   this.header.setSelectedTabItem(this.selectedTab);
-};
+}
 
-scout.TabBox.prototype._renderSelectedTab = function() {
+_renderSelectedTab() {
   if (this.selectedTab) {
     this.selectedTab.render(this._$tabContent);
   }
   if (this.rendered) {
-    scout.HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
+    HtmlComponent.get(this._$tabContent).revalidateLayoutTree();
   }
-};
+}
 
-scout.TabBox.prototype._removeSelectedTab = function() {
+_removeSelectedTab() {
   if (this.selectedTab) {
     this.selectedTab.remove();
   }
-};
+}
 
-scout.TabBox.prototype.setTabAreaStyle = function(tabAreaStyle) {
+setTabAreaStyle(tabAreaStyle) {
   this.setProperty('tabAreaStyle', tabAreaStyle);
-};
+}
 
-scout.TabBox.prototype._setTabAreaStyle = function(tabAreaStyle) {
+_setTabAreaStyle(tabAreaStyle) {
   this.tabAreaStyle = tabAreaStyle;
   if (this.header && this.header.tabArea) {
     this.header.tabArea.setDisplayStyle(tabAreaStyle);
   }
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype._renderStatusPosition = function() {
-  scout.TabBox.parent.prototype._renderStatusPosition.call(this);
+_renderStatusPosition() {
+  super._renderStatusPosition();
   if (!this.fieldStatus) {
     return;
   }
-  if (this.statusPosition === scout.FormField.StatusPosition.TOP) {
+  if (this.statusPosition === FormField.StatusPosition.TOP) {
     // move into title
     this.$status.appendTo(this.header.$container);
   } else {
     this.$status.appendTo(this.$container);
   }
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override CompositeField.js
  */
-scout.TabBox.prototype.getFields = function() {
+getFields() {
   return this.tabItems;
-};
+}
 
-scout.TabBox.prototype.getTabItem = function(tabId) {
-  return scout.arrays.find(this.tabItems, function(tabItem) {
+getTabItem(tabId) {
+  return arrays.find(this.tabItems, function(tabItem) {
     return tabItem.id === tabId;
   });
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.TabBox.prototype.focus = function() {
+focus() {
   if (!this.rendered) {
     this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
@@ -232,27 +244,28 @@ scout.TabBox.prototype.focus = function() {
   if (this.selectedTab) {
     return this.selectedTab.focus();
   }
-};
+}
 
 /**
  * @override
  */
-scout.TabBox.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (this.selectedTab) {
     return this.selectedTab.getFocusableElement();
   }
   return null;
-};
+}
 
-scout.TabBox.prototype.focusTab = function(tab) {
+focusTab(tab) {
   if (this.selectedTab !== tab) {
     this.selectTab(tab);
   }
   this.header.focusTabItem(tab);
-};
+}
 
-scout.TabBox.prototype._onTabBoxHeaderPropertyChange = function(event) {
+_onTabBoxHeaderPropertyChange(event) {
   if (event.propertyName === 'selectedTabItem') {
     this.setSelectedTab(event.newValue);
   }
-};
+}
+}

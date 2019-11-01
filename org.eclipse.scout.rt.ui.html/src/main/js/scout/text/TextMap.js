@@ -8,11 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TextMap = function(textMap) {
-  this.map = textMap || {};
-};
+import {objects} from '../index';
 
-scout.TextMap.TEXT_KEY_REGEX = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
+export default class TextMap {
+
+constructor(textMap) {
+  this.map = textMap || {};
+}
+
+static TEXT_KEY_REGEX = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
 
 /**
  * Returns the text for the given key.
@@ -21,10 +25,10 @@ scout.TextMap.TEXT_KEY_REGEX = /\$\{textKey\:([a-zA-Z0-9\.]*)\}/;
  * @param textKey key to lookup the text
  * @param vararg texts to replace the placeholders specified by {0}, {1}, etc.
  */
-scout.TextMap.prototype.get = function(textKey) {
+get(textKey) {
   if (!this._exists(textKey)) {
     if (this.parent) {
-      return scout.TextMap.prototype.get.apply(this.parent, arguments);
+      return this.parent.get(...arguments);
     }
     return '[undefined text: ' + textKey + ']';
   }
@@ -39,25 +43,25 @@ scout.TextMap.prototype.get = function(textKey) {
     text = text.replace(new RegExp('\\{' + (i - 1) + '\\}', 'g'), arguments[i]);
   }
   return text;
-};
+}
 
-scout.TextMap.prototype.optGet = function(textKey, defaultValue) {
+optGet(textKey, defaultValue) {
   if (!this._exists(textKey)) {
     if (this.parent) {
-      return scout.TextMap.prototype.optGet.apply(this.parent, arguments);
+      return this.parent.optGet(...arguments);
     }
     return defaultValue;
   }
   if (arguments.length > 2) {
     // dynamically call text() without 'defaultValue' argument
-    var args = Array.prototype.slice.call(arguments, 2);
+    var args = [...arguments].slice(2);
     args.unshift(textKey); // add textKey as first argument
-    return scout.TextMap.prototype.get.apply(this, args);
+    return this.get(...args);
   }
   return this.get(textKey);
-};
+}
 
-scout.TextMap.prototype.exists = function(textKey) {
+exists(textKey) {
   if (this._exists(textKey)) {
     return true;
   }
@@ -65,34 +69,35 @@ scout.TextMap.prototype.exists = function(textKey) {
     return this.parent.exists(textKey);
   }
   return false;
-};
+}
 
-scout.TextMap.prototype._exists = function(textKey) {
+_exists(textKey) {
   return this.map.hasOwnProperty(textKey);
-};
+}
 
-scout.TextMap.prototype.add = function(textKey, text) {
+add(textKey, text) {
   this.map[textKey] = text;
-};
+}
 
 /**
  * Adds all texts from the given textMap to this textMap
- * @param {Object|scout.TextMap} textMap either a plain object or a {@link scout.TextMap}
+ * @param {Object|TextMap} textMap either a plain object or a {@link TextMap}
  */
-scout.TextMap.prototype.addAll = function(textMap) {
+addAll(textMap) {
   if (!textMap) {
     return;
   }
-  if (textMap instanceof scout.TextMap) {
+  if (textMap instanceof TextMap) {
     textMap = textMap.map;
   }
-  scout.objects.copyOwnProperties(textMap, this.map);
-};
+  objects.copyOwnProperties(textMap, this.map);
+}
 
-scout.TextMap.prototype.setParent = function(parent) {
+setParent(parent) {
   this.parent = parent;
-};
+}
 
-scout.TextMap.prototype.remove = function(textKey) {
+remove(textKey) {
   delete this.map[textKey];
-};
+}
+}

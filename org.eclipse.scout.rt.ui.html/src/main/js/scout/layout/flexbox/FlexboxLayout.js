@@ -8,12 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FlexboxLayout = function(direction, cacheKey) {
-  scout.FlexboxLayout.parent.call(this);
+import {webstorage} from '../../index';
+import {HtmlComponent} from '../../index';
+import {Rectangle} from '../../index';
+import {Dimension} from '../../index';
+import * as $ from 'jquery';
+import {AbstractLayout} from '../../index';
+
+export default class FlexboxLayout extends AbstractLayout {
+
+constructor(direction, cacheKey) {
+  super();
   this.childrenLayoutDatas = [];
   this.cacheKey = null;
   this.setCacheKey(cacheKey);
-  if (direction === scout.FlexboxLayout.Direction.ROW) {
+  if (direction === FlexboxLayout.Direction.ROW) {
     this.preferredLayoutSize = this.preferredLayoutSizeRow;
     this._getDimensionValue = this._getWidth;
     this._layoutFromLayoutData = this._layoutFromLayoutDataRow;
@@ -22,28 +31,28 @@ scout.FlexboxLayout = function(direction, cacheKey) {
     this._getDimensionValue = this._getHeight;
     this._layoutFromLayoutData = this._layoutFromLayoutDataColumn;
   }
-};
-scout.inherits(scout.FlexboxLayout, scout.AbstractLayout);
+}
+
 
 // constants
-scout.FlexboxLayout.Direction = {
+static Direction = {
   COLUMN: 0,
   ROW: 1
 };
 
-scout.FlexboxLayout.prototype.setCacheKey = function(cacheKey) {
+setCacheKey(cacheKey) {
   this.cacheKey = cacheKey;
   if (this.cacheKey && this.cacheKey.length > 0) {
     this.cacheKey.unshift('scout.flexboxLayout');
   }
-};
+}
 
-scout.FlexboxLayout.prototype._readCache = function(childCount) {
+_readCache(childCount) {
   if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
     return;
   }
   var keySequence = this.cacheKey.slice(),
-    cacheValue = scout.webstorage.getItem(localStorage, keySequence[0]),
+    cacheValue = webstorage.getItem(localStorage, keySequence[0]),
     i = 1,
     cacheObj;
   keySequence.push('' + childCount);
@@ -55,14 +64,14 @@ scout.FlexboxLayout.prototype._readCache = function(childCount) {
     i++;
   }
   return cacheObj;
-};
+}
 
-scout.FlexboxLayout.prototype._writeCache = function(childCount, sizes) {
+_writeCache(childCount, sizes) {
   if (!this.cacheKey || this.cacheKey.length === 0 || childCount < 2) {
     return;
   }
   var keySequence = this.cacheKey.slice(),
-    cacheValue = scout.webstorage.getItem(localStorage, keySequence[0]),
+    cacheValue = webstorage.getItem(localStorage, keySequence[0]),
     i = 1,
     cacheObj,
     cachedSizes;
@@ -81,21 +90,21 @@ scout.FlexboxLayout.prototype._writeCache = function(childCount, sizes) {
     i++;
   }
   cachedSizes[keySequence[i]] = sizes;
-  scout.webstorage.setItem(localStorage, keySequence[0], JSON.stringify(cacheObj));
-};
+  webstorage.setItem(localStorage, keySequence[0], JSON.stringify(cacheObj));
+}
 
-scout.FlexboxLayout.prototype._computeCacheKey = function(childCount) {
+_computeCacheKey(childCount) {
   // no need to cache bounds of a single child
   if (!this.cacheKey || childCount < 2) {
     return;
   }
   return this.cacheKey + '-' + childCount;
-};
+}
 
 // layout functions
-scout.FlexboxLayout.prototype.layout = function($container) {
+layout($container) {
   var children = this._getChildren($container),
-    htmlContainer = scout.HtmlComponent.get($container),
+    htmlContainer = HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize({
       exact: true
     }),
@@ -114,12 +123,12 @@ scout.FlexboxLayout.prototype.layout = function($container) {
     this._layoutComponents(children, containerSize);
     return;
   }
-};
+}
 
-scout.FlexboxLayout.prototype._getChildren = function($container) {
+_getChildren($container) {
   var children = [];
   $container.children().each(function() {
-    var htmlChild = scout.HtmlComponent.optGet($(this));
+    var htmlChild = HtmlComponent.optGet($(this));
     if (htmlChild) {
       children.push(htmlChild);
     }
@@ -128,18 +137,18 @@ scout.FlexboxLayout.prototype._getChildren = function($container) {
     return (a.layoutData.order || 0) - (b.layoutData.order || 0);
   });
   return children;
-};
+}
 
-scout.FlexboxLayout.prototype.reset = function() {
+reset() {
   this.childrenLayoutDatas.forEach(function(ld) {
     ld.sizePx = 0;
     ld.initialPx = 0;
     ld.diff = null;
   });
   this.childrenLayoutDatas = [];
-};
+}
 
-scout.FlexboxLayout.prototype._layoutDelta = function(children, deltaComp, containerSize) {
+_layoutDelta(children, deltaComp, containerSize) {
   this.ensureInitialValues(children, containerSize);
   var delta = deltaComp.layoutData.diff,
     componentsBefore = children.slice(0, children.indexOf(deltaComp)).reverse(),
@@ -171,9 +180,9 @@ scout.FlexboxLayout.prototype._layoutDelta = function(children, deltaComp, conta
       return diff;
     }, delta);
   }
-};
+}
 
-scout.FlexboxLayout.prototype._layoutComponents = function(children, containerSize) {
+_layoutComponents(children, containerSize) {
   var delta = this.ensureInitialValues(children, containerSize);
   if (delta < 0) {
     this._adjust(children, delta, function(ld) {
@@ -185,9 +194,9 @@ scout.FlexboxLayout.prototype._layoutComponents = function(children, containerSi
     });
   }
   this._layoutFromLayoutDataWithCache(children, containerSize);
-};
+}
 
-scout.FlexboxLayout.prototype._adjust = function(children, delta, getWeightFunction) {
+_adjust(children, delta, getWeightFunction) {
   var weightSum,
     deltaFactor,
     layoutDatas = children.map(function(c) {
@@ -214,18 +223,18 @@ scout.FlexboxLayout.prototype._adjust = function(children, delta, getWeightFunct
     this._adjust(children, delta, getWeightFunction);
   }
 
-};
+}
 
-scout.FlexboxLayout.prototype._getPreferredSize = function(htmlComp) {
+_getPreferredSize(htmlComp) {
   var prefSize;
   prefSize = htmlComp.prefSize({
       useCssSize: true
     })
     .add(htmlComp.margins());
   return prefSize;
-};
+}
 
-scout.FlexboxLayout.prototype.ensureInitialValues = function(children, containerSize) {
+ensureInitialValues(children, containerSize) {
   var totalPx = this._getDimensionValue(containerSize),
     sumOfAbsolutePx = 0,
     sumOfRelatives = 0,
@@ -276,66 +285,67 @@ scout.FlexboxLayout.prototype.ensureInitialValues = function(children, container
       return restWidth - ld.sizePx;
     }.bind(this), totalPx);
 
-};
-scout.FlexboxLayout.prototype._layoutFromLayoutDataWithCache = function(children, containerSize) {
+}
+_layoutFromLayoutDataWithCache(children, containerSize) {
   this._cacheSizes(children, containerSize);
   this._layoutFromLayoutData(children, containerSize);
-};
+}
 
-scout.FlexboxLayout.prototype._cacheSizes = function(children, containerSize) {
+_cacheSizes(children, containerSize) {
   var totalPx = this._getDimensionValue(containerSize),
     value;
   value = children.map(function(c) {
     return c.layoutData.sizePx / totalPx;
   });
   this._writeCache(children.length, value);
-};
+}
 
 //functions differ from row to column mode
 
-scout.FlexboxLayout.prototype.preferredLayoutSizeColumn = function($container, options) {
+preferredLayoutSizeColumn($container, options) {
   return this._getChildren($container).reduce(function(size, c) {
     var prefSize = this._getPreferredSize(c);
     size.width = Math.max(prefSize.width, size.width);
     size.height += prefSize.height;
     return size;
-  }.bind(this), new scout.Dimension(0, 0));
-};
+  }.bind(this), new Dimension(0, 0));
+}
 
-scout.FlexboxLayout.prototype.preferredLayoutSizeRow = function($container, options) {
+preferredLayoutSizeRow($container, options) {
   return this._getChildren($container).reduce(function(size, c) {
     var prefSize = this._getPreferredSize(c);
     size.height = Math.max(prefSize.height, size.height);
     size.width += prefSize.width;
     return size;
-  }.bind(this), new scout.Dimension(0, 0));
-};
+  }.bind(this), new Dimension(0, 0));
+}
 
-scout.FlexboxLayout.prototype._getWidth = function(dimension) {
+_getWidth(dimension) {
   return dimension.width;
-};
-scout.FlexboxLayout.prototype._getHeight = function(dimension) {
+}
+_getHeight(dimension) {
   return dimension.height;
-};
+}
 
-scout.FlexboxLayout.prototype._layoutFromLayoutDataRow = function(children, containerSize) {
+_layoutFromLayoutDataRow(children, containerSize) {
   children.reduce(function(x, comp) {
     var margins = comp.margins();
     var insets = comp.insets();
     var w = comp.layoutData.sizePx;
-    var bounds = new scout.Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
+    var bounds = new Rectangle(x - insets.left - margins.left, 0, w + insets.left + insets.right, containerSize.height);
     comp.setBounds(bounds);
     return x + w;
   }, 0);
-};
+}
 
-scout.FlexboxLayout.prototype._layoutFromLayoutDataColumn = function(children, containerSize) {
+_layoutFromLayoutDataColumn(children, containerSize) {
   children.reduce(function(y, comp) {
     var margins = comp.margins();
     var insets = comp.insets();
     var h = comp.layoutData.sizePx;
-    var bounds = new scout.Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
+    var bounds = new Rectangle(0, y - insets.top - margins.top, containerSize.width, h + insets.top + insets.bottom);
     comp.setBounds(bounds);
     return y + h;
   }, 0);
-};
+}
+}

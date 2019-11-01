@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AggregateTableControl = function() {
-  scout.AggregateTableControl.parent.call(this);
+import {icons} from '../../index';
+import {graphics} from '../../index';
+import {arrays} from '../../index';
+import {TableControl} from '../../index';
+import * as $ from 'jquery';
+
+export default class AggregateTableControl extends TableControl {
+
+constructor() {
+  super();
   this._tableDataScrollHandler = this._onTableDataScroll.bind(this);
   this._tableColumnResizedHandler = this._onTableColumnResized.bind(this);
   this._tableColumnMovedHandler = this._onTableColumnMoved.bind(this);
@@ -17,37 +25,37 @@ scout.AggregateTableControl = function() {
   this._tableChangedHandler = this._onTableChanged.bind(this);
   this._aggregationFunctionChangedHandler = this._onAggregationFunctionChanged.bind(this);
 
-  this.animateDuration = scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION;
+  this.animateDuration = AggregateTableControl.CONTAINER_ANIMATE_DURATION;
   this.aggregateRow = [];
   this.cssClass = 'aggregate';
   this.height = 0; // Will be as height as a row
-  this.iconId = scout.icons.SUM;
+  this.iconId = icons.SUM;
   this.tooltipText = '${textKey:ui.Total}';
   this.resizerVisible = false;
-};
-scout.inherits(scout.AggregateTableControl, scout.TableControl);
+}
 
-scout.AggregateTableControl.CONTAINER_ANIMATE_DURATION = 200;
 
-scout.AggregateTableControl.prototype._init = function(model) {
-  scout.AggregateTableControl.parent.prototype._init.call(this, model);
+static CONTAINER_ANIMATE_DURATION = 200;
+
+_init(model) {
+  super._init( model);
   this.table.on('columnStructureChanged', this._tableColumnStructureChangedHandler);
   this.table.on('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);
-};
+}
 
-scout.AggregateTableControl.prototype._destroy = function() {
-  scout.AggregateTableControl.parent.prototype._destroy.call(this);
+_destroy() {
+  super._destroy();
   this.table.off('columnStructureChanged', this._tableColumnStructureChangedHandler);
   this.table.off('aggregationFunctionChanged', this._aggregationFunctionChangedHandler);
-};
+}
 
-scout.AggregateTableControl.prototype._render = function() {
-  scout.AggregateTableControl.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this._updateEnabledAndSelectedState();
-  this.height = this.table.rowHeight + scout.graphics.insets(this.table.footer.$controlContainer).vertical();
-};
+  this.height = this.table.rowHeight + graphics.insets(this.table.footer.$controlContainer).vertical();
+}
 
-scout.AggregateTableControl.prototype._renderContent = function($parent) {
+_renderContent($parent) {
   this.$contentContainer = $parent.appendDiv('table-aggregate');
 
   this._aggregate();
@@ -58,18 +66,18 @@ scout.AggregateTableControl.prototype._renderContent = function($parent) {
   this.table.on('columnResized', this._tableColumnResizedHandler);
   this.table.on('columnMoved', this._tableColumnMovedHandler);
   this.table.on('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
-};
+}
 
-scout.AggregateTableControl.prototype._removeContent = function() {
+_removeContent() {
   this.$contentContainer.remove();
 
   this.table.$data.off('scroll', this._tableDataScrollHandler);
   this.table.off('columnResized', this._tableColumnResizedHandler);
   this.table.off('columnMoved', this._tableColumnMovedHandler);
   this.table.off('rowsSelected rowsInserted rowsUpdated rowsDeleted filter group allRowsDeleted', this._tableChangedHandler);
-};
+}
 
-scout.AggregateTableControl.prototype._renderAggregate = function() {
+_renderAggregate() {
   this.table.visibleColumns().forEach(function(column, c) {
     var aggregateValue, cell, $cell;
 
@@ -93,14 +101,14 @@ scout.AggregateTableControl.prototype._renderAggregate = function() {
   if (this.aggregateRow.selection) {
     this.$contentContainer.addClass('selection');
   }
-};
+}
 
-scout.AggregateTableControl.prototype._rerenderAggregate = function() {
+_rerenderAggregate() {
   this.$contentContainer.empty();
   this._renderAggregate();
-};
+}
 
-scout.AggregateTableControl.prototype._aggregate = function() {
+_aggregate() {
   var rows,
     aggregateRow = [],
     selectedRows = this.table.selectedRows;
@@ -122,15 +130,15 @@ scout.AggregateTableControl.prototype._aggregate = function() {
   if (this.contentRendered && this.selected) {
     this._rerenderAggregate();
   }
-};
+}
 
-scout.AggregateTableControl.prototype._reconcileScrollPos = function() {
+_reconcileScrollPos() {
   // When scrolling horizontally scroll aggregate content as well
   var scrollLeft = this.table.$data.scrollLeft();
   this.$contentContainer.scrollLeft(scrollLeft);
-};
+}
 
-scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(aggregationFunctionChanged) {
+_updateEnabledAndSelectedState(aggregationFunctionChanged) {
   if (!this.initialized) {
     // During init the columns are not resolved yet -> containsAggregatedNumberColumn won't return a correct value
     return;
@@ -147,50 +155,51 @@ scout.AggregateTableControl.prototype._updateEnabledAndSelectedState = function(
     this.setSelected(false);
   }
   this.setEnabled(enabled);
-};
+}
 
-scout.AggregateTableControl.prototype._setEnabled = function(enabled) {
-  scout.AggregateTableControl.parent.prototype._setEnabled.call(this, enabled);
+_setEnabled(enabled) {
+  super._setEnabled( enabled);
   this._updateEnabledAndSelectedState();
-};
+}
 
-scout.AggregateTableControl.prototype._setSelected = function(selected) {
+_setSelected(selected) {
   this._setProperty('selected', selected);
   this._updateEnabledAndSelectedState();
-};
+}
 
-scout.AggregateTableControl.prototype._onTableDataScroll = function() {
+_onTableDataScroll() {
   this._reconcileScrollPos();
-};
+}
 
 /**
  * Generic handler for various events
  * @private
  */
-scout.AggregateTableControl.prototype._onTableChanged = function() {
+_onTableChanged() {
   this._aggregate();
-};
+}
 
-scout.AggregateTableControl.prototype._onAggregationFunctionChanged = function() {
+_onAggregationFunctionChanged() {
   this._updateEnabledAndSelectedState(true);
   if (this.contentRendered && this.selected) {
     this._aggregate();
   }
-};
+}
 
-scout.AggregateTableControl.prototype._onTableColumnResized = function() {
+_onTableColumnResized() {
   this._rerenderAggregate();
-};
+}
 
-scout.AggregateTableControl.prototype._onTableColumnMoved = function(event) {
+_onTableColumnMoved(event) {
   // move aggregated value in aggregateRow
-  scout.arrays.move(this.aggregateRow, event.oldPos, event.newPos);
+  arrays.move(this.aggregateRow, event.oldPos, event.newPos);
   this._rerenderAggregate();
-};
+}
 
-scout.AggregateTableControl.prototype._onTableColumnStructureChanged = function() {
+_onTableColumnStructureChanged() {
   this._updateEnabledAndSelectedState();
   if (this.contentRendered && this.selected) {
     this._aggregate();
   }
-};
+}
+}

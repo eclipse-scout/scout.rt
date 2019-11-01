@@ -8,8 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BackgroundJobPollingStatus = {
+const BackgroundJobPollingStatus = {
   STOPPED: 'stopped',
   RUNNING: 'running',
   FAILURE: 'failure'
 };
+
+export default BackgroundJobPollingStatus;

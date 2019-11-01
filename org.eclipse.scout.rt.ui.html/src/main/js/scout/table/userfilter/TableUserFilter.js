@@ -8,44 +8,50 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableUserFilter = function() {
-  scout.TableUserFilter.parent.call(this);
-};
-scout.inherits(scout.TableUserFilter, scout.TableFilter);
+import {TableFilter} from '../../index';
+import * as $ from 'jquery';
 
-scout.TableUserFilter.prototype.init = function(model) {
+export default class TableUserFilter extends TableFilter {
+
+constructor() {
+  super();
+}
+
+
+init(model) {
   this.session = model.session;
   if (!this.session) {
     throw new Error('Session expected: ' + this);
   }
   this._init(model);
-};
+}
 
-scout.TableUserFilter.prototype._init = function(model) {
+_init(model) {
   $.extend(this, model);
-};
+}
 
-scout.TableUserFilter.prototype.createFilterAddedEventData = function() {
+createFilterAddedEventData() {
   return {
     filterType: this.filterType
   };
-};
+}
 
-scout.TableUserFilter.prototype.createFilterRemovedEventData = function() {
+createFilterRemovedEventData() {
   return {
     filterType: this.filterType
   };
-};
+}
 
-scout.TableUserFilter.prototype.createKey = function() {
+createKey() {
   return this.filterType;
-};
+}
 
-scout.TableUserFilter.prototype.createLabel = function() {
+createLabel() {
   // to be implemented by subclasses
   return '';
-};
+}
 
-scout.TableUserFilter.prototype.accept = function(row) {
+accept(row) {
   // to be implemented by subclasses
-};
+}
+}

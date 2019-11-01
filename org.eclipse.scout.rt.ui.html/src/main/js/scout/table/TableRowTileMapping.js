@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableRowTileMapping = function() {
-  scout.TableRowTileMapping.parent.call(this);
+import {Widget} from '../index';
+
+export default class TableRowTileMapping extends Widget {
+
+constructor() {
+  super();
   this.tableRow = null;
   this.tile = null;
   this._addWidgetProperties(['tile']);
-};
-scout.inherits(scout.TableRowTileMapping, scout.Widget);
+}
+
+}

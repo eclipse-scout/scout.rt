@@ -8,104 +8,118 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {NullLogger} from '../index';
+import {URL} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /* global log4javascript */
-scout.logging = {
 
-  DEFAULT_LEVEL: 'trace',
-  initialized: false,
-  _appendersToAdd: [],
-  showStackTraces: true,
 
-  /***
-   * Loads log4javascript.min.js if logging is enabled.
-   *
-   * @returns {Promise}
-   */
-  bootstrap: function(options) {
-    var location = new scout.URL(),
-      logging = location.getParameter('logging'),
-      logLevel = location.getParameter('logLevel');
+const DEFAULT_LEVEL = 'trace';
+let initialized = false;
+let _appendersToAdd = [];
+let showStackTraces = true;
 
-    options = scout.nvl(options, {});
+/***
+ * Loads log4javascript.min.js if logging is enabled.
+ *
+ * @returns {Promise}
+ */
+export function bootstrap(options) {
+  var location = new URL(),
+    logging = location.getParameter('logging'),
+    logLevel = location.getParameter('logLevel');
 
-    var enabled = !!(options.enabled || logging),
-      showPopup = !!(options.showPopup || logging);
+  options = scout.nvl(options, {});
 
-    var resourceUrl = scout.nvl(options.resourceUrl, 'res/');
+  var enabled = !!(options.enabled || logging),
+    showPopup = !!(options.showPopup || logging);
 
-    $.log = new scout.NullLogger();
-    if (!enabled) {
-      return $.resolvedPromise();
-    }
-    if (window.log4javascript) {
-      this.initLog4Javascript(logLevel, showPopup);
-      return $.resolvedPromise();
-    }
+  var resourceUrl = scout.nvl(options.resourceUrl, '');
 
-    // If log4javascript is not yet installed, dynamically load the library
-    return $.injectScript(resourceUrl + 'log4javascript-1.4.9/log4javascript.js')
-      .done(this.initLog4Javascript.bind(this, logLevel, showPopup));
-  },
-
-  initLog4Javascript: function(logLevel, showPopup) {
-    logLevel = scout.nvl(logLevel, scout.logging.DEFAULT_LEVEL);
-    log4javascript.setShowStackTraces(this.showStackTraces);
-    var defaultLogger = log4javascript.getDefaultLogger();
-    defaultLogger.setLevel(this.parseLevel(logLevel));
-    $.log = defaultLogger;
-
-    this.initialized = true;
-
-    if (showPopup) {
-      // To avoid problems with our CSP rule which prohibits inline scripts we set the useDocumentWrite
-      // flag to false, so the console[_uncompressed].html/js is loaded instead.
-      defaultLogger.getEffectiveAppenders().forEach(function(appender) {
-        appender.setUseDocumentWrite(false);
-      });
-    } else {
-      // Remove default PopUpAppender (which is the only appender at this point)
-      defaultLogger.removeAllAppenders();
-    }
-
-    // Add appenders later
-    this._appendersToAdd.forEach(function(obj) {
-      this.addAppender(obj.factoryName, obj.options);
-    }, this);
-    this._appendersToAdd = [];
-  },
-
-  parseLevel: function(level) {
-    if (!level) {
-      return;
-    }
-    level = level.toLowerCase();
-    switch (level) {
-      case 'trace':
-        return log4javascript.Level.TRACE;
-      case 'debug':
-        return log4javascript.Level.DEBUG;
-      case 'info':
-        return log4javascript.Level.INFO;
-      case 'warn':
-        return log4javascript.Level.WARN;
-      case 'error':
-        return log4javascript.Level.ERROR;
-      case 'fatal':
-        return log4javascript.Level.FATAL;
-    }
-  },
-
-  addAppender: function(factoryName, options) {
-    if (!this.initialized) {
-      this._appendersToAdd.push({
-        factoryName: factoryName,
-        options: options
-      });
-      return;
-    }
-
-    var factory = scout.create(factoryName, options);
-    $.log.addAppender(factory.create());
+  $.log = new NullLogger();
+  if (!enabled) {
+    return $.resolvedPromise();
+  }
+  if (window.log4javascript) {
+    initLog4Javascript(logLevel, showPopup);
+    return $.resolvedPromise();
   }
 
+  // If log4javascript is not yet installed, dynamically load the library
+  return $.injectScript(resourceUrl + 'log4javascript-1.4.9/log4javascript.js')
+    .done(initLog4Javascript.bind(this, logLevel, showPopup));
+}
+
+export function initLog4Javascript(logLevel, showPopup) {
+  logLevel = scout.nvl(logLevel, DEFAULT_LEVEL);
+  log4javascript.setShowStackTraces(showStackTraces);
+  var defaultLogger = log4javascript.getDefaultLogger();
+  defaultLogger.setLevel(parseLevel(logLevel));
+  $.log = defaultLogger;
+
+  initialized = true;
+
+  if (showPopup) {
+    // To avoid problems with our CSP rule which prohibits inline scripts we set the useDocumentWrite
+    // flag to false, so the console[_uncompressed].html/js is loaded instead.
+    defaultLogger.getEffectiveAppenders().forEach(function(appender) {
+      appender.setUseDocumentWrite(false);
+    });
+  } else {
+    // Remove default PopUpAppender (which is the only appender at this point)
+    defaultLogger.removeAllAppenders();
+  }
+
+  // Add appenders later
+  _appendersToAdd.forEach(function(obj) {
+    addAppender(obj.factoryName, obj.options);
+  }, this);
+  _appendersToAdd = [];
+}
+
+export function parseLevel(level) {
+  if (!level) {
+    return;
+  }
+  level = level.toLowerCase();
+  switch (level) {
+    case 'trace':
+      return log4javascript.Level.TRACE;
+    case 'debug':
+      return log4javascript.Level.DEBUG;
+    case 'info':
+      return log4javascript.Level.INFO;
+    case 'warn':
+      return log4javascript.Level.WARN;
+    case 'error':
+      return log4javascript.Level.ERROR;
+    case 'fatal':
+      return log4javascript.Level.FATAL;
+  }
+}
+
+export function addAppender(factoryName, options) {
+  if (!initialized) {
+    _appendersToAdd.push({
+      factoryName: factoryName,
+      options: options
+    });
+    return;
+  }
+
+  var factory = scout.create(factoryName, options);
+  $.log.addAppender(factory.create());
+}
+
+
+export default {
+  DEFAULT_LEVEL,
+  addAppender,
+  bootstrap,
+  initLog4Javascript,
+  initialized,
+  parseLevel,
+  showStackTraces
 };

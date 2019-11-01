@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableRowTileMappingAdapter = function() {
-  scout.TableRowTileMappingAdapter.parent.call(this);
-};
-scout.inherits(scout.TableRowTileMappingAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class TableRowTileMappingAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

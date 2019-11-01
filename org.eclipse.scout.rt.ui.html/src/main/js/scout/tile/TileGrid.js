@@ -8,12 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGrid = function() {
-  scout.TileGrid.parent.call(this);
+import {TileGridLayoutConfig} from '../index';
+import {TileGridSelectAllKeyStroke} from '../index';
+import {HtmlComponent} from '../index';
+import {KeyStrokeContext} from '../index';
+import {TileGridSelectionHandler} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {MenuDestinations} from '../index';
+import {numbers} from '../index';
+import {Range} from '../index';
+import {LoadingSupport} from '../index';
+import {TileGridSelectUpKeyStroke} from '../index';
+import {TileGridSelectLastKeyStroke} from '../index';
+import {menus as menus_1} from '../index';
+import {objects} from '../index';
+import {TileGridSelectLeftKeyStroke} from '../index';
+import {DoubleClickSupport} from '../index';
+import {TileGridGridConfig} from '../index';
+import {TileGridSelectDownKeyStroke} from '../index';
+import {ContextMenuKeyStroke} from '../index';
+import {TileGridLayout} from '../index';
+import {TileGridSelectRightKeyStroke} from '../index';
+import {Tile} from '../index';
+import {TileGridSelectFirstKeyStroke} from '../index';
+import {LogicalGridData} from '../index';
+import {VirtualScrolling} from '../index';
+import {PlaceholderTile} from '../index';
+import {Widget} from '../index';
+import {arrays} from '../index';
+
+export default class TileGrid extends Widget {
+
+constructor() {
+  super();
   this.animateTileRemoval = true;
   this.animateTileInsertion = true;
   this.comparator = null;
-  this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._doubleClickSupport = new DoubleClickSupport();
   this.empty = false;
   this.filters = [];
   this.filteredTiles = [];
@@ -29,7 +61,7 @@ scout.TileGrid = function() {
   this.renderAnimationEnabled = false;
   this.selectable = false;
   this.selectedTiles = [];
-  this.selectionHandler = new scout.TileGridSelectionHandler(this);
+  this.selectionHandler = new TileGridSelectionHandler(this);
   this.scrollable = true;
   this.scrolling = false;
   this.scrollTopDirty = false;
@@ -38,7 +70,7 @@ scout.TileGrid = function() {
   this.tiles = [];
   this.tileRemovalPendingCount = 0;
   this.viewRangeSize = 0;
-  this.viewRangeRendered = new scout.Range(0, 0);
+  this.viewRangeRendered = new Range(0, 0);
   this.virtual = false;
   this.virtualScrolling = null;
   this.withPlaceholders = false;
@@ -50,11 +82,11 @@ scout.TileGrid = function() {
 
   this.$fillBefore = null;
   this.$fillAfter = null;
-};
-scout.inherits(scout.TileGrid, scout.Widget);
+}
 
-scout.TileGrid.prototype._init = function(model) {
-  scout.TileGrid.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setGridColumnCount(this.gridColumnCount);
   this._setLayoutConfig(this.layoutConfig);
   this._initVirtualScrolling();
@@ -62,21 +94,21 @@ scout.TileGrid.prototype._init = function(model) {
   this._applyFilters(this.tiles);
   this._updateFilteredTiles();
   this._setMenus(this.menus);
-};
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
-scout.TileGrid.prototype._initVirtualScrolling = function() {
+_initVirtualScrolling() {
   this.virtualScrolling = this._createVirtualScrolling();
-};
+}
 
-scout.TileGrid.prototype._createVirtualScrolling = function() {
-  return new scout.VirtualScrolling({
+_createVirtualScrolling() {
+  return new VirtualScrolling({
     widget: this,
     enabled: this.virtual,
     viewRangeSize: this.viewRangeSize,
@@ -84,139 +116,139 @@ scout.TileGrid.prototype._createVirtualScrolling = function() {
     rowCount: this.rowCount.bind(this),
     _renderViewRange: this._renderViewRange.bind(this)
   });
-};
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this
   });
-};
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._initKeyStrokeContext = function() {
-  scout.TileGrid.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TileGridSelectAllKeyStroke(this),
-    new scout.TileGridSelectLeftKeyStroke(this),
-    new scout.TileGridSelectRightKeyStroke(this),
-    new scout.TileGridSelectDownKeyStroke(this),
-    new scout.TileGridSelectUpKeyStroke(this),
-    new scout.TileGridSelectFirstKeyStroke(this),
-    new scout.TileGridSelectLastKeyStroke(this),
-    new scout.ContextMenuKeyStroke(this, this.showContextMenu, this)
+    new TileGridSelectAllKeyStroke(this),
+    new TileGridSelectLeftKeyStroke(this),
+    new TileGridSelectRightKeyStroke(this),
+    new TileGridSelectDownKeyStroke(this),
+    new TileGridSelectUpKeyStroke(this),
+    new TileGridSelectFirstKeyStroke(this),
+    new TileGridSelectLastKeyStroke(this),
+    new ContextMenuKeyStroke(this, this.showContextMenu, this)
   ]);
-};
+}
 
-scout.TileGrid.prototype._initTiles = function() {
+_initTiles() {
   this.tiles.forEach(function(tile) {
     this._initTile(tile);
   }, this);
-};
+}
 
-scout.TileGrid.prototype._initTile = function(tile) {
+_initTile(tile) {
   tile.setSelectable(this.selectable);
   tile.setSelected(this.selectedTiles.indexOf(tile) >= 0);
 
   // Set proper state in case tile was used in another grid
   tile.setParent(this);
   tile.setFilterAccepted(true);
-};
+}
 
-scout.TileGrid.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tile-grid');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.$container
     .on('mousedown', '.tile', this._onTileMouseDown.bind(this))
     .on('click', '.tile', this._onTileClick.bind(this))
     .on('dblclick', '.tile', this._onTileDoubleClick.bind(this));
-};
+}
 
-scout.TileGrid.prototype._createLayout = function() {
-  return new scout.TileGridLayout(this, this.layoutConfig);
-};
+_createLayout() {
+  return new TileGridLayout(this, this.layoutConfig);
+}
 
-scout.TileGrid.prototype._renderProperties = function() {
-  scout.TileGrid.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderLayoutConfig();
   this._renderScrollable();
   this._renderVirtual();
   this._renderSelectable();
   this._renderEmpty();
-};
+}
 
-scout.TileGrid.prototype._remove = function() {
+_remove() {
   this.$fillBefore = null;
   this.$fillAfter = null;
-  this.viewRangeRendered = new scout.Range(0, 0);
+  this.viewRangeRendered = new Range(0, 0);
   this._updateVirtualScrollable();
-  scout.TileGrid.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._renderOnAttach = function() {
-  scout.TileGrid.parent.prototype._renderOnAttach.call(this);
+_renderOnAttach() {
+  super._renderOnAttach();
   if (this._renderViewPortAfterAttach) {
     this._renderViewPort();
     this._renderViewPortAfterAttach = false;
   }
-};
+}
 
-scout.TileGrid.prototype._renderEnabled = function() {
-  scout.TileGrid.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
 
   this._updateTabbable();
-};
+}
 
-scout.TileGrid.prototype._updateTabbable = function() {
+_updateTabbable() {
   this.$container.setTabbable(this.enabled && this.selectable);
-};
+}
 
-scout.TileGrid.prototype.insertTile = function(tile) {
+insertTile(tile) {
   this.insertTiles([tile]);
-};
+}
 
-scout.TileGrid.prototype.insertTiles = function(tilesToInsert, appendPlaceholders) {
-  tilesToInsert = scout.arrays.ensure(tilesToInsert);
+insertTiles(tilesToInsert, appendPlaceholders) {
+  tilesToInsert = arrays.ensure(tilesToInsert);
   if (tilesToInsert.length === 0) {
     return;
   }
   this.setTiles(this.tiles.concat(tilesToInsert), appendPlaceholders);
-};
+}
 
-scout.TileGrid.prototype.deleteTile = function(tile) {
+deleteTile(tile) {
   this.deleteTiles([tile]);
-};
+}
 
-scout.TileGrid.prototype.deleteTiles = function(tilesToDelete, appendPlaceholders) {
-  tilesToDelete = scout.arrays.ensure(tilesToDelete);
+deleteTiles(tilesToDelete, appendPlaceholders) {
+  tilesToDelete = arrays.ensure(tilesToDelete);
   if (tilesToDelete.length === 0) {
     return;
   }
   var tiles = this.tiles.slice();
-  scout.arrays.removeAll(tiles, tilesToDelete);
+  arrays.removeAll(tiles, tilesToDelete);
   this.setTiles(tiles, appendPlaceholders);
-};
+}
 
-scout.TileGrid.prototype.deleteAllTiles = function() {
+deleteAllTiles() {
   this.setTiles([]);
-};
+}
 
-scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
-  tiles = scout.arrays.ensure(tiles);
-  if (scout.objects.equals(this.tiles, tiles)) {
+setTiles(tiles, appendPlaceholders) {
+  tiles = arrays.ensure(tiles);
+  if (objects.equals(this.tiles, tiles)) {
     return;
   }
 
-  // Ensure given tiles are real tiles (of type scout.Tile)
+  // Ensure given tiles are real tiles (of type Tile)
   tiles = this._createChildren(tiles);
 
   if (this.withPlaceholders && scout.nvl(appendPlaceholders, true)) {
@@ -225,7 +257,7 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
   }
 
   // Only insert those which are not already there
-  var tilesToInsert = scout.arrays.diff(tiles, this.tiles);
+  var tilesToInsert = arrays.diff(tiles, this.tiles);
   this._insertTiles(tilesToInsert);
 
   // Append the existing placeholders, otherwise they would be unnecessarily deleted if a tile is deleted
@@ -234,15 +266,15 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
     // But only add as much placeholders as needed: If a new tile is added, it should replace the placeholder underneath.
     // If this were not done the placeholders would move animated when a new tile is inserted rather than just staying where they are
     placeholders = placeholders.slice(Math.min(this._filterTiles(tilesToInsert).length, placeholders.length), placeholders.length);
-    scout.arrays.pushAll(tiles, placeholders);
+    arrays.pushAll(tiles, placeholders);
   }
 
   // Only delete those which are not in the new array
-  var tilesToDelete = scout.arrays.diff(this.tiles, tiles);
+  var tilesToDelete = arrays.diff(this.tiles, tiles);
   this._deleteTiles(tilesToDelete);
 
   this._sort(tiles);
-  this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !scout.arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
+  this.filteredTilesDirty = this.filteredTilesDirty || tilesToDelete.length > 0 || tilesToInsert.length > 0 || !arrays.equals(this.tiles, tiles); // last check necessary if sorting changed
   var currentTiles = this.tiles;
   this._setProperty('tiles', tiles);
   this._updateFilteredTiles();
@@ -252,9 +284,9 @@ scout.TileGrid.prototype.setTiles = function(tiles, appendPlaceholders) {
     this._renderTileOrder(currentTiles);
     this._renderInsertTiles(tilesToInsert);
   }
-};
+}
 
-scout.TileGrid.prototype._insertTiles = function(tiles) {
+_insertTiles(tiles) {
   if (tiles.length === 0) {
     return;
   }
@@ -267,17 +299,17 @@ scout.TileGrid.prototype._insertTiles = function(tiles) {
     // no need to invalidate when tile placeholders are added or removed while layouting
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.TileGrid.prototype._insertTile = function(tile) {
+_insertTile(tile) {
   this._initTile(tile);
   this._applyFilters([tile]);
   if (!this.virtual && this.rendered) {
     this._renderTile(tile);
   }
-};
+}
 
-scout.TileGrid.prototype._renderTile = function(tile) {
+_renderTile(tile) {
   if (tile.removalPending) {
     // If tile is being removed by the filter and the filter cleared so that the tile should be rendered again while the animation is still running,
     // we need to wait for the remove animation, otherwise an already rendered exception occurs
@@ -295,11 +327,11 @@ scout.TileGrid.prototype._renderTile = function(tile) {
     return;
   }
   tile.render();
-  tile.setLayoutData(new scout.LogicalGridData(tile));
+  tile.setLayoutData(new LogicalGridData(tile));
   tile.$container.addClass('newly-rendered');
-};
+}
 
-scout.TileGrid.prototype._renderInsertTiles = function(tiles) {
+_renderInsertTiles(tiles) {
   tiles.forEach(function(tile) {
     if (!tile.rendered) {
       return;
@@ -317,22 +349,22 @@ scout.TileGrid.prototype._renderInsertTiles = function(tiles) {
       }
     }.bind(this));
   }, this);
-};
+}
 
-scout.TileGrid.prototype._removeAllTiles = function() {
+_removeAllTiles() {
   this.tiles.forEach(function(tile) {
     tile.remove();
   });
-  this.viewRangeRendered = new scout.Range(0, 0);
-};
+  this.viewRangeRendered = new Range(0, 0);
+}
 
-scout.TileGrid.prototype._renderAllTiles = function() {
+_renderAllTiles() {
   this.tiles.forEach(function(tile) {
     this._renderTile(tile);
   }, this);
-};
+}
 
-scout.TileGrid.prototype._deleteTiles = function(tiles) {
+_deleteTiles(tiles) {
   if (tiles.length === 0) {
     return;
   }
@@ -346,9 +378,9 @@ scout.TileGrid.prototype._deleteTiles = function(tiles) {
     // no need to invalidate when tile placeholders are added or removed while layouting
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.TileGrid.prototype._deleteTile = function(tile) {
+_deleteTile(tile) {
   if (this._animateTileRemoval(tile)) {
     // Animate tile removal, but not while layouting when tile placeholders are added or removed
     tile.animateRemoval = true;
@@ -364,17 +396,17 @@ scout.TileGrid.prototype._deleteTile = function(tile) {
   if (tile === this.focusedTile) {
     this.setFocusedTile(null);
   }
-};
+}
 
-scout.TileGrid.prototype._animateTileRemoval = function(tile) {
-  return this.animateTileRemoval && !(tile instanceof scout.PlaceholderTile);
-};
+_animateTileRemoval(tile) {
+  return this.animateTileRemoval && !(tile instanceof PlaceholderTile);
+}
 
-scout.TileGrid.prototype._animateTileInsertion = function(tile) {
-  return this.animateTileInsertion && !(tile instanceof scout.PlaceholderTile);
-};
+_animateTileInsertion(tile) {
+  return this.animateTileInsertion && !(tile instanceof PlaceholderTile);
+}
 
-scout.TileGrid.prototype._onAnimatedTileRemove = function(tile) {
+_onAnimatedTileRemove(tile) {
   if (!tile.rendered || !tile.animateRemoval) {
     return;
   }
@@ -385,19 +417,19 @@ scout.TileGrid.prototype._onAnimatedTileRemove = function(tile) {
       this.invalidateLayoutTree();
     }
   }.bind(this));
-};
+}
 
-scout.TileGrid.prototype.setComparator = function(comparator) {
+setComparator(comparator) {
   if (this.comparator === comparator) {
     return;
   }
   this.comparator = comparator;
-};
+}
 
-scout.TileGrid.prototype.sort = function() {
+sort() {
   var tiles = this.tiles.slice();
   this._sort(tiles);
-  if (scout.arrays.equals(this.tiles, tiles)) {
+  if (arrays.equals(this.tiles, tiles)) {
     // Check is needed anyway to determine whether filteredTilesDirty needs to be set, so we can use it here as well to early return if nothing changed
     return;
   }
@@ -413,9 +445,9 @@ scout.TileGrid.prototype.sort = function() {
     this._renderTileOrder(currentTiles);
     this.validateLayoutTree(); // prevent flickering in virtual mode
   }
-};
+}
 
-scout.TileGrid.prototype._sort = function(tiles) {
+_sort(tiles) {
   if (this.comparator === null) {
     return;
   }
@@ -426,39 +458,39 @@ scout.TileGrid.prototype._sort = function(tiles) {
     placeholders = this._deletePlaceholders(tiles);
   }
   tiles.sort(this.comparator);
-  scout.arrays.pushAll(tiles, placeholders);
-};
+  arrays.pushAll(tiles, placeholders);
+}
 
-scout.TileGrid.prototype.invalidateLayoutTree = function(invalidateParents) {
+invalidateLayoutTree(invalidateParents) {
   if (this.tileRemovalPendingCount > 0) {
     // Do not invalidate while tile removal is still pending
     return;
   }
-  scout.TileGrid.parent.prototype.invalidateLayoutTree.call(this, invalidateParents);
-};
+  super.invalidateLayoutTree( invalidateParents);
+}
 
-scout.TileGrid.prototype.setGridColumnCount = function(gridColumnCount) {
+setGridColumnCount(gridColumnCount) {
   this.setProperty('gridColumnCount', gridColumnCount);
-};
+}
 
-scout.TileGrid.prototype._setGridColumnCount = function(gridColumnCount) {
+_setGridColumnCount(gridColumnCount) {
   this._setProperty('gridColumnCount', gridColumnCount);
   this.prefGridColumnCount = gridColumnCount;
   this.invalidateLogicalGrid();
-};
+}
 
-scout.TileGrid.prototype.setLayoutConfig = function(layoutConfig) {
+setLayoutConfig(layoutConfig) {
   this.setProperty('layoutConfig', layoutConfig);
-};
+}
 
-scout.TileGrid.prototype._setLayoutConfig = function(layoutConfig) {
+_setLayoutConfig(layoutConfig) {
   if (!layoutConfig) {
-    layoutConfig = new scout.TileGridLayoutConfig();
+    layoutConfig = new TileGridLayoutConfig();
   }
-  this._setProperty('layoutConfig', scout.TileGridLayoutConfig.ensure(layoutConfig));
-};
+  this._setProperty('layoutConfig', TileGridLayoutConfig.ensure(layoutConfig));
+}
 
-scout.TileGrid.prototype._renderLayoutConfig = function() {
+_renderLayoutConfig() {
   var oldMinWidth = this.htmlComp.layout.minWidth;
   this.layoutConfig.applyToLayout(this.htmlComp.layout);
   if (this.virtualScrolling) {
@@ -469,22 +501,22 @@ scout.TileGrid.prototype._renderLayoutConfig = function() {
     this._renderScrollable();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileGrid.prototype._setMenus = function(menus, oldMenus) {
+_setMenus(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this._setProperty('menus', menus);
-};
+}
 
-scout.TileGrid.prototype._filterMenus = function(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  return scout.menus.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
-};
+_filterMenus(menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return menus_1.filterAccordingToSelection('TileGrid', this.selectedTiles.length, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+}
 
-scout.TileGrid.prototype.showContextMenu = function(options) {
+showContextMenu(options) {
   this.session.onRequestsDone(this._showContextMenu.bind(this, options));
-};
+}
 
-scout.TileGrid.prototype._showContextMenu = function(options) {
+_showContextMenu(options) {
   options = options || {};
   if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
     return;
@@ -492,14 +524,14 @@ scout.TileGrid.prototype._showContextMenu = function(options) {
   if (this.selectedTiles.length === 0) {
     return;
   }
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false);
+  var menuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false);
   if (menuItems.length === 0) {
     return;
   }
   var pageX = scout.nvl(options.pageX, null);
   var pageY = scout.nvl(options.pageY, null);
   if (pageX === null || pageY === null) {
-    var $selectedTile = scout.arrays.last(this.selectedTiles).$container;
+    var $selectedTile = arrays.last(this.selectedTiles).$container;
     var offset = $selectedTile.offset();
     pageX = offset.left + 10;
     pageY = offset.top + 10;
@@ -520,13 +552,13 @@ scout.TileGrid.prototype._showContextMenu = function(options) {
     menuFilter: this._filterMenusHandler
   });
   this.contextMenu.open();
-};
+}
 
-scout.TileGrid.prototype.setScrollable = function(scrollable) {
+setScrollable(scrollable) {
   this.setProperty('scrollable', scrollable);
-};
+}
 
-scout.TileGrid.prototype._renderScrollable = function() {
+_renderScrollable() {
   this._uninstallScrollbars();
 
   // horizontal (x-axis) scrollbar is only installed when minWidth is > 0
@@ -542,12 +574,12 @@ scout.TileGrid.prototype._renderScrollable = function() {
   this.$container.toggleClass('scrollable', this.scrollable);
   this._updateVirtualScrollable();
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._onScroll = function() {
+_onScroll() {
   var scrollTop = this.$container[0].scrollTop;
   var scrollLeft = this.$container[0].scrollLeft;
   if (this.scrollTop !== scrollTop && this.virtual) {
@@ -557,41 +589,41 @@ scout.TileGrid.prototype._onScroll = function() {
   }
   this.scrollTop = scrollTop;
   this.scrollLeft = scrollLeft;
-};
+}
 
-scout.TileGrid.prototype._onScrollParentScroll = function(event) {
+_onScrollParentScroll(event) {
   this.scrolling = true;
   this.revalidateLayoutTree(false);
   this.scrolling = false;
-};
+}
 
-scout.TileGrid.prototype.setWithPlaceholders = function(withPlaceholders) {
+setWithPlaceholders(withPlaceholders) {
   this.setProperty('withPlaceholders', withPlaceholders);
-};
+}
 
-scout.TileGrid.prototype._renderWithPlaceholders = function() {
+_renderWithPlaceholders() {
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileGrid.prototype.fillUpWithPlaceholders = function() {
+fillUpWithPlaceholders() {
   if (!this.withPlaceholders) {
     this._deleteAllPlaceholders();
     return;
   }
   this._deleteObsoletePlaceholders();
   this._insertMissingPlaceholders();
-};
+}
 
-scout.TileGrid.prototype.tilesWithoutPlaceholders = function() {
+tilesWithoutPlaceholders() {
   if (!this.withPlaceholders) {
     return this.tiles;
   }
   return this.tiles.filter(function(tile) {
-    return !(tile instanceof scout.PlaceholderTile);
+    return !(tile instanceof PlaceholderTile);
   });
-};
+}
 
-scout.TileGrid.prototype._createPlaceholders = function() {
+_createPlaceholders() {
   var numPlaceholders, lastX,
     columnCount = this.gridColumnCount,
     tiles = this.filteredTiles,
@@ -615,15 +647,15 @@ scout.TileGrid.prototype._createPlaceholders = function() {
     placeholders.push(this._createPlaceholder());
   }
   return placeholders;
-};
+}
 
-scout.TileGrid.prototype._createPlaceholder = function() {
+_createPlaceholder() {
   return scout.create('PlaceholderTile', {
     parent: this
   });
-};
+}
 
-scout.TileGrid.prototype._deleteObsoletePlaceholders = function() {
+_deleteObsoletePlaceholders() {
   var obsoletePlaceholders = [],
     obsolete = false;
 
@@ -639,57 +671,57 @@ scout.TileGrid.prototype._deleteObsoletePlaceholders = function() {
   }, this);
 
   this.deleteTiles(obsoletePlaceholders, false);
-};
+}
 
-scout.TileGrid.prototype._deleteAllPlaceholders = function() {
+_deleteAllPlaceholders() {
   this.deleteTiles(this.placeholders(), false);
-};
+}
 
-scout.TileGrid.prototype.placeholders = function() {
+placeholders() {
   var i, placeholders = [];
   for (i = this.tiles.length - 1; i >= 0; i--) {
-    if (!(this.tiles[i] instanceof scout.PlaceholderTile)) {
+    if (!(this.tiles[i] instanceof PlaceholderTile)) {
       // Placeholders are always at the end -> we may stop as soon as no more placeholders are found
       break;
     }
-    scout.arrays.insert(placeholders, this.tiles[i], 0);
+    arrays.insert(placeholders, this.tiles[i], 0);
   }
   return placeholders;
-};
+}
 
-scout.TileGrid.prototype._insertMissingPlaceholders = function() {
+_insertMissingPlaceholders() {
   var placeholders = this._createPlaceholders();
   this.insertTiles(placeholders, false);
-};
+}
 
-scout.TileGrid.prototype._deletePlaceholders = function(tiles) {
+_deletePlaceholders(tiles) {
   var i;
   var deletedPlaceholders = [];
   for (i = tiles.length - 1; i >= 0; i--) {
-    if (tiles[i] instanceof scout.PlaceholderTile) {
+    if (tiles[i] instanceof PlaceholderTile) {
       deletedPlaceholders.push(tiles[i]);
-      scout.arrays.remove(tiles, tiles[i]);
+      arrays.remove(tiles, tiles[i]);
     }
   }
   return deletedPlaceholders.reverse();
-};
+}
 
-scout.TileGrid.prototype._replacePlaceholders = function(tiles, tilesToInsert) {
+_replacePlaceholders(tiles, tilesToInsert) {
   // Find index of the first tile which is not a placeholder (placeholders are always added at the end, so it is faster if search is done backwards)
-  var index = scout.arrays.findIndexFromReverse(tiles, tiles.length - 1, function(tile) {
-    return !(tile instanceof scout.PlaceholderTile);
+  var index = arrays.findIndexFromReverse(tiles, tiles.length - 1, function(tile) {
+    return !(tile instanceof PlaceholderTile);
   });
 
   var numPlaceholders = tiles.length - 1 - index;
   for (var i = 1; i <= numPlaceholders; i++) {
     var tile = tiles[index + i];
-    if (tilesToInsert[i - 1] && !(tilesToInsert[i - 1] instanceof scout.PlaceholderTile)) {
-      scout.arrays.remove(tiles, tile);
+    if (tilesToInsert[i - 1] && !(tilesToInsert[i - 1] instanceof PlaceholderTile)) {
+      arrays.remove(tiles, tile);
     }
   }
-};
+}
 
-scout.TileGrid.prototype.validateLogicalGrid = function() {
+validateLogicalGrid() {
   if (!this.logicalGrid.dirty) {
     return;
   }
@@ -697,19 +729,19 @@ scout.TileGrid.prototype.validateLogicalGrid = function() {
   this.fillUpWithPlaceholders();
   this.logicalGrid.setDirty(true);
   this.logicalGrid.validate(this);
-};
+}
 
 /**
  * @override
  */
-scout.TileGrid.prototype._setLogicalGrid = function(logicalGrid) {
-  scout.TileGrid.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+_setLogicalGrid(logicalGrid) {
+  super._setLogicalGrid( logicalGrid);
   if (this.logicalGrid) {
-    this.logicalGrid.setGridConfig(new scout.TileGridGridConfig());
+    this.logicalGrid.setGridConfig(new TileGridGridConfig());
   }
-};
+}
 
-scout.TileGrid.prototype.setFocusedTile = function(tile) {
+setFocusedTile(tile) {
   if (this.focusedTile === tile) {
     return;
   }
@@ -731,9 +763,9 @@ scout.TileGrid.prototype.setFocusedTile = function(tile) {
       $scrollables[idx].scrollTop(val);
     }, this);
   }
-};
+}
 
-scout.TileGrid.prototype.setSelectable = function(selectable) {
+setSelectable(selectable) {
   this.setProperty('selectable', selectable);
   if (!selectable) {
     this.deselectAllTiles();
@@ -741,24 +773,24 @@ scout.TileGrid.prototype.setSelectable = function(selectable) {
   this.tiles.forEach(function(tile) {
     tile.setSelectable(selectable);
   });
-};
+}
 
-scout.TileGrid.prototype._renderSelectable = function() {
+_renderSelectable() {
   this.$container.toggleClass('selectable', this.selectable);
   this._updateTabbable();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileGrid.prototype.setMultiSelect = function(multiSelect) {
+setMultiSelect(multiSelect) {
   this.setProperty('multiSelect', multiSelect);
-};
+}
 
 /**
  * Selects the given tiles and deselects the previously selected ones.
  */
-scout.TileGrid.prototype.selectTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
-  // Ensure given tiles are real tiles (of type scout.Tile)
+selectTiles(tiles) {
+  tiles = arrays.ensure(tiles);
+  // Ensure given tiles are real tiles (of type Tile)
   tiles = this._createChildren(tiles);
   tiles = this._filterTiles(tiles); // Selecting invisible tiles is not allowed
 
@@ -772,14 +804,14 @@ scout.TileGrid.prototype.selectTiles = function(tiles) {
     tiles = [tiles[0]];
   }
 
-  if (scout.arrays.equals(this.selectedTiles, tiles)) {
+  if (arrays.equals(this.selectedTiles, tiles)) {
     // Do nothing if new selection is same as old one
     return;
   }
 
   // Deselect the tiles which are not part of the new selection
   var tilesToUnselect = this.selectedTiles;
-  scout.arrays.removeAll(tilesToUnselect, tiles);
+  arrays.removeAll(tilesToUnselect, tiles);
   tilesToUnselect.forEach(function(tile) {
     tile.setSelected(false);
     if (tile === this.focusedTile) {
@@ -793,53 +825,53 @@ scout.TileGrid.prototype.selectTiles = function(tiles) {
   }, this);
 
   this.setProperty('selectedTiles', tiles.slice());
-};
+}
 
-scout.TileGrid.prototype.selectTile = function(tile) {
+selectTile(tile) {
   this.selectTiles([tile]);
-};
+}
 
 /**
  * Selects all tiles. As for every selection operation: only filtered tiles are considered.
  */
-scout.TileGrid.prototype.selectAllTiles = function() {
+selectAllTiles() {
   this.selectTiles(this.filteredTiles);
-};
+}
 
-scout.TileGrid.prototype.deselectTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
+deselectTiles(tiles) {
+  tiles = arrays.ensure(tiles);
   var selectedTiles = this.selectedTiles.slice();
-  if (scout.arrays.removeAll(selectedTiles, tiles)) {
+  if (arrays.removeAll(selectedTiles, tiles)) {
     this.selectTiles(selectedTiles);
   }
-};
+}
 
-scout.TileGrid.prototype.deselectTile = function(tile) {
+deselectTile(tile) {
   this.deselectTiles([tile]);
-};
+}
 
-scout.TileGrid.prototype.deselectAllTiles = function() {
+deselectAllTiles() {
   this.selectTiles([]);
-};
+}
 
-scout.TileGrid.prototype.toggleSelection = function() {
+toggleSelection() {
   if (this.selectedTiles.length === this.filteredTiles.length) {
     this.deselectAllTiles();
   } else {
     this.selectAllTiles();
   }
-};
+}
 
-scout.TileGrid.prototype.addTilesToSelection = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
+addTilesToSelection(tiles) {
+  tiles = arrays.ensure(tiles);
   this.selectTiles(this.selectedTiles.concat(tiles));
-};
+}
 
-scout.TileGrid.prototype.addTileToSelection = function(tile) {
+addTileToSelection(tile) {
   this.addTilesToSelection([tile]);
-};
+}
 
-scout.TileGrid.prototype._onTileMouseDown = function(event) {
+_onTileMouseDown(event) {
   this._doubleClickSupport.mousedown(event);
   this._selectTileOnMouseDown(event);
 
@@ -850,12 +882,12 @@ scout.TileGrid.prototype._onTileMouseDown = function(event) {
     });
     return false;
   }
-};
+}
 
-scout.TileGrid.prototype._onTileClick = function(event) {
+_onTileClick(event) {
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
-  if (tile instanceof scout.PlaceholderTile) {
+  if (tile instanceof PlaceholderTile) {
     return;
   }
 
@@ -866,47 +898,47 @@ scout.TileGrid.prototype._onTileClick = function(event) {
 
   var mouseButton = event.which;
   this._triggerTileClick(tile, mouseButton);
-};
+}
 
-scout.TileGrid.prototype._triggerTileClick = function(tile, mouseButton) {
+_triggerTileClick(tile, mouseButton) {
   var event = {
     tile: tile,
     mouseButton: mouseButton
   };
   this.trigger('tileClick', event);
-};
+}
 
-scout.TileGrid.prototype._onTileDoubleClick = function(event) {
+_onTileDoubleClick(event) {
   var $tile = $(event.currentTarget);
   var tile = $tile.data('widget');
-  if (tile instanceof scout.PlaceholderTile) {
+  if (tile instanceof PlaceholderTile) {
     return;
   }
   this.doTileAction(tile);
-};
+}
 
-scout.TileGrid.prototype.doTileAction = function(tile) {
+doTileAction(tile) {
   if (!tile) {
     return;
   }
   this._triggerTileAction(tile);
-};
+}
 
-scout.TileGrid.prototype._triggerTileAction = function(tile) {
+_triggerTileAction(tile) {
   this.trigger('tileAction', {
     tile: tile
   });
-};
+}
 
-scout.TileGrid.prototype.setSelectionHandler = function(selectionHandler) {
+setSelectionHandler(selectionHandler) {
   this.selectionHandler = selectionHandler;
-};
+}
 
-scout.TileGrid.prototype._selectTileOnMouseDown = function(event) {
+_selectTileOnMouseDown(event) {
   this.selectionHandler.selectTileOnMouseDown(event);
-};
+}
 
-scout.TileGrid.prototype.scrollTo = function(tile, options) {
+scrollTo(tile, options) {
   this.ensureTileRendered(tile);
   // If tile was not rendered it is not yet positioned correctly -> make sure layout is valid before trying to scroll
   // Layout must not render the viewport because scroll position is not correct yet -> just make sure tiles are at the correct position
@@ -916,9 +948,9 @@ scout.TileGrid.prototype.scrollTo = function(tile, options) {
   this.scrolling = false;
   tile.reveal(options);
   this.scrollTopDirty = false;
-};
+}
 
-scout.TileGrid.prototype.revealSelection = function() {
+revealSelection() {
   if (!this.rendered) {
     // Execute delayed because tileGrid may be not layouted yet
     this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
@@ -928,14 +960,14 @@ scout.TileGrid.prototype.revealSelection = function() {
   if (this.selectedTiles.length > 0) {
     this.scrollTo(this.selectedTiles[0]);
   }
-};
+}
 
-scout.TileGrid.prototype.addFilter = function(filter) {
+addFilter(filter) {
   this.addFilters([filter]);
-};
+}
 
-scout.TileGrid.prototype.addFilters = function(filtersToAdd) {
-  filtersToAdd = scout.arrays.ensure(filtersToAdd);
+addFilters(filtersToAdd) {
+  filtersToAdd = arrays.ensure(filtersToAdd);
   var filters = this.filters.slice();
   filtersToAdd.forEach(function(filter) {
     if (filters.indexOf(filter) >= 0) {
@@ -947,26 +979,26 @@ scout.TileGrid.prototype.addFilters = function(filtersToAdd) {
     return;
   }
   this.setFilters(filters);
-};
+}
 
-scout.TileGrid.prototype.removeFilter = function(filter) {
+removeFilter(filter) {
   this.removeFilters([filter]);
-};
+}
 
-scout.TileGrid.prototype.removeFilters = function(filtersToRemove) {
-  filtersToRemove = scout.arrays.ensure(filtersToRemove);
+removeFilters(filtersToRemove) {
+  filtersToRemove = arrays.ensure(filtersToRemove);
   var filters = this.filters.slice();
-  if (!scout.arrays.removeAll(filters, filtersToRemove)) {
+  if (!arrays.removeAll(filters, filtersToRemove)) {
     return;
   }
   this.setFilters(filters);
-};
+}
 
-scout.TileGrid.prototype.setFilters = function(filters) {
+setFilters(filters) {
   this.setProperty('filters', filters.slice());
-};
+}
 
-scout.TileGrid.prototype.filter = function() {
+filter() {
   var currentTiles = this.tiles;
   // Full reset is set to true to loop through every tile and make sure tile.filterAccepted is correctly set
   var filterResult = this._applyFilters(this.tiles, true);
@@ -977,9 +1009,9 @@ scout.TileGrid.prototype.filter = function() {
     this._renderTileDelta(filterResult);
     this._renderTileOrder(currentTiles);
   }
-};
+}
 
-scout.TileGrid.prototype._applyFilters = function(tiles, fullReset) {
+_applyFilters(tiles, fullReset) {
   if (this.filters.length === 0 && !scout.nvl(fullReset, false)) {
     return;
   }
@@ -1010,9 +1042,9 @@ scout.TileGrid.prototype._applyFilters = function(tiles, fullReset) {
     newlyHiddenTiles: newlyHiddenTiles,
     newlyShownTiles: newlyShownTiles
   };
-};
+}
 
-scout.TileGrid.prototype._updateFilteredTiles = function() {
+_updateFilteredTiles() {
   var tiles = this.tiles;
   if (this.filters.length > 0) {
     tiles = this._filterTiles();
@@ -1023,25 +1055,25 @@ scout.TileGrid.prototype._updateFilteredTiles = function() {
     this.filteredTilesDirty = false;
   }
   this._updateEmpty();
-};
+}
 
-scout.TileGrid.prototype._updateEmpty = function() {
+_updateEmpty() {
   this.setEmpty(this.filteredTiles.length === 0);
-};
+}
 
-scout.TileGrid.prototype.setEmpty = function(empty) {
+setEmpty(empty) {
   this.setProperty('empty', empty);
-};
+}
 
-scout.TileGrid.prototype._renderEmpty = function() {
+_renderEmpty() {
   this.$container.toggleClass('empty', this.empty);
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @returns {Boolean} true if tile state has changed, false if not
  */
-scout.TileGrid.prototype._applyFiltersForTile = function(tile) {
+_applyFiltersForTile(tile) {
   if (this._tileAcceptedByFilters(tile)) {
     if (!tile.filterAccepted) {
       tile.setFilterAccepted(true);
@@ -1054,24 +1086,24 @@ scout.TileGrid.prototype._applyFiltersForTile = function(tile) {
     }
   }
   return false;
-};
+}
 
-scout.TileGrid.prototype._tileAcceptedByFilters = function(tile) {
+_tileAcceptedByFilters(tile) {
   return !this.filters.some(function(filter) {
     // return true if an element was found which is not accepted by the filter to break the some() loop
-    if (tile instanceof scout.PlaceholderTile) {
+    if (tile instanceof PlaceholderTile) {
       return false;
     }
     if (!filter.accept(tile)) {
       return true;
     }
   });
-};
+}
 
 /**
  * @returns the tiles which are accepted by the filter and therefore visible.
  */
-scout.TileGrid.prototype._filterTiles = function(tiles) {
+_filterTiles(tiles) {
   tiles = scout.nvl(tiles, this.tiles);
   if (this.filters.length === 0) {
     return tiles.slice();
@@ -1079,19 +1111,19 @@ scout.TileGrid.prototype._filterTiles = function(tiles) {
   return tiles.filter(function(tile) {
     return tile.filterAccepted;
   });
-};
+}
 
-scout.TileGrid.prototype.findTileIndexAt = function(x, y, startIndex, reverse) {
+findTileIndexAt(x, y, startIndex, reverse) {
   startIndex = scout.nvl(startIndex, 0);
-  return scout.arrays.findIndexFrom(this.filteredTiles, startIndex, function(tile, i) {
+  return arrays.findIndexFrom(this.filteredTiles, startIndex, function(tile, i) {
     return tile.gridData.x === x && tile.gridData.y === y;
   }, reverse);
-};
+}
 
 /**
  * If the max range is used, the live list of filtered tiles is returned, because every tile has to be in the range.
  */
-scout.TileGrid.prototype.findTilesInRange = function(viewRange, filter) {
+findTilesInRange(viewRange, filter) {
   if (viewRange.equals(this.virtualScrolling.maxViewRange())) {
     // Directly return all tiles if max view range
     return this.filteredTiles;
@@ -1106,20 +1138,20 @@ scout.TileGrid.prototype.findTilesInRange = function(viewRange, filter) {
     });
   }
   return tiles;
-};
+}
 
-scout.TileGrid.prototype.findTilesInRow = function(row) {
+findTilesInRow(row) {
   var tiles = [];
   this.eachTileInRow(row, function(tile) {
     tiles.push(tile);
   });
   return tiles;
-};
+}
 
 /**
  * Executes the given function for each tile in a row.
  */
-scout.TileGrid.prototype.eachTileInRow = function(row, func) {
+eachTileInRow(row, func) {
   var startIndex = row * this.gridColumnCount;
   var tiles = [];
   for (var i = startIndex; i < startIndex + this.gridColumnCount; i++) {
@@ -1128,18 +1160,18 @@ scout.TileGrid.prototype.eachTileInRow = function(row, func) {
     }
   }
   return tiles;
-};
+}
 
-scout.TileGrid.prototype.setVirtual = function(virtual) {
+setVirtual(virtual) {
   this.setProperty('virtual', virtual);
-};
+}
 
-scout.TileGrid.prototype._setVirtual = function(virtual) {
+_setVirtual(virtual) {
   this._setProperty('virtual', virtual);
   this.virtualScrolling.setEnabled(this.virtual);
-};
+}
 
-scout.TileGrid.prototype._renderVirtual = function() {
+_renderVirtual() {
   this._updateVirtualScrollable();
   if (!this.rendering) {
     // No need to do it while rendering, will be done by the layout. But needs to be done if virtual changes on the fly
@@ -1161,9 +1193,9 @@ scout.TileGrid.prototype._renderVirtual = function() {
 
   this._renderViewPort();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileGrid.prototype._updateVirtualScrollable = function() {
+_updateVirtualScrollable() {
   var $scrollable = this.virtualScrolling.$scrollable;
   if ($scrollable) {
     $scrollable.off('scroll', this._scrollParentScrollHandler);
@@ -1178,21 +1210,21 @@ scout.TileGrid.prototype._updateVirtualScrollable = function() {
     this.virtualScrolling.set$Scrollable(this.$container.scrollParent());
     this.virtualScrolling.$scrollable.on('scroll', this._scrollParentScrollHandler);
   }
-};
+}
 
-scout.TileGrid.prototype.calculateViewRangeSize = function() {
+calculateViewRangeSize() {
   return this.virtualScrolling.calculateViewRangeSize();
-};
+}
 
-scout.TileGrid.prototype.setViewRangeSize = function(viewRangeSize, updateViewPort) {
+setViewRangeSize(viewRangeSize, updateViewPort) {
   if (this.viewRangeSize === viewRangeSize) {
     return;
   }
   this._setProperty('viewRangeSize', viewRangeSize);
   this.virtualScrolling.setViewRangeSize(viewRangeSize, updateViewPort);
-};
+}
 
-scout.TileGrid.prototype._heightForRow = function(row) {
+_heightForRow(row) {
   var height = 0;
 
   height = this.htmlComp.layout.rowHeight;
@@ -1201,29 +1233,29 @@ scout.TileGrid.prototype._heightForRow = function(row) {
     height += this.htmlComp.layout.vgap;
   }
 
-  if (!scout.numbers.isNumber(height)) {
+  if (!numbers.isNumber(height)) {
     throw new Error('Calculated height is not a number: ' + height);
   }
   return height;
-};
+}
 
 /**
  * Used for virtual scrolling to calculate the view range size.
  * @returns the configured rowHeight + vgap / 2. Reason: the gaps are only between rows, the first and last row therefore only have 1 gap.
  */
-scout.TileGrid.prototype._minRowHeight = function() {
+_minRowHeight() {
   return this.htmlComp.layout.rowHeight + this.htmlComp.layout.vgap / 2;
-};
+}
 
-scout.TileGrid.prototype.rowCount = function(gridColumnCount) {
+rowCount(gridColumnCount) {
   gridColumnCount = scout.nvl(gridColumnCount, this.gridColumnCount);
   return Math.ceil(this.filteredTiles.length / gridColumnCount);
-};
+}
 
 /**
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
-scout.TileGrid.prototype._renderViewPort = function() {
+_renderViewPort() {
   if (!this.isAttachedAndRendered()) {
     // if grid is not attached the correct viewPort can not be evaluated. Mark for render after attach.
     this._renderViewPortAfterAttach = true;
@@ -1233,12 +1265,12 @@ scout.TileGrid.prototype._renderViewPort = function() {
     return;
   }
   this.virtualScrolling._renderViewPort();
-};
+}
 
 /**
  * Renders the rows visible in the viewport and removes the other rows
  */
-scout.TileGrid.prototype._renderViewRange = function(viewRange) {
+_renderViewRange(viewRange) {
   if (viewRange.equals(this.viewRangeRendered)) {
     if (viewRange.size() === 0) {
       // Iif view range is empty initially viewRangeRendered will be empty as well -> make sure fillers are rendered correctly (used for pref size)
@@ -1262,9 +1294,9 @@ scout.TileGrid.prototype._renderViewRange = function(viewRange) {
   }.bind(this));
 
   this._renderFiller();
-};
+}
 
-scout.TileGrid.prototype._renderTilesInRange = function(range) {
+_renderTilesInRange(range) {
   var numRowsRendered = 0;
   var tilesRendered = 0;
   var tiles = this.filteredTiles;
@@ -1297,12 +1329,12 @@ scout.TileGrid.prototype._renderTilesInRange = function(range) {
     this._renderTile(tile);
     tilesRendered++;
   }
-};
+}
 
 /**
  * @returns the newly rendered tiles
  */
-scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
+_renderTileDelta(filterResult) {
   if (!this.virtual) {
     return;
   }
@@ -1310,8 +1342,8 @@ scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
   var newViewRange = this.virtualScrolling.calculateCurrentViewRange();
   var newTiles = this.findTilesInRange(newViewRange);
 
-  var tilesToRemove = scout.arrays.diff(prevTiles, newTiles);
-  var tilesToRender = scout.arrays.diff(newTiles, prevTiles);
+  var tilesToRemove = arrays.diff(prevTiles, newTiles);
+  var tilesToRender = arrays.diff(newTiles, prevTiles);
   if (filterResult) {
     filterResult.newlyHiddenTiles.forEach(function(tile) {
       if (tile.rendered) {
@@ -1348,9 +1380,9 @@ scout.TileGrid.prototype._renderTileDelta = function(filterResult) {
     this.invalidateLayoutTree();
   }
   return tilesToRender;
-};
+}
 
-scout.TileGrid.prototype._removeTileByFilter = function(tile) {
+_removeTileByFilter(tile) {
   // In virtual mode, filtered tiles are not rendered. In normal mode, the filter animation is triggerd by _renderVisible of the tile.
   // Since the tile is removed immediately, the invisible animation would not start, so we use the remove animation instead.
   // But because the delete animation is a different one to the filter animation, the removeClass needs to be swapped
@@ -1366,9 +1398,9 @@ scout.TileGrid.prototype._removeTileByFilter = function(tile) {
     // Reset to default
     tile.animateRemovalClass = 'animate-remove';
   });
-};
+}
 
-scout.TileGrid.prototype._renderTileVisibleForFilter = function(tile) {
+_renderTileVisibleForFilter(tile) {
   if (!tile.filterAccepted || tile.$container.hasClass('animate-visible')) {
     return;
   }
@@ -1378,9 +1410,9 @@ scout.TileGrid.prototype._renderTileVisibleForFilter = function(tile) {
   // Start filter animation (at the time setFilterAccepted was set the tile was not rendered)
   tile.$container.setVisible(false);
   tile._renderVisible();
-};
+}
 
-scout.TileGrid.prototype._renderTileOrder = function(prevTiles) {
+_renderTileOrder(prevTiles) {
   // Loop through the tiles and move every html element to the end of the container
   // Only move if the order is different to the old order
   // This is actually only necessary to make debugging easier, since the tiles are positioned absolutely it would work without it
@@ -1401,16 +1433,16 @@ scout.TileGrid.prototype._renderTileOrder = function(prevTiles) {
     // In virtual mode this is done by _renderTileDelta()
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.TileGrid.prototype._rowsRenderedInfo = function() {
+_rowsRenderedInfo() {
   var numRenderedTiles = this.$container.children('.tile').length,
     renderedRowsRange = '(' + this.viewRangeRendered + ')',
     text = numRenderedTiles + ' tiles rendered in range ' + renderedRowsRange;
   return text;
-};
+}
 
-scout.TileGrid.prototype._removeTilesInRange = function(range) {
+_removeTilesInRange(range) {
   var numRowsRemoved = 0;
   var newRange = this.viewRangeRendered.subtract(range);
   if (newRange.length === 2) {
@@ -1427,36 +1459,36 @@ scout.TileGrid.prototype._removeTilesInRange = function(range) {
     $.log.trace(numRowsRemoved + ' rows removed from ' + range + '.');
     $.log.trace(this._rowsRenderedInfo());
   }
-};
+}
 
-scout.TileGrid.prototype._removeTilesInRow = function(row) {
+_removeTilesInRow(row) {
   var tiles = this.findTilesInRow(row);
   tiles.forEach(function(tile) {
     tile.remove();
   });
-};
+}
 
-scout.TileGrid.prototype.rowHasRenderedTiles = function(row) {
+rowHasRenderedTiles(row) {
   var tilesInRow = this.findTilesInRow(row);
   return tilesInRow.some(function(tile) {
     return tile.rendered && !tile.removing;
   });
-};
+}
 
-scout.TileGrid.prototype.ensureTileRendered = function(tile) {
+ensureTileRendered(tile) {
   if (!tile.rendered) {
     var rowIndex = tile.gridData.y;
     this.virtualScrolling._renderViewRangeForRowIndex(rowIndex);
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.TileGrid.prototype._renderFiller = function() {
+_renderFiller() {
   if (!this.$fillBefore) {
     this.$fillBefore = this.$container.prependDiv('filler');
   }
 
-  var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
+  var fillBeforeHeight = this._calculateFillerHeight(new Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.css('width', '100%');
   $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -1467,28 +1499,28 @@ scout.TileGrid.prototype._renderFiller = function() {
   // Make sure filler is always at the end
   this.$fillAfter.appendTo(this.$container);
 
-  var renderedTilesHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.from, this.viewRangeRendered.to));
+  var renderedTilesHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.from, this.viewRangeRendered.to));
   this.$fillAfter.cssTop(fillBeforeHeight + renderedTilesHeight);
 
-  var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.rowCount()));
+  var fillAfterHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.to, this.rowCount()));
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.css('width', '100%');
 
   $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
-};
+}
 
-scout.TileGrid.prototype._calculateFillerHeight = function(range) {
+_calculateFillerHeight(range) {
   var totalHeight = 0;
   for (var i = range.from; i < range.to; i++) {
     totalHeight += this._heightForRow(i);
   }
   return totalHeight;
-};
+}
 
 /**
  * If virtual is false, the live list of filtered tiles is returned, because every tile has to be rendered. If virtual is true, the rendered tiles are collected and returned.
  */
-scout.TileGrid.prototype.renderedTiles = function() {
+renderedTiles() {
   if (!this.rendered) {
     return [];
   }
@@ -1505,4 +1537,5 @@ scout.TileGrid.prototype.renderedTiles = function() {
     }
   });
   return tiles;
-};
+}
+}

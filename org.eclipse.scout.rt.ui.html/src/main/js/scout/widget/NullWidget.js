@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NullWidget = function() {
-  scout.NullWidget.parent.call(this);
+import {Widget} from '../index';
+
+export default class NullWidget extends Widget {
+
+constructor() {
+  super();
 
   this._addWidgetProperties(['childWidget']);
-};
-scout.inherits(scout.NullWidget, scout.Widget);
+}
 
-scout.NullWidget.prototype.setChildWidget = function(childWidget) {
+
+setChildWidget(childWidget) {
   this.setProperty('childWidget', childWidget);
-};
+}
+}

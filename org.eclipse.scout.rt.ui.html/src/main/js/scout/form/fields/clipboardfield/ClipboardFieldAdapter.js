@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ClipboardFieldAdapter = function() {
-  scout.ClipboardFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.ClipboardFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class ClipboardFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

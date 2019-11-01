@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LogoutBox = function() {
-  scout.LogoutBox.parent.call(this);
-};
-scout.inherits(scout.LogoutBox, scout.Box);
+import {TextMap} from '../index';
+import {strings} from '../index';
+import {Box} from '../index';
+import {webstorage} from '../index';
+import * as $ from 'jquery';
 
-scout.LogoutBox.prototype.init = function(opts) {
+export default class LogoutBox extends Box {
+
+constructor() {
+  super();
+}
+
+
+init(opts) {
   var defaultOpts = {
-    loginUrl: scout.webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
-    logoUrl: 'res/logo.png'
+    loginUrl: webstorage.getItem(sessionStorage, 'scout:loginUrl') || './',
+    logoUrl: 'logo.png'
   };
   this.options = $.extend({}, defaultOpts, opts);
   var defaultTexts = {
@@ -25,16 +33,16 @@ scout.LogoutBox.prototype.init = function(opts) {
   };
   this.options.texts = $.extend({}, defaultTexts, opts.texts);
 
-  this.texts = new scout.TextMap(this.options.texts);
+  this.texts = new TextMap(this.options.texts);
   this.loginUrl = this.options.loginUrl;
   this.logoUrl = this.options.logoUrl;
-};
+}
 
-scout.LogoutBox.prototype._render = function() {
-  scout.LogoutBox.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this.$content.addClass('small centered')
-    .appendDiv().html(scout.strings.nl2br(this.texts.get('ui.LogoutSuccessful')));
+    .appendDiv().html(strings.nl2br(this.texts.get('ui.LogoutSuccessful')));
 
   this.$buttonBar = $('<div>')
     .addClass('button-bar')
@@ -44,8 +52,9 @@ scout.LogoutBox.prototype._render = function() {
     .text(this.texts.get('ui.LoginAgain'))
     .on('click', this._loginAgain.bind(this))
     .appendTo(this.$buttonBar);
-};
+}
 
-scout.LogoutBox.prototype._loginAgain = function() {
+_loginAgain() {
   window.location = this.loginUrl;
-};
+}
+}

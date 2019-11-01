@@ -8,8 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupWithHead = function() {
-  scout.PopupWithHead.parent.call(this);
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {PopupWithHeadLayout} from '../index';
+import {Popup} from '../index';
+import {HtmlComponent} from '../index';
+import {Point} from '../index';
+import {NullLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class PopupWithHead extends Popup {
+
+constructor() {
+  super();
   this.$head;
   this.$body;
   this.$deco;
@@ -18,58 +30,58 @@ scout.PopupWithHead = function() {
   this.verticalSwitch = true;
   this._headVisible = true;
   this.windowResizeType = 'remove';
-};
-scout.inherits(scout.PopupWithHead, scout.Popup);
+}
 
-scout.PopupWithHead.prototype._createLayout = function() {
-  return new scout.PopupWithHeadLayout(this);
-};
 
-scout.PopupWithHead.prototype._init = function(options) {
-  scout.PopupWithHead.parent.prototype._init.call(this, options);
+_createLayout() {
+  return new PopupWithHeadLayout(this);
+}
+
+_init(options) {
+  super._init( options);
 
   // Compared to a regular popup, the popup is aligned with the head and either opened left or right,
   // -> the width should be adjusted as well if it does not fit into the window
   this.trimWidth = scout.nvl(options.trimWidth, this._headVisible);
-};
+}
 
-scout.PopupWithHead.prototype._render = function() {
-  scout.PopupWithHead.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this._$createBody();
 
   if (this._headVisible) {
     this._renderHead();
   }
-};
+}
 
-scout.PopupWithHead.prototype._postRender = function() {
-  scout.PopupWithHead.parent.prototype._postRender.call(this);
-  scout.scrollbars.update(this.$body);
-};
+_postRender() {
+  super._postRender();
+  scrollbars.update(this.$body);
+}
 
-scout.PopupWithHead.prototype._$createBody = function() {
+_$createBody() {
   this.$body = this.$container.appendDiv('popup-body');
   // Complete the layout hierarchy between the popup and the menu items
-  var htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  var htmlBody = HtmlComponent.install(this.$body, this.session);
   htmlBody.setLayout(this._createBodyLayout());
 
   this._modifyBody();
-};
+}
 
-scout.PopupWithHead.prototype._createBodyLayout = function() {
-  return new scout.NullLayout();
-};
+_createBodyLayout() {
+  return new NullLayout();
+}
 
-scout.PopupWithHead.prototype.rerenderHead = function() {
+rerenderHead() {
   this._removeHead();
   this._renderHead();
-};
+}
 
 /**
  * Copies html from this.$headBlueprint, if set.
  */
-scout.PopupWithHead.prototype._renderHead = function() {
+_renderHead() {
   this.$deco = this.$container.makeDiv('popup-deco');
   this.$head = this.$container
     .makeDiv('popup-head menu-item')
@@ -81,69 +93,69 @@ scout.PopupWithHead.prototype._renderHead = function() {
     this.$head.html(this.$headBlueprint.html());
     this._copyStyleToHeadChildren();
   }
-};
+}
 
 /**
  * Sets CSS classes or CSS-properties on the body.
  */
-scout.PopupWithHead.prototype._modifyBody = function() {
+_modifyBody() {
   // NOP
-};
+}
 
-scout.PopupWithHead.prototype._removeHead = function() {
+_removeHead() {
   if (this.$head) {
     this.$head.remove();
   }
   if (this.$deco) {
     this.$deco.remove();
   }
-};
+}
 
-scout.PopupWithHead.prototype._copyCssClassToHead = function(className) {
+_copyCssClassToHead(className) {
   if (this.$headBlueprint && this.$headBlueprint.hasClass(className)) {
     this.$head.addClass(className);
   }
-};
+}
 
-scout.PopupWithHead.prototype._copyStyleToHeadChildren = function() {
+_copyStyleToHeadChildren() {
   var $blueprintChildren = this.$headBlueprint.children();
   this.$head.children().each(function(i) {
     var $headChild = $(this);
     var $blueprintChild = $blueprintChildren.eq(i);
     $headChild.copyCss($blueprintChild, 'margin padding line-height border vertical-align font-size display width height');
   });
-};
+}
 
-scout.PopupWithHead.prototype._onHeadMouseDown = function(event) {
+_onHeadMouseDown(event) {
   if (this.$head && this.$head.isOrHas(event.target)) {
     this.close();
   }
-};
+}
 
 /**
  * @override
  */
-scout.PopupWithHead.prototype._isMouseDownOutside = function(event) {
+_isMouseDownOutside(event) {
   if (this.$headBlueprint && this.$headBlueprint.isOrHas(event.target)) {
     // click on the head still belongs to the popup -> not an outside click -> do not close popup
     return false;
   }
 
-  return scout.PopupWithHead.parent.prototype._isMouseDownOutside.call(this, event);
-};
+  return super._isMouseDownOutside( event);
+}
 
-scout.PopupWithHead.prototype.appendToBody = function($element) {
+appendToBody($element) {
   this.$body.append($element);
-};
+}
 
-scout.PopupWithHead.prototype.addClassToBody = function(clazz) {
+addClassToBody(clazz) {
   this.$body.addClass(clazz);
-};
+}
 
 /**
  * @override Popup.js
  */
-scout.PopupWithHead.prototype._position = function(switchIfNecessary) {
+_position(switchIfNecessary) {
   var $container = this.$container;
   if (!$container) {
     // When layouting the menu bar, menus are removed at first and then added anew.
@@ -152,15 +164,15 @@ scout.PopupWithHead.prototype._position = function(switchIfNecessary) {
   var horizontalAlignment, verticalAlignment, overlap, pos;
   if (!this._headVisible) {
     // If head is not visible, use default implementation and adjust $body to $container
-    scout.PopupWithHead.parent.prototype._position.call(this, switchIfNecessary);
+    super._position( switchIfNecessary);
     this.$body.removeClass(this._alignClasses());
-    verticalAlignment = scout.Popup.Alignment.TOP;
-    if ($container.hasClass(scout.Popup.Alignment.BOTTOM)) {
-      verticalAlignment = scout.Popup.Alignment.BOTTOM;
+    verticalAlignment = Popup.Alignment.TOP;
+    if ($container.hasClass(Popup.Alignment.BOTTOM)) {
+      verticalAlignment = Popup.Alignment.BOTTOM;
     }
-    horizontalAlignment = scout.Popup.Alignment.LEFTEDGE;
-    if ($container.hasClass(scout.Popup.Alignment.RIGHTEDGE)) {
-      horizontalAlignment = scout.Popup.Alignment.RIGHTEDGE;
+    horizontalAlignment = Popup.Alignment.LEFTEDGE;
+    if ($container.hasClass(Popup.Alignment.RIGHTEDGE)) {
+      horizontalAlignment = Popup.Alignment.RIGHTEDGE;
     }
     this.$body.addClass(verticalAlignment + ' ' + horizontalAlignment);
     return;
@@ -181,20 +193,20 @@ scout.PopupWithHead.prototype._position = function(switchIfNecessary) {
     overlap.y -= parentOffset.top;
     if (overlap.y > 0 && verticalSwitch) {
       // switch opening direction
-      verticalAlignment = scout.Popup.Alignment.TOP;
+      verticalAlignment = Popup.Alignment.TOP;
     }
     if (overlap.x > 0 && horizontalSwitch) {
       // switch opening direction
-      horizontalAlignment = scout.Popup.Alignment.RIGHTEDGE;
+      horizontalAlignment = Popup.Alignment.RIGHTEDGE;
     }
     if (horizontalAlignment || verticalAlignment) {
       // Align again if openingDirection has to be switched
       this._positionImpl(horizontalAlignment, verticalAlignment);
     }
   }
-};
+}
 
-scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, verticalAlignment) {
+_positionImpl(horizontalAlignment, verticalAlignment) {
   var pos, headSize, bodySize, bodyWidth, widthDiff, left, top, headInsets, menuInsets,
     bodyTop = 0,
     headTop = 0,
@@ -215,8 +227,8 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
 
   this._copyStyleToHeadChildren();
 
-  headSize = scout.graphics.size(this.$head, true);
-  bodySize = scout.graphics.size(this.$body, true);
+  headSize = graphics.size(this.$head, true);
+  bodySize = graphics.size(this.$body, true);
   bodySize.width = Math.max(bodySize.width, headSize.width);
   bodyWidth = bodySize.width;
 
@@ -227,17 +239,17 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
   pos.top -= parentOffset.top;
 
   left = pos.left;
-  headInsets = scout.graphics.insets(this.$head);
-  menuInsets = scout.graphics.insets(this.$headBlueprint);
+  headInsets = graphics.insets(this.$head);
+  menuInsets = graphics.insets(this.$headBlueprint);
   top = pos.top - headInsets.top + menuInsets.top;
 
-  if (verticalAlignment === scout.Popup.Alignment.TOP) {
+  if (verticalAlignment === Popup.Alignment.TOP) {
     top -= bodySize.height;
     headTop = bodyTop + bodySize.height;
     decoTop = headTop - 1; // -1 is body border (the purpose of deco is to hide the body border)
     this.$container.cssMarginBottom(headSize.height);
     this.$container.css('margin-top', '');
-  } else if (verticalAlignment === scout.Popup.Alignment.BOTTOM) {
+  } else if (verticalAlignment === Popup.Alignment.BOTTOM) {
     headTop -= headSize.height;
     this.$container.cssMarginTop(headSize.height);
     this.$container.css('margin-bottom', '');
@@ -249,7 +261,7 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
   this.$body.cssTop(bodyTop);
   this.$deco.cssTop(decoTop);
 
-  if (horizontalAlignment === scout.Popup.Alignment.RIGHTEDGE) {
+  if (horizontalAlignment === Popup.Alignment.RIGHTEDGE) {
     widthDiff = bodyWidth - headSize.width;
     left -= widthDiff + headInsets.left - menuInsets.left;
     this.$head.cssLeft(widthDiff);
@@ -265,9 +277,10 @@ scout.PopupWithHead.prototype._positionImpl = function(horizontalAlignment, vert
 
   this.horizontalAlignment = horizontalAlignment;
   this.verticalAlignment = verticalAlignment;
-  this.setLocation(new scout.Point(left, top));
+  this.setLocation(new Point(left, top));
 
   // Explicitly write the (rounded, by jQuery) sizes to the elements to prevent rounding issues
-  scout.graphics.setSize(this.$head, headSize);
-  scout.graphics.setSize(this.$body, bodySize);
-};
+  graphics.setSize(this.$head, headSize);
+  graphics.setSize(this.$body, bodySize);
+}
+}

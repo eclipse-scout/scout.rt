@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonKeyStroke = function(button, keyStroke) {
-  scout.RadioButtonKeyStroke.parent.call(this, button, keyStroke);
-  this.renderingHints.hAlign = scout.HAlign.LEFT;
-};
-scout.inherits(scout.RadioButtonKeyStroke, scout.ButtonKeyStroke);
+import {ButtonKeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class RadioButtonKeyStroke extends ButtonKeyStroke {
+
+constructor(button, keyStroke) {
+  super( button, keyStroke);
+  this.renderingHints.hAlign = HAlign.LEFT;
+}
+
 
 /**
  * @override ButtonKeyStroke.js
  *
  * To not prevent a parent key stroke context from execution of the event, the key stroke event is only accepted if the radio button is not selected.
  */
-scout.RadioButtonKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.RadioButtonKeyStroke.parent.prototype._accept.call(this, event);
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && !this.field.selected;
-};
+}
+}

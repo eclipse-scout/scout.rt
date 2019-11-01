@@ -8,19 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.objectFactories = {
-  'KeyStroke': function() {
-    // A model keystroke is represented as an Action
-    return new scout.Action();
-  },
-  'KeyStrokeAdapter': function() {
-    return new scout.ActionAdapter();
-  },
-  'ComposerField': function() {
-    // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
-    return new scout.TreeField();
-  },
-  'ComposerFieldAdapter': function() {
-    return new scout.TreeFieldAdapter();
-  }
+import {ActionAdapter} from './index';
+import {TreeField} from './index';
+import {Action} from './index';
+import {TreeFieldAdapter} from './index';
+
+
+'KeyStroke': function() {
+  // A model keystroke is represented as an Action
+  return new Action();
+}
+'KeyStrokeAdapter': function() {
+  return new ActionAdapter();
+}
+'ComposerField': function() {
+  // Composer is just a tree field, there is currently no need to duplicate the JS/CSS code
+  return new TreeField();
+}
+'ComposerFieldAdapter': function() {
+  return new TreeFieldAdapter();
+}
+
+export default {
+
 };

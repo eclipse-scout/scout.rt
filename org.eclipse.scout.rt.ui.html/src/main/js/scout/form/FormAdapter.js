@@ -8,56 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormAdapter = function() {
-  scout.FormAdapter.parent.call(this);
-};
-scout.inherits(scout.FormAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class FormAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * @override
  */
-scout.FormAdapter.prototype._initModel = function(model, parent) {
-  model = scout.FormAdapter.parent.prototype._initModel.call(this, model, parent);
+_initModel(model, parent) {
+  model = super._initModel( model, parent);
   // Set logical grid to null -> Calculation happens on server side
   model.logicalGrid = null;
   return model;
-};
+}
 
-scout.FormAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'abort') {
     this._onWidgetAbort(event);
   } else if (event.type === 'close') {
     this._onWidgetClose(event);
   } else {
-    scout.FormAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.FormAdapter.prototype._onWidgetAbort = function(event) {
+_onWidgetAbort(event) {
   // Do not close the form immediately, server will send the close event
   event.preventDefault();
 
   this._send('formClosing');
-};
+}
 
-scout.FormAdapter.prototype._onWidgetClose = function(event) {
+_onWidgetClose(event) {
   this._send('close');
-};
+}
 
-scout.FormAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'requestFocus') {
     this._onRequestFocus(event);
   } else if (event.type === 'requestInput') {
     this._onRequestInput(event);
   } else {
-    scout.FormAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
 
-scout.FormAdapter.prototype._onRequestFocus = function(event) {
+_onRequestFocus(event) {
   this.session.getOrCreateWidget(event.formField, this.widget).focus();
-};
+}
 
-scout.FormAdapter.prototype._onRequestInput = function(event) {
+_onRequestInput(event) {
   this.session.getOrCreateWidget(event.formField, this.widget).requestInput();
-};
+}
+}

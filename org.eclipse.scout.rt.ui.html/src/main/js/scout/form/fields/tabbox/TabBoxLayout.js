@@ -8,36 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabBoxLayout = function(tabBox) {
-  scout.TabBoxLayout.parent.call(this);
+import {AbstractLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {graphics} from '../../../index';
+import {Dimension} from '../../../index';
+import {FormField} from '../../../index';
+
+export default class TabBoxLayout extends AbstractLayout {
+
+constructor(tabBox) {
+  super();
   this._tabBox = tabBox;
 
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this._tabBox.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
+}
 
-scout.TabBoxLayout.prototype._initDefaults = function() {
-  this._statusWidth = scout.htmlEnvironment.fieldStatusWidth;
-};
 
-scout.TabBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_initDefaults() {
+  this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
+}
+
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this._tabBox.invalidateLayoutTree();
-};
+}
 
-scout.TabBoxLayout.prototype.layout = function($container) {
+layout($container) {
   var containerSize, tabContentSize, tabAreaMargins, innerTabAreaSize,
-    htmlContainer = scout.HtmlComponent.get($container),
-    htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
-    htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
+    htmlContainer = HtmlComponent.get($container),
+    htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
+    htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
     tabAreaWidthHint = 0,
-    tabAreaSize = new scout.Dimension(),
+    tabAreaSize = new Dimension(),
     tooltip = this._tabBox._tooltip(),
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition;
@@ -50,8 +59,8 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaWidthHint = containerSize.subtract(tabAreaMargins).width;
     if ($status && $status.isVisible()) {
       this._layoutStatus();
-      if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
-        tabAreaWidthHint -= (this._statusWidth + scout.graphics.margins($status).horizontal());
+      if (statusPosition === FormField.StatusPosition.DEFAULT) {
+        tabAreaWidthHint -= (this._statusWidth + graphics.margins($status).horizontal());
       }
     }
     innerTabAreaSize = htmlTabArea.prefSize({
@@ -75,9 +84,9 @@ scout.TabBoxLayout.prototype.layout = function($container) {
   if (tooltip && tooltip.rendered) {
     tooltip.position();
   }
-};
+}
 
-scout.TabBoxLayout.prototype._layoutStatus = function(height) {
+_layoutStatus(height) {
   var htmlContainer = this._tabBox.htmlComp,
     containerPadding = htmlContainer.insets({
       includeBorder: false
@@ -86,12 +95,12 @@ scout.TabBoxLayout.prototype._layoutStatus = function(height) {
     right = containerPadding.right,
     $tabArea = this._tabBox.header.$container,
     $status = this._tabBox.$status,
-    statusMargins = scout.graphics.margins($status),
+    statusMargins = graphics.margins($status),
     statusTop = top,
     statusPosition = this._tabBox.statusPosition,
     statusHeight = height - statusMargins.vertical();
 
-  if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
+  if (statusPosition === FormField.StatusPosition.DEFAULT) {
     statusTop += $tabArea.cssMarginTop();
   } else {
     statusHeight -= $status.cssBorderWidthY(); // status has a transparent border to align icon with text
@@ -102,18 +111,18 @@ scout.TabBoxLayout.prototype._layoutStatus = function(height) {
     .cssRight(right)
     .cssHeight(statusHeight)
     .cssLineHeight(statusHeight);
-};
+}
 
 /**
  * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
  */
-scout.TabBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = options || {};
-  var htmlContainer = scout.HtmlComponent.get($container),
-    htmlTabContent = scout.HtmlComponent.get(this._tabBox._$tabContent),
-    htmlTabArea = scout.HtmlComponent.get(this._tabBox.header.$container),
-    tabAreaSize = new scout.Dimension(),
-    tabContentSize = new scout.Dimension(),
+  var htmlContainer = HtmlComponent.get($container),
+    htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
+    htmlTabArea = HtmlComponent.get(this._tabBox.header.$container),
+    tabAreaSize = new Dimension(),
+    tabContentSize = new Dimension(),
     $status = this._tabBox.$status,
     statusPosition = this._tabBox.statusPosition,
     headerWidthHint = htmlContainer.availableSize().subtract(htmlContainer.insets()).width;
@@ -123,7 +132,7 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container, options)
 
   if (htmlTabArea.isVisible()) {
     if ($status && $status.isVisible()) {
-      if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
+      if (statusPosition === FormField.StatusPosition.DEFAULT) {
         headerWidthHint -= $status.outerWidth(true);
       }
     }
@@ -137,7 +146,8 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container, options)
     .add(htmlContainer.insets())
     .add(htmlTabContent.margins());
 
-  return new scout.Dimension(
+  return new Dimension(
     Math.max(tabAreaSize.width, tabContentSize.width),
     tabContentSize.height + tabAreaSize.height);
-};
+}
+}

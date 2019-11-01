@@ -8,88 +8,103 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.tooltips = {
+import {TooltipSupport} from '../index';
+import {Device} from '../index';
+import * as $ from 'jquery';
 
-  DEFAULT_TOOLTIP_DELAY: 600, // ms
 
-  // Quite long tooltip delay for cases where the normal delay would be annoying
-  LONG_TOOLTIP_DELAY: 2000, // ms
 
-  install: function($comp, options) {
-    var support = $comp.data('tooltipSupport');
-    if (!support) {
-      support = new scout.TooltipSupport(options);
-      support.install($comp);
-    } else {
-      support.update($comp, options);
-    }
-  },
+const DEFAULT_TOOLTIP_DELAY = 600; // ms
 
-  uninstall: function($comp) {
-    var support = $comp.data('tooltipSupport');
-    if (support) {
-      support.uninstall($comp);
-    }
-  },
+// Quite long tooltip delay for cases where the normal delay would be annoying
+const LONG_TOOLTIP_DELAY = 2000; // ms
 
-  /**
-   * If the tooltip is currently showing, its contents are updated immediately.
-   * Otherwise, nothing happens.
-   */
-  update: function($comp, options) {
-    var support = $comp.data('tooltipSupport');
-    if (support) {
-      support.update($comp, options);
-    }
-  },
-
-  close: function($comp) {
-    var support = $comp.data('tooltipSupport');
-    if (support) {
-      support.close();
-    }
-  },
-
-  /**
-   * Cancels the scheduled task to show the tooltip.
-   */
-  cancel: function($comp) {
-    var support = $comp.data('tooltipSupport');
-    if (support) {
-      support.cancel($comp);
-    }
-  },
-
-  /**
-   * Convenient function to install tooltip support for ellipsis only.
-   */
-  installForEllipsis: function($comp, options) {
-    var defaultOptions = {
-      text: function($label) {
-        if ($label.isContentTruncated()) {
-          return $label.text();
-        }
-      },
-      nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
-    };
-    options = $.extend({}, defaultOptions, options);
-    this.install($comp, options);
-  },
-
-  /**
-   * Finds every tooltip whose $anchor belongs to $context.
-   */
-  find: function($context) {
-    var $tooltips, i, tooltip,
-      tooltips = [];
-    $tooltips = $('.tooltip', $context.document(true));
-
-    for (i = 0; i < $tooltips.length; i++) {
-      tooltip = $tooltips.eq(i).data('tooltip');
-      if ($context.has(tooltip.$anchor).length > 0) {
-        tooltips.push(tooltip);
-      }
-    }
-    return tooltips;
+export function install($comp, options) {
+  var support = $comp.data('tooltipSupport');
+  if (!support) {
+    support = new TooltipSupport(options);
+    support.install($comp);
+  } else {
+    support.update($comp, options);
   }
+}
+
+export function uninstall($comp) {
+  var support = $comp.data('tooltipSupport');
+  if (support) {
+    support.uninstall($comp);
+  }
+}
+
+/**
+ * If the tooltip is currently showing, its contents are updated immediately.
+ * Otherwise, nothing happens.
+ */
+export function update($comp, options) {
+  var support = $comp.data('tooltipSupport');
+  if (support) {
+    support.update($comp, options);
+  }
+}
+
+export function close($comp) {
+  var support = $comp.data('tooltipSupport');
+  if (support) {
+    support.close();
+  }
+}
+
+/**
+ * Cancels the scheduled task to show the tooltip.
+ */
+export function cancel($comp) {
+  var support = $comp.data('tooltipSupport');
+  if (support) {
+    support.cancel($comp);
+  }
+}
+
+/**
+ * Convenient function to install tooltip support for ellipsis only.
+ */
+export function installForEllipsis($comp, options) {
+  var defaultOptions = {
+    text: function($label) {
+      if ($label.isContentTruncated()) {
+        return $label.text();
+      }
+    },
+    nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
+  };
+  options = $.extend({}, defaultOptions, options);
+  install($comp, options);
+}
+
+/**
+ * Finds every tooltip whose $anchor belongs to $context.
+ */
+export function find($context) {
+  var $tooltips, i, tooltip,
+    tooltips = [];
+  $tooltips = $('.tooltip', $context.document(true));
+
+  for (i = 0; i < $tooltips.length; i++) {
+    tooltip = $tooltips.eq(i).data('tooltip');
+    if ($context.has(tooltip.$anchor).length > 0) {
+      tooltips.push(tooltip);
+    }
+  }
+  return tooltips;
+}
+
+export default {
+  DEFAULT_TOOLTIP_DELAY,
+  LONG_TOOLTIP_DELAY,
+  cancel,
+  close,
+  find,
+  install,
+  installForEllipsis,
+  uninstall,
+  update
 };

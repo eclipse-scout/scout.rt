@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewButtonAdapter = function() {
-  scout.ViewButtonAdapter.parent.call(this);
-};
-scout.inherits(scout.ViewButtonAdapter, scout.ActionAdapter);
+import {ActionAdapter} from '../../index';
+
+export default class ViewButtonAdapter extends ActionAdapter {
+
+constructor() {
+  super();
+}
+
+}

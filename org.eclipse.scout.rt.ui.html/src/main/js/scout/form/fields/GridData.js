@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GridData = function(model) {
+import {FormField} from '../../index';
+import * as $ from 'jquery';
+
+export default class GridData {
+
+constructor(model) {
   model = model || {};
   this.x = -1;
   this.y = -1;
@@ -26,22 +31,23 @@ scout.GridData = function(model) {
   this.heightInPixel = 0;
 
   $.extend(this, model);
-};
+}
 
-scout.GridData.createFromHints = function(field, gridColumnCount) {
-  var data = new scout.GridData(field.gridDataHints);
-  if (data.w === scout.FormField.FULL_WIDTH) {
+static createFromHints(field, gridColumnCount) {
+  var data = new GridData(field.gridDataHints);
+  if (data.w === FormField.FULL_WIDTH) {
     data.w = gridColumnCount;
   }
   return data;
-};
+}
 
-scout.GridData.ensure = function(gridData) {
+static ensure(gridData) {
   if (!gridData) {
     return gridData;
   }
-  if (gridData instanceof scout.GridData) {
+  if (gridData instanceof GridData) {
     return gridData;
   }
-  return new scout.GridData(gridData);
-};
+  return new GridData(gridData);
+}
+}

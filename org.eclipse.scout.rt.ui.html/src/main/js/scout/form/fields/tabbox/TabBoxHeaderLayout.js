@@ -8,31 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabBoxHeaderLayout = function(tabBoxHeader) {
-  scout.TabBoxHeaderLayout.parent.call(this);
+import {AbstractLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {graphics} from '../../../index';
+import {Dimension} from '../../../index';
+import {FormField} from '../../../index';
+import {Rectangle} from '../../../index';
+
+export default class TabBoxHeaderLayout extends AbstractLayout {
+
+constructor(tabBoxHeader) {
+  super();
   this.tabBoxHeader = tabBoxHeader;
 
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this.tabBoxHeader.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.TabBoxHeaderLayout, scout.AbstractLayout);
+}
 
-scout.TabBoxHeaderLayout.prototype._initDefaults = function() {
-  this.fieldStatusWidth = scout.htmlEnvironment.fieldStatusWidth;
-};
 
-scout.TabBoxHeaderLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_initDefaults() {
+  this.fieldStatusWidth = HtmlEnvironment.get().fieldStatusWidth;
+}
+
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this.tabBoxHeader.invalidateLayoutTree();
-};
+}
 
-scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
-  var htmlContainer = scout.HtmlComponent.get($container),
+layout($container) { //
+  var htmlContainer = HtmlComponent.get($container),
     tabArea = this.tabBoxHeader.tabArea,
     tabAreaMargins = tabArea.htmlComp.margins(),
     tabAreaPrefSize,
@@ -40,21 +50,21 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
     menuBarMargins = menuBar.htmlComp.margins(),
     menuBarMinumumSize,
     $status = this.tabBoxHeader.tabBox.$status,
-    statusSizeLarge = new scout.Dimension(),
+    statusSizeLarge = new Dimension(),
     insets = htmlContainer.insets(),
     containerSize = htmlContainer.availableSize({
       exact: true
     }).subtract(htmlContainer.insets()),
-    clientArea = new scout.Rectangle(insets.left, insets.top, containerSize.width, containerSize.height),
+    clientArea = new Rectangle(insets.left, insets.top, containerSize.width, containerSize.height),
     left = clientArea.x;
 
   menuBarMinumumSize = menuBar.htmlComp.prefSize({
     widthHint: 0
   });
 
-  if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
+  if (this.tabBoxHeader.tabBox.statusPosition === FormField.StatusPosition.TOP && $status && $status.isVisible()) {
     statusSizeLarge.height = $status.outerHeight(true);
-    statusSizeLarge.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeLarge.width = this.fieldStatusWidth + graphics.margins($status).horizontal();
   }
 
   tabAreaPrefSize = tabArea.htmlComp.prefSize({
@@ -63,7 +73,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
   });
 
   // layout tabItemsBar
-  tabArea.htmlComp.setBounds(new scout.Rectangle(
+  tabArea.htmlComp.setBounds(new Rectangle(
     clientArea.x + tabAreaMargins.left,
     insets.top + tabAreaMargins.top,
     tabAreaPrefSize.width,
@@ -72,7 +82,7 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
 
   menuBar.htmlComp.layout.collapsed = tabArea.htmlComp.layout.overflowTabs.length > 0;
   // layout menuBar
-  menuBar.htmlComp.setBounds(new scout.Rectangle(
+  menuBar.htmlComp.setBounds(new Rectangle(
     left + tabAreaPrefSize.width + tabAreaMargins.horizontal() + menuBarMargins.left,
     insets.top + menuBarMargins.top,
     clientArea.width - tabAreaPrefSize.width - tabAreaMargins.horizontal() - menuBarMargins.horizontal() - statusSizeLarge.width,
@@ -80,22 +90,22 @@ scout.TabBoxHeaderLayout.prototype.layout = function($container) { //
   ));
 
   // layout status
-  if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
+  if (this.tabBoxHeader.tabBox.statusPosition === FormField.StatusPosition.TOP && $status && $status.isVisible()) {
     $status.cssWidth(this.fieldStatusWidth)
       .cssRight(insets.left)
-      .cssHeight(clientArea.height - scout.graphics.margins($status).vertical())
-      .cssLineHeight(clientArea.height - scout.graphics.margins($status).vertical());
+      .cssHeight(clientArea.height - graphics.margins($status).vertical())
+      .cssLineHeight(clientArea.height - graphics.margins($status).vertical());
   }
 
-};
+}
 
-scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, options) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+preferredLayoutSize($container, options) {
+  var htmlContainer = HtmlComponent.get($container),
     insets = htmlContainer.insets(),
     wHint = (options.widthHint || htmlContainer.availableSize().width) - htmlContainer.insets().horizontal(),
-    prefSize = new scout.Dimension(),
+    prefSize = new Dimension(),
     $status = this.tabBoxHeader.tabBox.$status,
-    statusSizeLarge = new scout.Dimension(),
+    statusSizeLarge = new Dimension(),
     tabArea = this.tabBoxHeader.tabArea,
     tabAreaMargins = tabArea.htmlComp.margins(),
     tabAreaPrefSize,
@@ -108,9 +118,9 @@ scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, op
     widthHint: 0
   });
 
-  if (this.tabBoxHeader.tabBox.statusPosition === scout.FormField.StatusPosition.TOP && $status && $status.isVisible()) {
+  if (this.tabBoxHeader.tabBox.statusPosition === FormField.StatusPosition.TOP && $status && $status.isVisible()) {
     statusSizeLarge.height = $status.outerHeight(true);
-    statusSizeLarge.width = this.fieldStatusWidth + scout.graphics.margins($status).horizontal();
+    statusSizeLarge.width = this.fieldStatusWidth + graphics.margins($status).horizontal();
 
     prefSize.width += statusSizeLarge.width;
     prefSize.height = Math.max(prefSize.height, statusSizeLarge.height);
@@ -131,4 +141,5 @@ scout.TabBoxHeaderLayout.prototype.preferredLayoutSize = function($container, op
   prefSize.height = Math.max(prefSize.height, menuBarPrefSize.height + menuBarMargins.vertical());
 
   return prefSize.add(insets);
-};
+}
+}

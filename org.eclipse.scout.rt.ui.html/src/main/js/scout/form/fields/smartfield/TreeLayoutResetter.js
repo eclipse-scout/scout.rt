@@ -12,12 +12,14 @@
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the tree.
  */
-scout.TreeLayoutResetter = function(tree) {
+export default class TreeLayoutResetter {
+
+constructor(tree) {
   this._tree = tree;
   this.cssSelector = '.tree';
-};
+}
 
-scout.TreeLayoutResetter.prototype.modifyDom = function() {
+modifyDom() {
   this._ensureFirstLast();
   this._tree.$container
     .css('display', 'inline-block')
@@ -25,18 +27,18 @@ scout.TreeLayoutResetter.prototype.modifyDom = function() {
     .css('height', 'auto');
   this._tree.$data
     .css('display', 'inline-block');
-};
+}
 
-scout.TreeLayoutResetter.prototype.restoreDom = function() {
+restoreDom() {
   this._tree.$container
     .css('display', 'block')
     .css('width', '100%')
     .css('height', '100%');
   this._tree.$data
     .css('display', 'block');
-};
+}
 
-scout.TreeLayoutResetter.prototype._ensureFirstLast = function() {
+_ensureFirstLast() {
   var $nodes = this._tree.$data
     .children('.tree-node')
     .removeClass('first last');
@@ -44,4 +46,5 @@ scout.TreeLayoutResetter.prototype._ensureFirstLast = function() {
     .addClass('first');
   $nodes.last()
     .addClass('last');
-};
+}
+}

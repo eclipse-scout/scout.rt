@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.IFrame = function() {
-  scout.IFrame.parent.call(this);
+import {Device} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import {scout} from '../index';
+
+export default class IFrame extends Widget {
+
+constructor() {
+  super();
 
   this.location = null;
   this.sandboxEnabled = true;
@@ -18,13 +25,13 @@ scout.IFrame = function() {
   this.trackLocation = false;
   // Iframe on iOS is always as big as its content. Workaround it by using a wrapper div with overflow: auto
   // Don't wrap it when running in the chrome emulator (in that case isIosPlatform returns false)
-  this.wrapIframe = scout.device.isIosPlatform();
+  this.wrapIframe = Device.get().isIosPlatform();
   this.$iframe = null;
   this._loadHandler = this._onLoad.bind(this);
-};
-scout.inherits(scout.IFrame, scout.Widget);
+}
 
-scout.IFrame.prototype._render = function() {
+
+_render() {
   if (this.wrapIframe) {
     this.$container = this.$parent.appendDiv('iframe-wrapper');
     this.$iframe = this.$container.appendElement('<iframe>', 'iframe');
@@ -32,44 +39,44 @@ scout.IFrame.prototype._render = function() {
     this.$iframe = this.$parent.appendElement('<iframe>', 'iframe');
     this.$container = this.$iframe;
   }
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
 /**
  * @override ValueField.js
  */
-scout.IFrame.prototype._renderProperties = function() {
-  scout.IFrame.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderScrollBarEnabled(); // Needs to be before _renderLocation, see comment in _renderScrollBarEnabled
   this._renderLocation();
   this._renderSandboxEnabled(); // includes _renderSandboxPermissions()
   this._renderTrackLocationChange();
-};
+}
 
-scout.IFrame.prototype.setLocation = function(location) {
+setLocation(location) {
   this.setProperty('location', location);
-};
+}
 
-scout.IFrame.prototype._renderLocation = function() {
+_renderLocation() {
   // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
   // empty locations simply remove the src attribute but don't remove the old content.
   var location = this.location || 'about:blank';
   this.$iframe.attr('src', location);
-};
+}
 
-scout.IFrame.prototype.setTrackLocationChange = function(trackLocation) {
+setTrackLocationChange(trackLocation) {
   this.setProperty('trackLocation', trackLocation);
-};
+}
 
-scout.IFrame.prototype._renderTrackLocationChange = function(trackLocation) {
+_renderTrackLocationChange(trackLocation) {
   if (this.trackLocation) {
     this.$iframe.on('load', this._loadHandler);
   } else {
     this.$iframe.off('load', this._loadHandler);
   }
-};
+}
 
-scout.IFrame.prototype._onLoad = function(event) {
+_onLoad(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
@@ -86,13 +93,13 @@ scout.IFrame.prototype._onLoad = function(event) {
     }
     this._setProperty('location', location);
   }
-};
+}
 
-scout.IFrame.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
+setScrollBarEnabled(scrollBarEnabled) {
   this.setProperty('scrollBarEnabled', scrollBarEnabled);
-};
+}
 
-scout.IFrame.prototype._renderScrollBarEnabled = function() {
+_renderScrollBarEnabled() {
   this.$container.toggleClass('no-scrolling', !this.scrollBarEnabled);
   // According to http://stackoverflow.com/a/18470016, setting 'overflow: hidden' via
   // CSS should be enough. However, if the inner page sets 'overflow' to another value,
@@ -105,13 +112,13 @@ scout.IFrame.prototype._renderScrollBarEnabled = function() {
   if (this.rendered) {
     this._renderLocation();
   }
-};
+}
 
-scout.IFrame.prototype.setSandboxEnabled = function(sandboxEnabled) {
+setSandboxEnabled(sandboxEnabled) {
   this.setProperty('sandboxEnabled', sandboxEnabled);
-};
+}
 
-scout.IFrame.prototype._renderSandboxEnabled = function() {
+_renderSandboxEnabled() {
   if (this.sandboxEnabled) {
     this._renderSandboxPermissions();
   } else {
@@ -121,13 +128,13 @@ scout.IFrame.prototype._renderSandboxEnabled = function() {
   // re-render location otherwise the attribute change would have no effect, see
   // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
   this._renderLocation();
-};
+}
 
-scout.IFrame.prototype.setSandboxPermissions = function(sandboxPermissions) {
+setSandboxPermissions(sandboxPermissions) {
   this.setProperty('sandboxPermissions', sandboxPermissions);
-};
+}
 
-scout.IFrame.prototype._renderSandboxPermissions = function() {
+_renderSandboxPermissions() {
   if (!this.sandboxEnabled) {
     return;
   }
@@ -135,4 +142,5 @@ scout.IFrame.prototype._renderSandboxPermissions = function() {
   // re-render location otherwise the attribute change would have no effect, see
   // https://html.spec.whatwg.org/multipage/embedded-content.html#attr-iframe-sandbox
   this._renderLocation();
-};
+}
+}

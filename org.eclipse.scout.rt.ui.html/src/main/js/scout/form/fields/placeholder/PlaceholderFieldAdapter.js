@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlaceholderFieldAdapter = function() {
-  scout.PlaceholderFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.PlaceholderFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class PlaceholderFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

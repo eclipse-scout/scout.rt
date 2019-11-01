@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewButtonBoxLayout = function(viewButtonBox) {
-  scout.ViewButtonBoxLayout.parent.call(this);
-  this.viewButtonBox = viewButtonBox;
-};
-scout.inherits(scout.ViewButtonBoxLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../../index';
+import {graphics} from '../../index';
 
-scout.ViewButtonBoxLayout.prototype.layout = function($container) {
+export default class ViewButtonBoxLayout extends AbstractLayout {
+
+constructor(viewButtonBox) {
+  super();
+  this.viewButtonBox = viewButtonBox;
+}
+
+
+layout($container) {
   var tabs = this.viewButtonBox.tabButtons.filter(function(tab) {
       return tab.visible;
     }),
@@ -25,13 +30,13 @@ scout.ViewButtonBoxLayout.prototype.layout = function($container) {
 
   if (viewMenuTab.visible && viewMenuTab.selectedButton.rendered) {
     if (viewMenuTab.selectedButton) {
-      tabWidth = (containerWidth - scout.graphics.size(viewMenuTab.dropdown.$container, {
+      tabWidth = (containerWidth - graphics.size(viewMenuTab.dropdown.$container, {
         exact: true
       }).width) / (tabs.length + 1);
       viewMenuTab.selectedButton.$container.cssWidth(tabWidth);
     }
 
-    containerWidth -= scout.graphics.size(viewMenuTab.$container, {
+    containerWidth -= graphics.size(viewMenuTab.$container, {
       exact: true
     }).width;
   }
@@ -46,11 +51,12 @@ scout.ViewButtonBoxLayout.prototype.layout = function($container) {
       containerWidth -= tab.$container.cssWidth();
     }
   }, this);
-};
+}
 
-scout.ViewButtonBoxLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   // View buttons have an absolute css height set -> useCssSize = true
-  return scout.graphics.prefSize($container, {
+  return graphics.prefSize($container, {
     useCssSize: true
   });
-};
+}
+}

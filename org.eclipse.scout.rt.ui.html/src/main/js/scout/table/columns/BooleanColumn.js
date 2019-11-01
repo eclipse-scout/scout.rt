@@ -8,33 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from '../../index';
+import {comparators} from '../../index';
+import {Column} from '../../index';
+
 /**
  * May be an ordinary boolean column or the table's checkable column (table.checkableColumn)
  * Difference: the table's checkable column represents the row.checked state, other boolean columns represent their own value.
  */
-scout.BooleanColumn = function() {
-  scout.BooleanColumn.parent.call(this);
-  this.comparator = scout.comparators.NUMERIC;
+export default class BooleanColumn extends Column {
+
+constructor() {
+  super();
+  this.comparator = comparators.NUMERIC;
   this.filterType = 'ColumnUserFilter';
   this.horizontalAlignment = 0;
-  this.minWidth = scout.Column.NARROW_MIN_WIDTH;
+  this.minWidth = Column.NARROW_MIN_WIDTH;
   this.triStateEnabled = false;
   this.textBased = false;
-};
-scout.inherits(scout.BooleanColumn, scout.Column);
+}
+
 
 /**
  * @override
  */
-scout.BooleanColumn.prototype._formatValue = function(value) {
+_formatValue(value) {
   // cell renders a checkbox, text is not visible
   return null;
-};
+}
 
 /**
  * @override
  */
-scout.BooleanColumn.prototype.buildCell = function(cell, row) {
+buildCell(cell, row) {
   var style,
     content = '',
     cssClass,
@@ -49,7 +55,7 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
 
   if (cell.empty) {
     // if cell wants to be really empty (e.g. no checkbox icon, use logic of base class)
-    return scout.BooleanColumn.parent.prototype.buildCell.call(this, cell, row);
+    return super.buildCell( cell, row);
   }
 
   enabled = enabled && cell.editable;
@@ -80,15 +86,15 @@ scout.BooleanColumn.prototype.buildCell = function(cell, row) {
   content = content + '<div class="' + checkBoxCssClass + '"/>';
 
   return '<div class="' + cssClass + '" style="' + style + '">' + content + '</div>';
-};
+}
 
-scout.BooleanColumn.prototype.$checkBox = function($row) {
+$checkBox($row) {
   var $cell = this.table.$cell(this, $row);
   return $cell.children('.check-box');
-};
+}
 
-scout.BooleanColumn.prototype._cellCssClass = function(cell, tableNode) {
-  var cssClass = scout.BooleanColumn.parent.prototype._cellCssClass.call(this, cell);
+_cellCssClass(cell, tableNode) {
+  var cssClass = super._cellCssClass( cell);
   cssClass = cssClass.replace(' editable', '');
   cssClass += ' checkable';
   if (tableNode) {
@@ -96,13 +102,13 @@ scout.BooleanColumn.prototype._cellCssClass = function(cell, tableNode) {
   }
 
   return cssClass;
-};
+}
 
 /**
  * This function does intentionally _not_ call the super function (prepareCellEdit) because we don't want to
  * show an editor for BooleanColumns when user clicks on a cell.
  */
-scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
+onMouseUp(event, $row) {
   var row = $row.data('row'),
     cell = this.cell(row);
   if (this.table.checkableColumn === this) {
@@ -110,21 +116,22 @@ scout.BooleanColumn.prototype.onMouseUp = function(event, $row) {
   } else if (this.isCellEditable(row, cell, event)) {
     this._toggleCellValue(row, cell);
   }
-};
+}
 
 /**
  * In a remote app this function is overridden by RemoteApp.js, the default implementation is the local case.
  * @see TableAdapter.js
  */
-scout.BooleanColumn.prototype._toggleCellValue = function(row, cell) {
+_toggleCellValue(row, cell) {
   this.setCellValue(row, !cell.value);
-};
+}
 
 /**
  * @override
  */
-scout.BooleanColumn.prototype._createEditor = function(row) {
+_createEditor(row) {
   return scout.create('CheckBoxField', {
     parent: this.table
   });
-};
+}
+}

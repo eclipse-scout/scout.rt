@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabItemAdapter = function() {
-  scout.TabItemAdapter.parent.call(this);
-};
-scout.inherits(scout.TabItemAdapter, scout.GroupBoxAdapter);
+import {GroupBoxAdapter} from '../../../index';
+
+export default class TabItemAdapter extends GroupBoxAdapter {
+
+constructor() {
+  super();
+}
+
+}

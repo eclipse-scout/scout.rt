@@ -8,8 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DateTimeCompositeLayout = function(dateField) {
-  scout.DateTimeCompositeLayout.parent.call(this);
+import {AbstractLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {Insets} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {graphics} from '../../../index';
+import {Dimension} from '../../../index';
+
+export default class DateTimeCompositeLayout extends AbstractLayout {
+
+constructor(dateField) {
+  super();
   this._dateField = dateField;
 
   // Minimum field with to normal state, for smaller widths the "compact" style is applied.
@@ -21,24 +30,24 @@ scout.DateTimeCompositeLayout = function(dateField) {
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this._dateField.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.DateTimeCompositeLayout, scout.AbstractLayout);
+}
 
-scout.DateTimeCompositeLayout.prototype._initDefaults = function() {
-  this.hgap = scout.htmlEnvironment.smallColumnGap;
-};
 
-scout.DateTimeCompositeLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_initDefaults() {
+  this.hgap = HtmlEnvironment.get().smallColumnGap;
+}
+
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this._dateField.invalidateLayoutTree();
-};
+}
 
-scout.DateTimeCompositeLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+layout($container) {
+  var htmlContainer = HtmlComponent.get($container),
     $dateField = this._dateField.$dateField,
     $timeField = this._dateField.$timeField,
     $dateFieldIcon = this._dateField.$dateFieldIcon,
@@ -47,8 +56,8 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     $timeClearIcon = this._dateField.$timeClearIcon,
     $predictDateField = this._dateField._$predictDateField,
     $predictTimeField = this._dateField._$predictTimeField,
-    htmlDateField = ($dateField ? scout.HtmlComponent.get($dateField) : null),
-    htmlTimeField = ($timeField ? scout.HtmlComponent.get($timeField) : null),
+    htmlDateField = ($dateField ? HtmlComponent.get($dateField) : null),
+    htmlTimeField = ($timeField ? HtmlComponent.get($timeField) : null),
     hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
     hasTime = ($timeField ? !$timeField.isDisplayNone() : false);
 
@@ -63,7 +72,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     // Field size
     var dateFieldMargins = htmlDateField.margins();
     var timeFieldMargins = htmlTimeField.margins();
-    var compositeMargins = new scout.Insets(
+    var compositeMargins = new Insets(
       Math.max(dateFieldMargins.top, timeFieldMargins.top),
       Math.max(dateFieldMargins.right, timeFieldMargins.right),
       Math.max(dateFieldMargins.bottom, timeFieldMargins.bottom),
@@ -76,8 +85,8 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     var dateFieldWidth = (totalWidth * 0.6);
     var timeFieldWidth = (totalWidth - dateFieldWidth);
 
-    dateFieldSize = new scout.Dimension(dateFieldWidth, compositeSize.height);
-    timeFieldSize = new scout.Dimension(timeFieldWidth, compositeSize.height);
+    dateFieldSize = new Dimension(dateFieldWidth, compositeSize.height);
+    timeFieldSize = new Dimension(timeFieldWidth, compositeSize.height);
     htmlDateField.setSize(dateFieldSize);
     htmlTimeField.setSize(timeFieldSize);
     $timeField.cssRight(0);
@@ -112,10 +121,10 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
 
     // Prediction
     if ($predictDateField) {
-      scout.graphics.setSize($predictDateField, dateFieldSize);
+      graphics.setSize($predictDateField, dateFieldSize);
     }
     if ($predictTimeField) {
-      scout.graphics.setSize($predictTimeField, timeFieldSize);
+      graphics.setSize($predictTimeField, timeFieldSize);
       $predictTimeField.cssRight(0);
     }
   }
@@ -143,7 +152,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
 
     // Prediction
     if ($predictDateField) {
-      scout.graphics.setSize($predictDateField, dateFieldSize);
+      graphics.setSize($predictDateField, dateFieldSize);
     }
   }
   // --- Time only ---
@@ -169,7 +178,7 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
 
     // Prediction
     if ($predictTimeField) {
-      scout.graphics.setSize($predictTimeField, timeFieldSize);
+      graphics.setSize($predictTimeField, timeFieldSize);
     }
   }
   var popup = this._dateField.popup;
@@ -177,17 +186,17 @@ scout.DateTimeCompositeLayout.prototype.layout = function($container) {
     // Make sure the popup is correctly positioned (especially necessary for cell editor)
     popup.position();
   }
-};
+}
 
-scout.DateTimeCompositeLayout.prototype._hgap = function() {
+_hgap() {
   if (this._dateField.cellEditor) {
     return 0;
   }
   return this.hgap;
-};
+}
 
-scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize = new scout.Dimension(),
+preferredLayoutSize($container) {
+  var prefSize = new Dimension(),
     $dateField = this._dateField.$dateField,
     $timeField = this._dateField.$timeField,
     hasDate = ($dateField ? !$dateField.isDisplayNone() : false),
@@ -195,19 +204,20 @@ scout.DateTimeCompositeLayout.prototype.preferredLayoutSize = function($containe
 
   // --- Date and time ---
   if (hasDate && hasTime) {
-    prefSize = scout.graphics.prefSize(this._dateField.$dateField);
+    prefSize = graphics.prefSize(this._dateField.$dateField);
     prefSize.width = this.PREF_DATE_FIELD_WIDTH + this._hgap() + this.PREF_TIME_FIELD_WIDTH;
   }
 
   // --- Date only ---
   else if (hasDate) {
-    prefSize = scout.graphics.prefSize(this._dateField.$dateField);
+    prefSize = graphics.prefSize(this._dateField.$dateField);
     prefSize.width = this.PREF_DATE_FIELD_WIDTH;
   }
   // --- Time only ---
   else if (hasTime) {
-    prefSize = scout.graphics.prefSize(this._dateField.$timeField);
+    prefSize = graphics.prefSize(this._dateField.$timeField);
     prefSize.width = this.PREF_TIME_FIELD_WIDTH;
   }
   return prefSize;
-};
+}
+}

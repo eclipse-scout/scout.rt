@@ -8,12 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {strings} from '../../index';
+import {Status} from '../../index';
+import {objects} from '../../index';
+import {scout} from '../../index';
+import {menus as menus_1} from '../../index';
+import {Event} from '../../index';
+import {FormField} from '../../index';
+import {arrays} from '../../index';
+import * as $ from 'jquery';
+import {focusUtils} from '../../index';
+
 /**
  * @abstract
  */
-scout.ValueField = function() {
-  scout.ValueField.parent.call(this);
-  this.clearable = scout.ValueField.Clearable.FOCUSED;
+export default class ValueField extends FormField {
+
+constructor() {
+  super();
+  this.clearable = ValueField.Clearable.FOCUSED;
   this.displayText = null;
   this.formatter = this._formatValue.bind(this);
   this.hasText = false;
@@ -27,10 +40,10 @@ scout.ValueField = function() {
   this.$clearIcon = null;
 
   this._addCloneProperties(['value', 'displayText', 'clearable']);
-};
-scout.inherits(scout.ValueField, scout.FormField);
+}
 
-scout.ValueField.Clearable = {
+
+static Clearable = {
   /**
    * The clear icon is showed when the field has text.
    */
@@ -45,8 +58,8 @@ scout.ValueField.Clearable = {
   NEVER: 'never'
 };
 
-scout.ValueField.prototype._init = function(model) {
-  scout.ValueField.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   if (this.validator) {
     // Validators are kept in a list, allow a single validator to be set in the model, similar to parser and formatter.
     // setValidator will add the new validator to this.validators and remove the other ones.
@@ -54,53 +67,53 @@ scout.ValueField.prototype._init = function(model) {
     delete this.validator;
   }
   this._initValue(this.value);
-};
+}
 
 /**
  * Override this method if you need to influence the value initialization (e.g. do something before the value is initially set)
  */
-scout.ValueField.prototype._initValue = function(value) {
+_initValue(value) {
   // Delete value first, value may be invalid and must not be set
   this.value = null;
   this._setValue(value);
   this._updateEmpty();
-};
+}
 
-scout.ValueField.prototype._renderProperties = function() {
-  scout.ValueField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderDisplayText();
   this._renderClearable();
   this._renderHasText();
-};
+}
 
-scout.ValueField.prototype._remove = function() {
-  scout.ValueField.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.$clearIcon = null;
-};
+}
 
 /**
  * The default impl. is a NOP, because not every ValueField has a sensible display text.
  */
-scout.ValueField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   this._updateHasText();
-};
+}
 
 /**
  * The default impl. returns an empty string, because not every ValueField has a sensible display text.
  */
-scout.ValueField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return '';
-};
+}
 
-scout.ValueField.prototype._onClearIconMouseDown = function(event) {
+_onClearIconMouseDown(event) {
   this.clear();
   event.preventDefault();
-};
+}
 
-scout.ValueField.prototype._onFieldBlur = function() {
-  scout.ValueField.parent.prototype._onFieldBlur.call(this);
+_onFieldBlur() {
+  super._onFieldBlur();
   this.acceptInput(false);
-};
+}
 
 /**
  * Accepts the current input and writes it to the model.
@@ -112,7 +125,7 @@ scout.ValueField.prototype._onFieldBlur = function() {
  * The default reads the display text using this._readDisplayText() and writes it to the model by calling _triggerAcceptInput().
  * If subclasses don't have a display-text or want to write another state to the server, they may override this method.
  */
-scout.ValueField.prototype.acceptInput = function(whileTyping) {
+acceptInput(whileTyping) {
   whileTyping = !!whileTyping; // cast to boolean
   var displayText = scout.nvl(this._readDisplayText(), '');
 
@@ -128,12 +141,12 @@ scout.ValueField.prototype.acceptInput = function(whileTyping) {
     // Display text may be formatted -> Use this.displayText
     this._triggerAcceptInput(whileTyping);
   }
-};
+}
 
-scout.ValueField.prototype.parseAndSetValue = function(displayText) {
+parseAndSetValue(displayText) {
   this.clearErrorStatus();
   try {
-    var event = new scout.Event({
+    var event = new Event({
       displayText: displayText
     });
     this.trigger('parse', event);
@@ -144,11 +157,11 @@ scout.ValueField.prototype.parseAndSetValue = function(displayText) {
   } catch (error) {
     this._parsingFailed(displayText, error);
   }
-};
+}
 
-scout.ValueField.prototype._parsingFailed = function(displayText, error) {
+_parsingFailed(displayText, error) {
   $.log.isDebugEnabled() && $.log.debug('Parsing failed for field with id ' + this.id, error);
-  var event = new scout.Event({
+  var event = new Event({
     displayText: displayText,
     error: error
   });
@@ -157,11 +170,11 @@ scout.ValueField.prototype._parsingFailed = function(displayText, error) {
     var status = this._createParsingFailedStatus(displayText, error);
     this.setErrorStatus(status);
   }
-};
+}
 
-scout.ValueField.prototype._createParsingFailedStatus = function(displayText, error) {
+_createParsingFailedStatus(displayText, error) {
   return this._createInvalidValueStatus(displayText, error);
-};
+}
 
 /**
  * Replaces the existing parser. The parser is called during {@link #parseValue(displayText)}.
@@ -169,40 +182,40 @@ scout.ValueField.prototype._createParsingFailedStatus = function(displayText, er
  * Remember calling the default parser passed as parameter to the parse function, if needed.
  * @param {function} parser the new parser. If null, the default parser is used.
  */
-scout.ValueField.prototype.setParser = function(parser) {
+setParser(parser) {
   this.setProperty('parser', parser);
   if (this.initialized) {
     this.parseAndSetValue(this.displayText);
   }
-};
+}
 
-scout.ValueField.prototype._setParser = function(parser) {
+_setParser(parser) {
   if (!parser) {
     parser = this._parseValue.bind(this);
   }
   this._setProperty('parser', parser);
-};
+}
 
 /**
  * @returns the parsed value
- * @throws a message, a scout.Status or an error if the parsing fails
+ * @throws a message, a Status or an error if the parsing fails
  */
-scout.ValueField.prototype.parseValue = function(displayText) {
+parseValue(displayText) {
   var defaultParser = this._parseValue.bind(this);
   return this.parser(displayText, defaultParser);
-};
+}
 
 /**
- * @throws a message, a scout.Status or an error if the parsing fails
+ * @throws a message, a Status or an error if the parsing fails
  */
-scout.ValueField.prototype._parseValue = function(displayText) {
+_parseValue(displayText) {
   return displayText;
-};
+}
 
-scout.ValueField.prototype._checkDisplayTextChanged = function(displayText, whileTyping) {
+_checkDisplayTextChanged(displayText, whileTyping) {
   var oldDisplayText = scout.nvl(this.displayText, '');
   return displayText !== oldDisplayText;
-};
+}
 
 /**
  * Method invoked upon a mousedown click with this field as the currently focused control, and is invoked just before the mousedown click will be interpreted.
@@ -213,56 +226,56 @@ scout.ValueField.prototype._checkDisplayTextChanged = function(displayText, whil
  * @param target
  *        the DOM target where the mouse down event occurred.
  */
-scout.ValueField.prototype.aboutToBlurByMouseDown = function(target) {
+aboutToBlurByMouseDown(target) {
   var eventOnField = this.isFocusOnField(target);
   if (!eventOnField) {
     this.acceptInput(); // event outside this value field.
   }
-};
+}
 
 /**
  * @override
  */
-scout.ValueField.prototype.isFocused = function() {
-  return this.rendered && scout.focusUtils.isActiveElement(this.$field);
-};
+isFocused() {
+  return this.rendered && focusUtils.isActiveElement(this.$field);
+}
 
-scout.ValueField.prototype.isFocusOnField = function(target) {
+isFocusOnField(target) {
   return this.$field.isOrHas(target) || (this.$clearIcon && this.$clearIcon.isOrHas(target));
-};
+}
 
-scout.ValueField.prototype._triggerAcceptInput = function(whileTyping) {
+_triggerAcceptInput(whileTyping) {
   var event = {
     displayText: this.displayText,
     whileTyping: !!whileTyping
   };
   this.trigger('acceptInput', event);
-};
+}
 
-scout.ValueField.prototype.setDisplayText = function(displayText) {
+setDisplayText(displayText) {
   this.setProperty('displayText', displayText);
-};
+}
 
-scout.ValueField.prototype._updateHasText = function() {
-  this.setHasText(scout.strings.hasText(this._readDisplayText()));
-};
+_updateHasText() {
+  this.setHasText(strings.hasText(this._readDisplayText()));
+}
 
-scout.ValueField.prototype.setHasText = function(hasText) {
+setHasText(hasText) {
   this.setProperty('hasText', hasText);
-};
+}
 
-scout.ValueField.prototype._renderHasText = function() {
+_renderHasText() {
   if (this.$field) {
     this.$field.toggleClass('has-text', this.hasText);
   }
   this.$container.toggleClass('has-text', this.hasText);
-};
+}
 
-scout.ValueField.prototype.setClearable = function(clearableStyle) {
+setClearable(clearableStyle) {
   this.setProperty('clearable', clearableStyle);
-};
+}
 
-scout.ValueField.prototype._renderClearable = function() {
+_renderClearable() {
   if (this.isClearable()) {
     if (!this.$clearIcon) {
       this.addClearIcon();
@@ -276,42 +289,42 @@ scout.ValueField.prototype._renderClearable = function() {
   }
   this.invalidateLayoutTree(false);
   this._updateClearableStyles();
-};
+}
 
-scout.ValueField.prototype._updateClearableStyles = function() {
+_updateClearableStyles() {
   this.$container.removeClass('clearable-always clearable-focused');
   if (this.isClearable()) {
-    if (this.clearable === scout.ValueField.Clearable.ALWAYS) {
+    if (this.clearable === ValueField.Clearable.ALWAYS) {
       this.$container.addClass('clearable-always');
-    } else if (this.clearable === scout.ValueField.Clearable.FOCUSED) {
+    } else if (this.clearable === ValueField.Clearable.FOCUSED) {
       this.$container.addClass('clearable-focused');
     }
   }
-};
+}
 
-scout.ValueField.prototype.isClearable = function() {
-  return this.clearable === scout.ValueField.Clearable.ALWAYS || this.clearable === scout.ValueField.Clearable.FOCUSED;
-};
+isClearable() {
+  return this.clearable === ValueField.Clearable.ALWAYS || this.clearable === ValueField.Clearable.FOCUSED;
+}
 
 /**
  * Clears the display text and the value to null.
  */
-scout.ValueField.prototype.clear = function() {
+clear() {
   this._clear();
   this._updateHasText();
   this.acceptInput();
   this._triggerClear();
-};
+}
 
-scout.ValueField.prototype._clear = function() {
+_clear() {
   // to be implemented by sublcasses
-};
+}
 
-scout.ValueField.prototype._triggerClear = function() {
+_triggerClear() {
   this.trigger('clear');
-};
+}
 
-scout.ValueField.prototype.setValue = function(value) {
+setValue(value) {
   // Same code as in Widget#setProperty expect for the equals check
   // -> _setValue has to be called even if the value is equal so that update display text will be executed
   value = this._prepareProperty('value', value);
@@ -322,25 +335,25 @@ scout.ValueField.prototype.setValue = function(value) {
   if (this.rendered) {
     this._callRenderProperty('value');
   }
-};
+}
 
 /**
  * Resets the value to its initial value.
  */
-scout.ValueField.prototype.resetValue = function() {
+resetValue() {
   this.setValue(this.initialValue);
-};
+}
 
 /**
  * Default does nothing because the value field does not know which type the concrete field uses.
  * May be overridden to cast the value to the required type.
  * @returns the value with the correct type.
  */
-scout.ValueField.prototype._ensureValue = function(value) {
+_ensureValue(value) {
   return value;
-};
+}
 
-scout.ValueField.prototype._setValue = function(value) {
+_setValue(value) {
   var oldValue = this.value;
   this._updateErrorStatus(null);
   var typedValue = null;
@@ -362,45 +375,45 @@ scout.ValueField.prototype._setValue = function(value) {
   this._updateTouched();
   this._updateEmpty();
   this.triggerPropertyChange('value', oldValue, this.value);
-};
+}
 
-scout.ValueField.prototype._valueEquals = function(valueA, valueB) {
-  return scout.objects.equals(valueA, valueB);
-};
+_valueEquals(valueA, valueB) {
+  return objects.equals(valueA, valueB);
+}
 
 /**
  * Is called after a value is changed. May be implemented by subclasses. The default does nothing.
  */
-scout.ValueField.prototype._valueChanged = function() {
+_valueChanged() {
   // NOP
-};
+}
 
 /**
  * Validates the value by executing the validators. If a new value is the result, it will be set.
  */
-scout.ValueField.prototype.validate = function() {
+validate() {
   this._setValue(this.value);
-};
+}
 
 /**
  * @param {function} validator the validator to be added
  * @param {boolean} [revalidate] True, to revalidate the value, false to just add the validator and do nothing else. Default is true.
  */
-scout.ValueField.prototype.addValidator = function(validator, revalidate) {
+addValidator(validator, revalidate) {
   var validators = this.validators.slice();
   validators.push(validator);
   this.setValidators(validators, revalidate);
-};
+}
 
 /**
  * @param {function} validator the validator to be removed
  * @param {boolean} [revalidate] True, to revalidate the value, false to just remove the validator and do nothing else. Default is true.
  */
-scout.ValueField.prototype.removeValidator = function(validator, revalidate) {
+removeValidator(validator, revalidate) {
   var validators = this.validators.slice();
-  scout.arrays.remove(validators, validator);
+  arrays.remove(validators, validator);
   this.setValidators(validators, revalidate);
-};
+}
 
 /**
  * Replaces all existing validators with the given one. If you want to add multiple validators, use {@link #addValidator}.
@@ -408,7 +421,7 @@ scout.ValueField.prototype.removeValidator = function(validator, revalidate) {
  * Remember calling the default validator which is passed as parameter to the validate function, if needed.
  * @param {function} validator the new validator which replaces every other. If null, the default validator is used.
  */
-scout.ValueField.prototype.setValidator = function(validator, revalidate) {
+setValidator(validator, revalidate) {
   if (!validator) {
     validator = this._validateValue.bind(this);
   }
@@ -417,68 +430,68 @@ scout.ValueField.prototype.setValidator = function(validator, revalidate) {
     validators = [validator];
   }
   this.setValidators(validators, revalidate);
-};
+}
 
-scout.ValueField.prototype.setValidators = function(validators, revalidate) {
+setValidators(validators, revalidate) {
   this.setProperty('validators', validators);
   if (this.initialized && scout.nvl(revalidate, true)) {
     this.validate();
   }
-};
+}
 
 /**
  * @param the value to be validated
  * @returns the validated value
- * @throws a message, a scout.Status or an error if the validation fails
+ * @throws a message, a Status or an error if the validation fails
  */
-scout.ValueField.prototype.validateValue = function(value) {
+validateValue(value) {
   var defaultValidator = this._validateValue.bind(this);
   this.validators.forEach(function(validator) {
     value = validator(value, defaultValidator);
   });
   value = scout.nvl(value, null); // Ensure value is never undefined (necessary for _updateTouched and should make it easier generally)
   return value;
-};
+}
 
 /**
  * @returns {*} the validated value
- * @throws a message, a scout.Status or an error if the validation fails
+ * @throws a message, a Status or an error if the validation fails
  */
-scout.ValueField.prototype._validateValue = function(value) {
+_validateValue(value) {
   if (typeof value === 'string' && value === '') {
     // Convert empty string to null.
     // Not using strings.nullIfEmpty is by purpose because it also removes white space characters which may not be desired here
     value = null;
   }
   return value;
-};
+}
 
-scout.ValueField.prototype._validationFailed = function(value, error) {
+_validationFailed(value, error) {
   $.log.isDebugEnabled() && $.log.debug('Validation failed for field with id ' + this.id, error);
   var status = this._createValidationFailedStatus(value, error);
   this._updateErrorStatus(status);
   this._updateDisplayText(value);
-};
+}
 
-scout.ValueField.prototype._createValidationFailedStatus = function(value, error) {
+_createValidationFailedStatus(value, error) {
   return this._createInvalidValueStatus(value, error);
-};
+}
 
-scout.ValueField.prototype._createInvalidValueStatus = function(value, error) {
-  if (error instanceof scout.Status) {
+_createInvalidValueStatus(value, error) {
+  if (error instanceof Status) {
     return error;
   }
   if (typeof error === 'string') {
-    return scout.Status.error({
+    return Status.error({
       message: error
     });
   }
-  return scout.Status.error({
+  return Status.error({
     message: this.session.text(this.invalidValueMessageKey, value)
   });
-};
+}
 
-scout.ValueField.prototype._updateErrorStatus = function(status) {
+_updateErrorStatus(status) {
   if (!this.initialized && this.errorStatus) {
     // Don't override the error status specified by the init model
     return;
@@ -488,10 +501,10 @@ scout.ValueField.prototype._updateErrorStatus = function(status) {
   } else {
     this.setErrorStatus(status);
   }
-};
+}
 
-scout.ValueField.prototype._updateDisplayText = function(value) {
-  if (!this.initialized && !scout.objects.isNullOrUndefined(this.displayText)) {
+_updateDisplayText(value) {
+  if (!this.initialized && !objects.isNullOrUndefined(this.displayText)) {
     // If a displayText is provided initially, use that text instead of using formatValue to generate a text based on the value
     return;
   }
@@ -508,7 +521,7 @@ scout.ValueField.prototype._updateDisplayText = function(value) {
   } else {
     this.setDisplayText(returned);
   }
-};
+}
 
 /**
  * Replaces the existing formatter. The formatter is called during {@link #formatValue(value)}.
@@ -516,87 +529,87 @@ scout.ValueField.prototype._updateDisplayText = function(value) {
  * Remember calling the default formatter which is passed as parameter to the format function, if needed.
  * @param {function} formatter the new formatter. If null, the default formatter is used.
  */
-scout.ValueField.prototype.setFormatter = function(formatter) {
+setFormatter(formatter) {
   this.setProperty('formatter', formatter);
   if (this.initialized) {
     this.validate();
   }
-};
+}
 
-scout.ValueField.prototype._setFormatter = function(formatter) {
+_setFormatter(formatter) {
   if (!formatter) {
     formatter = this._formatValue.bind(this);
   }
   this._setProperty('formatter', formatter);
-};
+}
 
 /**
  * @returns {string|Promise} the formatted display text
  */
-scout.ValueField.prototype.formatValue = function(value) {
+formatValue(value) {
   var defaultFormatter = this._formatValue.bind(this);
   return this.formatter(value, defaultFormatter);
-};
+}
 
 /**
  * @returns {string|Promise} the formatted string or a promise
  */
-scout.ValueField.prototype._formatValue = function(value) {
+_formatValue(value) {
   return scout.nvl(value, '') + '';
-};
+}
 
-scout.ValueField.prototype._updateTouched = function() {
+_updateTouched() {
   this.touched = !this._valueEquals(this.value, this.initialValue);
-};
+}
 
-scout.ValueField.prototype.addClearIcon = function($parent) {
+addClearIcon($parent) {
   if (!$parent) {
     $parent = this.$container;
   }
   this.$clearIcon = $parent.appendSpan('clear-icon needsclick unfocusable')
     .on('mousedown', this._onClearIconMouseDown.bind(this));
-};
+}
 
-scout.ValueField.prototype.addContainer = function($parent, cssClass, layout) {
-  scout.ValueField.parent.prototype.addContainer.call(this, $parent, cssClass, layout);
+addContainer($parent, cssClass, layout) {
+  super.addContainer( $parent, cssClass, layout);
   this.$container.addClass('value-field');
-};
+}
 
-scout.ValueField.prototype.addField = function($field) {
-  scout.ValueField.parent.prototype.addField.call(this, $field);
+addField($field) {
+  super.addField( $field);
   this.$field.data('valuefield', this);
-};
+}
 
-scout.ValueField.prototype.setCurrentMenuTypes = function(currentMenuTypes) {
+setCurrentMenuTypes(currentMenuTypes) {
   this.setProperty('currentMenuTypes', currentMenuTypes);
-};
+}
 
-scout.ValueField.prototype._renderCurrentMenuTypes = function() {
+_renderCurrentMenuTypes() {
   // If a tooltip is shown, update it with the new menus
   this._updateFieldStatus();
-};
+}
 
-scout.ValueField.prototype._getCurrentMenus = function() {
+_getCurrentMenus() {
   if (this.currentMenuTypes) {
     var menuTypes = this.currentMenuTypes.map(function(elem) {
       return 'ValueField.' + elem;
     });
-    return scout.menus.filter(this.menus, menuTypes);
+    return menus_1.filter(this.menus, menuTypes);
   }
-  return scout.ValueField.parent.prototype._getCurrentMenus.call(this);
-};
+  return super._getCurrentMenus();
+}
 
-scout.ValueField.prototype.markAsSaved = function() {
-  scout.ValueField.parent.prototype.markAsSaved.call(this);
+markAsSaved() {
+  super.markAsSaved();
   this.initialValue = this.value;
-};
+}
 
 /**
  * @override
  */
-scout.ValueField.prototype._updateEmpty = function() {
+_updateEmpty() {
   this.empty = this.value === null || this.value === undefined;
-};
+}
 
 // ==== static helper methods ==== //
 
@@ -604,34 +617,35 @@ scout.ValueField.prototype._updateEmpty = function() {
  * Invokes 'ValueField.aboutToBlurByMouseDown' on the currently active value field.
  * This method has no effect if another element is the focus owner.
  */
-scout.ValueField.invokeValueFieldAboutToBlurByMouseDown = function(target) {
+static invokeValueFieldAboutToBlurByMouseDown(target) {
   var activeValueField = this._getActiveValueField(target);
   if (activeValueField) {
     activeValueField.aboutToBlurByMouseDown(target);
   }
-};
+}
 
 /**
  * Invokes 'ValueField.acceptInput' on the currently active value field.
  * This method has no effect if another element is the focus owner.
  */
-scout.ValueField.invokeValueFieldAcceptInput = function(target) {
+static invokeValueFieldAcceptInput(target) {
   var activeValueField = this._getActiveValueField(target);
   if (activeValueField) {
     activeValueField.acceptInput();
   }
-};
+}
 
 /**
  * Returns the currently active value field, or null if another element is active.
  * Also, if no value field currently owns the focus, its parent is checked to be a value field and is returned accordingly.
  * That is used in DateField.js with multiple input elements.
  */
-scout.ValueField._getActiveValueField = function(target) {
+static _getActiveValueField(target) {
   var $activeElement = $(target).activeElement(),
     activeWidget = scout.widget($activeElement);
-  if (activeWidget instanceof scout.ValueField && activeWidget.enabledComputed) {
+  if (activeWidget instanceof ValueField && activeWidget.enabledComputed) {
     return activeWidget;
   }
   return null;
-};
+}
+}

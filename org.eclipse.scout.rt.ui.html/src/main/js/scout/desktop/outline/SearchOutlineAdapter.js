@@ -8,34 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SearchOutlineAdapter = function() {
-  scout.SearchOutlineAdapter.parent.call(this);
-};
-scout.inherits(scout.SearchOutlineAdapter, scout.OutlineAdapter);
+import {OutlineAdapter} from '../../index';
 
-scout.SearchOutlineAdapter.prototype._initProperties = function(model) {
+export default class SearchOutlineAdapter extends OutlineAdapter {
+
+constructor() {
+  super();
+}
+
+
+_initProperties(model) {
   if (model.requestFocusQueryField !== undefined) {
     // ignore pseudo property initially (to prevent the function SearchOutlineAdapter#requestFocusQueryField() to be replaced)
     delete model.requestFocusQueryField;
   }
-};
+}
 
-scout.SearchOutlineAdapter.prototype._syncRequestFocusQueryField = function() {
+_syncRequestFocusQueryField() {
   this.widget.focusQueryField();
-};
+}
 
-scout.SearchOutlineAdapter.prototype._onWidgetSearch = function(event) {
+_onWidgetSearch(event) {
   this._send('search', {
     query: event.query
   }, {
     showBusyIndicator: false
   });
-};
+}
 
-scout.SearchOutlineAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'search') {
     this._onWidgetSearch(event);
   } else {
-    scout.SearchOutlineAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

@@ -8,23 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import * as $ from 'jquery';
 
-scout.sessions = [];
-scout.appListeners = [];
-scout.$activeElements = null;
+
+export let sessions =[];
+export let appListeners =[];
+export let $activeElements =null;
 
 /**
  * Adds a listener to the app. If the app is not created yet it remembers the listener and adds it as soon the app is started.
  */
-scout.addAppListener = function(type, func) {
+export function addAppListener(type, func) {
   var listener = {
     type: type,
     func: func
   };
-  if (scout.app) {
-    scout.app.events.addListener(listener);
+  if (app) {
+    app.events.addListener(listener);
   } else {
-    scout.appListeners.push(listener);
+    appListeners.push(listener);
   }
   return listener;
 };
@@ -33,7 +35,7 @@ scout.addAppListener = function(type, func) {
  *  session.start();
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Details_of_the_Object_Model
  */
-scout.inherits = function(childCtor, parentCtor) {
+export function inherits(childCtor, parentCtor) {
   childCtor.prototype = Object.create(parentCtor.prototype);
   childCtor.prototype.constructor = childCtor;
   childCtor.parent = parentCtor;
@@ -43,7 +45,7 @@ scout.inherits = function(childCtor, parentCtor) {
  * Returns the first of the given arguments that is not null or undefined. If no such element
  * is present, the last argument is returned. If no arguments are given, undefined is returned.
  */
-scout.nvl = function() {
+export function nvl() {
   var result;
   for (var i = 0; i < arguments.length; i++) {
     result = arguments[i];
@@ -61,8 +63,8 @@ scout.nvl = function() {
  * @param type (optional) if this parameter is set, the given value must be of this type (instanceof check)
  * @return the value (for direct assignment)
  */
-scout.assertParameter = function(parameterName, value, type) {
-  if (scout.objects.isNullOrUndefined(value)) {
+export function assertParameter(parameterName, value, type) {
+  if (objects.isNullOrUndefined(value)) {
     throw new Error('Missing required parameter \'' + parameterName + '\'');
   }
   if (type && !(value instanceof type)) {
@@ -77,9 +79,9 @@ scout.assertParameter = function(parameterName, value, type) {
  * @param type (optional) if this parameter is set, the value must be of this type (instanceof check)
  * @return the value (for direct assignment)
  */
-scout.assertProperty = function(object, propertyName, type) {
+export function assertProperty(object, propertyName, type) {
   var value = object[propertyName];
-  if (scout.objects.isNullOrUndefined(value)) {
+  if (objects.isNullOrUndefined(value)) {
     throw new Error('Missing required property \'' + propertyName + '\'');
   }
   if (type && !(value instanceof type)) {
@@ -93,7 +95,7 @@ scout.assertProperty = function(object, propertyName, type) {
  * @param value
  * @param arguments to check against the value, may be an array or a variable argument list.
  */
-scout.isOneOf = function(value) {
+export function isOneOf(value) {
   if (arguments.length < 2) {
     return false;
   }
@@ -101,33 +103,33 @@ scout.isOneOf = function(value) {
   if (arguments.length === 2 && Array.isArray(arguments[1])) {
     argsToCheck = arguments[1];
   } else {
-    argsToCheck = Array.prototype.slice.call(arguments, 1);
+    argsToCheck = [...arguments].slice(1);
   }
   return argsToCheck.indexOf(value) !== -1;
 };
 
 /**
- * Creates a new object instance.<p> Delegates the create call to scout.ObjectFactory#create.
+ * Creates a new object instance.<p> Delegates the create call to ObjectFactory#create.
  * @returns {object}
  */
-scout.create = function(objectType, model, options) {
-  return scout.objectFactory.create(objectType, model, options);
+export function create(objectType, model, options) {
+  return objectFactory.create(objectType, model, options);
 };
 
 /**
- * Prepares the DOM for scout in the given document. This should be called once while initializing scout.
+ * Prepares the DOM for scout in the given document. This should be called once while initializing 
  * If the target document is not specified, the global "document" variable is used instead.
  *
  * This is used by apps (App, LoginApp, LogoutApp)
  *
  * Currently it does the following:
  * - Remove the <noscript> tag (obviously there is no need for it).
- * - Remove <scout-text> tags (they must have been processed before, see scout.texts.readFromDOM())
- * - Remove <scout-version> tag (it must have been processed before, see scout.App._initVersion())
+ * - Remove <scout-text> tags (they must have been processed before, see texts.readFromDOM())
+ * - Remove <scout-version> tag (it must have been processed before, see App._initVersion())
  * - Add a device / browser class to the body tag to allow for device specific CSS rules.
  * - If the browser is Google Chrome, add a special meta header to prevent automatic translation.
  */
-scout.prepareDOM = function(targetDocument) {
+export function prepareDOM(targetDocument) {
   targetDocument = targetDocument || document;
   // Cleanup DOM
   $('noscript', targetDocument).remove();
@@ -136,7 +138,7 @@ scout.prepareDOM = function(targetDocument) {
   $('body', targetDocument).addDeviceClass();
 
   // Prevent "Do you want to translate this page?" in Google Chrome
-  if (scout.device.browser === scout.Device.Browser.CHROME) {
+  if (device.browser === Device.Browser.CHROME) {
     var metaNoTranslate = '<meta name="google" content="notranslate" />';
     var $title = $('head > title', targetDocument);
     if ($title.length === 0) {
@@ -151,9 +153,9 @@ scout.prepareDOM = function(targetDocument) {
 /**
  * Installs a global 'mousedown' interceptor to invoke 'aboutToBlurByMouseDown' on value field before anything else gets executed.
  */
-scout.installGlobalMouseDownInterceptor = function(myDocument) {
+export function installGlobalMouseDownInterceptor(myDocument) {
   myDocument.addEventListener('mousedown', function(event) {
-    scout.ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
+    ValueField.invokeValueFieldAboutToBlurByMouseDown(event.target || event.srcElement);
   }, true); // true=the event handler is executed in the capturing phase
 };
 
@@ -166,22 +168,22 @@ scout.installGlobalMouseDownInterceptor = function(myDocument) {
  * Typically you'd write something like this in your CSS:
  *   button:active, button.active { ... }
  */
-scout.installSyntheticActiveStateHandler = function(myDocument) {
-  if (scout.device.requiresSyntheticActiveState()) {
-    scout.$activeElements = [];
+export function installSyntheticActiveStateHandler(myDocument) {
+  if (device.requiresSyntheticActiveState()) {
+    $activeElements = [];
     $(myDocument)
       .on('mousedown', function(event) {
         var $element = $(event.target);
         while ($element.length) {
-          scout.$activeElements.push($element.addClass('active'));
+          $activeElements.push($element.addClass('active'));
           $element = $element.parent();
         }
       })
       .on('mouseup', function() {
-        scout.$activeElements.forEach(function($element) {
+        $activeElements.forEach(function($element) {
           $element.removeClass('active');
         });
-        scout.$activeElements = [];
+        $activeElements = [];
       });
   }
 };
@@ -190,7 +192,7 @@ scout.installSyntheticActiveStateHandler = function(myDocument) {
  * Resolves the widget using the given widget id or HTML element.
  * <p>
  * If the argument is a string or a number, it will search the widget hierarchy for the given id using Widget#widget(id).
- * If the argument is a HTML or jQuery element, it will use scout.widgets.get() to get the widget which belongs to the given element.
+ * If the argument is a HTML or jQuery element, it will use widgets.get() to get the widget which belongs to the given element.
  *
  * @param widgetIdOrElement
  *          a widget ID or a HTML or jQuery element
@@ -200,20 +202,20 @@ scout.installSyntheticActiveStateHandler = function(myDocument) {
  * @returns
  *          the widget for the given element or id
  */
-scout.widget = function(widgetIdOrElement, partId) {
-  if (scout.objects.isNullOrUndefined(widgetIdOrElement)) {
+export function widget(widgetIdOrElement, partId) {
+  if (objects.isNullOrUndefined(widgetIdOrElement)) {
     return null;
   }
   var $elem = widgetIdOrElement;
   if (typeof widgetIdOrElement === 'string' || typeof widgetIdOrElement === 'number') {
     // Find widget for ID
-    var session = scout.getSession(partId);
+    var session = getSession(partId);
     if (session) {
-      widgetIdOrElement = scout.strings.asString(widgetIdOrElement);
+      widgetIdOrElement = strings.asString(widgetIdOrElement);
       return session.root.widget(widgetIdOrElement);
     }
   }
-  return scout.widgets.get($elem);
+  return widgets.get($elem);
 };
 
 /**
@@ -222,19 +224,19 @@ scout.widget = function(widgetIdOrElement, partId) {
  * to be queried. If not specified explicitly, the first session is used. If the session or
  * the adapter could not be found, null is returned.
  */
-scout.adapter = function(adapterId, partId) {
-  if (scout.objects.isNullOrUndefined(adapterId)) {
+export function adapter(adapterId, partId) {
+  if (objects.isNullOrUndefined(adapterId)) {
     return null;
   }
-  var session = scout.getSession(partId);
+  var session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     return session.modelAdapterRegistry[adapterId];
   }
   return null;
 };
 
-scout.cloneShallow = function(template, properties, createUniqueId) {
-  scout.assertParameter('template', template);
+export function cloneShallow(template, properties, createUniqueId) {
+  assertParameter('template', template);
   var clone = Object.create(Object.getPrototypeOf(template));
   Object.getOwnPropertyNames(template)
     .forEach(function(key) {
@@ -245,8 +247,8 @@ scout.cloneShallow = function(template, properties, createUniqueId) {
       clone[key] = properties[key];
     }
   }
-  if (scout.nvl(createUniqueId, true)) {
-    clone.id = scout.objectFactory.createUniqueId();
+  if (nvl(createUniqueId, true)) {
+    clone.id = objectFactory.createUniqueId();
   }
   if (clone.cloneOf === undefined) {
     clone.cloneOf = template;
@@ -254,15 +256,15 @@ scout.cloneShallow = function(template, properties, createUniqueId) {
   return clone;
 };
 
-scout.getSession = function(partId) {
-  if (!scout.sessions) {
+export function getSession(partId) {
+  if (!sessions) {
     return null;
   }
-  if (scout.objects.isNullOrUndefined(partId)) {
-    return scout.sessions[0];
+  if (objects.isNullOrUndefined(partId)) {
+    return sessions[0];
   }
-  for (var i = 0; i < scout.sessions.length; i++) {
-    var session = scout.sessions[i];
+  for (var i = 0; i < sessions.length; i++) {
+    var session = sessions[i];
     // noinspection EqualityComparisonWithCoercionJS
     if (session.partId == partId) { // <-- compare with '==' is intentional! (NOSONAR)
       return session;
@@ -277,12 +279,12 @@ scout.getSession = function(partId) {
  * This method can only be called through the browser JavaScript console.
  * Here's an example of how to call the method:
  *
- * JSON.stringify(scout.exportAdapter(4))
+ * JSON.stringify(exportAdapter(4))
  *
  * @param adapterId
  */
-scout.exportAdapter = function(adapterId, partId) {
-  var session = scout.getSession(partId);
+export function exportAdapter(adapterId, partId) {
+  var session = getSession(partId);
   if (session && session.modelAdapterRegistry) {
     var adapter = session.getModelAdapter(adapterId);
     if (!adapter) {
@@ -344,7 +346,7 @@ scout.exportAdapter = function(adapterId, partId) {
  *   [redirectUrl]
  *      The new URL to load. If not specified, the current location is used (window.location).
  */
-scout.reloadPage = function(options) {
+export function reloadPage(options) {
   options = options || {};
   if (options.schedule) {
     setTimeout(reloadPageImpl);
@@ -356,7 +358,7 @@ scout.reloadPage = function(options) {
 
   function reloadPageImpl() {
     // Hide everything (on entire page, not only $entryPoint)
-    if (scout.nvl(options.clearBody, true)) {
+    if (nvl(options.clearBody, true)) {
       $('body').html('');
     }
 
@@ -369,4 +371,26 @@ scout.reloadPage = function(options) {
       }
     });
   }
+};
+
+export default {
+  $activeElements,
+  adapter,
+  addAppListener,
+  appListeners,
+  assertParameter,
+  assertProperty,
+  cloneShallow,
+  create,
+  exportAdapter,
+  getSession,
+  inherits,
+  installGlobalMouseDownInterceptor,
+  installSyntheticActiveStateHandler,
+  isOneOf,
+  nvl,
+  prepareDOM,
+  reloadPage,
+  sessions,
+  widget
 };

@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetTooltip = function() {
-  scout.WidgetTooltip.parent.call(this);
+import {Tooltip} from '../index';
+import {keys} from '../index';
+import {KeyStrokeContext} from '../index';
+import {FocusRule} from '../index';
+import {scout} from '../index';
+
+export default class WidgetTooltip extends Tooltip {
+
+constructor() {
+  super();
 
   this.$widgetContainer = null;
   this.widget = null;
@@ -19,7 +27,7 @@ scout.WidgetTooltip = function() {
   // Otherwise, the tooltip would be destroyed for all key strokes that bubble up to the
   // root (see global document listener in Tooltip.js).
   this.keyStrokeStopPropagationInterceptor = function(event) {
-    if (scout.isOneOf(event.which, scout.keys.ESC, scout.keys.ENTER)) {
+    if (scout.isOneOf(event.which, keys.ESC, keys.ENTER)) {
       return;
     }
     event.stopPropagation();
@@ -27,44 +35,44 @@ scout.WidgetTooltip = function() {
 
   this.withFocusContext = true;
   this.initialFocus = function() {
-    return scout.FocusRule.AUTO;
+    return FocusRule.AUTO;
   };
   this.focusableContainer = false;
-};
-scout.inherits(scout.WidgetTooltip, scout.Tooltip);
+}
 
-scout.WidgetTooltip.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
 
-scout.WidgetTooltip.prototype._initKeyStrokeContext = function() {
-  scout.WidgetTooltip.parent.prototype._initKeyStrokeContext.call(this);
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
+
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   if (this.keyStrokeStopPropagationInterceptor) {
     this.keyStrokeContext.registerStopPropagationInterceptor(this.keyStrokeStopPropagationInterceptor);
   }
-};
+}
 
-scout.WidgetTooltip.prototype._render = function() {
-  scout.WidgetTooltip.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('widget-tooltip');
   this.$widgetContainer = this.$container.appendDiv('tooltip-widget-container');
-};
+}
 
-scout.WidgetTooltip.prototype._renderProperties = function() {
-  scout.WidgetTooltip.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWidget();
-};
+}
 
-scout.WidgetTooltip.prototype._remove = function() {
+_remove() {
   this._removeWidget();
-  scout.WidgetTooltip.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.WidgetTooltip.prototype.setWidget = function(widget) {
+setWidget(widget) {
   this.setProperty('widget', widget);
-};
+}
 
-scout.WidgetTooltip.prototype._renderWidget = function() {
+_renderWidget() {
   if (this.widget) {
     this.widget.render(this.$widgetContainer);
     this.widget.$container.addClass('widget');
@@ -82,11 +90,12 @@ scout.WidgetTooltip.prototype._renderWidget = function() {
   if (this.withFocusContext && this.widget) {
     this.session.focusManager.installFocusContext(this.$widgetContainer, this.initialFocus());
   }
-};
+}
 
-scout.WidgetTooltip.prototype._removeWidget = function() {
+_removeWidget() {
   if (this.widget) {
     this.session.focusManager.uninstallFocusContext(this.$widgetContainer);
     this.widget.remove();
   }
-};
+}
+}

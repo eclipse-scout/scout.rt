@@ -8,29 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButton = function() {
-  scout.RadioButton.parent.call(this);
+import {fields} from '../../../index';
+import {Button} from '../../../index';
+import {RadioButtonKeyStroke} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {RadioButtonLayout} from '../../../index';
+import {tooltips} from '../../../index';
+
+export default class RadioButton extends Button {
+
+constructor() {
+  super();
 
   this.gridDataHints.fillHorizontal = true;
   this.focusWhenSelected = true;
   this.wrapText = false;
-  this.buttonKeyStroke = new scout.RadioButtonKeyStroke(this, null);
+  this.buttonKeyStroke = new RadioButtonKeyStroke(this, null);
   this.radioValue = null;
-};
-scout.inherits(scout.RadioButton, scout.Button);
+}
+
 
 /**
  * @override Button.js
  */
-scout.RadioButton.prototype._initDefaultKeyStrokes = function() {
+_initDefaultKeyStrokes() {
   this.keyStrokeContext.registerKeyStroke([
-    new scout.RadioButtonKeyStroke(this, 'ENTER'),
-    new scout.RadioButtonKeyStroke(this, 'SPACE')
+    new RadioButtonKeyStroke(this, 'ENTER'),
+    new RadioButtonKeyStroke(this, 'SPACE')
   ]);
-};
+}
 
-scout.RadioButton.prototype._render = function() {
-  this.addContainer(this.$parent, 'radio-button', new scout.RadioButtonLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'radio-button', new RadioButtonLayout(this));
   this.addFieldContainer(this.$parent.makeDiv());
   this.$radioButton = this.$fieldContainer
     .appendDiv('radio-button-circle')
@@ -41,89 +51,89 @@ scout.RadioButton.prototype._render = function() {
   this.$buttonLabel = this.$fieldContainer
     .appendDiv('label');
 
-  scout.fields.linkElementWithLabel(this.$radioButton, this.$buttonLabel);
+  fields.linkElementWithLabel(this.$radioButton, this.$buttonLabel);
 
   this.$fieldContainer.on('mousedown', this._onMouseDown.bind(this));
 
-  scout.tooltips.installForEllipsis(this.$buttonLabel, {
+  tooltips.installForEllipsis(this.$buttonLabel, {
     parent: this
   });
 
   this.addStatus();
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
-};
+}
 
-scout.RadioButton.prototype._remove = function() {
-  scout.tooltips.uninstall(this.$buttonLabel);
+_remove() {
+  tooltips.uninstall(this.$buttonLabel);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
-  scout.RadioButton.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
 /**
  * @override
  */
-scout.RadioButton.prototype._renderProperties = function() {
-  scout.RadioButton.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWrapText();
   this._renderSelected();
-};
+}
 
-scout.RadioButton.prototype.setWrapText = function(wrapText) {
+setWrapText(wrapText) {
   this.setProperty('wrapText', wrapText);
-};
+}
 
-scout.RadioButton.prototype._renderWrapText = function() {
+_renderWrapText() {
   this.$buttonLabel.toggleClass('white-space-nowrap', !this.wrapText);
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * Convenience for {@link #setSelected(true)}
  */
-scout.RadioButton.prototype.select = function() {
+select() {
   this.setSelected(true);
-};
+}
 
-scout.RadioButton.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.RadioButton.prototype._renderSelected = function() {
+_renderSelected() {
   this.$fieldContainer.toggleClass('checked', this.selected);
   this.$field.toggleClass('checked', this.selected);
-};
+}
 
-scout.RadioButton.prototype.setTabbable = function(tabbable) {
+setTabbable(tabbable) {
   if (this.rendered) {
-    this.$field.setTabbable(tabbable && !scout.device.supportsTouch());
+    this.$field.setTabbable(tabbable && !Device.get().supportsTouch());
   }
-};
+}
 
-scout.RadioButton.prototype.isTabbable = function() {
+isTabbable() {
   return this.rendered && this.$field.isTabbable();
-};
+}
 
-scout.RadioButton.prototype._renderIconId = function() {
-  scout.RadioButton.parent.prototype._renderIconId.call(this);
+_renderIconId() {
+  super._renderIconId();
   var $icon = this.get$Icon();
   if ($icon.length > 0) {
     $icon.insertAfter(this.$radioButton);
   }
-};
+}
 
 /**
  * @override Button.js
  */
-scout.RadioButton.prototype.doAction = function() {
+doAction() {
   if (!this.enabledComputed || !this.visible) {
     return false;
   }
   // Since RadioButton extends Button, doAction should do something useful because it may be called (and actually is by ButtonKeyStroke)
   this.select();
   return true;
-};
+}
 
-scout.RadioButton.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   var $icon = this.get$Icon();
   if (!this.enabledComputed || !scout.isOneOf(event.target, this.$radioButton[0], this.$buttonLabel[0], $icon[0])) {
     return;
@@ -132,4 +142,5 @@ scout.RadioButton.prototype._onMouseDown = function(event) {
   if (this.focusWhenSelected && scout.isOneOf(event.target, this.$buttonLabel[0], $icon[0])) {
     this.focusAndPreventDefault(event);
   }
-};
+}
+}

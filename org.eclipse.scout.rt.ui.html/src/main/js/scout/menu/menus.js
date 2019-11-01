@@ -8,182 +8,199 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.menus = {
+import {icons} from '../index';
+import {MenuDestinations} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
 
-  filterAccordingToSelection: function(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-    var allowedTypes = [];
 
-    if (destination === scout.MenuDestinations.MENU_BAR) {
-      allowedTypes = [prefix + '.EmptySpace', prefix + '.SingleSelection', prefix + '.MultiSelection'];
-    } else if (destination === scout.MenuDestinations.CONTEXT_MENU) {
-      allowedTypes = [prefix + '.SingleSelection', prefix + '.MultiSelection'];
-    } else if (destination === scout.MenuDestinations.HEADER) {
-      allowedTypes = [prefix + '.Header'];
+
+export function filterAccordingToSelection(prefix, selectionLength, menus, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  var allowedTypes = [];
+
+  if (destination === MenuDestinations.MENU_BAR) {
+    allowedTypes = [prefix + '.EmptySpace', prefix + '.SingleSelection', prefix + '.MultiSelection'];
+  } else if (destination === MenuDestinations.CONTEXT_MENU) {
+    allowedTypes = [prefix + '.SingleSelection', prefix + '.MultiSelection'];
+  } else if (destination === MenuDestinations.HEADER) {
+    allowedTypes = [prefix + '.Header'];
+  }
+
+  if (allowedTypes.indexOf(prefix + '.SingleSelection') > -1 && selectionLength !== 1) {
+    arrays.remove(allowedTypes, prefix + '.SingleSelection');
+  }
+  if (allowedTypes.indexOf(prefix + '.MultiSelection') > -1 && selectionLength <= 1) {
+    arrays.remove(allowedTypes, prefix + '.MultiSelection');
+  }
+  notAllowedTypes = arrays.ensure(notAllowedTypes);
+  var fixedNotAllowedTypes = [];
+  //ensure prefix
+  prefix = prefix + '.';
+  notAllowedTypes.forEach(function(type) {
+    if (type.slice(0, prefix.length) !== prefix) {
+      type = prefix + type;
     }
+    fixedNotAllowedTypes.push(type);
+  }, this);
+  return filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke, fixedNotAllowedTypes);
+}
 
-    if (allowedTypes.indexOf(prefix + '.SingleSelection') > -1 && selectionLength !== 1) {
-      scout.arrays.remove(allowedTypes, prefix + '.SingleSelection');
-    }
-    if (allowedTypes.indexOf(prefix + '.MultiSelection') > -1 && selectionLength <= 1) {
-      scout.arrays.remove(allowedTypes, prefix + '.MultiSelection');
-    }
-    notAllowedTypes = scout.arrays.ensure(notAllowedTypes);
-    var fixedNotAllowedTypes = [];
-    //ensure prefix
-    prefix = prefix + '.';
-    notAllowedTypes.forEach(function(type) {
-      if (type.slice(0, prefix.length) !== prefix) {
-        type = prefix + type;
-      }
-      fixedNotAllowedTypes.push(type);
-    }, this);
-    return scout.menus.filter(menus, allowedTypes, onlyVisible, enableDisableKeyStroke, fixedNotAllowedTypes);
-  },
+/**
+ * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
+ * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
+ * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
+ * these types and if they are matching the menu is filtered.
+ */
+export function filter(menus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
+  if (!menus) {
+    return;
+  }
+  types = arrays.ensure(types);
+  notAllowedTypes = arrays.ensure(notAllowedTypes);
 
-  /**
-   * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
-   * from this method. The visible state is only checked if the parameter onlyVisible is set to true. Otherwise invisible items are returned and added to the
-   * menu-bar DOM (invisible, however). They may change their visible state later. If there are any types in notAllowedTypes each menu is checked also against
-   * these types and if they are matching the menu is filtered.
-   */
-  filter: function(menus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes) {
-    if (!menus) {
-      return;
-    }
-    types = scout.arrays.ensure(types);
-    notAllowedTypes = scout.arrays.ensure(notAllowedTypes);
+  var filteredMenus = [],
+    separatorCount = 0;
 
-    var filteredMenus = [],
-      separatorCount = 0;
-
-    menus.forEach(function(menu) {
-      var childMenus = menu.childActions;
-      if (childMenus.length > 0) {
-        childMenus = scout.menus.filter(childMenus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes);
-        if (childMenus.length === 0) {
-          scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
-          return;
-        }
-      } // Don't check the menu type for a group
-      else if (!scout.menus._checkType(menu, types) || (notAllowedTypes.length !== 0 && scout.menus._checkType(menu, notAllowedTypes))) {
-        scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
+  menus.forEach(function(menu) {
+    var childMenus = menu.childActions;
+    if (childMenus.length > 0) {
+      childMenus = filter(childMenus, types, onlyVisible, enableDisableKeyStrokes, notAllowedTypes);
+      if (childMenus.length === 0) {
+        _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
         return;
       }
-
-      if (onlyVisible && !menu.visible) {
-        scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
-        return;
-      }
-      if (menu.separator) {
-        separatorCount++;
-      }
-      scout.menus._enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, false);
-      filteredMenus.push(menu);
-    });
-
-    // Ignore menus with only separators
-    if (separatorCount === filteredMenus.length) {
-      return [];
-    }
-    return filteredMenus;
-  },
-
-  /**
-   * Makes leading, trailing and duplicate separators invisible or reverts the visibility change if needed.
-   */
-  updateSeparatorVisibility: function(menus) {
-    menus = scout.arrays.ensure(menus);
-
-    menus = menus.filter(function(menu) {
-      return menu.visible || menu.separator;
-    });
-
-    if (menus.length === 0) {
+    } // Don't check the menu type for a group
+    else if (!_checkType(menu, types) || (notAllowedTypes.length !== 0 && _checkType(menu, notAllowedTypes))) {
+      _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
       return;
     }
 
-    var hasMenuBefore = false;
-    var hasMenuAfter = false;
-    menus.forEach(function(menu, i) {
-      if (menu.ellipsis) {
-        return;
+    if (onlyVisible && !menu.visible) {
+      _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, true);
+      return;
+    }
+    if (menu.separator) {
+      separatorCount++;
+    }
+    _enableDisableMenuKeyStroke(menu, enableDisableKeyStrokes, false);
+    filteredMenus.push(menu);
+  });
+
+  // Ignore menus with only separators
+  if (separatorCount === filteredMenus.length) {
+    return [];
+  }
+  return filteredMenus;
+}
+
+/**
+ * Makes leading, trailing and duplicate separators invisible or reverts the visibility change if needed.
+ */
+export function updateSeparatorVisibility(menus) {
+  menus = arrays.ensure(menus);
+
+  menus = menus.filter(function(menu) {
+    return menu.visible || menu.separator;
+  });
+
+  if (menus.length === 0) {
+    return;
+  }
+
+  var hasMenuBefore = false;
+  var hasMenuAfter = false;
+  menus.forEach(function(menu, i) {
+    if (menu.ellipsis) {
+      return;
+    }
+    if (!menu.separator) {
+      hasMenuBefore = true;
+      return;
+    }
+    hasMenuAfter = menus[i + 1] && !menus[i + 1].separator && !menus[i + 1].ellipsis;
+
+    // If the separator has a separator next to it, make it invisible
+    if (!hasMenuBefore || !hasMenuAfter) {
+      if (menu.visibleOrig === undefined) {
+        menu.visibleOrig = menu.visible;
+        menu.setVisible(false);
       }
-      if (!menu.separator) {
-        hasMenuBefore = true;
-        return;
-      }
-      hasMenuAfter = menus[i + 1] && !menus[i + 1].separator && !menus[i + 1].ellipsis;
-
-      // If the separator has a separator next to it, make it invisible
-      if (!hasMenuBefore || !hasMenuAfter) {
-        if (menu.visibleOrig === undefined) {
-          menu.visibleOrig = menu.visible;
-          menu.setVisible(false);
-        }
-      } else if (menu.visibleOrig !== undefined) {
-        // Revert to original state
-        menu.setVisible(menu.visibleOrig);
-        menu.visibleOrig = undefined;
-      }
-    });
-  },
-
-  checkType: function(menu, types) {
-    types = scout.arrays.ensure(types);
-    if (menu.childActions.length > 0) {
-      var childMenus = scout.menus.filter(menu.childActions, types);
-      return (childMenus.length > 0);
+    } else if (menu.visibleOrig !== undefined) {
+      // Revert to original state
+      menu.setVisible(menu.visibleOrig);
+      menu.visibleOrig = undefined;
     }
-    return scout.menus._checkType(menu, types);
-  },
+  });
+}
 
-  _enableDisableMenuKeyStroke: function(menu, activated, exclude) {
-    if (activated) {
-      menu.excludedByFilter = exclude;
-    }
-  },
+export function checkType(menu, types) {
+  types = arrays.ensure(types);
+  if (menu.childActions.length > 0) {
+    var childMenus = filter(menu.childActions, types);
+    return (childMenus.length > 0);
+  }
+  return _checkType(menu, types);
+}
 
-  /**
-   * Checks the type of a menu. Don't use this for menu groups.
-   */
-  _checkType: function(menu, types) {
-    if (!types || types.length === 0) {
-      return false;
-    }
-    if (!menu.menuTypes) {
-      return false;
-    }
-    for (var j = 0; j < types.length; j++) {
-      if (menu.menuTypes.indexOf(types[j]) > -1) {
-        return true;
-      }
-    }
-  },
+//private
+ export function _enableDisableMenuKeyStroke(menu, activated, exclude) {
+  if (activated) {
+    menu.excludedByFilter = exclude;
+  }
+}
 
-  createEllipsisMenu: function(options) {
-    var defaults = {
-      iconId: scout.icons.ELLIPSIS_V,
-      tabbable: false
-    };
-    options = $.extend({}, defaults, options);
-    return scout.create('Menu', options);
-  },
-
-  moveMenuIntoEllipsis: function(menu, ellipsis) {
-    menu.remove();
-    menu.overflow = true;
-    menu.overflowMenu = ellipsis;
-
-    var menusInEllipsis = ellipsis.childActions.slice();
-    menusInEllipsis.unshift(menu); // add as first element
-    ellipsis.setChildActions(menusInEllipsis);
-  },
-
-  removeMenuFromEllipsis: function(menu, $parent) {
-    menu.overflow = false;
-    menu.overflowMenu = null;
-    if (!menu.rendered) {
-      menu.render($parent);
+/**
+ * Checks the type of a menu. Don't use this for menu groups.
+ */
+//private
+ export function _checkType(menu, types) {
+  if (!types || types.length === 0) {
+    return false;
+  }
+  if (!menu.menuTypes) {
+    return false;
+  }
+  for (var j = 0; j < types.length; j++) {
+    if (menu.menuTypes.indexOf(types[j]) > -1) {
+      return true;
     }
   }
+}
+
+export function createEllipsisMenu(options) {
+  var defaults = {
+    iconId: icons.ELLIPSIS_V,
+    tabbable: false
+  };
+  options = $.extend({}, defaults, options);
+  return scout.create('Menu', options);
+}
+
+export function moveMenuIntoEllipsis(menu, ellipsis) {
+  menu.remove();
+  menu.overflow = true;
+  menu.overflowMenu = ellipsis;
+
+  var menusInEllipsis = ellipsis.childActions.slice();
+  menusInEllipsis.unshift(menu); // add as first element
+  ellipsis.setChildActions(menusInEllipsis);
+}
+
+export function removeMenuFromEllipsis(menu, $parent) {
+  menu.overflow = false;
+  menu.overflowMenu = null;
+  if (!menu.rendered) {
+    menu.render($parent);
+  }
+}
+
+export default {
+  checkType,
+  createEllipsisMenu,
+  filter,
+  filterAccordingToSelection,
+  moveMenuIntoEllipsis,
+  removeMenuFromEllipsis,
+  updateSeparatorVisibility
 };

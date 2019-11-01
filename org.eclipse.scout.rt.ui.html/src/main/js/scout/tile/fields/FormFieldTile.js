@@ -8,42 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormFieldTile = function() {
-  scout.FormFieldTile.parent.call(this);
-  this.displayStyle = scout.FormFieldTile.DisplayStyle.DASHBOARD;
-};
-scout.inherits(scout.FormFieldTile, scout.WidgetTile);
+import {WidgetTile} from '../../index';
+import {BrowserField} from '../../index';
+import {Tile} from '../../index';
 
-scout.FormFieldTile.DisplayStyle = {
-  DEFAULT: scout.Tile.DEFAULT,
-  PLAIN: scout.Tile.PLAIN,
+export default class FormFieldTile extends WidgetTile {
+
+constructor() {
+  super();
+  this.displayStyle = FormFieldTile.DisplayStyle.DASHBOARD;
+}
+
+
+static DisplayStyle = {
+  DEFAULT: Tile.DEFAULT,
+  PLAIN: Tile.PLAIN,
   DASHBOARD: 'dashboard'
 };
 
-scout.FormFieldTile.prototype._renderProperties = function() {
-  scout.FormFieldTile.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderFieldLabelVisible();
-};
+}
 
-scout.FormFieldTile.prototype._renderDisplayStyle = function() {
-  scout.FormFieldTile.parent.prototype._renderDisplayStyle.call(this);
-  this.$container.toggleClass('dashboard', this.displayStyle === scout.FormFieldTile.DisplayStyle.DASHBOARD);
-};
+_renderDisplayStyle() {
+  super._renderDisplayStyle();
+  this.$container.toggleClass('dashboard', this.displayStyle === FormFieldTile.DisplayStyle.DASHBOARD);
+}
 
-scout.FormFieldTile.prototype._renderFieldLabelVisible = function() {
-  if (this.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
+_renderFieldLabelVisible() {
+  if (this.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
     return;
   }
   // Special handling for browser field (remove padding when label is invisible)
-  if (this.tileWidget instanceof scout.BrowserField) {
+  if (this.tileWidget instanceof BrowserField) {
     this.tileWidget.$container.toggleClass('no-padding', !this.tileWidget.labelVisible && !this.tileWidget.errorStatus);
   }
-};
+}
 
-scout.FormFieldTile.prototype._onFieldPropertyChange = function(event) {
+_onFieldPropertyChange(event) {
   if (event.propertyName === 'labelVisible' || event.propertyName === 'errorStatus') {
     if (this.rendered) {
       this._renderFieldLabelVisible();
     }
   }
-};
+}
+}

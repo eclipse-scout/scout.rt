@@ -8,27 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HtmlTile = function() {
-  scout.HtmlTile.parent.call(this);
+import {Tile} from '../index';
+import {HtmlComponent} from '../index';
+
+export default class HtmlTile extends Tile {
+
+constructor() {
+  super();
   this.content = null;
-};
-scout.inherits(scout.HtmlTile, scout.Tile);
+}
 
-scout.HtmlTile.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.appendDiv('html-tile');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.HtmlTile.prototype._renderProperties = function() {
-  scout.HtmlTile.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderContent();
-};
+}
 
-scout.HtmlTile.prototype.setContent = function(content) {
+setContent(content) {
   this.setProperty('content', content);
-};
+}
 
-scout.HtmlTile.prototype._renderContent = function() {
+_renderContent() {
   if (!this.content) {
     this.$container.empty();
     return;
@@ -41,12 +46,13 @@ scout.HtmlTile.prototype._renderContent = function() {
     .on('error', this._onImageError.bind(this));
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.HtmlTile.prototype._onImageLoad = function(event) {
+_onImageLoad(event) {
   this.invalidateLayoutTree();
-};
+}
 
-scout.HtmlTile.prototype._onImageError = function(event) {
+_onImageError(event) {
   this.invalidateLayoutTree();
-};
+}
+}

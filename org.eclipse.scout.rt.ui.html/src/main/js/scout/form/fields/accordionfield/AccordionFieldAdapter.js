@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AccordionFieldAdapter = function() {
-  scout.AccordionFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.AccordionFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class AccordionFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

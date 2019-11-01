@@ -8,27 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FilterFieldsGroupBox = function() {
-  scout.FilterFieldsGroupBox.parent.call(this);
+import {GroupBox} from '../index';
+import {scout} from '../index';
+
+export default class FilterFieldsGroupBox extends GroupBox {
+
+constructor() {
+  super();
   this.gridColumnCount = 1;
   this.cssClass = 'filter-fields';
-};
-scout.inherits(scout.FilterFieldsGroupBox, scout.GroupBox);
+}
 
-scout.FilterFieldsGroupBox.prototype._init = function(model) {
-  scout.FilterFieldsGroupBox.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.filter.addFilterFields(this);
-};
+}
 
 /**
  * @override GroupBox.js
  */
-scout.FilterFieldsGroupBox.prototype._renderProperties = function($parent) {
-  scout.FilterFieldsGroupBox.parent.prototype._renderProperties.call(this, $parent);
+_renderProperties($parent) {
+  super._renderProperties( $parent);
   this.filter.modifyFilterFields();
-};
+}
 
-scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text) {
+addFilterField(objectType, text) {
   var field = scout.create(objectType, {
     parent: this,
     label: this.session.text(text),
@@ -39,11 +44,12 @@ scout.FilterFieldsGroupBox.prototype.addFilterField = function(objectType, text)
   });
   this.addField0(field);
   return field;
-};
+}
 
 // Info from awe, cgu: Added '0' to the name to avoid temporarily to avoid naming conflict with FormField#addField
 // This should be refactored in a future release
-scout.FilterFieldsGroupBox.prototype.addField0 = function(field) {
+addField0(field) {
   this.fields.push(field);
   this._prepareFields();
-};
+}
+}

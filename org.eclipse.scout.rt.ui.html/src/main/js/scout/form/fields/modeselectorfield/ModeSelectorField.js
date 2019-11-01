@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ModeSelectorField = function() {
-  scout.ModeSelectorField.parent.call(this);
+import {ValueField} from '../../../index';
+
+export default class ModeSelectorField extends ValueField {
+
+constructor() {
+  super();
   // modes will be moved to the ModeSelector after the adapters are created (only required in scout classic)
   // see ModeSelectorFieldAdapter.js
   this._addWidgetProperties(['modeSelector', 'modes']);
   this._modeSelectorPropertyChangeHandler = this._onModeSelectorPropertyChange.bind(this);
-};
-scout.inherits(scout.ModeSelectorField, scout.ValueField);
+}
 
-scout.ModeSelectorField.prototype._render = function() {
+
+_render() {
   this.addContainer(this.$parent, 'mode-selector-field');
   this.addLabel();
   this.addStatus();
@@ -25,20 +29,20 @@ scout.ModeSelectorField.prototype._render = function() {
     this._renderModeSelector();
     this.modeSelector.on('propertyChange', this._modeSelectorPropertyChangeHandler);
   }
-};
+}
 
 // Will also be called by model adapter on property change event
-scout.ModeSelectorField.prototype._renderModeSelector = function() {
+_renderModeSelector() {
   this.modeSelector.render();
   this.addField(this.modeSelector.$container);
-};
+}
 
-scout.ModeSelectorField.prototype._removeModeSelector = function() {
+_removeModeSelector() {
   this.modeSelector.remove();
   this._removeField();
-};
+}
 
-scout.ModeSelectorField.prototype._onModeSelectorPropertyChange = function(event) {
+_onModeSelectorPropertyChange(event) {
   if (event.propertyName === 'selectedMode') {
     if (event.newValue) {
       this.setValue(event.newValue.ref);
@@ -48,4 +52,5 @@ scout.ModeSelectorField.prototype._onModeSelectorPropertyChange = function(event
       this.setValue(null);
     }
   }
-};
+}
+}

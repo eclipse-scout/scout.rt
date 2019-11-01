@@ -8,86 +8,93 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LabelField = function() {
-  scout.LabelField.parent.call(this);
+import {ValueField} from '../../../index';
+import {strings} from '../../../index';
+import {texts} from '../../../index';
+
+export default class LabelField extends ValueField {
+
+constructor() {
+  super();
   this.htmlEnabled = false;
   this.selectable = true;
   this.wrapText = false;
-};
-scout.inherits(scout.LabelField, scout.ValueField);
+}
+
 
 /**
  * Resolves the text key if value contains one.
  * This cannot be done in _init because the value field would call _setValue first
  */
-scout.LabelField.prototype._initValue = function(value) {
-  value = scout.texts.resolveText(value, this.session.locale.languageTag);
-  scout.LabelField.parent.prototype._initValue.call(this, value);
-};
+_initValue(value) {
+  value = texts.resolveText(value, this.session.locale.languageTag);
+  super._initValue( value);
+}
 
-scout.LabelField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'label-field');
   this.addLabel();
   this.addField(this.$parent.makeDiv());
   this.addStatus();
-};
+}
 
-scout.LabelField.prototype._renderProperties = function() {
-  scout.LabelField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWrapText();
   // TODO [7.0] cgu: render selectable
-};
+}
 
 /**
  * Since a LabelField cannot be changed by a user, acceptInput does nothing.
  * Otherwise LabelFields could 'become' touched, because value and displayText
  * of the LabelField don't match.
  */
-scout.LabelField.prototype.acceptInput = function() {
+acceptInput() {
   // NOP
-};
+}
 
-scout.LabelField.prototype.setHtmlEnabled = function(htmlEnabled) {
+setHtmlEnabled(htmlEnabled) {
   this.setProperty('htmlEnabled', htmlEnabled);
-};
+}
 
-scout.LabelField.prototype._renderHtmlEnabled = function() {
+_renderHtmlEnabled() {
   // Render the display text again when html enabled changes dynamically
   this._renderDisplayText();
-};
+}
 
 /**
  * @override
  */
-scout.LabelField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   var displayText = this.displayText || '';
   if (this.htmlEnabled) {
     this.$field.html(displayText);
   } else {
-    this.$field.html(scout.strings.nl2br(displayText));
+    this.$field.html(strings.nl2br(displayText));
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.LabelField.prototype.setWrapText = function(wrapText) {
+setWrapText(wrapText) {
   this.setProperty('wrapText', wrapText);
-};
+}
 
-scout.LabelField.prototype._renderWrapText = function() {
+_renderWrapText() {
   this.$field.toggleClass('white-space-nowrap', !this.wrapText);
   this.invalidateLayoutTree();
-};
+}
 
-scout.LabelField.prototype._renderGridData = function() {
-  scout.LabelField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.LabelField.prototype._renderGridDataHints = function() {
-  scout.LabelField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
+}

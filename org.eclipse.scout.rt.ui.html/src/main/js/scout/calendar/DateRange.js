@@ -8,33 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DateRange = function(from, to) {
+import {dates} from '../index';
+
+export default class DateRange {
+
+constructor(from, to) {
   this.from = from;
   this.to = to;
-};
+}
 
-scout.DateRange.prototype.equals = function(other) {
+equals(other) {
   if (!other) {
     return false;
   }
-  return scout.dates.equals(this.from, other.from) &&
-    scout.dates.equals(this.to, other.to);
-};
+  return dates.equals(this.from, other.from) &&
+    dates.equals(this.to, other.to);
+}
 
-scout.DateRange.prototype.toString = function() {
+toString() {
   return 'scout.DateRange[' +
     'from=' + (this.from === null ? 'null' : this.from.toUTCString()) +
     ' to=' + (this.to === null ? 'null' : this.to.toUTCString()) + ']';
-};
+}
 
-scout.DateRange.ensure = function(dateRange) {
+static ensure(dateRange) {
   if (!dateRange) {
     return dateRange;
   }
-  if (dateRange instanceof scout.DateRange) {
+  if (dateRange instanceof DateRange) {
     return dateRange;
   }
-  return new scout.DateRange(
-    scout.dates.ensure(dateRange.from),
-    scout.dates.ensure(dateRange.to));
-};
+  return new DateRange(
+    dates.ensure(dateRange.from),
+    dates.ensure(dateRange.to));
+}
+}

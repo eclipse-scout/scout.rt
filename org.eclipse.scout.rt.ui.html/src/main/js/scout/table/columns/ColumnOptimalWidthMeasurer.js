@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ColumnOptimalWidthMeasurer = function(column) {
+import {graphics} from '../../index';
+import * as $ from 'jquery';
+
+export default class ColumnOptimalWidthMeasurer {
+
+constructor(column) {
   this.column = column;
   this.table = null;
   this.$measurement = null;
@@ -17,9 +22,9 @@ scout.ColumnOptimalWidthMeasurer = function(column) {
   this.completeImageCount = 0;
   this._imageLoadOrErrorHandler = this._onImageLoadOrError.bind(this);
   this._columnCellContents = {};
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype.measure = function(promise) {
+measure(promise) {
   $.log.isDebugEnabled() && $.log.debug('Optimal width measuring started for column ' + this.column.id);
 
   // Table is not yet available on the column in the constructor -> set it here
@@ -59,9 +64,9 @@ scout.ColumnOptimalWidthMeasurer.prototype.measure = function(promise) {
   this.$measurement[0].addEventListener('error', this._imageLoadOrErrorHandler, true);
   this.deferred = $.Deferred();
   return this.deferred.promise();
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype.remove = function() {
+remove() {
   if (!this.$measurement) {
     return;
   }
@@ -69,9 +74,9 @@ scout.ColumnOptimalWidthMeasurer.prototype.remove = function() {
   this.$measurement[0].removeEventListener('error', this._imageLoadOrErrorHandler, true);
   this.$measurement.remove();
   this.$measurement = null;
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._measure = function() {
+_measure() {
   var optimalWidth = this.column.minWidth;
   // Since the measurement may be async due to image loading, the $measurement is hidden (=display: none) until the real measurement starts.
   // Otherwise it would influence the scroll width of the real table data
@@ -79,37 +84,37 @@ scout.ColumnOptimalWidthMeasurer.prototype._measure = function() {
     .addClass('invisible')
     .removeClass('hidden')
     .children().each(function() {
-      optimalWidth = Math.max(optimalWidth, scout.graphics.size($(this)).width);
+      optimalWidth = Math.max(optimalWidth, graphics.size($(this)).width);
     });
   return optimalWidth;
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._resolve = function(optimalWidth) {
+_resolve(optimalWidth) {
   this.remove();
   if (this.deferred) {
     this.deferred.resolve(optimalWidth);
     this.deferred = null;
   }
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendElements = function() {
+_appendElements() {
   this._appendHeader();
   this._appendRows();
   this._appendAggregateRows();
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendHeader = function() {
+_appendHeader() {
   if (this.column.$header) {
     this._appendToMeasurement(this.column.$header.clone());
   }
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendRows = function() {
+_appendRows() {
   this.table.rows.forEach(this._appendRow.bind(this));
   this._columnCellContents = {};
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendRow = function(row) {
+_appendRow(row) {
   var columnContent = this.column.buildCellForRow(row);
   if (this._columnCellContents[columnContent]) {
     return;
@@ -117,17 +122,17 @@ scout.ColumnOptimalWidthMeasurer.prototype._appendRow = function(row) {
   this._columnCellContents[columnContent] = true;
 
   this._appendToMeasurement($(columnContent));
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendAggregateRows = function() {
+_appendAggregateRows() {
   this.table._aggregateRows.forEach(this._appendAggregateRow.bind(this));
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendAggregateRow = function(row) {
+_appendAggregateRow(row) {
   this._appendToMeasurement($(this.column.buildCellForAggregateRow(row)));
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._appendToMeasurement = function($calc) {
+_appendToMeasurement($calc) {
   // Count images
   var $calcImgs = $calc.find('img');
   $calcImgs.each(function(index, elem) {
@@ -145,9 +150,9 @@ scout.ColumnOptimalWidthMeasurer.prototype._appendToMeasurement = function($calc
     minWidth: '',
     maxWidth: ''
   }).appendTo(this.$measurement);
-};
+}
 
-scout.ColumnOptimalWidthMeasurer.prototype._onImageLoadOrError = function(event) {
+_onImageLoadOrError(event) {
   var $img = $(event.target);
   if ($img.data('complete')) {
     // Ignore images which were already complete and therefore already incremented the _imageCompleteCount
@@ -161,4 +166,5 @@ scout.ColumnOptimalWidthMeasurer.prototype._onImageLoadOrError = function(event)
     $.log.isDebugEnabled() && $.log.debug('Optimal width measuring done (async) for column ' + this.column.id + ': ' + optimalWidth);
     this._resolve(optimalWidth);
   }
-};
+}
+}

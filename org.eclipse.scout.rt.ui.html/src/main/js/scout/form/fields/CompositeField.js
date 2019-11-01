@@ -8,74 +8,82 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CompositeField = function() {
-  scout.CompositeField.parent.call(this);
-};
-scout.inherits(scout.CompositeField, scout.FormField);
+import {widgets} from '../../index';
+import {TreeVisitResult} from '../../index';
+import {FormField} from '../../index';
+import {fields} from '../../index';
+
+export default class CompositeField extends FormField {
+
+constructor() {
+  super();
+}
+
 
 /**
- * @returns {scout.FormField[]} an array of child-fields.
+ * @returns {FormField[]} an array of child-fields.
  */
-scout.CompositeField.prototype.getFields = function() {
+getFields() {
   throw new Error('Not implemented');
-};
+}
 
 /**
  *
- * @param {scout.FormField[]} fields
+ * @param {FormField[]} fields
  */
-scout.CompositeField.prototype.setFields = function(fields) {
+setFields(fields) {
   throw new Error('Not implemented');
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.CompositeField.prototype.visitFields = function(visitor) {
-  var treeVisitResult = scout.CompositeField.parent.prototype.visitFields.call(this, visitor);
-  if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
-    return scout.TreeVisitResult.TERMINATE;
+visitFields(visitor) {
+  var treeVisitResult = super.visitFields( visitor);
+  if (treeVisitResult === TreeVisitResult.TERMINATE) {
+    return TreeVisitResult.TERMINATE;
   }
 
-  if (treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE) {
-    return scout.TreeVisitResult.CONTINUE;
+  if (treeVisitResult === TreeVisitResult.SKIP_SUBTREE) {
+    return TreeVisitResult.CONTINUE;
   }
 
   var fields = this.getFields();
   for (var i = 0; i < fields.length; i++) {
     var field = fields[i];
     treeVisitResult = field.visitFields(visitor);
-    if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
-      return scout.TreeVisitResult.TERMINATE;
+    if (treeVisitResult === TreeVisitResult.TERMINATE) {
+      return TreeVisitResult.TERMINATE;
     }
   }
-};
+}
 
 /**
  * Sets the given fieldStyle recursively on all fields of the composite field.
  * @override FormField.js
  */
-scout.CompositeField.prototype.setFieldStyle = function(fieldStyle) {
+setFieldStyle(fieldStyle) {
   this.getFields().forEach(function(field) {
     field.setFieldStyle(fieldStyle);
   });
-  scout.CompositeField.parent.prototype.setFieldStyle.call(this, fieldStyle);
-};
+  super.setFieldStyle( fieldStyle);
+}
 
 /**
  * @override
  */
-scout.CompositeField.prototype.activate = function() {
-  scout.fields.activateFirstField(this, this.getFields());
-};
+activate() {
+  fields.activateFirstField(this, this.getFields());
+}
 
 /**
  * @override
  */
-scout.CompositeField.prototype.getFocusableElement = function() {
-  var field = scout.widgets.findFirstFocusableWidget(this.getFields(), this);
+getFocusableElement() {
+  var field = widgets.findFirstFocusableWidget(this.getFields(), this);
   if (field) {
     return field.getFocusableElement();
   }
   return null;
-};
+}
+}

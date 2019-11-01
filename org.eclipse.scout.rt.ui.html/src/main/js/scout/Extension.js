@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {scout} from './index';
+
 /**
  * This class is used to extend an existing Scout object. In order to use the extension feature
- * you must subclass scout.Extension an implement an init method where you register the methods
+ * you must subclass Extension an implement an init method where you register the methods
  * you want to extend. Example:
  *
  * scout.MyExtension.prototype.init = function() {
@@ -34,9 +36,11 @@
  *
  *   extended: is the extended or original object.
  */
-scout.Extension = function() {};
+export default class Extension {
 
-scout.Extension.prototype.extend = function(extended, funcName) {
+constructor() {};
+
+extend(extended, funcName) {
   var origFunc = extended[funcName];
   var extension = this;
   var wrapper = function() {
@@ -45,7 +49,7 @@ scout.Extension.prototype.extend = function(extended, funcName) {
     return extension[funcName].apply(extension, arguments);
   };
   extended[funcName] = wrapper;
-};
+}
 
 /**
  * Calls scout.create for each extension class in the given extensions array.
@@ -53,8 +57,9 @@ scout.Extension.prototype.extend = function(extended, funcName) {
  * @param extensions an Array of strings containing extension class names
  * @static
  */
-scout.Extension.install = function(extensions) {
+static install(extensions) {
   extensions.forEach(function(ext) {
     scout.create(ext);
   });
-};
+}
+}

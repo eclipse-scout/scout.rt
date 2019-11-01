@@ -8,20 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CellEditorTabKeyStroke = function(popup) {
-  scout.CellEditorTabKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class CellEditorTabKeyStroke extends KeyStroke {
+
+constructor(popup) {
+  super();
   this.field = popup;
-  this.which = [scout.keys.TAB];
+  this.which = [keys.TAB];
   this.shift = undefined; // to tab forward and backward
-};
-scout.inherits(scout.CellEditorTabKeyStroke, scout.KeyStroke);
+}
 
-scout.CellEditorTabKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.CellEditorTabKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && !this.field.isCompleteCellEditRequested(); // Make sure events (complete, prepare) don't get sent twice since it will lead to exceptions. This may happen if user presses and holds the tab key.
-};
+}
 
-scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var pos,
     backwards = event.shiftKey,
     table = this.field.table,
@@ -35,4 +40,5 @@ scout.CellEditorTabKeyStroke.prototype.handle = function(event) {
         table.prepareCellEdit(pos.column, pos.row);
       }
     });
-};
+}
+}

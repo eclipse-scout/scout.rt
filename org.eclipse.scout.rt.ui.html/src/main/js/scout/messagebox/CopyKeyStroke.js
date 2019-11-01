@@ -8,19 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CopyKeyStroke = function(field) {
-  scout.CopyKeyStroke.parent.call(this);
+import {KeyStroke} from '../index';
+import {keys} from '../index';
+
+export default class CopyKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.C];
+  this.which = [keys.C];
   this.ctrl = true;
   this.preventDefault = false;
   this.renderingHints.render = true;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return field.$container;
   };
-};
-scout.inherits(scout.CopyKeyStroke, scout.KeyStroke);
+}
 
-scout.CopyKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.copy();
-};
+}
+}

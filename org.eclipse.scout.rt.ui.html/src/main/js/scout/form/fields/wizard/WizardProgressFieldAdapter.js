@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WizardProgressFieldAdapter = function() {
-  scout.WizardProgressFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.WizardProgressFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
 
-scout.WizardProgressFieldAdapter.prototype._onWidgetStepAction = function(event) {
+export default class WizardProgressFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetStepAction(event) {
   this._send('doStepAction', {
     stepIndex: event.stepIndex
   });
-};
+}
 
-scout.WizardProgressFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'stepAction') {
     this._onWidgetStepAction(event);
   } else {
-    scout.WizardProgressFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

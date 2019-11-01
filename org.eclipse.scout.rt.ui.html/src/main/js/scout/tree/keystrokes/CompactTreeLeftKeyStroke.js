@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CompactTreeLeftKeyStroke = function(compactProcessTree) {
-  scout.CompactTreeLeftKeyStroke.parent.call(this, compactProcessTree);
-  this.renderingHints.text = '←';
-  this.which = [scout.keys.LEFT];
-};
-scout.inherits(scout.CompactTreeLeftKeyStroke, scout.AbstractCompactTreeControlKeyStroke);
+import {AbstractCompactTreeControlKeyStroke} from '../../index';
+import {keys} from '../../index';
 
-scout.CompactTreeLeftKeyStroke.prototype._findNextNode = function($currentNode, currentNode) {
+export default class CompactTreeLeftKeyStroke extends AbstractCompactTreeControlKeyStroke {
+
+constructor(compactProcessTree) {
+  super( compactProcessTree);
+  this.renderingHints.text = '←';
+  this.which = [keys.LEFT];
+}
+
+
+_findNextNode($currentNode, currentNode) {
   // Find first process node of previous section, or first process node.
   return $currentNode.parent().prev('.section').children('.section-node').first().data('node') || $currentNode.parent().children('.section-node').not($currentNode).first().data('node');
-};
+}
+}

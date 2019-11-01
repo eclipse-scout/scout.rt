@@ -8,45 +8,54 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TimePickerPopup = function() {
-  scout.TimePickerPopup.parent.call(this);
-};
-scout.inherits(scout.TimePickerPopup, scout.Popup);
+import {TimePickerPopupLayout} from '../index';
+import {Popup} from '../index';
+import {HtmlComponent} from '../index';
+import {FormField} from '../index';
+import {scout} from '../index';
 
-scout.TimePickerPopup.prototype._init = function(options) {
+export default class TimePickerPopup extends Popup {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
   options.scrollType = options.scrollType || 'layoutAndPosition';
   options.withFocusContext = false;
-  scout.TimePickerPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.picker = scout.create('TimePicker', {
     parent: this,
     timeResolution: options.timeResolution
   });
-};
+}
 
-scout.TimePickerPopup.prototype._createLayout = function() {
-  return new scout.TimePickerPopupLayout(this);
-};
+_createLayout() {
+  return new TimePickerPopupLayout(this);
+}
 
-scout.TimePickerPopup.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('time-picker-popup');
-  this.$container.toggleClass('alternative', this.field.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
   this.picker.render();
-};
+}
 
 /**
  * @implements DatePickerPopup
  */
-scout.TimePickerPopup.prototype.getTimePicker = function() {
+getTimePicker() {
   return this.picker;
-};
+}
 
 /**
  * @override because the icon is not in the $anchor container.
  */
-scout.TimePickerPopup.prototype._isMouseDownOnAnchor = function(event) {
+_isMouseDownOnAnchor(event) {
   return this.field.$timeField.isOrHas(event.target) || this.field.$timeFieldIcon.isOrHas(event.target) || (this.field.$timeClearIcon && this.field.$timeClearIcon.isOrHas(event.target));
-};
+}
+}

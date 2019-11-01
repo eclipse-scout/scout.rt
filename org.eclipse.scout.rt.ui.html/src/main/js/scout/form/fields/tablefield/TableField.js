@@ -8,44 +8,53 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableField = function() {
-  scout.TableField.parent.call(this);
+import {TableRow} from '../../../index';
+import {EventDelegator} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import {FormField} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class TableField extends FormField {
+
+constructor() {
+  super();
 
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 3;
   this.eventDelegator = null;
   this._tableChangedHandler = this._onTableChanged.bind(this);
-  this._deletedRows = scout.objects.createMap();
-  this._insertedRows = scout.objects.createMap();
-  this._updatedRows = scout.objects.createMap();
-  this._checkedRows = scout.objects.createMap();
+  this._deletedRows = objects.createMap();
+  this._insertedRows = objects.createMap();
+  this._updatedRows = objects.createMap();
+  this._checkedRows = objects.createMap();
   this._addWidgetProperties(['table']);
-};
-scout.inherits(scout.TableField, scout.FormField);
+}
 
-scout.TableField.TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted rowsUpdated rowsChecked';
 
-scout.TableField.prototype._init = function(model) {
-  scout.TableField.parent.prototype._init.call(this, model);
+static TABLE_CHANGE_EVENTS = 'rowsInserted rowsDeleted allRowsDeleted rowsUpdated rowsChecked';
+
+_init(model) {
+  super._init( model);
 
   this._setTable(this.table);
-};
+}
 
-scout.TableField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'table-field');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
   this._renderTable();
-};
+}
 
-scout.TableField.prototype.setTable = function(table) {
+setTable(table) {
   this.setProperty('table', table);
-};
+}
 
-scout.TableField.prototype._setTable = function(table) {
+_setTable(table) {
   if (this.table) {
-    this.table.off(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
+    this.table.off(TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
     if (this.eventDelegator) {
       this.eventDelegator.destroy();
       this.eventDelegator = null;
@@ -53,21 +62,21 @@ scout.TableField.prototype._setTable = function(table) {
   }
   this._setProperty('table', table);
   if (table) {
-    table.on(scout.TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
-    this.eventDelegator = scout.EventDelegator.create(this, table, {
+    table.on(TableField.TABLE_CHANGE_EVENTS, this._tableChangedHandler);
+    this.eventDelegator = EventDelegator.create(this, table, {
       delegateProperties: ['enabled', 'disabledStyle', 'loading']
     });
     table.setDisabledStyle(this.disabledStyle);
     table.setLoading(this.loading);
     table.setScrollTop(this.scrollTop);
   }
-};
+}
 
-scout.TableField.prototype.setTable = function(table) {
+setTable(table) {
   this.setProperty('table', table);
-};
+}
 
-scout.TableField.prototype._renderTable = function() {
+_renderTable() {
   if (!this.table) {
     return;
   }
@@ -75,25 +84,25 @@ scout.TableField.prototype._renderTable = function() {
   this.addField(this.table.$container);
   this.$field.addDeviceClass();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TableField.prototype._removeTable = function() {
+_removeTable() {
   if (!this.table) {
     return;
   }
   this.table.remove();
   this._removeField();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TableField.prototype.computeRequiresSave = function() {
+computeRequiresSave() {
   return Object.keys(this._deletedRows).length > 0 ||
     Object.keys(this._insertedRows).length > 0 ||
     Object.keys(this._updatedRows).length > 0 ||
     Object.keys(this._checkedRows).length > 0;
-};
+}
 
-scout.TableField.prototype._onTableChanged = function(event) {
+_onTableChanged(event) {
   if (scout.isOneOf(event.type, 'rowsDeleted', 'allRowsDeleted')) {
     this._updateDeletedRows(event.rows);
   } else if (event.type === 'rowsInserted') {
@@ -103,9 +112,9 @@ scout.TableField.prototype._onTableChanged = function(event) {
   } else if (event.type === 'rowsChecked') {
     this._updateCheckedRows(event.rows);
   }
-};
+}
 
-scout.TableField.prototype._updateDeletedRows = function(rows) {
+_updateDeletedRows(rows) {
   rows.forEach(function(row) {
     if (row.id in this._insertedRows) {
       // If a row is contained in _insertedRows an inserted row has been deleted again.
@@ -117,28 +126,28 @@ scout.TableField.prototype._updateDeletedRows = function(rows) {
     }
     this._deletedRows[row.id] = row;
   }, this);
-};
+}
 
-scout.TableField.prototype._updateInsertedRows = function(rows) {
+_updateInsertedRows(rows) {
   rows.forEach(function(row) {
     this._insertedRows[row.id] = row;
   }, this);
-};
+}
 
-scout.TableField.prototype._updateUpdatedRows = function(rows) {
+_updateUpdatedRows(rows) {
   rows.forEach(function(row) {
-    if (row.status === scout.TableRow.Status.NON_CHANGED) {
+    if (row.status === TableRow.Status.NON_CHANGED) {
       return;
     }
     this._updatedRows[row.id] = row;
   }, this);
-};
+}
 
 /**
  * If a row already exists in the _checkedRows array, remove it (row was checked/unchecked again, which
  * means it is no longer changed). Add it to the array otherwise.
  */
-scout.TableField.prototype._updateCheckedRows = function(rows) {
+_updateCheckedRows(rows) {
   rows.forEach(function(row) {
     if (row.id in this._checkedRows) {
       delete this._checkedRows[row.id];
@@ -146,19 +155,19 @@ scout.TableField.prototype._updateCheckedRows = function(rows) {
       this._checkedRows[row.id] = row;
     }
   }, this);
-};
+}
 
-scout.TableField.prototype.markAsSaved = function() {
-  scout.TableField.parent.prototype.markAsSaved.call(this);
-  this._deletedRows = scout.objects.createMap();
-  this._insertedRows = scout.objects.createMap();
-  this._updatedRows = scout.objects.createMap();
-  this._checkedRows = scout.objects.createMap();
+markAsSaved() {
+  super.markAsSaved();
+  this._deletedRows = objects.createMap();
+  this._insertedRows = objects.createMap();
+  this._updatedRows = objects.createMap();
+  this._checkedRows = objects.createMap();
   this.table.markRowsAsNonChanged();
-};
+}
 
-scout.TableField.prototype.getValidationResult = function() {
-  var desc = scout.TableField.parent.prototype.getValidationResult.call(this);
+getValidationResult() {
+  var desc = super.getValidationResult();
   if (desc && !desc.valid) {
     return desc;
   }
@@ -167,8 +176,8 @@ scout.TableField.prototype.getValidationResult = function() {
   var validByMandatory = !this.mandatory || !this.empty;
 
   // check cells
-  var rows = scout.arrays.ensure(this.table.rows);
-  var columns = scout.arrays.ensure(this.table.columns);
+  var rows = arrays.ensure(this.table.rows);
+  var columns = arrays.ensure(this.table.columns);
 
   rows.some(function(row) {
     return columns.some(function(column) {
@@ -186,11 +195,12 @@ scout.TableField.prototype.getValidationResult = function() {
     validByErrorStatus: validByErrorStatus,
     validByMandatory: validByMandatory
   };
-};
+}
 
 /**
  * @override
  */
-scout.TableField.prototype.getDelegateScrollable = function() {
+getDelegateScrollable() {
   return this.table;
-};
+}
+}

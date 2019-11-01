@@ -8,24 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.inspector = {
 
-  /**
-   * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
-   * is either the given '$container' or model.$container. Nothing happens if model or target
-   * element is undefined.
-   */
-  applyInfo: function(model, $container) {
-    if (!model) {
-      return;
-    }
-    $container = $container || model.$container;
-    if (!$container) {
-      return;
-    }
-    $container.toggleAttr('data-id', !!model.id, model.id);
-    $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
-    $container.toggleAttr('data-classid', !!model.classId, model.classId);
+
+/**
+ * Adds inspector info (e.g. classId) from the given 'model' to the DOM. The target element
+ * is either the given '$container' or model.$container. Nothing happens if model or target
+ * element is undefined.
+ */
+export function applyInfo(model, $container) {
+  if (!model) {
+    return;
   }
+  $container = $container || model.$container;
+  if (!$container) {
+    return;
+  }
+  $container.toggleAttr('data-id', !!model.id, model.id);
+  $container.toggleAttr('data-modelclass', !!model.modelClass, model.modelClass);
+  $container.toggleAttr('data-classid', !!model.classId, model.classId);
+}
 
+
+export default {
+  applyInfo
 };

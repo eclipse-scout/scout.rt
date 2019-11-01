@@ -8,8 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabAreaLayout = function(tabArea) {
-  scout.TabAreaLayout.parent.call(this);
+import {AbstractLayout} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {TabArea} from '../../../index';
+import {graphics} from '../../../index';
+import {Dimension} from '../../../index';
+import * as $ from 'jquery';
+
+export default class TabAreaLayout extends AbstractLayout {
+
+constructor(tabArea) {
+  super();
   this.tabArea = tabArea;
   this.overflowTabs = [];
   this.visibleTabs = [];
@@ -19,12 +29,12 @@ scout.TabAreaLayout = function(tabArea) {
   this.tabArea.one('remove', function() {
     this.tabArea.off('propertyChange', this._tabAreaPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.TabAreaLayout, scout.AbstractLayout);
+}
 
-scout.TabAreaLayout.prototype.layout = function($container) {
+
+layout($container) {
   var ellipsis = this.tabArea.ellipsis,
-    htmlContainer = scout.HtmlComponent.get($container),
+    htmlContainer = HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize().subtract(htmlContainer.insets());
 
   // compute visible and overflown tabs
@@ -68,26 +78,26 @@ scout.TabAreaLayout.prototype.layout = function($container) {
   }, this));
 
   this._layoutSelectionMarker();
-};
+}
 
-scout.TabAreaLayout.prototype._layoutSelectionMarker = function() {
+_layoutSelectionMarker() {
   var $selectionMarker = this.tabArea.$selectionMarker,
     selectedTab = this.tabArea.selectedTab,
     selectedItemBounds;
 
   if (selectedTab) {
     $selectionMarker.setVisible(true);
-    selectedItemBounds = scout.graphics.bounds(selectedTab.$container);
+    selectedItemBounds = graphics.bounds(selectedTab.$container);
     $selectionMarker.cssLeft(selectedItemBounds.x);
     $selectionMarker.cssWidth(selectedItemBounds.width);
   } else {
     $selectionMarker.setVisible(false);
   }
-};
+}
 
-scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options) {
-  var htmlComp = scout.HtmlComponent.get($container),
-    prefSize = new scout.Dimension(0, 0),
+preferredLayoutSize($container, options) {
+  var htmlComp = HtmlComponent.get($container),
+    prefSize = new Dimension(0, 0),
     prefWidth = Number.MAX_VALUE,
     visibleTabItems = this.tabArea.tabs.filter(function(tabItem) {
       return tabItem.isVisible();
@@ -127,14 +137,14 @@ scout.TabAreaLayout.prototype.preferredLayoutSize = function($container, options
   this.visibleTabs = visibleTabItems;
 
   // Use the total available space if spreading tabs evenly.
-  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
-    return scout.graphics.prefSize($container, options);
+  if (this.tabArea.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN) {
+    return graphics.prefSize($container, options);
   }
 
-  return scout.graphics.exactPrefSize(prefSize.add(htmlComp.insets()), options);
-};
+  return graphics.exactPrefSize(prefSize.add(htmlComp.insets()), options);
+}
 
-scout.TabAreaLayout.prototype._minSize = function(tabItems) {
+_minSize(tabItems) {
   var visibleTabItems = [],
     prefSize;
   this.overflowTabs = tabItems.filter(function(tabItem) {
@@ -150,17 +160,17 @@ scout.TabAreaLayout.prototype._minSize = function(tabItems) {
   prefSize = this._prefSize(visibleTabItems);
 
   return prefSize;
-};
+}
 
-scout.TabAreaLayout.prototype._prefSize = function(tabItems, considerEllipsis) {
+_prefSize(tabItems, considerEllipsis) {
   var prefSize = tabItems.map(function(tabItem) {
       return this._tabItemSize(tabItem.htmlComp);
     }, this).reduce(function(prefSize, itemSize) {
       prefSize.height = Math.max(prefSize.height, itemSize.height);
       prefSize.width += itemSize.width;
       return prefSize;
-    }, new scout.Dimension(0, 0)),
-    ellipsisSize = new scout.Dimension(0, 0);
+    }, new Dimension(0, 0)),
+    ellipsisSize = new Dimension(0, 0);
 
   considerEllipsis = scout.nvl(considerEllipsis, this.overflowTabs.length > 0);
   if (considerEllipsis) {
@@ -169,9 +179,9 @@ scout.TabAreaLayout.prototype._prefSize = function(tabItems, considerEllipsis) {
     prefSize.width += ellipsisSize.width;
   }
   return prefSize;
-};
+}
 
-scout.TabAreaLayout.prototype._setFirstLastMarker = function(tabItems, considerEllipsis) {
+_setFirstLastMarker(tabItems, considerEllipsis) {
   considerEllipsis = scout.nvl(considerEllipsis, this.overflowTabs.length > 0);
 
   // reset
@@ -189,14 +199,14 @@ scout.TabAreaLayout.prototype._setFirstLastMarker = function(tabItems, considerE
       tabItems[tabItems.length - 1].$container.addClass('last');
     }
   }
-};
+}
 
-scout.TabAreaLayout.prototype._tabItemSize = function(htmlComp) {
+_tabItemSize(htmlComp) {
   var prefSize,
     classList = htmlComp.$comp.attr('class');
 
   // temporarly revert display style to default. otherwise the pref size of the tab item will be the size of the container.
-  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
+  if (this.tabArea.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN) {
     this.tabArea.$container.removeClass('spread-even');
   }
 
@@ -206,18 +216,19 @@ scout.TabAreaLayout.prototype._tabItemSize = function(htmlComp) {
   prefSize = htmlComp.prefSize({
     useCssSize: true,
     exact: true
-  }).add(scout.graphics.margins(htmlComp.$comp));
+  }).add(graphics.margins(htmlComp.$comp));
 
   htmlComp.$comp.attrOrRemove('class', classList);
 
-  if (this.tabArea.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN) {
+  if (this.tabArea.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN) {
     this.tabArea.$container.addClass('spread-even');
   }
   return prefSize;
-};
+}
 
-scout.TabAreaLayout.prototype._onTabAreaPropertyChange = function(event) {
+_onTabAreaPropertyChange(event) {
   if (event.propertyName === 'selectedTab') {
     this._layoutSelectionMarker();
   }
-};
+}
+}

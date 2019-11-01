@@ -8,24 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewButtonActionKeyStroke = function(action) {
-  scout.ViewButtonActionKeyStroke.parent.call(this, action);
+import {HAlign} from '../../index';
+import {ActionKeyStroke} from '../../index';
 
-};
-scout.inherits(scout.ViewButtonActionKeyStroke, scout.ActionKeyStroke);
+export default class ViewButtonActionKeyStroke extends ActionKeyStroke {
 
-scout.ViewButtonActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+constructor(action) {
+  super( action);
+
+}
+
+
+_postRenderKeyBox($drawingArea) {
   if (this.field.iconId && !this.field._isMenuItem) {
     var width = $drawingArea.outerWidth();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
     var leftKeyBox = width / 2 - wKeybox / 2;
     $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
-};
+}
 
-scout.ViewButtonActionKeyStroke.prototype.renderKeyBox = function($drawingArea, event) {
+renderKeyBox($drawingArea, event) {
   if (this.field._isMenuItem) {
-    this.renderingHints.hAlign = scout.HAlign.RIGHT;
+    this.renderingHints.hAlign = HAlign.RIGHT;
   }
-  return scout.ViewButtonActionKeyStroke.parent.prototype.renderKeyBox.call(this, $drawingArea, event);
-};
+  return super.renderKeyBox( $drawingArea, event);
+}
+}

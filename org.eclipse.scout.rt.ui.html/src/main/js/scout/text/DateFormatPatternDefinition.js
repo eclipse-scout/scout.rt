@@ -8,6 +8,8 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {DateFormatPatternType} from '../index';
+
 /**
  * Definition of a date format pattern.
  *
@@ -16,7 +18,7 @@
  * type:
  *   The "group" where the pattern definition belongs to. E.g. "dd" and "d" belong to the same group "day".
  *   This is used during analysis to find other definitions for the same type. Use one of the constants
- *   defined in scout.DateFormatPatternType.
+ *   defined in DateFormatPatternType.
  *
  * terms:
  *   An array consisting of all pattern terms that this particular definition can handle. Multiple
@@ -69,7 +71,9 @@
  *   @return
  *            A string with the matched part of the input, or null if it did not match.
  */
-scout.DateFormatPatternDefinition = function(options) { // NOSONAR
+export default class DateFormatPatternDefinition {
+
+constructor(options) { // NOSONAR
   options = options || {};
   this.type = options.type;
   this.terms = options.terms;
@@ -78,9 +82,9 @@ scout.DateFormatPatternDefinition = function(options) { // NOSONAR
   this.parseRegExp = options.parseRegExp;
   this.applyMatchFunction = options.applyMatchFunction && options.applyMatchFunction.bind(this);
   this.parseFunction = options.parseFunction && options.parseFunction.bind(this);
-};
+}
 
-scout.DateFormatPatternDefinition.prototype.createFormatFunction = function(acceptedTerm) {
+createFormatFunction(acceptedTerm) {
   return function(formatContext) {
     if (this.formatFunction) {
       var result = this.formatFunction(formatContext, acceptedTerm);
@@ -89,9 +93,9 @@ scout.DateFormatPatternDefinition.prototype.createFormatFunction = function(acce
       }
     }
   }.bind(this);
-};
+}
 
-scout.DateFormatPatternDefinition.prototype.createParseFunction = function(acceptedTerm) {
+createParseFunction(acceptedTerm) {
   return function(parseContext) {
     var m, parsedTerm, match;
 
@@ -134,12 +138,12 @@ scout.DateFormatPatternDefinition.prototype.createParseFunction = function(accep
     }
     return success;
   }.bind(this);
-};
+}
 
 /**
  * @return the accepted term (if is accepted) or null (if it is not accepted)
  */
-scout.DateFormatPatternDefinition.prototype.accept = function(term) {
+accept(term) {
   if (term) {
     // Check if one of the terms matches
     for (var i = 0; i < this.terms.length; i++) {
@@ -149,4 +153,5 @@ scout.DateFormatPatternDefinition.prototype.accept = function(term) {
     }
   }
   return null;
-};
+}
+}

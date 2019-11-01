@@ -8,12 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableFilter = function() {};
+export default class TableFilter {
 
-scout.TableFilter.prototype.createKey = function() {
+constructor() {};
+
+createKey() {
   return 'filterKey';
-};
+}
 
-scout.TableFilter.prototype.accept = function(row) {
+accept(row) {
   // to be implemented by subclasses
-};
+}
+}

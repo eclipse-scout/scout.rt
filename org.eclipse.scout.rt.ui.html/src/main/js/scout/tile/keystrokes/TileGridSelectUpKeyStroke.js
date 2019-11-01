@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridSelectUpKeyStroke = function(tileGrid) {
-  scout.TileGridSelectUpKeyStroke.parent.call(this, tileGrid);
+import {TileGridSelectKeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TileGridSelectUpKeyStroke extends TileGridSelectKeyStroke {
+
+constructor(tileGrid) {
+  super( tileGrid);
   this.stopPropagation = true;
   this.repeatable = true;
-  this.which = [scout.keys.UP];
+  this.which = [keys.UP];
   this.renderingHints.text = '↑';
-};
-scout.inherits(scout.TileGridSelectUpKeyStroke, scout.TileGridSelectKeyStroke);
+}
 
-scout.TileGridSelectUpKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TileGridSelectUpKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -26,8 +31,9 @@ scout.TileGridSelectUpKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
-scout.TileGridSelectUpKeyStroke.prototype._computeNewSelection = function(extend) {
+_computeNewSelection(extend) {
   return this.getSelectionHandler().computeSelectionY(-1, extend);
-};
+}
+}

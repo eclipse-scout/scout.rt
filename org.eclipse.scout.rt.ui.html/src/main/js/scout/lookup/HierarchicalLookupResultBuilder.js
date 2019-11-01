@@ -8,32 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.HierarchicalLookupResultBuilder = function(lookupCall) {
+import {objects} from '../index';
+import {LookupCall} from '../index';
+import {LookupRow} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class HierarchicalLookupResultBuilder {
+
+constructor(lookupCall) {
   scout.assertParameter('lookupCall', lookupCall);
   this.lookupCall = lookupCall;
 
   this._lookupRowMap = {};
-};
+}
 
 /**
  * Load all parent nodes of the given lookup rows up to the root.
  *
- * @returns {Promise} a promise resolved to an array of {scout.LookupRow}s
+ * @returns {Promise} a promise resolved to an array of {LookupRow}s
  */
-scout.HierarchicalLookupResultBuilder.prototype.addParentLookupRows = function(lookupRows) {
+addParentLookupRows(lookupRows) {
   this._fillMap(lookupRows);
 
   var promises = lookupRows.map(this._addParent.bind(this));
   return $.promiseAll(promises)
     .then(function() {
-      return scout.objects.values(this._lookupRowMap);
+      return objects.values(this._lookupRowMap);
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.HierarchicalLookupResultBuilder.prototype._addParent = function(lookupRow) {
+_addParent(lookupRow) {
   var key = lookupRow.parentKey;
 
   if (!key) {
@@ -51,37 +59,37 @@ scout.HierarchicalLookupResultBuilder.prototype._addParent = function(lookupRow)
     .cloneForKey(key)
     .execute()
     .then(function(result) {
-      var lookupRow = scout.LookupCall.firstLookupRow(result);
+      var lookupRow = LookupCall.firstLookupRow(result);
       this._lookupRowMap[lookupRow.key] = lookupRow;
       return this._addParent(lookupRow);
     }.bind(this));
-};
+}
 
-scout.HierarchicalLookupResultBuilder.prototype._fillMap = function(lookupRows) {
+_fillMap(lookupRows) {
   lookupRows.forEach(function(lookupRow) {
     this._lookupRowMap[lookupRow.key] = lookupRow;
   }.bind(this));
-};
+}
 
 /**
  * Load all parent child of the given lookup rows.
  *
- * @returns {Promise} a promise resolved to an array of {scout.LookupRow}s
+ * @returns {Promise} a promise resolved to an array of {LookupRow}s
  */
-scout.HierarchicalLookupResultBuilder.prototype.addChildLookupRows = function(lookupRows) {
+addChildLookupRows(lookupRows) {
   this._fillMap(lookupRows);
 
   var promises = lookupRows.map(this._addChildren.bind(this));
   return $.promiseAll(promises)
     .then(function() {
-      return scout.objects.values(this._lookupRowMap);
+      return objects.values(this._lookupRowMap);
     }.bind(this));
-};
+}
 
 /**
  * @returns {Promise}
  */
-scout.HierarchicalLookupResultBuilder.prototype._addChildren = function(lookupRow) {
+_addChildren(lookupRow) {
   return this.lookupCall
     .cloneForRec(lookupRow.key)
     .execute()
@@ -90,4 +98,5 @@ scout.HierarchicalLookupResultBuilder.prototype._addChildren = function(lookupRo
         return this.addChildLookupRows(result.lookupRows);
       }
     }.bind(this));
-};
+}
+}

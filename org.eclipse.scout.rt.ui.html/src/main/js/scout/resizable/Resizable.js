@@ -8,10 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {graphics} from '../index';
+import {Rectangle} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * Resizable makes a DOM element resizable by adding resize handlers to all edges of the given $container. This is primarily used for (modal) dialogs.
  */
-scout.Resizable = function($container) {
+export default class Resizable {
+
+constructor($container) {
   scout.assertParameter('$container', $container);
   this.$container = $container;
   this.$window = $container.window();
@@ -24,15 +31,15 @@ scout.Resizable = function($container) {
   this._mouseUpHandler = this._onMouseUp.bind(this);
   this._mousemoveHandler = this._onMousemove.bind(this);
   this._resizeHandler = this._resize.bind(this);
-};
+}
 
 /**
  * 15 fps seems to be a good value for slower browsers like firefox,
  * where it takes longer to render.
  */
-scout.Resizable.FPS = 1000 / 15;
+static FPS = 1000 / 15;
 
-scout.Resizable.prototype._appendResizeHandles = function() {
+_appendResizeHandles() {
   this.$resizableS = this.$container.appendDiv('resizable-handle resizable-s')
     .data('edge', 's')
     .on('mousedown.resizable', this._mouseDownHandler);
@@ -57,19 +64,19 @@ scout.Resizable.prototype._appendResizeHandles = function() {
   this.$resizableN = this.$container.appendDiv('resizable-handle resizable-ne')
     .data('edge', 'ne')
     .on('mousedown.resizable', this._mouseDownHandler);
-};
+}
 
-scout.Resizable.prototype.init = function() {
+init() {
   this.$container.addClass('resizable');
   this._appendResizeHandles();
   this._installRemoveHandler();
-};
+}
 
-scout.Resizable.prototype._installRemoveHandler = function() {
+_installRemoveHandler() {
   this.$container.on('remove', this.destroy.bind(this));
-};
+}
 
-scout.Resizable.prototype.destroy = function() {
+destroy() {
   if (this.$resizableS) {
     this.$resizableS.remove();
     this.$resizableS = null;
@@ -88,25 +95,25 @@ scout.Resizable.prototype.destroy = function() {
   this.$window
     .off('mouseup.resizable', this._mouseUpHandler)
     .off('mousemove.resizable', this._mousemoveHandler);
-};
+}
 
-scout.Resizable.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   var $resizable = this.$container,
     $myWindow = $resizable.window(),
     $handle = $(event.target),
     minWidth = $resizable.cssPxValue('min-width'),
     minHeight = $resizable.cssPxValue('min-height'),
-    initialBounds = scout.graphics.bounds($resizable);
+    initialBounds = graphics.bounds($resizable);
 
   this._context = {
     initialBounds: initialBounds,
-    minBounds: new scout.Rectangle(
+    minBounds: new Rectangle(
       initialBounds.right() - minWidth,
       initialBounds.bottom() - minHeight,
       minWidth,
       minHeight
     ),
-    maxBounds: new scout.Rectangle(
+    maxBounds: new Rectangle(
       -$resizable.cssMarginLeft(),
       -$resizable.cssMarginTop(),
       $myWindow.width() - $resizable[0].offsetLeft,
@@ -124,18 +131,18 @@ scout.Resizable.prototype._onMouseDown = function(event) {
     .on('mouseup.resizable', this._mouseUpHandler)
     .on('mousemove.resizable', this._mousemoveHandler);
   $('iframe').addClass('dragging-in-progress');
-};
+}
 
-scout.Resizable.prototype._onMouseUp = function(event) {
+_onMouseUp(event) {
   this.$container.removeClass('resizable-resizing');
   this.$window
     .off('mouseup.resizable', this._mouseUpHandler)
     .off('mousemove.resizable', this._mousemoveHandler);
   $('iframe').removeClass('dragging-in-progress');
   this._context = null;
-};
+}
 
-scout.Resizable.prototype._onMousemove = function(event) {
+_onMousemove(event) {
   var ctx = this._context,
     newBounds = ctx.initialBounds.clone(),
     distance = this._calcDistance(ctx.mousedownEvent, event);
@@ -158,20 +165,21 @@ scout.Resizable.prototype._onMousemove = function(event) {
       Math.max(ctx.maxBounds.y, ctx.initialBounds.y + distance[1]));
     newBounds.height += ctx.initialBounds.y - newBounds.y;
   }
-  $.throttle(this._resizeHandler, scout.Resizable.FPS)(newBounds);
-};
+  $.throttle(this._resizeHandler, Resizable.FPS)(newBounds);
+}
 
-scout.Resizable.prototype._resize = function(newBounds) {
-  scout.graphics.setBounds(this.$container, newBounds);
+_resize(newBounds) {
+  graphics.setBounds(this.$container, newBounds);
   this.$container.trigger('resize', {
     newBounds: newBounds,
     initialBounds: this._context.initialBounds
   });
-};
+}
 
-scout.Resizable.prototype._calcDistance = function(eventA, eventB) {
+_calcDistance(eventA, eventB) {
   var
     distX = eventB.pageX - eventA.pageX,
     distY = eventB.pageY - eventA.pageY;
   return [distX, distY];
-};
+}
+}

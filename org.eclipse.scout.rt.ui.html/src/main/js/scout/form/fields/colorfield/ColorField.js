@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ColorField = function() {
-  scout.ColorField.parent.call(this);
-};
-scout.inherits(scout.ColorField, scout.ValueField);
+import {ValueField} from '../../../index';
 
-scout.ColorField.prototype._render = function() {
+export default class ColorField extends ValueField {
+
+constructor() {
+  super();
+}
+
+
+_render() {
   this.addContainer(this.$parent, 'color-field');
   this.addLabel();
   this.addField(this.$parent.makeDiv('not-implemented').text('not implemented yet'));
   this.addMandatoryIndicator();
   this.addStatus();
-};
+}
+}

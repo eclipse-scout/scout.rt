@@ -8,34 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.VerticalGridMatrix = function(columnCount, rowCount, x, y) {
-  scout.VerticalGridMatrix.parent.call(this, new scout.LogicalGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, scout.LogicalGridMatrixCursor.VERTICAL));
+import {LogicalGridMatrixCursor} from '../../../index';
+import {LogicalGridMatrix} from '../../../index';
+import {AbstractGrid} from '../../../index';
+import {LogicalGridMatrixCell} from '../../../index';
+
+export default class VerticalGridMatrix extends LogicalGridMatrix {
+
+constructor(columnCount, rowCount, x, y) {
+  super( new LogicalGridMatrixCursor(x || 0, y || 0, columnCount, rowCount, LogicalGridMatrixCursor.VERTICAL));
 
   this._widgets = [];
   this._widgetGridDatas = [];
-};
-scout.inherits(scout.VerticalGridMatrix, scout.LogicalGridMatrix);
+}
 
-scout.VerticalGridMatrix.prototype.resetAll = function(columnCount, rowCount) {
+
+resetAll(columnCount, rowCount) {
   this._widgetGridDatas = [];
   this._assignedCells = [];
   this._widgetIndexes = [];
-  this._cursor = new scout.LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, scout.LogicalGridMatrixCursor.VERTICAL);
-};
+  this._cursor = new LogicalGridMatrixCursor(this._cursor.startX, this._cursor.startY, columnCount, rowCount, LogicalGridMatrixCursor.VERTICAL);
+}
 
-scout.VerticalGridMatrix.prototype.computeGridData = function(widgets) {
+computeGridData(widgets) {
   this._widgets = widgets;
   return widgets.every(function(f, i) {
-    this._widgetGridDatas[i] = scout.AbstractGrid.getGridDataFromHints(f, this._cursor.columnCount);
+    this._widgetGridDatas[i] = AbstractGrid.getGridDataFromHints(f, this._cursor.columnCount);
     return this._add(f, this._widgetGridDatas[i]);
   }.bind(this));
-};
+}
 
-scout.VerticalGridMatrix.prototype.getGridData = function(f) {
+getGridData(f) {
   return this._widgetGridDatas[this._widgets.indexOf(f)];
-};
+}
 
-scout.VerticalGridMatrix.prototype._addAssignedCells = function(cells) {
+_addAssignedCells(cells) {
   cells.forEach(function(v, i) {
     if (v) {
       v.forEach(function(w, j) {
@@ -48,13 +55,13 @@ scout.VerticalGridMatrix.prototype._addAssignedCells = function(cells) {
       }.bind(this));
     }
   }.bind(this));
-};
+}
 
-scout.VerticalGridMatrix.prototype._getAssignedCells = function() {
+_getAssignedCells() {
   return this._assignedCells;
-};
+}
 
-scout.VerticalGridMatrix.prototype._add = function(f, gd) {
+_add(f, gd) {
   var idx = this._cursor.currentIndex();
   if (gd.w > 1) {
     // try to reorganize widgets above
@@ -80,13 +87,13 @@ scout.VerticalGridMatrix.prototype._add = function(f, gd) {
       this._setAssignedCell({
         x: xx,
         y: yy
-      }, new scout.LogicalGridMatrixCell(f, gd));
+      }, new LogicalGridMatrixCell(f, gd));
     }
   }
   return true;
-};
+}
 
-scout.VerticalGridMatrix.prototype._reorganizeGridAbove = function(x, y, w) {
+_reorganizeGridAbove(x, y, w) {
   var widgetsToReorganize = [];
   var addWidgetToReorganize = function(f) {
     if (widgetsToReorganize.indexOf(f) === -1) {
@@ -146,7 +153,7 @@ scout.VerticalGridMatrix.prototype._reorganizeGridAbove = function(x, y, w) {
   }.bind(this));
   reorgBounds.y = minY;
 
-  var reorgMatrix = new scout.VerticalGridMatrix(reorgBounds.w, Math.floor((usedCells + reorgBounds.w - 1) / reorgBounds.w), reorgBounds.x, reorgBounds.y);
+  var reorgMatrix = new VerticalGridMatrix(reorgBounds.w, Math.floor((usedCells + reorgBounds.w - 1) / reorgBounds.w), reorgBounds.x, reorgBounds.y);
   reorgMatrix._addAssignedCells(occupiedCells);
   while (!reorgMatrix.computeGridData(widgetsToReorganize)) {
     reorgMatrix.resetAll(reorgMatrix.getColumnCount(), reorgMatrix.getRowCount() + 1);
@@ -156,12 +163,13 @@ scout.VerticalGridMatrix.prototype._reorganizeGridAbove = function(x, y, w) {
   reorgMatrix._widgetGridDatas.forEach(function(v, i) {
     this._widgetGridDatas[this._widgets.indexOf(reorgMatrix._widgets[i])] = v;
   }.bind(this));
-};
+}
 
-scout.VerticalGridMatrix.prototype._horizontalMatchesOrOverlaps = function(bounds, gd) {
+_horizontalMatchesOrOverlaps(bounds, gd) {
   return bounds.x >= gd.x && bounds.x + bounds.w <= gd.x + gd.w;
-};
+}
 
-scout.VerticalGridMatrix.prototype._horizontalOverlapsOnSide = function(bounds, gd) {
+_horizontalOverlapsOnSide(bounds, gd) {
   return bounds.x > gd.x || bounds.x + bounds.w < gd.x + gd.w;
-};
+}
+}

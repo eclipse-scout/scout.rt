@@ -8,18 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableInfoSelectionTooltip = function() {
-  scout.TableInfoSelectionTooltip.parent.call(this);
-};
-scout.inherits(scout.TableInfoSelectionTooltip, scout.Tooltip);
+import {Tooltip} from '../index';
 
-scout.TableInfoSelectionTooltip.prototype._init = function(options) {
-  scout.TableInfoSelectionTooltip.parent.prototype._init.call(this, options);
+export default class TableInfoSelectionTooltip extends Tooltip {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
 
   this.tableFooter = options.tableFooter;
-};
+}
 
-scout.TableInfoSelectionTooltip.prototype._renderText = function() {
+_renderText() {
   var table = this.tableFooter.table,
     numRowsSelected = table.selectedRows.length;
 
@@ -32,14 +36,15 @@ scout.TableInfoSelectionTooltip.prototype._renderText = function() {
   this.$content.appendSpan('link')
     .text(this.session.text('ui.SelectAll'))
     .on('click', this._onSelectAllClick.bind(this));
-};
+}
 
-scout.TableInfoSelectionTooltip.prototype._onSelectNoneClick = function() {
+_onSelectNoneClick() {
   this.tableFooter.table.deselectAll();
   this.destroy();
-};
+}
 
-scout.TableInfoSelectionTooltip.prototype._onSelectAllClick = function() {
+_onSelectAllClick() {
   this.tableFooter.table.selectAll();
   this.destroy();
-};
+}
+}

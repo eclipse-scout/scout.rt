@@ -8,8 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormFieldAdapter = function() {
-  scout.FormFieldAdapter.parent.call(this);
+import {ModelAdapter} from '../../index';
+
+export default class FormFieldAdapter extends ModelAdapter {
+
+constructor() {
+  super();
 
   /**
    * Set this property to true when the form-field should stay enabled in offline case.
@@ -17,20 +21,21 @@ scout.FormFieldAdapter = function() {
    */
   this.enabledWhenOffline = false;
 
-};
-scout.inherits(scout.FormFieldAdapter, scout.ModelAdapter);
+}
 
-scout.FormFieldAdapter.prototype._goOffline = function() {
+
+_goOffline() {
   if (this.enabledWhenOffline) {
     return;
   }
   this._enabledBeforeOffline = this.widget.enabled;
   this.widget.setEnabled(false);
-};
+}
 
-scout.FormFieldAdapter.prototype._goOnline = function() {
+_goOnline() {
   if (this.enabledWhenOffline) {
     return;
   }
   this.widget.setEnabled(this._enabledBeforeOffline);
-};
+}
+}

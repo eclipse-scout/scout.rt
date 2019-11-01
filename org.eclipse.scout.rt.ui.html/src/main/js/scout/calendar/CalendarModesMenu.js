@@ -8,35 +8,42 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarModesMenu = function() {
-  scout.CalendarModesMenu.parent.call(this);
+import {Calendar} from '../index';
+import {Menu} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class CalendarModesMenu extends Menu {
+
+constructor() {
+  super();
   this.cssClass = 'calendar-mode-menu';
   this.displayMode;
-};
-scout.inherits(scout.CalendarModesMenu, scout.Menu);
+}
 
-scout.CalendarModesMenu.prototype._init = function(model) {
-  scout.CalendarModesMenu.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.calendar = this.parent;
   var menusToAdd = [];
   menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
-    displayMode: scout.Calendar.DisplayMode.DAY,
+    displayMode: Calendar.DisplayMode.DAY,
     text: this.session.text('ui.CalendarDay')
   }));
   menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
-    displayMode: scout.Calendar.DisplayMode.WORK_WEEK,
+    displayMode: Calendar.DisplayMode.WORK_WEEK,
     text: this.session.text('ui.CalendarWorkWeek')
   }));
   menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
-    displayMode: scout.Calendar.DisplayMode.WEEK,
+    displayMode: Calendar.DisplayMode.WEEK,
     text: this.session.text('ui.CalendarWeek')
   }));
   menusToAdd.push(scout.create('CalendarModeMenu', {
     parent: this,
-    displayMode: scout.Calendar.DisplayMode.MONTH,
+    displayMode: Calendar.DisplayMode.MONTH,
     text: this.session.text('ui.CalendarMonth')
   }));
   this.addChildActions(menusToAdd);
@@ -46,26 +53,26 @@ scout.CalendarModesMenu.prototype._init = function(model) {
   }, this);
 
   this._setDisplayMode(this.displayMode);
-};
+}
 
-scout.CalendarModesMenu.prototype.setDisplayMode = function(displayMode) {
+setDisplayMode(displayMode) {
   this.setProperty('displayMode', displayMode);
-};
+}
 
-scout.CalendarModesMenu.prototype._setDisplayMode = function(displayMode) {
+_setDisplayMode(displayMode) {
   this._setProperty('displayMode', displayMode);
   var menu = this.getMenuForMode(this.displayMode);
   menu.setSelected(true);
   this.setText(menu.text);
-};
+}
 
-scout.CalendarModesMenu.prototype.getMenuForMode = function(displayMode) {
-  return scout.arrays.find(this.childActions, function(menu) {
+getMenuForMode(displayMode) {
+  return arrays.find(this.childActions, function(menu) {
     return menu.displayMode === displayMode;
   });
-};
+}
 
-scout.CalendarModesMenu.prototype._onMenuPropertyChange = function(event) {
+_onMenuPropertyChange(event) {
   if (event.propertyName === 'selected') {
     var selected = event.newValue;
     if (selected) {
@@ -81,4 +88,5 @@ scout.CalendarModesMenu.prototype._onMenuPropertyChange = function(event) {
       }, this);
     }
   }
-};
+}
+}

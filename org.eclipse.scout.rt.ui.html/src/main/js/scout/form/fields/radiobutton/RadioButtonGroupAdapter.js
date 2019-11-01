@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonGroupAdapter = function() {
-  scout.RadioButtonGroupAdapter.parent.call(this);
-};
-scout.inherits(scout.RadioButtonGroupAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class RadioButtonGroupAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * @override
  */
-scout.RadioButtonGroupAdapter.prototype._initModel = function(model, parent) {
-  model = scout.RadioButtonGroupAdapter.parent.prototype._initModel.call(this, model, parent);
+_initModel(model, parent) {
+  model = super._initModel( model, parent);
   // Set logical grid to null -> Calculation happens on server side
   model.logicalGrid = null;
   return model;
-};
+}
+}

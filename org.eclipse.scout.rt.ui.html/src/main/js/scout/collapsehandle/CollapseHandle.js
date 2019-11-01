@@ -8,86 +8,90 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CollapseHandle = function() {
-  scout.CollapseHandle.parent.call(this);
+import {Widget} from '../index';
+
+export default class CollapseHandle extends Widget {
+
+constructor() {
+  super();
   this.leftVisible = true;
   this.rightVisible = true;
-  this.horizontalAlignment = scout.CollapseHandle.HorizontalAlignment.LEFT;
-};
-scout.inherits(scout.CollapseHandle, scout.Widget);
+  this.horizontalAlignment = CollapseHandle.HorizontalAlignment.LEFT;
+}
 
-scout.CollapseHandle.HorizontalAlignment = {
+
+static HorizontalAlignment = {
   LEFT: 'left',
   RIGHT: 'right'
 };
 
-scout.CollapseHandle.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('collapse-handle');
   this.$container.on('mousedown', this._onMouseDown.bind(this));
 
   this.$left = this.$container.appendDiv('collapse-handle-body left');
   this.$right = this.$container.appendDiv('collapse-handle-body right');
-};
+}
 
-scout.CollapseHandle.prototype._renderProperties = function() {
-  scout.CollapseHandle.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderLeftVisible();
   this._renderRightVisible();
   this._renderHorizontalAlignment();
-};
+}
 
-scout.CollapseHandle.prototype.setHorizontalAlignment = function(alignment) {
+setHorizontalAlignment(alignment) {
   this.setProperty('horizontalAlignment', alignment);
-};
+}
 
-scout.CollapseHandle.prototype._renderHorizontalAlignment = function() {
+_renderHorizontalAlignment() {
   this.$container.removeClass('left-aligned right-aligned');
-  if (this.horizontalAlignment === scout.CollapseHandle.HorizontalAlignment.LEFT) {
+  if (this.horizontalAlignment === CollapseHandle.HorizontalAlignment.LEFT) {
     this.$container.addClass('left-aligned');
-  } else if (this.horizontalAlignment === scout.CollapseHandle.HorizontalAlignment.RIGHT) {
+  } else if (this.horizontalAlignment === CollapseHandle.HorizontalAlignment.RIGHT) {
     this.$container.addClass('right-aligned');
   }
-};
+}
 
-scout.CollapseHandle.prototype.setLeftVisible = function(visible) {
+setLeftVisible(visible) {
   this.setProperty('leftVisible', visible);
-};
+}
 
-scout.CollapseHandle.prototype._renderLeftVisible = function() {
+_renderLeftVisible() {
   this.$left.setVisible(this.leftVisible);
   this._updateVisibilityClasses();
-};
+}
 
-scout.CollapseHandle.prototype.setRightVisible = function(visible) {
+setRightVisible(visible) {
   this.setProperty('rightVisible', visible);
-};
+}
 
-scout.CollapseHandle.prototype._renderRightVisible = function() {
+_renderRightVisible() {
   this.$right.setVisible(this.rightVisible);
   this._updateVisibilityClasses();
-};
+}
 
-scout.CollapseHandle.prototype._updateVisibilityClasses = function() {
+_updateVisibilityClasses() {
   var bothVisible = this.leftVisible && this.rightVisible;
   this.$container.toggleClass('both-visible', bothVisible);
   this.$left.toggleClass('both-visible', bothVisible);
   this.$right.toggleClass('both-visible', bothVisible);
   this.$container.toggleClass('one-visible', (this.leftVisible || this.rightVisible) && !bothVisible);
-};
+}
 
-scout.CollapseHandle.prototype._onLeftMouseDown = function(event) {
+_onLeftMouseDown(event) {
   this.trigger('action', {
     left: true
   });
-};
+}
 
-scout.CollapseHandle.prototype._onRightMouseDown = function(event) {
+_onRightMouseDown(event) {
   this.trigger('action', {
     right: true
   });
-};
+}
 
-scout.CollapseHandle.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   var target = event.target;
   if (this.$left.isOrHas(target)) {
     this.trigger('action', {
@@ -110,4 +114,5 @@ scout.CollapseHandle.prototype._onMouseDown = function(event) {
       right: this.rightVisible
     });
   }
-};
+}
+}

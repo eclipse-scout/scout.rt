@@ -8,29 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopNotificationAdapter = function() {
-  scout.DesktopNotificationAdapter.parent.call(this);
-};
-scout.inherits(scout.DesktopNotificationAdapter, scout.NotificationAdapter);
+import {NotificationAdapter} from '../../index';
 
-scout.DesktopNotificationAdapter.prototype._onWidgetClose = function(event) {
+export default class DesktopNotificationAdapter extends NotificationAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetClose(event) {
   this._send('close', {
     ref: event.ref
   });
-};
+}
 
-scout.DesktopNotificationAdapter.prototype._onWidgetAppLinkAction = function(event) {
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.DesktopNotificationAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'close') {
     this._onWidgetClose(event);
   } else if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.DesktopNotificationAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

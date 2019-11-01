@@ -12,8 +12,10 @@
 /**
  * JavaScript port from java.awt.Insets.
  */
-scout.Insets = function(vararg, right, bottom, left) {
-  if (vararg instanceof scout.Insets) {
+export default class Insets {
+
+constructor(vararg, right, bottom, left) {
+  if (vararg instanceof Insets) {
     this.top = vararg.top;
     this.right = vararg.right;
     this.bottom = vararg.bottom;
@@ -24,35 +26,36 @@ scout.Insets = function(vararg, right, bottom, left) {
     this.bottom = bottom || 0;
     this.left = left || 0;
   }
-};
+}
 
-scout.Insets.prototype.toString = function() {
+toString() {
   return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
-};
+}
 
-scout.Insets.prototype.equals = function(o) {
+equals(o) {
   return this.top === o.top &&
     this.right === o.right &&
     this.bottom === o.bottom &&
     this.left === o.left;
-};
+}
 
-scout.Insets.prototype.clone = function() {
-  return new scout.Insets(this.top, this.right, this.bottom, this.left);
-};
+clone() {
+  return new Insets(this.top, this.right, this.bottom, this.left);
+}
 
-scout.Insets.prototype.horizontal = function() {
+horizontal() {
   return this.right + this.left;
-};
+}
 
-scout.Insets.prototype.vertical = function() {
+vertical() {
   return this.top + this.bottom;
-};
+}
 
-scout.Insets.prototype.floor = function() {
-  return new scout.Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
-};
+floor() {
+  return new Insets(Math.floor(this.top), Math.floor(this.right), Math.floor(this.bottom), Math.floor(this.left));
+}
 
-scout.Insets.prototype.ceil = function() {
-  return new scout.Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
-};
+ceil() {
+  return new Insets(Math.ceil(this.top), Math.ceil(this.right), Math.ceil(this.bottom), Math.ceil(this.left));
+}
+}

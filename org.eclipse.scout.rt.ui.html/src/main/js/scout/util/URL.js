@@ -8,11 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {arrays} from '../index';
+
 /**
  * Input is expected to be encoded. Output (toString()) is also encoded.
  * If no URL is passed, 'window.location.href' is used as input.
  */
-scout.URL = function(url) {
+export default class URL {
+
+constructor(url) {
   if (url === undefined) {
     url = window.location.href;
   }
@@ -22,29 +26,29 @@ scout.URL = function(url) {
   this.queryPartRaw = urlParts[2];
   this.hashPartRaw = urlParts[3];
   // un-encoded (!)
-  this.parameterMap = scout.URL._parse(this.queryPartRaw);
-};
+  this.parameterMap = URL._parse(this.queryPartRaw);
+}
 
-scout.URL.prototype.getParameter = function(param) {
+getParameter(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
   var value = this.parameterMap[param];
   if (Array.isArray(value)) {
-    return value.sort(scout.URL._sorter);
+    return value.sort(URL._sorter);
   }
   return value;
-};
+}
 
-scout.URL.prototype.removeParameter = function(param) {
+removeParameter(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
   delete this.parameterMap[param];
   return this;
-};
+}
 
-scout.URL.prototype.setParameter = function(param, value) {
+setParameter(param, value) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
@@ -53,18 +57,18 @@ scout.URL.prototype.setParameter = function(param, value) {
   }
   this.parameterMap[param] = value;
   return this;
-};
+}
 
-scout.URL.prototype.addParameter = function(param, value) {
+addParameter(param, value) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
   if (param === '') { // ignore empty keys
     return;
   }
-  scout.URL._addToMap(this.parameterMap, param, value);
+  URL._addToMap(this.parameterMap, param, value);
   return this;
-};
+}
 
 /**
  * Options:
@@ -82,15 +86,15 @@ scout.URL.prototype.addParameter = function(param, value) {
  *     similar to alwaysFirst, but puts the parameters at the end of
  *     the resulting string.
  */
-scout.URL.prototype.toString = function(options) {
+toString(options) {
   var result = this.baseUrlRaw;
 
   if (Object.keys(this.parameterMap).length) {
     options = options || {};
-    var sorter = options.sorter || scout.URL._sorter;
+    var sorter = options.sorter || URL._sorter;
     if (options.alwaysFirst || options.alwaysLast) {
-      options.alwaysFirst = scout.arrays.ensure(options.alwaysFirst);
-      options.alwaysLast = scout.arrays.ensure(options.alwaysLast);
+      options.alwaysFirst = arrays.ensure(options.alwaysFirst);
+      options.alwaysLast = arrays.ensure(options.alwaysLast);
       var origSorter = sorter;
       sorter = function(a, b) {
         var firstA = options.alwaysFirst.indexOf(a);
@@ -122,11 +126,11 @@ scout.URL.prototype.toString = function(options) {
       if (Array.isArray(value)) {
         return value.map(
           function(innerKey, innerIndex) {
-            return scout.URL._formatQueryParam(key, value[innerIndex]);
+            return URL._formatQueryParam(key, value[innerIndex]);
           }
         ).join('&');
       }
-      return scout.URL._formatQueryParam(key, value);
+      return URL._formatQueryParam(key, value);
     }.bind(this)).join('&');
     result += '?' + reconstructedQueryPart;
   }
@@ -136,40 +140,40 @@ scout.URL.prototype.toString = function(options) {
   }
 
   return result;
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
  * Helper function to sort arrays alphabetically, nulls in front
  *
- * @memberOf scout.URL
+ * @memberOf URL
  */
-scout.URL._sorter = function(a, b) {
+static _sorter(a, b) {
   return a === null ? -1 : b === null ? 1 : a.toString().localeCompare(b);
-};
+}
 
 /**
  * Helper function to build a query parameter with value
  *
- * @memberOf scout.URL
+ * @memberOf URL
  */
 //
-scout.URL._formatQueryParam = function(key, value) {
+static _formatQueryParam(key, value) {
   var s = encodeURIComponent(key);
   if (value !== undefined && value !== null) {
     s += '=' + encodeURIComponent(value);
   }
   return s;
-};
+}
 
 /**
  * Helper function to add an key-value pair to a map. If the key is added multiple
  * times, the value is converted to an array.
  *
- * @memberOf scout.URL
+ * @memberOf URL
  */
-scout.URL._addToMap = function(map, key, value) {
+static _addToMap(map, key, value) {
   if (map === undefined) {
     throw new Error("Argument 'map' must not be null");
   }
@@ -186,15 +190,15 @@ scout.URL._addToMap = function(map, key, value) {
   } else {
     map[key] = value;
   }
-};
+}
 
 /**
  * Helper function to parse the given (encoded) query string and return
  * it as (un-encoded) map of key-value pairs.
  *
- * @memberOf scout.URL
+ * @memberOf URL
  */
-scout.URL._parse = function(queryPart) {
+static _parse(queryPart) {
   var queryString = (queryPart || '').replace(/\+/g, ' '),
     pattern = /([^&=]+)(=?)([^&]*)/g,
     map = {},
@@ -206,7 +210,8 @@ scout.URL._parse = function(queryPart) {
     if (value === '' && m[2] !== '=') {
       value = null;
     }
-    scout.URL._addToMap(map, key, value);
+    URL._addToMap(map, key, value);
   }
   return map;
-};
+}
+}

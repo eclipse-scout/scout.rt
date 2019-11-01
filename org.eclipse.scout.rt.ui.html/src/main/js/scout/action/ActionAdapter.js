@@ -8,32 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ActionAdapter = function() {
-  scout.ActionAdapter.parent.call(this);
-  this._addRemoteProperties(['selected']);
-};
-scout.inherits(scout.ActionAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
 
-scout.ActionAdapter.prototype._goOffline = function() {
+export default class ActionAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+  this._addRemoteProperties(['selected']);
+}
+
+
+_goOffline() {
   this._enabledBeforeOffline = this.widget.enabled;
   this.widget.setEnabled(false);
-};
+}
 
-scout.ActionAdapter.prototype._goOnline = function() {
+_goOnline() {
   this.widget.setEnabled(this._enabledBeforeOffline);
-};
+}
 
-scout.ActionAdapter.prototype._onWidgetAction = function(event) {
+_onWidgetAction(event) {
   if (this.widget.isToggleAction()) {
     return;
   }
   this._send('action');
-};
+}
 
-scout.ActionAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'action') {
     this._onWidgetAction(event);
   } else {
-    scout.ActionAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

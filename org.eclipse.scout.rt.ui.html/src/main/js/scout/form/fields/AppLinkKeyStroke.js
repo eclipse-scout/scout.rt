@@ -8,27 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AppLinkKeyStroke = function(field, appLinkTriggerFunction) {
-  scout.AppLinkKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+import * as $ from 'jquery';
+
+export default class AppLinkKeyStroke extends KeyStroke {
+
+constructor(field, appLinkTriggerFunction) {
+  super();
   this.field = field;
   this.appLinkTriggerFunction = appLinkTriggerFunction;
 
-  this.which = [scout.keys.SPACE];
+  this.which = [keys.SPACE];
   this.renderingHints.render = false;
-};
-scout.inherits(scout.AppLinkKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.AppLinkKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.AppLinkKeyStroke.parent.prototype._accept.call(this, event);
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && $(event.target).hasClass('app-link');
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.AppLinkKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.appLinkTriggerFunction.call(this.field, event);
-};
+}
+}

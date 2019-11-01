@@ -8,18 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileAccordionAdapter = function() {
-  scout.TileAccordionAdapter.parent.call(this);
-};
-scout.inherits(scout.TileAccordionAdapter, scout.AccordionAdapter);
+import {AccordionAdapter} from '../../index';
+
+export default class TileAccordionAdapter extends AccordionAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * @override
  */
-scout.TileAccordionAdapter.prototype._initProperties = function(model) {
-  scout.TileAccordionAdapter.parent.prototype._initProperties.call(this, model);
+_initProperties(model) {
+  super._initProperties( model);
   // TileGridAdapter creates a RemoteTileFilter for each grid.
   // Such filters must not be added to the tile accordion, otherwise no tiles would be visible at all.
   // Because taking the filters from the group is only necessary for Scout JS usage, it is ok to disable this feature completely.
   model.takeTileFiltersFromGroup = false;
-};
+}
+}

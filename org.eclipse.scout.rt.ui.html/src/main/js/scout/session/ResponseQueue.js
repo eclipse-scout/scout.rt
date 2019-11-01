@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ResponseQueue = function(session) {
+import {strings} from '../index';
+
+export default class ResponseQueue {
+
+constructor(session) {
   this.session = session;
   this.queue = [];
   this.lastProcessedSequenceNo = 0;
@@ -16,11 +20,11 @@ scout.ResponseQueue = function(session) {
 
   this.force = false;
   this.forceTimeoutId = null;
-};
+}
 
-scout.ResponseQueue.FORCE_TIMEOUT = 10 * 1000; // in ms
+static FORCE_TIMEOUT = 10 * 1000; // in ms
 
-scout.ResponseQueue.prototype.add = function(response) {
+add(response) {
   var sequenceNo = response && response['#'];
 
   // Ignore responses that were already processed (duplicate detection)
@@ -61,9 +65,9 @@ scout.ResponseQueue.prototype.add = function(response) {
     }
     this.queue = newQueue;
   }
-};
+}
 
-scout.ResponseQueue.prototype.process = function(response) {
+process(response) {
   if (response) {
     this.add(response);
   }
@@ -107,13 +111,13 @@ scout.ResponseQueue.prototype.process = function(response) {
   this._checkTimeout();
 
   return responseSuccess;
-};
+}
 
-scout.ResponseQueue.prototype.size = function() {
+size() {
   return this.queue.length;
-};
+}
 
-scout.ResponseQueue.prototype._checkTimeout = function() {
+_checkTimeout() {
   // If there are non-processed elements, schedule a job that forces the processing of those
   // elements after a certain timeout to prevent the "blocked forever syndrome" if a response
   // was lost on the network.
@@ -128,11 +132,11 @@ scout.ResponseQueue.prototype._checkTimeout = function() {
           if (i > 0) {
             s += ', ';
           }
-          s += (scout.strings.box('#', this.queue[i]['#']) || '<none>');
+          s += (strings.box('#', this.queue[i]['#']) || '<none>');
         }
         s += ']';
         this.session.sendLogRequest('Expected response #' + this.nextExpectedSequenceNo + ' still missing after ' +
-          scout.ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + s);
+          ResponseQueue.FORCE_TIMEOUT + ' ms. Forcing response queue to process ' + this.size() + ' elements: ' + s);
       } catch (error) {
         // nop
       }
@@ -143,15 +147,16 @@ scout.ResponseQueue.prototype._checkTimeout = function() {
         this.force = false;
         this.forceTimeoutId = null;
       }
-    }.bind(this), scout.ResponseQueue.FORCE_TIMEOUT);
+    }.bind(this), ResponseQueue.FORCE_TIMEOUT);
   }
-};
+}
 
-scout.ResponseQueue.prototype.prepareRequest = function(request) {
+prepareRequest(request) {
   request['#ACK'] = this.lastProcessedSequenceNo;
-};
+}
 
-scout.ResponseQueue.prototype.prepareHttpRequest = function(ajaxOptions) {
+prepareHttpRequest(ajaxOptions) {
   ajaxOptions.headers = ajaxOptions.headers || {};
   ajaxOptions.headers['X-Scout-#ACK'] = this.lastProcessedSequenceNo;
-};
+}
+}

@@ -8,20 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableSelectAllKeyStroke = function(table) {
-  scout.TableSelectAllKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableSelectAllKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
   this.ctrl = true;
-  this.which = [scout.keys.A];
+  this.which = [keys.A];
   this.renderingHints.offset = 14;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.footer ? this.field.footer._$infoSelection.find('.table-info-button') : null;
   }.bind(this);
-};
-scout.inherits(scout.TableSelectAllKeyStroke, scout.KeyStroke);
+}
 
-scout.TableSelectAllKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var table = this.field;
   table.toggleSelection();
   table.selectionHandler.lastActionRow = null;
-};
+}
+}

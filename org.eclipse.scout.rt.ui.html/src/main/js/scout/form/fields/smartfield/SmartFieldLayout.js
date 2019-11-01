@@ -8,17 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FormFieldLayout} from '../../../index';
+
 /**
  * SmartFieldLayout works like FormLayout but additionally layouts its proposal-chooser popup.
  */
-scout.SmartFieldLayout = function(smartField) {
-  scout.SmartFieldLayout.parent.call(this, smartField);
-  this._smartField = smartField;
-};
-scout.inherits(scout.SmartFieldLayout, scout.FormFieldLayout);
+export default class SmartFieldLayout extends FormFieldLayout {
 
-scout.SmartFieldLayout.prototype.layout = function($container) {
-  scout.SmartFieldLayout.parent.prototype.layout.call(this, $container);
+constructor(smartField) {
+  super( smartField);
+  this._smartField = smartField;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   // when embedded smart-field layout must not validate the popup
   // since this would lead to an endless recursion because the smart-field
@@ -33,4 +37,5 @@ scout.SmartFieldLayout.prototype.layout = function($container) {
     popup.position();
     popup.validateLayout();
   }
-};
+}
+}

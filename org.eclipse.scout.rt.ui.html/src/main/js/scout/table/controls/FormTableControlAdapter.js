@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormTableControlAdapter = function() {
-  scout.FormTableControlAdapter.parent.call(this);
-};
-scout.inherits(scout.FormTableControlAdapter, scout.TableControlAdapter);
+import {TableControlAdapter} from '../../index';
+
+export default class FormTableControlAdapter extends TableControlAdapter {
+
+constructor() {
+  super();
+}
+
+}

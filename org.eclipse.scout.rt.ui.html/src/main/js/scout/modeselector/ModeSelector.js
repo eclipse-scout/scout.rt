@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ModeSelector = function() {
-  scout.ModeSelector.parent.call(this);
+import {ModeSelectorLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import {arrays} from '../index';
+
+export default class ModeSelector extends Widget {
+
+constructor() {
+  super();
   this._addWidgetProperties(['modes', 'selectedMode']);
   this._addPreserveOnPropertyChangeProperties(['selectedMode']);
 
@@ -17,55 +24,55 @@ scout.ModeSelector = function() {
   this.selectedMode = null;
 
   this._modePropertyChangeHandler = this._onModePropertyChange.bind(this);
-};
-scout.inherits(scout.ModeSelector, scout.Widget);
+}
 
-scout.ModeSelector.prototype._init = function(model) {
-  scout.ModeSelector.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setModes(this.modes);
   this._setSelectedMode(this.selectedMode);
-};
+}
 
-scout.ModeSelector.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('mode-selector');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ModeSelectorLayout(this));
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new ModeSelectorLayout(this));
+}
 
-scout.ModeSelector.prototype._renderProperties = function() {
-  scout.ModeSelector.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderModes();
-};
+}
 
-scout.ModeSelector.prototype.setModes = function(modes) {
+setModes(modes) {
   this.setProperty('modes', modes);
-};
+}
 
-scout.ModeSelector.prototype._setModes = function(modes) {
+_setModes(modes) {
   this.modes.forEach(function(mode) {
     mode.off('propertyChange', this._modePropertyChangeHandler);
   }, this);
-  this._setProperty('modes', scout.arrays.ensure(modes));
+  this._setProperty('modes', arrays.ensure(modes));
   this.modes.forEach(function(mode) {
     mode.on('propertyChange', this._modePropertyChangeHandler);
     if (mode.selected) {
       this.setSelectedMode(mode);
     }
   }, this);
-};
+}
 
-scout.ModeSelector.prototype._renderModes = function() {
+_renderModes() {
   this.modes.forEach(function(mode) {
     mode.render();
   });
   this._updateMarkers();
-};
+}
 
-scout.ModeSelector.prototype.setSelectedMode = function(selectedMode) {
+setSelectedMode(selectedMode) {
   this.setProperty('selectedMode', selectedMode);
-};
+}
 
-scout.ModeSelector.prototype._setSelectedMode = function(selectedMode) {
+_setSelectedMode(selectedMode) {
   if (this.selectedMode && this.selectedMode !== selectedMode) {
     this.selectedMode.setSelected(false);
   }
@@ -74,17 +81,17 @@ scout.ModeSelector.prototype._setSelectedMode = function(selectedMode) {
   }
   this._updateMarkers();
   this._setProperty('selectedMode', selectedMode);
-};
+}
 
-scout.ModeSelector.prototype._onModePropertyChange = function(event) {
+_onModePropertyChange(event) {
   if (event.propertyName === 'selected' && event.newValue) {
     this.setSelectedMode(event.source);
   } else if (event.propertyName === 'visible') {
     this._updateMarkers();
   }
-};
+}
 
-scout.ModeSelector.prototype._updateMarkers = function() {
+_updateMarkers() {
   var visibleModes = [];
   var selectedModeIndex = -1;
   this.modes.forEach(function(mode) {
@@ -105,24 +112,25 @@ scout.ModeSelector.prototype._updateMarkers = function() {
       visibleModes[selectedModeIndex + 1].$container.addClass('after-selected');
     }
   }
-};
+}
 
-scout.ModeSelector.prototype.findModeById = function(id) {
-  return scout.arrays.find(this.modes, function(mode) {
+findModeById(id) {
+  return arrays.find(this.modes, function(mode) {
     return mode.id === id;
   });
-};
+}
 
-scout.ModeSelector.prototype.findModeByRef = function(ref) {
-  return scout.arrays.find(this.modes, function(mode) {
+findModeByRef(ref) {
+  return arrays.find(this.modes, function(mode) {
     return mode.ref === ref;
   });
-};
+}
 
-scout.ModeSelector.prototype.selectModeById = function(id) {
+selectModeById(id) {
   this.setSelectedMode(this.findModeById(id));
-};
+}
 
-scout.ModeSelector.prototype.selectModeByRef = function(ref) {
+selectModeByRef(ref) {
   this.setSelectedMode(this.findModeByRef(ref));
-};
+}
+}

@@ -8,30 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NumberFieldAdapter = function() {
-  scout.NumberFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.NumberFieldAdapter, scout.BasicFieldAdapter);
+import {BasicFieldAdapter} from '../../../index';
+import {App} from '../../../index';
+import {NumberField} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
 
-scout.NumberFieldAdapter.prototype._onWidgetParseError = function(event) {
+export default class NumberFieldAdapter extends BasicFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetParseError(event) {
   // The parsing might fail on JS side, but it might succeed on server side -> Don't show an error status, instead let the server decide
   event.preventDefault();
-};
+}
 
-scout.NumberFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'parseError') {
     this._onWidgetParseError(event);
   } else {
-    scout.NumberFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.NumberFieldAdapter.modifyPrototype = function() {
-  if (!scout.app.remote) {
+static modifyPrototype() {
+  if (!App.get().remote) {
     return;
   }
 
-  scout.objects.replacePrototypeFunction(scout.NumberField, 'clearErrorStatus', function() {
+  objects.replacePrototypeFunction(NumberField, 'clearErrorStatus', function() {
     if (this.modelAdapter) {
       // Don't do anything -> let server handle it
       return;
@@ -39,6 +47,7 @@ scout.NumberFieldAdapter.modifyPrototype = function() {
       return this.clearErrorStatusOrig();
     }
   }, true);
-};
+}
+}
 
-scout.addAppListener('bootstrap', scout.NumberFieldAdapter.modifyPrototype);
+App.addListener('bootstrap', NumberFieldAdapter.modifyPrototype);

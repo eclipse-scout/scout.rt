@@ -8,59 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CellEditorPopup = function() {
-  scout.CellEditorPopup.parent.call(this);
+import {CellEditorTabKeyStroke} from '../../index';
+import {CellEditorPopupLayout} from '../../index';
+import {scout} from '../../index';
+import {Popup} from '../../index';
+import {graphics} from '../../index';
+import {Point} from '../../index';
+import {FormField} from '../../index';
+import {CellEditorCompleteEditKeyStroke} from '../../index';
+import {CellEditorCancelEditKeyStroke} from '../../index';
+import * as $ from 'jquery';
+
+export default class CellEditorPopup extends Popup {
+
+constructor() {
+  super();
   this.table = null;
   this.column = null;
   this.row = null;
   this.cell = null;
   this._pendingCompleteCellEdit = null;
   this._keyStrokeHandler = this._onKeyStroke.bind(this);
-};
-scout.inherits(scout.CellEditorPopup, scout.Popup);
+}
 
-scout.CellEditorPopup.prototype._init = function(options) {
+
+_init(options) {
   options.scrollType = options.scrollType || 'position';
-  scout.CellEditorPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.table = options.column.table;
   this.link(this.cell.field);
-};
+}
 
-scout.CellEditorPopup.prototype._createLayout = function() {
-  return new scout.CellEditorPopupLayout(this);
-};
+_createLayout() {
+  return new CellEditorPopupLayout(this);
+}
 
 /**
  * @override
  */
-scout.CellEditorPopup.prototype._initKeyStrokeContext = function() {
-  scout.CellEditorPopup.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.CellEditorCompleteEditKeyStroke(this),
-    new scout.CellEditorTabKeyStroke(this)
+    new CellEditorCompleteEditKeyStroke(this),
+    new CellEditorTabKeyStroke(this)
   ]);
-};
+}
 
 /**
  * @override Popup.js
  */
-scout.CellEditorPopup.prototype._createCloseKeyStroke = function() {
-  return new scout.CellEditorCancelEditKeyStroke(this);
-};
+_createCloseKeyStroke() {
+  return new CellEditorCancelEditKeyStroke(this);
+}
 
 /**
  * @override
  */
-scout.CellEditorPopup.prototype._open = function($parent, event) {
+_open($parent, event) {
   this.render($parent, event);
   this.position();
   this.pack();
-};
+}
 
-scout.CellEditorPopup.prototype._render = function() {
-  scout.CellEditorPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   var firstCell = this.table.visibleColumns().indexOf(this.column) === 0;
   this.$container.addClass('cell-editor-popup');
@@ -70,7 +83,7 @@ scout.CellEditorPopup.prototype._render = function() {
   }
 
   var field = this.cell.field;
-  field.mode = scout.FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
+  field.mode = FormField.Mode.CELLEDITOR; // hint that this field is used within a cell-editor
   field.render();
   field.prepareForCellEdit({
     firstCell: firstCell
@@ -96,10 +109,10 @@ scout.CellEditorPopup.prototype._render = function() {
     this.table.$container.addClass('focused');
   }
   this.session.keyStrokeManager.on('keyStroke', this._keyStrokeHandler);
-};
+}
 
-scout.CellEditorPopup.prototype._postRender = function() {
-  scout.CellEditorPopup.parent.prototype._postRender.call(this); // installs the focus context for this popup
+_postRender() {
+  super._postRender(); // installs the focus context for this popup
 
   // If applicable, invoke the field's function 'onCellEditorRendered' to signal the cell-editor to be rendered.
   var field = this.cell.field;
@@ -109,10 +122,10 @@ scout.CellEditorPopup.prototype._postRender = function() {
       cellEditorPopup: this
     });
   }
-};
+}
 
-scout.CellEditorPopup.prototype._remove = function() {
-  scout.CellEditorPopup.parent.prototype._remove.call(this); // uninstalls the focus context for this popup
+_remove() {
+  super._remove(); // uninstalls the focus context for this popup
 
   this.session.keyStrokeManager.off('keyStroke', this._keyStrokeHandler);
   this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
@@ -121,26 +134,26 @@ scout.CellEditorPopup.prototype._remove = function() {
     this.table.$container.removeClass('focused');
   }
   this.$anchor.css('visibility', '');
-};
+}
 
-scout.CellEditorPopup.prototype.position = function() {
+position() {
   var cellBounds, rowBounds,
     $tableData = this.table.$data,
     $row = this.row.$row,
     $cell = this.$anchor,
     insetsLeft = $tableData.cssPxValue('padding-left') + $row.cssBorderLeftWidth();
 
-  cellBounds = scout.graphics.bounds($cell);
+  cellBounds = graphics.bounds($cell);
   cellBounds.x += $cell.cssMarginX(); // first cell popup has a negative left margin
-  rowBounds = scout.graphics.bounds($row);
+  rowBounds = graphics.bounds($row);
   rowBounds.y += $row.cssMarginY(); // row has a negative top margin
-  this.setLocation(new scout.Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
-};
+  this.setLocation(new Point(insetsLeft + cellBounds.x, $tableData.scrollTop() + rowBounds.y));
+}
 
 /**
  * @returns {Promise} resolved when acceptInput is performed on the editor field
  */
-scout.CellEditorPopup.prototype.completeEdit = function(waitForAcceptInput) {
+completeEdit(waitForAcceptInput) {
   if (this._pendingCompleteCellEdit) {
     // Make sure complete cell edit does not get sent twice since it will lead to exceptions. This may happen if user clicks very fast multiple times.
     return this._pendingCompleteCellEdit;
@@ -165,22 +178,22 @@ scout.CellEditorPopup.prototype.completeEdit = function(waitForAcceptInput) {
   }.bind(this));
 
   return this._pendingCompleteCellEdit;
-};
+}
 
-scout.CellEditorPopup.prototype.isCompleteCellEditRequested = function() {
+isCompleteCellEditRequested() {
   return !!this._pendingCompleteCellEdit;
-};
+}
 
-scout.CellEditorPopup.prototype.cancelEdit = function() {
+cancelEdit() {
   this.table.cancelCellEdit();
   this.remove();
-};
+}
 
-scout.CellEditorPopup.prototype._onMouseDownOutside = function(event) {
+_onMouseDownOutside(event) {
   this.completeEdit();
-};
+}
 
-scout.CellEditorPopup.prototype._onKeyStroke = function(event) {
+_onKeyStroke(event) {
   if (!this.session.keyStrokeManager.invokeAcceptInputOnActiveValueField(event.keyStroke, event.keyStrokeContext)) {
     return;
   }
@@ -191,11 +204,12 @@ scout.CellEditorPopup.prototype._onKeyStroke = function(event) {
   // Make sure completeEdit is called immediately after calling acceptInput.
   // Otherwise the key stroke will be executed before completing the edit which prevents the input from being saved
   this.completeEdit(false);
-};
+}
 
-scout.CellEditorPopup.prototype.waitForCompleteCellEdit = function() {
+waitForCompleteCellEdit() {
   if (this._pendingCompleteCellEdit) {
     return this._pendingCompleteCellEdit.promise();
   }
   return $.resolvedPromise();
-};
+}
+}

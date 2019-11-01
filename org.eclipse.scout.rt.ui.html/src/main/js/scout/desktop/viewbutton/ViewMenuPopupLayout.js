@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewMenuPopupLayout = function(popup) {
-  scout.ViewMenuPopupLayout.parent.call(this, popup);
-};
-scout.inherits(scout.ViewMenuPopupLayout, scout.PopupWithHeadLayout);
+import {ViewMenuPopup} from '../../index';
+import {PopupWithHeadLayout} from '../../index';
 
-scout.ViewMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize = scout.ViewMenuPopupLayout.parent.prototype.preferredLayoutSize.call(this, $container);
+export default class ViewMenuPopupLayout extends PopupWithHeadLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
+
+preferredLayoutSize($container) {
+  var prefSize = super.preferredLayoutSize( $container);
 
   // Always use pref size if it is larger than view button box so that the menu items are fully readable
   if (prefSize.width >= this.popup.viewButtonBoxBounds.width) {
@@ -22,6 +27,7 @@ scout.ViewMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
   }
 
   // Otherwise make popup as width as the view button box or MAX_MENU_WIDTH at max
-  prefSize.width = Math.min(scout.ViewMenuPopup.MAX_MENU_WIDTH, this.popup.viewButtonBoxBounds.width);
+  prefSize.width = Math.min(ViewMenuPopup.MAX_MENU_WIDTH, this.popup.viewButtonBoxBounds.width);
   return prefSize;
-};
+}
+}

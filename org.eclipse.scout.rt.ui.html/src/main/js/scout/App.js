@@ -8,7 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.App = function() {
+import {models} from './index';
+import {codes} from './index';
+import {fonts} from './index';
+import {Session} from './index';
+import {objects} from './index';
+import {numbers} from './index';
+import * as $ from 'jquery';
+import {ObjectFactory} from './index';
+import {texts} from './index';
+import {logging} from './index';
+import {scout} from './index';
+import {polyfills} from './index';
+import {webstorage} from './index';
+import {locales} from './index';
+import {Device} from './index';
+import {EventSupport} from './index';
+import {App as App_1} from './index';
+
+export default class App {
+
+constructor() {
   this.events = this._createEventSupport();
   this.initialized = false;
 
@@ -18,9 +38,9 @@ scout.App = function() {
   }, this);
   scout.appListeners = [];
 
-  scout.app = this;
-  scout.errorHandler = this._createErrorHandler();
-};
+  App_1.get() = this;
+  App_1.get().errorHandler = this._createErrorHandler();
+}
 
 /**
  * Main initialization function.<p>
@@ -30,41 +50,41 @@ scout.App = function() {
  * During the bootstrap phase additional scripts may get loaded required for a successful session startup.<br>
  * The actual initialization does not get started before these bootstrap scripts are loaded.
  */
-scout.App.prototype.init = function(options) {
+init(options) {
   options = options || {};
   return this._prepare(options)
     .then(this._bootstrap.bind(this, options.bootstrap))
     .then(this._init.bind(this, options))
     .then(this._initDone.bind(this, options))
     .catch(this._fail.bind(this, options));
-};
+}
 
 /**
  * Initializes the logging framework, polyfills and the object factory.
  * This happens at the prepare phase because all these things should be available from the beginning.
  */
-scout.App.prototype._prepare = function(options) {
+_prepare(options) {
   return this._prepareLogging(options).done(function() {
     this._prepareEssentials(options);
     this._prepareDone(options);
   }.bind(this));
-};
+}
 
-scout.App.prototype._prepareEssentials = function(options) {
-  scout.polyfills.install(window);
-  scout.objectFactory.init();
-};
+_prepareEssentials(options) {
+  polyfills.install(window);
+  ObjectFactory.get().init();
+}
 
-scout.App.prototype._prepareDone = function(options) {
+_prepareDone(options) {
   this.trigger('prepare', {
     options: options
   });
   $.log.isDebugEnabled() && $.log.debug('App prepared');
-};
+}
 
-scout.App.prototype._prepareLogging = function(options) {
-  return scout.logging.bootstrap();
-};
+_prepareLogging(options) {
+  return logging.bootstrap();
+}
 
 /**
  * Executes the default bootstrap functions and returns an array of promises.<p>
@@ -72,7 +92,7 @@ scout.App.prototype._prepareLogging = function(options) {
  * This gives the possibility to dynamically load additional scripts or files which are mandatory for a successful session startup.
  * The individual bootstrap functions may return null or undefined, a single promise or multiple promises as an array.
  */
-scout.App.prototype._bootstrap = function(options) {
+_bootstrap(options) {
   options = options || {};
 
   var promises = [];
@@ -87,28 +107,28 @@ scout.App.prototype._bootstrap = function(options) {
   return $.promiseAll(promises)
     .done(this._bootstrapDone.bind(this, options))
     .catch(this._bootstrapFail.bind(this, options));
-};
+}
 
-scout.App.prototype._doBootstrap = function(options) {
+_doBootstrap(options) {
   return [
-    scout.device.bootstrap(),
-    scout.fonts.bootstrap(options.fonts),
-    scout.models.bootstrap(options.modelsUrl),
-    scout.locales.bootstrap(options.localesUrl),
-    scout.texts.bootstrap(options.textsUrl),
-    scout.codes.bootstrap(options.codesUrl)
+    Device.get().bootstrap(),
+    fonts.bootstrap(options.fonts),
+    models.bootstrap(options.modelsUrl),
+    locales.bootstrap(options.localesUrl),
+    texts.bootstrap(options.textsUrl),
+    codes.bootstrap(options.codesUrl)
   ];
-};
+}
 
-scout.App.prototype._bootstrapDone = function(options) {
-  scout.webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
+_bootstrapDone(options) {
+  webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
   this.trigger('bootstrap', {
     options: options
   });
   $.log.isDebugEnabled() && $.log.debug('App bootstrapped');
-};
+}
 
-scout.App.prototype._bootstrapFail = function(options, vararg, textStatus, errorThrown, requestOptions) {
+_bootstrapFail(options, vararg, textStatus, errorThrown, requestOptions) {
   $.log.isInfoEnabled() && $.log.info('App bootstrap failed');
 
   // If one of the bootstrap ajax call fails due to a session timeout, the index.html is probably loaded from cache without asking the server for its validity.
@@ -126,42 +146,42 @@ scout.App.prototype._bootstrapFail = function(options, vararg, textStatus, error
       this._handleBootstrapTimeoutError(vararg, url);
       return;
     }
-  } else if (scout.objects.isPlainObject(vararg) && vararg.error) {
+  } else if (objects.isPlainObject(vararg) && vararg.error) {
     // Json based error
     // Json errors (normally processed by Session.js) are returned with http status 200
-    if (vararg.error.code === scout.Session.JsonResponseError.SESSION_TIMEOUT) {
+    if (vararg.error.code === Session.JsonResponseError.SESSION_TIMEOUT) {
       this._handleBootstrapTimeoutError(vararg.error, vararg.url);
       return;
     }
   }
 
   // Make sure promise will be rejected with all original arguments so that it can be eventually handled by this._fail
-  var args = scout.objects.argumentsToArray(arguments).slice(1);
+  var args = objects.argumentsToArray(arguments).slice(1);
   return $.rejectedPromise.apply($, args);
-};
+}
 
-scout.App.prototype._isSessionTimeoutStatus = function(httpStatus) {
+_isSessionTimeoutStatus(httpStatus) {
   return httpStatus === 401;
-};
+}
 
-scout.App.prototype._handleBootstrapTimeoutError = function(error, url) {
+_handleBootstrapTimeoutError(error, url) {
   $.log.isInfoEnabled() && $.log.info('Timeout error for resource ' + url + '. Reloading page...');
-  if (scout.webstorage.getItem(sessionStorage, 'scout:timeoutPageReload')) {
+  if (webstorage.getItem(sessionStorage, 'scout:timeoutPageReload')) {
     // Prevent loop in case a reload did not solve the problem
     $.log.isWarnEnabled() && $.log.warn('Prevented automatic reload, startup will likely fail', error, url);
-    scout.webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
+    webstorage.removeItem(sessionStorage, 'scout:timeoutPageReload');
     throw new Error('Resource ' + url + ' could not be loaded due to a session timeout, even after a page reload');
   }
-  scout.webstorage.setItem(sessionStorage, 'scout:timeoutPageReload', true);
+  webstorage.setItem(sessionStorage, 'scout:timeoutPageReload', true);
 
   // See comment in _bootstrapFail for the reasons why to reload here
   scout.reloadPage();
-};
+}
 
 /**
- * Initializes a session for each html element with class '.scout' and stores them in scout.sessions.
+ * Initializes a session for each html element with class '.scout' and stores them in App_1.get().sessions.
  */
-scout.App.prototype._init = function(options) {
+_init(options) {
   options = options || {};
   if (!this._checkBrowserCompability(options)) {
     return;
@@ -176,18 +196,18 @@ scout.App.prototype._init = function(options) {
   this._installExtensions();
   return this._load(options)
     .then(this._loadSessions.bind(this, options.session));
-};
+}
 
 /**
  * Maybe implemented to load data from a server before the desktop is created.
  * @returns {Promise} promise which is resolved after the loading is complete
  */
-scout.App.prototype._load = function(options) {
+_load(options) {
   return $.resolvedPromise();
-};
+}
 
-scout.App.prototype._checkBrowserCompability = function(options) {
-  var device = scout.device;
+_checkBrowserCompability(options) {
+  var device = Device.get();
   var app = this;
   $.log.isInfoEnabled() && $.log.info('Detected browser ' + device.browser + ' version ' + device.browserVersion);
   if (!scout.nvl(options.checkBrowserCompatibility, true) || device.isSupportedBrowser()) {
@@ -198,7 +218,7 @@ scout.App.prototype._checkBrowserCompability = function(options) {
   $('.scout').each(function() {
     var $entryPoint = $(this),
       $box = $entryPoint.appendDiv(),
-      newOptions = scout.objects.valueCopy(options);
+      newOptions = objects.valueCopy(options);
 
     newOptions.checkBrowserCompatibility = false;
     $box.load('unsupported-browser.html', function() {
@@ -209,26 +229,26 @@ scout.App.prototype._checkBrowserCompability = function(options) {
     });
   });
   return false;
-};
+}
 
-scout.App.prototype._initVersion = function(options) {
+_initVersion(options) {
   this.version = scout.nvl(
     this.version,
     options.version,
     $('scout-version').data('value'));
-};
+}
 
-scout.App.prototype._prepareDOM = function() {
+_prepareDOM() {
   scout.prepareDOM(document);
-};
+}
 
-scout.App.prototype._installGlobalMouseDownInterceptor = function() {
+_installGlobalMouseDownInterceptor() {
   scout.installGlobalMouseDownInterceptor(document);
-};
+}
 
-scout.App.prototype._installSyntheticActiveStateHandler = function() {
+_installSyntheticActiveStateHandler() {
   scout.installSyntheticActiveStateHandler(document);
-};
+}
 
 /**
  * Installs a global error handler.
@@ -241,25 +261,25 @@ scout.App.prototype._installSyntheticActiveStateHandler = function() {
  * on the first line of the stack. Firefox does only contain the stack lines, without the message, but in return
  * the stack trace is much longer :)
  */
-scout.App.prototype._installErrorHandler = function() {
-  window.onerror = scout.errorHandler.windowErrorHandler;
+_installErrorHandler() {
+  window.onerror = App_1.get().errorHandler.windowErrorHandler;
   // FIXME bsh, cgu: use ErrorHandler to handle unhandled promise rejections
   //                 --> replace jQuery.Deferred.exceptionHook(error, stack)
-};
+}
 
-scout.App.prototype._createErrorHandler = function() {
+_createErrorHandler() {
   return scout.create('ErrorHandler');
-};
+}
 
 /**
  * Uses the object returned by {@link #_ajaxDefaults} to setup ajax. The values in that object are used as default values for every ajax call.
  */
-scout.App.prototype._ajaxSetup = function() {
+_ajaxSetup() {
   var ajaxDefaults = this._ajaxDefaults();
   if (ajaxDefaults) {
     $.ajaxSetup(ajaxDefaults);
   }
-};
+}
 
 /**
  * Returns the defaults for every ajax call. You may override it to set custom defaults.
@@ -267,23 +287,23 @@ scout.App.prototype._ajaxSetup = function() {
  * <p>
  * Note: This will affect every ajax call, so use it with care! See also the advice on https://api.jquery.com/jquery.ajaxsetup/.
  */
-scout.App.prototype._ajaxDefaults = function() {
+_ajaxDefaults() {
   return {
     beforeSend: this._beforeAjaxCall.bind(this)
   };
-};
+}
 
 /**
  * Called before every ajax call. Sets the header X-Scout-Correlation-Id.
  * <p>
  * Maybe overridden to set custom headers or to execute other code which should run before an ajax call.
  */
-scout.App.prototype._beforeAjaxCall = function(request) {
-  request.setRequestHeader('X-Scout-Correlation-Id', scout.numbers.correlationId());
+_beforeAjaxCall(request) {
+  request.setRequestHeader('X-Scout-Correlation-Id', numbers.correlationId());
   request.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // explicitly add here because jQuery only adds it automatically if it is no crossDomain request
-};
+}
 
-scout.App.prototype._loadSessions = function(options) {
+_loadSessions(options) {
   options = options || {};
   var promises = [];
   $('.scout').each(function(i, elem) {
@@ -293,16 +313,16 @@ scout.App.prototype._loadSessions = function(options) {
     promises.push(promise);
   }.bind(this));
   return $.promiseAll(promises);
-};
+}
 
 /**
  * @returns {Promise} promise which is resolved when the session is ready
  */
-scout.App.prototype._loadSession = function($entryPoint, options) {
+_loadSession($entryPoint, options) {
   options.locale = options.locale || this._loadLocale();
   options.$entryPoint = $entryPoint;
   var session = this._createSession(options);
-  scout.sessions.push(session);
+  App_1.get().sessions.push(session);
 
   // TODO [7.0] cgu improve this, start must not be executed because it currently does a server request
   var desktop = this._createDesktop(session.root);
@@ -320,52 +340,52 @@ scout.App.prototype._loadSession = function($entryPoint, options) {
     this.trigger('sessionReady', {
       session: session
     });
-    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + scout.device);
+    $.log.isInfoEnabled() && $.log.info('Session initialized. Detected ' + Device.get());
   }.bind(this));
   return $.resolvedPromise();
-};
+}
 
-scout.App.prototype._createSession = function(options) {
+_createSession(options) {
   return scout.create('Session', options, {
     ensureUniqueId: false
   });
-};
+}
 
-scout.App.prototype._createDesktop = function(parent) {
+_createDesktop(parent) {
   return scout.create('Desktop', {
     parent: parent
   });
-};
+}
 
 /**
  * @returns the locale to be used when no locale is provided as app option. By default the navigators locale is used.
  */
-scout.App.prototype._loadLocale = function() {
-  return scout.locales.getNavigatorLocale();
-};
+_loadLocale() {
+  return locales.getNavigatorLocale();
+}
 
-scout.App.prototype._initDone = function(options) {
+_initDone(options) {
   this.initialized = true;
   this.trigger('init', {
     options: options
   });
   $.log.isInfoEnabled() && $.log.info('App initialized');
-};
+}
 
-scout.App.prototype._fail = function(options, error) {
+_fail(options, error) {
   $.log.error('App initialization failed', error);
   var $error = $('body').appendDiv('startup-error');
   $error.appendDiv('startup-error-title').text('The application could not be started');
 
-  var args = scout.objects.argumentsToArray(arguments).slice(1);
-  var errorInfo = scout.errorHandler.handle(args);
+  var args = objects.argumentsToArray(arguments).slice(1);
+  var errorInfo = App_1.get().errorHandler.handle(args);
   if (errorInfo.message) {
     $error.appendDiv('startup-error-message').text(errorInfo.message);
   }
 
   // Reject with original rejection arguments
   return $.rejectedPromise.apply($, args);
-};
+}
 
 /**
  * Override this method to install extensions to Scout objects. Since the extension feature replaces functions
@@ -374,41 +394,42 @@ scout.App.prototype._fail = function(options, error) {
  *
  * The default implementation does nothing.
  */
-scout.App.prototype._installExtensions = function() {
+_installExtensions() {
   // NOP
-};
+}
 
 //--- Event handling methods ---
-scout.App.prototype._createEventSupport = function() {
-  return new scout.EventSupport();
-};
+_createEventSupport() {
+  return new EventSupport();
+}
 
-scout.App.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
-};
+}
 
-scout.App.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.App.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.App.prototype.off = function(type, func) {
+off(type, func) {
   this.events.off(type, func);
-};
+}
 
-scout.App.prototype.addListener = function(listener) {
+addListener(listener) {
   this.events.addListener(listener);
-};
+}
 
-scout.App.prototype.removeListener = function(listener) {
+removeListener(listener) {
   this.events.removeListener(listener);
-};
+}
 
-scout.App.prototype.when = function(type) {
+when(type) {
   return this.events.when(type);
-};
+}
+}

@@ -8,19 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DatePickerPopupLayout = function(popup) {
-  scout.DatePickerPopupLayout.parent.call(this);
+import {PopupLayout} from '../index';
+
+export default class DatePickerPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super();
   this.popup = popup;
   this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.DatePickerPopupLayout, scout.PopupLayout);
+}
 
-scout.DatePickerPopupLayout.prototype.layout = function($container) {
+
+layout($container) {
   var size,
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
 
-  scout.DatePickerPopupLayout.parent.prototype.layout.call(this, $container);
+  super.layout( $container);
 
   size = htmlComp.size()
     .subtract(htmlComp.insets())
@@ -33,9 +37,9 @@ scout.DatePickerPopupLayout.prototype.layout = function($container) {
   if (this.popup.htmlComp.layouted) {
     this.popup.position();
   }
-};
+}
 
-scout.DatePickerPopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var prefSize,
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
@@ -45,4 +49,5 @@ scout.DatePickerPopupLayout.prototype.preferredLayoutSize = function($container)
     .add(htmlPicker.margins());
 
   return prefSize;
-};
+}
+}

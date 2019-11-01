@@ -8,10 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationExpandKeyStroke = function(table) {
-  scout.TableNavigationExpandKeyStroke.parent.call(this, table);
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableNavigationExpandKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
   this.field = table;
-  this.which = [scout.keys.ADD, scout.keys.RIGHT];
+  this.which = [keys.ADD, keys.RIGHT];
   this.renderingHints.text = '+';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var row = this.field.selectedRows[0];
@@ -19,11 +24,11 @@ scout.TableNavigationExpandKeyStroke = function(table) {
       return row.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationExpandKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationExpandKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableNavigationExpandKeyStroke.parent.prototype._accept.call(this, event),
+
+_accept(event) {
+  var accepted = super._accept( event),
     selectedRow = this.field.selectedRows[0];
   if (!accepted) {
     return false;
@@ -32,9 +37,9 @@ scout.TableNavigationExpandKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return selectedRow._expandable;
-};
+}
 
-scout.TableNavigationExpandKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var table = this.field,
     selectedRow = this.field.selectedRows[0],
     visibleChildRows;
@@ -52,4 +57,5 @@ scout.TableNavigationExpandKeyStroke.prototype.handle = function(event) {
       table.expandRow(selectedRow);
     }
   }
-};
+}
+}

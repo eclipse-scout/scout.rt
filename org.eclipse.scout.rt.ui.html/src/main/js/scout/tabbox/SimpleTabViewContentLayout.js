@@ -8,36 +8,43 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SimpleTabViewContentLayout = function(tabBox) {
-  scout.SimpleTabViewContentLayout.parent.call(this);
-  this.tabBox = tabBox;
-};
-scout.inherits(scout.SimpleTabViewContentLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Dimension} from '../index';
 
-scout.SimpleTabViewContentLayout.prototype.layout = function($container) {
+export default class SimpleTabViewContentLayout extends AbstractLayout {
+
+constructor(tabBox) {
+  super();
+  this.tabBox = tabBox;
+}
+
+
+layout($container) {
   var currentView = this.tabBox.currentView;
   if (!currentView || !currentView.rendered || !currentView.htmlComp) {
     return;
   }
 
-  var htmlContainer = scout.HtmlComponent.get($container);
+  var htmlContainer = HtmlComponent.get($container);
   var size = htmlContainer.availableSize()
     .subtract(htmlContainer.insets())
     .subtract(currentView.htmlComp.margins());
 
   currentView.htmlComp.setSize(size);
-};
+}
 
-scout.SimpleTabViewContentLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var currentView = this.tabBox.currentView;
   if (!currentView || !currentView.rendered || !currentView.htmlComp) {
-    return new scout.Dimension();
+    return new Dimension();
   }
 
-  var htmlContainer = scout.HtmlComponent.get($container);
+  var htmlContainer = HtmlComponent.get($container);
   var prefSize = currentView.htmlComp.prefSize()
     .add(htmlContainer.insets())
     .add(currentView.htmlComp.margins());
 
   return prefSize;
-};
+}
+}

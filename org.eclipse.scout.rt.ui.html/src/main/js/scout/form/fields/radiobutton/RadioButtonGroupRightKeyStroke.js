@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonGroupRightKeyStroke = function(radioButtonGroup) {
-  scout.RadioButtonGroupRightKeyStroke.parent.call(this);
-  this.field = radioButtonGroup;
-  this.which = [scout.keys.RIGHT];
-  this.renderingHints.render = false;
-};
-scout.inherits(scout.RadioButtonGroupRightKeyStroke, scout.KeyStroke);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import * as $ from 'jquery';
 
-scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
+export default class RadioButtonGroupRightKeyStroke extends KeyStroke {
+
+constructor(radioButtonGroup) {
+  super();
+  this.field = radioButtonGroup;
+  this.which = [keys.RIGHT];
+  this.renderingHints.render = false;
+}
+
+
+handle(event) {
   var fieldBefore,
     focusedButton = $(event.target).data('radiobutton');
 
@@ -30,4 +36,5 @@ scout.RadioButtonGroupRightKeyStroke.prototype.handle = function(event) {
       fieldBefore = radioButton;
     }
   }, this);
-};
+}
+}

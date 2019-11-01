@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CarouselLayout = function(carousel) {
-  scout.CarouselLayout.parent.call(this);
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Dimension} from '../index';
+
+export default class CarouselLayout extends AbstractLayout {
+
+constructor(carousel) {
+  super();
 
   this.carousel = carousel;
-};
-scout.inherits(scout.CarouselLayout, scout.AbstractLayout);
+}
 
-scout.CarouselLayout.prototype.layout = function($container) {
+
+layout($container) {
   // recalculate style transformation after layout
   this.carousel.recalcTransformation();
 
@@ -38,17 +44,18 @@ scout.CarouselLayout.prototype.layout = function($container) {
   this.carousel.htmlCompFilmstrip.setSize(filmstripSize);
 
   $carouselItems.forEach(function(e) {
-    var htmlCarouselItem = scout.HtmlComponent.get(e);
+    var htmlCarouselItem = HtmlComponent.get(e);
     htmlCarouselItem.setSize(itemSize);
   });
-};
+}
 
-scout.CarouselLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var currentIndex = this.carousel.currentItem;
-  var dim = new scout.Dimension(1, 1);
+  var dim = new Dimension(1, 1);
   if (currentIndex < this.carousel.$carouselItems.length && currentIndex >= 0) {
-    dim = scout.HtmlComponent.get(this.carousel.$carouselItems[currentIndex]).prefSize();
+    dim = HtmlComponent.get(this.carousel.$carouselItems[currentIndex]).prefSize();
   }
   dim.height += this.carousel.htmlCompStatus.size().height;
   return dim;
-};
+}
+}

@@ -8,15 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagChooserPopup = function() {
-  scout.TagChooserPopup.parent.call(this);
+import {Popup} from '../../../index';
+import {lookupField} from '../../../index';
+import {TagChooserPopupLayout} from '../../../index';
+import {scout} from '../../../index';
+
+export default class TagChooserPopup extends Popup {
+
+constructor() {
+  super();
 
   this.table = null;
-};
-scout.inherits(scout.TagChooserPopup, scout.Popup);
+}
 
-scout.TagChooserPopup.prototype._init = function(model) {
-  scout.TagChooserPopup.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   var column = scout.create('Column', {
     index: 0,
@@ -36,22 +43,22 @@ scout.TagChooserPopup.prototype._init = function(model) {
   });
 
   this.table.on('rowClick', this._onRowClick.bind(this));
-};
+}
 
-scout.TagChooserPopup.prototype._createLayout = function() {
-  return new scout.TagChooserPopupLayout(this);
-};
+_createLayout() {
+  return new TagChooserPopupLayout(this);
+}
 
-scout.TagChooserPopup.prototype._render = function() {
-  scout.TagChooserPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this.$container
     .addClass('tag-chooser-popup')
     .on('mousedown', this._onContainerMouseDown.bind(this));
   this._renderTable();
-};
+}
 
-scout.TagChooserPopup.prototype._renderTable = function() {
+_renderTable() {
   this.table.setVirtual(false);
   this.table.render();
 
@@ -59,23 +66,23 @@ scout.TagChooserPopup.prototype._renderTable = function() {
   this.table.$container
     .setTabbable(false)
     .addClass('focused');
-};
+}
 
-scout.TagChooserPopup.prototype.setLookupResult = function(result) {
+setLookupResult(result) {
   var
     tableRows = [],
     lookupRows = result.lookupRows;
 
   this.table.deleteAllRows();
   lookupRows.forEach(function(lookupRow) {
-    tableRows.push(scout.lookupField.createTableRow(lookupRow));
+    tableRows.push(lookupField.createTableRow(lookupRow));
   }, this);
   this.table.insertRows(tableRows);
-};
+}
 
-scout.TagChooserPopup.prototype._onRowClick = function(event) {
+_onRowClick(event) {
   this.triggerLookupRowSelected();
-};
+}
 
 /**
  * This event handler is called before the mousedown handler on the _document_ is triggered
@@ -83,23 +90,23 @@ scout.TagChooserPopup.prototype._onRowClick = function(event) {
  * should stay open when the SmartField popup is closed. It also prevents the focus blur
  * event on the SmartField input-field.
  */
-scout.TagChooserPopup.prototype._onContainerMouseDown = function(event) {
+_onContainerMouseDown(event) {
   // when user clicks on proposal popup with table or tree (prevent default,
   // so input-field does not lose the focus, popup will be closed by the
   // proposal chooser impl.
   return false;
-};
+}
 
-scout.TagChooserPopup.prototype._isMouseDownOnAnchor = function(event) {
+_isMouseDownOnAnchor(event) {
   return this.field.$field.isOrHas(event.target);
-};
+}
 
-scout.TagChooserPopup.prototype.delegateKeyEvent = function(event) {
+delegateKeyEvent(event) {
   event.originalEvent.smartFieldEvent = true;
   this.table.$container.trigger(event);
-};
+}
 
-scout.TagChooserPopup.prototype.triggerLookupRowSelected = function(row) {
+triggerLookupRowSelected(row) {
   row = row || this.selectedRow();
   if (!row || !row.enabled) {
     return;
@@ -107,8 +114,9 @@ scout.TagChooserPopup.prototype.triggerLookupRowSelected = function(row) {
   this.trigger('lookupRowSelected', {
     lookupRow: row.lookupRow
   });
-};
+}
 
-scout.TagChooserPopup.prototype.selectedRow = function() {
+selectedRow() {
   return this.table.selectedRow();
-};
+}
+}

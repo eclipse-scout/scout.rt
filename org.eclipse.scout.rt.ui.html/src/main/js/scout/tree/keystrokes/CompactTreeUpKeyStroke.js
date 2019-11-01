@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CompactTreeUpKeyStroke = function(compactProcessTree) {
-  scout.CompactTreeUpKeyStroke.parent.call(this, compactProcessTree);
-  this.which = [scout.keys.UP];
-  this.renderingHints.text = '↑';
-};
-scout.inherits(scout.CompactTreeUpKeyStroke, scout.AbstractCompactTreeControlKeyStroke);
+import {AbstractCompactTreeControlKeyStroke} from '../../index';
+import {keys} from '../../index';
+import {arrays} from '../../index';
 
-scout.CompactTreeUpKeyStroke.prototype._findNextNode = function($currentNode, currentNode) {
+export default class CompactTreeUpKeyStroke extends AbstractCompactTreeControlKeyStroke {
+
+constructor(compactProcessTree) {
+  super( compactProcessTree);
+  this.which = [keys.UP];
+  this.renderingHints.text = '↑';
+}
+
+
+_findNextNode($currentNode, currentNode) {
   if (currentNode) {
     // Find last process node, or last process node in previous section.
     return $currentNode.prev('.section-node').data('node') || $currentNode.parent().prev('.section').children('.section-node').last().data('node');
   } else {
     // Find last process node.
-    return scout.arrays.last(scout.arrays.last(this.field.nodes).childNodes);
+    return arrays.last(arrays.last(this.field.nodes).childNodes);
   }
-};
+}
+}

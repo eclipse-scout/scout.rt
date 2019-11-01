@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BeanFieldAdapter = function() {
-  scout.BeanFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.BeanFieldAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
 
-scout.BeanFieldAdapter.prototype._onWidgetAppLinkAction = function(event) {
+export default class BeanFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.BeanFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.BeanFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

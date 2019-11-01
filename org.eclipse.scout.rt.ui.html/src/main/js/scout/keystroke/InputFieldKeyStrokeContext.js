@@ -8,87 +8,94 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../index';
+import {KeyStrokeContext} from '../index';
+import {keyStrokeModifier} from '../index';
+import * as $ from 'jquery';
+
 /**
  * Keystroke context used for input fields.
  */
-scout.InputFieldKeyStrokeContext = function() {
-  scout.InputFieldKeyStrokeContext.parent.call(this);
+export default class InputFieldKeyStrokeContext extends KeyStrokeContext {
+
+constructor() {
+  super();
 
   this.invokeAcceptInputOnActiveValueField = true;
 
-  this.registerStopPropagationKeys(scout.keyStrokeModifier.CTRL, [
-    scout.keys.A,
-    scout.keys.C,
-    scout.keys.Y,
-    scout.keys.V,
-    scout.keys.Z,
-    scout.keys.RIGHT,
-    scout.keys.BACKSPACE,
-    scout.keys.LEFT,
-    scout.keys.HOME,
-    scout.keys.END,
-    scout.keys.NUMPAD_4,
-    scout.keys.NUMPAD_6
+  this.registerStopPropagationKeys(keyStrokeModifier.CTRL, [
+    keys.A,
+    keys.C,
+    keys.Y,
+    keys.V,
+    keys.Z,
+    keys.RIGHT,
+    keys.BACKSPACE,
+    keys.LEFT,
+    keys.HOME,
+    keys.END,
+    keys.NUMPAD_4,
+    keys.NUMPAD_6
   ]);
 
-  this.registerStopPropagationKeys(scout.keyStrokeModifier.CTRL | scout.keyStrokeModifier.SHIFT, [ // NOSONAR
-    scout.keys.RIGHT,
-    scout.keys.BACKSPACE,
-    scout.keys.LEFT,
-    scout.keys.HOME,
-    scout.keys.END,
-    scout.keys.NUMPAD_4,
-    scout.keys.NUMPAD_6
+  this.registerStopPropagationKeys(keyStrokeModifier.CTRL | keyStrokeModifier.SHIFT, [ // NOSONAR
+    keys.RIGHT,
+    keys.BACKSPACE,
+    keys.LEFT,
+    keys.HOME,
+    keys.END,
+    keys.NUMPAD_4,
+    keys.NUMPAD_6
   ]);
 
-  this.registerStopPropagationKeys(scout.keyStrokeModifier.SHIFT, [
-    scout.keys.RIGHT,
-    scout.keys.BACKSPACE,
-    scout.keys.LEFT,
-    scout.keys.HOME,
-    scout.keys.END,
-    scout.keys.NUMPAD_4,
-    scout.keys.NUMPAD_6
+  this.registerStopPropagationKeys(keyStrokeModifier.SHIFT, [
+    keys.RIGHT,
+    keys.BACKSPACE,
+    keys.LEFT,
+    keys.HOME,
+    keys.END,
+    keys.NUMPAD_4,
+    keys.NUMPAD_6
   ]);
-  this.registerStopPropagationKeys(scout.keyStrokeModifier.NONE, [
-    scout.keys.SEMICOLON,
-    scout.keys.DASH,
-    scout.keys.COMMA,
-    scout.keys.POINT,
-    scout.keys.FORWARD_SLASH,
-    scout.keys.OPEN_BRACKET,
-    scout.keys.BACK_SLASH,
-    scout.keys.CLOSE_BRACKET,
-    scout.keys.SINGLE_QUOTE,
-    scout.keys.MULTIPLY,
-    scout.keys.ADD,
-    scout.keys.SUBTRACT,
-    scout.keys.DECIMAL_POINT,
-    scout.keys.DIVIDE,
-    scout.keys.NUMPAD_0,
-    scout.keys.NUMPAD_1,
-    scout.keys.NUMPAD_2,
-    scout.keys.NUMPAD_3,
-    scout.keys.NUMPAD_4,
-    scout.keys.NUMPAD_5,
-    scout.keys.NUMPAD_6,
-    scout.keys.NUMPAD_7,
-    scout.keys.NUMPAD_8,
-    scout.keys.NUMPAD_9,
-    scout.keys.MULTIPLY,
-    scout.keys.END,
-    scout.keys.HOME,
-    scout.keys.RIGHT,
-    scout.keys.BACKSPACE,
-    scout.keys.LEFT,
-    scout.keys.DELETE,
-    scout.keys.SPACE
+  this.registerStopPropagationKeys(keyStrokeModifier.NONE, [
+    keys.SEMICOLON,
+    keys.DASH,
+    keys.COMMA,
+    keys.POINT,
+    keys.FORWARD_SLASH,
+    keys.OPEN_BRACKET,
+    keys.BACK_SLASH,
+    keys.CLOSE_BRACKET,
+    keys.SINGLE_QUOTE,
+    keys.MULTIPLY,
+    keys.ADD,
+    keys.SUBTRACT,
+    keys.DECIMAL_POINT,
+    keys.DIVIDE,
+    keys.NUMPAD_0,
+    keys.NUMPAD_1,
+    keys.NUMPAD_2,
+    keys.NUMPAD_3,
+    keys.NUMPAD_4,
+    keys.NUMPAD_5,
+    keys.NUMPAD_6,
+    keys.NUMPAD_7,
+    keys.NUMPAD_8,
+    keys.NUMPAD_9,
+    keys.MULTIPLY,
+    keys.END,
+    keys.HOME,
+    keys.RIGHT,
+    keys.BACKSPACE,
+    keys.LEFT,
+    keys.DELETE,
+    keys.SPACE
   ]);
-};
-scout.inherits(scout.InputFieldKeyStrokeContext, scout.KeyStrokeContext);
+}
 
-scout.InputFieldKeyStrokeContext.prototype._applyPropagationFlags = function(event) {
-  scout.InputFieldKeyStrokeContext.parent.prototype._applyPropagationFlags.call(this, event);
+
+_applyPropagationFlags(event) {
+  super._applyPropagationFlags( event);
 
   if (event.isPropagationStopped()) {
     return;
@@ -98,12 +105,13 @@ scout.InputFieldKeyStrokeContext.prototype._applyPropagationFlags = function(eve
   if (inputField && (this._isLetterKeyStroke(event) || this._isNumberKeyStroke(event))) {
     event.stopPropagation();
   }
-};
+}
 
-scout.InputFieldKeyStrokeContext.prototype._isNumberKeyStroke = function(event) {
-  return !event.ctrlKey && event.which >= scout.keys[0] && event.which <= scout.keys[9];
-};
+_isNumberKeyStroke(event) {
+  return !event.ctrlKey && event.which >= keys[0] && event.which <= keys[9];
+}
 
-scout.InputFieldKeyStrokeContext.prototype._isLetterKeyStroke = function(event) {
-  return !event.ctrlKey && event.which >= scout.keys.A && event.which <= scout.keys.Z;
-};
+_isLetterKeyStroke(event) {
+  return !event.ctrlKey && event.which >= keys.A && event.which <= keys.Z;
+}
+}

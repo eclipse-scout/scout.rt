@@ -8,74 +8,83 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormFieldMenu = function() {
-  scout.FormFieldMenu.parent.call(this);
-  this._addWidgetProperties('field');
-};
-scout.inherits(scout.FormFieldMenu, scout.Menu);
+import {Menu} from '../../../index';
+import {LogicalGridData} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {ColumnLayout} from '../../../index';
+import {GridData} from '../../../index';
 
-scout.FormFieldMenu.prototype._render = function() {
+export default class FormFieldMenu extends Menu {
+
+constructor() {
+  super();
+  this._addWidgetProperties('field');
+}
+
+
+_render() {
   this.$container = this.$parent.appendDiv('menu-item');
   this.$container.addClass('form-field-menu');
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
   }
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ColumnLayout({
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new ColumnLayout({
     stretch: false
   }));
-};
+}
 
-scout.FormFieldMenu.prototype._renderProperties = function() {
-  scout.FormFieldMenu.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderField();
-};
+}
 
 /**
  * Override
  */
-scout.FormFieldMenu.prototype._renderText = function(text) {
-  scout.FormFieldMenu.parent.prototype._renderText.call(this, text);
+_renderText(text) {
+  super._renderText( text);
   if (this.field && this.field.rendered && this.$text) {
     this.field.$container.insertAfter(this.$text);
   }
-};
+}
 
-scout.FormFieldMenu.prototype.setField = function(field) {
+setField(field) {
   this.setProperty('field', field);
-};
+}
 
-scout.FormFieldMenu.prototype._renderField = function() {
+_renderField() {
   if (this.field) {
     // Use gridDataHints as "computed" gridData property, because FormFieldMenu
     // does not have a logical grid (see FormField._updateElementInnerAlignment()).
-    this.field.gridData = scout.GridData.createFromHints(this.field, 1);
+    this.field.gridData = GridData.createFromHints(this.field, 1);
 
     this.field.render(this.$container);
-    var layoutData = new scout.LogicalGridData(this.field);
+    var layoutData = new LogicalGridData(this.field);
     layoutData.validate();
     this.field.setLayoutData(layoutData);
     this.field.$container.addClass('content');
   }
-};
+}
 
-scout.FormFieldMenu.prototype._removeField = function() {
+_removeField() {
   if (this.field) {
     this.field.remove();
   }
-};
+}
 
-scout.FormFieldMenu.prototype.clone = function(model, options) {
-  var clone = scout.FormFieldMenu.parent.prototype.clone.call(this, model, options);
+clone(model, options) {
+  var clone = super.clone( model, options);
   this._deepCloneProperties(clone, ['field'], options);
   return clone;
-};
+}
 
-scout.FormFieldMenu.prototype.isTabTarget = function() {
+isTabTarget() {
   return false;
-};
+}
 
-scout.FormFieldMenu.prototype._renderOverflown = function() {
-  scout.FormFieldMenu.parent.prototype._renderOverflown.call(this);
+_renderOverflown() {
+  super._renderOverflown();
   this.field._hideStatusMessage();
-};
+}
+}

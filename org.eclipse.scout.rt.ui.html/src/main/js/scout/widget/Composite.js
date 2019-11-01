@@ -8,31 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Composite = function() {
-  scout.Composite.parent.call(this);
+import {Widget} from '../index';
+import {HtmlComponent} from '../index';
+
+export default class Composite extends Widget {
+
+constructor() {
+  super();
 
   this.widgets = [];
   this._addWidgetProperties(['widgets']);
-};
-scout.inherits(scout.Composite, scout.Widget);
+}
 
-scout.Composite.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.appendDiv();
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.Composite.prototype._renderProperties = function() {
-  scout.Composite.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWidgets();
-};
+}
 
-scout.Composite.prototype.setWidgets = function(widgets) {
+setWidgets(widgets) {
   this.setProperty('widgets', widgets);
-};
+}
 
-scout.Composite.prototype._renderWidgets = function() {
+_renderWidgets() {
   this.widgets.forEach(function(widget) {
     widget.render();
   }, this);
   this.invalidateLayoutTree();
-};
+}
+}

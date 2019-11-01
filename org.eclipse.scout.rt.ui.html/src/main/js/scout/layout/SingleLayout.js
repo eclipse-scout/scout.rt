@@ -8,18 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {AbstractLayout} from '../index';
+import {Dimension} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+import {graphics} from '../index';
+
 /**
  * Resizes the child so it has the same size as the container.<br>
  * If no child is provided, the first child in the container is used.
  */
-scout.SingleLayout = function(htmlChild) {
-  scout.SingleLayout.parent.call(this);
-  this._htmlChild = htmlChild;
-};
-scout.inherits(scout.SingleLayout, scout.AbstractLayout);
+export default class SingleLayout extends AbstractLayout {
 
-scout.SingleLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container);
+constructor(htmlChild) {
+  super();
+  this._htmlChild = htmlChild;
+}
+
+
+layout($container) {
+  var htmlContainer = HtmlComponent.get($container);
   var childSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets()),
     htmlChild = this._htmlChild;
@@ -30,30 +38,31 @@ scout.SingleLayout.prototype.layout = function($container) {
   if (htmlChild) {
     htmlChild.setSize(childSize);
   }
-};
+}
 
-scout.SingleLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var htmlChild = this._htmlChild;
   if (!htmlChild) {
     htmlChild = this._getHtmlSingleChild($container);
   }
   if (htmlChild) {
-    return htmlChild.prefSize(options).add(scout.graphics.insets($container));
+    return htmlChild.prefSize(options).add(graphics.insets($container));
   }
-  return new scout.Dimension(1, 1);
-};
+  return new Dimension(1, 1);
+}
 
 /**
  * @returns the first child html component of the given container or null if the container has no child with a html component or no children at all.
  */
-scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
+_getHtmlSingleChild($container) {
   var htmlComp = null;
   $container.children().each(function(i, child) {
-    var htmlChild = scout.HtmlComponent.optGet($(child));
+    var htmlChild = HtmlComponent.optGet($(child));
     if (htmlChild) {
       htmlComp = htmlChild;
       return false;
     }
   });
   return htmlComp;
-};
+}
+}

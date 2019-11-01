@@ -8,11 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Status} from '../index';
+import {strings} from '../index';
+import * as $ from 'jquery';
+
 /**
  * @class
  * @constructor
  */
-scout.Cell = function() {
+export default class Cell {
+
+constructor() {
   this.cssClass = null;
   this.editable = null; /* do not initialize with false. This is required because there's a subtle logic in Column.js (_initCell) which checks if a value is set. */
   this.errorStatus = null;
@@ -24,42 +30,42 @@ scout.Cell = function() {
   this.text = null;
   this.value = null;
   this.tooltipText = null;
-};
+}
 
-scout.Cell.prototype.init = function(model) {
+init(model) {
   this._init(model);
-};
+}
 
-scout.Cell.prototype._init = function(model) {
+_init(model) {
   $.extend(this, model);
-};
+}
 
-scout.Cell.prototype.update = function(model) {
+update(model) {
   this.setText(model.text);
   $.extend(this, model);
-};
+}
 
-scout.Cell.prototype.setEditable = function(editable) {
+setEditable(editable) {
   this.editable = editable;
-};
+}
 
-scout.Cell.prototype.setMandatory = function(mandatory) {
+setMandatory(mandatory) {
   this.mandatory = mandatory;
-};
+}
 
-scout.Cell.prototype.setHorizontalAlignment = function(hAlign) {
+setHorizontalAlignment(hAlign) {
   this.horizontalAlignment = hAlign;
-};
+}
 
-scout.Cell.prototype.setValue = function(value) {
+setValue(value) {
   this.value = value;
-};
+}
 
-scout.Cell.prototype.setErrorStatus = function(errorStatus) {
+setErrorStatus(errorStatus) {
   this.errorStatus = errorStatus;
-};
+}
 
-scout.Cell.prototype.setText = function(text) {
+setText(text) {
   var oldText = this.text;
   this.text = text;
 
@@ -68,26 +74,27 @@ scout.Cell.prototype.setText = function(text) {
   if (oldText !== this.text) {
     this._cachedEncodedText = null;
   }
-};
+}
 
-scout.Cell.prototype.encodedText = function() {
+encodedText() {
   if (!this._cachedEncodedText) {
     // Encode text and cache it, encoding is expensive
-    this._cachedEncodedText = scout.strings.encode(this.text);
+    this._cachedEncodedText = strings.encode(this.text);
   }
   return this._cachedEncodedText;
-};
+}
 
-scout.Cell.prototype.setCssClass = function(cssClass) {
+setCssClass(cssClass) {
   this.cssClass = cssClass;
-};
+}
 
-scout.Cell.prototype.isContentValid = function() {
-  var validByErrorStatus = !this.errorStatus || this.errorStatus.severity !== scout.Status.Severity.ERROR;
+isContentValid() {
+  var validByErrorStatus = !this.errorStatus || this.errorStatus.severity !== Status.Severity.ERROR;
   var validByMandatory = !this.mandatory || !!this.value;
   return {
     valid: validByErrorStatus && validByMandatory,
     validByErrorStatus: validByErrorStatus,
     validByMandatory: validByMandatory
   };
-};
+}
+}

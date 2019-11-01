@@ -8,31 +8,37 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BenchColumnLayoutData = function(model) {
+import {BenchRowLayoutData} from '../../../index';
+import * as $ from 'jquery';
+
+export default class BenchColumnLayoutData {
+
+constructor(model) {
   // initial
   this.columns = [null, null, null];
   $.extend(this, model);
 
   this._ensureColumns();
-};
+}
 
-scout.BenchColumnLayoutData.prototype._ensureColumns = function() {
+_ensureColumns() {
   this.columns = this.columns.map(function(col, i) {
-    return new scout.BenchRowLayoutData(col).withOrder(i * 2);
+    return new BenchRowLayoutData(col).withOrder(i * 2);
   });
-};
+}
 
-scout.BenchColumnLayoutData.prototype.getColumns = function() {
+getColumns() {
   return this.columns;
-};
+}
 
-scout.BenchColumnLayoutData.ensure = function(layoutData) {
+static ensure(layoutData) {
   if (!layoutData) {
-    layoutData = new scout.BenchColumnLayoutData();
+    layoutData = new BenchColumnLayoutData();
     return layoutData;
   }
-  if (layoutData instanceof scout.BenchColumnLayoutData) {
+  if (layoutData instanceof BenchColumnLayoutData) {
     return layoutData;
   }
-  return new scout.BenchColumnLayoutData(layoutData);
-};
+  return new BenchColumnLayoutData(layoutData);
+}
+}

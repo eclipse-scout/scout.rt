@@ -8,29 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FieldStatus = function() {
-  scout.FieldStatus.parent.call(this);
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {strings} from '../../index';
+import {Status} from '../../index';
+import {scout} from '../../index';
+import {Event} from '../../index';
+import {FormField} from '../../index';
+import {arrays} from '../../index';
+
+export default class FieldStatus extends Widget {
+
+constructor() {
+  super();
   this.tooltip = null;
   this.contextMenu = null;
   this.status = null;
   this.updating = false;
   this.autoRemove = true;
-  this.position = scout.FormField.StatusPosition.DEFAULT;
+  this.position = FormField.StatusPosition.DEFAULT;
 
   this._parents = [];
   this._parentPropertyChangeListener = this._onParentPropertyChange.bind(this);
   this._parentHierarchyChangeListener = this._onParentHierarchyChange.bind(this);
-};
-scout.inherits(scout.FieldStatus, scout.Widget);
+}
 
-scout.FieldStatus.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.appendSpan('status')
     .on('mousedown', this._onStatusMouseDown.bind(this));
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.FieldStatus.prototype._remove = function() {
-  scout.FieldStatus.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   if (this.tooltip) {
     this.tooltip.destroy();
     this.tooltip = null;
@@ -40,89 +51,89 @@ scout.FieldStatus.prototype._remove = function() {
     this.contextMenu = null;
   }
   this._removeParentListeners();
-};
+}
 
-scout.FieldStatus.prototype._renderProperties = function() {
-  scout.FieldStatus.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderPosition();
-};
+}
 
-scout.FieldStatus.prototype.update = function(status, menus, autoRemove, showStatus) {
+update(status, menus, autoRemove, showStatus) {
   this.updating = true;
   this.setStatus(status);
   this.setMenus(menus);
   this.setAutoRemove(autoRemove);
   this.updating = false;
   this._updatePopup(showStatus);
-};
+}
 
-scout.FieldStatus.prototype.clearStatus = function() {
+clearStatus() {
   this.setStatus(null);
-};
+}
 
-scout.FieldStatus.prototype.setStatus = function(status) {
+setStatus(status) {
   this.setProperty('status', status);
-};
+}
 
-scout.FieldStatus.prototype._setStatus = function(status) {
-  status = scout.Status.ensure(status);
+_setStatus(status) {
+  status = Status.ensure(status);
   this._setProperty('status', status);
-};
+}
 
-scout.FieldStatus.prototype._renderStatus = function() {
+_renderStatus() {
   if (!this.updating) {
     this._updatePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype.setAutoRemove = function(autoRemove) {
+setAutoRemove(autoRemove) {
   this.setProperty('autoRemove', autoRemove);
-};
+}
 
-scout.FieldStatus.prototype._renderAutoRemove = function(autoRemove) {
+_renderAutoRemove(autoRemove) {
   if (!this.updating) {
     this._updatePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype.setPosition = function(position) {
+setPosition(position) {
   this.setProperty('position', position);
-};
+}
 
-scout.FieldStatus.prototype._renderPosition = function() {
-  this.$container.toggleClass('top', this.position === scout.FormField.StatusPosition.TOP);
+_renderPosition() {
+  this.$container.toggleClass('top', this.position === FormField.StatusPosition.TOP);
   this.invalidateLayoutTree();
-};
+}
 
-scout.FieldStatus.prototype._renderVisible = function() {
-  scout.FieldStatus.parent.prototype._renderVisible.call(this);
+_renderVisible() {
+  super._renderVisible();
   if (!this.visible) {
     this.hidePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype.setMenus = function(menus) {
-  this.setProperty('menus', scout.arrays.ensure(menus));
-};
+setMenus(menus) {
+  this.setProperty('menus', arrays.ensure(menus));
+}
 
-scout.FieldStatus.prototype._renderMenus = function() {
+_renderMenus() {
   if (!this.updating) {
     this._updatePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype.setAutoRemove = function(autoRemove) {
+setAutoRemove(autoRemove) {
   this.setProperty('autoRemove', autoRemove);
-};
+}
 
-scout.FieldStatus.prototype._renderAutoRemove = function() {
+_renderAutoRemove() {
   if (!this.updating) {
     this._updatePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype.hideTooltip = function() {
-  var event = new scout.Event();
+hideTooltip() {
+  var event = new Event();
   if (this.tooltip) {
     this.trigger('hideTooltip', event);
     if (!event.defaultPrevented) {
@@ -131,13 +142,13 @@ scout.FieldStatus.prototype.hideTooltip = function() {
       this._removeParentListeners();
     }
   }
-};
+}
 
-scout.FieldStatus.prototype._updatePopup = function(showStatus) {
+_updatePopup(showStatus) {
   if (!this.status) {
     this.hideTooltip();
   }
-  if (scout.arrays.empty(this.menus)) {
+  if (arrays.empty(this.menus)) {
     this.hideContextMenu();
   }
   if (showStatus === true) {
@@ -145,16 +156,16 @@ scout.FieldStatus.prototype._updatePopup = function(showStatus) {
   } else if (showStatus === false) {
     this.hideTooltip();
   }
-};
+}
 
-scout.FieldStatus.prototype.showTooltip = function() {
+showTooltip() {
   if (!this.status) {
     return;
   }
-  if (scout.arrays.empty(this.menus) && !scout.strings.hasText(this.status.message)) {
+  if (arrays.empty(this.menus) && !strings.hasText(this.status.message)) {
     return;
   }
-  var event = new scout.Event();
+  var event = new Event();
   this.trigger('showTooltip', event);
   if (event.defaultPrevented) {
     return;
@@ -185,17 +196,17 @@ scout.FieldStatus.prototype.showTooltip = function() {
     }.bind(this));
     this.tooltip.render();
   }
-};
+}
 
-scout.FieldStatus.prototype.hideContextMenu = function() {
+hideContextMenu() {
   if (this.contextMenu) {
     this.contextMenu.destroy();
     this.contextMenu = null;
   }
-};
+}
 
-scout.FieldStatus.prototype.showContextMenu = function() {
-  if (scout.arrays.empty(this.menus)) {
+showContextMenu() {
+  if (arrays.empty(this.menus)) {
     // at least one menu item must be visible
     return;
   }
@@ -213,14 +224,14 @@ scout.FieldStatus.prototype.showContextMenu = function() {
     this.hideContextMenu();
   }.bind(this));
   this.contextMenu.open();
-};
+}
 
-scout.FieldStatus.prototype.hidePopup = function() {
+hidePopup() {
   this.hideTooltip();
   this.hideContextMenu();
-};
+}
 
-scout.FieldStatus.prototype.togglePopup = function() {
+togglePopup() {
   if (this.status) {
     // ensure context menu closed
     this.hideContextMenu();
@@ -231,7 +242,7 @@ scout.FieldStatus.prototype.togglePopup = function() {
     }
     return;
   }
-  if (!scout.arrays.empty(this.menus)) {
+  if (!arrays.empty(this.menus)) {
     this.hideTooltip();
     var func = function func() {
       if (!this.rendered) { // check needed because function is called asynchronously
@@ -251,16 +262,16 @@ scout.FieldStatus.prototype.togglePopup = function() {
     // close all
     this.hidePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype._onStatusMouseDown = function(event) {
+_onStatusMouseDown(event) {
   this.trigger('statusMouseDown', event);
   if (!event.defaultPrevented) {
     this.togglePopup();
   }
-};
+}
 
-scout.FieldStatus.prototype._updateTooltipVisibility = function(parent) {
+_updateTooltipVisibility(parent) {
   if (this.isEveryParentVisible()) {
     /* We must use a timeout here, because the propertyChange event for the visible property
      * is triggered before the _renderVisible() function is called. Which means the DOM is still
@@ -280,33 +291,33 @@ scout.FieldStatus.prototype._updateTooltipVisibility = function(parent) {
       this.tooltip.remove();
     }
   }
-};
+}
 
-scout.FieldStatus.prototype._onParentHierarchyChange = function(event) {
+_onParentHierarchyChange(event) {
   // If the parent of a widget we're listening to changes, we must re-check the parent hierarchy
   // and re-install the property change listener
   this._updateParentListeners();
-};
+}
 
-scout.FieldStatus.prototype._onParentPropertyChange = function(event) {
+_onParentPropertyChange(event) {
   if ('visible' === event.propertyName) {
     this._updateTooltipVisibility(event.source);
   }
-};
+}
 
-scout.FieldStatus.prototype._removeParentListeners = function() {
+_removeParentListeners() {
   this._parents.forEach(function(parent) {
     parent.off('hierarchyChange', this._parentHierarchyChangeListener);
     parent.off('propertyChange', this._parentPropertyChangeListener);
   }.bind(this));
   this._parents = [];
-};
+}
 
 /**
  * Adds a property change listener to every parent of the field status. We keep a list of all parents because
  * we need to remove the listeners later, also when the parent hierarchy has changed.
  */
-scout.FieldStatus.prototype._updateParentListeners = function() {
+_updateParentListeners() {
   this._removeParentListeners();
   var parent = this.parent;
   while (parent) {
@@ -315,4 +326,5 @@ scout.FieldStatus.prototype._updateParentListeners = function() {
     this._parents.push(parent);
     parent = parent.parent;
   }
-};
+}
+}

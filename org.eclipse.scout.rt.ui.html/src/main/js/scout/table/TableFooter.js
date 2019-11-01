@@ -8,8 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableFooter = function() {
-  scout.TableFooter.parent.call(this);
+import {HtmlComponent} from '../index';
+import {Status} from '../index';
+import {MenuBarLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {TableFooterLayout} from '../index';
+import {InputFieldKeyStrokeContext} from '../index';
+import {graphics} from '../index';
+import {Table} from '../index';
+import {TableTextUserFilter} from '../index';
+import {strings} from '../index';
+import {Widget} from '../index';
+import {fields} from '../index';
+
+export default class TableFooter extends Widget {
+
+constructor() {
+  super();
 
   this.animating = false;
   this.open = false;
@@ -22,31 +38,31 @@ scout.TableFooter = function() {
   this._tableRowsSelectedHandler = this._onTableRowsSelected.bind(this);
   this._tableStatusChangedHandler = this._onTableStatusChanged.bind(this);
   this._tablePropertyChangeHandler = this._onTablePropertyChange.bind(this);
-};
-scout.inherits(scout.TableFooter, scout.Widget);
+}
 
-scout.TableFooter.prototype._init = function(options) {
-  scout.TableFooter.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
 
   // Keystroke context for the search field.
-  this.searchFieldKeyStrokeContext = new scout.InputFieldKeyStrokeContext();
+  this.searchFieldKeyStrokeContext = new InputFieldKeyStrokeContext();
   this.searchFieldKeyStrokeContext.$bindTarget = function() {
     return this._$textFilter;
   }.bind(this);
   this.searchFieldKeyStrokeContext.$scopeTarget = function() {
     return this._$textFilter;
   }.bind(this);
-};
+}
 
-scout.TableFooter.prototype._render = function() {
+_render() {
   var filter, $filter;
 
   this.$container = this.$parent.appendDiv('table-footer');
   this._$window = this.$parent.window();
   this._$body = this.$parent.body();
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TableFooterLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new TableFooterLayout(this));
 
   // --- container for an open control ---
   this.$controlContainer = this.$container.appendDiv('table-control-container').hide();
@@ -60,12 +76,12 @@ scout.TableFooter.prototype._render = function() {
 
   // text filter
   $filter = this._$info.appendDiv('table-filter');
-  this._$textFilter = scout.fields.makeTextField(this.$container, 'table-text-filter')
+  this._$textFilter = fields.makeTextField(this.$container, 'table-text-filter')
     .appendTo($filter)
     .on('input', '', this._createOnFilterFieldInputFunction().bind(this))
     .placeholder(this.session.text('ui.FilterBy_'));
 
-  filter = this.table.getFilter(scout.TableTextUserFilter.TYPE);
+  filter = this.table.getFilter(TableTextUserFilter.TYPE);
   if (filter) {
     this._$textFilter.val(filter.text);
   }
@@ -111,17 +127,17 @@ scout.TableFooter.prototype._render = function() {
   this.table.on('propertyChange', this._tablePropertyChangeHandler);
 
   this.session.keyStrokeManager.installKeyStrokeContext(this.searchFieldKeyStrokeContext);
-};
+}
 
-scout.TableFooter.prototype.getFocusableElement = function() {
+getFocusableElement() {
   return this._$textFilter;
-};
+}
 
-scout.TableFooter.prototype._renderProperties = function() {
+_renderProperties() {
   this._updateHasFilterText();
-};
+}
 
-scout.TableFooter.prototype._remove = function() {
+_remove() {
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.searchFieldKeyStrokeContext);
   this._hideTableStatusTooltip();
   this.$resizer = null;
@@ -139,10 +155,10 @@ scout.TableFooter.prototype._remove = function() {
   this.table.off('statusChanged', this._tableStatusChangedHandler);
   this.table.off('propertyChange', this._tablePropertyChangeHandler);
 
-  scout.TableFooter.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.TableFooter.prototype._renderResizerVisible = function() {
+_renderResizerVisible() {
   if (this.selectedControl.resizerVisible) {
     this._renderResizer();
     this.$controlContainer.addClass('has-resizer');
@@ -151,9 +167,9 @@ scout.TableFooter.prototype._renderResizerVisible = function() {
     this.$resizer = null;
     this.$controlContainer.removeClass('has-resizer');
   }
-};
+}
 
-scout.TableFooter.prototype._renderResizer = function() {
+_renderResizer() {
   if (this.$resizer) {
     return;
   }
@@ -183,7 +199,7 @@ scout.TableFooter.prototype._renderResizer = function() {
       // Calculate new height of table control container
       var newHeight = Math.min(startHeight - dx, maxHeight);
       this.$controlContainer.height(newHeight);
-      var controlContainerInsets = scout.graphics.insets(this.$controlContainer);
+      var controlContainerInsets = graphics.insets(this.$controlContainer);
       this.$controlContent.outerHeight(newHeight - controlContainerInsets.vertical());
       this._revalidateTableLayout();
     }
@@ -200,9 +216,9 @@ scout.TableFooter.prototype._renderResizer = function() {
 
     return false;
   }
-};
+}
 
-scout.TableFooter.prototype._renderControls = function() {
+_renderControls() {
   var controls = this.table.tableControls;
   if (controls) {
     controls.forEach(function(control) {
@@ -212,16 +228,16 @@ scout.TableFooter.prototype._renderControls = function() {
   } else {
     this._$controls.empty();
   }
-};
+}
 
-scout.TableFooter.prototype._renderInfo = function() {
+_renderInfo() {
   this._renderInfoLoad();
   this._renderInfoTableStatus();
   this._renderInfoFilter();
   this._renderInfoSelection();
-};
+}
 
-scout.TableFooter.prototype._renderInfoLoad = function() {
+_renderInfoLoad() {
   var $info = this._$infoLoad,
     numRows = this.table.rows.length,
     estRows = this.table.estimatedRowCount,
@@ -262,9 +278,9 @@ scout.TableFooter.prototype._renderInfoLoad = function() {
   if (!this.htmlComp.layouting) {
     this.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.TableFooter.prototype._renderInfoFilter = function() {
+_renderInfoFilter() {
   var $info = this._$infoFilter;
   var numRowsFiltered = this.table.filteredRows().length;
   var filteredBy = this.table.filteredBy().join(', '); // filteredBy() returns an array
@@ -301,9 +317,9 @@ scout.TableFooter.prototype._renderInfoFilter = function() {
   if (!this.htmlComp.layouting) {
     this.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.TableFooter.prototype._renderInfoSelection = function() {
+_renderInfoSelection() {
   var $info = this._$infoSelection,
     numRows = this.table.filteredRows().length,
     numRowsSelected = this.table.selectedRows.length,
@@ -331,12 +347,12 @@ scout.TableFooter.prototype._renderInfoSelection = function() {
   if (!this.htmlComp.layouting) {
     this.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.TableFooter.prototype._renderInfoTableStatus = function() {
+_renderInfoTableStatus() {
   var $info = this._$infoTableStatus;
   var tableStatus = this.table.tableStatus;
-  $info.removeClass(scout.Status.SEVERITY_CSS_CLASSES);
+  $info.removeClass(Status.SEVERITY_CSS_CLASSES);
   if (tableStatus) {
     $info.addClass(tableStatus.cssClass());
   }
@@ -344,25 +360,25 @@ scout.TableFooter.prototype._renderInfoTableStatus = function() {
   if (!this.htmlComp.layouting) {
     this.invalidateLayoutTree(false);
   }
-};
+}
 
-scout.TableFooter.prototype._updateInfoVisibility = function() {
+_updateInfoVisibility() {
   this._updateInfoFilterVisibility();
   this._updateInfoSelectionVisibility();
   this._updateInfoTableStatusVisibility();
-};
+}
 
-scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
+_updateInfoFilterVisibility() {
   var visible = this.table.filteredBy().length > 0;
   this._setInfoVisible(this._$infoFilter, visible);
-};
+}
 
-scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
+_updateInfoSelectionVisibility() {
   var visible = this.table.multiSelect;
   this._setInfoVisible(this._$infoSelection, visible);
-};
+}
 
-scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
+_updateInfoTableStatusVisibility() {
   var visible = this.table.tableStatus;
   if (visible) {
     // If the uiState of the tableStatus was not set to hidden (either manually by the
@@ -384,9 +400,9 @@ scout.TableFooter.prototype._updateInfoTableStatusVisibility = function() {
     this._hideTableStatusTooltip();
     this._setInfoVisible(this._$infoTableStatus, false);
   }
-};
+}
 
-scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete) {
+_setInfoVisible($info, visible, complete) {
   if ($info.isVisible() === visible && !(visible && $info.data('hiding'))) {
     if (complete) {
       complete();
@@ -427,9 +443,9 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible, complete)
       }
     });
   }
-};
+}
 
-scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipType) {
+_toggleTableInfoTooltip($info, tooltipType) {
   if (this._tableInfoTooltip) {
     this._tableInfoTooltip.destroy();
   } else {
@@ -446,11 +462,11 @@ scout.TableFooter.prototype._toggleTableInfoTooltip = function($info, tooltipTyp
     }.bind(this));
     this._tableInfoTooltip.render();
   }
-};
+}
 
 //n: row count
 //m: total count, optional. Meaning is '3 of 10 rows'
-scout.TableFooter.prototype.computeCountInfo = function(n, m) {
+computeCountInfo(n, m) {
   n = scout.nvl(n, 0);
   if (m) {
     return this.session.text('ui.TableRowCount',
@@ -470,15 +486,15 @@ scout.TableFooter.prototype.computeCountInfo = function(n, m) {
   } else {
     return this.session.text('ui.TableRowCount', this.session.locale.decimalFormat.format(n));
   }
-};
+}
 
 /* open, close and resize of the container */
 
-scout.TableFooter.prototype._revalidateTableLayout = function() {
+_revalidateTableLayout() {
   this.table.htmlComp.revalidateLayoutTree();
-};
+}
 
-scout.TableFooter.prototype.openControlContainer = function(control) {
+openControlContainer(control) {
   if (this.open) {
     // Calling open again may resize the container -> don't return
   }
@@ -493,7 +509,7 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
 
   var allowedControlHeight = this.computeControlContainerHeight(this.table, control);
 
-  var insets = scout.graphics.insets(this.$controlContainer);
+  var insets = graphics.insets(this.$controlContainer);
   this.$controlContent.outerHeight(allowedControlHeight - insets.vertical());
 
   // If container is opened the first time, set the height to 0 to make animation work
@@ -518,9 +534,9 @@ scout.TableFooter.prototype.openControlContainer = function(control) {
       this.table.invalidateLayoutTree();
     }.bind(this)
   });
-};
+}
 
-scout.TableFooter.prototype.closeControlContainer = function(control) {
+closeControlContainer(control) {
   if (!this.open) {
     return;
   }
@@ -538,15 +554,15 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
       control.onControlContainerClosed();
     }.bind(this)
   });
-};
+}
 
-scout.TableFooter.prototype.computeControlContainerHeight = function(table, control, growControl) {
+computeControlContainerHeight(table, control, growControl) {
   var menuBarHeight = 0,
     footerHeight = 0,
-    containerHeight = scout.graphics.size(table.$container).height,
+    containerHeight = graphics.size(table.$container).height,
     maxControlHeight,
     controlContainerHeight = 0,
-    dataMargins = scout.graphics.margins(scout.nvl(table.$data, table.$container)),
+    dataMargins = graphics.margins(scout.nvl(table.$data, table.$container)),
     dataMarginsHeight = dataMargins.top + dataMargins.bottom,
     menuBar = table.menuBar,
     footer = table.footer,
@@ -559,11 +575,11 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
   }
 
   if (table.menuBarVisible && menuBar.visible) {
-    var htmlMenuBar = scout.HtmlComponent.get(menuBar.$container);
-    menuBarHeight = scout.MenuBarLayout.size(htmlMenuBar, containerSize).height;
+    var htmlMenuBar = HtmlComponent.get(menuBar.$container);
+    menuBarHeight = MenuBarLayout.size(htmlMenuBar, containerSize).height;
   }
   // Layout table footer and add size of footer (including the control content) to 'height'
-  footerHeight = scout.graphics.size(footer.$container).height;
+  footerHeight = graphics.size(footer.$container).height;
   if (footer.open) {
     if (footer.animating) {
       // Layout may be called when container stays open but changes its size using an animation.
@@ -571,7 +587,7 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
       controlContainerHeight = control.height;
     } else {
       // Measure the real height
-      controlContainerHeight = scout.graphics.size(footer.$controlContainer).height;
+      controlContainerHeight = graphics.size(footer.$controlContainer).height;
       // Expand control height? (but only if not resizing)
       if (!footer.resizing && growControl) {
         controlContainerHeight = Math.max(control.height, controlContainerHeight);
@@ -584,16 +600,16 @@ scout.TableFooter.prototype.computeControlContainerHeight = function(table, cont
     controlContainerHeight = Math.min(controlContainerHeight, maxControlHeight);
   }
   return controlContainerHeight;
-};
+}
 
-scout.TableFooter.prototype._hideTableStatusTooltip = function() {
+_hideTableStatusTooltip() {
   clearTimeout(this._autoHideTableStatusTooltipTimeoutId);
   if (this._tableStatusTooltip) {
     this._tableStatusTooltip.destroy();
   }
-};
+}
 
-scout.TableFooter.prototype._showTableStatusTooltip = function() {
+_showTableStatusTooltip() {
   // Remove existing tooltip (might have the wrong css class)
   if (this._tableStatusTooltip) {
     this._tableStatusTooltip.destroy();
@@ -601,7 +617,7 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
 
   var tableStatus = this.table.tableStatus;
   var text = (tableStatus ? tableStatus.message : null);
-  if (scout.strings.empty(text)) {
+  if (strings.empty(text)) {
     return; // Refuse to show empty tooltip
   }
 
@@ -641,13 +657,13 @@ scout.TableFooter.prototype._showTableStatusTooltip = function() {
       this._hideTableStatusTooltip();
     }.bind(this), 5000);
   }
-};
+}
 
-scout.TableFooter.prototype._updateHasFilterText = function() {
+_updateHasFilterText() {
   this._$textFilter.toggleClass('has-text', !!this._$textFilter.val());
-};
+}
 
-scout.TableFooter.prototype.onControlSelected = function(control) {
+onControlSelected(control) {
   var previousControl = this.selectedControl;
   this.selectedControl = control;
 
@@ -657,9 +673,9 @@ scout.TableFooter.prototype.onControlSelected = function(control) {
       this.openControlContainer(control);
     }
   }
-};
+}
 
-scout.TableFooter.prototype._onStatusMouseDown = function(event) {
+_onStatusMouseDown(event) {
   // Toggle tooltip
   if (this._tableStatusTooltip) {
     this._hideTableStatusTooltip();
@@ -670,9 +686,9 @@ scout.TableFooter.prototype._onStatusMouseDown = function(event) {
       this.table.tableStatus.uiState = 'user-shown';
     }
   }
-};
+}
 
-scout.TableFooter.prototype._createOnFilterFieldInputFunction = function() {
+_createOnFilterFieldInputFunction() {
   var debounceFunction = $.debounce(this._applyFilter.bind(this));
   var fn = function(event) {
     this._updateHasFilterText();
@@ -680,16 +696,16 @@ scout.TableFooter.prototype._createOnFilterFieldInputFunction = function() {
     debounceFunction();
   };
   return fn;
-};
+}
 
-scout.TableFooter.prototype._onDeleteFilterMouseDown = function(event) {
+_onDeleteFilterMouseDown(event) {
   this._$textFilter.val('');
   this._updateHasFilterText();
   this._applyFilter();
   event.preventDefault();
-};
+}
 
-scout.TableFooter.prototype._applyFilter = function(event) {
+_applyFilter(event) {
   var filter,
     filterText = this._$textFilter.val();
   if (this.filterText !== filterText) {
@@ -703,15 +719,15 @@ scout.TableFooter.prototype._applyFilter = function(event) {
       filter.text = filterText;
       this.table.addFilter(filter);
     } else {
-      this.table.removeFilterByKey(scout.TableTextUserFilter.TYPE);
+      this.table.removeFilterByKey(TableTextUserFilter.TYPE);
     }
 
     this.table.filter();
     this.validateLayoutTree();
   }
-};
+}
 
-scout.TableFooter.prototype._onInfoLoadClick = function() {
+_onInfoLoadClick() {
   if (!this._$infoLoad.isEnabled()) {
     return;
   }
@@ -722,42 +738,42 @@ scout.TableFooter.prototype._onInfoLoadClick = function() {
     var estRows = this.table.estimatedRowCount;
     var maxRows = this.table.maxRowCount;
     if (estRows && maxRows && numRows < estRows && numRows < maxRows) {
-      this.table.reload(scout.Table.ReloadReason.OVERRIDE_ROW_LIMIT);
+      this.table.reload(Table.ReloadReason.OVERRIDE_ROW_LIMIT);
     } else {
       this.table.reload();
     }
   }
-};
+}
 
-scout.TableFooter.prototype._onInfoFilterClick = function() {
+_onInfoFilterClick() {
   if (this._compactStyle) {
     this._toggleTableInfoTooltip(this._$infoFilter, 'TableInfoFilterTooltip');
   } else {
     this.table.resetUserFilter();
   }
-};
+}
 
-scout.TableFooter.prototype._onInfoSelectionClick = function() {
+_onInfoSelectionClick() {
   if (this._compactStyle) {
     this._toggleTableInfoTooltip(this._$infoSelection, 'TableInfoSelectionTooltip');
   } else {
     this.table.toggleSelection();
   }
-};
+}
 
-scout.TableFooter.prototype._onTableRowsChanged = function(event) {
+_onTableRowsChanged(event) {
   this._renderInfoLoad();
-};
+}
 
-scout.TableFooter.prototype._onTableFilter = function(event) {
+_onTableFilter(event) {
   this._renderInfoFilter();
   this._renderInfoSelection();
-};
+}
 
-scout.TableFooter.prototype._onTableFilterAdded = function(event) {
+_onTableFilterAdded(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
-  if (event.filter.filterType === scout.TableTextUserFilter.TYPE) {
+  if (event.filter.filterType === TableTextUserFilter.TYPE) {
     // Do not update the content when the value does not change. This is the case when typing text in
     // the UI. If we would call val() unconditionally, the current cursor position will get lost.
     var currentText = this._$textFilter.val();
@@ -767,29 +783,30 @@ scout.TableFooter.prototype._onTableFilterAdded = function(event) {
       this._applyFilter();
     }
   }
-};
+}
 
-scout.TableFooter.prototype._onTableFilterRemoved = function(event) {
+_onTableFilterRemoved(event) {
   this._renderInfoFilter();
   this._updateInfoFilterVisibility();
-  if (event.filter.filterType === scout.TableTextUserFilter.TYPE) {
+  if (event.filter.filterType === TableTextUserFilter.TYPE) {
     this._$textFilter.val('');
     this._updateHasFilterText();
     this._applyFilter();
   }
-};
+}
 
-scout.TableFooter.prototype._onTableRowsSelected = function(event) {
+_onTableRowsSelected(event) {
   this._renderInfoSelection();
-};
+}
 
-scout.TableFooter.prototype._onTableStatusChanged = function(event) {
+_onTableStatusChanged(event) {
   this._renderInfoTableStatus();
   this._updateInfoTableStatusVisibility();
-};
+}
 
-scout.TableFooter.prototype._onTablePropertyChange = function(event) {
+_onTablePropertyChange(event) {
   if (event.propertyName === 'multiSelect') {
     this._updateInfoSelectionVisibility();
   }
-};
+}
+}

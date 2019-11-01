@@ -8,18 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableInfoLoadTooltip = function() {
-  scout.TableInfoLoadTooltip.parent.call(this);
-};
-scout.inherits(scout.TableInfoLoadTooltip, scout.Tooltip);
+import {Tooltip} from '../index';
 
-scout.TableInfoLoadTooltip.prototype._init = function(options) {
-  scout.TableInfoLoadTooltip.parent.prototype._init.call(this, options);
+export default class TableInfoLoadTooltip extends Tooltip {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
 
   this.tableFooter = options.tableFooter;
-};
+}
 
-scout.TableInfoLoadTooltip.prototype._renderText = function() {
+_renderText() {
   var table = this.tableFooter.table,
     numRows = table.rows.length;
 
@@ -28,9 +32,10 @@ scout.TableInfoLoadTooltip.prototype._renderText = function() {
   this.$content.appendSpan('link')
     .text(this.session.text('ui.ReloadData'))
     .on('click', this._onReloadClick.bind(this));
-};
+}
 
-scout.TableInfoLoadTooltip.prototype._onReloadClick = function() {
+_onReloadClick() {
   this.tableFooter.table.reload();
   this.destroy();
-};
+}
+}

@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineViewButtonAdapter = function() {
-  scout.OutlineViewButtonAdapter.parent.call(this);
-};
-scout.inherits(scout.OutlineViewButtonAdapter, scout.ViewButtonAdapter);
+import {ViewButtonAdapter} from '../../index';
 
-scout.OutlineViewButtonAdapter.prototype._goOffline = function() {
+export default class OutlineViewButtonAdapter extends ViewButtonAdapter {
+
+constructor() {
+  super();
+}
+
+
+_goOffline() {
   // Disable only if outline has not been loaded yet
   if (this.widget.outline) {
     return;
   }
   this._enabledBeforeOffline = this.widget.enabled;
   this.widget.setEnabled(false);
-};
+}
 
-scout.OutlineViewButtonAdapter.prototype._goOnline = function() {
+_goOnline() {
   if (this.widget.outline) {
     return;
   }
   this.widget.setEnabled(this._enabledBeforeOffline);
-};
+}
+}

@@ -8,15 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CarouselField = function() {
-  scout.CarouselField.parent.call(this);
+import {FormField} from '../../../index';
+
+export default class CarouselField extends FormField {
+
+constructor() {
+  super();
   this.gridDataHints.weightY = 1.0;
 
   this._addWidgetProperties(['carousel']);
-};
-scout.inherits(scout.CarouselField, scout.FormField);
+}
 
-scout.CarouselField.prototype._render = function() {
+
+_render() {
   this.addContainer(this.$parent, 'carousel-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -24,14 +28,15 @@ scout.CarouselField.prototype._render = function() {
   if (this.carousel) {
     this._renderCarousel();
   }
-};
+}
 
-scout.CarouselField.prototype._renderCarousel = function() {
+_renderCarousel() {
   this.carousel.render();
   this.addField(this.carousel.$container);
-};
+}
 
-scout.CarouselField.prototype._removeCarousel = function() {
+_removeCarousel() {
   this.carousel.remove();
   this._removeField();
-};
+}
+}

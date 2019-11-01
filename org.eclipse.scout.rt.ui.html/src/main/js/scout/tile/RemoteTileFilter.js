@@ -8,21 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RemoteTileFilter = function(model) {
+export default class RemoteTileFilter {
+
+constructor(model) {
   model = model || {};
   this.tileMap = {};
   if (model.tileIds) {
     this.setTileIds(model.tileIds);
   }
-};
+}
 
-scout.RemoteTileFilter.prototype.setTileIds = function(tileIds) {
+setTileIds(tileIds) {
   this.tileMap = {};
   tileIds.forEach(function(tileId) {
     this.tileMap[tileId] = tileId;
   }, this);
-};
+}
 
-scout.RemoteTileFilter.prototype.accept = function(tile) {
+accept(tile) {
   return !!this.tileMap[tile.id];
-};
+}
+}

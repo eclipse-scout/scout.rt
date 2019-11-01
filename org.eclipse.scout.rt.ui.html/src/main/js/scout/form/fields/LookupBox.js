@@ -8,8 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LookupBox = function() {
-  scout.LookupBox.parent.call(this);
+import {HtmlComponent} from '../../index';
+import {LookupCall} from '../../index';
+import {strings} from '../../index';
+import {Status} from '../../index';
+import {objects} from '../../index';
+import {ValueField} from '../../index';
+import {arrays} from '../../index';
+import * as $ from 'jquery';
+
+export default class LookupBox extends ValueField {
+
+constructor() {
+  super();
   this.filterBox = null;
   this.gridDataHints.weightY = 1.0;
   this.gridDataHints.h = 2;
@@ -23,38 +34,38 @@ scout.LookupBox = function() {
   this._valueSyncing = false; // true when value is either syncing to table or table to value
 
   this._addCloneProperties(['lookupCall']);
-};
-scout.inherits(scout.LookupBox, scout.ValueField);
+}
 
-scout.LookupBox.ErrorCode = {
+
+static ErrorCode = {
   NO_DATA: 1
 };
 
-scout.LookupBox.prototype._init = function(model) {
-  scout.LookupBox.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   if (this.filterBox) {
     this.filterBox.enabledComputed = true; // filter is always enabled
     this.filterBox.recomputeEnabled(true);
     this.filterBox.on('propertyChange', this._onFilterBoxPropertyChange.bind(this));
   }
-};
+}
 
-scout.LookupBox.prototype._initValue = function(value) {
+_initValue(value) {
   if (this.lookupCall) {
     this._setLookupCall(this.lookupCall);
   }
   this._initStructure(value);
-  scout.LookupBox.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
-scout.LookupBox.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'lookup-box');
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
   this.addFieldContainer(this.$parent.makeDiv());
 
-  var htmlComp = scout.HtmlComponent.install(this.$fieldContainer, this.session);
+  var htmlComp = HtmlComponent.install(this.$fieldContainer, this.session);
   htmlComp.setLayout(this._createFieldContainerLayout());
 
   this._ensureLookupCallExecuted();
@@ -62,24 +73,24 @@ scout.LookupBox.prototype._render = function() {
   this.$field.addDeviceClass();
   this.$field.addClass('structure');
   this._renderFilterBox();
-};
+}
 
-scout.LookupBox.prototype._renderFilterBox = function() {
+_renderFilterBox() {
   if (!this.filterBox || !this.filterBox.visible) {
     return;
   }
   this.filterBox.render(this.$fieldContainer);
-};
+}
 
-scout.LookupBox.prototype._ensureValue = function(value) {
-  return scout.arrays.ensure(value);
-};
+_ensureValue(value) {
+  return arrays.ensure(value);
+}
 
-scout.LookupBox.prototype._updateEmpty = function() {
-  this.empty = scout.arrays.empty(this.value);
-};
+_updateEmpty() {
+  this.empty = arrays.empty(this.value);
+}
 
-scout.LookupBox.prototype._lookupByAll = function() {
+_lookupByAll() {
   if (!this.lookupCall) {
     return;
   }
@@ -95,16 +106,16 @@ scout.LookupBox.prototype._lookupByAll = function() {
     .done(doneHandler);
 
   return deferred.promise();
-};
+}
 
-scout.LookupBox.prototype._clearPendingLookup = function() {
+_clearPendingLookup() {
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
     this._pendingLookup = null;
   }
-};
+}
 
-scout.LookupBox.prototype._executeLookup = function(lookupCall, abortExisting) {
+_executeLookup(lookupCall, abortExisting) {
   this.setLoading(true);
 
   if (abortExisting && this._currentLookupCall) {
@@ -123,13 +134,13 @@ scout.LookupBox.prototype._executeLookup = function(lookupCall, abortExisting) {
       this.setLoading(false);
       this._clearLookupStatus();
     }.bind(this));
-};
+}
 
-scout.LookupBox.prototype._lookupByAllDone = function(result) {
+_lookupByAllDone(result) {
   try {
     if (result.exception) {
       // Oops! Something went wrong while the lookup has been processed.
-      this.setErrorStatus(scout.Status.error({
+      this.setErrorStatus(Status.error({
         message: result.exception
       }));
       return false;
@@ -137,9 +148,9 @@ scout.LookupBox.prototype._lookupByAllDone = function(result) {
 
     // 'No data' case
     if (result.lookupRows.length === 0) {
-      this.setLookupStatus(scout.Status.warning({
+      this.setLookupStatus(Status.warning({
         message: this.session.text('SmartFieldNoDataFound'),
-        code: scout.LookupBox.ErrorCode.NO_DATA
+        code: LookupBox.ErrorCode.NO_DATA
       }));
       return false;
     }
@@ -150,70 +161,70 @@ scout.LookupBox.prototype._lookupByAllDone = function(result) {
       result: result
     });
   }
-};
+}
 
-scout.LookupBox.prototype._clearLookupStatus = function() {
+_clearLookupStatus() {
   this.setLookupStatus(null);
-};
+}
 
-scout.LookupBox.prototype._errorStatus = function() {
+_errorStatus() {
   return this.lookupStatus || this.errorStatus;
-};
+}
 
-scout.LookupBox.prototype.setLookupStatus = function(lookupStatus) {
+setLookupStatus(lookupStatus) {
   this.setProperty('lookupStatus', lookupStatus);
   if (this.rendered) {
     this._renderErrorStatus();
   }
-};
+}
 
-scout.LookupBox.prototype.clearErrorStatus = function() {
+clearErrorStatus() {
   this.setErrorStatus(null);
   this._clearLookupStatus();
-};
+}
 
-scout.LookupBox.prototype._clearLookupStatus = function() {
+_clearLookupStatus() {
   this.setLookupStatus(null);
-};
+}
 
-scout.LookupBox.prototype.setLookupCall = function(lookupCall) {
+setLookupCall(lookupCall) {
   this.setProperty('lookupCall', lookupCall);
-};
+}
 
-scout.LookupBox.prototype._setLookupCall = function(lookupCall) {
-  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+_setLookupCall(lookupCall) {
+  this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   this._lookupExecuted = false;
   if (this.rendered) {
     this._ensureLookupCallExecuted();
   }
-};
+}
 
-scout.LookupBox.prototype.refreshLookup = function() {
+refreshLookup() {
   this._lookupExecuted = false;
   this._ensureLookupCallExecuted();
-};
+}
 
 /**
  * @return {boolean} true if a lookup call execution has been scheduled now. false otherwise.
  */
-scout.LookupBox.prototype._ensureLookupCallExecuted = function() {
+_ensureLookupCallExecuted() {
   if (this._lookupExecuted) {
     return false;
   }
   this._lookupByAll();
   return true;
-};
+}
 
-scout.LookupBox.prototype._formatValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_formatValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return '';
   }
 
   return this._formatLookupRows(this.getCheckedLookupRows());
-};
+}
 
-scout.LookupBox.prototype._formatLookupRows = function(lookupRows) {
-  lookupRows = scout.arrays.ensure(lookupRows);
+_formatLookupRows(lookupRows) {
+  lookupRows = arrays.ensure(lookupRows);
   if (lookupRows.length === 0) {
     return '';
   }
@@ -222,18 +233,18 @@ scout.LookupBox.prototype._formatLookupRows = function(lookupRows) {
   lookupRows.forEach(function(row) {
     formatted.push(row.text);
   });
-  return scout.strings.join(', ', formatted);
-};
+  return strings.join(', ', formatted);
+}
 
-scout.LookupBox.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.displayText;
-};
+}
 
-scout.LookupBox.prototype._clear = function() {
+_clear() {
   this.setValue(null);
-};
+}
 
-scout.LookupBox.prototype._onFilterBoxPropertyChange = function(event) {
+_onFilterBoxPropertyChange(event) {
   if (event.propertyName === 'visible') {
     if (!this.rendered) {
       return;
@@ -244,4 +255,5 @@ scout.LookupBox.prototype._onFilterBoxPropertyChange = function(event) {
       this.filterBox.remove();
     }
   }
-};
+}
+}

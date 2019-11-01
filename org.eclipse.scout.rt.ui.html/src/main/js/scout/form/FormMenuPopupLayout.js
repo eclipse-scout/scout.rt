@@ -8,34 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormMenuPopupLayout = function(popup) {
-  scout.FormMenuPopupLayout.parent.call(this, popup);
-  this.popup = popup;
-};
-scout.inherits(scout.FormMenuPopupLayout, scout.PopupWithHeadLayout);
+import {graphics} from '../index';
+import {PopupWithHeadLayout} from '../index';
 
-scout.FormMenuPopupLayout.prototype._setSize = function(prefSize) {
+export default class FormMenuPopupLayout extends PopupWithHeadLayout {
+
+constructor(popup) {
+  super( popup);
+  this.popup = popup;
+}
+
+
+_setSize(prefSize) {
   var popupSize,
     htmlForm = this.popup.form.htmlComp;
 
-  scout.FormMenuPopupLayout.parent.prototype._setSize.call(this, prefSize);
+  super._setSize( prefSize);
 
-  popupSize = scout.graphics.size(this.popup.$body);
+  popupSize = graphics.size(this.popup.$body);
 
   // set size of form
-  popupSize = popupSize.subtract(scout.graphics.insets(this.popup.$body));
+  popupSize = popupSize.subtract(graphics.insets(this.popup.$body));
   htmlForm.setSize(popupSize);
-};
+}
 
-scout.FormMenuPopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var htmlComp = this.popup.htmlComp,
     htmlForm = this.popup.form.htmlComp,
     prefSize;
 
   prefSize = htmlForm.prefSize()
     .add(htmlComp.insets())
-    .add(scout.graphics.insets(this.popup.$body, true))
+    .add(graphics.insets(this.popup.$body, true))
     .add(htmlForm.margins());
 
   return prefSize;
-};
+}
+}

@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeaderMenuButtonKeyStroke = function(field) {
-  scout.TableHeaderMenuButtonKeyStroke.parent.call(this);
+import {KeyStroke} from '../index';
+import {keys} from '../index';
+
+export default class TableHeaderMenuButtonKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.ENTER, scout.keys.SPACE];
+  this.which = [keys.ENTER, keys.SPACE];
   this.renderingHints.render = true;
   this.stopPropagation = true;
-};
-scout.inherits(scout.TableHeaderMenuButtonKeyStroke, scout.KeyStroke);
+}
 
-scout.TableHeaderMenuButtonKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.doAction();
-};
+}
+}

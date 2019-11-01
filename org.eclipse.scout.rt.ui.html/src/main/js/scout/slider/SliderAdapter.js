@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SliderAdapter = function() {
-  scout.SliderAdapter.parent.call(this);
+import {ModelAdapter} from '../index';
+
+export default class SliderAdapter extends ModelAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['value']);
-};
-scout.inherits(scout.SliderAdapter, scout.ModelAdapter);
+}
+
+}

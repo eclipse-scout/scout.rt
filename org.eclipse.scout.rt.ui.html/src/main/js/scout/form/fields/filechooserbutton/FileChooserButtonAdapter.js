@@ -8,30 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooserButtonAdapter = function() {
-  scout.FileChooserButtonAdapter.parent.call(this);
-};
-scout.inherits(scout.FileChooserButtonAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
 
-scout.FileChooserButtonAdapter.prototype._onWidgetPropertyChange = function(event) {
-  scout.FileChooserButtonAdapter.parent.prototype._onWidgetPropertyChange.call(this, event);
+export default class FileChooserButtonAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetPropertyChange(event) {
+  super._onWidgetPropertyChange( event);
 
   if (event.propertyName === 'value') {
     this._onValueChange(event);
   }
-};
+}
 
-scout.FileChooserButtonAdapter.prototype._onValueChange = function(event) {
+_onValueChange(event) {
   var success = this.widget.fileInput.upload();
   if (!success) {
     this.widget.fileInput.clear();
   }
-};
+}
 
 /**
  * @override
  */
-scout.FileChooserButtonAdapter.prototype._syncDisplayText = function(displayText) {
+_syncDisplayText(displayText) {
   this.widget.setDisplayText(displayText);
   // When displayText comes from the server we must not call parseAndSetValue here.
-};
+}
+}

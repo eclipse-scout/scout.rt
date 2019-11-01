@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupLayout = function(group) {
-  scout.GroupLayout.parent.call(this);
-  this.group = group;
-};
-scout.inherits(scout.GroupLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../index';
+import {Dimension} from '../index';
 
-scout.GroupLayout.prototype.layout = function($container) {
+export default class GroupLayout extends AbstractLayout {
+
+constructor(group) {
+  super();
+  this.group = group;
+}
+
+
+layout($container) {
   var htmlComp = this.group.htmlComp;
   var containerSize = htmlComp.availableSize()
     .subtract(htmlComp.insets());
@@ -52,9 +57,9 @@ scout.GroupLayout.prototype.layout = function($container) {
     bodySize.height -= htmlFooter.prefSize(true).height;
   }
   htmlBody.setSize(bodySize);
-};
+}
 
-scout.GroupLayout.prototype.invalidate = function(htmlSource) {
+invalidate(htmlSource) {
   var htmlBody = this.group.body.htmlComp;
   // If a child triggers a layout invalidation, the animation should be stopped and restarted because the body will likely have another height.
   // This will happen for sure if a child is an image which will be loaded during the animation.
@@ -65,9 +70,9 @@ scout.GroupLayout.prototype.invalidate = function(htmlSource) {
     // Resize to new height
     this.group.resizeBody();
   }
-};
+}
 
-scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = options || {};
   var prefSize;
   var htmlComp = this.group.htmlComp;
@@ -85,7 +90,7 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
   } else if (this.group.collapsed || !this.group.body.rendered || !this.group.body.isVisible()) {
     // Body may not be rendered even if collapsed is false if property has changed but _renderCollapse not called yet
     // (if revalidateLayoutTree is called during collapsed property event)
-    prefSize = new scout.Dimension(0, 0);
+    prefSize = new Dimension(0, 0);
   } else {
     prefSize = htmlBody.prefSize(options)
       .add(htmlBody.margins());
@@ -102,4 +107,5 @@ scout.GroupLayout.prototype.preferredLayoutSize = function($container, options) 
     }).height;
   }
   return prefSize;
-};
+}
+}

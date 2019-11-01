@@ -8,42 +8,57 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {AbstractLayout} from '../../index';
+import {HtmlComponent} from '../../index';
+import {Insets} from '../../index';
+import {scout} from '../../index';
+import {Dimension} from '../../index';
+import {graphics} from '../../index';
+import {Device} from '../../index';
+import {FormField} from '../../index';
+import {BasicField} from '../../index';
+import {HtmlEnvironment} from '../../index';
+import {Rectangle} from '../../index';
+import {scrollbars} from '../../index';
+
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field.
  * This layout class works with a FormField instance, since we must access properties of the model.
  * Note: we use optGet() here, since some form-fields have only a bare HTML element as field, other
  * (composite) form-fields work with a HtmlComponent which has its own LayoutManager.
  */
-scout.FormFieldLayout = function(formField) {
-  scout.FormFieldLayout.parent.call(this);
+export default class FormFieldLayout extends AbstractLayout {
+
+constructor(formField) {
+  super();
   this.formField = formField;
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this.formField.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
+}
+
 
 // Minimum field with to normal state, for smaller widths the "compact" style is applied.
-scout.FormFieldLayout.MIN_FIELD_WIDTH = 61;
+static MIN_FIELD_WIDTH = 61;
 
-scout.FormFieldLayout.prototype._initDefaults = function() {
-  this.mandatoryIndicatorWidth = scout.htmlEnvironment.fieldMandatoryIndicatorWidth;
-  this.statusWidth = scout.htmlEnvironment.fieldStatusWidth;
-  this.rowHeight = scout.htmlEnvironment.formRowHeight;
-};
+_initDefaults() {
+  this.mandatoryIndicatorWidth = HtmlEnvironment.get().fieldMandatoryIndicatorWidth;
+  this.statusWidth = HtmlEnvironment.get().fieldStatusWidth;
+  this.rowHeight = HtmlEnvironment.get().formRowHeight;
+}
 
-scout.FormFieldLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this.formField.invalidateLayoutTree();
-};
+}
 
-scout.FormFieldLayout.prototype.layout = function($container) {
+layout($container) {
   var containerPadding, fieldOffset, fieldSize, fieldBounds, htmlField, labelHasFieldWidth, top, bottom, left, right,
-    htmlContainer = scout.HtmlComponent.get($container),
+    htmlContainer = HtmlComponent.get($container),
     formField = this.formField,
     tooltip = formField._tooltip(),
     labelWidth = this.labelWidth(),
@@ -60,18 +75,18 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (this._isLabelVisible()) {
     // currently a gui only flag, necessary for sequencebox
-    if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
+    if (formField.labelWidthInPixel === FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         labelWidth = 0;
       } else {
-        labelWidth = scout.graphics.prefSize(formField.$label).width;
+        labelWidth = graphics.prefSize(formField.$label).width;
       }
     }
-    if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
-      scout.graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
+    if (scout.isOneOf(formField.labelPosition, FormField.LabelPosition.DEFAULT, FormField.LabelPosition.LEFT)) {
+      graphics.setBounds(formField.$label, left, top, labelWidth, this.rowHeight);
       left += labelWidth + formField.$label.cssMarginX();
-    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
-      var labelHeight = scout.graphics.prefSize(formField.$label).height;
+    } else if (formField.labelPosition === FormField.LabelPosition.TOP) {
+      var labelHeight = graphics.prefSize(formField.$label).height;
       // prefSize rounds the value -> ensure label height is set to that value to prevent gaps between container and label.
       // In addition, this also ensures that the correct height is set when changing the label position from left to top
       formField.$label.cssHeight(labelHeight);
@@ -90,8 +105,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     formField.$status
       .cssWidth(statusWidth);
     // If both status and label position is "top", pull status up (without margin on the right side)
-    if (formField.statusPosition === scout.FormField.StatusPosition.TOP && labelHasFieldWidth) {
-      var statusHeight = scout.graphics.prefSize(formField.$status, {
+    if (formField.statusPosition === FormField.StatusPosition.TOP && labelHasFieldWidth) {
+      var statusHeight = graphics.prefSize(formField.$status, {
         useCssSize: true
       }).height;
       // Vertically center status with label
@@ -102,7 +117,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
         .cssHeight(statusHeight)
         .cssLineHeight(null);
       // Add padding to label to prevent overlay of text and status icon
-      var w = scout.graphics.size(formField.$status, true).width;
+      var w = graphics.size(formField.$status, true).width;
       formField.$label.cssPaddingRight(w);
     } else {
       // Default status position
@@ -117,32 +132,32 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   if (formField.$fieldContainer) {
     // Calculate the additional field offset (because of label, mandatory indicator etc.) without the containerInset.
-    fieldOffset = new scout.Insets(
+    fieldOffset = new Insets(
       top - containerPadding.top,
       right - containerPadding.right,
       bottom - containerPadding.bottom,
       left - containerPadding.left);
     // Calculate field size: "available size" - "insets (border and padding)" - "additional offset" - "field's margin"
-    var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
+    var fieldMargins = graphics.margins(formField.$fieldContainer);
     fieldSize = htmlContainer.availableSize({
         exact: true
       })
       .subtract(htmlContainer.insets())
       .subtract(fieldOffset)
       .subtract(fieldMargins);
-    fieldBounds = new scout.Rectangle(left, top, fieldSize.width, fieldSize.height);
+    fieldBounds = new Rectangle(left, top, fieldSize.width, fieldSize.height);
     if (formField.$fieldContainer.css('position') !== 'absolute') {
       fieldBounds.x = 0;
       fieldBounds.y = 0;
     }
-    htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    htmlField = HtmlComponent.optGet(formField.$fieldContainer);
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
     } else {
-      scout.graphics.setBounds(formField.$fieldContainer, fieldBounds);
+      graphics.setBounds(formField.$fieldContainer, fieldBounds);
     }
-    formField.$field.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
-    formField.$container.toggleClass('compact', fieldBounds.width <= scout.FormFieldLayout.MIN_FIELD_WIDTH);
+    formField.$field.toggleClass('compact', fieldBounds.width <= FormFieldLayout.MIN_FIELD_WIDTH);
+    formField.$container.toggleClass('compact', fieldBounds.width <= FormFieldLayout.MIN_FIELD_WIDTH);
 
     if (labelHasFieldWidth) {
       var fieldWidth = fieldSize.add(fieldMargins).width - formField.$label.cssMarginX();
@@ -156,8 +171,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.$fieldContainer) {
     // Icons are placed inside the field (as overlay)
     var $iconInput = this._$elementForIconLayout();
-    var fieldBorder = scout.graphics.borders($iconInput);
-    var inputBounds = scout.graphics.offsetBounds($iconInput);
+    var fieldBorder = graphics.borders($iconInput);
+    var inputBounds = graphics.offsetBounds($iconInput);
     top += fieldBorder.top;
     right += fieldBorder.right;
     fieldBounds.x += fieldBorder.left;
@@ -182,19 +197,19 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
   // Check for scrollbars, update them if necessary
   if (formField.$field) {
-    scout.scrollbars.update(formField.$field);
+    scrollbars.update(formField.$field);
   }
 
   this._layoutDisabledCopyOverlay();
-};
+}
 
-scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
+_layoutDisabledCopyOverlay() {
   if (this.formField.$field && this.formField.$disabledCopyOverlay) {
     var $overlay = this.formField.$disabledCopyOverlay;
     var $field = this.formField.$field;
 
     var pos = $field.position();
-    var padding = scout.graphics.insets($field, {
+    var padding = graphics.insets($field, {
       includePadding: true
     });
 
@@ -206,7 +221,7 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
     var overflowY = $field.css('overflow-y');
     var scrollHorizontal = overflowX === 'scroll' || overflowX === 'auto' && (elem.scrollWidth - elem.clientWidth) > 0;
     var scrollVertical = overflowY === 'scroll' || overflowY === 'auto' && (elem.scrollHeight - elem.clientHeight) > 0;
-    var scrollbarSize = scout.device.scrollbarWidth;
+    var scrollbarSize = Device.get().scrollbarWidth;
 
     $overlay
       .css('top', pos.top)
@@ -215,27 +230,27 @@ scout.FormFieldLayout.prototype._layoutDisabledCopyOverlay = function() {
       .height($field.height() + padding.vertical() - (scrollHorizontal ? scrollbarSize : 0));
 
   }
-};
+}
 
-scout.FormFieldLayout.prototype._isLabelVisible = function() {
+_isLabelVisible() {
   return !!this.formField.$label && this.formField.labelVisible;
-};
+}
 
-scout.FormFieldLayout.prototype._isStatusVisible = function() {
+_isStatusVisible() {
   return !!this.formField.$status && (this.formField.statusVisible || this.formField.$status.isVisible());
-};
+}
 
-scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, options) {
-  var htmlContainer = scout.HtmlComponent.get(this.formField.$container);
+preferredLayoutSize($container, options) {
+  var htmlContainer = HtmlComponent.get(this.formField.$container);
   var formField = this.formField;
-  var prefSizeLabel = new scout.Dimension();
-  var prefSizeMandatory = new scout.Dimension();
-  var prefSizeStatus = new scout.Dimension();
-  var prefSizeField = new scout.Dimension();
+  var prefSizeLabel = new Dimension();
+  var prefSizeMandatory = new Dimension();
+  var prefSizeStatus = new Dimension();
+  var prefSizeField = new Dimension();
   var widthHint = scout.nvl(options.widthHint, 0);
   var heightHint = scout.nvl(options.heightHint, 0);
   // Status is only pulled up if status AND label are on top
-  var statusOnTop = formField.statusPosition === scout.FormField.StatusPosition.TOP && this._isLabelVisible() && formField.labelPosition === scout.FormField.LabelPosition.TOP;
+  var statusOnTop = formField.statusPosition === FormField.StatusPosition.TOP && this._isLabelVisible() && formField.labelPosition === FormField.LabelPosition.TOP;
 
   // Calculate the preferred sizes of the individual parts
   // Mandatory indicator
@@ -248,21 +263,21 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   if (this._isLabelVisible()) {
     prefSizeLabel.width = this.labelWidth() + formField.$label.cssMarginX();
     prefSizeLabel.height = this.rowHeight;
-    if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
+    if (formField.labelPosition === FormField.LabelPosition.TOP) {
       // Label is always as width as the field if it is on top
       prefSizeLabel.width = 0;
-      prefSizeLabel.height = scout.graphics.prefSize(formField.$label, true).height;
-    } else if (formField.labelWidthInPixel === scout.FormField.LabelWidth.UI || formField.labelUseUiWidth) {
+      prefSizeLabel.height = graphics.prefSize(formField.$label, true).height;
+    } else if (formField.labelWidthInPixel === FormField.LabelWidth.UI || formField.labelUseUiWidth) {
       if (formField.$label.hasClass('empty')) {
         prefSizeLabel.width = 0;
       } else {
-        prefSizeLabel = scout.graphics.prefSize(formField.$label, true);
+        prefSizeLabel = graphics.prefSize(formField.$label, true);
       }
     }
 
-    if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
+    if (scout.isOneOf(formField.labelPosition, FormField.LabelPosition.DEFAULT, FormField.LabelPosition.LEFT)) {
       widthHint -= prefSizeLabel.width;
-    } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
+    } else if (formField.labelPosition === FormField.LabelPosition.TOP) {
       heightHint -= prefSizeLabel.height;
     }
   }
@@ -278,8 +293,8 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
 
   // Field
   if (formField.$fieldContainer) {
-    var fieldMargins = scout.graphics.margins(formField.$fieldContainer);
-    var htmlField = scout.HtmlComponent.optGet(formField.$fieldContainer);
+    var fieldMargins = graphics.margins(formField.$fieldContainer);
+    var htmlField = HtmlComponent.optGet(formField.$fieldContainer);
     if (!htmlField) {
       widthHint -= fieldMargins.horizontal();
       heightHint -= fieldMargins.vertical();
@@ -294,13 +309,13 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
       prefSizeField = htmlField.prefSize(options)
         .add(fieldMargins);
     } else {
-      prefSizeField = scout.graphics.prefSize(formField.$fieldContainer, options)
+      prefSizeField = graphics.prefSize(formField.$fieldContainer, options)
         .add(fieldMargins);
     }
   }
 
   // Now sum up to calculate the preferred size of the container
-  var prefSize = new scout.Dimension();
+  var prefSize = new Dimension();
 
   // Field is the base, and it should be at least as height as a form row height.
   prefSize.width = prefSizeField.width;
@@ -311,10 +326,10 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   prefSize.height = Math.max(prefSize.height, prefSizeMandatory.height);
 
   // Label
-  if (scout.isOneOf(formField.labelPosition, scout.FormField.LabelPosition.DEFAULT, scout.FormField.LabelPosition.LEFT)) {
+  if (scout.isOneOf(formField.labelPosition, FormField.LabelPosition.DEFAULT, FormField.LabelPosition.LEFT)) {
     prefSize.width += prefSizeLabel.width;
     prefSize.height = Math.max(prefSize.height, prefSizeLabel.height);
-  } else if (formField.labelPosition === scout.FormField.LabelPosition.TOP) {
+  } else if (formField.labelPosition === FormField.LabelPosition.TOP) {
     prefSize.width = Math.max(prefSize.width, prefSizeLabel.width);
     prefSize.height += prefSizeLabel.height;
   }
@@ -329,16 +344,16 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container, optio
   prefSize = prefSize.add(htmlContainer.insets());
 
   return prefSize;
-};
+}
 
 /**
  * @returns {$} the input element used to position the icon. May be overridden if another element than $field should be used.
  */
-scout.FormFieldLayout.prototype._$elementForIconLayout = function() {
+_$elementForIconLayout() {
   return this.formField.$field;
-};
+}
 
-scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, right, top) {
+_layoutIcon(formField, fieldBounds, right, top) {
   var height = this.rowHeight;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
@@ -349,15 +364,15 @@ scout.FormFieldLayout.prototype._layoutIcon = function(formField, fieldBounds, r
     .cssTop(fieldBounds.y)
     .cssHeight(height)
     .cssLineHeight(height);
-};
+}
 
-scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBounds, right, top) {
+_layoutClearIcon(formField, fieldBounds, right, top) {
   var height = this.rowHeight;
   if (fieldBounds) {
     // If field is bigger than rowHeight (e.g. if used in desktop cell editor), make sure icon is as height as field
     height = fieldBounds.height;
   }
-  if (formField instanceof scout.BasicField && formField.gridData.horizontalAlignment > 0) {
+  if (formField instanceof BasicField && formField.gridData.horizontalAlignment > 0) {
     formField.$clearIcon
       .cssLeft(fieldBounds.x)
       .cssRight('')
@@ -372,12 +387,13 @@ scout.FormFieldLayout.prototype._layoutClearIcon = function(formField, fieldBoun
       .cssHeight(height)
       .cssLineHeight(height);
   }
-};
+}
 
-scout.FormFieldLayout.prototype.labelWidth = function() {
+labelWidth() {
   // use configured label width in pixel or default label width
-  if (scout.FormField.LabelWidth.DEFAULT === this.formField.labelWidthInPixel) {
-    return scout.htmlEnvironment.fieldLabelWidth;
+  if (FormField.LabelWidth.DEFAULT === this.formField.labelWidthInPixel) {
+    return HtmlEnvironment.get().fieldLabelWidth;
   }
   return this.formField.labelWidthInPixel;
-};
+}
+}

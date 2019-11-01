@@ -8,9 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Icon} from '../index';
+import {HtmlComponent} from '../index';
+import {Insets} from '../index';
+import {KeyStrokeContext} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {GroupToggleCollapseKeyStroke} from '../index';
+import {graphics} from '../index';
+import {GroupLayout} from '../index';
+import {tooltips} from '../index';
+import {LoadingSupport} from '../index';
+import {Widget} from '../index';
+import {Dimension} from '../index';
 
-scout.Group = function() {
-  scout.Group.parent.call(this);
+
+export default class Group extends Widget {
+
+constructor() {
+  super();
   this.bodyAnimating = false;
   this.collapsed = false;
   this.collapsible = true;
@@ -28,7 +44,7 @@ scout.Group = function() {
   this.$collapseIcon = null;
   this.$collapseBorderLeft = null;
   this.$collapseBorderRight = null;
-  this.collapseStyle = scout.Group.CollapseStyle.LEFT;
+  this.collapseStyle = Group.CollapseStyle.LEFT;
   this.htmlComp = null;
   this.htmlHeader = null;
   this.htmlFooter = null;
@@ -36,49 +52,49 @@ scout.Group = function() {
   this.icon = null;
   this._addWidgetProperties(['header']);
   this._addWidgetProperties(['body']);
-};
-scout.inherits(scout.Group, scout.Widget);
+}
 
-scout.Group.CollapseStyle = {
+
+static CollapseStyle = {
   LEFT: 'left',
   RIGHT: 'right',
   BOTTOM: 'bottom'
 };
 
-scout.Group.prototype._init = function(model) {
-  scout.Group.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.resolveTextKeys(['title', 'titleSuffix']);
   this.resolveIconIds(['iconId']);
   this._setBody(this.body);
   this._setHeader(this.header);
-};
+}
 
 /**
  * @override
  */
-scout.Group.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.Group.prototype._initKeyStrokeContext = function() {
-  scout.Group.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   // Key stroke should only work when header is focused
   this.keyStrokeContext.$bindTarget = function() {
     return this.$header;
   }.bind(this);
   this.keyStrokeContext.registerKeyStroke([
-    new scout.GroupToggleCollapseKeyStroke(this)
+    new GroupToggleCollapseKeyStroke(this)
   ]);
-};
+}
 
-scout.Group.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('group');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.GroupLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new GroupLayout(this));
 
   this._renderHeader();
 
@@ -86,12 +102,12 @@ scout.Group.prototype._render = function() {
   this.$footer = this.$container.appendDiv('group-footer');
   this.$collapseBorderLeft = this.$footer.appendDiv('group-collapse-border');
   this.$collapseBorderRight = this.$footer.appendDiv('group-collapse-border');
-  this.htmlFooter = scout.HtmlComponent.install(this.$footer, this.session);
+  this.htmlFooter = HtmlComponent.install(this.$footer, this.session);
   this.$footer.on('mousedown', this._onFooterMouseDown.bind(this));
-};
+}
 
-scout.Group.prototype._renderProperties = function() {
-  scout.Group.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderIconId();
   this._renderTitle();
   this._renderTitleSuffix();
@@ -100,9 +116,9 @@ scout.Group.prototype._renderProperties = function() {
   this._renderCollapsed();
   this._renderCollapseStyle();
   this._renderCollapsible();
-};
+}
 
-scout.Group.prototype._remove = function() {
+_remove() {
   this.$header = null;
   this.$title = null;
   this.$titleSuffix = null;
@@ -111,24 +127,24 @@ scout.Group.prototype._remove = function() {
   this.$collapseBorderLeft = null;
   this.$collapseBorderRight = null;
   this._removeIconId();
-  scout.Group.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Group.prototype._renderEnabled = function() {
-  scout.Group.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this.$header.setTabbable(this.enabledComputed);
-};
+}
 
-scout.Group.prototype.setIconId = function(iconId) {
+setIconId(iconId) {
   this.setProperty('iconId', iconId);
-};
+}
 
 /**
  * Adds an image or font-based icon to the group header by adding either an IMG or SPAN element.
  */
-scout.Group.prototype._renderIconId = function() {
+_renderIconId() {
   var iconId = this.iconId || '';
-  // If the icon is an image (and not a font icon), the scout.Icon class will invalidate the layout when the image has loaded
+  // If the icon is an image (and not a font icon), the Icon class will invalidate the layout when the image has loaded
   if (!iconId) {
     this._removeIconId();
     this._updateIconStyle();
@@ -149,49 +165,49 @@ scout.Group.prototype._renderIconId = function() {
   }.bind(this));
   this.icon.render(this.$header);
   this._updateIconStyle();
-};
+}
 
-scout.Group.prototype._updateIconStyle = function() {
+_updateIconStyle() {
   var hasTitle = !!this.title;
   this.get$Icon().toggleClass('with-title', hasTitle);
   this.get$Icon().addClass('group-icon');
   this._renderCollapseStyle();
-};
+}
 
-scout.Group.prototype.get$Icon = function() {
+get$Icon() {
   if (this.icon) {
     return this.icon.$container;
   }
   return $();
-};
+}
 
-scout.Group.prototype._removeIconId = function() {
+_removeIconId() {
   if (this.icon) {
     this.icon.destroy();
   }
-};
+}
 
-scout.Group.prototype.setHeader = function(header) {
+setHeader(header) {
   this.setProperty('header', header);
-};
+}
 
-scout.Group.prototype._setHeader = function(header) {
+_setHeader(header) {
   this._setProperty('header', header);
-};
+}
 
-scout.Group.prototype.setHeaderFocusable = function(headerFocusable) {
+setHeaderFocusable(headerFocusable) {
   this.setProperty('headerFocusable', headerFocusable);
-};
+}
 
-scout.Group.prototype._renderHeaderFocusable = function() {
+_renderHeaderFocusable() {
   this.$header.toggleClass('unfocusable', !this.headerFocusable);
-};
+}
 
-scout.Group.prototype.setTitle = function(title) {
+setTitle(title) {
   this.setProperty('title', title);
-};
+}
 
-scout.Group.prototype._renderTitle = function() {
+_renderTitle() {
   if (this.$title) {
     if (this.titleHtmlEnabled) {
       this.$title.htmlOrNbsp(this.title);
@@ -200,56 +216,56 @@ scout.Group.prototype._renderTitle = function() {
     }
     this._updateIconStyle();
   }
-};
+}
 
-scout.Group.prototype.setTitleSuffix = function(titleSuffix) {
+setTitleSuffix(titleSuffix) {
   this.setProperty('titleSuffix', titleSuffix);
-};
+}
 
-scout.Group.prototype._renderTitleSuffix = function() {
+_renderTitleSuffix() {
   if (this.$titleSuffix) {
     this.$titleSuffix.text(this.titleSuffix || '');
   }
-};
+}
 
-scout.Group.prototype.setHeaderVisible = function(headerVisible) {
+setHeaderVisible(headerVisible) {
   this.setProperty('headerVisible', headerVisible);
-};
+}
 
-scout.Group.prototype._renderHeaderVisible = function() {
+_renderHeaderVisible() {
   this.$header.setVisible(this.headerVisible);
   this._renderCollapsible();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Group.prototype.setBody = function(body) {
+setBody(body) {
   this.setProperty('body', body);
-};
+}
 
-scout.Group.prototype._setBody = function(body) {
+_setBody(body) {
   if (!body) {
     // Create empty body if no body was provided
     body = scout.create('Widget', {
       parent: this,
       _render: function() {
         this.$container = this.$parent.appendDiv('group');
-        this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+        this.htmlComp = HtmlComponent.install(this.$container, this.session);
       }
     });
   }
   this._setProperty('body', body);
-};
+}
 
-scout.Group.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this,
     $container: function() {
       return this.$header;
     }.bind(this)
   });
-};
+}
 
-scout.Group.prototype._renderHeader = function() {
+_renderHeader() {
   if (this.$header) {
     this.$header.remove();
     this._removeIconId();
@@ -268,10 +284,10 @@ scout.Group.prototype._renderHeader = function() {
       .addClass('prevent-initial-focus');
     this.$title = this.$header.appendDiv('group-title');
     this.$titleSuffix = this.$header.appendDiv('group-title-suffix');
-    scout.tooltips.installForEllipsis(this.$title, {
+    tooltips.installForEllipsis(this.$title, {
       parent: this
     });
-    this.htmlHeader = scout.HtmlComponent.install(this.$header, this.session);
+    this.htmlHeader = HtmlComponent.install(this.$header, this.session);
     if (!this.rendering) {
       this._renderIconId();
       this._renderTitle();
@@ -280,34 +296,34 @@ scout.Group.prototype._renderHeader = function() {
   }
   this.$header.on('mousedown', this._onHeaderMouseDown.bind(this));
   this.invalidateLayoutTree();
-};
+}
 
-scout.Group.prototype._renderBody = function() {
+_renderBody() {
   this.body.render();
   this.body.$container.insertAfter(this.$header);
   this.body.$container.addClass('group-body');
   this.body.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.Group.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (!this.rendered) {
     return false;
   }
   return this.$header;
-};
+}
 
-scout.Group.prototype.toggleCollapse = function() {
+toggleCollapse() {
   this.setCollapsed(!this.collapsed && this.collapsible);
-};
+}
 
-scout.Group.prototype.setCollapsed = function(collapsed) {
+setCollapsed(collapsed) {
   this.setProperty('collapsed', collapsed);
-};
+}
 
-scout.Group.prototype._renderCollapsed = function() {
+_renderCollapsed() {
   this.$container.toggleClass('collapsed', this.collapsed);
   this.$collapseIcon.toggleClass('collapsed', this.collapsed);
   if (!this.collapsed && !this.bodyAnimating) {
@@ -320,34 +336,34 @@ scout.Group.prototype._renderCollapsed = function() {
     this.body.remove();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.Group.prototype.setCollapsible = function(collapsible) {
+setCollapsible(collapsible) {
   this.setProperty('collapsible', collapsible);
-};
+}
 
-scout.Group.prototype._renderCollapsible = function() {
+_renderCollapsible() {
   this.$container.toggleClass('collapsible', this.collapsible);
   this.$header.toggleClass('disabled', !this.collapsible);
   // footer is visible if collapseStyle is 'bottom' and either header is visible or has a (collapsible) body
-  this.$footer.setVisible(this.collapseStyle === scout.Group.CollapseStyle.BOTTOM && (this.headerVisible || this.collapsible));
+  this.$footer.setVisible(this.collapseStyle === Group.CollapseStyle.BOTTOM && (this.headerVisible || this.collapsible));
   this.$collapseIcon.setVisible(this.collapsible);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Group.prototype.setCollapseStyle = function(collapseStyle) {
+setCollapseStyle(collapseStyle) {
   this.setProperty('collapseStyle', collapseStyle);
-};
+}
 
-scout.Group.prototype._renderCollapseStyle = function() {
-  this.$header.toggleClass('collapse-right', this.collapseStyle === scout.Group.CollapseStyle.RIGHT);
-  this.$container.toggleClass('collapse-bottom', this.collapseStyle === scout.Group.CollapseStyle.BOTTOM);
+_renderCollapseStyle() {
+  this.$header.toggleClass('collapse-right', this.collapseStyle === Group.CollapseStyle.RIGHT);
+  this.$container.toggleClass('collapse-bottom', this.collapseStyle === Group.CollapseStyle.BOTTOM);
 
-  if (this.collapseStyle === scout.Group.CollapseStyle.RIGHT && !this.header) {
+  if (this.collapseStyle === Group.CollapseStyle.RIGHT && !this.header) {
     this.$collapseIcon.appendTo(this.$header);
-  } else if (this.collapseStyle === scout.Group.CollapseStyle.LEFT && !this.header) {
+  } else if (this.collapseStyle === Group.CollapseStyle.LEFT && !this.header) {
     this.$collapseIcon.prependTo(this.$header);
-  } else if (this.collapseStyle === scout.Group.CollapseStyle.BOTTOM) {
+  } else if (this.collapseStyle === Group.CollapseStyle.BOTTOM) {
     var sibling = this.body.$container ? this.body.$container : this.$header;
     this.$footer.insertAfter(sibling);
     this.$collapseIcon.insertAfter(this.$collapseBorderLeft);
@@ -355,24 +371,24 @@ scout.Group.prototype._renderCollapseStyle = function() {
 
   this._renderCollapsible();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Group.prototype._onHeaderMouseDown = function(event) {
-  if (this.collapsible && (!this.header || this.collapseStyle !== scout.Group.CollapseStyle.BOTTOM)) {
+_onHeaderMouseDown(event) {
+  if (this.collapsible && (!this.header || this.collapseStyle !== Group.CollapseStyle.BOTTOM)) {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
-};
+}
 
-scout.Group.prototype._onFooterMouseDown = function(event) {
+_onFooterMouseDown(event) {
   if (this.collapsible) {
     this.setCollapsed(!this.collapsed && this.collapsible);
   }
-};
+}
 
 /**
  * Resizes the body to its preferred size by animating the height.
  */
-scout.Group.prototype.resizeBody = function() {
+resizeBody() {
   this.animateToggleCollapse().done(function() {
     if (this.bodyAnimating) {
       // Another animation has been started in the mean time -> ignore done event
@@ -383,24 +399,24 @@ scout.Group.prototype.resizeBody = function() {
     }
     this.invalidateLayoutTree();
   }.bind(this));
-};
+}
 
 /**
  * @param {object} [options]
  * @returns {Promise}
  */
-scout.Group.prototype.animateToggleCollapse = function(options) {
-  var currentSize = scout.graphics.cssSize(this.body.$container);
-  var currentMargins = scout.graphics.margins(this.body.$container);
-  var currentPaddings = scout.graphics.paddings(this.body.$container);
+animateToggleCollapse(options) {
+  var currentSize = graphics.cssSize(this.body.$container);
+  var currentMargins = graphics.margins(this.body.$container);
+  var currentPaddings = graphics.paddings(this.body.$container);
   var targetHeight, targetMargins, targetPaddings;
 
   if (this.collapsed) {
     // Collapsing
     // Set target values to 0 when collapsing
     targetHeight = 0;
-    targetMargins = new scout.Insets();
-    targetPaddings = new scout.Insets();
+    targetMargins = new Insets();
+    targetPaddings = new Insets();
   } else {
     // Expanding
     // Expand to preferred size of the body
@@ -410,7 +426,7 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
 
     // Make sure body is layouted correctly before starting the animation (with the target size)
     // Use setSize to explicitly call its layout (this might even be necessary during the animation, see GroupLayout.invalidate)
-    this.body.htmlComp.setSize(new scout.Dimension(this.body.$container.outerWidth(), targetHeight));
+    this.body.htmlComp.setSize(new Dimension(this.body.$container.outerWidth(), targetHeight));
 
     if (this.bodyAnimating) {
       // The group may be expanded while being collapsed or vice verca.
@@ -420,15 +436,15 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
       this.body.$container
         .cssMarginY('')
         .cssPaddingY('');
-      targetMargins = scout.graphics.margins(this.body.$container);
-      targetPaddings = scout.graphics.paddings(this.body.$container);
+      targetMargins = graphics.margins(this.body.$container);
+      targetPaddings = graphics.paddings(this.body.$container);
     } else {
       // If toggling is not already in progress, start expanding from 0
       currentSize.height = 0;
-      currentMargins = new scout.Insets();
-      currentPaddings = new scout.Insets();
-      targetMargins = scout.graphics.margins(this.body.$container);
-      targetPaddings = scout.graphics.paddings(this.body.$container);
+      currentMargins = new Insets();
+      currentPaddings = new Insets();
+      targetMargins = graphics.margins(this.body.$container);
+      targetPaddings = graphics.paddings(this.body.$container);
     }
   }
 
@@ -469,4 +485,5 @@ scout.Group.prototype.animateToggleCollapse = function(options) {
       }.bind(this)
     })
     .promise();
-};
+}
+}

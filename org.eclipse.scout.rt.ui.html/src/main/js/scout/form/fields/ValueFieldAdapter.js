@@ -8,12 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ValueFieldAdapter = function() {
-  scout.ValueFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.ValueFieldAdapter, scout.FormFieldAdapter);
+import {comparators} from '../../index';
+import {FormFieldAdapter} from '../../index';
 
-scout.ValueFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
+export default class ValueFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAcceptInput(event) {
   this._send('acceptInput', {
     displayText: event.displayText,
     whileTyping: event.whileTyping
@@ -23,31 +28,31 @@ scout.ValueFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
       return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
     }
   });
-};
+}
 
-scout.ValueFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'acceptInput') {
     this._onWidgetAcceptInput(event);
   } else {
-    scout.ValueFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.ValueFieldAdapter.prototype.exportAdapterData = function(adapterData) {
-  adapterData = scout.ValueFieldAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+exportAdapterData(adapterData) {
+  adapterData = super.exportAdapterData( adapterData);
   delete adapterData.displayText;
   return adapterData;
-};
+}
 
-scout.ValueFieldAdapter.prototype._syncDisplayText = function(displayText) {
+_syncDisplayText(displayText) {
   this.widget.setDisplayText(displayText);
   this.widget.parseAndSetValue(displayText);
-};
+}
 
-scout.ValueFieldAdapter.prototype._createPropertySortFunc = function(order) {
+_createPropertySortFunc(order) {
   return function(a, b) {
     var ia = order.indexOf(a);
     var ib = order.indexOf(b);
@@ -60,6 +65,7 @@ scout.ValueFieldAdapter.prototype._createPropertySortFunc = function(order) {
     if (ib > -1) { // A is not in list
       return 1;
     }
-    return scout.comparators.TEXT.compare(a, b); // both are not in list
+    return comparators.TEXT.compare(a, b); // both are not in list
   };
-};
+}
+}

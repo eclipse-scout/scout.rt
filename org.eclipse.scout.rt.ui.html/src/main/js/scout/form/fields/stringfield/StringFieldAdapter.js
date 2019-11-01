@@ -8,23 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StringFieldAdapter = function() {
-  scout.StringFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.StringFieldAdapter, scout.BasicFieldAdapter);
+import {BasicFieldAdapter} from '../../../index';
 
-scout.StringFieldAdapter.prototype._initProperties = function(model) {
+export default class StringFieldAdapter extends BasicFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_initProperties(model) {
   if (model.insertText !== undefined) {
     // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
     delete model.insertText;
   }
-};
+}
 
-scout.StringFieldAdapter.prototype._syncInsertText = function(insertText) {
+_syncInsertText(insertText) {
   this.widget.insertText(insertText);
-};
+}
 
-scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
+_onWidgetSelectionChange(event) {
   // send delayed to avoid a lot of requests while selecting
   // coalesce: only send the latest selection changed event for a field
   this._send('selectionChange', {
@@ -37,18 +41,19 @@ scout.StringFieldAdapter.prototype._onWidgetSelectionChange = function(event) {
       return this.target === previous.target && this.type === previous.type;
     }
   });
-};
+}
 
-scout.StringFieldAdapter.prototype._onWidgetAction = function(event) {
+_onWidgetAction(event) {
   this._send('action');
-};
+}
 
-scout.StringFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'selectionChange') {
     this._onWidgetSelectionChange(event);
   } else if (event.type === 'action') {
     this._onWidgetAction(event);
   } else {
-    scout.StringFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

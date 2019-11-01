@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabItemKeyStroke = function(keyStroke, field) {
-  scout.TabItemKeyStroke.parent.call(this);
+import {HAlign} from '../index';
+import {KeyStroke} from '../index';
+
+export default class TabItemKeyStroke extends KeyStroke {
+
+constructor(keyStroke, field) {
+  super();
   this.field = field;
   this.parseAndSetKeyStroke(keyStroke);
 
   this.renderingHints.offset = 16;
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$tabContainer;
   }.bind(this);
-};
-scout.inherits(scout.TabItemKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.TabItemKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.parent.setSelectedTab(this.field);
-};
+}
+}

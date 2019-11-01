@@ -8,16 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DatePickerTouchPopupLayout = function(popup) {
-  scout.DatePickerTouchPopupLayout.parent.call(this, popup);
-};
-scout.inherits(scout.DatePickerTouchPopupLayout, scout.TouchPopupLayout);
+import {graphics} from '../index';
+import {TouchPopupLayout} from '../index';
+import {HtmlEnvironment} from '../index';
+import {Dimension} from '../index';
+
+export default class DatePickerTouchPopupLayout extends TouchPopupLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
 
 /**
  * @override
  */
-scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($container, options) {
-  var popupWidth = scout.htmlEnvironment.formColumnWidth,
+preferredLayoutSize($container, options) {
+  var popupWidth = HtmlEnvironment.get().formColumnWidth,
     containerInsets = this.popup.htmlComp.insets(),
     fieldHtmlComp = this.popup._field.htmlComp,
     widgetContainerHtmlComp = this.popup._widgetContainerHtmlComp,
@@ -25,8 +32,9 @@ scout.DatePickerTouchPopupLayout.prototype.preferredLayoutSize = function($conta
     .add(fieldHtmlComp.margins()),
     widgetContainerPrefSize = widgetContainerHtmlComp.prefSize(options)
     .add(widgetContainerHtmlComp.margins()),
-    headerHeight = scout.graphics.size(this.popup._$header, true).height,
+    headerHeight = graphics.size(this.popup._$header, true).height,
     popupHeight = headerHeight + fieldPrefSize.height + widgetContainerPrefSize.height + containerInsets.vertical();
 
-  return new scout.Dimension(popupWidth, popupHeight);
-};
+  return new Dimension(popupWidth, popupHeight);
+}
+}

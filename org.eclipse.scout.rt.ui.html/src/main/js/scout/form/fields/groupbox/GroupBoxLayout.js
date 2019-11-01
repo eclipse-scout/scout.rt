@@ -8,26 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxLayout = function(groupBox) {
-  scout.GroupBoxLayout.parent.call(this);
+import {AbstractLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {scrollbars} from '../../../index';
+import {MenuBarLayout} from '../../../index';
+import {GroupBox} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {graphics} from '../../../index';
+import {ResponsiveManager} from '../../../index';
+import {Dimension} from '../../../index';
+import {FormField} from '../../../index';
+import * as $ from 'jquery';
+
+export default class GroupBoxLayout extends AbstractLayout {
+
+constructor(groupBox) {
+  super();
   this.groupBox = groupBox;
 
   this._initDefaults();
 
-  scout.htmlEnvironment.on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
-};
-scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
+  HtmlEnvironment.get().on('propertyChange', this._onHtmlEnvironmenPropertyChange.bind(this));
+}
 
-scout.GroupBoxLayout.prototype._initDefaults = function() {
-  this._statusWidth = scout.htmlEnvironment.fieldStatusWidth;
-};
 
-scout.GroupBoxLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_initDefaults() {
+  this._statusWidth = HtmlEnvironment.get().fieldStatusWidth;
+}
+
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this.groupBox.invalidateLayoutTree();
-};
+}
 
-scout.GroupBoxLayout.prototype.layout = function($container) {
+layout($container) {
   var gbBodySize,
     menuBarSize,
     menuBarHeight = 0,
@@ -45,7 +59,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   // apply responsive transformations if necessary.
   if (this.groupBox.responsive) {
-    scout.responsiveManager.handleResponsive(this.groupBox, containerSize.width);
+    ResponsiveManager.get().handleResponsive(this.groupBox, containerSize.width);
   }
 
   if ($status && $status.isVisible()) {
@@ -55,14 +69,14 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   // Menu-bar
   if (htmlMenuBar) {
-    if (this.groupBox.menuBarPosition === scout.GroupBox.MenuBarPosition.TITLE) {
+    if (this.groupBox.menuBarPosition === GroupBox.MenuBarPosition.TITLE) {
       // position: TITLE
       // Use Math.floor/ceil and +1 to avoid rounding issues with text-ellipsis and title label
       menuBarSize = htmlMenuBar.prefSize({
         exact: true
       });
-      var titleSize = scout.graphics.prefSize(this.groupBox.$title);
-      var titleLabelWidth = Math.ceil(scout.graphics.prefSize(this.groupBox.$label, true).width) + 1;
+      var titleSize = graphics.prefSize(this.groupBox.$title);
+      var titleLabelWidth = Math.ceil(graphics.prefSize(this.groupBox.$label, true).width) + 1;
       var menuBarWidth = menuBarSize.width;
       var titleWidth = titleSize.width - statusWidth;
 
@@ -107,8 +121,8 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   // Position of label and title
   setWidthForStatus($groupBoxTitle);
-  if (statusPosition === scout.FormField.StatusPosition.TOP) {
-    if (this.groupBox.menuBarPosition !== scout.GroupBox.MenuBarPosition.TITLE) {
+  if (statusPosition === FormField.StatusPosition.TOP) {
+    if (this.groupBox.menuBarPosition !== GroupBox.MenuBarPosition.TITLE) {
       setWidthForStatus($label, statusWidth);
     }
   } else {
@@ -128,7 +142,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
   }
 
   if (htmlGbBody.scrollable || this.groupBox.bodyLayoutConfig.minWidth > 0) {
-    scout.scrollbars.update(htmlGbBody.$comp);
+    scrollbars.update(htmlGbBody.$comp);
   }
 
   // Make $element wider, so status is on the left
@@ -140,9 +154,9 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
       $element.cssWidth('');
     }
   }
-};
+}
 
-scout.GroupBoxLayout.prototype._layoutStatus = function() {
+_layoutStatus() {
   var htmlContainer = this.groupBox.htmlComp,
     containerPadding = htmlContainer.insets({
       includeBorder: false
@@ -152,20 +166,20 @@ scout.GroupBoxLayout.prototype._layoutStatus = function() {
     $groupBoxTitle = this.groupBox.$title,
     titleInnerHeight = $groupBoxTitle.innerHeight(),
     $status = this.groupBox.$status,
-    statusMargins = scout.graphics.margins($status),
+    statusMargins = graphics.margins($status),
     statusPosition = this.groupBox.statusPosition;
 
   $status.cssWidth(this._statusWidth);
-  if (statusPosition === scout.FormField.StatusPosition.DEFAULT) {
+  if (statusPosition === FormField.StatusPosition.DEFAULT) {
     $status
       .cssTop(top + $groupBoxTitle.cssMarginTop())
       .cssRight(right)
       .cssHeight(titleInnerHeight - statusMargins.vertical())
       .cssLineHeight(titleInnerHeight - statusMargins.vertical());
   }
-};
+}
 
-scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = options || {};
   var htmlContainer = this.groupBox.htmlComp,
     htmlGbBody = this._htmlGbBody(),
@@ -178,7 +192,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
 
   if (this.groupBox.responsive &&
     options.widthHint) {
-    undoResponsive = scout.responsiveManager.handleResponsive(this.groupBox, options.widthHint);
+    undoResponsive = ResponsiveManager.get().handleResponsive(this.groupBox, options.widthHint);
   }
 
   if (gridData) {
@@ -187,7 +201,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
   }
   if (widthInPixel && heightInPixel) {
     // If width and height are set there is no need to calculate anything -> just return it as preferred size
-    prefSize = new scout.Dimension(widthInPixel, heightInPixel)
+    prefSize = new Dimension(widthInPixel, heightInPixel)
       .add(htmlContainer.insets());
     return prefSize;
   }
@@ -207,7 +221,7 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
       prefSize.height += htmlMenuBar.prefSize(options).height;
     }
   } else {
-    prefSize = new scout.Dimension(0, 0);
+    prefSize = new Dimension(0, 0);
   }
   prefSize = prefSize.add(htmlContainer.insets());
   prefSize.height += this._titleHeight();
@@ -222,47 +236,48 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container, option
   }
 
   if (undoResponsive) {
-    scout.responsiveManager.reset(this.groupBox);
+    ResponsiveManager.get().reset(this.groupBox);
   }
 
   return prefSize;
-};
+}
 
-scout.GroupBoxLayout.prototype._titleHeight = function() {
-  return scout.graphics.prefSize(this.groupBox.$title, true).height;
-};
+_titleHeight() {
+  return graphics.prefSize(this.groupBox.$title, true).height;
+}
 
-scout.GroupBoxLayout.prototype._notificationHeight = function(options) {
+_notificationHeight(options) {
   options = options || {};
   if (!this.groupBox.notification) {
     return 0;
   }
   options.includeMargin = true;
   return this.groupBox.notification.htmlComp.prefSize(options).height;
-};
+}
 
-scout.GroupBoxLayout.prototype._menuBarSize = function(htmlMenuBar, containerSize, statusWidth) {
-  var menuBarSize = scout.MenuBarLayout.size(htmlMenuBar, containerSize);
+_menuBarSize(htmlMenuBar, containerSize, statusWidth) {
+  var menuBarSize = MenuBarLayout.size(htmlMenuBar, containerSize);
   if (!this.groupBox.mainBox) {
     // adjust size of menubar as well if it is in a regular group box
     menuBarSize.width -= statusWidth;
   }
   return menuBarSize;
-};
+}
 
 /**
  * Return menu-bar when it exists and it is visible.
  */
-scout.GroupBoxLayout.prototype._htmlMenuBar = function() {
+_htmlMenuBar() {
   if (this.groupBox.menuBar && this.groupBox.menuBarVisible) {
-    var htmlMenuBar = scout.HtmlComponent.get(this.groupBox.menuBar.$container);
+    var htmlMenuBar = HtmlComponent.get(this.groupBox.menuBar.$container);
     if (htmlMenuBar.isVisible()) {
       return htmlMenuBar;
     }
   }
   return null;
-};
+}
 
-scout.GroupBoxLayout.prototype._htmlGbBody = function() {
-  return scout.HtmlComponent.get(this.groupBox.$body);
-};
+_htmlGbBody() {
+  return HtmlComponent.get(this.groupBox.$body);
+}
+}

@@ -8,13 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AjaxCall = function() {
-  scout.AjaxCall.parent.call(this);
-  this.type = 'ajax';
-};
-scout.inherits(scout.AjaxCall, scout.Call);
+import {Call} from '../index';
+import {URL} from '../index';
+import * as $ from 'jquery';
 
-scout.AjaxCall.prototype.init = function(model) {
+export default class AjaxCall extends Call {
+
+constructor() {
+  super();
+  this.type = 'ajax';
+}
+
+
+init(model) {
   if (!model) {
     throw new Error('Missing argument "model"');
   }
@@ -24,45 +30,45 @@ scout.AjaxCall.prototype.init = function(model) {
   if (!model.name) {
     model.name = model.ajaxOptions.url;
   }
-  scout.AjaxCall.parent.prototype.init.call(this, model);
-};
+  super.init( model);
+}
 
 // ==================================================================================
 
-scout.AjaxCall.prototype._callImpl = function() {
+_callImpl() {
   // Mark retries by adding an URL parameter
   if (this.callCounter !== 1) {
-    this.ajaxOptions.url = new scout.URL(this.ajaxOptions.url).setParameter('retry', this.callCounter - 1).toString({
+    this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', this.callCounter - 1).toString({
       alwaysLast: ['retry']
     });
   }
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.type + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
   return $.ajax(this.ajaxOptions);
-};
+}
 
-scout.AjaxCall.prototype._onCallDone = function(data, textStatus, jqXHR) {
+_onCallDone(data, textStatus, jqXHR) {
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX success');
-  scout.AjaxCall.parent.prototype._onCallDone.call(this, data, textStatus, jqXHR);
-};
+  super._onCallDone( data, textStatus, jqXHR);
+}
 
-scout.AjaxCall.prototype._onCallFail = function(jqXHR, textStatus, errorThrown) {
+_onCallFail(jqXHR, textStatus, errorThrown) {
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + textStatus + ', httpStatus=' + jqXHR.status + (errorThrown ? ' "' + errorThrown + '"' : ''));
-  scout.AjaxCall.parent.prototype._onCallFail.call(this, jqXHR, textStatus, errorThrown);
-};
+  super._onCallFail( jqXHR, textStatus, errorThrown);
+}
 
-scout.AjaxCall.prototype._nextRetryImpl = function(jqXHR, textStatus, errorThrown) {
-  var offlineError = scout.AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, this.request);
+_nextRetryImpl(jqXHR, textStatus, errorThrown) {
+  var offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown, this.request);
   if (!offlineError) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
     return false;
   }
-  return scout.AjaxCall.parent.prototype._nextRetryImpl.call(this);
-};
+  return super._nextRetryImpl();
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-scout.AjaxCall.isOfflineError = function(jqXHR, textStatus, errorThrown, request) {
+static isOfflineError(jqXHR, textStatus, errorThrown, request) {
   var offline = (
     // Status code = 0 -> no connection
     !jqXHR.status ||
@@ -83,4 +89,5 @@ scout.AjaxCall.isOfflineError = function(jqXHR, textStatus, errorThrown, request
     jqXHR.status === 504
   );
   return offline;
-};
+}
+}

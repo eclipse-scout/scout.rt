@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ViewButtonBox = function() {
-  scout.ViewButtonBox.parent.call(this);
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {ViewButtonBoxLayout} from '../../index';
+import {scout} from '../../index';
+import {OutlineViewButton} from '../../index';
+
+export default class ViewButtonBox extends Widget {
+
+constructor() {
+  super();
   this.viewMenuTab = null;
   this.viewButtons = [];
   this.menuButtons = [];
@@ -17,52 +25,52 @@ scout.ViewButtonBox = function() {
   this._desktopOutlineChangeHandler = this._onDesktopOutlineChange.bind(this);
   this._viewButtonPropertyChangeHandler = this._onViewButtonPropertyChange.bind(this);
   this._addWidgetProperties(['tabButtons']);
-};
-scout.inherits(scout.ViewButtonBox, scout.Widget);
+}
 
-scout.ViewButtonBox.prototype._init = function(model) {
-  scout.ViewButtonBox.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.desktop = this.session.desktop;
   this.viewMenuTab = scout.create('ViewMenuTab', {
     parent: this
   });
   this._setViewButtons(this.viewButtons);
   this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
-};
+}
 
-scout.ViewButtonBox.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('view-button-box');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.ViewButtonBoxLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new ViewButtonBoxLayout(this));
 
   this.viewMenuTab.render();
   this._onDesktopOutlineChange();
-};
+}
 
-scout.ViewButtonBox.prototype._renderProperties = function() {
-  scout.ViewButtonBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderTabButtons();
-};
+}
 
-scout.ViewButtonBox.prototype._remove = function() {
+_remove() {
   this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
   this.viewButtons.forEach(function(viewButton) {
     viewButton.off('selected', this._viewButtonPropertyChangeHandler);
   }, this);
 
-  scout.ViewButtonBox.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.ViewButtonBox.prototype.setMenuTabVisible = function(menuTabVisible) {
+setMenuTabVisible(menuTabVisible) {
   this.viewMenuTab.setViewTabVisible(menuTabVisible);
   this.invalidateLayoutTree();
-};
+}
 
-scout.ViewButtonBox.prototype.setViewButtons = function(viewButtons) {
+setViewButtons(viewButtons) {
   this.setProperty('viewButtons', viewButtons);
-};
+}
 
-scout.ViewButtonBox.prototype._setViewButtons = function(viewButtons) {
+_setViewButtons(viewButtons) {
   if (this.viewButtons) {
     this.viewButtons.forEach(function(viewButton) {
       viewButton.off('propertyChange', this._viewButtonPropertyChangeHandler);
@@ -73,13 +81,13 @@ scout.ViewButtonBox.prototype._setViewButtons = function(viewButtons) {
     viewButton.on('propertyChange', this._viewButtonPropertyChangeHandler);
   }, this);
   this._updateViewButtons();
-};
+}
 
-scout.ViewButtonBox.prototype.setTabButtons = function(tabButtons) {
+setTabButtons(tabButtons) {
   this.setProperty('tabButtons', tabButtons);
-};
+}
 
-scout.ViewButtonBox.prototype._renderTabButtons = function() {
+_renderTabButtons() {
   this.tabButtons.forEach(function(viewTab, i) {
     viewTab.renderAsTab();
     viewTab.tab();
@@ -87,9 +95,9 @@ scout.ViewButtonBox.prototype._renderTabButtons = function() {
       viewTab.last();
     }
   }, this);
-};
+}
 
-scout.ViewButtonBox.prototype._updateViewButtons = function() {
+_updateViewButtons() {
   var viewButtons = this.viewButtons.filter(function(b) {
       return b.visible;
     }),
@@ -112,44 +120,44 @@ scout.ViewButtonBox.prototype._updateViewButtons = function() {
 
   this.setTabButtons(tabButtons);
   this._updateVisibility();
-};
+}
 
-scout.ViewButtonBox.prototype._updateVisibility = function(menuButtons) {
+_updateVisibility(menuButtons) {
   this.setVisible((this.tabButtons.length + this.menuButtons.length) > 1);
-};
+}
 
-scout.ViewButtonBox.prototype.setMenuButtons = function(menuButtons) {
+setMenuButtons(menuButtons) {
   this.setProperty('menuButtons', menuButtons);
   this._updateVisibility();
-};
+}
 
-scout.ViewButtonBox.prototype._setMenuButtons = function(menuButtons) {
+_setMenuButtons(menuButtons) {
   this._setProperty('menuButtons', menuButtons);
   this.viewMenuTab.setViewButtons(this.menuButtons);
-};
+}
 
-scout.ViewButtonBox.prototype.sendToBack = function() {
+sendToBack() {
   this.viewMenuTab.sendToBack();
-};
+}
 
-scout.ViewButtonBox.prototype.bringToFront = function() {
+bringToFront() {
   this.viewMenuTab.bringToFront();
-};
+}
 
 /**
  * This method updates the state of the view-menu-tab and the selected state of outline-view-button-box.
  * This method must also work in offline mode.
  */
-scout.ViewButtonBox.prototype._onDesktopOutlineChange = function(event) {
+_onDesktopOutlineChange(event) {
   var outline = this.desktop.outline;
   this.viewButtons.forEach(function(viewTab) {
-    if (viewTab instanceof scout.OutlineViewButton) {
+    if (viewTab instanceof OutlineViewButton) {
       viewTab.onOutlineChange(outline);
     }
   });
-};
+}
 
-scout.ViewButtonBox.prototype._onViewButtonSelected = function(event) {
+_onViewButtonSelected(event) {
   // Deselect other togglable view buttons
   this.viewButtons.forEach(function(viewButton) {
     if (viewButton !== event.source && viewButton.isToggleAction()) {
@@ -159,13 +167,14 @@ scout.ViewButtonBox.prototype._onViewButtonSelected = function(event) {
 
   // Inform viewMenu tab about new selection
   this.viewMenuTab.onViewButtonSelected();
-};
+}
 
-scout.ViewButtonBox.prototype._onViewButtonPropertyChange = function(event) {
+_onViewButtonPropertyChange(event) {
   if (event.propertyName === 'selected') {
     this._onViewButtonSelected(event);
   } else if (event.propertyName === 'visible' ||
     event.propertyName === 'displayStyle') {
     this._updateViewButtons();
   }
-};
+}
+}

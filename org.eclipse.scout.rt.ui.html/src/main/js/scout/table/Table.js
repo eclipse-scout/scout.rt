@@ -8,8 +8,63 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Table = function() {
-  scout.Table.parent.call(this);
+import {AppLinkKeyStroke} from '../index';
+import {keys} from '../index';
+import {KeyStrokeContext} from '../index';
+import {TableUserFilter} from '../index';
+import {TableCopyKeyStroke} from '../index';
+import {TableSelectionHandler} from '../index';
+import {MenuItemsOrder} from '../index';
+import {TableNavigationUpKeyStroke} from '../index';
+import {scout} from '../index';
+import {TableNavigationEndKeyStroke} from '../index';
+import {Range} from '../index';
+import {TableFocusFilterFieldKeyStroke} from '../index';
+import {AggregateTableControl} from '../index';
+import {NumberColumn} from '../index';
+import {Device} from '../index';
+import {MenuBar} from '../index';
+import {TableSelectAllKeyStroke} from '../index';
+import {Status} from '../index';
+import {dragAndDrop} from '../index';
+import {DoubleClickSupport} from '../index';
+import {ContextMenuPopup} from '../index';
+import {ContextMenuKeyStroke} from '../index';
+import {Column} from '../index';
+import {TableNavigationPageUpKeyStroke} from '../index';
+import {TableRow} from '../index';
+import {TableToggleRowKeyStroke} from '../index';
+import {Tree} from '../index';
+import {strings} from '../index';
+import {Widget} from '../index';
+import {styles} from '../index';
+import {arrays} from '../index';
+import {HtmlComponent} from '../index';
+import {clipboard} from '../index';
+import * as $ from 'jquery';
+import {MenuDestinations} from '../index';
+import {tooltips as tooltips_1} from '../index';
+import {LoadingSupport} from '../index';
+import {TableNavigationPageDownKeyStroke} from '../index';
+import {TableNavigationCollapseKeyStroke} from '../index';
+import {TableLayout} from '../index';
+import {BooleanColumn} from '../index';
+import {TableStartCellEditKeyStroke} from '../index';
+import {menus as menus_1} from '../index';
+import {Event} from '../index';
+import {objects} from '../index';
+import {TableNavigationExpandKeyStroke} from '../index';
+import {TableNavigationHomeKeyStroke} from '../index';
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {TableNavigationDownKeyStroke} from '../index';
+import {TableUpdateBuffer} from '../index';
+import {TableRefreshKeyStroke} from '../index';
+
+export default class Table extends Widget {
+
+constructor() {
+  super();
 
   this.autoResizeColumns = false;
   this.columnAddable = false;
@@ -17,17 +72,17 @@ scout.Table = function() {
   this.columns = [];
   this.contextColumn = null;
   this.checkable = false;
-  this.checkableStyle = scout.Table.CheckableStyle.CHECKBOX;
+  this.checkableStyle = Table.CheckableStyle.CHECKBOX;
   this.dropType = 0;
-  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
-  this.groupingStyle = scout.Table.GroupingStyle.BOTTOM;
+  this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+  this.groupingStyle = Table.GroupingStyle.BOTTOM;
   this.header = null;
   this.headerEnabled = true;
   this.headerVisible = true;
   this.headerMenusEnabled = true;
   this.hasReloadHandler = false;
   this.hierarchical = false;
-  this.hierarchicalStyle = scout.Table.HierarchicalStyle.DEFAULT;
+  this.hierarchicalStyle = Table.HierarchicalStyle.DEFAULT;
   this.keyStrokes = [];
   this.keyboardNavigation = true;
   this.menus = [];
@@ -64,9 +119,9 @@ scout.Table = function() {
   this.rowBorderLeftWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.rowBorderRightWidth = 0; // read-only, set by _calculateRowBorderWidth(), also used in TableHeader.js
   this.rowIconVisible = false;
-  this.rowIconColumnWidth = scout.Column.NARROW_MIN_WIDTH;
+  this.rowIconColumnWidth = Column.NARROW_MIN_WIDTH;
   this.staticMenus = [];
-  this.selectionHandler = new scout.TableSelectionHandler(this);
+  this.selectionHandler = new TableSelectionHandler(this);
   this.tooltips = [];
   this._filterMap = {};
   this._filteredRows = [];
@@ -75,15 +130,15 @@ scout.Table = function() {
   this._aggregateRows = [];
   this._animationRowLimit = 25;
   this._blockLoadThreshold = 25;
-  this.updateBuffer = new scout.TableUpdateBuffer(this);
+  this.updateBuffer = new TableUpdateBuffer(this);
   // Initial value must be > 0 to make prefSize work (if it is 0, no filler will be generated).
   // If rows have a variable height, prefSize is only correct for 10 rows.
   // Layout will adjust this value depending on the view port size.
   this.viewRangeSize = 10;
   this.viewRangeDirty = false;
-  this.viewRangeRendered = new scout.Range(0, 0);
+  this.viewRangeRendered = new Range(0, 0);
   this.virtual = true;
-  this._doubleClickSupport = new scout.DoubleClickSupport();
+  this._doubleClickSupport = new DoubleClickSupport();
   this._permanentHeadSortColumns = [];
   this._permanentTailSortColumns = [];
   this._filterMenusHandler = this._filterMenus.bind(this);
@@ -95,17 +150,17 @@ scout.Table = function() {
 
   this.$data = null;
   this.$emptyData = null;
-};
-scout.inherits(scout.Table, scout.Widget);
+}
+
 
 // TODO [7.0] cgu create StringColumn.js incl. defaultValues from defaultValues.json
 
-scout.Table.HierarchicalStyle = {
+static HierarchicalStyle = {
   DEFAULT: 'default',
   STRUCTURED: 'structured'
 };
 
-scout.Table.GroupingStyle = {
+static GroupingStyle = {
   /**
    * Aggregate row is rendered on top of the row-group.
    */
@@ -116,7 +171,7 @@ scout.Table.GroupingStyle = {
   BOTTOM: 'bottom'
 };
 
-scout.Table.CheckableStyle = {
+static CheckableStyle = {
   /**
    * When row is checked a boolean column with a checkbox is inserted into the table.
    */
@@ -135,7 +190,7 @@ scout.Table.CheckableStyle = {
 /**
  * This enum defines the reload reasons for a table reload operation
  */
-scout.Table.ReloadReason = {
+static ReloadReason = {
   /**
    * No specificv reason, just reload data using the current search settings, the current row limits and the current
    * filter (Default)
@@ -168,19 +223,19 @@ scout.Table.ReloadReason = {
   DATA_CHANGED_TRIGGER: 'dataChangedTrigger'
 };
 
-scout.Table.SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
+static SELECTION_CLASSES = 'select-middle select-top select-bottom select-single selected';
 
-scout.Table.prototype._init = function(model) {
-  scout.Table.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.resolveConsts([{
     property: 'hierarchicalStyle',
-    constType: scout.Table.HierarchicalStyle
+    constType: Table.HierarchicalStyle
   }, {
     property: 'checkableStyle',
-    constType: scout.Table.CheckableStyle
+    constType: Table.CheckableStyle
   }, {
     property: 'groupingStyle',
-    constType: scout.Table.GroupingStyle
+    constType: Table.GroupingStyle
   }]);
   this._initColumns();
 
@@ -204,10 +259,10 @@ scout.Table.prototype._init = function(model) {
   this._group();
   this._setTileMode(this.tileMode);
   this._setTileTableHeader(this.tileTableHeader);
-};
+}
 
-scout.Table.prototype._initRow = function(row) {
-  if (!(row instanceof scout.TableRow)) {
+_initRow(row) {
+  if (!(row instanceof TableRow)) {
     row.parent = this;
     row = scout.create('TableRow', row);
   }
@@ -216,13 +271,13 @@ scout.Table.prototype._initRow = function(row) {
     row: row
   });
   return row;
-};
+}
 
-scout.Table.prototype._initColumns = function() {
+_initColumns() {
   this.columns = this.columns.map(function(colModel, index) {
     var column = colModel;
     column.session = this.session;
-    if (column instanceof scout.Column) {
+    if (column instanceof Column) {
       column._setTable(this);
     } else {
       column.table = this;
@@ -252,27 +307,27 @@ scout.Table.prototype._initColumns = function() {
   // Sync head and tail sort columns
   this._setHeadAndTailSortColumns();
   this.columnLayoutDirty = true;
-};
+}
 
-scout.Table.prototype._destroy = function() {
+_destroy() {
   this._destroyColumns();
-  scout.Table.parent.prototype._destroy.call(this);
-};
+  super._destroy();
+}
 
-scout.Table.prototype._destroyColumns = function() {
+_destroyColumns() {
   this.columns.forEach(function(column) {
     column.destroy();
   });
   this.checkableColumn = null;
   this.columns = [];
-};
+}
 
-scout.Table.prototype._calculateTableNodeColumn = function() {
+_calculateTableNodeColumn() {
   var candidateColumns = this.visibleColumns().filter(function(column) {
     return column.nodeColumnCandidate;
   });
 
-  var tableNodeColumn = scout.arrays.first(candidateColumns);
+  var tableNodeColumn = arrays.first(candidateColumns);
   if (this.tableNodeColumn && this.tableNodeColumn !== tableNodeColumn) {
     // restore
     this.tableNodeColumn.minWidth = this.tableNodeColumn._initialMinWidth;
@@ -290,54 +345,54 @@ scout.Table.prototype._calculateTableNodeColumn = function() {
       }
     }
   }
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this,
     $container: function() {
       return this.$data;
     }.bind(this)
   });
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.Table.prototype._initKeyStrokeContext = function() {
-  scout.Table.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this._initTableKeyStrokeContext();
-};
+}
 
-scout.Table.prototype._initTableKeyStrokeContext = function() {
+_initTableKeyStrokeContext() {
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TableNavigationUpKeyStroke(this),
-    new scout.TableNavigationDownKeyStroke(this),
-    new scout.TableNavigationPageUpKeyStroke(this),
-    new scout.TableNavigationPageDownKeyStroke(this),
-    new scout.TableNavigationHomeKeyStroke(this),
-    new scout.TableNavigationEndKeyStroke(this),
-    new scout.TableNavigationCollapseKeyStroke(this),
-    new scout.TableNavigationExpandKeyStroke(this),
-    new scout.TableFocusFilterFieldKeyStroke(this),
-    new scout.TableStartCellEditKeyStroke(this),
-    new scout.TableSelectAllKeyStroke(this),
-    new scout.TableRefreshKeyStroke(this),
-    new scout.TableToggleRowKeyStroke(this),
-    new scout.TableCopyKeyStroke(this),
-    new scout.ContextMenuKeyStroke(this, this.showContextMenu, this),
-    new scout.AppLinkKeyStroke(this, this.handleAppLinkAction)
+    new TableNavigationUpKeyStroke(this),
+    new TableNavigationDownKeyStroke(this),
+    new TableNavigationPageUpKeyStroke(this),
+    new TableNavigationPageDownKeyStroke(this),
+    new TableNavigationHomeKeyStroke(this),
+    new TableNavigationEndKeyStroke(this),
+    new TableNavigationCollapseKeyStroke(this),
+    new TableNavigationExpandKeyStroke(this),
+    new TableFocusFilterFieldKeyStroke(this),
+    new TableStartCellEditKeyStroke(this),
+    new TableSelectAllKeyStroke(this),
+    new TableRefreshKeyStroke(this),
+    new TableToggleRowKeyStroke(this),
+    new TableCopyKeyStroke(this),
+    new ContextMenuKeyStroke(this, this.showContextMenu, this),
+    new AppLinkKeyStroke(this, this.handleAppLinkAction)
   ]);
 
   // Prevent default action and do not propagate ↓ or ↑ keys if ctrl- or alt-modifier is not pressed.
@@ -346,16 +401,16 @@ scout.Table.prototype._initTableKeyStrokeContext = function() {
   //           - shift + '↑-event'/'↓-event' are not consumed by a single selection table, and would propagate otherwise;
   //           - preventDefault because of smartfield, so that the cursor is not moved on first or last row;
   this.keyStrokeContext.registerStopPropagationInterceptor(function(event) {
-    if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, scout.keys.UP, scout.keys.DOWN)) {
+    if (!event.ctrlKey && !event.altKey && scout.isOneOf(event.which, keys.UP, keys.DOWN)) {
       event.stopPropagation();
       event.preventDefault();
     }
   });
-};
+}
 
-scout.Table.prototype._insertBooleanColumn = function() {
+_insertBooleanColumn() {
   // don't add checkbox column when we're in checkableStyle mode
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+  if (this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
     return;
   }
   var column = scout.create('BooleanColumn', {
@@ -366,15 +421,15 @@ scout.Table.prototype._insertBooleanColumn = function() {
     nodeColumnCandidate: false,
     headerMenuEnabled: false,
     showSeparator: false,
-    width: scout.Column.NARROW_MIN_WIDTH,
+    width: Column.NARROW_MIN_WIDTH,
     table: this
   });
 
-  scout.arrays.insert(this.columns, column, 0);
+  arrays.insert(this.columns, column, 0);
   this.checkableColumn = column;
-};
+}
 
-scout.Table.prototype._insertRowIconColumn = function() {
+_insertRowIconColumn() {
   var position = 0,
     column = scout.create('IconColumn', {
       session: this.session,
@@ -390,24 +445,24 @@ scout.Table.prototype._insertRowIconColumn = function() {
   if (this.columns[0] === this.checkableColumn) {
     position = 1;
   }
-  scout.arrays.insert(this.columns, column, position);
+  arrays.insert(this.columns, column, position);
   this.rowIconColumn = column;
-};
+}
 
-scout.Table.prototype.handleAppLinkAction = function(event) {
+handleAppLinkAction(event) {
   var $appLink = $(event.target);
   var column = this._columnAtX($appLink.offset().left);
   this._triggerAppLinkAction(column, $appLink.data('ref'));
-};
+}
 
-scout.Table.prototype._isDataRendered = function() {
+_isDataRendered() {
   return this.rendered && this.$data !== null;
-};
+}
 
-scout.Table.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('table');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TableLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new TableLayout(this));
 
   if (this.uiCssClass) {
     this.$container.addClass(this.uiCssClass);
@@ -421,9 +476,9 @@ scout.Table.prototype._render = function() {
 
   this.session.desktop.on('popupOpen', this._popupOpenHandler);
   this.session.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
-};
+}
 
-scout.Table.prototype._renderData = function() {
+_renderData() {
   this.$data = this.$container.appendDiv('table-data');
   this.$data.on('mousedown', '.table-row', this._onRowMouseDown.bind(this))
     .on('mouseup', '.table-row', this._onRowMouseUp.bind(this))
@@ -443,31 +498,31 @@ scout.Table.prototype._renderData = function() {
   if (this.scrollToSelection) {
     this.revealSelection();
   }
-};
+}
 
-scout.Table.prototype._renderProperties = function() {
-  scout.Table.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderTableHeader();
   this._renderMenuBarVisible();
   this._renderFooterVisible();
   this._renderDropType();
   this._renderCheckableStyle();
   this._renderHierarchicalStyle();
-};
+}
 
-scout.Table.prototype._setCssClass = function(cssClass) {
-  scout.Table.parent.prototype._setCssClass.call(this, cssClass);
+_setCssClass(cssClass) {
+  super._setCssClass( cssClass);
   // calculate row level padding
   var paddingClasses = ['table-row-level-padding'];
   if (this.cssClass) {
     paddingClasses.push(this.cssClass);
   }
-  this.setRowLevelPadding(scout.styles.getSize(paddingClasses.reduce(function(acc, cssClass) {
+  this.setRowLevelPadding(styles.getSize(paddingClasses.reduce(function(acc, cssClass) {
     return acc + ' ' + cssClass;
   }, ''), 'width', 'width', 15));
-};
+}
 
-scout.Table.prototype._removeData = function() {
+_removeData() {
   this._destroyCellEditorPopup();
   this._removeAggregateRows();
   this._uninstallImageListeners();
@@ -479,9 +534,9 @@ scout.Table.prototype._removeData = function() {
   this.$data.remove();
   this.$data = null;
   this.$emptyData = null;
-};
+}
 
-scout.Table.prototype._remove = function() {
+_remove() {
   this.session.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.session.desktop.off('popupOpen', this._popupOpenHandler);
   this._uninstallDragAndDropHandler();
@@ -490,28 +545,28 @@ scout.Table.prototype._remove = function() {
   if (this.$data) {
     this._removeData();
   }
-  scout.Table.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Table.prototype.setRowLevelPadding = function(rowLevelPadding) {
+setRowLevelPadding(rowLevelPadding) {
   this.setProperty('rowLevelPadding', rowLevelPadding);
-};
+}
 
-scout.Table.prototype._renderRowLevelPadding = function() {
+_renderRowLevelPadding() {
   this._rerenderViewport();
-};
+}
 
-scout.Table.prototype.setTableControls = function(controls) {
+setTableControls(controls) {
   this.setProperty('tableControls', controls);
-};
+}
 
-scout.Table.prototype._renderTableControls = function() {
+_renderTableControls() {
   if (this.footer) {
     this.footer._renderControls();
   }
-};
+}
 
-scout.Table.prototype._setTableControls = function(controls) {
+_setTableControls(controls) {
   var i;
   for (i = 0; i < this.tableControls.length; i++) {
     this.keyStrokeContext.unregisterKeyStroke(this.tableControls[i]);
@@ -524,13 +579,13 @@ scout.Table.prototype._setTableControls = function(controls) {
   this.tableControls.forEach(function(control) {
     control.tableFooter = this.footer;
   }, this);
-};
+}
 
 /**
  * When an IMG has been loaded we must update the stored height in the model-row.
  * Note: we don't change the width of the row or table.
  */
-scout.Table.prototype._onImageLoadOrError = function(event) {
+_onImageLoadOrError(event) {
   var $target = $(event.target);
   if ($target.data('measure') === 'in-progress') {
     // Ignore events created by autoOptimizeWidth measurement (see ColumnOptimalWidthMeasurer)
@@ -548,9 +603,9 @@ scout.Table.prototype._onImageLoadOrError = function(event) {
   if (oldRowHeight !== row.height) {
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype._onRowMouseDown = function(event) {
+_onRowMouseDown(event) {
   this._doubleClickSupport.mousedown(event);
   this._$mouseDownRow = $(event.currentTarget);
   this._mouseDownRowId = this._$mouseDownRow.data('row').id;
@@ -568,7 +623,7 @@ scout.Table.prototype._onRowMouseDown = function(event) {
   var $target = $(event.target);
 
   // For checkableStyle TABLE_ROW & CHECKBOX_TABLE_ROW only: check row if left click OR clicked row was not checked yet
-  if (scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
+  if (scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW) &&
     (!isRightClick || !row.checked) &&
     !$(event.target).is('.table-row-control') &&
     // Click on BooleanColumns should not trigger a row check. The only exception is if the BooleanColumn is the checkableColumn of this table (handled in BooleanColumn.js)
@@ -582,9 +637,9 @@ scout.Table.prototype._onRowMouseDown = function(event) {
     });
     return false;
   }
-};
+}
 
-scout.Table.prototype._onRowMouseUp = function(event) {
+_onRowMouseUp(event) {
   var $row, $mouseUpRow, column, $appLink, row,
     mouseButton = event.which,
     $target = $(event.target);
@@ -629,20 +684,20 @@ scout.Table.prototype._onRowMouseUp = function(event) {
   } else {
     this._triggerRowClick(row, mouseButton);
   }
-};
+}
 
-scout.Table.prototype._onRowDoubleClick = function(event) {
+_onRowDoubleClick(event) {
   var $row = $(event.currentTarget),
     column = this._columnAtX(event.pageX);
 
   this.doRowAction($row.data('row'), column);
-};
+}
 
-scout.Table.prototype.showContextMenu = function(options) {
+showContextMenu(options) {
   this.session.onRequestsDone(this._showContextMenu.bind(this, options));
-};
+}
 
-scout.Table.prototype._showContextMenu = function(options) {
+_showContextMenu(options) {
   options = options || {};
   if (!this.rendered || !this.attached) { // check needed because function is called asynchronously
     return;
@@ -650,7 +705,7 @@ scout.Table.prototype._showContextMenu = function(options) {
   if (this.selectedRows.length === 0) {
     return;
   }
-  var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+  var menuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
   if (menuItems.length === 0) {
     return;
   }
@@ -661,7 +716,7 @@ scout.Table.prototype._showContextMenu = function(options) {
     if (rowToDisplay !== null) {
       var $rowToDisplay = rowToDisplay.$row;
       var offset = $rowToDisplay.offset();
-      var dataOffsetBounds = scout.graphics.offsetBounds(this.$data);
+      var dataOffsetBounds = graphics.offsetBounds(this.$data);
       offset.left += this.$data.scrollLeft();
       pageX = offset.left + 10;
       pageY = offset.top + $rowToDisplay.outerHeight() / 2;
@@ -687,25 +742,25 @@ scout.Table.prototype._showContextMenu = function(options) {
     menuFilter: this._filterMenusHandler
   });
   this.contextMenu.open();
-};
+}
 
-scout.Table.prototype.isRowSelectedAndVisible = function(row) {
+isRowSelectedAndVisible(row) {
   if (!this.isRowSelected(row) || !row.$row) {
     return false;
   }
-  return scout.graphics.offsetBounds(row.$row).intersects(scout.graphics.offsetBounds(this.$data));
-};
+  return graphics.offsetBounds(row.$row).intersects(graphics.offsetBounds(this.$data));
+}
 
-scout.Table.prototype.getLastSelectedAndVisibleRow = function() {
+getLastSelectedAndVisibleRow() {
   for (var i = this.viewRangeRendered.to; i >= this.viewRangeRendered.from; i--) {
     if (this.isRowSelectedAndVisible(this.rows[i])) {
       return this.rows[i];
     }
   }
   return null;
-};
+}
 
-scout.Table.prototype.onColumnVisibilityChanged = function(column) {
+onColumnVisibilityChanged(column) {
   this.columnLayoutDirty = true;
   if (this._isDataRendered()) {
     this._updateRowWidth();
@@ -713,12 +768,12 @@ scout.Table.prototype.onColumnVisibilityChanged = function(column) {
     this.invalidateLayoutTree();
   }
   this.trigger('columnStructureChanged');
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype._onScroll = function() {
+_onScroll() {
   var scrollTop = this.$data[0].scrollTop;
   var scrollLeft = this.$data[0].scrollLeft;
   if (this.scrollTop !== scrollTop) {
@@ -726,60 +781,60 @@ scout.Table.prototype._onScroll = function() {
   }
   this.scrollTop = scrollTop;
   this.scrollLeft = scrollLeft;
-};
+}
 
-scout.Table.prototype._renderTableStatus = function() {
+_renderTableStatus() {
   this.trigger('statusChanged');
-};
+}
 
-scout.Table.prototype.setContextColumn = function(contextColumn) {
+setContextColumn(contextColumn) {
   this.setProperty('contextColumn', contextColumn);
-};
+}
 
-scout.Table.prototype._hasVisibleTableControls = function() {
+_hasVisibleTableControls() {
   return this.tableControls.some(function(control) {
     return control.visible;
   });
-};
+}
 
-scout.Table.prototype.hasAggregateTableControl = function() {
+hasAggregateTableControl() {
   return this.tableControls.some(function(control) {
-    return control instanceof scout.AggregateTableControl;
+    return control instanceof AggregateTableControl;
   });
-};
+}
 
-scout.Table.prototype._createHeader = function() {
+_createHeader() {
   return scout.create('TableHeader', {
     parent: this,
     table: this,
     enabled: this.headerEnabled,
     headerMenusEnabled: this.headerMenusEnabled
   });
-};
+}
 
-scout.Table.prototype._createFooter = function() {
+_createFooter() {
   return scout.create('TableFooter', {
     parent: this,
     table: this
   });
-};
+}
 
-scout.Table.prototype._installCellTooltipSupport = function() {
-  scout.tooltips.install(this.$data, {
+_installCellTooltipSupport() {
+  tooltips_1.install(this.$data, {
     parent: this,
     selector: '.table-cell',
     text: this._cellTooltipText.bind(this),
     arrowPosition: 50,
     arrowPositionUnit: '%',
-    nativeTooltip: !scout.device.isCustomEllipsisTooltipPossible()
+    nativeTooltip: !Device.get().isCustomEllipsisTooltipPossible()
   });
-};
+}
 
-scout.Table.prototype._uninstallCellTooltipSupport = function() {
-  scout.tooltips.uninstall(this.$data);
-};
+_uninstallCellTooltipSupport() {
+  tooltips_1.uninstall(this.$data);
+}
 
-scout.Table.prototype._cellTooltipText = function($cell) {
+_cellTooltipText($cell) {
   var cell, tooltipText,
     $row = $cell.parent(),
     column = this.columnFor$Cell($cell, $row),
@@ -793,28 +848,28 @@ scout.Table.prototype._cellTooltipText = function($cell) {
   if (tooltipText) {
     return tooltipText;
   } else if (this._isTruncatedCellTooltipEnabled(column) && $cell.isContentTruncated()) {
-    return scout.strings.plainText($cell.html(), {
+    return strings.plainText($cell.html(), {
       trim: true
     });
   }
-};
+}
 
-scout.Table.prototype.setTruncatedCellTooltipEnabled = function(truncatedCellTooltipEnabled) {
+setTruncatedCellTooltipEnabled(truncatedCellTooltipEnabled) {
   this.setProperty('truncatedCellTooltipEnabled', truncatedCellTooltipEnabled);
-};
+}
 
 /**
  * Decides if a cell tooltip should be shown for a truncated cell.
  */
-scout.Table.prototype._isTruncatedCellTooltipEnabled = function(column) {
+_isTruncatedCellTooltipEnabled(column) {
   if (this.truncatedCellTooltipEnabled === null) {
     // Show cell tooltip only if it is not possible to resize the column.
     return !this.headerVisible || !this.headerEnabled || column.fixedWidth;
   }
   return this.truncatedCellTooltipEnabled;
-};
+}
 
-scout.Table.prototype.reload = function(reloadReason) {
+reload(reloadReason) {
   if (!this.hasReloadHandler) {
     return;
   }
@@ -824,91 +879,91 @@ scout.Table.prototype.reload = function(reloadReason) {
     this._renderFiller();
   }
   this._triggerReload(reloadReason);
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype.setLoading = function(loading) {
+setLoading(loading) {
   if (!loading && this.updateBuffer.isBuffering()) {
     // Don't abort loading while buffering, the buffer will do it at the end
     return;
   }
-  scout.Table.parent.prototype.setLoading.call(this, loading);
-};
+  super.setLoading( loading);
+}
 
-scout.Table.prototype.exportToClipboard = function() {
+exportToClipboard() {
   this._triggerClipboardExport();
-};
+}
 
 /**
  * JS implementation of AbstractTable.execCopy(rows)
  */
-scout.Table.prototype._exportToClipboard = function() {
-  scout.clipboard.copyText({
+_exportToClipboard() {
+  clipboard.copyText({
     parent: this,
     text: this._selectedRowsToText()
   });
-};
+}
 
-scout.Table.prototype._selectedRowsToText = function() {
+_selectedRowsToText() {
   var columns = this.visibleColumns();
   return this.selectedRows.map(function(row) {
     return columns.map(function(column) {
       var cell = column.cell(row);
       var text;
-      if (column instanceof scout.BooleanColumn) {
+      if (column instanceof BooleanColumn) {
         text = (cell.value ? 'X' : '');
       } else if (cell.htmlEnabled) {
-        text = scout.strings.plainText(cell.text);
+        text = strings.plainText(cell.text);
       } else {
         text = cell.text;
       }
       // unwrap
-      return scout.strings.nvl(text)
+      return strings.nvl(text)
         .replace(/\r/g, '')
         .replace(/[\n\t]/g, ' ')
         .replace(/[ ]+/g, ' ');
     }).join('\t');
   }).join('\n');
-};
+}
 
-scout.Table.prototype.setMultiSelect = function(multiSelect) {
+setMultiSelect(multiSelect) {
   this.setProperty('multiSelect', multiSelect);
-};
+}
 
-scout.Table.prototype.toggleSelection = function() {
+toggleSelection() {
   if (this.selectedRows.length === this.visibleRows.length) {
     this.deselectAll();
   } else {
     this.selectAll();
   }
-};
+}
 
-scout.Table.prototype.selectAll = function() {
+selectAll() {
   this.selectRows(this.visibleRows);
-};
+}
 
-scout.Table.prototype.deselectAll = function() {
+deselectAll() {
   this.selectRows([]);
-};
+}
 
-scout.Table.prototype.checkAll = function(checked, options) {
+checkAll(checked, options) {
   var opts = $.extend(options, {
     checked: checked
   });
   this.checkRows(this.visibleRows, opts);
-};
+}
 
-scout.Table.prototype.uncheckAll = function(options) {
+uncheckAll(options) {
   this.checkAll(false, options);
-};
+}
 
-scout.Table.prototype.updateScrollbars = function() {
-  scout.scrollbars.update(this.$data);
-};
+updateScrollbars() {
+  scrollbars.update(this.$data);
+}
 
-scout.Table.prototype._sort = function(animateAggregateRows) {
+_sort(animateAggregateRows) {
   var sortColumns = this._sortColumns();
 
   // Initialize comparators
@@ -922,7 +977,7 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
   }
 
   // add all visible columns as fallback sorting to guarantee same sorting as in Java.
-  sortColumns = scout.arrays.union(sortColumns, this.columns);
+  sortColumns = arrays.union(sortColumns, this.columns);
 
   this._sortImpl(sortColumns);
   this._triggerRowOrderChanged();
@@ -935,18 +990,18 @@ scout.Table.prototype._sort = function(animateAggregateRows) {
 
   // Sort was possible -> return true
   return true;
-};
+}
 
 /**
  * @returns whether or not sorting is possible. Asks each column to answer this question by calling Column#isSortingPossible.
  */
-scout.Table.prototype._isSortingPossible = function(sortColumns) {
+_isSortingPossible(sortColumns) {
   return sortColumns.every(function(column) {
     return column.isSortingPossible();
   });
-};
+}
 
-scout.Table.prototype._sortColumns = function() {
+_sortColumns() {
   var sortColumns = [];
   for (var c = 0; c < this.columns.length; c++) {
     var column = this.columns[c];
@@ -956,9 +1011,9 @@ scout.Table.prototype._sortColumns = function() {
     }
   }
   return sortColumns;
-};
+}
 
-scout.Table.prototype._sortImpl = function(sortColumns) {
+_sortImpl(sortColumns) {
   var sortFunction = function(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       var column = sortColumns[s];
@@ -994,29 +1049,29 @@ scout.Table.prototype._sortImpl = function(sortColumns) {
     applyFilters: false,
     visibleRows: true
   });
-};
+}
 
 /**
  * Pre-order (top-down) traversal of all rows in this table (if hierarchical).
  */
-scout.Table.prototype.visitRows = function(visitFunc, rows, level) {
+visitRows(visitFunc, rows, level) {
   level = scout.nvl(level, 0);
   rows = rows || this.rootRows;
   rows.forEach(function(row) {
     visitFunc(row, level);
     this.visitRows(visitFunc, row.childRows, level + 1);
   }, this);
-};
+}
 
-scout.Table.prototype._sortHierarchical = function(sortFunc, rows) {
+_sortHierarchical(sortFunc, rows) {
   rows = rows || this.rootRows;
   rows.sort(sortFunc);
   rows.forEach(function(row) {
     this._sortHierarchical(sortFunc, row.childRows);
   }, this);
-};
+}
 
-scout.Table.prototype._renderRowOrderChanges = function() {
+_renderRowOrderChanges() {
   var animate,
     $rows = this.$rows(),
     oldRowPositions = {};
@@ -1076,17 +1131,17 @@ scout.Table.prototype._renderRowOrderChanges = function() {
       }
     }.bind(this));
   }
-};
+}
 
-scout.Table.prototype.setSortEnabled = function(sortEnabled) {
+setSortEnabled(sortEnabled) {
   this.setProperty('sortEnabled', sortEnabled);
-};
+}
 
 /**
  * @param multiSort true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
  * @param remove true to remove the column from the sort columns
  */
-scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
+sort(column, direction, multiSort, remove) {
   var data, sorted, animateAggregateRows;
   multiSort = scout.nvl(multiSort, false);
   remove = scout.nvl(remove, false);
@@ -1119,9 +1174,9 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
     this._animateAggregateRows = animateAggregateRows;
   }
   this.trigger('sort', data);
-};
+}
 
-scout.Table.prototype._addSortColumn = function(column, direction, multiSort) {
+_addSortColumn(column, direction, multiSort) {
   var groupColCount, sortColCount;
   direction = scout.nvl(direction, column.sortAscending ? 'asc' : 'desc');
   multiSort = scout.nvl(multiSort, true);
@@ -1141,20 +1196,20 @@ scout.Table.prototype._addSortColumn = function(column, direction, multiSort) {
 
   column.sortAscending = direction === 'asc' ? true : false;
   column.sortActive = true;
-};
+}
 
 /**
  * Intended to be called for new sort columns.
  * Sets the sortIndex of the given column and its siblings.
  */
-scout.Table.prototype._updateSortIndexForColumn = function(column, multiSort) {
+_updateSortIndexForColumn(column, multiSort) {
   var deviation,
     sortIndex = -1;
 
   if (multiSort) {
     // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
     if (!column.sortActive || column.sortIndex === -1) {
-      sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
+      sortIndex = Math.max(-1, arrays.max(this.columns.map(function(c) {
         return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd) ? -1 : c.sortIndex;
       })));
       column.sortIndex = sortIndex + 1;
@@ -1171,7 +1226,7 @@ scout.Table.prototype._updateSortIndexForColumn = function(column, multiSort) {
     }
 
     // remove sort index for siblings (ignore permanent head/tail columns, only if not multi sort)
-    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+    arrays.eachSibling(this.columns, column, function(siblingColumn) {
       if (siblingColumn.sortActive) {
         this._removeSortColumnInternal(siblingColumn);
       }
@@ -1183,31 +1238,31 @@ scout.Table.prototype._updateSortIndexForColumn = function(column, multiSort) {
       c.sortIndex = this._permanentHeadSortColumns.length + deviation + index;
     }, this);
   }
-};
+}
 
-scout.Table.prototype._removeSortColumn = function(column) {
+_removeSortColumn(column) {
   if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
     return;
   }
   // Adjust sibling columns with higher index
-  scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+  arrays.eachSibling(this.columns, column, function(siblingColumn) {
     if (siblingColumn.sortIndex > column.sortIndex) {
       siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
     }
   });
   this._removeSortColumnInternal(column);
-};
+}
 
-scout.Table.prototype._removeSortColumnInternal = function(column) {
+_removeSortColumnInternal(column) {
   if (column.initialAlwaysIncludeSortAtBegin || column.initialAlwaysIncludeSortAtEnd) {
     return;
   }
   column.sortActive = false;
   column.grouped = false;
   column.sortIndex = -1;
-};
+}
 
-scout.Table.prototype.isGroupingPossible = function(column) {
+isGroupingPossible(column) {
   var possible = true;
 
   if (this.hierarchical) {
@@ -1226,7 +1281,7 @@ scout.Table.prototype.isGroupingPossible = function(column) {
 
   if (column.initialAlwaysIncludeSortAtBegin) {
     possible = true;
-    scout.arrays.eachSibling(this._permanentHeadSortColumns, column, function(c) {
+    arrays.eachSibling(this._permanentHeadSortColumns, column, function(c) {
       if (c.sortIndex < column.sortIndex) {
         possible = possible && c.grouped;
       }
@@ -1244,10 +1299,10 @@ scout.Table.prototype.isGroupingPossible = function(column) {
     possible = possible && c.grouped;
   });
   return possible;
-};
+}
 
-scout.Table.prototype.isAggregationPossible = function(column) {
-  if (!(column instanceof scout.NumberColumn)) {
+isAggregationPossible(column) {
+  if (!(column instanceof NumberColumn)) {
     return false;
   }
 
@@ -1263,13 +1318,13 @@ scout.Table.prototype.isAggregationPossible = function(column) {
 
   // Aggregation is possible if it is grouped by another column or aggregation control is available
   return this.isGrouped() || this.hasAggregateTableControl();
-};
+}
 
-scout.Table.prototype.changeAggregation = function(column, func) {
+changeAggregation(column, func) {
   this.changeAggregations([column], [func]);
-};
+}
 
-scout.Table.prototype.changeAggregations = function(columns, functions) {
+changeAggregations(columns, functions) {
   columns.forEach(function(column, i) {
     var func = functions[i];
     if (column.aggregationFunction !== func) {
@@ -1279,9 +1334,9 @@ scout.Table.prototype.changeAggregations = function(columns, functions) {
   }, this);
 
   this._group();
-};
+}
 
-scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) {
+_addGroupColumn(column, direction, multiGroup) {
   var sortIndex = -1;
 
   if (!this.isGroupingPossible(column)) {
@@ -1294,7 +1349,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
     // do not update sort index for permanent head/tail sort columns, their order is fixed (see ColumnSet.java)
     if (multiGroup) {
 
-      sortIndex = Math.max(-1, scout.arrays.max(this.columns.map(function(c) {
+      sortIndex = Math.max(-1, arrays.max(this.columns.map(function(c) {
         return (c.sortIndex === undefined || c.initialAlwaysIncludeSortAtEnd || !c.grouped) ? -1 : c.sortIndex;
       })));
 
@@ -1303,7 +1358,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
         // and move all subsequent nodes by one.
         // add just after all other grouping columns in column set.
         column.sortIndex = sortIndex + 1;
-        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex > sortIndex) {
             siblingColumn.sortIndex++;
           }
@@ -1316,7 +1371,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
       } else {
         // column already sorted, update position:
         // move all sort columns between the newly determined sortindex and the old sortindex by one.
-        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
             (siblingColumn.sortIndex > sortIndex) &&
             (siblingColumn.sortIndex < column.sortIndex)) {
@@ -1332,7 +1387,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
       if (column.sortActive) {
         // column already sorted, update position:
         // move all sort columns between the newly determined sortindex and the old sortindex by one.
-        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) &&
             (siblingColumn.sortIndex >= sortIndex) &&
             (siblingColumn.sortIndex < column.sortIndex)) {
@@ -1341,7 +1396,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
         });
         column.sortIndex = sortIndex;
       } else { //not sorted yet
-        scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        arrays.eachSibling(this.columns, column, function(siblingColumn) {
           if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
             siblingColumn.sortIndex++;
           }
@@ -1356,7 +1411,7 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
       }
 
       // remove all other grouped properties:
-      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+      arrays.eachSibling(this.columns, column, function(siblingColumn) {
         if (siblingColumn.sortActive && !(siblingColumn.initialAlwaysIncludeSortAtBegin || siblingColumn.initialAlwaysIncludeSortAtEnd) && siblingColumn.sortIndex >= sortIndex) {
           siblingColumn.grouped = false;
         }
@@ -1377,9 +1432,9 @@ scout.Table.prototype._addGroupColumn = function(column, direction, multiGroup) 
   }
 
   column.grouped = true;
-};
+}
 
-scout.Table.prototype._removeGroupColumn = function(column) {
+_removeGroupColumn(column) {
   column.grouped = false;
 
   if (column.initialAlwaysIncludeSortAtBegin) {
@@ -1392,9 +1447,9 @@ scout.Table.prototype._removeGroupColumn = function(column) {
   }
 
   this._removeSortColumn(column);
-};
+}
 
-scout.Table.prototype._buildRowDiv = function(row) {
+_buildRowDiv(row) {
   var rowWidth = this.rowWidth;
   var rowClass = 'table-row';
   if (row.cssClass) {
@@ -1403,14 +1458,14 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (!row.enabled) {
     rowClass += ' disabled';
   }
-  if (row.checked && this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+  if (row.checked && this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
     rowClass += ' checked';
   }
   // if a row is not filterAccepted it must be visible since any of its child rows are filter accepted.
   if (!row.filterAccepted) {
     rowClass += ' filter-not-accepted';
   }
-  if (scout.arrays.empty(row.childRows)) {
+  if (arrays.empty(row.childRows)) {
     rowClass += ' leaf';
   }
 
@@ -1425,23 +1480,23 @@ scout.Table.prototype._buildRowDiv = function(row) {
   rowDiv += '</div>';
 
   return rowDiv;
-};
+}
 
-scout.Table.prototype._calculateRowBorderWidth = function() {
+_calculateRowBorderWidth() {
   var $tableRowDummy = this.$data.appendDiv('table-row');
   this.rowBorderLeftWidth = $tableRowDummy.cssBorderLeftWidth();
   this.rowBorderRightWidth = $tableRowDummy.cssBorderRightWidth();
   this.rowBorderWidth = this.rowBorderLeftWidth + this.rowBorderRightWidth;
   $tableRowDummy.remove();
-};
+}
 
-scout.Table.prototype._updateRowWidth = function() {
+_updateRowWidth() {
   this.rowWidth = this.visibleColumns().reduce(function(sum, column) {
     return sum + column.width;
   }, this.rowBorderWidth);
-};
+}
 
-scout.Table.prototype._updateRowHeight = function() {
+_updateRowHeight() {
   var $emptyRow = this.$data.appendDiv('table-row');
   var $emptyAggrRow = this.$data.appendDiv('table-aggregate-row');
 
@@ -1451,12 +1506,12 @@ scout.Table.prototype._updateRowHeight = function() {
   this.aggregateRowHeight = $emptyAggrRow.outerHeight(true);
   $emptyRow.remove();
   $emptyAggrRow.remove();
-};
+}
 
 /**
  * Updates the row heights for every visible row and aggregate row and clears the height of the others
  */
-scout.Table.prototype._updateRowHeights = function() {
+_updateRowHeights() {
   this.rows.forEach(function(row) {
     if (!row.$row) {
       row.height = null;
@@ -1471,9 +1526,9 @@ scout.Table.prototype._updateRowHeights = function() {
       aggregateRow.height = aggregateRow.$row.outerHeight(true);
     }
   });
-};
+}
 
-scout.Table.prototype._renderRowsInRange = function(range) {
+_renderRowsInRange(range) {
   var $rows,
     rowString = '',
     numRowsRendered = 0,
@@ -1484,9 +1539,9 @@ scout.Table.prototype._renderRowsInRange = function(range) {
     return;
   }
 
-  var maxRange = new scout.Range(0, this.rows.length);
+  var maxRange = new Range(0, this.rows.length);
   range = maxRange.intersect(range);
-  if (this.viewRangeRendered.size() > 0 && !range.intersect(this.viewRangeRendered).equals(new scout.Range(0, 0))) {
+  if (this.viewRangeRendered.size() > 0 && !range.intersect(this.viewRangeRendered).equals(new Range(0, 0))) {
     throw new Error('New range must not intersect with existing.');
   }
   if (range.to <= this.viewRangeRendered.from) {
@@ -1525,7 +1580,7 @@ scout.Table.prototype._renderRowsInRange = function(range) {
   $rows.each(function(index, rowObject) {
     var $row = $(rowObject);
     var row = rows[range.from + index];
-    scout.Table.linkRowToDiv(row, $row);
+    Table.linkRowToDiv(row, $row);
     this._installRow(row);
   }.bind(this));
 
@@ -1533,35 +1588,35 @@ scout.Table.prototype._renderRowsInRange = function(range) {
     $.log.trace(numRowsRendered + ' new rows rendered from ' + range);
     $.log.trace(this._rowsRenderedInfo());
   }
-};
+}
 
-scout.Table.prototype._rowsRenderedInfo = function() {
+_rowsRenderedInfo() {
   var numRenderedRows = this.$rows().length,
     renderedRowsRange = '(' + this.viewRangeRendered + ')',
     text = numRenderedRows + ' rows rendered ' + renderedRowsRange;
   return text;
-};
+}
 
 /**
  * Moves the row to the top.
  */
-scout.Table.prototype.moveRowToTop = function(row) {
+moveRowToTop(row) {
   var rowIndex = this.rows.indexOf(row);
   this.moveRow(rowIndex, 0);
-};
+}
 
 /**
  * Moves the row to the bottom.
  */
-scout.Table.prototype.moveRowToBottom = function(row) {
+moveRowToBottom(row) {
   var rowIndex = this.rows.indexOf(row);
   this.moveRow(rowIndex, this.rows.length - 1);
-};
+}
 
 /**
  * Moves the row one up, disregarding filtered rows.
  */
-scout.Table.prototype.moveRowUp = function(row) {
+moveRowUp(row) {
   var rowIndex = this.rows.indexOf(row),
     targetIndex = rowIndex - 1;
   if (this.hierarchical) {
@@ -1579,12 +1634,12 @@ scout.Table.prototype.moveRowUp = function(row) {
   }
 
   this.moveRow(rowIndex, targetIndex);
-};
+}
 
 /**
  * Moves the row one down, disregarding filtered rows.
  */
-scout.Table.prototype.moveRowDown = function(row) {
+moveRowDown(row) {
   var rowIndex = this.rows.indexOf(row),
     targetIndex = rowIndex + 1;
   if (this.hierarchical) {
@@ -1601,17 +1656,17 @@ scout.Table.prototype.moveRowDown = function(row) {
     }
   }
   this.moveRow(rowIndex, targetIndex);
-};
+}
 
 /**
  * Moves the row one up with respected to filtered rows. Row must be one of the filtered rows.
  * @deprecated use moveVisibleRowUp instead
  */
-scout.Table.prototype.moveFilteredRowUp = function(row) {
+moveFilteredRowUp(row) {
   this.moveVisibleRowUp(row);
-};
+}
 
-scout.Table.prototype.moveVisibleRowUp = function(row) {
+moveVisibleRowUp(row) {
   var rowIndex = this.rows.indexOf(row),
     visibleIndex = this.visibleRows.indexOf(row),
     sibling,
@@ -1638,17 +1693,17 @@ scout.Table.prototype.moveVisibleRowUp = function(row) {
     targetIndex = this.rows.indexOf(sibling);
   }
   this.moveRow(rowIndex, targetIndex);
-};
+}
 
 /**
  * Moves the row one down with respected to filtered rows. Row must be one of the filtered rows.
  * @deprecated use moveVisibleRowDown instead
  */
-scout.Table.prototype.moveFilteredRowDown = function(row) {
+moveFilteredRowDown(row) {
   this.moveVisibleRowDown(row);
-};
+}
 
-scout.Table.prototype.moveVisibleRowDown = function(row) {
+moveVisibleRowDown(row) {
   var rowIndex = this.rows.indexOf(row),
     visibleIndex = this.visibleRows.indexOf(row),
     sibling,
@@ -1675,9 +1730,9 @@ scout.Table.prototype.moveVisibleRowDown = function(row) {
     targetIndex = this.rows.indexOf(sibling);
   }
   this.moveRow(rowIndex, targetIndex);
-};
+}
 
-scout.Table.prototype.moveRow = function(sourceIndex, targetIndex) {
+moveRow(sourceIndex, targetIndex) {
   var rowCount = this.rows.length;
   sourceIndex = Math.max(sourceIndex, 0);
   sourceIndex = Math.min(sourceIndex, rowCount - 1);
@@ -1688,16 +1743,16 @@ scout.Table.prototype.moveRow = function(sourceIndex, targetIndex) {
     return;
   }
 
-  scout.arrays.move(this.rows, sourceIndex, targetIndex);
+  arrays.move(this.rows, sourceIndex, targetIndex);
   this.updateRowOrder(this.rows);
-};
+}
 
-scout.Table.prototype._removeRowsInRange = function(range) {
+_removeRowsInRange(range) {
   var row, i,
     numRowsRemoved = 0,
     rows = this.visibleRows;
 
-  var maxRange = new scout.Range(0, rows.length);
+  var maxRange = new Range(0, rows.length);
   range = maxRange.intersect(range);
 
   var newRange = this.viewRangeRendered.subtract(range);
@@ -1716,9 +1771,9 @@ scout.Table.prototype._removeRowsInRange = function(range) {
     $.log.trace(numRowsRemoved + ' rows removed from ' + range + '.');
     $.log.trace(this._rowsRenderedInfo());
   }
-};
+}
 
-scout.Table.prototype.removeAllRows = function() {
+removeAllRows() {
   if (this._isDataRendered()) {
     this.$rows().each(function(i, elem) {
       var $row = $(elem),
@@ -1731,21 +1786,21 @@ scout.Table.prototype.removeAllRows = function() {
       this._removeRow(row);
     }.bind(this));
   }
-  this.viewRangeRendered = new scout.Range(0, 0);
-};
+  this.viewRangeRendered = new Range(0, 0);
+}
 
 /**
  *
  * @param rows if undefined, all rows are removed
  */
-scout.Table.prototype._removeRows = function(rows) {
+_removeRows(rows) {
   if (!rows) {
     this.removeAllRows();
     return;
   }
 
   var tableAttached = this.isAttachedAndRendered();
-  rows = scout.arrays.ensure(rows);
+  rows = arrays.ensure(rows);
   rows.forEach(function(row) {
     var rowIndex = this.visibleRows.indexOf(row);
     if (rowIndex === -1) {
@@ -1780,12 +1835,12 @@ scout.Table.prototype._removeRows = function(rows) {
       }
     }
   }.bind(this));
-};
+}
 
 /**
  * Just removes the row, does NOT adjust this.viewRangeRendered
  */
-scout.Table.prototype._removeRow = function(row) {
+_removeRow(row) {
   var $row = row.$row;
   if (!$row) {
     return;
@@ -1799,12 +1854,12 @@ scout.Table.prototype._removeRow = function(row) {
     $row.remove();
     row.$row = null;
   }
-};
+}
 
 /**
  * Animates the rendering of a row by setting it to invisible before doing a slideDown animation. The row needs to already be rendered.
  */
-scout.Table.prototype._showRow = function(row) {
+_showRow(row) {
   var $row = row.$row;
   if (!$row) {
     return;
@@ -1823,12 +1878,12 @@ scout.Table.prototype._showRow = function(row) {
       this.updateScrollbars();
     }.bind(this)
   });
-};
+}
 
 /**
  * Animates the removal of a row by doing a slideUp animation. The row will be removed after the animation finishes.
  */
-scout.Table.prototype._hideRow = function(row) {
+_hideRow(row) {
   var $row = row.$row;
   if (!$row) {
     return;
@@ -1855,13 +1910,13 @@ scout.Table.prototype._hideRow = function(row) {
       this.updateScrollbars();
     }.bind(this)
   });
-};
+}
 
 /**
  * This method should be used after a row is added to the DOM (new rows, updated rows). The 'row'
  * is expected to be linked with the corresponding '$row' (row.$row and $row.data('row')).
  */
-scout.Table.prototype._installRow = function(row) {
+_installRow(row) {
   row.height = row.$row.outerHeight(true);
 
   if (row.hasError) {
@@ -1872,16 +1927,16 @@ scout.Table.prototype._installRow = function(row) {
     var editorField = this.cellEditorPopup.cell.field;
     this.startCellEdit(this.cellEditorPopup.column, row, editorField);
   }
-};
+}
 
-scout.Table.prototype._calcRowLevelPadding = function(row) {
+_calcRowLevelPadding(row) {
   if (!row) {
     return -this.rowLevelPadding;
   }
   return this._calcRowLevelPadding(row.parentRow) + this.rowLevelPadding;
-};
+}
 
-scout.Table.prototype._showCellErrorForRow = function(row) {
+_showCellErrorForRow(row) {
   var $cells = this.$cellsForRow(row.$row),
     that = this;
 
@@ -1892,9 +1947,9 @@ scout.Table.prototype._showCellErrorForRow = function(row) {
       that._showCellError(row, $cell, cell.errorStatus);
     }
   });
-};
+}
 
-scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
+_showCellError(row, $cell, errorStatus) {
   var tooltip, opts,
     text = errorStatus.message;
 
@@ -1910,12 +1965,12 @@ scout.Table.prototype._showCellError = function(row, $cell, errorStatus) {
   // link to be able to remove it when row gets deleted
   tooltip.row = row;
   this.tooltips.push(tooltip);
-};
+}
 
 /**
  * @returns the column at position x (e.g. from event.pageX)
  */
-scout.Table.prototype._columnAtX = function(x) {
+_columnAtX(x) {
   var columnOffsetRight = 0,
     columnOffsetLeft = this.$data.offset().left + this.rowBorderLeftWidth,
     scrollLeft = this.$data.scrollLeft();
@@ -1927,7 +1982,7 @@ scout.Table.prototype._columnAtX = function(x) {
 
   columnOffsetLeft -= scrollLeft;
   var visibleColumns = this.visibleColumns();
-  var column = scout.arrays.find(visibleColumns, function(column) {
+  var column = arrays.find(visibleColumns, function(column) {
     columnOffsetRight = columnOffsetLeft + column.width;
     if (x >= columnOffsetLeft && x < columnOffsetRight) {
       return true;
@@ -1939,9 +1994,9 @@ scout.Table.prototype._columnAtX = function(x) {
     column = visibleColumns[visibleColumns.length - 1];
   }
   return column;
-};
+}
 
-scout.Table.prototype._find$AppLink = function(event) {
+_find$AppLink(event) {
   // bubble up from target to delegateTarget
   var $elem = $(event.target);
   var $stop = $(event.delegateTarget);
@@ -1955,55 +2010,55 @@ scout.Table.prototype._find$AppLink = function(event) {
     $elem = $elem.parent();
   }
   return null;
-};
+}
 
-scout.Table.prototype._filterMenus = function(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
-  return scout.menus.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
-};
+_filterMenus(menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes) {
+  return menus_1.filterAccordingToSelection('Table', this.selectedRows.length, menuItems, destination, onlyVisible, enableDisableKeyStroke, notAllowedTypes);
+}
 
-scout.Table.prototype.setStaticMenus = function(staticMenus) {
+setStaticMenus(staticMenus) {
   this.setProperty('staticMenus', staticMenus);
   this._updateMenuBar();
-};
+}
 
-scout.Table.prototype._removeMenus = function() {
+_removeMenus() {
   // menubar takes care about removal
-};
+}
 
-scout.Table.prototype.notifyRowSelectionFinished = function() {
+notifyRowSelectionFinished() {
   if (this._triggerRowsSelectedPending) {
     this._triggerRowsSelected();
     this._triggerRowsSelectedPending = false;
   }
   this.session.onRequestsDone(this._updateMenuBar.bind(this));
-};
+}
 
-scout.Table.prototype._triggerRowClick = function(row, mouseButton, column) {
+_triggerRowClick(row, mouseButton, column) {
   var event = {
     row: row,
     mouseButton: mouseButton
   };
   this.trigger('rowClick', event);
-};
+}
 
-scout.Table.prototype._triggerRowAction = function(row, column) {
+_triggerRowAction(row, column) {
   this.trigger('rowAction', {
     row: row,
     column: column
   });
-};
+}
 
 /**
  * This functions starts the cell editor for the given row and column. Prepare must wait until
  * a pending completeCellEdit operation is resolved.
  */
-scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCellEdit) {
+prepareCellEdit(column, row, openFieldPopupOnCellEdit) {
   var promise = $.resolvedPromise();
   if (this.cellEditorPopup) {
     promise = this.cellEditorPopup.waitForCompleteCellEdit();
   }
   promise.then(this.prepareCellEditInternal.bind(this, column, row, openFieldPopupOnCellEdit));
-};
+}
 
 /**
  * @param openFieldPopupOnCellEdit when this parameter is set to true, the CellEditorPopup sets an
@@ -2011,8 +2066,8 @@ scout.Table.prototype.prepareCellEdit = function(column, row, openFieldPopupOnCe
  *    to decide whether or not it should open a popup immediately after it is rendered. This is used
  *    for Smart- and DateFields.
  */
-scout.Table.prototype.prepareCellEditInternal = function(column, row, openFieldPopupOnCellEdit) {
-  var event = new scout.Event({
+prepareCellEditInternal(column, row, openFieldPopupOnCellEdit) {
+  var event = new Event({
     column: column,
     row: row
   });
@@ -2023,16 +2078,16 @@ scout.Table.prototype.prepareCellEditInternal = function(column, row, openFieldP
     var field = column.createEditor(row);
     this.startCellEdit(column, row, field);
   }
-};
+}
 
 /**
  * @returns returns a cell for the given column and row. Row Icon column and cell icon column don't not have cells --> generate one.
  */
-scout.Table.prototype.cell = function(column, row) {
+cell(column, row) {
   if (column === this.rowIconColumn) {
     return scout.create('Cell', {
       iconId: row.iconId,
-      cssClass: scout.strings.join(' ', 'row-icon-cell', row.cssClass)
+      cssClass: strings.join(' ', 'row-icon-cell', row.cssClass)
     });
   }
 
@@ -2045,13 +2100,13 @@ scout.Table.prototype.cell = function(column, row) {
   }
 
   return row.cells[column.index];
-};
+}
 
-scout.Table.prototype.cellByCellIndex = function(cellIndex, row) {
+cellByCellIndex(cellIndex, row) {
   return this.cell(this.columns[cellIndex], row);
-};
+}
 
-scout.Table.prototype.cellValue = function(column, row) {
+cellValue(column, row) {
   var cell = this.cell(column, row);
   if (!cell) {
     return cell;
@@ -2060,22 +2115,22 @@ scout.Table.prototype.cellValue = function(column, row) {
     return cell.value;
   }
   return '';
-};
+}
 
-scout.Table.prototype.cellText = function(column, row) {
+cellText(column, row) {
   var cell = this.cell(column, row);
   if (!cell) {
     return '';
   }
   return cell.text || '';
-};
+}
 
 /**
  *
  * @returns the next editable position in the table, starting from the cell at (currentColumn / currentRow).
  * A position is an object containing row and column (cell has no reference to a row or column due to memory reasons).
  */
-scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, reverse) {
+nextEditableCellPos(currentColumn, currentRow, reverse) {
   var pos, startColumnIndex, rowIndex, startRowIndex, predicate,
     colIndex = this.columns.indexOf(currentColumn);
 
@@ -2108,12 +2163,12 @@ scout.Table.prototype.nextEditableCellPos = function(currentColumn, currentRow, 
   if (reverse) {
     startRowIndex = rowIndex - 1;
   }
-  scout.arrays.findFrom(this.rows, startRowIndex, predicate, reverse);
+  arrays.findFrom(this.rows, startRowIndex, predicate, reverse);
 
   return pos;
-};
+}
 
-scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row, reverse) {
+nextEditableCellPosForRow(startColumnIndex, row, reverse) {
   var cell, column, predicate;
 
   predicate = function(column) {
@@ -2125,16 +2180,16 @@ scout.Table.prototype.nextEditableCellPosForRow = function(startColumnIndex, row
     return this.enabledComputed && row.enabled && cell.editable;
   }.bind(this);
 
-  column = scout.arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
+  column = arrays.findFrom(this.columns, startColumnIndex, predicate, reverse);
   if (column) {
     return {
       column: column,
       row: row
     };
   }
-};
+}
 
-scout.Table.prototype.clearAggregateRows = function(animate) {
+clearAggregateRows(animate) {
   // Remove "hasAggregateRow" markers from real rows
   this._aggregateRows.forEach(function(aggregateRow) {
     if (aggregateRow.prevRow) {
@@ -2150,7 +2205,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
     this._renderSelection(); // fix selection borders
   }
   this._aggregateRows = [];
-};
+}
 
 /**
  * Executes the aggregate function with the given funcName for each visible column, but only if the Column
@@ -2159,7 +2214,7 @@ scout.Table.prototype.clearAggregateRows = function(animate) {
  * @param states is a reference to an Array containing the results for each column.
  * @param row (optional) if set, an additional cell-value parameter is passed to the aggregate function
  */
-scout.Table.prototype._forEachVisibleColumn = function(funcName, states, row) {
+_forEachVisibleColumn(funcName, states, row) {
   var value;
   this.visibleColumns().forEach(function(column, i) {
     if (column[funcName]) {
@@ -2171,12 +2226,12 @@ scout.Table.prototype._forEachVisibleColumn = function(funcName, states, row) {
       states[i] = undefined;
     }
   });
-};
+}
 
-scout.Table.prototype._group = function(animate) {
+_group(animate) {
   var rows, nextRow, newGroup, firstRow, lastRow,
     groupColumns = this._groupedColumns(),
-    onTop = this.groupingStyle === scout.Table.GroupingStyle.TOP,
+    onTop = this.groupingStyle === Table.GroupingStyle.TOP,
     states = [];
 
   this.clearAggregateRows();
@@ -2215,9 +2270,9 @@ scout.Table.prototype._group = function(animate) {
     this._renderAggregateRows(animate);
     this._renderSelection(); // fix selection borders
   }
-};
+}
 
-scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
+_isNewGroup(groupedColumns, row, nextRow) {
   var i, col, newRow = false,
     hasCellTextForGroupingFunction;
 
@@ -2235,13 +2290,13 @@ scout.Table.prototype._isNewGroup = function(groupedColumns, row, nextRow) {
     }
   }
   return false;
-};
+}
 
-scout.Table.prototype._groupedColumns = function() {
+_groupedColumns() {
   return this.columns.filter(function(col) {
     return col.grouped;
   });
-};
+}
 
 /**
  * Inserts a new aggregation row between 'prevRow' and 'nextRow'.
@@ -2250,7 +2305,7 @@ scout.Table.prototype._groupedColumns = function() {
  * @param prevRow row _before_ the new aggregate row
  * @param nextRow row _after_ the new aggregate row
  */
-scout.Table.prototype._addAggregateRow = function(contents, prevRow, nextRow) {
+_addAggregateRow(contents, prevRow, nextRow) {
   var aggregateRow = {
     contents: contents.slice(),
     prevRow: prevRow,
@@ -2263,9 +2318,9 @@ scout.Table.prototype._addAggregateRow = function(contents, prevRow, nextRow) {
   if (nextRow) {
     nextRow.aggregateRowBefore = aggregateRow;
   }
-};
+}
 
-scout.Table.prototype._removeAggregateRows = function(animate) {
+_removeAggregateRows(animate) {
   if (this._aggregateRows.length === 0) {
     return;
   }
@@ -2280,10 +2335,10 @@ scout.Table.prototype._removeAggregateRows = function(animate) {
       this._hideRow(aggregateRow);
     }, this);
   }
-};
+}
 
-scout.Table.prototype._renderAggregateRows = function(animate) {
-  var onTop = this.groupingStyle === scout.Table.GroupingStyle.TOP,
+_renderAggregateRows(animate) {
+  var onTop = this.groupingStyle === Table.GroupingStyle.TOP,
     insertFunc = onTop ? 'insertBefore' : 'insertAfter';
   animate = scout.nvl(animate, false);
 
@@ -2315,9 +2370,9 @@ scout.Table.prototype._renderAggregateRows = function(animate) {
       this._showRow(aggregateRow);
     }
   }, this);
-};
+}
 
-scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remove) {
+groupColumn(column, multiGroup, direction, remove) {
   var data, sorted;
   multiGroup = scout.nvl(multiGroup, false);
   remove = scout.nvl(remove, false);
@@ -2354,59 +2409,59 @@ scout.Table.prototype.groupColumn = function(column, multiGroup, direction, remo
     this._animateAggregateRows = true;
   }
   this.trigger('group', data);
-};
+}
 
-scout.Table.prototype.removeColumnGrouping = function(column) {
+removeColumnGrouping(column) {
   if (column) {
     this.groupColumn(column, false, 'asc', true);
   }
-};
+}
 
 /**
  * @returns {boolean} true if at least one column has grouped=true
  */
-scout.Table.prototype.isGrouped = function() {
+isGrouped() {
   return this.columns.some(function(column) {
     return column.grouped;
   });
-};
+}
 
-scout.Table.prototype.setColumnBackgroundEffect = function(column, effect) {
+setColumnBackgroundEffect(column, effect) {
   column.setBackgroundEffect(effect);
-};
+}
 
 /**
  * Updates the background effect of every column, if column.backgroundEffect is set.
  * Meaning: Recalculates the min / max values and renders the background effect again.
  */
-scout.Table.prototype._updateBackgroundEffect = function() {
+_updateBackgroundEffect() {
   this.columns.forEach(function(column) {
     if (!column.backgroundEffect) {
       return;
     }
     column.updateBackgroundEffect();
   }, this);
-};
+}
 
 /**
  * Recalculates the values necessary for the background effect of every column, if column.backgroundEffect is set
  */
-scout.Table.prototype._calculateValuesForBackgroundEffect = function() {
+_calculateValuesForBackgroundEffect() {
   this.columns.forEach(function(column) {
     if (!column.backgroundEffect) {
       return;
     }
     column.calculateMinMaxValues();
   }, this);
-};
+}
 
-scout.Table.prototype._markAutoOptimizeWidthColumnsAsDirty = function() {
+_markAutoOptimizeWidthColumnsAsDirty() {
   this.columns.forEach(function(column) {
     column.autoOptimizeWidthRequired = true;
   });
-};
+}
 
-scout.Table.prototype._markAutoOptimizeWidthColumnsAsDirtyIfNeeded = function(autoOptimizeWidthColumns, oldRow, newRow) {
+_markAutoOptimizeWidthColumnsAsDirtyIfNeeded(autoOptimizeWidthColumns, oldRow, newRow) {
   var i,
     marked = false;
   for (i = autoOptimizeWidthColumns.length - 1; i >= 0; i--) {
@@ -2419,26 +2474,26 @@ scout.Table.prototype._markAutoOptimizeWidthColumnsAsDirtyIfNeeded = function(au
     }
   }
   return marked;
-};
+}
 
-scout.Table.prototype.setMultiCheck = function(multiCheck) {
+setMultiCheck(multiCheck) {
   this.setProperty('multiCheck', multiCheck);
-};
+}
 
-scout.Table.prototype.checkedRows = function() {
+checkedRows() {
   return this.rows.filter(function(row) {
     return row.checked;
   });
-};
+}
 
-scout.Table.prototype.checkRow = function(row, checked, options) {
+checkRow(row, checked, options) {
   var opts = $.extend(options, {
     checked: checked
   });
   this.checkRows([row], opts);
-};
+}
 
-scout.Table.prototype.checkRows = function(rows, options) {
+checkRows(rows, options) {
   var opts = $.extend({
     checked: true,
     checkOnlyEnabled: true
@@ -2448,7 +2503,7 @@ scout.Table.prototype.checkRows = function(rows, options) {
   if (!this.checkable || (!this.enabledComputed && opts.checkOnlyEnabled)) {
     return;
   }
-  rows = scout.arrays.ensure(rows);
+  rows = arrays.ensure(rows);
   rows.forEach(function(row) {
     if ((!row.enabled && opts.checkOnlyEnabled) || row.checked === opts.checked) {
       return;
@@ -2471,48 +2526,48 @@ scout.Table.prototype.checkRows = function(rows, options) {
     }, this);
   }
   this._triggerRowsChecked(checkedRows);
-};
+}
 
-scout.Table.prototype.uncheckRow = function(row, options) {
+uncheckRow(row, options) {
   this.uncheckRows([row], options);
-};
+}
 
-scout.Table.prototype.uncheckRows = function(rows, options) {
+uncheckRows(rows, options) {
   var opts = $.extend({
     checked: false
   }, options);
   this.checkRows(rows, opts);
-};
+}
 
-scout.Table.prototype.isTableNodeColumn = function(column) {
+isTableNodeColumn(column) {
   return this.hierarchical && this.tableNodeColumn === column;
-};
+}
 
-scout.Table.prototype.collapseRow = function(row) {
-  this.collapseRows(scout.arrays.ensure(row));
-};
+collapseRow(row) {
+  this.collapseRows(arrays.ensure(row));
+}
 
-scout.Table.prototype.collapseAll = function() {
+collapseAll() {
   this.expandRowsInternal(this.rootRows, false, true);
-};
+}
 
-scout.Table.prototype.expandAll = function() {
+expandAll() {
   this.expandRowsInternal(this.rootRows, true, true);
-};
+}
 
-scout.Table.prototype.collapseRows = function(rows, recursive) {
+collapseRows(rows, recursive) {
   this.expandRowsInternal(rows, false, recursive);
-};
+}
 
-scout.Table.prototype.expandRow = function(row, recursive) {
-  this.expandRows(scout.arrays.ensure(row));
-};
+expandRow(row, recursive) {
+  this.expandRows(arrays.ensure(row));
+}
 
-scout.Table.prototype.expandRows = function(rows, recursive) {
+expandRows(rows, recursive) {
   this.expandRowsInternal(rows, true, recursive);
-};
+}
 
-scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
+expandRowsInternal(rows, expanded, recursive) {
   var changedRows = [],
     rowsForAnimation = [];
   rows = rows || this.rootRows;
@@ -2555,7 +2610,7 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
     });
 
     if (rows[0].$row) {
-      scout.scrollbars.ensureExpansionVisible({
+      scrollbars.ensureExpansionVisible({
         element: rows[0],
         $element: rows[0].$row,
         $scrollable: this.get$Scrollable(),
@@ -2569,9 +2624,9 @@ scout.Table.prototype.expandRowsInternal = function(rows, expanded, recursive) {
       });
     }
   }
-};
+}
 
-scout.Table.prototype.doRowAction = function(row, column) {
+doRowAction(row, column) {
   if (this.selectedRows.length !== 1 || this.selectedRows[0] !== row) {
     // Only allow row action if the selected row was double clicked because the handler of the event expects a selected row.
     // This may happen if the user modifies the selection using ctrl or shift while double clicking.
@@ -2580,7 +2635,7 @@ scout.Table.prototype.doRowAction = function(row, column) {
 
   column = column || this.columns[0];
   if (column && column.guiOnly) {
-    column = scout.arrays.find(this.columns, function(col) {
+    column = arrays.find(this.columns, function(col) {
       return !col.guiOnly;
     });
   }
@@ -2588,19 +2643,19 @@ scout.Table.prototype.doRowAction = function(row, column) {
     return;
   }
   this._triggerRowAction(row, column);
-};
+}
 
-scout.Table.prototype.insertRow = function(row) {
+insertRow(row) {
   this.insertRows([row]);
-};
+}
 
-scout.Table.prototype.insertRows = function(rows) {
+insertRows(rows) {
   var wasEmpty = this.rows.length === 0;
 
   // Update model
   rows.forEach(function(row, i) {
     row = this._initRow(row);
-    row.status = scout.TableRow.Status.INSERTED;
+    row.status = TableRow.Status.INSERTED;
     rows[i] = row;
     // Always insert new rows at the end, if the order is wrong a rowOrderChanged event will follow
     this.rows.push(row);
@@ -2641,24 +2696,24 @@ scout.Table.prototype.insertRows = function(rows) {
         this._insertedRows = null;
       }.bind(this), 0);
     } else {
-      scout.arrays.pushAll(this._insertedRows, rows);
+      arrays.pushAll(this._insertedRows, rows);
     }
 
     this.viewRangeDirty = true;
     this._renderViewport();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype._sortAfterInsert = function(wasEmpty) {
+_sortAfterInsert(wasEmpty) {
   this._sort();
-};
+}
 
-scout.Table.prototype.deleteRow = function(row) {
+deleteRow(row) {
   this.deleteRows([row]);
-};
+}
 
-scout.Table.prototype.deleteRows = function(rows) {
+deleteRows(rows) {
   var invalidate,
     filterChanged,
     removedRows = [];
@@ -2681,9 +2736,9 @@ scout.Table.prototype.deleteRows = function(rows) {
     }
 
     // Update model
-    scout.arrays.remove(this.rows, row);
-    scout.arrays.remove(this.visibleRows, row);
-    if (this._filterCount() > 0 && scout.arrays.remove(this._filteredRows, row)) {
+    arrays.remove(this.rows, row);
+    arrays.remove(this.visibleRows, row);
+    if (this._filterCount() > 0 && arrays.remove(this._filteredRows, row)) {
       filterChanged = true;
     }
     delete this.rowsMap[row.id];
@@ -2717,9 +2772,9 @@ scout.Table.prototype.deleteRows = function(rows) {
     this._renderEmptyData();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype.deleteAllRows = function() {
+deleteAllRows() {
   var filterChanged = this._filterCount() > 0 && this._filteredRows.length > 0,
     rows = this.rows;
 
@@ -2762,13 +2817,13 @@ scout.Table.prototype.deleteAllRows = function() {
     this._renderEmptyData();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype.updateRow = function(row) {
+updateRow(row) {
   this.updateRows([row]);
-};
+}
 
-scout.Table.prototype.updateRows = function(rows) {
+updateRows(rows) {
   if (this.updateBuffer.isBuffering()) {
     this.updateBuffer.buffer(rows);
     return;
@@ -2794,17 +2849,17 @@ scout.Table.prototype.updateRows = function(rows) {
       throw new Error('Update event received for non existing row. RowId: ' + row.id);
     }
     // check structure changes
-    if (row.parentRow && !scout.objects.isNullOrUndefined(row.parentRow.id)) {
+    if (row.parentRow && !objects.isNullOrUndefined(row.parentRow.id)) {
       parentRowId = row.parentRow.id;
     }
     structureChanged = structureChanged || row._parentRowId !== parentRowId;
     row = this._initRow(row);
     // Check if cell values have changed
-    if (row.status === scout.TableRow.Status.NON_CHANGED) {
+    if (row.status === TableRow.Status.NON_CHANGED) {
       row.cells.some(function(cell, i) {
         var oldCell = oldRow.cells[i];
         if (!oldCell || oldCell.value !== cell.value) {
-          row.status = scout.TableRow.Status.UPDATED;
+          row.status = TableRow.Status.UPDATED;
           return true; // break "some()" loop
         }
       });
@@ -2813,7 +2868,7 @@ scout.Table.prototype.updateRows = function(rows) {
     if (this.selectionHandler.lastActionRow === oldRow) {
       this.selectionHandler.lastActionRow = row;
     }
-    scout.arrays.replace(this.selectedRows, oldRow, row);
+    arrays.replace(this.selectedRows, oldRow, row);
     // replace row use index lookup for performance reasons
     this.rows[rowsToIndex[row.id]] = row;
     // filter
@@ -2844,9 +2899,9 @@ scout.Table.prototype.updateRows = function(rows) {
         return;
       }
       $updatedRow = $(this._buildRowDiv(row));
-      $updatedRow.copyCssClasses(oldRow.$row, scout.Table.SELECTION_CLASSES + ' first last');
+      $updatedRow.copyCssClasses(oldRow.$row, Table.SELECTION_CLASSES + ' first last');
       oldRow.$row.replaceWith($updatedRow);
-      scout.Table.linkRowToDiv(row, $updatedRow);
+      Table.linkRowToDiv(row, $updatedRow);
       this._destroyTooltipsForRow(row);
       this._removeCellEditorForRow(row);
       this._installRow(row);
@@ -2865,22 +2920,22 @@ scout.Table.prototype.updateRows = function(rows) {
   this._sortAfterUpdate();
   this._updateBackgroundEffect();
   this.invalidateLayoutTree(); // this will also update the scroll-bars
-};
+}
 
-scout.Table.prototype._sortAfterUpdate = function() {
+_sortAfterUpdate() {
   this._sort();
-};
+}
 
-scout.Table.prototype.isHierarchical = function() {
+isHierarchical() {
   return this.hierarchical;
-};
+}
 
 /**
  * The given rows must be rows of this table in desired order.
- * @param {scout.TableRow[]} rows
+ * @param {TableRow[]} rows
  */
-scout.Table.prototype.updateRowOrder = function(rows) {
-  rows = scout.arrays.ensure(rows);
+updateRowOrder(rows) {
+  rows = arrays.ensure(rows);
   if (rows.length !== this.rows.length) {
     throw new Error('Row order may not be updated because lengths of the arrays differ.');
   }
@@ -2901,24 +2956,24 @@ scout.Table.prototype.updateRowOrder = function(rows) {
 
   this._group(this._animateAggregateRows);
   this._animateAggregateRows = false;
-};
+}
 
-scout.Table.prototype._destroyTooltipsForRow = function(row) {
+_destroyTooltipsForRow(row) {
   for (var i = this.tooltips.length - 1; i >= 0; i--) {
     if (this.tooltips[i].row.id === row.id) {
       this.tooltips[i].destroy();
       this.tooltips.splice(i, 1);
     }
   }
-};
+}
 
-scout.Table.prototype._removeCellEditorForRow = function(row) {
+_removeCellEditorForRow(row) {
   if (this.cellEditorPopup && this.cellEditorPopup.rendered && this.cellEditorPopup.row.id === row.id) {
     this.cellEditorPopup.remove();
   }
-};
+}
 
-scout.Table.prototype.startCellEdit = function(column, row, field) {
+startCellEdit(column, row, field) {
   if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.startCellEdit.bind(this, column, row, field));
     return;
@@ -2933,14 +2988,14 @@ scout.Table.prototype.startCellEdit = function(column, row, field) {
   var popup = column.startCellEdit(row, field);
   this.cellEditorPopup = popup;
   return popup;
-};
+}
 
 /**
  * @param saveEditorValue when this parameter is set to true, the value of the editor field is set as
  *    new value on the edited cell. In remote case this parameter is always false, because the cell
  *    value is updated by an updateRow event instead.
  */
-scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
+endCellEdit(field, saveEditorValue) {
   if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.endCellEdit.bind(this, field, saveEditorValue));
     return;
@@ -2973,11 +3028,11 @@ scout.Table.prototype.endCellEdit = function(field, saveEditorValue) {
   }
 
   field.destroy();
-};
+}
 
-scout.Table.prototype.completeCellEdit = function() {
+completeCellEdit() {
   var field = this.cellEditorPopup.cell.field;
-  var event = new scout.Event({
+  var event = new Event({
     field: field,
     row: this.cellEditorPopup.row,
     column: this.cellEditorPopup.column,
@@ -2988,11 +3043,11 @@ scout.Table.prototype.completeCellEdit = function() {
   if (!event.defaultPrevented) {
     return this.endCellEdit(field, true);
   }
-};
+}
 
-scout.Table.prototype.cancelCellEdit = function() {
+cancelCellEdit() {
   var field = this.cellEditorPopup.cell.field;
-  var event = new scout.Event({
+  var event = new Event({
     field: field,
     row: this.cellEditorPopup.row,
     column: this.cellEditorPopup.column,
@@ -3003,65 +3058,65 @@ scout.Table.prototype.cancelCellEdit = function() {
   if (!event.defaultPrevented) {
     this.endCellEdit(field);
   }
-};
+}
 
-scout.Table.prototype.scrollTo = function(row, options) {
+scrollTo(row, options) {
   if (this.viewRangeRendered.size() === 0) {
     // Cannot scroll to a row no row is rendered
     return;
   }
   this.ensureRowRendered(row);
-  scout.scrollbars.scrollTo(this.$data, row.$row, options);
-};
+  scrollbars.scrollTo(this.$data, row.$row, options);
+}
 
-scout.Table.prototype.scrollPageUp = function() {
+scrollPageUp() {
   var newScrollTop = Math.max(0, this.$data[0].scrollTop - this.$data.height());
   this.setScrollTop(newScrollTop);
-};
+}
 
-scout.Table.prototype.scrollPageDown = function() {
+scrollPageDown() {
   var newScrollTop = Math.min(this.$data[0].scrollHeight, this.$data[0].scrollTop + this.$data.height());
   this.setScrollTop(newScrollTop);
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype.setScrollTop = function(scrollTop) {
+setScrollTop(scrollTop) {
   this.setProperty('scrollTop', scrollTop);
   // call _renderViewport to make sure rows are rendered immediately. The browser fires the scroll event handled by onDataScroll delayed
   if (this._isDataRendered()) {
     this._renderViewport();
   }
-};
+}
 
 /**
  * @override
  */
-scout.Table.prototype._renderScrollTop = function() {
+_renderScrollTop() {
   if (this.rendering) {
     // Not necessary to do it while rendering since it will be done by the layout
     return;
   }
-  scout.scrollbars.scrollTop(this.get$Scrollable(), this.scrollTop);
-};
+  scrollbars.scrollTop(this.get$Scrollable(), this.scrollTop);
+}
 
 /**
  * @override
  */
-scout.Table.prototype.get$Scrollable = function() {
+get$Scrollable() {
   if (this.$data) {
     return this.$data;
   } else {
     return this.$container;
   }
-};
+}
 
-scout.Table.prototype.setScrollToSelection = function(scrollToSelection) {
+setScrollToSelection(scrollToSelection) {
   this.setProperty('scrollToSelection', scrollToSelection);
-};
+}
 
-scout.Table.prototype.revealSelection = function() {
+revealSelection() {
   if (!this._isDataRendered()) {
     // Execute delayed because table may be not layouted yet
     this.session.layoutValidator.schedulePostValidateFunction(this.revealSelection.bind(this));
@@ -3071,44 +3126,44 @@ scout.Table.prototype.revealSelection = function() {
   if (this.selectedRows.length > 0) {
     this.scrollTo(this.selectedRows[0]);
   }
-};
+}
 
-scout.Table.prototype.revealChecked = function() {
-  var firstCheckedRow = scout.arrays.find(this.rows, function(row) {
+revealChecked() {
+  var firstCheckedRow = arrays.find(this.rows, function(row) {
     return row.checked === true;
   });
   if (firstCheckedRow) {
     this.scrollTo(firstCheckedRow);
   }
-};
+}
 
-scout.Table.prototype._rowById = function(id) {
+_rowById(id) {
   return this.rowsMap[id];
-};
+}
 
-scout.Table.prototype._rowsByIds = function(ids) {
+_rowsByIds(ids) {
   return ids.map(this._rowById.bind(this));
-};
+}
 
-scout.Table.prototype._rowsToIds = function(rows) {
+_rowsToIds(rows) {
   return rows.map(function(row) {
     return row.id;
   });
-};
+}
 
 /**
  * Checks whether the given row is contained in the table. Uses the id of the row for the lookup.
  */
-scout.Table.prototype.hasRow = function(row) {
+hasRow(row) {
   return !!this.rowsMap[row.id];
-};
+}
 
 /**
  * render borders and selection of row. default select if no argument or false is passed in deselect
  * model has to be updated before calling this method.
  */
-scout.Table.prototype._renderSelection = function(rows) {
-  rows = scout.arrays.ensure(rows || this.selectedRows);
+_renderSelection(rows) {
+  rows = arrays.ensure(rows || this.selectedRows);
 
   // helper function adds/removes a class for a row only if necessary, return true if classes have been changed
   var addOrRemoveClassIfNeededFunc = function($row, condition, classname) {
@@ -3167,19 +3222,19 @@ scout.Table.prototype._renderSelection = function(rows) {
     this.cellEditorPopup.position();
     this.cellEditorPopup.pack();
   }
-};
+}
 
-scout.Table.prototype._removeSelection = function() {
+_removeSelection() {
   this.selectedRows.forEach(function(row) {
     if (!row.$row) {
       return;
     }
     row.$row.select(false);
-    row.$row.toggleClass(scout.Table.SELECTION_CLASSES, false);
+    row.$row.toggleClass(Table.SELECTION_CLASSES, false);
   }, this);
-};
+}
 
-scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
+addRowToSelection(row, ongoingSelection) {
   if (this.selectedRows.indexOf(row) > -1) {
     return;
   }
@@ -3198,11 +3253,11 @@ scout.Table.prototype.addRowToSelection = function(row, ongoingSelection) {
   if (!ongoingSelection) {
     this.notifyRowSelectionFinished();
   }
-};
+}
 
-scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
+removeRowFromSelection(row, ongoingSelection) {
   ongoingSelection = ongoingSelection !== undefined ? ongoingSelection : true;
-  if (scout.arrays.remove(this.selectedRows, row)) {
+  if (arrays.remove(this.selectedRows, row)) {
     if (this._isDataRendered()) {
       this._renderSelection(row);
     }
@@ -3212,19 +3267,19 @@ scout.Table.prototype.removeRowFromSelection = function(row, ongoingSelection) {
       this._triggerRowsSelectedPending = true;
     }
   }
-};
+}
 
-scout.Table.prototype.selectRow = function(row, debounceSend) {
+selectRow(row, debounceSend) {
   this.selectRows(row, debounceSend);
-};
+}
 
-scout.Table.prototype.selectRows = function(rows, debounceSend) {
+selectRows(rows, debounceSend) {
   // Exclude rows that are currently not visible because of a filter (they cannot be selected)
-  rows = scout.arrays.ensure(rows).filter(function(row) {
+  rows = arrays.ensure(rows).filter(function(row) {
     return !!this.visibleRowsMap[row.id];
   }, this);
 
-  var selectedEqualRows = scout.arrays.equalsIgnoreOrder(rows, this.selectedRows);
+  var selectedEqualRows = arrays.equalsIgnoreOrder(rows, this.selectedRows);
   // TODO [7.0] cgu: maybe make sure selectedRows are in correct order, this would make logic in AbstractTableNavigationKeyStroke or renderSelection easier
   // but requires some effort (remember rowIndex, keep array in order after sort, ... see java Table)
   if (selectedEqualRows) {
@@ -3249,115 +3304,115 @@ scout.Table.prototype.selectRows = function(rows, debounceSend) {
       this.revealSelection();
     }
   }
-};
+}
 
-scout.Table.prototype.deselectRow = function(row) {
+deselectRow(row) {
   this.deselectRows(row);
-};
+}
 
-scout.Table.prototype.deselectRows = function(rows) {
-  rows = scout.arrays.ensure(rows);
+deselectRows(rows) {
+  rows = arrays.ensure(rows);
   var selectedRows = this.selectedRows.slice(); // copy
-  if (scout.arrays.removeAll(selectedRows, rows)) {
+  if (arrays.removeAll(selectedRows, rows)) {
     this.selectRows(selectedRows);
   }
-};
+}
 
-scout.Table.prototype.isRowSelected = function(row) {
+isRowSelected(row) {
   return this.selectedRows.indexOf(row) > -1;
-};
+}
 
-scout.Table.prototype._filterCount = function() {
+_filterCount() {
   return Object.keys(this._filterMap).length;
-};
+}
 
-scout.Table.prototype.filteredRows = function() {
+filteredRows() {
   return this._filteredRows;
-};
+}
 
-scout.Table.prototype.$rows = function(includeAggrRows) {
+$rows(includeAggrRows) {
   var selector = '.table-row';
   if (includeAggrRows) {
     selector += ', .table-aggregate-row';
   }
   return this.$data.find(selector);
-};
+}
 
-scout.Table.prototype.$aggregateRows = function() {
+$aggregateRows() {
   return this.$data.find('.table-aggregate-row');
-};
+}
 
 /**
- * @returns {scout.TableRow} the first selected row of this table or null when no row is selected
+ * @returns {TableRow} the first selected row of this table or null when no row is selected
  */
-scout.Table.prototype.selectedRow = function() {
+selectedRow() {
   if (this.selectedRows.length > 0) {
     return this.selectedRows[0];
   }
   return null;
-};
+}
 
-scout.Table.prototype.$selectedRows = function() {
+$selectedRows() {
   if (!this.$data) {
     return $();
   }
   return this.$data.find('.selected');
-};
+}
 
-scout.Table.prototype.$cellsForColIndex = function(colIndex, includeAggrRows) {
+$cellsForColIndex(colIndex, includeAggrRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ')';
   if (includeAggrRows) {
     selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ')';
   }
   return this.$data.find(selector);
-};
+}
 
-scout.Table.prototype.$cellsForColIndexWidthFix = function(colIndex, includeAggrRows) {
+$cellsForColIndexWidthFix(colIndex, includeAggrRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ') > .width-fix ';
   if (includeAggrRows) {
     selector += ', .table-aggregate-row > div:nth-of-type(' + colIndex + ') > .width-fix';
   }
   return this.$data.find(selector);
-};
+}
 
-scout.Table.prototype.$cellsForRow = function($row) {
+$cellsForRow($row) {
   return $row.children('.table-cell');
-};
+}
 
-scout.Table.prototype.$cell = function(column, $row) {
+$cell(column, $row) {
   var columnIndex = column;
   if (typeof column !== 'number') {
     columnIndex = this.visibleColumns().indexOf(column);
   }
   return $row.children('.table-cell').eq(columnIndex);
-};
+}
 
-scout.Table.prototype.columnById = function(columnId) {
-  return scout.arrays.find(this.columns, function(column) {
+columnById(columnId) {
+  return arrays.find(this.columns, function(column) {
     return column.id === columnId;
   });
-};
+}
 
 /**
  * @param {$} $cell the $cell to get the column for
  * @param {$} [$row] the $row which contains the $cell. If not passed it will be determined automatically
- * @returns {scout.Column} the column for the given $cell
+ * @returns {Column} the column for the given $cell
  */
-scout.Table.prototype.columnFor$Cell = function($cell, $row) {
+columnFor$Cell($cell, $row) {
   $row = $row || $cell.closest('.table-row');
   var cellIndex = this.$cellsForRow($row).index($cell);
   return this.visibleColumns()[cellIndex];
-};
+}
 
-scout.Table.prototype.columnsByIds = function(columnIds) {
+columnsByIds(columnIds) {
   return columnIds.map(this.columnById.bind(this));
-};
+}
 
-scout.Table.prototype.getVisibleRows = function() {
+getVisibleRows() {
   return this.visibleRows;
-};
+}
 
-scout.Table.prototype._updateRowStructure = function(options) {
+_updateRowStructure(options) {
   var updateTree = scout.nvl(options.updateTree, false),
     updateFilteredRows = scout.nvl(options.filteredRows, updateTree),
     applyFilters = scout.nvl(options.applyFilters, updateFilteredRows),
@@ -3371,13 +3426,13 @@ scout.Table.prototype._updateRowStructure = function(options) {
   if (updateVisibleRows) {
     this._updateVisibleRows();
   }
-};
+}
 
-scout.Table.prototype._rebuildTreeStructure = function() {
+_rebuildTreeStructure() {
   var hierarchical = false;
   this.rows.forEach(function(row) {
     row.childRows = [];
-    hierarchical = hierarchical || !scout.objects.isNullOrUndefined(row.parentRow);
+    hierarchical = hierarchical || !objects.isNullOrUndefined(row.parentRow);
   }, this);
   if (!hierarchical) {
     this.rootRows = this.rows;
@@ -3389,14 +3444,14 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   this.rootRows = [];
   this.rows.forEach(function(row) {
     var parentRow;
-    if (scout.objects.isNullOrUndefined(row.parentRow)) {
+    if (objects.isNullOrUndefined(row.parentRow)) {
       // root row
       row.parentRow = null;
       row._parentRowId = null;
       this.rootRows.push(row);
       return;
     }
-    if (!scout.objects.isNullOrUndefined(row.parentRow.id)) {
+    if (!objects.isNullOrUndefined(row.parentRow.id)) {
       parentRow = this.rowsMap[row.parentRow.id];
     } else {
       // expect id
@@ -3422,9 +3477,9 @@ scout.Table.prototype._rebuildTreeStructure = function() {
   }.bind(this));
 
   this._calculateTableNodeColumn();
-};
+}
 
-scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
+_updateFilteredRows(applyFilters, changed) {
   changed = !!changed;
   applyFilters = scout.nvl(applyFilters, true);
   this._filteredRows = this.rows.filter(function(row) {
@@ -3437,9 +3492,9 @@ scout.Table.prototype._updateFilteredRows = function(applyFilters, changed) {
   if (changed) {
     this._triggerFilter();
   }
-};
+}
 
-scout.Table.prototype._updateVisibleRows = function() {
+_updateVisibleRows() {
   this.visibleRows = this._computeVisibleRows();
   // rebuild the rows by id map of visible rows
   this.visibleRowsMap = this.visibleRows.reduce(function(map, row) {
@@ -3453,9 +3508,9 @@ scout.Table.prototype._updateVisibleRows = function() {
       return !this.visibleRowsMap[selectedRow.id];
     }, this));
   }
-};
+}
 
-scout.Table.prototype._computeVisibleRows = function(rows) {
+_computeVisibleRows(rows) {
   var visibleRows = [];
   rows = rows || this.rootRows;
   rows.forEach(function(row) {
@@ -3471,15 +3526,15 @@ scout.Table.prototype._computeVisibleRows = function(rows) {
     }
   }, this);
   return visibleRows;
-};
+}
 
-scout.Table.prototype.visibleChildRows = function(row) {
+visibleChildRows(row) {
   return row.childRows.filter(function(child) {
     return !!this.visibleRowsMap[child.id];
   }, this);
-};
+}
 
-scout.Table.prototype._renderRowDelta = function() {
+_renderRowDelta() {
   if (!this._isDataRendered()) {
     return;
   }
@@ -3526,21 +3581,21 @@ scout.Table.prototype._renderRowDelta = function() {
   }.bind(this));
   this._renderScrollTop();
   this._renderEmptyData();
-};
+}
 
-scout.Table.prototype.filter = function() {
+filter() {
   this._updateRowStructure({
     filteredRows: true
   });
   this._renderRowDelta();
   this._group();
   this.revealSelection();
-};
+}
 
 /**
  * Sorts the given $rows according to the row index
  */
-scout.Table.prototype._order$Rows = function($rows) {
+_order$Rows($rows) {
   // Find rows using jquery because
   // this.filteredRows() may be empty but there may be $rows which are getting removed by animation
   $rows = $rows || this.$rows();
@@ -3552,9 +3607,9 @@ scout.Table.prototype._order$Rows = function($rows) {
 
     return this.rows.indexOf(row1) - this.rows.indexOf(row2);
   }.bind(this));
-};
+}
 
-scout.Table.prototype._order$AggregateRows = function($rows) {
+_order$AggregateRows($rows) {
   // Find aggregate rows using jquery because
   // this._aggregateRows may be empty but there may be $aggregateRows which are getting removed by animation
   $rows = $rows || this.$aggregateRows();
@@ -3566,9 +3621,9 @@ scout.Table.prototype._order$AggregateRows = function($rows) {
     }
     $aggrRow.insertAfter(aggregateRow.prevRow.$row);
   });
-};
+}
 
-scout.Table.prototype._rowAcceptedByFilters = function(row) {
+_rowAcceptedByFilters(row) {
   for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
     if (!filter.accept(row)) {
@@ -3576,12 +3631,12 @@ scout.Table.prototype._rowAcceptedByFilters = function(row) {
     }
   }
   return true;
-};
+}
 
 /**
  * @returns {Boolean} true if row state has changed, false if not
  */
-scout.Table.prototype._applyFiltersForRow = function(row) {
+_applyFiltersForRow(row) {
   if (this._rowAcceptedByFilters(row)) {
     if (!row.filterAccepted) {
       row.filterAccepted = true;
@@ -3594,12 +3649,12 @@ scout.Table.prototype._applyFiltersForRow = function(row) {
     }
   }
   return false;
-};
+}
 
 /**
  * @returns {String[]} labels of the currently active Filters that provide a createLabel() function
  */
-scout.Table.prototype.filteredBy = function() {
+filteredBy() {
   var filteredBy = [];
   for (var key in this._filterMap) { // NOSONAR
     var filter = this._filterMap[key];
@@ -3609,13 +3664,13 @@ scout.Table.prototype.filteredBy = function() {
     }
   }
   return filteredBy;
-};
+}
 
-scout.Table.prototype.resetUserFilter = function() {
+resetUserFilter() {
   var filter;
   for (var key in this._filterMap) { // NOSONAR
     filter = this._filterMap[key];
-    if (filter instanceof scout.TableUserFilter) {
+    if (filter instanceof TableUserFilter) {
       this.removeFilterByKey(key);
     }
   }
@@ -3623,32 +3678,32 @@ scout.Table.prototype.resetUserFilter = function() {
   // reset rows
   this.filter();
   this._triggerFilterReset();
-};
+}
 
-scout.Table.prototype.hasUserFilter = function() {
+hasUserFilter() {
   return Object.keys(this._filterMap).map(function(key) {
       this._filterMap[key];
     }, this)
     .filter(function(filter) {
-      return filter instanceof scout.TableUserFilter;
+      return filter instanceof TableUserFilter;
     })
     .length > 0;
-};
+}
 
-scout.Table.prototype.resizeToFit = function(column, maxWidth) {
+resizeToFit(column, maxWidth) {
   if (column.fixedWidth) {
     return;
   }
   var returnValue = column.calculateOptimalWidth();
-  if (scout.objects.isPlainObject(returnValue)) {
+  if (objects.isPlainObject(returnValue)) {
     // Function returned a promise -> delay resizing
     returnValue.always(this._resizeToFit.bind(this, column, maxWidth));
   } else {
     this._resizeToFit(column, maxWidth, returnValue);
   }
-};
+}
 
-scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) {
+_resizeToFit(column, maxWidth, calculatedSize) {
   if (calculatedSize === -1) {
     // Calculation has been aborted -> don't resize
     return;
@@ -3656,7 +3711,7 @@ scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) 
   if (maxWidth && maxWidth > 0 && calculatedSize > maxWidth) {
     calculatedSize = maxWidth;
   }
-  if (scout.device.isInternetExplorer() && calculatedSize !== column.minWidth) {
+  if (Device.get().isInternetExplorer() && calculatedSize !== column.minWidth) {
     calculatedSize++;
   }
   if (column.width !== calculatedSize) {
@@ -3664,12 +3719,12 @@ scout.Table.prototype._resizeToFit = function(column, maxWidth, calculatedSize) 
   }
   column.autoOptimizeWidthRequired = false;
   this._triggerColumnResizedToFit();
-};
+}
 
 /**
  * @param filter object with createKey() and accept()
  */
-scout.Table.prototype.addFilter = function(filter) {
+addFilter(filter) {
   var key = filter.createKey();
   if (!key) {
     throw new Error('key has to be defined');
@@ -3679,13 +3734,13 @@ scout.Table.prototype.addFilter = function(filter) {
   this.trigger('filterAdded', {
     filter: filter
   });
-};
+}
 
-scout.Table.prototype.removeFilter = function(filter) {
+removeFilter(filter) {
   this.removeFilterByKey(filter.createKey());
-};
+}
 
-scout.Table.prototype.removeFilterByKey = function(key) {
+removeFilterByKey(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
@@ -3697,14 +3752,14 @@ scout.Table.prototype.removeFilterByKey = function(key) {
   this.trigger('filterRemoved', {
     filter: filter
   });
-};
+}
 
-scout.Table.prototype.getFilter = function(key) {
+getFilter(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
   return this._filterMap[key];
-};
+}
 
 /**
  * Resizes the given column to the new size.
@@ -3714,7 +3769,7 @@ scout.Table.prototype.getFilter = function(key) {
  * @param width
  *          new column size
  */
-scout.Table.prototype.resizeColumn = function(column, width) {
+resizeColumn(column, width) {
   if (column.fixedWidth) {
     return;
   }
@@ -3742,9 +3797,9 @@ scout.Table.prototype.resizeColumn = function(column, width) {
   }
 
   this._triggerColumnResized(column);
-};
+}
 
-scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos, dragged) {
+moveColumn(column, visibleOldPos, visibleNewPos, dragged) {
   // If there are fixed columns, don't allow moving the column onto the other side of the fixed columns
   visibleNewPos = this._considerFixedPositionColumns(visibleOldPos, visibleNewPos);
 
@@ -3753,8 +3808,8 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
   var newColumn = visibleColumns[visibleNewPos];
   var newPos = this.columns.indexOf(newColumn);
 
-  scout.arrays.remove(this.columns, column);
-  scout.arrays.insert(this.columns, column, newPos);
+  arrays.remove(this.columns, column);
+  arrays.insert(this.columns, column, newPos);
 
   visibleColumns = this.visibleColumns();
   visibleNewPos = visibleColumns.indexOf(column); // we must re-evaluate visible columns
@@ -3764,23 +3819,23 @@ scout.Table.prototype.moveColumn = function(column, visibleOldPos, visibleNewPos
 
   // move aggregated rows
   this._aggregateRows.forEach(function(aggregateRow) {
-    scout.arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos);
+    arrays.move(aggregateRow.contents, visibleOldPos, visibleNewPos);
   });
 
   // move cells
   if (this._isDataRendered()) {
     this._rerenderViewport();
   }
-};
+}
 
 /**
  * Ensures the given newPos does not pass a fixed column boundary (necessary when moving columns)
  */
-scout.Table.prototype._considerFixedPositionColumns = function(visibleOldPos, visibleNewPos) {
+_considerFixedPositionColumns(visibleOldPos, visibleNewPos) {
   var fixedColumnIndex = -1;
   if (visibleNewPos > visibleOldPos) {
     // move to right
-    fixedColumnIndex = scout.arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, function(col) {
+    fixedColumnIndex = arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, function(col) {
       return col.fixedPosition;
     });
     if (fixedColumnIndex > -1) {
@@ -3788,7 +3843,7 @@ scout.Table.prototype._considerFixedPositionColumns = function(visibleOldPos, vi
     }
   } else {
     // move to left
-    fixedColumnIndex = scout.arrays.findIndexFromReverse(this.visibleColumns(), visibleOldPos, function(col) {
+    fixedColumnIndex = arrays.findIndexFromReverse(this.visibleColumns(), visibleOldPos, function(col) {
       return col.fixedPosition;
     });
     if (fixedColumnIndex > -1) {
@@ -3796,9 +3851,9 @@ scout.Table.prototype._considerFixedPositionColumns = function(visibleOldPos, vi
     }
   }
   return visibleNewPos;
-};
+}
 
-scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
+_renderColumnOrderChanges(oldColumnOrder) {
   var column, i, j, $orderedCells, $cell, $cells, that = this,
     $row;
 
@@ -3825,102 +3880,102 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
     }
     $row.prepend($orderedCells);
   });
-};
+}
 
-scout.Table.prototype._triggerRowsInserted = function(rows) {
+_triggerRowsInserted(rows) {
   this.trigger('rowsInserted', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerRowsDeleted = function(rows) {
+_triggerRowsDeleted(rows) {
   this.trigger('rowsDeleted', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerRowsUpdated = function(rows) {
+_triggerRowsUpdated(rows) {
   this.trigger('rowsUpdated', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerAllRowsDeleted = function(rows) {
+_triggerAllRowsDeleted(rows) {
   this.trigger('allRowsDeleted', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerRowsSelected = function(debounce) {
+_triggerRowsSelected(debounce) {
   this.trigger('rowsSelected', {
     debounce: debounce
   });
-};
+}
 
-scout.Table.prototype._triggerRowsChecked = function(rows) {
+_triggerRowsChecked(rows) {
   this.trigger('rowsChecked', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerRowsExpanded = function(rows) {
+_triggerRowsExpanded(rows) {
   this.trigger('rowsExpanded', {
     rows: rows
   });
-};
+}
 
-scout.Table.prototype._triggerFilter = function() {
+_triggerFilter() {
   this.trigger('filter');
-};
+}
 
-scout.Table.prototype._triggerFilterReset = function() {
+_triggerFilterReset() {
   this.trigger('filterReset');
-};
+}
 
-scout.Table.prototype._triggerAppLinkAction = function(column, ref) {
+_triggerAppLinkAction(column, ref) {
   this.trigger('appLinkAction', {
     column: column,
     ref: ref
   });
-};
+}
 
-scout.Table.prototype._triggerReload = function(reloadReason) {
+_triggerReload(reloadReason) {
   this.trigger('reload', {
     reloadReason: reloadReason
   });
-};
+}
 
-scout.Table.prototype._triggerClipboardExport = function() {
-  var event = new scout.Event();
+_triggerClipboardExport() {
+  var event = new Event();
   this.trigger('clipboardExport', event);
   if (!event.defaultPrevented) {
     this._exportToClipboard();
   }
-};
+}
 
-scout.Table.prototype._triggerRowOrderChanged = function(row, animating) {
+_triggerRowOrderChanged(row, animating) {
   var event = {
     row: row,
     animating: animating
   };
   this.trigger('rowOrderChanged', event);
-};
+}
 
-scout.Table.prototype._triggerColumnResized = function(column) {
+_triggerColumnResized(column) {
   var event = {
     column: column
   };
   this.trigger('columnResized', event);
-};
+}
 
-scout.Table.prototype._triggerColumnResizedToFit = function(column) {
+_triggerColumnResizedToFit(column) {
   var event = {
     column: column
   };
   this.trigger('columnResizedToFit', event);
-};
+}
 
-scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dragged) {
+_triggerColumnMoved(column, oldPos, newPos, dragged) {
   var event = {
     column: column,
     oldPos: oldPos,
@@ -3928,45 +3983,45 @@ scout.Table.prototype._triggerColumnMoved = function(column, oldPos, newPos, dra
     dragged: dragged
   };
   this.trigger('columnMoved', event);
-};
+}
 
-scout.Table.prototype._triggerAggregationFunctionChanged = function(column) {
+_triggerAggregationFunctionChanged(column) {
   var event = {
     column: column
   };
   this.trigger('aggregationFunctionChanged', event);
-};
+}
 
-scout.Table.prototype.setHeaderVisible = function(visible) {
+setHeaderVisible(visible) {
   this.setProperty('headerVisible', visible);
-};
+}
 
-scout.Table.prototype._renderHeaderVisible = function() {
+_renderHeaderVisible() {
   this._renderTableHeader();
-};
+}
 
-scout.Table.prototype.setHeaderEnabled = function(headerEnabled) {
+setHeaderEnabled(headerEnabled) {
   this.setProperty('headerEnabled', headerEnabled);
-};
+}
 
-scout.Table.prototype._renderHeaderEnabled = function() {
+_renderHeaderEnabled() {
   // Rebuild the table header when this property changes
   this._removeTableHeader();
   this._renderTableHeader();
-};
+}
 
-scout.Table.prototype.setHeaderMenusEnabled = function(headerMenusEnabled) {
+setHeaderMenusEnabled(headerMenusEnabled) {
   this.setProperty('headerMenusEnabled', headerMenusEnabled);
   if (this.header) {
     this.header.setHeaderMenusEnabled(this.headerMenusEnabled);
   }
-};
+}
 
-scout.Table.prototype.hasPermanentHeadOrTailSortColumns = function() {
+hasPermanentHeadOrTailSortColumns() {
   return this._permanentHeadSortColumns.length !== 0 || this._permanentTailSortColumns.length !== 0;
-};
+}
 
-scout.Table.prototype._setHeadAndTailSortColumns = function() {
+_setHeadAndTailSortColumns() {
   // find all sort columns (head and tail sort columns should always be included)
   var sortColumns = this.columns.filter(function(c) {
     return c.sortIndex >= 0;
@@ -3985,13 +4040,13 @@ scout.Table.prototype._setHeadAndTailSortColumns = function() {
       this._permanentTailSortColumns.push(c);
     }
   }, this);
-};
+}
 
-scout.Table.prototype.setTileMode = function(tileMode) {
+setTileMode(tileMode) {
   this.setProperty('tileMode', tileMode);
-};
+}
 
-scout.Table.prototype._setTileMode = function(tileMode) {
+_setTileMode(tileMode) {
   if (tileMode) {
     this._ensureMediator();
     if (!this.tileTableHeader) {
@@ -4005,60 +4060,60 @@ scout.Table.prototype._setTileMode = function(tileMode) {
   if (!tileMode && this.tableTileGridMediator) {
     this.tableTileGridMediator.deactivate();
   }
-};
+}
 
-scout.Table.prototype._ensureMediator = function() {
+_ensureMediator() {
   if (!this.tableTileGridMediator) {
     this.tableTileGridMediator = scout.create('TableTileGridMediator', {
       parent: this,
       gridColumnCount: 6
     });
   }
-};
+}
 
-scout.Table.prototype._renderTileMode = function() {
+_renderTileMode() {
   if (this.tableTileGridMediator) {
     this.tableTileGridMediator.renderTileMode();
   }
-};
+}
 
-scout.Table.prototype.createTiles = function(rows) {
+createTiles(rows) {
   return rows.map(function(row) {
     var tile = this.createTileForRow(row);
     this._adaptTile(tile);
     tile.rowId = row.id;
     return tile;
   }, this);
-};
+}
 
-scout.Table.prototype._adaptTile = function(tile) {
+_adaptTile(tile) {
   tile.gridDataHints = {
     weightX: 0
   };
-};
+}
 
-scout.Table.prototype.createTileForRow = function(row) {
+createTileForRow(row) {
   throw new Error('Not implemented');
-};
+}
 
-scout.Table.prototype._setTileTableHeader = function(tileTableHeader) {
+_setTileTableHeader(tileTableHeader) {
   if (tileTableHeader) {
     tileTableHeader.addCssClass('tile-table-header');
   }
   this._setProperty('tileTableHeader', tileTableHeader);
-};
+}
 
-scout.Table.prototype._createTileTableHeader = function() {
+_createTileTableHeader() {
   return scout.create('TileTableHeaderBox', {
     parent: this
   });
-};
+}
 
-scout.Table.prototype.setRowIconVisible = function(rowIconVisible) {
+setRowIconVisible(rowIconVisible) {
   this.setProperty('rowIconVisible', rowIconVisible);
-};
+}
 
-scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
+_setRowIconVisible(rowIconVisible) {
   this._setProperty('rowIconVisible', rowIconVisible);
   var column = this.rowIconColumn;
   if (this.rowIconVisible && !column) {
@@ -4066,37 +4121,37 @@ scout.Table.prototype._setRowIconVisible = function(rowIconVisible) {
     this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   } else if (!this.rowIconVisible && column) {
-    scout.arrays.remove(this.columns, column);
+    arrays.remove(this.columns, column);
     this.rowIconColumn = null;
     this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   }
-};
+}
 
-scout.Table.prototype.setRowIconColumnWidth = function(width) {
+setRowIconColumnWidth(width) {
   this.setProperty('rowIconColumnWidth', width);
-};
+}
 
-scout.Table.prototype._setRowIconColumnWidth = function(width) {
+_setRowIconColumnWidth(width) {
   this._setProperty('rowIconColumnWidth', width);
   var column = this.rowIconColumn;
   if (column) {
     column.width = width;
   }
-};
+}
 
-scout.Table.prototype._setSelectedRows = function(selectedRows) {
+_setSelectedRows(selectedRows) {
   if (typeof selectedRows[0] === 'string') {
     selectedRows = this._rowsByIds(selectedRows);
   }
   this._setProperty('selectedRows', selectedRows);
-};
+}
 
-scout.Table.prototype.setMenus = function(menus) {
+setMenus(menus) {
   this.setProperty('menus', menus);
-};
+}
 
-scout.Table.prototype._setMenus = function(menus, oldMenus) {
+_setMenus(menus, oldMenus) {
   this.updateKeyStrokes(menus, oldMenus);
   this._setProperty('menus', menus);
   this._updateMenuBar();
@@ -4104,18 +4159,18 @@ scout.Table.prototype._setMenus = function(menus, oldMenus) {
   if (this.header) {
     this.header.updateMenuBar();
   }
-};
+}
 
-scout.Table.prototype.setMenuBarVisible = function(visible) {
+setMenuBarVisible(visible) {
   this.setProperty('menuBarVisible', visible);
-};
+}
 
-scout.Table.prototype._setMenuBarVisible = function(visible) {
+_setMenuBarVisible(visible) {
   this._setProperty('menuBarVisible', visible);
   this._updateMenuBar();
-};
+}
 
-scout.Table.prototype._renderMenuBarVisible = function() {
+_renderMenuBarVisible() {
   if (this.menuBarVisible) {
     this.menuBar.render();
     this._refreshMenuBarPosition();
@@ -4124,52 +4179,52 @@ scout.Table.prototype._renderMenuBarVisible = function() {
   }
   this._updateMenuBar();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Table.prototype._refreshMenuBarPosition = function() {
+_refreshMenuBarPosition() {
   if (this.menuBarVisible && this.menuBar.rendered) {
-    if (this.menuBar.position === scout.MenuBar.Position.TOP) {
+    if (this.menuBar.position === MenuBar.Position.TOP) {
       this.menuBar.$container.prependTo(this.$container);
     } else {
       this.menuBar.$container.appendTo(this.$container);
     }
   }
-};
+}
 
-scout.Table.prototype._createMenuBar = function() {
+_createMenuBar() {
   return scout.create('MenuBar', {
     parent: this,
-    position: scout.MenuBar.Position.BOTTOM,
-    menuOrder: new scout.MenuItemsOrder(this.session, 'Table'),
+    position: MenuBar.Position.BOTTOM,
+    menuOrder: new MenuItemsOrder(this.session, 'Table'),
     menuFilter: this._filterMenusHandler
   });
-};
+}
 
-scout.Table.prototype._updateMenuBar = function() {
+_updateMenuBar() {
   if (this.menuBarVisible) {
     // Do not update menuBar while it is invisible, the menus may now be managed by another widget.
     // -> this makes sure the parent is not accidentally set to the table, the other widget should remain responsible
     var notAllowedTypes = ['Header'];
-    var menuItems = this._filterMenus(this.menus, scout.MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
+    var menuItems = this._filterMenus(this.menus, MenuDestinations.MENU_BAR, false, true, notAllowedTypes);
     menuItems = this.staticMenus.concat(menuItems);
     this.menuBar.setMenuItems(menuItems);
   }
   if (this.contextMenu) {
-    var contextMenuItems = this._filterMenus(this.menus, scout.MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
+    var contextMenuItems = this._filterMenus(this.menus, MenuDestinations.CONTEXT_MENU, true, false, ['Header']);
     this.contextMenu.updateMenuItems(contextMenuItems);
   }
-};
+}
 
-scout.Table.prototype._setKeyStrokes = function(keyStrokes) {
+_setKeyStrokes(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
+}
 
-scout.Table.prototype.setFilters = function(filters) {
+setFilters(filters) {
   var filter;
   for (var key in this._filterMap) { // NOSONAR
     filter = this._filterMap[key];
-    if (filter instanceof scout.TableUserFilter) {
+    if (filter instanceof TableUserFilter) {
       this.removeFilterByKey(key);
     }
   }
@@ -4179,10 +4234,10 @@ scout.Table.prototype.setFilters = function(filters) {
       this.addFilter(filter);
     }, this);
   }
-};
+}
 
-scout.Table.prototype._ensureFilter = function(filter) {
-  if (filter instanceof scout.TableUserFilter) {
+_ensureFilter(filter) {
+  if (filter instanceof TableUserFilter) {
     return filter;
   }
   if (filter.column) {
@@ -4191,35 +4246,35 @@ scout.Table.prototype._ensureFilter = function(filter) {
   filter.table = this;
   filter.session = this.session;
   return scout.create(filter);
-};
+}
 
-scout.Table.prototype.setTableStatus = function(status) {
+setTableStatus(status) {
   this.setProperty('tableStatus', status);
-};
+}
 
-scout.Table.prototype._setTableStatus = function(status) {
-  status = scout.Status.ensure(status);
+_setTableStatus(status) {
+  status = Status.ensure(status);
   this._setProperty('tableStatus', status);
-};
+}
 
-scout.Table.prototype.setTableStatusVisible = function(visible) {
+setTableStatusVisible(visible) {
   this.setProperty('tableStatusVisible', visible);
   this._updateFooterVisibility();
-};
+}
 
-scout.Table.prototype._updateFooterVisibility = function() {
+_updateFooterVisibility() {
   this.setFooterVisible(this.tableStatusVisible || this._hasVisibleTableControls());
-};
+}
 
-scout.Table.prototype.setHierarchicalStyle = function(style) {
+setHierarchicalStyle(style) {
   this.setProperty('hierarchicalStyle', style);
-};
+}
 
-scout.Table.prototype._renderHierarchicalStyle = function() {
-  this.$container.toggleClass('structured', scout.Table.HierarchicalStyle.STRUCTURED === this.hierarchicalStyle);
-};
+_renderHierarchicalStyle() {
+  this.$container.toggleClass('structured', Table.HierarchicalStyle.STRUCTURED === this.hierarchicalStyle);
+}
 
-scout.Table.prototype.setFooterVisible = function(visible) {
+setFooterVisible(visible) {
   this._setProperty('footerVisible', visible);
   if (visible && !this.footer) {
     this.footer = this._createFooter();
@@ -4237,21 +4292,21 @@ scout.Table.prototype.setFooterVisible = function(visible) {
     this.footer.destroy();
     this.footer = null;
   }
-};
+}
 
 /**
  * Renders the background effect of every column, if column.backgroundEffect is set
  */
-scout.Table.prototype._renderBackgroundEffect = function() {
+_renderBackgroundEffect() {
   this.columns.forEach(function(column) {
     if (!column.backgroundEffect) {
       return;
     }
     column._renderBackgroundEffect();
   }, this);
-};
+}
 
-scout.Table.prototype._renderRowChecked = function(row) {
+_renderRowChecked(row) {
   if (!this.checkable) {
     return;
   }
@@ -4259,7 +4314,7 @@ scout.Table.prototype._renderRowChecked = function(row) {
     return;
   }
   var $styleElem;
-  if (this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW) {
+  if (this.checkableStyle === Table.CheckableStyle.TABLE_ROW) {
     $styleElem = row.$row;
   } else {
     if (!this.checkableColumn) {
@@ -4268,96 +4323,96 @@ scout.Table.prototype._renderRowChecked = function(row) {
     $styleElem = this.checkableColumn.$checkBox(row.$row);
   }
   $styleElem.toggleClass('checked', row.checked);
-};
+}
 
-scout.Table.prototype.setCheckable = function(checkable) {
+setCheckable(checkable) {
   this.setProperty('checkable', checkable);
-};
+}
 
-scout.Table.prototype._setCheckable = function(checkable) {
+_setCheckable(checkable) {
   this._setProperty('checkable', checkable);
   this._updateCheckableColumn();
-};
+}
 
-scout.Table.prototype._updateCheckableColumn = function() {
+_updateCheckableColumn() {
   var column = this.checkableColumn;
-  var showCheckBoxes = this.checkable && scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.CHECKBOX, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW);
+  var showCheckBoxes = this.checkable && scout.isOneOf(this.checkableStyle, Table.CheckableStyle.CHECKBOX, Table.CheckableStyle.CHECKBOX_TABLE_ROW);
   if (showCheckBoxes && !column) {
     this._insertBooleanColumn();
     this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   } else if (!showCheckBoxes && column && column.guiOnly) {
-    scout.arrays.remove(this.columns, column);
+    arrays.remove(this.columns, column);
     this.checkableColumn = null;
     this._calculateTableNodeColumn();
     this.trigger('columnStructureChanged');
   }
-};
+}
 
-scout.Table.prototype._renderCheckable = function() {
+_renderCheckable() {
   this.columnLayoutDirty = true;
   this._updateRowWidth();
   this._redraw();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Table.prototype.setCheckableStyle = function(checkableStyle) {
+setCheckableStyle(checkableStyle) {
   this.setProperty('checkableStyle', checkableStyle);
-};
+}
 
-scout.Table.prototype._setCheckableStyle = function(checkableStyle) {
+_setCheckableStyle(checkableStyle) {
   this._setProperty('checkableStyle', checkableStyle);
   this._updateCheckableColumn();
-};
+}
 
-scout.Table.prototype._renderCheckableStyle = function() {
-  this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, scout.Table.CheckableStyle.TABLE_ROW, scout.Table.CheckableStyle.CHECKBOX_TABLE_ROW));
-  this.$container.toggleClass('table-row-check', this.checkableStyle === scout.Table.CheckableStyle.TABLE_ROW);
+_renderCheckableStyle() {
+  this.$container.toggleClass('checkable', scout.isOneOf(this.checkableStyle, Table.CheckableStyle.TABLE_ROW, Table.CheckableStyle.CHECKBOX_TABLE_ROW));
+  this.$container.toggleClass('table-row-check', this.checkableStyle === Table.CheckableStyle.TABLE_ROW);
   if (this._isDataRendered()) {
     this._redraw();
   }
-};
+}
 
-scout.Table.prototype._renderRowIconVisible = function() {
+_renderRowIconVisible() {
   this.columnLayoutDirty = true;
   this._updateRowWidth();
   this._redraw();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Table.prototype._renderRowIconColumnWidth = function() {
+_renderRowIconColumnWidth() {
   if (!this.rowIconVisible) {
     return;
   }
   this._renderRowIconVisible();
-};
+}
 
-scout.Table.prototype.setGroupingStyle = function(groupingStyle) {
+setGroupingStyle(groupingStyle) {
   this.setProperty('groupingStyle', groupingStyle);
-};
+}
 
-scout.Table.prototype._setGroupingStyle = function(groupingStyle) {
+_setGroupingStyle(groupingStyle) {
   this._setProperty('groupingStyle', groupingStyle);
   this._group();
-};
+}
 
-scout.Table.prototype._renderGroupingStyle = function() {
+_renderGroupingStyle() {
   this._rerenderViewport();
-};
+}
 
-scout.Table.prototype._redraw = function() {
+_redraw() {
   this._rerenderHeaderColumns();
   this._rerenderViewport();
-};
+}
 
-scout.Table.prototype._rerenderHeaderColumns = function() {
+_rerenderHeaderColumns() {
   if (this.header) {
     this.header.rerenderColumns();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype._renderTableHeader = function() {
+_renderTableHeader() {
   var changed = false;
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
@@ -4373,19 +4428,19 @@ scout.Table.prototype._renderTableHeader = function() {
   if (changed) {
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype._removeTableHeader = function() {
+_removeTableHeader() {
   if (this.header) {
     this.header.destroy();
     this.header = null;
   }
-};
+}
 
 /**
  * @param width optional width of emptyData, if omitted the width is set to the header's scrollWidth.
  */
-scout.Table.prototype._renderEmptyData = function() {
+_renderEmptyData() {
   if (!this.header || this.visibleRows.length > 0) {
     return;
   }
@@ -4396,9 +4451,9 @@ scout.Table.prototype._renderEmptyData = function() {
     .css('min-width', this.rowWidth)
     .css('max-width', this.rowWidth);
   this.updateScrollbars();
-};
+}
 
-scout.Table.prototype._removeEmptyData = function() {
+_removeEmptyData() {
   if (this.header && this.visibleRows.length === 0) {
     return;
   }
@@ -4407,9 +4462,9 @@ scout.Table.prototype._removeEmptyData = function() {
     this.$emptyData = null;
     this.updateScrollbars();
   }
-};
+}
 
-scout.Table.prototype._renderFooterVisible = function() {
+_renderFooterVisible() {
   if (!this.footer) {
     return;
   }
@@ -4419,28 +4474,28 @@ scout.Table.prototype._renderFooterVisible = function() {
     this._removeFooter();
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.Table.prototype._renderFooter = function() {
+_renderFooter() {
   if (this.footer.rendered) {
     return;
   }
 
   this.footer.render();
-};
+}
 
-scout.Table.prototype._removeFooter = function() {
+_removeFooter() {
   if (!this.footer.rendered) {
     return;
   }
   this.footer.remove();
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.Table.prototype._renderEnabled = function() {
-  scout.Table.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
 
   var enabled = this.enabledComputed;
   if (!this.tileMode) {
@@ -4457,51 +4512,51 @@ scout.Table.prototype._renderEnabled = function() {
       $row.find('input').setEnabled(enabled && row.enabled);
     });
   }
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.Table.prototype._renderDisabledStyle = function() {
-  scout.Table.parent.prototype._renderDisabledStyle.call(this);
+_renderDisabledStyle() {
+  super._renderDisabledStyle();
   this._renderDisabledStyleInternal(this.$data);
-};
+}
 
-scout.Table.prototype.setAutoResizeColumns = function(autoResizeColumns) {
+setAutoResizeColumns(autoResizeColumns) {
   this.setProperty('autoResizeColumns', autoResizeColumns);
-};
+}
 
-scout.Table.prototype._renderAutoResizeColumns = function() {
+_renderAutoResizeColumns() {
   if (this.autoResizeColumns) {
     this.columnLayoutDirty = true;
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype.setMultilineText = function(multilineText) {
+setMultilineText(multilineText) {
   this.setProperty('multilineText', multilineText);
-};
+}
 
-scout.Table.prototype._renderMultilineText = function() {
+_renderMultilineText() {
   this._markAutoOptimizeWidthColumnsAsDirty();
   this._redraw();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Table.prototype._renderDropType = function() {
+_renderDropType() {
   if (this.dropType) {
     this._installDragAndDropHandler();
   } else {
     this._uninstallDragAndDropHandler();
   }
-};
+}
 
-scout.Table.prototype._installDragAndDropHandler = function(event) {
+_installDragAndDropHandler(event) {
   if (this.dragAndDropHandler) {
     return;
   }
-  this.dragAndDropHandler = scout.dragAndDrop.handler(this, {
-    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+  this.dragAndDropHandler = dragAndDrop.handler(this, {
+    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -4521,37 +4576,37 @@ scout.Table.prototype._installDragAndDropHandler = function(event) {
     }.bind(this)
   });
   this.dragAndDropHandler.install(this.$container, '.table-data,.table-row');
-};
+}
 
-scout.Table.prototype._uninstallDragAndDropHandler = function(event) {
+_uninstallDragAndDropHandler(event) {
   if (!this.dragAndDropHandler) {
     return;
   }
   this.dragAndDropHandler.uninstall();
   this.dragAndDropHandler = null;
-};
+}
 
 /**
  * This listener is used to invalidate table layout when an image icon has been loaded (which happens async in the browser).
  */
-scout.Table.prototype._installImageListeners = function() {
+_installImageListeners() {
   this._imageLoadListener = this._onImageLoadOrError.bind(this);
   // Image events don't bubble -> use capture phase instead
   this.$data[0].addEventListener('load', this._imageLoadListener, true);
   this.$data[0].addEventListener('error', this._imageLoadListener, true);
-};
+}
 
-scout.Table.prototype._uninstallImageListeners = function() {
+_uninstallImageListeners() {
   this.$data[0].removeEventListener('load', this._imageLoadListener, true);
   this.$data[0].removeEventListener('error', this._imageLoadListener, true);
-};
+}
 
 /**
  * Calculates the optimal view range size (number of rows to be rendered).
  * It uses the default row height to estimate how many rows fit in the view port.
  * The view range size is this value * 2.
  */
-scout.Table.prototype.calculateViewRangeSize = function() {
+calculateViewRangeSize() {
   // Make sure row height is up to date (row height may be different after zooming)
   this._updateRowHeight();
 
@@ -4559,9 +4614,9 @@ scout.Table.prototype.calculateViewRangeSize = function() {
     throw new Error('Cannot calculate view range with rowHeight = 0');
   }
   return Math.ceil(this.$data.outerHeight() / this.rowHeight) * 2;
-};
+}
 
-scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
+setViewRangeSize(viewRangeSize) {
   if (this.viewRangeSize === viewRangeSize) {
     return;
   }
@@ -4569,9 +4624,9 @@ scout.Table.prototype.setViewRangeSize = function(viewRangeSize) {
   if (this._isDataRendered()) {
     this._renderViewport();
   }
-};
+}
 
-scout.Table.prototype._calculateCurrentViewRange = function() {
+_calculateCurrentViewRange() {
   var rowIndex,
     scrollTop = this.$data[0].scrollTop,
     maxScrollTop = this.$data[0].scrollHeight - this.$data[0].clientHeight;
@@ -4584,12 +4639,12 @@ scout.Table.prototype._calculateCurrentViewRange = function() {
   }
 
   return this._calculateViewRangeForRowIndex(rowIndex);
-};
+}
 
 /**
  * Returns the index of the row which is at position scrollTop.
  */
-scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
+_rowIndexAtScrollTop(scrollTop) {
   var height = 0,
     index = -1;
   this.visibleRows.some(function(row, i) {
@@ -4600,9 +4655,9 @@ scout.Table.prototype._rowIndexAtScrollTop = function(scrollTop) {
     }
   }.bind(this));
   return index;
-};
+}
 
-scout.Table.prototype._heightForRow = function(row) {
+_heightForRow(row) {
   var height = 0,
     aggregateRow = row.aggregateRowAfter;
 
@@ -4622,20 +4677,20 @@ scout.Table.prototype._heightForRow = function(row) {
   }
 
   return height;
-};
+}
 
 /**
  * Returns a range of size this.viewRangeSize. Start of range is rowIndex - viewRangeSize / 4.
  * -> 1/4 of the rows are before the viewport 2/4 in the viewport 1/4 after the viewport,
  * assuming viewRangeSize is 2*number of possible rows in the viewport (see calculateViewRangeSize).
  */
-scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
+_calculateViewRangeForRowIndex(rowIndex) {
   // regular / non-virtual scrolling? -> all rows are already rendered in the DOM
   if (!this.virtual) {
-    return new scout.Range(0, this.visibleRows.length);
+    return new Range(0, this.visibleRows.length);
   }
 
-  var viewRange = new scout.Range(),
+  var viewRange = new Range(),
     quarterRange = Math.floor(this.viewRangeSize / 4),
     diff;
 
@@ -4648,12 +4703,12 @@ scout.Table.prototype._calculateViewRangeForRowIndex = function(rowIndex) {
     viewRange.from = Math.max(viewRange.to - this.viewRangeSize, 0);
   }
   return viewRange;
-};
+}
 
 /**
  * Calculates and renders the rows which should be visible in the current viewport based on scroll top.
  */
-scout.Table.prototype._renderViewport = function() {
+_renderViewport() {
   if (!this.isAttachedAndRendered()) {
     // if table is not attached the correct viewPort can not be evaluated. Mark for render after attach.
     this._renderViewPortAfterAttach = true;
@@ -4672,9 +4727,9 @@ scout.Table.prototype._renderViewport = function() {
   }
   var viewRange = this._calculateCurrentViewRange();
   this._renderViewRange(viewRange);
-};
+}
 
-scout.Table.prototype._rerenderViewport = function() {
+_rerenderViewport() {
   if (!this.isAttachedAndRendered()) {
     // if table is not attached the correct viewPort can not be evaluated. Mark for rerender after attach.
     this._rerenderViewPortAfterAttach = true;
@@ -4684,17 +4739,17 @@ scout.Table.prototype._rerenderViewport = function() {
   this._removeAggregateRows();
   this._renderFiller();
   this._renderViewport();
-};
+}
 
-scout.Table.prototype._renderViewRangeForRowIndex = function(rowIndex) {
+_renderViewRangeForRowIndex(rowIndex) {
   var viewRange = this._calculateViewRangeForRowIndex(rowIndex);
   this._renderViewRange(viewRange);
-};
+}
 
 /**
  * Renders the rows visible in the viewport and removes the other rows
  */
-scout.Table.prototype._renderViewRange = function(viewRange) {
+_renderViewRange(viewRange) {
   if (viewRange.from === this.viewRangeRendered.from && viewRange.to === this.viewRangeRendered.to && !this.viewRangeDirty) {
     // Range already rendered -> do nothing
     return;
@@ -4727,17 +4782,17 @@ scout.Table.prototype._renderViewRange = function(viewRange) {
   this._renderBackgroundEffect();
   this._renderSelection();
   this.viewRangeDirty = false;
-};
+}
 
-scout.Table.prototype._removeRangeMarkers = function() {
+_removeRangeMarkers() {
   this._modifyRangeMarkers('removeClass');
-};
+}
 
-scout.Table.prototype._renderRangeMarkers = function() {
+_renderRangeMarkers() {
   this._modifyRangeMarkers('addClass');
-};
+}
 
-scout.Table.prototype._modifyRangeMarkers = function(funcName) {
+_modifyRangeMarkers(funcName) {
   if (this.viewRangeRendered.size() === 0) {
     return;
   }
@@ -4750,22 +4805,22 @@ scout.Table.prototype._modifyRangeMarkers = function(funcName) {
       row.$row[funcName](cssClass);
     }
   }
-};
+}
 
-scout.Table.prototype.ensureRowRendered = function(row) {
+ensureRowRendered(row) {
   if (!row.$row) {
     var rowIndex = this.visibleRows.indexOf(row);
     this._renderViewRangeForRowIndex(rowIndex);
   }
-};
+}
 
-scout.Table.prototype._renderFiller = function() {
+_renderFiller() {
   if (!this.$fillBefore) {
     this.$fillBefore = this.$data.prependDiv('table-data-fill');
     this._applyFillerStyle(this.$fillBefore);
   }
 
-  var fillBeforeHeight = this._calculateFillerHeight(new scout.Range(0, this.viewRangeRendered.from));
+  var fillBeforeHeight = this._calculateFillerHeight(new Range(0, this.viewRangeRendered.from));
   this.$fillBefore.cssHeight(fillBeforeHeight);
   this.$fillBefore.cssWidth(this.rowWidth);
   $.log.isTraceEnabled() && $.log.trace('FillBefore height: ' + fillBeforeHeight);
@@ -4775,13 +4830,13 @@ scout.Table.prototype._renderFiller = function() {
     this._applyFillerStyle(this.$fillAfter);
   }
 
-  var fillAfterHeight = this._calculateFillerHeight(new scout.Range(this.viewRangeRendered.to, this.visibleRows.length));
+  var fillAfterHeight = this._calculateFillerHeight(new Range(this.viewRangeRendered.to, this.visibleRows.length));
   this.$fillAfter.cssHeight(fillAfterHeight);
   this.$fillAfter.cssWidth(this.rowWidth);
   $.log.isTraceEnabled() && $.log.trace('FillAfter height: ' + fillAfterHeight);
-};
+}
 
-scout.Table.prototype._applyFillerStyle = function($filler) {
+_applyFillerStyle($filler) {
   var lineColor = $filler.css('background-color');
   // In order to get a 1px border we need to get the right value in percentage for the linear gradient
   var lineWidth = ((1 - (1 / this.rowHeight)) * 100).toFixed(2) + '%';
@@ -4790,31 +4845,31 @@ scout.Table.prototype._applyFillerStyle = function($filler) {
     backgroundSize: '100% ' + this.rowHeight + 'px',
     backgroundColor: 'transparent'
   });
-};
+}
 
-scout.Table.prototype._calculateFillerHeight = function(range) {
+_calculateFillerHeight(range) {
   var totalHeight = 0;
   for (var i = range.from; i < range.to; i++) {
     var row = this.visibleRows[i];
     totalHeight += this._heightForRow(row);
   }
   return totalHeight;
-};
+}
 
-scout.Table.prototype.containsAggregatedNumberColumn = function() {
+containsAggregatedNumberColumn() {
   if (!this.initialized) {
     return false;
   }
   return this.visibleColumns().some(function(column) {
-    return column instanceof scout.NumberColumn && column.aggregationFunction !== 'none';
+    return column instanceof NumberColumn && column.aggregationFunction !== 'none';
   });
-};
+}
 
 /**
  * Rebuilds the header.<br>
  * Does not modify the rows, it expects a deleteAll and insert operation to follow which will do the job.
  */
-scout.Table.prototype.updateColumnStructure = function(columns) {
+updateColumnStructure(columns) {
   this._destroyColumns();
   this.columns = columns;
   this._initColumns();
@@ -4826,9 +4881,9 @@ scout.Table.prototype.updateColumnStructure = function(columns) {
     this._renderEmptyData();
   }
   this.trigger('columnStructureChanged');
-};
+}
 
-scout.Table.prototype.updateColumnOrder = function(columns) {
+updateColumnOrder(columns) {
   var i, column, currentPosition, oldColumnOrder;
   if (columns.length !== this.columns.length) {
     throw new Error('Column order may not be updated because lengths of the arrays differ.');
@@ -4845,20 +4900,20 @@ scout.Table.prototype.updateColumnOrder = function(columns) {
 
     if (currentPosition !== i) {
       // Update model
-      scout.arrays.remove(this.columns, column);
-      scout.arrays.insert(this.columns, column, i);
+      arrays.remove(this.columns, column);
+      arrays.insert(this.columns, column, i);
     }
   }
 
   if (this._isDataRendered()) {
     this._renderColumnOrderChanges(oldColumnOrder);
   }
-};
+}
 
 /**
  * @param columns array of columns which were updated.
  */
-scout.Table.prototype.updateColumnHeaders = function(columns) {
+updateColumnHeaders(columns) {
   var column, oldColumnState;
 
   // Update model columns
@@ -4896,9 +4951,9 @@ scout.Table.prototype.updateColumnHeaders = function(columns) {
       this.header.updateHeader(column, oldColumnState);
     }
   }
-};
+}
 
-scout.Table.prototype.focusCell = function(column, row) {
+focusCell(column, row) {
   if (!this._isDataRendered() || !this.isAttachedAndRendered()) {
     this._postRenderActions.push(this.focusCell.bind(this, column, row));
     return;
@@ -4908,27 +4963,27 @@ scout.Table.prototype.focusCell = function(column, row) {
   if (this.enabledComputed && row.enabled && cell.editable) {
     this.prepareCellEdit(column, row, false);
   }
-};
+}
 
-scout.Table.prototype._attach = function() {
+_attach() {
   this.$parent.append(this.$container);
-  scout.Table.parent.prototype._attach.call(this);
-};
+  super._attach();
+}
 /**
  * Method invoked when this is a 'detailTable' and the outline content is displayed.
  * @override Widget.js
  */
-scout.Table.prototype._postAttach = function() {
+_postAttach() {
   var htmlParent = this.htmlComp.getParent();
   this.htmlComp.setSize(htmlParent.size());
-  scout.Table.parent.prototype._postAttach.call(this);
-};
+  super._postAttach();
+}
 
 /**
  * @override Widget.js
  */
-scout.Table.prototype._renderOnAttach = function() {
-  scout.Table.parent.prototype._renderOnAttach.call(this);
+_renderOnAttach() {
+  super._renderOnAttach();
   // this is an "if... else if..." to avoid rendering the viewport multiple
   // times in case all ...afterAttach flags are set to true.
   if (this._rerenderViewPortAfterAttach) {
@@ -4938,25 +4993,25 @@ scout.Table.prototype._renderOnAttach = function() {
     this._renderViewport();
     this._renderViewPortAfterAttach = false;
   }
-};
+}
 
 /**
  * Method invoked when this is a 'detailTable' and the outline content is not displayed anymore.
  * @override Widget.js
  */
-scout.Table.prototype._detach = function() {
+_detach() {
   this.$container.detach();
   // Detach helper stores the current scroll pos and restores in attach.
   // To make it work scrollTop needs to be reset here otherwise viewport won't be rendered by _onDataScroll
-  scout.Table.parent.prototype._detach.call(this);
-};
+  super._detach();
+}
 
-scout.Table.prototype._onDetach = function() {
-  scout.Table.parent.prototype._onDetach.call(this);
+_onDetach() {
+  super._onDetach();
   this._destroyCellEditorPopup();
-};
+}
 
-scout.Table.prototype._destroyCellEditorPopup = function() {
+_destroyCellEditorPopup() {
   // When a cell editor popup is open and table is detached, we close the popup immediately
   // and don't wait for the model event 'endCellEdit'. By doing this we can avoid problems
   // with invalid focus contexts.
@@ -4978,39 +5033,39 @@ scout.Table.prototype._destroyCellEditorPopup = function() {
       promise.then(destroyEditor);
     }
   }
-};
+}
 
-scout.Table.prototype.setVirtual = function(virtual) {
+setVirtual(virtual) {
   this._setProperty('virtual', virtual);
-};
+}
 
-scout.Table.prototype.setCellValue = function(column, row, value) {
+setCellValue(column, row, value) {
   column.setCellValue(row, value);
-};
+}
 
-scout.Table.prototype.setCellText = function(column, row, displayText) {
+setCellText(column, row, displayText) {
   column.setCellText(row, displayText);
-};
+}
 
-scout.Table.prototype.setCellErrorStatus = function(column, row, errorStatus) {
+setCellErrorStatus(column, row, errorStatus) {
   column.setCellErrorStatus(row, errorStatus);
-};
+}
 
-scout.Table.prototype.visibleColumns = function(includeGuiColumns) {
+visibleColumns(includeGuiColumns) {
   includeGuiColumns = scout.nvl(includeGuiColumns, true);
   return this.columns.filter(function(column) {
     return column.isVisible() && (includeGuiColumns || !column.guiOnly);
   }, this);
-};
+}
 
-// same as on scout.Tree.prototype._onDesktopPopupOpen
-scout.Table.prototype._onDesktopPopupOpen = function(event) {
+// same as on Tree.prototype._onDesktopPopupOpen
+_onDesktopPopupOpen(event) {
   var popup = event.popup;
   if (!this.enabledComputed) {
     return;
   }
   // Set table style to focused if a context menu or a menu bar popup opens, so that it looks as it still has the focus
-  if (this.has(popup) && popup instanceof scout.ContextMenuPopup) {
+  if (this.has(popup) && popup instanceof ContextMenuPopup) {
     this.$container.addClass('focused');
     popup.one('destroy', function() {
       if (this._isDataRendered()) {
@@ -5018,27 +5073,27 @@ scout.Table.prototype._onDesktopPopupOpen = function(event) {
       }
     }.bind(this));
   }
-};
+}
 
-scout.Table.prototype._onDesktopPropertyChange = function(event) {
+_onDesktopPropertyChange(event) {
   // The height of the menuBar changes by css when switching to or from the dense mode
   if (event.propertyName === 'dense') {
     this.menuBar.invalidateLayoutTree();
   }
-};
+}
 
-scout.Table.prototype.markRowsAsNonChanged = function(rows) {
-  scout.arrays.ensure(rows || this.rows).forEach(function(row) {
-    row.status = scout.TableRow.Status.NON_CHANGED;
+markRowsAsNonChanged(rows) {
+  arrays.ensure(rows || this.rows).forEach(function(row) {
+    row.status = TableRow.Status.NON_CHANGED;
   });
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @memberOf scout.Table
+ * @memberOf Table
  */
-scout.Table.parseHorizontalAlignment = function(alignment) {
+static parseHorizontalAlignment(alignment) {
   if (alignment > 0) {
     return 'right';
   }
@@ -5046,13 +5101,14 @@ scout.Table.parseHorizontalAlignment = function(alignment) {
     return 'center';
   }
   return 'left';
-};
+}
 
-scout.Table.linkRowToDiv = function(row, $row) {
+static linkRowToDiv(row, $row) {
   if (row) {
     row.$row = $row;
   }
   if ($row) {
     $row.data('row', row);
   }
-};
+}
+}

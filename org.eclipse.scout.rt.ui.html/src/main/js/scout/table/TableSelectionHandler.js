@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * Enhances the table with selection behaviour.<p>
  *
  * If mouseMoveSelectionEnabled is set to true, the user can select the rows by moving the mouse with pressed left mouse button.
  *
  */
-scout.TableSelectionHandler = function(table) {
+export default class TableSelectionHandler {
+
+constructor(table) {
   this.table = table;
   this.mouseMoveSelectionEnabled = true;
   this._mouseDown;
@@ -30,14 +35,14 @@ scout.TableSelectionHandler = function(table) {
   this._prevSelectedRowIndex;
   // The index of the selected row with the greatest distance to fromIndex (needed to efficiently clear the selection)
   this._maxSelectedRowIndex;
-};
+}
 
-scout.TableSelectionHandler.prototype.clearLastSelectedRowMarker = function() {
+clearLastSelectedRowMarker() {
   this.lastActionRow = undefined;
-};
+}
 
 // TODO [7.0] bsh: Table Selection | Try to merge this with TableKeystrokeContext
-scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
+onMouseDown(event) {
   var $row = $(event.currentTarget),
     row = $row.data('row'),
     oldSelectedState = $row.isSelected();
@@ -101,17 +106,17 @@ scout.TableSelectionHandler.prototype.onMouseDown = function(event) {
 
   $row.window().one('mouseup.selectionHandler', this.onMouseUp.bind(this));
   this.lastActionRow = row;
-};
+}
 
-scout.TableSelectionHandler.prototype.onMouseOver = function(event) {
+onMouseOver(event) {
   var $row = $(event.currentTarget),
     row = $row.data('row');
   this.toIndex = this._allRows.indexOf(row);
   this.handleSelection(event);
   this.lastActionRow = row;
-};
+}
 
-scout.TableSelectionHandler.prototype.handleSelection = function(event) {
+handleSelection(event) {
   var rowsToUnselect;
   if (this.table.multiSelect) {
     // Multi-selection -> expand/shrink selection
@@ -168,9 +173,9 @@ scout.TableSelectionHandler.prototype.handleSelection = function(event) {
 
   // Set the new selection
   this._selectRange(this.fromIndex, this.toIndex, this.select);
-};
+}
 
-scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex, select) {
+_selectRange(fromIndex, toIndex, select) {
   var startIndex = Math.min(fromIndex, toIndex),
     endIndex = Math.max(fromIndex, toIndex) + 1,
     actionRows = this._allRows.slice(startIndex, endIndex);
@@ -184,9 +189,9 @@ scout.TableSelectionHandler.prototype._selectRange = function(fromIndex, toIndex
       this.table.removeRowFromSelection(row, true);
     }, this);
   }
-};
+}
 
-scout.TableSelectionHandler.prototype.getMinMaxSelectionIndizes = function() {
+getMinMaxSelectionIndizes() {
   var
     selectedRows = this.table.selectedRows,
     allRows = this.table.visibleRows;
@@ -207,9 +212,9 @@ scout.TableSelectionHandler.prototype.getMinMaxSelectionIndizes = function() {
     }
   });
   return [min, max];
-};
+}
 
-scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
+onMouseUp(event) {
   if (!this._mouseDown) {
     // May happen when selecting elements with chrome dev tools
     return;
@@ -229,4 +234,5 @@ scout.TableSelectionHandler.prototype.onMouseUp = function(event) {
   // Update selectedRows and allRows, this might have changed in the meantime (e.g. when row
   // was replaced by update event due to cell editing)
   this.table.notifyRowSelectionFinished();
-};
+}
+}

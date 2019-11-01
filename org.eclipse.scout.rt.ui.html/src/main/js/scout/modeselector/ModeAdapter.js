@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ModeAdapter = function() {
-  scout.ModeAdapter.parent.call(this);
-};
-scout.inherits(scout.ModeAdapter, scout.ActionAdapter);
+import {ActionAdapter} from '../index';
+
+export default class ModeAdapter extends ActionAdapter {
+
+constructor() {
+  super();
+}
+
+}

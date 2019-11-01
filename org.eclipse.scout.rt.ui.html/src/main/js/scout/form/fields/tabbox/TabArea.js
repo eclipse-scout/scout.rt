@@ -8,27 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabArea = function() {
-  scout.TabArea.parent.call(this);
+import {KeyStrokeContext} from '../../../index';
+import {strings} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {Widget} from '../../../index';
+import {TabAreaLayout} from '../../../index';
+import {arrays} from '../../../index';
+import {TabAreaLeftKeyStroke} from '../../../index';
+import {TabAreaRightKeyStroke} from '../../../index';
+
+export default class TabArea extends Widget {
+
+constructor() {
+  super();
   this.tabBox = null;
   this.tabs = [];
-  this.displayStyle = scout.TabArea.DisplayStyle.DEFAULT;
+  this.displayStyle = TabArea.DisplayStyle.DEFAULT;
 
   this._tabItemPropertyChangeHandler = this._onTabItemPropertyChange.bind(this);
   this._tabPropertyChangeHandler = this._onTabPropertyChange.bind(this);
   this.ellipsis = null;
 
   this.$selectionMarker = null;
-};
-scout.inherits(scout.TabArea, scout.Widget);
+}
 
-scout.TabArea.DisplayStyle = {
+
+static DisplayStyle = {
   DEFAULT: 'default',
   SPREAD_EVEN: 'spreadEven'
 };
 
-scout.TabArea.prototype._init = function(options) {
-  scout.TabArea.parent.prototype._init.call(this, options);
+_init(options) {
+  super._init( options);
   this.tabBox = options.tabBox;
 
   this.ellipsis = scout.create('EllipsisMenu', {
@@ -37,67 +49,67 @@ scout.TabArea.prototype._init = function(options) {
     iconId: null,
     text: '0' // Initialize with the normal value to prevent unnecessary layout invalidation by the TabAreaLayout if ellipsis menus is not visible
   });
-};
+}
 
 /**
  * @override
  */
-scout.TabArea.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.TabArea.prototype._initKeyStrokeContext = function() {
-  scout.TabArea.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TabAreaLeftKeyStroke(this),
-    new scout.TabAreaRightKeyStroke(this)
+    new TabAreaLeftKeyStroke(this),
+    new TabAreaRightKeyStroke(this)
   ]);
-};
+}
 
-scout.TabArea.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tab-area');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TabAreaLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new TabAreaLayout(this));
 
   this.ellipsis.render(this.$container);
 
   this.$selectionMarker = this.$container.appendDiv('selection-marker');
-};
+}
 
-scout.TabArea.prototype._renderProperties = function() {
-  scout.TabArea.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderTabs();
   this._renderSelectedTab();
   this._renderHasSubLabel();
   this._renderDisplayStyle();
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.TabArea.prototype._remove = function() {
-  scout.TabArea.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this._removeTabs();
-};
+}
 
-scout.TabArea.prototype.setSelectedTabItem = function(tabItem) {
+setSelectedTabItem(tabItem) {
   this.setSelectedTab(this.getTabForItem(tabItem));
-};
+}
 
-scout.TabArea.prototype.getTabForItem = function(tabItem) {
-  return scout.arrays.find(this.tabs, function(tab) {
+getTabForItem(tabItem) {
+  return arrays.find(this.tabs, function(tab) {
     return tab.tabItem === tabItem;
   }, this);
-};
+}
 
-scout.TabArea.prototype.setSelectedTab = function(tab) {
+setSelectedTab(tab) {
   this.setProperty('selectedTab', tab);
-};
+}
 
-scout.TabArea.prototype._setSelectedTab = function(tab) {
+_setSelectedTab(tab) {
   if (this.selectedTab) {
     this.selectedTab.setSelected(false);
   }
@@ -106,30 +118,30 @@ scout.TabArea.prototype._setSelectedTab = function(tab) {
   }
   this._setProperty('selectedTab', tab);
   this._setTabbableItem(tab);
-};
+}
 
-scout.TabArea.prototype._renderSelectedTab = function() {
+_renderSelectedTab() {
   // force a relayout in case the selected tab is overflown. The layout will ensure the selected tab is visible.
   if (this.selectedTab && this.selectedTab.overflown) {
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.TabArea.prototype.focusTabItem = function(tabItem) {
+focusTabItem(tabItem) {
   this.focusTab(this.getTabForItem(tabItem));
-};
+}
 
-scout.TabArea.prototype.focusTab = function(tabItem) {
+focusTab(tabItem) {
   tabItem.focus();
-};
+}
 
-scout.TabArea.prototype.setTabItems = function(tabItems) {
+setTabItems(tabItems) {
   this.setProperty('tabs', tabItems);
   this._updateHasSubLabel();
   this.invalidateLayoutTree();
-};
+}
 
-scout.TabArea.prototype._setTabs = function(tabItems) {
+_setTabs(tabItems) {
   var tabsToRemove = this.tabs.slice(),
     tabs = tabItems.map(function(tabItem) {
       var tab = this.getTabForItem(tabItem);
@@ -141,7 +153,7 @@ scout.TabArea.prototype._setTabs = function(tabItems) {
         tabItem.on('propertyChange', this._tabItemPropertyChangeHandler);
         tab.on('propertyChange', this._tabPropertyChangeHandler);
       } else {
-        scout.arrays.remove(tabsToRemove, tab);
+        arrays.remove(tabsToRemove, tab);
       }
       return tab;
     }, this);
@@ -153,9 +165,9 @@ scout.TabArea.prototype._setTabs = function(tabItems) {
 
   this._removeTabs(tabsToRemove);
   this._setProperty('tabs', tabs);
-};
+}
 
-scout.TabArea.prototype._renderTabs = function() {
+_renderTabs() {
   this.tabs.slice().reverse().forEach(function(tab, index, items) {
     if (!tab.rendered) {
       tab.render();
@@ -168,40 +180,40 @@ scout.TabArea.prototype._renderTabs = function() {
       .on('blur', this._onTabItemBlur.bind(this))
       .on('focus', this._onTabItemFocus.bind(this));
   }, this);
-};
+}
 
-scout.TabArea.prototype._removeTabs = function(tabs) {
+_removeTabs(tabs) {
   tabs = tabs || this.tabs;
   tabs.forEach(function(tab) {
     tab.remove();
   });
-};
+}
 
-scout.TabArea.prototype.setDisplayStyle = function(displayStyle) {
+setDisplayStyle(displayStyle) {
   this.setProperty('displayStyle', displayStyle);
-};
+}
 
-scout.TabArea.prototype._renderDisplayStyle = function() {
-  this.$container.toggleClass('spread-even', this.displayStyle === scout.TabArea.DisplayStyle.SPREAD_EVEN);
+_renderDisplayStyle() {
+  this.$container.toggleClass('spread-even', this.displayStyle === TabArea.DisplayStyle.SPREAD_EVEN);
   this.invalidateLayoutTree();
-};
+}
 
-scout.TabArea.prototype._onTabItemFocus = function() {
+_onTabItemFocus() {
   this.setFocused(true);
-};
+}
 
-scout.TabArea.prototype._onTabItemBlur = function() {
+_onTabItemBlur() {
   this.setFocused(false);
-};
+}
 
-scout.TabArea.prototype._updateHasSubLabel = function() {
+_updateHasSubLabel() {
   var items = this.tabs || [];
   this._setHasSubLabel(items.some(function(item) {
-    return scout.strings.hasText(item.subLabel);
+    return strings.hasText(item.subLabel);
   }));
-};
+}
 
-scout.TabArea.prototype._setHasSubLabel = function(hasSubLabel) {
+_setHasSubLabel(hasSubLabel) {
   if (this.hasSubLabel === hasSubLabel) {
     return;
   }
@@ -209,14 +221,14 @@ scout.TabArea.prototype._setHasSubLabel = function(hasSubLabel) {
   if (this.rendered) {
     this._renderHasSubLabel();
   }
-};
+}
 
-scout.TabArea.prototype._renderHasSubLabel = function() {
+_renderHasSubLabel() {
   this.$container.toggleClass('has-sub-label', this.hasSubLabel);
   this.invalidateLayoutTree();
-};
+}
 
-scout.TabArea.prototype.selectNextTab = function() {
+selectNextTab() {
   var currentIndex = this.tabs.indexOf(this.selectedTab),
     nextTab;
   if (this.tabss.length > currentIndex + 1) {
@@ -224,9 +236,9 @@ scout.TabArea.prototype.selectNextTab = function() {
     this.setSelectedTab(nextTab);
     nextTab.focus();
   }
-};
+}
 
-scout.TabArea.prototype.selectPreviousTab = function() {
+selectPreviousTab() {
   var currentIndex = this.tabs.indexOf(this.selectedTab),
     previousTab;
   if (currentIndex - 1 > -1) {
@@ -234,16 +246,16 @@ scout.TabArea.prototype.selectPreviousTab = function() {
     this.setSelectedTab(previousTab);
     previousTab.focus();
   }
-};
+}
 
-scout.TabArea.prototype.selectNextTab = function(focusTab) {
+selectNextTab(focusTab) {
   this._moveSelectionHorizontal(true, focusTab);
-};
-scout.TabArea.prototype.selectPreviousTab = function(focusTab) {
+}
+selectPreviousTab(focusTab) {
   this._moveSelectionHorizontal(false, focusTab);
-};
+}
 
-scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focusTab) {
+_moveSelectionHorizontal(directionRight, focusTab) {
   var tabItems = this.tabs.slice(),
     $focusedElement = this.$container.activeElement(),
     selectNext = false;
@@ -273,9 +285,9 @@ scout.TabArea.prototype._moveSelectionHorizontal = function(directionRight, focu
       this.ellipsis.focus();
     }
   }
-};
+}
 
-scout.TabArea.prototype._setTabbableItem = function(tabItem) {
+_setTabbableItem(tabItem) {
   var tabItems = this.tabs;
   if (tabItem) {
     // clear old tabbable
@@ -285,19 +297,20 @@ scout.TabArea.prototype._setTabbableItem = function(tabItem) {
     });
     tabItem.setTabbable(true);
   }
-};
+}
 
-scout.TabArea.prototype._onTabPropertyChange = function(event) {
+_onTabPropertyChange(event) {
   if (event.propertyName === 'selected') {
     this.setSelectedTab(event.source);
   }
-};
+}
 
-scout.TabArea.prototype._onTabItemPropertyChange = function(event) {
+_onTabItemPropertyChange(event) {
   if (event.propertyName === 'visible') {
     this.invalidateLayoutTree();
   }
   if (event.propertyName === 'subLabel') {
     this._updateHasSubLabel();
   }
-};
+}
+}

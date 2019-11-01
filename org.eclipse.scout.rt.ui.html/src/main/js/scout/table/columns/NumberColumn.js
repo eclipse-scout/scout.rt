@@ -8,8 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NumberColumn = function() {
-  scout.NumberColumn.parent.call(this);
+import {scout} from '../../index';
+import {comparators} from '../../index';
+import {Column} from '../../index';
+import {aggregation} from '../../index';
+import * as $ from 'jquery';
+import {styles} from '../../index';
+import {numbers} from '../../index';
+import {DecimalFormat} from '../../index';
+
+export default class NumberColumn extends Column {
+
+constructor() {
+  super();
   this.aggregationFunction = 'sum';
   this.backgroundEffect = null;
   this.decimalFormat = null;
@@ -19,22 +30,22 @@ scout.NumberColumn = function() {
   this.calcMaxValue = null; // the calculated max value of all rows
   this.horizontalAlignment = 1;
   this.filterType = 'NumberColumnUserFilter';
-  this.comparator = scout.comparators.NUMERIC;
+  this.comparator = comparators.NUMERIC;
   this.textBased = false;
   this.allowedAggregationFunctions = ['sum', 'avg', 'min', 'max', 'none'];
-};
-scout.inherits(scout.NumberColumn, scout.Column);
+}
+
 
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype._init = function(model) {
-  scout.NumberColumn.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this._setDecimalFormat(this.decimalFormat);
   this.setAggregationFunction(this.aggregationFunction);
-};
+}
 
-scout.NumberColumn.prototype.setDecimalFormat = function(decimalFormat) {
+setDecimalFormat(decimalFormat) {
   if (this.decimalFormat === decimalFormat) {
     return;
   }
@@ -45,56 +56,56 @@ scout.NumberColumn.prototype.setDecimalFormat = function(decimalFormat) {
       this._updateCellText(row, this.cell(row));
     }.bind(this));
   }
-};
+}
 
-scout.NumberColumn.prototype._setDecimalFormat = function(format) {
+_setDecimalFormat(format) {
   if (!format) {
     format = this._getDefaultFormat(this.session.locale);
   }
-  this.decimalFormat = scout.DecimalFormat.ensure(this.session.locale, format);
-};
+  this.decimalFormat = DecimalFormat.ensure(this.session.locale, format);
+}
 
-scout.NumberColumn.prototype._getDefaultFormat = function(locale) {
+_getDefaultFormat(locale) {
   return locale.decimalFormatPatternDefault;
-};
+}
 
 /**
  * @override Columns.js
  */
-scout.NumberColumn.prototype._formatValue = function(value) {
+_formatValue(value) {
   return this.decimalFormat.format(value);
-};
+}
 
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype._parseValue = function(value) {
+_parseValue(value) {
   // server sends cell.value only if it differs from text -> make sure cell.value is set and has the right type
-  return scout.numbers.ensure(value);
-};
+  return numbers.ensure(value);
+}
 
-scout.NumberColumn.prototype.setAggregationFunction = function(func) {
+setAggregationFunction(func) {
   this.aggregationFunction = func;
   if (func === 'sum') {
-    this.aggrStart = scout.aggregation.sumStart;
-    this.aggrStep = scout.aggregation.sumStep;
-    this.aggrFinish = scout.aggregation.sumFinish;
-    this.aggrSymbol = scout.aggregation.sumSymbol;
+    this.aggrStart = aggregation.sumStart;
+    this.aggrStep = aggregation.sumStep;
+    this.aggrFinish = aggregation.sumFinish;
+    this.aggrSymbol = aggregation.sumSymbol;
   } else if (func === 'avg') {
-    this.aggrStart = scout.aggregation.avgStart;
-    this.aggrStep = scout.aggregation.avgStep;
-    this.aggrFinish = scout.aggregation.avgFinish;
-    this.aggrSymbol = scout.aggregation.avgSymbol;
+    this.aggrStart = aggregation.avgStart;
+    this.aggrStep = aggregation.avgStep;
+    this.aggrFinish = aggregation.avgFinish;
+    this.aggrSymbol = aggregation.avgSymbol;
   } else if (func === 'min') {
-    this.aggrStart = scout.aggregation.minStart;
-    this.aggrStep = scout.aggregation.minStep;
-    this.aggrFinish = scout.aggregation.minFinish;
-    this.aggrSymbol = scout.aggregation.minSymbol;
+    this.aggrStart = aggregation.minStart;
+    this.aggrStep = aggregation.minStep;
+    this.aggrFinish = aggregation.minFinish;
+    this.aggrSymbol = aggregation.minSymbol;
   } else if (func === 'max') {
-    this.aggrStart = scout.aggregation.maxStart;
-    this.aggrStep = scout.aggregation.maxStep;
-    this.aggrFinish = scout.aggregation.maxFinish;
-    this.aggrSymbol = scout.aggregation.maxSymbol;
+    this.aggrStart = aggregation.maxStart;
+    this.aggrStep = aggregation.maxStep;
+    this.aggrFinish = aggregation.maxFinish;
+    this.aggrSymbol = aggregation.maxSymbol;
   } else if (func === 'none') {
     var undefinedFunc = function() {
       return undefined;
@@ -104,9 +115,9 @@ scout.NumberColumn.prototype.setAggregationFunction = function(func) {
     this.aggrFinish = undefinedFunc;
     this.aggrSymbol = undefined;
   }
-};
+}
 
-scout.NumberColumn.prototype.createAggrValueCell = function(value) {
+createAggrValueCell(value) {
   var formattedValue = this._formatValue(value);
   return scout.create('Cell', {
     text: formattedValue,
@@ -114,10 +125,10 @@ scout.NumberColumn.prototype.createAggrValueCell = function(value) {
     horizontalAlignment: this.horizontalAlignment,
     cssClass: 'table-aggregate-cell'
   });
-};
+}
 
-scout.NumberColumn.prototype._cellStyle = function(cell, tableNodeColumn, rowPadding) {
-  var style = scout.NumberColumn.parent.prototype._cellStyle.call(this, cell, tableNodeColumn, rowPadding);
+_cellStyle(cell, tableNodeColumn, rowPadding) {
+  var style = super._cellStyle( cell, tableNodeColumn, rowPadding);
 
   if (this.backgroundEffect && cell.value !== undefined) {
     if (!this.backgroundEffectFunc) {
@@ -132,16 +143,16 @@ scout.NumberColumn.prototype._cellStyle = function(cell, tableNodeColumn, rowPad
     }
   }
   return style;
-};
+}
 
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype._preprocessValueOrTextForCalculation = function(value) {
+_preprocessValueOrTextForCalculation(value) {
   return this.decimalFormat.round(value);
-};
+}
 
-scout.NumberColumn.prototype.setBackgroundEffect = function(effect) {
+setBackgroundEffect(effect) {
   if (this.backgroundEffect === effect) {
     return;
   }
@@ -168,19 +179,19 @@ scout.NumberColumn.prototype.setBackgroundEffect = function(effect) {
   if (this.table.rendered) {
     this._renderBackgroundEffect();
   }
-};
+}
 
 /**
  * Recalculates the min / max values and renders the background effect again.
  */
-scout.NumberColumn.prototype.updateBackgroundEffect = function() {
+updateBackgroundEffect() {
   this.calculateMinMaxValues();
   if (this.table.rendered) {
     this._renderBackgroundEffect();
   }
-};
+}
 
-scout.NumberColumn.prototype._resolveBackgroundEffectFunc = function() {
+_resolveBackgroundEffectFunc() {
   var effect = this.backgroundEffect;
   if (effect === 'colorGradient1') {
     return this._colorGradient1.bind(this);
@@ -198,9 +209,9 @@ scout.NumberColumn.prototype._resolveBackgroundEffectFunc = function() {
       return {};
     };
   }
-};
+}
 
-scout.NumberColumn.prototype._renderBackgroundEffect = function() {
+_renderBackgroundEffect() {
   this.table.visibleRows.forEach(function(row) {
     if (!row.$row) {
       return;
@@ -212,9 +223,9 @@ scout.NumberColumn.prototype._renderBackgroundEffect = function() {
       $cell[0].style.cssText = this._cellStyle(cell);
     }
   }, this);
-};
+}
 
-scout.NumberColumn.prototype.calculateMinMaxValues = function() {
+calculateMinMaxValues() {
   var row, calcMinValue, calcMaxValue, value,
     rows = this.table.rows;
 
@@ -231,27 +242,27 @@ scout.NumberColumn.prototype.calculateMinMaxValues = function() {
   }
   this.calcMinValue = scout.nvl(calcMinValue, null);
   this.calcMaxValue = scout.nvl(calcMaxValue, null);
-};
+}
 
-scout.NumberColumn.prototype._colorGradient1 = function(value) {
-  var startStyle = scout.styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
-    endStyle = scout.styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
-    startColor = scout.styles.rgb(startStyle.backgroundColor),
-    endColor = scout.styles.rgb(endStyle.backgroundColor);
-
-  return this._colorGradient(value, startColor, endColor);
-};
-
-scout.NumberColumn.prototype._colorGradient2 = function(value) {
-  var startStyle = scout.styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
-    endStyle = scout.styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
-    startColor = scout.styles.rgb(startStyle.backgroundColor),
-    endColor = scout.styles.rgb(endStyle.backgroundColor);
+_colorGradient1(value) {
+  var startStyle = styles.get('column-background-effect-gradient1-start', 'backgroundColor'),
+    endStyle = styles.get('column-background-effect-gradient1-end', 'backgroundColor'),
+    startColor = styles.rgb(startStyle.backgroundColor),
+    endColor = styles.rgb(endStyle.backgroundColor);
 
   return this._colorGradient(value, startColor, endColor);
-};
+}
 
-scout.NumberColumn.prototype._colorGradient = function(value, startColor, endColor) {
+_colorGradient2(value) {
+  var startStyle = styles.get('column-background-effect-gradient2-start', 'backgroundColor'),
+    endStyle = styles.get('column-background-effect-gradient2-end', 'backgroundColor'),
+    startColor = styles.rgb(startStyle.backgroundColor),
+    endColor = styles.rgb(endStyle.backgroundColor);
+
+  return this._colorGradient(value, startColor, endColor);
+}
+
+_colorGradient(value, startColor, endColor) {
   var level = (value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue);
 
   var r = Math.ceil(startColor.red - level * (startColor.red - endColor.red)),
@@ -261,24 +272,25 @@ scout.NumberColumn.prototype._colorGradient = function(value, startColor, endCol
   return {
     backgroundColor: 'rgb(' + r + ',' + g + ', ' + b + ')'
   };
-};
+}
 
-scout.NumberColumn.prototype._barChart = function(value) {
+_barChart(value) {
   var level = Math.ceil((value - this.calcMinValue) / (this.calcMaxValue - this.calcMinValue) * 100) + '';
-  var color = scout.styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
+  var color = styles.get('column-background-effect-bar-chart', 'backgroundColor').backgroundColor;
   return {
     backgroundImage: 'linear-gradient(to left, ' + color + ' 0%, ' + color + ' ' + level + '%, transparent ' + level + '%, transparent 100% )'
   };
-};
+}
 
 /**
  * @override Column.js
  */
-scout.NumberColumn.prototype._createEditor = function() {
+_createEditor() {
   return scout.create('NumberField', {
     parent: this.table,
     maxValue: this.maxValue,
     minValue: this.minValue,
     decimalFormat: this.decimalFormat
   });
-};
+}
+}

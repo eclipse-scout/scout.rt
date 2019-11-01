@@ -8,32 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagFieldAdapter = function() {
-  scout.TagFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.TagFieldAdapter, scout.LookupFieldAdapter);
+import {scout} from '../../../index';
+import {LookupFieldAdapter} from '../../../index';
 
-scout.TagFieldAdapter.prototype._initProperties = function(model) {
+export default class TagFieldAdapter extends LookupFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_initProperties(model) {
   if (model.insertText !== undefined) {
     // ignore pseudo property initially (to prevent the function StringField#insertText() to be replaced)
     delete model.insertText;
   }
-};
+}
 
-scout.TagFieldAdapter.prototype._postCreateWidget = function() {
-  scout.TagFieldAdapter.parent.prototype._postCreateWidget.call(this);
+_postCreateWidget() {
+  super._postCreateWidget();
   this.widget.lookupCall = scout.create('RemoteLookupCall', this);
-};
+}
 
-scout.TagFieldAdapter.prototype._syncResult = function(result) {
+_syncResult(result) {
   if (this.widget._currentLookupCall) {
     this.widget._currentLookupCall.resolveLookup(result);
   }
-};
+}
 
-scout.TagFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
+_onWidgetAcceptInput(event) {
   this._send('acceptInput', {
     displayText: event.displayText,
     value: event.value
   });
-};
+}
+}

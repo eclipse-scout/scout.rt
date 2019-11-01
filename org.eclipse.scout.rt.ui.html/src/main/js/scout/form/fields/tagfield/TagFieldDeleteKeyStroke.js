@@ -8,34 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import {TagBar} from '../../../index';
+
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
  *
  */
-scout.TagFieldDeleteKeyStroke = function(fieldAdapter) {
-  scout.TagFieldDeleteKeyStroke.parent.call(this);
+export default class TagFieldDeleteKeyStroke extends KeyStroke {
+
+constructor(fieldAdapter) {
+  super();
   this.fieldAdapter = fieldAdapter;
-  this.which = [scout.keys.DELETE];
+  this.which = [keys.DELETE];
   this.renderingHints.render = false;
   this.preventDefault = false;
-};
-scout.inherits(scout.TagFieldDeleteKeyStroke, scout.KeyStroke);
+}
 
-scout.TagFieldDeleteKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldDeleteKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
   return this._$focusedTag().length > 0;
-};
+}
 
-scout.TagFieldDeleteKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var $tag = this._$focusedTag();
-  var tag = scout.TagBar.getTagData($tag);
+  var tag = TagBar.getTagData($tag);
   this.fieldAdapter.removeTag(tag);
-};
+}
 
-scout.TagFieldDeleteKeyStroke.prototype._$focusedTag = function() {
-  return scout.TagBar.findFocusedTagElement(this.fieldAdapter.$container());
-};
+_$focusedTag() {
+  return TagBar.findFocusedTagElement(this.fieldAdapter.$container());
+}
+}

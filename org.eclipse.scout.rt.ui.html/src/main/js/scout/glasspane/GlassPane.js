@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GlassPane = function() {
-  scout.GlassPane.parent.call(this);
-};
-scout.inherits(scout.GlassPane, scout.Widget);
+import {Device} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
 
-scout.GlassPane.prototype._render = function() {
+export default class GlassPane extends Widget {
+
+constructor() {
+  super();
+}
+
+
+_render() {
   this.$container = this.$parent
     .appendDiv('glasspane')
     .on('mousedown', this._onMouseDown.bind(this));
 
   // This is required in touch mode, because FastClick messes up the order
   // of mouse/click events which is especially important for TouchPopups.
-  if (scout.device.supportsTouch()) {
+  if (Device.get().supportsTouch()) {
     this.$container.addClass('needsclick');
   }
 
@@ -32,15 +39,16 @@ scout.GlassPane.prototype._render = function() {
 
   // Register 'glassPaneTarget' in focus manager.
   this.session.focusManager.registerGlassPaneTarget(this.$parent);
-};
+}
 
-scout.GlassPane.prototype._remove = function() {
+_remove() {
   this.$parent.removeClass('glasspane-parent');
   this.session.focusManager.unregisterGlassPaneTarget(this.$parent);
-  scout.GlassPane.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.GlassPane.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   // Won't be executed if pointer events is set to none. But acts as safety net if pointer events are not supported or even removed by the user
   $.suppressEvent(event);
-};
+}
+}

@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartFieldMultilineAdapter = function() {
-  scout.SmartFieldMultilineAdapter.parent.call(this);
-};
-scout.inherits(scout.SmartFieldMultilineAdapter, scout.SmartFieldAdapter);
+import {SmartFieldAdapter} from '../../../index';
+
+export default class SmartFieldMultilineAdapter extends SmartFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

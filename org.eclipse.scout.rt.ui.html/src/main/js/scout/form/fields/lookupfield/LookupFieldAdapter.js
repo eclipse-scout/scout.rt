@@ -8,27 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {ValueFieldAdapter} from '../../../index';
+import {strings} from '../../../index';
+import {QueryBy} from '../../../index';
+import {objects} from '../../../index';
+
 
 /**
  * Use this base class for field-adapters that work with lookup-calls like SmartField and TagField.
  */
-scout.LookupFieldAdapter = function() {
-  scout.LookupFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.LookupFieldAdapter, scout.ValueFieldAdapter);
+export default class LookupFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
- * @param {scout.QueryBy} queryBy
+ * @param {QueryBy} queryBy
  * @param {object} [queryData] optional data (text, key, rec)
  */
-scout.LookupFieldAdapter.prototype.sendLookup = function(queryBy, queryData) {
+sendLookup(queryBy, queryData) {
   var propertyName = queryBy.toLowerCase(),
-    requestType = 'lookupBy' + scout.strings.toUpperCaseFirstLetter(propertyName),
+    requestType = 'lookupBy' + strings.toUpperCaseFirstLetter(propertyName),
     requestData = {
       showBusyIndicator: false
     };
-  if (!scout.objects.isNullOrUndefined(queryData)) {
+  if (!objects.isNullOrUndefined(queryData)) {
     requestData[propertyName] = queryData;
   }
   this._send(requestType, requestData);
-};
+}
+}

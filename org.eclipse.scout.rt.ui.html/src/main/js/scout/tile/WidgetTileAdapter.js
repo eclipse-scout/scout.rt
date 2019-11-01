@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetTileAdapter = function() {
-  scout.WidgetTileAdapter.parent.call(this);
-};
-scout.inherits(scout.WidgetTileAdapter, scout.TileAdapter);
+import {TileAdapter} from '../index';
+
+export default class WidgetTileAdapter extends TileAdapter {
+
+constructor() {
+  super();
+}
+
+}

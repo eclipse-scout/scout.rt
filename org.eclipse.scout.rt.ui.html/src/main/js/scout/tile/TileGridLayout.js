@@ -8,39 +8,53 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridLayout = function(widget, layoutConfig) {
-  scout.TileGridLayout.parent.call(this, widget, layoutConfig);
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {Rectangle} from '../index';
+import {HtmlComponent} from '../index';
+import {Point} from '../index';
+import {LogicalGridLayout} from '../index';
+import {PlaceholderTile} from '../index';
+import {styles} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {Dimension} from '../index';
+
+export default class TileGridLayout extends LogicalGridLayout {
+
+constructor(widget, layoutConfig) {
+  super( widget, layoutConfig);
   this.containerPos = null;
   this.containerScrollTop = null;
   this.tiles = [];
   this._calculatingPrimitivePrefSize = false;
-};
-scout.inherits(scout.TileGridLayout, scout.LogicalGridLayout);
+}
 
-scout.TileGridLayout._DEFAULTSIZE = undefined;
 
-scout.TileGridLayout.getTileDimensions = function() {
-  if (!(scout.TileGridLayout._DEFAULTSIZE instanceof scout.Rectangle)) {
-    var h = scout.styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
-    var w = scout.styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
-    var horizontalGap = scout.styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
-    var verticalGap = scout.styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
-    scout.TileGridLayout._DEFAULTSIZE = new scout.Rectangle(horizontalGap, verticalGap, w, h);
+static _DEFAULTSIZE = undefined;
+
+static getTileDimensions() {
+  if (!(TileGridLayout._DEFAULTSIZE instanceof Rectangle)) {
+    var h = styles.getSize('tile-grid-layout-config', 'height', 'height', -1);
+    var w = styles.getSize('tile-grid-layout-config', 'width', 'width', -1);
+    var horizontalGap = styles.getSize('tile-grid-layout-config', 'margin-left', 'marginLeft', -1);
+    var verticalGap = styles.getSize('tile-grid-layout-config', 'margin-top', 'marginTop', -1);
+    TileGridLayout._DEFAULTSIZE = new Rectangle(horizontalGap, verticalGap, w, h);
   }
-  return scout.TileGridLayout._DEFAULTSIZE;
-};
+  return TileGridLayout._DEFAULTSIZE;
+}
 
-scout.TileGridLayout.prototype._initDefaults = function() {
-  scout.TileGridLayout.parent.prototype._initDefaults.call(this);
-  var dim = scout.TileGridLayout.getTileDimensions();
+_initDefaults() {
+  super._initDefaults();
+  var dim = TileGridLayout.getTileDimensions();
   this.hgap = dim.x;
   this.vgap = dim.y;
   this.columnWidth = dim.width;
   this.rowHeight = dim.height;
   this.maxWidth = -1;
-};
+}
 
-scout.TileGridLayout.prototype.layout = function($container) {
+layout($container) {
   var htmlComp = this.widget.htmlComp;
   if (this.widget.scrolling) {
     // Try to layout only as much as needed while scrolling in virtual mode
@@ -58,7 +72,7 @@ scout.TileGridLayout.prototype.layout = function($container) {
   this.tiles = this.widget.renderedTiles();
 
   // Make them invisible otherwise the influence scrollHeight (e.g. if grid is scrolled to the very bottom and tiles are filtered, scrollbar would still increase scroll height)
-  scout.scrollbars.setVisible($container, false);
+  scrollbars.setVisible($container, false);
 
   // Store the current position of the tiles
   if (animated) {
@@ -103,7 +117,7 @@ scout.TileGridLayout.prototype.layout = function($container) {
     var newTiles = this.widget._renderTileDelta();
     // Make sure newly rendered tiles are animated (if enabled) and layouted as well
     this._storeBounds(newTiles);
-    scout.arrays.pushAll(this.tiles, newTiles);
+    arrays.pushAll(this.tiles, newTiles);
     this._layout($container);
   }
 
@@ -119,40 +133,40 @@ scout.TileGridLayout.prototype.layout = function($container) {
   } else {
     this._onAnimationDone();
   }
-};
+}
 
-scout.TileGridLayout.prototype._sizeChanged = function(htmlComp) {
+_sizeChanged(htmlComp) {
   return htmlComp.sizeCached && !htmlComp.sizeCached.equals(htmlComp.size());
-};
+}
 
-scout.TileGridLayout.prototype._storeBounds = function(tiles) {
+_storeBounds(tiles) {
   tiles.forEach(function(tile, i) {
-    var bounds = scout.graphics.cssBounds(tile.$container);
+    var bounds = graphics.cssBounds(tile.$container);
     tile.$container.data('oldBounds', bounds);
     tile.$container.data('was-layouted', tile.htmlComp.layouted);
   }, this);
-};
+}
 
 /**
  * @override
  */
-scout.TileGridLayout.prototype._validateGridData = function(htmlComp) {
+_validateGridData(htmlComp) {
   htmlComp.$comp.removeClass('newly-rendered');
-  return scout.TileGridLayout.parent.prototype._validateGridData.call(this, htmlComp);
-};
+  return super._validateGridData( htmlComp);
+}
 
 /**
  * @override
  */
-scout.TileGridLayout.prototype._layoutCellBounds = function(containerSize, containerInsets) {
+_layoutCellBounds(containerSize, containerInsets) {
   // Since the tiles are positioned absolutely it is necessary to add the height of the filler to the top insets
   if (this.widget.virtual) {
     containerInsets.top += this.widget.$fillBefore.outerHeight(true);
   }
-  return scout.TileGridLayout.parent.prototype._layoutCellBounds.call(this, containerSize, containerInsets);
-};
+  return super._layoutCellBounds( containerSize, containerInsets);
+}
 
-scout.TileGridLayout.prototype._animateTiles = function() {
+_animateTiles() {
   var htmlComp = this.widget.htmlComp;
   var $container = htmlComp.$comp;
 
@@ -160,8 +174,8 @@ scout.TileGridLayout.prototype._animateTiles = function() {
   this.containerScrollTop = $container.scrollTop();
 
   // Hide scrollbar before the animation (does not look good if scrollbar is hidden after the animation)
-  scout.scrollbars.setVisible($container, true);
-  scout.scrollbars.opacity($container, 0);
+  scrollbars.setVisible($container, true);
+  scrollbars.opacity($container, 0);
 
   // Animate the position change of the tiles
   var promises = [];
@@ -174,7 +188,7 @@ scout.TileGridLayout.prototype._animateTiles = function() {
 
     var promise = this._animateTile(tile);
     if (promise) {
-      scout.arrays.pushAll(promises, promise);
+      arrays.pushAll(promises, promise);
     }
 
     tile.$container.removeData('oldBounds');
@@ -182,9 +196,9 @@ scout.TileGridLayout.prototype._animateTiles = function() {
   }, this);
 
   return promises;
-};
+}
 
-scout.TileGridLayout.prototype._animateTile = function(tile) {
+_animateTile(tile) {
   var htmlComp = this.widget.htmlComp;
 
   // Stop running animations before starting the new ones to make sure existing promises are not resolved too early
@@ -202,9 +216,9 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
     return;
   }
 
-  var bounds = scout.graphics.cssBounds(tile.$container);
+  var bounds = graphics.cssBounds(tile.$container);
   var fromBounds = tile.$container.data('oldBounds');
-  if (tile instanceof scout.PlaceholderTile && !tile.$container.data('was-layouted')) {
+  if (tile instanceof PlaceholderTile && !tile.$container.data('was-layouted')) {
     // Placeholders may not have fromBounds because they are added while layouting
     // Just let them appear at the correct position
     fromBounds = bounds.clone();
@@ -213,7 +227,7 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
   if (!htmlComp.layouted && this.widget.startupAnimationDone && this.widget.renderAnimationEnabled) {
     // This is a small, discreet render animation, just move the tiles a little
     // It will happen if the startup animation is disabled or done and every time the tiles are rendered anew
-    fromBounds = new scout.Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
+    fromBounds = new Rectangle(bounds.x * 0.95, bounds.y * 0.95, bounds.width, bounds.height);
   }
 
   if (fromBounds.equals(bounds)) {
@@ -233,22 +247,22 @@ scout.TileGridLayout.prototype._animateTile = function(tile) {
 
   // Start animation
   return this._animateTileBounds(tile, fromBounds, bounds);
-};
+}
 
-scout.TileGridLayout.prototype._inViewport = function(bounds) {
+_inViewport(bounds) {
   bounds = bounds.translate(this.containerPos.x, this.containerPos.y).translate(0, -this.containerScrollTop);
-  var topLeftPos = new scout.Point(bounds.x, bounds.y);
-  var bottomRightPos = new scout.Point(bounds.x + bounds.width, bounds.y + bounds.height);
+  var topLeftPos = new Point(bounds.x, bounds.y);
+  var bottomRightPos = new Point(bounds.x + bounds.width, bounds.y + bounds.height);
   var $scrollable = this.widget.$container.scrollParent();
-  return scout.scrollbars.isLocationInView(topLeftPos, $scrollable) || scout.scrollbars.isLocationInView(bottomRightPos, $scrollable);
-};
+  return scrollbars.isLocationInView(topLeftPos, $scrollable) || scrollbars.isLocationInView(bottomRightPos, $scrollable);
+}
 
-scout.TileGridLayout.prototype._onAnimationDone = function() {
+_onAnimationDone() {
   this._updateScrollbar();
   this.widget.trigger('layoutAnimationDone');
-};
+}
 
-scout.TileGridLayout.prototype._animateTileBounds = function(tile, fromBounds, bounds) {
+_animateTileBounds(tile, fromBounds, bounds) {
   // jQuery's animate() function sets "overflow: hidden" during the animation. After the animation, the
   // original value is restored. (Search for "opts.overflow" in the jQuery source code, and see
   // https://stackoverflow.com/a/5696656/7188380 for details why this is required.)
@@ -294,29 +308,29 @@ scout.TileGridLayout.prototype._animateTileBounds = function(tile, fromBounds, b
     });
 
   return $.promiseAll(promises).then(restoreOverflowStyle);
-};
+}
 
-scout.TileGridLayout.prototype._updateScrollbar = function() {
-  scout.scrollbars.setVisible(this.widget.$container, true);
-  scout.scrollbars.opacity(this.widget.$container, 1);
+_updateScrollbar() {
+  scrollbars.setVisible(this.widget.$container, true);
+  scrollbars.opacity(this.widget.$container, 1);
 
   // Update first scrollable parent (if widget itself is not scrollable, maybe a parent is)
   var htmlComp = this.widget.htmlComp;
   while (htmlComp) {
     if (htmlComp.scrollable) {
       // Update immediately to prevent flickering (scrollbar is made visible on the top of this function)
-      scout.scrollbars.update(htmlComp.$comp, true);
+      scrollbars.update(htmlComp.$comp, true);
       break;
     }
     htmlComp = htmlComp.getParent();
   }
-};
+}
 
 /**
  * When max. width should be enforced, add a padding to the container if necessary
  * (to make sure, scrollbar position is not changed)
  */
-scout.TileGridLayout.prototype._updateMaxWidth = function() {
+_updateMaxWidth() {
   // Reset padding-right set by layout
   var htmlComp = this.widget.htmlComp;
   htmlComp.$comp.cssPaddingRight(null);
@@ -336,29 +350,29 @@ scout.TileGridLayout.prototype._updateMaxWidth = function() {
   if (diff > cssPaddingRight) {
     htmlComp.$comp.cssPaddingRight(diff);
   }
-};
+}
 
-scout.TileGridLayout.prototype._resetGridColumnCount = function() {
+_resetGridColumnCount() {
   this.widget.gridColumnCount = this.widget.prefGridColumnCount;
-};
+}
 
-scout.TileGridLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = $.extend({}, options);
 
   if (this.widget.virtual) {
     return this.virtualPrefSize($container, options);
   }
   return this.primitivePrefSize($container, options);
-};
+}
 
 /**
  * Calculates the preferred size only based on the grid column count, row count and layout config. Does not use rendered elements.
  * Therefore only works if all tiles are of the same size (which is a precondition for the virtual scrolling anyway).
  */
-scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
+virtualPrefSize($container, options) {
   var rowCount, columnCount;
-  var insets = scout.HtmlComponent.get($container).insets();
-  var prefSize = new scout.Dimension();
+  var insets = HtmlComponent.get($container).insets();
+  var prefSize = new Dimension();
   var columnWidth = this.columnWidth;
   var rowHeight = this.rowHeight;
   var hgap = this.hgap;
@@ -388,19 +402,19 @@ scout.TileGridLayout.prototype.virtualPrefSize = function($container, options) {
   prefSize.width += insets.horizontal();
   prefSize.height += insets.vertical();
   return prefSize;
-};
+}
 
-scout.TileGridLayout.prototype.primitivePrefSize = function($container, options) {
+primitivePrefSize($container, options) {
   if (!options.widthHint || this._calculatingPrimitivePrefSize) {
-    return scout.TileGridLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+    return super.preferredLayoutSize( $container, options);
   }
   this._calculatingPrimitivePrefSize = true;
   var prefSize = this._primitivePrefSize(options);
   this._calculatingPrimitivePrefSize = false;
   return prefSize;
-};
+}
 
-scout.TileGridLayout.prototype._primitivePrefSize = function(options) {
+_primitivePrefSize(options) {
   var prefSize,
     htmlComp = this.widget.htmlComp,
     contentFits = false,
@@ -429,4 +443,5 @@ scout.TileGridLayout.prototype._primitivePrefSize = function(options) {
   // Reset to previous gridColumnCount (prefSize should not modify properties)
   this.widget.gridColumnCount = gridColumnCount;
   return prefSize;
-};
+}
+}

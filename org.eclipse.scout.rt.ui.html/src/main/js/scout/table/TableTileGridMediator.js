@@ -8,13 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Widget} from '../index';
+import {AggregateTableControl} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
 
 /**
  * Delegates events between the Table and it's internal TileGrid.
  *
  */
-scout.TableTileGridMediator = function() {
-  scout.TableTileGridMediator.parent.call(this);
+export default class TableTileGridMediator extends Widget {
+
+constructor() {
+  super();
 
   this.table = null;
   this.tileAccordion = null;
@@ -54,11 +62,11 @@ scout.TableTileGridMediator = function() {
   this.withPlaceholders = null;
 
   this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
-};
-scout.inherits(scout.TableTileGridMediator, scout.Widget);
+}
 
-scout.TableTileGridMediator.prototype.init = function(model) {
-  scout.TableTileGridMediator.parent.prototype._init.call(this, model);
+
+init(model) {
+  super._init( model);
 
   this.table = this.parent;
 
@@ -70,9 +78,9 @@ scout.TableTileGridMediator.prototype.init = function(model) {
 
   this._setTiles(this.tiles);
   this._setTileMappings(this.tileMappings);
-};
+}
 
-scout.TableTileGridMediator.prototype._installListeners = function() {
+_installListeners() {
   this.tileAccordion.on('propertyChange', this._tileAccordionPropertyChangeHandler);
   this.tileAccordion.on('tileAction', this._tileAccordionActionHandler);
   this.tileAccordion.on('tileClick', this._tileAccordionClickHandler);
@@ -89,9 +97,9 @@ scout.TableTileGridMediator.prototype._installListeners = function() {
 
   this.tileAccordion.on('destroy', this._destroyHandler);
   this.table.on('destroy', this._destroyHandler);
-};
+}
 
-scout.TableTileGridMediator.prototype._uninstallListeners = function() {
+_uninstallListeners() {
   this.tileAccordion.off('propertyChange', this._tileAccordionPropertyChangeHandler);
   this.tileAccordion.off('tileAction', this._tileAccordionActionHandler);
   this.tileAccordion.off('tileClick', this._tileAccordionClickHandler);
@@ -108,49 +116,49 @@ scout.TableTileGridMediator.prototype._uninstallListeners = function() {
 
   this.tileAccordion.off('destroy', this._destroyHandler);
   this.table.off('destroy', this._destroyHandler);
-};
+}
 
-scout.TableTileGridMediator.prototype.setGridColumnCount = function(gridColumnCount) {
+setGridColumnCount(gridColumnCount) {
   this.setProperty('gridColumnCount', gridColumnCount);
   if (this.tileAccordion) {
     this.tileAccordion.setGridColumnCount(gridColumnCount);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype.setTileGridLayoutConfig = function(tileGridLayoutConfig) {
+setTileGridLayoutConfig(tileGridLayoutConfig) {
   this.setProperty('tileGridLayoutConfig', tileGridLayoutConfig);
   if (this.tileAccordion) {
     this.tileAccordion.setTileGridLayoutConfig(tileGridLayoutConfig);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype.setWithPlaceholders = function(withPlaceholders) {
+setWithPlaceholders(withPlaceholders) {
   this.setProperty('withPlaceholders', withPlaceholders);
   if (this.tileAccordion) {
     this.tileAccordion.setWithPlaceholders(withPlaceholders);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._setTileMappings = function(tableRowTileMappings) {
+_setTileMappings(tableRowTileMappings) {
   if (!tableRowTileMappings) {
     return;
   }
   var tiles = tableRowTileMappings.map(this.resolveMapping, this);
   this._setTiles(tiles);
-};
+}
 
-scout.TableTileGridMediator.prototype.setTiles = function(tiles) {
+setTiles(tiles) {
   this.setProperty('tiles', tiles);
-};
+}
 
-scout.TableTileGridMediator.prototype._setTiles = function(tiles) {
+_setTiles(tiles) {
   this._isUpdatingTiles = true;
   this.reset();
   this._setTilesInternal(tiles);
   this._isUpdatingTiles = false;
-};
+}
 
-scout.TableTileGridMediator.prototype._setTilesInternal = function(tiles) {
+_setTilesInternal(tiles) {
   // check if all tiles are already available in the table
   var tableRowMissing = tiles.some(function(tile) {
     return this.table.rowsMap[tile.rowId] === undefined;
@@ -178,10 +186,10 @@ scout.TableTileGridMediator.prototype._setTilesInternal = function(tiles) {
   this._updateGroupVisibility();
 
   this._syncSelectionFromTableToTile();
-};
+}
 
 // only used in ScoutJS, see TableAdapter.modifyTablePrototype()
-scout.TableTileGridMediator.prototype.loadTiles = function() {
+loadTiles() {
   // hierarchy is not supported in tile mode. There is no way to visualize a parent-child hierarchy in the tileGrid. Therefore only top level rows are displayed.
   var rows = this.table.rows.filter(function(row) {
     return !row.parentRow;
@@ -190,18 +198,18 @@ scout.TableTileGridMediator.prototype.loadTiles = function() {
   if (tiles) {
     this.setTiles(tiles);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype.resolveMapping = function(tableRowTileMapping) {
+resolveMapping(tableRowTileMapping) {
   var tile = tableRowTileMapping.tile;
   tile.rowId = tableRowTileMapping.tableRow;
   tile.setParent(this);
   tile.setOwner(this);
   return tile;
-};
+}
 
 //update tilesMap with the given tiles or recreate tilesMap completely in case of null given
-scout.TableTileGridMediator.prototype._refreshTilesMap = function(tiles) {
+_refreshTilesMap(tiles) {
   if (!tiles) {
     tiles = this.tiles;
     this.tilesMap = {};
@@ -209,18 +217,18 @@ scout.TableTileGridMediator.prototype._refreshTilesMap = function(tiles) {
   tiles.forEach(function(tile) {
     this.tilesMap[tile.rowId] = tile;
   }, this);
-};
+}
 
-scout.TableTileGridMediator.prototype.getTilesForRows = function(rows) {
+getTilesForRows(rows) {
   return rows.map(function(row) {
     return this.tilesMap[row.id];
   }, this).filter(function(t) {
     return !!t;
   });
-};
+}
 
-scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
-  var primaryGroupingColumn = scout.arrays.find(this.table.columns, function(column) {
+_initGroups(tiles) {
+  var primaryGroupingColumn = arrays.find(this.table.columns, function(column) {
     return column.grouped && column.sortIndex === 0;
   });
 
@@ -238,16 +246,16 @@ scout.TableTileGridMediator.prototype._initGroups = function(tiles) {
     }
     tile.parent = group;
   }, this);
-};
+}
 
-scout.TableTileGridMediator.prototype._adaptTileGrid = function(tileGrid) {
+_adaptTileGrid(tileGrid) {
   // we want to use the table's context menu, redirect request to show the context menu. The selection is already synchronized.
   tileGrid.showContextMenu = function(options) {
     this.session.onRequestsDone(this.table._showContextMenu.bind(this.table, options));
   }.bind(this);
-};
+}
 
-scout.TableTileGridMediator.prototype._createTileAccordion = function() {
+_createTileAccordion() {
   return scout.create('TileAccordion', {
     parent: this.table,
     virtual: true,
@@ -258,9 +266,9 @@ scout.TableTileGridMediator.prototype._createTileAccordion = function() {
     tileGridLayoutConfig: this.tileGridLayoutConfig,
     withPlaceholders: this.withPlaceholders
   });
-};
+}
 
-scout.TableTileGridMediator.prototype._createTileGroup = function(groupId, htmlEnabled) {
+_createTileGroup(groupId, htmlEnabled) {
   return new scout.create('Group', {
     parent: this.tileAccordion,
     id: groupId,
@@ -272,9 +280,9 @@ scout.TableTileGridMediator.prototype._createTileGroup = function(groupId, htmlE
       scrollable: false
     }
   });
-};
+}
 
-scout.TableTileGridMediator.prototype.activate = function() {
+activate() {
   this.tableState.headerVisible = this.table.headerVisible;
   this.table.setHeaderVisible(false);
   if (this.table.tileTableHeader) {
@@ -283,7 +291,7 @@ scout.TableTileGridMediator.prototype.activate = function() {
 
   // hide aggregation table control
   this.table.tableControls.filter(function(control) {
-    if (control instanceof scout.AggregateTableControl) {
+    if (control instanceof AggregateTableControl) {
       control.setVisible(false);
     }
   });
@@ -310,12 +318,12 @@ scout.TableTileGridMediator.prototype.activate = function() {
   this._syncFiltersFromTableToTile();
 
   this._syncScrollTopFromTableToTile();
-};
+}
 
-scout.TableTileGridMediator.prototype.deactivate = function() {
+deactivate() {
   // show aggregation table control
   this.table.tableControls.filter(function(control) {
-    if (control instanceof scout.AggregateTableControl) {
+    if (control instanceof AggregateTableControl) {
       control.setVisible(true);
     }
   });
@@ -336,17 +344,17 @@ scout.TableTileGridMediator.prototype.deactivate = function() {
 
   // complete reset
   this.reset();
-};
+}
 
-scout.TableTileGridMediator.prototype.reset = function() {
+reset() {
   this.tilesMap = {};
   this.groups = {};
   this.groupForTileMap = {};
   this.tileAccordion.deleteAllTiles();
   this.tileAccordion.deleteAllGroups();
-};
+}
 
-scout.TableTileGridMediator.prototype.renderTileMode = function() {
+renderTileMode() {
   if (this.table.tileMode) {
     // if the table was previously in tileMode this is not necessary...
     if (this.table.$data) {
@@ -363,9 +371,9 @@ scout.TableTileGridMediator.prototype.renderTileMode = function() {
     this.session.keyStrokeManager.installKeyStrokeContext(this.table.keyStrokeContext);
   }
   this.table._refreshMenuBarPosition();
-};
+}
 
-scout.TableTileGridMediator.prototype.destroy = function() {
+destroy() {
   // destroy tiles manually since owner is this.table thus the tileGrid can't destroy them
   this.tiles.forEach(function(tile) {
     tile.destroy();
@@ -373,21 +381,21 @@ scout.TableTileGridMediator.prototype.destroy = function() {
 
   this.tileAccordion.destroy();
   this.tileAccordion = null;
-};
+}
 
-scout.TableTileGridMediator.prototype.insertTiles = function(tiles) {
-  tiles = scout.arrays.ensure(tiles);
+insertTiles(tiles) {
+  tiles = arrays.ensure(tiles);
   if (tiles.length === 0) {
     return;
   }
   this.setTiles(this.tiles.concat(tiles));
-};
+}
 
-scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
+deleteTiles(tiles) {
   if (!tiles) {
     tiles = this.tiles.slice();
   }
-  scout.arrays.removeAll(this.tiles, tiles);
+  arrays.removeAll(this.tiles, tiles);
   tiles.forEach(function(tile) {
     delete this.tilesMap[tile.rowId];
     delete this.groupForTileMap[tile.rowId];
@@ -401,9 +409,9 @@ scout.TableTileGridMediator.prototype.deleteTiles = function(tiles) {
     tile.destroy();
   }, this);
   this.tileAccordion.deleteTiles(tiles);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(event) {
+_onTileAccordionPropertyChange(event) {
   if (!this.table.tileMode) {
     return;
   }
@@ -413,51 +421,51 @@ scout.TableTileGridMediator.prototype._onTileAccordionPropertyChange = function(
   if (event.propertyName === 'filteredTiles') {
     this._updateGroupVisibility();
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._onTileAccordionAction = function(event) {
+_onTileAccordionAction(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.table.doRowAction(this.table.rowsMap[event.tile.rowId]);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTileAccordionClick = function(event) {
+_onTileAccordionClick(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.table._triggerRowClick(this.table.rowsMap[event.tile.rowId], event.mouseButton);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableRowsSelected = function(event) {
+_onTableRowsSelected(event) {
   if (!this.table.tileMode) {
     return;
   }
   this._syncSelectionFromTableToTile();
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableRowsInserted = function(event) {
+_onTableRowsInserted(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.insertTiles(this.table.createTiles(event.rows));
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableRowsDeleted = function(event) {
+_onTableRowsDeleted(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.deleteTiles(this.getTilesForRows(event.rows));
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableAllRowsDeleted = function(event) {
+_onTableAllRowsDeleted(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.deleteTiles();
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(event) {
+_onTableRowOrderChangedHandler(event) {
   // ignore event when not in tileMode or when this.tilesMap is not (yet) initialized correctly
   if (!this.table.tileMode || $.isEmptyObject(this.tilesMap)) {
     return;
@@ -466,43 +474,43 @@ scout.TableTileGridMediator.prototype._onTableRowOrderChangedHandler = function(
     return this.tilesMap[row.id];
   }, this);
   this.tileAccordion.setTiles(this.tiles);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableRenderHandler = function(event) {
+_onTableRenderHandler(event) {
   if (this.table.tileMode) {
     // the table's keyStrokeContext is actually un/installed in renderTileMode.
     // When refreshing the whole page or getConfiguredTileMode is true renderTileMode is called before the table in Widget.render installs it's context.
     // For this case this 'additional' uninstall is necessary.
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.table.keyStrokeContext);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableGroup = function(event) {
+_onTableGroup(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.tileAccordion.deleteAllGroups();
   this._initGroups(this.tiles);
   this.tileAccordion.setTiles(this.tiles);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableFilterAdded = function(event) {
+_onTableFilterAdded(event) {
   if (!this.table.tileMode) {
     return;
   }
   this._addFilter(event.filter);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableFilterRemoved = function(event) {
+_onTableFilterRemoved(event) {
   if (!this.table.tileMode) {
     return;
   }
 
   this.tileAccordion.removeTileFilter(this.tileFilterMap[event.filter.createKey()]);
   this.tileAccordion.filterTiles();
-};
+}
 
-scout.TableTileGridMediator.prototype._addFilter = function(tableFilter) {
+_addFilter(tableFilter) {
   var tileFilter = {
     table: this.table,
     accept: function(tile) {
@@ -520,22 +528,22 @@ scout.TableTileGridMediator.prototype._addFilter = function(tableFilter) {
   }
   this.tileFilterMap[key] = tileFilter;
   this.tileAccordion.addTileFilter(tileFilter);
-};
+}
 
-scout.TableTileGridMediator.prototype._onTableFilter = function(event) {
+_onTableFilter(event) {
   if (!this.table.tileMode) {
     return;
   }
   this.tileAccordion.filterTiles();
-};
+}
 
-scout.TableTileGridMediator.prototype._syncSelectionFromTableToTile = function() {
+_syncSelectionFromTableToTile() {
   if (this.tileAccordion) {
     this.tileAccordion.selectTiles(this.getTilesForRows(this.table.selectedRows));
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._syncSelectionFromTileGridToTable = function(selectedTiles) {
+_syncSelectionFromTileGridToTable(selectedTiles) {
   if (!this._isUpdatingTiles) {
     var selectedRows = selectedTiles.map(function(tile) {
       return this.table.rowsMap[tile.rowId];
@@ -544,18 +552,18 @@ scout.TableTileGridMediator.prototype._syncSelectionFromTileGridToTable = functi
     });
     this.table.selectRows(selectedRows);
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._updateGroupVisibility = function() {
+_updateGroupVisibility() {
   this.tileAccordion.groups.forEach(function(group) {
     // Make groups invisible if a tile filter is active and no tiles match (= no tiles are visible)
     var groupEmpty = group.body.filters.length > 0 && group.body.filteredTiles.length === 0;
     group.setVisible(!groupEmpty);
     group.setTitleSuffix('(' + group.body.filteredTiles.length + ')');
   });
-};
+}
 
-scout.TableTileGridMediator.prototype._syncScrollTopFromTableToTile = function() {
+_syncScrollTopFromTableToTile() {
   var rowIndex = this.table._rowIndexAtScrollTop(this.table.scrollTop);
   if (rowIndex <= 0) {
     return;
@@ -578,9 +586,9 @@ scout.TableTileGridMediator.prototype._syncScrollTopFromTableToTile = function()
     return;
   }
   tile.reveal(options);
-};
+}
 
-scout.TableTileGridMediator.prototype._syncScrollTopFromTileGridToTable = function() {
+_syncScrollTopFromTileGridToTable() {
   var tile = this.tileAccordion._tileAtScrollTop(this.tileAccordion.scrollTop);
   if (tile) {
     var options = {
@@ -592,9 +600,9 @@ scout.TableTileGridMediator.prototype._syncScrollTopFromTileGridToTable = functi
       this.table.scrollTo(this.table.rowsMap[tile.rowId], options);
     }
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
+_syncFiltersFromTableToTile() {
   if (this.tileAccordion) {
     this.tileAccordion.setTileFilters([]);
     Object.keys(this.table._filterMap)
@@ -606,28 +614,29 @@ scout.TableTileGridMediator.prototype._syncFiltersFromTableToTile = function() {
       }, this);
     this.tileAccordion.filterTiles();
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._renderTileTableHeader = function() {
+_renderTileTableHeader() {
   if (this.table.tileTableHeader) {
     this.table.tileTableHeader.render();
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._removeTileTableHeader = function() {
+_removeTileTableHeader() {
   if (this.table.tileTableHeader) {
     this.table.tileTableHeader.remove();
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._renderTileAccordion = function() {
+_renderTileAccordion() {
   if (!this.tileAccordion.rendered) {
     this.tileAccordion.render();
   }
-};
+}
 
-scout.TableTileGridMediator.prototype._removeTileAccordion = function() {
+_removeTileAccordion() {
   if (this.tileAccordion.rendered) {
     this.tileAccordion.remove();
   }
-};
+}
+}

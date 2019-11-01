@@ -8,50 +8,56 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DatePickerTouchPopup = function() {
-  scout.DatePickerTouchPopup.parent.call(this);
-};
-scout.inherits(scout.DatePickerTouchPopup, scout.TouchPopup);
+import {DatePickerTouchPopupLayout} from '../index';
+import {TouchPopup} from '../index';
+import {scout} from '../index';
 
-scout.DatePickerTouchPopup.prototype._init = function(options) {
-  scout.DatePickerTouchPopup.parent.prototype._init.call(this, options);
+export default class DatePickerTouchPopup extends TouchPopup {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
   this._field.on('acceptInput', this._onFieldAcceptInput.bind(this));
-};
+}
 
 /**
  * @override TouchPopup.js
  */
-scout.DatePickerTouchPopup.prototype._initWidget = function(options) {
+_initWidget(options) {
   this._widget = scout.create('DatePicker', {
     parent: this,
     dateFormat: options.dateFormat,
     allowedDates: options.allowedDates
   });
-};
-scout.DatePickerTouchPopup.prototype._render = function() {
-  scout.DatePickerTouchPopup.parent.prototype._render.call(this);
+}
+_render() {
+  super._render();
   this._field.$container.addClass('date');
-};
+}
 
-scout.DatePickerTouchPopup.prototype._onMouseDownOutside = function() {
+_onMouseDownOutside() {
   this._acceptInput();
-};
+}
 
 /**
  * @implements DatePickerPopup
  */
-scout.DatePickerTouchPopup.prototype.getDatePicker = function() {
+getDatePicker() {
   return this._widget;
-};
+}
 
 /**
  * @override
  */
-scout.DatePickerTouchPopup.prototype._createLayout = function() {
-  return new scout.DatePickerTouchPopupLayout(this);
-};
+_createLayout() {
+  return new DatePickerTouchPopupLayout(this);
+}
 
-scout.DatePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
+_onFieldAcceptInput(event) {
   // Delegate to original field
   this._touchField.setDisplayText(event.displayText);
   this._touchField.setErrorStatus(event.errorStatus);
@@ -59,4 +65,5 @@ scout.DatePickerTouchPopup.prototype._onFieldAcceptInput = function(event) {
     this._touchField.setValue(event.value);
   }
   this._touchField._triggerAcceptInput();
-};
+}
+}

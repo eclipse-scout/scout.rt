@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormMenuActionKeyStroke = function(action) {
-  scout.FormMenuActionKeyStroke.parent.call(this, action);
-};
-scout.inherits(scout.FormMenuActionKeyStroke, scout.ActionKeyStroke);
+import {ActionKeyStroke} from '../index';
 
-scout.FormMenuActionKeyStroke.prototype.handle = function(event) {
+export default class FormMenuActionKeyStroke extends ActionKeyStroke {
+
+constructor(action) {
+  super( action);
+}
+
+
+handle(event) {
   this.field.toggle();
-};
+}
 
-scout.FormMenuActionKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+_postRenderKeyBox($drawingArea) {
   if (this.field.iconId) {
     var wIcon = $drawingArea.find('.icon').width();
     var wKeybox = $drawingArea.find('.key-box').outerWidth();
@@ -25,4 +29,5 @@ scout.FormMenuActionKeyStroke.prototype._postRenderKeyBox = function($drawingAre
     var leftKeyBox = wIcon / 2 - wKeybox / 2 + containerPadding;
     $drawingArea.find('.key-box').cssLeft(leftKeyBox);
   }
-};
+}
+}

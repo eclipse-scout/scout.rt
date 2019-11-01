@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Slider = function() {
-  scout.Slider.parent.call(this);
+import {objects} from '../index';
+import {HtmlComponent} from '../index';
+import {SliderLayout} from '../index';
+import {Widget} from '../index';
+import {scout} from '../index';
+
+export default class Slider extends Widget {
+
+constructor() {
+  super();
 
   this.value = null;
   this.minValue = null;
@@ -18,82 +26,83 @@ scout.Slider = function() {
 
   this.$sliderInput = null;
   this.$sliderValue = null;
-};
-scout.inherits(scout.Slider, scout.Widget);
+}
 
-scout.Slider.prototype._init = function(options) {
-  scout.Slider.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.value = options.value;
   this.minValue = options.minValue;
   this.maxValue = options.maxValue;
   this.step = options.step;
-};
+}
 
-scout.Slider.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('slider');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SliderLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new SliderLayout(this));
   this.$sliderInput = this.$container.appendElement('<input>', 'slider-input')
     .attr('type', 'range')
     .on('change', this._onValueChange.bind(this));
 
   this.$sliderValue = this.$container
     .appendSpan('slider-value', this.value);
-};
+}
 
-scout.Slider.prototype._renderProperties = function() {
-  scout.Slider.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderValue();
   this._renderMinValue();
   this._renderMaxValue();
   this._renderStep();
-};
+}
 
-scout.Slider.prototype._remove = function() {
-  scout.Slider.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.$sliderInput = null;
   this.$sliderValue = null;
-};
+}
 
-scout.Slider.prototype._renderValue = function() {
+_renderValue() {
   var value = scout.nvl(this.value, 0);
   this.$sliderInput.val(value);
   this.$sliderValue.text(value);
-};
+}
 
-scout.Slider.prototype._renderMinValue = function() {
+_renderMinValue() {
   if (this.minValue) {
     this.$sliderInput.attr('min', this.minValue);
   } else {
     this.$sliderInput.removeAttr('min');
   }
-};
+}
 
-scout.Slider.prototype._renderMaxValue = function() {
+_renderMaxValue() {
   if (this.maxValue) {
     this.$sliderInput.attr('max', this.maxValue);
   } else {
     this.$sliderInput.removeAttr('max');
   }
-};
+}
 
-scout.Slider.prototype._renderStep = function() {
+_renderStep() {
   if (this.step) {
     this.$sliderInput.attr('step', this.step);
   } else {
     this.$sliderInput.removeAttr('step');
   }
-};
+}
 
-scout.Slider.prototype._onValueChange = function(event) {
+_onValueChange(event) {
   var n = Number(this.$sliderInput.val());
   // Ensure valid number
-  if (!scout.objects.isNumber(n)) {
+  if (!objects.isNumber(n)) {
     n = scout.nvl(this.maxValue, this.minValue, 0);
   }
   this.setValue(n);
-};
+}
 
-scout.Slider.prototype.setValue = function(value) {
+setValue(value) {
   this.setProperty('value', value);
-};
+}
+}

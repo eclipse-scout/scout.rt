@@ -8,55 +8,67 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableControl = function() {
-  scout.TableControl.parent.call(this);
-  scout.TableControl.CONTAINER_SIZE = scout.styles.getSize('table-control-container', 'height', 'height', scout.TableControl.CONTAINER_SIZE);
+import {Action} from '../../index';
+import {HtmlComponent} from '../../index';
+import {NullLayout} from '../../index';
+import {scout} from '../../index';
+import {TableControlActionKeyStroke} from '../../index';
+import {Table} from '../../index';
+import {KeyStrokeContext} from '../../index';
+import {TableControlCloseKeyStroke} from '../../index';
+import {styles} from '../../index';
+
+export default class TableControl extends Action {
+
+constructor() {
+  super();
+  TableControl.CONTAINER_SIZE = styles.getSize('table-control-container', 'height', 'height', TableControl.CONTAINER_SIZE);
   this.tableFooter = null;
   this.contentRendered = false;
-  this.height = scout.TableControl.CONTAINER_SIZE;
-  this.animateDuration = scout.TableControl.CONTAINER_ANIMATE_DURATION;
+  this.height = TableControl.CONTAINER_SIZE;
+  this.animateDuration = TableControl.CONTAINER_ANIMATE_DURATION;
   this.resizerVisible = true;
   this.toggleAction = true;
   this.showTooltipWhenSelected = false;
-};
-scout.inherits(scout.TableControl, scout.Action);
+}
 
-scout.TableControl.CONTAINER_SIZE = 345; // Defined in sizes.less
-scout.TableControl.CONTAINER_ANIMATE_DURATION = 350;
 
-scout.TableControl.prototype._init = function(model) {
+static CONTAINER_SIZE = 345; // Defined in sizes.less
+static CONTAINER_ANIMATE_DURATION = 350;
+
+_init(model) {
   this.parent = model.parent;
   this.table = this.getTable();
-  scout.TableControl.parent.prototype._init.call(this, model);
+  super._init( model);
   this._setSelected(this.selected);
-};
+}
 
 /**
  * @override
  */
-scout.TableControl.prototype._initKeyStrokeContext = function() {
-  scout.TableControl.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.tableControlKeyStrokeContext = this._createKeyStrokeContextForTableControl();
-};
+}
 
-scout.TableControl.prototype._createKeyStrokeContextForTableControl = function() {
-  var keyStrokeContext = new scout.KeyStrokeContext();
+_createKeyStrokeContextForTableControl() {
+  var keyStrokeContext = new KeyStrokeContext();
   keyStrokeContext.$scopeTarget = function() {
     return this.tableFooter.$controlContent;
   }.bind(this);
   keyStrokeContext.$bindTarget = function() {
     return this.tableFooter.$controlContent;
   }.bind(this);
-  keyStrokeContext.registerKeyStroke(new scout.TableControlCloseKeyStroke(this));
+  keyStrokeContext.registerKeyStroke(new TableControlCloseKeyStroke(this));
   return keyStrokeContext;
-};
+}
 
-scout.TableControl.prototype._createLayout = function() {
-  return new scout.NullLayout();
-};
+_createLayout() {
+  return new NullLayout();
+}
 
-scout.TableControl.prototype._render = function() {
+_render() {
   var classes = 'table-control ';
   if (this.cssClass) {
     classes += this.cssClass + '-table-control';
@@ -64,24 +76,24 @@ scout.TableControl.prototype._render = function() {
   this.$container = this.$parent.appendDiv(classes)
     .on('mousedown', this._onMouseDown.bind(this))
     .data('control', this);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-};
+}
 
-scout.TableControl.prototype.remove = function() {
+remove() {
   this.removeContent();
-  scout.TableControl.parent.prototype.remove.call(this);
-};
+  super.remove();
+}
 
-scout.TableControl.prototype._renderContent = function($parent) {
+_renderContent($parent) {
   // to be implemented by subclass
-};
+}
 
-scout.TableControl.prototype._removeContent = function() {
+_removeContent() {
   // to be implemented by subclass
-};
+}
 
-scout.TableControl.prototype.removeContent = function() {
+removeContent() {
   if (this.contentRendered) {
     this._removeContent();
     if (this.cssClass) {
@@ -91,14 +103,14 @@ scout.TableControl.prototype.removeContent = function() {
     this.session.keyStrokeManager.uninstallKeyStrokeContext(this.tableControlKeyStrokeContext);
     this.contentRendered = false;
   }
-};
+}
 
 /**
  * Renders the content if not already rendered.<br>
  * Opens the container if the container is not already open.<br>
  * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.
  */
-scout.TableControl.prototype.renderContent = function() {
+renderContent() {
   if (!this.contentRendered && !this.isContentAvailable()) {
     return;
   }
@@ -120,16 +132,16 @@ scout.TableControl.prototype.renderContent = function() {
     }
     this.contentRendered = true;
   }
-};
+}
 
 /**
  * @override
  */
-scout.TableControl.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$contentContainer;
-};
+}
 
-scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
+_renderSelected(selected, closeWhenUnselected) {
   selected = scout.nvl(selected, this.selected);
   closeWhenUnselected = scout.nvl(closeWhenUnselected, true);
 
@@ -154,16 +166,16 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
     }
   }
   this._updateTooltip();
-};
+}
 
 /**
  * Returns true if the table control may be displayed (opened).
  */
-scout.TableControl.prototype.isContentAvailable = function() {
+isContentAvailable() {
   return true;
-};
+}
 
-scout.TableControl.prototype.toggle = function() {
+toggle() {
   if (!this.enabledComputed) {
     return;
   }
@@ -172,9 +184,9 @@ scout.TableControl.prototype.toggle = function() {
   } else {
     this.setSelected(true);
   }
-};
+}
 
-scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
+setSelected(selected, closeWhenUnselected) {
   if (selected && !this.visible) {
     return;
   }
@@ -195,46 +207,47 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   } else if (closeWhenUnselected && this.tableFooter && this === this.tableFooter.selectedControl && !selected) {
     this.tableFooter.onControlSelected(null);
   }
-};
+}
 
-scout.TableControl.prototype._setSelected = function(selected) {
+_setSelected(selected) {
   // Does not nothing more than the default but allows for extension by a subclass
   this._setProperty('selected', selected);
-};
+}
 
-scout.TableControl.prototype._configureTooltip = function() {
-  var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
+_configureTooltip() {
+  var options = super._configureTooltip();
   options.cssClass = 'table-control-tooltip';
   return options;
-};
+}
 
-scout.TableControl.prototype._onMouseDown = function() {
+_onMouseDown() {
   this.toggle();
-};
+}
 
-scout.TableControl.prototype.onControlContainerOpened = function() {
+onControlContainerOpened() {
   // nop
-};
+}
 
-scout.TableControl.prototype.onControlContainerClosed = function() {
+onControlContainerClosed() {
   this.removeContent();
-};
+}
 
 /**
  * @override Action.js
  */
-scout.TableControl.prototype._createActionKeyStroke = function() {
-  return new scout.TableControlActionKeyStroke(this);
-};
+_createActionKeyStroke() {
+  return new TableControlActionKeyStroke(this);
+}
 
-scout.TableControl.prototype.getTable = function() {
+getTable() {
   var parent = this.parent;
   while (parent) {
-    if (parent instanceof scout.Table) {
+    if (parent instanceof Table) {
       return parent;
     }
     parent = parent.parent;
   }
 
   return null;
-};
+}
+}

@@ -8,26 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.EllipsisMenu = function() {
-  scout.EllipsisMenu.parent.call(this);
+import {icons} from '../index';
+import {Menu} from '../index';
+
+export default class EllipsisMenu extends Menu {
+
+constructor() {
+  super();
   this.hidden = true;
   this.ellipsis = true;
   this.stackable = false;
   this.horizontalAlignment = 1;
-  this.iconId = scout.icons.ELLIPSIS_V;
+  this.iconId = icons.ELLIPSIS_V;
   this.tabbable = false;
   this.rightAligned = false;
   this._addPreserveOnPropertyChangeProperties(['childActions']);
-};
-scout.inherits(scout.EllipsisMenu, scout.Menu);
+}
 
-scout.EllipsisMenu.prototype._render = function() {
-  scout.EllipsisMenu.parent.prototype._render.call(this);
+
+_render() {
+  super._render();
   this.$container.addClass('ellipsis');
-};
+}
 
-scout.EllipsisMenu.prototype.setChildActions = function(childActions) {
-  scout.EllipsisMenu.parent.prototype.setChildActions.call(this, childActions);
+setChildActions(childActions) {
+  super.setChildActions( childActions);
 
   if (childActions) {
     // close all actions that have been added to the ellipsis
@@ -35,22 +40,23 @@ scout.EllipsisMenu.prototype.setChildActions = function(childActions) {
       ca.setSelected(false);
     });
   }
-};
+}
 
-scout.EllipsisMenu.prototype._renderProperties = function() {
-  scout.EllipsisMenu.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderHidden();
-};
+}
 
 // add the set hidden function to the ellipsis
-scout.EllipsisMenu.prototype.setHidden = function(hidden) {
+setHidden(hidden) {
   this.setProperty('hidden', hidden);
-};
+}
 
-scout.EllipsisMenu.prototype._renderHidden = function() {
+_renderHidden() {
   this.$container.setVisible(!this.hidden);
-};
+}
 
-scout.EllipsisMenu.prototype.isTabTarget = function() {
-  return scout.EllipsisMenu.parent.prototype.isTabTarget.call(this) && !this.hidden;
-};
+isTabTarget() {
+  return super.isTabTarget() && !this.hidden;
+}
+}

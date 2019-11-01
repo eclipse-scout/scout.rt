@@ -8,96 +8,106 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NumberField = function() {
-  scout.NumberField.parent.call(this);
-  this.calc = new scout.Calculator();
+import {DecimalFormat} from '../../../index';
+import {fields} from '../../../index';
+import {numbers} from '../../../index';
+import {InputFieldKeyStrokeContext} from '../../../index';
+import {BasicField} from '../../../index';
+import {objects} from '../../../index';
+import {Calculator} from '../../../index';
+
+export default class NumberField extends BasicField {
+
+constructor() {
+  super();
+  this.calc = new Calculator();
   this.minValue = null;
   this.maxValue = null;
   this.decimalFormat = null;
   this.invalidValueMessageKey = 'InvalidNumberMessageX';
   this.gridDataHints.horizontalAlignment = 1; // number fields are right aligned by default.
-};
-scout.inherits(scout.NumberField, scout.BasicField);
+}
 
-scout.NumberField.prototype._init = function(model) {
-  scout.NumberField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setMinValue(this.minValue);
   this._setMaxValue(this.maxValue);
   this._setDecimalFormat(this.decimalFormat);
-};
+}
 
 /**
  * Initializes the decimal format before calling set value.
  * This cannot be done in _init because the value field would call _setValue first
  */
-scout.NumberField.prototype._initValue = function(value) {
+_initValue(value) {
   this._setDecimalFormat(this.decimalFormat);
-  scout.NumberField.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
 /**
  * @override Widget.js
  */
-scout.NumberField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new InputFieldKeyStrokeContext();
+}
 
-scout.NumberField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'number-field');
   this.addLabel();
   this.addMandatoryIndicator();
-  var $field = scout.fields.makeTextField(this.$parent);
+  var $field = fields.makeTextField(this.$parent);
   this.addField($field);
   this.addStatus();
-};
+}
 
-scout.NumberField.prototype._renderGridData = function() {
-  scout.NumberField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.NumberField.prototype._renderGridDataHints = function() {
-  scout.NumberField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.NumberField.prototype._getDefaultFormat = function(locale) {
+_getDefaultFormat(locale) {
   return locale.decimalFormatPatternDefault;
-};
+}
 
-scout.NumberField.prototype.setDecimalFormat = function(decimalFormat) {
+setDecimalFormat(decimalFormat) {
   this.setProperty('decimalFormat', decimalFormat);
-};
+}
 
-scout.NumberField.prototype._setDecimalFormat = function(decimalFormat) {
+_setDecimalFormat(decimalFormat) {
   if (!decimalFormat) {
     decimalFormat = this._getDefaultFormat(this.session.locale);
   }
-  decimalFormat = scout.DecimalFormat.ensure(this.session.locale, decimalFormat);
+  decimalFormat = DecimalFormat.ensure(this.session.locale, decimalFormat);
   this._setProperty('decimalFormat', decimalFormat);
 
   if (this.initialized) {
     // if format changes on the fly, just update the display text
     this._updateDisplayText();
   }
-};
+}
 
 /**
  * @override
  */
-scout.NumberField.prototype._parseValue = function(displayText) {
+_parseValue(displayText) {
   if (!displayText) {
     return null;
   }
 
   return this.decimalFormat.parse(displayText, this._evaluateNumber.bind(this));
-};
+}
 
-scout.NumberField.prototype._evaluateNumber = function(normalizedNumberString) {
+_evaluateNumber(normalizedNumberString) {
   // Convert to JS number format (remove groupingChar, replace decimalSeparatorChar with '.')
   // Only needed for calculator
   // if only math symbols are in the input string...
@@ -112,55 +122,55 @@ scout.NumberField.prototype._evaluateNumber = function(normalizedNumberString) {
   }
 
   return Number(normalizedNumberString);
-};
+}
 
 /**
  * @override
  */
-scout.NumberField.prototype._ensureValue = function(value) {
-  return scout.numbers.ensure(value);
-};
+_ensureValue(value) {
+  return numbers.ensure(value);
+}
 
 /**
  * @param {number} the number to validate
  * @return {number} the validated number
  * @override
  */
-scout.NumberField.prototype._validateValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_validateValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return value;
   }
-  if (!scout.numbers.isNumber(value)) {
+  if (!numbers.isNumber(value)) {
     throw this.session.text(this.invalidValueMessageKey, value);
   }
-  if (!scout.objects.isNullOrUndefined(this.minValue) && value < this.minValue) {
+  if (!objects.isNullOrUndefined(this.minValue) && value < this.minValue) {
     this._onNumberTooSmall();
   }
-  if (!scout.objects.isNullOrUndefined(this.maxValue) && value > this.maxValue) {
+  if (!objects.isNullOrUndefined(this.maxValue) && value > this.maxValue) {
     this._onNumberTooLarge();
   }
   return value;
-};
+}
 
-scout.NumberField.prototype._onNumberTooLarge = function() {
-  if (scout.objects.isNullOrUndefined(this.minValue)) {
+_onNumberTooLarge() {
+  if (objects.isNullOrUndefined(this.minValue)) {
     throw this.session.text("NumberTooLargeMessageX", this._formatValue(this.maxValue));
   }
   throw this.session.text("NumberTooLargeMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
-};
+}
 
-scout.NumberField.prototype._onNumberTooSmall = function() {
-  if (scout.objects.isNullOrUndefined(this.maxValue)) {
+_onNumberTooSmall() {
+  if (objects.isNullOrUndefined(this.maxValue)) {
     throw this.session.text("NumberTooSmallMessageX", this._formatValue(this.minValue));
   }
   throw this.session.text("NumberTooSmallMessageXY", this._formatValue(this.minValue), this._formatValue(this.maxValue));
-};
+}
 
 /**
  * @override
  */
-scout.NumberField.prototype._formatValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_formatValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return '';
   }
   if (typeof value !== 'number') {
@@ -168,7 +178,7 @@ scout.NumberField.prototype._formatValue = function(value) {
     return value + '';
   }
   return this.decimalFormat.format(value, true);
-};
+}
 
 /**
  * Set the minimum value. Value <code>null</code> means no limitation.
@@ -176,20 +186,20 @@ scout.NumberField.prototype._formatValue = function(value) {
  * If the new minimum value is bigger than the current maxValue, the current maximum value is changed to the new minimum value.
  * @param {number} the new minimum value
  */
-scout.NumberField.prototype.setMinValue = function(minValue) {
+setMinValue(minValue) {
   if (this.minValue === minValue) {
     return;
   }
   this._setMinValue(minValue);
   this.validate();
-};
+}
 
-scout.NumberField.prototype._setMinValue = function(minValue) {
+_setMinValue(minValue) {
   this._setProperty('minValue', minValue);
-  if (!scout.objects.isNullOrUndefined(this.maxValue) && !scout.objects.isNullOrUndefined(this.minValue) && minValue > this.maxValue) {
+  if (!objects.isNullOrUndefined(this.maxValue) && !objects.isNullOrUndefined(this.minValue) && minValue > this.maxValue) {
     this._setMaxValue(minValue);
   }
-};
+}
 
 /**
  * Set the maximum value. Value <code>null</code> means no limitation.
@@ -197,17 +207,18 @@ scout.NumberField.prototype._setMinValue = function(minValue) {
  * If the new maximum value is smaller than the current minValue, the current minimum value is changed to the new maximum value.
  * @param {number} the new minimum value
  */
-scout.NumberField.prototype.setMaxValue = function(maxValue) {
+setMaxValue(maxValue) {
   if (this.maxValue === maxValue) {
     return;
   }
   this._setMaxValue(maxValue);
   this.validate();
-};
+}
 
-scout.NumberField.prototype._setMaxValue = function(maxValue) {
+_setMaxValue(maxValue) {
   this._setProperty('maxValue', maxValue);
-  if (!scout.objects.isNullOrUndefined(this.maxValue) && !scout.objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
+  if (!objects.isNullOrUndefined(this.maxValue) && !objects.isNullOrUndefined(this.minValue) && maxValue < this.minValue) {
     this._setMinValue(maxValue);
   }
-};
+}
+}

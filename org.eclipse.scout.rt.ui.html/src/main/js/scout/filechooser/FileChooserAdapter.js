@@ -8,29 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooserAdapter = function() {
-  scout.FileChooserAdapter.parent.call(this);
-};
-scout.inherits(scout.FileChooserAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
 
-scout.FileChooserAdapter.prototype._onWidgetCancel = function(event) {
+export default class FileChooserAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetCancel(event) {
   // Do not close the file chooser immediately, server will send the close event
   event.preventDefault();
 
   this._send('cancel');
-};
+}
 
-scout.FileChooserAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'cancel') {
     this._onWidgetCancel(event);
   } else if (event.type === 'upload') {
     this._onUpload(event);
   } else {
-    scout.FileChooserAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.FileChooserAdapter.prototype._onUpload = function(event) {
+_onUpload(event) {
   if (this.widget.rendered) {
     this.widget.$uploadButton.setEnabled(false);
   }
@@ -50,4 +54,5 @@ scout.FileChooserAdapter.prototype._onUpload = function(event) {
       this.widget.$uploadButton.setEnabled(true);
     }
   }.bind(this));
-};
+}
+}

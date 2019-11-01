@@ -8,13 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Status} from '../../index';
+import {scout} from '../../index';
+import {MessageBoxes} from '../../index';
+import * as $ from 'jquery';
+
 /**
  * @param {optional boolean} preserveOpener A boolean indicating if the popup-window should have a back reference to the origin window. By default this parameter is false because of security reasons. Only trusted sites may be allowed to access the opener window and potentially modify the origin web application! See https://mathiasbynens.github.io/rel-noopener/ for more details.
  */
-scout.PopupBlockerHandler = function(session, preserveOpener) {
+export default class PopupBlockerHandler {
+
+constructor(session, preserveOpener) {
   this.session = session;
   this.preserveOpener = preserveOpener;
-};
+}
 
 /**
  * @param {String} uri The URI for the window to open
@@ -24,7 +31,7 @@ scout.PopupBlockerHandler = function(session, preserveOpener) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/open
  */
-scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windowSpecs, onWindowOpened) {
+openWindow(uri, windowName, windowSpecs, onWindowOpened) {
   windowName = windowName || 'scout_' + new Date().getTime();
 
   var popup = window.open('', windowName, windowSpecs);
@@ -47,10 +54,10 @@ scout.PopupBlockerHandler.prototype.openWindow = function(uri, windowName, windo
       this.openWindow(uri, windowName, windowSpecs, onWindowOpened);
     }.bind(this));
   }
-};
+}
 
 // Shows a notification when popup-blocker has been detected
-scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
+showNotification(vararg) {
   var notification, linkUrl,
     desktop = this.session.desktop;
 
@@ -68,9 +75,9 @@ scout.PopupBlockerHandler.prototype.showNotification = function(vararg) {
     notification.on('linkClick', vararg);
   }
   notification.show();
-};
+}
 
-scout.PopupBlockerHandler.prototype._handleInvalidUri = function(uri, popup, err) {
+_handleInvalidUri(uri, popup, err) {
   // Log
   scout.create('ErrorHandler', {
     logError: true,
@@ -82,9 +89,10 @@ scout.PopupBlockerHandler.prototype._handleInvalidUri = function(uri, popup, err
   popup.close();
 
   // Show message
-  scout.MessageBoxes.createOk(this.session.desktop)
+  MessageBoxes.createOk(this.session.desktop)
     .withHeader(this.session.text('ui.UnexpectedProblem'))
     .withBody(this.session.text('ui.InvalidUriMsg'))
-    .withSeverity(scout.Status.Severity.ERROR)
+    .withSeverity(Status.Severity.ERROR)
     .buildAndOpen();
-};
+}
+}

@@ -8,18 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ContextMenuPopup = function() {
-  scout.ContextMenuPopup.parent.call(this);
+import {scrollbars} from '../index';
+import {PopupWithHead} from '../index';
+import {ContextMenuPopupLayout} from '../index';
+import {Popup} from '../index';
+import {MenuDestinations} from '../index';
+import {HtmlComponent} from '../index';
+import {RowLayout} from '../index';
+import {menuNavigationKeyStrokes} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+
+export default class ContextMenuPopup extends PopupWithHead {
+
+constructor() {
+  super();
 
   // Make sure head won't be rendered, there is a css selector which is applied only if there is a head
   this._headVisible = false;
   this.menuItems = [];
   this.cloneMenuItems = true;
   this._toggleSubMenuQueue = [];
-};
-scout.inherits(scout.ContextMenuPopup, scout.PopupWithHead);
+}
 
-scout.ContextMenuPopup.prototype._init = function(options) {
+
+_init(options) {
   options.focusableContainer = true; // In order to allow keyboard navigation, the popup must gain focus. Because menu-items are not focusable, make the container focusable instead.
 
   // If menu items are cloned, don't link the original menus with the popup, otherwise they would be removed when the context menu is removed
@@ -27,51 +40,51 @@ scout.ContextMenuPopup.prototype._init = function(options) {
     this._addWidgetProperties('menuItems');
   }
 
-  scout.ContextMenuPopup.parent.prototype._init.call(this, options);
-};
+  super._init( options);
+}
 
 /**
  * @override Popup.js
  */
-scout.ContextMenuPopup.prototype._initKeyStrokeContext = function() {
-  scout.ContextMenuPopup.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  scout.menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
-};
+  menuNavigationKeyStrokes.registerKeyStrokes(this.keyStrokeContext, this, 'menu-item');
+}
 
-scout.ContextMenuPopup.prototype._createLayout = function() {
-  return new scout.ContextMenuPopupLayout(this);
-};
+_createLayout() {
+  return new ContextMenuPopupLayout(this);
+}
 
-scout.ContextMenuPopup.prototype._createBodyLayout = function() {
-  return new scout.RowLayout({
+_createBodyLayout() {
+  return new RowLayout({
     pixelBasedSizing: false
   });
-};
+}
 
-scout.ContextMenuPopup.prototype._render = function() {
-  scout.ContextMenuPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this._installScrollbars();
   this._renderMenuItems();
-};
+}
 
 /**
  * @override
  */
-scout.ContextMenuPopup.prototype._installScrollbars = function(options) {
-  scout.ContextMenuPopup.parent.prototype._installScrollbars.call(this, {
+_installScrollbars(options) {
+  super._installScrollbars( {
     axis: 'y'
   });
-};
+}
 
 /**
  * @override
  */
-scout.ContextMenuPopup.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$body;
-};
+}
 
-scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, animated) {
+removeSubMenuItems(parentMenu, animated) {
   if (!this.rendered) {
     return;
   }
@@ -105,7 +118,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
     var targetSize = this.htmlComp.size();
     parentMenu.$subMenuBody.css('box-shadow', 'none');
     this.htmlComp.setBounds(actualBounds);
-    if (this.verticalAlignment !== scout.Popup.Alignment.TOP) {
+    if (this.verticalAlignment !== Popup.Alignment.TOP) {
       // set container to element
       parentMenu.$subMenuBody.cssTop();
     }
@@ -123,7 +136,7 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       queue: false,
       complete: function() {
         if (parentMenu.$container) { //check if $container is not removed before by closing operation.
-          scout.scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
+          scrollbars.uninstall(parentMenu.$subMenuBody, this.session);
           parentMenu.$placeHolder.replaceWith(parentMenu.$container);
           parentMenu.$container.toggleClass('expanded', false);
           this._updateFirstLastClass();
@@ -157,9 +170,9 @@ scout.ContextMenuPopup.prototype.removeSubMenuItems = function(parentMenu, anima
       });
     }
   }
-};
+}
 
-scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus, animated, initialSubMenuRendering) {
+renderSubMenuItems(parentMenu, menus, animated, initialSubMenuRendering) {
   if (!this.session.desktop.rendered && !initialSubMenuRendering) {
     this.initialSubMenusToRender = {
       parentMenu: parentMenu,
@@ -195,7 +208,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
   var position = parentMenu.$container.position();
   parentMenu.$placeHolder = parentMenu.$container.clone();
   // HtmlComponent is necessary for the row layout (it would normally be installed by Menu.js, but $placeholder is just a jquery clone of parentMenu.$container and is not managed by a real widget)
-  scout.HtmlComponent.install(parentMenu.$placeHolder, this.session);
+  HtmlComponent.install(parentMenu.$placeHolder, this.session);
   if ($insertAfterElement.length) {
     parentMenu.$placeHolder.insertAfter($insertAfterElement);
   } else {
@@ -244,7 +257,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
       complete: function() {
         this.bodyAnimating = false;
         if (parentMenu.__originalParent.$subMenuBody) {
-          scout.scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
+          scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
           parentMenu.__originalParent.$subMenuBody.detach();
           this.$body.cssTop(topMargin);
           this._installScrollbars();
@@ -270,7 +283,7 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
         queue: false
       });
     }
-    if (this.verticalAlignment === scout.Popup.Alignment.TOP) {
+    if (this.verticalAlignment === Popup.Alignment.TOP) {
       this.$container.cssTopAnimated(actualBounds.y, targetBounds.y, {
         duration: duration,
         queue: false
@@ -287,18 +300,18 @@ scout.ContextMenuPopup.prototype.renderSubMenuItems = function(parentMenu, menus
     }
   } else {
     if (!initialSubMenuRendering) {
-      scout.scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
+      scrollbars.uninstall(parentMenu.__originalParent.$subMenuBody, this.session);
     }
     parentMenu.__originalParent.$subMenuBody.detach();
     this._installScrollbars();
     this._updateFirstLastClass();
   }
-};
+}
 
-scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMenuRendering) {
+_renderMenuItems(menus, initialSubMenuRendering) {
   menus = menus ? menus : this._getMenuItems();
   if (this.menuFilter) {
-    menus = this.menuFilter(menus, scout.MenuDestinations.CONTEXT_MENU);
+    menus = this.menuFilter(menus, MenuDestinations.CONTEXT_MENU);
   }
 
   if (!menus || menus.length === 0) {
@@ -345,31 +358,31 @@ scout.ContextMenuPopup.prototype._renderMenuItems = function(menus, initialSubMe
 
   this._handleInitialSubMenus(initialSubMenuRendering);
   this._updateFirstLastClass();
-};
+}
 
-scout.ContextMenuPopup.prototype._attachCloneMenuListeners = function(menu) {
+_attachCloneMenuListeners(menu) {
   menu.on('propertyChange', this._onCloneMenuPropertyChange.bind(this));
   menu.childActions.forEach(this._attachCloneMenuListeners.bind(this));
-};
+}
 
-scout.ContextMenuPopup.prototype._onCloneMenuPropertyChange = function(event) {
+_onCloneMenuPropertyChange(event) {
   if (event.propertyName === 'selected') {
     var menu = event.source;
     // Only trigger property change, setSelected would try to render the selected state which must not happen for the original menu
     menu.cloneOf.triggerPropertyChange('selected', event.oldValue, event.newValue);
   }
-};
+}
 
-scout.ContextMenuPopup.prototype._handleInitialSubMenus = function(initialSubMenuRendering) {
+_handleInitialSubMenus(initialSubMenuRendering) {
   var menusObj;
   while (this.initialSubMenusToRender && !initialSubMenuRendering) {
     menusObj = this.initialSubMenusToRender;
     this.initialSubMenusToRender = undefined;
     this.renderSubMenuItems(menusObj.parentMenu, menusObj.menus, false, true);
   }
-};
+}
 
-scout.ContextMenuPopup.prototype._attachMenuListeners = function(menu) {
+_attachMenuListeners(menu) {
   var menuItemActionHandler = this._onMenuItemAction.bind(this);
   var menuItemPropertyChange = this._onMenuItemPropertyChange.bind(this);
   menu.on('action', menuItemActionHandler);
@@ -378,46 +391,46 @@ scout.ContextMenuPopup.prototype._attachMenuListeners = function(menu) {
     menu.off('action', menuItemActionHandler);
     menu.off('propertyChange', menuItemPropertyChange);
   });
-};
+}
 
 /**
  * @override PopupWithHead.js
  */
-scout.ContextMenuPopup.prototype._modifyBody = function() {
+_modifyBody() {
   this.$body.addClass('context-menu');
-};
+}
 
-scout.ContextMenuPopup.prototype.updateMenuItems = function(menuItems) {
-  menuItems = scout.arrays.ensure(menuItems);
+updateMenuItems(menuItems) {
+  menuItems = arrays.ensure(menuItems);
   // Only update if list of menus changed. Don't compare this.menuItems, because that list
   // may contain additional UI separators, and may not be in the same order
-  if (!scout.arrays.equals(this.menuItems, menuItems)) {
+  if (!arrays.equals(this.menuItems, menuItems)) {
     this.close();
   }
-};
+}
 /**
  * Override this method to return menu items or actions used to render menu items.
  */
-scout.ContextMenuPopup.prototype._getMenuItems = function() {
+_getMenuItems() {
   return this.menuItems;
-};
+}
 
 /**
  * Currently rendered $menuItems
  */
-scout.ContextMenuPopup.prototype.$menuItems = function() {
+$menuItems() {
   return this.$body.children('.menu-item');
-};
+}
 
-scout.ContextMenuPopup.prototype.$visibleMenuItems = function() {
+$visibleMenuItems() {
   return this.$body.children('.menu-item:visible');
-};
+}
 
 /**
  * Updates the first and last visible menu items with the according css classes.
  * Necessary because invisible menu-items are rendered.
  */
-scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
+_updateFirstLastClass(event) {
   var $firstMenuItem, $lastMenuItem;
 
   this.$body.children('.menu-item').each(function() {
@@ -437,9 +450,9 @@ scout.ContextMenuPopup.prototype._updateFirstLastClass = function(event) {
   if ($lastMenuItem) {
     $lastMenuItem.addClass('context-menu-item-last');
   }
-};
+}
 
-scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, $selectedItem) {
+updateNextToSelected(menuItemClass, $selectedItem) {
   menuItemClass = menuItemClass ? menuItemClass : 'menu-item';
   var $all = this.$body.find('.' + menuItemClass);
   $selectedItem = $selectedItem ? $selectedItem : this.$body.find('.' + menuItemClass + '.selected');
@@ -448,16 +461,16 @@ scout.ContextMenuPopup.prototype.updateNextToSelected = function(menuItemClass, 
   if ($selectedItem.hasClass('selected')) {
     $selectedItem.nextAll(':visible').first().addClass('next-to-selected');
   }
-};
+}
 
-scout.ContextMenuPopup.prototype._onMenuItemAction = function(event) {
+_onMenuItemAction(event) {
   if (event.source.isToggleAction()) {
     return;
   }
   this.close();
-};
+}
 
-scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
+_onMenuItemPropertyChange(event) {
   if (!this.rendered) {
     return;
   }
@@ -471,19 +484,19 @@ scout.ContextMenuPopup.prototype._onMenuItemPropertyChange = function(event) {
   }
   // Make sure menu is positioned correctly afterwards (if it is opened upwards hiding/showing a menu item makes it necessary to reposition)
   this.position();
-};
+}
 
 /**
  * Deselects the visible siblings of the given menu item. It just removes the CSS class and does not modify the selected property.
  */
-scout.ContextMenuPopup.prototype._deselectSiblings = function(menuItem) {
+_deselectSiblings(menuItem) {
   menuItem.$container.siblings('.menu-item').each(function(i, elem) {
     var $menuItem = $(elem);
     $menuItem.select(false);
   }, this);
-};
+}
 
-scout.ContextMenuPopup.prototype._invalidateLayoutTreeAndRepositionPopup = function() {
+_invalidateLayoutTreeAndRepositionPopup() {
   this.invalidateLayoutTree();
   this.session.layoutValidator.schedulePostValidateFunction(function() {
     if (!this.rendered) { // check needed because this is an async callback
@@ -491,4 +504,5 @@ scout.ContextMenuPopup.prototype._invalidateLayoutTreeAndRepositionPopup = funct
     }
     this.position();
   }.bind(this));
-};
+}
+}

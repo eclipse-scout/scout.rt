@@ -8,6 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
 /**
  * Helper to support clone property and event handling between original and clone.
  *
@@ -29,7 +33,9 @@
  *                                          the target.
  *
  */
-scout.EventDelegator = function(source, target, options) {
+export default class EventDelegator {
+
+constructor(source, target, options) {
   options = options || {};
   this.source = source;
   this.target = target;
@@ -43,13 +49,13 @@ scout.EventDelegator = function(source, target, options) {
   this._destroyHandler = null;
 
   this._installSourceListener();
-};
+}
 
-scout.EventDelegator.prototype.destroy = function() {
+destroy() {
   this._uninstallSourceListener();
-};
+}
 
-scout.EventDelegator.prototype._installSourceListener = function() {
+_installSourceListener() {
   if (this._mirrorListener) {
     throw new Error('source listeners already installed.');
   }
@@ -60,9 +66,9 @@ scout.EventDelegator.prototype._installSourceListener = function() {
   this._destroyHandler = this._uninstallSourceListener.bind(this);
   this.source.on('destroy', this._destroyHandler);
   this.target.on('destroy', this._destroyHandler);
-};
+}
 
-scout.EventDelegator.prototype._uninstallSourceListener = function() {
+_uninstallSourceListener() {
   if (this._mirrorListener) {
     this.source.events.removeListener(this._mirrorListener);
     this._mirrorListener = null;
@@ -72,22 +78,22 @@ scout.EventDelegator.prototype._uninstallSourceListener = function() {
     this.target.off('destroy', this._destroyHandler);
     this._destroyHandler = null;
   }
-};
+}
 
-scout.EventDelegator.prototype._onSourceEvent = function(event) {
+_onSourceEvent(event) {
   if (event.type === 'propertyChange') {
     this._onSourcePropertyChange(event);
   } else if (this.delegateAllEvents || this.delegateEvents.indexOf(event.type) > -1) {
     this.target.trigger(event.type, event);
   }
-};
+}
 
-scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
+_onSourcePropertyChange(event) {
   if (this.excludeProperties.indexOf(event.propertyName) > -1) {
     return;
   }
   if (this.delegateAllProperties || this.delegateProperties.indexOf(event.propertyName) > -1) {
-    if (scout.EventDelegator.equalsProperty(event.propertyName, this.target, event.newValue)) {
+    if (EventDelegator.equalsProperty(event.propertyName, this.target, event.newValue)) {
       return;
     }
     if (this.callSetter) {
@@ -96,23 +102,24 @@ scout.EventDelegator.prototype._onSourcePropertyChange = function(event) {
       this.target.trigger(event.type, event);
     }
   }
-};
+}
 
-scout.EventDelegator.equalsProperty = function(propName, obj, value) {
+static equalsProperty(propName, obj, value) {
   var propValue = obj[propName];
-  // Compare arrays using scout.arrays.equals()
+  // Compare arrays using arrays.equals()
   if (Array.isArray(value) && Array.isArray(propValue)) {
-    return scout.arrays.equals(value, propValue);
+    return arrays.equals(value, propValue);
   }
-  return scout.objects.equals(propValue, value);
-};
+  return objects.equals(propValue, value);
+}
 
-scout.EventDelegator.create = function(source, target, options) {
+static create(source, target, options) {
   if ((options.delegateProperties && options.delegateProperties.length > 0) ||
     (options.delegateEvents && options.delegateEvents.length > 0) ||
     options.delegateAllProperties ||
     options.delegateAllEvents) {
-    return new scout.EventDelegator(source, target, options);
+    return new EventDelegator(source, target, options);
   }
   return null;
-};
+}
+}

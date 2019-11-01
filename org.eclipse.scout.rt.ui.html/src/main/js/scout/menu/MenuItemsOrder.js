@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuItemsOrder = function(session, objectType) {
+import {menus} from '../index';
+import {scout} from '../index';
+
+export default class MenuItemsOrder {
+
+constructor(session, objectType) {
   this.session = session;
   this.objectType = objectType;
   this.emptySpaceTypes = ['EmptySpace'];
   this.selectionTypes = ['SingleSelection', 'MultiSelection'];
-};
+}
 
-scout.MenuItemsOrder.prototype.order = function(items) {
+order(items) {
   var buttons = [],
     emptySpaceItems = [],
     selectionItems = [],
@@ -32,12 +37,12 @@ scout.MenuItemsOrder.prototype.order = function(items) {
       buttons.push(item);
     } else if (item.horizontalAlignment === 1) {
       rightItems.push(item);
-    } else if (scout.menus.checkType(item, this._menuTypes(this.emptySpaceTypes))) {
+    } else if (menus.checkType(item, this._menuTypes(this.emptySpaceTypes))) {
       if (item.visible) {
         isEmptyspaceMenuVisible = true;
       }
       emptySpaceItems.push(item);
-    } else if (scout.menus.checkType(item, this._menuTypes(this.selectionTypes))) {
+    } else if (menus.checkType(item, this._menuTypes(this.selectionTypes))) {
       if (item.visible) {
         isSelectionMenuVisible = true;
       }
@@ -55,25 +60,26 @@ scout.MenuItemsOrder.prototype.order = function(items) {
     right: rightItems,
     all: buttons.concat(emptySpaceItems, selectionItems).concat(rightItems)
   };
-};
+}
 
-scout.MenuItemsOrder.prototype._menuTypes = function(types) {
+_menuTypes(types) {
   var i, menuTypes = [];
   types = types || [];
   for (i = 0; i < types.length; i++) {
     menuTypes.push(this.objectType + '.' + types[i]);
   }
   return menuTypes;
-};
+}
 
 /**
  * The separator here does not exist in the model delivered by the server-side client.
  * The createdBy property is added to the model to find and destroy items added by the UI later.
  */
-scout.MenuItemsOrder.prototype._createSeparator = function() {
+_createSeparator() {
   return scout.create('Menu', {
     parent: this.menuBar,
     createdBy: this,
     separator: true
   });
-};
+}
+}

@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ComboMenuAdapter = function() {
-  scout.ComboMenuAdapter.parent.call(this);
-};
-scout.inherits(scout.ComboMenuAdapter, scout.MenuAdapter);
+import {MenuAdapter} from '../index';
+
+export default class ComboMenuAdapter extends MenuAdapter {
+
+constructor() {
+  super();
+}
+
+}

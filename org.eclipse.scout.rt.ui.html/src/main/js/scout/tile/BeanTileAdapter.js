@@ -1,18 +1,23 @@
-scout.BeanTileAdapter = function() {
-  scout.BeanTileAdapter.parent.call(this);
-};
-scout.inherits(scout.BeanTileAdapter, scout.TileAdapter);
+import {TileAdapter} from '../index';
 
-scout.BeanTileAdapter.prototype._onWidgetAppLinkAction = function(event) {
+export default class BeanTileAdapter extends TileAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.BeanTileAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.BeanTileAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarFieldAdapter = function() {
-  scout.CalendarFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.CalendarFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class CalendarFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

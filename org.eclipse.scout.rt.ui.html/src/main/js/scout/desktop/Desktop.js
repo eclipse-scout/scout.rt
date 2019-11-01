@@ -8,10 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Desktop = function() {
-  scout.Desktop.parent.call(this);
+import {Device} from '../index';
+import {DeferredGlassPaneTarget} from '../index';
+import {FileChooserController} from '../index';
+import {Form} from '../index';
+import {HtmlEnvironment} from '../index';
+import {Event} from '../index';
+import {HtmlComponent} from '../index';
+import {KeyStrokeContext} from '../index';
+import {DesktopNavigation} from '../index';
+import {DisableBrowserTabSwitchingKeyStroke} from '../index';
+import {cookies} from '../index';
+import * as $ from 'jquery';
+import {Outline} from '../index';
+import {scout} from '../index';
+import {MessageBoxController} from '../index';
+import {DisableBrowserF5ReloadKeyStroke} from '../index';
+import {DesktopLayout} from '../index';
+import {Tree} from '../index';
+import {Widget} from '../index';
+import {webstorage} from '../index';
+import {styles} from '../index';
+import {arrays} from '../index';
+import {BenchColumnLayoutData} from '../index';
 
-  this.desktopStyle = scout.Desktop.DisplayStyle.DEFAULT;
+export default class Desktop extends Widget {
+
+constructor() {
+  super();
+
+  this.desktopStyle = Desktop.DisplayStyle.DEFAULT;
 
   this.title = null;
   this.selectViewTabsKeyStrokesEnabled = true;
@@ -23,7 +49,7 @@ scout.Desktop = function() {
   this.navigationHandleVisible = true;
   this.benchVisible = true;
   this.headerVisible = true;
-  this.geolocationServiceAvailable = scout.device.supportsGeolocation();
+  this.geolocationServiceAvailable = Device.get().supportsGeolocation();
   this.benchLayoutData = null;
 
   this.menus = [];
@@ -59,16 +85,16 @@ scout.Desktop = function() {
 
   // event listeners
   this._benchActiveViewChangedHandler = this._onBenchActivateViewChanged.bind(this);
-};
-scout.inherits(scout.Desktop, scout.Widget);
+}
 
-scout.Desktop.DisplayStyle = {
+
+static DisplayStyle = {
   DEFAULT: 'default',
   BENCH: 'bench',
   COMPACT: 'compact'
 };
 
-scout.Desktop.UriAction = {
+static UriAction = {
   DOWNLOAD: 'download',
   OPEN: 'open',
   NEW_WINDOW: 'newWindow',
@@ -76,7 +102,7 @@ scout.Desktop.UriAction = {
   SAME_WINDOW: 'sameWindow'
 };
 
-scout.Desktop.prototype._init = function(model) {
+_init(model) {
   // Note: session and desktop are tightly coupled. Because a lot of widgets want to register
   // a listener on the desktop in their init phase, they access the desktop by calling 'this.session.desktop'
   // that's why we need this instance as early as possible. When that happens they access a desktop which is
@@ -88,15 +114,15 @@ scout.Desktop.prototype._init = function(model) {
   var session = model.session || model.parent.session;
   session.desktop = this;
 
-  scout.Desktop.parent.prototype._init.call(this, model);
+  super._init( model);
 
   this._initTheme();
   this.formController = scout.create('DesktopFormController', {
     displayParent: this,
     session: this.session
   });
-  this.messageBoxController = new scout.MessageBoxController(this, this.session);
-  this.fileChooserController = new scout.FileChooserController(this, this.session);
+  this.messageBoxController = new MessageBoxController(this, this.session);
+  this.fileChooserController = new FileChooserController(this, this.session);
   this._resizeHandler = this.onResize.bind(this);
   this._popstateHandler = this.onPopstate.bind(this);
   this.updateSplitterVisibility();
@@ -117,43 +143,43 @@ scout.Desktop.prototype._init = function(model) {
     var target = scout.widget(targetElem);
     return !element.has(target);
   });
-};
+}
 
 /**
  * @override
  */
-scout.Desktop.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.Desktop.prototype._initKeyStrokeContext = function() {
-  scout.Desktop.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.keyStrokeContext.registerKeyStroke([
-    new scout.DisableBrowserF5ReloadKeyStroke(this),
-    new scout.DisableBrowserTabSwitchingKeyStroke(this)
+    new DisableBrowserF5ReloadKeyStroke(this),
+    new DisableBrowserTabSwitchingKeyStroke(this)
   ]);
-};
+}
 
-scout.Desktop.prototype._onBenchActivateViewChanged = function(event) {
+_onBenchActivateViewChanged(event) {
   if (this.initialFormRendering) {
     return;
   }
   var view = event.view;
-  if (view instanceof scout.Form && this.bench.outlineContent !== view && !view.detailForm) {
+  if (view instanceof Form && this.bench.outlineContent !== view && !view.detailForm) {
     // Notify model that this form is active (only for regular views, not detail forms)
     this._setFormActivated(view);
   }
-};
+}
 
-scout.Desktop.prototype._render = function() {
+_render() {
   this.$container = this.$parent;
   this.$container.addClass('desktop');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
 
   // Attach resize listener before other elements can add their own resize listener (e.g. an addon) to make sure it is executed first
@@ -183,20 +209,20 @@ scout.Desktop.prototype._render = function() {
   this._setupDragAndDrop();
 
   this._disableContextMenu();
-};
+}
 
-scout.Desktop.prototype._remove = function() {
+_remove() {
   this.formController.remove();
   this.messageBoxController.remove();
   this.fileChooserController.remove();
   this.$container.window()
     .off('resize', this._resizeHandler)
     .off('popstate', this._popstateHandler);
-  scout.Desktop.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Desktop.prototype._postRender = function() {
-  scout.Desktop.parent.prototype._postRender.call(this);
+_postRender() {
+  super._postRender();
 
   // Render attached forms, message boxes and file choosers.
   this.initialFormRendering = true;
@@ -205,12 +231,12 @@ scout.Desktop.prototype._postRender = function() {
   this.messageBoxController.render();
   this.fileChooserController.render();
   this.initialFormRendering = false;
-};
+}
 
-scout.Desktop.prototype._setDisplayStyle = function(displayStyle) {
+_setDisplayStyle(displayStyle) {
   this._setProperty('displayStyle', displayStyle);
 
-  var isCompact = this.displayStyle === scout.Desktop.DisplayStyle.COMPACT;
+  var isCompact = this.displayStyle === Desktop.DisplayStyle.COMPACT;
 
   if (this.header) {
     this.header.setToolBoxVisible(!isCompact);
@@ -227,32 +253,32 @@ scout.Desktop.prototype._setDisplayStyle = function(displayStyle) {
     this.outline.setCompact(isCompact);
     this.outline.setEmbedDetailContent(isCompact);
   }
-};
+}
 
-scout.Desktop.prototype.setDense = function(dense) {
+setDense(dense) {
   this.setProperty('dense', dense);
-};
+}
 
-scout.Desktop.prototype._setDense = function(dense) {
+_setDense(dense) {
   this._setProperty('dense', dense);
 
-  scout.styles.clearCache();
-  scout.htmlEnvironment.init(this.dense ? 'dense' : null);
-};
+  styles.clearCache();
+  HtmlEnvironment.get().init(this.dense ? 'dense' : null);
+}
 
-scout.Desktop.prototype._renderDense = function() {
+_renderDense() {
   this.$container.toggleClass('dense', this.dense);
-};
+}
 
-scout.Desktop.prototype._createLayout = function() {
-  return new scout.DesktopLayout(this);
-};
+_createLayout() {
+  return new DesktopLayout(this);
+}
 
 /**
  * Displays attached forms, message boxes and file choosers.
  * Outline does not need to be rendered to show the child elements, it needs to be active (necessary if navigation is invisible)
  */
-scout.Desktop.prototype._renderDisplayChildrenOfOutline = function() {
+_renderDisplayChildrenOfOutline() {
   if (!this.outline) {
     return;
   }
@@ -265,28 +291,28 @@ scout.Desktop.prototype._renderDisplayChildrenOfOutline = function() {
       this.formController._activateView(selectedView);
     }.bind(this));
   }
-};
+}
 
-scout.Desktop.prototype._removeDisplayChildrenOfOutline = function() {
+_removeDisplayChildrenOfOutline() {
   if (!this.outline) {
     return;
   }
   this.outline.formController.remove();
   this.outline.messageBoxController.remove();
   this.outline.fileChooserController.remove();
-};
+}
 
-scout.Desktop.prototype.computeParentForDisplayParent = function(displayParent) {
+computeParentForDisplayParent(displayParent) {
   // Outline must not be used as parent, otherwise the children (form, messageboxes etc.) would be removed if navigation is made invisible
   // The functions _render/removeDisplayChildrenOfOutline take care that the elements are correctly rendered/removed on an outline switch
   var parent = displayParent;
-  if (displayParent instanceof scout.Outline) {
+  if (displayParent instanceof Outline) {
     parent = this;
   }
   return parent;
-};
+}
 
-scout.Desktop.prototype._renderTitle = function() {
+_renderTitle() {
   var title = this.title;
   if (title === undefined || title === null) {
     return;
@@ -295,13 +321,13 @@ scout.Desktop.prototype._renderTitle = function() {
   if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
     $scoutDivs.document(true).title = title;
   }
-};
+}
 
-scout.Desktop.prototype._renderActiveForm = function() {
+_renderActiveForm() {
   // NOP -> is handled in _setFormActivated when ui changes active form or if model changes form in _onFormShow/_onFormActivate
-};
+}
 
-scout.Desktop.prototype._renderBench = function() {
+_renderBench() {
   if (this.bench) {
     return;
   }
@@ -309,15 +335,15 @@ scout.Desktop.prototype._renderBench = function() {
     parent: this,
     animateRemoval: true,
     headerTabArea: this.header ? this.header.tabArea : undefined,
-    outlineContentVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
+    outlineContentVisible: this.displayStyle !== Desktop.DisplayStyle.COMPACT
   });
   this.bench.on('viewActivate', this._benchActiveViewChangedHandler);
   this.bench.render();
   this.bench.$container.insertBefore(this.$overlaySeparator);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Desktop.prototype._removeBench = function() {
+_removeBench() {
   if (!this.bench) {
     return;
   }
@@ -327,9 +353,9 @@ scout.Desktop.prototype._removeBench = function() {
     this.invalidateLayoutTree();
   }.bind(this));
   this.bench.destroy();
-};
+}
 
-scout.Desktop.prototype._renderBenchVisible = function() {
+_renderBenchVisible() {
   this.animateLayoutChange = this.rendered;
   if (this.benchVisible) {
     this._renderBench();
@@ -337,35 +363,35 @@ scout.Desktop.prototype._renderBenchVisible = function() {
   } else {
     this._removeBench();
   }
-};
+}
 
-scout.Desktop.prototype._renderNavigation = function() {
+_renderNavigation() {
   if (this.navigation) {
     return;
   }
   this.navigation = scout.create('DesktopNavigation', {
     parent: this,
     outline: this.outline,
-    toolBoxVisible: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
+    toolBoxVisible: this.displayStyle === Desktop.DisplayStyle.COMPACT,
     layoutData: {
-      fullWidth: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT
+      fullWidth: this.displayStyle === Desktop.DisplayStyle.COMPACT
     }
   });
   this.navigation.render();
   this.navigation.$container.prependTo(this.$container);
   this.invalidateLayoutTree();
-};
+}
 
-scout.Desktop.prototype._removeNavigation = function() {
+_removeNavigation() {
   if (!this.navigation) {
     return;
   }
   this.navigation.destroy();
   this.navigation = null;
   this.invalidateLayoutTree();
-};
+}
 
-scout.Desktop.prototype._renderNavigationVisible = function() {
+_renderNavigationVisible() {
   this.animateLayoutChange = this.rendered;
   if (this.navigationVisible) {
     this._renderNavigation();
@@ -377,17 +403,17 @@ scout.Desktop.prototype._renderNavigationVisible = function() {
       this.invalidateLayoutTree();
     }
   }
-};
+}
 
-scout.Desktop.prototype._renderHeader = function() {
+_renderHeader() {
   if (this.header) {
     return;
   }
   this.header = scout.create('DesktopHeader', {
     parent: this,
     logoUrl: this.logoUrl,
-    animateRemoval: this.displayStyle === scout.Desktop.DisplayStyle.COMPACT,
-    toolBoxVisible: this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT
+    animateRemoval: this.displayStyle === Desktop.DisplayStyle.COMPACT,
+    toolBoxVisible: this.displayStyle !== Desktop.DisplayStyle.COMPACT
   });
   this.header.render();
   if (this.navigation && this.navigation.rendered) {
@@ -400,9 +426,9 @@ scout.Desktop.prototype._renderHeader = function() {
     this.bench._setTabArea(this.header.tabArea);
   }
   this.invalidateLayoutTree();
-};
+}
 
-scout.Desktop.prototype._removeHeader = function() {
+_removeHeader() {
   if (!this.header) {
     return;
   }
@@ -411,31 +437,31 @@ scout.Desktop.prototype._removeHeader = function() {
     this.header = null;
   }.bind(this));
   this.header.destroy();
-};
+}
 
-scout.Desktop.prototype._renderHeaderVisible = function() {
+_renderHeaderVisible() {
   if (this.headerVisible) {
     this._renderHeader();
   } else {
     this._removeHeader();
   }
-};
+}
 
-scout.Desktop.prototype._renderLogoUrl = function() {
+_renderLogoUrl() {
   if (this.header) {
     this.header.setLogoUrl(this.logoUrl);
   }
-};
+}
 
-scout.Desktop.prototype._renderSplitterVisible = function() {
+_renderSplitterVisible() {
   if (this.splitterVisible) {
     this._renderSplitter();
   } else {
     this._removeSplitter();
   }
-};
+}
 
-scout.Desktop.prototype._renderSplitter = function() {
+_renderSplitter() {
   if (this.splitter || !this.navigation) {
     return;
   }
@@ -450,24 +476,24 @@ scout.Desktop.prototype._renderSplitter = function() {
   this.splitter.on('moveEnd', this._onSplitterMoveEnd.bind(this));
   this.splitter.on('positionChange', this._onSplitterPositionChange.bind(this));
   this.updateSplitterPosition();
-};
+}
 
-scout.Desktop.prototype._removeSplitter = function() {
+_removeSplitter() {
   if (!this.splitter) {
     return;
   }
   this.splitter.destroy();
   this.splitter = null;
-};
+}
 
-scout.Desktop.prototype._renderInBackground = function() {
+_renderInBackground() {
   if (this.bench) {
     this.bench.$container.toggleClass('drop-shadow', this.inBackground);
   }
-};
+}
 
-scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
-  if (!scout.device.supportsHistoryApi()) {
+_renderBrowserHistoryEntry() {
+  if (!Device.get().supportsHistoryApi()) {
     return;
   }
   var myWindow = this.$container.window(true),
@@ -478,9 +504,9 @@ scout.Desktop.prototype._renderBrowserHistoryEntry = function() {
       deepLinkPath: history.deepLinkPath
     }, history.title, history.path);
   }
-};
+}
 
-scout.Desktop.prototype._setupDragAndDrop = function() {
+_setupDragAndDrop() {
   var dragEnterOrOver = function(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -494,18 +520,18 @@ scout.Desktop.prototype._setupDragAndDrop = function() {
     event.stopPropagation();
     event.preventDefault();
   });
-};
+}
 
-scout.Desktop.prototype.updateSplitterVisibility = function() {
+updateSplitterVisibility() {
   // Splitter should only be visible if navigation and bench are visible, but never in compact mode (to prevent unnecessary splitter rendering)
-  this.setSplitterVisible(this.navigationVisible && this.benchVisible && this.displayStyle !== scout.Desktop.DisplayStyle.COMPACT);
-};
+  this.setSplitterVisible(this.navigationVisible && this.benchVisible && this.displayStyle !== Desktop.DisplayStyle.COMPACT);
+}
 
-scout.Desktop.prototype.setSplitterVisible = function(visible) {
+setSplitterVisible(visible) {
   this.setProperty('splitterVisible', visible);
-};
+}
 
-scout.Desktop.prototype.updateSplitterPosition = function() {
+updateSplitterPosition() {
   if (!this.splitter) {
     return;
   }
@@ -520,18 +546,18 @@ scout.Desktop.prototype.updateSplitterPosition = function() {
     this.splitter.setPosition();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Desktop.prototype._disableContextMenu = function() {
+_disableContextMenu() {
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
   this.$container.on('contextmenu', function(event) {
     if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'TEXTAREA' && !event.target.isContentEditable) {
       event.preventDefault();
     }
   });
-};
+}
 
-scout.Desktop.prototype.setOutline = function(outline) {
+setOutline(outline) {
   if (this.outline === outline) {
     return;
   }
@@ -560,113 +586,113 @@ scout.Desktop.prototype.setOutline = function(outline) {
       this.bench.setChanging(false);
     }
   }
-};
+}
 
-scout.Desktop.prototype._setViews = function(views) {
+_setViews(views) {
   if (views) {
     views.forEach(function(view) {
       view.setDisplayParent(this);
     }.bind(this));
   }
   this._setProperty('views', views);
-};
+}
 
-scout.Desktop.prototype._setViewButtons = function(viewButtons) {
+_setViewButtons(viewButtons) {
   this.updateKeyStrokes(viewButtons, this.viewButtons);
   this._setProperty('viewButtons', viewButtons);
-};
+}
 
-scout.Desktop.prototype.setMenus = function(menus) {
+setMenus(menus) {
   if (this.header) {
     this.header.setMenus(menus);
   }
-};
+}
 
-scout.Desktop.prototype._setMenus = function(menus) {
+_setMenus(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
-};
+}
 
-scout.Desktop.prototype._setKeyStrokes = function(keyStrokes) {
+_setKeyStrokes(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
+}
 
-scout.Desktop.prototype.setNavigationHandleVisible = function(visible) {
+setNavigationHandleVisible(visible) {
   this.setProperty('navigationHandleVisible', visible);
-};
+}
 
-scout.Desktop.prototype._renderNavigationHandleVisible = function() {
+_renderNavigationHandleVisible() {
   this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
-};
+}
 
-scout.Desktop.prototype.setNavigationVisible = function(visible) {
+setNavigationVisible(visible) {
   this.setProperty('navigationVisible', visible);
   this.updateSplitterVisibility();
-};
+}
 
-scout.Desktop.prototype.setBenchVisible = function(visible) {
+setBenchVisible(visible) {
   this.setProperty('benchVisible', visible);
   this.updateSplitterVisibility();
-};
+}
 
-scout.Desktop.prototype.setHeaderVisible = function(visible) {
+setHeaderVisible(visible) {
   this.setProperty('headerVisible', visible);
-};
+}
 
-scout.Desktop.prototype._setBenchLayoutData = function(layoutData) {
-  layoutData = scout.BenchColumnLayoutData.ensure(layoutData);
+_setBenchLayoutData(layoutData) {
+  layoutData = BenchColumnLayoutData.ensure(layoutData);
   this._setProperty('benchLayoutData', layoutData);
-};
+}
 
-scout.Desktop.prototype._setInBackground = function(inBackground) {
+_setInBackground(inBackground) {
   this._setProperty('inBackground', inBackground);
-};
+}
 
-scout.Desktop.prototype.outlineDisplayStyle = function() {
+outlineDisplayStyle() {
   if (this.outline) {
     return this.outline.displayStyle;
   }
-};
+}
 
-scout.Desktop.prototype.shrinkNavigation = function() {
+shrinkNavigation() {
   if (this.outline.toggleBreadcrumbStyleEnabled && this.navigationVisible &&
-    this.outlineDisplayStyle() === scout.Tree.DisplayStyle.DEFAULT) {
-    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.BREADCRUMB);
+    this.outlineDisplayStyle() === Tree.DisplayStyle.DEFAULT) {
+    this.outline.setDisplayStyle(Tree.DisplayStyle.BREADCRUMB);
   } else {
     this.setNavigationVisible(false);
   }
-};
+}
 
-scout.Desktop.prototype.enlargeNavigation = function() {
-  if (this.navigationVisible && this.outlineDisplayStyle() === scout.Tree.DisplayStyle.BREADCRUMB) {
-    this.outline.setDisplayStyle(scout.Tree.DisplayStyle.DEFAULT);
+enlargeNavigation() {
+  if (this.navigationVisible && this.outlineDisplayStyle() === Tree.DisplayStyle.BREADCRUMB) {
+    this.outline.setDisplayStyle(Tree.DisplayStyle.DEFAULT);
   } else {
     this.setNavigationVisible(true);
     // Layout immediately to have view tabs positioned correctly before animation starts
     this.validateLayoutTree();
   }
-};
+}
 
-scout.Desktop.prototype.switchToBench = function() {
+switchToBench() {
   this.setHeaderVisible(true);
   this.setBenchVisible(true);
   this.setNavigationVisible(false);
-};
+}
 
-scout.Desktop.prototype.switchToNavigation = function() {
+switchToNavigation() {
   this.setNavigationVisible(true);
   this.setHeaderVisible(false);
   this.setBenchVisible(false);
-};
+}
 
-scout.Desktop.prototype.revalidateHeaderLayout = function() {
+revalidateHeaderLayout() {
   if (this.header) {
     this.header.revalidateLayout();
   }
-};
+}
 
-scout.Desktop.prototype.goOffline = function() {
+goOffline() {
   if (this.offline) {
     return;
   }
@@ -676,20 +702,20 @@ scout.Desktop.prototype.goOffline = function() {
     parent: this
   });
   this._offlineNotification.show();
-};
+}
 
-scout.Desktop.prototype.goOnline = function() {
+goOnline() {
   this._removeOfflineNotification();
-};
+}
 
-scout.Desktop.prototype._removeOfflineNotification = function() {
+_removeOfflineNotification() {
   if (this._offlineNotification) {
     setTimeout(this.removeNotification.bind(this, this._offlineNotification), 3000);
     this._offlineNotification = null;
   }
-};
+}
 
-scout.Desktop.prototype.addNotification = function(notification) {
+addNotification(notification) {
   if (!notification) {
     return;
   }
@@ -697,9 +723,9 @@ scout.Desktop.prototype.addNotification = function(notification) {
   if (this.rendered) {
     this._renderNotification(notification);
   }
-};
+}
 
-scout.Desktop.prototype._renderNotification = function(notification) {
+_renderNotification(notification) {
   if (this.$notifications) {
     // Bring to front
     this.$notifications.appendTo(this.$container);
@@ -713,22 +739,22 @@ scout.Desktop.prototype._renderNotification = function(notification) {
       this.removeNotification(notification);
     }.bind(this));
   }
-};
+}
 
-scout.Desktop.prototype._renderNotifications = function() {
+_renderNotifications() {
   this.notifications.forEach(function(notification) {
     this._renderNotification(notification);
   }.bind(this));
-};
+}
 
 /**
  * Removes the given notification.
- * @param notification Either an instance of scout.DesktopNavigation or a String containing an ID of a notification instance.
+ * @param notification Either an instance of DesktopNavigation or a String containing an ID of a notification instance.
  */
-scout.Desktop.prototype.removeNotification = function(notification) {
+removeNotification(notification) {
   if (typeof notification === 'string') {
     var notificationId = notification;
-    notification = scout.arrays.find(this.notifications, function(n) {
+    notification = arrays.find(this.notifications, function(n) {
       return notificationId === n.id;
     });
   }
@@ -738,7 +764,7 @@ scout.Desktop.prototype.removeNotification = function(notification) {
   if (notification.removeTimeout) {
     clearTimeout(notification.removeTimeout);
   }
-  scout.arrays.remove(this.notifications, notification);
+  arrays.remove(this.notifications, notification);
   if (!this.rendered) {
     return;
   }
@@ -746,12 +772,12 @@ scout.Desktop.prototype.removeNotification = function(notification) {
     notification.fadeOut();
     notification.one('remove', this._onNotificationRemove.bind(this, notification));
   }
-};
+}
 
 /**
  * Destroys every popup which is a descendant of the given widget.
  */
-scout.Desktop.prototype.destroyPopupsFor = function(widget) {
+destroyPopupsFor(widget) {
   this.$container.children('.popup').each(function(i, elem) {
     var $popup = $(elem),
       popup = scout.widget($popup);
@@ -760,23 +786,23 @@ scout.Desktop.prototype.destroyPopupsFor = function(widget) {
       popup.destroy();
     }
   });
-};
+}
 
-scout.Desktop.prototype.openUri = function(uri, action) {
+openUri(uri, action) {
   if (!this.rendered) {
     this._postRenderActions.push(this.openUri.bind(this, uri, action));
     return;
   }
   this.openUriHandler.openUri(uri, action);
-};
+}
 
-scout.Desktop.prototype.bringOutlineToFront = function() {
+bringOutlineToFront() {
   if (!this.rendered) {
     this._postRenderActions.push(this.bringOutlineToFront.bind(this));
     return;
   }
 
-  if (!this.inBackground || this.displayStyle === scout.Desktop.DisplayStyle.BENCH) {
+  if (!this.inBackground || this.displayStyle === Desktop.DisplayStyle.BENCH) {
     return;
   }
 
@@ -794,9 +820,9 @@ scout.Desktop.prototype.bringOutlineToFront = function() {
   }
 
   this._renderInBackground();
-};
+}
 
-scout.Desktop.prototype.sendOutlineToBack = function() {
+sendOutlineToBack() {
   if (this.inBackground) {
     return;
   }
@@ -811,23 +837,23 @@ scout.Desktop.prototype.sendOutlineToBack = function() {
     this.header.sendToBack();
   }
   this._renderInBackground();
-};
+}
 
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
  * Returns 'true' if the Desktop is currently accessible to the user.
  */
-scout.Desktop.prototype.inFront = function() {
+inFront() {
   return true; // Desktop is always available to the user.
-};
+}
 
 /**
  * === Method required for objects that act as 'displayParent' ===
  *
  * Returns the DOM elements to paint a glassPanes over, once a modal Form, message-box, file-chooser or wait-dialog is showed with the Desktop as its 'displayParent'.
  */
-scout.Desktop.prototype._glassPaneTargets = function(element) {
+_glassPaneTargets(element) {
   // Do not return $container, because this is the parent of all forms and message boxes. Otherwise, no form could gain focus, even the form requested desktop modality.
   var $glassPaneTargets = this.$container
     .children()
@@ -847,7 +873,7 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
   }
 
   var glassPaneTargets;
-  if (element instanceof scout.Form && element.displayHint === scout.Form.DisplayHint.VIEW) {
+  if (element instanceof Form && element.displayHint === Form.DisplayHint.VIEW) {
     $glassPaneTargets = $glassPaneTargets
       .not('.desktop-bench')
       .not('.desktop-header');
@@ -857,7 +883,7 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
     }
 
     glassPaneTargets = $.makeArray($glassPaneTargets);
-    scout.arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
+    arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
   } else {
     glassPaneTargets = $.makeArray($glassPaneTargets);
   }
@@ -866,7 +892,7 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
   this._pushPopupWindowGlassPaneTargets(glassPaneTargets, element);
 
   return glassPaneTargets;
-};
+}
 
 /**
  * Adds a filter which is applied when the glass pane targets are collected.
@@ -874,13 +900,13 @@ scout.Desktop.prototype._glassPaneTargets = function(element) {
  * @param filter a function with the parameter target and element. Target is the element which would be covered by a glass pane, element is the element the user interacts with (e.g. the modal dialog).
  * @see _glassPaneTargets
  */
-scout.Desktop.prototype.addGlassPaneTargetFilter = function(filter) {
+addGlassPaneTargetFilter(filter) {
   this._glassPaneTargetFilters.push(filter);
-};
+}
 
-scout.Desktop.prototype.removeGlassPaneTargetFilter = function(filter) {
-  scout.arrays.remove(this._glassPaneTargetFilters, filter);
-};
+removeGlassPaneTargetFilter(filter) {
+  arrays.remove(this._glassPaneTargetFilters, filter);
+}
 
 /**
  * This 'deferred' object is used because popup windows are not immediately usable when they're opened.
@@ -889,15 +915,15 @@ scout.Desktop.prototype.removeGlassPaneTargetFilter = function(filter) {
  * the glass pane renderer is ready. Only when both conditions are fullfilled, we can render the glass
  * pane.
  */
-scout.Desktop.prototype._deferredGlassPaneTarget = function(popupWindow) {
-  var deferred = new scout.DeferredGlassPaneTarget();
+_deferredGlassPaneTarget(popupWindow) {
+  var deferred = new DeferredGlassPaneTarget();
   popupWindow.one('init', function() {
     deferred.ready([popupWindow.$container]);
   });
   return deferred;
-};
+}
 
-scout.Desktop.prototype._getBenchGlassPaneTargetsForView = function(view) {
+_getBenchGlassPaneTargetsForView(view) {
   var $glassPanes = [];
 
   $glassPanes = $glassPanes.concat(this._getTabGlassPaneTargetsForView(view, this.header));
@@ -915,9 +941,9 @@ scout.Desktop.prototype._getBenchGlassPaneTargetsForView = function(view) {
     }, this);
   }
   return $glassPanes;
-};
+}
 
-scout.Desktop.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) {
+_getTabGlassPaneTargetsForView(view, tabBox) {
   var $glassPanes = [];
   if (tabBox && tabBox.tabArea) {
     tabBox.tabArea.tabs.forEach(function(tab) {
@@ -931,9 +957,9 @@ scout.Desktop.prototype._getTabGlassPaneTargetsForView = function(view, tabBox) 
     });
   }
   return $glassPanes;
-};
+}
 
-scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTargets, element) {
+_pushPopupWindowGlassPaneTargets(glassPaneTargets, element) {
   this.formController._popupWindows.forEach(function(popupWindow) {
     if (element === popupWindow.form) {
       // Don't block form itself
@@ -942,18 +968,18 @@ scout.Desktop.prototype._pushPopupWindowGlassPaneTargets = function(glassPaneTar
     glassPaneTargets.push(popupWindow.initialized ?
       popupWindow.$container[0] : this._deferredGlassPaneTarget(popupWindow));
   }, this);
-};
+}
 
-scout.Desktop.prototype.showForm = function(form, position) {
+showForm(form, position) {
   var displayParent = form.displayParent || this;
   form.setDisplayParent(displayParent);
 
   this._setFormActivated(form);
   // register listener to recover active form when child dialog is removed
   displayParent.formController.registerAndRender(form, position, true);
-};
+}
 
-scout.Desktop.prototype.hideForm = function(form) {
+hideForm(form) {
   if (!form.displayParent) {
     // showForm has probably never been called -> nothing to do here
     // May happen if form.close() is called immediately after form.open() without waiting for the open promise to resolve
@@ -962,9 +988,9 @@ scout.Desktop.prototype.hideForm = function(form) {
     return;
   }
 
-  if (this.displayStyle === scout.Desktop.DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
+  if (this.displayStyle === Desktop.DisplayStyle.COMPACT && form.isView() && this.benchVisible) {
     var openViews = this.bench.getViews().slice();
-    scout.arrays.remove(openViews, form);
+    arrays.remove(openViews, form);
     if (openViews.length === 0) {
       // Hide bench and show navigation if this is the last view to be hidden
       this.switchToNavigation();
@@ -976,9 +1002,9 @@ scout.Desktop.prototype.hideForm = function(form) {
     // even if bench is invisible (compact case) to update state correctly and reshow elements (dialog etc.) linked to the outline
     this.bringOutlineToFront();
   }
-};
+}
 
-scout.Desktop.prototype.activateForm = function(form) {
+activateForm(form) {
   var displayParent = form.displayParent || this;
   displayParent.formController.activateForm(form);
   this._setFormActivated(form);
@@ -989,16 +1015,16 @@ scout.Desktop.prototype.activateForm = function(form) {
       this.activateForm(dialog);
     }
   }, this);
-};
+}
 
-scout.Desktop.prototype._setOutlineActivated = function() {
+_setOutlineActivated() {
   this._setFormActivated(null);
   if (this.outline) {
     this.outline.activateCurrentPage();
   }
-};
+}
 
-scout.Desktop.prototype._setFormActivated = function(form) {
+_setFormActivated(form) {
   // If desktop is in rendering process the can not set a new active form. instead the active form from the model is set selected.
   if (!this.rendered || this.initialFormRendering) {
     return;
@@ -1012,7 +1038,7 @@ scout.Desktop.prototype._setFormActivated = function(form) {
   if (!form) {
     // no form is activated -> show outline
     this.bringOutlineToFront();
-  } else if (form.displayHint === scout.Form.DisplayHint.VIEW && !form.detailForm && this.bench && this.bench.hasView(form)) {
+  } else if (form.displayHint === Form.DisplayHint.VIEW && !form.detailForm && this.bench && this.bench.hasView(form)) {
     // view form was activated. send the outline to back to ensure the form is attached
     // exclude detail forms even though detail forms usually are not activated
     // Also only consider "real" views used in the bench and ignore other views (e.g. used in a form menu)
@@ -1020,27 +1046,27 @@ scout.Desktop.prototype._setFormActivated = function(form) {
   }
 
   this.triggerFormActivate(form);
-};
+}
 
-scout.Desktop.prototype.triggerFormActivate = function(form) {
+triggerFormActivate(form) {
   this.trigger('formActivate', {
     form: form
   });
-};
+}
 
-scout.Desktop.prototype.cancelViews = function(forms) {
-  var event = new scout.Event();
+cancelViews(forms) {
+  var event = new Event();
   event.forms = forms;
   this.trigger('cancelForms', event);
   if (!event.defaultPrevented) {
     this._cancelViews(forms);
   }
-};
+}
 
-scout.Desktop.prototype._cancelViews = function(forms) {
+_cancelViews(forms) {
   // do not cancel forms when the form child hierarchy does not get canceled.
   forms = forms.filter(function(form) {
-    return !scout.arrays.find(form.views, function(view) {
+    return !arrays.find(form.views, function(view) {
       return view.modal;
     });
   });
@@ -1059,7 +1085,7 @@ scout.Desktop.prototype._cancelViews = function(forms) {
         requiresSaveChildDialogs = true;
       }
     }, function(displayChild) {
-      return displayChild instanceof scout.Form;
+      return displayChild instanceof Form;
     });
     return form.lifecycle.requiresSave() || requiresSaveChildDialogs;
   });
@@ -1080,7 +1106,7 @@ scout.Desktop.prototype._cancelViews = function(forms) {
       formsToSave.forEach(function(form) {
         form.visitDisplayChildren(function(dialog) {
           // forms should be stored with ok(). Other display children can simply be closed.
-          if (dialog instanceof scout.Form) {
+          if (dialog instanceof Form) {
             dialog.ok();
           } else {
             dialog.close();
@@ -1094,7 +1120,7 @@ scout.Desktop.prototype._cancelViews = function(forms) {
   waitFor.then(function(formsToSave) {
     if (formsToSave) {
       // already saved & closed forms (handled by the UnsavedFormChangesForm)
-      scout.arrays.removeAll(forms, formsToSave);
+      arrays.removeAll(forms, formsToSave);
     }
     // close the remaining forms that don't require saving.
     forms.forEach(function(form) {
@@ -1104,12 +1130,12 @@ scout.Desktop.prototype._cancelViews = function(forms) {
       form.close();
     });
   });
-};
+}
 
 /**
  * Called when the animation triggered by animationLayoutChange is complete (e.g. navigation or bench got visible/invisible)
  */
-scout.Desktop.prototype.onLayoutAnimationComplete = function() {
+onLayoutAnimationComplete() {
   if (!this.headerVisible) {
     this._removeHeader();
   }
@@ -1121,17 +1147,17 @@ scout.Desktop.prototype.onLayoutAnimationComplete = function() {
   }
   this.trigger('animationEnd');
   this.animateLayoutChange = false;
-};
+}
 
-scout.Desktop.prototype.onResize = function(event) {
+onResize(event) {
   this.revalidateLayoutTree();
-};
+}
 
-scout.Desktop.prototype.resetPopstateHandler = function() {
+resetPopstateHandler() {
   this.setPopstateHandler(this.onPopstate.bind(this));
-};
+}
 
-scout.Desktop.prototype.setPopstateHandler = function(handler) {
+setPopstateHandler(handler) {
   if (this.rendered || this.rendering) {
     var window = this.$container.window();
     if (this._popstateHandler) {
@@ -1142,32 +1168,32 @@ scout.Desktop.prototype.setPopstateHandler = function(handler) {
     }
   }
   this._popstateHandler = handler;
-};
+}
 
-scout.Desktop.prototype.onPopstate = function(event) {
+onPopstate(event) {
   var historyState = event.originalEvent.state;
   if (historyState && historyState.deepLinkPath) {
     this.trigger('historyEntryActivate', historyState);
   }
-};
+}
 
-scout.Desktop.prototype._onSplitterMove = function(event) {
+_onSplitterMove(event) {
   // disallow a position greater than 50%
   this.resizing = true;
   var max = Math.floor(this.$container.outerWidth(true) / 2);
   if (event.position > max) {
     event.setPosition(max);
   }
-};
+}
 
-scout.Desktop.prototype._onSplitterPositionChange = function(event) {
+_onSplitterPositionChange(event) {
   // No need to revalidate while layouting (desktop layout sets the splitter position and would trigger a relayout)
   if (!this.htmlComp.layouting) {
     this.revalidateLayout();
   }
-};
+}
 
-scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
+_onSplitterMoveEnd(event) {
   var splitterPosition = event.position;
 
   // Store size
@@ -1176,12 +1202,12 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   }
 
   // Check if splitter is smaller than min size
-  if (splitterPosition < scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
+  if (splitterPosition < DesktopNavigation.BREADCRUMB_STYLE_WIDTH) {
     // Set width of navigation to BREADCRUMB_STYLE_WIDTH, using an animation.
     // While animating, update the desktop layout.
     // At the end of the animation, update the desktop layout, and store the splitter position.
     this.navigation.$container.animate({
-      width: scout.DesktopNavigation.BREADCRUMB_STYLE_WIDTH
+      width: DesktopNavigation.BREADCRUMB_STYLE_WIDTH
     }, {
       progress: function() {
         this.resizing = true;
@@ -1201,63 +1227,63 @@ scout.Desktop.prototype._onSplitterMoveEnd = function(event) {
   } else {
     this.resizing = false;
   }
-};
+}
 
-scout.Desktop.prototype._loadCachedSplitterPosition = function() {
-  return scout.webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition') ||
-    scout.webstorage.getItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname);
-};
+_loadCachedSplitterPosition() {
+  return webstorage.getItem(sessionStorage, 'scout:desktopSplitterPosition') ||
+    webstorage.getItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname);
+}
 
-scout.Desktop.prototype._storeCachedSplitterPosition = function(splitterPosition) {
-  scout.webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
-  scout.webstorage.setItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
-};
+_storeCachedSplitterPosition(splitterPosition) {
+  webstorage.setItem(sessionStorage, 'scout:desktopSplitterPosition', splitterPosition);
+  webstorage.setItem(localStorage, 'scout:desktopSplitterPosition:' + window.location.pathname, splitterPosition);
+}
 
-scout.Desktop.prototype._onNotificationRemove = function(notification) {
+_onNotificationRemove(notification) {
   if (this.notifications.length === 0 && this.$notifications) {
     this.$notifications.remove();
     this.$notifications = null;
   }
-};
+}
 
-scout.Desktop.prototype.onReconnecting = function() {
+onReconnecting() {
   if (!this.offline) {
     return;
   }
   this._offlineNotification.reconnect();
-};
+}
 
-scout.Desktop.prototype.onReconnectingSucceeded = function() {
+onReconnectingSucceeded() {
   if (!this.offline) {
     return;
   }
   this.offline = false;
   this._offlineNotification.reconnectSucceeded();
   this._removeOfflineNotification();
-};
+}
 
-scout.Desktop.prototype.onReconnectingFailed = function() {
+onReconnectingFailed() {
   if (!this.offline) {
     return;
   }
   this._offlineNotification.reconnectFailed();
-};
+}
 
-scout.Desktop.prototype.dataChange = function(dataType) {
+dataChange(dataType) {
   this.events.trigger('dataChange', dataType);
-};
+}
 
-scout.Desktop.prototype._activeTheme = function() {
-  return scout.cookies.get('scout.ui.theme') || 'default';
-};
+_activeTheme() {
+  return cookies.get('scout.ui.theme') || 'default';
+}
 
-scout.Desktop.prototype._initTheme = function() {
+_initTheme() {
   var theme = this.theme;
   if (theme === null) {
     theme = this._activeTheme();
   }
   this.setTheme(theme);
-};
+}
 
 /**
  * Changes the current theme.
@@ -1267,16 +1293,16 @@ scout.Desktop.prototype._initTheme = function() {
  * <p>
  * Since it is a persistent cookie, the theme will be activated again the next time the app is started, unless the cookie is deleted.
  */
-scout.Desktop.prototype.setTheme = function(theme) {
+setTheme(theme) {
   this.setProperty('theme', theme);
   if (this.theme !== this._activeTheme()) {
     this._switchTheme(theme);
   }
-};
+}
 
-scout.Desktop.prototype._switchTheme = function(theme) {
+_switchTheme(theme) {
   // Add a persistent cookie which expires in 30 days
-  scout.cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
+  cookies.set('scout.ui.theme', theme, 30 * 24 * 3600);
 
   // Reload page in order to download the CSS files for the new theme
   // Don't remove body but make it invisible, otherwise JS exceptions might be thrown if body is removed while an action executed
@@ -1284,7 +1310,7 @@ scout.Desktop.prototype._switchTheme = function(theme) {
   scout.reloadPage({
     clearBody: false
   });
-};
+}
 
 /**
  * Moves all the given overlays (popups, dialogs, message boxes etc.) before the target overlay and activates the focus context of the target overlay.
@@ -1292,11 +1318,11 @@ scout.Desktop.prototype._switchTheme = function(theme) {
  * @param overlaysToMove {HTMLElement[]} the overlays which should be moved before the target overlay
  * @param $targetOverlay {$|HTMLElement} the overlay which should eventually be on top of the movable overlays
  */
-scout.Desktop.prototype.moveOverlaysBehindAndFocus = function(overlaysToMove, $targetOverlay) {
+moveOverlaysBehindAndFocus(overlaysToMove, $targetOverlay) {
   $targetOverlay = $.ensure($targetOverlay);
   $targetOverlay.nextAll().toArray()
     .forEach(function(overlay) {
-      if (scout.arrays.containsAll(overlaysToMove, [overlay])) {
+      if (arrays.containsAll(overlaysToMove, [overlay])) {
         $(overlay).insertBefore($targetOverlay);
       }
     }.bind(this));
@@ -1310,4 +1336,5 @@ scout.Desktop.prototype.moveOverlaysBehindAndFocus = function(overlaysToMove, $t
   if (!$targetOverlay.isOrHas($targetOverlay.activeElement())) {
     this.session.focusManager.activateFocusContext($targetOverlay);
   }
-};
+}
+}

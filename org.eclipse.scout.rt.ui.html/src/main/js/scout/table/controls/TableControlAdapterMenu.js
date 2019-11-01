@@ -8,79 +8,83 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableControlAdapterMenu = function() {
-  scout.TableControlAdapterMenu.parent.call(this);
+import {FormMenu} from '../../index';
+
+export default class TableControlAdapterMenu extends FormMenu {
+
+constructor() {
+  super();
 
   this._tableControlPropertyChangeHandler = this._onTableControlPropertyChange.bind(this);
   this._tableControlDestroyHandler = this._onTableControlDestroy.bind(this);
 
   this._addCloneProperties(['tableControl']);
-};
-scout.inherits(scout.TableControlAdapterMenu, scout.FormMenu);
+}
+
 
 /**
  * @override Action.js
  */
-scout.TableControlAdapterMenu.prototype._init = function(model) {
-  scout.TableControlAdapterMenu.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   if (!this.tableControl) {
     throw new Error('Cannot adapt to undefined tableControl');
   }
   this._installListeners();
-};
+}
 
-scout.TableControlAdapterMenu.prototype._installListeners = function() {
+_installListeners() {
   this.tableControl.on('propertyChange', this._tableControlPropertyChangeHandler);
   this.tableControl.on('destroy', this._tableControlDestroyHandler);
-};
+}
 
-scout.TableControlAdapterMenu.prototype._uninstallListeners = function() {
+_uninstallListeners() {
   this.tableControl.off('propertyChange', this._tableControlPropertyChangeHandler);
   this.tableControl.off('destroy', this._tableControlDestroyHandler);
-};
+}
 
-scout.TableControlAdapterMenu.prototype._render = function() {
-  scout.TableControlAdapterMenu.parent.prototype._render.call(this);
+_render() {
+  super._render();
   // Convenience: Add ID of original tableControl to DOM for debugging purposes
   this.$container.attr('data-tableControlAdapter', this.tableControl.id);
-};
+}
 
-scout.TableControlAdapterMenu.prototype._onTableControlPropertyChange = function(event) {
+_onTableControlPropertyChange(event) {
   // Whenever a tableControl property changes, apply the changes to the menu
   var changedProperties = {};
   changedProperties[event.propertyName] = event.newValue;
-  changedProperties = scout.TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
+  changedProperties = TableControlAdapterMenu.adaptTableControlProperties(changedProperties);
   for (var prop in changedProperties) { // NOSONAR
     // Set the property (don't use callSetter because this may delegate to the table control)
     this.setProperty(prop, changedProperties[prop]);
   }
-};
+}
 
-scout.TableControlAdapterMenu.prototype._onTableControlDestroy = function(event) {
+_onTableControlDestroy(event) {
   this.destroy();
   this._uninstallListeners();
-};
+}
 
 /**
  * @override Action.js
  */
-scout.TableControlAdapterMenu.prototype.doAction = function() {
+doAction() {
   return this.tableControl.doAction();
-};
+}
 
 /**
  * @override Action.js
  */
-scout.TableControlAdapterMenu.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.tableControl.setSelected(selected);
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @memberOf scout.TableControlAdapterMenu
+ * @memberOf TableControlAdapterMenu
  */
-scout.TableControlAdapterMenu.adaptTableControlProperties = function(tableControlProperties, menuProperties) {
+static adaptTableControlProperties(tableControlProperties, menuProperties) {
   menuProperties = menuProperties || {};
 
   // Plain properties: simply copy, no translation required
@@ -96,4 +100,5 @@ scout.TableControlAdapterMenu.adaptTableControlProperties = function(tableContro
     }
   }
   return menuProperties;
-};
+}
+}

@@ -8,22 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuExecKeyStroke = function(menu) {
-  scout.MenuExecKeyStroke.parent.call(this);
+import {KeyStroke} from '../index';
+import {keys} from '../index';
+
+export default class MenuExecKeyStroke extends KeyStroke {
+
+constructor(menu) {
+  super();
   this.field = menu;
-  this.which = [scout.keys.SPACE, scout.keys.ENTER];
+  this.which = [keys.SPACE, keys.ENTER];
   this.stopPropagation = true;
 
   this.renderingHints.offset = 16;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$container;
   }.bind(this);
-};
-scout.inherits(scout.MenuExecKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.MenuExecKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.doAction();
-};
+}
+}

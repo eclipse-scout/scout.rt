@@ -8,66 +8,72 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.lookupField = {
+import {scout} from '../../../index';
 
-  /**
-   * Creates a table-row for the given lookup-row.
-   *
-   * @returns {object} table-row model
-   */
-  createTableRow: function(lookupRow, multipleColumns) {
-    multipleColumns = scout.nvl(multipleColumns, false);
-    var cells = [],
-      row = {
-        cells: cells,
-        lookupRow: lookupRow
-      };
-    if (lookupRow.enabled === false) {
-      row.enabled = false;
-    }
-    if (lookupRow.active === false) {
-      row.active = false;
-    }
-    if (lookupRow.cssClass) {
-      row.cssClass = lookupRow.cssClass;
-    }
 
-    if (!multipleColumns) {
-      cells.push(this.createTableCell(lookupRow, null, null));
-    }
 
-    return row;
-  },
-
-  /**
-   * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
-   */
-  createTableCell: function(lookupRow, desc, tableRowData) {
-    var cell = scout.create('Cell');
-
-    // default column descriptor (first column) has propertyName null
-    if (!(desc && desc.propertyName)) {
-      cell.text = lookupRow.text;
-      if (lookupRow.iconId) {
-        cell.iconId = lookupRow.iconId;
-      }
-      if (lookupRow.tooltipText) {
-        cell.tooltipText = lookupRow.tooltipText;
-      }
-      if (lookupRow.backgroundColor) {
-        cell.backgroundColor = lookupRow.backgroundColor;
-      }
-      if (lookupRow.foregroundColor) {
-        cell.foregroundColor = lookupRow.foregroundColor;
-      }
-      if (lookupRow.font) {
-        cell.font = lookupRow.font;
-      }
-    } else {
-      cell.text = tableRowData[desc.propertyName];
-    }
-
-    return cell;
+/**
+ * Creates a table-row for the given lookup-row.
+ *
+ * @returns {object} table-row model
+ */
+export function createTableRow(lookupRow, multipleColumns) {
+  multipleColumns = scout.nvl(multipleColumns, false);
+  var cells = [],
+    row = {
+      cells: cells,
+      lookupRow: lookupRow
+    };
+  if (lookupRow.enabled === false) {
+    row.enabled = false;
+  }
+  if (lookupRow.active === false) {
+    row.active = false;
+  }
+  if (lookupRow.cssClass) {
+    row.cssClass = lookupRow.cssClass;
   }
 
+  if (!multipleColumns) {
+    cells.push(createTableCell(lookupRow, null, null));
+  }
+
+  return row;
+}
+
+/**
+ * Creates a table cell for a descriptor. If no descriptor is provided, the default lookupRow cell is created.
+ */
+export function createTableCell(lookupRow, desc, tableRowData) {
+  var cell = scout.create('Cell');
+
+  // default column descriptor (first column) has propertyName null
+  if (!(desc && desc.propertyName)) {
+    cell.text = lookupRow.text;
+    if (lookupRow.iconId) {
+      cell.iconId = lookupRow.iconId;
+    }
+    if (lookupRow.tooltipText) {
+      cell.tooltipText = lookupRow.tooltipText;
+    }
+    if (lookupRow.backgroundColor) {
+      cell.backgroundColor = lookupRow.backgroundColor;
+    }
+    if (lookupRow.foregroundColor) {
+      cell.foregroundColor = lookupRow.foregroundColor;
+    }
+    if (lookupRow.font) {
+      cell.font = lookupRow.font;
+    }
+  } else {
+    cell.text = tableRowData[desc.propertyName];
+  }
+
+  return cell;
+}
+
+
+export default {
+  createTableCell,
+  createTableRow
 };

@@ -8,42 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxAdapter = function() {
-  scout.GroupBoxAdapter.parent.call(this);
+import {ResponsiveManager} from '../../../index';
+import {GridData} from '../../../index';
+import {CompositeFieldAdapter} from '../../../index';
+
+export default class GroupBoxAdapter extends CompositeFieldAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['expanded']);
-};
-scout.inherits(scout.GroupBoxAdapter, scout.CompositeFieldAdapter);
+}
+
 
 /**
  * @override
  */
-scout.GroupBoxAdapter.prototype._initModel = function(model, parent) {
-  model = scout.GroupBoxAdapter.parent.prototype._initModel.call(this, model, parent);
+_initModel(model, parent) {
+  model = super._initModel( model, parent);
   // Set logical grid to null -> Calculation happens on server side
   model.logicalGrid = null;
 
   return model;
-};
+}
 
 // Replace method on responsive handler.
-scout.GroupBoxAdapter.prototype._postCreateWidget = function() {
-  scout.GroupBoxAdapter.parent.prototype._postCreateWidget.call(this);
+_postCreateWidget() {
+  super._postCreateWidget();
 
   if (this.widget.responsiveHandler) {
-    this.widget.responsiveHandler.setAllowedStates([scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.CONDENSED]);
+    this.widget.responsiveHandler.setAllowedStates([ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.CONDENSED]);
     this.widget.responsiveHandler.getGridData = this._getGridData;
     this.widget.responsiveHandler.setGridData = this._setGridData;
   }
-};
+}
 
-scout.GroupBoxAdapter.prototype.destroy = function() {
-  scout.GroupBoxAdapter.parent.prototype.destroy.call(this);
-};
+destroy() {
+  super.destroy();
+}
 
-scout.GroupBoxAdapter.prototype._getGridData = function(field) {
-  return new scout.GridData(field.gridData);
-};
+_getGridData(field) {
+  return new GridData(field.gridData);
+}
 
-scout.GroupBoxAdapter.prototype._setGridData = function(field, gridData) {
+_setGridData(field, gridData) {
   field._setGridData(gridData);
-};
+}
+}

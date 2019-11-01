@@ -8,12 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableProposalChooser = function() {
-  scout.TableProposalChooser.parent.call(this);
-};
-scout.inherits(scout.TableProposalChooser, scout.ProposalChooser);
+import {ProposalChooser} from '../../../index';
+import {Column} from '../../../index';
+import {lookupField} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import {arrays} from '../../../index';
 
-scout.TableProposalChooser.prototype._createModel = function() {
+export default class TableProposalChooser extends ProposalChooser {
+
+constructor() {
+  super();
+}
+
+
+_createModel() {
   var headerVisible = false,
     columns = [],
     descriptors = this.smartField.columnDescriptors;
@@ -31,18 +40,18 @@ scout.TableProposalChooser.prototype._createModel = function() {
   table.on('rowClick', this._onRowClick.bind(this));
 
   return table;
-};
+}
 
-scout.TableProposalChooser.prototype._createColumn = function() {
+_createColumn() {
   return scout.create('Column', {
     session: this.session,
-    width: scout.Column.NARROW_MIN_WIDTH,
+    width: Column.NARROW_MIN_WIDTH,
     horizontalAlignment: this.smartField.gridData.horizontalAlignment
   });
-};
+}
 
-scout.TableProposalChooser.prototype._createColumnForDescriptor = function(descriptor) {
-  var width = scout.Column.NARROW_MIN_WIDTH;
+_createColumnForDescriptor(descriptor) {
+  var width = Column.NARROW_MIN_WIDTH;
   if (descriptor.width && descriptor.width > 0) { // 0 = default
     width = descriptor.width;
   }
@@ -59,9 +68,9 @@ scout.TableProposalChooser.prototype._createColumnForDescriptor = function(descr
     htmlEnabled: scout.nvl(descriptor.htmlEnabled, false)
   });
   return column;
-};
+}
 
-scout.TableProposalChooser.prototype._createTable = function(columns, headerVisible) {
+_createTable(columns, headerVisible) {
   return scout.create('Table', {
     parent: this,
     headerVisible: headerVisible,
@@ -72,22 +81,22 @@ scout.TableProposalChooser.prototype._createTable = function(columns, headerVisi
     columns: columns,
     headerMenusEnabled: false
   });
-};
+}
 
-scout.TableProposalChooser.prototype._onRowClick = function(event) {
+_onRowClick(event) {
   var row = event.row;
   if (!row || !row.enabled) {
     return;
   }
   this.setBusy(true);
   this.triggerLookupRowSelected(row);
-};
+}
 
-scout.TableProposalChooser.prototype.selectedRow = function() {
+selectedRow() {
   return this.model.selectedRow();
-};
+}
 
-scout.TableProposalChooser.prototype.setLookupResult = function(result) {
+setLookupResult(result) {
   var
     tableRows = [],
     lookupRows = result.lookupRows,
@@ -100,74 +109,75 @@ scout.TableProposalChooser.prototype.setLookupResult = function(result) {
   this.model.insertRows(tableRows);
 
   this._selectProposal(result, tableRows);
-};
+}
 
-scout.TableProposalChooser.prototype.trySelectCurrentValue = function() {
+trySelectCurrentValue() {
   var currentValue = this.smartField.getValueForSelection();
-  if (scout.objects.isNullOrUndefined(currentValue)) {
+  if (objects.isNullOrUndefined(currentValue)) {
     return;
   }
-  var tableRow = scout.arrays.find(this.model.rows, function(row) {
+  var tableRow = arrays.find(this.model.rows, function(row) {
     return row.lookupRow.key === currentValue;
   });
   if (tableRow) {
     this.model.selectRow(tableRow);
   }
-};
+}
 
-scout.TableProposalChooser.prototype.selectFirstLookupRow = function() {
+selectFirstLookupRow() {
   if (this.model.rows.length) {
     this.model.selectRow(this.model.rows[0]);
   }
-};
+}
 
-scout.TableProposalChooser.prototype.clearSelection = function() {
+clearSelection() {
   this.model.deselectAll();
-};
+}
 
-scout.TableProposalChooser.prototype.clearLookupRows = function() {
+clearLookupRows() {
   this.model.removeAllRows();
-};
+}
 
 /**
  * Creates a table-row for the given lookup-row.
  *
  * @returns {object} table-row model
  */
-scout.TableProposalChooser.prototype._createTableRow = function(lookupRow, multipleColumns) {
-  var row = scout.lookupField.createTableRow(lookupRow, multipleColumns);
+_createTableRow(lookupRow, multipleColumns) {
+  var row = lookupField.createTableRow(lookupRow, multipleColumns);
   if (multipleColumns) {
-    scout.arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));
+    arrays.pushAll(row.cells, this._transformTableRowData(lookupRow, lookupRow.additionalTableRowData));
   }
   return row;
-};
+}
 
-scout.TableProposalChooser.prototype._renderModel = function() {
+_renderModel() {
   this.model.setVirtual(this.smartField.virtual());
   this.model.render();
 
   // Make sure table never gets the focus, but looks focused
   this.model.$container.setTabbable(false);
   this.model.$container.addClass('focused');
-};
+}
 
-scout.TableProposalChooser.prototype.getSelectedLookupRow = function() {
+getSelectedLookupRow() {
   var selectedRow = this.model.selectedRow();
   if (!selectedRow) {
     return null;
   }
   return selectedRow.lookupRow;
-};
+}
 
 /**
  * Takes the TableRowData bean and the infos provided by the column descriptors to create an
  * array of additional values in the correct order, as defined by the descriptors.
  */
-scout.TableProposalChooser.prototype._transformTableRowData = function(lookupRow, tableRowData) {
+_transformTableRowData(lookupRow, tableRowData) {
   var descriptors = this.smartField.columnDescriptors;
   var cells = [];
   descriptors.forEach(function(desc) {
-    cells.push(scout.lookupField.createTableCell(lookupRow, desc, tableRowData));
+    cells.push(lookupField.createTableCell(lookupRow, desc, tableRowData));
   });
   return cells;
-};
+}
+}

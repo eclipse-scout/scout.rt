@@ -8,22 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooserFieldBrowseKeyStroke = function(field) {
-  scout.FileChooserFieldBrowseKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class FileChooserFieldBrowseKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.SPACE];
+  this.which = [keys.SPACE];
   this.stopPropagation = true;
 
-  this.renderingHints.hAlign = scout.HAlign.LEFT;
+  this.renderingHints.hAlign = HAlign.LEFT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
-};
-scout.inherits(scout.FileChooserFieldBrowseKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.FileChooserFieldBrowseKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.fileInput.browse();
-};
+}
+}

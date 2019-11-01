@@ -8,39 +8,46 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CodeLookupCall = function() {
-  scout.CodeLookupCall.parent.call(this);
-  this.codeType = null;
-};
-scout.inherits(scout.CodeLookupCall, scout.StaticLookupCall);
+import {StaticLookupCall} from '../index';
+import {strings} from '../index';
+import {codes} from '../index';
+import {scout} from '../index';
 
-scout.CodeLookupCall.prototype._lookupRowByKey = function(key) {
-  var codeType = scout.codes.codeType(this.codeType, true);
+export default class CodeLookupCall extends StaticLookupCall {
+
+constructor() {
+  super();
+  this.codeType = null;
+}
+
+
+_lookupRowByKey(key) {
+  var codeType = codes.codeType(this.codeType, true);
   if (!codeType) {
     return null;
   }
   return this._createLookupRow(codeType.optGet(key));
-};
+}
 
-scout.CodeLookupCall.prototype._lookupRowsByAll = function() {
+_lookupRowsByAll() {
   return this._collectLookupRows();
-};
+}
 
-scout.CodeLookupCall.prototype._lookupRowsByText = function(text) {
+_lookupRowsByText(text) {
   return this._collectLookupRows(function(lookupRow) {
     var lookupRowText = lookupRow.text || '';
-    return scout.strings.startsWith(lookupRowText.toLowerCase(), text.toLowerCase());
+    return strings.startsWith(lookupRowText.toLowerCase(), text.toLowerCase());
   });
-};
+}
 
-scout.CodeLookupCall.prototype._lookupRowsByRec = function(rec) {
+_lookupRowsByRec(rec) {
   return this._collectLookupRows(function(lookupRow) {
     return lookupRow.parentKey === rec;
   });
-};
+}
 
-scout.CodeLookupCall.prototype._collectLookupRows = function(predicate) {
-  var codeType = scout.codes.codeType(this.codeType, true);
+_collectLookupRows(predicate) {
+  var codeType = codes.codeType(this.codeType, true);
   if (!codeType) {
     return [];
   }
@@ -52,9 +59,9 @@ scout.CodeLookupCall.prototype._collectLookupRows = function(predicate) {
     }
   }.bind(this));
   return lookupRows;
-};
+}
 
-scout.CodeLookupCall.prototype._createLookupRow = function(code) {
+_createLookupRow(code) {
   if (!code) {
     return null;
   }
@@ -64,4 +71,5 @@ scout.CodeLookupCall.prototype._createLookupRow = function(code) {
     parentKey: code.parent && code.parent.id
   });
   return lookupRow;
-};
+}
+}

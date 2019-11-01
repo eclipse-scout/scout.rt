@@ -8,19 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SimpleTabBox = function() {
-  scout.SimpleTabBox.parent.call(this);
+import {SimpleTabBoxLayout} from '../index';
+import {SimpleTabBoxController} from '../index';
+import {SimpleTabViewContentLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class SimpleTabBox extends Widget {
+
+constructor() {
+  super();
   this._addWidgetProperties(['tabArea']);
 
   this.tabArea = null;
   this.viewStack = [];
   this.currentView = null;
   this._removeViewInProgress = 0;
-};
-scout.inherits(scout.SimpleTabBox, scout.Widget);
+}
 
-scout.SimpleTabBox.prototype._init = function(model) {
-  scout.SimpleTabBox.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.cssClass = model.cssClass;
 
   if (!this.tabArea) {
@@ -37,48 +47,48 @@ scout.SimpleTabBox.prototype._init = function(model) {
   this.controller.install(this, this.tabArea);
 
   this._viewDestroyedHandler = this._onViewDestroyed.bind(this);
-};
+}
 
 /**
  * Returns a $container used as a bind target for the key-stroke context of the group-box.
  * By default this function returns the container of the form, or when group-box is has no
  * form as a parent the container of the group-box.
  */
-scout.SimpleTabBox.prototype._keyStrokeBindTarget = function() {
+_keyStrokeBindTarget() {
   return this.$container;
-};
+}
 
-scout.SimpleTabBox.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('simple-tab-box');
   if (this.cssClass) {
     this.$container.addClass(this.cssClass);
   }
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SimpleTabBoxLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new SimpleTabBoxLayout(this));
   this.htmlComp.layoutData = this.layoutData;
 
   // render content
   this.$viewContent = this.$container.appendDiv('tab-content');
-  this.viewContent = scout.HtmlComponent.install(this.$viewContent, this.session);
-  this.viewContent.setLayout(new scout.SimpleTabViewContentLayout(this));
-};
+  this.viewContent = HtmlComponent.install(this.$viewContent, this.session);
+  this.viewContent.setLayout(new SimpleTabViewContentLayout(this));
+}
 
-scout.SimpleTabBox.prototype._renderProperties = function() {
-  scout.SimpleTabBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   // render tabArea
   this._renderTabArea();
   this._renderView(this.currentView);
-};
+}
 
-scout.SimpleTabBox.prototype._renderTabArea = function() {
+_renderTabArea() {
   this.tabArea.render();
   this.$tabArea = this.tabArea.$container;
   if (this.tabArea.attached) {
     this.$tabArea.insertBefore(this.$viewContent);
   }
-};
+}
 
-scout.SimpleTabBox.prototype._renderView = function(view) {
+_renderView(view) {
   if (!view) {
     return;
   }
@@ -88,15 +98,15 @@ scout.SimpleTabBox.prototype._renderView = function(view) {
   view.render(this.$viewContent);
   view.$container.addClass('view');
   view.validateRoot = true;
-};
+}
 
-scout.SimpleTabBox.prototype.postRender = function() {
+postRender() {
   if (this.viewStack.length > 0 && !this.currentView) {
     this.activateView(this.viewStack[this.viewStack.length - 1]);
   }
-};
+}
 
-scout.SimpleTabBox.prototype.activateView = function(view) {
+activateView(view) {
   if (view === this.currentView) {
     return;
   }
@@ -123,32 +133,32 @@ scout.SimpleTabBox.prototype.activateView = function(view) {
   });
 
   this.revalidateLayout();
-};
+}
 
-scout.SimpleTabBox.prototype.setLayoutData = function(layoutData) {
-  scout.SimpleTabBox.parent.prototype.setLayoutData.call(this, layoutData);
+setLayoutData(layoutData) {
+  super.setLayoutData( layoutData);
   this.layoutData = layoutData;
-};
+}
 
-scout.SimpleTabBox.prototype.getLayoutData = function() {
+getLayoutData() {
   return this.layoutData;
-};
+}
 
-scout.SimpleTabBox.prototype.revalidateLayout = function() {
+revalidateLayout() {
   if (this.rendered) {
     this.viewContent.invalidateLayoutTree();
     // Layout immediate to prevent 'laggy' form visualization,
     // but not initially while desktop gets rendered because it will be done at the end anyway
     this.viewContent.validateLayoutTree();
   }
-};
+}
 
 /**
  *
  * @param view
  * @param bringToTop whether the view should be placed on top of the view stack. the view tab will be selected.
  */
-scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
+addView(view, bringToTop) {
   var activate = scout.nvl(bringToTop, true);
   // add to view stack
   var siblingView = this._addToViewStack(view, activate);
@@ -163,20 +173,20 @@ scout.SimpleTabBox.prototype.addView = function(view, bringToTop) {
   if (activate) {
     this.activateView(view);
   }
-};
+}
 
 /**
  * @param view
  * @return the view which is gonna be the sibling to insert the new view tab after.
  */
-scout.SimpleTabBox.prototype._addToViewStack = function(view, bringToTop) {
+_addToViewStack(view, bringToTop) {
   var sibling;
   var index = this.viewStack.indexOf(view);
   if (index > -1) {
     return this.viewStack[index - 1];
   }
 
-  if (!scout.SimpleTabBoxController.hasViewTab(view)) {
+  if (!SimpleTabBoxController.hasViewTab(view)) {
     // first
     this.viewStack.unshift(view);
     this._addDestroyListener(view);
@@ -194,28 +204,28 @@ scout.SimpleTabBox.prototype._addToViewStack = function(view, bringToTop) {
   // it does not matter when index is -1 will be inserted at first position
   this.viewStack.splice(currentIndex + 1, 0, view);
   return sibling;
-};
+}
 
-scout.SimpleTabBox.prototype._addDestroyListener = function(view) {
+_addDestroyListener(view) {
   view.one('destroy', this._viewDestroyedHandler);
-};
+}
 
-scout.SimpleTabBox.prototype._removeDestroyListener = function(view) {
+_removeDestroyListener(view) {
   view.off('destroy', this._viewDestroyedHandler);
-};
+}
 
-scout.SimpleTabBox.prototype._onViewDestroyed = function(event) {
+_onViewDestroyed(event) {
   var view = event.source;
-  scout.arrays.remove(this.viewStack, view);
+  arrays.remove(this.viewStack, view);
   if (this.currentView === view) {
     if (this.rendered) {
       view.remove();
     }
     this.currentView = null;
   }
-};
+}
 
-scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
+removeView(view, showSiblingView) {
   if (!view) {
     return;
   }
@@ -260,31 +270,32 @@ scout.SimpleTabBox.prototype.removeView = function(view, showSiblingView) {
       }
     }
   }
-};
+}
 
-scout.SimpleTabBox.prototype.getController = function() {
+getController() {
   return this.controller;
-};
+}
 
-scout.SimpleTabBox.prototype.viewCount = function() {
+viewCount() {
   return this.viewStack.length;
-};
+}
 
-scout.SimpleTabBox.prototype.hasViews = function() {
+hasViews() {
   return this.viewStack.length > 0;
-};
+}
 
-scout.SimpleTabBox.prototype.hasView = function(view) {
+hasView(view) {
   return this.viewStack.filter(function(v) {
     return v === view;
   }).length > 0;
-};
+}
 
-scout.SimpleTabBox.prototype.getViews = function(displayViewId) {
+getViews(displayViewId) {
   return this.viewStack.filter(function(view) {
     if (!displayViewId) {
       return true;
     }
     return displayViewId === view.displayViewId;
   });
-};
+}
+}

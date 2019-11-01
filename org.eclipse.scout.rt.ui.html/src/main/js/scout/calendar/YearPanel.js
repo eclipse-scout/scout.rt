@@ -8,34 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.YearPanel = function() {
-  scout.YearPanel.parent.call(this);
+import {scrollbars} from '../index';
+import {dates} from '../index';
+import {Planner} from '../index';
+import {Calendar} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class YearPanel extends Widget {
+
+constructor() {
+  super();
 
   this.$yearTitle;
   this.$yearList;
   this.selectedDate;
   this.displayMode;
   this.alwaysSelectFirstDay;
-};
-scout.inherits(scout.YearPanel, scout.Widget);
+}
 
-scout.YearPanel.prototype._init = function(model) {
-  scout.YearPanel.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   // If true, it is only possible to select the first day of a range, depending of the selected mode
   // day mode: every day may be selected
   // week, work week, calendar week mode: only first day of week may be selected
   // year, month mode: only first day of month may be selected
   this.alwaysSelectFirstDay = model.alwaysSelectFirstDay;
-};
+}
 
-scout.YearPanel.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('year-panel-container');
   this.$yearTitle = this.$container.appendDiv('year-panel-title');
   this.$yearList = this.$container.appendDiv('year-panel-list');
-};
+}
 
-scout.YearPanel.prototype.renderContent = function() {
+renderContent() {
   this.removeContent();
   this._drawYear();
   this._installScrollbars({
@@ -43,24 +53,24 @@ scout.YearPanel.prototype.renderContent = function() {
   });
   this.yearRendered = true;
   this._colorYear();
-};
+}
 
-scout.YearPanel.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$yearList;
-};
+}
 
-scout.YearPanel.prototype.removeContent = function() {
+removeContent() {
   this._uninstallScrollbars();
   this.$yearList.empty();
   this.yearRendered = false;
-};
+}
 
-scout.YearPanel.prototype._remove = function() {
+_remove() {
   this.removeContent();
-  scout.YearPanel.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.YearPanel.prototype._drawYear = function() {
+_drawYear() {
   var first, month, $month, d, day, $day,
     year = this.selectedDate.getFullYear();
 
@@ -111,10 +121,10 @@ scout.YearPanel.prototype._drawYear = function() {
     .hover(this._onYearHoverIn.bind(this), this._onYearHoverOut.bind(this));
 
   // update scrollbar
-  scout.scrollbars.update(this.$yearList);
-};
+  scrollbars.update(this.$yearList);
+}
 
-scout.YearPanel.prototype._colorYear = function() {
+_colorYear() {
   if (!this.yearRendered) {
     return;
   }
@@ -129,20 +139,20 @@ scout.YearPanel.prototype._colorYear = function() {
   $('.year-day', this.$yearList).each(function() {
     $day = $(this);
     date = $day.data('date');
-    if (that.displayMode !== scout.Calendar.DisplayMode.DAY &&
+    if (that.displayMode !== Calendar.DisplayMode.DAY &&
       date >= that.viewRange.from && date < that.viewRange.to) {
       $day.addClass('year-range');
     }
-    if (scout.dates.isSameDay(date, that.selectedDate)) {
+    if (dates.isSameDay(date, that.selectedDate)) {
       $day.addClass('year-range-day');
     }
   });
 
   // selected has to be visible day
   this._scrollYear();
-};
+}
 
-scout.YearPanel.prototype._scrollYear = function() {
+_scrollYear() {
   var top, halfMonth, halfYear,
     $day = $('.year-range-day', this.$yearList),
     $month = $day.parent(),
@@ -156,13 +166,13 @@ scout.YearPanel.prototype._scrollYear = function() {
   halfYear = $year.outerHeight() / 2;
 
   this.$yearList.animateAVCSD('scrollTop', top + halfMonth - halfYear);
-};
+}
 
-scout.YearPanel.prototype._format = function(date, pattern) {
-  return scout.dates.format(date, this.session.locale, pattern);
-};
+_format(date, pattern) {
+  return dates.format(date, this.session.locale, pattern);
+}
 
-scout.YearPanel.prototype.selectDate = function(date) {
+selectDate(date) {
   this.selectedDate = date;
 
   if (this.rendered) {
@@ -172,9 +182,9 @@ scout.YearPanel.prototype.selectDate = function(date) {
     }
     this._colorYear();
   }
-};
+}
 
-scout.YearPanel.prototype.setDisplayMode = function(displayMode) {
+setDisplayMode(displayMode) {
   if (displayMode === this.displayMode) {
     return;
   }
@@ -182,9 +192,9 @@ scout.YearPanel.prototype.setDisplayMode = function(displayMode) {
   if (this.rendered) {
     this._colorYear();
   }
-};
+}
 
-scout.YearPanel.prototype.setViewRange = function(viewRange) {
+setViewRange(viewRange) {
   if (viewRange === this.viewRange) {
     return;
   }
@@ -192,15 +202,15 @@ scout.YearPanel.prototype.setViewRange = function(viewRange) {
   if (this.rendered) {
     this._colorYear();
   }
-};
+}
 
 /* -- events ---------------------------------------- */
 
-scout.YearPanel.prototype._onYearClick = function(event) {
+_onYearClick(event) {
   var
   // we must use Planner.DisplayMode (extends Calendar.DisplayMode) here
   // because YearPanel must work for calendar and planner.
-    displayMode = scout.Planner.DisplayMode,
+    displayMode = Planner.DisplayMode,
     diff = $(event.target).data('year-diff'),
     year = this.selectedDate.getFullYear(),
     month = this.selectedDate.getMonth(),
@@ -213,12 +223,12 @@ scout.YearPanel.prototype._onYearClick = function(event) {
   if (this.alwaysSelectFirstDay) {
     // find date based on mode
     if (scout.isOneOf(this.displayMode, displayMode.WEEK, displayMode.WORK_WEEK, displayMode.CALENDAR_WEEK)) {
-      oldWeek = scout.dates.weekInYear(this.selectedDate);
-      newWeek = scout.dates.weekInYear(newDate);
+      oldWeek = dates.weekInYear(this.selectedDate);
+      newWeek = dates.weekInYear(newDate);
       weekDiff = oldWeek - newWeek;
       // shift new selection that week in year does not change and the new selection is a monday.
-      newDate = scout.dates.shift(newDate, 0, 0, weekDiff * 7);
-      newDate = scout.dates.shiftToNextOrPrevMonday(newDate, 0);
+      newDate = dates.shift(newDate, 0, 0, weekDiff * 7);
+      newDate = dates.shiftToNextOrPrevMonday(newDate, 0);
     } else if (scout.isOneOf(this.displayMode, displayMode.MONTH, displayMode.YEAR)) {
       // set to first day of month
       newDate = new Date(year + diff, month, 1);
@@ -229,18 +239,18 @@ scout.YearPanel.prototype._onYearClick = function(event) {
   this.trigger('dateSelect', {
     date: this.selectedDate
   });
-};
+}
 
-scout.YearPanel.prototype._onYearDayClick = function(event) {
+_onYearDayClick(event) {
   this.selectedDate = $('.year-hover-day', this.$yearList).data('date');
   if (this.selectedDate) {
     this.trigger('dateSelect', {
       date: this.selectedDate
     });
   }
-};
+}
 
-scout.YearPanel.prototype._onYearHoverIn = function(event) {
+_onYearHoverIn(event) {
   var $day = $(event.target),
     date1 = $day.data('date'),
     year = date1.getFullYear(),
@@ -252,13 +262,13 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     $day2, date2;
 
   // find hover based on mode
-  if (this.displayMode === scout.Calendar.DisplayMode.DAY) {
+  if (this.displayMode === Calendar.DisplayMode.DAY) {
     startHover = new Date(year, month, date);
     endHover = new Date(year, month, date);
-  } else if (this.displayMode === scout.Calendar.DisplayMode.WEEK) {
+  } else if (this.displayMode === Calendar.DisplayMode.WEEK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 6);
-  } else if (this.displayMode === scout.Calendar.DisplayMode.WORK_WEEK) {
+  } else if (this.displayMode === Calendar.DisplayMode.WORK_WEEK) {
     startHover = new Date(year, month, date - day);
     endHover = new Date(year, month, date - day + 4);
 
@@ -266,10 +276,10 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     if (date1 > endHover) {
       date1 = endHover;
     }
-  } else if (this.displayMode === scout.Calendar.DisplayMode.MONTH) {
+  } else if (this.displayMode === Calendar.DisplayMode.MONTH) {
     startHover = new Date(year, month, 1);
     endHover = new Date(year, month + 1, 0);
-  } else if (this.displayMode === scout.Planner.DisplayMode.YEAR) {
+  } else if (this.displayMode === Planner.DisplayMode.YEAR) {
     startHover = new Date(year, month, 1);
     endHover = startHover;
   } else {
@@ -290,13 +300,14 @@ scout.YearPanel.prototype._onYearHoverIn = function(event) {
     } else {
       $day2.removeClass('year-hover');
     }
-    if (scout.dates.isSameDay(date1, date2)) {
+    if (dates.isSameDay(date1, date2)) {
       $day2.addClass('year-hover-day');
     }
   });
-};
+}
 
 // remove all hover effects
-scout.YearPanel.prototype._onYearHoverOut = function(event) {
+_onYearHoverOut(event) {
   $('.year-day.year-hover, .year-day.year-hover-day', this.$yearList).removeClass('year-hover year-hover-day');
-};
+}
+}

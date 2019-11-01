@@ -8,61 +8,66 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.IconDesc = function() {
+import {icons} from '../index';
+
+export default class IconDesc {
+
+constructor() {
   this.iconType;
   this.font;
   this.iconCharacter;
   this.iconUrl;
-};
+}
 
-scout.IconDesc.IconType = {
+static IconType = {
   FONT_ICON: 0,
   BITMAP: 1
 };
 
-scout.IconDesc.DEFAULT_FONT = 'scoutIcons';
+static DEFAULT_FONT = 'scoutIcons';
 
 /**
  * Returns a CSS class based on the used font-name.
  */
-scout.IconDesc.prototype.cssClass = function() {
-  if (this.isFontIcon() && this.font !== scout.IconDesc.DEFAULT_FONT) {
+cssClass() {
+  if (this.isFontIcon() && this.font !== IconDesc.DEFAULT_FONT) {
     return 'font-' + this.font;
   } else {
     return '';
   }
-};
+}
 
 /**
  * Returns a CSS class string to be used with JQuery.add/removeClass().
  */
-scout.IconDesc.prototype.appendCssClass = function(cssClass) {
+appendCssClass(cssClass) {
   var additionalCssClass = this.cssClass();
   if (additionalCssClass.length > 0) {
     return cssClass + ' ' + additionalCssClass;
   } else {
     return cssClass;
   }
-};
+}
 
-scout.IconDesc.prototype.isFontIcon = function() {
-  return this.iconType === scout.IconDesc.IconType.FONT_ICON;
-};
+isFontIcon() {
+  return this.iconType === IconDesc.IconType.FONT_ICON;
+}
 
-scout.IconDesc.prototype.isBitmap = function() {
-  return this.iconType === scout.IconDesc.IconType.BITMAP;
-};
+isBitmap() {
+  return this.iconType === IconDesc.IconType.BITMAP;
+}
 
 /**
- * Ensures that the given icon is of type {@link scout.iconDesc}. It a string is provided it is assumed that the string is the iconId which may be parsed to create the {@link scout.IconDesc}.
- * @param {(string|scout.IconDesc)} icon
+ * Ensures that the given icon is of type {@link scout.iconDesc}. It a string is provided it is assumed that the string is the iconId which may be parsed to create the {@link IconDesc}.
+ * @param {(string|IconDesc)} icon
  */
-scout.IconDesc.ensure = function(icon) {
+static ensure(icon) {
   if (!icon) {
     return icon;
   }
-  if (icon instanceof scout.IconDesc) {
+  if (icon instanceof IconDesc) {
     return icon;
   }
-  return scout.icons.parseIconId(icon);
-};
+  return icons.parseIconId(icon);
+}
+}

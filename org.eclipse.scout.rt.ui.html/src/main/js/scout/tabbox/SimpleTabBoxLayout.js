@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SimpleTabBoxLayout = function(tabBox) {
-  scout.SimpleTabBoxLayout.parent.call(this);
-  this.tabBox = tabBox;
-};
-scout.inherits(scout.SimpleTabBoxLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import {Dimension} from '../index';
 
-scout.SimpleTabBoxLayout.prototype.layout = function($container) {
+export default class SimpleTabBoxLayout extends AbstractLayout {
+
+constructor(tabBox) {
+  super();
+  this.tabBox = tabBox;
+}
+
+
+layout($container) {
   var containerSize, viewContentSize,
-    htmlContainer = scout.HtmlComponent.get($container),
-    htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
+    htmlContainer = HtmlComponent.get($container),
+    htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent),
     tabAreaSize;
 
   containerSize = htmlContainer.availableSize({
@@ -30,35 +36,35 @@ scout.SimpleTabBoxLayout.prototype.layout = function($container) {
   viewContentSize = containerSize.subtract(htmlViewContent.margins());
   viewContentSize.height -= tabAreaSize.height;
   htmlViewContent.setSize(viewContentSize);
-};
+}
 
 /**
  * @param containerSize
- * @returns {scout.Dimension} used of the tab area
+ * @returns {Dimension} used of the tab area
  */
-scout.SimpleTabBoxLayout.prototype._layoutTabArea = function(containerSize) {
+_layoutTabArea(containerSize) {
   if (!this.tabBox.rendered) {
-    return new scout.Dimension(0, 0);
+    return new Dimension(0, 0);
   }
   // exprected the tab area is layouted dynamically only
-  var htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
+  var htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
     prefSize = htmlViewTabs.prefSize(),
     margins = htmlViewTabs.margins();
-  var size = new scout.Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
+  var size = new Dimension(containerSize.width, prefSize.height + margins.top + margins.bottom);
   htmlViewTabs.setSize(size);
   return size;
-};
+}
 
 /**
  * Preferred size of the tab-box aligns every tab-item in a single line, so that each item is visible.
  */
-scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = options || {};
-  var htmlContainer = scout.HtmlComponent.get($container),
-    htmlViewContent = scout.HtmlComponent.get(this.tabBox.$viewContent),
-    htmlViewTabs = scout.HtmlComponent.get(this.tabBox.$tabArea),
-    viewTabsSize = new scout.Dimension(),
-    viewContentSize = new scout.Dimension();
+  var htmlContainer = HtmlComponent.get($container),
+    htmlViewContent = HtmlComponent.get(this.tabBox.$viewContent),
+    htmlViewTabs = HtmlComponent.get(this.tabBox.$tabArea),
+    viewTabsSize = new Dimension(),
+    viewContentSize = new Dimension();
 
   // HeightHint not supported
   options.heightHint = null;
@@ -72,7 +78,8 @@ scout.SimpleTabBoxLayout.prototype.preferredLayoutSize = function($container, op
     .add(htmlContainer.insets())
     .add(htmlViewContent.margins());
 
-  return new scout.Dimension(
+  return new Dimension(
     Math.max(viewTabsSize.width, viewContentSize.width),
     viewContentSize.height + viewTabsSize.height);
-};
+}
+}

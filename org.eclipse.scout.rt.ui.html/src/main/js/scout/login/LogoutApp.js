@@ -8,37 +8,46 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {texts} from '../index';
+import {ObjectFactory} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {App} from '../index';
+
 /**
  * init options:
  * - loginUrl: URL to redirect after login again button click
- * - logoUrl: default points to 'res/logo.png'
+ * - logoUrl: default points to 'logo.png'
  */
-scout.LogoutApp = function() {
-  scout.LogoutApp.parent.call(this);
-};
-scout.inherits(scout.LogoutApp, scout.App);
+export default class LogoutApp extends App {
+
+constructor() {
+  super();
+}
+
 
 /**
  * Default adds polyfills too, not required here
  * @override
  */
-scout.LogoutApp.prototype._prepareEssentials = function(options) {
-  scout.objectFactory.init();
-};
+_prepareEssentials(options) {
+  ObjectFactory.get().init();
+}
 
 /**
  * No bootstrapping required
  * @override
  */
-scout.LogoutApp.prototype._doBootstrap = function(options) {
+_doBootstrap(options) {
   return [];
-};
+}
 
-scout.LogoutApp.prototype._init = function(options) {
+_init(options) {
   options = options || {};
-  options.texts = $.extend({}, scout.texts.readFromDOM(), options.texts);
+  options.texts = $.extend({}, texts.readFromDOM(), options.texts);
   this._prepareDOM();
 
   var logoutBox = scout.create('LogoutBox', options);
   logoutBox.render($('body'));
-};
+}
+}

@@ -8,6 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {QueryBy} from '../index';
+
 
 /**
  * This class is used to remember what lookup is called (=request) and to compare that
@@ -16,20 +19,23 @@
  * with the parameters from the result. If the parameters don't match, we simply ignore the
  * result, because it is out-dated.
  *
- * @param {scout.QueryBy} requestType
+ * @param {QueryBy} requestType
  * @param {object} requestData
  */
-scout.RemoteLookupRequest = function(requestType, requestData) {
-  if (!scout.QueryBy.hasOwnProperty(requestType)) {
+export default class RemoteLookupRequest {
+
+constructor(requestType, requestData) {
+  if (!QueryBy.hasOwnProperty(requestType)) {
     throw new Error('Invalid enum value');
   }
   this.requestType = requestType;
   this.requestData = requestData;
-};
+}
 
-scout.RemoteLookupRequest.prototype.equals = function(o) {
-  if (!o || !(o instanceof scout.RemoteLookupRequest)) {
+equals(o) {
+  if (!o || !(o instanceof RemoteLookupRequest)) {
     return false;
   }
-  return scout.objects.propertiesEquals(this, o, ['requestType', 'requestData']);
-};
+  return objects.propertiesEquals(this, o, ['requestType', 'requestData']);
+}
+}

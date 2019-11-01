@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ColumnLayout = function(options) {
-  scout.ColumnLayout.parent.call(this);
+import {AbstractLayout} from '../index';
+import {Dimension} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class ColumnLayout extends AbstractLayout {
+
+constructor(options) {
+  super();
   options = options || {};
   this.stretch = scout.nvl(options.stretch, true);
   this.useCssWidth = scout.nvl(options.useCssWidth, false);
@@ -18,17 +26,17 @@ scout.ColumnLayout = function(options) {
   // +------+---+------+
   // |      |   |      |
   // +------+---+------+
-};
-scout.inherits(scout.ColumnLayout, scout.AbstractLayout);
+}
 
-scout.ColumnLayout.prototype.layout = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container);
+
+layout($container) {
+  var htmlComp = HtmlComponent.get($container);
   var containerSize = htmlComp.availableSize()
     .subtract(htmlComp.insets());
 
   $container.children().each(function(i, elem) {
     var $elem = $(elem);
-    var htmlChild = scout.HtmlComponent.optGet($elem);
+    var htmlChild = HtmlComponent.optGet($elem);
     if (!htmlChild || !$elem.isVisible()) {
       return;
     }
@@ -53,18 +61,18 @@ scout.ColumnLayout.prototype.layout = function($container) {
       htmlChild.setSize(childPrefSize);
     }
   }.bind(this));
-};
+}
 
-scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options) {
-  var prefSize = new scout.Dimension(),
-    htmlContainer = scout.HtmlComponent.get($container),
+preferredLayoutSize($container, options) {
+  var prefSize = new Dimension(),
+    htmlContainer = HtmlComponent.get($container),
     childOptions = {
       useCssSize: true
     };
 
   $container.children().each(function(i, elem) {
     var $elem = $(elem);
-    var htmlChild = scout.HtmlComponent.optGet($elem);
+    var htmlChild = HtmlComponent.optGet($elem);
     if (!htmlChild || !$elem.isVisible()) {
       return;
     }
@@ -81,4 +89,5 @@ scout.ColumnLayout.prototype.preferredLayoutSize = function($container, options)
 
   prefSize = prefSize.add(htmlContainer.insets());
   return prefSize;
-};
+}
+}

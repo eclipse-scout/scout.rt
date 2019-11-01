@@ -8,17 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineNavigateToTopKeyStroke = function(tree, modifierBitMask) {
-  scout.OutlineNavigateToTopKeyStroke.parent.call(this, tree, modifierBitMask);
-  this.which = [scout.keys.HOME];
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+import {keys} from '../../../index';
+import {AbstractTreeNavigationKeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class OutlineNavigateToTopKeyStroke extends AbstractTreeNavigationKeyStroke {
+
+constructor(tree, modifierBitMask) {
+  super( tree, modifierBitMask);
+  this.which = [keys.HOME];
+  this.renderingHints.hAlign = HAlign.RIGHT;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$title || this.field.$data;
   }.bind(this);
-};
-scout.inherits(scout.OutlineNavigateToTopKeyStroke, scout.AbstractTreeNavigationKeyStroke);
+}
 
-scout.OutlineNavigateToTopKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.navigateToTop();
-};
+}
+}

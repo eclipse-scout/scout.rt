@@ -8,38 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineMediator = function() {};
+export default class OutlineMediator {
 
-scout.OutlineMediator.prototype.init = function(model) {};
+constructor() {};
 
-scout.OutlineMediator.prototype._skipEvent = function(page) {
+init(model) {};
+
+_skipEvent(page) {
   return page === null || page.getOutline() === null || page.leaf;
-};
+}
 
-scout.OutlineMediator.prototype.onTableRowsInserted = function(rows, childPages, pageWithTable) {
+onTableRowsInserted(rows, childPages, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
   pageWithTable.getTree().insertNodes(childPages, pageWithTable);
-};
+}
 
-scout.OutlineMediator.prototype.onTableRowsDeleted = function(rows, childPages, pageWithTable) {
+onTableRowsDeleted(rows, childPages, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
   pageWithTable.getTree().deleteNodes(childPages, pageWithTable);
-};
+}
 
-scout.OutlineMediator.prototype.onTableRowsUpdated = function(event, pageWithTable) {
+onTableRowsUpdated(event, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
 
   var pages = pageWithTable.updatePagesFromTableRows(event.rows);
   pageWithTable.getTree().updateNodes(pages);
-};
+}
 
-scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
+onTableRowAction(event, page) {
   var childPage = event.row.page;
   if (!childPage) {
     return;
@@ -52,9 +54,9 @@ scout.OutlineMediator.prototype.onTableRowAction = function(event, page) {
 
   outline.selectNode(childPage);
   outline.setNodeExpanded(childPage, true);
-};
+}
 
-scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWithTable) {
+onTableRowOrderChanged(event, pageWithTable) {
   if (this._skipEvent(pageWithTable)) {
     return;
   }
@@ -62,8 +64,9 @@ scout.OutlineMediator.prototype.onTableRowOrderChanged = function(event, pageWit
   var table = event.source;
   var childPages = pageWithTable.pagesForTableRows(table.rows);
   pageWithTable.getOutline().updateNodeOrder(childPages, pageWithTable);
-};
+}
 
-scout.OutlineMediator.prototype.onTableFilter = function(event, page) {
+onTableFilter(event, page) {
   page.getOutline().filter();
-};
+}
+}

@@ -8,23 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FileChooserFieldDeleteKeyStroke = function(field) {
-  scout.FileChooserFieldDeleteKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import {HAlign} from '../../../index';
+
+export default class FileChooserFieldDeleteKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.DELETE];
+  this.which = [keys.DELETE];
   this.stopPropagation = true;
 
   this.renderingHints.offset = 25;
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
-};
-scout.inherits(scout.FileChooserFieldDeleteKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.FileChooserFieldDeleteKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.clear();
-};
+}
+}

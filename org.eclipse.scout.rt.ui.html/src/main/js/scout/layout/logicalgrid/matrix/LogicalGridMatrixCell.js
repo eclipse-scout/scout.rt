@@ -8,11 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LogicalGridMatrixCell = function(widget, data) {
+export default class LogicalGridMatrixCell {
+
+constructor(widget, data) {
   this.widget = widget;
   this.data = data;
-};
+}
 
-scout.LogicalGridMatrixCell.prototype.isEmpty = function() {
+isEmpty() {
   return !this.widget;
-};
+}
+}

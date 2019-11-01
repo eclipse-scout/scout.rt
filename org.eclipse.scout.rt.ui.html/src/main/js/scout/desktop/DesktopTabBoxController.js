@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {SimpleTabBoxController} from '../index';
+import {scout} from '../index';
 
-scout.DesktopTabBoxController = function() {
-  scout.DesktopTabBoxController.parent.call(this);
-};
-scout.inherits(scout.DesktopTabBoxController, scout.SimpleTabBoxController);
 
-scout.DesktopTabBoxController.prototype._createTab = function(view) {
+export default class DesktopTabBoxController extends SimpleTabBoxController {
+
+constructor() {
+  super();
+}
+
+
+_createTab(view) {
   return scout.create('DesktopTab', {
     parent: this.tabArea,
     view: view
   });
-};
+}
+}

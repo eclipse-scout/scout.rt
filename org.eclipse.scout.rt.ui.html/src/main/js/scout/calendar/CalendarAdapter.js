@@ -8,24 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarAdapter = function() {
-  scout.CalendarAdapter.parent.call(this);
-};
-scout.inherits(scout.CalendarAdapter, scout.ModelAdapter);
+import {dates} from '../index';
+import {ModelAdapter} from '../index';
+
+export default class CalendarAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * We must send the view-range to the client-model on the server. The view-range is determined by the UI.
  * Thus the calendar cannot be completely initialized without the view-range from the UI.
  * @override ModelAdapter.js
  */
-scout.CalendarAdapter.prototype._postCreateWidget = function() {
+_postCreateWidget() {
   this._sendViewRangeChange();
-};
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.CalendarAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'viewRangeChange') {
     this._sendViewRangeChange();
   } else if (event.type === 'modelChange') {
@@ -33,37 +38,38 @@ scout.CalendarAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'selectionChange') {
     this._sendSelectionChange();
   } else {
-    scout.CalendarAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.CalendarAdapter.prototype._jsonViewRange = function() {
-  return scout.dates.toJsonDateRange(this.widget.viewRange);
-};
+_jsonViewRange() {
+  return dates.toJsonDateRange(this.widget.viewRange);
+}
 
-scout.CalendarAdapter.prototype._jsonSelectedDate = function() {
-  return scout.dates.toJsonDate(this.widget.selectedDate);
-};
+_jsonSelectedDate() {
+  return dates.toJsonDate(this.widget.selectedDate);
+}
 
-scout.CalendarAdapter.prototype._sendViewRangeChange = function() {
+_sendViewRangeChange() {
   this._send('viewRangeChange', {
     viewRange: this._jsonViewRange()
   });
-};
+}
 
-scout.CalendarAdapter.prototype._sendModelChange = function() {
+_sendModelChange() {
   var data = {
     viewRange: this._jsonViewRange(),
     selectedDate: this._jsonSelectedDate(),
     displayMode: this.widget.displayMode
   };
   this._send('modelChange', data);
-};
+}
 
-scout.CalendarAdapter.prototype._sendSelectionChange = function() {
+_sendSelectionChange() {
   var selectedComponentId = this.widget.selectedComponent ? this.widget.selectedComponent.id : null;
   this._send('selectionChange', {
     date: this._jsonSelectedDate(),
     componentId: selectedComponentId
   });
-};
+}
+}

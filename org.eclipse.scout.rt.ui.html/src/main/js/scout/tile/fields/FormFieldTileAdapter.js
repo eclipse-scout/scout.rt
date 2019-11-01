@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormFieldTileAdapter = function() {
-  scout.FormFieldTileAdapter.parent.call(this);
-};
-scout.inherits(scout.FormFieldTileAdapter, scout.TileAdapter);
+import {TileAdapter} from '../../index';
+
+export default class FormFieldTileAdapter extends TileAdapter {
+
+constructor() {
+  super();
+}
+
+}

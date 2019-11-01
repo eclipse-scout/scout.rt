@@ -8,13 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonGroup = function() {
-  scout.RadioButtonGroup.parent.call(this);
+import {RadioButtonGroupLayout} from '../../../index';
+import {RadioButton} from '../../../index';
+import {LogicalGridData} from '../../../index';
+import {Status} from '../../../index';
+import {LogicalGridLayoutConfig} from '../../../index';
+import * as $ from 'jquery';
+import {RadioButtonGroupRightKeyStroke} from '../../../index';
+import {ValueField} from '../../../index';
+import {RadioButtonGroupGridConfig} from '../../../index';
+import {RadioButtonGroupLeftKeyStroke} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {LoadingSupport} from '../../../index';
+import {objects} from '../../../index';
+import {TreeVisitResult} from '../../../index';
+import {LookupCall} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class RadioButtonGroup extends ValueField {
+
+constructor() {
+  super();
   this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.layoutConfig = null;
   this.fields = [];
   this.radioButtons = [];
-  this.gridColumnCount = scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT;
+  this.gridColumnCount = RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT;
   this.selectedButton = null;
   this.$body = null;
   this.lookupStatus = null;
@@ -29,51 +49,51 @@ scout.RadioButtonGroup = function() {
   this._addWidgetProperties(['fields']);
   this._addCloneProperties(['lookupCall', 'layoutConfig', 'gridColumnCount']);
   this._buttonPropertyChangeHandler = this._onButtonPropertyChange.bind(this);
-};
-scout.inherits(scout.RadioButtonGroup, scout.ValueField);
+}
 
-scout.RadioButtonGroup.DEFAULT_GRID_COLUMN_COUNT = -1;
 
-scout.RadioButtonGroup.ErrorCode = {
+static DEFAULT_GRID_COLUMN_COUNT = -1;
+
+static ErrorCode = {
   NO_DATA: 1
 };
 
-scout.RadioButtonGroup.prototype._init = function(model) {
-  scout.RadioButtonGroup.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   this._setLayoutConfig(this.layoutConfig);
   this._setGridColumnCount(this.gridColumnCount);
-};
+}
 
-scout.RadioButtonGroup.prototype._initValue = function(value) {
+_initValue(value) {
   if (this.lookupCall) {
     this._setLookupCall(this.lookupCall);
   }
   // must be called before value is set
   this._setFields(this.fields);
-  scout.RadioButtonGroup.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.RadioButtonGroup.prototype._initKeyStrokeContext = function() {
-  scout.RadioButtonGroup.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.RadioButtonGroupLeftKeyStroke(this),
-    new scout.RadioButtonGroupRightKeyStroke(this)
+    new RadioButtonGroupLeftKeyStroke(this),
+    new RadioButtonGroupRightKeyStroke(this)
   ]);
-};
+}
 
-scout.RadioButtonGroup.prototype._initButtons = function() {
+_initButtons() {
   this.radioButtons = this.fields.filter(function(formField) {
-    return formField instanceof scout.RadioButton;
+    return formField instanceof RadioButton;
   });
   this.radioButtons.forEach(this._initButton.bind(this));
-};
+}
 
-scout.RadioButtonGroup.prototype._initButton = function(button) {
+_initButton(button) {
   if (button.events.count('propertyChange', this._buttonPropertyChangeHandler) === 0) {
     button.on('propertyChange', this._buttonPropertyChangeHandler);
   }
@@ -84,91 +104,91 @@ scout.RadioButtonGroup.prototype._initButton = function(button) {
       this.setFocused(true);
     }
   }
-};
+}
 
-scout.RadioButtonGroup.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'radiobutton-group');
   this.addLabel();
   this.addMandatoryIndicator();
 
   this.$body = this.$container.appendDiv('radiobutton-group-body');
-  this.htmlBody = scout.HtmlComponent.install(this.$body, this.session);
+  this.htmlBody = HtmlComponent.install(this.$body, this.session);
   this.htmlBody.setLayout(this._createBodyLayout());
 
   // fields are rendered in _renderFields
   this.addField(this.$body);
   this.addStatus();
-};
+}
 
-scout.RadioButtonGroup.prototype._renderProperties = function() {
-  scout.RadioButtonGroup.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderFields();
   this._renderLayoutConfig();
-};
+}
 
-scout.RadioButtonGroup.prototype._createBodyLayout = function() {
-  return new scout.RadioButtonGroupLayout(this, this.layoutConfig);
-};
+_createBodyLayout() {
+  return new RadioButtonGroupLayout(this, this.layoutConfig);
+}
 
 /**
  * @override Widgets.js
  */
-scout.RadioButtonGroup.prototype._setLogicalGrid = function(logicalGrid) {
-  scout.RadioButtonGroup.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+_setLogicalGrid(logicalGrid) {
+  super._setLogicalGrid( logicalGrid);
   if (this.logicalGrid) {
-    this.logicalGrid.setGridConfig(new scout.RadioButtonGroupGridConfig());
+    this.logicalGrid.setGridConfig(new RadioButtonGroupGridConfig());
   }
-};
+}
 
 /**
  * @override Widgets.js
  */
-scout.RadioButtonGroup.prototype.invalidateLogicalGrid = function(invalidateLayout) {
-  scout.RadioButtonGroup.parent.prototype.invalidateLogicalGrid.call(this, false);
+invalidateLogicalGrid(invalidateLayout) {
+  super.invalidateLogicalGrid( false);
   if (scout.nvl(invalidateLayout, true) && this.rendered) {
     this.htmlBody.invalidateLayoutTree();
   }
-};
+}
 
-scout.RadioButtonGroup.prototype.setLayoutConfig = function(layoutConfig) {
+setLayoutConfig(layoutConfig) {
   this.setProperty('layoutConfig', layoutConfig);
-};
+}
 
-scout.RadioButtonGroup.prototype._setLayoutConfig = function(layoutConfig) {
+_setLayoutConfig(layoutConfig) {
   if (!layoutConfig) {
-    layoutConfig = new scout.LogicalGridLayoutConfig();
+    layoutConfig = new LogicalGridLayoutConfig();
   }
-  this._setProperty('layoutConfig', scout.LogicalGridLayoutConfig.ensure(layoutConfig));
-};
+  this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
+}
 
-scout.RadioButtonGroup.prototype._renderLayoutConfig = function() {
+_renderLayoutConfig() {
   this.layoutConfig.applyToLayout(this.htmlBody.layout);
   if (this.rendered) {
     this.htmlBody.invalidateLayoutTree();
   }
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.RadioButtonGroup.prototype.isClearable = function() {
+isClearable() {
   return false;
-};
+}
 
-scout.RadioButtonGroup.prototype.getFields = function() {
+getFields() {
   return this.fields;
-};
+}
 
 /**
  * @override
  */
-scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
-  var treeVisitResult = scout.RadioButtonGroup.parent.prototype.visitFields.call(this, visitor);
-  if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
-    return scout.TreeVisitResult.TERMINATE;
+visitFields(visitor) {
+  var treeVisitResult = super.visitFields( visitor);
+  if (treeVisitResult === TreeVisitResult.TERMINATE) {
+    return TreeVisitResult.TERMINATE;
   }
 
-  if (treeVisitResult === scout.TreeVisitResult.SKIP_SUBTREE) {
+  if (treeVisitResult === TreeVisitResult.SKIP_SUBTREE) {
     return;
   }
 
@@ -176,56 +196,56 @@ scout.RadioButtonGroup.prototype.visitFields = function(visitor) {
   for (var i = 0; i < fields.length; i++) {
     var field = fields[i];
     treeVisitResult = field.visitFields(visitor);
-    if (treeVisitResult === scout.TreeVisitResult.TERMINATE) {
-      return scout.TreeVisitResult.TERMINATE;
+    if (treeVisitResult === TreeVisitResult.TERMINATE) {
+      return TreeVisitResult.TERMINATE;
     }
   }
-};
+}
 
 /**
  * @override
  */
-scout.RadioButtonGroup.prototype.getFocusableElement = function() {
+getFocusableElement() {
   // The first button may not be focusable because it is not selected and therefore has no tab index -> find the first focusable button
   return this.session.focusManager.findFirstFocusableElement(this.$container);
-};
+}
 
-scout.RadioButtonGroup.prototype.setFields = function(fields) {
+setFields(fields) {
   this.setProperty('fields', fields);
-};
+}
 
-scout.RadioButtonGroup.prototype._setFields = function(fields) {
+_setFields(fields) {
   this._setProperty('fields', fields);
   this._initButtons();
-};
+}
 
-scout.RadioButtonGroup.prototype._renderFields = function() {
+_renderFields() {
   this._ensureLookupCallExecuted();
   this.fields.forEach(function(formField) {
     formField.render(this.$body);
 
     // set each children layout data to logical grid data
-    formField.setLayoutData(new scout.LogicalGridData(formField));
+    formField.setLayoutData(new LogicalGridData(formField));
 
     this._linkWithLabel(formField.$field);
   }, this);
   this._provideTabIndex(); // depends on rendered fields
   this.invalidateLogicalGrid();
   this.validateLayoutTree(); // prevent flickering
-};
+}
 
 /**
  * @override
  */
-scout.RadioButtonGroup.prototype._renderEnabled = function() {
-  scout.RadioButtonGroup.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this._provideTabIndex();
-};
+}
 
 /**
  * Set the selected (or first if none is selected) to tabbable
  */
-scout.RadioButtonGroup.prototype._provideTabIndex = function() {
+_provideTabIndex() {
   var tabSet;
   this.radioButtons.forEach(function(radioButton) {
     if (radioButton.enabledComputed && this.enabledComputed && !tabSet) {
@@ -239,13 +259,13 @@ scout.RadioButtonGroup.prototype._provideTabIndex = function() {
       radioButton.setTabbable(false);
     }
   }, this);
-};
+}
 
-scout.RadioButtonGroup.prototype.setGridColumnCount = function(gridColumnCount) {
+setGridColumnCount(gridColumnCount) {
   this.setProperty('gridColumnCount', gridColumnCount);
-};
+}
 
-scout.RadioButtonGroup.prototype._setGridColumnCount = function(gridColumnCount) {
+_setGridColumnCount(gridColumnCount) {
   if (gridColumnCount < 0) {
     gridColumnCount = this._calcDefaultGridColumnCount();
   }
@@ -256,31 +276,31 @@ scout.RadioButtonGroup.prototype._setGridColumnCount = function(gridColumnCount)
   this._setProperty('gridColumnCount', gridColumnCount);
   this.invalidateLogicalGrid();
   return true;
-};
+}
 
-scout.RadioButtonGroup.prototype._calcDefaultGridColumnCount = function() {
+_calcDefaultGridColumnCount() {
   var height = 1,
     hints = this.gridDataHints;
   if (hints && hints.h > 1) {
     height = hints.h;
   }
   return Math.ceil(this.fields.length / height);
-};
+}
 
-scout.RadioButtonGroup.prototype.getButtonForRadioValue = function(radioValue) {
+getButtonForRadioValue(radioValue) {
   if (radioValue === null) {
     return null;
   }
-  return scout.arrays.find(this.radioButtons, function(button) {
-    return scout.objects.equals(button.radioValue, radioValue);
+  return arrays.find(this.radioButtons, function(button) {
+    return objects.equals(button.radioValue, radioValue);
   });
-};
+}
 
 /**
  * Search and then select the button with the corresponding radioValue
  */
-scout.RadioButtonGroup.prototype._validateValue = function(value) {
-  scout.RadioButtonGroup.parent.prototype._validateValue.call(this, value);
+_validateValue(value) {
+  super._validateValue( value);
 
   if (!this.initialized && this.lookupCall) {
     // lookup call may not be started during field initialization. otherwise lookup prepare listeners cannot be attached.
@@ -301,31 +321,31 @@ scout.RadioButtonGroup.prototype._validateValue = function(value) {
     throw this.session.text('InvalidValueMessageX', value);
   }
   return value;
-};
+}
 
-scout.RadioButtonGroup.prototype._valueChanged = function() {
-  scout.RadioButtonGroup.parent.prototype._valueChanged.call(this);
+_valueChanged() {
+  super._valueChanged();
   // Don't select button during initialization if value is null to not override selected state of a button
   if (this.value !== null || this.initialized) {
     this.selectButton(this.getButtonForRadioValue(this.value));
   }
-};
+}
 
-scout.RadioButtonGroup.prototype.selectFirstButton = function() {
+selectFirstButton() {
   this.selectButtonByIndex(0);
-};
+}
 
-scout.RadioButtonGroup.prototype.selectLastButton = function() {
+selectLastButton() {
   this.selectButtonByIndex(this.radioButtons.length - 1);
-};
+}
 
-scout.RadioButtonGroup.prototype.selectButtonByIndex = function(index) {
+selectButtonByIndex(index) {
   if (this.radioButtons.length && index >= 0 && index < this.radioButtons.length) {
     this.selectButton(this.radioButtons[index]);
   }
-};
+}
 
-scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
+selectButton(radioButton) {
   if (this.selectedButton === radioButton) {
     // Already selected
     return;
@@ -362,21 +382,21 @@ scout.RadioButtonGroup.prototype.selectButton = function(radioButton) {
   }
   this._selectButtonLocked = false;
   this.setProperty('selectedButton', radioButton);
-};
+}
 
-scout.RadioButtonGroup.prototype.getTabbableButton = function() {
-  return scout.arrays.find(this.radioButtons, function(button) {
+getTabbableButton() {
+  return arrays.find(this.radioButtons, function(button) {
     return button.visible && button.isTabbable();
   });
-};
+}
 
-scout.RadioButtonGroup.prototype.insertButton = function(radioButton) {
+insertButton(radioButton) {
   var newFields = this.fields.slice();
   newFields.push(radioButton);
   this.setFields(newFields);
-};
+}
 
-scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
+_onButtonPropertyChange(event) {
   if (event.propertyName === 'selected') {
     var selected = event.newValue;
     if (selected) {
@@ -388,20 +408,20 @@ scout.RadioButtonGroup.prototype._onButtonPropertyChange = function(event) {
   } else if (event.propertyName === 'focused') {
     this.setFocused(event.newValue);
   }
-};
+}
 
-scout.RadioButtonGroup.prototype._setLookupCall = function(lookupCall) {
-  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
+_setLookupCall(lookupCall) {
+  this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
   this._lookupExecuted = false;
   if (this.rendered) {
     this._ensureLookupCallExecuted();
   }
-};
+}
 
 /**
  * @return true if a lookup call execution has been scheduled now. false otherwise.
  */
-scout.RadioButtonGroup.prototype._ensureLookupCallExecuted = function() {
+_ensureLookupCallExecuted() {
   if (!this.lookupCall) {
     return false;
   }
@@ -410,21 +430,21 @@ scout.RadioButtonGroup.prototype._ensureLookupCallExecuted = function() {
   }
   this._lookupByAll();
   return true;
-};
+}
 
 /**
  * @override
  */
-scout.RadioButtonGroup.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this,
     $container: function() {
       return this.$body;
     }.bind(this)
   });
-};
+}
 
-scout.RadioButtonGroup.prototype._lookupByAll = function() {
+_lookupByAll() {
   if (!this.lookupCall) {
     return;
   }
@@ -441,19 +461,19 @@ scout.RadioButtonGroup.prototype._lookupByAll = function() {
     .done(doneHandler);
 
   return deferred.promise();
-};
+}
 
-scout.RadioButtonGroup.prototype._clearPendingLookup = function() {
+_clearPendingLookup() {
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
     this._pendingLookup = null;
   }
-};
+}
 
 /**
  * A wrapper function around lookup calls used to set the _lookupInProgress flag, and display the state in the UI.
  */
-scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExisting) {
+_executeLookup(lookupCall, abortExisting) {
   if (abortExisting && this._currentLookupCall) {
     this._currentLookupCall.abort();
   }
@@ -475,14 +495,14 @@ scout.RadioButtonGroup.prototype._executeLookup = function(lookupCall, abortExis
       this.setLoading(false);
       this._clearLookupStatus();
     }.bind(this));
-};
+}
 
-scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
+_lookupByAllDone(result) {
   try {
 
     if (result.exception) {
       // Oops! Something went wrong while the lookup has been processed.
-      this.setErrorStatus(scout.Status.error({
+      this.setErrorStatus(Status.error({
         message: result.exception
       }));
       return;
@@ -490,9 +510,9 @@ scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
 
     // 'No data' case
     if (result.lookupRows.length === 0) {
-      this.setLookupStatus(scout.Status.warning({
+      this.setLookupStatus(Status.warning({
         message: this.session.text('SmartFieldNoDataFound'),
-        code: scout.RadioButtonGroup.ErrorCode.NO_DATA
+        code: RadioButtonGroup.ErrorCode.NO_DATA
       }));
       return;
     }
@@ -504,9 +524,9 @@ scout.RadioButtonGroup.prototype._lookupByAllDone = function(result) {
       result: result
     });
   }
-};
+}
 
-scout.RadioButtonGroup.prototype._populateRadioButtonGroup = function(result) {
+_populateRadioButtonGroup(result) {
   var lookupRows = result.lookupRows;
   var newFields = this.fields.slice();
   lookupRows.forEach(function(lookupRow) {
@@ -518,24 +538,24 @@ scout.RadioButtonGroup.prototype._populateRadioButtonGroup = function(result) {
   this.setValue(this.value);
   // also select the button (the line above does not change the value, therefore _valueChanged is not called)
   this.selectButton(this.getButtonForRadioValue(this.value));
-};
+}
 
-scout.RadioButtonGroup.prototype._clearLookupStatus = function() {
+_clearLookupStatus() {
   this.setLookupStatus(null);
-};
+}
 
-scout.RadioButtonGroup.prototype.setLookupStatus = function(lookupStatus) {
+setLookupStatus(lookupStatus) {
   this.setProperty('lookupStatus', lookupStatus);
   if (this.rendered) {
     this._renderErrorStatus();
   }
-};
+}
 
-scout.RadioButtonGroup.prototype._errorStatus = function() {
+_errorStatus() {
   return this.lookupStatus || this.errorStatus;
-};
+}
 
-scout.RadioButtonGroup.prototype._createLookupRowRadioButton = function(lookupRow) {
+_createLookupRowRadioButton(lookupRow) {
   var button = {
     parent: this,
     label: lookupRow.text,
@@ -569,11 +589,12 @@ scout.RadioButtonGroup.prototype._createLookupRowRadioButton = function(lookupRo
   }
 
   return scout.create('RadioButton', button);
-};
+}
 
-scout.RadioButtonGroup.prototype.clone = function(model, options) {
-  var clone = scout.RadioButtonGroup.parent.prototype.clone.call(this, model, options);
+clone(model, options) {
+  var clone = super.clone( model, options);
   this._deepCloneProperties(clone, 'fields', options);
   clone._initButtons();
   return clone;
-};
+}
+}

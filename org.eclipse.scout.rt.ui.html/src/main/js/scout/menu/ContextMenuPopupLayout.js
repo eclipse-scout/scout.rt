@@ -8,20 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ContextMenuPopupLayout = function(popup) {
-  scout.ContextMenuPopupLayout.parent.call(this, popup);
-};
-scout.inherits(scout.ContextMenuPopupLayout, scout.PopupWithHeadLayout);
+import {PopupWithHeadLayout} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
 
-scout.ContextMenuPopupLayout.prototype.layout = function($container) {
+export default class ContextMenuPopupLayout extends PopupWithHeadLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
+
+layout($container) {
   var $menuItems = this.popup.$visibleMenuItems();
   this._adjustTextAlignment($menuItems);
   this._resetMaxWidthFor($menuItems);
-  scout.ContextMenuPopupLayout.parent.prototype.layout.call(this, $container);
+  super.layout( $container);
   this._setMaxWidthFor($menuItems);
-};
+}
 
-scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItems) {
+_adjustTextAlignment($menuItems) {
   // Calculate the text offset (= max icon width)
   var textOffset = 0;
   $menuItems.each(function(index, menuItem) {
@@ -47,14 +53,14 @@ scout.ContextMenuPopupLayout.prototype._adjustTextAlignment = function($menuItem
       iconWidth = $icon.outerWidth(true);
     }
     $text.css('padding-left', textOffset - iconWidth);
-    var htmlComp = scout.HtmlComponent.optGet($menuItem);
+    var htmlComp = HtmlComponent.optGet($menuItem);
     if (htmlComp) {
       htmlComp.invalidateLayout();
     }
   });
-};
+}
 
-scout.ContextMenuPopupLayout.prototype._resetMaxWidthFor = function($menuItems) {
+_resetMaxWidthFor($menuItems) {
   $menuItems.each(function(pos, item) {
     var $menu = $(item),
       menu = $menu.data('widget');
@@ -68,9 +74,9 @@ scout.ContextMenuPopupLayout.prototype._resetMaxWidthFor = function($menuItems) 
       menu.$text.css('max-width', '');
     }
   }.bind(this));
-};
+}
 
-scout.ContextMenuPopupLayout.prototype._setMaxWidthFor = function($menuItems) {
+_setMaxWidthFor($menuItems) {
   $menuItems.each(function(pos, item) {
     var $menu = $(item),
       menu = $menu.data('widget');
@@ -88,9 +94,9 @@ scout.ContextMenuPopupLayout.prototype._setMaxWidthFor = function($menuItems) {
       menu.$text.cssPxValue('max-width', textMaxWidth);
     }
   }.bind(this));
-};
+}
 
-scout.ContextMenuPopupLayout.prototype._calcTextMaxWidth = function(menu) {
+_calcTextMaxWidth(menu) {
   var containerWidth = menu.$container.width(),
     $icon = menu.get$Icon(),
     $text = menu.$text,
@@ -107,4 +113,5 @@ scout.ContextMenuPopupLayout.prototype._calcTextMaxWidth = function(menu) {
     textWidth -= $submenuIcon.outerWidth(true);
   }
   return textWidth;
-};
+}
+}

@@ -8,68 +8,74 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetField = function() {
-  scout.WidgetField.parent.call(this);
+import {WidgetFieldLayout} from '../../index';
+import {FormField} from '../../index';
+
+export default class WidgetField extends FormField {
+
+constructor() {
+  super();
 
   this.scrollable = true;
   this.fieldWidget = null;
   this._addWidgetProperties(['fieldWidget']);
-};
-scout.inherits(scout.WidgetField, scout.FormField);
+}
 
-scout.WidgetField.prototype._init = function(model) {
-  scout.WidgetField.parent.prototype._init.call(this, model);
-};
 
-scout.WidgetField.prototype._render = function() {
-  this.addContainer(this.$parent, 'widget-field', new scout.WidgetFieldLayout(this));
+_init(model) {
+  super._init( model);
+}
+
+_render() {
+  this.addContainer(this.$parent, 'widget-field', new WidgetFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
   this.addStatus();
-};
+}
 
-scout.WidgetField.prototype._renderProperties = function() {
-  scout.WidgetField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderFieldWidget();
   this._renderScrollable();
-};
+}
 
-scout.WidgetField.prototype.setFieldWidget = function(fieldWidget) {
+setFieldWidget(fieldWidget) {
   this.setProperty('fieldWidget', fieldWidget);
-};
+}
 
-scout.WidgetField.prototype._renderFieldWidget = function() {
+_renderFieldWidget() {
   if (!this.fieldWidget) {
     return;
   }
   this.fieldWidget.render();
   this.addField(this.fieldWidget.$container);
   this.invalidateLayoutTree();
-};
+}
 
-scout.WidgetField.prototype._removeFieldWidget = function() {
+_removeFieldWidget() {
   if (!this.fieldWidget) {
     return;
   }
   this.fieldWidget.remove();
   this._removeField();
   this.invalidateLayoutTree();
-};
+}
 
-scout.WidgetField.prototype.setScrollable = function(scrollable) {
+setScrollable(scrollable) {
   this.setProperty('scrollable', scrollable);
-};
+}
 
-scout.WidgetField.prototype._renderScrollable = function() {
+_renderScrollable() {
   this._uninstallScrollbars();
   if (this.scrollable) {
     this._installScrollbars();
   }
-};
+}
 
 /**
  * @override
  */
-scout.WidgetField.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$fieldContainer;
-};
+}
+}

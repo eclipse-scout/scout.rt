@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BasicFieldAdapter = function() {
-  scout.BasicFieldAdapter.parent.call(this);
+import {ValueFieldAdapter} from '../../index';
+
+export default class BasicFieldAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
   this.enabledWhenOffline = true;
-};
-scout.inherits(scout.BasicFieldAdapter, scout.ValueFieldAdapter);
+}
+
+}

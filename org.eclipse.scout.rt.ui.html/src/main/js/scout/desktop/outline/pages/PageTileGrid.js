@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PageTileGrid = function() {
-  scout.PageTileGrid.parent.call(this);
+import {TileGrid} from '../../../index';
+import {KeyStrokeContext} from '../../../index';
+import {scout} from '../../../index';
+import {PageTileGridSelectKeyStroke} from '../../../index';
+
+export default class PageTileGrid extends TileGrid {
+
+constructor() {
+  super();
   this.outline = null;
   this.withPlaceholders = true;
   this.scrollable = false;
@@ -17,38 +24,38 @@ scout.PageTileGrid = function() {
   this.startupAnimationEnabled = true;
   this._outlineNodeChangedHandler = this._onOutlineNodeChanged.bind(this);
   this._outlineStructureChangedHandler = this._onOutlineStructureChanged.bind(this);
-};
-scout.inherits(scout.PageTileGrid, scout.TileGrid);
+}
 
-scout.PageTileGrid.prototype._init = function(model) {
-  scout.PageTileGrid.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setOutline(this.outline);
-};
+}
 
-scout.PageTileGrid.prototype._destroy = function() {
+_destroy() {
   this._setOutline(null);
-  scout.PageTileGrid.parent.prototype._destroy.call(this);
-};
+  super._destroy();
+}
 
 /**
  * @override
  */
-scout.PageTileGrid.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.PageTileGrid.prototype._initKeyStrokeContext = function() {
-  scout.PageTileGrid.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   this.keyStrokeContext.$bindTarget = this.session.$entryPoint;
   this.keyStrokeContext.registerKeyStroke([
-    new scout.PageTileGridSelectKeyStroke(this)
+    new PageTileGridSelectKeyStroke(this)
   ]);
-};
+}
 
-scout.PageTileGrid.prototype._setOutline = function(outline) {
+_setOutline(outline) {
   var tiles = [];
   if (this.outline) {
     this.outline.off('nodeChanged pageChanged', this._outlineNodeChangedHandler);
@@ -67,18 +74,18 @@ scout.PageTileGrid.prototype._setOutline = function(outline) {
     tiles = this._createPageTiles(this.outline.nodes);
   }
   this.setTiles(tiles);
-};
+}
 
-scout.PageTileGrid.prototype._createPageTiles = function(pages) {
+_createPageTiles(pages) {
   var tiles = [];
   pages.forEach(function(page) {
     var tile = this._createPageTile(page);
     tiles.push(tile);
   }, this);
   return tiles;
-};
+}
 
-scout.PageTileGrid.prototype._createPageTile = function(page) {
+_createPageTile(page) {
   var button = scout.create('PageTileButton', {
     parent: this,
     outline: this.outline,
@@ -91,22 +98,22 @@ scout.PageTileGrid.prototype._createPageTile = function(page) {
   });
   page.tile = tile;
   return tile;
-};
+}
 
-scout.PageTileGrid.prototype._rebuild = function() {
+_rebuild() {
   this.setTiles(this._createPageTiles(this.outline.nodes));
-};
+}
 
-scout.PageTileGrid.prototype._onOutlineNodeChanged = function(event) {
+_onOutlineNodeChanged(event) {
   var page = event.node || event.page;
   var tile = page.tile;
   if (!tile) {
     return;
   }
   tile.tileWidget.notifyPageChanged();
-};
+}
 
-scout.PageTileGrid.prototype._onOutlineStructureChanged = function(event) {
+_onOutlineStructureChanged(event) {
   var eventContainsTopLevelNode = event.nodes && event.nodes.some(function(node) {
     return !node.parentNode;
   }) || event.type === 'allChildNodesDeleted';
@@ -114,4 +121,5 @@ scout.PageTileGrid.prototype._onOutlineStructureChanged = function(event) {
   if (eventContainsTopLevelNode) {
     this._rebuild();
   }
-};
+}
+}

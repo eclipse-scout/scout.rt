@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NullWidgetAdapter = function() {
-  scout.NullWidgetAdapter.parent.call(this);
+import {ModelAdapter} from '../index';
 
-};
-scout.inherits(scout.NullWidgetAdapter, scout.ModelAdapter);
+export default class NullWidgetAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+
+}
+
+}

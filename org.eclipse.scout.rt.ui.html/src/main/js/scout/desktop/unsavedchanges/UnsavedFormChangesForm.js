@@ -8,14 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.UnsavedFormChangesForm = function() {
-  scout.UnsavedFormChangesForm.parent.call(this);
+import {Status} from '../../index';
+import {Form} from '../../index';
+import {scout} from '../../index';
+import {arrays} from '../../index';
+
+export default class UnsavedFormChangesForm extends Form {
+
+constructor() {
+  super();
 
   this.unsavedForms = [];
-};
-scout.inherits(scout.UnsavedFormChangesForm, scout.Form);
+}
 
-scout.UnsavedFormChangesForm.prototype._jsonModel = function() {
+
+_jsonModel() {
   return {
     id: 'scout.UnsavedFormChangesForm',
     objectType: 'Form',
@@ -48,10 +55,10 @@ scout.UnsavedFormChangesForm.prototype._jsonModel = function() {
       }]
     }
   };
-};
+}
 
-scout.UnsavedFormChangesForm.prototype._init = function(model) {
-  scout.UnsavedFormChangesForm.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   this.openFormsField = this.widget('OpenFormsField');
   this.openFormsField.setLookupCall(scout.create('scout.UnsavedFormsLookupCall', {
@@ -90,44 +97,45 @@ scout.UnsavedFormChangesForm.prototype._init = function(model) {
   this.on('postLoad', function(event) {
     this.touch();
   }.bind(this));
-};
+}
 
-scout.UnsavedFormChangesForm.prototype._validate = function(data) {
+_validate(data) {
   var invalidForms = this.getInvalidForms();
   if (invalidForms.length > 0) {
     var msg = [];
     msg.push('<p><b>', this.session.text('NotAllCheckedFormsCanBeSaved'), '</b></p>');
     msg.push(this.session.text('FormsCannotBeSaved'), '<br><br>');
     invalidForms.forEach(function(form) {
-      msg.push('- ', scout.UnsavedFormChangesForm.getFormDisplayName(form), '<br>');
+      msg.push('- ', UnsavedFormChangesForm.getFormDisplayName(form), '<br>');
     }, this);
-    return scout.Status.error({
+    return Status.error({
       message: msg.join('')
     });
   }
-  return scout.Status.ok();
-};
+  return Status.ok();
+}
 
-scout.UnsavedFormChangesForm.prototype.getInvalidForms = function() {
+getInvalidForms() {
   var invalidForms = [];
   this.openFormsField.value.forEach(function(form) {
     var missingElements = form.lifecycle._invalidElements().missingElements.slice();
     var invalidElements = form.lifecycle._invalidElements().invalidElements.slice();
     form.visitDisplayChildren(function(dialog) {
       var diagElem = dialog.lifecycle._invalidElements();
-      scout.arrays.pushAll(missingElements, diagElem.missingElements);
-      scout.arrays.pushAll(invalidElements, diagElem.invalidElements);
+      arrays.pushAll(missingElements, diagElem.missingElements);
+      arrays.pushAll(invalidElements, diagElem.invalidElements);
     }, function(dialog) {
       // forms are the only display children with a lifecycle, only visit those.
-      return dialog instanceof scout.Form;
+      return dialog instanceof Form;
     });
     if (missingElements.length > 0 || invalidElements.length > 0) {
       invalidForms.push(form);
     }
   });
   return invalidForms;
-};
+}
 
-scout.UnsavedFormChangesForm.getFormDisplayName = function(form) {
+static getFormDisplayName(form) {
   return [form.title, form.name, form.subTitle].filter(Boolean).join(' - ');
-};
+}
+}

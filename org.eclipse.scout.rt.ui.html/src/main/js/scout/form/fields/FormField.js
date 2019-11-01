@@ -8,25 +8,47 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {strings} from '../../index';
+import {Status} from '../../index';
+import {clipboard} from '../../index';
+import {scout} from '../../index';
+import {dragAndDrop} from '../../index';
+import {tooltips} from '../../index';
+import {LoadingSupport} from '../../index';
+import * as $ from 'jquery';
+import {styles} from '../../index';
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {objects} from '../../index';
+import {FormFieldLayout} from '../../index';
+import {Event} from '../../index';
+import {GroupBox} from '../../index';
+import {Device} from '../../index';
+import {KeyStrokeContext} from '../../index';
+import {fields} from '../../index';
+import {GridData} from '../../index';
+
 /**
  * Abstract class for all form-fields.
  * @abstract
  */
-scout.FormField = function() {
-  scout.FormField.parent.call(this);
+export default class FormField extends Widget {
+
+constructor() {
+  super();
 
   this.dropType = 0;
-  this.dropMaximumSize = scout.dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
+  this.dropMaximumSize = dragAndDrop.DEFAULT_DROP_MAXIMUM_SIZE;
   this.empty = true;
   this.errorStatus = null;
-  this.fieldStyle = scout.FormField.DEFAULT_FIELD_STYLE;
+  this.fieldStyle = FormField.DEFAULT_FIELD_STYLE;
   this.gridData = null;
-  this.gridDataHints = new scout.GridData();
-  this.mode = scout.FormField.Mode.DEFAULT;
+  this.gridDataHints = new GridData();
+  this.mode = FormField.Mode.DEFAULT;
   this.keyStrokes = [];
   this.label = null;
   this.labelVisible = true;
-  this.labelPosition = scout.FormField.LabelPosition.DEFAULT;
+  this.labelPosition = FormField.LabelPosition.DEFAULT;
   this.labelWidthInPixel = 0;
   this.mandatory = false;
   this.statusMenuMappings = [];
@@ -34,11 +56,11 @@ scout.FormField = function() {
   this.menusVisible = true;
   this.preventInitialFocus = false;
   this.requiresSave = false;
-  this.statusPosition = scout.FormField.StatusPosition.DEFAULT;
+  this.statusPosition = FormField.StatusPosition.DEFAULT;
   this.statusVisible = true;
   this.touched = false;
   this.tooltipText = null;
-  this.tooltipAnchor = scout.FormField.TooltipAnchor.DEFAULT;
+  this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
 
   this.$label = null;
   /**
@@ -70,23 +92,23 @@ scout.FormField = function() {
   this._addCloneProperties(['dropType', 'dropMaximumSize', 'errorStatus', 'fieldStyle', 'gridDataHints', 'gridData', 'label', 'labelVisible', 'labelPosition',
                             'labelWidthInPixel', 'mandatory', 'mode', 'preventInitialFocus', 'requiresSave', 'touched', 'statusVisible', 'statusPosition', 'statusMenuMappings',
                             'tooltipText', 'tooltipAnchor']);
-};
-scout.inherits(scout.FormField, scout.Widget);
+}
 
-scout.FormField.FieldStyle = {
+
+static FieldStyle = {
   CLASSIC: 'classic',
   ALTERNATIVE: 'alternative'
 };
 
 /** Global variable to make it easier to adjust the default field style for all fields */
-scout.FormField.DEFAULT_FIELD_STYLE = scout.FormField.FieldStyle.ALTERNATIVE;
+static DEFAULT_FIELD_STYLE = FormField.FieldStyle.ALTERNATIVE;
 
-scout.FormField.StatusPosition = {
+static StatusPosition = {
   DEFAULT: 'default',
   TOP: 'top'
 };
 
-scout.FormField.LabelPosition = {
+static LabelPosition = {
   DEFAULT: 0,
   LEFT: 1,
   ON_FIELD: 2,
@@ -94,47 +116,47 @@ scout.FormField.LabelPosition = {
   TOP: 4
 };
 
-scout.FormField.TooltipAnchor = {
+static TooltipAnchor = {
   DEFAULT: 'default',
   ON_FIELD: 'onField'
 };
 
-scout.FormField.LabelWidth = {
+static LabelWidth = {
   DEFAULT: 0,
   UI: -1
 };
 
 // see org.eclipse.scout.rt.client.ui.form.fields.IFormField.FULL_WIDTH
-scout.FormField.FULL_WIDTH = 0;
+static FULL_WIDTH = 0;
 
-scout.FormField.Mode = {
+static Mode = {
   DEFAULT: 'default',
   CELLEDITOR: 'celleditor'
 };
 
-scout.FormField.SEVERITY_CSS_CLASSES = 'has-error has-warning has-info has-ok';
+static SEVERITY_CSS_CLASSES = 'has-error has-warning has-info has-ok';
 
 /**
  * @override
  */
-scout.FormField.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.FormField.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this
   });
-};
+}
 
-scout.FormField.prototype._init = function(model) {
-  scout.FormField.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.resolveConsts([{
     property: 'labelPosition',
-    constType: scout.FormField.LabelPosition
+    constType: FormField.LabelPosition
   }]);
   this.resolveTextKeys(['label', 'tooltipText']);
   this._setKeyStrokes(this.keyStrokes);
@@ -143,15 +165,15 @@ scout.FormField.prototype._init = function(model) {
   this._setGridDataHints(this.gridDataHints);
   this._setGridData(this.gridData);
   this._updateEmpty();
-};
+}
 
-scout.FormField.prototype._initProperty = function(propertyName, value) {
+_initProperty(propertyName, value) {
   if ('gridDataHints' === propertyName) {
     this._initGridDataHints(value);
   } else {
-    scout.FormField.parent.prototype._initProperty.call(this, propertyName, value);
+    super._initProperty( propertyName, value);
   }
-};
+}
 
 /**
  * This function <strong>extends</strong> the default grid data hints of the form field.
@@ -161,18 +183,18 @@ scout.FormField.prototype._initProperty = function(propertyName, value) {
  * @param gridDataHints
  * @private
  */
-scout.FormField.prototype._initGridDataHints = function(gridDataHints) {
-  if (gridDataHints instanceof scout.GridData) {
+_initGridDataHints(gridDataHints) {
+  if (gridDataHints instanceof GridData) {
     this.gridDataHints = gridDataHints;
-  } else if (scout.objects.isPlainObject(gridDataHints)) {
+  } else if (objects.isPlainObject(gridDataHints)) {
     $.extend(this.gridDataHints, gridDataHints);
   } else {
     this.gridDataHints = gridDataHints;
   }
-};
+}
 
 /**
- * All sub-classes of scout.FormField must implement a _render method. The default implementation
+ * All sub-classes of FormField must implement a _render method. The default implementation
  * will throw an Error when _render is called. The _render method should call the various add*
  * methods provided by the FormField class. A possible _render implementation could look like this.
  *
@@ -184,12 +206,12 @@ scout.FormField.prototype._initGridDataHints = function(gridDataHints) {
  * this.addStatus();
  * </pre>
  */
-scout.FormField.prototype._render = function() {
-  throw new Error('sub-classes of scout.FormField must implement a _render method');
-};
+_render() {
+  throw new Error('sub-classes of FormField must implement a _render method');
+}
 
-scout.FormField.prototype._renderProperties = function() {
-  scout.FormField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderMandatory();
   this._renderTooltipText();
   this._renderErrorStatus();
@@ -207,10 +229,10 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderGridData();
   this._renderPreventInitialFocus();
   this._renderFieldStyle();
-};
+}
 
-scout.FormField.prototype._remove = function() {
-  scout.FormField.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this._removeField();
   this._removeStatus();
   this._removeLabel();
@@ -218,13 +240,13 @@ scout.FormField.prototype._remove = function() {
   this.removeMandatoryIndicator();
   this._removeDisabledCopyOverlay();
   this._uninstallDragAndDropHandler();
-};
+}
 
-scout.FormField.prototype.setFieldStyle = function(fieldStyle) {
+setFieldStyle(fieldStyle) {
   this.setProperty('fieldStyle', fieldStyle);
-};
+}
 
-scout.FormField.prototype._renderFieldStyle = function() {
+_renderFieldStyle() {
   this._renderFieldStyleInternal(this.$container);
   this._renderFieldStyleInternal(this.$fieldContainer);
   this._renderFieldStyleInternal(this.$field);
@@ -236,81 +258,81 @@ scout.FormField.prototype._renderFieldStyle = function() {
     }
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.FormField.prototype._renderFieldStyleInternal = function($element) {
+_renderFieldStyleInternal($element) {
   if (!$element) {
     return;
   }
-  $element.toggleClass('alternative', this.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-};
+  $element.toggleClass('alternative', this.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+}
 
-scout.FormField.prototype.setMandatory = function(mandatory) {
+setMandatory(mandatory) {
   this.setProperty('mandatory', mandatory);
-};
+}
 
-scout.FormField.prototype._renderMandatory = function() {
+_renderMandatory() {
   this.$container.toggleClass('mandatory', this.mandatory);
-};
+}
 
 /**
  * Override this function to return another error status property.
  * The default implementation returns the property 'errorStatus'.
  *
- * @return {scout.Status}
+ * @return {Status}
  */
-scout.FormField.prototype._errorStatus = function() {
+_errorStatus() {
   return this.errorStatus;
-};
+}
 
-scout.FormField.prototype.setErrorStatus = function(errorStatus) {
+setErrorStatus(errorStatus) {
   this.setProperty('errorStatus', errorStatus);
-};
+}
 
-scout.FormField.prototype._setErrorStatus = function(errorStatus) {
-  errorStatus = scout.Status.ensure(errorStatus);
+_setErrorStatus(errorStatus) {
+  errorStatus = Status.ensure(errorStatus);
   this._setProperty('errorStatus', errorStatus);
-};
+}
 
-scout.FormField.prototype.clearErrorStatus = function() {
+clearErrorStatus() {
   this.setErrorStatus(null);
-};
+}
 
-scout.FormField.prototype._renderErrorStatus = function() {
+_renderErrorStatus() {
   var status = this._errorStatus(),
     hasStatus = !!status,
     statusClass = hasStatus ? 'has-' + status.cssClass() : '';
 
   this._updateErrorStatusClasses(statusClass, hasStatus);
   this._updateFieldStatus();
-};
+}
 
-scout.FormField.prototype._updateErrorStatusClasses = function(statusClass, hasStatus) {
-  this.$container.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+_updateErrorStatusClasses(statusClass, hasStatus) {
+  this.$container.removeClass(FormField.SEVERITY_CSS_CLASSES);
   this.$container.addClass(statusClass, hasStatus);
   if (this.$field) {
-    this.$field.removeClass(scout.FormField.SEVERITY_CSS_CLASSES);
+    this.$field.removeClass(FormField.SEVERITY_CSS_CLASSES);
     this.$field.addClass(statusClass, hasStatus);
   }
-};
+}
 
-scout.FormField.prototype.setTooltipText = function(tooltipText) {
+setTooltipText(tooltipText) {
   this.setProperty('tooltipText', tooltipText);
-};
+}
 
-scout.FormField.prototype._renderTooltipText = function() {
+_renderTooltipText() {
   this._updateTooltip();
-};
+}
 
-scout.FormField.prototype.setTooltipAnchor = function(tooltipAnchor) {
+setTooltipAnchor(tooltipAnchor) {
   this.setProperty('tooltipAnchor', tooltipAnchor);
-};
+}
 
-scout.FormField.prototype._renderTooltipAnchor = function() {
+_renderTooltipAnchor() {
   this._updateTooltip();
-};
+}
 
-scout.FormField.prototype._updateTooltip = function() {
+_updateTooltip() {
   var hasTooltipText = this.hasStatusTooltip();
   this.$container.toggleClass('has-tooltip', hasTooltipText);
   if (this.$field) {
@@ -320,45 +342,45 @@ scout.FormField.prototype._updateTooltip = function() {
 
   if (this.$fieldContainer) {
     if (this.hasOnFieldTooltip()) {
-      scout.tooltips.install(this.$fieldContainer, {
+      tooltips.install(this.$fieldContainer, {
         parent: this,
         text: this.tooltipText,
         arrowPosition: 50
       });
     } else {
-      scout.tooltips.uninstall(this.$fieldContainer);
+      tooltips.uninstall(this.$fieldContainer);
     }
   }
-};
+}
 
-scout.FormField.prototype.hasStatusTooltip = function() {
-  return this.tooltipAnchor === scout.FormField.TooltipAnchor.DEFAULT &&
-    scout.strings.hasText(this.tooltipText);
-};
+hasStatusTooltip() {
+  return this.tooltipAnchor === FormField.TooltipAnchor.DEFAULT &&
+    strings.hasText(this.tooltipText);
+}
 
-scout.FormField.prototype.hasOnFieldTooltip = function() {
-  return this.tooltipAnchor === scout.FormField.TooltipAnchor.ON_FIELD &&
-    scout.strings.hasText(this.tooltipText);
-};
+hasOnFieldTooltip() {
+  return this.tooltipAnchor === FormField.TooltipAnchor.ON_FIELD &&
+    strings.hasText(this.tooltipText);
+}
 
 /**
  * @override
  */
-scout.FormField.prototype._renderVisible = function() {
-  scout.FormField.parent.prototype._renderVisible.call(this);
+_renderVisible() {
+  super._renderVisible();
   if (this.rendered) {
     // Make sure error status is hidden / shown when visibility changes
     this._renderErrorStatus();
   }
-};
+}
 
-scout.FormField.prototype.setLabel = function(label) {
+setLabel(label) {
   this.setProperty('label', label);
-};
+}
 
-scout.FormField.prototype._renderLabel = function() {
+_renderLabel() {
   var label = this.label;
-  if (this.labelPosition === scout.FormField.LabelPosition.ON_FIELD) {
+  if (this.labelPosition === FormField.LabelPosition.ON_FIELD) {
     this._renderPlaceholder();
     if (this.$label) {
       this.$label.text('');
@@ -367,92 +389,92 @@ scout.FormField.prototype._renderLabel = function() {
     this._removePlaceholder();
     // Make sure an empty label is as height as the other labels, especially important for top labels
     this.$label.textOrNbsp(label, 'empty');
-    this.$label.toggleClass('top', this.labelPosition === scout.FormField.LabelPosition.TOP);
+    this.$label.toggleClass('top', this.labelPosition === FormField.LabelPosition.TOP);
 
     // Invalidate layout if label width depends on its content
-    if (this.labelUseUiWidth || this.labelWidthInPixel === scout.FormField.LabelWidth.UI) {
+    if (this.labelUseUiWidth || this.labelWidthInPixel === FormField.LabelWidth.UI) {
       this.invalidateLayoutTree();
     }
   }
-};
+}
 
 /**
  * Renders an empty label for button-like fields that don't have a regular label but which do want to support the 'labelVisible'
  * property in order to provide some layout-flexibility. Makes sure the empty label has the same height as the other labels,
  * which is especially important for top labels.
  */
-scout.FormField.prototype._renderEmptyLabel = function() {
+_renderEmptyLabel() {
   this.$label
     .html('&nbsp;')
-    .toggleClass('top', this.labelPosition === scout.FormField.LabelPosition.TOP);
-};
+    .toggleClass('top', this.labelPosition === FormField.LabelPosition.TOP);
+}
 
-scout.FormField.prototype._renderPlaceholder = function($field) {
+_renderPlaceholder($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {
     $field.placeholder(this.label);
   }
-};
+}
 
 /**
  * @param $field (optional) argument is required by DateField.js, when not set this.$field is used
  */
-scout.FormField.prototype._removePlaceholder = function($field) {
+_removePlaceholder($field) {
   $field = scout.nvl($field, this.$field);
   if ($field) {
     $field.placeholder('');
   }
-};
+}
 
-scout.FormField.prototype.setLabelVisible = function(visible) {
+setLabelVisible(visible) {
   this.setProperty('labelVisible', visible);
-};
+}
 
-scout.FormField.prototype._renderLabelVisible = function() {
+_renderLabelVisible() {
   var visible = this.labelVisible;
   this._renderChildVisible(this.$label, visible);
   this.$container.toggleClass('label-hidden', !visible);
-  if (this.rendered && this.labelPosition === scout.FormField.LabelPosition.TOP) {
+  if (this.rendered && this.labelPosition === FormField.LabelPosition.TOP) {
     // See _renderLabelPosition why it is necessary to invalidate parent as well.
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) {
       htmlCompParent.invalidateLayoutTree();
     }
   }
-};
+}
 
-scout.FormField.prototype.setLabelWidthInPixel = function(labelWidthInPixel) {
+setLabelWidthInPixel(labelWidthInPixel) {
   this.setProperty('labelWidthInPixel', labelWidthInPixel);
-};
+}
 
-scout.FormField.prototype._renderLabelWidthInPixel = function() {
+_renderLabelWidthInPixel() {
   this.invalidateLayoutTree();
-};
+}
 
-scout.FormField.prototype.setStatusVisible = function(visible) {
+setStatusVisible(visible) {
   this.setProperty('statusVisible', visible);
-};
+}
 
-scout.FormField.prototype._renderStatusVisible = function() {
+_renderStatusVisible() {
   this._updateFieldStatus();
-};
+}
 
-scout.FormField.prototype.setStatusPosition = function(statusPosition) {
+setStatusPosition(statusPosition) {
   this.setProperty('statusPosition', statusPosition);
-};
+}
 
-scout.FormField.prototype._renderStatusPosition = function(statusPosition) {
+_renderStatusPosition(statusPosition) {
   this._updateFieldStatus();
-};
+}
 
-scout.FormField.prototype._tooltip = function() {
+_tooltip() {
   if (this.fieldStatus) {
     return this.fieldStatus.tooltip;
   }
   return null;
-};
+}
 
-scout.FormField.prototype._updateFieldStatus = function() {
+_updateFieldStatus() {
   if (!this.fieldStatus) {
     return;
   }
@@ -472,7 +494,7 @@ scout.FormField.prototype._updateFieldStatus = function() {
   if (errorStatus) {
     // If the field is used as a cell editor in a editable table, then no validation errors should be shown.
     // (parsing and validation will be handled by the cell/column itself)
-    if (this.mode === scout.FormField.Mode.CELLEDITOR) {
+    if (this.mode === FormField.Mode.CELLEDITOR) {
       return;
     }
     status = errorStatus;
@@ -481,7 +503,7 @@ scout.FormField.prototype._updateFieldStatus = function() {
   } else if (this.hasStatusTooltip()) {
     status = scout.create('Status', {
       message: this.tooltipText,
-      severity: scout.Status.Severity.OK
+      severity: Status.Severity.OK
     });
     // If there are menus, show them in the tooltip. But only if there is a tooltipText, don't do it if there is an error status.
     // Menus make most likely no sense if an error status is displayed
@@ -494,26 +516,26 @@ scout.FormField.prototype._updateFieldStatus = function() {
   }
 
   this.fieldStatus.update(status, menus, autoRemove, this._isInitialShowStatus());
-};
+}
 
-scout.FormField.prototype._isInitialShowStatus = function() {
+_isInitialShowStatus() {
   return !!this._errorStatus();
-};
+}
 
 /**
  * Computes whether the $status should be visible based on statusVisible, errorStatus and tooltip.
  * -> errorStatus and tooltip override statusVisible, so $status may be visible event though statusVisible is set to false
  */
-scout.FormField.prototype._computeStatusVisible = function() {
+_computeStatusVisible() {
   var status = this._errorStatus(),
     statusVisible = this.statusVisible,
     hasStatus = !!status,
     hasTooltip = this.hasStatusTooltip();
 
   return !this.suppressStatus && this.visible && (statusVisible || hasStatus || hasTooltip || (this._hasMenus() && this.menusVisible));
-};
+}
 
-scout.FormField.prototype._renderChildVisible = function($child, visible) {
+_renderChildVisible($child, visible) {
   if (!$child) {
     return;
   }
@@ -522,14 +544,14 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
     this.invalidateLayoutTree();
     return true;
   }
-};
+}
 
-scout.FormField.prototype.setLabelPosition = function(labelPosition) {
+setLabelPosition(labelPosition) {
   this.setProperty('labelPosition', labelPosition);
-};
+}
 
 // Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
-scout.FormField.prototype._renderLabelPosition = function(position) {
+_renderLabelPosition(position) {
   this._renderLabel();
   if (this.rendered) {
     // Necessary to invalidate parent as well if parent uses the logical grid.
@@ -540,124 +562,124 @@ scout.FormField.prototype._renderLabelPosition = function(position) {
     }
     this.invalidateLayoutTree();
   }
-};
+}
 
 /**
  * @override
  */
-scout.FormField.prototype._renderEnabled = function() {
-  scout.FormField.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   if (this.$field) {
     this.$field.setEnabled(this.enabledComputed);
   }
   this._updateDisabledCopyOverlay();
-};
+}
 
 /**
  * @override Wigdet.js
  */
-scout.FormField.prototype._renderDisabledStyle = function() {
+_renderDisabledStyle() {
   this._renderDisabledStyleInternal(this.$container);
   this._renderDisabledStyleInternal(this.$fieldContainer);
   this._renderDisabledStyleInternal(this.$field);
   this._renderDisabledStyleInternal(this.$mandatory);
-};
+}
 
-scout.FormField.prototype.setFont = function(font) {
+setFont(font) {
   this.setProperty('font', font);
-};
+}
 
-scout.FormField.prototype._renderFont = function() {
-  scout.styles.legacyFont(this, this.$field);
-};
+_renderFont() {
+  styles.legacyFont(this, this.$field);
+}
 
-scout.FormField.prototype.setForegroundColor = function(foregroundColor) {
+setForegroundColor(foregroundColor) {
   this.setProperty('foregroundColor', foregroundColor);
-};
+}
 
-scout.FormField.prototype._renderForegroundColor = function() {
-  scout.styles.legacyForegroundColor(this, this.$field);
-};
+_renderForegroundColor() {
+  styles.legacyForegroundColor(this, this.$field);
+}
 
-scout.FormField.prototype.setBackgroundColor = function(backgroundColor) {
+setBackgroundColor(backgroundColor) {
   this.setProperty('backgroundColor', backgroundColor);
-};
+}
 
-scout.FormField.prototype._renderBackgroundColor = function() {
-  scout.styles.legacyBackgroundColor(this, this.$field);
-};
+_renderBackgroundColor() {
+  styles.legacyBackgroundColor(this, this.$field);
+}
 
-scout.FormField.prototype.setLabelFont = function(labelFont) {
+setLabelFont(labelFont) {
   this.setProperty('labelFont', labelFont);
-};
+}
 
-scout.FormField.prototype._renderLabelFont = function() {
-  scout.styles.legacyFont(this, this.$label, 'label');
-};
+_renderLabelFont() {
+  styles.legacyFont(this, this.$label, 'label');
+}
 
-scout.FormField.prototype.setLabelForegroundColor = function(labelForegroundColor) {
+setLabelForegroundColor(labelForegroundColor) {
   this.setProperty('labelForegroundColor', labelForegroundColor);
-};
+}
 
-scout.FormField.prototype._renderLabelForegroundColor = function() {
-  scout.styles.legacyForegroundColor(this, this.$label, 'label');
-};
+_renderLabelForegroundColor() {
+  styles.legacyForegroundColor(this, this.$label, 'label');
+}
 
-scout.FormField.prototype.setLabelBackgroundColor = function(labelBackgroundColor) {
+setLabelBackgroundColor(labelBackgroundColor) {
   this.setProperty('labelBackgroundColor', labelBackgroundColor);
-};
+}
 
-scout.FormField.prototype._renderLabelBackgroundColor = function() {
-  scout.styles.legacyBackgroundColor(this, this.$label, 'label');
-};
+_renderLabelBackgroundColor() {
+  styles.legacyBackgroundColor(this, this.$label, 'label');
+}
 
-scout.FormField.prototype.setGridDataHints = function(gridData) {
+setGridDataHints(gridData) {
   this.setProperty('gridDataHints', gridData);
-};
+}
 
-scout.FormField.prototype._setGridDataHints = function(gridData) {
+_setGridDataHints(gridData) {
   if (!gridData) {
-    gridData = new scout.GridData();
+    gridData = new GridData();
   }
-  this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
-};
+  this._setProperty('gridDataHints', GridData.ensure(gridData));
+}
 
-scout.FormField.prototype._renderGridDataHints = function() {
+_renderGridDataHints() {
   this.parent.invalidateLogicalGrid();
-};
+}
 
-scout.FormField.prototype._setGridData = function(gridData) {
+_setGridData(gridData) {
   if (!gridData) {
-    gridData = new scout.GridData();
+    gridData = new GridData();
   }
-  this._setProperty('gridData', scout.GridData.ensure(gridData));
-};
+  this._setProperty('gridData', GridData.ensure(gridData));
+}
 
-scout.FormField.prototype._renderGridData = function() {
+_renderGridData() {
   if (this.rendered) {
     var htmlCompParent = this.htmlComp.getParent();
     if (htmlCompParent) { // may be null if $container is detached
       htmlCompParent.invalidateLayoutTree();
     }
   }
-};
+}
 
-scout.FormField.prototype.setMenus = function(menus) {
+setMenus(menus) {
   this.setProperty('menus', menus);
-};
+}
 
-scout.FormField.prototype._setMenus = function(menus) {
+_setMenus(menus) {
   this.updateKeyStrokes(menus, this.menus);
   this._setProperty('menus', menus);
-};
+}
 
-scout.FormField.prototype._getCurrentMenus = function() {
+_getCurrentMenus() {
   return this.menus.filter(function(menu) {
     return menu.visible;
   });
-};
+}
 
-scout.FormField.prototype._getMenusForStatus = function(status) {
+_getMenusForStatus(status) {
   return this.statusMenuMappings.filter(function(mapping) {
     if (!mapping.menu || !mapping.menu.visible) {
       return;
@@ -668,61 +690,61 @@ scout.FormField.prototype._getMenusForStatus = function(status) {
   }).map(function(mapping) {
     return mapping.menu;
   });
-};
+}
 
-scout.FormField.prototype._hasMenus = function() {
+_hasMenus() {
   return !!(this.menus && this._getCurrentMenus().length > 0);
-};
+}
 
-scout.FormField.prototype._updateMenus = function() {
+_updateMenus() {
   this.$container.toggleClass('has-menus', this._hasMenus() && this.menusVisible);
   this._updateFieldStatus();
-};
+}
 
-scout.FormField.prototype._renderMenus = function() {
+_renderMenus() {
   this._updateMenus();
-};
+}
 
-scout.FormField.prototype._renderStatusMenuMappings = function() {
+_renderStatusMenuMappings() {
   this._updateMenus();
-};
+}
 
-scout.FormField.prototype.setMenusVisible = function(menusVisible) {
+setMenusVisible(menusVisible) {
   this.setProperty('menusVisible', menusVisible);
-};
+}
 
 /**
  * override by TabItem
  **/
-scout.FormField.prototype._setMenusVisible = function(menusVisible) {
+_setMenusVisible(menusVisible) {
   this._setProperty('menusVisible', menusVisible);
-};
+}
 
-scout.FormField.prototype._renderMenusVisible = function() {
+_renderMenusVisible() {
   this._updateMenus();
 
-};
+}
 
-scout.FormField.prototype._setKeyStrokes = function(keyStrokes) {
+_setKeyStrokes(keyStrokes) {
   this.updateKeyStrokes(keyStrokes, this.keyStrokes);
   this._setProperty('keyStrokes', keyStrokes);
-};
+}
 
 /**
  * May be overridden to explicitly provide a tooltip $parent
  */
-scout.FormField.prototype._$tooltipParent = function() {
+_$tooltipParent() {
   // Will be determined by the tooltip itself
   return undefined;
-};
+}
 
-scout.FormField.prototype._hideStatusMessage = function() {
+_hideStatusMessage() {
   if (this.fieldStatus) {
     this.fieldStatus.hideTooltip();
   }
-};
+}
 
-scout.FormField.prototype._showContextMenu = function() {
+_showContextMenu() {
   var menus = this._getCurrentMenus();
   if (menus.length === 0) {
     // at least one menu item must be visible
@@ -740,25 +762,25 @@ scout.FormField.prototype._showContextMenu = function() {
     closeOnAnchorMouseDown: false
   });
   this.contextPopup.open();
-};
+}
 
-scout.FormField.prototype._hideContextMenu = function() {
+_hideContextMenu() {
   if (this.contextPopup) {
     this.contextPopup.close();
     this.contextPopup = null;
   }
-};
+}
 
-scout.FormField.prototype._renderPreventInitialFocus = function() {
+_renderPreventInitialFocus() {
   this.$container.toggleClass('prevent-initial-focus', !!this.preventInitialFocus);
-};
+}
 
 /**
  * Sets the focus on this field. If the field is not rendered, the focus will be set as soon as it is rendered.
  *
  * @override
  */
-scout.FormField.prototype.focus = function() {
+focus() {
   if (!this.rendered) {
     this.session.layoutValidator.schedulePostValidateFunction(this.focus.bind(this));
     return false;
@@ -773,7 +795,7 @@ scout.FormField.prototype.focus = function() {
     return this.session.focusManager.requestFocus(focusableElement);
   }
   return false;
-};
+}
 
 /**
  * This method returns the HtmlElement to be used as initial focus element or when {@link #focus()} is called.
@@ -781,26 +803,26 @@ scout.FormField.prototype.focus = function() {
  *
  * @override
  */
-scout.FormField.prototype.getFocusableElement = function() {
+getFocusableElement() {
   if (this.rendered && this.$field) {
     return this.$field[0];
   }
   return null;
-};
+}
 
-scout.FormField.prototype._onFieldFocus = function(event) {
+_onFieldFocus(event) {
   this.setFocused(true);
-};
+}
 
-scout.FormField.prototype._onFieldBlur = function() {
+_onFieldBlur() {
   this.setFocused(false);
-};
+}
 
 /**
  * When calling this function, the same should happen as when clicking into the field. It is used when the label is clicked.<br>
  * The most basic action is focusing the field but this may differ from field to field.
  */
-scout.FormField.prototype.activate = function() {
+activate() {
   if (!this.enabledComputed || !this.rendered) {
     return;
   }
@@ -809,82 +831,82 @@ scout.FormField.prototype.activate = function() {
   if (focusableElement) {
     $.ensure(focusableElement).focus();
   }
-};
+}
 
 /**
  * @override
  */
-scout.FormField.prototype.get$Scrollable = function() {
+get$Scrollable() {
   return this.$field;
-};
+}
 
-scout.FormField.prototype.getParentGroupBox = function() {
+getParentGroupBox() {
   var parent = this.parent;
-  while (parent && !(parent instanceof scout.GroupBox)) {
+  while (parent && !(parent instanceof GroupBox)) {
     parent = parent.parent;
   }
   return parent;
-};
+}
 
-scout.FormField.prototype.getParentField = function() {
+getParentField() {
   return this.parent;
-};
+}
 
 /**
  * Appends a LABEL element to this.$container and sets the this.$label property.
  */
-scout.FormField.prototype.addLabel = function() {
+addLabel() {
   this.$label = this.$container.appendElement('<label>');
-  scout.tooltips.installForEllipsis(this.$label, {
+  tooltips.installForEllipsis(this.$label, {
     parent: this
   });
 
   // Setting the focus programmatically does not work in a mousedown listener on mobile devices,
   // that is why a click listener is used instead
   this.$label.on('click', this._onLabelClick.bind(this));
-};
+}
 
-scout.FormField.prototype._onLabelClick = function(event) {
-  if (!scout.strings.hasText(this.label)) {
+_onLabelClick(event) {
+  if (!strings.hasText(this.label)) {
     // Clicking on "invisible" labels should not have any effect since it is confusing
     return;
   }
   this.activate();
-};
+}
 
-scout.FormField.prototype._removeLabel = function() {
+_removeLabel() {
   if (!this.$label) {
     return;
   }
-  scout.tooltips.uninstall(this.$label);
+  tooltips.uninstall(this.$label);
   this.$label.remove();
   this.$label = null;
-};
+}
 
 /**
  * Links the given element with the label by setting aria-labelledby.<br>
  * This allows screen readers to build a catalog of the elements on the screen and their relationships, for example, to read the label when the input is focused.
  */
-scout.FormField.prototype._linkWithLabel = function($element) {
+_linkWithLabel($element) {
   if (!this.$label || !$element) {
     return;
   }
 
-  scout.fields.linkElementWithLabel($element, this.$label);
-};
+  fields.linkElementWithLabel($element, this.$label);
+}
 
-scout.FormField.prototype._removeIcon = function() {
+_removeIcon() {
   if (!this.$icon) {
     return;
   }
   this.$icon.remove();
   this.$icon = null;
-};
+}
 /**
  * Appends the given field to the this.$container and sets the property this.$field.
  * The $field is used as $fieldContainer as long as you don't explicitly call addFieldContainer before calling addField.
  */
-scout.FormField.prototype.addField = function($field) {
+addField($field) {
   if (!this.$fieldContainer) {
     this.addFieldContainer($field);
   }
@@ -892,21 +914,21 @@ scout.FormField.prototype.addField = function($field) {
   this._linkWithLabel($field);
   this.$field.on('blur', this._onFieldBlur.bind(this))
     .on('focus', this._onFieldFocus.bind(this));
-};
+}
 
 /**
  * Call this method before addField if you'd like to have a different field container than $field.
  */
-scout.FormField.prototype.addFieldContainer = function($fieldContainer) {
+addFieldContainer($fieldContainer) {
   this.$fieldContainer = $fieldContainer
     .addClass('field')
     .appendTo(this.$container);
-};
+}
 
 /**
  * Removes this.$field and this.$fieldContainer and sets the properties to null.
  */
-scout.FormField.prototype._removeField = function() {
+_removeField() {
   if (this.$field) {
     this.$field.remove();
     this.$field = null;
@@ -915,12 +937,12 @@ scout.FormField.prototype._removeField = function() {
     this.$fieldContainer.remove();
     this.$fieldContainer = null;
   }
-};
+}
 
 /**
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
-scout.FormField.prototype.addStatus = function() {
+addStatus() {
   if (this.fieldStatus) {
     return;
   }
@@ -933,57 +955,57 @@ scout.FormField.prototype.addStatus = function() {
   this.fieldStatus.render();
   this.$status = this.fieldStatus.$container;
   this._updateFieldStatus();
-};
+}
 
-scout.FormField.prototype._removeStatus = function() {
+_removeStatus() {
   if (!this.fieldStatus) {
     return;
   }
   this.fieldStatus.remove();
   this.$status = null;
   this.fieldStatus = null;
-};
+}
 
 /**
  * Appends a SPAN element to this.$container and sets the this.$pseudoStatus property.
  * The purpose of a pseudo status is to consume the space an ordinary status would.
  * This makes it possible to make components without a status as width as components with a status.
  */
-scout.FormField.prototype.addPseudoStatus = function() {
+addPseudoStatus() {
   this.$pseudoStatus = this.$container.appendSpan('status');
-};
+}
 
-scout.FormField.prototype.addMandatoryIndicator = function() {
+addMandatoryIndicator() {
   this.$mandatory = this.$container.appendSpan('mandatory-indicator');
-};
+}
 
-scout.FormField.prototype.removeMandatoryIndicator = function() {
+removeMandatoryIndicator() {
   if (!this.$mandatory) {
     return;
   }
   this.$mandatory.remove();
   this.$mandatory = null;
-};
+}
 
 /**
  * Adds a SPAN element with class 'icon' the the given optional $parent.
  * When $parent is not set, the element is added to this.$container.
  * @param $parent (optional)
  */
-scout.FormField.prototype.addIcon = function($parent) {
+addIcon($parent) {
   if (!$parent) {
     $parent = this.$container;
   }
-  this.$icon = scout.fields.appendIcon($parent)
+  this.$icon = fields.appendIcon($parent)
     .on('mousedown', this._onIconMouseDown.bind(this));
-};
+}
 
-scout.FormField.prototype._onIconMouseDown = function(event) {
+_onIconMouseDown(event) {
   if (!this.enabledComputed) {
     return;
   }
   this.$field.focus();
-};
+}
 
 /**
  * Appends a DIV element as form-field container to $parent and sets the this.$container property.
@@ -995,22 +1017,22 @@ scout.FormField.prototype._onIconMouseDown = function(event) {
  * @param layout when layout is undefined, this#_createLayout() is called
  *
  */
-scout.FormField.prototype.addContainer = function($parent, cssClass, layout) {
+addContainer($parent, cssClass, layout) {
   this.$container = $parent.appendDiv('form-field');
   if (cssClass) {
     this.$container.addClass(cssClass);
   }
-  var htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  var htmlComp = HtmlComponent.install(this.$container, this.session);
   htmlComp.setLayout(layout || this._createLayout());
   this.htmlComp = htmlComp;
-};
+}
 
 /**
- * @return the default layout scout.FormFieldLayout. Override this function if your field needs another layout.
+ * @return the default layout FormFieldLayout. Override this function if your field needs another layout.
  */
-scout.FormField.prototype._createLayout = function() {
-  return new scout.FormFieldLayout(this);
-};
+_createLayout() {
+  return new FormFieldLayout(this);
+}
 
 /**
  * Updates the "inner alignment" of a field. Usually, the GridData hints only have influence on the
@@ -1029,7 +1051,7 @@ scout.FormField.prototype._createLayout = function() {
  *   $fieldContainer:
  *     Specifies the div where the classes should be added. If omitted, this.$fieldContainer is used.
  */
-scout.FormField.prototype.updateInnerAlignment = function(opts) {
+updateInnerAlignment(opts) {
   opts = opts || {};
   var $fieldContainer = opts.$fieldContainer || this.$fieldContainer;
 
@@ -1038,9 +1060,9 @@ scout.FormField.prototype.updateInnerAlignment = function(opts) {
     // also set the styles to the container
     this._updateElementInnerAlignment(opts, this.$container);
   }
-};
+}
 
-scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) {
+_updateElementInnerAlignment(opts, $field) {
   opts = opts || {};
   var useHorizontalAlignment = scout.nvl(opts.useHorizontalAlignment, true);
   var useVerticalAlignment = scout.nvl(opts.useVerticalAlignment, true);
@@ -1069,9 +1091,9 @@ scout.FormField.prototype._updateElementInnerAlignment = function(opts, $field) 
     // Alignment might have affected inner elements (e.g. clear icon)
     this.invalidateLayout();
   }
-};
+}
 
-scout.FormField.prototype.prepareForCellEdit = function(opts) {
+prepareForCellEdit(opts) {
   opts = opts || {};
 
   // remove mandatory and status indicators (popup should 'fill' the whole cell)
@@ -1091,19 +1113,19 @@ scout.FormField.prototype.prepareForCellEdit = function(opts) {
       this.$field.addClass('first');
     }
   }
-};
+}
 
-scout.FormField.prototype._renderDropType = function() {
+_renderDropType() {
   if (this.dropType) {
     this._installDragAndDropHandler();
   } else {
     this._uninstallDragAndDropHandler();
   }
-};
+}
 
-scout.FormField.prototype._createDragAndDropHandler = function() {
-  return scout.dragAndDrop.handler(this, {
-    supportedScoutTypes: scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
+_createDragAndDropHandler() {
+  return dragAndDrop.handler(this, {
+    supportedScoutTypes: dragAndDrop.SCOUT_TYPES.FILE_TRANSFER,
     dropType: function() {
       return this.dropType;
     }.bind(this),
@@ -1111,26 +1133,26 @@ scout.FormField.prototype._createDragAndDropHandler = function() {
       return this.dropMaximumSize;
     }.bind(this)
   });
-};
+}
 
-scout.FormField.prototype._installDragAndDropHandler = function(event) {
+_installDragAndDropHandler(event) {
   if (this.dragAndDropHandler) {
     return;
   }
   this.dragAndDropHandler = this._createDragAndDropHandler();
   this.dragAndDropHandler.install(this.$field);
-};
+}
 
-scout.FormField.prototype._uninstallDragAndDropHandler = function(event) {
+_uninstallDragAndDropHandler(event) {
   if (!this.dragAndDropHandler) {
     return;
   }
   this.dragAndDropHandler.uninstall();
   this.dragAndDropHandler = null;
-};
+}
 
-scout.FormField.prototype._updateDisabledCopyOverlay = function() {
-  if (this.disabledCopyOverlay && !scout.device.supportsCopyFromDisabledInputFields()) {
+_updateDisabledCopyOverlay() {
+  if (this.disabledCopyOverlay && !Device.get().supportsCopyFromDisabledInputFields()) {
     if (this.enabledComputed) {
       this._removeDisabledCopyOverlay();
     } else {
@@ -1138,25 +1160,25 @@ scout.FormField.prototype._updateDisabledCopyOverlay = function() {
       this.revalidateLayout(); // because bounds of overlay is set in FormFieldLayout
     }
   }
-};
+}
 
-scout.FormField.prototype._renderDisabledCopyOverlay = function() {
+_renderDisabledCopyOverlay() {
   if (!this.$disabledCopyOverlay) {
     this.$disabledCopyOverlay = this.$container
       .appendDiv('disabled-overlay')
       .on('contextmenu', this._createCopyContextMenu.bind(this));
   }
-};
+}
 
-scout.FormField.prototype._removeDisabledCopyOverlay = function() {
+_removeDisabledCopyOverlay() {
   if (this.$disabledCopyOverlay) {
     this.$disabledCopyOverlay.remove();
     this.$disabledCopyOverlay = null;
   }
-};
+}
 
-scout.FormField.prototype._createCopyContextMenu = function(event) {
-  if (!this.visible || scout.strings.empty(this.displayText)) {
+_createCopyContextMenu(event) {
+  if (!this.visible || strings.empty(this.displayText)) {
     return;
   }
 
@@ -1179,47 +1201,47 @@ scout.FormField.prototype._createCopyContextMenu = function(event) {
     }
   });
   popup.open();
-};
+}
 
 /**
  * Visits this field and all child formfields in pre-order (top-down).
  *
  * @returns {string} the TreeVisitResult, or nothing to continue.
  */
-scout.FormField.prototype.visitFields = function(visitor) {
+visitFields(visitor) {
   return visitor(this);
-};
+}
 
 /**
  * Visit all parent form fields. The visit stops if the parent is no form field anymore (e.g. a form, desktop or session).
  */
-scout.FormField.prototype.visitParents = function(visitor) {
+visitParents(visitor) {
   var curParent = this.parent;
-  while (curParent instanceof scout.FormField) {
+  while (curParent instanceof FormField) {
     visitor(curParent);
     curParent = curParent.parent;
   }
-};
+}
 
-scout.FormField.prototype.markAsSaved = function() {
+markAsSaved() {
   this.setProperty('touched', false);
   this.updateRequiresSave();
-};
+}
 
-scout.FormField.prototype.touch = function() {
+touch() {
   this.setProperty('touched', true);
   this.updateRequiresSave();
-};
+}
 
 /**
  * Updates the requiresSave property by checking if the field is touched or if computeRequiresSave() returns true.
  */
-scout.FormField.prototype.updateRequiresSave = function() {
+updateRequiresSave() {
   if (!this.initialized) {
     return;
   }
   this.requiresSave = this.touched || this.computeRequiresSave();
-};
+}
 
 /**
  * Override this function in order to return whether or not this field requires to be saved.
@@ -1227,14 +1249,14 @@ scout.FormField.prototype.updateRequiresSave = function() {
  *
  * @returns {boolean}
  */
-scout.FormField.prototype.computeRequiresSave = function() {
+computeRequiresSave() {
   return false;
-};
+}
 
 /**
  * @returns {object} which contains 3 properties: valid, validByErrorStatus and validByMandatory
  */
-scout.FormField.prototype.getValidationResult = function() {
+getValidationResult() {
   var validByErrorStatus = !this._errorStatus();
   var validByMandatory = !this.mandatory || !this.empty;
   var valid = validByErrorStatus && validByMandatory;
@@ -1243,40 +1265,41 @@ scout.FormField.prototype.getValidationResult = function() {
     validByErrorStatus: validByErrorStatus,
     validByMandatory: validByMandatory
   };
-};
+}
 
-scout.FormField.prototype._updateEmpty = function() {
+_updateEmpty() {
   // NOP
-};
+}
 
-scout.FormField.prototype.requestInput = function() {
+requestInput() {
   if (this.enabledComputed && this.rendered) {
     this.focus();
   }
-};
+}
 
-scout.FormField.prototype.clone = function(model, options) {
-  var clone = scout.FormField.parent.prototype.clone.call(this, model, options);
+clone(model, options) {
+  var clone = super.clone( model, options);
   this._deepCloneProperties(clone, 'menus', options);
   return clone;
-};
+}
 
-scout.FormField.prototype.exportToClipboard = function() {
+exportToClipboard() {
   if (!this.displayText) {
     return;
   }
-  var event = new scout.Event({
+  var event = new Event({
     text: this.displayText
   });
   this.trigger('clipboardExport', event);
   if (!event.defaultPrevented) {
     this._exportToClipboard(event.text);
   }
-};
+}
 
-scout.FormField.prototype._exportToClipboard = function(text) {
-  scout.clipboard.copyText({
+_exportToClipboard(text) {
+  clipboard.copyText({
     parent: this,
     text: text
   });
-};
+}
+}

@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableControlCloseKeyStroke = function(tableControl) {
-  scout.TableControlCloseKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableControlCloseKeyStroke extends KeyStroke {
+
+constructor(tableControl) {
+  super();
   this.field = tableControl;
-  this.which = [scout.keys.ESC];
+  this.which = [keys.ESC];
   this.stopPropagation = true;
   this.renderingHints.render = false;
-};
-scout.inherits(scout.TableControlCloseKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.TableControlCloseKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.toggle();
-};
+}
+}

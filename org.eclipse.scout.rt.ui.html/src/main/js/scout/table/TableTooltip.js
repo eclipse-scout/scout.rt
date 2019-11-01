@@ -8,19 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableTooltip = function() {
-  scout.TableTooltip.parent.call(this);
-};
-scout.inherits(scout.TableTooltip, scout.Tooltip);
+import {Tooltip} from '../index';
 
-scout.TableTooltip.prototype._init = function(options) {
-  scout.TableTooltip.parent.prototype._init.call(this, options);
+export default class TableTooltip extends Tooltip {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
 
   this.table = options.table;
-};
+}
 
-scout.TableTooltip.prototype._render = function() {
-  scout.TableTooltip.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this._rowOrderChangedFunc = function(event) {
     if (event.animating) {
@@ -33,9 +37,10 @@ scout.TableTooltip.prototype._render = function() {
     }
   }.bind(this);
   this.table.on('rowOrderChanged', this._rowOrderChangedFunc);
-};
+}
 
-scout.TableTooltip.prototype._remove = function() {
-  scout.TableTooltip.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.table.off('rowOrderChanged', this._rowOrderChangedFunc);
-};
+}
+}

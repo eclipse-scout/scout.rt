@@ -8,8 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopBench = function() {
-  scout.DesktopBench.parent.call(this);
+import {Splitter} from '../../index';
+import {BenchColumn} from '../../index';
+import {scout} from '../../index';
+import {FlexboxLayoutData} from '../../index';
+import {arrays} from '../../index';
+import * as $ from 'jquery';
+import {Table} from '../../index';
+import {styles} from '../../index';
+import {Widget} from '../../index';
+import {widgets} from '../../index';
+import {HtmlComponent} from '../../index';
+import {DesktopTabSelectKeyStroke} from '../../index';
+import {FlexboxLayout} from '../../index';
+import {KeyStrokeContext} from '../../index';
+
+export default class DesktopBench extends Widget {
+
+constructor() {
+  super();
   this.columns = [];
   this.components = null;
   this.tabBoxMap = {}; // [key=viewId, value=SimpleTabBox instance]
@@ -32,29 +49,29 @@ scout.DesktopBench = function() {
   this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
 
   this._desktopAnimationEndHandler = this._onDesktopAnimationEnd.bind(this);
-};
-scout.inherits(scout.DesktopBench, scout.Widget);
+}
 
-scout.DesktopBench.VIEW_MIN_HEIGHT = null; // Configured in sizes.css
-scout.DesktopBench.VIEW_MIN_WIDTH = null; // Configured in sizes.css
 
-scout.DesktopBench.VIEW_AREA_COLUMN_INDEX = {
+static VIEW_MIN_HEIGHT = null; // Configured in sizes.css
+static VIEW_MIN_WIDTH = null; // Configured in sizes.css
+
+static VIEW_AREA_COLUMN_INDEX = {
   LEFT: 0,
   CENTER: 1,
   RIGHT: 2
 };
 
-scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES = [
+static VIEW_AREA_COLUMN_CLASSES = [
   'west',
   'center',
   'east'
 ];
 
-scout.DesktopBench.prototype._init = function(model) {
-  scout.DesktopBench.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
-  scout.DesktopBench.VIEW_MIN_HEIGHT = $.pxToNumber(scout.styles.get('view-tab-box', 'min-height').minHeight);
-  scout.DesktopBench.VIEW_MIN_WIDTH = $.pxToNumber(scout.styles.get('view-tab-box', 'min-width').minWidth);
+  DesktopBench.VIEW_MIN_HEIGHT = $.pxToNumber(styles.get('view-tab-box', 'min-height').minHeight);
+  DesktopBench.VIEW_MIN_WIDTH = $.pxToNumber(styles.get('view-tab-box', 'min-width').minWidth);
 
   this.desktop = this.session.desktop;
 
@@ -69,9 +86,9 @@ scout.DesktopBench.prototype._init = function(model) {
   this.outlineContentVisible = scout.nvl(model.outlineContentVisible, true);
   this.setOutline(this.desktop.outline);
   this.updateNavigationHandleVisibility();
-};
+}
 
-scout.DesktopBench.prototype._setTabArea = function(headerTabArea) {
+_setTabArea(headerTabArea) {
   this.headerTabArea = headerTabArea;
   if (this.headerTabAreaController) {
     this.headerTabAreaController.install(this, this.headerTabArea);
@@ -84,9 +101,9 @@ scout.DesktopBench.prototype._setTabArea = function(headerTabArea) {
     // ensure the correct view tab area is visible (header or center part)
     this.headerTabAreaController._onViewsChanged();
   }
-};
+}
 
-scout.DesktopBench.prototype._createColumns = function() {
+_createColumns() {
   var layoutData = this.getLayoutData(),
     columnLayoutData = [];
 
@@ -102,7 +119,7 @@ scout.DesktopBench.prototype._createColumns = function() {
       parent: this,
       layoutData: columnLayoutData[i],
       cacheKey: cacheKey,
-      cssClass: scout.DesktopBench.VIEW_AREA_COLUMN_CLASSES[i]
+      cssClass: DesktopBench.VIEW_AREA_COLUMN_CLASSES[i]
     });
     column.on('viewAdd', this._viewAddHandler);
     column.on('viewRemove', this._viewRemoveHandler);
@@ -110,22 +127,22 @@ scout.DesktopBench.prototype._createColumns = function() {
     column.on('viewDeactivate', this._viewDeactivateHandler);
     this.columns.push(column);
   }
-};
+}
 
-scout.DesktopBench.prototype._initKeyStrokeContext = function() {
-  scout.DesktopBench.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   // Bound to desktop
-  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
+  this.desktopKeyStrokeContext = new KeyStrokeContext();
   this.desktopKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.desktopKeyStrokeContext.$bindTarget = this.desktop.$container;
   this.desktopKeyStrokeContext.$scopeTarget = this.desktop.$container;
-  this.desktopKeyStrokeContext.registerKeyStroke(new scout.DesktopTabSelectKeyStroke(this.desktop));
-};
+  this.desktopKeyStrokeContext.registerKeyStroke(new DesktopTabSelectKeyStroke(this.desktop));
+}
 
-scout.DesktopBench.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('desktop-bench');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
 
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.layoutData = this.getLayoutData();
@@ -138,45 +155,45 @@ scout.DesktopBench.prototype._render = function() {
   this.desktop.on('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.on('outlineChange', this._desktopOutlineChangeHandler);
   this.desktop.on('animationEnd', this._desktopAnimationEndHandler);
-};
+}
 
-scout.DesktopBench.prototype._createLayout = function() {
-  return new scout.FlexboxLayout(scout.FlexboxLayout.Direction.ROW, this.layoutCacheKey);
-};
+_createLayout() {
+  return new FlexboxLayout(FlexboxLayout.Direction.ROW, this.layoutCacheKey);
+}
 
-scout.DesktopBench.prototype.visibleColumns = function() {
+visibleColumns() {
   return this.columns.filter(function(column) {
     return column.hasViews();
   });
-};
+}
 
-scout.DesktopBench.prototype._renderColumns = function() {
+_renderColumns() {
   this.visibleColumns().forEach(function(column) {
     this._renderColumn(column);
   }, this);
   this.updateFirstLastMarker();
-};
+}
 
-scout.DesktopBench.prototype._renderColumn = function(column) {
+_renderColumn(column) {
   if (!column || column.rendered) {
     return;
   }
   column.render();
-};
+}
 
-scout.DesktopBench.prototype._remove = function() {
+_remove() {
   this.desktop.off('propertyChange', this._desktopPropertyChangeHandler);
   this.desktop.off('outlineChange', this._desktopOutlineChangeHandler);
   this.desktop.off('animationEnd', this._desktopAnimationEndHandler);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
-  scout.DesktopBench.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.DesktopBench.prototype.updateFirstLastMarker = function() {
-  scout.widgets.updateFirstLastMarker(this.visibleColumns());
-};
+updateFirstLastMarker() {
+  widgets.updateFirstLastMarker(this.visibleColumns());
+}
 
-scout.DesktopBench.prototype._renderOutlineContent = function() {
+_renderOutlineContent() {
   if (!this.outlineContent) {
     return;
   }
@@ -194,23 +211,23 @@ scout.DesktopBench.prototype._renderOutlineContent = function() {
     this.session.focusManager.validateFocus();
   }
 
-};
+}
 
-scout.DesktopBench.prototype._removeOutlineContent = function() {
+_removeOutlineContent() {
   if (!this.outlineContent) {
     return;
   }
   this.removeView(this.outlineContent, false);
-};
+}
 
-scout.DesktopBench.prototype._createNavigationHandle = function() {
+_createNavigationHandle() {
   return scout.create('DesktopNavigationHandle', {
     parent: this,
     leftVisible: false
   });
-};
+}
 
-scout.DesktopBench.prototype._renderNavigationHandle = function() {
+_renderNavigationHandle() {
   if (this.navigationHandle) {
     return;
   }
@@ -218,35 +235,35 @@ scout.DesktopBench.prototype._renderNavigationHandle = function() {
   this.navigationHandle.render();
   this.navigationHandle.addCssClass('navigation-closed');
   this.navigationHandle.on('action', this._onNavigationHandleAction.bind(this));
-};
+}
 
-scout.DesktopBench.prototype._removeNavigationHandle = function() {
+_removeNavigationHandle() {
   if (!this.navigationHandle) {
     return;
   }
   this.navigationHandle.destroy();
   this.navigationHandle = null;
-};
+}
 
-scout.DesktopBench.prototype._renderNavigationHandleVisible = function() {
+_renderNavigationHandleVisible() {
   if (this.navigationHandleVisible) {
     this._renderNavigationHandle();
   } else {
     this._removeNavigationHandle();
   }
   this.$container.toggleClass('has-navigation-handle', this.navigationHandleVisible);
-};
+}
 
 /**
  * is called in post render of desktop used to initialize the ui state. E.g. show default views
  */
-scout.DesktopBench.prototype.postRender = function() {
+postRender() {
   this.columns.forEach(function(column) {
     column.postRender();
   });
-};
+}
 
-scout.DesktopBench.prototype.setChanging = function(changing) {
+setChanging(changing) {
   if (changing) {
     this.changingCounter++;
   } else {
@@ -258,9 +275,9 @@ scout.DesktopBench.prototype.setChanging = function(changing) {
     this.htmlComp.validateLayoutTree();
     this.changed = false;
   }
-};
+}
 
-scout.DesktopBench.prototype.updateLayoutData = function(layoutData) {
+updateLayoutData(layoutData) {
   if (this.getLayoutData() === layoutData) {
     return;
   }
@@ -284,29 +301,29 @@ scout.DesktopBench.prototype.updateLayoutData = function(layoutData) {
     this.htmlComp.validateLayoutTree();
   }
   this._updateSplitterMovable();
-};
+}
 
-scout.DesktopBench.prototype.setLayoutData = function(layoutData) {
+setLayoutData(layoutData) {
   if (this.layoutData === layoutData) {
     return;
   }
-  scout.DesktopBench.parent.prototype.setLayoutData.call(this, layoutData);
+  super.setLayoutData( layoutData);
   this.layoutData = layoutData;
   this.layoutCacheKey = [];
   if (layoutData.cacheKey) {
     this.layoutCacheKey.push(layoutData.cacheKey);
   }
-};
+}
 
-scout.DesktopBench.prototype.getLayoutData = function() {
+getLayoutData() {
   return this.layoutData;
-};
+}
 
-scout.DesktopBench.prototype.setNavigationHandleVisible = function(visible) {
+setNavigationHandleVisible(visible) {
   this.setProperty('navigationHandleVisible', visible);
-};
+}
 
-scout.DesktopBench.prototype.setOutline = function(outline) {
+setOutline(outline) {
   if (this.outline) {
     this.outline.off('nodesSelected', this._outlineNodesSelectedHandler);
     this.outline.off('pageChanged', this._outlinePageChangedHandler);
@@ -319,9 +336,9 @@ scout.DesktopBench.prototype.setOutline = function(outline) {
     this.outline.on('propertyChange', this._outlinePropertyChangeHandler);
   }
   this.updateOutlineContent();
-};
+}
 
-scout.DesktopBench.prototype.setOutlineContent = function(content) {
+setOutlineContent(content) {
   var oldContent = this.outlineContent;
   if (this.outlineContent === content) {
     return;
@@ -347,36 +364,36 @@ scout.DesktopBench.prototype.setOutlineContent = function(content) {
     this.desktop.header.onBenchOutlineContentChange(content, oldContent);
   }
   this._renderOutlineContent();
-};
+}
 
-scout.DesktopBench.prototype.setOutlineContentVisible = function(visible) {
+setOutlineContentVisible(visible) {
   if (visible === this.outlineContentVisible) {
     return;
   }
   this._setProperty('outlineContentVisible', visible);
   this.updateOutlineContent();
-};
+}
 
-scout.DesktopBench.prototype.bringToFront = function() {
+bringToFront() {
   if (!this.outlineContent) {
     return;
   }
   this._renderOutlineContent();
-};
+}
 
-scout.DesktopBench.prototype.sendToBack = function() {
+sendToBack() {
   // nop
-};
+}
 
-scout.DesktopBench.prototype._computeDefaultDetailForm = function() {
+_computeDefaultDetailForm() {
   return this.outline.defaultDetailForm;
-};
+}
 
-scout.DesktopBench.prototype._computeOutlineOverview = function() {
+_computeOutlineOverview() {
   return this.outline.outlineOverview;
-};
+}
 
-scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
+_computeDetailContentForPage(node) {
   if (!node) {
     throw new Error('called _showDetailContentForPage without node');
   }
@@ -391,9 +408,9 @@ scout.DesktopBench.prototype._computeDetailContentForPage = function(node) {
   }
 
   return content;
-};
+}
 
-scout.DesktopBench.prototype.updateOutlineContent = function() {
+updateOutlineContent() {
   if (!this.outlineContentVisible || !this.outline) {
     return;
   }
@@ -410,79 +427,79 @@ scout.DesktopBench.prototype.updateOutlineContent = function() {
     }
   }
   if (content) {
-    if (content instanceof scout.Table) {
+    if (content instanceof Table) {
       content.menuBar.setCssClass('main-menubar');
     }
     content.displayViewId = 'C';
   }
   this.setOutlineContent(content);
-};
+}
 
-scout.DesktopBench.prototype.updateOutlineContentDebounced = function() {
+updateOutlineContentDebounced() {
   clearTimeout(this._updateOutlineContentTimeout);
   this._updateOutlineContentTimeout = setTimeout(function() {
     this.updateOutlineContent();
   }.bind(this), 300);
-};
+}
 
-scout.DesktopBench.prototype.updateNavigationHandleVisibility = function() {
+updateNavigationHandleVisibility() {
   // Don't show handle if desktop says handle must not be visible
   // Only show handle if navigation is invisible
   this.setNavigationHandleVisible(this.desktop.navigationHandleVisible && !this.desktop.navigationVisible);
-};
+}
 
-scout.DesktopBench.prototype._onDesktopOutlineChange = function(event) {
+_onDesktopOutlineChange(event) {
   this.setOutline(this.desktop.outline);
   this.updateNavigationHandleVisibility();
-};
+}
 
-scout.DesktopBench.prototype._onoutlineContentDestroy = function(event) {
+_onoutlineContentDestroy(event) {
   this.setOutlineContent(null);
-};
+}
 
-scout.DesktopBench.prototype._onOutlineNodesSelected = function(event) {
+_onOutlineNodesSelected(event) {
   if (event.debounce) {
     this.updateOutlineContentDebounced();
   } else {
     this.updateOutlineContent();
   }
-};
+}
 
-scout.DesktopBench.prototype._onOutlinePageChanged = function(event) {
+_onOutlinePageChanged(event) {
   var selectedPage = this.outline.selectedNode();
   if (!event.page && !selectedPage || event.page === selectedPage) {
     this.updateOutlineContent();
   }
-};
+}
 
-scout.DesktopBench.prototype._onOutlinePropertyChange = function(event) {
+_onOutlinePropertyChange(event) {
   if (scout.isOneOf(event.propertyName, ['defaultDetailForm', 'outlineOverview'])) {
     this.updateOutlineContent();
   }
-};
+}
 
-scout.DesktopBench.prototype._onDesktopNavigationVisibleChange = function(event) {
+_onDesktopNavigationVisibleChange(event) {
   // If navigation gets visible: Hide handle immediately
   // If navigation gets hidden using animation: Show handle when animation ends
   if (this.desktop.navigationVisible) {
     this.updateNavigationHandleVisibility();
   }
-};
+}
 
-scout.DesktopBench.prototype._onDesktopNavigationHandleVisibleChange = function(event) {
+_onDesktopNavigationHandleVisibleChange(event) {
   this.updateNavigationHandleVisibility();
-};
+}
 
-scout.DesktopBench.prototype._onDesktopAnimationEnd = function(event) {
+_onDesktopAnimationEnd(event) {
   if (!this.desktop.navigationVisible) {
     this.updateNavigationHandleVisibility();
   }
-};
-scout.DesktopBench.prototype._onBenchLayoutDataChange = function(event) {
+}
+_onBenchLayoutDataChange(event) {
   this.updateLayoutData(this.desktop.benchLayoutData);
-};
+}
 
-scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
+_onDesktopPropertyChange(event) {
   if (event.propertyName === 'navigationVisible') {
     this._onDesktopNavigationVisibleChange();
   } else if (event.propertyName === 'navigationHandleVisible') {
@@ -491,17 +508,17 @@ scout.DesktopBench.prototype._onDesktopPropertyChange = function(event) {
   if (event.propertyName === 'benchLayoutData') {
     this._onBenchLayoutDataChange();
   }
-};
+}
 
-scout.DesktopBench.prototype._onNavigationHandleAction = function(event) {
+_onNavigationHandleAction(event) {
   this.desktop.enlargeNavigation();
-};
+}
 
-scout.DesktopBench.prototype._revalidateSplitters = function() {
+_revalidateSplitters() {
   // remove old splitters
   if (this.components) {
     this.components.forEach(function(comp) {
-      if (comp instanceof scout.Splitter) {
+      if (comp instanceof Splitter) {
         comp.destroy();
       }
     });
@@ -517,7 +534,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
           maxRatio: 1
         });
         splitter.render();
-        splitter.setLayoutData(scout.FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
+        splitter.setLayoutData(FlexboxLayoutData.fixed().withOrder(col.getLayoutData().order - 1));
         splitter.$container.addClass('line');
 
         arr.push(splitter);
@@ -527,7 +544,7 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
     }.bind(this), []);
   // well order the dom elements (reduce is used for simple code reasons, the result of reduce is not of interest).
   this.components.filter(function(comp) {
-      return comp instanceof scout.BenchColumn;
+      return comp instanceof BenchColumn;
     })
     .reduce(function(c1, c2, index) {
       if (index > 0) {
@@ -536,14 +553,14 @@ scout.DesktopBench.prototype._revalidateSplitters = function() {
       return c2;
     }, undefined);
   this._updateSplitterMovable();
-};
+}
 
-scout.DesktopBench.prototype._updateSplitterMovable = function() {
+_updateSplitterMovable() {
   if (!this.components) {
     return;
   }
   this.components.forEach(function(c, i) {
-    if (c instanceof scout.Splitter) {
+    if (c instanceof Splitter) {
       var componentsBefore = this.components.slice(0, i).reverse();
       var componentsAfter = this.components.slice(i + 1);
       // shrink
@@ -576,30 +593,30 @@ scout.DesktopBench.prototype._updateSplitterMovable = function() {
 
     }
   }.bind(this));
-};
+}
 
-scout.DesktopBench.prototype._onSplitterMove = function(event) {
+_onSplitterMove(event) {
   var splitter = event.source;
   var diff = event.position - splitter.htmlComp.location().x - splitter.htmlComp.margins().left - splitter.htmlComp.insets().left;
   splitter.getLayoutData().diff = diff;
   this.revalidateLayout();
   splitter.getLayoutData().diff = null;
   event.preventDefault();
-};
+}
 
-scout.DesktopBench.prototype._onViewAdd = function(event) {
+_onViewAdd(event) {
   this.trigger('viewAdd', {
     view: event.view
   });
-};
+}
 
-scout.DesktopBench.prototype._onViewRemove = function(event) {
+_onViewRemove(event) {
   this.trigger('viewRemove', {
     view: event.view
   });
-};
+}
 
-scout.DesktopBench.prototype._onViewActivate = function(event) {
+_onViewActivate(event) {
   var view = event.view;
   if (this.outlineContent === view) {
     this.desktop.bringOutlineToFront();
@@ -607,18 +624,18 @@ scout.DesktopBench.prototype._onViewActivate = function(event) {
   this.trigger('viewActivate', {
     view: view
   });
-};
+}
 
-scout.DesktopBench.prototype._onViewDeactivate = function(event) {
+_onViewDeactivate(event) {
   if (this.outlineContent === event.view) {
     this.desktop.sendOutlineToBack();
   }
   this.trigger('viewDeactivate', {
     view: event.view
   });
-};
+}
 
-scout.DesktopBench.prototype.addView = function(view, activate) {
+addView(view, activate) {
   // normalize displayViewId
   switch (view.displayViewId) {
     case 'NW':
@@ -656,9 +673,9 @@ scout.DesktopBench.prototype.addView = function(view, activate) {
       }
     }
   }
-};
+}
 
-scout.DesktopBench.prototype.activateView = function(view) {
+activateView(view) {
   // activate views is only for existing views allowed.
   if (!this.hasView(view)) {
     return;
@@ -667,30 +684,30 @@ scout.DesktopBench.prototype.activateView = function(view) {
   if (column) {
     column.activateView(view);
   }
-};
+}
 
-scout.DesktopBench.prototype._getColumn = function(displayViewId) {
+_getColumn(displayViewId) {
   var column;
 
   switch (displayViewId) {
     case 'NW':
     case 'W':
     case 'SW':
-      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.LEFT];
+      column = this.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.LEFT];
       break;
     case 'NE':
     case 'E':
     case 'SE':
-      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.RIGHT];
+      column = this.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.RIGHT];
       break;
     default:
-      column = this.columns[scout.DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
+      column = this.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
       break;
   }
   return column;
-};
+}
 
-scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
+removeView(view, showSiblingView) {
   var column = this.tabBoxMap[view.id];
   if (column) {
     this._removeViewInProgress++;
@@ -713,41 +730,41 @@ scout.DesktopBench.prototype.removeView = function(view, showSiblingView) {
       }
     }
   }
-};
+}
 
-scout.DesktopBench.prototype.getComponents = function() {
+getComponents() {
   return this.components;
-};
+}
 
-scout.DesktopBench.prototype.getTabBox = function(displayViewId) {
+getTabBox(displayViewId) {
   var viewColumn = this._getColumn(displayViewId);
   if (!viewColumn) {
     return;
   }
   return viewColumn.getTabBox(displayViewId);
-};
+}
 
-scout.DesktopBench.prototype.visibleTabBoxes = function() {
+visibleTabBoxes() {
   return this.visibleColumns().reduce(function(arr, column) {
-    scout.arrays.pushAll(arr, column.visibleTabBoxes());
+    arrays.pushAll(arr, column.visibleTabBoxes());
     return arr;
   }, []);
-};
+}
 
-scout.DesktopBench.prototype.hasView = function(view) {
+hasView(view) {
   return this.columns.filter(function(column) {
     return column.hasView(view);
   }).length > 0;
-};
+}
 
-scout.DesktopBench.prototype.getViews = function(displayViewId) {
+getViews(displayViewId) {
   return this.columns.reduce(function(arr, column) {
-    scout.arrays.pushAll(arr, column.getViews(displayViewId));
+    arrays.pushAll(arr, column.getViews(displayViewId));
     return arr;
   }, []);
-};
+}
 
-scout.DesktopBench.prototype.getViewTab = function(view) {
+getViewTab(view) {
   var viewTab = null;
   this.getTabs().some(function(vt) {
     if (vt.view === view) {
@@ -757,9 +774,9 @@ scout.DesktopBench.prototype.getViewTab = function(view) {
     return false;
   });
   return viewTab;
-};
+}
 
-scout.DesktopBench.prototype.getTabs = function() {
+getTabs() {
   var tabs = [];
   // consider right order
   tabs = tabs.concat(this.getTabBox('NW').getController().getTabs());
@@ -776,12 +793,12 @@ scout.DesktopBench.prototype.getTabs = function() {
   tabs = tabs.concat(this.getTabBox('E').getController().getTabs());
   tabs = tabs.concat(this.getTabBox('SE').getController().getTabs());
   return tabs;
-};
+}
 
 /**
  * @returns all the currently active views (the selected ones) of all the visible tab boxes
  */
-scout.DesktopBench.prototype.activeViews = function() {
+activeViews() {
   var activeViews = [];
   this.visibleColumns().forEach(function(column) {
     column.visibleTabBoxes().forEach(function(tabBox) {
@@ -789,4 +806,5 @@ scout.DesktopBench.prototype.activeViews = function() {
     });
   });
   return activeViews;
-};
+}
+}

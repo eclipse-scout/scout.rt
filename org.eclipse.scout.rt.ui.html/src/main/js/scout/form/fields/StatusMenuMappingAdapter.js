@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StatusMenuMappingAdapter = function() {
-  scout.StatusMenuMappingAdapter.parent.call(this);
-};
-scout.inherits(scout.StatusMenuMappingAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../../index';
+
+export default class StatusMenuMappingAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

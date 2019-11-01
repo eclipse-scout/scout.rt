@@ -8,14 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MobilePopupLayout = function(popup) {
-  scout.MobilePopupLayout.parent.call(this, popup);
-  this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.MobilePopupLayout, scout.PopupLayout);
+import {graphics} from '../index';
+import {Point} from '../index';
+import {PopupLayout} from '../index';
+import {Dimension} from '../index';
 
-scout.MobilePopupLayout.prototype.layout = function($container) {
-  scout.MobilePopupLayout.parent.prototype.layout.call(this, $container);
+export default class MobilePopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
+  this.doubleCalcPrefSize = false;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   var htmlPopup = this.popup.htmlComp,
     popupSize = htmlPopup.size(),
@@ -25,21 +32,22 @@ scout.MobilePopupLayout.prototype.layout = function($container) {
     headerSize = 0;
 
   popupSize = popupSize.subtract(htmlPopup.insets());
-  headerSize = scout.graphics.prefSize($header, true);
-  scout.graphics.setLocation($header, new scout.Point(0, 0));
+  headerSize = graphics.prefSize($header, true);
+  graphics.setLocation($header, new Point(0, 0));
 
   widgetSize = popupSize.clone();
   widgetSize.height -= headerSize.height;
-  htmlWidget.setLocation(new scout.Point(0, headerSize.height));
+  htmlWidget.setLocation(new Point(0, headerSize.height));
   htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
-};
+}
 
 /**
  * @override AbstractLayout.js
  */
-scout.MobilePopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var $window = this.popup.$container.window(),
-    windowSize = new scout.Dimension($window.width(), $window.height());
+    windowSize = new Dimension($window.width(), $window.height());
 
   return windowSize;
-};
+}
+}

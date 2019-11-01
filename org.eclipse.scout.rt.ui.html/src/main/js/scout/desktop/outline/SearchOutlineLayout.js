@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SearchOutlineLayout = function(outline) {
-  scout.SearchOutlineLayout.parent.call(this, outline);
-  this.outline = outline;
-};
-scout.inherits(scout.SearchOutlineLayout, scout.OutlineLayout);
+import {OutlineLayout} from '../../index';
+import {graphics} from '../../index';
 
-scout.SearchOutlineLayout.prototype._setDataHeight = function(heightOffset) {
+export default class SearchOutlineLayout extends OutlineLayout {
+
+constructor(outline) {
+  super( outline);
+  this.outline = outline;
+}
+
+
+_setDataHeight(heightOffset) {
   // Add search panel height to heightOffset
-  var searchPanelSize = scout.graphics.size(this.outline.$searchPanel, true);
+  var searchPanelSize = graphics.size(this.outline.$searchPanel, true);
   heightOffset += searchPanelSize.height;
 
-  scout.SearchOutlineLayout.parent.prototype._setDataHeight.call(this, heightOffset);
-};
+  super._setDataHeight( heightOffset);
+}
+}

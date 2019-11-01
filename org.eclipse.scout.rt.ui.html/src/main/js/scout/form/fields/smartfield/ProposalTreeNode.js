@@ -8,16 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ProposalTreeNode = function() {
-  scout.ProposalTreeNode.parent.call(this);
-};
-scout.inherits(scout.ProposalTreeNode, scout.TreeNode);
+import {TreeNode} from '../../../index';
+import * as $ from 'jquery';
 
-scout.ProposalTreeNode.prototype._init = function(model) {
-  scout.ProposalTreeNode.parent.prototype._init.call(this, model);
-};
+export default class ProposalTreeNode extends TreeNode {
 
-scout.ProposalTreeNode.prototype._renderText = function() {
+constructor() {
+  super();
+}
+
+
+_init(model) {
+  super._init( model);
+}
+
+_renderText() {
   var text = this.text;
   if (this.lookupRow.active === false) {
     text += ' (' + this.session.text('InactiveState') + ')';
@@ -27,38 +32,39 @@ scout.ProposalTreeNode.prototype._renderText = function() {
   } else {
     this.$text.textOrNbsp(text);
   }
-};
+}
 
-scout.ProposalTreeNode.prototype._getStyles = function() {
+_getStyles() {
   return this.lookupRow;
-};
+}
 
-scout.ProposalTreeNode.prototype._decorate = function() {
+_decorate() {
   // This node is not yet rendered, nothing to do
   if (!this.$node) {
     return;
   }
 
-  scout.ProposalTreeNode.parent.prototype._decorate.call(this);
+  super._decorate();
   this.$node.toggleClass('inactive', !this.lookupRow.active);
-};
+}
 
-scout.ProposalTreeNode.prototype.isBrowseLoadIncremental = function() {
+isBrowseLoadIncremental() {
   return this.proposalChooser.isBrowseLoadIncremental();
-};
+}
 
-scout.ProposalTreeNode.prototype.loadChildren = function() {
+loadChildren() {
   if (this.isBrowseLoadIncremental()) {
     var parentKey = this.lookupRow.key;
     return this.proposalChooser.smartField.lookupByRec(parentKey);
   }
   // child nodes are already loaded -> same as parent.loadChildren
   return $.resolvedDeferred();
-};
+}
 
-scout.ProposalTreeNode.prototype.hasChildNodes = function() {
+hasChildNodes() {
   if (this.isBrowseLoadIncremental() && !this.childrenLoaded) {
     return true; // because we don't now yet
   }
-  return scout.ProposalTreeNode.parent.prototype.hasChildNodes.call(this);
-};
+  return super.hasChildNodes();
+}
+}

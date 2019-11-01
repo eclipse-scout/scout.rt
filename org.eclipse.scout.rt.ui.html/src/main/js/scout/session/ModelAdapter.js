@@ -8,11 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Event} from '../index';
+import {objects} from '../index';
+import {EventSupport} from '../index';
+import {PropertyChangeEventFilter} from '../index';
+import {WidgetEventTypeFilter} from '../index';
+import {RemoteEvent} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {App} from '../index';
+import {defaultValues} from '../index';
+import {strings} from '../index';
+import {DateRange} from '../index';
+import {Widget} from '../index';
+import {arrays} from '../index';
+
 /**
  * A model adapter is the connector with the server, it takes the events sent from the server and calls the corresponding methods on the widget.
  * It also sends events to the server whenever an action happens on the widget.
  */
-scout.ModelAdapter = function() {
+export default class ModelAdapter {
+
+constructor() {
   this.initialized = false;
   this.attached = false;
   this.destroyed = false;
@@ -25,57 +42,57 @@ scout.ModelAdapter = function() {
   this._remoteProperties = [];
   this._widgetListener = null;
 
-  this._propertyChangeEventFilter = new scout.PropertyChangeEventFilter();
-  this._widgetEventTypeFilter = new scout.WidgetEventTypeFilter();
-  this.events = new scout.EventSupport();
-};
+  this._propertyChangeEventFilter = new PropertyChangeEventFilter();
+  this._widgetEventTypeFilter = new WidgetEventTypeFilter();
+  this.events = new EventSupport();
+}
 
-scout.ModelAdapter.prototype.init = function(model) {
+init(model) {
   this._init(model);
   this.initialized = true;
-};
+}
 
 /**
  * @param model expects a plain-object with properties: id, session
  */
-scout.ModelAdapter.prototype._init = function(model) {
+_init(model) {
   scout.assertParameter('id', model.id);
   scout.assertParameter('session', model.session);
   $.extend(this, model);
   this.session.registerModelAdapter(this);
-};
+}
 
-scout.ModelAdapter.prototype.destroy = function() {
+destroy() {
   this._detachWidget();
   this.widget.destroy();
   this.widget = null;
   this.session.unregisterModelAdapter(this);
   this.destroyed = true;
-};
+}
 
-scout.ModelAdapter.prototype.createWidget = function(adapterData, parent) {
+createWidget(adapterData, parent) {
   var model = this._initModel(adapterData, parent);
   this.widget = this._createWidget(model);
   this._attachWidget();
   this._postCreateWidget();
   return this.widget;
-};
+}
 
 /**
  * Override this method to do something right after the widget has been created and has been
  * attached to the remote adapter. The default impl. does nothing.
  */
-scout.ModelAdapter.prototype._postCreateWidget = function() {
+_postCreateWidget() {
   // NOP
-};
+}
 
-scout.ModelAdapter.prototype._initModel = function(model, parent) {
+_initModel(model, parent) {
   // Make a copy to prevent a modification of the given model
   var deepCopy = this.session.adapterExportEnabled;
   model = $.extend(deepCopy, {}, model);
 
   // Fill in the missing default values
-  scout.defaultValues.applyTo(model);
+  defaultValues.applyTo(model);
 
   model.parent = parent;
   model.owner = parent; // Set it explicitly because server sends owner in inspector mode -> ignore the owner sent by server.
@@ -89,25 +106,25 @@ scout.ModelAdapter.prototype._initModel = function(model, parent) {
   this._initProperties(model);
 
   return model;
-};
+}
 
 /**
  * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
  */
-scout.ModelAdapter.prototype._initProperties = function(model) {
+_initProperties(model) {
   // NOP
-};
+}
 
 /**
  * @returns A new widget instance. The default impl. uses calls scout.create() with property objectType from given model.
  */
-scout.ModelAdapter.prototype._createWidget = function(model) {
+_createWidget(model) {
   var widget = scout.create(model);
   widget._addCloneProperties(['modelClass', 'classId']);
   return widget;
-};
+}
 
-scout.ModelAdapter.prototype._attachWidget = function() {
+_attachWidget() {
   if (this._widgetListener) {
     return;
   }
@@ -117,9 +134,9 @@ scout.ModelAdapter.prototype._attachWidget = function() {
   this.widget.addListener(this._widgetListener);
   this.attached = true;
   this.events.trigger('attach');
-};
+}
 
-scout.ModelAdapter.prototype._detachWidget = function() {
+_detachWidget() {
   if (!this._widgetListener) {
     return;
   }
@@ -127,59 +144,59 @@ scout.ModelAdapter.prototype._detachWidget = function() {
   this._widgetListener = null;
   this.attached = false;
   this.events.trigger('detach');
-};
+}
 
-scout.ModelAdapter.prototype.goOffline = function() {
+goOffline() {
   this.widget.visitChildren(function(child) {
     if (child.modelAdapter) {
       child.modelAdapter._goOffline();
     }
   });
-};
+}
 
-scout.ModelAdapter.prototype._goOffline = function() {
+_goOffline() {
   // NOP may be implemented by subclasses
-};
+}
 
-scout.ModelAdapter.prototype.goOnline = function() {
+goOnline() {
   this.widget.visitChildren(function(child) {
     if (child.modelAdapter) {
       child.modelAdapter._goOnline();
     }
   });
-};
+}
 
-scout.ModelAdapter.prototype._goOnline = function() {
+_goOnline() {
   // NOP may be implemented by subclasses
-};
+}
 
-scout.ModelAdapter.prototype.isRemoteProperty = function(propertyName) {
+isRemoteProperty(propertyName) {
   return this._remoteProperties.indexOf(propertyName) > -1;
-};
+}
 
-scout.ModelAdapter.prototype._addRemoteProperties = function(properties) {
+_addRemoteProperties(properties) {
   this._addProperties('_remoteProperties', properties);
-};
+}
 
-scout.ModelAdapter.prototype._removeRemoteProperties = function(properties) {
+_removeRemoteProperties(properties) {
   this._removeProperties('_remoteProperties', properties);
-};
+}
 
-scout.ModelAdapter.prototype._addProperties = function(propertyName, properties) {
+_addProperties(propertyName, properties) {
   if (Array.isArray(properties)) {
     this[propertyName] = this[propertyName].concat(properties);
   } else {
     this[propertyName].push(properties);
   }
-};
+}
 
-scout.ModelAdapter.prototype._removeProperties = function(propertyName, properties) {
-  properties = scout.arrays.ensure(properties);
-  scout.arrays.removeAll(this[propertyName], properties);
-};
+_removeProperties(propertyName, properties) {
+  properties = arrays.ensure(properties);
+  arrays.removeAll(this[propertyName], properties);
+}
 
 /**
- * @returns Creates a scout.Event object from the current adapter instance and
+ * @returns Creates a Event object from the current adapter instance and
  *   sends the event by using the Session#sendEvent() method. Local objects may
  *   set a different remoteHandler to call custom code instead of the Session#sendEvent()
  *   method.
@@ -201,7 +218,7 @@ scout.ModelAdapter.prototype._removeProperties = function(propertyName, properti
  *                                       We don't write it explicitly to the event here
  *                                       because that would break many Jasmine tests.
  */
-scout.ModelAdapter.prototype._send = function(type, data, options) {
+_send(type, data, options) {
   // Legacy fallback with all options as arguments
   var opts = {};
   if (arguments.length > 2) {
@@ -216,7 +233,7 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
   options = opts;
   // (End legacy fallback)
 
-  var event = new scout.RemoteEvent(this.id, type, data);
+  var event = new RemoteEvent(this.id, type, data);
   // The following properties will not be sent to the server, see Session._requestToJson().
   if (options.coalesce !== undefined) {
     event.coalesce = options.coalesce;
@@ -228,67 +245,67 @@ scout.ModelAdapter.prototype._send = function(type, data, options) {
     event.newRequest = options.newRequest;
   }
   this.session.sendEvent(event, options.delay);
-};
+}
 
 /**
  * Sends the given value as property event to the server.
  */
-scout.ModelAdapter.prototype._sendProperty = function(propertyName, value) {
+_sendProperty(propertyName, value) {
   var data = {};
   data[propertyName] = value;
   this._send('property', data);
-};
+}
 
 /**
  * Adds a custom filter for events.
  */
-scout.ModelAdapter.prototype.addFilterForWidgetEvent = function(filter) {
+addFilterForWidgetEvent(filter) {
   this._widgetEventTypeFilter.addFilter(filter);
-};
+}
 
 /**
  * Adds a filter which only checks the type of the event.
  */
-scout.ModelAdapter.prototype.addFilterForWidgetEventType = function(eventType) {
+addFilterForWidgetEventType(eventType) {
   this._widgetEventTypeFilter.addFilterForEventType(eventType);
-};
+}
 
 /**
  * Adds a filter which checks the name and value of every property in the given properties array.
  */
-scout.ModelAdapter.prototype.addFilterForProperties = function(properties) {
+addFilterForProperties(properties) {
   this._propertyChangeEventFilter.addFilterForProperties(properties);
-};
+}
 
 /**
  * Adds a filter which only checks the property name and ignores the value.
  */
-scout.ModelAdapter.prototype.addFilterForPropertyName = function(propertyName) {
+addFilterForPropertyName(propertyName) {
   this._propertyChangeEventFilter.addFilterForPropertyName(propertyName);
-};
+}
 
-scout.ModelAdapter.prototype._isPropertyChangeEventFiltered = function(propertyName, value) {
-  if (value instanceof scout.Widget) {
+_isPropertyChangeEventFiltered(propertyName, value) {
+  if (value instanceof Widget) {
     // In case of a remote widget property use the id, otherwise it would always return false
     value = value.id;
   }
   return this._propertyChangeEventFilter.filter(propertyName, value);
-};
+}
 
-scout.ModelAdapter.prototype._isWidgetEventFiltered = function(event) {
+_isWidgetEventFiltered(event) {
   return this._widgetEventTypeFilter.filter(event);
-};
+}
 
-scout.ModelAdapter.prototype.resetEventFilters = function() {
+resetEventFilters() {
   this._propertyChangeEventFilter.reset();
   this._widgetEventTypeFilter.reset();
-};
+}
 
-scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
+_onWidgetPropertyChange(event) {
   var propertyName = event.propertyName;
   var value = event.newValue;
 
-  // TODO [7.0] cgu This does not work if value will be converted into another object (e.g scout.DateRange.ensure(selectionRange) in Planner.js)
+  // TODO [7.0] cgu This does not work if value will be converted into another object (e.g DateRange.ensure(selectionRange) in Planner.js)
   // -> either do the check in this._send() or extract ensure into separate method and move the call of addFilterForProperties.
   // The advantage of the first one would be simpler filter functions (e.g. this.widget._nodesToIds(this.widget.selectedNodes) in Tree.js)
   if (this._isPropertyChangeEventFiltered(propertyName, value)) {
@@ -299,9 +316,9 @@ scout.ModelAdapter.prototype._onWidgetPropertyChange = function(event) {
     value = this._prepareRemoteProperty(propertyName, value);
     this._callSendProperty(propertyName, value);
   }
-};
+}
 
-scout.ModelAdapter.prototype._prepareRemoteProperty = function(propertyName, value) {
+_prepareRemoteProperty(propertyName, value) {
   if (!value || !this.widget.isWidgetProperty(propertyName)) {
     return value;
   }
@@ -313,62 +330,62 @@ scout.ModelAdapter.prototype._prepareRemoteProperty = function(propertyName, val
   return value.map(function(widget) {
     return widget.modelAdapter.id;
   });
-};
+}
 
-scout.ModelAdapter.prototype._callSendProperty = function(propertyName, value) {
-  var sendFuncName = '_send' + scout.strings.toUpperCaseFirstLetter(propertyName);
+_callSendProperty(propertyName, value) {
+  var sendFuncName = '_send' + strings.toUpperCaseFirstLetter(propertyName);
   if (this[sendFuncName]) {
     this[sendFuncName](value);
   } else {
     this._sendProperty(propertyName, value);
   }
-};
+}
 
-scout.ModelAdapter.prototype._onWidgetDestroy = function() {
+_onWidgetDestroy() {
   this.destroy();
-};
+}
 
 /**
  * Do not override this method. Widget event filtering is done here, before _onWidgetEvent is called.
  */
-scout.ModelAdapter.prototype._onWidgetEventInternal = function(event) {
+_onWidgetEventInternal(event) {
   if (!this._isWidgetEventFiltered(event)) {
     this._onWidgetEvent(event);
   }
-};
+}
 
-scout.ModelAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'destroy') {
     this._onWidgetDestroy(event);
   } else if (event.type === 'propertyChange') {
     this._onWidgetPropertyChange(event);
   }
-};
+}
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(newProperties) {
+_syncPropertiesOnPropertyChange(newProperties) {
   var orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
   orderedPropertyNames.forEach(function(propertyName) {
     var value = newProperties[propertyName];
-    var syncFuncName = '_sync' + scout.strings.toUpperCaseFirstLetter(propertyName);
+    var syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
     if (this[syncFuncName]) {
       this[syncFuncName](value);
     } else {
       this.widget.callSetter(propertyName, value);
     }
   }, this);
-};
+}
 
 /**
  * May be overridden to return a custom order of how the properties will be set.
  */
-scout.ModelAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
+_orderPropertyNamesOnSync(newProperties) {
   return Object.keys(newProperties);
-};
+}
 
 /**
  * Called by Session.js for every event from the model
  */
-scout.ModelAdapter.prototype.onModelEvent = function(event) {
+onModelEvent(event) {
   if (!event) {
     return;
   }
@@ -377,35 +394,35 @@ scout.ModelAdapter.prototype.onModelEvent = function(event) {
   } else {
     this.onModelAction(event);
   }
-};
+}
 
 /**
  * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
  */
-scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
+onModelPropertyChange(event) {
   this.addFilterForProperties(event.properties);
   this._syncPropertiesOnPropertyChange(event.properties);
-};
+}
 
 /**
  * The default impl. only logs a warning that the event is not supported.
  */
-scout.ModelAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'scrollToTop') {
     this.widget.scrollToTop();
   } else {
     $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
   }
-};
+}
 
-scout.ModelAdapter.prototype.toString = function() {
+toString() {
   return 'ModelAdapter[objectType=' + this.objectType + ' id=' + this.id + ']';
-};
+}
 
 /**
  * This method is used to modify adapterData before the data is exported (as used for JSON export).
  */
-scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
+exportAdapterData(adapterData) {
   // use last part of class-name as ID (because that's better than having only a number as ID)
   var modelClass = adapterData.modelClass;
   if (modelClass) {
@@ -418,19 +435,19 @@ scout.ModelAdapter.prototype.exportAdapterData = function(adapterData) {
   delete adapterData.classId;
   delete adapterData.modelClass;
   return adapterData;
-};
+}
 
 /**
- * Static method to modify the prototype of scout.Widget.
+ * Static method to modify the prototype of Widget.
  */
-scout.ModelAdapter.modifyWidgetPrototype = function() {
-  if (!scout.app.remote) {
+static modifyWidgetPrototype() {
+  if (!App.get().remote) {
     return;
   }
 
   // _createChild
-  scout.objects.replacePrototypeFunction(scout.Widget, '_createChild', function(model) {
-    if (model instanceof scout.Widget) {
+  objects.replacePrototypeFunction(Widget, '_createChild', function(model) {
+    if (model instanceof Widget) {
       return model;
     }
 
@@ -445,6 +462,7 @@ scout.ModelAdapter.modifyWidgetPrototype = function() {
     // Local case (default)
     return this._createChildOrig(model);
   }, true); // <-- true = keep original function
-};
+}
+}
 
-scout.addAppListener('bootstrap', scout.ModelAdapter.modifyWidgetPrototype);
+App.addListener('bootstrap', ModelAdapter.modifyWidgetPrototype);

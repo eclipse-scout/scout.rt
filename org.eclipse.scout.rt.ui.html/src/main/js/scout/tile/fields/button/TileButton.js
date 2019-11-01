@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileButton = function() {
-  scout.TileButton.parent.call(this);
-  this.processButton = false;
-};
-scout.inherits(scout.TileButton, scout.Button);
+import {NullLayout} from '../../../index';
+import {strings} from '../../../index';
+import {FormFieldTile} from '../../../index';
+import {Button} from '../../../index';
+import {tooltips} from '../../../index';
 
-scout.TileButton.prototype._render = function() {
-  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
-    scout.TileButton.parent.prototype._render.call(this);
+export default class TileButton extends Button {
+
+constructor() {
+  super();
+  this.processButton = false;
+}
+
+
+_render() {
+  if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+    super._render();
     return;
   }
   var $button = this.$parent.makeDiv();
@@ -27,21 +35,21 @@ scout.TileButton.prototype._render = function() {
 
   // Disable inner form field layout, because the tile button should always occupy
   // the entire container area.
-  this.htmlComp.setLayout(new scout.NullLayout());
+  this.htmlComp.setLayout(new NullLayout());
 
   this.$container
     .on('click', this._onClick.bind(this))
     .unfocusable();
-};
+}
 
-scout.TileButton.prototype._remove = function() {
+_remove() {
   this.$iconContainer = null;
-  scout.TileButton.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.TileButton.prototype._renderIconId = function() {
-  if (this.parent.displayStyle !== scout.FormFieldTile.DisplayStyle.DASHBOARD) {
-    scout.TileButton.parent.prototype._renderIconId.call(this);
+_renderIconId() {
+  if (this.parent.displayStyle !== FormFieldTile.DisplayStyle.DASHBOARD) {
+    super._renderIconId();
     return;
   }
   this.$field.removeClass('with-icon without-icon');
@@ -60,16 +68,17 @@ scout.TileButton.prototype._renderIconId = function() {
   }
   // Invalidate layout because button may now be longer or shorter
   this.invalidateLayoutTree();
-};
+}
 
-scout.TileButton.prototype._renderTooltipText = function() {
+_renderTooltipText() {
   // Because tile buttons don't have a visible status, display the tooltip text as normal "hover" tooltip
-  if (scout.strings.hasText(this.tooltipText)) {
-    scout.tooltips.install(this.$container, {
+  if (strings.hasText(this.tooltipText)) {
+    tooltips.install(this.$container, {
       parent: this,
       text: this.tooltipText
     });
   } else {
-    scout.tooltips.uninstall(this.$container);
+    tooltips.uninstall(this.$container);
   }
-};
+}
+}

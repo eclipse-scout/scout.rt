@@ -8,6 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {strings} from '../index';
+import {LookupCall} from '../index';
+import {LookupRow} from '../index';
+import {QueryBy} from '../index';
+import {HierarchicalLookupResultBuilder} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
 /**
  * Base class for lookup calls with static or local data. Implement the _data() and _dataToLookupRow()
  * functions to provide data for lookup calls. Results are resolved as a Promise, the delay
@@ -19,80 +29,82 @@
  * 1: text
  * 2: parentKey (optional)
  */
-scout.StaticLookupCall = function() {
-  scout.StaticLookupCall.parent.call(this);
+export default class StaticLookupCall extends LookupCall {
+
+constructor() {
+  super();
 
   this.delay = 0; // delay in [ms]
   this.data = null;
   this.active = true;
-};
-scout.inherits(scout.StaticLookupCall, scout.LookupCall);
+}
 
-scout.StaticLookupCall.MAX_ROW_COUNT = 100;
 
-scout.StaticLookupCall.prototype._init = function(model) {
-  scout.StaticLookupCall.parent.prototype._init.call(this, model);
+static MAX_ROW_COUNT = 100;
+
+_init(model) {
+  super._init( model);
   if (!this.data) {
     // data may either be provided by the model or by implementing the _data function
     this.data = this._data();
   }
-};
+}
 
-scout.StaticLookupCall.prototype.refreshData = function(data) {
+refreshData(data) {
   if (data === undefined) {
     this.data = this._data();
   } else {
     this.data = data;
   }
-};
+}
 
-scout.StaticLookupCall.prototype._getAll = function() {
+_getAll() {
   var deferred = $.Deferred();
   setTimeout(this._queryByAll.bind(this, deferred), this.delay);
   return deferred.promise();
-};
+}
 
-scout.StaticLookupCall.prototype._queryByAll = function(deferred) {
+_queryByAll(deferred) {
   deferred.resolve({
-    queryBy: scout.QueryBy.ALL,
+    queryBy: QueryBy.ALL,
     lookupRows: this._lookupRowsByAll()
   });
-};
+}
 
-scout.StaticLookupCall.prototype._lookupRowsByAll = function() {
-  var datas = this.data.slice(0, scout.StaticLookupCall.MAX_ROW_COUNT + 1);
+_lookupRowsByAll() {
+  var datas = this.data.slice(0, StaticLookupCall.MAX_ROW_COUNT + 1);
   return datas
     .map(this._dataToLookupRow, this)
     .filter(this._filterActiveLookupRow, this);
-};
+}
 
-scout.StaticLookupCall.prototype._filterActiveLookupRow = function(dataRow) {
-  if (scout.objects.isNullOrUndefined(this.active)) {
+_filterActiveLookupRow(dataRow) {
+  if (objects.isNullOrUndefined(this.active)) {
     return true;
   }
   return this.active === scout.nvl(dataRow.active, true);
-};
+}
 
-scout.StaticLookupCall.prototype._getByText = function(text) {
+_getByText(text) {
   var deferred = $.Deferred();
   setTimeout(this._queryByText.bind(this, deferred, text), this.delay);
   return deferred.promise();
-};
+}
 
-scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
+_queryByText(deferred, text) {
   var lookupRows = this._lookupRowsByText(text);
 
   // resolve non-hierarchical results immediately
   if (!this.hierarchical) {
     deferred.resolve({
-      queryBy: scout.QueryBy.TEXT,
+      queryBy: QueryBy.TEXT,
       text: text,
       lookupRows: lookupRows
     });
   }
 
   // if loadIncremental=false we must also load children
-  var promise, builder = new scout.HierarchicalLookupResultBuilder(this);
+  var promise, builder = new HierarchicalLookupResultBuilder(this);
   if (this.loadIncremental) {
     promise = $.resolvedPromise(lookupRows);
   } else {
@@ -107,7 +119,7 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
     })
     .done(function(lookupRows) {
       deferred.resolve({
-        queryBy: scout.QueryBy.TEXT,
+        queryBy: QueryBy.TEXT,
         text: text,
         lookupRows: lookupRows
       });
@@ -115,60 +127,60 @@ scout.StaticLookupCall.prototype._queryByText = function(deferred, text) {
     .fail(function(error) {
       throw error;
     });
-};
+}
 
-scout.StaticLookupCall.prototype._lookupRowsByText = function(text) {
+_lookupRowsByText(text) {
   var datas = this.data.filter(function(data) {
-    return scout.strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
+    return strings.startsWith(data[1].toLowerCase(), text.toLowerCase());
   });
   return datas
     .map(this._dataToLookupRow, this)
     .filter(this._filterActiveLookupRow, this);
-};
+}
 
-scout.StaticLookupCall.prototype._getByKey = function(key) {
+_getByKey(key) {
   var deferred = $.Deferred();
   setTimeout(this._queryByKey.bind(this, deferred, key), this.delay);
   return deferred.promise();
-};
+}
 
-scout.StaticLookupCall.prototype._queryByKey = function(deferred, key) {
+_queryByKey(deferred, key) {
   var lookupRow = this._lookupRowByKey(key);
   if (lookupRow) {
     deferred.resolve({
-      queryBy: scout.QueryBy.KEY,
+      queryBy: QueryBy.KEY,
       lookupRows: [lookupRow]
     });
   } else {
     deferred.reject();
   }
-};
+}
 
-scout.StaticLookupCall.prototype._lookupRowByKey = function(key) {
-  var data = scout.arrays.find(this.data, function(data) {
+_lookupRowByKey(key) {
+  var data = arrays.find(this.data, function(data) {
     return data[0] === key;
   });
   if (!data) {
     return null;
   }
   return this._dataToLookupRow(data);
-};
+}
 
-scout.StaticLookupCall.prototype._getByRec = function(rec) {
+_getByRec(rec) {
   var deferred = $.Deferred();
   setTimeout(this._queryByRec.bind(this, deferred, rec), this.delay);
   return deferred.promise();
-};
+}
 
-scout.StaticLookupCall.prototype._queryByRec = function(deferred, rec) {
+_queryByRec(deferred, rec) {
   deferred.resolve({
-    queryBy: scout.QueryBy.REC,
+    queryBy: QueryBy.REC,
     rec: rec,
     lookupRows: this._lookupRowsByRec(rec)
   });
-};
+}
 
-scout.StaticLookupCall.prototype._lookupRowsByRec = function(rec) {
+_lookupRowsByRec(rec) {
   return this.data.reduce(function(aggr, data) {
     if (data[2] === rec) {
       aggr.push(this._dataToLookupRow(data));
@@ -176,27 +188,27 @@ scout.StaticLookupCall.prototype._lookupRowsByRec = function(rec) {
     return aggr;
   }.bind(this), [])
   .filter(this._filterActiveLookupRow, this);
-};
+}
 
-scout.StaticLookupCall.prototype.setDelay = function(delay) {
+setDelay(delay) {
   this.delay = delay;
-};
+}
 
 /**
- * Implement this function to convert a single data array into an instance of scout.LookupRow.
+ * Implement this function to convert a single data array into an instance of LookupRow.
  */
-scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
+_dataToLookupRow(data) {
   var lookupRow = scout.create('LookupRow', {
     key: data[0],
     text: data[1],
     parentKey: data[2]
   });
   return lookupRow;
-};
+}
 
 /**
  * Implement this function to provide static data. The data should be an array of arrays,
- * where the inner array contains the values required to create a scout.LookupRow. By
+ * where the inner array contains the values required to create a LookupRow. By
  * default the first two elements of the array are mandatory, the others are optional:
  *
  *   0: Key
@@ -205,6 +217,7 @@ scout.StaticLookupCall.prototype._dataToLookupRow = function(data) {
  *
  * When your data contains more elements you must also implement the _dataToLookupRow() function.
  */
-scout.StaticLookupCall.prototype._data = function() {
+_data() {
   return [];
-};
+}
+}

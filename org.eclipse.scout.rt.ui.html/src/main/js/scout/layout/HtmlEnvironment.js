@@ -8,10 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {EventSupport} from '../index';
+import {styles} from '../index';
+import {scout} from '../index';
+import {App} from '../index';
+
+let instance;
 /**
  * @singleton
  */
-scout.HtmlEnvironment = function() {
+export default class HtmlEnvironment {
+
+constructor() {
   // -------------------------------
   // The values for these properties are defined using CSS (sizes.less).
   // The following values are default values in case the CSS values are not available.
@@ -24,38 +32,43 @@ scout.HtmlEnvironment = function() {
   this.fieldLabelWidth = 140;
   this.fieldMandatoryIndicatorWidth = 8;
   this.fieldStatusWidth = 20;
-  this.events = new scout.EventSupport();
-};
+  this.events = new EventSupport();
+}
 
-scout.HtmlEnvironment.prototype.init = function(additionalClass) {
-  this.formRowHeight = scout.styles.getSize('html-env-logical-grid-row', 'height', 'height', this.formRowHeight, additionalClass);
-  this.formRowGap = scout.styles.getSize('html-env-logical-grid-row', 'margin-bottom', 'marginBottom', this.formRowGap, additionalClass);
-  this.formColumnWidth = scout.styles.getSize('html-env-logical-grid-column', 'width', 'width', this.formColumnWidth, additionalClass);
-  this.formColumnGap = scout.styles.getSize('html-env-logical-grid-column', 'margin-right', 'marginRight', this.formColumnGap, additionalClass);
-  this.smallColumnGap = scout.styles.getSize('html-env-logical-grid-column', 'margin-left', 'marginLeft', this.smallColumnGap, additionalClass);
-  this.fieldLabelWidth = scout.styles.getSize('html-env-field-label', 'width', 'width', this.fieldLabelWidth, additionalClass);
-  this.fieldMandatoryIndicatorWidth = scout.styles.getSize('html-env-field-mandatory-indicator', 'width', 'width', this.fieldMandatoryIndicatorWidth, additionalClass);
-  this.fieldStatusWidth = scout.styles.getSize('html-env-field-status', 'width', 'width', this.fieldStatusWidth, additionalClass);
+init(additionalClass) {
+  this.formRowHeight = styles.getSize('html-env-logical-grid-row', 'height', 'height', this.formRowHeight, additionalClass);
+  this.formRowGap = styles.getSize('html-env-logical-grid-row', 'margin-bottom', 'marginBottom', this.formRowGap, additionalClass);
+  this.formColumnWidth = styles.getSize('html-env-logical-grid-column', 'width', 'width', this.formColumnWidth, additionalClass);
+  this.formColumnGap = styles.getSize('html-env-logical-grid-column', 'margin-right', 'marginRight', this.formColumnGap, additionalClass);
+  this.smallColumnGap = styles.getSize('html-env-logical-grid-column', 'margin-left', 'marginLeft', this.smallColumnGap, additionalClass);
+  this.fieldLabelWidth = styles.getSize('html-env-field-label', 'width', 'width', this.fieldLabelWidth, additionalClass);
+  this.fieldMandatoryIndicatorWidth = styles.getSize('html-env-field-mandatory-indicator', 'width', 'width', this.fieldMandatoryIndicatorWidth, additionalClass);
+  this.fieldStatusWidth = styles.getSize('html-env-field-status', 'width', 'width', this.fieldStatusWidth, additionalClass);
 
   var event = {
     source: this
   };
   this.events.trigger('propertyChange', event);
-};
+}
 
-scout.HtmlEnvironment.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.HtmlEnvironment.prototype.off = function(type, func) {
+off(type, func) {
   return this.events.off(type, func);
-};
+}
 
-scout.addAppListener('prepare', function() {
-  if (scout.htmlEnvironment) {
+static get() {
+  return instance;
+}
+}
+
+App.addListener('prepare', function() {
+  if (instance) {
     // if the environment was created before the app itself, use it instead of creating a new one
     return;
   }
-  scout.htmlEnvironment = scout.create('HtmlEnvironment');
-  scout.htmlEnvironment.init();
+  instance = scout.create('HtmlEnvironment');
+  instance.init();
 });

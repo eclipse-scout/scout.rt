@@ -11,7 +11,7 @@
 /**
  * Controls how the tree visiting should continue.
  */
-scout.TreeVisitResult = {
+const TreeVisitResult = {
   /**
    * Normally continue visiting. Nothing will be skipped.
    */
@@ -27,3 +27,5 @@ scout.TreeVisitResult = {
    */
   SKIP_SUBTREE: 'skip_subtree'
 };
+
+export default TreeVisitResult;

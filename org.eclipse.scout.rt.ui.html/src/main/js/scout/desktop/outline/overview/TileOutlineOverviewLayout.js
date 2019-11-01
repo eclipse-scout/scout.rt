@@ -8,19 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileOutlineOverviewLayout = function(tileOutlineOverview) {
-  scout.TileOutlineOverviewLayout.parent.call(this);
-  this.tileOutlineOverview = tileOutlineOverview;
-};
-scout.inherits(scout.TileOutlineOverviewLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../../../index';
+import {graphics} from '../../../index';
 
-scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
+export default class TileOutlineOverviewLayout extends AbstractLayout {
+
+constructor(tileOutlineOverview) {
+  super();
+  this.tileOutlineOverview = tileOutlineOverview;
+}
+
+
+layout($container) {
   var htmlContainer = this.tileOutlineOverview.htmlComp;
   var pageTileGrid = this.tileOutlineOverview.pageTileGrid;
   var $content = this.tileOutlineOverview.$content;
   var contentSize = htmlContainer.availableSize()
     .subtract(htmlContainer.insets())
-    .subtract(scout.graphics.insets($content, {
+    .subtract(graphics.insets($content, {
       includeMargin: true
     }));
 
@@ -29,4 +34,5 @@ scout.TileOutlineOverviewLayout.prototype.layout = function($container) {
     widthHint: contentSize.width
   });
   htmlTileGrid.setSize(tilesPrefSize);
-};
+}
+}

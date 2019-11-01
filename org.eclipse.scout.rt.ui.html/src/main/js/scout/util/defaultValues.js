@@ -8,142 +8,155 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.defaultValues = {
+import {objects} from '../index';
+import {strings} from '../index';
+import {TypeDescriptor} from '../index';
+import * as $ from 'jquery';
 
-  /**
-   * map of "objectType" -> { defaultValuesObject }
-   */
-  _defaults: {},
 
-  /**
-   * map of "objectType" -> [ "objectType", "parentObjectType", ..., "topLevelObjectType" ]
-   */
-  _objectTypeHierarchyFlat: {},
 
-  bootstrap: function(options) {
-    options = options || {};
-    var defaultOptions = {
-      url: 'defaultValues'
-    };
-    options = $.extend({}, defaultOptions, options);
-    // Load default value configuration from server (and cache it)
-    return $.ajaxJson(options.url)
-      .done(this.init.bind(this));
-  },
+/**
+ * map of "objectType" -> { defaultValuesObject }
+ */
+let _defaults = {};
 
-  init: function(data) {
-    // Store defaults
-    this._objectTypeHierarchyFlat = {};
-    this._defaults = data.defaults || {};
+/**
+ * map of "objectType" -> [ "objectType", "parentObjectType", ..., "topLevelObjectType" ]
+ */
+let _objectTypeHierarchyFlat = {};
 
-    // Generate object type hierarchy
-    var objectTypeHierarchy = data.objectTypeHierarchy || {};
-    this._generateObjectTypeHierarchyRec(objectTypeHierarchy, undefined, this._objectTypeHierarchyFlat);
+export function bootstrap(options) {
+  options = options || {};
+  var defaultOptions = {
+    url: 'defaultValues'
+  };
+  options = $.extend({}, defaultOptions, options);
+  // Load default value configuration from server (and cache it)
+  return $.ajaxJson(options.url)
+    .done(init.bind(this));
+}
 
-    // For all object types in the defaults that don't have a hierarchy yet, add a dummy hierarchy with one element
-    Object.keys(this._defaults).forEach(function(objectType) {
-      if (!this._objectTypeHierarchyFlat[objectType]) {
-        this._objectTypeHierarchyFlat[objectType] = [objectType];
-      }
-    }, this);
-  },
+export function init(data) {
+  // Store defaults
+  _objectTypeHierarchyFlat = {};
+  _defaults = data.defaults || {};
 
-  _generateObjectTypeHierarchyRec: function(json, currentParentObjectTypes, targetMap) {
-    if (!json) {
-      return;
+  // Generate object type hierarchy
+  var objectTypeHierarchy = data.objectTypeHierarchy || {};
+  _generateObjectTypeHierarchyRec(objectTypeHierarchy, undefined, _objectTypeHierarchyFlat);
+
+  // For all object types in the defaults that don't have a hierarchy yet, add a dummy hierarchy with one element
+  Object.keys(_defaults).forEach(function(objectType) {
+    if (!_objectTypeHierarchyFlat[objectType]) {
+      _objectTypeHierarchyFlat[objectType] = [objectType];
     }
-    if (!targetMap) {
-      throw new Error('Argument \'targetMap\' must not be null');
-    }
-    Object.keys(json).forEach(function(objectType) {
-      var newCurrentParentObjectTypes = [objectType];
-      if (currentParentObjectTypes) {
-        newCurrentParentObjectTypes = newCurrentParentObjectTypes.concat(currentParentObjectTypes);
-      }
+  }, this);
+}
 
-      if (typeof json[objectType] === 'object') {
-        this._generateObjectTypeHierarchyRec(json[objectType], newCurrentParentObjectTypes, targetMap);
-      }
+//private
+ export function _generateObjectTypeHierarchyRec(json, currentParentObjectTypes, targetMap) {
+  if (!json) {
+    return;
+  }
+  if (!targetMap) {
+    throw new Error('Argument \'targetMap\' must not be null');
+  }
+  Object.keys(json).forEach(function(objectType) {
+    var newCurrentParentObjectTypes = [objectType];
+    if (currentParentObjectTypes) {
+      newCurrentParentObjectTypes = newCurrentParentObjectTypes.concat(currentParentObjectTypes);
+    }
 
-      // Store current result
-      if (targetMap[objectType]) {
-        throw new Error('Object type \'' + objectType + '\' has ambiguous parent object types.');
-      }
-      targetMap[objectType] = newCurrentParentObjectTypes;
-    }, this);
-  },
+    if (typeof json[objectType] === 'object') {
+      _generateObjectTypeHierarchyRec(json[objectType], newCurrentParentObjectTypes, targetMap);
+    }
 
-  /**
-   * Applies the defaults for the given object type to the given object. Properties
-   * are only set if they don't exist yet. The argument 'objectType' is optional
-   * if the object has a property of the same name. If the object is an array,
-   * the defaults are applied to each of the elements.
-   */
-  applyTo: function(object, objectType) {
-    if (Array.isArray(object)) {
-      for (var i = 0; i < object.length; i++) {
-        this.applyTo(object[i], objectType);
-      }
-    } else if (typeof object === 'object') {
-      objectType = objectType || object.objectType;
-      if (objectType) {
-        this._applyToInternal(object, objectType);
-      }
+    // Store current result
+    if (targetMap[objectType]) {
+      throw new Error('Object type \'' + objectType + '\' has ambiguous parent object types.');
     }
-  },
+    targetMap[objectType] = newCurrentParentObjectTypes;
+  }, this);
+}
 
-  _applyToInternal: function(object, objectType) {
-    var objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
-    if (!objectTypeHierarchy) {
-      // Remove model variant and try again
-      var objectInfo = scout.TypeDescriptor.parse(objectType);
-      objectType = objectInfo.objectType.toString();
-      objectTypeHierarchy = this._objectTypeHierarchyFlat[objectType];
+/**
+ * Applies the defaults for the given object type to the given object. Properties
+ * are only set if they don't exist yet. The argument 'objectType' is optional
+ * if the object has a property of the same name. If the object is an array,
+ * the defaults are applied to each of the elements.
+ */
+export function applyTo(object, objectType) {
+  if (Array.isArray(object)) {
+    for (var i = 0; i < object.length; i++) {
+      applyTo(object[i], objectType);
     }
-    if (!objectTypeHierarchy) {
-      // Unknown type, nothing to apply
-      return;
+  } else if (typeof object === 'object') {
+    objectType = objectType || object.objectType;
+    if (objectType) {
+      _applyToInternal(object, objectType);
     }
-    for (var i = 0; i < objectTypeHierarchy.length; i++) {
-      var t = objectTypeHierarchy[i];
-      var defaults = this._defaults[t];
-      this._extendWithDefaults(object, defaults);
-    }
-  },
+  }
+}
 
-  _extendWithDefaults: function(object, defaults) {
-    if (object === undefined || defaults === undefined) {
-      return;
+//private
+ export function _applyToInternal(object, objectType) {
+  var objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
+  if (!objectTypeHierarchy) {
+    // Remove model variant and try again
+    var objectInfo = TypeDescriptor.parse(objectType);
+    objectType = objectInfo.objectType.toString();
+    objectTypeHierarchy = _objectTypeHierarchyFlat[objectType];
+  }
+  if (!objectTypeHierarchy) {
+    // Unknown type, nothing to apply
+    return;
+  }
+  for (var i = 0; i < objectTypeHierarchy.length; i++) {
+    var t = objectTypeHierarchy[i];
+    var defaults = _defaults[t];
+    _extendWithDefaults(object, defaults);
+  }
+}
+
+//private
+ export function _extendWithDefaults(object, defaults) {
+  if (object === undefined || defaults === undefined) {
+    return;
+  }
+  Object.keys(defaults).forEach(function(prop) {
+    // Support for "pseudo" default values: If a property name in the default values definition
+    // starts with a "~" character, the defined object will _not_ be applied as a default value
+    // for a non-existing property, but inner properties of that object will be applied to an
+    // existing object.
+    var realProp = prop;
+    if (strings.startsWith(prop, '~')) {
+      realProp = prop.substring(1);
     }
-    Object.keys(defaults).forEach(function(prop) {
-      // Support for "pseudo" default values: If a property name in the default values definition
-      // starts with a "~" character, the defined object will _not_ be applied as a default value
-      // for a non-existing property, but inner properties of that object will be applied to an
-      // existing object.
-      var realProp = prop;
-      if (scout.strings.startsWith(prop, '~')) {
-        realProp = prop.substring(1);
-      }
-      // If property does not exist, set the default value and return.
-      if (object[realProp] === undefined) {
-        object[realProp] = scout.objects.valueCopy(defaults[realProp]);
-      }
-      // Special case: "default objects". If the property value is an object and default
-      // value is also an object, extend the property value instead of replacing it.
-      else if (scout.objects.isPlainObject(object[realProp]) && scout.objects.isPlainObject(defaults[prop])) {
-        this._extendWithDefaults(object[realProp], defaults[prop]);
-      }
-      // Special case: "array of default objects": If the property value is an array of objects and
-      // the default value is an object, extend each object in the array with the default value.
-      else if (Array.isArray(object[realProp]) && scout.objects.isPlainObject(defaults[prop])) {
-        var objectArray = object[realProp];
-        for (var i = 0; i < objectArray.length; i++) {
-          if (scout.objects.isPlainObject(objectArray[i])) {
-            this._extendWithDefaults(objectArray[i], defaults[prop]);
-          }
+    // If property does not exist, set the default value and return.
+    if (object[realProp] === undefined) {
+      object[realProp] = objects.valueCopy(defaults[realProp]);
+    }
+    // Special case: "default objects". If the property value is an object and default
+    // value is also an object, extend the property value instead of replacing it.
+    else if (objects.isPlainObject(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      _extendWithDefaults(object[realProp], defaults[prop]);
+    }
+    // Special case: "array of default objects": If the property value is an array of objects and
+    // the default value is an object, extend each object in the array with the default value.
+    else if (Array.isArray(object[realProp]) && objects.isPlainObject(defaults[prop])) {
+      var objectArray = object[realProp];
+      for (var i = 0; i < objectArray.length; i++) {
+        if (objects.isPlainObject(objectArray[i])) {
+          _extendWithDefaults(objectArray[i], defaults[prop]);
         }
       }
-    }, this);
-  }
+    }
+  }, this);
+}
 
+
+export default {
+  applyTo,
+  bootstrap,
+  init
 };

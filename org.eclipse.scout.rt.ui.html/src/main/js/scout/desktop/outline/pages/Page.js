@@ -8,6 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {icons} from '../../../index';
+import {MenuBar} from '../../../index';
+import {TableRow} from '../../../index';
+import {TreeNode} from '../../../index';
+import {Outline} from '../../../index';
+import * as $ from 'jquery';
+
 /**
  * This class is used differently in online and JS-only case. In the online case we only have instances
  * of Page in an outline. The server sets the property <code>nodeType</code> which is used to distinct
@@ -16,10 +23,12 @@
  * Implementations of these classes contain code which loads table data or child nodes.
  *
  * @class
- * @extends scout.TreeNode
+ * @extends TreeNode
  */
-scout.Page = function() {
-  scout.Page.parent.call(this);
+export default class Page extends TreeNode {
+
+constructor() {
+  super();
 
   /**
    * This property is set by the server, see: JsonOutline#putNodeType.
@@ -44,17 +53,17 @@ scout.Page = function() {
    * The icon id which is used for icons in the tile outline overview.
    */
   this.overviewIconId = null;
-};
-scout.inherits(scout.Page, scout.TreeNode);
+}
+
 
 /**
  * This enum defines a node-type. This is basically used for the online case where we only have instances
- * of scout.Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
+ * of Page, but never instances of PageWithTable or PageWithNodes. The server simply sets a nodeType
  * instead.
  *
  * @type {{NODES: string, TABLE: string}}
  */
-scout.Page.NodeType = {
+static NodeType = {
   NODES: 'nodes',
   TABLE: 'table'
 };
@@ -63,34 +72,34 @@ scout.Page.NodeType = {
  * Override this function to return a detail form which is displayed in the outline when this page is selected.
  * The default impl. returns null.
  */
-scout.Page.prototype.createDetailForm = function() {
+createDetailForm() {
   return null;
-};
+}
 
 /**
  * @override TreeNode.js
  */
-scout.Page.prototype._init = function(model) {
-  scout.Page.parent.prototype._init.call(this, model);
-  scout.icons.resolveIconProperty(this, 'overviewIconId');
+_init(model) {
+  super._init( model);
+  icons.resolveIconProperty(this, 'overviewIconId');
   this._internalInitTable();
   this._internalInitDetailForm();
-};
+}
 
 /**
  * @override TreeNode.js
  */
-scout.Page.prototype._destroy = function() {
-  scout.Page.parent.prototype._destroy.call(this);
+_destroy() {
+  super._destroy();
   if (this.detailTable) {
     this.detailTable.destroy();
   }
   if (this.detailForm) {
     this.detailForm.destroy();
   }
-};
+}
 
-scout.Page.prototype._internalInitTable = function() {
+_internalInitTable() {
   var table = this.detailTable;
   if (table) {
     // this case is used for Scout classic
@@ -100,38 +109,38 @@ scout.Page.prototype._internalInitTable = function() {
   }
 
   this.setDetailTable(table);
-};
+}
 
-scout.Page.prototype._internalInitDetailForm = function() {
+_internalInitDetailForm() {
   var detailForm = this.detailForm;
   if (detailForm) {
     detailForm = this.getOutline()._createChild(detailForm);
   }
 
   this.setDetailForm(detailForm);
-};
+}
 
 /**
  * Override this function to create the internal table. Default impl. returns null.
  */
-scout.Page.prototype._createTable = function() {
+_createTable() {
   return null;
-};
+}
 
 /**
  * Override this function to initialize the internal (detail) table. Default impl. delegates
  * <code>filter</code> events to the outline mediator.
  */
-scout.Page.prototype._initTable = function(table) {
-  table.menuBar.setPosition(scout.MenuBar.Position.TOP);
+_initTable(table) {
+  table.menuBar.setPosition(MenuBar.Position.TOP);
   table.on('filter', this._onTableFilter.bind(this));
   if (this.drillDownOnRowClick) {
     table.on('rowClick', this._onTableRowClick.bind(this));
     table.setMultiSelect(false);
   }
-};
+}
 
-scout.Page.prototype._ensureDetailForm = function() {
+_ensureDetailForm() {
   if (this.detailForm) {
     return;
   }
@@ -140,73 +149,73 @@ scout.Page.prototype._ensureDetailForm = function() {
     form.setDisplayParent(this.getOutline());
   }
   this.setDetailForm(form);
-};
+}
 
 // see Java: AbstractPage#pageActivatedNotify
-scout.Page.prototype.activate = function() {
+activate() {
   this._ensureDetailForm();
-};
+}
 
 // see Java: AbstractPage#pageDeactivatedNotify
-scout.Page.prototype.deactivate = function() {};
+deactivate() {};
 
 /**
- * @returns {scout.Outline} the tree / outline / parent instance. it's all the same,
+ * @returns {Outline} the tree / outline / parent instance. it's all the same,
  *     but it's more intuitive to work with the 'outline' when we deal with pages.
  */
-scout.Page.prototype.getOutline = function() {
+getOutline() {
   return this.parent;
-};
+}
 
 /**
- * @returns {Array.<scout.Page>} an array of pages linked with the given rows.
+ * @returns {Array.<Page>} an array of pages linked with the given rows.
  *   The order of the returned pages will be the same as the order of the rows.
  */
-scout.Page.prototype.pagesForTableRows = function(rows) {
+pagesForTableRows(rows) {
   return rows.map(this.pageForTableRow);
-};
+}
 
-scout.Page.prototype.pageForTableRow = function(row) {
+pageForTableRow(row) {
   if (!row.page) {
     throw new Error('Table-row is not linked to a page');
   }
   return row.page;
-};
+}
 
-scout.Page.prototype.setDetailForm = function(form) {
+setDetailForm(form) {
   this.detailForm = form;
   if (this.detailForm) {
     this.detailForm.setModal(false);
   }
-};
+}
 
-scout.Page.prototype.setDetailTable = function(table) {
+setDetailTable(table) {
   if (table) {
     this._initTable(table);
     table.setTableStatusVisible(this.tableStatusVisible);
   }
   this.detailTable = table;
-};
+}
 
 /**
  * Updates relevant properties from the pages linked with the given rows using the method updatePageFromTableRow and returns the pages.
  *
- * @returns {Array.<scout.Page>} pages linked with the given rows.
+ * @returns {Array.<Page>} pages linked with the given rows.
  */
-scout.Page.prototype.updatePagesFromTableRows = function(rows) {
+updatePagesFromTableRows(rows) {
   return rows.map(function(row) {
     var page = row.page;
     page.updatePageFromTableRow(row);
     return page;
   });
-};
+}
 
 /**
  * Updates relevant properties (text, enabled, htmlEnabled) from the page linked with the given row.
  *
- * @returns {scout.Page} page linked with the given row.
+ * @returns {Page} page linked with the given row.
  */
-scout.Page.prototype.updatePageFromTableRow = function(row) {
+updatePageFromTableRow(row) {
   var page = row.page;
   page.enabled = row.enabled;
   page.text = page.computeTextForRow(row);
@@ -215,62 +224,62 @@ scout.Page.prototype.updatePageFromTableRow = function(row) {
     page.cssClass = row.cells[0].cssClass;
   }
   return page;
-};
+}
 
 /**
  * This function creates the text property of this page. The default implementation returns the
  * text from the first cell of the given row. It's allowed to ignore the given row entirely, when you override
  * this function.
  *
- * @param {scout.TableRow} row
+ * @param {TableRow} row
  */
-scout.Page.prototype.computeTextForRow = function(row) {
+computeTextForRow(row) {
   var text = '';
   if (row.cells.length >= 1) {
     text = row.cells[0].text;
   }
   return text;
-};
+}
 
 /**
  * @returns {object} a page parameter object used to pass to newly created child pages. Sets the parent
  *     to our outline instance and adds optional other properties. Typically you'll pass an
  *     object (entity-key or arbitrary data) to a child page.
  */
-scout.Page.prototype._pageParam = function(paramProperties) {
+_pageParam(paramProperties) {
   var param = {
     parent: this.getOutline()
   };
   $.extend(param, paramProperties);
   return param;
-};
+}
 
-scout.Page.prototype.reloadPage = function() {
+reloadPage() {
   var outline = this.getOutline();
   if (outline) {
     this.loadChildren();
   }
-};
+}
 
-scout.Page.prototype.linkWithRow = function(row) {
+linkWithRow(row) {
   this.row = row;
   row.page = this;
   this.getOutline().trigger('pageRowLink', {
     page: this,
     row: row
   });
-};
+}
 
-scout.Page.prototype.unlinkWithRow = function(row) {
+unlinkWithRow(row) {
   delete this.row;
   delete row.page;
-};
+}
 
-scout.Page.prototype._onTableFilter = function(event) {
+_onTableFilter(event) {
   this.getOutline().mediator.onTableFilter(event, this);
-};
+}
 
-scout.Page.prototype._onTableRowClick = function(event) {
+_onTableRowClick(event) {
   if (!this.drillDownOnRowClick) {
     return;
   }
@@ -278,4 +287,5 @@ scout.Page.prototype._onTableRowClick = function(event) {
   var drillNode = this.pageForTableRow(row);
   this.getOutline().selectNode(drillNode);
   this.detailTable.deselectRow(row);
-};
+}
+}

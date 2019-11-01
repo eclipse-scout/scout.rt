@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {App} from '../index';
+
+let instance;
 /* global FastClick */
 
 /**
@@ -16,13 +22,15 @@
  *
  * @singleton
  */
-scout.Device = function(model) {
+export default class Device {
+
+constructor(model) {
   // user agent string from browser
   this.userAgent = model.userAgent;
   this.features = {};
-  this.system = scout.Device.System.UNKNOWN;
-  this.type = scout.Device.Type.DESKTOP;
-  this.browser = scout.Device.Browser.UNKNOWN;
+  this.system = Device.System.UNKNOWN;
+  this.type = Device.Type.DESKTOP;
+  this.browser = Device.Browser.UNKNOWN;
   this.browserVersion = 0;
   this.scrollbarWidth = 0;
 
@@ -32,11 +40,11 @@ scout.Device = function(model) {
     this._parseBrowser();
     this._parseBrowserVersion();
   }
-};
+}
 
-scout.Device.VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
+static VENDOR_PREFIXES = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
 
-scout.Device.Browser = {
+static Browser = {
   UNKNOWN: 'Unknown',
   FIREFOX: 'Firefox',
   CHROME: 'Chrome',
@@ -45,14 +53,14 @@ scout.Device.Browser = {
   SAFARI: 'Safari'
 };
 
-scout.Device.System = {
+static System = {
   UNKNOWN: 'Unknown',
   IOS: 'IOS',
   ANDROID: 'ANDROID',
   WINDOWS: 'WINDOWS'
 };
 
-scout.Device.Type = {
+static Type = {
   DESKTOP: 'DESKTOP',
   TABLET: 'TABLET',
   MOBILE: 'MOBILE'
@@ -64,7 +72,7 @@ scout.Device.Type = {
  * in a static way (and prevent many repeating function calls within loops).<p>
  * Also loads device specific scripts (e.g. fast click for ios devices)
  */
-scout.Device.prototype.bootstrap = function() {
+bootstrap() {
   var promises = [];
 
   // Pre-calculate value and store in a simple property, to prevent many function calls inside loops
@@ -79,7 +87,7 @@ scout.Device.prototype.bootstrap = function() {
   }
 
   return promises;
-};
+}
 
 /**
  * The 300ms delay exists because the browser does not know whether the user wants to just tab or wants to zoom using double tab.
@@ -89,13 +97,13 @@ scout.Device.prototype.bootstrap = function() {
  * <p>
  * @return {boolean} true if it is an older iOS (< 9.3), running in homescreen mode or running in a cordova container. Otherwise false.
  */
-scout.Device.prototype._needsFastClick = function() {
+_needsFastClick() {
   if (!this.isIos()) {
     // Currently only IOS still has the issue -> don't load the script for other systems and browsers
     return false;
   }
 
-  if (this.systemVersion >= 9.3 && !this.isStandalone() && this.browser !== scout.Device.Browser.UNKNOWN) {
+  if (this.systemVersion >= 9.3 && !this.isStandalone() && this.browser !== Device.Browser.UNKNOWN) {
     // With iOS >= 9.3 the delay is gone if zooming is disabled, but not for the home screen / web app mode.
     // It is also necessary if running in a Cordova container (browser is set to unknown in that case)
     return false;
@@ -103,69 +111,69 @@ scout.Device.prototype._needsFastClick = function() {
 
   // -> load only for older IOS devices or if running in home screen mode or Cordova
   return true;
-};
+}
 
-scout.Device.prototype._loadFastClickDeferred = function() {
-  return this._loadScriptDeferred('res/fastclick-1.0.6.js', function() {
+_loadFastClickDeferred() {
+  return this._loadScriptDeferred('fastclick-1.0.6.js', function() {
     FastClick.attach(document.body);
     $.log.isInfoEnabled() && $.log.info('FastClick script loaded and attached');
   });
-};
+}
 
-scout.Device.prototype._loadScriptDeferred = function(scriptUrl, doneFunc) {
+_loadScriptDeferred(scriptUrl, doneFunc) {
   return $
     .injectScript(scriptUrl)
     .done(doneFunc);
-};
+}
 
 /**
  * IOs does only trigger :active when touching an element if a touchstart listener is attached
  * Unfortunately, the :active is also triggered when scrolling, there is no delay.
  * To fix this we would have to work with a custom active class which will be toggled on touchstart/end
  */
-scout.Device.prototype._installActiveHandler = function() {
+_installActiveHandler() {
   document.addEventListener('touchstart', function() {}, false);
-};
+}
 
-scout.Device.prototype.hasOnScreenKeyboard = function() {
+hasOnScreenKeyboard() {
   return this.supportsFeature('_onScreenKeyboard', function() {
     return this.isIos() || this.isAndroid() || this.isWindowsTabletMode();
   }.bind(this));
-};
+}
 
 /**
  * Returns if the current browser includes the padding-right-space in the scrollWidth calculations.<br>
  * Such a browser increases the scrollWidth only if the text-content exceeds the space <i>including</i> the right-padding.
  * This means the scrollWidth is equal to the clientWidth until the right-padding-space is consumed as well.
  */
-scout.Device.prototype.isScrollWidthIncludingPadding = function() {
+isScrollWidthIncludingPadding() {
   return this.isInternetExplorer() || this.isFirefox() || this.isEdge();
-};
+}
 
 /**
  * Safari shows a tooltip if ellipsis are displayed due to text truncation. This is fine but, unfortunately, it cannot be prevented.
  * Because showing two tooltips at the same time (native and custom) is bad, the custom tooltip cannot be displayed.
  * @returns {Boolean}
  */
-scout.Device.prototype.isCustomEllipsisTooltipPossible = function() {
-  return this.browser !== scout.Device.Browser.SAFARI;
-};
+isCustomEllipsisTooltipPossible() {
+  return this.browser !== Device.Browser.SAFARI;
+}
 
-scout.Device.prototype.isIos = function() {
-  return scout.Device.System.IOS === this.system;
-};
+isIos() {
+  return Device.System.IOS === this.system;
+}
 
-scout.Device.prototype.isEdge = function() {
-  return scout.Device.Browser.EDGE === this.browser;
-};
+isEdge() {
+  return Device.Browser.EDGE === this.browser;
+}
 
-scout.Device.prototype.isInternetExplorer = function() {
-  return scout.Device.Browser.INTERNET_EXPLORER === this.browser;
-};
+isInternetExplorer() {
+  return Device.Browser.INTERNET_EXPLORER === this.browser;
+}
 
-scout.Device.prototype.isFirefox = function() {
-  return scout.Device.Browser.FIREFOX === this.browser;
-};
+isFirefox() {
+  return Device.Browser.FIREFOX === this.browser;
+}
 
 /**
  * Compared to isIos() this function uses navigator.platform instead of navigator.userAgent to check whether the app runs on iOS.
@@ -173,38 +181,38 @@ scout.Device.prototype.isFirefox = function() {
  * This function was mainly introduced to detect whether it is a real iOS or an emulated one (e.g. using chrome emulator).
  * @returns {boolean} true if the platform is iOS, false if not (e.g. if chrome emulator is running)
  */
-scout.Device.prototype.isIosPlatform = function() {
+isIosPlatform() {
   return /iPad|iPhone|iPod/.test(navigator.platform);
-};
+}
 
-scout.Device.prototype.isAndroid = function() {
-  return scout.Device.System.ANDROID === this.system;
-};
+isAndroid() {
+  return Device.System.ANDROID === this.system;
+}
 
 /**
  * The best way we have to detect a Microsoft Surface Tablet in table mode is to check if
  * the scrollbar width is 0 pixel. In desktop mode the scrollbar width is > 0 pixel.
  */
-scout.Device.prototype.isWindowsTabletMode = function() {
-  return scout.Device.System.WINDOWS === this.system && this.systemVersion >= 10 && this.scrollbarWidth === 0;
-};
+isWindowsTabletMode() {
+  return Device.System.WINDOWS === this.system && this.systemVersion >= 10 && this.scrollbarWidth === 0;
+}
 
 /**
  * @returns {boolean} true if navigator.standalone is true which is the case for iOS home screen mode
  */
-scout.Device.prototype.isStandalone = function() {
+isStandalone() {
   return !!window.navigator.standalone;
-};
+}
 
 /**
  * This method returns false for very old browsers. Basically we check for the first version
  * that supports ECMAScript 5. This methods excludes all browsers that are known to be
  * unsupported, all others (e.g. unknown engines) are allowed by default.
  */
-scout.Device.prototype.isSupportedBrowser = function(browser, version) {
+isSupportedBrowser(browser, version) {
   browser = scout.nvl(browser, this.browser);
   version = scout.nvl(version, this.browserVersion);
-  var browsers = scout.Device.Browser;
+  var browsers = Device.Browser;
   if ((browser === browsers.INTERNET_EXPLORER && version < 11) ||
     (browser === browsers.CHROME && version < 40) ||
     (browser === browsers.FIREFOX && version < 35) ||
@@ -212,47 +220,47 @@ scout.Device.prototype.isSupportedBrowser = function(browser, version) {
     return false;
   }
   return true;
-};
+}
 
 /**
  * Can not detect type until DOM is ready because we must create a DIV to measure the scrollbars.
  */
-scout.Device.prototype._detectType = function(userAgent) {
-  if (scout.Device.System.ANDROID === this.system) {
+_detectType(userAgent) {
+  if (Device.System.ANDROID === this.system) {
     if (userAgent.indexOf('Mobile') > -1) {
-      return scout.Device.Type.MOBILE;
+      return Device.Type.MOBILE;
     } else {
-      return scout.Device.Type.TABLET;
+      return Device.Type.TABLET;
     }
-  } else if (scout.Device.System.IOS === this.system) {
+  } else if (Device.System.IOS === this.system) {
     if (userAgent.indexOf('iPad') > -1) {
-      return scout.Device.Type.TABLET;
+      return Device.Type.TABLET;
     } else {
-      return scout.Device.Type.MOBILE;
+      return Device.Type.MOBILE;
     }
   } else if (this.isWindowsTabletMode()) {
-    return scout.Device.Type.TABLET;
+    return Device.Type.TABLET;
   }
-  return scout.Device.Type.DESKTOP;
-};
+  return Device.Type.DESKTOP;
+}
 
-scout.Device.prototype._parseSystem = function() {
+_parseSystem() {
   var userAgent = this.userAgent;
   if (userAgent.indexOf('iPhone') > -1 || userAgent.indexOf('iPad') > -1) {
-    this.system = scout.Device.System.IOS;
+    this.system = Device.System.IOS;
   } else if (userAgent.indexOf('Android') > -1) {
-    this.system = scout.Device.System.ANDROID;
+    this.system = Device.System.ANDROID;
   } else if (userAgent.indexOf('Windows') > -1) {
-    this.system = scout.Device.System.WINDOWS;
+    this.system = Device.System.WINDOWS;
   }
-};
+}
 
 /**
  * Currently only supports IOS
  */
-scout.Device.prototype._parseSystemVersion = function() {
+_parseSystemVersion() {
   var versionRegex,
-    System = scout.Device.System,
+    System = Device.System,
     userAgent = this.userAgent;
 
   if (this.system === System.IOS) {
@@ -266,25 +274,25 @@ scout.Device.prototype._parseSystemVersion = function() {
   if (versionRegex) {
     this.systemVersion = this._parseVersion(userAgent, versionRegex);
   }
-};
+}
 
-scout.Device.prototype._parseBrowser = function() {
+_parseBrowser() {
   var userAgent = this.userAgent;
 
   if (userAgent.indexOf('Firefox') > -1) {
-    this.browser = scout.Device.Browser.FIREFOX;
+    this.browser = Device.Browser.FIREFOX;
   } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
-    this.browser = scout.Device.Browser.INTERNET_EXPLORER;
+    this.browser = Device.Browser.INTERNET_EXPLORER;
   } else if (userAgent.indexOf('Edge') > -1) {
     // must check for Edge before we do other checks, because the Edge user-agent string
     // also contains matches for Chrome and Webkit.
-    this.browser = scout.Device.Browser.EDGE;
+    this.browser = Device.Browser.EDGE;
   } else if (userAgent.indexOf('Chrome') > -1) {
-    this.browser = scout.Device.Browser.CHROME;
+    this.browser = Device.Browser.CHROME;
   } else if (userAgent.indexOf('Safari') > -1) {
-    this.browser = scout.Device.Browser.SAFARI;
+    this.browser = Device.Browser.SAFARI;
   }
-};
+}
 
 /**
  * Version regex only matches the first number pair
@@ -293,9 +301,9 @@ scout.Device.prototype._parseBrowser = function() {
  * - 21.1   match: 21.1
  * - 21.1.3 match: 21.1
  */
-scout.Device.prototype._parseBrowserVersion = function() {
+_parseBrowserVersion() {
   var versionRegex,
-    browsers = scout.Device.Browser,
+    browsers = Device.Browser,
     userAgent = this.userAgent;
 
   if (this.browser === browsers.INTERNET_EXPLORER) {
@@ -319,21 +327,21 @@ scout.Device.prototype._parseBrowserVersion = function() {
   if (versionRegex) {
     this.browserVersion = this._parseVersion(userAgent, versionRegex);
   }
-};
+}
 
-scout.Device.prototype._parseVersion = function(userAgent, versionRegex) {
+_parseVersion(userAgent, versionRegex) {
   var matches = versionRegex.exec(userAgent);
   if (Array.isArray(matches) && matches.length === 2) {
     return parseFloat(matches[1]);
   }
-};
+}
 
-scout.Device.prototype.supportsFeature = function(property, checkFunc) {
+supportsFeature(property, checkFunc) {
   if (this.features[property] === undefined) {
     this.features[property] = checkFunc(property);
   }
   return this.features[property];
-};
+}
 
 /**
  * Currently this method should be used when you want to check if the device is "touch only" -
@@ -344,105 +352,105 @@ scout.Device.prototype.supportsFeature = function(property, checkFunc) {
  * Currently this method returns the same as hasOnScreenKeyboard(). Maybe the implementation here will be
  * different in the future.
  */
-scout.Device.prototype.supportsTouch = function() {
+supportsTouch() {
   return this.supportsFeature('_touch', this.hasOnScreenKeyboard.bind(this));
-};
+}
 
-scout.Device.prototype.supportsFile = function() {
+supportsFile() {
   return !!window.File;
-};
+}
 
 /**
  * Some browsers support the file API but don't support the File constructor (new File()).
  */
-scout.Device.prototype.supportsFileConstructor = function() {
+supportsFileConstructor() {
   return typeof File === 'function';
-};
+}
 
-scout.Device.prototype.supportsCssAnimation = function() {
+supportsCssAnimation() {
   return this.supportsCssProperty('animation');
-};
+}
 
 /**
  * Used to determine if browser supports full history API.
  * Note that IE9 only partially supports the API, pushState and replaceState functions are missing.
  * @see: https://developer.mozilla.org/de/docs/Web/API/Window/history
  */
-scout.Device.prototype.supportsHistoryApi = function() {
+supportsHistoryApi() {
   return !!(window.history && window.history.pushState);
-};
+}
 
-scout.Device.prototype.supportsCssGradient = function() {
+supportsCssGradient() {
   var testValue = 'linear-gradient(to left, #000 0%, #000 50%, transparent 50%, transparent 100% )';
   return this.supportsFeature('gradient', this.checkCssValue.bind(this, 'backgroundImage', testValue, function(actualValue) {
     return (actualValue + '').indexOf('gradient') > 0;
   }));
-};
+}
 
-scout.Device.prototype.supportsInternationalization = function() {
+supportsInternationalization() {
   return window.Intl && typeof window.Intl === 'object';
-};
+}
 
 /**
  * Returns true if the device supports the download of resources in the same window as the single page app is running.
  * With "download" we mean: change <code>window.location.href</code> to the URL of the resource to download. Some browsers don't
  * support this behavior and require the resource to be opened in a new window with <code>window.open</code>.
  */
-scout.Device.prototype.supportsDownloadInSameWindow = function() {
-  return scout.Device.Browser.FIREFOX !== this.browser;
-};
+supportsDownloadInSameWindow() {
+  return Device.Browser.FIREFOX !== this.browser;
+}
 
-scout.Device.prototype.supportsWebcam = function() {
+supportsWebcam() {
   return this.supportsFeature('_webcam', function check(property) {
-    var getUserMedia = scout.objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
-    return scout.objects.isFunction(getUserMedia);
+    var getUserMedia = objects.optProperty(navigator, 'mediaDevices', 'getUserMedia');
+    return objects.isFunction(getUserMedia);
   });
-};
+}
 
-scout.Device.prototype.hasPrettyScrollbars = function() {
+hasPrettyScrollbars() {
   return this.supportsFeature('_prettyScrollbars', function check(property) {
     return this.scrollbarWidth === 0;
   }.bind(this));
-};
+}
 
-scout.Device.prototype.canHideScrollbars = function() {
+canHideScrollbars() {
   return this.supportsFeature('_canHideScrollbars', function check(property) {
     // Check if scrollbar is vanished if class hybrid-scrollable is applied which hides the scrollbar, see also scrollbars.js and Scrollbar.less
     return this._detectScrollbarWidth('hybrid-scrollable') === 0;
   }.bind(this));
-};
+}
 
-scout.Device.prototype.supportsCopyFromDisabledInputFields = function() {
-  return scout.Device.Browser.FIREFOX !== this.browser;
-};
+supportsCopyFromDisabledInputFields() {
+  return Device.Browser.FIREFOX !== this.browser;
+}
 
 /**
  * If the mouse down on an element with a pseudo element removes the pseudo element (e.g. check box toggling),
  * the firefox cannot focus the element anymore and instead focuses the body. In that case manual focus handling is necessary.
  */
-scout.Device.prototype.loosesFocusIfPseudoElementIsRemoved = function() {
-  return scout.Device.Browser.FIREFOX === this.browser;
-};
+loosesFocusIfPseudoElementIsRemoved() {
+  return Device.Browser.FIREFOX === this.browser;
+}
 
-scout.Device.prototype.supportsCssProperty = function(property) {
+supportsCssProperty(property) {
   return this.supportsFeature(property, function check(property) {
     if (document.body.style[property] !== undefined) {
       return true;
     }
 
     property = property.charAt(0).toUpperCase() + property.slice(1);
-    for (var i = 0; i < scout.Device.VENDOR_PREFIXES.length; i++) {
-      if (document.body.style[scout.Device.VENDOR_PREFIXES[i] + property] !== undefined) {
+    for (var i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
+      if (document.body.style[Device.VENDOR_PREFIXES[i] + property] !== undefined) {
         return true;
       }
     }
     return false;
   });
-};
+}
 
-scout.Device.prototype.supportsGeolocation = function() {
+supportsGeolocation() {
   return !!navigator.geolocation;
-};
+}
 
 /**
  * When we call .preventDefault() on a mousedown event Firefox doesn't apply the :active state.
@@ -451,11 +459,11 @@ scout.Device.prototype.supportsGeolocation = function() {
  *
  * https://bugzilla.mozilla.org/show_bug.cgi?id=771241#c7
  */
-scout.Device.prototype.requiresSyntheticActiveState = function() {
+requiresSyntheticActiveState() {
   return this.isFirefox();
-};
+}
 
-scout.Device.prototype.supportsPassiveEventListener = function() {
+supportsPassiveEventListener() {
   return this.supportsFeature('_passiveEventListener', function check(property) {
     // Code from MDN https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#Safely_detecting_option_support
     var passiveSupported = false;
@@ -472,9 +480,9 @@ scout.Device.prototype.supportsPassiveEventListener = function() {
     }
     return passiveSupported;
   }.bind(this));
-};
+}
 
-scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
+checkCssValue(property, value, checkFunc) {
   // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
   if (document.body.style[property] === undefined) {
     return false;
@@ -486,8 +494,8 @@ scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
   }
 
   property = property.charAt(0).toUpperCase() + property.slice(1);
-  for (var i = 0; i < scout.Device.VENDOR_PREFIXES.length; i++) {
-    var vendorProperty = scout.Device.VENDOR_PREFIXES[i] + property;
+  for (var i = 0; i < Device.VENDOR_PREFIXES.length; i++) {
+    var vendorProperty = Device.VENDOR_PREFIXES[i] + property;
     if (document.body.style[vendorProperty] !== undefined) {
       div.style[vendorProperty] = value;
       if (checkFunc(div.style[vendorProperty])) {
@@ -496,9 +504,9 @@ scout.Device.prototype.checkCssValue = function(property, value, checkFunc) {
     }
   }
   return false;
-};
+}
 
-scout.Device.prototype._detectScrollbarWidth = function(cssClass) {
+_detectScrollbarWidth(cssClass) {
   var $measure = $('body')
     .appendDiv(cssClass)
     .attr('id', 'MeasureScrollbar')
@@ -509,9 +517,9 @@ scout.Device.prototype._detectScrollbarWidth = function(cssClass) {
   var scrollbarWidth = measureElement.offsetWidth - measureElement.clientWidth;
   $measure.remove();
   return scrollbarWidth;
-};
+}
 
-scout.Device.prototype.toString = function() {
+toString() {
   return 'scout.Device[' +
     'system=' + this.system +
     ' browser=' + this.browser +
@@ -519,14 +527,19 @@ scout.Device.prototype.toString = function() {
     ' type=' + this.type +
     ' scrollbarWidth=' + this.scrollbarWidth +
     ' features=' + JSON.stringify(this.features) + ']';
-};
+}
 
-scout.addAppListener('prepare', function() {
-  if (scout.device) {
+static get() {
+  return instance;
+}
+}
+
+App.addListener('prepare', function() {
+  if (instance) {
     // if the device was created before the app itself, use it instead of creating a new one
     return;
   }
-  scout.device = scout.create('Device', {
+  instance = scout.create('Device', {
     userAgent: navigator.userAgent
   });
 });

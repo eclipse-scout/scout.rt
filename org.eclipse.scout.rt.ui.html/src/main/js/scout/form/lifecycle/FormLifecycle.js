@@ -8,29 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormLifecycle = function() {
-  scout.FormLifecycle.parent.call(this);
+import {scout} from '../../index';
+import {Form} from '../../index';
+import {Lifecycle} from '../../index';
+import {ValueField} from '../../index';
+
+export default class FormLifecycle extends Lifecycle {
+
+constructor() {
+  super();
 
   this.emptyMandatoryElementsTextKey = 'FormEmptyMandatoryFieldsMessage';
   this.invalidElementsTextKey = 'FormInvalidFieldsMessage';
   this.saveChangesQuestionTextKey = 'FormSaveChangesQuestion';
-};
-scout.inherits(scout.FormLifecycle, scout.Lifecycle);
+}
 
-scout.FormLifecycle.prototype.init = function(model) {
-  scout.assertParameter('widget', model.widget, scout.Form);
-  scout.FormLifecycle.parent.prototype.init.call(this, model);
-};
 
-scout.FormLifecycle.prototype._reset = function() {
+init(model) {
+  scout.assertParameter('widget', model.widget, Form);
+  super.init( model);
+}
+
+_reset() {
   this.widget.visitFields(function(field) {
-    if (field instanceof scout.ValueField) {
+    if (field instanceof ValueField) {
       field.resetValue();
     }
   });
-};
+}
 
-scout.FormLifecycle.prototype._invalidElements = function() {
+_invalidElements() {
   var missingFields = [];
   var invalidFields = [];
 
@@ -53,25 +60,25 @@ scout.FormLifecycle.prototype._invalidElements = function() {
     missingElements: missingFields,
     invalidElements: invalidFields
   };
-};
+}
 
-scout.FormLifecycle.prototype._invalidElementText = function(element) {
+_invalidElementText(element) {
   return element.label;
-};
+}
 
-scout.FormLifecycle.prototype._missingElementText = function(element) {
+_missingElementText(element) {
   return element.label;
-};
+}
 
-scout.FormLifecycle.prototype._validateWidget = function() {
+_validateWidget() {
   return this.widget._validate();
-};
+}
 
-scout.FormLifecycle.prototype.markAsSaved = function() {
+markAsSaved() {
   this.widget.visitFields(function(field) {
     field.markAsSaved();
   });
-};
+}
 
 /**
  * Visits all form fields and calls the updateRequiresSave() function. If any
@@ -80,7 +87,7 @@ scout.FormLifecycle.prototype.markAsSaved = function() {
  *
  * @see (Java) AbstractFormField #checkSaveNeeded, #isSaveNeeded
  */
-scout.FormLifecycle.prototype.requiresSave = function() {
+requiresSave() {
   var requiresSave = false;
   this.widget.visitFields(function(field) {
     field.updateRequiresSave();
@@ -89,4 +96,5 @@ scout.FormLifecycle.prototype.requiresSave = function() {
     }
   });
   return requiresSave;
-};
+}
+}

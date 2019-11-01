@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ProposalFieldAdapter = function() {
-  scout.ProposalFieldAdapter.parent.call(this);
+import {SmartFieldAdapter} from '../../../index';
+
+export default class ProposalFieldAdapter extends SmartFieldAdapter {
+
+constructor() {
+  super();
 
   this._addRemoteProperties(['lookupRows']);
-};
-scout.inherits(scout.ProposalFieldAdapter, scout.SmartFieldAdapter);
+}
+
+}

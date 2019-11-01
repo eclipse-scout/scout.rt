@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableStartCellEditKeyStroke = function(table) {
-  scout.TableStartCellEditKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TableStartCellEditKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.field = table;
   this.ctrl = true;
-  this.which = [scout.keys.ENTER];
+  this.which = [keys.ENTER];
   this.stopPropagation = true;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var editPosition = event._editPosition,
@@ -23,11 +28,11 @@ scout.TableStartCellEditKeyStroke = function(table) {
     }
     return this.field.$cell(columnIndex, editPosition.row.$row);
   }.bind(this);
-};
-scout.inherits(scout.TableStartCellEditKeyStroke, scout.KeyStroke);
+}
 
-scout.TableStartCellEditKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TableStartCellEditKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -49,9 +54,10 @@ scout.TableStartCellEditKeyStroke.prototype._accept = function(event) {
   } else {
     return false;
   }
-};
+}
 
-scout.TableStartCellEditKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var editPosition = event._editPosition;
   this.field.prepareCellEdit(editPosition.column, editPosition.row, true);
-};
+}
+}

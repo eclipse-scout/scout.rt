@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MessageBoxAdapter = function() {
-  scout.MessageBoxAdapter.parent.call(this);
-};
-scout.inherits(scout.MessageBoxAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
 
-scout.MessageBoxAdapter.prototype._onWidgetAction = function(event) {
+export default class MessageBoxAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAction(event) {
   this._send('action', {
     option: event.option
   });
-};
+}
 
-scout.MessageBoxAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'action') {
     this._onWidgetAction(event);
   } else {
-    scout.MessageBoxAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

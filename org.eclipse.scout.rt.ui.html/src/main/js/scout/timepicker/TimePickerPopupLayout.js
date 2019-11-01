@@ -8,19 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TimePickerPopupLayout = function(popup) {
-  scout.TimePickerPopupLayout.parent.call(this);
+import {PopupLayout} from '../index';
+
+export default class TimePickerPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super();
   this.popup = popup;
   this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.TimePickerPopupLayout, scout.PopupLayout);
+}
 
-scout.TimePickerPopupLayout.prototype.layout = function($container) {
+
+layout($container) {
   var size,
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
 
-  scout.TimePickerPopupLayout.parent.prototype.layout.call(this, $container);
+  super.layout( $container);
 
   size = htmlComp.size()
     .subtract(htmlComp.insets())
@@ -33,9 +37,9 @@ scout.TimePickerPopupLayout.prototype.layout = function($container) {
   if (this.popup.htmlComp.layouted) {
     this.popup.position();
   }
-};
+}
 
-scout.TimePickerPopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var prefSize,
     htmlComp = this.popup.htmlComp,
     htmlPicker = this.popup.picker.htmlComp;
@@ -46,4 +50,5 @@ scout.TimePickerPopupLayout.prototype.preferredLayoutSize = function($container)
 
   prefSize.height = Math.max(15, Math.min(350, prefSize.height)); // at least some pixels height in case there is no data, no status, no active filter
   return prefSize;
-};
+}
+}

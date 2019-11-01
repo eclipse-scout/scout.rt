@@ -8,12 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {FocusContext} from '../index';
+
 /**
  * Rule describing how to resolve a focusable element.
  *
  * @see FocusManager.js
  */
-scout.FocusRule = {
+const FocusRule = {
   /**
    * Indicates to focus the first focusable element.
    */
@@ -28,7 +30,9 @@ scout.FocusRule = {
    *
    * This is useful to disable focus requests during a preparation phase without losing the element which should be focused.
    *
-   * <b>Important</b>: {@link scout.FocusContext#ready()} must be called manually as soon as the focus context is ready.
+   * <b>Important</b>: {@link FocusContext#ready()} must be called manually as soon as the focus context is ready.
    */
   PREPARE: 'prepare'
 };
+
+export default FocusRule;

@@ -8,11 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HAlign} from '../../index';
+import {keys} from '../../index';
+import {RangeKeyStroke} from '../../index';
+
 /**
  * Composite keystroke to provide a numeric keystroke to select view tabs.
  */
-scout.DesktopTabSelectKeyStroke = function(desktop) {
-  scout.DesktopTabSelectKeyStroke.parent.call(this);
+export default class DesktopTabSelectKeyStroke extends RangeKeyStroke {
+
+constructor(desktop) {
+  super();
   this.field = desktop;
 
   // modifier
@@ -20,34 +26,34 @@ scout.DesktopTabSelectKeyStroke = function(desktop) {
 
   // range [1..9]
   this.registerRange(
-    scout.keys['1'], // range from
+    keys['1'], // range from
     function() {
-      return scout.keys[Math.min(this._viewTabs().length, 9)]; // range to
+      return keys[Math.min(this._viewTabs().length, 9)]; // range to
     }.bind(this)
   );
 
   // rendering hints
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var viewIndex = event.which - scout.keys['1'];
+    var viewIndex = event.which - keys['1'];
     return this._viewTabs()[viewIndex].$container;
   }.bind(this);
-};
-scout.inherits(scout.DesktopTabSelectKeyStroke, scout.RangeKeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.DesktopTabSelectKeyStroke.prototype._isEnabled = function() {
-  var enabled = scout.DesktopTabSelectKeyStroke.parent.prototype._isEnabled.call(this);
+_isEnabled() {
+  var enabled = super._isEnabled();
   return enabled && this.field.selectViewTabsKeyStrokesEnabled && this._viewTabs().length > 0;
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.DesktopTabSelectKeyStroke.prototype.handle = function(event) {
-  var viewIndex = event.which - scout.keys['1'];
+handle(event) {
+  var viewIndex = event.which - keys['1'];
 
   if (this._viewTabs().length && (viewIndex < this._viewTabs().length)) {
     var viewTab = this._viewTabs()[viewIndex];
@@ -55,11 +61,12 @@ scout.DesktopTabSelectKeyStroke.prototype.handle = function(event) {
       this.field.bench.activateView(viewTab.view);
     }
   }
-};
+}
 
-scout.DesktopTabSelectKeyStroke.prototype._viewTabs = function() {
+_viewTabs() {
   if (this.field.bench) {
     return this.field.bench.getTabs();
   }
   return [];
-};
+}
+}

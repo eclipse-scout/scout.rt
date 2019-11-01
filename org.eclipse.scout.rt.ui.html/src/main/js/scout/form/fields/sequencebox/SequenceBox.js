@@ -8,18 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SequenceBox = function() {
-  scout.SequenceBox.parent.call(this);
+import {SequenceBoxLayout} from '../../../index';
+import {dates} from '../../../index';
+import {CheckBoxField} from '../../../index';
+import {LogicalGridData} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {CompositeField} from '../../../index';
+import {scout} from '../../../index';
+import {LogicalGridLayoutConfig} from '../../../index';
+import {DateField} from '../../../index';
+import {SequenceBoxGridConfig} from '../../../index';
+
+export default class SequenceBox extends CompositeField {
+
+constructor() {
+  super();
   this._addWidgetProperties('fields');
   this._addCloneProperties(['layoutConfig']);
   this.logicalGrid = scout.create('scout.HorizontalGrid');
   this.layoutConfig = null;
   this.fields = [];
-};
-scout.inherits(scout.SequenceBox, scout.CompositeField);
+}
 
-scout.SequenceBox.prototype._init = function(model) {
-  scout.SequenceBox.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this._setLayoutConfig(this.layoutConfig);
 
@@ -29,12 +42,12 @@ scout.SequenceBox.prototype._init = function(model) {
   this.setTooltipText(this.tooltipText);
   this.setMenus(this.menus);
   this.setMenusVisible(this.menusVisible);
-};
+}
 
 /**
  * Initialize all DateFields in this SequenceBox with a meaningful autoDate, except fields which already have an autoDate provided by the model.
  */
-scout.SequenceBox.prototype._initDateFields = function() {
+_initDateFields() {
   var dateFields = this._getDateFields();
   var newAutoDate = null;
   for (var i = 0; i < dateFields.length; i++) {
@@ -48,16 +61,16 @@ scout.SequenceBox.prototype._initDateFields = function() {
     }
     newAutoDate = this._getAutoDateProposal(currField);
   }
-};
+}
 
-scout.SequenceBox.prototype._render = function() {
+_render() {
   var field, i;
   this.addContainer(this.$parent, 'sequence-box');
   this.addLabel();
   this.addField(this.$parent.makeDiv());
   this.addStatus();
   this._handleStatus();
-  this.htmlBody = scout.HtmlComponent.install(this.$field, this.session);
+  this.htmlBody = HtmlComponent.install(this.$field, this.session);
   this.htmlBody.setLayout(this._createBodyLayout());
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
@@ -67,58 +80,58 @@ scout.SequenceBox.prototype._render = function() {
     this._modifyLabel(field);
 
     // set each children layout data to logical grid data
-    field.setLayoutData(new scout.LogicalGridData(field));
+    field.setLayoutData(new LogicalGridData(field));
   }
-};
+}
 
-scout.SequenceBox.prototype._renderProperties = function() {
-  scout.SequenceBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderLayoutConfig();
-};
+}
 
-scout.SequenceBox.prototype._createBodyLayout = function() {
-  return new scout.SequenceBoxLayout(this, this.layoutConfig);
-};
+_createBodyLayout() {
+  return new SequenceBoxLayout(this, this.layoutConfig);
+}
 
 /**
  * @override Widgets.js
  */
-scout.SequenceBox.prototype.invalidateLogicalGrid = function(invalidateLayout) {
-  scout.SequenceBox.parent.prototype.invalidateLogicalGrid.call(this, false);
+invalidateLogicalGrid(invalidateLayout) {
+  super.invalidateLogicalGrid( false);
   if (scout.nvl(invalidateLayout, true) && this.rendered) {
     this.htmlBody.invalidateLayoutTree();
   }
-};
+}
 
 /**
  * @override Widgets.js
  */
-scout.SequenceBox.prototype._setLogicalGrid = function(logicalGrid) {
-  scout.SequenceBox.parent.prototype._setLogicalGrid.call(this, logicalGrid);
+_setLogicalGrid(logicalGrid) {
+  super._setLogicalGrid( logicalGrid);
   if (this.logicalGrid) {
-    this.logicalGrid.setGridConfig(new scout.SequenceBoxGridConfig());
+    this.logicalGrid.setGridConfig(new SequenceBoxGridConfig());
   }
-};
+}
 
-scout.SequenceBox.prototype.setLayoutConfig = function(layoutConfig) {
+setLayoutConfig(layoutConfig) {
   this.setProperty('layoutConfig', layoutConfig);
-};
+}
 
-scout.SequenceBox.prototype._setLayoutConfig = function(layoutConfig) {
+_setLayoutConfig(layoutConfig) {
   if (!layoutConfig) {
-    layoutConfig = new scout.LogicalGridLayoutConfig();
+    layoutConfig = new LogicalGridLayoutConfig();
   }
-  this._setProperty('layoutConfig', scout.LogicalGridLayoutConfig.ensure(layoutConfig));
-};
+  this._setProperty('layoutConfig', LogicalGridLayoutConfig.ensure(layoutConfig));
+}
 
-scout.SequenceBox.prototype._renderLayoutConfig = function() {
+_renderLayoutConfig() {
   this.layoutConfig.applyToLayout(this.htmlBody.layout);
   if (this.rendered) {
     this.htmlBody.invalidateLayoutTree();
   }
-};
+}
 
-scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
+_onFieldPropertyChange(event) {
   var visibiltyChanged = (event.propertyName === 'visible');
   if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
     this._handleStatus(visibiltyChanged);
@@ -126,12 +139,12 @@ scout.SequenceBox.prototype._onFieldPropertyChange = function(event) {
   if (event.propertyName === 'value') {
     this._onFieldValueChange(event);
   }
-};
+}
 
 /**
  * Moves the status relevant properties from the last visible field to the sequencebox. This makes sure that the fields inside the sequencebox have the same size.
  */
-scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
+_handleStatus(visibilityChanged) {
   if (visibilityChanged && this._lastVisibleField) {
     // if there is a new last visible field, make sure the status is shown on the previously last one
     this._lastVisibleField.suppressStatus = false;
@@ -185,9 +198,9 @@ scout.SequenceBox.prototype._handleStatus = function(visibilityChanged) {
       this._lastVisibleField._renderMenus();
     }
   }
-};
+}
 
-scout.SequenceBox.prototype.setErrorStatus = function(errorStatus) {
+setErrorStatus(errorStatus) {
   if (this._isOverwritingStatusFromField && !this._isErrorStatusOverwritten) {
     // was not overwritten, will be overwritten now -> backup old value
     this.boxErrorStatus = this.errorStatus;
@@ -197,11 +210,11 @@ scout.SequenceBox.prototype.setErrorStatus = function(errorStatus) {
   }
   if (this._isOverwritingStatusFromField || !this._isErrorStatusOverwritten) {
     // prevent setting value if directly changed on seq box and is already overwritten
-    scout.SequenceBox.parent.prototype.setErrorStatus.call(this, errorStatus);
+    super.setErrorStatus( errorStatus);
   }
-};
+}
 
-scout.SequenceBox.prototype.setTooltipText = function(tooltipText) {
+setTooltipText(tooltipText) {
   if (this._isOverwritingStatusFromField && !this._isTooltipTextOverwritten) {
     // was not overwritten, will be overwritten now -> backup old value
     this.boxTooltipText = this.tooltipText;
@@ -211,11 +224,11 @@ scout.SequenceBox.prototype.setTooltipText = function(tooltipText) {
   }
   if (this._isOverwritingStatusFromField || !this._isTooltipTextOverwritten) {
     // prevent setting value if directly changed on seq box and is already overwritten
-    scout.SequenceBox.parent.prototype.setTooltipText.call(this, tooltipText);
+    super.setTooltipText( tooltipText);
   }
-};
+}
 
-scout.SequenceBox.prototype.setMenus = function(menus) {
+setMenus(menus) {
   if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
     // was not overwritten, will be overwritten now -> backup old value
     this.boxMenus = this.menus;
@@ -225,11 +238,11 @@ scout.SequenceBox.prototype.setMenus = function(menus) {
   }
   if (this._isOverwritingStatusFromField || !this._isMenusOverwritten) {
     // prevent setting value if directly changed on seq box and is already overwritten
-    scout.SequenceBox.parent.prototype.setMenus.call(this, menus);
+    super.setMenus( menus);
   }
-};
+}
 
-scout.SequenceBox.prototype.setMenusVisible = function(menusVisible) {
+setMenusVisible(menusVisible) {
   if (this._isOverwritingStatusFromField && !this._isMenusOverwritten) {
     // was not overwritten, will be overwritten now -> backup old value
     this.boxMenusVisible = this.menusVisible;
@@ -239,11 +252,11 @@ scout.SequenceBox.prototype.setMenusVisible = function(menusVisible) {
   }
   if (this._isOverwritingStatusFromField || !this._isMenusOverwritten) {
     // prevent setting value if directly changed on seq box and is already overwritten
-    scout.SequenceBox.parent.prototype.setMenusVisible.call(this, menusVisible);
+    super.setMenusVisible( menusVisible);
   }
-};
+}
 
-scout.SequenceBox.prototype._getLastVisibleField = function() {
+_getLastVisibleField() {
   var visibleFields = this.fields.filter(function(field) {
     return field.visible;
   });
@@ -252,15 +265,15 @@ scout.SequenceBox.prototype._getLastVisibleField = function() {
   }
 
   return visibleFields[visibleFields.length - 1];
-};
+}
 
-scout.SequenceBox.prototype._onFieldValueChange = function(event) {
-  if (event.source instanceof scout.DateField) {
+_onFieldValueChange(event) {
+  if (event.source instanceof DateField) {
     this._onDateFieldValueChange(event);
   }
-};
+}
 
-scout.SequenceBox.prototype._onDateFieldValueChange = function(event) {
+_onDateFieldValueChange(event) {
   // For a better user experience preselect a meaningful date on all following DateFields in the sequence box.
   var field = event.source;
   var dateFields = this._getDateFields();
@@ -275,35 +288,35 @@ scout.SequenceBox.prototype._onDateFieldValueChange = function(event) {
       break;
     }
   }
-};
+}
 
-scout.SequenceBox.prototype._getDateFields = function() {
+_getDateFields() {
   var dateFields = this.fields.filter(function(field) {
-    return field instanceof scout.DateField;
+    return field instanceof DateField;
   });
   return dateFields;
-};
+}
 
-scout.SequenceBox.prototype._getAutoDateProposal = function(field) {
+_getAutoDateProposal(field) {
   var newAutoDate = null;
   // if it's only a time field, add one hour, otherwise add one day
   if (field && field.value) {
     if (!field.hasDate && field.hasTime) {
-      newAutoDate = scout.dates.shiftTime(field.value, 1, 0, 0);
+      newAutoDate = dates.shiftTime(field.value, 1, 0, 0);
     } else {
-      newAutoDate = scout.dates.shift(field.value, 0, 0, 1);
+      newAutoDate = dates.shift(field.value, 0, 0, 1);
     }
   }
   return newAutoDate;
-};
+}
 
 // The new sequence-box sets the label to invisible on the model.
-scout.SequenceBox.prototype._modifyLabel = function(field) {
-  if (field instanceof scout.CheckBoxField) {
+_modifyLabel(field) {
+  if (field instanceof CheckBoxField) {
     field.labelVisible = false;
   }
 
-  if (field instanceof scout.DateField) {
+  if (field instanceof DateField) {
     // The DateField has two inputs ($dateField and $timeField), field.$field refers to the composite which is irrelevant here
     // In order to support aria-labelledby for date fields also, the individual inputs have to be linked with the label rather than the composite
     if (field.$dateField) {
@@ -315,24 +328,25 @@ scout.SequenceBox.prototype._modifyLabel = function(field) {
   } else if (field.$field) { // If $field is set depends on the concrete field e.g. a group box does not have a $field
     this._linkWithLabel(field.$field);
   }
-};
+}
 
-scout.SequenceBox.prototype.setFields = function(fields) {
+setFields(fields) {
   if (this.rendered) {
     throw new Error('Setting fields is not supported if sequence box is already rendered.');
   }
   this.setProperty('fields', fields);
-};
+}
 
 /**
  * @override CompositeField.js
  */
-scout.SequenceBox.prototype.getFields = function() {
+getFields() {
   return this.fields;
-};
+}
 
-scout.SequenceBox.prototype.clone = function(model, options) {
-  var clone = scout.SequenceBox.parent.prototype.clone.call(this, model, options);
+clone(model, options) {
+  var clone = super.clone( model, options);
   this._deepCloneProperties(clone, 'fields', options);
   return clone;
-};
+}
+}

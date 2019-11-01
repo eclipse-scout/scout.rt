@@ -8,34 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {AbstractLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {HtmlComponent} from '../../../index';
+
 /**
  * This layout only layouts the INPUT and DIV part of the multi-line smart-field, not the entire form-field.
  */
-scout.SmartFieldMultilineLayout = function(smartField) {
-  scout.SmartFieldMultilineLayout.parent.call(this);
+export default class SmartFieldMultilineLayout extends AbstractLayout {
+
+constructor(smartField) {
+  super();
   this.smartField = smartField;
 
   this._initDefaults();
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this.smartField.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
-};
-scout.inherits(scout.SmartFieldMultilineLayout, scout.AbstractLayout);
+}
 
-scout.SmartFieldMultilineLayout.prototype._initDefaults = function() {
-  this.rowHeight = scout.htmlEnvironment.formRowHeight;
-};
 
-scout.SmartFieldMultilineLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_initDefaults() {
+  this.rowHeight = HtmlEnvironment.get().formRowHeight;
+}
+
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this.smartField.invalidateLayoutTree();
-};
+}
 
-scout.SmartFieldMultilineLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+layout($container) {
+  var htmlContainer = HtmlComponent.get($container),
     $input = $container.children('.multiline-input'),
     $lines = $container.children('.multiline-lines'),
     innerSize = htmlContainer.availableSize()
@@ -43,4 +49,5 @@ scout.SmartFieldMultilineLayout.prototype.layout = function($container) {
 
   $input.cssHeight(this.rowHeight);
   $lines.cssHeight(innerSize.height - this.rowHeight);
-};
+}
+}

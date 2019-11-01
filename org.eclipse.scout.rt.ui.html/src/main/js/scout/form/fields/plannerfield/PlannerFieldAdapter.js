@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerFieldAdapter = function() {
-  scout.PlannerFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.PlannerFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class PlannerFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

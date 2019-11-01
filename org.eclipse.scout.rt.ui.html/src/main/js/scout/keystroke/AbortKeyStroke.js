@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AbortKeyStroke = function(field, $drawingArea) {
-  scout.AbortKeyStroke.parent.call(this, field, $drawingArea);
-};
-scout.inherits(scout.AbortKeyStroke, scout.CloseKeyStroke);
+import {CloseKeyStroke} from '../index';
 
-scout.AbortKeyStroke.prototype.handle = function(event) {
+export default class AbortKeyStroke extends CloseKeyStroke {
+
+constructor(field, $drawingArea) {
+  super( field, $drawingArea);
+}
+
+
+handle(event) {
   this.field.abort();
-};
+}
+}

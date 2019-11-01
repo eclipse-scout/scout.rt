@@ -8,22 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeaderMenuLayout = function(popup) {
-  scout.TableHeaderMenuLayout.parent.call(this, popup);
+import {graphics} from '../index';
+import {HtmlComponent} from '../index';
+import {PopupLayout} from '../index';
+import {Dimension} from '../index';
+
+export default class TableHeaderMenuLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
   this.popup = popup;
   this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.TableHeaderMenuLayout, scout.PopupLayout);
+}
 
-scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT = 330;
+
+static TABLE_MAX_HEIGHT = 330;
 
 /**
  * When this layout method is called we've calculated the pref. size before. Layout does this:
  * - layout the filter-fields (their size is fixed)
  * - use the remaining height to layout the filter table
  */
-scout.TableHeaderMenuLayout.prototype.layout = function($container) {
-  scout.TableHeaderMenuLayout.parent.prototype.layout.call(this, $container);
+layout($container) {
+  super.layout( $container);
 
   if (!this.popup.hasFilterFields && !this.popup.hasFilterTable) {
     return;
@@ -32,16 +39,16 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   var
     actionColumnSize, filterColumnSize,
     $filterColumn = this.popup.$columnFilters,
-    filterColumnInsets = scout.graphics.insets($filterColumn),
-    filterColumnMargins = scout.graphics.margins($filterColumn),
-    filterFieldGroupSize = new scout.Dimension();
+    filterColumnInsets = graphics.insets($filterColumn),
+    filterColumnMargins = graphics.margins($filterColumn),
+    filterFieldGroupSize = new Dimension();
 
   if (this.popup.$body.hasClass('compact')) {
     // height is auto -> read pref size
-    filterColumnSize = scout.HtmlComponent.get($filterColumn).prefSize();
+    filterColumnSize = HtmlComponent.get($filterColumn).prefSize();
   } else {
     // make filter column as height as body (since body is scrollable pref size is calculated which takes TABLE_MAX_HEIGHT into account)
-    filterColumnSize = this.preferredLayoutSize($container).subtract(scout.graphics.insets($container));
+    filterColumnSize = this.preferredLayoutSize($container).subtract(graphics.insets($container));
     filterColumnSize = filterColumnSize.subtract(filterColumnMargins);
   }
   // width is always set with css
@@ -50,17 +57,17 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   // Set explicit height, necessary if there is no filter table
   $filterColumn.cssHeight(filterColumnSize.height);
 
-  // TODO [7.0] cgu this code could be written a lot easier -> replace following code (filter fields, filter table) with scout.HtmlComponent.get($filterColumn).setSize(filterColumnSize);
+  // TODO [7.0] cgu this code could be written a lot easier -> replace following code (filter fields, filter table) with HtmlComponent.get($filterColumn).setSize(filterColumnSize);
   // Same for pref size. To implement max height of table, the RowLayout could read css max-height
   // Filter fields
   if (this.popup.hasFilterFields) {
     var
       $filterFieldsGroup = this.popup.$filterFieldsGroup,
-      filterFieldHtmlComp = scout.HtmlComponent.get($filterFieldsGroup.find('.form-field'));
+      filterFieldHtmlComp = HtmlComponent.get($filterFieldsGroup.find('.form-field'));
 
     // Layout filter field(s) and get size
-    filterFieldHtmlComp.setSize(new scout.Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
-    filterFieldGroupSize = scout.graphics.size($filterFieldsGroup, true);
+    filterFieldHtmlComp.setSize(new Dimension(filterColumnSize.width - filterColumnInsets.horizontal(), this._filterFieldsGroupBoxHeight()));
+    filterFieldGroupSize = graphics.size($filterFieldsGroup, true);
   }
 
   // Filter table
@@ -68,7 +75,7 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
     var
       filterTableContainerHeight,
       $filterTableGroup = this.popup.$filterTableGroup,
-      filterTableContainerInsets = scout.graphics.insets($filterTableGroup),
+      filterTableContainerInsets = graphics.insets($filterTableGroup),
       filterTableHtmlComp = this.popup.filterTable.htmlComp;
 
     filterTableContainerHeight = filterColumnSize.height - filterColumnInsets.vertical();
@@ -79,10 +86,10 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
     // subtract insets of table container
     filterTableContainerHeight -= filterTableContainerInsets.vertical();
     // limit height of table
-    filterTableContainerHeight = Math.min(filterTableContainerHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
+    filterTableContainerHeight = Math.min(filterTableContainerHeight, TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
 
     // Layout filter table
-    filterTableHtmlComp.setSize(new scout.Dimension(
+    filterTableHtmlComp.setSize(new Dimension(
       filterColumnSize.width - filterColumnInsets.horizontal(),
       filterTableContainerHeight));
   }
@@ -90,15 +97,15 @@ scout.TableHeaderMenuLayout.prototype.layout = function($container) {
   // fix width of actions column, so it doesn't become wider when user
   // hovers over a button and thus the text of the group changes.
   this._setMaxWidth();
-  actionColumnSize = scout.graphics.size(this.popup.$columnActions);
+  actionColumnSize = graphics.size(this.popup.$columnActions);
   this._setMaxWidth(actionColumnSize.width);
 
   // IE hack: IE adds some invisible space to the left box which causes unecessary scrollbars to appear. Setting the vertical align flags the following way seems to fix it...
   this.popup.$columnActions.css('vertical-align', actionColumnSize.height >= filterColumnSize.height ? 'middle' : 'top');
   $filterColumn.css('vertical-align', 'middle');
-};
+}
 
-scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize) {
+_adjustSizeWithAnchor(prefSize) {
   var maxWidth,
     htmlComp = this.popup.htmlComp,
     windowPaddingX = this.popup.windowPaddingX,
@@ -114,17 +121,17 @@ scout.TableHeaderMenuLayout.prototype._adjustSizeWithAnchor = function(prefSize)
     prefSize = this.preferredLayoutSize(this.popup.$container);
   }
 
-  return scout.TableHeaderMenuLayout.parent.prototype._adjustSizeWithAnchor.call(this, prefSize);
-};
+  return super._adjustSizeWithAnchor( prefSize);
+}
 
 // group title (size used for table + field container)
-scout.TableHeaderMenuLayout.prototype._groupTitleHeight = function($group) {
-  return scout.graphics.size($group.find('.table-header-menu-group-text'), true).height;
-};
+_groupTitleHeight($group) {
+  return graphics.size($group.find('.table-header-menu-group-text'), true).height;
+}
 
-scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
+_filterFieldsGroupBoxHeight() {
   return this.popup.filterFieldsGroupBox.htmlComp.prefSize().height;
-};
+}
 
 /**
  * The preferred layout size of this widget is
@@ -132,26 +139,26 @@ scout.TableHeaderMenuLayout.prototype._filterFieldsGroupBoxHeight = function() {
  * + size of filter-fields
  * + paddings of surrounding containers
  */
-scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var prefSize, filterColumnMargins, filterColumnInsets,
     rightColumnHeight = 0,
     leftColumnHeight = 0,
-    containerInsets = scout.graphics.insets($container),
+    containerInsets = graphics.insets($container),
     oldMaxWidth = this._getMaxWidth();
 
   this._setMaxWidth(); // temp. remove max-width so we can determine pref. size
-  leftColumnHeight = scout.graphics.size(this.popup.$columnActions, true).height;
+  leftColumnHeight = graphics.size(this.popup.$columnActions, true).height;
 
   // Filter table
   if (this.popup.hasFilterTable) {
     var
       $filterTableGroup = this.popup.$filterTableGroup,
       filterTableHeight = this.popup.filterTable.htmlComp.size(true).height,
-      filterTableContainerInsets = scout.graphics.insets($filterTableGroup),
+      filterTableContainerInsets = graphics.insets($filterTableGroup),
       filterTableContainerHeight;
 
     // limit height of table
-    filterTableHeight = Math.min(filterTableHeight, scout.TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
+    filterTableHeight = Math.min(filterTableHeight, TableHeaderMenuLayout.TABLE_MAX_HEIGHT);
     // size of container with table
     filterTableContainerHeight = filterTableHeight;
     // add group-title height
@@ -166,7 +173,7 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   if (this.popup.hasFilterFields) {
     var
       $filterFieldsGroup = this.popup.$filterFieldsGroup,
-      filterFieldContainerInsets = scout.graphics.insets($filterFieldsGroup),
+      filterFieldContainerInsets = graphics.insets($filterFieldsGroup),
       filterFieldContainerHeight;
 
     // size of group-box with 1 or 2 filter fields
@@ -180,14 +187,14 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   }
 
   if (this.popup.hasFilterFields || this.popup.hasFilterTable) {
-    filterColumnMargins = scout.graphics.margins(this.popup.$columnFilters);
-    filterColumnInsets = scout.graphics.insets(this.popup.$columnFilters);
+    filterColumnMargins = graphics.margins(this.popup.$columnFilters);
+    filterColumnInsets = graphics.insets(this.popup.$columnFilters);
     rightColumnHeight += filterColumnMargins.vertical();
     rightColumnHeight += filterColumnInsets.vertical();
   }
 
   // Use height of left or right column as preferred size (and add insets of container)
-  prefSize = scout.graphics.prefSize($container);
+  prefSize = graphics.prefSize($container);
   if (!this.popup.$body.hasClass('compact')) {
     prefSize.height = Math.max(leftColumnHeight, rightColumnHeight) + containerInsets.vertical();
   } else {
@@ -198,12 +205,13 @@ scout.TableHeaderMenuLayout.prototype.preferredLayoutSize = function($container)
   this._setMaxWidth(oldMaxWidth);
 
   return prefSize;
-};
+}
 
-scout.TableHeaderMenuLayout.prototype._getMaxWidth = function() {
+_getMaxWidth() {
   return this.popup.$columnActions.css('max-width');
-};
+}
 
-scout.TableHeaderMenuLayout.prototype._setMaxWidth = function(maxWidth) {
+_setMaxWidth(maxWidth) {
   this.popup.$columnActions.css('max-width', maxWidth || '');
-};
+}
+}

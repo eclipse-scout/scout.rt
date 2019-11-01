@@ -8,22 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SplitBoxAdapter = function() {
-  scout.SplitBoxAdapter.parent.call(this);
-  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
-};
-scout.inherits(scout.SplitBoxAdapter, scout.CompositeFieldAdapter);
+import {CompositeFieldAdapter} from '../../../index';
 
-scout.SplitBoxAdapter.prototype._onWidgetPositionChange = function(event) {
+export default class SplitBoxAdapter extends CompositeFieldAdapter {
+
+constructor() {
+  super();
+  this._addRemoteProperties(['collapsibleField', 'fieldCollapsed', 'minSplitterPosition', 'fieldMinimized']);
+}
+
+
+_onWidgetPositionChange(event) {
   this._send('setSplitterPosition', {
     splitterPosition: event.position
   });
-};
+}
 
-scout.SplitBoxAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'positionChange') {
     this._onWidgetPositionChange(event);
   } else {
-    scout.SplitBoxAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

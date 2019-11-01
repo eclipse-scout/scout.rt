@@ -8,22 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ImageFieldAdapter = function() {
-  scout.ImageFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.ImageFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
 
-scout.ImageFieldAdapter.prototype._onWidgetEvent = function(event) {
+export default class ImageFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetEvent(event) {
   if (event.type === 'fileUpload') {
     this._onFileUpload(event);
   } else {
-    scout.ImageFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.ImageFieldAdapter.prototype._onFileUpload = function(event) {
+_onFileUpload(event) {
   var success = this.widget.fileInput.upload();
   if (!success) {
     this.widget.fileInput.clear();
   }
-};
+}
+}

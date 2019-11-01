@@ -8,51 +8,58 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.NavigateDownButton = function() {
-  scout.NavigateDownButton.parent.call(this);
-  this._defaultIconId = scout.icons.ANGLE_DOWN;
+import {icons} from '../../../index';
+import {NavigateButton} from '../../../index';
+import {Page} from '../../../index';
+import * as $ from 'jquery';
+
+export default class NavigateDownButton extends NavigateButton {
+
+constructor() {
+  super();
+  this._defaultIconId = icons.ANGLE_DOWN;
   this._defaultText = 'ui.Continue';
   this.iconId = this._defaultIconId;
   this.keyStroke = 'enter';
   this._detailTableRowsSelectedHandler = this._onDetailTableRowsSelected.bind(this);
   this._outlinePageRowLinkHandler = this._onOutlinePageRowLink.bind(this);
-};
-scout.inherits(scout.NavigateDownButton, scout.NavigateButton);
+}
 
-scout.NavigateDownButton.prototype._init = function(options) {
-  scout.NavigateDownButton.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
 
   if (this.node.detailTable) {
     this.node.detailTable.on('rowsSelected', this._detailTableRowsSelectedHandler);
   }
   this.outline.on('pageRowLink', this._outlinePageRowLinkHandler);
-};
+}
 
-scout.NavigateDownButton.prototype._destroy = function() {
+_destroy() {
   if (this.node.detailTable) {
     this.node.detailTable.off('rowsSelected', this._detailTableRowsSelectedHandler);
   }
   this.outline.off('pageRowLink', this._outlinePageRowLinkHandler);
 
-  scout.NavigateDownButton.parent.prototype._destroy.call(this);
-};
+  super._destroy();
+}
 
-scout.NavigateDownButton.prototype._render = function() {
-  scout.NavigateDownButton.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('down');
-};
+}
 
-scout.NavigateDownButton.prototype._isDetail = function() {
+_isDetail() {
   // Button is in "detail mode" if there are both detail form and detail table visible and detail form is _not_ hidden.
   return !!(this.node.detailFormVisible && this.node.detailForm &&
     this.node.detailTableVisible && this.node.detailTable && this.node.detailFormVisibleByUi);
-};
+}
 
-scout.NavigateDownButton.prototype._toggleDetail = function() {
+_toggleDetail() {
   return false;
-};
+}
 
-scout.NavigateDownButton.prototype._buttonEnabled = function() {
+_buttonEnabled() {
   if (this._isDetail()) {
     return true;
   }
@@ -66,9 +73,9 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
     return table.selectedRows.length === 1 && !!table.selectedRows[0].page;
   }
   return true;
-};
+}
 
-scout.NavigateDownButton.prototype._drill = function() {
+_drill() {
   var drillNode;
 
   if (this.node.detailTable) {
@@ -97,19 +104,20 @@ scout.NavigateDownButton.prototype._drill = function() {
 
     // If the parent node is a table page node, expand the drillNode
     // --> Same logic as in OutlineMediator.mediateTableRowAction()
-    if (parentNode && parentNode.nodeType === scout.Page.NodeType.TABLE) {
+    if (parentNode && parentNode.nodeType === Page.NodeType.TABLE) {
       this.outline.expandNode(drillNode);
     }
   }
-};
+}
 
-scout.NavigateDownButton.prototype._onDetailTableRowsSelected = function(event) {
+_onDetailTableRowsSelected(event) {
   this.updateEnabled();
-};
+}
 
-scout.NavigateDownButton.prototype._onOutlinePageRowLink = function(event) {
+_onOutlinePageRowLink(event) {
   var table = this.node.detailTable;
   if (table && table.selectedRows.length === 1 && table.selectedRows[0].page === event.page) {
     this.updateEnabled();
   }
-};
+}
+}

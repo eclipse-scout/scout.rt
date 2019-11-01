@@ -8,8 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridSelectKeyStroke = function(tileGrid) {
-  scout.TileGridSelectKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+
+export default class TileGridSelectKeyStroke extends KeyStroke {
+
+constructor(tileGrid) {
+  super();
   this.field = tileGrid;
   this.shift = !tileGrid.multiSelect ? false : undefined;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
@@ -18,20 +22,20 @@ scout.TileGridSelectKeyStroke = function(tileGrid) {
       return result.focusedTile.$container;
     }
   }.bind(this);
-};
-scout.inherits(scout.TileGridSelectKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * Selection handler should be used for every interaction with the tileGrid.
  * This is necessary to provide the same selection behavior for the tile accordion which uses multiple tile grids
  */
-scout.TileGridSelectKeyStroke.prototype.getSelectionHandler = function() {
+getSelectionHandler() {
   // Not stored as member variable by purpose because it will be exchanged later by the tile accordion
   return this.field.selectionHandler;
-};
+}
 
-scout.TileGridSelectKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TileGridSelectKeyStroke.parent.prototype._accept.call(this, event);
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -42,12 +46,13 @@ scout.TileGridSelectKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
-scout.TileGridSelectKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.getSelectionHandler().executeSelection(this._computeNewSelection(event.shiftKey));
-};
+}
 
-scout.TileGridSelectKeyStroke.prototype._computeNewSelection = function(extend) {
+_computeNewSelection(extend) {
   // To be implemented by subclasses
-};
+}
+}

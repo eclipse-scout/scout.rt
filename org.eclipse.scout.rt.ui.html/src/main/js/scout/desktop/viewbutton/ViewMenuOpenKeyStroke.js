@@ -8,34 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
 /**
  * Keystroke to open the 'ViewMenuPopup' on 'F2'.
  */
-scout.ViewMenuOpenKeyStroke = function(viewMenuTab) {
-  scout.ViewMenuOpenKeyStroke.parent.call(this);
+export default class ViewMenuOpenKeyStroke extends KeyStroke {
+
+constructor(viewMenuTab) {
+  super();
   this.field = viewMenuTab;
 
-  this.which = [scout.keys.F2];
+  this.which = [keys.F2];
   this.stopPropagation = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$container;
   }.bind(this);
-};
-scout.inherits(scout.ViewMenuOpenKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.ViewMenuOpenKeyStroke.prototype.handle = function(event) {
+handle(event) {
   if (this.field.selected && !this.field.inBackground) {
     this.field.togglePopup();
   } else if (this.field.selectedButton) {
     this.field.selectedButton.doAction();
   }
-};
+}
 
-scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea) {
+_postRenderKeyBox($drawingArea) {
   var wKeybox = $drawingArea.find('.key-box').outerWidth(),
     left = this.field.dropdown.$container.outerWidth();
 
@@ -46,4 +51,5 @@ scout.ViewMenuOpenKeyStroke.prototype._postRenderKeyBox = function($drawingArea)
   }
   left -= wKeybox / 2;
   $drawingArea.find('.key-box').cssLeft(left);
-};
+}
+}

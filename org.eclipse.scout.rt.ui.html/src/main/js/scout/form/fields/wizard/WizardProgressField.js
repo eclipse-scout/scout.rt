@@ -8,8 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WizardProgressField = function() {
-  scout.WizardProgressField.parent.call(this);
+import {icons} from '../../../index';
+import {WizardProgressFieldLayout} from '../../../index';
+import {scrollbars} from '../../../index';
+import {strings} from '../../../index';
+import {inspector} from '../../../index';
+import {scout} from '../../../index';
+import {GroupBox} from '../../../index';
+import {tooltips} from '../../../index';
+import {FormField} from '../../../index';
+import * as $ from 'jquery';
+import {Form} from '../../../index';
+
+export default class WizardProgressField extends FormField {
+
+constructor() {
+  super();
 
   this.steps = [];
 
@@ -19,16 +33,16 @@ scout.WizardProgressField = function() {
   // Helper map to find a step by step index. The step index does not necessarily correspond to the
   // array index, because invisible model steps can produce "holes" in the sequence of indices.
   this.stepsMap = {};
-};
-scout.inherits(scout.WizardProgressField, scout.FormField);
+}
 
-scout.WizardProgressField.prototype._init = function(model) {
-  scout.WizardProgressField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._updateStepsMap();
-};
+}
 
-scout.WizardProgressField.prototype._render = function() {
-  this.addContainer(this.$parent, 'wizard-progress-field', new scout.WizardProgressFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'wizard-progress-field', new WizardProgressFieldLayout(this));
   this.addField(this.$parent.makeDiv('wizard-steps'));
   this.addStatus();
   this.addLabel();
@@ -40,29 +54,29 @@ scout.WizardProgressField.prototype._render = function() {
   });
 
   // If this field is the first field in a form's main box, mark the form as "wizard-container-form"
-  if (this.parent instanceof scout.GroupBox && this.parent.controls[0] === this && this.parent.parent instanceof scout.Form) {
+  if (this.parent instanceof GroupBox && this.parent.controls[0] === this && this.parent.parent instanceof Form) {
     var form = this.parent.parent;
     form.$container.addClass('wizard-container-form');
   }
-};
+}
 
-scout.WizardProgressField.prototype._renderProperties = function() {
-  scout.WizardProgressField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSteps();
   this._renderActiveStepIndex();
-};
+}
 
-scout.WizardProgressField.prototype._setSteps = function(steps) {
+_setSteps(steps) {
   this._setProperty('steps', steps);
   this._updateStepsMap();
-};
+}
 
-scout.WizardProgressField.prototype._renderSteps = function() {
+_renderSteps() {
   this.$wizardStepsBody.children('.wizard-step').each(function() {
     // Tooltips are only uninstalled if user clicked outside container. However, the steps
     // may be updated by clicking inside the container. Therefore, manually make sure all
     // tooltips are uninstalled before destroying the DOM elements.
-    scout.tooltips.uninstall($(this).children('.wizard-step-content'));
+    tooltips.uninstall($(this).children('.wizard-step-content'));
   });
   this.$wizardStepsBody.empty();
 
@@ -77,14 +91,14 @@ scout.WizardProgressField.prototype._renderSteps = function() {
 
     // Inspector info
     if (this.session.inspector) {
-      scout.inspector.applyInfo(step, $step);
+      inspector.applyInfo(step, $step);
       $step.attr('data-step-index', step.index);
     }
 
     // Content
     var $content = $step.appendDiv('wizard-step-content');
-    if (scout.strings.hasText(step.tooltipText)) {
-      scout.tooltips.install($content, {
+    if (strings.hasText(step.tooltipText)) {
+      tooltips.install($content, {
         parent: this,
         text: step.tooltipText,
         tooltipPosition: 'bottom'
@@ -96,7 +110,7 @@ scout.WizardProgressField.prototype._renderSteps = function() {
     if (step.iconId) {
       $icon.icon(step.iconId);
     } else if (step.finished) {
-      $icon.icon(scout.icons.CHECKED_BOLD);
+      $icon.icon(icons.CHECKED_BOLD);
     } else {
       $icon.text(index + 1);
     }
@@ -111,26 +125,26 @@ scout.WizardProgressField.prototype._renderSteps = function() {
     if (index < this.steps.length - 1) {
       this.$wizardStepsBody
         .appendDiv('wizard-step-separator')
-        .icon(scout.icons.ANGLE_RIGHT);
+        .icon(icons.ANGLE_RIGHT);
     }
   }.bind(this));
 
   this.invalidateLayoutTree(false);
-};
+}
 
-scout.WizardProgressField.prototype._setActiveStepIndex = function(activeStepIndex) {
+_setActiveStepIndex(activeStepIndex) {
   this.previousActiveStepIndex = this.activeStepIndex;
   // Ensure this.activeStepIndex always has a value. If the server has no active step set (may
   // happen during transition between steps), we use -1 as dummy value
   this._setProperty('activeStepIndex', scout.nvl(activeStepIndex, -1));
-};
+}
 
-scout.WizardProgressField.prototype._renderActiveStepIndex = function() {
+_renderActiveStepIndex() {
   this.steps.forEach(this._updateStepClasses.bind(this));
   this.invalidateLayoutTree(false);
-};
+}
 
-scout.WizardProgressField.prototype._updateStepClasses = function(step) {
+_updateStepClasses(step) {
   var $step = step.$step;
   $step.removeClass('active-step before-active-step after-active-step first last action-enabled disabled');
   $step.off('click.active-step');
@@ -169,9 +183,9 @@ scout.WizardProgressField.prototype._updateStepClasses = function(step) {
   if (stepIndex === this.steps.length - 1) {
     this.$wizardStepsBody.css('background-color', $step.css('background-color'));
   }
-};
+}
 
-scout.WizardProgressField.prototype._stepIndex = function($step) {
+_stepIndex($step) {
   if ($step) {
     var step = $step.data('wizard-step');
     if (step) {
@@ -179,16 +193,16 @@ scout.WizardProgressField.prototype._stepIndex = function($step) {
     }
   }
   return -1;
-};
+}
 
-scout.WizardProgressField.prototype._updateStepsMap = function() {
+_updateStepsMap() {
   this.stepsMap = {};
   this.steps.forEach(function(step) {
     this.stepsMap[step.index] = step;
   }.bind(this));
-};
+}
 
-scout.WizardProgressField.prototype._resolveStep = function(stepIndex) {
+_resolveStep(stepIndex) {
   // Because "step index" does not necessarily correspond to the array indices
   // (invisible model steps produce "holes"), we have to loop over the array.
   for (var i = 0; i < this.steps.length; i++) {
@@ -198,9 +212,9 @@ scout.WizardProgressField.prototype._resolveStep = function(stepIndex) {
     }
   }
   return null;
-};
+}
 
-scout.WizardProgressField.prototype._onStepClick = function(event) {
+_onStepClick(event) {
   var $step = $(event.currentTarget); // currentTarget instead of target to support event bubbling from inner divs
   var targetStepIndex = this._stepIndex($step);
   if (targetStepIndex >= 0 && targetStepIndex !== this.activeStepIndex) {
@@ -208,9 +222,9 @@ scout.WizardProgressField.prototype._onStepClick = function(event) {
       stepIndex: targetStepIndex
     });
   }
-};
+}
 
-scout.WizardProgressField.prototype.scrollToActiveStep = function() {
+scrollToActiveStep() {
   var currentStep = this.stepsMap[this.activeStepIndex];
   if (currentStep) {
     var $currentStep = currentStep.$step;
@@ -225,7 +239,8 @@ scout.WizardProgressField.prototype.scrollToActiveStep = function() {
     var p1 = scrollLeft + Math.floor(fieldWidth * (goingBack ? 0.25 : 0.75));
     var p2 = currentStepLeft + Math.floor(currentStepWidth / 2);
     if ((goingBack && p2 < p1) || (!goingBack && p2 > p1)) {
-      scout.scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
+      scrollbars.scrollLeft(this.$field, scrollLeft + (p2 - p1));
     }
   }
-};
+}
+}

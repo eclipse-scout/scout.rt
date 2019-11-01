@@ -8,50 +8,61 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {HtmlComponent} from '../../index';
+import {HtmlEnvironment} from '../../index';
+import {Dimension} from '../../index';
+import {LogicalGridLayoutInfo} from '../../index';
+import * as $ from 'jquery';
+import {LogicalGridLayoutConfig} from '../../index';
+import {AbstractLayout} from '../../index';
+import {LayoutConstants} from '../../index';
+
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
  *
  * @param options available options: hgap, vgap, rowHeight, columnWidth, minWidth
  *
  */
-scout.LogicalGridLayout = function(widget, layoutConfig) {
-  scout.LogicalGridLayout.parent.call(this);
+export default class LogicalGridLayout extends AbstractLayout {
+
+constructor(widget, layoutConfig) {
+  super();
   this.cssClass = 'logical-grid-layout';
-  this.validityBasedOnContainerSize = new scout.Dimension();
+  this.validityBasedOnContainerSize = new Dimension();
   this.valid = false;
   this.widget = widget;
   this.info = null;
 
   this._initDefaults();
-  this.layoutConfig = scout.LogicalGridLayoutConfig.ensure(layoutConfig || {});
+  this.layoutConfig = LogicalGridLayoutConfig.ensure(layoutConfig || {});
   this.layoutConfig.applyToLayout(this);
 
   this.htmlPropertyChangeHandler = this._onHtmlEnvironmenPropertyChange.bind(this);
-  scout.htmlEnvironment.on('propertyChange', this.htmlPropertyChangeHandler);
+  HtmlEnvironment.get().on('propertyChange', this.htmlPropertyChangeHandler);
   this.widget.one('remove', function() {
-    scout.htmlEnvironment.off('propertyChange', this.htmlPropertyChangeHandler);
+    HtmlEnvironment.get().off('propertyChange', this.htmlPropertyChangeHandler);
   }.bind(this));
 
-};
-scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
+}
 
-scout.LogicalGridLayout.prototype._initDefaults = function() {
-  var env = scout.htmlEnvironment;
+
+_initDefaults() {
+  var env = HtmlEnvironment.get();
   this.hgap = env.formColumnGap;
   this.vgap = env.formRowGap;
   this.columnWidth = env.formColumnWidth;
   this.rowHeight = env.formRowHeight;
   this.minWidth = 0;
-};
+}
 
-scout.LogicalGridLayout.prototype._onHtmlEnvironmenPropertyChange = function() {
+_onHtmlEnvironmenPropertyChange() {
   this._initDefaults();
   this.layoutConfig.applyToLayout(this);
   this.widget.invalidateLayoutTree();
   this.widget.invalidateLogicalGrid();
-};
+}
 
-scout.LogicalGridLayout.prototype.validateLayout = function($container, options) {
+validateLayout($container, options) {
   var visibleComps = [],
     visibleCons = [];
 
@@ -75,7 +86,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
   } else {
     $container.children().each(function(idx, elem) {
       var $comp = $(elem);
-      var htmlComp = scout.HtmlComponent.optGet($comp);
+      var htmlComp = HtmlComponent.optGet($comp);
       if (!htmlComp) {
         // Only consider elements with a html component
         return;
@@ -91,7 +102,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     }
   }
 
-  this.info = new scout.LogicalGridLayoutInfo({
+  this.info = new LogicalGridLayoutInfo({
     $components: visibleComps,
     cons: visibleCons,
     hgap: this.hgap,
@@ -102,10 +113,10 @@ scout.LogicalGridLayout.prototype.validateLayout = function($container, options)
     heightHint: options.heightHint,
     widthOnly: options.widthOnly
   });
-  $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + scout.HtmlComponent.get($container).debug());
-};
+  $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#validateLayout) $container=' + HtmlComponent.get($container).debug());
+}
 
-scout.LogicalGridLayout.prototype._validateGridData = function(htmlComp) {
+_validateGridData(htmlComp) {
   var $comp = htmlComp.$comp;
   var widget = $comp.data('widget');
   // Prefer the visibility state of the widget, if there is one.
@@ -115,14 +126,14 @@ scout.LogicalGridLayout.prototype._validateGridData = function(htmlComp) {
     htmlComp.layoutData.validate();
     return true;
   }
-};
+}
 
-scout.LogicalGridLayout.prototype.layout = function($container) {
+layout($container) {
   this._layout($container);
-};
+}
 
-scout.LogicalGridLayout.prototype._layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+_layout($container) {
+  var htmlContainer = HtmlComponent.get($container),
     containerSize = htmlContainer.availableSize(),
     containerInsets = htmlContainer.insets();
   this.validateLayout($container, {
@@ -139,7 +150,7 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
   var r1, r2, r, d, $comp, i, htmlComp, data, delta, margins;
   for (i = 0; i < this.info.$components.length; i++) {
     $comp = this.info.$components[i];
-    htmlComp = scout.HtmlComponent.get($comp);
+    htmlComp = HtmlComponent.get($comp);
     data = this.info.gridDatas[i];
     r1 = cellBounds[data.gridy][data.gridx];
     r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
@@ -187,18 +198,18 @@ scout.LogicalGridLayout.prototype._layout = function($container) {
     $.log.isTraceEnabled() && $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
     htmlComp.setBounds(r);
   }
-};
+}
 
-scout.LogicalGridLayout.prototype._layoutCellBounds = function(containerSize, containerInsets) {
+_layoutCellBounds(containerSize, containerInsets) {
   return this.info.layoutCellBounds(containerSize, containerInsets);
-};
+}
 
-scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   // widthHint and heightHint are already adjusted by HtmlComponent, no need to remove insets here
   this.validateLayout($container, options);
 
-  var sizeflag = scout.LayoutConstants.PREF;
-  var dim = new scout.Dimension();
+  var sizeflag = LayoutConstants.PREF;
+  var dim = new Dimension();
   // w
   var i, w, h, useCount = 0;
   for (i = 0; i < this.info.cols; i++) {
@@ -220,8 +231,9 @@ scout.LogicalGridLayout.prototype.preferredLayoutSize = function($container, opt
     useCount++;
   }
   // insets
-  var insets = scout.HtmlComponent.get($container).insets();
+  var insets = HtmlComponent.get($container).insets();
   dim.width += insets.horizontal();
   dim.height += insets.vertical();
   return dim;
-};
+}
+}

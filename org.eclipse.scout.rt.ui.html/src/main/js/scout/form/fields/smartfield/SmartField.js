@@ -8,8 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartField = function() {
-  scout.SmartField.parent.call(this);
+import {fields} from '../../../index';
+import {Status} from '../../../index';
+import {keys} from '../../../index';
+import {Device} from '../../../index';
+import {SmartFieldLayout} from '../../../index';
+import {SmartFieldCancelKeyStroke} from '../../../index';
+import {FormField} from '../../../index';
+import * as $ from 'jquery';
+import {ValueField} from '../../../index';
+import {strings} from '../../../index';
+import {scout} from '../../../index';
+import {InputFieldKeyStrokeContext} from '../../../index';
+import {QueryBy} from '../../../index';
+import {objects} from '../../../index';
+import {SimpleLoadingSupport} from '../../../index';
+import {LookupCall} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class SmartField extends ValueField {
+
+constructor() {
+  super();
 
   this.popup = null;
   this.lookupCall = null;
@@ -19,7 +39,7 @@ scout.SmartField = function() {
   this._tabPrevented = null;
   this.lookupRow = null;
   this.browseHierarchy = false;
-  this.browseMaxRowCount = scout.SmartField.DEFAULT_BROWSE_MAX_COUNT;
+  this.browseMaxRowCount = SmartField.DEFAULT_BROWSE_MAX_COUNT;
   this.browseAutoExpandAll = true;
   this.browseLoadIncremental = false;
   this.searchRequired = false;
@@ -27,7 +47,7 @@ scout.SmartField = function() {
   this.activeFilter = null;
   this.activeFilterLabels = [];
   this.columnDescriptors = null;
-  this.displayStyle = scout.SmartField.DisplayStyle.DEFAULT;
+  this.displayStyle = SmartField.DisplayStyle.DEFAULT;
   this.touchMode = false;
   this.embedded = false;
   this._userWasTyping = false; // used to detect whether the last thing the user did was typing (a proposal) or something else, like selecting a proposal row
@@ -44,32 +64,32 @@ scout.SmartField = function() {
     'browseHierarchy', 'browseMaxRowCount', 'browseAutoExpandAll', 'browseLoadIncremental', 'searchRequired', 'columnDescriptors',
     'displayStyle'
   ]);
-};
-scout.inherits(scout.SmartField, scout.ValueField);
+}
 
-scout.SmartField.DisplayStyle = {
+
+static DisplayStyle = {
   DEFAULT: 'default',
   DROPDOWN: 'dropdown'
 };
 
-scout.SmartField.ErrorCode = {
+static ErrorCode = {
   NOT_UNIQUE: 1,
   NO_RESULTS: 2,
   NO_DATA: 3,
   SEARCH_REQUIRED: 4
 };
 
-scout.SmartField.DEBOUNCE_DELAY = 200;
+static DEBOUNCE_DELAY = 200;
 
-scout.SmartField.DEFAULT_BROWSE_MAX_COUNT = 100;
+static DEFAULT_BROWSE_MAX_COUNT = 100;
 
 /**
  * @see IContentAssistField#getActiveFilterLabels() - should have the same order.
  */
-scout.SmartField.ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
+static ACTIVE_FILTER_VALUES = ['UNDEFINED', 'FALSE', 'TRUE'];
 
-scout.SmartField.prototype._init = function(model) {
-  scout.SmartField.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   if (this.activeFilterLabels.length === 0) {
     this.activeFilterLabels = [
@@ -79,35 +99,35 @@ scout.SmartField.prototype._init = function(model) {
     ];
   }
 
-  scout.fields.initTouch(this, model);
-};
+  fields.initTouch(this, model);
+}
 
 /**
  * Initializes lookup call and code type before calling set value.
  * This cannot be done in _init because the value field would call _setValue first
  */
-scout.SmartField.prototype._initValue = function(value) {
+_initValue(value) {
   this._setLookupCall(this.lookupCall);
   this._setCodeType(this.codeType);
   this._setLookupRow(this.lookupRow);
-  scout.SmartField.parent.prototype._initValue.call(this, value);
-};
+  super._initValue( value);
+}
 
-scout.SmartField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new InputFieldKeyStrokeContext();
+}
 
-scout.SmartField.prototype._initKeyStrokeContext = function() {
-  scout.SmartField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke(new scout.SmartFieldCancelKeyStroke(this));
-};
+  this.keyStrokeContext.registerKeyStroke(new SmartFieldCancelKeyStroke(this));
+}
 
-scout.SmartField.prototype._render = function() {
-  this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new scout.SmartFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'has-icon ' + this.cssClassName(), new SmartFieldLayout(this));
   this.addLabel();
 
-  var fieldFunc = this.isDropdown() ? scout.fields.makeInputDiv : scout.fields.makeInputOrDiv;
+  var fieldFunc = this.isDropdown() ? fields.makeInputDiv : fields.makeInputOrDiv;
   var $field = fieldFunc.call(scout.fields, this)
     .on('mousedown', this._onFieldMouseDown.bind(this));
 
@@ -125,56 +145,56 @@ scout.SmartField.prototype._render = function() {
   this.addIcon();
   this.$icon.addClass('needsclick');
   this.addStatus();
-};
+}
 
-scout.SmartField.prototype._renderGridData = function() {
-  scout.SmartField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this.updateInnerAlignment({
     useHorizontalAlignment: (this.browseHierarchy ? false : true)
   });
-};
+}
 
-scout.SmartField.prototype._renderGridDataHints = function() {
-  scout.SmartField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this.updateInnerAlignment({
     useHorizontalAlignment: (this.browseHierarchy ? false : true)
   });
-};
+}
 
-scout.SmartField.prototype.cssClassName = function() {
+cssClassName() {
   var prefix = this.displayStyle;
-  if (this.displayStyle === scout.SmartField.DisplayStyle.DEFAULT) {
+  if (this.displayStyle === SmartField.DisplayStyle.DEFAULT) {
     prefix = 'smart';
   }
   return prefix + '-field';
-};
+}
 
-scout.SmartField.prototype._readSearchText = function() {
+_readSearchText() {
   var fieldText = this._readDisplayText(),
     displayText = scout.nvl(this.displayText, ''),
     textLines = displayText.split('\n');
 
-  if (textLines.length === 1 || scout.strings.empty(fieldText)) {
+  if (textLines.length === 1 || strings.empty(fieldText)) {
     return fieldText;
   }
   textLines.shift(); // remove first line
-  scout.arrays.insert(textLines, fieldText, 0);
-  return scout.strings.join('\n', textLines);
-};
+  arrays.insert(textLines, fieldText, 0);
+  return strings.join('\n', textLines);
+}
 
-scout.SmartField.prototype._readDisplayText = function() {
-  return scout.fields.valOrText(this.$field);
-};
+_readDisplayText() {
+  return fields.valOrText(this.$field);
+}
 
-scout.SmartField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   var displayText = scout.nvl(this.displayText, ''),
     textLines = displayText.split('\n');
   if (textLines.length) {
     displayText = textLines[0];
   }
-  scout.fields.valOrText(this.$field, displayText);
-  scout.SmartField.parent.prototype._renderDisplayText.call(this);
-};
+  fields.valOrText(this.$field, displayText);
+  super._renderDisplayText();
+}
 
 /**
  * Accepts the selected lookup row and sets its id as value.
@@ -182,7 +202,7 @@ scout.SmartField.prototype._renderDisplayText = function() {
  *
  * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
-scout.SmartField.prototype.acceptInput = function(sync) {
+acceptInput(sync) {
   if (!this._acceptInputEnabled) {
     $.log.isTraceEnabled() && $.log.trace('(SmartField#acceptInput) Skipped acceptInput because _acceptInputEnabled=false');
     return this._acceptInputDeferred.promise();
@@ -196,7 +216,7 @@ scout.SmartField.prototype.acceptInput = function(sync) {
 
   var
     searchText = this._readSearchText(),
-    searchTextEmpty = scout.strings.empty(searchText),
+    searchTextEmpty = strings.empty(searchText),
     searchTextChanged = this._checkSearchTextChanged(searchText),
     selectedLookupRow = this._getSelectedLookupRow(searchTextChanged);
 
@@ -212,14 +232,14 @@ scout.SmartField.prototype.acceptInput = function(sync) {
   }
 
   return this._acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow);
-};
+}
 
 /**
  * This function is used to determine if the currently selected lookup row can be
  * used when acceptInput is called. Basically we don't want to use the row in case
  * the result is out-dated.
  */
-scout.SmartField.prototype._getSelectedLookupRow = function(searchTextChanged) {
+_getSelectedLookupRow(searchTextChanged) {
   // don't use selected lookup row if...
   if (!this.isPopupOpen() || // 1. popup has been closed
     (searchTextChanged && this._userWasTyping)) { // 2. search text has changed and user was typing
@@ -228,9 +248,9 @@ scout.SmartField.prototype._getSelectedLookupRow = function(searchTextChanged) {
   // 3. if the result row is from an out-dated result
   return this.lookupSeqNo === this.popup.lookupResult.seqNo ?
     this.popup.getSelectedLookupRow() : null;
-};
+}
 
-scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
+_checkSearchTextChanged(searchText) {
   if (this.isDropdown() || !this._userWasTyping) {
     return false; // search text cannot change in drop-down fields
   }
@@ -239,27 +259,27 @@ scout.SmartField.prototype._checkSearchTextChanged = function(searchText) {
   // we cannot use the currently selected lookup row, because these proposals are
   // out-dated.
   return !this._searchTextEquals(searchText, this._lastSearchText);
-};
+}
 
-scout.SmartField.prototype._searchTextEquals = function(searchText, lastSearchText) {
-  var a = scout.strings.nullIfEmpty(this._firstTextLine(searchText));
-  var b = scout.strings.nullIfEmpty(lastSearchText);
-  return scout.strings.equalsIgnoreCase(a, b);
-};
+_searchTextEquals(searchText, lastSearchText) {
+  var a = strings.nullIfEmpty(this._firstTextLine(searchText));
+  var b = strings.nullIfEmpty(lastSearchText);
+  return strings.equalsIgnoreCase(a, b);
+}
 
-scout.SmartField.prototype._clearPendingLookup = function() {
+_clearPendingLookup() {
   if (this._pendingLookup) {
     clearTimeout(this._pendingLookup);
     this._pendingLookup = null;
   }
-};
+}
 
 /**
  * This function is intended to be overridden. Proposal field has another behavior than the smart field.
  *
  * @param [sync] optional boolean value (default: false), when set to true acceptInput is not allowed to start an asynchronous lookup for text search
  */
-scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+_acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
   // Don't show the not-unique error when the search-text becomes empty while typing (see ticket #229775)
   if (this._notUnique && !searchTextEmpty) {
     this._setNotUniqueError(searchText);
@@ -267,7 +287,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
 
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow) {
-    var lookupRowText = scout.strings.nvl(this.lookupRow.text);
+    var lookupRowText = strings.nvl(this.lookupRow.text);
     if (lookupRowText === searchText) {
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is equals. Close popup');
       this._clearLookupStatus();
@@ -282,7 +302,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
   if (!selectedLookupRow && !this.lookupRow && searchTextEmpty) {
     $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptInput) unchanged: text is empty. Close popup');
     this._clearLookupStatus();
-    if (this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
+    if (this.errorStatus && this.errorStatus.code === SmartField.ErrorCode.NO_RESULTS) {
       // clear the error status from previous search which did not find any results. This error status is no longer valid as we accept the null content here.
       this.clearErrorStatus();
     }
@@ -325,7 +345,7 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
   }
 
   return this._acceptInputDeferred.promise();
-};
+}
 
 /**
  * Required for multiline smart-field. Only use first line of search text for accept by text.
@@ -334,12 +354,12 @@ scout.SmartField.prototype._acceptInput = function(sync, searchText, searchTextE
  * lines) in order to check whether or not the display text has changed, compared to the current
  * lookup row. That's why we must extract the first line here.
  */
-scout.SmartField.prototype._firstTextLine = function(text) {
-  if (scout.strings.empty(text)) {
+_firstTextLine(text) {
+  if (strings.empty(text)) {
     return text;
   }
   return text.split('\n')[0];
-};
+}
 
 /**
  * This function is intended to be overridden. Proposal field has another behavior than the smart field.
@@ -349,7 +369,7 @@ scout.SmartField.prototype._firstTextLine = function(text) {
  *     we must make sure the order of (browser) events is not changed by the lookup that would return _after_
  *     the events for the clicked field are handled.
  */
-scout.SmartField.prototype._acceptByText = function(sync, searchText) {
+_acceptByText(sync, searchText) {
   sync = scout.nvl(sync, false);
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_acceptByText) sync=' + sync + ' searchText=', searchText);
 
@@ -358,25 +378,25 @@ scout.SmartField.prototype._acceptByText = function(sync, searchText) {
   } else {
     this._acceptByTextAsync(searchText);
   }
-};
+}
 
-scout.SmartField.prototype._acceptByTextSync = function(searchText) {
+_acceptByTextSync(searchText) {
   this._lastSearchText = null;
   this._inputAccepted();
   if (!this._hasUiError()) {
     this.resetDisplayText();
   }
-};
+}
 
-scout.SmartField.prototype._acceptByTextAsync = function(searchText) {
+_acceptByTextAsync(searchText) {
   this._lastSearchText = searchText;
   this._executeLookup(this.lookupCall.cloneForText(searchText), true)
     .done(this._acceptByTextDone.bind(this))
     .done(this._triggerLookupCallDone.bind(this));
   this._triggerAcceptByText(searchText);
-};
+}
 
-scout.SmartField.prototype._inputAccepted = function(triggerEvent, acceptByLookupRow) {
+_inputAccepted(triggerEvent, acceptByLookupRow) {
   triggerEvent = scout.nvl(triggerEvent, true);
   acceptByLookupRow = scout.nvl(acceptByLookupRow, true);
   // don't close when shown in touch popup (also called when clear() is executed)
@@ -389,9 +409,9 @@ scout.SmartField.prototype._inputAccepted = function(triggerEvent, acceptByLooku
   }
   this._focusNextTabbable();
   this._acceptInputDeferred.resolve();
-};
+}
 
-scout.SmartField.prototype._focusNextTabbable = function() {
+_focusNextTabbable() {
   if (this._tabPrevented) {
     var $tabElements = this.entryPoint().find(':tabbable'),
       direction = this._tabPrevented.shiftKey ? -1 : 1,
@@ -405,14 +425,14 @@ scout.SmartField.prototype._focusNextTabbable = function() {
     }
     $.log.isDebugEnabled() && $.log.debug('(SmartField#_inputAccepted) tab-index=' + fieldIndex + ' next tab-index=' + nextIndex);
     var $nextElement = $tabElements.eq(nextIndex).focus();
-    if (scout.objects.isFunction($nextElement[0].select)) {
+    if (objects.isFunction($nextElement[0].select)) {
       $nextElement[0].select();
     }
     this._tabPrevented = null;
   }
-};
+}
 
-scout.SmartField.prototype._acceptByTextDone = function(result) {
+_acceptByTextDone(result) {
   this._userWasTyping = false;
   this._extendResult(result);
   this._notUnique = result.numLookupRows > 1;
@@ -424,7 +444,7 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
       this.setLookupRow(lookupRow);
       this._inputAccepted();
     } else {
-      this.setErrorStatus(scout.Status.error({
+      this.setErrorStatus(Status.error({
         message: this.session.text('SmartFieldInactiveRow', result.text)
       }));
     }
@@ -432,18 +452,18 @@ scout.SmartField.prototype._acceptByTextDone = function(result) {
   }
 
   this._acceptInputFail(result);
-};
+}
 
 /**
  * Extends the properties 'uniqueMatch' and 'numLookupRows' on the given result object.
  * The implementation is different depending on the browseHierarchy property.
  */
-scout.SmartField.prototype._extendResult = function(result) {
+_extendResult(result) {
   result.seqNo = this.lookupSeqNo;
   result.uniqueMatch = null;
 
   // Set query type on result, e.g. 'byAll'
-  var propertyName = 'by' + scout.strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase());
+  var propertyName = 'by' + strings.toUpperCaseFirstLetter(result.queryBy.toLowerCase());
   result[propertyName] = true;
 
   if (this.browseHierarchy) {
@@ -467,9 +487,9 @@ scout.SmartField.prototype._extendResult = function(result) {
   }
 
   result.empty = (result.numLookupRows === 0);
-};
+}
 
-scout.SmartField.prototype._acceptInputFail = function(result) {
+_acceptInputFail(result) {
   var searchText = result.text;
 
   // in any other case something went wrong
@@ -479,9 +499,9 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
     }
     this.setValue(null);
     this.setDisplayText(searchText);
-    this.setErrorStatus(scout.Status.error({
+    this.setErrorStatus(Status.error({
       message: this.session.text('SmartFieldCannotComplete', searchText),
-      code: scout.SmartField.ErrorCode.NO_RESULTS
+      code: SmartField.ErrorCode.NO_RESULTS
     }));
   }
 
@@ -502,9 +522,9 @@ scout.SmartField.prototype._acceptInputFail = function(result) {
 
   this._acceptInputDeferred.resolve();
   this._triggerAcceptInputFail();
-};
+}
 
-scout.SmartField.prototype.lookupByRec = function(rec) {
+lookupByRec(rec) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#lookupByRec) rec=', rec);
   this._lastSearchText = null;
   return this._executeLookup(this.lookupCall.cloneForRec(rec))
@@ -520,14 +540,14 @@ scout.SmartField.prototype.lookupByRec = function(rec) {
       }
     }.bind(this))
     .then(this._triggerLookupCallDone.bind(this));
-};
+}
 
 /**
  * Validates the given lookup row is enabled and matches the current activeFilter settings.
  *
  * @returns {boolean}
  */
-scout.SmartField.prototype._isLookupRowActive = function(lookupRow) {
+_isLookupRowActive(lookupRow) {
   if (!lookupRow.enabled) {
     return false;
   }
@@ -541,26 +561,26 @@ scout.SmartField.prototype._isLookupRowActive = function(lookupRow) {
     return !lookupRow.active;
   }
   return true;
-};
+}
 
-scout.SmartField.prototype._renderEnabled = function() {
-  scout.SmartField.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this.$field.setTabbable(this.enabledComputed);
-};
+}
 
-scout.SmartField.prototype.setLookupCall = function(lookupCall) {
+setLookupCall(lookupCall) {
   this.setProperty('lookupCall', lookupCall);
-};
+}
 
-scout.SmartField.prototype._setLookupCall = function(lookupCall) {
-  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
-};
+_setLookupCall(lookupCall) {
+  this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
+}
 
-scout.SmartField.prototype._setCodeType = function(codeType) {
+_setCodeType(codeType) {
   this.setProperty('codeType', codeType);
-};
+}
 
-scout.SmartField.prototype._setCodeType = function(codeType) {
+_setCodeType(codeType) {
   this._setProperty('codeType', codeType);
   if (!codeType) {
     return;
@@ -570,10 +590,10 @@ scout.SmartField.prototype._setCodeType = function(codeType) {
     codeType: codeType
   });
   this.setProperty('lookupCall', lookupCall);
-};
+}
 
-scout.SmartField.prototype._formatValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_formatValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return '';
   }
 
@@ -589,30 +609,30 @@ scout.SmartField.prototype._formatValue = function(value) {
   return this._executeLookup(this.lookupCall.cloneForKey(value), true)
     .then(this._lookupByKeyDone.bind(this))
     .then(this._triggerLookupCallDone.bind(this));
-};
+}
 
-scout.SmartField.prototype._lookupByKeyDone = function(result) {
+_lookupByKeyDone(result) {
   this._notUnique = false;
-  var lookupRow = scout.LookupCall.firstLookupRow(result);
+  var lookupRow = LookupCall.firstLookupRow(result);
   this.setLookupRow(lookupRow);
   return this._formatLookupRow(lookupRow);
-};
+}
 
 /**
  * This function is called when we need to format a display text from a given lookup
  * row. By default the property 'text' is used for that purpose. Override this function
  * if you need to format different properties from the lookupRow.
  */
-scout.SmartField.prototype._formatLookupRow = function(lookupRow) {
+_formatLookupRow(lookupRow) {
   return lookupRow ? lookupRow.text : '';
-};
+}
 
 /**
  * @param {boolean} [browse] whether or not the lookup call should execute getAll() or getByText() with the current display text.
  *     if browse is undefined, browse is set to true automatically if search text is empty
  * @returns {Promise}
  */
-scout.SmartField.prototype.openPopup = function(browse) {
+openPopup(browse) {
   var searchText = this._readDisplayText();
   $.log.isInfoEnabled() && $.log.info('SmartField#openPopup browse=' + browse + ' searchText=' + searchText + ' popup=' + this.popup + ' pendingOpenPopup=' + this._pendingOpenPopup);
 
@@ -620,7 +640,7 @@ scout.SmartField.prototype.openPopup = function(browse) {
   this._tabPrevented = null;
   this._pendingOpenPopup = true;
 
-  if (scout.strings.empty(searchText)) {
+  if (strings.empty(searchText)) {
     // if search text is empty - always do 'browse', no matter what the error code is
     browse = true;
   } else if (this.errorStatus) {
@@ -630,9 +650,9 @@ scout.SmartField.prototype.openPopup = function(browse) {
   }
 
   return this._lookupByTextOrAll(browse, searchText);
-};
+}
 
-scout.SmartField.prototype._hasUiError = function(codes) {
+_hasUiError(codes) {
   var status = this._errorStatus();
 
   if (!status) {
@@ -640,13 +660,13 @@ scout.SmartField.prototype._hasUiError = function(codes) {
   }
 
   if (codes) {
-    codes = scout.arrays.ensure(codes);
+    codes = arrays.ensure(codes);
   } else {
-    codes = [scout.SmartField.ErrorCode.NO_RESULTS, scout.SmartField.ErrorCode.NOT_UNIQUE];
+    codes = [SmartField.ErrorCode.NO_RESULTS, SmartField.ErrorCode.NOT_UNIQUE];
   }
 
   // collect codes from the status hierarchy
-  var statusList = scout.Status.asFlatList(status);
+  var statusList = Status.asFlatList(status);
   var foundCodes = statusList.reduce(function(list, status) {
     if (status.code && list.indexOf(status.code) === -1) {
       list.push(status.code);
@@ -658,7 +678,7 @@ scout.SmartField.prototype._hasUiError = function(codes) {
   return codes.some(function(code) {
     return foundCodes.indexOf(code) > -1;
   });
-};
+}
 
 /**
  * @param browse [boolean] optional, whether to perform a lookupByAll (=browse) or a lookupByText.
@@ -669,10 +689,10 @@ scout.SmartField.prototype._hasUiError = function(codes) {
  *        set to <code>false</code>.
  * @returns {Promise}
  */
-scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, searchAlways) {
+_lookupByTextOrAll(browse, searchText, searchAlways) {
   // default values
   searchText = scout.nvl(searchText, this._readDisplayText());
-  browse = scout.nvl(browse, scout.strings.empty(searchText));
+  browse = scout.nvl(browse, strings.empty(searchText));
   searchAlways = scout.nvl(searchAlways, false);
 
   // never do a text-lookup if field has dropdown style
@@ -709,12 +729,12 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, sea
     this._lastSearchText = null;
     if (this.searchRequired) {
       doneHandler({
-        queryBy: scout.QueryBy.TEXT,
+        queryBy: QueryBy.TEXT,
         lookupRows: []
       });
-      this.setLookupStatus(scout.Status.warning({
+      this.setLookupStatus(Status.warning({
         message: this.session.text('TooManyRows'),
-        code: scout.SmartField.ErrorCode.SEARCH_REQUIRED
+        code: SmartField.ErrorCode.SEARCH_REQUIRED
       }));
     } else {
       this._executeLookup(this.lookupCall.cloneForAll(), true)
@@ -729,20 +749,20 @@ scout.SmartField.prototype._lookupByTextOrAll = function(browse, searchText, sea
       this._executeLookup(this.lookupCall.cloneForText(searchText), true)
         .done(doneHandler)
         .done(this._triggerLookupCallDone.bind(this));
-    }.bind(this), scout.SmartField.DEBOUNCE_DELAY);
+    }.bind(this), SmartField.DEBOUNCE_DELAY);
   }
 
   return deferred.promise();
-};
+}
 
 /**
  * Returns the text used to store the 'last search-text'. The implementation differs between SmartField and ProposalField.
  */
-scout.SmartField.prototype._getLastSearchText = function() {
-  return scout.objects.optProperty(this.lookupRow, 'text');
-};
+_getLastSearchText() {
+  return objects.optProperty(this.lookupRow, 'text');
+}
 
-scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
+_lookupByTextOrAllDone(result) {
   this._extendResult(result);
   this._notUnique = !result.byAll && result.numLookupRows > 1;
 
@@ -772,18 +792,18 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
       this.closePopup();
     }
 
-    this.setLookupStatus(scout.Status.warning({
+    this.setLookupStatus(Status.warning({
       message: this.session.text('SmartFieldNoDataFound'),
-      code: scout.SmartField.ErrorCode.NO_DATA
+      code: SmartField.ErrorCode.NO_DATA
     }));
     return;
   }
 
   if (result.empty) {
     this._handleEmptyResult();
-    this.setLookupStatus(scout.Status.warning({
+    this.setLookupStatus(Status.warning({
       message: this.session.text('SmartFieldCannotComplete', result.text),
-      code: scout.SmartField.ErrorCode.NO_RESULTS
+      code: SmartField.ErrorCode.NO_RESULTS
     }));
     return;
   }
@@ -795,37 +815,37 @@ scout.SmartField.prototype._lookupByTextOrAllDone = function(result) {
     // unnecessary lookup rows over the slow network. Make sure your Scout lookup call
     // or REST service impl. respects the max. row count property.
     result.lookupRows = result.lookupRows.slice(0, this.browseMaxRowCount);
-    popupStatus = scout.Status.info({
+    popupStatus = Status.info({
       message: this.session.text('SmartFieldMoreThanXRows', this.browseMaxRowCount)
     });
   }
 
   // Render popup, if not yet rendered and set results
   this._ensurePopup(result, popupStatus);
-};
+}
 
-scout.SmartField.prototype._ensurePopup = function(result, status) {
+_ensurePopup(result, status) {
   if (this.popup) {
     this.popup.setLookupResult(result);
     this.popup.setStatus(status);
   } else {
     this._renderPopup(result, status);
   }
-};
+}
 
-scout.SmartField.prototype._handleException = function(result) {
+_handleException(result) {
   // Oops! Something went wrong while the lookup has been processed.
   if (result.exception) {
-    this.setErrorStatus(scout.Status.error({
+    this.setErrorStatus(Status.error({
       message: result.exception
     }));
     this.closePopup();
     return true;
   }
   return false;
-};
+}
 
-scout.SmartField.prototype._handleEmptyResult = function() {
+_handleEmptyResult() {
   if (this.touchMode || this.activeFilterEnabled) {
     // In mobile mode we always open the popup, event if we don't have a result
     // Otherwise it would be impossible to enter text in a proposal field with
@@ -842,9 +862,9 @@ scout.SmartField.prototype._handleEmptyResult = function() {
   } else {
     this.closePopup();
   }
-};
+}
 
-scout.SmartField.prototype._renderPopup = function(result, status) {
+_renderPopup(result, status) {
   // On touch devices the field does not get the focus.
   // But it should look focused when the popup is open.
   this.$field.addClass('focused');
@@ -887,20 +907,20 @@ scout.SmartField.prototype._renderPopup = function(result, status) {
       this._renderErrorStatus();
     }
   }.bind(this));
-};
+}
 
-scout.SmartField.prototype.closePopup = function() {
+closePopup() {
   this._pendingOpenPopup = false;
   if (this.popup) {
     this.popup.close();
   }
-};
+}
 
 /**
  * Calls acceptInput if mouse down happens outside of the field or popup
  * @override
  */
-scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
+aboutToBlurByMouseDown(target) {
   if (this.touchMode) {
     return false;
   }
@@ -910,18 +930,18 @@ scout.SmartField.prototype.aboutToBlurByMouseDown = function(target) {
   if (!eventOnField && !eventOnPopup && !eventOnTooltip) {
     this.acceptInput(true); // event outside this value field
   }
-};
+}
 
-scout.SmartField.prototype._onFieldMouseDown = function(event) {
+_onFieldMouseDown(event) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldMouseDown)');
   this.activate(true);
-};
+}
 
-scout.SmartField.prototype.activate = function(onField) {
+activate(onField) {
   if (!this.enabledComputed || !this.rendered) {
     return;
   }
-  if (!this.isDropdown() && !scout.fields.handleOnClick(this)) {
+  if (!this.isDropdown() && !fields.handleOnClick(this)) {
     if (this.popup && this.popup.removalPending) {
       // If smart field is activated while it is closing (during remove animation), wait for the animation to finish and activate it afterwards
       this.popup.one('remove', function() {
@@ -934,13 +954,13 @@ scout.SmartField.prototype.activate = function(onField) {
   }
   // Don't focus on desktop devices when click is on field #217192
   // Also required for touch case where field is a DIV and not an INPUT field
-  if (!onField || scout.device.supportsTouch()) {
+  if (!onField || Device.get().supportsTouch()) {
     this.$field.focus();
   }
   this.togglePopup();
-};
+}
 
-scout.SmartField.prototype._onIconMouseDown = function(event) {
+_onIconMouseDown(event) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_onIconMouseDown)');
   if (!this.enabledComputed) {
     return;
@@ -954,9 +974,9 @@ scout.SmartField.prototype._onIconMouseDown = function(event) {
       this.openPopup(!this.searchRequired);
     }
   }
-};
+}
 
-scout.SmartField.prototype._onClearIconMouseDown = function(event) {
+_onClearIconMouseDown(event) {
   $.log.isDebugEnabled() && $.log.debug('(SmartField#_onClearIconMouseDown)');
   if (!this.enabledComputed) {
     return;
@@ -964,15 +984,15 @@ scout.SmartField.prototype._onClearIconMouseDown = function(event) {
   event.preventDefault();
   this.$field.focus();
   this.clear();
-};
+}
 
-scout.SmartField.prototype._clear = function() {
+_clear() {
   // don't tab next field when user clicks on clear icon (acceptInput is called later)
   this._tabPrevented = null;
   // the state of these two flags is important. See #_checkSearchTextChanged
   this._lastSearchText = this._readDisplayText();
   this._userWasTyping = true;
-  scout.fields.valOrText(this.$field, '');
+  fields.valOrText(this.$field, '');
   if (this.touchMode) {
     // There is actually no "x" the user can press in touch mode, but if the developer calls clear() manually, it should work too.
     // Because accept input works differently in touch mode we need to explicitly set the value to null
@@ -983,18 +1003,18 @@ scout.SmartField.prototype._clear = function() {
     setTimeout(this._lookupByTextOrAll.bind(this, true));
   }
   this._updateHasText();
-};
+}
 
-scout.SmartField.prototype.togglePopup = function() {
+togglePopup() {
   $.log.isInfoEnabled() && $.log.info('(SmartField#togglePopup) popupOpen=', this.isPopupOpen());
   if (this.isPopupOpen()) {
     this.closePopup();
   } else {
     this.openPopup(!this.searchRequired);
   }
-};
+}
 
-scout.SmartField.prototype._onFieldBlur = function(event) {
+_onFieldBlur(event) {
   this.setFocused(false);
   this.setLoading(false);
   if (this.isTouchable()) {
@@ -1002,47 +1022,47 @@ scout.SmartField.prototype._onFieldBlur = function(event) {
   }
   this.acceptInput(false);
   this.closePopup();
-};
+}
 
 /**
  * @returns true if the field is either 'embedded' or in 'touchMode'.
  */
-scout.SmartField.prototype.isTouchable = function() {
+isTouchable() {
   return this.embedded || this.touchMode;
-};
+}
 
-scout.SmartField.prototype._onFieldKeyUp = function(event) {
+_onFieldKeyUp(event) {
   // Escape
-  if (event.which === scout.keys.ESC) {
+  if (event.which === keys.ESC) {
     return;
   }
 
   // Pop-ups shouldn't open when one of the following keys is pressed
   var w = event.which;
-  var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
-  var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
+  var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
+  var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
 
   if (!isPaste && !isCut && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
-      w === scout.keys.ENTER ||
-      w === scout.keys.TAB ||
-      w === scout.keys.SHIFT ||
-      w === scout.keys.CTRL ||
-      w === scout.keys.ALT ||
-      w === scout.keys.HOME ||
-      w === scout.keys.END ||
-      w === scout.keys.LEFT ||
-      w === scout.keys.RIGHT ||
-      w === scout.keys.WIN_LEFT ||
-      w === scout.keys.WIN_RIGHT ||
-      w === scout.keys.SELECT ||
-      w === scout.keys.NUM_LOCK ||
-      w === scout.keys.CAPS_LOCK ||
-      w === scout.keys.SCROLL_LOCK ||
-      w === scout.keys.PAUSE ||
-      w === scout.keys.PRINT_SCREEN ||
+      w === keys.ENTER ||
+      w === keys.TAB ||
+      w === keys.SHIFT ||
+      w === keys.CTRL ||
+      w === keys.ALT ||
+      w === keys.HOME ||
+      w === keys.END ||
+      w === keys.LEFT ||
+      w === keys.RIGHT ||
+      w === keys.WIN_LEFT ||
+      w === keys.WIN_RIGHT ||
+      w === keys.SELECT ||
+      w === keys.NUM_LOCK ||
+      w === keys.CAPS_LOCK ||
+      w === keys.SCROLL_LOCK ||
+      w === keys.PAUSE ||
+      w === keys.PRINT_SCREEN ||
       this._isNavigationKey(event) ||
       this._isFunctionKey(event)
     )) {
@@ -1060,18 +1080,18 @@ scout.SmartField.prototype._onFieldKeyUp = function(event) {
   } else if (!this._pendingOpenPopup) {
     this.openPopup();
   }
-};
+}
 
-scout.SmartField.prototype.isPopupOpen = function() {
+isPopupOpen() {
   return !!(this.popup && !this.popup.removalPending);
-};
+}
 
-scout.SmartField.prototype._onFieldKeyDown = function(event) {
+_onFieldKeyDown(event) {
   this._updateUserWasTyping(event);
 
   // We must prevent default focus handling
-  if (event.which === scout.keys.TAB) {
-    if (this.mode === scout.FormField.Mode.DEFAULT) {
+  if (event.which === keys.TAB) {
+    if (this.mode === FormField.Mode.DEFAULT) {
       event.preventDefault(); // prevent browser default TAB behavior
       event.stopPropagation(); // prevent FocusContext#._onKeyDown
       $.log.isDebugEnabled() && $.log.debug('(SmartField#_onFieldKeyDown) set _tabPrevented');
@@ -1083,7 +1103,7 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     return;
   }
 
-  if (event.which === scout.keys.ENTER) {
+  if (event.which === keys.ENTER) {
     this._handleEnterKey(event);
     return;
   }
@@ -1095,18 +1115,18 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
-      w === scout.keys.ESC ||
-      w === scout.keys.SHIFT ||
-      w === scout.keys.CTRL ||
-      w === scout.keys.ALT ||
-      w === scout.keys.WIN_LEFT ||
-      w === scout.keys.WIN_RIGHT ||
-      w === scout.keys.SELECT ||
-      w === scout.keys.NUM_LOCK ||
-      w === scout.keys.CAPS_LOCK ||
-      w === scout.keys.SCROLL_LOCK ||
-      w === scout.keys.PAUSE ||
-      w === scout.keys.PRINT_SCREEN ||
+      w === keys.ESC ||
+      w === keys.SHIFT ||
+      w === keys.CTRL ||
+      w === keys.ALT ||
+      w === keys.WIN_LEFT ||
+      w === keys.WIN_RIGHT ||
+      w === keys.SELECT ||
+      w === keys.NUM_LOCK ||
+      w === keys.CAPS_LOCK ||
+      w === keys.SCROLL_LOCK ||
+      w === keys.PAUSE ||
+      w === keys.PRINT_SCREEN ||
       this._isFunctionKey(event)
     )) {
     return;
@@ -1122,75 +1142,75 @@ scout.SmartField.prototype._onFieldKeyDown = function(event) {
     }
     event.stopPropagation(); // key has been handled (popup open). do not allow propagation to other listeners because this could remove tooltips
   }
-};
+}
 
-scout.SmartField.prototype._onFieldInput = function() {
+_onFieldInput() {
   this._updateHasText();
-};
+}
 
-scout.SmartField.prototype._updateUserWasTyping = function(event) {
+_updateUserWasTyping(event) {
   var w = event.which;
-  var isPaste = ((event.ctrlKey || event.metaKey) && w === scout.keys.V) || (event.shiftKey && w === scout.keys.INSERT);
-  var isCut = ((event.ctrlKey || event.metaKey) && w === scout.keys.X) || (event.shiftKey && w === scout.keys.DELETE);
+  var isPaste = ((event.ctrlKey || event.metaKey) && w === keys.V) || (event.shiftKey && w === keys.INSERT);
+  var isCut = ((event.ctrlKey || event.metaKey) && w === keys.X) || (event.shiftKey && w === keys.DELETE);
 
   if (!isPaste && !isCut && (
       event.ctrlKey ||
       event.altKey ||
       event.metaKey ||
-      w === scout.keys.ESC ||
-      w === scout.keys.TAB ||
-      w === scout.keys.SHIFT ||
-      w === scout.keys.CTRL ||
-      w === scout.keys.ALT ||
-      w === scout.keys.HOME ||
-      w === scout.keys.END ||
-      w === scout.keys.LEFT ||
-      w === scout.keys.RIGHT ||
-      w === scout.keys.WIN_LEFT ||
-      w === scout.keys.WIN_RIGHT ||
-      w === scout.keys.SELECT ||
-      w === scout.keys.NUM_LOCK ||
-      w === scout.keys.CAPS_LOCK ||
-      w === scout.keys.SCROLL_LOCK ||
-      w === scout.keys.PAUSE ||
-      w === scout.keys.PRINT_SCREEN ||
+      w === keys.ESC ||
+      w === keys.TAB ||
+      w === keys.SHIFT ||
+      w === keys.CTRL ||
+      w === keys.ALT ||
+      w === keys.HOME ||
+      w === keys.END ||
+      w === keys.LEFT ||
+      w === keys.RIGHT ||
+      w === keys.WIN_LEFT ||
+      w === keys.WIN_RIGHT ||
+      w === keys.SELECT ||
+      w === keys.NUM_LOCK ||
+      w === keys.CAPS_LOCK ||
+      w === keys.SCROLL_LOCK ||
+      w === keys.PAUSE ||
+      w === keys.PRINT_SCREEN ||
       this._isFunctionKey(event)
     )) {
     // neutral, don't change flag
     return;
   }
 
-  this._userWasTyping = !(this._isNavigationKey(event) || w === scout.keys.ENTER);
-};
+  this._userWasTyping = !(this._isNavigationKey(event) || w === keys.ENTER);
+}
 
-scout.SmartField.prototype._isNavigationKey = function(event) {
+_isNavigationKey(event) {
   var navigationKeys = [
-    scout.keys.PAGE_UP,
-    scout.keys.PAGE_DOWN,
-    scout.keys.UP,
-    scout.keys.DOWN
+    keys.PAGE_UP,
+    keys.PAGE_DOWN,
+    keys.UP,
+    keys.DOWN
   ];
 
   if (this.isDropdown()) {
-    navigationKeys.push(scout.keys.HOME);
-    navigationKeys.push(scout.keys.END);
+    navigationKeys.push(keys.HOME);
+    navigationKeys.push(keys.END);
   }
 
   return scout.isOneOf(event.which, navigationKeys);
-};
+}
 
-scout.SmartField.prototype._handleEnterKey = function(event) {
+_handleEnterKey(event) {
   if (this.isPopupOpen()) {
     this.popup.selectLookupRow();
     event.stopPropagation();
   }
-};
+}
 
-scout.SmartField.prototype._isFunctionKey = function(event) {
-  return event.which >= scout.keys.F1 && event.which <= scout.keys.F12;
-};
+_isFunctionKey(event) {
+  return event.which >= keys.F1 && event.which <= keys.F12;
+}
 
-scout.SmartField.prototype._onLookupRowSelected = function(event) {
+_onLookupRowSelected(event) {
   // When a row has been selected in the proposal chooser, cancel all
   // pending and running lookup-calls. This avoids situations where the
   // lookup-call returns with results after the user has pressed the
@@ -1208,14 +1228,14 @@ scout.SmartField.prototype._onLookupRowSelected = function(event) {
   this.setLookupRow(event.lookupRow);
   this._inputAccepted();
   this.closePopup();
-};
+}
 
 /**
  * When the user changes the active-filter we must always perform a new search. When the user has typed a searchText
  * we must perform a lookupByText. When the searchText is empty or different from the text of the selected lookup-row
  * we are in browse mode where we use the default given by the 'searchRequired' property. See: #237229.
  */
-scout.SmartField.prototype._onActiveFilterSelected = function(event) {
+_onActiveFilterSelected(event) {
   this.setActiveFilter(event.activeFilter);
   var browse = !this.searchRequired;
   var searchText = this._readSearchText();
@@ -1223,44 +1243,44 @@ scout.SmartField.prototype._onActiveFilterSelected = function(event) {
     if (this.lookupRow.text !== searchText) {
       browse = false;
     }
-  } else if (scout.strings.hasText(searchText)) {
+  } else if (strings.hasText(searchText)) {
     browse = false;
   }
   this._lookupByTextOrAll(browse, searchText, true);
-};
+}
 
-scout.SmartField.prototype.setBrowseMaxRowCount = function(browseMaxRowCount) {
+setBrowseMaxRowCount(browseMaxRowCount) {
   this.setProperty('browseMaxRowCount', browseMaxRowCount);
-};
+}
 
-scout.SmartField.prototype.setBrowseAutoExpandAll = function(browseAutoExpandAll) {
+setBrowseAutoExpandAll(browseAutoExpandAll) {
   this.setProperty('browseAutoExpandAll', browseAutoExpandAll);
-};
+}
 
-scout.SmartField.prototype.setBrowseLoadIncremental = function(browseLoadIncremental) {
+setBrowseLoadIncremental(browseLoadIncremental) {
   this.setProperty('browseLoadIncremental', browseLoadIncremental);
   if (this.lookupCall) {
     // change template here. Will be used on the next clone
     this.lookupCall.setLoadIncremental(browseLoadIncremental);
   }
-};
+}
 
-scout.SmartField.prototype.setActiveFilter = function(activeFilter) {
+setActiveFilter(activeFilter) {
   this.setProperty('activeFilter', this.activeFilterEnabled ? activeFilter : null);
-};
+}
 
-scout.SmartField.prototype.setActiveFilterEnabled = function(activeFilterEnabled) {
+setActiveFilterEnabled(activeFilterEnabled) {
   this.setProperty('activeFilterEnabled', activeFilterEnabled);
-};
+}
 
-scout.SmartField.prototype.setSearchRequired = function(searchRequired) {
+setSearchRequired(searchRequired) {
   this.setProperty('searchRequired', searchRequired);
-};
+}
 
 /**
  * A wrapper function around lookup calls used to display the state in the UI.
  */
-scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) {
+_executeLookup(lookupCall, abortExisting) {
   this.lookupSeqNo++;
   this.setLoading(true);
 
@@ -1282,20 +1302,20 @@ scout.SmartField.prototype._executeLookup = function(lookupCall, abortExisting) 
       this._clearLookupStatus();
       this._clearNoResultsErrorStatus();
     }.bind(this));
-};
+}
 
 /**
  * Reset error status NO_RESULTS when a lookup is performed, otherwise it would interfere with the
  * temporary lookupStatus and we'd see an out-dated error-status message while the user is typing.
  */
-scout.SmartField.prototype._clearNoResultsErrorStatus = function() {
+_clearNoResultsErrorStatus() {
   if (this.isTouchable()) {
     return;
   }
-  if (this._userWasTyping && this.errorStatus && this.errorStatus.code === scout.SmartField.ErrorCode.NO_RESULTS) {
+  if (this._userWasTyping && this.errorStatus && this.errorStatus.code === SmartField.ErrorCode.NO_RESULTS) {
     this.setErrorStatus(null);
   }
-};
+}
 
 /**
  * Returns true if the smart-field lookup returns a lot of rows. In that case
@@ -1304,15 +1324,15 @@ scout.SmartField.prototype._clearNoResultsErrorStatus = function() {
  * all rows, since this avoids problems with layout-invalidation with rows
  * that have a bitmap-image (PNG) which is loaded asynchronously.
  */
-scout.SmartField.prototype.virtual = function() {
-  return this.browseMaxRowCount > scout.SmartField.DEFAULT_BROWSE_MAX_COUNT;
-};
+virtual() {
+  return this.browseMaxRowCount > SmartField.DEFAULT_BROWSE_MAX_COUNT;
+}
 
-scout.SmartField.prototype.isDropdown = function() {
-  return this.displayStyle === scout.SmartField.DisplayStyle.DROPDOWN;
-};
+isDropdown() {
+  return this.displayStyle === SmartField.DisplayStyle.DROPDOWN;
+}
 
-scout.SmartField.prototype._setLookupRow = function(lookupRow) {
+_setLookupRow(lookupRow) {
   // remove css classes from old lookup-row
   if (this.lookupRow) {
     this.removeCssClass(this.lookupRow.cssClass);
@@ -1324,9 +1344,9 @@ scout.SmartField.prototype._setLookupRow = function(lookupRow) {
   if (lookupRow) {
     this.addCssClass(lookupRow.cssClass);
   }
-};
+}
 
-scout.SmartField.prototype.setLookupRow = function(lookupRow) {
+setLookupRow(lookupRow) {
   if (this.lookupRow === lookupRow) {
     return;
   }
@@ -1348,14 +1368,14 @@ scout.SmartField.prototype.setLookupRow = function(lookupRow) {
   // never called. That's why we always reset the display text to make sure the display
   // text is correct.
   this.resetDisplayText();
-};
+}
 
-scout.SmartField.prototype.setDisplayText = function(displayText) {
-  scout.SmartField.parent.prototype.setDisplayText.call(this, displayText);
+setDisplayText(displayText) {
+  super.setDisplayText( displayText);
   this._userWasTyping = false;
-};
+}
 
-scout.SmartField.prototype.resetDisplayText = function() {
+resetDisplayText() {
   var returned = this.formatValue(this.value);
   if (returned && $.isFunction(returned.promise)) {
     // Promise is returned -> set display text later
@@ -1367,7 +1387,7 @@ scout.SmartField.prototype.resetDisplayText = function() {
   } else {
     this._setAndRenderDisplayText(returned);
   }
-};
+}
 
 /**
  * This method is very similar to setDisplayText(), but does _not_ check for equality with
@@ -1376,22 +1396,22 @@ scout.SmartField.prototype.resetDisplayText = function() {
  * because the visible text in the input field may differ from the "displayText" property
  * value. If setDisplayText() was used, the visible text would not always be reset.
  */
-scout.SmartField.prototype._setAndRenderDisplayText = function(displayText) {
+_setAndRenderDisplayText(displayText) {
   this._setProperty('displayText', displayText);
   if (this.rendered) {
     this._renderDisplayText();
   }
-};
+}
 
-scout.SmartField.prototype._getValueFromLookupRow = function(lookupRow) {
+_getValueFromLookupRow(lookupRow) {
   return lookupRow.key;
-};
+}
 
-scout.SmartField.prototype._setValue = function(value) {
+_setValue(value) {
   // set the cached lookup row to null. Keep in mind that the lookup row is set async in a timeout
   // must of the time. Thus we must remove the reference to the old lookup row as early as possible
   if (!this._lockLookupRow) {
-    if (scout.objects.isNullOrUndefined(value)) {
+    if (objects.isNullOrUndefined(value)) {
       // when value is set to null, we must also reset the cached lookup row
       this._setLookupRow(null);
     } else {
@@ -1401,16 +1421,16 @@ scout.SmartField.prototype._setValue = function(value) {
       }
     }
   }
-  scout.SmartField.parent.prototype._setValue.call(this, value);
+  super._setValue( value);
   this._notUnique = false;
-};
+}
 
 /**
  * Sub-classes like the proposal field may override this function to implement a different behavior.
  */
-scout.SmartField.prototype._checkResetLookupRow = function(value) {
+_checkResetLookupRow(value) {
   return this.lookupRow && this.lookupRow.key !== value;
-};
+}
 
 /**
  * This function may be overridden to return another value than this.value.
@@ -1419,13 +1439,13 @@ scout.SmartField.prototype._checkResetLookupRow = function(value) {
  *
  * @returns the value used to find the selected element in a proposal chooser.
  */
-scout.SmartField.prototype.getValueForSelection = function() {
+getValueForSelection() {
   return this._showSelection() ? this.value : null;
-};
+}
 
-scout.SmartField.prototype._showSelection = function() {
-  if (scout.objects.isNullOrUndefined(this.value) ||
-    scout.objects.isNullOrUndefined(this.lookupRow)) {
+_showSelection() {
+  if (objects.isNullOrUndefined(this.value) ||
+    objects.isNullOrUndefined(this.lookupRow)) {
     return false;
   }
 
@@ -1442,27 +1462,27 @@ scout.SmartField.prototype._showSelection = function() {
   }
 
   return text === this.lookupRow.text;
-};
+}
 
 /**
  * override to ensure dropdown fields and touch mode smart fields does not have a clear icon.
  */
-scout.SmartField.prototype.isClearable = function() {
-  return scout.SmartField.parent.prototype.isClearable.call(this) && !this.isDropdown() && !this.touchMode;
-};
+isClearable() {
+  return super.isClearable() && !this.isDropdown() && !this.touchMode;
+}
 
-scout.SmartField.prototype._triggerLookupCallDone = function(result) {
+_triggerLookupCallDone(result) {
   this.trigger('lookupCallDone', {
     result: result
   });
   return result;
-};
+}
 
-scout.SmartField.prototype._triggerAcceptInputFail = function() {
+_triggerAcceptInputFail() {
   this._triggerAcceptInput(false, true);
-};
+}
 
-scout.SmartField.prototype._triggerAcceptInput = function(acceptByLookupRow, failure) {
+_triggerAcceptInput(acceptByLookupRow, failure) {
   this.trigger('acceptInput', {
     displayText: this.displayText,
     errorStatus: this.errorStatus,
@@ -1471,26 +1491,26 @@ scout.SmartField.prototype._triggerAcceptInput = function(acceptByLookupRow, fai
     acceptByLookupRow: scout.nvl(acceptByLookupRow, true),
     failure: scout.nvl(failure, false)
   });
-};
+}
 
-scout.SmartField.prototype._triggerAcceptByText = function(searchText) {
+_triggerAcceptByText(searchText) {
   this.trigger('acceptByText', {
     searchText: searchText,
     errorStatus: this.errorStatus
   });
-};
+}
 
 /**
  * Function invoked if being rendered within a cell-editor (mode='scout.FormField.Mode.CELLEDITOR'), and once the editor finished its rendering.
  */
-scout.SmartField.prototype.onCellEditorRendered = function(options) {
+onCellEditorRendered(options) {
   if (options.openFieldPopup) {
     this._cellEditorPopup = options.cellEditorPopup;
     this.openPopup(!this.searchRequired);
   }
-};
+}
 
-scout.SmartField.prototype.additionalLines = function() {
+additionalLines() {
   var text = scout.nvl(this.displayText, ''),
     textLines = text.split('\n');
   if (textLines.length > 1) {
@@ -1499,31 +1519,31 @@ scout.SmartField.prototype.additionalLines = function() {
   } else {
     return null;
   }
-};
+}
 
-scout.SmartField.prototype._createLoadingSupport = function() {
-  return new scout.SimpleLoadingSupport({
+_createLoadingSupport() {
+  return new SimpleLoadingSupport({
     widget: this,
     loadingIndicatorDelay: 400 // ms
   });
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.SmartField.prototype._isInitialShowStatus = function() {
+_isInitialShowStatus() {
   if (this.touchMode && (this._pendingOpenPopup || this.isPopupOpen())) {
     // Do not display a tooltip if the touch popup is open, the tooltip will be displayed there
     return false;
   }
-  return scout.SmartField.parent.prototype._isInitialShowStatus.call(this);
-};
+  return super._isInitialShowStatus();
+}
 
 /**
  * In touch mode, we must close the cell editor popup explicitly, because the touch-popup and its glasspane
  * prevents the cell editor popup from receiving mouse down events.
  */
-scout.SmartField.prototype.acceptInputFromField = function(otherField) {
+acceptInputFromField(otherField) {
   this._copyValuesFromField(otherField);
 
   if (this._cellEditorPopup) {
@@ -1533,73 +1553,74 @@ scout.SmartField.prototype.acceptInputFromField = function(otherField) {
   } else {
     this.acceptInput();
   }
-};
+}
 
 /**
  * This function is overridden by ProposalField because it has a different behavior than the smart-field.
  */
-scout.SmartField.prototype._copyValuesFromField = function(otherField) {
+_copyValuesFromField(otherField) {
   if (this.lookupRow !== otherField.lookupRow) {
     this.setLookupRow(otherField.lookupRow);
   }
   this.setErrorStatus(otherField.errorStatus);
   this.setDisplayText(otherField.displayText);
-};
+}
 
-scout.SmartField.prototype._setNotUniqueError = function(searchText) {
-  this.setErrorStatus(scout.Status.error({
+_setNotUniqueError(searchText) {
+  this.setErrorStatus(Status.error({
     message: this.session.text('SmartFieldNotUnique', searchText),
-    code: scout.SmartField.ErrorCode.NOT_UNIQUE
+    code: SmartField.ErrorCode.NOT_UNIQUE
   }));
-};
+}
 
-scout.SmartField.prototype._hasNotUniqueError = function(searchText) {
-  return this._notUnique || this._hasUiError(scout.SmartField.ErrorCode.NOT_UNIQUE);
-};
+_hasNotUniqueError(searchText) {
+  return this._notUnique || this._hasUiError(SmartField.ErrorCode.NOT_UNIQUE);
+}
 
-scout.SmartField.prototype._errorStatus = function() {
+_errorStatus() {
   return this.lookupStatus || this.errorStatus;
-};
+}
 
-scout.SmartField.prototype.setLookupStatus = function(lookupStatus) {
+setLookupStatus(lookupStatus) {
   this.setProperty('lookupStatus', lookupStatus);
   if (this.rendered) {
     this._renderErrorStatus();
   }
-};
+}
 
-scout.SmartField.prototype.clearErrorStatus = function() {
+clearErrorStatus() {
   this.setErrorStatus(null);
   this._clearLookupStatus();
-};
+}
 
-scout.SmartField.prototype._clearLookupStatus = function() {
+_clearLookupStatus() {
   this.setLookupStatus(null);
-};
+}
 
 /**
  * Checks if there is a lookup status that needs to be set as error status
  * before we leave the smart-field. The lookup status is set to null, because
  * it is a temporary state that is only important while the user executes a lookup.
  */
-scout.SmartField.prototype._flushLookupStatus = function() {
+_flushLookupStatus() {
   if (!this.lookupStatus) {
     return;
   }
 
-  if (this.lookupStatus.code === scout.SmartField.ErrorCode.NO_RESULTS ||
-    this.lookupStatus.code === scout.SmartField.ErrorCode.NOT_UNIQUE) {
+  if (this.lookupStatus.code === SmartField.ErrorCode.NO_RESULTS ||
+    this.lookupStatus.code === SmartField.ErrorCode.NOT_UNIQUE) {
     var errorStatus = this.lookupStatus.clone();
-    errorStatus.severity = scout.Status.Severity.ERROR;
+    errorStatus.severity = Status.Severity.ERROR;
     this.setErrorStatus(errorStatus);
   }
 
   this._clearLookupStatus();
-};
+}
 
-scout.SmartField.prototype.requestInput = function() {
+requestInput() {
   if (this.enabledComputed && this.rendered) {
     this.focus();
     this.openPopup(!this.searchRequired);
   }
-};
+}
+}

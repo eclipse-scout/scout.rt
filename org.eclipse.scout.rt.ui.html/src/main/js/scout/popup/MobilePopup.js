@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MobilePopup = function() {
-  scout.MobilePopup.parent.call(this);
+import {Popup} from '../index';
+import {HtmlComponent} from '../index';
+import {Point} from '../index';
+import {MobilePopupLayout} from '../index';
+
+export default class MobilePopup extends Popup {
+
+constructor() {
+  super();
   this.animateOpening = true;
   this.boundToAnchor = false;
   this.windowPaddingX = 0;
@@ -20,54 +27,54 @@ scout.MobilePopup = function() {
   this.title = null;
   this.withGlassPane = true;
   this._addWidgetProperties('widget');
-};
-scout.inherits(scout.MobilePopup, scout.Popup);
+}
 
-scout.MobilePopup.prototype._createLayout = function() {
-  return new scout.MobilePopupLayout(this);
-};
+
+_createLayout() {
+  return new MobilePopupLayout(this);
+}
 
 /**
  * @override Popup.js
  */
-scout.MobilePopup.prototype.prefLocation = function(verticalAlignment, horizontalAlignment) {
+prefLocation(verticalAlignment, horizontalAlignment) {
   var popupSize = this.htmlComp.prefSize(),
     windowHeight = this.$container.window().height(),
     y = Math.max(windowHeight - popupSize.height, 0);
-  return new scout.Point(0, y);
-};
+  return new Point(0, y);
+}
 
-scout.MobilePopup.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('popup mobile-popup');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.validateRoot = true;
   this.htmlComp.setLayout(this._createLayout());
 
   this.$header = this.$container.appendDiv('mobile-popup-header');
   this.$title = this.$header.appendDiv('title');
-};
+}
 
-scout.MobilePopup.prototype._renderProperties = function() {
-  scout.MobilePopup.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWidget();
   this._renderTitle();
   this._renderClosable();
-};
+}
 
-scout.MobilePopup.prototype.setWidget = function(widget) {
+setWidget(widget) {
   this.setProperty('widget', widget);
-};
+}
 
-scout.MobilePopup.prototype._renderWidget = function() {
+_renderWidget() {
   if (!this.widget) {
     return;
   }
   this.widget.render();
   this.widget.$container.addClass('mobile-popup-widget');
   this.invalidateLayoutTree();
-};
+}
 
-scout.MobilePopup.prototype._renderClosable = function() {
+_renderClosable() {
   this.$container.toggleClass('closable');
   if (this.closable) {
     if (this.$close) {
@@ -83,8 +90,9 @@ scout.MobilePopup.prototype._renderClosable = function() {
     this.$close.remove();
     this.$close = null;
   }
-};
+}
 
-scout.MobilePopup.prototype._renderTitle = function() {
+_renderTitle() {
   this.$title.textOrNbsp(this.title);
-};
+}
+}

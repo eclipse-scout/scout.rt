@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuBarLeftKeyStroke = function(menuBar) {
-  scout.MenuBarLeftKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class MenuBarLeftKeyStroke extends KeyStroke {
+
+constructor(menuBar) {
+  super();
   this.field = menuBar;
-  this.which = [scout.keys.LEFT];
+  this.which = [keys.LEFT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.MenuBarLeftKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var menuItems = this.field.orderedMenuItems.all,
     $menuItemFocused = this.field.$container.find(':focus'),
     i, menuItem, lastValidItem;
@@ -36,4 +41,5 @@ scout.MenuBarLeftKeyStroke.prototype.handle = function(event) {
       lastValidItem = menuItem;
     }
   }
-};
+}
+}

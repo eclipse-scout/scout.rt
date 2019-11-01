@@ -8,19 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerAdapter = function() {
-  scout.PlannerAdapter.parent.call(this);
+import {dates} from '../index';
+import {DateRange} from '../index';
+import {ModelAdapter} from '../index';
+
+export default class PlannerAdapter extends ModelAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['displayMode', 'viewRange', 'selectionRange', 'selectedActivity']);
-};
-scout.inherits(scout.PlannerAdapter, scout.ModelAdapter);
+}
 
-scout.PlannerAdapter.prototype._sendViewRange = function(viewRange) {
+
+_sendViewRange(viewRange) {
   this._send('property', {
-    viewRange: scout.dates.toJsonDateRange(viewRange)
+    viewRange: dates.toJsonDateRange(viewRange)
   });
-};
+}
 
-scout.PlannerAdapter.prototype._sendSelectedActivity = function() {
+_sendSelectedActivity() {
   var activityId = null;
   if (this.widget.selectedActivity) {
     activityId = this.widget.selectedActivity.id;
@@ -28,68 +34,68 @@ scout.PlannerAdapter.prototype._sendSelectedActivity = function() {
   this._send('property', {
     selectedActivity: activityId
   });
-};
+}
 
-scout.PlannerAdapter.prototype._sendSelectionRange = function() {
-  var selectionRange = scout.dates.toJsonDateRange(this.widget.selectionRange);
+_sendSelectionRange() {
+  var selectionRange = dates.toJsonDateRange(this.widget.selectionRange);
   this._send('property', {
     selectionRange: selectionRange
   });
-};
+}
 
-scout.PlannerAdapter.prototype._onWidgetResourcesSelected = function(event) {
+_onWidgetResourcesSelected(event) {
   this._sendResourcesSelected();
-};
+}
 
-scout.PlannerAdapter.prototype._sendResourcesSelected = function() {
+_sendResourcesSelected() {
   var resourceIds = this.widget.selectedResources.map(function(r) {
     return r.id;
   });
   this._send('resourcesSelected', {
     resourceIds: resourceIds
   });
-};
+}
 
-scout.PlannerAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'resourcesSelected') {
     this._onWidgetResourcesSelected(event);
   } else {
-    scout.PlannerAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.PlannerAdapter.prototype._onResourcesInserted = function(resources) {
+_onResourcesInserted(resources) {
   this.widget.insertResources(resources);
-};
+}
 
-scout.PlannerAdapter.prototype._onResourcesDeleted = function(resourceIds) {
+_onResourcesDeleted(resourceIds) {
   var resources = this.widget._resourcesByIds(resourceIds);
   this.addFilterForWidgetEventType('resourcesSelected');
   this.addFilterForProperties({
-    selectionRange: new scout.DateRange()
+    selectionRange: new DateRange()
   });
   this.widget.deleteResources(resources);
-};
+}
 
-scout.PlannerAdapter.prototype._onAllResourcesDeleted = function() {
+_onAllResourcesDeleted() {
   this.addFilterForWidgetEventType('resourcesSelected');
   this.addFilterForProperties({
-    selectionRange: new scout.DateRange()
+    selectionRange: new DateRange()
   });
   this.widget.deleteAllResources();
-};
+}
 
-scout.PlannerAdapter.prototype._onResourcesSelected = function(resourceIds) {
+_onResourcesSelected(resourceIds) {
   var resources = this.widget._resourcesByIds(resourceIds);
   this.addFilterForWidgetEventType('resourcesSelected');
   this.widget.selectResources(resources, false);
-};
+}
 
-scout.PlannerAdapter.prototype._onResourcesUpdated = function(resources) {
+_onResourcesUpdated(resources) {
   this.widget.updateResources(resources);
-};
+}
 
-scout.PlannerAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'resourcesInserted') {
     this._onResourcesInserted(event.resources);
   } else if (event.type === 'resourcesDeleted') {
@@ -101,6 +107,7 @@ scout.PlannerAdapter.prototype.onModelAction = function(event) {
   } else if (event.type === 'resourcesUpdated') {
     this._onResourcesUpdated(event.resources);
   } else {
-    scout.PlannerAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
+}

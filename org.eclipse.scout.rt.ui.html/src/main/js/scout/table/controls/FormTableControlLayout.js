@@ -8,31 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormTableControlLayout = function(control) {
-  scout.FormTableControlLayout.parent.call(this);
-  this.control = control;
-};
-scout.inherits(scout.FormTableControlLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../../index';
+import {graphics} from '../../index';
+import {TabBox} from '../../index';
+import * as $ from 'jquery';
+import {scrollbars} from '../../index';
 
-scout.FormTableControlLayout.prototype.layout = function($container) {
+export default class FormTableControlLayout extends AbstractLayout {
+
+constructor(control) {
+  super();
+  this.control = control;
+}
+
+
+layout($container) {
   if (!this.control.contentRendered || !this.control.form) {
     return;
   }
 
   var form = this.control.form,
     htmlForm = form.htmlComp,
-    controlContentSize = scout.graphics.size(this.control.tableFooter.$controlContent),
+    controlContentSize = graphics.size(this.control.tableFooter.$controlContent),
     formSize = controlContentSize.subtract(htmlForm.margins());
 
   htmlForm.setSize(formSize);
 
   // special case: when the control is opened/resized and there is not enough space, ensure that the active element is
   // visible by scrolling to it
-  if (form.rootGroupBox.controls[0] instanceof scout.TabBox) {
+  if (form.rootGroupBox.controls[0] instanceof TabBox) {
     var tabBox = form.rootGroupBox.controls[0];
     var tab = tabBox.selectedTab;
     if (tab && tab.scrollable && document.activeElement && tab.$body.has(document.activeElement)) {
-      scout.scrollbars.scrollTo(tab.$body, $(document.activeElement));
+      scrollbars.scrollTo(tab.$body, $(document.activeElement));
     }
   }
-};
+}
+}

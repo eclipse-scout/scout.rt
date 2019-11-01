@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WrappedFormFieldAdapter = function() {
-  scout.WrappedFormFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.WrappedFormFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class WrappedFormFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

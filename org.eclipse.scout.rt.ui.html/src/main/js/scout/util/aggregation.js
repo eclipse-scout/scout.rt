@@ -8,92 +8,112 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.aggregation = {
+import {icons} from '../index';
 
-  sumStart: function() {
-    return null;
-  },
 
-  sumStep: function(currentState, newVal) {
-    if (typeof newVal === 'number') {
-      currentState = (currentState || 0) + newVal;
-    }
-    return currentState;
-  },
 
-  sumFinish: function(currentState) {
-    return currentState;
-  },
+export function sumStart() {
+  return null;
+}
 
-  sumSymbol: scout.icons.SUM_BOLD,
+export function sumStep(currentState, newVal) {
+  if (typeof newVal === 'number') {
+    currentState = (currentState || 0) + newVal;
+  }
+  return currentState;
+}
 
-  avgStart: function() {
-    return {
-      sum: 0,
-      count: 0
-    };
-  },
+export function sumFinish(currentState) {
+  return currentState;
+}
 
-  avgStep: function(currentState, newVal) {
-    if (typeof newVal === 'number') {
-      currentState.sum += newVal;
-      currentState.count += 1;
-    }
-    return currentState;
-  },
+let sumSymbol = icons.SUM_BOLD;
 
-  avgFinish: function(currentState) {
-    if (currentState.count && currentState.count > 0) {
-      return (currentState.sum * 1.0) / currentState.count;
-    }
-  },
+export function avgStart() {
+  return {
+    sum: 0,
+    count: 0
+  };
+}
 
-  avgSymbol: scout.icons.AVG_BOLD,
+export function avgStep(currentState, newVal) {
+  if (typeof newVal === 'number') {
+    currentState.sum += newVal;
+    currentState.count += 1;
+  }
+  return currentState;
+}
 
-  minStart: function() {
-    return null;
-  },
+export function avgFinish(currentState) {
+  if (currentState.count && currentState.count > 0) {
+    return (currentState.sum * 1.0) / currentState.count;
+  }
+}
 
-  minStep: function(currentState, newVal) {
-    if (typeof newVal === 'number') {
-      if (typeof currentState === 'number') {
-        if (newVal < currentState) {
-          currentState = newVal;
-        }
-      } else {
+let avgSymbol = icons.AVG_BOLD;
+
+export function minStart() {
+  return null;
+}
+
+export function minStep(currentState, newVal) {
+  if (typeof newVal === 'number') {
+    if (typeof currentState === 'number') {
+      if (newVal < currentState) {
         currentState = newVal;
       }
+    } else {
+      currentState = newVal;
     }
-    return currentState;
-  },
+  }
+  return currentState;
+}
 
-  minFinish: function(currentState) {
-    return currentState;
-  },
+export function minFinish(currentState) {
+  return currentState;
+}
 
-  minSymbol: scout.icons.MIN_BOLD,
+let minSymbol = icons.MIN_BOLD;
 
-  maxStart: function() {
-    return null;
-  },
+export function maxStart() {
+  return null;
+}
 
-  maxStep: function(currentState, newVal) {
-    if (typeof newVal === 'number') {
-      if (typeof currentState === 'number') {
-        if (newVal > currentState) {
-          currentState = newVal;
-        }
-      } else {
+export function maxStep(currentState, newVal) {
+  if (typeof newVal === 'number') {
+    if (typeof currentState === 'number') {
+      if (newVal > currentState) {
         currentState = newVal;
       }
+    } else {
+      currentState = newVal;
     }
-    return currentState;
-  },
+  }
+  return currentState;
+}
 
-  maxFinish: function(currentState) {
-    return currentState;
-  },
+export function maxFinish(currentState) {
+  return currentState;
+}
 
-  maxSymbol: scout.icons.MAX_BOLD
+let maxSymbol = icons.MAX_BOLD
 
+
+export default {
+  avgFinish,
+  avgStart,
+  avgStep,
+  avgSymbol,
+  maxFinish,
+  maxStart,
+  maxStep,
+  maxSymbol,
+  minFinish,
+  minStart,
+  minStep,
+  minSymbol,
+  sumFinish,
+  sumStart,
+  sumStep,
+  sumSymbol
 };

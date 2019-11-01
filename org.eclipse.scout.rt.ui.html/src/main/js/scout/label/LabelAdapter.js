@@ -8,21 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LabelAdapter = function() {
-  scout.LabelAdapter.parent.call(this);
-};
-scout.inherits(scout.LabelAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
 
-scout.LabelAdapter.prototype._onWidgetAppLinkAction = function(event) {
+export default class LabelAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+
+_onWidgetAppLinkAction(event) {
   this._send('appLinkAction', {
     ref: event.ref
   });
-};
+}
 
-scout.LabelAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'appLinkAction') {
     this._onWidgetAppLinkAction(event);
   } else {
-    scout.LabelAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
+}

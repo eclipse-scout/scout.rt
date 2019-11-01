@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineKeyStrokeContext = function(outline) {
-  scout.OutlineKeyStrokeContext.parent.call(this);
-  this._outline = outline;
-};
+import {KeyStrokeContext} from '../../../index';
 
-scout.inherits(scout.OutlineKeyStrokeContext, scout.KeyStrokeContext);
+export default class OutlineKeyStrokeContext extends KeyStrokeContext {
+
+constructor(outline) {
+  super();
+  this._outline = outline;
+}
+
+
 
 /**
  * Returns true if this event is handled by this context, and if so sets the propagation flags accordingly.
  */
-scout.OutlineKeyStrokeContext.prototype.accept = function(event) {
-  return !this._outline.inBackground && !this.isFormMenuOpen() && scout.OutlineKeyStrokeContext.parent.prototype.accept.call(this, event);
-};
+accept(event) {
+  return !this._outline.inBackground && !this.isFormMenuOpen() && super.accept( event);
+}
 
-scout.OutlineKeyStrokeContext.prototype.isFormMenuOpen = function() {
+isFormMenuOpen() {
   var menus = this._outline.session.desktop.menus;
   return menus.some(function(menu) {
     return menu.popup && menu.popup.$container && menu.popup.$container.isAttached();
   }, this);
-};
+}
+}

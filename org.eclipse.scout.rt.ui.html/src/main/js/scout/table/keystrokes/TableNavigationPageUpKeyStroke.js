@@ -8,9 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableNavigationPageUpKeyStroke = function(table) {
-  scout.TableNavigationPageUpKeyStroke.parent.call(this, table);
-  this.which = [scout.keys.PAGE_UP];
+import {AbstractTableNavigationKeyStroke} from '../../index';
+import {keys} from '../../index';
+import {arrays} from '../../index';
+
+export default class TableNavigationPageUpKeyStroke extends AbstractTableNavigationKeyStroke {
+
+constructor(table) {
+  super( table);
+  this.which = [keys.PAGE_UP];
   this.renderingHints.text = 'PgUp';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var viewport = this._viewportInfo();
@@ -18,15 +24,15 @@ scout.TableNavigationPageUpKeyStroke = function(table) {
       return viewport.firstRow.$row;
     }
   }.bind(this);
-};
-scout.inherits(scout.TableNavigationPageUpKeyStroke, scout.AbstractTableNavigationKeyStroke);
+}
 
-scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var table = this.field,
     viewport = this._viewportInfo(),
     rows = table.visibleRows,
     selectedRows = table.selectedRows,
-    firstSelectedRow = scout.arrays.first(selectedRows),
+    firstSelectedRow = arrays.first(selectedRows),
     lastActionRow = table.selectionHandler.lastActionRow,
     lastActionRowIndex = -1,
     newSelectedRows;
@@ -63,11 +69,12 @@ scout.TableNavigationPageUpKeyStroke.prototype.handle = function(event) {
 
   if (event.shiftKey && selectedRows.length > 0) {
     newSelectedRows = rows.slice(rows.indexOf(viewport.firstRow), lastActionRowIndex);
-    newSelectedRows = scout.arrays.union(selectedRows, newSelectedRows);
+    newSelectedRows = arrays.union(selectedRows, newSelectedRows);
   } else {
     newSelectedRows = [viewport.firstRow];
   }
 
   table.selectionHandler.lastActionRow = viewport.firstRow;
   table.selectRows(newSelectedRows, true);
-};
+}
+}

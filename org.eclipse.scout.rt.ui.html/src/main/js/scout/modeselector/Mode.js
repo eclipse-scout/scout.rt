@@ -8,41 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Mode = function() {
-  scout.Mode.parent.call(this);
+import {Action} from '../index';
+
+export default class Mode extends Action {
+
+constructor() {
+  super();
 
   this.selected = false;
   this.ref = null; // Arbitrary reference value, can be used to find and select modes (see ModeSelector.js)
-};
-scout.inherits(scout.Mode, scout.Action);
+}
 
-scout.Mode.prototype._init = function(model) {
+
+_init(model) {
   model.owner = model.parent;
-  scout.Mode.parent.prototype._init.call(this, model);
-};
+  super._init( model);
+}
 
-scout.Mode.prototype._render = function() {
-  scout.Mode.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('mode');
-};
+}
 
-scout.Mode.prototype._renderProperties = function() {
-  scout.Mode.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderSelected();
-};
+}
 
-scout.Mode.prototype.setSelected = function(selected) {
+setSelected(selected) {
   this.setProperty('selected', selected);
-};
+}
 
-scout.Mode.prototype._renderSelected = function() {
+_renderSelected() {
   this.$container.select(this.selected);
-};
+}
 
 /**
  * @Override Action.js
  */
-scout.Mode.prototype.doAction = function() {
+doAction() {
   if (!this.prepareDoAction()) {
     return false;
   }
@@ -52,34 +56,35 @@ scout.Mode.prototype.doAction = function() {
   }
 
   return true;
-};
+}
 
 /**
  * @Override Action.js
  */
-scout.Mode.prototype.toggle = function() {
+toggle() {
   if (!this.selected) {
     this.setSelected(true);
   }
-};
+}
 
-scout.Mode.prototype._renderIconId = function() {
-  scout.Mode.parent.prototype._renderIconId.call(this);
-
-  this._updateLabelAndIconStyle();
-  // Invalidate layout because mode may now be longer or shorter
-  this.invalidateLayoutTree();
-};
-
-scout.Mode.prototype._renderText = function() {
-  scout.Mode.parent.prototype._renderText.call(this);
+_renderIconId() {
+  super._renderIconId();
 
   this._updateLabelAndIconStyle();
   // Invalidate layout because mode may now be longer or shorter
   this.invalidateLayoutTree();
-};
+}
 
-scout.Mode.prototype._updateLabelAndIconStyle = function() {
+_renderText() {
+  super._renderText();
+
+  this._updateLabelAndIconStyle();
+  // Invalidate layout because mode may now be longer or shorter
+  this.invalidateLayoutTree();
+}
+
+_updateLabelAndIconStyle() {
   var hasText = !!this.text;
   this.get$Icon().toggleClass('with-label', hasText);
-};
+}
+}

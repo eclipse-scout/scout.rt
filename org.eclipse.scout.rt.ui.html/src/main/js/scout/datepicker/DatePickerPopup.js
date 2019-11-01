@@ -8,46 +8,55 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DatePickerPopup = function() {
-  scout.DatePickerPopup.parent.call(this);
-};
-scout.inherits(scout.DatePickerPopup, scout.Popup);
+import {Popup} from '../index';
+import {HtmlComponent} from '../index';
+import {FormField} from '../index';
+import {DatePickerPopupLayout} from '../index';
+import {scout} from '../index';
 
-scout.DatePickerPopup.prototype._init = function(options) {
+export default class DatePickerPopup extends Popup {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
   options.scrollType = options.scrollType || 'layoutAndPosition';
   options.withFocusContext = false;
-  scout.DatePickerPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.picker = scout.create('DatePicker', {
     parent: this,
     dateFormat: options.dateFormat,
     allowedDates: options.allowedDates
   });
-};
+}
 
-scout.DatePickerPopup.prototype._createLayout = function() {
-  return new scout.DatePickerPopupLayout(this);
-};
+_createLayout() {
+  return new DatePickerPopupLayout(this);
+}
 
-scout.DatePickerPopup.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('date-picker-popup');
-  this.$container.toggleClass('alternative', this.field.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.$container.toggleClass('alternative', this.field.fieldStyle === FormField.FieldStyle.ALTERNATIVE);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
   this.htmlComp.validateRoot = true;
   this.picker.render();
-};
+}
 
 /**
  * @implements DatePickerPopup
  */
-scout.DatePickerPopup.prototype.getDatePicker = function() {
+getDatePicker() {
   return this.picker;
-};
+}
 
 /**
  * @override because the icon is not in the $anchor container.
  */
-scout.DatePickerPopup.prototype._isMouseDownOnAnchor = function(event) {
+_isMouseDownOnAnchor(event) {
   return this.field.$dateField.isOrHas(event.target) || this.field.$dateFieldIcon.isOrHas(event.target) || (this.field.$dateClearIcon && this.field.$dateClearIcon.isOrHas(event.target));
-};
+}
+}

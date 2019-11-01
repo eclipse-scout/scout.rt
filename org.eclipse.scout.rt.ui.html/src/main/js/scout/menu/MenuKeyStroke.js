@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuKeyStroke = function(action) {
-  scout.MenuKeyStroke.parent.call(this, action);
-};
-scout.inherits(scout.MenuKeyStroke, scout.ActionKeyStroke);
+import {ActionKeyStroke} from '../index';
 
-scout.MenuKeyStroke.prototype._isEnabled = function() {
+export default class MenuKeyStroke extends ActionKeyStroke {
+
+constructor(action) {
+  super( action);
+}
+
+
+_isEnabled() {
   if (this.field.excludedByFilter) {
     return false;
   } else {
-    return scout.MenuKeyStroke.parent.prototype._isEnabled.call(this);
+    return super._isEnabled();
   }
-};
+}
+}

@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TabBoxHeader = function() {
-  scout.TabBoxHeader.parent.call(this);
+import {HtmlComponent} from '../../../index';
+import {scout} from '../../../index';
+import {Widget} from '../../../index';
+import {GroupBoxMenuItemsOrder} from '../../../index';
+import {TabBoxHeaderLayout} from '../../../index';
+
+export default class TabBoxHeader extends Widget {
+
+constructor() {
+  super();
 
   this.tabBox = null;
   this.tabArea = null;
@@ -19,11 +27,11 @@ scout.TabBoxHeader = function() {
   this.$borderBottom = null;
   this._tabBoxPropertyChangeHandler = this._onTabBoxPropertyChange.bind(this);
   this._tabAreaPropertyChangeHandler = this._onTabAreaPropertyChange.bind(this);
-};
-scout.inherits(scout.TabBoxHeader, scout.Widget);
+}
 
-scout.TabBoxHeader.prototype._init = function(options) {
-  scout.TabBoxHeader.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.tabBox = options.tabBox;
 
   this.tabArea = scout.create('TabArea', {
@@ -34,62 +42,63 @@ scout.TabBoxHeader.prototype._init = function(options) {
 
   this.menuBar = scout.create('MenuBar', {
     parent: this,
-    menuOrder: new scout.GroupBoxMenuItemsOrder()
+    menuOrder: new GroupBoxMenuItemsOrder()
   });
   // tabbox listener
   this.tabBox.on('propertyChange', this._tabBoxPropertyChangeHandler);
 
   this.menuBar.setMenuItems(this.tabBox.menus);
-};
+}
 
-scout.TabBoxHeader.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tab-box-header');
   this.$borderBottom = this.$container.appendDiv('tab-box-header-bottom-border');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.TabBoxHeaderLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new TabBoxHeaderLayout(this));
   this.tabArea.render(this.$container);
   this.menuBar.render(this.$container);
   this.$container.append(this.menuBar.$container);
-};
+}
 
-scout.TabBoxHeader.prototype._destroy = function() {
+_destroy() {
   this.tabBox.off('propertyChange', this._tabBoxPropertyChangeHandler);
   this.tabArea.off('propertyChange', this._tabAreaPropertyChangeHandler);
-  scout.TabBoxHeader.parent.prototype._destroy.call(this);
-};
+  super._destroy();
+}
 
-scout.TabBoxHeader.prototype.setTabItems = function(tabItems) {
+setTabItems(tabItems) {
   this.tabArea.setTabItems(tabItems);
-};
+}
 
-scout.TabBoxHeader.prototype._setSelectedTab = function(tab) {
+_setSelectedTab(tab) {
   if (tab) {
     this.setSelectedTabItem(tab.tabItem);
   } else {
     this.setSelectedTabItem(null);
   }
-};
+}
 
-scout.TabBoxHeader.prototype.setSelectedTabItem = function(tabItem) {
+setSelectedTabItem(tabItem) {
   this.setProperty('selectedTabItem', tabItem);
-};
-scout.TabBoxHeader.prototype._setSelectedTabItem = function(tabItem) {
+}
+_setSelectedTabItem(tabItem) {
   this._setProperty('selectedTabItem', tabItem);
   this.tabArea.setSelectedTabItem(tabItem);
-};
+}
 
-scout.TabBoxHeader.prototype.focusTabItem = function(tabItem) {
+focusTabItem(tabItem) {
   this.tabArea.focusTabItem(tabItem);
-};
+}
 
-scout.TabBoxHeader.prototype._onTabBoxPropertyChange = function(event) {
+_onTabBoxPropertyChange(event) {
   if (event.propertyName === 'menus') {
     this.menuBar.setMenuItems(this.tabBox.menus);
   }
-};
+}
 
-scout.TabBoxHeader.prototype._onTabAreaPropertyChange = function(event) {
+_onTabAreaPropertyChange(event) {
   if (event.propertyName === 'selectedTab') {
     this._setSelectedTab(event.newValue);
   }
-};
+}
+}

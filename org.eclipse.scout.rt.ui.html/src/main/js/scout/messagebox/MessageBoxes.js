@@ -8,77 +8,85 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {MessageBox} from '../index';
+import {Status} from '../index';
+import {strings} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * This class is a convenient builder for creating message boxes. Use the static functions to
  * create and open simple and often used message boxes.
  */
-scout.MessageBoxes = function() {
+export default class MessageBoxes {
+
+constructor() {
   this.parent = null;
 
   this.yesText = null;
   this.noText = null;
   this.cancelText = null;
   this.bodyText = null;
-  this.severity = scout.Status.Severity.INFO;
+  this.severity = Status.Severity.INFO;
   this.headerText = null;
   this.closeOnClick = true;
   this.html = false;
-};
+}
 
-scout.MessageBoxes.prototype.init = function(options) {
+init(options) {
   scout.assertParameter('parent', options.parent);
   $.extend(this, options);
-};
+}
 
-scout.MessageBoxes.prototype.withHeader = function(headerText) {
+withHeader(headerText) {
   this.headerText = headerText;
   return this;
-};
+}
 
 /**
  * @param bodyText
  * @param {boolean} [html] Set to true if body must contain HTML, default is false
- * @returns {scout.MessageBoxes}
+ * @returns {MessageBoxes}
  */
-scout.MessageBoxes.prototype.withBody = function(bodyText, html) {
+withBody(bodyText, html) {
   this.bodyText = bodyText;
   this.html = scout.nvl(html, false);
   return this;
-};
+}
 
-scout.MessageBoxes.prototype.withSeverity = function(severity) {
-  this.severity = scout.nvl(severity, scout.Status.Severity.INFO);
+withSeverity(severity) {
+  this.severity = scout.nvl(severity, Status.Severity.INFO);
   return this;
-};
-scout.MessageBoxes.prototype.withYes = function(yesText) {
+}
+withYes(yesText) {
   this.yesText = scout.nvl(yesText, this.parent.session.text('Yes'));
   return this;
-};
+}
 
-scout.MessageBoxes.prototype.withNo = function(noText) {
+withNo(noText) {
   this.noText = scout.nvl(noText, this.parent.session.text('No'));
   return this;
-};
+}
 
-scout.MessageBoxes.prototype.withCancel = function(cancelText) {
+withCancel(cancelText) {
   this.cancelText = scout.nvl(cancelText, this.parent.session.text('Cancel'));
   return this;
-};
+}
 
-scout.MessageBoxes.prototype.build = function() {
+build() {
   var options = {
     parent: this.parent,
     header: this.headerText,
     body: this.bodyText,
     severity: this.severity
   };
-  if (scout.strings.hasText(this.yesText)) {
+  if (strings.hasText(this.yesText)) {
     options.yesButtonText = this.yesText;
   }
-  if (scout.strings.hasText(this.noText)) {
+  if (strings.hasText(this.noText)) {
     options.noButtonText = this.noText;
   }
-  if (scout.strings.hasText(this.cancelText)) {
+  if (strings.hasText(this.cancelText)) {
     options.cancelButtonText = this.cancelText;
   }
   // When this class is refactored we should check with the author, why it needs two properties html and body.
@@ -87,13 +95,13 @@ scout.MessageBoxes.prototype.build = function() {
     delete options.body;
   }
   return scout.create('MessageBox', options);
-};
+}
 
 /**
  * @returns {Promise} resolved to selected button / option
- * @see scout.MessageBox.Buttons
+ * @see MessageBox.Buttons
  */
-scout.MessageBoxes.prototype.buildAndOpen = function() {
+buildAndOpen() {
   var def = $.Deferred();
   var messageBox = this.build();
   messageBox.on('action', function(event) {
@@ -104,27 +112,27 @@ scout.MessageBoxes.prototype.buildAndOpen = function() {
   }.bind(this));
   messageBox.open();
   return def.promise();
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-scout.MessageBoxes.create = function(parent) {
+static create(parent) {
   return scout.create('MessageBoxes', {
     parent: parent
   });
-};
+}
 
-scout.MessageBoxes.createOk = function(parent) {
+static createOk(parent) {
   return this.create(parent).withYes(parent.session.text('Ok'));
-};
+}
 
-scout.MessageBoxes.createYesNo = function(parent) {
+static createYesNo(parent) {
   return this.create(parent).withYes().withNo();
-};
+}
 
-scout.MessageBoxes.createYesNoCancel = function(parent) {
+static createYesNoCancel(parent) {
   return this.create(parent).withYes().withNo().withCancel();
-};
+}
 
 /**
  * Opens a message box with an Ok button.
@@ -132,15 +140,15 @@ scout.MessageBoxes.createYesNoCancel = function(parent) {
  * @returns {Promise} resolved to clicked button
  * @param {Object} parent
  * @param {string} bodyText
- * @param {number} [severity] default is <code>scout.Status.Severity.INFO</code>
+ * @param {number} [severity] default is <code>Status.Severity.INFO</code>
  * @static
  */
-scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
+static openOk(parent, bodyText, severity) {
   return this.createOk(parent)
     .withBody(bodyText)
     .withSeverity(severity)
     .buildAndOpen();
-};
+}
 
 /**
  * Opens a message box with a yes and a no button.
@@ -148,12 +156,13 @@ scout.MessageBoxes.openOk = function(parent, bodyText, severity) {
  * @returns {Promise} resolved to clicked button
  * @param {Object} parent
  * @param {string} bodyText
- * @param {number} [severity] default is <code>scout.Status.Severity.INFO</code>
+ * @param {number} [severity] default is <code>Status.Severity.INFO</code>
  * @static
  */
-scout.MessageBoxes.openYesNo = function(parent, bodyText, severity) {
+static openYesNo(parent, bodyText, severity) {
   return this.createYesNo(parent)
     .withBody(bodyText)
     .withSeverity(severity)
     .buildAndOpen();
-};
+}
+}

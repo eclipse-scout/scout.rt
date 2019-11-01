@@ -8,24 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineAdapter = function() {
-  scout.OutlineAdapter.parent.call(this);
+import {objects} from '../../index';
+import {scout} from '../../index';
+import {App} from '../../index';
+import {TreeAdapter} from '../../index';
+import {Outline} from '../../index';
+
+export default class OutlineAdapter extends TreeAdapter {
+
+constructor() {
+  super();
   this._nodeIdToRowMap = {};
   this._detailTableRowInitHandler = this._onDetailTableRowInit.bind(this);
-};
-scout.inherits(scout.OutlineAdapter, scout.TreeAdapter);
+}
+
 
 /**
  * We must call onWidgetPageInit because this adapter cannot process the 'pageInit' event
  * while the widget is initialized, since the listener is not attached until the widget
  * is created completely.
  */
-scout.OutlineAdapter.prototype._postCreateWidget = function() {
+_postCreateWidget() {
   var outline = this.widget;
   outline.visitNodes(this._onWidgetPageInit.bind(this));
-};
+}
 
-scout.OutlineAdapter.prototype._onPageChanged = function(event) {
+_onPageChanged(event) {
   var page = this.widget._nodeById(event.nodeId);
   page.overviewIconId = event.overviewIconId;
 
@@ -48,45 +56,45 @@ scout.OutlineAdapter.prototype._onPageChanged = function(event) {
   }
 
   this.widget.pageChanged(page);
-};
+}
 
-scout.OutlineAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'pageInit') {
     this._onWidgetPageInit(event.page);
   } else {
-    scout.OutlineAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.OutlineAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'pageChanged') {
     this._onPageChanged(event);
   } else {
-    scout.OutlineAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
 
-scout.OutlineAdapter.prototype._onWidgetPageInit = function(page) {
+_onWidgetPageInit(page) {
   if (page.detailTable) {
     this._initDetailTable(page);
   }
   this._linkNodeWithRowLater(page);
-};
+}
 
-scout.OutlineAdapter.prototype._initDetailTable = function(page) {
+_initDetailTable(page) {
   // link already existing rows now
   page.detailTable.rows.forEach(this._linkNodeWithRow.bind(this));
   // rows which are inserted later are linked by _onDetailTableRowInit
   page.detailTable.on('rowInit', this._detailTableRowInitHandler);
-};
+}
 
-scout.OutlineAdapter.prototype._destroyDetailTable = function(page) {
+_destroyDetailTable(page) {
   this._nodeIdToRowMap = {};
   page.detailTable.rows.forEach(this._unlinkNodeWithRow.bind(this));
   page.detailTable.off('rowInit', this._detailTableRowInitHandler);
-};
+}
 
-scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
+_linkNodeWithRow(row) {
   scout.assertParameter('row', row);
   var node,
     nodeId = row.nodeId;
@@ -104,16 +112,16 @@ scout.OutlineAdapter.prototype._linkNodeWithRow = function(row) {
     // see: #_linkNodeWithRowLater
     this._nodeIdToRowMap[nodeId] = row;
   }
-};
+}
 
-scout.OutlineAdapter.prototype._unlinkNodeWithRow = function(row) {
+_unlinkNodeWithRow(row) {
   var node = this.widget.nodesMap[row.nodeId];
   if (node) {
     node.unlinkWithRow(row);
   }
-};
+}
 
-scout.OutlineAdapter.prototype._onDetailTableRowInit = function(event) {
+_onDetailTableRowInit(event) {
   var node,
     outline = this.widget,
     nodeId = event.row.nodeId;
@@ -132,12 +140,12 @@ scout.OutlineAdapter.prototype._onDetailTableRowInit = function(event) {
     // Table row detail could not be created because the link from page to row was missing at the time the node got selected -> do it now
     this.widget.updateDetailContent();
   }
-};
+}
 
 /**
  * Link node with row, if it hasn't been linked yet.
  */
-scout.OutlineAdapter.prototype._linkNodeWithRowLater = function(page) {
+_linkNodeWithRowLater(page) {
   if (!page.parentNode || !page.parentNode.detailTable) {
     return;
   }
@@ -147,24 +155,24 @@ scout.OutlineAdapter.prototype._linkNodeWithRowLater = function(page) {
   var row = this._nodeIdToRowMap[page.id];
   page.linkWithRow(row);
   delete this._nodeIdToRowMap[page.id];
-};
+}
 
 /**
- * Static method to modify the prototype of scout.Outline.
+ * Static method to modify the prototype of Outline.
  */
-scout.OutlineAdapter.modifyOutlinePrototype = function() {
-  if (!scout.app.remote) {
+static modifyOutlinePrototype() {
+  if (!App.get().remote) {
     return;
   }
 
-  scout.objects.replacePrototypeFunction(scout.Outline, '_computeDetailContent', scout.OutlineAdapter._computeDetailContentRemote, true);
-  scout.objects.replacePrototypeFunction(scout.Outline, 'updateDetailMenus', scout.OutlineAdapter.updateDetailMenusRemote, true);
-};
+  objects.replacePrototypeFunction(Outline, '_computeDetailContent', OutlineAdapter._computeDetailContentRemote, true);
+  objects.replacePrototypeFunction(Outline, 'updateDetailMenus', OutlineAdapter.updateDetailMenusRemote, true);
+}
 
 /**
  * Replacement for Outline#_computeDetailContent(). 'This' points to the outline.
  */
-scout.OutlineAdapter._computeDetailContentRemote = function() {
+static _computeDetailContentRemote() {
   if (!this.modelAdapter) {
     return this._computeDetailContentOrig();
   }
@@ -199,18 +207,19 @@ scout.OutlineAdapter._computeDetailContentRemote = function() {
     selectedPage.detailFormResolved = true;
     this.updateDetailContent();
   }.bind(this, selectedPage));
-};
+}
 
 /**
  * Replacement for Outline#updateDetailMenusRemote(). 'This' points to the outline.
  */
-scout.OutlineAdapter.updateDetailMenusRemote = function() {
+static updateDetailMenusRemote() {
   if (!this.modelAdapter) {
     return this.updateDetailMenusOrig();
   }
   if (this.selectedNode() && this.selectedNode().detailFormResolved) {
     return this.updateDetailMenusOrig();
   }
-};
+}
+}
 
-scout.addAppListener('bootstrap', scout.OutlineAdapter.modifyOutlinePrototype);
+App.addListener('bootstrap', OutlineAdapter.modifyOutlinePrototype);

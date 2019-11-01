@@ -8,8 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Accordion = function() {
-  scout.Accordion.parent.call(this);
+import {objects} from '../index';
+import {HtmlComponent} from '../index';
+import {LoadingSupport} from '../index';
+import {widgets} from '../index';
+import {Widget} from '../index';
+import {RowLayout} from '../index';
+import {Group} from '../index';
+import {arrays} from '../index';
+
+export default class Accordion extends Widget {
+
+constructor() {
+  super();
   this.comparator = null;
   this.collapseStyle = null;
   this.exclusiveExpand = true;
@@ -20,83 +31,83 @@ scout.Accordion = function() {
   this.htmlComp = null;
   this._addWidgetProperties(['groups']);
   this._groupPropertyChangeHandler = this._onGroupPropertyChange.bind(this);
-};
-scout.inherits(scout.Accordion, scout.Widget);
+}
 
-scout.Accordion.prototype._init = function(model) {
-  scout.Accordion.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._initGroups(this.groups);
   this._setExclusiveExpand(this.exclusiveExpand);
-};
+}
 
 /**
  * @override
  */
-scout.Accordion.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this
   });
-};
+}
 
-scout.Accordion.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('accordion');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this.htmlComp.setLayout(this._createLayout());
-};
+}
 
-scout.Accordion.prototype._createLayout = function() {
-  return new scout.RowLayout();
-};
+_createLayout() {
+  return new RowLayout();
+}
 
-scout.Accordion.prototype._renderProperties = function() {
-  scout.Accordion.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderScrollable();
   this._renderGroups();
-};
+}
 
-scout.Accordion.prototype.insertGroup = function(group) {
+insertGroup(group) {
   this.insertGroups([group]);
-};
+}
 
-scout.Accordion.prototype.insertGroups = function(groupsToInsert) {
-  groupsToInsert = scout.arrays.ensure(groupsToInsert);
+insertGroups(groupsToInsert) {
+  groupsToInsert = arrays.ensure(groupsToInsert);
   this.setGroups(this.groups.concat(groupsToInsert));
-};
+}
 
-scout.Accordion.prototype.deleteGroup = function(group) {
+deleteGroup(group) {
   this.deleteGroups([group]);
-};
+}
 
-scout.Accordion.prototype.deleteGroups = function(groupsToDelete) {
-  groupsToDelete = scout.arrays.ensure(groupsToDelete);
+deleteGroups(groupsToDelete) {
+  groupsToDelete = arrays.ensure(groupsToDelete);
   var groups = this.groups.slice();
-  scout.arrays.removeAll(groups, groupsToDelete);
+  arrays.removeAll(groups, groupsToDelete);
   this.setGroups(groups);
-};
+}
 
-scout.Accordion.prototype.deleteAllGroups = function() {
+deleteAllGroups() {
   this.setGroups([]);
-};
+}
 
-scout.Accordion.prototype._initGroups = function(groups) {
+_initGroups(groups) {
   this.groups.forEach(function(group) {
     this._initGroup(group);
   }, this);
-};
+}
 
-scout.Accordion.prototype.setGroups = function(groups) {
-  groups = scout.arrays.ensure(groups);
-  if (scout.objects.equals(this.groups, groups)) {
+setGroups(groups) {
+  groups = arrays.ensure(groups);
+  if (objects.equals(this.groups, groups)) {
     return;
   }
 
-  // Ensure given groups are real groups (of type scout.Group)
+  // Ensure given groups are real groups (of type Group)
   groups = this._createChildren(groups);
 
   // Only delete those which are not in the new array
   // Only insert those which are not already there
-  var groupsToDelete = scout.arrays.diff(this.groups, groups);
-  var groupsToInsert = scout.arrays.diff(groups, this.groups);
+  var groupsToDelete = arrays.diff(this.groups, groups);
+  var groupsToInsert = arrays.diff(groups, this.groups);
   this._deleteGroups(groupsToDelete);
   this._insertGroups(groupsToInsert);
   this._sort(groups);
@@ -110,22 +121,22 @@ scout.Accordion.prototype.setGroups = function(groups) {
     this._updateFirstLastMarker();
     this.invalidateLayoutTree();
   }
-};
+}
 
-scout.Accordion.prototype._insertGroups = function(groups) {
+_insertGroups(groups) {
   groups.forEach(function(group) {
     this._insertGroup(group);
   }, this);
-};
+}
 
-scout.Accordion.prototype._insertGroup = function(group) {
+_insertGroup(group) {
   this._initGroup(group);
   if (this.rendered) {
     this._renderGroup(group);
   }
-};
+}
 
-scout.Accordion.prototype._initGroup = function(group) {
+_initGroup(group) {
   group.setParent(this);
   group.on('propertyChange', this._groupPropertyChangeHandler);
 
@@ -135,57 +146,57 @@ scout.Accordion.prototype._initGroup = function(group) {
     group.setCollapseStyle(this.collapseStyle);
   }
   this.setProperty('collapseStyle', group.collapseStyle);
-};
+}
 
-scout.Accordion.prototype._renderGroup = function(group) {
+_renderGroup(group) {
   group.render();
-};
+}
 
-scout.Accordion.prototype._deleteGroups = function(groups) {
+_deleteGroups(groups) {
   groups.forEach(function(group) {
     this._deleteGroup(group);
   }, this);
-};
+}
 
-scout.Accordion.prototype._deleteGroup = function(group) {
+_deleteGroup(group) {
   group.off('propertyChange', this._groupPropertyChangeHandler);
   if (group.owner === this) {
     group.destroy();
   } else if (this.rendered) {
     group.remove();
   }
-};
+}
 
-scout.Accordion.prototype._renderGroups = function() {
+_renderGroups() {
   this.groups.forEach(function(group) {
     this._renderGroup(group);
   }, this);
   this._updateFirstLastMarker();
   this.invalidateLayoutTree();
-};
+}
 
-scout.Accordion.prototype.setComparator = function(comparator) {
+setComparator(comparator) {
   if (this.comparator === comparator) {
     return;
   }
   this.comparator = comparator;
-};
+}
 
-scout.Accordion.prototype.sort = function() {
+sort() {
   var groups = this.groups.slice();
   this._sort(groups);
   this._updateGroupOrder(groups);
   this._setProperty('groups', groups);
-};
+}
 
-scout.Accordion.prototype._sort = function(groups) {
+_sort(groups) {
   if (this.comparator === null) {
     return;
   }
   groups.sort(this.comparator);
-};
+}
 
-scout.Accordion.prototype._updateGroupOrder = function(groups) {
+_updateGroupOrder(groups) {
   if (!this.rendered) {
     return;
   }
@@ -199,17 +210,17 @@ scout.Accordion.prototype._updateGroupOrder = function(groups) {
       group.$container.appendTo(this.$container);
     }
   }, this);
-};
+}
 
-scout.Accordion.prototype._updateFirstLastMarker = function() {
-  scout.widgets.updateFirstLastMarker(this.groups);
-};
+_updateFirstLastMarker() {
+  widgets.updateFirstLastMarker(this.groups);
+}
 
-scout.Accordion.prototype.setScrollable = function(scrollable) {
+setScrollable(scrollable) {
   this.setProperty('scrollable', scrollable);
-};
+}
 
-scout.Accordion.prototype._renderScrollable = function() {
+_renderScrollable() {
   if (this.scrollable) {
     this._installScrollbars({
       axis: 'y'
@@ -219,46 +230,46 @@ scout.Accordion.prototype._renderScrollable = function() {
   }
   this.$container.toggleClass('scrollable', this.scrollable);
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.Accordion.prototype.getFocusableElement = function() {
-  var group = scout.widgets.findFirstFocusableWidget(this.groups, this);
+getFocusableElement() {
+  var group = widgets.findFirstFocusableWidget(this.groups, this);
   if (group) {
     return group.getFocusableElement();
   }
   return null;
-};
+}
 
-scout.Accordion.prototype.setExclusiveExpand = function(exclusiveExpand) {
+setExclusiveExpand(exclusiveExpand) {
   this.setProperty('exclusiveExpand', exclusiveExpand);
-};
+}
 
-scout.Accordion.prototype._setExclusiveExpand = function(exclusiveExpand) {
+_setExclusiveExpand(exclusiveExpand) {
   this._setProperty('exclusiveExpand', exclusiveExpand);
   this._updateExclusiveExpand();
-};
+}
 
-scout.Accordion.prototype._updateExclusiveExpand = function() {
+_updateExclusiveExpand() {
   if (!this.exclusiveExpand) {
     return;
   }
-  var expandedGroup = scout.arrays.find(this.groups, function(group) {
+  var expandedGroup = arrays.find(this.groups, function(group) {
     return group.visible && !group.collapsed;
   });
   this._collapseOthers(expandedGroup);
-};
+}
 
-scout.Accordion.prototype.setCollapseStyle = function(collapseStyle) {
+setCollapseStyle(collapseStyle) {
   this.groups.forEach(function(group) {
     group.setCollapseStyle(collapseStyle);
   });
   this.setProperty('collapseStyle', collapseStyle);
-};
+}
 
-scout.Accordion.prototype._collapseOthers = function(expandedGroup) {
+_collapseOthers(expandedGroup) {
   if (!expandedGroup || !expandedGroup.collapsible) {
     return;
   }
@@ -267,18 +278,19 @@ scout.Accordion.prototype._collapseOthers = function(expandedGroup) {
       group.setCollapsed(true);
     }
   });
-};
+}
 
-scout.Accordion.prototype._onGroupPropertyChange = function(event) {
+_onGroupPropertyChange(event) {
   if (event.propertyName === 'collapsed') {
     this._onGroupCollapsedChange(event);
   } else if (event.propertyName === 'visible') {
     this._updateFirstLastMarker();
   }
-};
+}
 
-scout.Accordion.prototype._onGroupCollapsedChange = function(event) {
+_onGroupCollapsedChange(event) {
   if (!event.newValue && this.exclusiveExpand) {
     this._collapseOthers(event.source);
   }
-};
+}
+}

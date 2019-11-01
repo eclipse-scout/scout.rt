@@ -8,15 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RadioButtonGroupGridConfig = function() {
-  scout.RadioButtonGroupGridConfig.parent.call(this);
-};
-scout.inherits(scout.RadioButtonGroupGridConfig, scout.LogicalGridConfig);
+import {LogicalGridConfig} from '../../../index';
 
-scout.RadioButtonGroupGridConfig.prototype.getGridColumnCount = function() {
+export default class RadioButtonGroupGridConfig extends LogicalGridConfig {
+
+constructor() {
+  super();
+}
+
+
+getGridColumnCount() {
   return this.widget.gridColumnCount;
-};
+}
 
-scout.RadioButtonGroupGridConfig.prototype.getGridWidgets = function() {
+getGridWidgets() {
   return this.widget.fields;
-};
+}
+}

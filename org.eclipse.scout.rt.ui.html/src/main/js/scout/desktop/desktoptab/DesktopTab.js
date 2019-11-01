@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopTab = function() {
-  scout.DesktopTab.parent.call(this);
-};
-scout.inherits(scout.DesktopTab, scout.SimpleTab);
+import {scout} from '../../index';
+import {SimpleTab} from '../../index';
+import {arrays} from '../../index';
 
-scout.DesktopTab.prototype._render = function() {
-  scout.DesktopTab.parent.prototype._render.call(this);
+export default class DesktopTab extends SimpleTab {
+
+constructor() {
+  super();
+}
+
+
+_render() {
+  super._render();
   this.$container.addClass('desktop-tab');
   this.$container.on('contextmenu', this._onContextMenu.bind(this));
-};
+}
 
-scout.DesktopTab.prototype._onContextMenu = function(event) {
+_onContextMenu(event) {
   var menuCloseAllTabs = scout.create('Menu', {
     parent: this,
     text: this.session.text('ui.CloseAllTabs')
@@ -43,19 +49,20 @@ scout.DesktopTab.prototype._onContextMenu = function(event) {
     }
   });
   popup.open();
-};
+}
 
-scout.DesktopTab.prototype._onCloseAll = function() {
+_onCloseAll() {
   var openViews = this.parent.tabs.map(function(desktopTab) {
     return desktopTab.view;
   });
   this.session.desktop.cancelViews(openViews);
-};
+}
 
-scout.DesktopTab.prototype._onCloseOther = function() {
+_onCloseOther() {
   var openViews = this.parent.tabs.map(function(desktopTab) {
     return desktopTab.view;
   });
-  scout.arrays.remove(openViews, this.view);
+  arrays.remove(openViews, this.view);
   this.session.desktop.cancelViews(openViews);
-};
+}
+}

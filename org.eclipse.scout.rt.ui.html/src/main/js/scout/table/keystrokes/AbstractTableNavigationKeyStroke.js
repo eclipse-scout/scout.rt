@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AbstractTableNavigationKeyStroke = function(table) {
-  scout.AbstractTableNavigationKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {graphics} from '../../index';
+import {arrays} from '../../index';
+
+export default class AbstractTableNavigationKeyStroke extends KeyStroke {
+
+constructor(table) {
+  super();
   this.repeatable = true;
   this.field = table;
   this.shift = !table.multiSelect ? false : undefined;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.AbstractTableNavigationKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.AbstractTableNavigationKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -37,12 +43,12 @@ scout.AbstractTableNavigationKeyStroke.prototype._accept = function(event) {
   }
 
   return true;
-};
+}
 
 /**
  * Returns viewport sensitive information containing the first and last visible row in the viewport.
  */
-scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
+_viewportInfo() {
   var viewportBounds, dataInsets, dataMarginTop, firstRow, lastRow,
     table = this.field,
     viewport = {},
@@ -52,8 +58,8 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
     return viewport;
   }
 
-  viewportBounds = scout.graphics.offsetBounds(table.$data);
-  dataInsets = scout.graphics.insets(table.$data);
+  viewportBounds = graphics.offsetBounds(table.$data);
+  dataInsets = graphics.insets(table.$data);
   dataMarginTop = table.$data.cssMarginTop();
   viewportBounds = viewportBounds.subtract(dataInsets);
 
@@ -69,9 +75,9 @@ scout.AbstractTableNavigationKeyStroke.prototype._viewportInfo = function() {
   viewport.firstRow = firstRow;
   viewport.lastRow = lastRow;
   return viewport;
-};
+}
 
-scout.AbstractTableNavigationKeyStroke.prototype.firstRowAfterSelection = function() {
+firstRowAfterSelection() {
   var $selectedRows = this.field.$selectedRows();
   if (!$selectedRows.length) {
     return;
@@ -82,9 +88,9 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowAfterSelection = functi
     rowIndex = this.field.filteredRows().indexOf(row);
 
   return rows[rowIndex + 1];
-};
+}
 
-scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = function() {
+firstRowBeforeSelection() {
   var $selectedRows = this.field.$selectedRows();
   if (!$selectedRows.length) {
     return;
@@ -94,17 +100,17 @@ scout.AbstractTableNavigationKeyStroke.prototype.firstRowBeforeSelection = funct
     rowIndex = this.field.visibleRows.indexOf(row);
 
   return rows[rowIndex - 1];
-};
+}
 
 /**
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
-scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = function(table, rowIndex) {
+_findLastSelectedRowBefore(table, rowIndex) {
   var row, rows = table.visibleRows;
   if (rowIndex === 0) {
     return rows[rowIndex];
   }
-  row = scout.arrays.findFromReverse(rows, rowIndex, function(row, i) {
+  row = arrays.findFromReverse(rows, rowIndex, function(row, i) {
     var previousRow = rows[i - 1];
     if (!previousRow) {
       return false;
@@ -116,17 +122,17 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowBefore = fu
     row = rows[0];
   }
   return row;
-};
+}
 
 /**
  * Searches for the last selected row in the current selection block, starting from rowIndex. Expects row at rowIndex to be selected.
  */
-scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = function(table, rowIndex) {
+_findLastSelectedRowAfter(table, rowIndex) {
   var row, rows = table.visibleRows;
   if (rowIndex === rows.length - 1) {
     return rows[rowIndex];
   }
-  row = scout.arrays.findFrom(rows, rowIndex, function(row, i) {
+  row = arrays.findFrom(rows, rowIndex, function(row, i) {
     var nextRow = rows[i + 1];
     if (!nextRow) {
       return false;
@@ -138,11 +144,11 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastSelectedRowAfter = fun
     row = rows[rows.length - 1];
   }
   return row;
-};
+}
 
-scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = function(table, viewportBounds) {
+_findFirstRowInViewport(table, viewportBounds) {
   var rows = table.visibleRows;
-  return scout.arrays.find(rows, function(row, i) {
+  return arrays.find(rows, function(row, i) {
     var rowOffset, rowMarginTop,
       $row = row.$row;
 
@@ -161,14 +167,14 @@ scout.AbstractTableNavigationKeyStroke.prototype._findFirstRowInViewport = funct
     // If the row is fully visible in the viewport -> break and return the row
     return viewportBounds.contains(rowOffset.left, rowOffset.top);
   });
-};
+}
 
-scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = function(table, startRowIndex, viewportBounds) {
+_findLastRowInViewport(table, startRowIndex, viewportBounds) {
   var rows = table.visibleRows;
   if (startRowIndex === rows.length - 1) {
     return rows[startRowIndex];
   }
-  return scout.arrays.findFromForward(rows, startRowIndex, function(row, i) {
+  return arrays.findFromForward(rows, startRowIndex, function(row, i) {
     var nextRowOffsetBounds, $nextRow,
       nextRow = rows[i + 1];
 
@@ -181,8 +187,9 @@ scout.AbstractTableNavigationKeyStroke.prototype._findLastRowInViewport = functi
       // If next row is not rendered anymore, current row has to be the last in the viewport
       return true;
     }
-    nextRowOffsetBounds = scout.graphics.offsetBounds($nextRow);
+    nextRowOffsetBounds = graphics.offsetBounds($nextRow);
     // If the next row is not fully visible in the viewport -> break and return current row
     return !viewportBounds.contains(nextRowOffsetBounds.x, nextRowOffsetBounds.y + nextRowOffsetBounds.height - 1);
   });
-};
+}
+}

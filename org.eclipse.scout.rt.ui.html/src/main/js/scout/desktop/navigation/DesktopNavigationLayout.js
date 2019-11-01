@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopNavigationLayout = function(navigation) {
-  scout.DesktopNavigationLayout.parent.call(this);
-  this.navigation = navigation;
-};
-scout.inherits(scout.DesktopNavigationLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../../index';
+import {Dimension} from '../../index';
 
-scout.DesktopNavigationLayout.prototype.layout = function($container) {
+export default class DesktopNavigationLayout extends AbstractLayout {
+
+constructor(navigation) {
+  super();
+  this.navigation = navigation;
+}
+
+
+layout($container) {
   var bodySize, viewButtonBoxSize, viewButtonBoxPrefSize,
     htmlContainer = this.navigation.htmlComp,
     containerSize = htmlContainer.size({
@@ -36,17 +41,17 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
       viewButtonBoxWidth = viewButtonBoxPrefSize.width;
     }
 
-    viewButtonBoxSize = new scout.Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
+    viewButtonBoxSize = new Dimension(viewButtonBoxWidth, viewButtonBoxHeight)
       .subtract(viewButtonBox.htmlComp.margins());
     viewButtonBox.htmlComp.setSize(viewButtonBoxSize);
   }
 
   if (toolBox) {
     toolBox.$container.cssLeft(viewButtonBoxWidth);
-    toolBox.htmlComp.setSize(new scout.Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight));
+    toolBox.htmlComp.setSize(new Dimension(containerSize.width - viewButtonBoxWidth, viewButtonBoxHeight));
   }
 
-  bodySize = new scout.Dimension(containerSize.width, containerSize.height)
+  bodySize = new Dimension(containerSize.width, containerSize.height)
     .subtract(htmlBody.margins());
   if (this.navigation.singleViewButton) {
     htmlBody.$comp.cssTop(0);
@@ -55,9 +60,9 @@ scout.DesktopNavigationLayout.prototype.layout = function($container) {
     bodySize.height -= viewButtonBoxHeight;
   }
   htmlBody.setSize(bodySize);
-};
+}
 
-scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var htmlContainer = this.navigation.htmlComp,
     htmlBody = this.navigation.htmlCompBody,
     toolBox = this.navigation.toolBox,
@@ -65,7 +70,7 @@ scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($containe
 
   var prefSize = htmlBody.prefSize();
 
-  var prefSizeBoxes = new scout.Dimension(0, 0);
+  var prefSizeBoxes = new Dimension(0, 0);
   if (viewButtonBox) {
     var prefSizeViewButtonBox = viewButtonBox.htmlComp.prefSize();
     prefSizeBoxes.width += prefSizeViewButtonBox.width;
@@ -82,4 +87,5 @@ scout.DesktopNavigationLayout.prototype.preferredLayoutSize = function($containe
   prefSize = prefSize.add(htmlContainer.insets());
 
   return prefSize;
-};
+}
+}

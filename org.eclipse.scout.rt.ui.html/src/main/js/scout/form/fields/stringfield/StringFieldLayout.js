@@ -8,14 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StringFieldLayout = function(stringField) {
-  scout.StringFieldLayout.parent.call(this, stringField);
-};
-scout.inherits(scout.StringFieldLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../../index';
+import {graphics} from '../../../index';
 
-scout.StringFieldLayout.prototype._layoutClearIcon = function(formField, fieldBounds, right, top) {
+export default class StringFieldLayout extends FormFieldLayout {
+
+constructor(stringField) {
+  super( stringField);
+}
+
+
+_layoutClearIcon(formField, fieldBounds, right, top) {
   if (formField.$icon && formField.$icon.isVisible()) {
-    right += scout.graphics.prefSize(formField.$icon, true).width;
+    right += graphics.prefSize(formField.$icon, true).width;
   }
-  scout.StringFieldLayout.parent.prototype._layoutClearIcon.call(this, formField, fieldBounds, right, top);
-};
+  super._layoutClearIcon( formField, fieldBounds, right, top);
+}
+}

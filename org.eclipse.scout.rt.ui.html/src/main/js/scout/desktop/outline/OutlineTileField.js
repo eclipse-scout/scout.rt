@@ -8,26 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.OutlineTileField = function() {
-  scout.OutlineTileField.parent.call(this);
+import {scout} from '../../index';
+import {FormField} from '../../index';
+
+export default class OutlineTileField extends FormField {
+
+constructor() {
+  super();
 
   // outline is not a widget, because at the time where _init runs, outline is not yet available
   this.outline = null;
   this.tileOutlineOverview = null;
-};
-scout.inherits(scout.OutlineTileField, scout.FormField);
+}
 
-scout.OutlineTileField.prototype._render = function() {
+
+_render() {
   this._ensureTileOutlineOverview();
   this.addContainer(this.$parent, 'outline-tile-field');
   this.tileOutlineOverview.render(this.$container);
   this.addField(this.tileOutlineOverview.$container);
-};
+}
 
 /**
  * We cannot create the TileOutlineOverview instance in the _init function, because at the time where _init runs, outlines are not yet available.
  */
-scout.OutlineTileField.prototype._ensureTileOutlineOverview = function() {
+_ensureTileOutlineOverview() {
   if (this.tileOutlineOverview) {
     return;
   }
@@ -36,4 +41,5 @@ scout.OutlineTileField.prototype._ensureTileOutlineOverview = function() {
     parent: this,
     outline: outline
   });
-};
+}
+}

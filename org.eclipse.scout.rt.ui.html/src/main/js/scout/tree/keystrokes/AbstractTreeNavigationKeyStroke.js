@@ -8,23 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AbstractTreeNavigationKeyStroke = function(tree, modifierBitMask) {
-  scout.AbstractTreeNavigationKeyStroke.parent.call(this);
+import {HAlign} from '../../index';
+import {keyStrokeModifier} from '../../index';
+import {KeyStroke} from '../../index';
+
+export default class AbstractTreeNavigationKeyStroke extends KeyStroke {
+
+constructor(tree, modifierBitMask) {
+  super();
   this.field = tree;
   this.repeatable = true;
   this.stopPropagation = true;
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
 
-  this.ctrl = scout.keyStrokeModifier.isCtrl(modifierBitMask);
-  this.shift = scout.keyStrokeModifier.isShift(modifierBitMask);
-  this.alt = scout.keyStrokeModifier.isAlt(modifierBitMask);
+  this.ctrl = keyStrokeModifier.isCtrl(modifierBitMask);
+  this.shift = keyStrokeModifier.isShift(modifierBitMask);
+  this.alt = keyStrokeModifier.isAlt(modifierBitMask);
 
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.AbstractTreeNavigationKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.AbstractTreeNavigationKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -34,20 +40,21 @@ scout.AbstractTreeNavigationKeyStroke.prototype._accept = function(event) {
     event._$treeCurrentNode = event._treeCurrentNode.$node;
   }
   return true;
-};
+}
 
-scout.AbstractTreeNavigationKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var newSelection = this._computeNewSelection(event._treeCurrentNode);
   if (newSelection) {
     this.selectNodesAndReveal(newSelection, true);
   }
-};
+}
 
-scout.AbstractTreeNavigationKeyStroke.prototype._computeNewSelection = function(currentNode) {
+_computeNewSelection(currentNode) {
   return [];
-};
+}
 
-scout.AbstractTreeNavigationKeyStroke.prototype.selectNodesAndReveal = function(newSelection, debounceSend) {
+selectNodesAndReveal(newSelection, debounceSend) {
   this.field.selectNodes(newSelection, debounceSend);
   this.field.revealSelection();
-};
+}
+}

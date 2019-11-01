@@ -8,16 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.UnsavedFormsLookupCall = function() {
-  scout.UnsavedFormsLookupCall.parent.call(this);
+import {UnsavedFormChangesForm} from '../../index';
+import {StaticLookupCall} from '../../index';
+
+export default class UnsavedFormsLookupCall extends StaticLookupCall {
+
+constructor() {
+  super();
 
   this.unsavedForms = [];
-};
-scout.inherits(scout.UnsavedFormsLookupCall, scout.StaticLookupCall);
+}
 
-scout.UnsavedFormsLookupCall.prototype._data = function() {
+
+_data() {
   return this.unsavedForms.map(function(form) {
-    var text = scout.UnsavedFormChangesForm.getFormDisplayName(form);
+    var text = UnsavedFormChangesForm.getFormDisplayName(form);
     return [form, text];
   });
-};
+}
+}

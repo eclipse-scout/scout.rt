@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SequenceBoxAdapter = function() {
-  scout.SequenceBoxAdapter.parent.call(this);
-};
-scout.inherits(scout.SequenceBoxAdapter, scout.ValueFieldAdapter);
+import {ValueFieldAdapter} from '../../../index';
+
+export default class SequenceBoxAdapter extends ValueFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

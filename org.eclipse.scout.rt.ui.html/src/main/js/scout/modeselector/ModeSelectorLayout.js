@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ModeSelectorLayout = function(modeSelector) {
-  scout.ModeSelectorLayout.parent.call(this);
-  this.modeSelector = modeSelector;
-};
-scout.inherits(scout.ModeSelectorLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../index';
 
-scout.ModeSelectorLayout.prototype.preferredLayoutSize = function($container, options) {
-  var prefSize = scout.ModeSelectorLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
+export default class ModeSelectorLayout extends AbstractLayout {
+
+constructor(modeSelector) {
+  super();
+  this.modeSelector = modeSelector;
+}
+
+
+preferredLayoutSize($container, options) {
+  var prefSize = super.preferredLayoutSize( $container, options);
 
   var oldStyle = this.modeSelector.$container.attr('style');
   this.modeSelector.$container.css({
@@ -35,4 +39,5 @@ scout.ModeSelectorLayout.prototype.preferredLayoutSize = function($container, op
 
   prefSize.width = maxWidth * this.modeSelector.modes.length + this.modeSelector.htmlComp.insets().horizontal();
   return prefSize;
-};
+}
+}

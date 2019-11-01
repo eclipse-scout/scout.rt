@@ -8,23 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableAdapter = function() {
-  scout.TableAdapter.parent.call(this);
-  this._addRemoteProperties(['contextColumn']);
-};
-scout.inherits(scout.TableAdapter, scout.ModelAdapter);
+import {defaultValues} from '../index';
+import {Table} from '../index';
+import {objects} from '../index';
+import {ModelAdapter} from '../index';
+import {TableUserFilter} from '../index';
+import {BooleanColumn} from '../index';
+import * as $ from 'jquery';
+import {Column} from '../index';
+import {scout} from '../index';
+import {App} from '../index';
 
-scout.TableAdapter.prototype._postCreateWidget = function() {
+export default class TableAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+  this._addRemoteProperties(['contextColumn']);
+}
+
+
+_postCreateWidget() {
   // if a newly created table has already a userfilter defined, we need to fire the filter event after creation
   // because the original event had been fired before the eventhandler was registered.
-  if (scout.objects.values(this.widget._filterMap).some(function(filter) {
-      return filter instanceof scout.TableUserFilter;
+  if (objects.values(this.widget._filterMap).some(function(filter) {
+      return filter instanceof TableUserFilter;
     })) {
     this._onWidgetFilter();
   }
-};
+}
 
-scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) {
+_sendRowsSelected(rowIds, debounceSend) {
   var eventData = {
     rowIds: rowIds
   };
@@ -37,50 +50,50 @@ scout.TableAdapter.prototype._sendRowsSelected = function(rowIds, debounceSend) 
       return this.target === previous.target && this.type === previous.type;
     }
   });
-};
+}
 
-scout.TableAdapter.prototype._sendRowClick = function(rowId, mouseButton, columnId) {
+_sendRowClick(rowId, mouseButton, columnId) {
   var data = {
     rowId: rowId,
     columnId: columnId,
     mouseButton: mouseButton
   };
   this._send('rowClick', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetRowsSelected = function(event) {
+_onWidgetRowsSelected(event) {
   var rowIds = this.widget._rowsToIds(this.widget.selectedRows);
   this._sendRowsSelected(rowIds, event.debounce);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetRowClick = function(event) {
+_onWidgetRowClick(event) {
   var columnId;
   if (event.column !== undefined) {
     columnId = event.column.id;
   }
 
   this._sendRowClick(event.row.id, event.mouseButton, columnId);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetFilterAdded = function(event) {
+_onWidgetFilterAdded(event) {
   var filter = event.filter;
-  if (filter instanceof scout.TableUserFilter) {
+  if (filter instanceof TableUserFilter) {
     this._send('filterAdded', filter.createFilterAddedEventData());
   }
-};
+}
 
-scout.TableAdapter.prototype._onWidgetFilterRemoved = function(event) {
+_onWidgetFilterRemoved(event) {
   var filter = event.filter;
-  if (filter instanceof scout.TableUserFilter) {
+  if (filter instanceof TableUserFilter) {
     this._send('filterRemoved', filter.createFilterRemovedEventData());
   }
-};
+}
 
-scout.TableAdapter.prototype._onWidgetColumnResized = function(event) {
+_onWidgetColumnResized(event) {
   this._sendColumnResized(event.column);
-};
+}
 
-scout.TableAdapter.prototype._sendColumnResized = function(column) {
+_sendColumnResized(column) {
   if (column.fixedWidth || this.widget.autoResizeColumns) {
     return;
   }
@@ -99,40 +112,40 @@ scout.TableAdapter.prototype._sendColumnResized = function(column) {
     },
     showBusyIndicator: false
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetAggregationFunctionChanged = function(event) {
+_onWidgetAggregationFunctionChanged(event) {
   this._sendAggregationFunctionChanged(event.column);
-};
+}
 
-scout.TableAdapter.prototype._sendAggregationFunctionChanged = function(column) {
+_sendAggregationFunctionChanged(column) {
   var data = {
     columnId: column.id,
     aggregationFunction: column.aggregationFunction
   };
   this._send('aggregationFunctionChanged', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetColumnBackgroundEffectChanged = function(event) {
+_onWidgetColumnBackgroundEffectChanged(event) {
   this._sendColumnBackgroundEffectChanged(event.column);
-};
+}
 
-scout.TableAdapter.prototype._sendColumnBackgroundEffectChanged = function(column) {
+_sendColumnBackgroundEffectChanged(column) {
   var data = {
     columnId: column.id,
     backgroundEffect: column.backgroundEffect
   };
   this._send('columnBackgroundEffectChanged', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetColumnOrganizeAction = function(event) {
+_onWidgetColumnOrganizeAction(event) {
   this._send('columnOrganizeAction', {
     action: event.action,
     columnId: event.column.id
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetColumnMoved = function(event) {
+_onWidgetColumnMoved(event) {
   var index = event.newPos;
   this.widget.columns.forEach(function(iteratingColumn, i) {
     // Adjust index if column is only known on the gui
@@ -141,58 +154,58 @@ scout.TableAdapter.prototype._onWidgetColumnMoved = function(event) {
     }
   });
   this._sendColumnMoved(event.column, index);
-};
+}
 
-scout.TableAdapter.prototype._sendColumnMoved = function(column, index) {
+_sendColumnMoved(column, index) {
   var data = {
     columnId: column.id,
     index: index
   };
   this._send('columnMoved', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetPrepareCellEdit = function(event) {
+_onWidgetPrepareCellEdit(event) {
   event.preventDefault();
   this._sendPrepareCellEdit(event.row, event.column);
-};
+}
 
-scout.TableAdapter.prototype._sendPrepareCellEdit = function(row, column) {
+_sendPrepareCellEdit(row, column) {
   var data = {
     rowId: row.id,
     columnId: column.id
   };
   this._send('prepareCellEdit', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetCompleteCellEdit = function(event) {
+_onWidgetCompleteCellEdit(event) {
   event.preventDefault();
   this._sendCompleteCellEdit(event.field);
-};
+}
 
-scout.TableAdapter.prototype._sendCompleteCellEdit = function(field) {
+_sendCompleteCellEdit(field) {
   var data = {
     fieldId: field.id
   };
   this._send('completeCellEdit', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetCancelCellEdit = function(event) {
+_onWidgetCancelCellEdit(event) {
   event.preventDefault();
   this._sendCancelCellEdit(event.field);
-};
+}
 
-scout.TableAdapter.prototype._sendCancelCellEdit = function(field) {
+_sendCancelCellEdit(field) {
   var data = {
     fieldId: field.id
   };
   this._send('cancelCellEdit', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetRowsChecked = function(event) {
+_onWidgetRowsChecked(event) {
   this._sendRowsChecked(event.rows);
-};
+}
 
-scout.TableAdapter.prototype._sendRowsChecked = function(rows) {
+_sendRowsChecked(rows) {
   var data = {
     rows: []
   };
@@ -205,13 +218,13 @@ scout.TableAdapter.prototype._sendRowsChecked = function(rows) {
   }
 
   this._send('rowsChecked', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetRowsExpanded = function(event) {
+_onWidgetRowsExpanded(event) {
   this._sendRowsExpanded(event.rows);
-};
+}
 
-scout.TableAdapter.prototype._sendRowsExpanded = function(rows) {
+_sendRowsExpanded(rows) {
   var data = {
     rows: rows.map(function(row) {
       return {
@@ -221,14 +234,14 @@ scout.TableAdapter.prototype._sendRowsExpanded = function(rows) {
     })
   };
   this._send('rowsExpanded', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetFilter = function(event) {
+_onWidgetFilter(event) {
   var rowIds = this.widget._rowsToIds(this.widget.filteredRows());
   this._sendFilter(rowIds);
-};
+}
 
-scout.TableAdapter.prototype._sendFilter = function(rowIds) {
+_sendFilter(rowIds) {
   var eventData = {};
   if (rowIds.length === this.widget.rows.length) {
     eventData.remove = true;
@@ -245,9 +258,9 @@ scout.TableAdapter.prototype._sendFilter = function(rowIds) {
     },
     showBusyIndicator: false
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetSort = function(event) {
+_onWidgetSort(event) {
   this._send('sort', {
     columnId: event.column.id,
     sortAscending: event.sortAscending,
@@ -255,9 +268,9 @@ scout.TableAdapter.prototype._onWidgetSort = function(event) {
     multiSort: event.multiSort,
     sortingRequested: event.sortingRequested
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetGroup = function(event) {
+_onWidgetGroup(event) {
   this._send('group', {
     columnId: event.column.id,
     groupAscending: event.groupAscending,
@@ -265,31 +278,31 @@ scout.TableAdapter.prototype._onWidgetGroup = function(event) {
     multiGroup: event.multiGroup,
     groupingRequested: event.groupingRequested
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetRowAction = function(event) {
+_onWidgetRowAction(event) {
   this._sendRowAction(event.row, event.column);
-};
+}
 
-scout.TableAdapter.prototype._sendRowAction = function(row, column) {
+_sendRowAction(row, column) {
   this._send('rowAction', {
     rowId: row.id,
     columnId: column.id
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetAppLinkAction = function(event) {
+_onWidgetAppLinkAction(event) {
   this._sendAppLinkAction(event.column, event.ref);
-};
+}
 
-scout.TableAdapter.prototype._sendAppLinkAction = function(column, ref) {
+_sendAppLinkAction(column, ref) {
   this._send('appLinkAction', {
     columnId: column.id,
     ref: ref
   });
-};
+}
 
-scout.TableAdapter.prototype._sendContextColumn = function(contextColumn) {
+_sendContextColumn(contextColumn) {
   if (contextColumn.guiOnly) {
     contextColumn = null;
     this.widget.contextColumn = null;
@@ -301,21 +314,21 @@ scout.TableAdapter.prototype._sendContextColumn = function(contextColumn) {
   this._send('property', {
     contextColumn: columnId
   });
-};
+}
 
-scout.TableAdapter.prototype._onWidgetReload = function(event) {
+_onWidgetReload(event) {
   var data = {
     reloadReason: event.reloadReason
   };
   this._send('reload', data);
-};
+}
 
-scout.TableAdapter.prototype._onWidgetExportToClipboard = function(event) {
+_onWidgetExportToClipboard(event) {
   this._send('clipboardExport');
   event.preventDefault();
-};
+}
 
-scout.TableAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'rowsSelected') {
     this._onWidgetRowsSelected(event);
   } else if (event.type === 'rowsChecked') {
@@ -359,39 +372,39 @@ scout.TableAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'aggregationFunctionChanged') {
     this._onWidgetAggregationFunctionChanged(event);
   } else {
-    scout.TableAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.TableAdapter.prototype._onRowsInserted = function(rows) {
+_onRowsInserted(rows) {
   this.widget.insertRows(rows);
   this._rebuildingTable = false;
-};
+}
 
-scout.TableAdapter.prototype._onRowsDeleted = function(rowIds) {
+_onRowsDeleted(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
   this.addFilterForWidgetEventType('rowsSelected');
   this.widget.deleteRows(rows);
-};
+}
 
-scout.TableAdapter.prototype._onAllRowsDeleted = function() {
+_onAllRowsDeleted() {
   this.addFilterForWidgetEventType('rowsSelected');
   this.widget.deleteAllRows();
-};
+}
 
-scout.TableAdapter.prototype._onRowsUpdated = function(rows) {
+_onRowsUpdated(rows) {
   this.widget.updateRows(rows);
-};
+}
 
-scout.TableAdapter.prototype._onRowsSelected = function(rowIds) {
+_onRowsSelected(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
   this.addFilterForWidgetEventType('rowsSelected');
   this.widget.selectRows(rows);
   // TODO [7.0] cgu what is this for? seems wrong here
   this.widget.selectionHandler.clearLastSelectedRowMarker();
-};
+}
 
-scout.TableAdapter.prototype._onRowsChecked = function(rows) {
+_onRowsChecked(rows) {
   var checkedRows = [],
     uncheckedRows = [];
 
@@ -412,9 +425,9 @@ scout.TableAdapter.prototype._onRowsChecked = function(rows) {
   this.widget.uncheckRows(uncheckedRows, {
     checkOnlyEnabled: false
   });
-};
+}
 
-scout.TableAdapter.prototype._onRowsExpanded = function(rows) {
+_onRowsExpanded(rows) {
   var expandedRows = [],
     collapsedRows = [];
   rows.forEach(function(rowData) {
@@ -429,26 +442,26 @@ scout.TableAdapter.prototype._onRowsExpanded = function(rows) {
 
   this.widget.expandRows(expandedRows);
   this.widget.collapseRows(collapsedRows);
-};
+}
 
-scout.TableAdapter.prototype._onRowOrderChanged = function(rowIds) {
+_onRowOrderChanged(rowIds) {
   var rows = this.widget._rowsByIds(rowIds);
   this.widget.updateRowOrder(rows);
-};
+}
 
-scout.TableAdapter.prototype._onColumnStructureChanged = function(columns) {
+_onColumnStructureChanged(columns) {
   this._rebuildingTable = true;
   this.widget.updateColumnStructure(columns);
-};
+}
 
-scout.TableAdapter.prototype._onColumnOrderChanged = function(columnIds) {
+_onColumnOrderChanged(columnIds) {
   var columns = this.widget.columnsByIds(columnIds);
   this.widget.updateColumnOrder(columns);
-};
+}
 
-scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
+_onColumnHeadersUpdated(columns) {
   columns.forEach(function(column) {
-    scout.defaultValues.applyTo(column);
+    defaultValues.applyTo(column);
   });
   this.widget.updateColumnHeaders(columns);
 
@@ -458,30 +471,30 @@ scout.TableAdapter.prototype._onColumnHeadersUpdated = function(columns) {
     // removing of a group column doesn't cause a rowOrderChange, nonetheless aggregation columns might need to be removed.
     this.widget.updateRowOrder(this.widget.rows);
   }
-};
+}
 
-scout.TableAdapter.prototype._onStartCellEdit = function(columnId, rowId, fieldId) {
+_onStartCellEdit(columnId, rowId, fieldId) {
   var column = this.widget.columnById(columnId),
     row = this.widget._rowById(rowId),
     field = this.session.getOrCreateWidget(fieldId, this.widget);
 
   this.widget.startCellEdit(column, row, field);
-};
+}
 
-scout.TableAdapter.prototype._onEndCellEdit = function(fieldId) {
+_onEndCellEdit(fieldId) {
   var field = this.session.getModelAdapter(fieldId);
   this.widget.endCellEdit(field.widget);
-};
+}
 
-scout.TableAdapter.prototype._onRequestFocus = function() {
+_onRequestFocus() {
   this.widget.focus();
-};
+}
 
-scout.TableAdapter.prototype._onScrollToSelection = function() {
+_onScrollToSelection() {
   this.widget.revealSelection();
-};
+}
 
-scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) {
+_onColumnBackgroundEffectChanged(event) {
   event.eventParts.forEach(function(eventPart) {
     var column = this.widget.columnById(eventPart.columnId),
       backgroundEffect = eventPart.backgroundEffect;
@@ -494,16 +507,16 @@ scout.TableAdapter.prototype._onColumnBackgroundEffectChanged = function(event) 
 
     column.setBackgroundEffect(backgroundEffect);
   }, this);
-};
+}
 
-scout.TableAdapter.prototype._onRequestFocusInCell = function(event) {
+_onRequestFocusInCell(event) {
   var row = this.widget._rowById(event.rowId),
     column = this.widget.columnById(event.columnId);
 
   this.widget.focusCell(column, row);
-};
+}
 
-scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
+_onAggregationFunctionChanged(event) {
   var columns = [],
     functions = [];
 
@@ -522,9 +535,9 @@ scout.TableAdapter.prototype._onAggregationFunctionChanged = function(event) {
   }, this);
 
   this.widget.changeAggregations(columns, functions);
-};
+}
 
-scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
+_onFiltersChanged(filters) {
   this.addFilterForWidgetEventType('filterAdded');
   this.addFilterForWidgetEventType('filterRemoved');
 
@@ -533,9 +546,9 @@ scout.TableAdapter.prototype._onFiltersChanged = function(filters) {
   if (!this._rebuildingTable) {
     this.widget.filter();
   }
-};
+}
 
-scout.TableAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {
@@ -575,15 +588,15 @@ scout.TableAdapter.prototype.onModelAction = function(event) {
   } else if (event.type === 'requestFocusInCell') {
     this._onRequestFocusInCell(event);
   } else {
-    scout.TableAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
 
 /**
  * @override ModelAdapter.js
  */
-scout.TableAdapter.prototype.exportAdapterData = function(adapterData) {
-  adapterData = scout.TableAdapter.parent.prototype.exportAdapterData.call(this, adapterData);
+exportAdapterData(adapterData) {
+  adapterData = super.exportAdapterData( adapterData);
   delete adapterData.selectedRows;
   adapterData.rows = [];
   adapterData.columns.forEach(function(column) {
@@ -591,18 +604,18 @@ scout.TableAdapter.prototype.exportAdapterData = function(adapterData) {
     delete column.modelClass;
   });
   return adapterData;
-};
+}
 
 /**
- * Static method to modify the prototype of scout.Table.
+ * Static method to modify the prototype of Table.
  */
-scout.TableAdapter.modifyTablePrototype = function() {
-  if (!scout.app.remote) {
+static modifyTablePrototype() {
+  if (!App.get().remote) {
     return;
   }
 
   // _sortAfterInsert
-  scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterInsert', function(wasEmpty) {
+  objects.replacePrototypeFunction(Table, '_sortAfterInsert', function(wasEmpty) {
     if (this.modelAdapter) {
       // There will only be a row order changed event if table was not empty.
       // If it was empty, there will be NO row order changed event (tableEventBuffer) -> inserted rows are already in correct order -> no sort necessary but group is
@@ -615,7 +628,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 
   // _sortAfterUpdate
-  scout.objects.replacePrototypeFunction(scout.Table, '_sortAfterUpdate', function() {
+  objects.replacePrototypeFunction(Table, '_sortAfterUpdate', function() {
     if (this.modelAdapter) {
       this._group();
     } else {
@@ -624,7 +637,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 
   // uiSortPossible
-  scout.objects.replacePrototypeFunction(scout.Table, '_isSortingPossible', function(sortColumns) {
+  objects.replacePrototypeFunction(Table, '_isSortingPossible', function(sortColumns) {
     if (this.modelAdapter) {
       // In a JS only app the flag 'uiSortPossible' is never set and thus defaults to true. Additionally we check if each column can install
       // its comparator used to sort. If installation failed for some reason, sorting is not possible. In a remote app the server sets the
@@ -636,7 +649,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 
   // sort
-  scout.objects.replacePrototypeFunction(scout.Table, 'sort', function(column, direction, multiSort, remove) {
+  objects.replacePrototypeFunction(Table, 'sort', function(column, direction, multiSort, remove) {
     if (this.modelAdapter && column.guiOnly) {
       return;
     }
@@ -644,7 +657,7 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 
   // no js default tileTableHeader in classic mode
-  scout.objects.replacePrototypeFunction(scout.Table, '_createTileTableHeader', function() {
+  objects.replacePrototypeFunction(Table, '_createTileTableHeader', function() {
     if (this.modelAdapter) {
       // nop in classic mode
       return;
@@ -653,32 +666,32 @@ scout.TableAdapter.modifyTablePrototype = function() {
   }, true);
 
   // not used in classic mode since tiles are created by the server
-  scout.objects.replacePrototypeFunction(scout.Table, 'createTiles', function() {
+  objects.replacePrototypeFunction(Table, 'createTiles', function() {
     if (this.modelAdapter) {
       // nop in classic mode
       return;
     }
     return this.createTilesOrig();
   }, true);
-};
+}
 
-scout.TableAdapter.modifyColumnPrototype = function() {
-  if (!scout.app.remote) {
+static modifyColumnPrototype() {
+  if (!App.get().remote) {
     return;
   }
 
   // init
-  scout.objects.replacePrototypeFunction(scout.Column, 'init', function(model) {
+  objects.replacePrototypeFunction(Column, 'init', function(model) {
     if (model.table && model.table.modelAdapter) {
       // Fill in the missing default values only in remote case, don't do it JS case to not accidentally set undefined properties (e.g. uiSortEnabled)
       model = $.extend({}, model);
-      scout.defaultValues.applyTo(model);
+      defaultValues.applyTo(model);
     }
     this.initOrig(model);
   }, true);
 
   // _ensureCell
-  scout.objects.replacePrototypeFunction(scout.Column, '_ensureCell', function(vararg) {
+  objects.replacePrototypeFunction(Column, '_ensureCell', function(vararg) {
     if (this.table.modelAdapter) {
       // Note: we do almost the same thing as in _ensureCellOrig, the difference is that
       // we treat a plain object always as cell-model and we always must apply defaultValues
@@ -688,7 +701,7 @@ scout.TableAdapter.modifyColumnPrototype = function() {
       // cell properties, which is required because the Column checks, whether it should apply
       // defaults from the Column instance to a cell, or use the values from the cell.
       var model;
-      if (scout.objects.isPlainObject(vararg)) {
+      if (objects.isPlainObject(vararg)) {
         model = vararg;
         model.value = this._parseValue(model.value);
         // Parse the value if a text but no value is provided. The server does only set the text if value and text are equal.
@@ -707,7 +720,7 @@ scout.TableAdapter.modifyColumnPrototype = function() {
           value: this._parseValue(vararg)
         };
       }
-      scout.defaultValues.applyTo(model, 'Cell');
+      defaultValues.applyTo(model, 'Cell');
       return scout.create('Cell', model);
     } else {
       return this._ensureCellOrig(vararg);
@@ -715,7 +728,7 @@ scout.TableAdapter.modifyColumnPrototype = function() {
   }, true);
 
   // uiSortPossible
-  scout.objects.replacePrototypeFunction(scout.Column, 'isSortingPossible', function() {
+  objects.replacePrototypeFunction(Column, 'isSortingPossible', function() {
     if (this.table.modelAdapter) {
       // Returns whether or not this column can be used to sort on the client side. In a JS only app the flag 'uiSortPossible'
       // is never set and defaults to true. As a side effect of this function a comparator is installed.
@@ -727,23 +740,24 @@ scout.TableAdapter.modifyColumnPrototype = function() {
     }
     return this.isSortingPossibleOrig();
   }, true);
-};
+}
 
-scout.TableAdapter.modifyBooleanColumnPrototype = function() {
-  if (!scout.app.remote) {
+static modifyBooleanColumnPrototype() {
+  if (!App.get().remote) {
     return;
   }
 
   // _toggleCellValue
-  scout.objects.replacePrototypeFunction(scout.BooleanColumn, '_toggleCellValue', function(row, cell) {
+  objects.replacePrototypeFunction(BooleanColumn, '_toggleCellValue', function(row, cell) {
     if (this.table.modelAdapter) {
       // NOP - do nothing, since server will handle the click, see Java AbstractTable#interceptRowClickSingleObserver
     } else {
       this._toggleCellValueOrig(row, cell);
     }
   }, true);
-};
+}
+}
 
-scout.addAppListener('bootstrap', scout.TableAdapter.modifyTablePrototype);
-scout.addAppListener('bootstrap', scout.TableAdapter.modifyColumnPrototype);
-scout.addAppListener('bootstrap', scout.TableAdapter.modifyBooleanColumnPrototype);
+App.addListener('bootstrap', TableAdapter.modifyTablePrototype);
+App.addListener('bootstrap', TableAdapter.modifyColumnPrototype);
+App.addListener('bootstrap', TableAdapter.modifyBooleanColumnPrototype);

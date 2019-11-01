@@ -8,15 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {SimpleTabArea} from '../index';
+import {objects} from '../index';
+import {SimpleTabBox} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 
 /**
- * The {@link {@link scout.SimpleTabBoxController}} is used to link a {@link {@link scout.SimpleTabBox}} with a {@link {@link scout.SimpleTabArea}}.
- * There are {@link {@link scout.SimpleTabBox}} with more than one {@link {@link scout.SimpleTabArea}} to actualized.
+ * The {@link {@link SimpleTabBoxController}} is used to link a {@link {@link SimpleTabBox}} with a {@link {@link SimpleTabArea}}.
+ * There are {@link {@link SimpleTabBox}} with more than one {@link {@link SimpleTabArea}} to actualized.
  * Therefore the linking is separated in a controller.
- * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link {@link scout.SimpleTabBox}} and
- * updates the {@link {@link scout.SimpleTabArea}}.
+ * The controller basically listens to 'viewAdd', 'viewRemove', 'viewActivate', 'viewDeactivate' on the {@link {@link SimpleTabBox}} and
+ * updates the {@link {@link SimpleTabArea}}.
  */
-scout.SimpleTabBoxController = function(tabBox, tabArea) {
+export default class SimpleTabBoxController {
+
+constructor(tabBox, tabArea) {
   this.tabBox = null;
   this._viewAddHandler = this._onViewAdd.bind(this);
   this._viewRemoveHandler = this._onViewRemove.bind(this);
@@ -25,49 +33,49 @@ scout.SimpleTabBoxController = function(tabBox, tabArea) {
 
   this.tabArea = null;
   this._viewTabSelectHandler = this._onViewTabSelect.bind(this);
-};
+}
 
-scout.SimpleTabBoxController.prototype.init = function(model) {
+init(model) {
   $.extend(this, model);
-};
+}
 
-scout.SimpleTabBoxController.prototype.install = function(tabBox, tabArea) {
+install(tabBox, tabArea) {
   this.tabBox = scout.assertParameter('tabBox', tabBox);
   this.tabArea = scout.assertParameter('tabArea', tabArea || this.tabBox.tabArea);
 
   this._installListeners();
-};
+}
 
-scout.SimpleTabBoxController.prototype.uninstall = function() {
+uninstall() {
   this._uninstallListeners();
-};
+}
 
-scout.SimpleTabBoxController.prototype._installListeners = function() {
+_installListeners() {
   this.tabBox.on('viewAdd', this._viewAddHandler);
   this.tabBox.on('viewRemove', this._viewRemoveHandler);
   this.tabBox.on('viewActivate', this._viewActivateHandler);
   this.tabBox.on('viewDeactivate', this._viewDeactivateHandler);
 
   this.tabArea.on('tabSelect', this._viewTabSelectHandler);
-};
+}
 
-scout.SimpleTabBoxController.prototype._uninstallListeners = function() {
+_uninstallListeners() {
   this.tabBox.off('viewAdd', this._viewAddHandler);
   this.tabBox.off('viewRemove', this._viewRemoveHandler);
   this.tabBox.off('viewActivate', this._viewActivateHandler);
   this.tabBox.off('viewDeactivate', this._viewDeactivateHandler);
 
   this.tabArea.off('tabSelect', this._viewTabSelectHandler);
-};
+}
 
-scout.SimpleTabBoxController.prototype._onViewAdd = function(event) {
+_onViewAdd(event) {
   var view = event.view,
     siblingView = event.siblingView,
     viewTab,
     // the sibling to insert the tab after.
     siblingViewTab;
 
-  if (!scout.SimpleTabBoxController.hasViewTab(view)) {
+  if (!SimpleTabBoxController.hasViewTab(view)) {
     return;
   }
   viewTab = this._getTab(view);
@@ -76,9 +84,9 @@ scout.SimpleTabBoxController.prototype._onViewAdd = function(event) {
     viewTab = this._createTab(view);
     this.tabArea.addTab(viewTab, siblingViewTab);
   }
-};
+}
 
-scout.SimpleTabBoxController.prototype._onViewRemove = function(event) {
+_onViewRemove(event) {
   var view = event.view;
   if (!view) {
     return;
@@ -87,36 +95,36 @@ scout.SimpleTabBoxController.prototype._onViewRemove = function(event) {
   if (viewTab) {
     this.tabArea.destroyTab(viewTab);
   }
-};
+}
 
-scout.SimpleTabBoxController.prototype._onViewActivate = function(event) {
+_onViewActivate(event) {
   var viewTab = this._getTab(event.view);
   // also reset selection if no view tab of the view is found.
   this.tabArea.selectTab(viewTab);
-};
+}
 
-scout.SimpleTabBoxController.prototype._onViewDeactivate = function(event) {
+_onViewDeactivate(event) {
   var viewTab = this._getTab(event.view);
   // also reset selection if no view tab of the view is found.
   this.tabArea.deselectTab(viewTab);
-};
+}
 
-scout.SimpleTabBoxController.prototype._onViewTabSelect = function(event) {
+_onViewTabSelect(event) {
   if (!event.viewTab) {
     return;
   }
   var view = event.viewTab.view;
   this.tabBox.activateView(view);
-};
+}
 
-scout.SimpleTabBoxController.prototype._createTab = function(view) {
+_createTab(view) {
   return scout.create('SimpleTab', {
     parent: this.tabArea,
     view: view
   });
-};
+}
 
-scout.SimpleTabBoxController.prototype._getTab = function(view) {
+_getTab(view) {
   if (!view) {
     return;
   }
@@ -129,14 +137,15 @@ scout.SimpleTabBoxController.prototype._getTab = function(view) {
     return false;
   });
   return viewTab;
-};
+}
 
-scout.SimpleTabBoxController.prototype.getTabs = function() {
+getTabs() {
   return this.tabArea.getTabs();
-};
+}
 
 /* ----- static functions ----- */
 
-scout.SimpleTabBoxController.hasViewTab = function(view) {
-  return scout.objects.someProperties(view, ['title', 'subTitle', 'iconId']);
-};
+static hasViewTab(view) {
+  return objects.someProperties(view, ['title', 'subTitle', 'iconId']);
+}
+}

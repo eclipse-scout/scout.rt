@@ -8,44 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PropertyChangeEventFilter = function() {
+import {objects} from '../index';
+
+export default class PropertyChangeEventFilter {
+
+constructor() {
   this._filterProperties = {};
   this._propertiesFilter = this._propertiesFilter.bind(this);
   this.filters = [this._propertiesFilter];
-};
+}
 
-scout.PropertyChangeEventFilter.prototype.addFilterForProperties = function(properties) {
-  scout.objects.copyProperties(properties, this._filterProperties);
-};
+addFilterForProperties(properties) {
+  objects.copyProperties(properties, this._filterProperties);
+}
 
-scout.PropertyChangeEventFilter.prototype.addFilter = function(filterFunc) {
+addFilter(filterFunc) {
   this.filters.push(filterFunc);
-};
+}
 
-scout.PropertyChangeEventFilter.prototype.filter = function(propertyName, value) {
+filter(propertyName, value) {
   return this.filters.some(function(filterFunc) {
     return filterFunc(propertyName, value);
   });
-};
+}
 
 /**
  * Will accept the property if the name matches, it won't check the value.
  */
-scout.PropertyChangeEventFilter.prototype.addFilterForPropertyName = function(filteredPropertyName) {
+addFilterForPropertyName(filteredPropertyName) {
   this.filters.push(function(propertyName, value) {
     return propertyName === filteredPropertyName;
   });
-};
+}
 
-scout.PropertyChangeEventFilter.prototype._propertiesFilter = function(propertyName, value) {
+_propertiesFilter(propertyName, value) {
   if (!this._filterProperties.hasOwnProperty(propertyName)) {
     return false;
   }
   var filterPropertyValue = this._filterProperties[propertyName];
-  return scout.objects.equals(filterPropertyValue, value);
-};
+  return objects.equals(filterPropertyValue, value);
+}
 
-scout.PropertyChangeEventFilter.prototype.reset = function() {
+reset() {
   this._filterProperties = {};
   this.filters = [this._propertiesFilter];
-};
+}
+}

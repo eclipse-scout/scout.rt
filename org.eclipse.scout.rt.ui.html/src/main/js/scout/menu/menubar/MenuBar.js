@@ -8,12 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuBar = function() {
-  scout.MenuBar.parent.call(this);
+import {MenuDestinations} from '../../index';
+import {scout} from '../../index';
+import {GroupBoxMenuItemsOrder} from '../../index';
+import {MenuBarLayout} from '../../index';
+import {arrays} from '../../index';
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {MenuBarLeftKeyStroke} from '../../index';
+import {MenuBarRightKeyStroke} from '../../index';
+import {Menu} from '../../index';
+import {KeyStrokeContext} from '../../index';
+import {keys} from '../../index';
+import {menus} from '../../index';
+
+export default class MenuBar extends Widget {
+
+constructor() {
+  super();
 
   this.menuSorter = null;
   this.menuFilter = null;
-  this.position = scout.MenuBar.Position.TOP;
+  this.position = MenuBar.Position.TOP;
   this.tabbable = true;
   this.menuboxLeft = null;
   this.menuboxRight = null;
@@ -25,31 +41,31 @@ scout.MenuBar = function() {
   };
   this.defaultMenu = null;
   this.visible = false;
-  this.ellipsisPosition = scout.MenuBar.EllipsisPosition.RIGHT;
+  this.ellipsisPosition = MenuBar.EllipsisPosition.RIGHT;
   this._menuItemPropertyChangeHandler = this._onMenuItemPropertyChange.bind(this);
   this._focusHandler = this._onMenuItemFocus.bind(this);
   this._addWidgetProperties('menuItems');
-};
-scout.inherits(scout.MenuBar, scout.Widget);
+}
 
-scout.MenuBar.EllipsisPosition = {
+
+static EllipsisPosition = {
   LEFT: 'left',
   RIGHT: 'right'
 };
 
-scout.MenuBar.Position = {
+static Position = {
   TOP: 'top',
   BOTTOM: 'bottom'
 };
 
-scout.MenuBar.prototype._init = function(options) {
-  scout.MenuBar.parent.prototype._init.call(this, options);
+_init(options) {
+  super._init( options);
 
-  this.menuSorter = options.menuOrder || new scout.GroupBoxMenuItemsOrder();
+  this.menuSorter = options.menuOrder || new GroupBoxMenuItemsOrder();
   this.menuSorter.menuBar = this;
   if (options.menuFilter) {
     this.menuFilter = function(menus, destination, onlyVisible, enableDisableKeyStroke) {
-      return options.menuFilter(menus, scout.MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
+      return options.menuFilter(menus, MenuDestinations.MENU_BAR, onlyVisible, enableDisableKeyStroke);
     };
   }
 
@@ -64,89 +80,89 @@ scout.MenuBar.prototype._init = function(options) {
     tooltipPosition: this._oppositePosition()
   });
 
-  this._setMenuItems(scout.arrays.ensure(this.menuItems));
+  this._setMenuItems(arrays.ensure(this.menuItems));
   this.updateVisibility();
-};
+}
 
-scout.MenuBar.prototype._destroy = function() {
-  scout.MenuBar.parent.prototype._destroy.call(this);
+_destroy() {
+  super._destroy();
   this._detachMenuHandlers();
-};
+}
 
 /**
  * @override
  */
-scout.MenuBar.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.MenuBar.prototype._initKeyStrokeContext = function() {
-  scout.MenuBar.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.MenuBarLeftKeyStroke(this),
-    new scout.MenuBarRightKeyStroke(this)
+    new MenuBarLeftKeyStroke(this),
+    new MenuBarRightKeyStroke(this)
   ]);
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.MenuBar.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('menubar');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.MenuBarLayout(this));
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new MenuBarLayout(this));
 
   this.menuboxRight.render(this.$container);
   this.menuboxLeft.render(this.$container);
-};
+}
 
-scout.MenuBar.prototype._renderProperties = function() {
-  scout.MenuBar.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderMenuItems();
   this._renderPosition();
-};
+}
 
-scout.MenuBar.prototype.setPosition = function(position) {
+setPosition(position) {
   this.setProperty('position', position);
-};
+}
 
-scout.MenuBar.prototype._setPosition = function(position) {
+_setPosition(position) {
   this._setProperty('position', position);
   this.menuboxLeft.setTooltipPosition(this._oppositePosition());
   this.menuboxRight.setTooltipPosition(this._oppositePosition());
-};
+}
 
-scout.MenuBar.prototype._renderPosition = function() {
-  this.$container.toggleClass('bottom', this.position === scout.MenuBar.Position.BOTTOM);
-};
+_renderPosition() {
+  this.$container.toggleClass('bottom', this.position === MenuBar.Position.BOTTOM);
+}
 
-scout.MenuBar.prototype._oppositePosition = function() {
-  return this.position === scout.MenuBar.Position.TOP ?
-      scout.MenuBar.Position.BOTTOM : scout.MenuBar.Position.TOP;
-};
+_oppositePosition() {
+  return this.position === MenuBar.Position.TOP ?
+      MenuBar.Position.BOTTOM : MenuBar.Position.TOP;
+}
 
-scout.MenuBar.prototype.setEllipsisPosition = function(ellipsisPosition) {
+setEllipsisPosition(ellipsisPosition) {
   this.setProperty('ellipsisPosition', ellipsisPosition);
-};
+}
 
 /**
  * Set the filter of the menu bar to all the menu items.
  */
-scout.MenuBar.prototype._setChildMenuFilters = function() {
+_setChildMenuFilters() {
   this.orderedMenuItems.all.forEach(function(item) {
     item.setMenuFilter(this.menuFilter);
   }, this);
-};
+}
 
 /**
  * This function can be called multiple times. The function attaches the menu handlers only if they are not yet added.
  */
-scout.MenuBar.prototype._attachMenuHandlers = function() {
+_attachMenuHandlers() {
   this.orderedMenuItems.all.forEach(function(item) {
     if (item.events.count('propertyChange', this._menuItemPropertyChangeHandler) === 0) {
       item.on('propertyChange', this._menuItemPropertyChangeHandler);
@@ -155,27 +171,27 @@ scout.MenuBar.prototype._attachMenuHandlers = function() {
       item.on('focus', this._focusHandler);
     }
   }, this);
-};
+}
 
-scout.MenuBar.prototype._detachMenuHandlers = function() {
+_detachMenuHandlers() {
   this.orderedMenuItems.all.forEach(function(item) {
     item.off('propertyChange', this._menuItemPropertyChangeHandler);
     item.off('focus', this._focusHandler);
   }.bind(this));
-};
+}
 
-scout.MenuBar.prototype.setMenuItems = function(menuItems) {
-  menuItems = scout.arrays.ensure(menuItems);
-  if (scout.arrays.equals(this.menuItems, menuItems)) {
+setMenuItems(menuItems) {
+  menuItems = arrays.ensure(menuItems);
+  if (arrays.equals(this.menuItems, menuItems)) {
     // Ensure existing menus are correctly linked even if the given menuItems are the same (see TableSpec for reasons)
     this.menuboxRight.link(this.menuboxRight.menuItems);
     this.menuboxLeft.link(this.menuboxLeft.menuItems);
     return;
   }
   this.setProperty('menuItems', menuItems);
-};
+}
 
-scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
+_setMenuItems(menuItems, rightFirst) {
   // remove property listeners of old menu items.
   this._detachMenuHandlers();
   this.orderedMenuItems = this._createOrderedMenus(menuItems);
@@ -197,19 +213,19 @@ scout.MenuBar.prototype._setMenuItems = function(menuItems, rightFirst) {
   this._updateTabbableMenu();
 
   this._setProperty('menuItems', menuItems);
-};
+}
 
-scout.MenuBar.prototype._renderMenuItems = function() {
+_renderMenuItems() {
   this.updateLeftOfButtonMarker();
   this.invalidateLayoutTree();
-};
+}
 
-scout.MenuBar.prototype._removeMenuItems = function() {
+_removeMenuItems() {
   // NOP: by implementing this function we avoid the call to Widget.js#_internalRemoveWidgets
   // which would remove our menuItems, because they are defined as widget-property (see constructor).
-};
+}
 
-scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
+_createOrderedMenus(menuItems) {
   var orderedMenuItems = this.menuSorter.order(menuItems, this),
     ellipsisIndex = -1,
     ellipsis;
@@ -225,7 +241,7 @@ scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
     this._ellipsis = ellipsis;
 
     // add ellipsis to the correct position
-    if (this.ellipsisPosition === scout.MenuBar.EllipsisPosition.RIGHT) {
+    if (this.ellipsisPosition === MenuBar.EllipsisPosition.RIGHT) {
       // try right
       var reverseIndexPosition = this._getFirstStackableIndexPosition(orderedMenuItems.right.slice().reverse());
       if (reverseIndexPosition > -1) {
@@ -257,9 +273,9 @@ scout.MenuBar.prototype._createOrderedMenus = function(menuItems) {
     orderedMenuItems.all = orderedMenuItems.left.concat(orderedMenuItems.right);
   }
   return orderedMenuItems;
-};
+}
 
-scout.MenuBar.prototype._getFirstStackableIndexPosition = function(menuList) {
+_getFirstStackableIndexPosition(menuList) {
   var foundIndex = -1;
   menuList.some(function(menu, index) {
     if (menu.stackable && menu.visible) {
@@ -270,27 +286,27 @@ scout.MenuBar.prototype._getFirstStackableIndexPosition = function(menuList) {
   }, this);
 
   return foundIndex;
-};
+}
 
-scout.MenuBar.prototype._updateTabbableMenu = function() {
+_updateTabbableMenu() {
   // Make first valid MenuItem tabbable so that it can be focused. All other items
   // are not tabbable. But they can be selected with the arrow keys.
   if (this.tabbable) {
     if (this.defaultMenu && this.defaultMenu.enabledComputed) {
       this.setTabbableMenu(this.defaultMenu);
     } else {
-      this.setTabbableMenu(scout.arrays.find(this.orderedMenuItems.all, function(item) {
+      this.setTabbableMenu(arrays.find(this.orderedMenuItems.all, function(item) {
         return item.isTabTarget();
       }));
     }
   }
-};
+}
 
-scout.MenuBar.prototype.setEllipsisPositon = function(ellipsisPositon) {
+setEllipsisPositon(ellipsisPositon) {
   this.setProperty('ellipsisPositon', ellipsisPositon);
-};
+}
 
-scout.MenuBar.prototype.setTabbableMenu = function(menu) {
+setTabbableMenu(menu) {
   if (!this.tabbable || menu === this.tabbableMenu) {
     return;
   }
@@ -301,20 +317,20 @@ scout.MenuBar.prototype.setTabbableMenu = function(menu) {
   if (menu) {
     menu.setTabbable(true);
   }
-};
+}
 
-scout.MenuBar.prototype.updateVisibility = function() {
-  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.left);
-  scout.menus.updateSeparatorVisibility(this.orderedMenuItems.right);
+updateVisibility() {
+  menus.updateSeparatorVisibility(this.orderedMenuItems.left);
+  menus.updateSeparatorVisibility(this.orderedMenuItems.right);
   this.setVisible(!this.hiddenByUi && this.orderedMenuItems.all.some(function(m) {
     return m.visible && !m.ellipsis;
   }));
-};
+}
 
 /**
  * First rendered item that is enabled and reacts to ENTER keystroke shall be marked as 'defaultMenu'
  */
-scout.MenuBar.prototype.updateDefaultMenu = function() {
+updateDefaultMenu() {
   var i, item;
   var defaultMenu = null;
   for (i = 0; i < this.orderedMenuItems.all.length; i++) {
@@ -338,38 +354,38 @@ scout.MenuBar.prototype.updateDefaultMenu = function() {
   if (defaultMenu && defaultMenu.isTabTarget()) {
     this.setTabbableMenu(defaultMenu);
   }
-};
+}
 
-scout.MenuBar.prototype._isDefaultKeyStroke = function(keyStroke) {
-  return scout.isOneOf(scout.keys.ENTER, keyStroke.which) &&
+_isDefaultKeyStroke(keyStroke) {
+  return scout.isOneOf(keys.ENTER, keyStroke.which) &&
     !keyStroke.ctrl &&
     !keyStroke.alt &&
     !keyStroke.shift;
-};
+}
 
-scout.MenuBar.prototype.setDefaultMenu = function(defaultMenu) {
+setDefaultMenu(defaultMenu) {
   this.setProperty('defaultMenu', defaultMenu);
-};
+}
 
-scout.MenuBar.prototype._setDefaultMenu = function(defaultMenu) {
+_setDefaultMenu(defaultMenu) {
   if (this.defaultMenu) {
-    this.defaultMenu.setMenuStyle(scout.Menu.MenuStyle.NONE);
+    this.defaultMenu.setMenuStyle(Menu.MenuStyle.NONE);
   }
   if (defaultMenu) {
-    defaultMenu.setMenuStyle(scout.Menu.MenuStyle.DEFAULT);
+    defaultMenu.setMenuStyle(Menu.MenuStyle.DEFAULT);
   }
   this._setProperty('defaultMenu', defaultMenu);
-};
+}
 
 /**
  * Add class 'left-of-button' to every menu item which is on the left of a button
  */
-scout.MenuBar.prototype.updateLeftOfButtonMarker = function() {
+updateLeftOfButtonMarker() {
   this._updateLeftOfButtonMarker(this.orderedMenuItems.left);
   this._updateLeftOfButtonMarker(this.orderedMenuItems.right);
-};
+}
 
-scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
+_updateLeftOfButtonMarker(items) {
   var item, previousItem;
 
   items = items.filter(function(item) {
@@ -384,9 +400,9 @@ scout.MenuBar.prototype._updateLeftOfButtonMarker = function(items) {
       previousItem.$container.addClass('left-of-button');
     }
   }
-};
+}
 
-scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
+_onMenuItemPropertyChange(event) {
   // We do not update the items directly, because this listener may be fired many times in one
   // user request (because many menus change one or more properties). Therefore, we just invalidate
   // the MenuBarLayout. It will be updated automatically after the user request has finished,
@@ -425,16 +441,17 @@ scout.MenuBar.prototype._onMenuItemPropertyChange = function(event) {
   if (event.propertyName === 'keyStroke' || event.propertyName === 'enabled' || event.propertyName === 'defaultMenu' || event.propertyName === 'visible') {
     this.updateDefaultMenu();
   }
-};
+}
 
-scout.MenuBar.prototype._onMenuItemFocus = function(event) {
+_onMenuItemFocus(event) {
   this.setTabbableMenu(event.source);
-};
+}
 
-scout.MenuBar.prototype.reorderMenus = function(rightFirst) {
+reorderMenus(rightFirst) {
   var menuItems = this.menuItems;
   this._setMenuItems(menuItems, rightFirst);
   if (this.rendered) {
     this.updateLeftOfButtonMarker();
   }
-};
+}
+}

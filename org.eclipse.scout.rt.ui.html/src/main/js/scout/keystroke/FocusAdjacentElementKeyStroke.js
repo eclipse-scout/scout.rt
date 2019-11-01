@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FocusAdjacentElementKeyStroke = function(session, field) {
-  scout.FocusAdjacentElementKeyStroke.parent.call(this);
+import {keys} from '../index';
+import {KeyStroke} from '../index';
+
+export default class FocusAdjacentElementKeyStroke extends KeyStroke {
+
+constructor(session, field) {
+  super();
   this.session = session;
   this.field = field;
-  this.which = [scout.keys.LEFT, scout.keys.RIGHT];
+  this.which = [keys.LEFT, keys.RIGHT];
   this.renderingHints.render = false;
   this.stopPropagation = true;
-  this.keyStrokeMode = scout.KeyStroke.Mode.DOWN;
-};
-scout.inherits(scout.FocusAdjacentElementKeyStroke, scout.KeyStroke);
+  this.keyStrokeMode = KeyStroke.Mode.DOWN;
+}
 
-scout.FocusAdjacentElementKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var activeElement = this.field.$container.activeElement(true),
     $focusableElements = this.field.$container.find(':focusable');
 
   switch (event.which) { // NOSONAR
-    case scout.keys.RIGHT:
+    case keys.RIGHT:
       if (activeElement === $focusableElements.last()[0]) {
         this.session.focusManager.requestFocus($focusableElements.first());
       } else {
@@ -32,7 +37,7 @@ scout.FocusAdjacentElementKeyStroke.prototype.handle = function(event) {
       }
 
       break;
-    case scout.keys.LEFT:
+    case keys.LEFT:
       if (activeElement === $focusableElements.first()[0]) {
         this.session.focusManager.requestFocus($focusableElements.last());
       } else {
@@ -40,4 +45,5 @@ scout.FocusAdjacentElementKeyStroke.prototype.handle = function(event) {
       }
       break;
   }
-};
+}
+}

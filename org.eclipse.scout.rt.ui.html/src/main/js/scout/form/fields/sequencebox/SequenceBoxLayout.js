@@ -8,15 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SequenceBoxLayout = function(widget, layoutConfig) {
-  scout.SequenceBoxLayout.parent.call(this, widget, layoutConfig);
-};
-scout.inherits(scout.SequenceBoxLayout, scout.LogicalGridLayout);
+import {LogicalGridLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+
+export default class SequenceBoxLayout extends LogicalGridLayout {
+
+constructor(widget, layoutConfig) {
+  super( widget, layoutConfig);
+}
+
 
 /**
  * @override LogicalGridLayout.js
  */
-scout.SequenceBoxLayout.prototype._initDefaults = function() {
-  scout.SequenceBoxLayout.parent.prototype._initDefaults.call(this);
-  this.hgap = scout.htmlEnvironment.smallColumnGap;
-};
+_initDefaults() {
+  super._initDefaults();
+  this.hgap = HtmlEnvironment.get().smallColumnGap;
+}
+}

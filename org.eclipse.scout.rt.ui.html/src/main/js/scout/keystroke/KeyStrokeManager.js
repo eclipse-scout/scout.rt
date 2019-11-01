@@ -8,31 +8,43 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.KeyStrokeManager = function() {
+import {filters as filters_1} from '../index';
+import {keys} from '../index';
+import {KeyStroke} from '../index';
+import {ValueField} from '../index';
+import {EventSupport} from '../index';
+import {Action} from '../index';
+import {VirtualKeyStrokeEvent} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+
+export default class KeyStrokeManager {
+
+constructor() {
   this.session = null;
-  this.helpKeyStroke = scout.KeyStroke.parseKeyStroke('F1');
+  this.helpKeyStroke = KeyStroke.parseKeyStroke('F1');
   this.swallowF1 = true;
   this._helpRendered = false;
   this._renderedKeys = [];
   this.events = this._createEventSupport();
   this.filters = [];
-};
+}
 
-scout.KeyStrokeManager.prototype.init = function(model) {
+init(model) {
   this.session = model.session;
   this.installTopLevelKeyStrokeHandlers(this.session.$entryPoint);
-};
+}
 
-scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($container) {
+installTopLevelKeyStrokeHandlers($container) {
   var
     myWindow = $container.window(true),
     // Swallow F1 (online help) key stroke
     helpHandler = function(event) {
-      return event.which !== scout.keys.F1;
+      return event.which !== keys.F1;
     }.bind(this),
     // Swallow Backspace (browser navigation) key stroke
     backspaceHandler = function(event) {
-      return event.which !== scout.keys.BACKSPACE;
+      return event.which !== keys.BACKSPACE;
     }.bind(this);
 
   if (this.swallowF1) {
@@ -45,14 +57,14 @@ scout.KeyStrokeManager.prototype.installTopLevelKeyStrokeHandlers = function($co
     .keyup(backspaceHandler);
 
   if ('onhelp' in myWindow) {
-    myWindow.onhelp = scout.filters.returnFalse;
+    myWindow.onhelp = filters_1.returnFalse;
   }
-};
+}
 
 /**
  * Installs the given keystroke context. This method has no effect if the context is null, or already installed.
  */
-scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeContext) {
+installKeyStrokeContext(keyStrokeContext) {
   if (!keyStrokeContext) {
     return;
   }
@@ -69,12 +81,12 @@ scout.KeyStrokeManager.prototype.installKeyStrokeContext = function(keyStrokeCon
   keyStrokeContext._handler.$target = keyStrokeContext.$getBindTarget();
   keyStrokeContext._handler.$target.on('keydown', keyStrokeContext._handler);
   keyStrokeContext._handler.$target.on('keyup', keyStrokeContext._handler);
-};
+}
 
 /**
  * Uninstalls the given keystroke context. This method has no effect if the context is null, or not installed.
  */
-scout.KeyStrokeManager.prototype.uninstallKeyStrokeContext = function(keyStrokeContext) {
+uninstallKeyStrokeContext(keyStrokeContext) {
   if (!keyStrokeContext) {
     return;
   }
@@ -86,12 +98,12 @@ scout.KeyStrokeManager.prototype.uninstallKeyStrokeContext = function(keyStrokeC
   keyStrokeContext._handler.$target.off('keyup', keyStrokeContext._handler);
   keyStrokeContext._handler.$target = null;
   keyStrokeContext._handler = null;
-};
+}
 
 /**
  * Visualizes the keys supported by the given keyStrokeContext.
  */
-scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event) {
+_renderKeys(keyStrokeContext, event) {
   var descendantContexts = event.originalEvent.keyStrokeContexts || [];
   var immediatePropagationStoppedKeys = [];
 
@@ -105,7 +117,7 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
       var $drawingArea = (keyStroke.field ? keyStroke.field.$container : null) || keyStrokeContext.$getScopeTarget(); // Precedence: keystroke's field container, or the scope target otherwise.
       var keys = keyStroke.keys(); // Get all keys which are handled by the keystroke. Typically, this is a single key.
       keys.forEach(function(key) {
-        var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
+        var virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, event.target);
 
         if (immediatePropagationStoppedKeys.indexOf(key.toKeyStrokeString()) < 0 && keyStrokeContext.accept(virtualKeyStrokeEvent) &&
           keyStroke.accept(virtualKeyStrokeEvent) && !this._isPreventedByDescendantContext(key, event.target, descendantContexts)) {
@@ -122,10 +134,10 @@ scout.KeyStrokeManager.prototype._renderKeys = function(keyStrokeContext, event)
 
   descendantContexts.push(keyStrokeContext); // Register this keyStrokeContext within the event, so that superior keyStrokeContexts can validate their keys (e.g. not swallowed by a descendant keyStrokeContext).
   event.originalEvent.keyStrokeContexts = descendantContexts;
-};
+}
 
-scout.KeyStrokeManager.prototype._isPreventedByDescendantContext = function(key, target, descendantContexts) {
-  var virtualKeyStrokeEvent = new scout.VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
+_isPreventedByDescendantContext(key, target, descendantContexts) {
+  var virtualKeyStrokeEvent = new VirtualKeyStrokeEvent(key.which, key.ctrl, key.alt, key.shift, key.keyStrokeMode, target);
 
   // Check whether any descendant keyStrokeContext prevents this keystroke from execution.
   return descendantContexts.some(function(descendantContext) {
@@ -141,12 +153,12 @@ scout.KeyStrokeManager.prototype._isPreventedByDescendantContext = function(key,
       return virtualKeyStrokeEvent.isAnyPropagationStopped();
     }, this);
   }, this);
-};
+}
 
 /**
  * Handles the keystroke event by the keyStrokeContext's keystroke handlers, but returns immediately once a keystroke requests immediate stop of propagation.
  */
-scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeContext, event) {
+_handleKeyStrokeEvent(keyStrokeContext, event) {
   if (!keyStrokeContext.accept(event)) {
     return;
   }
@@ -172,7 +184,7 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
 
     // Before handling the keystroke, accept the input of a potential active value field
     if (this.invokeAcceptInputOnActiveValueField(keyStroke, keyStrokeContext)) {
-      scout.ValueField.invokeValueFieldAcceptInput(event.target);
+      ValueField.invokeValueFieldAcceptInput(event.target);
     }
 
     if (!this._filter(keyStroke)) {
@@ -190,26 +202,26 @@ scout.KeyStrokeManager.prototype._handleKeyStrokeEvent = function(keyStrokeConte
     // Break on 'stopImmediate'.
     return event.isImmediatePropagationStopped(); // 'some-loop' breaks on true
   }, this);
-};
+}
 
-scout.KeyStrokeManager.prototype._filter = function(keyStroke) {
+_filter(keyStroke) {
   for (var i = 0; i < this.filters.length; i++) {
     if (!this.filters[i].filter(keyStroke)) {
       return false;
     }
   }
   return true;
-};
+}
 
-scout.KeyStrokeManager.prototype.invokeAcceptInputOnActiveValueField = function(keyStroke, keyStrokeContext) {
+invokeAcceptInputOnActiveValueField(keyStroke, keyStrokeContext) {
   return !keyStroke.preventInvokeAcceptInputOnActiveValueField && (keyStroke.invokeAcceptInputOnActiveValueField || keyStrokeContext.invokeAcceptInputOnActiveValueField);
-};
+}
 
-scout.KeyStrokeManager.prototype._isHelpKeyStroke = function(event) {
-  return scout.KeyStroke.acceptEvent(this.helpKeyStroke, event);
-};
+_isHelpKeyStroke(event) {
+  return KeyStroke.acceptEvent(this.helpKeyStroke, event);
+}
 
-scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
+_installHelpDisposeListener(event) {
   var helpDisposeHandler,
     $currentTarget = $(event.currentTarget),
     $myWindow = $currentTarget.window(),
@@ -229,14 +241,14 @@ scout.KeyStrokeManager.prototype._installHelpDisposeListener = function(event) {
   $myWindow.on('blur', helpDisposeHandler); // once the current browser tab/window is left
 
   return false;
-};
+}
 
-scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event) {
+_onKeyEvent(keyStrokeContext, event) {
   // check if scopeTarget is covered by glass pane
   if (this.session.focusManager.isElementCovertByGlassPane(keyStrokeContext.$getScopeTarget())) {
     // check if any action with 'keyStrokeFirePolicy=IAction.KeyStrokeFirePolicy.ALWAYS' is in keyStrokeContext
     var keyStrokeFirePolicyAlways = $.grep(keyStrokeContext.keyStrokes, function(k) { // (will at least return an empty array)
-      return k.keyStrokeFirePolicy === scout.Action.KeyStrokeFirePolicy.ALWAYS;
+      return k.keyStrokeFirePolicy === Action.KeyStrokeFirePolicy.ALWAYS;
     });
     if (keyStrokeFirePolicyAlways.length === 0) {
       return;
@@ -256,43 +268,44 @@ scout.KeyStrokeManager.prototype._onKeyEvent = function(keyStrokeContext, event)
   } else {
     this._handleKeyStrokeEvent(keyStrokeContext, event);
   }
-};
+}
 
-scout.KeyStrokeManager.prototype.addFilter = function(filter) {
-  scout.arrays.pushSet(this.filters, filter);
-};
+addFilter(filter) {
+  arrays.pushSet(this.filters, filter);
+}
 
-scout.KeyStrokeManager.prototype.removeFilter = function(filter) {
-  scout.arrays.remove(this.filters, filter);
-};
+removeFilter(filter) {
+  arrays.remove(this.filters, filter);
+}
 
 //--- Event handling methods ---
-scout.KeyStrokeManager.prototype._createEventSupport = function() {
-  return new scout.EventSupport();
-};
+_createEventSupport() {
+  return new EventSupport();
+}
 
-scout.KeyStrokeManager.prototype.trigger = function(type, event) {
+trigger(type, event) {
   event = event || {};
   event.source = this;
   this.events.trigger(type, event);
-};
+}
 
-scout.KeyStrokeManager.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.KeyStrokeManager.prototype.on = function(type, func) {
+on(type, func) {
   return this.events.on(type, func);
-};
+}
 
-scout.KeyStrokeManager.prototype.off = function(type, func) {
+off(type, func) {
   this.events.off(type, func);
-};
+}
 
-scout.KeyStrokeManager.prototype.addListener = function(listener) {
+addListener(listener) {
   this.events.addListener(listener);
-};
+}
 
-scout.KeyStrokeManager.prototype.removeListener = function(listener) {
+removeListener(listener) {
   this.events.removeListener(listener);
-};
+}
+}

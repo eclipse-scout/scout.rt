@@ -8,16 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxGridConfig = function() {
-  scout.GroupBoxGridConfig.parent.call(this);
-};
-scout.inherits(scout.GroupBoxGridConfig, scout.LogicalGridConfig);
+import {LogicalGridConfig} from '../../../index';
+import {scout} from '../../../index';
 
-scout.GroupBoxGridConfig.prototype.getGridWidgets = function() {
+export default class GroupBoxGridConfig extends LogicalGridConfig {
+
+constructor() {
+  super();
+}
+
+
+getGridWidgets() {
   return this.widget.controls;
-};
+}
 
-scout.GroupBoxGridConfig.prototype.getGridColumnCount = function() {
+getGridColumnCount() {
   var gridColumns = -1,
     widget = this.widget;
 
@@ -26,4 +31,5 @@ scout.GroupBoxGridConfig.prototype.getGridColumnCount = function() {
   } while (gridColumns < 0 && widget.getParentGroupBox && (widget = widget.getParentGroupBox()));
 
   return gridColumns < 0 ? 2 : gridColumns;
-};
+}
+}

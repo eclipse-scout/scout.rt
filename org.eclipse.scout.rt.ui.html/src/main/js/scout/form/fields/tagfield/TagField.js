@@ -8,8 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagField = function() {
-  scout.TagField.parent.call(this);
+import {keys} from '../../../index';
+import {TagFieldNavigationKeyStroke} from '../../../index';
+import {TagFieldOpenPopupKeyStroke} from '../../../index';
+import {ValueField} from '../../../index';
+import {TagFieldDeleteKeyStroke} from '../../../index';
+import {TagFieldLayout} from '../../../index';
+import {strings} from '../../../index';
+import {HtmlComponent} from '../../../index';
+import {TagFieldCancelKeyStroke} from '../../../index';
+import {TagFieldEnterKeyStroke} from '../../../index';
+import {scout} from '../../../index';
+import {InputFieldKeyStrokeContext} from '../../../index';
+import {LookupCall} from '../../../index';
+import {TagFieldContainerLayout} from '../../../index';
+import {arrays} from '../../../index';
+
+export default class TagField extends ValueField {
+
+constructor() {
+  super();
 
   this.$field = null;
   this.fieldHtmlComp = null;
@@ -17,11 +35,11 @@ scout.TagField = function() {
   this.lookupCall = null;
   this._currentLookupCall = null;
   this.tagBar = null;
-};
-scout.inherits(scout.TagField, scout.ValueField);
+}
 
-scout.TagField.prototype._init = function(model) {
-  scout.TagField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
 
   this.tagBar = scout.create('TagBar', {
     parent: this,
@@ -30,34 +48,34 @@ scout.TagField.prototype._init = function(model) {
   this.tagBar.on('tagRemove', this._onTagRemove.bind(this));
   this.on('propertyChange', this._onValueChange.bind(this));
   this._setLookupCall(this.lookupCall);
-};
+}
 
-scout.TagField.prototype._onTagRemove = function(event) {
+_onTagRemove(event) {
   this.removeTag(event.tag);
-};
+}
 
-scout.TagField.prototype._initKeyStrokeContext = function() {
-  scout.TagField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
   this.keyStrokeContext.registerKeyStroke([
-    new scout.TagFieldCancelKeyStroke(this),
-    new scout.TagFieldEnterKeyStroke(this),
-    new scout.TagFieldNavigationKeyStroke(this._createFieldAdapter()),
-    new scout.TagFieldDeleteKeyStroke(this._createFieldAdapter()),
-    new scout.TagFieldOpenPopupKeyStroke(this)
+    new TagFieldCancelKeyStroke(this),
+    new TagFieldEnterKeyStroke(this),
+    new TagFieldNavigationKeyStroke(this._createFieldAdapter()),
+    new TagFieldDeleteKeyStroke(this._createFieldAdapter()),
+    new TagFieldOpenPopupKeyStroke(this)
   ]);
-};
+}
 
-scout.TagField.prototype._createKeyStrokeContext = function() {
-  return new scout.InputFieldKeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new InputFieldKeyStrokeContext();
+}
 
-scout.TagField.prototype._render = function() {
-  this.addContainer(this.$parent, 'tag-field', new scout.TagFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'tag-field', new TagFieldLayout(this));
   this.addLabel();
   this.addMandatoryIndicator();
   var $fieldContainer = this.$container.appendDiv();
-  this.fieldHtmlComp = scout.HtmlComponent.install($fieldContainer, this.session);
-  this.fieldHtmlComp.setLayout(new scout.TagFieldContainerLayout(this));
+  this.fieldHtmlComp = HtmlComponent.install($fieldContainer, this.session);
+  this.fieldHtmlComp.setLayout(new TagFieldContainerLayout(this));
   this.tagBar.render($fieldContainer);
   var $field = $fieldContainer.appendElement('<input>', 'field')
     .on('keydown', this._onInputKeydown.bind(this))
@@ -66,41 +84,41 @@ scout.TagField.prototype._render = function() {
   this.addFieldContainer($fieldContainer);
   this.addField($field);
   this.addStatus();
-};
+}
 
-scout.TagField.prototype._renderProperties = function() {
-  scout.TagField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderValue();
-};
+}
 
-scout.TagField.prototype._renderValue = function() {
+_renderValue() {
   this.tagBar.updateTags();
-};
+}
 
-scout.TagField.prototype._setValue = function(value) {
-  scout.TagField.parent.prototype._setValue.call(this, value);
+_setValue(value) {
+  super._setValue( value);
   if (this.tagBar) { // required for _init case
     this.tagBar.setTags(this.value /* do not use the function parameter here. instead use the member variable because the value might have changed in a validator. */ );
   }
-};
+}
 
-scout.TagField.prototype._setLookupCall = function(lookupCall) {
-  this._setProperty('lookupCall', scout.LookupCall.ensure(lookupCall, this.session));
-};
+_setLookupCall(lookupCall) {
+  this._setProperty('lookupCall', LookupCall.ensure(lookupCall, this.session));
+}
 
-scout.TagField.prototype.formatValue = function(value) {
+formatValue(value) {
   // Info: value and displayText are not related in the TagField
   return '';
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.TagField.prototype._validateValue = function(value) {
-  var tags = scout.arrays.ensure(value);
+_validateValue(value) {
+  var tags = arrays.ensure(value);
   var result = [];
   tags.forEach(function(tag) {
-    if (!scout.strings.empty(tag)) {
+    if (!strings.empty(tag)) {
       tag = tag.toLowerCase();
       if (result.indexOf(tag) < 0) {
         result.push(tag);
@@ -108,59 +126,59 @@ scout.TagField.prototype._validateValue = function(value) {
     }
   });
   return result;
-};
+}
 
-scout.TagField.prototype._parseValue = function(displayText) {
-  var tags = scout.arrays.ensure(this.value);
+_parseValue(displayText) {
+  var tags = arrays.ensure(this.value);
   tags = tags.slice();
   tags.push(displayText);
   return tags;
-};
+}
 
-scout.TagField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   this.$field.val(this.displayText); // needs to be before super call (otherwise updateHasText fails)
-  scout.TagField.parent.prototype._renderDisplayText.call(this);
+  super._renderDisplayText();
   this._updateInputVisible();
-};
+}
 
-scout.TagField.prototype._renderEnabled = function() {
-  scout.TagField.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this._updateInputVisible();
-};
+}
 
-scout.TagField.prototype._renderFieldStyle = function() {
-  scout.TagField.parent.prototype._renderFieldStyle.call(this);
+_renderFieldStyle() {
+  super._renderFieldStyle();
   if (this.rendered) {
     this.fieldHtmlComp.invalidateLayoutTree();
   }
-};
+}
 
-scout.TagField.prototype._updateInputVisible = function() {
+_updateInputVisible() {
   var visible, oldVisible = !this.$field.isVisible();
   if (this.enabledComputed) {
     visible = true;
   } else {
-    visible = scout.strings.hasText(this.displayText);
+    visible = strings.hasText(this.displayText);
   }
   this.$field.setVisible(visible);
   // update tag-elements (must remove X when disabled)
   if (visible !== oldVisible) {
     this._renderValue();
   }
-};
+}
 
-scout.TagField.prototype._readDisplayText = function() {
+_readDisplayText() {
   return this.$field.val();
-};
+}
 
-scout.TagField.prototype._clear = function() {
+_clear() {
   this.$field.val('');
-};
+}
 
 /**
  * @override
  */
-scout.TagField.prototype.acceptInput = function(whileTyping) {
+acceptInput(whileTyping) {
   if (this.chooser) {
     if (this.chooser.selectedRow()) {
       this.chooser.triggerLookupRowSelected();
@@ -169,96 +187,96 @@ scout.TagField.prototype.acceptInput = function(whileTyping) {
     }
     return;
   }
-  scout.TagField.parent.prototype.acceptInput.call(this, false);
-};
+  super.acceptInput( false);
+}
 
-scout.TagField.prototype._triggerAcceptInput = function() {
+_triggerAcceptInput() {
   this.trigger('acceptInput', {
     displayText: this.displayText,
     value: this.value
   });
-};
+}
 
 /**
  * @override
  */
-scout.TagField.prototype._onFieldBlur = function(event) {
+_onFieldBlur(event) {
   // We cannot call super until chooser popup has been closed (see #acceptInput)
   this.closeChooserPopup();
-  scout.TagField.parent.prototype._onFieldBlur.call(this, event);
+  super._onFieldBlur( event);
   if (this.rendered && !this.removing) {
     this.tagBar.blur();
   }
-};
+}
 
 /**
  * @override
  */
-scout.TagField.prototype._onFieldFocus = function(event) {
-  scout.TagField.parent.prototype._onFieldFocus.call(this, event);
+_onFieldFocus(event) {
+  super._onFieldFocus( event);
   if (this.rendered && !this.removing) {
     this.tagBar.focus();
   }
-};
+}
 
-scout.TagField.prototype._onFieldInput = function() {
+_onFieldInput() {
   this._updateHasText();
-};
+}
 
-scout.TagField.prototype.addTag = function(text) {
+addTag(text) {
   var value = this._parseValue(text);
   this.setValue(value);
   this._triggerAcceptInput();
-};
+}
 
-scout.TagField.prototype.removeTag = function(tag) {
-  if (scout.strings.empty(tag)) {
+removeTag(tag) {
+  if (strings.empty(tag)) {
     return;
   }
   tag = tag.toLowerCase();
-  var tags = scout.arrays.ensure(this.value);
+  var tags = arrays.ensure(this.value);
   if (tags.indexOf(tag) === -1) {
     return;
   }
   tags = tags.slice();
-  scout.arrays.remove(tags, tag);
+  arrays.remove(tags, tag);
   this.setValue(tags);
   this._triggerAcceptInput();
   // focus was previously on the removed tag, restore focus on the field.
   this.focus();
-};
+}
 
-scout.TagField.prototype._onInputKeydown = function(event) {
+_onInputKeydown(event) {
   if (this._isNavigationKey(event) && this.chooser) {
     this.chooser.delegateKeyEvent(event);
   }
-};
+}
 
-scout.TagField.prototype._isNavigationKey = function(event) {
+_isNavigationKey(event) {
   return scout.isOneOf(event.which, [
-    scout.keys.PAGE_UP,
-    scout.keys.PAGE_DOWN,
-    scout.keys.UP,
-    scout.keys.DOWN
+    keys.PAGE_UP,
+    keys.PAGE_DOWN,
+    keys.UP,
+    keys.DOWN
   ]);
-};
+}
 
-scout.TagField.prototype._onInputKeyup = function(event) {
+_onInputKeyup(event) {
   // Prevent chooser popup from being opened again, after it has been closed by pressing ESC
-  if (event.which === scout.keys.ESC) {
+  if (event.which === keys.ESC) {
     return;
   }
 
   if (!this._isNavigationKey(event)) {
     this._lookupByText(this.$field.val());
   }
-};
+}
 
-scout.TagField.prototype._lookupByText = function(text) {
+_lookupByText(text) {
   if (!this.lookupCall) {
     return null;
   }
-  if (scout.strings.empty(text) || text.length < 2) {
+  if (strings.empty(text) || text.length < 2) {
     this.closeChooserPopup();
     return;
   }
@@ -273,9 +291,9 @@ scout.TagField.prototype._lookupByText = function(text) {
       this._currentLookupCall = null;
     }.bind(this))
     .done(this._onLookupDone.bind(this));
-};
+}
 
-scout.TagField.prototype._onLookupDone = function(result) {
+_onLookupDone(result) {
   try {
     if (!this.rendered || !this.isFocused() || result.lookupRows.length === 0) {
       this.closeChooserPopup();
@@ -289,9 +307,9 @@ scout.TagField.prototype._onLookupDone = function(result) {
       result: result
     });
   }
-};
+}
 
-scout.TagField.prototype.openChooserPopup = function() {
+openChooserPopup() {
   if (this.chooser) {
     return;
   }
@@ -304,57 +322,57 @@ scout.TagField.prototype.openChooserPopup = function() {
   this.chooser.on('lookupRowSelected', this._onLookupRowSelected.bind(this));
   this.chooser.one('close', this._onChooserPopupClose.bind(this));
   this.chooser.open();
-};
+}
 
-scout.TagField.prototype.closeChooserPopup = function() {
+closeChooserPopup() {
   if (this.chooser && !this.chooser.destroying) {
     this.chooser.close();
   }
-};
+}
 
-scout.TagField.prototype._onLookupRowSelected = function(event) {
+_onLookupRowSelected(event) {
   this._clear();
   this._updateHasText();
   this.addTag(event.lookupRow.key);
   this.closeChooserPopup();
-};
+}
 
-scout.TagField.prototype._onChooserPopupClose = function(event) {
+_onChooserPopupClose(event) {
   this.chooser = null;
-};
+}
 
-scout.TagField.prototype.isInputFocused = function() {
+isInputFocused() {
   var ae = this.$fieldContainer.activeElement();
   return this.$field.is(ae);
-};
+}
 
-scout.TagField.prototype._onValueChange = function(event) {
+_onValueChange(event) {
   if ('value' === event.propertyName) {
     this._renderLabel();
   }
-};
+}
 
-scout.TagField.prototype._renderPlaceholder = function($field) {
+_renderPlaceholder($field) {
   // only render placeholder when tag field is empty (has no tags)
-  var hasTags = !!scout.arrays.ensure(this.value).length;
+  var hasTags = !!arrays.ensure(this.value).length;
   $field = scout.nvl($field, this.$field);
   if ($field) {
     $field.placeholder(hasTags ? '' : this.label);
   }
-};
+}
 
-scout.TagField.prototype._createFieldAdapter = function() {
-  return scout.TagField.createFieldAdapter(this);
-};
+_createFieldAdapter() {
+  return TagField.createFieldAdapter(this);
+}
 
-scout.TagField.createFieldAdapter = function(field) {
+static createFieldAdapter(field) {
   return {
     $container: function() {
       return field.$fieldContainer;
     },
 
     enabled: function() {
-      return scout.strings.empty(field._readDisplayText());
+      return strings.empty(field._readDisplayText());
     },
 
     focus: function() {
@@ -373,4 +391,5 @@ scout.TagField.createFieldAdapter = function(field) {
       field.removeTag(tag);
     }
   };
-};
+}
+}

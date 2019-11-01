@@ -8,48 +8,53 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LogicalGridMatrix = function(cursor) {
+import {LogicalGridMatrixCursor} from '../../../index';
+import {LogicalGridMatrixCell} from '../../../index';
+
+export default class LogicalGridMatrix {
+
+constructor(cursor) {
   this._cursor = cursor;
   this._assignedCells = [];
-};
+}
 
-scout.LogicalGridMatrix.prototype.getColumnCount = function() {
+getColumnCount() {
   return this._cursor.columnCount;
-};
+}
 
-scout.LogicalGridMatrix.prototype.getRowCount = function() {
+getRowCount() {
   return this._cursor.rowCount;
-};
+}
 
-scout.LogicalGridMatrix.prototype._setAssignedCell = function(index, val) {
+_setAssignedCell(index, val) {
   if (!this._assignedCells[index.x]) {
     this._assignedCells[index.x] = [];
   }
   this._assignedCells[index.x][index.y] = val;
-};
+}
 
-scout.LogicalGridMatrix.prototype._getAssignedCell = function(index) {
+_getAssignedCell(index) {
   if (!this._assignedCells[index.x]) {
     return null;
   }
   return this._assignedCells[index.x][index.y];
-};
+}
 
-scout.LogicalGridMatrix.prototype._nextFree = function(w, h) {
+_nextFree(w, h) {
   if (!this._cursor.increment()) {
     return false;
   }
   var currentIndex = this._cursor.currentIndex();
   if (!this._isAllCellFree(currentIndex.x, currentIndex.y, w, h)) {
     if (!this._getAssignedCell(currentIndex)) {
-      this._setAssignedCell(currentIndex, new scout.LogicalGridMatrixCell());
+      this._setAssignedCell(currentIndex, new LogicalGridMatrixCell());
     }
     return this._nextFree(w, h);
   }
   return true;
-};
+}
 
-scout.LogicalGridMatrix.prototype._isAllCellFree = function(x, y, w, h) {
+_isAllCellFree(x, y, w, h) {
   if (x + w > this._cursor.startX + this._cursor.columnCount || y + h > this._cursor.startY + this._cursor.rowCount) {
     return false;
   }
@@ -58,11 +63,11 @@ scout.LogicalGridMatrix.prototype._isAllCellFree = function(x, y, w, h) {
       return !valY;
     }.bind(this));
   }.bind(this));
-};
+}
 
-scout.LogicalGridMatrix.prototype.toString = function() {
+toString() {
   var ret = '----Group Box Grid Matrix [orientation=' + this._cursor.orientation + ', columnCount=' + this.getColumnCount() + ', rowCount=' + this.getRowCount() + ']--------------\n';
-  var tempCursor = new scout.LogicalGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
+  var tempCursor = new LogicalGridMatrixCursor(0, 0, this.getColumnCount(), this.getRowCount(), this._cursor.orientation);
   while (tempCursor.increment()) {
     var cell = this._getAssignedCell(tempCursor.currentIndex());
     ret += 'cell[' + tempCursor.currentIndex().x + ', ' + tempCursor.currentIndex().y + '] ';
@@ -76,4 +81,5 @@ scout.LogicalGridMatrix.prototype.toString = function() {
     ret += '\n';
   }
   return ret;
-};
+}
+}

@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupAdapter = function() {
-  scout.GroupAdapter.parent.call(this);
+import {ModelAdapter} from '../index';
+
+export default class GroupAdapter extends ModelAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['collapsed']);
-};
-scout.inherits(scout.GroupAdapter, scout.ModelAdapter);
+}
+
+}

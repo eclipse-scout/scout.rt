@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Event = function(model) {
+import * as $ from 'jquery';
+
+export default class Event {
+
+constructor(model) {
   this.defaultPrevented = false;
   $.extend(this, model);
-};
+}
 
-scout.Event.prototype.preventDefault = function() {
+preventDefault() {
   this.defaultPrevented = true;
-};
+}
+}

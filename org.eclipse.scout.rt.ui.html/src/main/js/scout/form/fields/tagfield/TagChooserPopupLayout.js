@@ -8,14 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TagChooserPopupLayout = function(popup) {
-  scout.TagChooserPopupLayout.parent.call(this, popup);
-  this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.TagChooserPopupLayout, scout.PopupLayout);
+import {PopupLayout} from '../../../index';
+import {scout} from '../../../index';
 
-scout.TagChooserPopupLayout.prototype.layout = function($container) {
-  scout.TagChooserPopupLayout.parent.prototype.layout.call(this, $container);
+export default class TagChooserPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
+  this.doubleCalcPrefSize = false;
+}
+
+
+layout($container) {
+  super.layout( $container);
 
   // layout table
   var htmlComp = this.popup.htmlComp;
@@ -23,15 +28,16 @@ scout.TagChooserPopupLayout.prototype.layout = function($container) {
   this.popup.table.htmlComp.setSize(size);
 
   this.popup.position();
-};
+}
 
 /**
  * @override AbstractLayout.js
  */
-scout.TagChooserPopupLayout.prototype.preferredLayoutSize = function($container) {
+preferredLayoutSize($container) {
   var tableHandler = scout.create('TableLayoutResetter', this.popup.table);
   tableHandler.modifyDom();
-  var prefSize = scout.TagChooserPopupLayout.parent.prototype.preferredLayoutSize.call(this, $container);
+  var prefSize = super.preferredLayoutSize( $container);
   tableHandler.restoreDom();
   return prefSize;
-};
+}
+}

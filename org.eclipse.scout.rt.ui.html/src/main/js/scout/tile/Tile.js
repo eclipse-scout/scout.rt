@@ -8,26 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Tile = function() {
-  scout.Tile.parent.call(this);
-  this.displayStyle = scout.Tile.DisplayStyle.DEFAULT;
+import {HtmlComponent} from '../index';
+import {strings} from '../index';
+import {LoadingSupport} from '../index';
+import {SingleLayout} from '../index';
+import {Widget} from '../index';
+import {GridData} from '../index';
+import * as $ from 'jquery';
+
+export default class Tile extends Widget {
+
+constructor() {
+  super();
+  this.displayStyle = Tile.DisplayStyle.DEFAULT;
   this.filterAccepted = true;
   this.gridData = null;
-  this.gridDataHints = new scout.GridData();
+  this.gridDataHints = new GridData();
   this.colorScheme = null;
   this.selected = false;
   this.selectable = false;
-};
-scout.inherits(scout.Tile, scout.Widget);
+}
+
 
 // These constants need to correspond to the IDs defined in TileColorScheme.java
-scout.Tile.ColorSchemeId = {
+static ColorSchemeId = {
   DEFAULT: 'default',
   ALTERNATIVE: 'alternative',
   RAINBOW: 'rainbow'
 };
 
-scout.Tile.DisplayStyle = {
+static DisplayStyle = {
   DEFAULT: 'default',
   PLAIN: 'plain'
 };
@@ -35,78 +45,78 @@ scout.Tile.DisplayStyle = {
 /**
  * @override
  */
-scout.Tile.prototype._createLoadingSupport = function() {
-  return new scout.LoadingSupport({
+_createLoadingSupport() {
+  return new LoadingSupport({
     widget: this
   });
-};
+}
 
-scout.Tile.prototype._init = function(model) {
-  scout.Tile.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this._setGridDataHints(this.gridDataHints);
   this._setColorScheme(this.colorScheme);
   this._setSelectable(this.selectable);
-};
+}
 
-scout.Tile.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('tile');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SingleLayout());
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new SingleLayout());
+}
 
-scout.Tile.prototype._renderProperties = function() {
-  scout.Tile.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderColorScheme();
   this._renderSelectable();
   this._renderSelected();
   this._renderDisplayStyle();
-};
+}
 
-scout.Tile.prototype._postRender = function() {
+_postRender() {
   this.$container.addClass('tile');
   // Make sure prefSize returns the size the tile has after the animation even if it is called while the animation runs
   // Otherwise the tile may have the wrong size after making a tile with useUiHeight = true visible
   this.htmlComp.layout.animateClasses = ['animate-visible', 'animate-invisible', 'animate-insert', 'animate-remove'];
-};
+}
 
-scout.Tile.prototype._renderDisplayStyle = function() {
-  this.$container.toggleClass('default-tile', this.displayStyle === scout.Tile.DisplayStyle.DEFAULT);
-};
+_renderDisplayStyle() {
+  this.$container.toggleClass('default-tile', this.displayStyle === Tile.DisplayStyle.DEFAULT);
+}
 
-scout.Tile.prototype.setGridDataHints = function(gridData) {
+setGridDataHints(gridData) {
   this.setProperty('gridDataHints', gridData);
   if (this.rendered) {
     // Do it here instead of _renderGridDataHints because grid does not need to be invalidated when rendering, only when hints change
     // Otherwise it forces too many unnecessary recalculations when tile grid is rendering tiles due to virtual scrolling
     this.parent.invalidateLogicalGrid();
   }
-};
+}
 
-scout.Tile.prototype._setGridDataHints = function(gridData) {
+_setGridDataHints(gridData) {
   if (!gridData) {
-    gridData = new scout.GridData();
+    gridData = new GridData();
   }
-  this._setProperty('gridDataHints', scout.GridData.ensure(gridData));
-};
+  this._setProperty('gridDataHints', GridData.ensure(gridData));
+}
 
-scout.Tile.prototype.setColorScheme = function(colorScheme) {
+setColorScheme(colorScheme) {
   this.setProperty('colorScheme', colorScheme);
-};
+}
 
-scout.Tile.prototype._setColorScheme = function(colorScheme) {
+_setColorScheme(colorScheme) {
   var defaultScheme = {
-    scheme: scout.Tile.ColorSchemeId.DEFAULT,
+    scheme: Tile.ColorSchemeId.DEFAULT,
     inverted: false
   };
   colorScheme = this._ensureColorScheme(colorScheme);
   colorScheme = $.extend({}, defaultScheme, colorScheme);
   this._setProperty('colorScheme', colorScheme);
-};
+}
 
 /**
  * ColorScheme may be a string -> convert to an object
  */
-scout.Tile.prototype._ensureColorScheme = function(colorScheme) {
+_ensureColorScheme(colorScheme) {
   if (typeof colorScheme === 'object') {
     return colorScheme;
   }
@@ -114,58 +124,58 @@ scout.Tile.prototype._ensureColorScheme = function(colorScheme) {
   if (typeof colorScheme === 'string') {
     // Split up colorScheme in two individual parts ("scheme" and "inverted").
     // This information is then used when rendering the color scheme.
-    if (scout.strings.startsWith(colorScheme, scout.Tile.ColorSchemeId.ALTERNATIVE)) {
-      colorSchemeObj.scheme = scout.Tile.ColorSchemeId.ALTERNATIVE;
+    if (strings.startsWith(colorScheme, Tile.ColorSchemeId.ALTERNATIVE)) {
+      colorSchemeObj.scheme = Tile.ColorSchemeId.ALTERNATIVE;
     }
-    if (scout.strings.startsWith(colorScheme, scout.Tile.ColorSchemeId.RAINBOW)) {
-      colorSchemeObj.scheme = scout.Tile.ColorSchemeId.RAINBOW;
+    if (strings.startsWith(colorScheme, Tile.ColorSchemeId.RAINBOW)) {
+      colorSchemeObj.scheme = Tile.ColorSchemeId.RAINBOW;
     }
-    colorSchemeObj.inverted = scout.strings.endsWith(colorScheme, '-inverted');
+    colorSchemeObj.inverted = strings.endsWith(colorScheme, '-inverted');
   }
   return colorSchemeObj;
-};
+}
 
-scout.Tile.prototype._renderColorScheme = function() {
-  this.$container.toggleClass('color-alternative', (this.colorScheme.scheme === scout.Tile.ColorSchemeId.ALTERNATIVE));
-  this.$container.toggleClass('color-rainbow', (this.colorScheme.scheme === scout.Tile.ColorSchemeId.RAINBOW));
+_renderColorScheme() {
+  this.$container.toggleClass('color-alternative', (this.colorScheme.scheme === Tile.ColorSchemeId.ALTERNATIVE));
+  this.$container.toggleClass('color-rainbow', (this.colorScheme.scheme === Tile.ColorSchemeId.RAINBOW));
   this.$container.toggleClass('inverted', this.colorScheme.inverted);
-};
+}
 
-scout.Tile.prototype.setSelected = function(selected) {
+setSelected(selected) {
   if (selected && !this.selectable) {
     return;
   }
   this.setProperty('selected', selected);
-};
+}
 
-scout.Tile.prototype._renderSelected = function() {
+_renderSelected() {
   this.$container.toggleClass('selected', this.selected);
-};
+}
 
-scout.Tile.prototype.setSelectable = function(selectable) {
+setSelectable(selectable) {
   this.setProperty('selectable', selectable);
-};
+}
 
-scout.Tile.prototype._setSelectable = function(selectable) {
+_setSelectable(selectable) {
   this._setProperty('selectable', selectable);
   if (!this.selectable) {
     this.setSelected(false);
   }
-};
+}
 
-scout.Tile.prototype._renderSelectable = function() {
+_renderSelectable() {
   this.$container.toggleClass('selectable', this.selectable);
-};
+}
 
-scout.Tile.prototype.setFilterAccepted = function(filterAccepted) {
+setFilterAccepted(filterAccepted) {
   this.setProperty('filterAccepted', filterAccepted);
-};
+}
 
-scout.Tile.prototype._renderFilterAccepted = function() {
+_renderFilterAccepted() {
   this._renderVisible();
-};
+}
 
-scout.Tile.prototype._renderVisible = function() {
+_renderVisible() {
   if (this.rendering) {
     this.$container.setVisible(this.isVisible());
     return;
@@ -199,11 +209,12 @@ scout.Tile.prototype._renderVisible = function() {
     }.bind(this));
   }
   this.invalidateParentLogicalGrid();
-};
+}
 
 /**
  * @override
  */
-scout.Tile.prototype.isVisible = function() {
+isVisible() {
   return this.visible && this.filterAccepted;
-};
+}
+}

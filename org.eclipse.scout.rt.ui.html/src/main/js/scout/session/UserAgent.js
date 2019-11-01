@@ -8,7 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.UserAgent = function(model) {
+import {scout} from '../index';
+
+export default class UserAgent {
+
+constructor(model) {
   model = model || {};
   if (!model.deviceType) {
     throw new Error('deviceType needs to be defined');
@@ -16,4 +20,5 @@ scout.UserAgent = function(model) {
   this.deviceType = model.deviceType;
   this.touch = scout.nvl(model.touch, false);
   this.standalone = scout.nvl(model.standalone, false);
-};
+}
+}

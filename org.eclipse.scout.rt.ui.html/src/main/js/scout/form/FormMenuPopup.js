@@ -8,29 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormMenuPopup = function() {
-  scout.FormMenuPopup.parent.call(this);
+import {PopupWithHead} from '../index';
+import {FormMenuPopupLayout} from '../index';
+
+export default class FormMenuPopup extends PopupWithHead {
+
+constructor() {
+  super();
   this.formMenu = null;
   this.formMenuPropertyChangeHandler = this._onFormMenuPropertyChange.bind(this);
   this._addWidgetProperties('form');
-};
-scout.inherits(scout.FormMenuPopup, scout.PopupWithHead);
+}
 
-scout.FormMenuPopup.prototype._init = function(options) {
+
+_init(options) {
   options.form = options.formMenu.form;
   options.initialFocus = options.formMenu.form._initialFocusElement.bind(options.formMenu.form);
-  scout.FormMenuPopup.parent.prototype._init.call(this, options);
+  super._init( options);
 
   this.$formMenu = this.formMenu.$container;
   this.$headBlueprint = this.$formMenu;
-};
+}
 
-scout.FormMenuPopup.prototype._createLayout = function() {
-  return new scout.FormMenuPopupLayout(this);
-};
+_createLayout() {
+  return new FormMenuPopupLayout(this);
+}
 
-scout.FormMenuPopup.prototype._render = function() {
-  scout.FormMenuPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('form-menu-popup');
 
   this.form.renderInitialFocusEnabled = false;
@@ -40,18 +45,18 @@ scout.FormMenuPopup.prototype._render = function() {
   if (this._headVisible) {
     this.formMenu.on('propertyChange', this.formMenuPropertyChangeHandler);
   }
-};
+}
 
-scout.FormMenuPopup.prototype._remove = function() {
-  scout.FormMenuPopup.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
 
   if (this._headVisible) {
     this.formMenu.off('propertyChange', this.formMenuPropertyChangeHandler);
   }
-};
+}
 
-scout.FormMenuPopup.prototype._renderHead = function() {
-  scout.FormMenuPopup.parent.prototype._renderHead.call(this);
+_renderHead() {
+  super._renderHead();
   if (this.formMenu.uiCssClass) {
     this._copyCssClassToHead(this.formMenu.uiCssClass);
   }
@@ -59,9 +64,9 @@ scout.FormMenuPopup.prototype._renderHead = function() {
     this._copyCssClassToHead(this.formMenu.cssClass);
   }
   this._copyCssClassToHead('unfocusable');
-};
+}
 
-scout.FormMenuPopup.prototype._onFormMenuPropertyChange = function(event) {
+_onFormMenuPropertyChange(event) {
   this.session.layoutValidator.schedulePostValidateFunction(function() {
     // Because this post layout validation function is executed asynchronously,
     // we have to check again if the popup is still rendered.
@@ -71,12 +76,12 @@ scout.FormMenuPopup.prototype._onFormMenuPropertyChange = function(event) {
     this.rerenderHead();
     this.position();
   }.bind(this));
-};
+}
 
 /**
  * @override
  */
-scout.FormMenuPopup.prototype._onWindowResize = function() {
+_onWindowResize() {
   if (!this.rendered) {
     // may already be removed if a parent popup is closed during the resize event
     return;
@@ -85,4 +90,5 @@ scout.FormMenuPopup.prototype._onWindowResize = function() {
   // In that case activating the field opens the keyboard which may resize the screen (android tablets).
   this.revalidateLayout();
   this.position(false);
-};
+}
+}

@@ -8,15 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarLayout = function(calendar) {
-  scout.CalendarLayout.parent.call(this);
+import {AbstractLayout} from '../index';
+
+export default class CalendarLayout extends AbstractLayout {
+
+constructor(calendar) {
+  super();
   this.calendar = calendar;
   this.stacked = false;
   this.compacted = false;
-};
-scout.inherits(scout.CalendarLayout, scout.AbstractLayout);
+}
 
-scout.CalendarLayout.prototype.layout = function($container) {
+
+layout($container) {
   var height = 0,
     headerHeight = 0,
     $yearContainer = this.calendar._yearPanel.$container,
@@ -41,9 +45,9 @@ scout.CalendarLayout.prototype.layout = function($container) {
 
   this.calendar.layoutSize();
   this.calendar.layoutYearPanel();
-};
+}
 
-scout.CalendarLayout.prototype.compact = function() {
+compact() {
   if (this.compacted) {
     return;
   }
@@ -51,9 +55,9 @@ scout.CalendarLayout.prototype.compact = function() {
   this.calendar.$title.appendTo(this.calendar.$headerRow2);
   $headerRow2.show();
   this.compacted = true;
-};
+}
 
-scout.CalendarLayout.prototype.undoCompact = function() {
+undoCompact() {
   if (!this.compacted) {
     return;
   }
@@ -61,22 +65,23 @@ scout.CalendarLayout.prototype.undoCompact = function() {
   this.calendar.$title.insertBefore(this.calendar.$commands);
   $headerRow2.hide();
   this.compacted = false;
-};
+}
 
-scout.CalendarLayout.prototype.stack = function() {
+stack() {
   if (this.stacked) {
     return;
   }
   this.calendar.$commands.children('.calendar-mode').hide();
   this.calendar.modesMenu.setVisible(true);
   this.stacked = true;
-};
+}
 
-scout.CalendarLayout.prototype.undoStack = function() {
+undoStack() {
   if (!this.stacked) {
     return;
   }
   this.calendar.$commands.children('.calendar-mode').show();
   this.calendar.modesMenu.setVisible(false);
   this.stacked = false;
-};
+}
+}

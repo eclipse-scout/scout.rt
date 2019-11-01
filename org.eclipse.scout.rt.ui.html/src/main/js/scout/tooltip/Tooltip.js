@@ -8,8 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Tooltip = function() {
-  scout.Tooltip.parent.call(this);
+import {graphics} from '../index';
+import {scrollbars} from '../index';
+import {Form} from '../index';
+import {Status} from '../index';
+import {strings} from '../index';
+import {keys} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {scout} from '../index';
+
+export default class Tooltip extends Widget {
+
+constructor() {
+  super();
 
   /**
    * Either a String or a function which returns a String
@@ -39,10 +52,10 @@ scout.Tooltip = function() {
   this._addWidgetProperties(['menus']);
 
   this._openLater = false;
-};
-scout.inherits(scout.Tooltip, scout.Widget);
+}
 
-scout.Tooltip.prototype.render = function($parent) {
+
+render($parent) {
   // Use entry point by default
   var $tooltipParent = $parent || this.entryPoint();
   // when the parent is detached it is not possible to render the popup -> do it later
@@ -51,10 +64,10 @@ scout.Tooltip.prototype.render = function($parent) {
     this.$parent = $tooltipParent;
     return;
   }
-  scout.Tooltip.parent.prototype.render.call(this, $tooltipParent);
-};
+  super.render( $tooltipParent);
+}
 
-scout.Tooltip.prototype._render = function() {
+_render() {
   this.$container = this.$parent
     .appendDiv('tooltip')
     .data('tooltip', this);
@@ -82,14 +95,14 @@ scout.Tooltip.prototype._render = function() {
 
   if (this.$anchor && this.scrollType) {
     this._anchorScrollHandler = this._onAnchorScroll.bind(this);
-    scout.scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
+    scrollbars.onScroll(this.$anchor, this._anchorScrollHandler);
   }
 
   // If the tooltip is rendered inside a (popup) dialog, get a reference to the dialog.
   this.dialog = null;
   var parent = this.parent;
   while (parent) {
-    if (parent instanceof scout.Form && parent.isDialog()) {
+    if (parent instanceof Form && parent.isDialog()) {
       this.dialog = parent;
       break;
     }
@@ -101,14 +114,14 @@ scout.Tooltip.prototype._render = function() {
     this._moveHandler = this.position.bind(this);
     this.dialog.on('move', this._moveHandler);
   }
-};
+}
 
-scout.Tooltip.prototype._postRender = function() {
-  scout.Tooltip.parent.prototype._postRender.call(this);
+_postRender() {
+  super._postRender();
   this.position();
-};
+}
 
-scout.Tooltip.prototype._remove = function() {
+_remove() {
   if (this._mouseDownHandler) {
     this.$container.document(true).removeEventListener('mousedown', this._mouseDownHandler, true);
     this._mouseDownHandler = null;
@@ -118,7 +131,7 @@ scout.Tooltip.prototype._remove = function() {
     this._keydownHandler = null;
   }
   if (this._anchorScrollHandler) {
-    scout.scrollbars.offScroll(this._anchorScrollHandler);
+    scrollbars.offScroll(this._anchorScrollHandler);
     this._anchorScrollHandler = null;
   }
   if (this._moveHandler) {
@@ -129,62 +142,62 @@ scout.Tooltip.prototype._remove = function() {
   }
   this.dialog = null;
   this.$menus = null;
-  scout.Tooltip.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.Tooltip.prototype._onAttach = function() {
-  scout.Tooltip.parent.prototype._onAttach.call(this);
+_onAttach() {
+  super._onAttach();
   if (this._openLater && !this.rendered) {
     this._openLater = false;
     this.render(this.$parent);
   }
-};
+}
 
-scout.Tooltip.prototype._renderOnDetach = function() {
+_renderOnDetach() {
   this._openLater = true;
   this.remove();
-  scout.Tooltip.parent.prototype._onDetach.call(this);
-};
+  super._onDetach();
+}
 
-scout.Tooltip.prototype._isRemovalPrevented = function() {
+_isRemovalPrevented() {
   // Never prevent. Default returns true if removal is pending by an animation, but tooltips should be closed before the animation starts
   return false;
-};
+}
 
-scout.Tooltip.prototype.setText = function(text) {
+setText(text) {
   this.setProperty('text', text);
-};
+}
 
-scout.Tooltip.prototype.setSeverity = function(severity) {
+setSeverity(severity) {
   this.setProperty('severity', severity);
-};
+}
 
-scout.Tooltip.prototype._renderText = function() {
+_renderText() {
   var text = this.text || '';
   if (this.htmlEnabled) {
     this.$content.html(text);
   } else {
     // use nl2br to allow tooltips with line breaks
-    this.$content.html(scout.strings.nl2br(text));
+    this.$content.html(strings.nl2br(text));
   }
   this.$content.setVisible(!!text);
   this.$container.toggleClass('no-text', !text);
   if (!this.rendering) {
     this.position();
   }
-};
+}
 
-scout.Tooltip.prototype._renderSeverity = function() {
-  this.$container.removeClass(scout.Status.SEVERITY_CSS_CLASSES);
-  this.$container.addClass(scout.Status.cssClassForSeverity(this.severity));
-};
+_renderSeverity() {
+  this.$container.removeClass(Status.SEVERITY_CSS_CLASSES);
+  this.$container.addClass(Status.cssClassForSeverity(this.severity));
+}
 
-scout.Tooltip.prototype.setMenus = function(menus) {
-  menus = scout.arrays.ensure(menus);
+setMenus(menus) {
+  menus = arrays.ensure(menus);
   this.setProperty('menus', menus);
-};
+}
 
-scout.Tooltip.prototype._renderMenus = function() {
+_renderMenus() {
   var maxIconWidth = 0,
     menus = this.menus;
 
@@ -219,9 +232,9 @@ scout.Tooltip.prototype._renderMenus = function() {
   if (!this.rendering) {
     this.position();
   }
-};
+}
 
-scout.Tooltip.prototype.position = function() {
+position() {
   var top, left, arrowSize, overlapX, overlapY, x, y, origin,
     tooltipWidth, tooltipHeight, arrowDivWidth, arrowPosition, inView;
 
@@ -229,14 +242,14 @@ scout.Tooltip.prototype.position = function() {
     origin = this.origin;
     x = origin.x;
   } else {
-    origin = scout.graphics.offsetBounds(this.$anchor);
+    origin = graphics.offsetBounds(this.$anchor);
     x = origin.x + origin.width / 2;
   }
   y = origin.y;
 
   if (this.$anchor) {
     // Sticky tooltip must only be visible if the location where the tooltip points is in view (prevents that the tooltip points at an invisible anchor)
-    inView = scout.scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
+    inView = scrollbars.isLocationInView(origin, this.$anchor.scrollParent());
     this.$container.setVisible(inView);
   }
 
@@ -249,7 +262,7 @@ scout.Tooltip.prototype.position = function() {
 
   arrowDivWidth = this.$arrow.outerWidth();
   // Arrow is a div rotated by 45 deg -> visible height is half the div
-  arrowSize = scout.Tooltip.computeHypotenuse(arrowDivWidth) / 2;
+  arrowSize = Tooltip.computeHypotenuse(arrowDivWidth) / 2;
 
   tooltipHeight = this.$container.outerHeight();
   tooltipWidth = this.$container.outerWidth();
@@ -294,9 +307,9 @@ scout.Tooltip.prototype.position = function() {
       menu.popup.position();
     }
   }, this);
-};
+}
 
-scout.Tooltip.prototype._onAnchorScroll = function(event) {
+_onAnchorScroll(event) {
   if (!this.rendered) {
     // Scroll events may be fired delayed, even if scroll listener are already removed.
     return;
@@ -306,18 +319,18 @@ scout.Tooltip.prototype._onAnchorScroll = function(event) {
   } else if (this.scrollType === 'remove') {
     this.destroy();
   }
-};
+}
 
-scout.Tooltip.prototype._onDocumentMouseDown = function(event) {
+_onDocumentMouseDown(event) {
   if (!this.rendered) {
     return false;
   }
   if (this._isMouseDownOutside(event)) {
     this._onMouseDownOutside(event);
   }
-};
+}
 
-scout.Tooltip.prototype._isMouseDownOutside = function(event) {
+_isMouseDownOutside(event) {
   var $target = $(event.target),
     targetWidget = scout.widget($target);
 
@@ -326,32 +339,33 @@ scout.Tooltip.prototype._isMouseDownOutside = function(event) {
   return !this.isOrHas(targetWidget) &&
     (this.$anchor && !this.$anchor.isOrHas($target[0])) &&
     !this.session.focusManager.isElementCovertByGlassPane(this.$container[0]);
-};
+}
 
 /**
  * Method invoked once a mouse down event occurs outside the tooltip.
  */
-scout.Tooltip.prototype._onMouseDownOutside = function() {
+_onMouseDownOutside() {
   this.destroy();
-};
+}
 
-scout.Tooltip.prototype._onDocumentKeyDown = function(event) {
+_onDocumentKeyDown(event) {
   if (scout.isOneOf(event.which,
-      scout.keys.CTRL, scout.keys.SHIFT, scout.keys.ALT,
-      scout.keys.NUM_LOCK, scout.keys.CAPS_LOCK, scout.keys.SCROLL_LOCK,
-      scout.keys.WIN_LEFT, scout.keys.WIN_RIGHT, scout.keys.SELECT,
-      scout.keys.PAUSE, scout.keys.PRINT_SCREEN)) {
+      keys.CTRL, keys.SHIFT, keys.ALT,
+      keys.NUM_LOCK, keys.CAPS_LOCK, keys.SCROLL_LOCK,
+      keys.WIN_LEFT, keys.WIN_RIGHT, keys.SELECT,
+      keys.PAUSE, keys.PRINT_SCREEN)) {
     return;
   }
 
   this.destroy();
-};
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
- * @memberOf scout.Tooltip
+ * @memberOf Tooltip
  */
-scout.Tooltip.computeHypotenuse = function(x) {
+static computeHypotenuse(x) {
   return Math.sqrt(Math.pow(x, 2) + Math.pow(x, 2));
-};
+}
+}

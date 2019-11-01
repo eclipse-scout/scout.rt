@@ -8,108 +8,114 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileAccordionSelectionHandler = function(tileAccordion) {
-  scout.TileAccordionSelectionHandler.parent.call(this, tileAccordion);
+import {TileGridSelectionHandler} from '../../index';
+import {HorizontalGrid} from '../../index';
+
+export default class TileAccordionSelectionHandler extends TileGridSelectionHandler {
+
+constructor(tileAccordion) {
+  super( tileAccordion);
   // The difference to the main selectionHandler is that this one works on the TileAccordion rather than on the TileGrid
   this.tileAccordion = this.tileGrid;
-};
-scout.inherits(scout.TileAccordionSelectionHandler, scout.TileGridSelectionHandler);
+}
+
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getFilteredTiles = function() {
+getFilteredTiles() {
   return this.tileAccordion.getFilteredTiles();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getFilteredTileCount = function() {
+getFilteredTileCount() {
   return this.tileAccordion.getFilteredTileCount();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getVisibleTiles = function() {
+getVisibleTiles() {
   return this.tileAccordion.getVisibleTiles();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getVisibleTileCount = function() {
+getVisibleTileCount() {
   return this.tileAccordion.getVisibleTileCount();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getSelectedTiles = function(event) {
+getSelectedTiles(event) {
   return this.tileAccordion.getSelectedTiles();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getFocusedTile = function() {
+getFocusedTile() {
   return this.tileAccordion.getFocusedTile();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getVisibleGridRowCount = function() {
+getVisibleGridRowCount() {
   return this.tileAccordion.getVisibleGridRowCount();
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getVisibleGridX = function(tile) {
+getVisibleGridX(tile) {
   return this.tileAccordion.getVisibleGridX(tile);
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getVisibleGridY = function(tile) {
+getVisibleGridY(tile) {
   return this.tileAccordion.getVisibleGridY(tile);
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.scrollTo = function(tile) {
+scrollTo(tile) {
   var group = this.tileAccordion.getGroupByTile(tile);
   group.body.scrollTo(tile);
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.getTileGridByRow = function(rowIndex) {
+getTileGridByRow(rowIndex) {
   var group = this.tileAccordion.getGroupByVisibleRow(rowIndex);
   if (group) {
     return group.body;
   }
   return null;
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.findVisibleTileIndexAt = function(x, y, startIndex, reverse) {
+findVisibleTileIndexAt(x, y, startIndex, reverse) {
   return this.tileAccordion.findVisibleTileIndexAt(x, y, startIndex, reverse);
-};
+}
 
 /**
  * @override
  */
-scout.TileAccordionSelectionHandler.prototype.isHorizontalGridActive = function() {
+isHorizontalGridActive() {
   if (this.tileAccordion.groups.length === 0) {
     return false;
   }
-  return this.tileAccordion.groups[0].body.logicalGrid instanceof scout.HorizontalGrid;
-};
+  return this.tileAccordion.groups[0].body.logicalGrid instanceof HorizontalGrid;
+}
+}

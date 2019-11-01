@@ -8,26 +8,32 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SmartFieldAdapter = function() {
-  scout.SmartFieldAdapter.parent.call(this);
+import {strings} from '../../../index';
+import {scout} from '../../../index';
+import {LookupFieldAdapter} from '../../../index';
+
+export default class SmartFieldAdapter extends LookupFieldAdapter {
+
+constructor() {
+  super();
 
   this._addRemoteProperties(['activeFilter']);
-};
-scout.inherits(scout.SmartFieldAdapter, scout.LookupFieldAdapter);
+}
+
 
 /**
  * Property lookup-row must be handled before value, since the smart-field has either a lookup-row
  * or a value but never both (when we only have a value, the smart-field must perform a lookup by key
  * in order to resolve the display name for that value).
  */
-scout.SmartFieldAdapter.PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
+static PROPERTIES_ORDER = ['lookupRow', 'value', 'errorStatus', 'displayText'];
 
-scout.SmartFieldAdapter.prototype._postCreateWidget = function() {
-  scout.SmartFieldAdapter.parent.prototype._postCreateWidget.call(this);
+_postCreateWidget() {
+  super._postCreateWidget();
   this.widget.lookupCall = scout.create('RemoteLookupCall', this);
-};
+}
 
-scout.SmartFieldAdapter.prototype._syncResult = function(result) {
+_syncResult(result) {
   var executedLookupCall = this.widget._currentLookupCall;
   if (!executedLookupCall && this.widget.touchMode && this.widget.popup && this.widget.popup._field) {
     // in case lookupCall is executed from within the popup (touch):
@@ -36,30 +42,30 @@ scout.SmartFieldAdapter.prototype._syncResult = function(result) {
   if (executedLookupCall) {
     executedLookupCall.resolveLookup(result);
   }
-};
+}
 
 // When displayText comes from the server we must not call parseAndSetValue here.
-scout.SmartFieldAdapter.prototype._syncDisplayText = function(displayText) {
+_syncDisplayText(displayText) {
   this.widget.setDisplayText(displayText);
-};
+}
 
-scout.SmartFieldAdapter.prototype._orderPropertyNamesOnSync = function(newProperties) {
-  return Object.keys(newProperties).sort(this._createPropertySortFunc(scout.SmartFieldAdapter.PROPERTIES_ORDER));
-};
+_orderPropertyNamesOnSync(newProperties) {
+  return Object.keys(newProperties).sort(this._createPropertySortFunc(SmartFieldAdapter.PROPERTIES_ORDER));
+}
 
-scout.SmartFieldAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'acceptByText') {
     this._onWidgetAcceptByText(event);
   } else {
-    scout.SmartFieldAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.SmartFieldAdapter.prototype._onWidgetAcceptByText = function(event) {
+_onWidgetAcceptByText(event) {
   this._sendProperty('errorStatus', event.errorStatus);
-};
+}
 
-scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
+_onWidgetAcceptInput(event) {
   var eventData = {
     displayText: event.displayText,
     errorStatus: event.errorStatus
@@ -67,7 +73,7 @@ scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
 
   if (event.errorStatus) {
     // 'clear' case
-    if (scout.strings.empty(event.displayText)) {
+    if (strings.empty(event.displayText)) {
       eventData.value = null;
     }
   } else {
@@ -83,4 +89,5 @@ scout.SmartFieldAdapter.prototype._onWidgetAcceptInput = function(event) {
       return this.target === previous.target && this.type === previous.type && this.whileTyping === previous.whileTyping;
     }
   });
-};
+}
+}

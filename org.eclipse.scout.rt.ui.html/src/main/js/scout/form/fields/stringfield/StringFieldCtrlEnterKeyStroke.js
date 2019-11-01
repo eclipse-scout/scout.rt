@@ -8,19 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StringFieldCtrlEnterKeyStroke = function(stringField) {
-  scout.StringFieldCtrlEnterKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+
+export default class StringFieldCtrlEnterKeyStroke extends KeyStroke {
+
+constructor(stringField) {
+  super();
   this.field = stringField;
-  this.which = [scout.keys.ENTER];
+  this.which = [keys.ENTER];
   this.ctrl = true;
-};
-scout.inherits(scout.StringFieldCtrlEnterKeyStroke, scout.KeyStroke);
+}
 
-scout.StringFieldCtrlEnterKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.StringFieldCtrlEnterKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted && this.field.hasAction;
-};
+}
 
-scout.StringFieldCtrlEnterKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field._onIconClick();
-};
+}
+}

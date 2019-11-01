@@ -8,29 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopLogo = function() {
-  scout.DesktopLogo.parent.call(this);
-};
-scout.inherits(scout.DesktopLogo, scout.Widget);
+import {Widget} from '../index';
 
-scout.DesktopLogo.prototype._init = function(model) {
-  scout.DesktopLogo.parent.prototype._init.call(this, model);
+export default class DesktopLogo extends Widget {
+
+constructor() {
+  super();
+}
+
+
+_init(model) {
+  super._init( model);
   this.url = model.url;
-};
+}
 
-scout.DesktopLogo.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('desktop-logo');
-};
+}
 
-scout.DesktopLogo.prototype._renderProperties = function() {
-  scout.DesktopLogo.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderUrl();
-};
+}
 
-scout.DesktopLogo.prototype._renderUrl = function() {
+_renderUrl() {
   this.$container.css('backgroundImage', 'url(' + this.url + ')');
-};
+}
 
-scout.DesktopLogo.prototype.setUrl = function(url) {
+setUrl(url) {
   this.setProperty('url', url);
-};
+}
+}

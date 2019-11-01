@@ -8,10 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.RemoteEvent = function(target, type, data) {
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class RemoteEvent {
+
+constructor(target, type, data) {
   scout.assertParameter('target', target);
   scout.assertParameter('type', type);
   $.extend(this, data);
   this.target = target;
   this.type = type;
-};
+}
+}

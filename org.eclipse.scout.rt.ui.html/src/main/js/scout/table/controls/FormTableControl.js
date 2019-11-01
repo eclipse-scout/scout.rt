@@ -8,30 +8,40 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormTableControl = function() {
-  scout.FormTableControl.parent.call(this);
+import {Form} from '../../index';
+import {Device} from '../../index';
+import {TabBox} from '../../index';
+import {FormField} from '../../index';
+import {TableControl} from '../../index';
+import {GroupBox} from '../../index';
+import {FormTableControlLayout} from '../../index';
+
+export default class FormTableControl extends TableControl {
+
+constructor() {
+  super();
   this._addWidgetProperties('form');
 
   this._formDestroyedHandler = this._onFormDestroyed.bind(this);
-};
-scout.inherits(scout.FormTableControl, scout.TableControl);
+}
 
-scout.FormTableControl.prototype._init = function(model) {
-  scout.FormTableControl.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setForm(this.form);
-};
+}
 
-scout.FormTableControl.prototype._createLayout = function() {
-  return new scout.FormTableControlLayout(this);
-};
+_createLayout() {
+  return new FormTableControlLayout(this);
+}
 
-scout.FormTableControl.prototype._renderContent = function($parent) {
+_renderContent($parent) {
   this.form.renderInitialFocusEnabled = false;
   this.form.render($parent);
 
   // Tab box gets a special style if it is the first field in the root group box
   var rootGroupBox = this.form.rootGroupBox;
-  if (rootGroupBox.controls[0] instanceof scout.TabBox) {
+  if (rootGroupBox.controls[0] instanceof TabBox) {
     rootGroupBox.controls[0].$container.addClass('in-table-control');
   }
 
@@ -39,30 +49,30 @@ scout.FormTableControl.prototype._renderContent = function($parent) {
   this.form.$container.width($parent.width());
   this.form.htmlComp.validateRoot = true;
   this.form.htmlComp.validateLayout();
-};
+}
 
-scout.FormTableControl.prototype._removeContent = function() {
+_removeContent() {
   if (this.form) {
     this.form.remove();
   }
-};
+}
 
-scout.FormTableControl.prototype._removeForm = function() {
+_removeForm() {
   this.removeContent();
-};
+}
 
-scout.FormTableControl.prototype._renderForm = function(form) {
+_renderForm(form) {
   this.renderContent();
-};
+}
 
 /**
  * Returns true if the table control may be displayed (opened).
  */
-scout.FormTableControl.prototype.isContentAvailable = function() {
+isContentAvailable() {
   return !!this.form;
-};
+}
 
-scout.FormTableControl.prototype._setForm = function(form) {
+_setForm(form) {
   if (this.form) {
     this.form.off('destroy', this._formDestroyedHandler);
   }
@@ -71,28 +81,29 @@ scout.FormTableControl.prototype._setForm = function(form) {
     this._adaptForm(form);
   }
   this._setProperty('form', form);
-};
+}
 
-scout.FormTableControl.prototype._adaptForm = function(form) {
-  form.rootGroupBox.setMenuBarPosition(scout.GroupBox.MenuBarPosition.BOTTOM);
-  form.setDisplayHint(scout.Form.DisplayHint.VIEW);
+_adaptForm(form) {
+  form.rootGroupBox.setMenuBarPosition(GroupBox.MenuBarPosition.BOTTOM);
+  form.setDisplayHint(Form.DisplayHint.VIEW);
   form.setModal(false);
   form.setAskIfNeedSave(false);
-  if (this.session.userAgent.deviceType !== scout.Device.Type.MOBILE && form.rootGroupBox.fieldStyle === scout.FormField.FieldStyle.ALTERNATIVE) {
+  if (this.session.userAgent.deviceType !== Device.Type.MOBILE && form.rootGroupBox.fieldStyle === FormField.FieldStyle.ALTERNATIVE) {
     // Use default style because alternative style does not look as good with a background color
-    form.rootGroupBox.setFieldStyle(scout.FormField.FieldStyle.CLASSIC);
+    form.rootGroupBox.setFieldStyle(FormField.FieldStyle.CLASSIC);
   }
-};
+}
 
-scout.FormTableControl.prototype.onControlContainerOpened = function() {
+onControlContainerOpened() {
   if (!this.form.rendered) {
     return;
   }
   this.form.renderInitialFocus();
-};
+}
 
-scout.FormTableControl.prototype._onFormDestroyed = function(event) {
+_onFormDestroyed(event) {
   // Called when the inner form is destroyed --> unlink it from this table control
   this._removeForm();
   this._setForm(null);
-};
+}
+}

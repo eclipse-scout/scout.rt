@@ -8,11 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TileGridSelectAllKeyStroke = function(tileGrid) {
-  scout.TileGridSelectAllKeyStroke.parent.call(this, tileGrid);
+import {TileGridSelectKeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TileGridSelectAllKeyStroke extends TileGridSelectKeyStroke {
+
+constructor(tileGrid) {
+  super( tileGrid);
   this.ctrl = true;
   this.shift = false;
-  this.which = [scout.keys.A];
+  this.which = [keys.A];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var tile = this.getSelectionHandler().getVisibleTiles()[0];
     if (tile) {
@@ -20,11 +25,11 @@ scout.TileGridSelectAllKeyStroke = function(tileGrid) {
       return tile.$container;
     }
   }.bind(this);
-};
-scout.inherits(scout.TileGridSelectAllKeyStroke, scout.TileGridSelectKeyStroke);
+}
 
-scout.TileGridSelectAllKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TileGridSelectAllKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -32,8 +37,9 @@ scout.TileGridSelectAllKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
-scout.TileGridSelectAllKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.getSelectionHandler().toggleSelection();
-};
+}
+}

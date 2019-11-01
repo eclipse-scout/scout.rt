@@ -8,12 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {objects} from '../index';
+import {arrays} from '../index';
+import {strings} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
 /**
  * Represents a robust "call" that, when it fails, is retried automatically for a specific
  * number of times, before failing ultimately. The call implementation must be provided
  * by a subclass by overriding the _callImpl() method.
  */
-scout.Call = function() {
+export default class Call {
+
+constructor() {
   // Delays in ms between retries (from left to right). The call eventually fails when this list gets empty.
   // Example: [100, 500, 500, 500]
   this.retryIntervals = [];
@@ -31,16 +39,16 @@ scout.Call = function() {
   this.name = null; // Identifier for the call, used to build the uniqueName
   this.uniqueName = null; // Unique identifier of this call instance for logging and debugging purposes
   this.logPrefix = ''; // All log messages are prefixed with this string. It contains the uniqueName and the current state (e.g. callCounter)
-};
+}
 
-scout.Call.GLOBAL_SEQ = 0;
+static GLOBAL_SEQ = 0;
 
-scout.Call.prototype.init = function(model) {
+init(model) {
   $.extend(this, model);
 
   // Ensure "retryIntervals" is a valid array
   if (typeof this.maxRetries === 'number') {
-    this.retryIntervals = scout.arrays.init(this.maxRetries, 0);
+    this.retryIntervals = arrays.init(this.maxRetries, 0);
   } else {
     // Do not modify the passed value -> create a copy
     this.retryIntervals = (this.retryIntervals ? this.retryIntervals.slice() : []);
@@ -49,30 +57,30 @@ scout.Call.prototype.init = function(model) {
   }
 
   // Assign a unique name to the call to help distinguish different calls in the log
-  this.uniqueName = scout.nvl(this.type, 'call') + '-' + (scout.Call.GLOBAL_SEQ++) + scout.strings.box(' ', this.name, '');
+  this.uniqueName = scout.nvl(this.type, 'call') + '-' + (Call.GLOBAL_SEQ++) + strings.box(' ', this.name, '');
 
   this.initialized = true;
-};
+}
 
-scout.Call.prototype._checkInitialized = function() {
+_checkInitialized() {
   if (!this.initialized) {
     throw new Error('Not initialized');
   }
-};
+}
 
-scout.Call.prototype._updateLogPrefix = function() {
+_updateLogPrefix() {
   this.logPrefix = this.callCounter + '/' + (this.maxRetries + 1) + ' [' + this.uniqueName + '] ';
-};
+}
 
-scout.Call.prototype._resolve = function() {
+_resolve() {
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[RESOLVE]');
   this.deferred.resolve.apply(this.deferred, this.result);
-};
+}
 
-scout.Call.prototype._reject = function() {
+_reject() {
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[REJECT]');
   this.deferred.reject.apply(this.deferred, this.result);
-};
+}
 
 //==================================================================================
 
@@ -106,11 +114,11 @@ scout.Call.prototype._reject = function() {
  *                             |        sleep          |
  *                             +-------- %%% ----------+
  */
-scout.Call.prototype.call = function() {
+call() {
   this._checkInitialized();
   this._call();
   return this.deferred.promise();
-};
+}
 
 /**
  * Aborts the call. If the request is currently running, it is aborted (interrupted).
@@ -118,14 +126,14 @@ scout.Call.prototype.call = function() {
  *
  * The promise returned by call() is REJECTED.
  */
-scout.Call.prototype.abort = function() {
+abort() {
   this._checkInitialized();
   this._abort();
-};
+}
 
 // ==================================================================================
 
-scout.Call.prototype._call = function() {
+_call() {
   if (this.aborted) {
     throw new Error('Call is aborted');
   }
@@ -141,27 +149,27 @@ scout.Call.prototype._call = function() {
       // Store the last callback's arguments. They will be used be _resolve() and _reject().
       // We could pass them through the _onCallX functions, but when a call is aborted while
       // it is only scheduled (setTimeout), we would not have any values to pass to _reject().
-      this.result = scout.objects.argumentsToArray(arguments);
+      this.result = objects.argumentsToArray(arguments);
     }.bind(this))
     .done(this._onCallDone.bind(this))
     .fail(this._onCallFail.bind(this));
-};
+}
 
 /**
  * Performs the actual request.
  *
  * >>> This method MUST be implemented by a subclass. <<<
  */
-scout.Call.prototype._callImpl = function() {
+_callImpl() {
   throw new Error('Missing implemention: _callImpl()');
-};
+}
 
-scout.Call.prototype._onCallDone = function() {
+_onCallDone() {
   // Call successful -> RESOLVE
   this._resolve();
-};
+}
 
-scout.Call.prototype._onCallFail = function() {
+_onCallFail() {
   // Aborted? -> REJECT
   if (this.aborted) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
@@ -183,7 +191,7 @@ scout.Call.prototype._onCallFail = function() {
   var retryInterval = nextInterval + additionalDelay;
   $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Try again in ' + retryInterval + ' ms...');
   this.callTimeoutId = setTimeout(this._call.bind(this), retryInterval);
-};
+}
 
 /**
  * Checks if the call can be retried. If a number is returned, a retry is performed
@@ -194,16 +202,16 @@ scout.Call.prototype._onCallFail = function() {
  *
  * >>> This method MAY be overridden by a subclass. <<<
  */
-scout.Call.prototype._nextRetryImpl = function() {
+_nextRetryImpl() {
   if (this.retryIntervals.length) {
     return this.retryIntervals.shift();
   }
   return false;
-};
+}
 
 //==================================================================================
 
-scout.Call.prototype._abort = function() {
+_abort() {
   this.aborted = true;
 
   // Abort while waiting for the next retry (there is no running call)
@@ -217,13 +225,14 @@ scout.Call.prototype._abort = function() {
 
   // Abort a running call
   this._abortImpl();
-};
+}
 
 /**
  * >>> This method MAY be overridden by a subclass. <<<
  */
-scout.Call.prototype._abortImpl = function() {
+_abortImpl() {
   if (this.pendingCall && typeof this.pendingCall.abort === 'function') {
     this.pendingCall.abort();
   }
-};
+}
+}

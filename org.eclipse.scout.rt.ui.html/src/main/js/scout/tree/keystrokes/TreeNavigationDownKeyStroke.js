@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeNavigationDownKeyStroke = function(tree, modifierBitMask) {
-  scout.TreeNavigationDownKeyStroke.parent.call(this, tree, modifierBitMask);
-  this.which = [scout.keys.DOWN];
+import {keys} from '../../index';
+import {AbstractTreeNavigationKeyStroke} from '../../index';
+
+export default class TreeNavigationDownKeyStroke extends AbstractTreeNavigationKeyStroke {
+
+constructor(tree, modifierBitMask) {
+  super( tree, modifierBitMask);
+  this.which = [keys.DOWN];
   this.renderingHints.text = '↓';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
@@ -18,10 +23,10 @@ scout.TreeNavigationDownKeyStroke = function(tree, modifierBitMask) {
       return newSelectedNode.$node;
     }
   }.bind(this);
-};
-scout.inherits(scout.TreeNavigationDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);
+}
 
-scout.TreeNavigationDownKeyStroke.prototype._computeNewSelection = function(currentNode) {
+
+_computeNewSelection(currentNode) {
   var nodes = this.field.visibleNodesFlat;
   if (nodes.length === 0) {
     return;
@@ -30,4 +35,5 @@ scout.TreeNavigationDownKeyStroke.prototype._computeNewSelection = function(curr
     return nodes[0];
   }
   return nodes[nodes.indexOf(currentNode) + 1];
-};
+}
+}

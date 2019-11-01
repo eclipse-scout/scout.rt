@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SequenceBoxAdapter = function() {
-  scout.SequenceBoxAdapter.parent.call(this);
-};
-scout.inherits(scout.SequenceBoxAdapter, scout.CompositeFieldAdapter);
+import {CompositeFieldAdapter} from '../../../index';
+
+export default class SequenceBoxAdapter extends CompositeFieldAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * @override
  */
-scout.SequenceBoxAdapter.prototype._initModel = function(model, parent) {
-  model = scout.SequenceBoxAdapter.parent.prototype._initModel.call(this, model, parent);
+_initModel(model, parent) {
+  model = super._initModel( model, parent);
   // Set logical grid to null -> Calculation happens on server side
   model.logicalGrid = null;
   return model;
-};
+}
+}

@@ -8,18 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LogicalGridConfig = function() {
+export default class LogicalGridConfig {
+
+constructor() {
   this.widget = null;
-};
+}
 
-scout.LogicalGridConfig.prototype.setWidget = function(widget) {
+setWidget(widget) {
   this.widget = widget;
-};
+}
 
-scout.LogicalGridConfig.prototype.getGridColumnCount = function() {
+getGridColumnCount() {
   return this.widget.gridColumnCount;
-};
+}
 
-scout.LogicalGridConfig.prototype.getGridWidgets = function() {
+getGridWidgets() {
   return this.widget.widgets;
-};
+}
+}

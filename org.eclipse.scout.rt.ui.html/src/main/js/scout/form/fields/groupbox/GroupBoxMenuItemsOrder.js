@@ -8,7 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.GroupBoxMenuItemsOrder = function() {};
+export default class GroupBoxMenuItemsOrder {
+
+constructor() {};
 
 /**
  * Sorts the given menus item by horizontal alignment and divides the items in two groups for each alignment.
@@ -21,7 +23,7 @@ scout.GroupBoxMenuItemsOrder = function() {};
  *
  * The buttons are always on the outer side of the group-box, the menus are on the inner side.
  */
-scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
+order(items) {
   var leftButtons = [],
     leftMenus = [],
     rightButtons = [],
@@ -53,4 +55,5 @@ scout.GroupBoxMenuItemsOrder.prototype.order = function(items) {
     right: rightMenus.concat(rightButtons),
     all: leftButtons.concat(leftMenus).concat(rightMenus).concat(rightButtons)
   };
-};
+}
+}

@@ -8,26 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetEventTypeFilter = function() {
+export default class WidgetEventTypeFilter {
+
+constructor() {
   this.filters = [];
-};
+}
 
-scout.WidgetEventTypeFilter.prototype.addFilter = function(filterFunc) {
+addFilter(filterFunc) {
   this.filters.push(filterFunc);
-};
+}
 
-scout.WidgetEventTypeFilter.prototype.addFilterForEventType = function(eventType) {
+addFilterForEventType(eventType) {
   this.filters.push(function(event) {
     return event.type === eventType;
   });
-};
+}
 
-scout.WidgetEventTypeFilter.prototype.filter = function(event) {
+filter(event) {
   return this.filters.some(function(filterFunc) {
     return filterFunc(event);
   });
-};
+}
 
-scout.WidgetEventTypeFilter.prototype.reset = function() {
+reset() {
   this.filters = [];
-};
+}
+}

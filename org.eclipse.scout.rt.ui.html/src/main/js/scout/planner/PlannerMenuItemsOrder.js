@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PlannerMenuItemsOrder = function(session, objectType) {
-  scout.PlannerMenuItemsOrder.parent.call(this, session, objectType);
+import {MenuItemsOrder} from '../index';
+
+export default class PlannerMenuItemsOrder extends MenuItemsOrder {
+
+constructor(session, objectType) {
+  super( session, objectType);
   this.selectionTypes = ['Resource', 'Activity', 'Range'];
-};
-scout.inherits(scout.PlannerMenuItemsOrder, scout.MenuItemsOrder);
+}
+
+}

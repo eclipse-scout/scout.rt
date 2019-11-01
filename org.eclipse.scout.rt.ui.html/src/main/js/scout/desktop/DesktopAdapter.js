@@ -8,34 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopAdapter = function() {
-  scout.DesktopAdapter.parent.call(this);
+import {ModelAdapter} from '../index';
+
+export default class DesktopAdapter extends ModelAdapter {
+
+constructor() {
+  super();
   this._addRemoteProperties(['benchVisible', 'navigationVisible', 'navigationHandleVisible', 'headerVisible', 'geolocationServiceAvailable', 'inBackground']);
-};
-scout.inherits(scout.DesktopAdapter, scout.ModelAdapter);
+}
 
-scout.DesktopAdapter.prototype._goOffline = function() {
+
+_goOffline() {
   this.widget.goOffline();
-};
+}
 
-scout.DesktopAdapter.prototype._goOnline = function() {
+_goOnline() {
   this.widget.goOnline();
-};
+}
 
-scout.DesktopAdapter.prototype._onWidgetHistoryEntryActivate = function(event) {
+_onWidgetHistoryEntryActivate(event) {
   this._send('historyEntryActivate', {
     deepLinkPath: event.deepLinkPath
   });
-};
+}
 
-scout.DesktopAdapter.prototype._onWidgetFormActivate = function(event) {
+_onWidgetFormActivate(event) {
   if (event.form && !event.form.modelAdapter) {
     return; // Ignore ScoutJS forms
   }
   this._sendFormActivate(event.form);
-};
+}
 
-scout.DesktopAdapter.prototype._sendFormActivate = function(form) {
+_sendFormActivate(form) {
   var eventData = {
     formId: form ? form.modelAdapter.id : null
   };
@@ -48,9 +52,9 @@ scout.DesktopAdapter.prototype._sendFormActivate = function(form) {
         !(previous.formId === null && this.formId !== null);
     }
   });
-};
+}
 
-scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
+_onWidgetEvent(event) {
   if (event.type === 'formActivate') {
     this._onWidgetFormActivate(event);
   } else if (event.type === 'historyEntryActivate') {
@@ -58,11 +62,11 @@ scout.DesktopAdapter.prototype._onWidgetEvent = function(event) {
   } else if (event.type === 'cancelForms') {
     this._onWidgetCancelAllForms(event);
   } else {
-    scout.DesktopAdapter.parent.prototype._onWidgetEvent.call(this, event);
+    super._onWidgetEvent( event);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onFormShow = function(event) {
+_onFormShow(event) {
   var form,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -81,9 +85,9 @@ scout.DesktopAdapter.prototype._onFormShow = function(event) {
 
     this.widget.showForm(form, event.position);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onFormHide = function(event) {
+_onFormHide(event) {
   var form,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -91,14 +95,14 @@ scout.DesktopAdapter.prototype._onFormHide = function(event) {
     form = this.session.getModelAdapter(event.form);
     this.widget.hideForm(form.widget);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onFormActivate = function(event) {
+_onFormActivate(event) {
   var form = this.session.getWidget(event.form);
   this.widget.activateForm(form);
-};
+}
 
-scout.DesktopAdapter.prototype._onWidgetCancelAllForms = function(event) {
+_onWidgetCancelAllForms(event) {
   event.preventDefault();
   var formIds = [];
   if (event.forms) {
@@ -109,9 +113,9 @@ scout.DesktopAdapter.prototype._onWidgetCancelAllForms = function(event) {
   this._send('cancelForms', {
     formIds: formIds
   });
-};
+}
 
-scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
+_onMessageBoxShow(event) {
   var messageBox,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -120,9 +124,9 @@ scout.DesktopAdapter.prototype._onMessageBoxShow = function(event) {
     messageBox.setDisplayParent(displayParent.widget);
     displayParent.widget.messageBoxController.registerAndRender(messageBox);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onMessageBoxHide = function(event) {
+_onMessageBoxHide(event) {
   var messageBox,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -130,9 +134,9 @@ scout.DesktopAdapter.prototype._onMessageBoxHide = function(event) {
     messageBox = this.session.getModelAdapter(event.messageBox);
     displayParent.widget.messageBoxController.unregisterAndRemove(messageBox.widget);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
+_onFileChooserShow(event) {
   var fileChooser,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -141,9 +145,9 @@ scout.DesktopAdapter.prototype._onFileChooserShow = function(event) {
     fileChooser.setDisplayParent(displayParent.widget);
     displayParent.widget.fileChooserController.registerAndRender(fileChooser);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onFileChooserHide = function(event) {
+_onFileChooserHide(event) {
   var fileChooser,
     displayParent = this.session.getModelAdapter(event.displayParent);
 
@@ -151,31 +155,31 @@ scout.DesktopAdapter.prototype._onFileChooserHide = function(event) {
     fileChooser = this.session.getModelAdapter(event.fileChooser);
     displayParent.widget.fileChooserController.unregisterAndRemove(fileChooser.widget);
   }
-};
+}
 
-scout.DesktopAdapter.prototype._onOpenUri = function(event) {
+_onOpenUri(event) {
   this.widget.openUri(event.uri, event.action);
-};
+}
 
-scout.DesktopAdapter.prototype._onOutlineChanged = function(event) {
+_onOutlineChanged(event) {
   var outline = this.session.getOrCreateWidget(event.outline, this.widget);
   this.widget.setOutline(outline);
-};
+}
 
-scout.DesktopAdapter.prototype._onAddNotification = function(event) {
+_onAddNotification(event) {
   var notification = this.session.getOrCreateWidget(event.notification, this.widget);
   this.widget.addNotification(notification);
-};
+}
 
-scout.DesktopAdapter.prototype._onRemoveNotification = function(event) {
+_onRemoveNotification(event) {
   this.widget.removeNotification(event.notification);
-};
+}
 
-scout.DesktopAdapter.prototype._onOutlineContentActivate = function(event) {
+_onOutlineContentActivate(event) {
   this.widget.bringOutlineToFront();
-};
+}
 
-scout.DesktopAdapter.prototype._onRequestGeolocation = function(event) {
+_onRequestGeolocation(event) {
   if (navigator.geolocation) {
     var success = function(position) {
       this._send('geolocationDetermined', {
@@ -191,9 +195,9 @@ scout.DesktopAdapter.prototype._onRequestGeolocation = function(event) {
     }.bind(this);
     navigator.geolocation.getCurrentPosition(success, error);
   }
-};
+}
 
-scout.DesktopAdapter.prototype.onModelAction = function(event) {
+onModelAction(event) {
   if (event.type === 'formShow') {
     this._onFormShow(event);
   } else if (event.type === 'formHide') {
@@ -221,6 +225,7 @@ scout.DesktopAdapter.prototype.onModelAction = function(event) {
   } else if (event.type === 'requestGeolocation') {
     this._onRequestGeolocation(event);
   } else {
-    scout.DesktopAdapter.parent.prototype.onModelAction.call(this, event);
+    super.onModelAction( event);
   }
-};
+}
+}

@@ -8,20 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SplitBoxSecondCollapseKeyStroke = function(splitBox, keyStroke) {
-  scout.SplitBoxSecondCollapseKeyStroke.parent.call(this);
+import {KeyStroke} from '../../../index';
+
+export default class SplitBoxSecondCollapseKeyStroke extends KeyStroke {
+
+constructor(splitBox, keyStroke) {
+  super();
   this.field = splitBox;
   this.parseAndSetKeyStroke(keyStroke);
-};
-scout.inherits(scout.SplitBoxSecondCollapseKeyStroke, scout.KeyStroke);
+}
 
-scout.SplitBoxSecondCollapseKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   this.field.collapseHandleButtonPressed({
     right: true
   });
-};
+}
 
-scout.SplitBoxSecondCollapseKeyStroke.prototype._postRenderKeyBox = function($drawingArea, $keyBox) {
+_postRenderKeyBox($drawingArea, $keyBox) {
   var handleOffset,
     $collapseHandle = this.field._collapseHandle.$container;
 
@@ -31,4 +35,5 @@ scout.SplitBoxSecondCollapseKeyStroke.prototype._postRenderKeyBox = function($dr
   $keyBox
     .cssLeft(handleOffset.left + $collapseHandle.width() - $keyBox.outerWidth())
     .cssTop(handleOffset.top - $keyBox.outerHeight());
-};
+}
+}

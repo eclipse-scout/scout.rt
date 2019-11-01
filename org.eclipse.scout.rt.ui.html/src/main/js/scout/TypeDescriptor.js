@@ -8,6 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {strings} from './index';
+import {scout} from './index';
+import {arrays} from './index';
+import {ObjectFactory} from './index';
+
 /**
  * This class contains a structured type description for a Scout class.
  * The model variant is optional.
@@ -17,13 +22,15 @@
  * @param {object} [modelVariant]
  * @constructor
  */
-scout.TypeDescriptor = function(typeDescriptor, objectType, modelVariant) {
+export default class TypeDescriptor {
+
+constructor(typeDescriptor, objectType, modelVariant) {
   this.typeDescriptor = typeDescriptor;
   this.objectType = objectType;
   this.modelVariant = modelVariant;
-};
+}
 
-scout.TypeDescriptor.prototype.newInstance = function(options) {
+newInstance(options) {
   var i, namespaces, className,
     namespace = scout; // default namespace
 
@@ -47,47 +54,47 @@ scout.TypeDescriptor.prototype.newInstance = function(options) {
 
   if (!namespace[className]) { // Try without variant if variantLenient is true
     if (options.variantLenient && this.modelVariant) {
-      var infoWithoutVariant = new scout.TypeDescriptor(this.typeDescriptor, this.objectType, null);
+      var infoWithoutVariant = new TypeDescriptor(this.typeDescriptor, this.objectType, null);
       return infoWithoutVariant.newInstance(options);
     }
     throw this.error('Could not find "' + className + '" in namespace "' + namespaces.join('.') + '"');
   }
 
   return new namespace[className](options.model);
-};
+}
 
-scout.TypeDescriptor.prototype.error = function(details) {
+error(details) {
   return new Error('Failed to create object for objectType "' + this.typeDescriptor + '": ' + details);
-};
+}
 
-scout.TypeDescriptor.newInstance = function(typeDescriptor, options) {
-  var info = scout.TypeDescriptor.parse(typeDescriptor);
+static newInstance(typeDescriptor, options) {
+  var info = TypeDescriptor.parse(typeDescriptor);
   return info.newInstance(options);
-};
+}
 
 /**
  * @param {string} typeDescriptor
- * @returns {scout.TypeDescriptor}
+ * @returns {TypeDescriptor}
  * @static
  */
-scout.TypeDescriptor.parse = function(typeDescriptor) {
+static parse(typeDescriptor) {
   var typePart = null,
     variantPart = null;
 
-  if (scout.strings.contains(typeDescriptor, scout.ObjectFactory.MODEL_VARIANT_SEPARATOR)) {
-    var tmp = typeDescriptor.split(scout.ObjectFactory.MODEL_VARIANT_SEPARATOR);
+  if (strings.contains(typeDescriptor, ObjectFactory.MODEL_VARIANT_SEPARATOR)) {
+    var tmp = typeDescriptor.split(ObjectFactory.MODEL_VARIANT_SEPARATOR);
     typePart = parseDescriptorPart(tmp[0]);
     variantPart = parseDescriptorPart(tmp[1]);
 
     // when type has namespaces but the variant has not, use type namespaces for variant too
-    if (scout.arrays.empty(variantPart.namespaces) && !scout.arrays.empty(typePart.namespaces)) {
+    if (arrays.empty(variantPart.namespaces) && !arrays.empty(typePart.namespaces)) {
       variantPart.namespaces = typePart.namespaces;
     }
   } else {
     typePart = parseDescriptorPart(typeDescriptor);
   }
 
-  return new scout.TypeDescriptor(typeDescriptor, typePart, variantPart);
+  return new TypeDescriptor(typeDescriptor, typePart, variantPart);
 
   function createInfo(name, namespaces) {
     return {
@@ -96,7 +103,7 @@ scout.TypeDescriptor.parse = function(typeDescriptor) {
       toString: function() {
         var parts = namespaces.slice();
         parts.push(name);
-        return scout.strings.join(scout.ObjectFactory.NAMESPACE_SEPARATOR, parts);
+        return strings.join(ObjectFactory.NAMESPACE_SEPARATOR, parts);
       }
     };
   }
@@ -104,12 +111,13 @@ scout.TypeDescriptor.parse = function(typeDescriptor) {
   function parseDescriptorPart(descriptorPart) {
     var namespaces = [];
 
-    if (scout.strings.contains(descriptorPart, scout.ObjectFactory.NAMESPACE_SEPARATOR)) {
-      var namespaceParts = descriptorPart.split(scout.ObjectFactory.NAMESPACE_SEPARATOR);
+    if (strings.contains(descriptorPart, ObjectFactory.NAMESPACE_SEPARATOR)) {
+      var namespaceParts = descriptorPart.split(ObjectFactory.NAMESPACE_SEPARATOR);
       namespaces = namespaceParts.slice(0, namespaceParts.length - 1);
-      descriptorPart = scout.arrays.last(namespaceParts);
+      descriptorPart = arrays.last(namespaceParts);
     }
 
     return createInfo(descriptorPart, namespaces);
   }
-};
+}
+}

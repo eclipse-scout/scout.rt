@@ -8,15 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Dimension} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+import {graphics} from '../index';
+
 /**
  * Abstract layout class with functions used by all layout algorithms.
  * Subclasses of AbstactLayout.js must implement the following functions:
  * - layout
  * - preferredLayoutSize
  */
-scout.AbstractLayout = function() {
+export default class AbstractLayout {
+
+constructor() {
   this.animateClasses = [];
-};
+}
 
 /**
  * Called when layout is invalidated. An implementation should delete cached layout-information
@@ -24,8 +31,8 @@ scout.AbstractLayout = function() {
  *
  * May be implemented by sub-class.
  */
-scout.AbstractLayout.prototype.invalidate = function() { //
-};
+invalidate() { //
+}
 
 /**
  * Layouts children of the given $container, according to the implemented layout algorithm.
@@ -33,29 +40,29 @@ scout.AbstractLayout.prototype.invalidate = function() { //
  *
  * Must be implemented by sub-class.
  */
-scout.AbstractLayout.prototype.layout = function($container) { //
-};
+layout($container) { //
+}
 
 /**
- * Reverts the adjustments made by {@link scout.HtmlComponent#_adjustSizeHintsForPrefSize} without the margin.
+ * Reverts the adjustments made by {@link HtmlComponent#_adjustSizeHintsForPrefSize} without the margin.
  * More concrete: it adds border and padding to the hints again.
  */
-scout.AbstractLayout.prototype._revertSizeHintsAdjustments = function($container, options) {
-  var htmlContainer = scout.HtmlComponent.get($container);
+_revertSizeHintsAdjustments($container, options) {
+  var htmlContainer = HtmlComponent.get($container);
   if (options.widthHint) {
     options.widthHint += htmlContainer.insets().horizontal();
   }
   if (options.heightHint) {
     options.heightHint += htmlContainer.insets().vertical();
   }
-};
+}
 
 /**
  * Returns the preferred size of the given $container.
  *
- * @return scout.Dimension preferred size
+ * @return Dimension preferred size
  */
-scout.AbstractLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   options = $.extend({}, options);
   if (this.animateClasses.length > 0) {
     options.animateClasses = this.animateClasses;
@@ -63,5 +70,6 @@ scout.AbstractLayout.prototype.preferredLayoutSize = function($container, option
   // Insets have been removed automatically by the html component with the assumption that the layout will pass it to its child elements.
   // Since this is not the case in this generic layout the insets have to be added again, otherwise the sizes used to measure would be too small.
   this._revertSizeHintsAdjustments($container, options);
-  return scout.graphics.prefSize($container, options);
-};
+  return graphics.prefSize($container, options);
+}
+}

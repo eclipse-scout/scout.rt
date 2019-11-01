@@ -8,8 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CompositeFieldAdapter = function() {
-  scout.CompositeFieldAdapter.parent.call(this);
+import {FormFieldAdapter} from '../../index';
+
+export default class CompositeFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
   this.enabledWhenOffline = true;
-};
-scout.inherits(scout.CompositeFieldAdapter, scout.FormFieldAdapter);
+}
+
+}

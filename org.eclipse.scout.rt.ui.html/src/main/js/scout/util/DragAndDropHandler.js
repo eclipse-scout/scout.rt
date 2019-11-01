@@ -8,17 +8,23 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DragAndDropHandler = function(options) {
+import {dragAndDrop} from '../index';
+import {arrays} from '../index';
+import * as $ from 'jquery';
+
+export default class DragAndDropHandler {
+
+constructor(options) {
   options = options || {};
   $.extend(this, options);
-  this.supportedScoutTypes = scout.arrays.ensure(options.supportedScoutTypes);
+  this.supportedScoutTypes = arrays.ensure(options.supportedScoutTypes);
 
   this._onDragEnterHandler = this._onDragEnter.bind(this);
   this._onDragOverHandler = this._onDragOver.bind(this);
   this._onDropHandler = this._onDrop.bind(this);
-};
+}
 
-scout.DragAndDropHandler.prototype.install = function($element, selector) {
+install($element, selector) {
   if (this.$element) {
     throw new Error('Already installed.');
   }
@@ -27,32 +33,32 @@ scout.DragAndDropHandler.prototype.install = function($element, selector) {
   this.$element.on('dragenter', this.selector, this._onDragEnterHandler)
     .on('dragover', this.selector, this._onDragOverHandler)
     .on('drop', this.selector, this._onDropHandler);
-};
+}
 
-scout.DragAndDropHandler.prototype.uninstall = function() {
+uninstall() {
   this.$element.off('dragenter', this.selector, this._onDragEnterHandler)
     .off('dragover', this.selector, this._onDragOverHandler)
     .off('drop', this.selector, this._onDropHandler);
   this.$element = null;
   this.selector = null;
-};
+}
 
-scout.DragAndDropHandler.prototype._onDragEnter = function(event) {
+_onDragEnter(event) {
   this._onDragEnterOrOver(event);
-};
+}
 
-scout.DragAndDropHandler.prototype._onDragOver = function(event) {
+_onDragOver(event) {
   this._onDragEnterOrOver(event);
-};
+}
 
-scout.DragAndDropHandler.prototype._onDragEnterOrOver = function(event) {
-  scout.dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
-};
+_onDragEnterOrOver(event) {
+  dragAndDrop.verifyDataTransferTypesScoutTypes(event, this.supportedScoutTypes, this.dropType());
+}
 
-scout.DragAndDropHandler.prototype._onDrop = function(event) {
-  if (this.supportedScoutTypes.indexOf(scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
-    this.dropType() & scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
-    scout.dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, scout.dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
+_onDrop(event) {
+  if (this.supportedScoutTypes.indexOf(dragAndDrop.SCOUT_TYPES.FILE_TRANSFER) >= 0 &&
+    this.dropType() & dragAndDrop.SCOUT_TYPES.FILE_TRANSFER === dragAndDrop.SCOUT_TYPES.FILE_TRANSFER && // NOSONAR
+    dragAndDrop.dataTransferTypesContainsScoutTypes(event.originalEvent.dataTransfer, dragAndDrop.SCOUT_TYPES.FILE_TRANSFER)) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -64,4 +70,5 @@ scout.DragAndDropHandler.prototype._onDrop = function(event) {
         this.allowedTypes ? this.allowedTypes() : undefined);
     }
   }
-};
+}
+}

@@ -8,18 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableInfoFilterTooltip = function() {
-  scout.TableInfoFilterTooltip.parent.call(this);
-};
-scout.inherits(scout.TableInfoFilterTooltip, scout.Tooltip);
+import {Tooltip} from '../index';
 
-scout.TableInfoFilterTooltip.prototype._init = function(options) {
-  scout.TableInfoFilterTooltip.parent.prototype._init.call(this, options);
+export default class TableInfoFilterTooltip extends Tooltip {
+
+constructor() {
+  super();
+}
+
+
+_init(options) {
+  super._init( options);
 
   this.tableFooter = options.tableFooter;
-};
+}
 
-scout.TableInfoFilterTooltip.prototype._renderText = function() {
+_renderText() {
   var table = this.tableFooter.table,
     numRowsFiltered = table.filteredRows().length,
     filteredBy = table.filteredBy().join(', '); // filteredBy() returns an array
@@ -30,9 +34,10 @@ scout.TableInfoFilterTooltip.prototype._renderText = function() {
   this.$content.appendSpan('link')
     .text(this.session.text('ui.RemoveFilter'))
     .on('click', this._onRemoveFilterClick.bind(this));
-};
+}
 
-scout.TableInfoFilterTooltip.prototype._onRemoveFilterClick = function() {
+_onRemoveFilterClick() {
   this.tableFooter.table.resetUserFilter();
   this.destroy();
-};
+}
+}

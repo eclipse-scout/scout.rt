@@ -8,42 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+import * as $ from 'jquery';
+import {TagBar} from '../../../index';
+
 
 /**
  * @param fieldAdapter acts as an interface so we can use the same key-stroke for TagField and TagFieldPopup.
  *
  */
-scout.TagFieldNavigationKeyStroke = function(fieldAdapter) {
-  scout.TagFieldNavigationKeyStroke.parent.call(this);
+export default class TagFieldNavigationKeyStroke extends KeyStroke {
+
+constructor(fieldAdapter) {
+  super();
   this.fieldAdapter = fieldAdapter;
-  this.which = [scout.keys.LEFT, scout.keys.RIGHT];
+  this.which = [keys.LEFT, keys.RIGHT];
   this.preventDefault = false;
   this.preventInvokeAcceptInputOnActiveValueField = true;
-};
-scout.inherits(scout.TagFieldNavigationKeyStroke, scout.KeyStroke);
+}
 
-scout.TagFieldNavigationKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TagFieldNavigationKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
   return this.fieldAdapter.enabled();
-};
+}
 
-scout.TagFieldNavigationKeyStroke.prototype.handle = function(event) {
-  if (event.which === scout.keys.LEFT) {
+handle(event) {
+  if (event.which === keys.LEFT) {
     this._focusTagElement(-1);
-  } else if (event.which === scout.keys.RIGHT) {
+  } else if (event.which === keys.RIGHT) {
     this._focusTagElement(1);
   }
-};
+}
 
-scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(direction) {
+_focusTagElement(direction) {
   var UNDEFINED = -1;
   var INPUT = -2;
 
   // find overflow-icon and all tag-elements
-  var $focusTargets = scout.TagBar.findFocusableTagElements(this.fieldAdapter.$container());
+  var $focusTargets = TagBar.findFocusableTagElements(this.fieldAdapter.$container());
   var numTargets = $focusTargets.length;
   if (numTargets === 0) {
     return;
@@ -70,7 +77,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
     } else if (nextFocusIndex < 0) {
       focusIndex = UNDEFINED;
     } else {
-      scout.TagBar.unfocusTagElement($focusTargets.eq(focusIndex));
+      TagBar.unfocusTagElement($focusTargets.eq(focusIndex));
       focusIndex = nextFocusIndex;
     }
   }
@@ -80,6 +87,7 @@ scout.TagFieldNavigationKeyStroke.prototype._focusTagElement = function(directio
   } else if (focusIndex === INPUT) {
     this.fieldAdapter.focus();
   } else {
-    scout.TagBar.focusTagElement($focusTargets.eq(focusIndex));
+    TagBar.focusTagElement($focusTargets.eq(focusIndex));
   }
-};
+}
+}

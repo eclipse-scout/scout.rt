@@ -8,14 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {CalendarComponent} from '../index';
+
 /**
  * Calendar component as used in the list panel of the calendar.
- * Delegates most functions to the scout.CalendarComponent instance used as source.
+ * Delegates most functions to the CalendarComponent instance used as source.
  * It's important we clean-up the registered listeners on the model-adapter, since
  * new instances of CalendarListComponent are created every time we click on a date
  * in the calendar, but the CalendarComponent instance is always the same.
  */
-scout.CalendarListComponent = function(partDay, source) {
+export default class CalendarListComponent {
+
+constructor(partDay, source) {
   this.partDay = partDay;
   this.source = source;
   this.$container;
@@ -23,9 +27,9 @@ scout.CalendarListComponent = function(partDay, source) {
     this.$container.toggleClass('comp-selected', event.selected);
   }.bind(this));
   this._removeListener = source.on('remove', this.remove.bind(this));
-};
+}
 
-scout.CalendarListComponent.prototype.render = function($parent) {
+render($parent) {
   var source = this.source;
   this.$container = $parent
     .appendDiv('calendar-component')
@@ -35,10 +39,11 @@ scout.CalendarListComponent.prototype.render = function($parent) {
     .mousedown(source._onMouseDown.bind(source))
     .on('contextmenu', source._onContextMenu.bind(source))
     .html(source._description());
-};
+}
 
-scout.CalendarListComponent.prototype.remove = function() {
+remove() {
   this.source.removeListener(this._selectedListener);
   this.source.removeListener(this._removeListener);
   this.$container.remove();
-};
+}
+}

@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableRow = function() {
+import {defaultValues} from '../index';
+import * as $ from 'jquery';
+
+export default class TableRow {
+
+constructor() {
   this.$row;
   this.aggregateRowAfter;
   this.cells = [];
@@ -22,30 +27,30 @@ scout.TableRow = function() {
   this.parentRow;
   this.childRows = [];
   this.expanded = false;
-  this.status = scout.TableRow.Status.NON_CHANGED;
-};
+  this.status = TableRow.Status.NON_CHANGED;
+}
 
-scout.TableRow.Status = {
+static Status = {
   NON_CHANGED: 'nonChanged',
   INSERTED: 'inserted',
   UPDATED: 'updated'
 };
 
-scout.TableRow.prototype.init = function(model) {
+init(model) {
   this._init(model);
   this.initialized = true;
-};
+}
 
-scout.TableRow.prototype._init = function(model) {
+_init(model) {
   if (!model.parent) {
     throw new Error('missing property \'parent\'');
   }
   $.extend(this, model);
-  scout.defaultValues.applyTo(this);
+  defaultValues.applyTo(this);
   this._initCells();
-};
+}
 
-scout.TableRow.prototype._initCells = function() {
+_initCells() {
   this.getTable().columns.forEach(function(column) {
     if (!column.guiOnly) {
       var cell = this.cells[column.index];
@@ -53,9 +58,9 @@ scout.TableRow.prototype._initCells = function() {
       this.cells[column.index] = cell;
     }
   }, this);
-};
+}
 
-scout.TableRow.prototype.animateExpansion = function() {
+animateExpansion() {
   var $row = this.$row,
     $rowControl;
   if (!$row) {
@@ -67,14 +72,15 @@ scout.TableRow.prototype.animateExpansion = function() {
   } else {
     $rowControl.addClassForAnimation('collapse-rotate');
   }
-};
+}
 
-scout.TableRow.prototype.hasFilterAcceptedChildren = function() {
+hasFilterAcceptedChildren() {
   return this.childRows.some(function(childRow) {
     return childRow.filterAccepted || childRow.hasFilterAcceptedChildren();
   });
-};
+}
 
-scout.TableRow.prototype.getTable = function() {
+getTable() {
   return this.parent;
-};
+}
+}

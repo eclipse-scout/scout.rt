@@ -8,12 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ImageFieldLayout = function(imageField) {
-  scout.ImageFieldLayout.parent.call(this, imageField);
-};
-scout.inherits(scout.ImageFieldLayout, scout.FormFieldLayout);
+import {FormFieldLayout} from '../../../index';
+import {scrollbars} from '../../../index';
 
-scout.ImageFieldLayout.prototype.layout = function($container) {
-  scout.ImageFieldLayout.parent.prototype.layout.call(this, $container);
-  scout.scrollbars.update(this.formField.$fieldContainer);
-};
+export default class ImageFieldLayout extends FormFieldLayout {
+
+constructor(imageField) {
+  super( imageField);
+}
+
+
+layout($container) {
+  super.layout( $container);
+  scrollbars.update(this.formField.$fieldContainer);
+}
+}

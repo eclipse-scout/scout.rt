@@ -8,24 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopResponsiveHandler = function() {
-  scout.DesktopResponsiveHandler.parent.call(this);
+import {ResponsiveManager} from '../index';
+import {ResponsiveHandler} from '../index';
+
+export default class DesktopResponsiveHandler extends ResponsiveHandler {
+
+constructor() {
+  super();
 
   this.compactThreshold = 500;
-  this.allowedStates = [scout.ResponsiveManager.ResponsiveState.NORMAL, scout.ResponsiveManager.ResponsiveState.COMPACT];
-};
-scout.inherits(scout.DesktopResponsiveHandler, scout.ResponsiveHandler);
+  this.allowedStates = [ResponsiveManager.ResponsiveState.NORMAL, ResponsiveManager.ResponsiveState.COMPACT];
+}
 
-scout.DesktopResponsiveHandler.prototype.init = function(model) {
-  scout.DesktopResponsiveHandler.parent.prototype.init.call(this, model);
+
+init(model) {
+  super.init( model);
 
   this._registerTransformation('navigationVisible', this._transformNavigationVisible);
-  this._enableTransformation(scout.ResponsiveManager.ResponsiveState.COMPACT, 'navigationVisible');
-};
+  this._enableTransformation(ResponsiveManager.ResponsiveState.COMPACT, 'navigationVisible');
+}
 
 /* --- TRANSFORMATIONS ------------------------------------------------------------- */
 
-scout.DesktopResponsiveHandler.prototype._transformNavigationVisible = function(widget, apply) {
+_transformNavigationVisible(widget, apply) {
   if (apply) {
     this._storeFieldProperty(widget, 'navigationVisible', widget.navigationVisible);
     widget.setNavigationVisible(false);
@@ -34,4 +39,5 @@ scout.DesktopResponsiveHandler.prototype._transformNavigationVisible = function(
       widget.setNavigationVisible(this._getFieldProperty(widget, 'navigationVisible'));
     }
   }
-};
+}
+}

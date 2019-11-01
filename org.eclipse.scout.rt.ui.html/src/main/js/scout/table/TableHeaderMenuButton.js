@@ -8,58 +8,64 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableHeaderMenuButton = function() {
-  scout.TableHeaderMenuButton.parent.call(this);
+import {TableHeaderMenuButtonKeyStroke} from '../index';
+import {Action} from '../index';
+
+export default class TableHeaderMenuButton extends Action {
+
+constructor() {
+  super();
   this.textVisible = false;
   this.tabbable = true;
-};
-scout.inherits(scout.TableHeaderMenuButton, scout.Action);
+}
+
 
 /**
  * @override
  */
-scout.TableHeaderMenuButton.prototype._initKeyStrokeContext = function() {
-  scout.TableHeaderMenuButton.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke([new scout.TableHeaderMenuButtonKeyStroke(this)]);
-};
+  this.keyStrokeContext.registerKeyStroke([new TableHeaderMenuButtonKeyStroke(this)]);
+}
 
-scout.TableHeaderMenuButton.prototype._render = function() {
-  scout.TableHeaderMenuButton.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container = this.$container.addClass('table-header-menu-command')
     .unfocusable()
     .on('mouseenter', this._onMouseOver.bind(this))
     .on('mouseleave', this._onMouseOut.bind(this));
   this.$icon = this.$container.appendSpan('icon');
-};
+}
 
-scout.TableHeaderMenuButton.prototype._renderProperties = function() {
-  scout.TableHeaderMenuButton.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderToggleAction();
-};
+}
 
 // Show 'remove' text when button is already selected
-scout.TableHeaderMenuButton.prototype._onMouseOver = function() {
+_onMouseOver() {
   var text = this.selected ?
     this.session.text('ui.remove') : this.text;
   this.parent.appendText(text);
-};
+}
 
-scout.TableHeaderMenuButton.prototype._onMouseOut = function() {
+_onMouseOut() {
   this.parent.resetText();
-};
+}
 
-scout.TableHeaderMenuButton.prototype._renderToggleAction = function() {
+_renderToggleAction() {
   this.$container.toggleClass('togglable', this.toggleAction);
-};
+}
 
 /**
  * @override
  */
-scout.TableHeaderMenuButton.prototype._renderIconId = function() {
+_renderIconId() {
   if (this.iconId) {
     this.$icon.attr('data-icon', this.iconId);
   } else {
     this.$icon.removeAttr('data-icon');
   }
-};
+}
+}

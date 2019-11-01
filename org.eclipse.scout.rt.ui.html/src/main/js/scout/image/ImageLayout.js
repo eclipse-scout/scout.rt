@@ -8,13 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ImageLayout = function(image) {
-  scout.ImageLayout.parent.call(this);
-  this.image = image;
-};
-scout.inherits(scout.ImageLayout, scout.AbstractLayout);
+import {AbstractLayout} from '../index';
+import {Dimension} from '../index';
 
-scout.ImageLayout.prototype.preferredLayoutSize = function($container, options) {
+export default class ImageLayout extends AbstractLayout {
+
+constructor(image) {
+  super();
+  this.image = image;
+}
+
+
+preferredLayoutSize($container, options) {
   var img = $container[0];
   if (img && img.complete && img.naturalWidth > 0 && img.naturalHeight > 0) {
     var prefHeight = img.naturalHeight;
@@ -26,7 +31,8 @@ scout.ImageLayout.prototype.preferredLayoutSize = function($container, options) 
       prefHeight = options.heightHint;
       prefWidth = options.heightHint / img.naturalHeight * img.naturalWidth;
     }
-    return new scout.Dimension(prefWidth, prefHeight);
+    return new Dimension(prefWidth, prefHeight);
   }
-  return scout.ImageLayout.parent.prototype.preferredLayoutSize.call(this, $container, options);
-};
+  return super.preferredLayoutSize( $container, options);
+}
+}

@@ -8,18 +8,24 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.FormFieldMenuAdapter = function() {
-  scout.FormFieldMenuAdapter.parent.call(this);
-};
-scout.inherits(scout.FormFieldMenuAdapter, scout.MenuAdapter);
+import {MenuAdapter} from '../../../index';
+import {GridData} from '../../../index';
+
+export default class FormFieldMenuAdapter extends MenuAdapter {
+
+constructor() {
+  super();
+}
+
 
 /**
  * @override
  */
-scout.FormFieldMenuAdapter.prototype._postCreateWidget = function() {
-  scout.FormFieldMenuAdapter.parent.prototype._postCreateWidget.call(this);
+_postCreateWidget() {
+  super._postCreateWidget();
   // Use grid data from server as hints
   if (this.widget.field) {
-    this.widget.field.gridDataHints = new scout.GridData(this.widget.field.gridData);
+    this.widget.field.gridDataHints = new GridData(this.widget.field.gridData);
   }
-};
+}
+}

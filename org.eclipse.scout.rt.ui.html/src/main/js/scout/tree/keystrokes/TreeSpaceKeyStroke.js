@@ -8,23 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeSpaceKeyStroke = function(tree) {
-  scout.TreeSpaceKeyStroke.parent.call(this);
+import {KeyStroke} from '../../index';
+import {keys} from '../../index';
+
+export default class TreeSpaceKeyStroke extends KeyStroke {
+
+constructor(tree) {
+  super();
   this.field = tree;
 
-  this.which = [scout.keys.SPACE];
+  this.which = [keys.SPACE];
   this.renderingHints.render = false;
-};
-scout.inherits(scout.TreeSpaceKeyStroke, scout.KeyStroke);
+}
 
-scout.TreeSpaceKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TreeSpaceKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   return accepted &&
     this.field.checkable &&
     this.field.selectedNodes.length;
-};
+}
 
-scout.TreeSpaceKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var selectedNodes = this.field.selectedNodes.filter(function(node) {
     return node.enabled;
   });
@@ -35,4 +40,5 @@ scout.TreeSpaceKeyStroke.prototype.handle = function(event) {
   selectedNodes.forEach(function(node) {
     this.field.checkNode(node, checked);
   }, this);
-};
+}
+}

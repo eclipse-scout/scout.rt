@@ -8,33 +8,41 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuExecByNumberKeyStroke = function(popup, menuItemClass) {
-  scout.MenuExecByNumberKeyStroke.parent.call(this, popup, menuItemClass);
+import {HAlign} from '../index';
+import {MenuNavigationExecKeyStroke} from '../index';
+import {keys} from '../index';
+import {menuNavigationKeyStrokes} from '../index';
+
+export default class MenuExecByNumberKeyStroke extends MenuNavigationExecKeyStroke {
+
+constructor(popup, menuItemClass) {
+  super( popup, menuItemClass);
   this._menuItemClass = menuItemClass;
-  this.which = [scout.keys[1], scout.keys[2], scout.keys[3], scout.keys[4], scout.keys[5], scout.keys[6], scout.keys[7], scout.keys[8], scout.keys[9]];
+  this.which = [keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7], keys[8], keys[9]];
   this.renderingHints.render = true;
-  this.renderingHints.hAlign = scout.HAlign.RIGHT;
+  this.renderingHints.hAlign = HAlign.RIGHT;
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return event.$menuItem;
   }.bind(this);
-};
-scout.inherits(scout.MenuExecByNumberKeyStroke, scout.MenuNavigationExecKeyStroke);
+}
 
-scout.MenuExecByNumberKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.MenuExecByNumberKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
 
-  var menuItems = scout.menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
-  var index = scout.keys.codesToKeys[event.which];
+  var menuItems = menuNavigationKeyStrokes._findMenuItems(this.field, this._menuItemClass);
+  var index = keys.codesToKeys[event.which];
   event.$menuItem = menuItems.$allVisible.eq(index - 1);
   if (event.$menuItem.length > 0) {
     return true;
   }
   return false;
-};
+}
 
-scout.MenuExecByNumberKeyStroke.prototype.handle = function(event) {
+handle(event) {
   event.$menuItem.data('widget').doAction();
-};
+}
+}

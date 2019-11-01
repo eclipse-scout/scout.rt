@@ -8,11 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.LazyNodeFilter = function(tree) { //
-  this.tree = tree;
-};
+export default class LazyNodeFilter {
 
-scout.LazyNodeFilter.prototype.accept = function(node) {
+constructor(tree) { //
+  this.tree = tree;
+}
+
+accept(node) {
   if (!node.expanded && node.parentNode && node.parentNode.expandedLazy && node.parentNode.lazyExpandingEnabled && this.tree.lazyExpandingEnabled) {
     // if this node is not expanded and parent is lazyExpanding.
     for (var i = 0; i < this.tree.selectedNodes.length; i++) {
@@ -28,4 +30,5 @@ scout.LazyNodeFilter.prototype.accept = function(node) {
     return false;
   }
   return true;
-};
+}
+}

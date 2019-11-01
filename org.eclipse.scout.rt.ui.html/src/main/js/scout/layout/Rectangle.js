@@ -8,12 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Point} from '../index';
+import {Dimension} from '../index';
+
 
 /**
  * JavaScript port from java.awt.Rectangle.
  */
-scout.Rectangle = function(vararg, y, width, height) {
-  if (vararg instanceof scout.Rectangle) {
+export default class Rectangle {
+
+constructor(vararg, y, width, height) {
+  if (vararg instanceof Rectangle) {
     this.x = vararg.x;
     this.y = vararg.y;
     this.width = vararg.width;
@@ -24,38 +29,38 @@ scout.Rectangle = function(vararg, y, width, height) {
     this.width = width || 0;
     this.height = height || 0;
   }
-};
+}
 
-scout.Rectangle.prototype.toString = function() {
+toString() {
   return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
-};
+}
 
-scout.Rectangle.prototype.equals = function(o) {
+equals(o) {
   if (!o) {
     return false;
   }
   return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
-};
+}
 
-scout.Rectangle.prototype.clone = function(o) {
-  return new scout.Rectangle(this.x, this.y, this.width, this.height);
-};
+clone(o) {
+  return new Rectangle(this.x, this.y, this.width, this.height);
+}
 
-scout.Rectangle.prototype.center = function() {
-  return new scout.Point(this.x + this.width / 2, this.y + this.height / 2);
-};
+center() {
+  return new Point(this.x + this.width / 2, this.y + this.height / 2);
+}
 
-scout.Rectangle.prototype.right = function() {
+right() {
   return this.x + this.width;
-};
+}
 
-scout.Rectangle.prototype.bottom = function() {
+bottom() {
   return this.y + this.height;
-};
+}
 
-scout.Rectangle.prototype.contains = function(x, y) {
+contains(x, y) {
   return y >= this.y && y < this.y + this.height && x >= this.x && x < this.x + this.width;
-};
+}
 
 /**
  * Tests whether or not the specified rectangle intersects this rectangle.
@@ -64,22 +69,22 @@ scout.Rectangle.prototype.contains = function(x, y) {
  * @param r the rectangle to test against
  * @return true if the specified rectangle intersects this one
  */
-scout.Rectangle.prototype.intersects = function(r) {
+intersects(r) {
   if (!r) {
     return false;
   }
   return r.width > 0 && r.height > 0 && this.width > 0 && this.height > 0 &&
     r.x < this.right() && r.right() > this.x &&
     r.y < this.bottom() && r.bottom() > this.y;
-};
+}
 
-scout.Rectangle.prototype.subtract = function(insets) {
-  return new scout.Rectangle(
+subtract(insets) {
+  return new Rectangle(
     this.x + insets.left,
     this.y + insets.top,
     this.width - insets.horizontal(),
     this.height - insets.vertical());
-};
+}
 
 /**
  * Moves the rectangle the given distance.
@@ -87,29 +92,29 @@ scout.Rectangle.prototype.subtract = function(insets) {
  * @param dx the distance to move the rectangle along the x axis.
  * @param dy the distance to move the rectangle along the y axis.
  */
-scout.Rectangle.prototype.translate = function(dx, dy) {
-  return new scout.Rectangle(
+translate(dx, dy) {
+  return new Rectangle(
     this.x + dx,
     this.y + dy,
     this.width,
     this.height);
-};
+}
 
 /**
- * @returns {scout.Point} property x and y of this instance as new Point instance
+ * @returns {Point} property x and y of this instance as new Point instance
  */
-scout.Rectangle.prototype.point = function() {
-  return new scout.Point(this.x, this.y);
-};
+point() {
+  return new Point(this.x, this.y);
+}
 
 /**
- * @returns {scout.Dimension} property width and height of this instance as new Dimension instance
+ * @returns {Dimension} property width and height of this instance as new Dimension instance
  */
-scout.Rectangle.prototype.dimension = function() {
-  return new scout.Dimension(this.width, this.height);
-};
+dimension() {
+  return new Dimension(this.width, this.height);
+}
 
-scout.Rectangle.prototype.union = function(r) {
+union(r) {
   var tx2 = this.width;
   var ty2 = this.height;
   if (tx2 < 0 || ty2 < 0) {
@@ -119,12 +124,12 @@ scout.Rectangle.prototype.union = function(r) {
     // are non-existant and we can return any non-existant rectangle
     // as an answer.  Thus, returning r meets that criterion.
     // Either way, r is our answer.
-    return new scout.Rectangle(r.x, r.y, r.width, r.height);
+    return new Rectangle(r.x, r.y, r.width, r.height);
   }
   var rx2 = r.width;
   var ry2 = r.height;
   if (rx2 < 0 || ry2 < 0) {
-    return new scout.Rectangle(this.x, this.y, this.width, this.height);
+    return new Rectangle(this.x, this.y, this.width, this.height);
   }
   var tx1 = this.x;
   var ty1 = this.y;
@@ -157,13 +162,14 @@ scout.Rectangle.prototype.union = function(r) {
   if (ty2 > Number.MAX_VALUE) {
     ty2 = Number.MAX_VALUE;
   }
-  return new scout.Rectangle(tx1, ty1, tx2, ty2);
-};
+  return new Rectangle(tx1, ty1, tx2, ty2);
+}
 
-scout.Rectangle.prototype.floor = function() {
-  return new scout.Rectangle(Math.floor(this.x), Math.floor(this.y), Math.floor(this.width), Math.floor(this.height));
-};
+floor() {
+  return new Rectangle(Math.floor(this.x), Math.floor(this.y), Math.floor(this.width), Math.floor(this.height));
+}
 
-scout.Rectangle.prototype.ceil = function() {
-  return new scout.Rectangle(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.width), Math.ceil(this.height));
-};
+ceil() {
+  return new Rectangle(Math.ceil(this.x), Math.ceil(this.y), Math.ceil(this.width), Math.ceil(this.height));
+}
+}

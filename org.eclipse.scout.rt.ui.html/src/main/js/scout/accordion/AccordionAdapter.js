@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.AccordionAdapter = function() {
-  scout.AccordionAdapter.parent.call(this);
-};
-scout.inherits(scout.AccordionAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class AccordionAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

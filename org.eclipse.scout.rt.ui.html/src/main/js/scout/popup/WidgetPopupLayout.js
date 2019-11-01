@@ -8,21 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetPopupLayout = function(popup) {
-  scout.WidgetPopupLayout.parent.call(this, popup);
-};
-scout.inherits(scout.WidgetPopupLayout, scout.PopupLayout);
+import {PopupLayout} from '../index';
 
-scout.WidgetPopupLayout.prototype._setSize = function(prefSize) {
-  scout.WidgetPopupLayout.parent.prototype._setSize.call(this, prefSize);
+export default class WidgetPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
+}
+
+
+_setSize(prefSize) {
+  super._setSize( prefSize);
 
   var htmlPopup = this.popup.htmlComp;
   var htmlWidget = this.popup.widget.htmlComp;
   var widgetSize = prefSize.subtract(htmlPopup.insets());
   htmlWidget.setSize(widgetSize.subtract(htmlWidget.margins()));
-};
+}
 
-scout.WidgetPopupLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var htmlComp = this.popup.htmlComp;
   var htmlWidget = this.popup.widget.htmlComp;
 
@@ -31,4 +35,5 @@ scout.WidgetPopupLayout.prototype.preferredLayoutSize = function($container, opt
     .add(htmlWidget.margins());
 
   return prefSize;
-};
+}
+}

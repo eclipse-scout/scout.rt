@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TableFieldAdapter = function() {
-  scout.TableFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.TableFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../../index';
+
+export default class TableFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

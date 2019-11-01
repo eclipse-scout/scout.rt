@@ -8,59 +8,66 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PageTileGridSelectKeyStroke = function(pageTileGrid) {
-  scout.PageTileGridSelectKeyStroke.parent.call(this);
+import {keys} from '../../../index';
+import {TileButton} from '../../../index';
+import {RangeKeyStroke} from '../../../index';
+
+export default class PageTileGridSelectKeyStroke extends RangeKeyStroke {
+
+constructor(pageTileGrid) {
+  super();
   this.field = pageTileGrid;
 
   // range [1..9]
   this.registerRange(
-    scout.keys['1'], // range from
+    keys['1'], // range from
     function() {
-      return scout.keys[Math.min(this._tiles().length, 9)]; // range to
+      return keys[Math.min(this._tiles().length, 9)]; // range to
     }.bind(this)
   );
 
   // rendering hints
   this.renderingHints.$drawingArea = function($drawingArea, event) {
-    var index = event.which - scout.keys['1'];
+    var index = event.which - keys['1'];
     var tiles = this._tiles();
-    if (index < tiles.length && tiles[index].tileWidget instanceof scout.TileButton) {
+    if (index < tiles.length && tiles[index].tileWidget instanceof TileButton) {
       return tiles[index].tileWidget.$fieldContainer;
     }
     return null;
   }.bind(this);
-};
-scout.inherits(scout.PageTileGridSelectKeyStroke, scout.RangeKeyStroke);
+}
+
 
 /**
  * @override
  */
-scout.PageTileGridSelectKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.PageTileGridSelectKeyStroke.parent.prototype._accept.call(this, event);
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
 
-  var index = scout.keys.codesToKeys[event.which] - 1;
+  var index = keys.codesToKeys[event.which] - 1;
   var tiles = this._tiles();
 
-  if (index < tiles.length && tiles[index].tileWidget instanceof scout.TileButton) {
+  if (index < tiles.length && tiles[index].tileWidget instanceof TileButton) {
     event._$element = tiles[index].$container;
     if (event._$element) {
       return true;
     }
   }
   return false;
-};
+}
 
 /**
  * @override
  */
-scout.PageTileGridSelectKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var tile = event._$element.data('widget');
   tile.tileWidget.doAction();
-};
+}
 
-scout.PageTileGridSelectKeyStroke.prototype._tiles = function() {
+_tiles() {
   return this.field.tiles;
-};
+}
+}

@@ -8,12 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CalendarModeMenu = function() {
-  scout.CalendarModeMenu.parent.call(this);
-};
-scout.inherits(scout.CalendarModeMenu, scout.Menu);
+import {Menu} from '../index';
 
-scout.CalendarModeMenu.prototype.doAction = function() {
+export default class CalendarModeMenu extends Menu {
+
+constructor() {
+  super();
+}
+
+
+doAction() {
   if (!this.prepareDoAction()) {
     return false;
   }
@@ -24,4 +28,5 @@ scout.CalendarModeMenu.prototype.doAction = function() {
   // close menu, cannot be done in parent menu itself because selecting an already selected item does not trigger an event
   this.parentMenu.setSelected(false);
   return true;
-};
+}
+}

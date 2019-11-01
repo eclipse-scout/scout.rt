@@ -8,16 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.StatusMenuMapping = function() {
-  scout.StatusMenuMapping.parent.call(this);
+import {Widget} from '../../index';
+
+export default class StatusMenuMapping extends Widget {
+
+constructor() {
+  super();
   this.codes = [];
   this.severities = [];
   this.menu = null;
   this._addWidgetProperties(['menu']);
-};
-scout.inherits(scout.StatusMenuMapping, scout.Widget);
+}
 
-scout.StatusMenuMapping.prototype._createChild = function(model) {
+
+_createChild(model) {
   if (typeof model === 'string') {
     // If the model is a string it is probably the id of the menu.
     // Menus are defined by the parent (form field) -> search the parent's children for the menu
@@ -27,5 +31,6 @@ scout.StatusMenuMapping.prototype._createChild = function(model) {
     }
     return existingWidget;
   }
-  return scout.StatusMenuMapping.parent.prototype._createChild(model);
-};
+  return super._createChild(model);
+}
+}

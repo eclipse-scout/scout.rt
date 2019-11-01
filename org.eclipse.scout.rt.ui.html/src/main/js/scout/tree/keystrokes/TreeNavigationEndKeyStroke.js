@@ -8,29 +8,36 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeNavigationEndKeyStroke = function(tree, modifierBitMask) {
-  scout.TreeNavigationEndKeyStroke.parent.call(this, tree, modifierBitMask);
-  this.which = [scout.keys.END];
+import {keys} from '../../index';
+import {AbstractTreeNavigationKeyStroke} from '../../index';
+import {arrays} from '../../index';
+
+export default class TreeNavigationEndKeyStroke extends AbstractTreeNavigationKeyStroke {
+
+constructor(tree, modifierBitMask) {
+  super( tree, modifierBitMask);
+  this.which = [keys.END];
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var newSelectedNode = this._computeNewSelection(event._treeCurrentNode);
     if (newSelectedNode) {
       return newSelectedNode.$node;
     }
   }.bind(this);
-};
-scout.inherits(scout.TreeNavigationEndKeyStroke, scout.AbstractTreeNavigationKeyStroke);
+}
 
-scout.TreeNavigationEndKeyStroke.prototype.handle = function(event) {
+
+handle(event) {
   var newSelection = this._computeNewSelection(event._treeCurrentNode);
   if (newSelection) {
     this.selectNodesAndReveal(newSelection);
   }
-};
+}
 
-scout.TreeNavigationEndKeyStroke.prototype._computeNewSelection = function(currentNode) {
+_computeNewSelection(currentNode) {
   var nodes = this.field.visibleNodesFlat;
   if (nodes.length === 0) {
     return;
   }
-  return scout.arrays.last(nodes);
-};
+  return arrays.last(nodes);
+}
+}

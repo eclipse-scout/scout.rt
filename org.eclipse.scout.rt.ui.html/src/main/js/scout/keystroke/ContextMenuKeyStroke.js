@@ -8,24 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ContextMenuKeyStroke = function(field, contextFunction, bindObject) {
-  scout.ContextMenuKeyStroke.parent.call(this);
+import {keys} from '../index';
+import {KeyStroke} from '../index';
+
+export default class ContextMenuKeyStroke extends KeyStroke {
+
+constructor(field, contextFunction, bindObject) {
+  super();
   this._contextFunction = contextFunction;
   this._bindObject = bindObject || this;
 
   this.field = field;
   this.renderingHints.render = false;
 
-  this.which = [scout.keys.SELECT]; // = "Menu" key
+  this.which = [keys.SELECT]; // = "Menu" key
   this.ctrl = false;
   this.shift = false;
   this.stopPropagation = true;
-};
-scout.inherits(scout.ContextMenuKeyStroke, scout.KeyStroke);
+}
+
 
 /**
  * @override KeyStroke.js
  */
-scout.ContextMenuKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this._contextFunction.call(this._bindObject, event);
-};
+}
+}

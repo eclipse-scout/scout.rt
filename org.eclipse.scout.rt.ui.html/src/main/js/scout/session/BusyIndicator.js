@@ -8,52 +8,65 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BusyIndicator = function() {
-  scout.BusyIndicator.parent.call(this);
+import {ClickActiveElementKeyStroke} from '../index';
+import {strings} from '../index';
+import {keys} from '../index';
+import {GlassPaneRenderer} from '../index';
+import {KeyStrokeContext} from '../index';
+import {BoxButtons} from '../index';
+import {Widget} from '../index';
+import {FocusRule} from '../index';
+import {scout} from '../index';
+import {CloseKeyStroke} from '../index';
+
+export default class BusyIndicator extends Widget {
+
+constructor() {
+  super();
   this.cancellable = true;
   this.showTimeout = 2500;
   this.label = null;
   this.details = null;
-};
-scout.inherits(scout.BusyIndicator, scout.Widget);
+}
+
 
 /**
  * @override
  */
-scout.BusyIndicator.prototype._createKeyStrokeContext = function() {
-  return new scout.KeyStrokeContext();
-};
+_createKeyStrokeContext() {
+  return new KeyStrokeContext();
+}
 
 /**
  * @override
  */
-scout.BusyIndicator.prototype._initKeyStrokeContext = function() {
-  scout.BusyIndicator.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   this.keyStrokeContext.registerKeyStroke([
-    new scout.ClickActiveElementKeyStroke(this, [
-      scout.keys.SPACE, scout.keys.ENTER
+    new ClickActiveElementKeyStroke(this, [
+      keys.SPACE, keys.ENTER
     ]),
-    new scout.CloseKeyStroke(this, function() {
+    new CloseKeyStroke(this, function() {
       return this.$cancelButton;
     }.bind(this))
   ]);
-};
+}
 
-scout.BusyIndicator.prototype._init = function(model) {
-  scout.BusyIndicator.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
   this.label = scout.nvl(this.label, this.session.text('ui.PleaseWait_'));
-};
+}
 
-scout.BusyIndicator.prototype.render = function($parent) {
+render($parent) {
   // Use entry point by default
   $parent = $parent || this.entryPoint();
-  scout.BusyIndicator.parent.prototype.render.call(this, $parent);
-};
+  super.render( $parent);
+}
 
-scout.BusyIndicator.prototype._render = function() {
+_render() {
   // 1. Render modality glasspanes (must precede adding the busy indicator to the DOM)
-  this._glassPaneRenderer = new scout.GlassPaneRenderer(this);
+  this._glassPaneRenderer = new GlassPaneRenderer(this);
   this._glassPaneRenderer.renderGlassPanes();
   this._glassPaneRenderer.eachGlassPane(function($glassPane) {
     $glassPane.addClass('busy');
@@ -72,7 +85,7 @@ scout.BusyIndicator.prototype._render = function() {
 
   if (this.cancellable) {
     this.$buttons = this.$container.appendDiv('busyindicator-buttons');
-    var boxButtons = new scout.BoxButtons(this.$buttons);
+    var boxButtons = new BoxButtons(this.$buttons);
     this.$cancelButton = boxButtons.addButton({
       text: this.session.text('Cancel'),
       onClick: this._onCancelClick.bind(this)
@@ -100,14 +113,14 @@ scout.BusyIndicator.prototype._render = function() {
     // Maybe, this is not required if problem with single-button form is solved (see FormController.js)
     this.session.focusManager.validateFocus();
   }.bind(this), this.showTimeout);
-};
+}
 
-scout.BusyIndicator.prototype._postRender = function() {
-  scout.BusyIndicator.parent.prototype._postRender.call(this);
-  this.session.focusManager.installFocusContext(this.$container, scout.FocusRule.AUTO);
-};
+_postRender() {
+  super._postRender();
+  this.session.focusManager.installFocusContext(this.$container, FocusRule.AUTO);
+}
 
-scout.BusyIndicator.prototype._remove = function() {
+_remove() {
   // Remove busy box (cancel timer in case it was not fired yet)
   clearTimeout(this._busyIndicatorTimeoutId);
 
@@ -118,52 +131,53 @@ scout.BusyIndicator.prototype._remove = function() {
   this._glassPaneRenderer.removeGlassPanes();
   this.session.focusManager.uninstallFocusContext(this.$container);
 
-  scout.BusyIndicator.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.BusyIndicator.prototype.setLabel = function(label) {
+setLabel(label) {
   this.setProperty('label', label);
-};
+}
 
-scout.BusyIndicator.prototype._renderLabel = function() {
+_renderLabel() {
   this.$label.text(this.label || '');
-};
+}
 
-scout.BusyIndicator.prototype.setDetails = function(details) {
+setDetails(details) {
   this.setProperty('details', details);
-};
+}
 
-scout.BusyIndicator.prototype._renderDetails = function() {
+_renderDetails() {
   this.$details
-    .html(scout.strings.nl2br(this.details))
+    .html(strings.nl2br(this.details))
     .setVisible(!!this.details);
-};
+}
 
-scout.BusyIndicator.prototype._position = function() {
+_position() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
-};
+}
 
 /**
  * Used by CloseKeyStroke.js
  */
-scout.BusyIndicator.prototype.close = function() {
+close() {
   if (this.$cancelButton && this.session.focusManager.requestFocus(this.$cancelButton)) {
     this.$cancelButton.focus();
     this.$cancelButton.click();
   }
-};
+}
 
-scout.BusyIndicator.prototype._onCancelClick = function(event) {
+_onCancelClick(event) {
   this.trigger('cancel', event);
-};
+}
 
 /**
  * Sets the busy indicator into cancelled state.
  */
-scout.BusyIndicator.prototype.cancelled = function() {
+cancelled() {
   if (this.rendered) { // not closed yet
     this.$label.addClass('cancelled');
     this.$buttons.remove();
     this.$content.addClass('no-buttons');
   }
-};
+}
+}

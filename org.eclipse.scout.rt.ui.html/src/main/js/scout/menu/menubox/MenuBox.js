@@ -8,69 +8,76 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenuBox = function(menuBar) {
-  scout.MenuBox.parent.call(this);
+import {Widget} from '../../index';
+import {HtmlComponent} from '../../index';
+import {MenuBoxLayout} from '../../index';
+
+export default class MenuBox extends Widget {
+
+constructor(menuBar) {
+  super();
   this.compact = false;
   this.menus = [];
   this._addWidgetProperties('menus');
-};
-scout.inherits(scout.MenuBox, scout.Widget);
+}
 
-scout.MenuBox.prototype._init = function(options) {
-  scout.MenuBox.parent.prototype._init.call(this, options);
+
+_init(options) {
+  super._init( options);
   this.menus = options.menus || [];
   this.uiMenuCssClass = options.uiMenuCssClass || '';
   this.uiMenuCssClass += ' ' + 'menu-box-item';
   this._initMenus(this.menus);
-};
+}
 
-scout.MenuBox.prototype._initMenus = function(menus) {
+_initMenus(menus) {
   menus.forEach(this._initMenu.bind(this));
-};
+}
 
-scout.MenuBox.prototype._initMenu = function(menu) {
+_initMenu(menu) {
   menu.uiCssClass = this.uiMenuCssClass;
-};
+}
 
 /**
  * @override Widget.js
  */
-scout.MenuBox.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('menu-box');
 
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.MenuBoxLayout(this));
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new MenuBoxLayout(this));
+}
 
-scout.MenuBox.prototype._renderProperties = function() {
-  scout.MenuBox.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderMenus();
   this._renderCompact();
-};
+}
 
-scout.MenuBox.prototype.setMenus = function(menus) {
+setMenus(menus) {
   this.setProperty('menus', menus);
-};
+}
 
-scout.MenuBox.prototype._renderMenus = function() {
+_renderMenus() {
   this.menus.forEach(function(menu) {
     menu.render();
   }, this);
   this.invalidateLayoutTree();
-};
+}
 
-scout.MenuBox.prototype._removeMenus = function() {
+_removeMenus() {
   this.menus.forEach(function(menu) {
     menu.remove();
   });
   this.invalidateLayoutTree();
-};
+}
 
-scout.MenuBox.prototype.setCompact = function(compact) {
+setCompact(compact) {
   this.setProperty('compact', compact);
-};
+}
 
-scout.MenuBox.prototype._renderCompact = function() {
+_renderCompact() {
   this.$container.toggleClass('compact', this.compact);
   this.invalidateLayoutTree();
-};
+}
+}

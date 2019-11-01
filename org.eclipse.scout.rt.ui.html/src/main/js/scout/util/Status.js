@@ -8,100 +8,107 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Status = function(model) {
+import {objects} from '../index';
+import {arrays} from '../index';
+import {strings} from '../index';
+import * as $ from 'jquery';
+
+export default class Status {
+
+constructor(model) {
   this.message = null;
-  this.severity = scout.Status.Severity.ERROR;
+  this.severity = Status.Severity.ERROR;
   this.code = 0;
   $.extend(this, model);
 
   // severity may be a string (e.g. if set in a model json file) -> convert to real severity
   if (typeof this.severity === 'string') {
-    this.severity = scout.Status.Severity[this.severity.toUpperCase()];
+    this.severity = Status.Severity[this.severity.toUpperCase()];
   }
   // children
   if (model && model.children && Array.isArray(model.children)) {
     this.children = model.children.map(function(child) {
-      return scout.Status.ensure(child);
+      return Status.ensure(child);
     }.bind(this));
   }
-};
+}
 
-scout.Status.Severity = {
+static Severity = {
   OK: 0x01,
   INFO: 0x100,
   WARNING: 0x10000,
   ERROR: 0x1000000
 };
 
-scout.Status.SEVERITY_CSS_CLASSES = 'error warning info ok';
+static SEVERITY_CSS_CLASSES = 'error warning info ok';
 
-scout.Status.prototype.cssClass = function() {
-  return scout.Status.cssClassForSeverity(this.severity);
-};
+cssClass() {
+  return Status.cssClassForSeverity(this.severity);
+}
 
 /**
  * @returns true if severity is OK or INFO, false if severity is WARNING or ERROR.
  */
-scout.Status.prototype.isValid = function() {
-  return this.severity === scout.Status.Severity.OK ||
-    this.severity === scout.Status.Severity.INFO;
-};
+isValid() {
+  return this.severity === Status.Severity.OK ||
+    this.severity === Status.Severity.INFO;
+}
 
-scout.Status.prototype.isError = function() {
-  return this.severity === scout.Status.Severity.ERROR;
-};
+isError() {
+  return this.severity === Status.Severity.ERROR;
+}
 
-scout.Status.prototype.isWarning = function() {
-  return this.severity === scout.Status.Severity.WARNING;
-};
+isWarning() {
+  return this.severity === Status.Severity.WARNING;
+}
 
-scout.Status.prototype.isInfo = function() {
-  return this.severity === scout.Status.Severity.INFO;
-};
+isInfo() {
+  return this.severity === Status.Severity.INFO;
+}
 
-scout.Status.prototype.isOk = function() {
-  return this.severity === scout.Status.Severity.OK;
-};
-
-/**
- * @returns {scout.Status[]} status including children as flat list.
- */
-scout.Status.prototype.asFlatList = function() {
-  return scout.Status.asFlatList(this);
-};
+isOk() {
+  return this.severity === Status.Severity.OK;
+}
 
 /**
- * @return {scout.Status} a clone of this Status instance.
+ * @returns {Status[]} status including children as flat list.
  */
-scout.Status.prototype.clone = function() {
+asFlatList() {
+  return Status.asFlatList(this);
+}
+
+/**
+ * @return {Status} a clone of this Status instance.
+ */
+clone() {
   var modelClone = $.extend({}, this);
-  return new scout.Status(modelClone);
-};
+  return new Status(modelClone);
+}
 
-scout.Status.prototype.equals = function(o) {
-  if (!(o instanceof scout.Status)) {
+equals(o) {
+  if (!(o instanceof Status)) {
     return false;
   }
-  return scout.objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
-};
+  return objects.propertiesEquals(this, o, ['severity', 'message', 'invalidDate', 'invalidTime']);
+}
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**
  * Null-safe static clone method.
  */
-scout.Status.clone = function(original) {
+static clone(original) {
   return original ? original.clone() : null;
-};
+}
 
 /**
  * @param {number} severity
  * @returns {string}
  * @static
  */
-scout.Status.cssClassForSeverity = function(severity) {
+static cssClassForSeverity(severity) {
   var cssSeverity,
-    Severity = scout.Status.Severity;
+    Severity = Status.Severity;
 
   switch (severity) {
     case Severity.OK:
@@ -118,10 +125,10 @@ scout.Status.cssClassForSeverity = function(severity) {
       break;
   }
   return cssSeverity;
-};
+}
 
-scout.Status.animateStatusMessage = function($status, message) {
-  if (scout.strings.endsWith(message, '...')) {
+static animateStatusMessage($status, message) {
+  if (strings.endsWith(message, '...')) {
     var $ellipsis = $status.makeSpan('ellipsis');
     for (var i = 0; i < 3; i++) {
       $ellipsis.append($status.makeSpan('animate-dot delay-' + i, '.'));
@@ -131,60 +138,60 @@ scout.Status.animateStatusMessage = function($status, message) {
   } else {
     $status.text(message);
   }
-};
+}
 
-scout.Status.ensure = function(status) {
+static ensure(status) {
   if (!status) {
     return status;
   }
-  if (status instanceof scout.Status) {
+  if (status instanceof Status) {
     return status;
   }
-  return new scout.Status(status);
-};
+  return new Status(status);
+}
 
 /**
- * @returns {scout.Status} a Status object with severity OK.
+ * @returns {Status} a Status object with severity OK.
  */
-scout.Status.ok = function(model) {
-  return scout.Status._create(model, scout.Status.Severity.OK);
-};
+static ok(model) {
+  return Status._create(model, Status.Severity.OK);
+}
 
 /**
- * @returns {scout.Status} a Status object with severity INFO.
+ * @returns {Status} a Status object with severity INFO.
  */
-scout.Status.info = function(model) {
-  return scout.Status._create(model, scout.Status.Severity.INFO);
-};
+static info(model) {
+  return Status._create(model, Status.Severity.INFO);
+}
 
 /**
- * @returns {scout.Status} a Status object with severity WARNING.
- * @deprecated do not use this legacy function, use scout.Status.warning() instead!
+ * @returns {Status} a Status object with severity WARNING.
+ * @deprecated do not use this legacy function, use Status.warning() instead!
  */
-scout.Status._warnDeprecationLogged = false;
-scout.Status.warn = function(model) {
-  if (!scout.Status._warnDeprecationLogged && window.console && (window.console.warn || window.console.log)) {
-    (window.console.warn || window.console.log)('scout.Status.warn() is deprecated and will be removed in a future release. Please use scout.Status.warning() instead.');
-    scout.Status._warnDeprecationLogged = true; // only warn once
+static _warnDeprecationLogged = false;
+static warn(model) {
+  if (!Status._warnDeprecationLogged && window.console && (window.console.warn || window.console.log)) {
+    (window.console.warn || window.console.log)('scout.Status.warn() is deprecated and will be removed in a future release. Please use Status.warning() instead.');
+    Status._warnDeprecationLogged = true; // only warn once
   }
-  return scout.Status.warning(model);
-};
+  return Status.warning(model);
+}
 
 /**
- * @returns {scout.Status} a Status object with severity WARNING.
+ * @returns {Status} a Status object with severity WARNING.
  */
-scout.Status.warning = function(model) {
-  return scout.Status._create(model, scout.Status.Severity.WARNING);
-};
+static warning(model) {
+  return Status._create(model, Status.Severity.WARNING);
+}
 
 /**
- * @returns {scout.Status} a Status object with severity ERROR.
+ * @returns {Status} a Status object with severity ERROR.
  */
-scout.Status.error = function(model) {
-  return scout.Status._create(model, scout.Status.Severity.ERROR);
-};
+static error(model) {
+  return Status._create(model, Status.Severity.ERROR);
+}
 
-scout.Status._create = function(model, severity) {
+static _create(model, severity) {
   if (typeof model === 'string') {
     model = {
       message: model
@@ -195,22 +202,23 @@ scout.Status._create = function(model, severity) {
   model = $.extend({}, model, {
     severity: severity
   });
-  return new scout.Status(model);
-};
+  return new Status(model);
+}
 
 /**
- * @returns {scout.Status[]} all Status objects as flat list (goes through the status hierarchy)
+ * @returns {Status[]} all Status objects as flat list (goes through the status hierarchy)
  */
-scout.Status.asFlatList = function(status) {
+static asFlatList(status) {
   if (!status) {
     return [];
   }
   var list = [];
   if (status.children) {
     status.children.forEach(function(childStatus) {
-      scout.arrays.pushAll(list, scout.Status.asFlatList(childStatus));
+      arrays.pushAll(list, Status.asFlatList(childStatus));
     });
   }
   list.push(status);
   return list;
-};
+}
+}

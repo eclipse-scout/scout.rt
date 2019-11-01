@@ -8,17 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.MenubarBoxLayout = function(menubox) {
-  scout.MenubarBoxLayout.parent.call(this);
+import {AbstractLayout} from '../../index';
+import {Dimension} from '../../index';
+
+export default class MenubarBoxLayout extends AbstractLayout {
+
+constructor(menubox) {
+  super();
   this.menubox = menubox;
-};
-scout.inherits(scout.MenubarBoxLayout, scout.AbstractLayout);
+}
 
-scout.MenubarBoxLayout.prototype.layout = function($container) {
+
+layout($container) {
   // void since the menu items are floated inline block.
-};
+}
 
-scout.MenubarBoxLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var menuItemSize = null;
 
   return this.menubox.menuItems.filter(function(menuItem) {
@@ -31,5 +36,6 @@ scout.MenubarBoxLayout.prototype.preferredLayoutSize = function($container, opti
     prefSize.height = Math.max(prefSize.height, menuItemSize.height);
     prefSize.width = Math.max(prefSize.width, menuItemSize.width);
     return prefSize;
-  }, new scout.Dimension());
-};
+  }, new Dimension());
+}
+}

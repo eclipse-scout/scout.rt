@@ -8,39 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.cookies = {
+import {scout} from '../index';
 
-  get: function(name, doc) {
-    doc = doc || document;
-    var prefix = name + '=';
-    var cookies = doc.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-      var cookie = cookies[i].trim();
-      if (cookie.indexOf(prefix) === 0) {
-        return cookie.substring(prefix.length);
-      }
-    }
-    return null;
-  },
 
-  /**
-   * Sets a cookie.
-   *
-   * @param maxAge If specified the cookie will be persistent, otherwise it will be a session cookie.
-   */
-  set: function(name, value, maxAge, path) {
-    value = scout.nvl(value, '');
-    maxAge = scout.nvl(maxAge, -1);
 
-    var cookie = name + '=' + value;
-    if (maxAge > -1) {
-      var expires = new Date();
-      expires.setTime(expires.getTime() + maxAge * 1000);
-      cookie += ';max-age=' + maxAge + ';expires=' + expires;
+export function get(name, doc) {
+  doc = doc || document;
+  var prefix = name + '=';
+  var cookies = doc.cookie.split(';');
+  for (var i = 0; i < cookies.length; i++) {
+    var cookie = cookies[i].trim();
+    if (cookie.indexOf(prefix) === 0) {
+      return cookie.substring(prefix.length);
     }
-    if (path) {
-      cookie += ';path=' + path;
-    }
-    document.cookie = cookie; // Does not override existing cookies with a different name
   }
+  return null;
+}
+
+/**
+ * Sets a cookie.
+ *
+ * @param maxAge If specified the cookie will be persistent, otherwise it will be a session cookie.
+ */
+export function set(name, value, maxAge, path) {
+  value = scout.nvl(value, '');
+  maxAge = scout.nvl(maxAge, -1);
+
+  var cookie = name + '=' + value;
+  if (maxAge > -1) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + maxAge * 1000);
+    cookie += ';max-age=' + maxAge + ';expires=' + expires;
+  }
+  if (path) {
+    cookie += ';path=' + path;
+  }
+  document.cookie = cookie; // Does not override existing cookies with a different name
+}
+
+export default {
+  get,
+  set
 };

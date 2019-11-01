@@ -8,11 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupWindow = function(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
+import {Rectangle} from '../index';
+import {HtmlComponent} from '../index';
+import {EventSupport} from '../index';
+import {polyfills} from '../index';
+import {SingleLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+import {Dimension} from '../index';
+
+export default class PopupWindow {
+
+constructor(myWindow, form) { // use 'myWindow' in place of 'window' to prevent confusion with global window variable
   this.myWindow = myWindow;
   this.form = form;
   this.session = form.session;
-  this.events = new scout.EventSupport();
+  this.events = new EventSupport();
   this.initialized = false;
   this.$container;
   this.htmlComp;
@@ -26,30 +37,30 @@ scout.PopupWindow = function(myWindow, form) { // use 'myWindow' in place of 'wi
   // to a popup window
   myWindow.popupWindow = this;
   myWindow.name = 'Scout popup-window ' + form.modelClass;
-};
+}
 
-scout.PopupWindow.prototype._onUnload = function() {
+_onUnload() {
   $.log.isDebugEnabled() && $.log.debug('stored form ID ' + this.form.id + ' to session storage');
   if (this.form.destroyed) {
     $.log.isDebugEnabled() && $.log.debug('form ID ' + this.form.id + ' is already destroyed - don\'t trigger unload event');
   } else {
     this.events.trigger('popupWindowUnload', this);
   }
-};
+}
 
-scout.PopupWindow.prototype._onReady = function() {
+_onReady() {
   // set container (used as document-root from callers)
   var myDocument = this.myWindow.document,
     $myWindow = $(this.myWindow),
     $myDocument = $(myDocument);
 
   // Install polyfills on new window
-  scout.polyfills.install(this.myWindow);
+  polyfills.install(this.myWindow);
   scout.prepareDOM(myDocument);
 
   this.$container = $('.scout', myDocument);
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.SingleLayout());
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+  this.htmlComp.setLayout(new SingleLayout());
   this.$container.height($myWindow.height());
   this.form.render(this.$container);
 
@@ -60,8 +71,8 @@ scout.PopupWindow.prototype._onReady = function() {
       // since the window "chrome" (window-border, -title and location bar)
       // occupies some space. That's why we measure the difference between
       // the current document size and the window size first.
-      myWindowSize = new scout.Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
-      myDocumentSize = new scout.Dimension($myDocument.width(), $myDocument.height()),
+      myWindowSize = new Dimension(this.myWindow.outerWidth, this.myWindow.outerHeight),
+      myDocumentSize = new Dimension($myDocument.width(), $myDocument.height()),
       windowChromeHoriz = myWindowSize.width - myDocumentSize.width,
       windowChromeVert = myWindowSize.height - myDocumentSize.height;
 
@@ -89,12 +100,12 @@ scout.PopupWindow.prototype._onReady = function() {
   // Finally set initialized flag to true, at this point the PopupWindow is fully initialized
   this.initialized = true;
   this.events.trigger('init');
-};
+}
 
 // Note: currently _onResize is only called when the window is resized, but not when the position of the window changes.
 // if we need to do that in a later release we should take a look on the SO-post below:
 // http://stackoverflow.com/questions/4319487/detecting-if-the-browser-window-is-moved-with-javascript
-scout.PopupWindow.prototype._onResize = function() {
+_onResize() {
   var $myWindow = $(this.myWindow),
     width = $myWindow.width(),
     height = $myWindow.height(),
@@ -102,23 +113,24 @@ scout.PopupWindow.prototype._onResize = function() {
     top = this.myWindow.screenY;
   $.log.isDebugEnabled() && $.log.debug('popup-window resize: width=' + width + ' height=' + height + ' top=' + top + ' left=' + left);
 
-  this.form.storeCacheBounds(new scout.Rectangle(left, top, width, height));
-  var windowSize = new scout.Dimension($myWindow.width(), $myWindow.height());
+  this.form.storeCacheBounds(new Rectangle(left, top, width, height));
+  var windowSize = new Dimension($myWindow.width(), $myWindow.height());
   this.htmlComp.setSize(windowSize);
-};
+}
 
-scout.PopupWindow.prototype.isClosed = function() {
+isClosed() {
   return this.myWindow.closed;
-};
+}
 
-scout.PopupWindow.prototype.one = function(type, func) {
+one(type, func) {
   this.events.one(type, func);
-};
+}
 
-scout.PopupWindow.prototype.close = function() {
+close() {
   this.myWindow.close();
-};
+}
 
-scout.PopupWindow.prototype.title = function(title) {
+title(title) {
   this.myWindow.document.title = title;
-};
+}
+}

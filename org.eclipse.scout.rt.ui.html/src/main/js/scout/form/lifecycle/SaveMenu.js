@@ -8,28 +8,38 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.SaveMenu = function() {
-  scout.SaveMenu.parent.call(this);
+import {Menu} from '../../index';
+import {Action} from '../../index';
+import {Button} from '../../index';
+import {scout} from '../../index';
+import {Form} from '../../index';
+import {Event} from '../../index';
 
-  this.actionStyle = scout.Action.ActionStyle.BUTTON;
+export default class SaveMenu extends Menu {
+
+constructor() {
+  super();
+
+  this.actionStyle = Action.ActionStyle.BUTTON;
   this.keyStroke = 'enter';
-  this.systemType = scout.Button.SystemType.SAVE;
-};
-scout.inherits(scout.SaveMenu, scout.Menu);
+  this.systemType = Button.SystemType.SAVE;
+}
 
-scout.SaveMenu.prototype._init = function(model) {
-  scout.SaveMenu.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.text = scout.nvl(this.text, this.session.text('SaveButton'));
-};
+}
 
-scout.SaveMenu.prototype.getForm = function() {
-  return scout.Form.findForm(this);
-};
+getForm() {
+  return Form.findForm(this);
+}
 
-scout.SaveMenu.prototype._doAction = function() {
-  var event = new scout.Event();
+_doAction() {
+  var event = new Event();
   this.trigger('action', event);
   if (!event.defaultPrevented) {
     this.getForm().save();
   }
-};
+}
+}

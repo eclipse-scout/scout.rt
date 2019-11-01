@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetFieldAdapter = function() {
-  scout.WidgetFieldAdapter.parent.call(this);
-};
-scout.inherits(scout.WidgetFieldAdapter, scout.FormFieldAdapter);
+import {FormFieldAdapter} from '../../index';
+
+export default class WidgetFieldAdapter extends FormFieldAdapter {
+
+constructor() {
+  super();
+}
+
+}

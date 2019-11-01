@@ -8,28 +8,35 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopToolBox = function(menuBar) {
-  scout.DesktopToolBox.parent.call(this);
-};
-scout.inherits(scout.DesktopToolBox, scout.MenuBox);
+import {MenuBox} from '../../index';
+import {strings} from '../../index';
+import {Popup} from '../../index';
 
-scout.DesktopToolBox.prototype._init = function(options) {
-  options.uiMenuCssClass = scout.strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
-  scout.DesktopToolBox.parent.prototype._init.call(this, options);
-};
+export default class DesktopToolBox extends MenuBox {
 
-/**
- * @override
- */
-scout.DesktopToolBox.prototype._initMenu = function(menu) {
-  scout.DesktopToolBox.parent.prototype._initMenu.call(this, menu);
-  menu.popupHorizontalAlignment = scout.Popup.Alignment.RIGHTEDGE;
-};
+constructor(menuBar) {
+  super();
+}
+
+
+_init(options) {
+  options.uiMenuCssClass = strings.join(' ', options.uiMenuCssClass, 'desktop-tool-box-item');
+  super._init( options);
+}
 
 /**
  * @override
  */
-scout.DesktopToolBox.prototype._render = function() {
-  scout.DesktopToolBox.parent.prototype._render.call(this);
+_initMenu(menu) {
+  super._initMenu( menu);
+  menu.popupHorizontalAlignment = Popup.Alignment.RIGHTEDGE;
+}
+
+/**
+ * @override
+ */
+_render() {
+  super._render();
   this.$container.addClass('desktop-tool-box');
-};
+}
+}

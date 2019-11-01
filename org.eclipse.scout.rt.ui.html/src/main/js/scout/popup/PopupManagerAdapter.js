@@ -8,7 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupManagerAdapter = function() {
-  scout.PopupManagerAdapter.parent.call(this);
-};
-scout.inherits(scout.PopupManagerAdapter, scout.ModelAdapter);
+import {ModelAdapter} from '../index';
+
+export default class PopupManagerAdapter extends ModelAdapter {
+
+constructor() {
+  super();
+}
+
+}

@@ -8,19 +8,26 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {AbstractLayout} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+
 /**
  * Null Layout.
  */
-scout.NullLayout = function() {
-  scout.NullLayout.parent.call(this);
-};
-scout.inherits(scout.NullLayout, scout.AbstractLayout);
+export default class NullLayout extends AbstractLayout {
 
-scout.NullLayout.prototype.layout = function($container) {
+constructor() {
+  super();
+}
+
+
+layout($container) {
   $container.children().each(function() {
-    var htmlComp = scout.HtmlComponent.optGet($(this));
+    var htmlComp = HtmlComponent.optGet($(this));
     if (htmlComp) {
       htmlComp.revalidateLayout();
     }
   });
-};
+}
+}

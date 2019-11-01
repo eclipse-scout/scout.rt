@@ -8,8 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.Splitter = function() {
-  scout.Splitter.parent.call(this);
+import {graphics} from '../index';
+import {HtmlComponent} from '../index';
+import {Widget} from '../index';
+import * as $ from 'jquery';
+
+export default class Splitter extends Widget {
+
+constructor() {
+  super();
   this.splitHorizontal = true;
   this.$anchor = null;
   this.$root = null;
@@ -17,44 +24,44 @@ scout.Splitter = function() {
   this.orientation = 'top'; // Direction set to position the splitter inside the root element ('top', 'right', 'bottom' or 'left')
   this._cursorOffset = 0; // distance from cursor to splitter, makes resizing smoother by preventing initial 'jump'
   this._mouseDownHandler = this._onMouseDown.bind(this);
-};
-scout.inherits(scout.Splitter, scout.Widget);
+}
 
-scout.Splitter.prototype._init = function(model) {
-  scout.Splitter.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.setPosition(this.position);
-};
+}
 
-scout.Splitter.prototype._render = function() {
+_render() {
   this.$container = this.$parent.appendDiv('splitter')
     .addClass(this.splitHorizontal ? 'x-axis' : 'y-axis');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
   this._$window = this.$parent.window();
   this._$body = this.$parent.body();
-};
+}
 
-scout.Splitter.prototype._renderProperties = function() {
-  scout.Splitter.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderPosition();
-};
+}
 
-scout.Splitter.prototype._renderEnabled = function() {
-  scout.Splitter.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   if (this.enabledComputed) {
     this.$container.on('mousedown', this._mouseDownHandler);
   } else {
     this.$container.off('mousedown', this._mouseDownHandler);
   }
-};
+}
 
-scout.Splitter.prototype.setLayoutData = function(layoutData) {
-  scout.Splitter.parent.prototype.setLayoutData.call(this, layoutData);
+setLayoutData(layoutData) {
+  super.setLayoutData( layoutData);
   this.layoutData = layoutData;
-};
+}
 
-scout.Splitter.prototype.getLayoutData = function() {
+getLayoutData() {
   return this.layoutData;
-};
+}
 
 /**
  * Sets the splitter position to the specified newSize (in pixels). If the newSize is
@@ -63,7 +70,7 @@ scout.Splitter.prototype.getLayoutData = function() {
  *
  * @returns the effective position in pixel.
  */
-scout.Splitter.prototype.setPosition = function(position) {
+setPosition(position) {
   if (!$.isNumeric(position)) {
     position = this._derivePositionFromAnchor();
   }
@@ -72,16 +79,16 @@ scout.Splitter.prototype.setPosition = function(position) {
   }
   this._setPosition(position);
   return position;
-};
+}
 
 /**
  * Derives the position from $anchor element's bounds
  */
-scout.Splitter.prototype._derivePositionFromAnchor = function() {
+_derivePositionFromAnchor() {
   if (!this.$anchor) {
     return null;
   }
-  var anchorBounds = scout.graphics.offsetBounds(this.$anchor, {
+  var anchorBounds = graphics.offsetBounds(this.$anchor, {
     exact: true
   });
   if (this.splitHorizontal) {
@@ -89,9 +96,9 @@ scout.Splitter.prototype._derivePositionFromAnchor = function() {
   } else {
     return anchorBounds.y + anchorBounds.height;
   }
-};
+}
 
-scout.Splitter.prototype._setPosition = function(position) {
+_setPosition(position) {
   if (!$.isNumeric(position)) {
     return;
   }
@@ -106,14 +113,14 @@ scout.Splitter.prototype._setPosition = function(position) {
   if (this.rendered) {
     this._renderPosition();
   }
-};
+}
 
-scout.Splitter.prototype._renderPosition = function() {
+_renderPosition() {
   if (this.position === null) {
     return;
   }
 
-  var splitterSize = scout.graphics.size(this.$container, true);
+  var splitterSize = graphics.size(this.$container, true);
   if (this.splitHorizontal) {
     var x = this.position - (splitterSize.width / 2);
     if (this.orientation === 'right') {
@@ -129,14 +136,14 @@ scout.Splitter.prototype._renderPosition = function() {
       this.$container.cssTop(y);
     }
   }
-};
+}
 
-scout.Splitter.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   // The calculation of the offset bounds looks a bit complicated, because we cannot
   // use "scout.graphics.offsetBounds($el, true)" here. This method would only consider
   // any margins in the size, not the position.
-  var splitterMargins = scout.graphics.margins(this.$container);
-  var splitterOffsetBounds = scout.graphics.offsetBounds(this.$container);
+  var splitterMargins = graphics.margins(this.$container);
+  var splitterOffsetBounds = graphics.offsetBounds(this.$container);
   splitterOffsetBounds.x -= splitterMargins.left;
   splitterOffsetBounds.y -= splitterMargins.top;
   splitterOffsetBounds.width += splitterMargins.horizontal();
@@ -159,10 +166,10 @@ scout.Splitter.prototype._onMouseDown = function(event) {
   });
   // Prevent text selection in a form
   event.preventDefault();
-};
+}
 
-scout.Splitter.prototype._getSplitterPosition = function(event) {
-  var rootBounds = scout.graphics.offsetBounds(this.$root);
+_getSplitterPosition(event) {
+  var rootBounds = graphics.offsetBounds(this.$root);
   if (this.splitHorizontal) {
     var x = event.pageX + this._cursorOffset.left - rootBounds.x;
     return (this.orientation === 'right' ? rootBounds.width - x : x);
@@ -170,9 +177,9 @@ scout.Splitter.prototype._getSplitterPosition = function(event) {
     var y = event.pageY + this._cursorOffset.top - rootBounds.y;
     return (this.orientation === 'bottom' ? rootBounds.height - y : y);
   }
-};
+}
 
-scout.Splitter.prototype._onMouseMove = function(event) {
+_onMouseMove(event) {
   var splitterPosition = this._getSplitterPosition(event);
   // fire event
   var moveEvent = {
@@ -190,9 +197,9 @@ scout.Splitter.prototype._onMouseMove = function(event) {
     return;
   }
   this._setPosition(moveEvent.position);
-};
+}
 
-scout.Splitter.prototype._onMouseUp = function(event) {
+_onMouseUp(event) {
   // Remove listeners and reset cursor
   this._$window.off('mousemove.splitter');
   this._$body.removeClass((this.splitHorizontal ? 'col-resize' : 'row-resize'));
@@ -200,4 +207,5 @@ scout.Splitter.prototype._onMouseUp = function(event) {
   this.trigger('moveEnd', {
     position: this.position
   });
-};
+}
+}

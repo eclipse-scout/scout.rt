@@ -8,31 +8,39 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopNavigationHandle = function() {
-  scout.DesktopNavigationHandle.parent.call(this);
-};
-scout.inherits(scout.DesktopNavigationHandle, scout.CollapseHandle);
+import {CollapseHandle} from '../../index';
+import {EnlargeNavigationKeyStroke} from '../../index';
+import {KeyStrokeContext} from '../../index';
+import {ShrinkNavigationKeyStroke} from '../../index';
 
-scout.DesktopNavigationHandle.prototype._initKeyStrokeContext = function() {
-  scout.DesktopNavigationHandle.parent.prototype._initKeyStrokeContext.call(this);
+export default class DesktopNavigationHandle extends CollapseHandle {
+
+constructor() {
+  super();
+}
+
+
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
   // Bound to desktop
-  this.desktopKeyStrokeContext = new scout.KeyStrokeContext();
+  this.desktopKeyStrokeContext = new KeyStrokeContext();
   this.desktopKeyStrokeContext.$bindTarget = this.session.desktop.$container;
   this.desktopKeyStrokeContext.$scopeTarget = this.session.desktop.$container;
   this.desktopKeyStrokeContext.registerKeyStroke([
-    new scout.ShrinkNavigationKeyStroke(this),
-    new scout.EnlargeNavigationKeyStroke(this)
+    new ShrinkNavigationKeyStroke(this),
+    new EnlargeNavigationKeyStroke(this)
   ]);
-};
+}
 
-scout.DesktopNavigationHandle.prototype._render = function() {
-  scout.DesktopNavigationHandle.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('desktop-navigation-handle');
   this.session.keyStrokeManager.installKeyStrokeContext(this.desktopKeyStrokeContext);
-};
+}
 
-scout.DesktopNavigationHandle.prototype._remove = function() {
-  scout.DesktopNavigationHandle.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.desktopKeyStrokeContext);
-};
+}
+}

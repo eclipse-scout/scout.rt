@@ -8,34 +8,45 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.CheckBoxField = function() {
-  scout.CheckBoxField.parent.call(this);
+import {CheckBoxToggleKeyStroke} from '../../../index';
+import {ValueField} from '../../../index';
+import {KeyStrokeContext} from '../../../index';
+import {fields} from '../../../index';
+import {Device} from '../../../index';
+import {scout} from '../../../index';
+import {styles} from '../../../index';
+import {tooltips} from '../../../index';
+
+export default class CheckBoxField extends ValueField {
+
+constructor() {
+  super();
 
   this.triStateEnabled = false;
   this.wrapText = false;
   this.keyStroke = null;
-  this.checkBoxKeyStroke = new scout.CheckBoxToggleKeyStroke(this);
+  this.checkBoxKeyStroke = new CheckBoxToggleKeyStroke(this);
 
   this.$checkBox = null;
   this.$checkBoxLabel = null;
-};
-scout.inherits(scout.CheckBoxField, scout.ValueField);
+}
 
-scout.CheckBoxField.prototype._init = function(model) {
-  scout.CheckBoxField.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this._setKeyStroke(this.keyStroke);
-};
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
-  scout.CheckBoxField.parent.prototype._initKeyStrokeContext.call(this);
+_initKeyStrokeContext() {
+  super._initKeyStrokeContext();
 
-  this.keyStrokeContext.registerKeyStroke(new scout.CheckBoxToggleKeyStroke(this));
+  this.keyStrokeContext.registerKeyStroke(new CheckBoxToggleKeyStroke(this));
 
   // The key stroke configured by this.keyStroke has form scope
-  this.formKeyStrokeContext = new scout.KeyStrokeContext();
+  this.formKeyStrokeContext = new KeyStrokeContext();
   this.formKeyStrokeContext.invokeAcceptInputOnActiveValueField = true;
   this.formKeyStrokeContext.registerKeyStroke(this.checkBoxKeyStroke);
   this.formKeyStrokeContext.$bindTarget = function() {
@@ -47,9 +58,9 @@ scout.CheckBoxField.prototype._initKeyStrokeContext = function() {
     // use desktop otherwise
     return this.session.desktop.$container;
   }.bind(this);
-};
+}
 
-scout.CheckBoxField.prototype._render = function() {
+_render() {
   this.addContainer(this.$parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
@@ -65,129 +76,129 @@ scout.CheckBoxField.prototype._render = function() {
     .appendDiv('label')
     .on('mousedown', this._onMouseDown.bind(this));
 
-  scout.fields.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
-  scout.tooltips.installForEllipsis(this.$checkBoxLabel, {
+  fields.linkElementWithLabel(this.$checkBox, this.$checkBoxLabel);
+  tooltips.installForEllipsis(this.$checkBoxLabel, {
     parent: this
   });
   this.addStatus();
   this.session.keyStrokeManager.installKeyStrokeContext(this.formKeyStrokeContext);
-};
+}
 
 
-scout.CheckBoxField.prototype._renderProperties = function() {
-  scout.CheckBoxField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderValue();
   this._renderWrapText();
-};
+}
 
-scout.CheckBoxField.prototype._remove = function() {
-  scout.tooltips.uninstall(this.$checkBoxLabel);
+_remove() {
+  tooltips.uninstall(this.$checkBoxLabel);
   this.session.keyStrokeManager.uninstallKeyStrokeContext(this.formKeyStrokeContext);
-  scout.CheckBoxField.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.CheckBoxField.prototype._renderDisplayText = function() {
+_renderDisplayText() {
   // NOP
-};
+}
 
-scout.CheckBoxField.prototype.setValue = function(value) {
+setValue(value) {
   this.setProperty('value', value);
-};
+}
 
 /**
  * The value may be false, true (and null in tri-state mode)
  */
-scout.CheckBoxField.prototype._renderValue = function() {
+_renderValue() {
   this.$fieldContainer.toggleClass('checked', this.value === true);
   this.$checkBox.toggleClass('checked', this.value === true);
   this.$checkBox.toggleClass('undefined', this.triStateEnabled && this.value !== true && this.value !== false);
-};
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderEnabled = function() {
-  scout.CheckBoxField.parent.prototype._renderEnabled.call(this);
+_renderEnabled() {
+  super._renderEnabled();
   this.$checkBox
-    .setTabbable(this.enabledComputed && !scout.device.supportsTouch())
+    .setTabbable(this.enabledComputed && !Device.get().supportsTouch())
     .setEnabled(this.enabledComputed);
-};
+}
 
-scout.CheckBoxField.prototype.setTriStateEnabled = function(triStateEnabled) {
+setTriStateEnabled(triStateEnabled) {
   this.setProperty('triStateEnabled', triStateEnabled);
   if (this.rendered) {
     this._renderValue();
   }
-};
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderLabel = function() {
+_renderLabel() {
   this.$checkBoxLabel.textOrNbsp(this.label, 'empty');
   this._renderEmptyLabel();
-};
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderFont = function() {
-  scout.styles.legacyFont(this, this.$fieldContainer);
+_renderFont() {
+  styles.legacyFont(this, this.$fieldContainer);
   // Changing the font may enlarge or shrink the field (e.g. set the style to bold makes the text bigger) -> invalidate layout
   this.invalidateLayoutTree();
-};
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderForegroundColor = function() {
-  scout.styles.legacyForegroundColor(this, this.$fieldContainer);
-};
+_renderForegroundColor() {
+  styles.legacyForegroundColor(this, this.$fieldContainer);
+}
 
 /**
  * @override
  */
-scout.CheckBoxField.prototype._renderBackgroundColor = function() {
-  scout.styles.legacyBackgroundColor(this, this.$fieldContainer);
-};
+_renderBackgroundColor() {
+  styles.legacyBackgroundColor(this, this.$fieldContainer);
+}
 
-scout.CheckBoxField.prototype._renderGridData = function() {
-  scout.CheckBoxField.parent.prototype._renderGridData.call(this);
+_renderGridData() {
+  super._renderGridData();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.CheckBoxField.prototype._renderGridDataHints = function() {
-  scout.CheckBoxField.parent.prototype._renderGridDataHints.call(this);
+_renderGridDataHints() {
+  super._renderGridDataHints();
   this.updateInnerAlignment({
     useHorizontalAlignment: true
   });
-};
+}
 
-scout.CheckBoxField.prototype.setKeyStroke = function(keyStroke) {
+setKeyStroke(keyStroke) {
   this.setProperty('keyStroke', keyStroke);
-};
+}
 
-scout.CheckBoxField.prototype._setKeyStroke = function(keyStroke) {
+_setKeyStroke(keyStroke) {
   this._setProperty('keyStroke', keyStroke);
   this.checkBoxKeyStroke.parseAndSetKeyStroke(this.keyStroke);
-};
+}
 
-scout.CheckBoxField.prototype.setWrapText = function(wrapText) {
+setWrapText(wrapText) {
   this.setProperty('wrapText', wrapText);
-};
+}
 
-scout.CheckBoxField.prototype._renderWrapText = function() {
+_renderWrapText() {
   this.$checkBoxLabel.toggleClass('white-space-nowrap', !this.wrapText);
   this.invalidateLayoutTree();
-};
+}
 
-scout.CheckBoxField.prototype.acceptInput = function(whileTyping, forceSend) {
+acceptInput(whileTyping, forceSend) {
   // NOP
-};
+}
 
-scout.CheckBoxField.prototype.toggleChecked = function() {
+toggleChecked() {
   if (!this.enabledComputed) {
     return;
   }
@@ -202,14 +213,14 @@ scout.CheckBoxField.prototype.toggleChecked = function() {
   } else {
     this.setValue(!this.value);
   }
-};
+}
 
-scout.CheckBoxField.prototype.prepareForCellEdit = function(opts) {
-  scout.CheckBoxField.parent.prototype.prepareForCellEdit.call(this, opts);
+prepareForCellEdit(opts) {
+  super.prepareForCellEdit( opts);
   this.$checkBoxLabel.hide();
-};
+}
 
-scout.CheckBoxField.prototype._onMouseDown = function(event) {
+_onMouseDown(event) {
   if (!this.enabledComputed) {
     return;
   }
@@ -218,4 +229,5 @@ scout.CheckBoxField.prototype._onMouseDown = function(event) {
   if (scout.isOneOf(event.currentTarget, this.$checkBox[0], this.$checkBoxLabel[0])) {
     this.focusAndPreventDefault(event);
   }
-};
+}
+}

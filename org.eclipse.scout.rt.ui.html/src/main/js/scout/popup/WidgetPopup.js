@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.WidgetPopup = function() {
-  scout.WidgetPopup.parent.call(this);
+import {icons} from '../index';
+import {Popup} from '../index';
+import {WidgetPopupLayout} from '../index';
+import * as $ from 'jquery';
+import {scout} from '../index';
+
+export default class WidgetPopup extends Popup {
+
+constructor() {
+  super();
   this.animateOpening = true;
   this.animateResize = true;
   this.animateRemoval = true;
@@ -26,54 +34,54 @@ scout.WidgetPopup = function() {
   this._resizeHandler = this._onResize.bind(this);
   this._autoPositionOrig = null;
   this._addWidgetProperties(['widget']);
-};
-scout.inherits(scout.WidgetPopup, scout.Popup);
+}
 
-scout.WidgetPopup.prototype._createLayout = function() {
-  return new scout.WidgetPopupLayout(this);
-};
 
-scout.WidgetPopup.prototype._init = function(model) {
-  scout.WidgetPopup.parent.prototype._init.call(this, model);
+_createLayout() {
+  return new WidgetPopupLayout(this);
+}
+
+_init(model) {
+  super._init( model);
   this._setClosable(this.closable);
-};
+}
 
-scout.WidgetPopup.prototype._render = function() {
-  scout.WidgetPopup.parent.prototype._render.call(this);
+_render() {
+  super._render();
   this.$container.addClass('widget-popup');
-};
+}
 
-scout.WidgetPopup.prototype._renderProperties = function() {
-  scout.WidgetPopup.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderWidget();
   this._renderClosable();
   this._renderMovable();
   this._renderResizable();
-};
+}
 
-scout.WidgetPopup.prototype._remove = function() {
+_remove() {
   this.$dragHandle = null;
-  scout.WidgetPopup.parent.prototype._remove.call(this);
-};
+  super._remove();
+}
 
-scout.WidgetPopup.prototype.setWidget = function(widget) {
+setWidget(widget) {
   this.setProperty('widget', widget);
-};
+}
 
-scout.WidgetPopup.prototype._renderWidget = function() {
+_renderWidget() {
   if (!this.widget) {
     return;
   }
   this.widget.render();
   this.widget.$container.addClass('popup-widget');
   this.invalidateLayoutTree();
-};
+}
 
-scout.WidgetPopup.prototype.setClosable = function(closable) {
+setClosable(closable) {
   this.setProperty('closable', closable);
-};
+}
 
-scout.WidgetPopup.prototype._setClosable = function(closable) {
+_setClosable(closable) {
   this._setProperty('closable', closable);
   if (this.closable) {
     if (this.closeAction) {
@@ -88,31 +96,31 @@ scout.WidgetPopup.prototype._setClosable = function(closable) {
     this.closeAction.destroy();
     this.closeAction = null;
   }
-};
+}
 
-scout.WidgetPopup.prototype._createCloseAction = function() {
+_createCloseAction() {
   return scout.create('Action', {
     parent: this,
     cssClass: 'close-action',
-    iconId: scout.icons.REMOVE
+    iconId: icons.REMOVE
   });
-};
+}
 
-scout.WidgetPopup.prototype._renderClosable = function() {
+_renderClosable() {
   if (this.closeAction) {
     this.closeAction.render();
   }
-};
+}
 
-scout.WidgetPopup.prototype._onCloseAction = function() {
+_onCloseAction() {
   this.close();
-};
+}
 
-scout.WidgetPopup.prototype.setResizable = function(resizable) {
+setResizable(resizable) {
   this.setProperty('resizable', resizable);
-};
+}
 
-scout.WidgetPopup.prototype._renderResizable = function() {
+_renderResizable() {
   if (this.resizable) {
     this.$container
       .resizable()
@@ -123,21 +131,21 @@ scout.WidgetPopup.prototype._renderResizable = function() {
       .off('resize', this._resizeHandler);
     this.invalidateLayoutTree(); // Resize popup to preferred size
   }
-};
+}
 
-scout.WidgetPopup.prototype._onResize = function(event) {
+_onResize(event) {
   var autoSizeOrig = this.htmlComp.layout.autoSize;
   this.htmlComp.layout.autoSize = false;
   this.htmlComp.revalidateLayout();
   this.htmlComp.layout.autoSize = autoSizeOrig;
   return false;
-};
+}
 
-scout.WidgetPopup.prototype.setMovable = function(movable) {
+setMovable(movable) {
   this.setProperty('movable', movable);
-};
+}
 
-scout.WidgetPopup.prototype._renderMovable = function() {
+_renderMovable() {
   if (this.movable) {
     if (this.$dragHandle) {
       return;
@@ -155,22 +163,23 @@ scout.WidgetPopup.prototype._renderMovable = function() {
     this._autoPositionOrig = null;
     this.invalidateLayoutTree(); // move popup to preferred position
   }
-};
+}
 
-scout.WidgetPopup.prototype._onMove = function(newOffset) {
+_onMove(newOffset) {
   // Disable automatic positioning as soon as the user drags the popup
   if (this._autoPositionOrig === null) {
     this._autoPositionOrig = this.htmlComp.layout.autoPosition;
     this.htmlComp.layout.autoPosition = false;
   }
   this.trigger('move', newOffset);
-};
+}
 
-scout.WidgetPopup.prototype.set$Anchor = function($anchor) {
+set$Anchor($anchor) {
   if (this._autoPositionOrig && $anchor && this.$anchor !== $anchor) {
     // If a new anchor is set, the popup is positioned automatically -> reset flag to make animation work
     this.htmlComp.layout.autoPosition = this._autoPositionOrig;
     this._autoPositionOrig = null;
   }
-  scout.WidgetPopup.parent.prototype.set$Anchor.call(this, $anchor);
-};
+  super.set$Anchor( $anchor);
+}
+}

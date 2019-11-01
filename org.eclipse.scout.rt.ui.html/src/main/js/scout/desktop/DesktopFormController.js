@@ -8,8 +8,17 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.DesktopFormController = function(model) {
-  scout.DesktopFormController.parent.call(this, model);
+import {PopupWindow} from '../index';
+import {FormController} from '../index';
+import * as $ from 'jquery';
+import {arrays} from '../index';
+import {PopupBlockerHandler} from '../index';
+import {Dimension} from '../index';
+
+export default class DesktopFormController extends FormController {
+
+constructor(model) {
+  super( model);
   this.desktop = model.displayParent;
   this._popupWindows = [];
   this._documentPopupWindowReadyHandler = this._onDocumentPopupWindowReady.bind(this);
@@ -17,21 +26,21 @@ scout.DesktopFormController = function(model) {
   // must use a document-event, since when popup-window is reloading it does
   // only know the opener of its own window (and nothing about Scout).
   $(document).on('popupWindowReady', this._documentPopupWindowReadyHandler);
-};
-scout.inherits(scout.DesktopFormController, scout.FormController);
+}
 
-scout.DesktopFormController.prototype.render = function() {
-  scout.DesktopFormController.parent.prototype.render.call(this);
+
+render() {
+  super.render();
   var activeForm = this.desktop.activeForm;
   if (activeForm) {
     activeForm.activate();
   } else {
     this.desktop.bringOutlineToFront();
   }
-};
+}
 
-scout.DesktopFormController.prototype._renderViews = function() {
-  scout.DesktopFormController.parent.prototype._renderViews.call(this);
+_renderViews() {
+  super._renderViews();
 
   if (this.desktop.selectedViewTabs) {
     this.desktop.selectedViewTabs.forEach(function(selectedView) {
@@ -45,12 +54,12 @@ scout.DesktopFormController.prototype._renderViews = function() {
     // ensure layout is done before continuing rendering dialogs.
     this.desktop.bench.htmlComp.validateLayoutTree();
   }
-};
+}
 
 /**
  * @override FormController.js
  */
-scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
+_renderPopupWindow(form) {
   var windowSpecs,
     resizeToPrefSize; // flag used to resize browser-window later (see PopupWindow.js)
 
@@ -60,7 +69,7 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
     resizeToPrefSize = false;
   } else {
     var $mainDocument = $(document),
-      documentSize = new scout.Dimension($mainDocument.width(), $mainDocument.height());
+      documentSize = new Dimension($mainDocument.width(), $mainDocument.height());
     windowSpecs = 'left=0,top=0,width=' + documentSize.width + ',height=' + documentSize.height;
     resizeToPrefSize = true;
   }
@@ -71,7 +80,7 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   // See: https://developer.mozilla.org/en-US/docs/Web/API/Window/open#Position_and_size_features
   windowSpecs += ',location=no,toolbar=no,menubar=no,resizable=yes';
 
-  var popupBlockerHandler = new scout.PopupBlockerHandler(this.session, true /* no external untrusted URI: Can keep the opener for callback. */ ),
+  var popupBlockerHandler = new PopupBlockerHandler(this.session, true /* no external untrusted URI: Can keep the opener for callback. */ ),
     // form ID in URL is required for 'reload window' support
     url = 'popup-window.html?formId=' + form.id;
 
@@ -79,17 +88,17 @@ scout.DesktopFormController.prototype._renderPopupWindow = function(form) {
   popupBlockerHandler.openWindow(url, '_blank', windowSpecs, function(popup) {
     this._addPopupWindow(popup, form, resizeToPrefSize);
   }.bind(this));
-};
+}
 
-scout.DesktopFormController.prototype._addPopupWindow = function(newWindow, form, resizeToPrefSize) {
-  var popupWindow = new scout.PopupWindow(newWindow, form);
+_addPopupWindow(newWindow, form, resizeToPrefSize) {
+  var popupWindow = new PopupWindow(newWindow, form);
   popupWindow.resizeToPrefSize = resizeToPrefSize;
   popupWindow.events.on('popupWindowUnload', this._onPopupWindowUnload.bind(this));
   this._popupWindows.push(popupWindow);
   $.log.isDebugEnabled() && $.log.debug('Opened new popup window for form ID ' + form.id);
-};
+}
 
-scout.DesktopFormController.prototype._onDocumentPopupWindowReady = function(event, data) {
+_onDocumentPopupWindowReady(event, data) {
   $.log.isDebugEnabled() && $.log.debug('(FormController#_onDocumentPopupWindowReady) data=' + data);
   var popupWindow;
   if (data.formId) {
@@ -113,9 +122,9 @@ scout.DesktopFormController.prototype._onDocumentPopupWindowReady = function(eve
     throw new Error('Neither property \'formId\' nor \'popupWindow\' exists on data parameter');
   }
   popupWindow._onReady();
-};
+}
 
-scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindow) {
+_onPopupWindowUnload(popupWindow) {
   var form = popupWindow.form;
   $.log.isDebugEnabled() && $.log.debug('Popup window for form ID ' + form.id + ' is unloaded - don\'t know if its closed or reloaded yet');
 
@@ -134,7 +143,7 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
       form.close();
     }
   }.bind(this), 250);
-};
+}
 
 /**
  * We only close browser windows here, since during an unload event, we cannot send
@@ -142,29 +151,30 @@ scout.DesktopFormController.prototype._onPopupWindowUnload = function(popupWindo
  * should "kill" the forms - instead we simply render the popupWindows and forms
  * again when the page has been reloaded.
  */
-scout.DesktopFormController.prototype.closePopupWindows = function() {
+closePopupWindows() {
   this._popupWindows.forEach(function(popupWindow) {
     this._removePopupWindow(popupWindow.form);
   }, this);
   this._popupWindows = [];
-};
+}
 
 /**
  * @override FormController.js
  */
-scout.DesktopFormController.prototype._removePopupWindow = function(form) {
+_removePopupWindow(form) {
   var popupWindow = form.popupWindow;
   if (!popupWindow) {
     throw new Error('Form has no popupWindow reference');
   }
   delete form.popupWindow;
-  scout.arrays.remove(this._popupWindows, popupWindow);
+  arrays.remove(this._popupWindows, popupWindow);
   if (form.rendered) {
     form.remove();
     popupWindow.close();
   }
-};
+}
 
-scout.DesktopFormController.prototype.dispose = function() {
+dispose() {
   $(document).off('popupWindowReady', this._documentPopupWindowReadyHandler);
-};
+}
+}

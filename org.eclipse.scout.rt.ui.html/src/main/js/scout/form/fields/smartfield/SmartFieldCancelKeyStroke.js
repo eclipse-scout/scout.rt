@@ -8,24 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {keys} from '../../../index';
+import {KeyStroke} from '../../../index';
+
 /**
  * Closes the popup without accepting the proposal
  */
-scout.SmartFieldCancelKeyStroke = function(field) {
-  scout.SmartFieldCancelKeyStroke.parent.call(this);
+export default class SmartFieldCancelKeyStroke extends KeyStroke {
+
+constructor(field) {
+  super();
   this.field = field;
-  this.which = [scout.keys.ESC];
+  this.which = [keys.ESC];
   this.stopPropagation = true;
   this.preventInvokeAcceptInputOnActiveValueField = true;
 
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     return this.field.$fieldContainer;
   }.bind(this);
-};
-scout.inherits(scout.SmartFieldCancelKeyStroke, scout.KeyStroke);
+}
 
-scout.SmartFieldCancelKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.SmartFieldCancelKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   if (!accepted) {
     return false;
   }
@@ -33,12 +38,13 @@ scout.SmartFieldCancelKeyStroke.prototype._accept = function(event) {
     return false;
   }
   return true;
-};
+}
 
 /**
  * @override
  */
-scout.SmartFieldCancelKeyStroke.prototype.handle = function(event) {
+handle(event) {
   this.field.closePopup();
   this.field.resetDisplayText();
-};
+}
+}

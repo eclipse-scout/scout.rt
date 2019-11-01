@@ -8,9 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.TreeExpandOrDrillDownKeyStroke = function(tree, modifierBitMask) {
-  scout.TreeExpandOrDrillDownKeyStroke.parent.call(this, tree, modifierBitMask);
-  this.which = [scout.keys.ADD];
+import {keys} from '../../index';
+import {AbstractTreeNavigationKeyStroke} from '../../index';
+
+export default class TreeExpandOrDrillDownKeyStroke extends AbstractTreeNavigationKeyStroke {
+
+constructor(tree, modifierBitMask) {
+  super( tree, modifierBitMask);
+  this.which = [keys.ADD];
   this.renderingHints.text = '+';
   this.renderingHints.$drawingArea = function($drawingArea, event) {
     var currentNode = event._treeCurrentNode;
@@ -20,20 +25,20 @@ scout.TreeExpandOrDrillDownKeyStroke = function(tree, modifierBitMask) {
       return currentNode.childNodes[0].$node;
     }
   }.bind(this);
-};
-scout.inherits(scout.TreeExpandOrDrillDownKeyStroke, scout.AbstractTreeNavigationKeyStroke);
+}
 
-scout.TreeExpandOrDrillDownKeyStroke.prototype._accept = function(event) {
-  var accepted = scout.TreeExpandOrDrillDownKeyStroke.parent.prototype._accept.call(this, event);
+
+_accept(event) {
+  var accepted = super._accept( event);
   var currentNode = event._treeCurrentNode;
   return accepted && currentNode && (this.isNodeExpandable(currentNode) || currentNode.childNodes.length > 0);
-};
+}
 
-scout.TreeExpandOrDrillDownKeyStroke.prototype.isNodeExpandable = function(node) {
+isNodeExpandable(node) {
   return !node.expanded && !node.leaf;
-};
+}
 
-scout.TreeExpandOrDrillDownKeyStroke.prototype.handle = function(event) {
+handle(event) {
   var currentNode = event._treeCurrentNode;
   if (this.isNodeExpandable(currentNode)) {
     this.field.expandNode(currentNode, {
@@ -48,4 +53,5 @@ scout.TreeExpandOrDrillDownKeyStroke.prototype.handle = function(event) {
       this.selectNodesAndReveal(visibleChildNodes[0], true);
     }
   }
-};
+}
+}

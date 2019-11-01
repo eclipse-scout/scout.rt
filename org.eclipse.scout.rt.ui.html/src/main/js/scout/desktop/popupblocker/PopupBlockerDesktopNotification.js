@@ -8,38 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.PopupBlockerDesktopNotification = function() {
-  scout.PopupBlockerDesktopNotification.parent.call(this);
-  this.duration = scout.DesktopNotification.INFINITE;
+import {Status} from '../../index';
+import {scout} from '../../index';
+import {DesktopNotification} from '../../index';
+
+export default class PopupBlockerDesktopNotification extends DesktopNotification {
+
+constructor() {
+  super();
+  this.duration = DesktopNotification.INFINITE;
   this.linkUrl;
   this.preserveOpener = false;
-};
-scout.inherits(scout.PopupBlockerDesktopNotification, scout.DesktopNotification);
+}
 
-scout.PopupBlockerDesktopNotification.prototype._init = function(model) {
-  scout.PopupBlockerDesktopNotification.parent.prototype._init.call(this, model);
+
+_init(model) {
+  super._init( model);
   this.linkText = scout.nvl(this.linkText, this.session.text('ui.OpenManually'));
   this._setStatus({
     message: this.session.text('ui.PopupBlockerDetected'),
-    severity: scout.Status.Severity.WARNING
+    severity: Status.Severity.WARNING
   });
-};
+}
 
-scout.PopupBlockerDesktopNotification.prototype._render = function() {
-  scout.PopupBlockerDesktopNotification.parent.prototype._render.call(this);
+_render() {
+  super._render();
 
   this.$messageText.addClass('popup-blocked-title');
   this.$link = this.$content.appendElement('<a>', 'popup-blocked-link')
     .text(this.linkText)
     .on('click', this._onLinkClick.bind(this));
-};
+}
 
-scout.PopupBlockerDesktopNotification.prototype._renderProperties = function() {
-  scout.PopupBlockerDesktopNotification.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderLinkUrl();
-};
+}
 
-scout.PopupBlockerDesktopNotification.prototype._renderLinkUrl = function() {
+_renderLinkUrl() {
   if (this.linkUrl) {
     this.$link
       .attr('href', this.linkUrl)
@@ -51,9 +57,10 @@ scout.PopupBlockerDesktopNotification.prototype._renderLinkUrl = function() {
     this.$link.removeAttr('href')
       .removeAttr('target');
   }
-};
+}
 
-scout.PopupBlockerDesktopNotification.prototype._onLinkClick = function() {
+_onLinkClick() {
   this.trigger('linkClick');
   this.hide();
-};
+}
+}

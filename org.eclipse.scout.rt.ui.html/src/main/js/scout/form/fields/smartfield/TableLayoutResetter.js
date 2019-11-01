@@ -8,21 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import * as $ from 'jquery';
+
 
 /**
  * This class is used to reset and restore styles in the DOM, so we can measure the preferred size of the table.
  */
-scout.TableLayoutResetter = function(table) {
+export default class TableLayoutResetter {
+
+constructor(table) {
   this._table = table;
   this._fillerWidth = null;
   this.cssSelector = '.table';
-};
+}
 
 /**
  * Modifies the table in a way that the preferred width may be read.
  * Removes explicit widths on rows, cells, fillers and sets display to inline-block.
  */
-scout.TableLayoutResetter.prototype.modifyDom = function() {
+modifyDom() {
   this._table.$container
     .css('display', 'inline-block')
     .css('width', 'auto')
@@ -33,9 +37,9 @@ scout.TableLayoutResetter.prototype.modifyDom = function() {
   this._modifyFiller(this._table.$fillBefore);
   this._modifyFiller(this._table.$fillAfter);
   this._modifyTableData(this._cssBackup);
-};
+}
 
-scout.TableLayoutResetter.prototype.restoreDom = function() {
+restoreDom() {
   this._table.$container
     .css('display', 'block')
     .css('width', '100%')
@@ -46,31 +50,31 @@ scout.TableLayoutResetter.prototype.restoreDom = function() {
   this._restoreFiller(this._table.$fillBefore);
   this._restoreFiller(this._table.$fillAfter);
   this._modifyTableData(this._cssRestore);
-};
+}
 
 /**
  * Clears the given CSS property and stores the old value as data with prefix 'backup'
  * which is used to restore the CSS property later.
  */
-scout.TableLayoutResetter.prototype._cssBackup = function($element, property) {
+_cssBackup($element, property) {
   var oldValue = $element.css(property);
   $element
     .css(property, '')
     .data('backup' + property, oldValue);
-};
+}
 
-scout.TableLayoutResetter.prototype._cssRestore = function($element, property) {
+_cssRestore($element, property) {
   var dataProperty = 'backup' + property,
     oldValue = $element.data(dataProperty);
   $element
     .css(property, oldValue)
     .removeData(dataProperty);
-};
+}
 
 /**
  * Go through all rows and cells and call the given modifyFunc (backup/restore) on each element.
  */
-scout.TableLayoutResetter.prototype._modifyTableData = function(modifyFunc) {
+_modifyTableData(modifyFunc) {
   var that = this;
   this._table.$rows().each(function() {
     var $row = $(this);
@@ -81,17 +85,18 @@ scout.TableLayoutResetter.prototype._modifyTableData = function(modifyFunc) {
       modifyFunc($cell, 'max-width');
     });
   });
-};
+}
 
-scout.TableLayoutResetter.prototype._modifyFiller = function($filler) {
+_modifyFiller($filler) {
   if ($filler) {
     this._fillerWidth = $filler.css('width');
     $filler.css('width', '');
   }
-};
+}
 
-scout.TableLayoutResetter.prototype._restoreFiller = function($filler) {
+_restoreFiller($filler) {
   if ($filler) {
     $filler.css('width', this._fillerWidth);
   }
-};
+}
+}

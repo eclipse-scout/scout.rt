@@ -12,43 +12,46 @@
 /**
  * JavaScript port from java.awt.Point.
  */
-scout.Point = function(vararg, y) {
-  if (vararg instanceof scout.Point) {
+export default class Point {
+
+constructor(vararg, y) {
+  if (vararg instanceof Point) {
     this.x = vararg.x;
     this.y = vararg.y;
   } else {
     this.x = vararg || 0;
     this.y = y || 0;
   }
-};
+}
 
-scout.Point.prototype.toString = function() {
+toString() {
   return 'Point[x=' + this.x + ' y=' + this.y + ']';
-};
+}
 
-scout.Point.prototype.equals = function(o) {
+equals(o) {
   if (!o) {
     return false;
   }
   return (this.x === o.x && this.y === o.y);
-};
+}
 
-scout.Point.prototype.clone = function(o) {
-  return new scout.Point(this.x, this.y);
-};
+clone(o) {
+  return new Point(this.x, this.y);
+}
 
-scout.Point.prototype.add = function(point) {
-  return new scout.Point(this.x + point.x, this.y + point.y);
-};
+add(point) {
+  return new Point(this.x + point.x, this.y + point.y);
+}
 
-scout.Point.prototype.subtract = function(point) {
-  return new scout.Point(this.x - point.x, this.y - point.y);
-};
+subtract(point) {
+  return new Point(this.x - point.x, this.y - point.y);
+}
 
-scout.Point.prototype.floor = function() {
-  return new scout.Point(Math.floor(this.x), Math.floor(this.y));
-};
+floor() {
+  return new Point(Math.floor(this.x), Math.floor(this.y));
+}
 
-scout.Point.prototype.ceil = function() {
-  return new scout.Point(Math.ceil(this.x), Math.ceil(this.y));
-};
+ceil() {
+  return new Point(Math.ceil(this.x), Math.ceil(this.y));
+}
+}

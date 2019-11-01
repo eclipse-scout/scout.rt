@@ -8,6 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {PopupLayout} from '../../../index';
+import {HtmlEnvironment} from '../../../index';
+import {graphics} from '../../../index';
+import {SmartFieldPopup} from '../../../index';
+import {Dimension} from '../../../index';
+
 /**
  * The popup layout is different from other layouts, since it can determine its own size
  * when the autoSize flag is set to true. Otherwise it uses the given size, like a regular
@@ -17,15 +23,17 @@
  *
  *  The proposal-chooser DIV is not always present.
  */
-scout.SmartFieldPopupLayout = function(popup) {
-  scout.SmartFieldPopupLayout.parent.call(this, popup);
+export default class SmartFieldPopupLayout extends PopupLayout {
+
+constructor(popup) {
+  super( popup);
 
   this.animating = false;
   this.doubleCalcPrefSize = false;
-};
-scout.inherits(scout.SmartFieldPopupLayout, scout.PopupLayout);
+}
 
-scout.SmartFieldPopupLayout.prototype.layout = function($container) {
+
+layout($container) {
   var size, popupSize,
     htmlProposalChooser = this._htmlProposalChooser();
 
@@ -37,7 +45,7 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
     return;
   }
 
-  scout.SmartFieldPopupLayout.parent.prototype.layout.call(this, $container);
+  super.layout( $container);
 
   popupSize = this.popup.htmlComp.size();
   size = popupSize.subtract(this.popup.htmlComp.insets());
@@ -48,7 +56,7 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
     // Don't do it the first time (will be done by popup.open), only if the popup is already
     // open and gets layouted again
     this.popup.position();
-  } else if (scout.SmartFieldPopup.hasPopupAnimation()) { // don't use animation on crappy browsers like IE
+  } else if (SmartFieldPopup.hasPopupAnimation()) { // don't use animation on crappy browsers like IE
     // This code here is a bit complicated because:
     // 1. we must position the scrollTo position before we start the animation
     //    because it looks ugly, when we jump to the scroll position after the
@@ -72,23 +80,23 @@ scout.SmartFieldPopupLayout.prototype.layout = function($container) {
       }.bind(this));
     }.bind(this));
   }
-};
+}
 
 /**
  * @override AbstractLayout.js
  */
-scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container, options) {
+preferredLayoutSize($container, options) {
   var prefSize,
     htmlProposalChooser = this._htmlProposalChooser(),
-    fieldBounds = scout.graphics.offsetBounds(this.popup.smartField.$field);
+    fieldBounds = graphics.offsetBounds(this.popup.smartField.$field);
 
   if (htmlProposalChooser) {
     prefSize = htmlProposalChooser.prefSize(options);
     prefSize = prefSize.add(this.popup.htmlComp.insets());
   } else {
-    prefSize = new scout.Dimension(
-      scout.htmlEnvironment.formColumnWidth,
-      scout.htmlEnvironment.formRowHeight * 2);
+    prefSize = new Dimension(
+      HtmlEnvironment.get().formColumnWidth,
+      HtmlEnvironment.get().formRowHeight * 2);
   }
 
   prefSize.width = Math.max(fieldBounds.width, prefSize.width);
@@ -99,16 +107,17 @@ scout.SmartFieldPopupLayout.prototype.preferredLayoutSize = function($container,
   }
 
   return prefSize;
-};
+}
 
-scout.SmartFieldPopupLayout.prototype._htmlProposalChooser = function() {
+_htmlProposalChooser() {
   var proposalChooser = this.popup.proposalChooser;
   if (!proposalChooser) {
     return null;
   }
   return proposalChooser.htmlComp;
-};
+}
 
-scout.SmartFieldPopupLayout.prototype._maxWindowSize = function() {
+_maxWindowSize() {
   return this.popup.$container.window().width() - (2 * this.popup.windowPaddingX);
-};
+}
+}

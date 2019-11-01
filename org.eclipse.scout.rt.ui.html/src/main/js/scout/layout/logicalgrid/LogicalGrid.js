@@ -8,38 +8,44 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {LogicalGridConfig} from '../../index';
+import {scout} from '../../index';
+
 /**
  * Base class for every logical grid. The concrete grids should implement {@link #_validate}.
  */
-scout.LogicalGrid = function(options) {
+export default class LogicalGrid {
+
+constructor(options) {
   options = options || {};
   this.dirty = true;
   this.gridConfig = options.gridConfig || null;
   this._setGridConfig(this.gridConfig);
-};
+}
 
-scout.LogicalGrid.prototype.setDirty = function(dirty) {
+setDirty(dirty) {
   this.dirty = dirty;
-};
+}
 
-scout.LogicalGrid.prototype.setGridConfig = function(gridConfig) {
+setGridConfig(gridConfig) {
   this._setGridConfig(gridConfig);
-};
+}
 
-scout.LogicalGrid.prototype._setGridConfig = function(gridConfig) {
-  if (gridConfig && !(gridConfig instanceof scout.LogicalGridConfig)) {
+_setGridConfig(gridConfig) {
+  if (gridConfig && !(gridConfig instanceof LogicalGridConfig)) {
     gridConfig = scout.create('LogicalGridConfig', gridConfig);
   }
   this.gridConfig = gridConfig;
-};
+}
 
 /**
  * Calls {@link #_validate} if the grid is dirty. Sets dirty to false afterwards.
  */
-scout.LogicalGrid.prototype.validate = function(gridContainer) {
+validate(gridContainer) {
   if (!this.dirty) {
     return;
   }
   this._validate(gridContainer);
   this.setDirty(false);
-};
+}
+}

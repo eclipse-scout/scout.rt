@@ -8,26 +8,31 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
+import {Key} from '../index';
+import {KeyStroke} from '../index';
+
 /**
  * KeyStroke which is bound to a range of keys, e.g. ctrl-1 ... ctrl-9.
  */
-scout.RangeKeyStroke = function() {
-  scout.RangeKeyStroke.parent.call(this);
-  this.ranges = [];
-};
-scout.inherits(scout.RangeKeyStroke, scout.KeyStroke);
+export default class RangeKeyStroke extends KeyStroke {
 
-scout.RangeKeyStroke.prototype.registerRange = function(from, to) {
+constructor() {
+  super();
+  this.ranges = [];
+}
+
+
+registerRange(from, to) {
   this.ranges.push({
     from: from,
     to: to
   });
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.RangeKeyStroke.prototype._accept = function(event) {
+_accept(event) {
   //event.ctrlKey||event.metaKey  --> some keystrokes with ctrl modifier are captured and suppressed by osx use in this cases command key
   if ((event.ctrlKey || event.metaKey) !== this.ctrl ||
     event.altKey !== this.alt ||
@@ -39,29 +44,30 @@ scout.RangeKeyStroke.prototype._accept = function(event) {
   return this.ranges.some(function(range) {
     return event.which >= this._getRangeFrom(range) && event.which <= this._getRangeTo(range);
   }, this);
-};
+}
 
 /**
  * @override KeyStroke.js
  */
-scout.RangeKeyStroke.prototype.keys = function() {
+keys() {
   var keys = [];
   this.ranges.forEach(function(range) {
     var from = this._getRangeFrom(range);
     var to = this._getRangeTo(range);
 
     for (var which = from; which <= to; which++) {
-      keys.push(new scout.Key(this, which));
+      keys.push(new Key(this, which));
     }
   }, this);
 
   return keys;
-};
+}
 
-scout.RangeKeyStroke.prototype._getRangeFrom = function(range) {
+_getRangeFrom(range) {
   return (typeof range.from === 'function' ? range.from() : range.from);
-};
+}
 
-scout.RangeKeyStroke.prototype._getRangeTo = function(range) {
+_getRangeTo(range) {
   return (typeof range.to === 'function' ? range.to() : range.to);
-};
+}
+}

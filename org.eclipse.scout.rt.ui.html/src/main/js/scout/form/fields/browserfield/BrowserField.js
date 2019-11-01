@@ -8,8 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.BrowserField = function() {
-  scout.BrowserField.parent.call(this);
+import {ValueField} from '../../../index';
+import {PopupBlockerHandler} from '../../../index';
+import {strings} from '../../../index';
+import {numbers} from '../../../index';
+import {scout} from '../../../index';
+import {Rectangle} from '../../../index';
+import {BrowserFieldLayout} from '../../../index';
+import * as $ from 'jquery';
+
+export default class BrowserField extends ValueField {
+
+constructor() {
+  super();
 
   this.autoCloseExternalWindow = false;
   this.externalWindowButtonText = null;
@@ -24,16 +35,16 @@ scout.BrowserField = function() {
   this._popupWindow = null;
   this._externalWindowTextField = null;
   this._externalWindowButton = null;
-};
-scout.inherits(scout.BrowserField, scout.ValueField);
+}
 
-scout.BrowserField.WindowStates = {
+
+static WindowStates = {
   WINDOW_OPEN: 'true',
   WINDOW_CLOSED: 'false'
 };
 
-scout.BrowserField.prototype._init = function(model) {
-  scout.BrowserField.parent.prototype._init.call(this, model);
+_init(model) {
+  super._init( model);
 
   this.iframe = scout.create('IFrame', {
     parent: this,
@@ -44,10 +55,10 @@ scout.BrowserField.prototype._init = function(model) {
     trackLocation: model.trackLocation
   });
   this.iframe.on('propertyChange', this._onIFramePropertyChange.bind(this));
-};
+}
 
-scout.BrowserField.prototype._render = function() {
-  this.addContainer(this.$parent, 'browser-field', new scout.BrowserFieldLayout(this));
+_render() {
+  this.addContainer(this.$parent, 'browser-field', new BrowserFieldLayout(this));
   this.addLabel();
   this.addStatus();
 
@@ -76,22 +87,22 @@ scout.BrowserField.prototype._render = function() {
     // use setTimeout to call method, because _openPopupWindow must be called after layouting
     setTimeout(this._openPopupWindow.bind(this, true), 20);
   }
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.BrowserField.prototype._renderProperties = function() {
-  scout.BrowserField.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderExternalWindowButtonText();
   this._renderExternalWindowFieldText();
-};
+}
 
 /**
  * @override FormField.js
  */
-scout.BrowserField.prototype._remove = function() {
-  scout.BrowserField.parent.prototype._remove.call(this);
+_remove() {
+  super._remove();
   this.myWindow.removeEventListener('message', this._messageListener);
   this._messageListener = null;
 
@@ -102,14 +113,14 @@ scout.BrowserField.prototype._remove = function() {
       this._popupWindow.close();
     }
   }
-};
+}
 
-scout.BrowserField.prototype.setLocation = function(location) {
+setLocation(location) {
   this.setProperty('location', location);
   this.iframe.setLocation(location);
-};
+}
 
-scout.BrowserField.prototype._renderLocation = function() {
+_renderLocation() {
   // Convert empty locations to 'about:blank', because in Firefox (maybe others, too?),
   // empty locations simply remove the src attribute but don't remove the old content.
   var location = this.location || 'about:blank';
@@ -119,31 +130,31 @@ scout.BrowserField.prototype._renderLocation = function() {
       this._popupWindow.location = location;
     }
   }
-};
+}
 
-scout.BrowserField.prototype.setAutoCloseExternalWindow = function(autoCloseExternalWindow) {
+setAutoCloseExternalWindow(autoCloseExternalWindow) {
   this.setProperty('autoCloseExternalWindow', autoCloseExternalWindow);
-};
+}
 
-scout.BrowserField.prototype.setExternalWindowButtonText = function(externalWindowButtonText) {
+setExternalWindowButtonText(externalWindowButtonText) {
   this.setProperty('externalWindowButtonText', externalWindowButtonText);
-};
+}
 
-scout.BrowserField.prototype._renderExternalWindowButtonText = function() {
+_renderExternalWindowButtonText() {
   if (this.showInExternalWindow) {
     this._externalWindowButton.text(this.externalWindowButtonText || '');
   }
-};
+}
 
-scout.BrowserField.prototype.setExternalWindowFieldText = function(externalWindowFieldText) {
+setExternalWindowFieldText(externalWindowFieldText) {
   this.setProperty('externalWindowFieldText', externalWindowFieldText);
-};
+}
 
-scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
+_renderExternalWindowFieldText() {
   if (this.showInExternalWindow) {
     this._externalWindowTextField.text(this.externalWindowFieldText || '');
   }
-};
+}
 
 /**
  * Note: this function is designed to deliver good results to position a popup over a BrowserField in Internet Explorer.
@@ -158,7 +169,7 @@ scout.BrowserField.prototype._renderExternalWindowFieldText = function() {
  * a HTML document. So we removed the check entirely, which shouldn't be an issue since the browser itself does prevent
  * popups from having an invalid position.
  */
-scout.BrowserField.prototype._calcPopupBounds = function() {
+_calcPopupBounds() {
   var myWindow = this.$container.window(true);
 
   var POPUP_WINDOW_TOP_HEIGHT = 30;
@@ -171,13 +182,13 @@ scout.BrowserField.prototype._calcPopupBounds = function() {
   // of the primary monitor) or larger then the availSize of the screen (if we have a secondary monitor on the right
   // side of the primary monitor). Note that IE cannot properly place the popup on a monitor on the left. It seems
   // to ignore negative X coordinates somehow (but not entirely).
-  var browserBounds = new scout.Rectangle(
+  var browserBounds = new Rectangle(
     myWindow.screenX,
     myWindow.screenY,
     $(myWindow).width(),
     $(myWindow).height() + BROWSER_WINDOW_TOP_HEIGHT);
 
-  var fieldBounds = new scout.Rectangle(
+  var fieldBounds = new Rectangle(
     this.$field.offset().left,
     this.$field.offset().top,
     this.$field.width(),
@@ -195,25 +206,25 @@ scout.BrowserField.prototype._calcPopupBounds = function() {
     popupHeight -= (popupLowerY - browserLowerY) + POPUP_WINDOW_CHROME_HEIGHT;
   }
 
-  return new scout.Rectangle(
-    scout.numbers.round(popupX),
-    scout.numbers.round(popupY),
-    scout.numbers.round(popupWidth),
-    scout.numbers.round(popupHeight)
+  return new Rectangle(
+    numbers.round(popupX),
+    numbers.round(popupY),
+    numbers.round(popupWidth),
+    numbers.round(popupHeight)
   );
-};
+}
 
-scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
+_openPopupWindow(reopenIfClosed) {
   reopenIfClosed = scout.nvl(reopenIfClosed, true);
   if (!this.showInExternalWindow) {
     return;
   }
 
   if (!this._popupWindow || (reopenIfClosed && this._popupWindow.closed)) {
-    var popupBlockerHandler = new scout.PopupBlockerHandler(this.session);
+    var popupBlockerHandler = new PopupBlockerHandler(this.session);
     var popupBounds = this._calcPopupBounds();
     // (b) window specifications
-    var windowSpecs = scout.strings.join(',',
+    var windowSpecs = strings.join(',',
       'directories=no',
       'location=no',
       'menubar=no',
@@ -232,13 +243,13 @@ scout.BrowserField.prototype._openPopupWindow = function(reopenIfClosed) {
   } else if (reopenIfClosed) {
     this._popupWindow.focus();
   }
-};
+}
 
-scout.BrowserField.prototype._popupWindowOpen = function(popup) {
+_popupWindowOpen(popup) {
   this._popupWindow = popup;
   if (this._popupWindow && !this._popupWindow.closed) {
     this.trigger('externalWindowStateChange', {
-      windowState: scout.BrowserField.WindowStates.WINDOW_OPEN
+      windowState: BrowserField.WindowStates.WINDOW_OPEN
     });
     var popupInterval = window.setInterval(function() {
       var popupWindowClosed = false;
@@ -252,14 +263,14 @@ scout.BrowserField.prototype._popupWindowOpen = function(popup) {
       if (popupWindowClosed) {
         window.clearInterval(popupInterval);
         this.trigger('externalWindowStateChange', {
-          windowState: scout.BrowserField.WindowStates.WINDOW_CLOSED
+          windowState: BrowserField.WindowStates.WINDOW_CLOSED
         });
       }
     }.bind(this), 500);
   }
-};
+}
 
-scout.BrowserField.prototype._onMessage = function(event) {
+_onMessage(event) {
   if (event.source !== this.$field[0].contentWindow) {
     $.log.isTraceEnabled() && $.log.trace('skipped post-message, because different source. data=' + event.data + ' origin=' + event.origin);
     return;
@@ -269,41 +280,42 @@ scout.BrowserField.prototype._onMessage = function(event) {
     data: event.data,
     origin: event.origin
   });
-};
+}
 
-scout.BrowserField.prototype.setTrackLocationChange = function(trackLocation) {
+setTrackLocationChange(trackLocation) {
   this.setProperty('trackLocation', trackLocation);
   this.iframe.setTrackLocationChange(trackLocation);
-};
+}
 
-scout.BrowserField.prototype._onIFramePropertyChange = function(event) {
+_onIFramePropertyChange(event) {
   if (!this.trackLocation) {
     return;
   }
   if (event.propertyName === 'location') {
     this._setProperty('location', event.newValue);
   }
-};
+}
 
-scout.BrowserField.prototype._onLoad = function(event) {
+_onLoad(event) {
   if (!this.rendered) { // check needed, because this is an async callback
     return;
   }
 
   this.invalidateLayoutTree();
-};
+}
 
-scout.BrowserField.prototype.setSandboxEnabled = function(sandboxEnabled) {
+setSandboxEnabled(sandboxEnabled) {
   this.setProperty('sandboxEnabled', sandboxEnabled);
   this.iframe.setSandboxEnabled(sandboxEnabled);
-};
+}
 
-scout.BrowserField.prototype.setSandboxPermissions = function(sandboxPermissions) {
+setSandboxPermissions(sandboxPermissions) {
   this.setProperty('sandboxPermissions', sandboxPermissions);
   this.iframe.setSandboxPermissions(sandboxPermissions);
-};
+}
 
-scout.BrowserField.prototype.setScrollBarEnabled = function(scrollBarEnabled) {
+setScrollBarEnabled(scrollBarEnabled) {
   this.setProperty('scrollBarEnabled', scrollBarEnabled);
   this.iframe.setScrollBarEnabled(scrollBarEnabled);
-};
+}
+}

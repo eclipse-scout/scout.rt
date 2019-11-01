@@ -1,32 +1,39 @@
-scout.BeanTile = function() {
-  scout.BeanTile.parent.call(this);
+import {Tile} from '../index';
+import {HtmlComponent} from '../index';
+import * as $ from 'jquery';
+
+export default class BeanTile extends Tile {
+
+constructor() {
+  super();
 
   this.bean = null;
-};
-scout.inherits(scout.BeanTile, scout.Tile);
+}
 
-scout.BeanTile.prototype._render = function() {
+
+_render() {
   this.$container = this.$parent.appendDiv('bean-tile');
-  this.htmlComp = scout.HtmlComponent.install(this.$container, this.session);
-};
+  this.htmlComp = HtmlComponent.install(this.$container, this.session);
+}
 
-scout.BeanTile.prototype._renderProperties = function() {
-  scout.BeanTile.parent.prototype._renderProperties.call(this);
+_renderProperties() {
+  super._renderProperties();
   this._renderBean();
-};
+}
 
-scout.BeanTile.prototype._renderBean = function() {
+_renderBean() {
   // to be implemented by the subclass
-};
+}
 
-scout.BeanTile.prototype.triggerAppLinkAction = function(ref) {
+triggerAppLinkAction(ref) {
   this.trigger('appLinkAction', {
     ref: ref
   });
-};
+}
 
-scout.BeanTile.prototype._onAppLinkAction = function(event) {
+_onAppLinkAction(event) {
   var $target = $(event.delegateTarget);
   var ref = $target.data('ref');
   this.triggerAppLinkAction(ref);
-};
+}
+}

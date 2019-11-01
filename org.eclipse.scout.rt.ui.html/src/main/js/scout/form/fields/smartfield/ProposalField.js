@@ -8,8 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-scout.ProposalField = function() {
-  scout.ProposalField.parent.call(this);
+import {SmartField} from '../../../index';
+import {strings} from '../../../index';
+import {scout} from '../../../index';
+import {objects} from '../../../index';
+import * as $ from 'jquery';
+
+export default class ProposalField extends SmartField {
+
+constructor() {
+  super();
 
   this.maxLength = 4000;
   this.trimText = true;
@@ -21,31 +29,31 @@ scout.ProposalField = function() {
    * from the lookup.
    */
   this.lookupOnAcceptByText = false;
-};
-scout.inherits(scout.ProposalField, scout.SmartField);
+}
 
-scout.ProposalField.prototype._getValueFromLookupRow = function(lookupRow) {
+
+_getValueFromLookupRow(lookupRow) {
   return lookupRow.text;
-};
+}
 
-scout.ProposalField.prototype._getLastSearchText = function() {
+_getLastSearchText() {
   return this.value;
-};
+}
 
-scout.ProposalField.prototype.cssClassName = function() {
+cssClassName() {
   return 'proposal-field';
-};
+}
 
-scout.ProposalField.prototype._handleEnterKey = function(event) {
+_handleEnterKey(event) {
   this.acceptInput();
   if (this.popup) {
     this.closePopup();
     event.stopPropagation();
   }
-};
+}
 
-scout.ProposalField.prototype._lookupByTextOrAllDone = function(result) {
-  if (scout.ProposalField.parent.prototype._handleException.call(this, result)) {
+_lookupByTextOrAllDone(result) {
+  if (super._handleException( result)) {
     return;
   }
   if (result.lookupRows.length === 0) {
@@ -53,18 +61,18 @@ scout.ProposalField.prototype._lookupByTextOrAllDone = function(result) {
     this._handleEmptyResult();
     return;
   }
-  scout.ProposalField.parent.prototype._lookupByTextOrAllDone.call(this, result);
-};
+  super._lookupByTextOrAllDone( result);
+}
 
-scout.ProposalField.prototype._formatValue = function(value) {
+_formatValue(value) {
   return scout.nvl(value, '');
-};
+}
 
-scout.ProposalField.prototype._validateValue = function(value) {
-  if (scout.objects.isNullOrUndefined(value)) {
+_validateValue(value) {
+  if (objects.isNullOrUndefined(value)) {
     return value;
   }
-  var validValue = scout.strings.asString(value);
+  var validValue = strings.asString(value);
   if (this.trimText) {
     validValue = validValue.trim();
   }
@@ -75,34 +83,34 @@ scout.ProposalField.prototype._validateValue = function(value) {
     validValue = null;
   }
   return validValue;
-};
+}
 
-scout.ProposalField.prototype._ensureValue = function(value) {
-  return scout.strings.asString(value);
-};
+_ensureValue(value) {
+  return strings.asString(value);
+}
 
 /**
  * When 'clear' has been clicked (searchText is empty), we want to call customTextAccepted,
  * so the new value is sent to the server #221199.
  */
-scout.ProposalField.prototype._acceptByText = function(sync, searchText) {
+_acceptByText(sync, searchText) {
   $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptByText) searchText=', searchText);
   var async = !sync;
 
   // In case sync=true we cannot wait for the results of the lookup-call,
   // that's why we simply accept the text that's already in the field
-  if (async && this.lookupOnAcceptByText && scout.strings.hasText(searchText)) {
-    scout.ProposalField.parent.prototype._acceptByTextAsync.call(this, searchText);
+  if (async && this.lookupOnAcceptByText && strings.hasText(searchText)) {
+    super._acceptByTextAsync( searchText);
   } else {
     this._customTextAccepted(searchText);
   }
-};
+}
 
 /**
  * Only used in case lookupOnAcceptByText is true. It's basically the same code
  * as in the smart-field but without the error handling.
  */
-scout.ProposalField.prototype._acceptByTextDone = function(result) {
+_acceptByTextDone(result) {
   this._userWasTyping = false;
   this._extendResult(result);
 
@@ -117,49 +125,49 @@ scout.ProposalField.prototype._acceptByTextDone = function(result) {
   }
 
   this._customTextAccepted(result.text);
-};
+}
 
-scout.ProposalField.prototype._checkResetLookupRow = function(value) {
+_checkResetLookupRow(value) {
   return this.lookupRow && this.lookupRow.text !== value;
-};
+}
 
-scout.ProposalField.prototype._checkSearchTextChanged = function(searchText) {
+_checkSearchTextChanged(searchText) {
   return this._checkDisplayTextChanged(searchText);
-};
+}
 
-scout.ProposalField.prototype._customTextAccepted = function(searchText) {
+_customTextAccepted(searchText) {
   this._setLookupRow(null); // only reset property lookup
   this._setValue(searchText);
   this._inputAccepted(true, false);
-};
+}
 
-scout.ProposalField.prototype.getValueForSelection = function() {
+getValueForSelection() {
   return this._showSelection() ? this.lookupRow.key : null;
-};
+}
 
 /**
  * This function is overridden by ProposalField because it has a different behavior than the smart-field.
  */
-scout.ProposalField.prototype._acceptLookupRowAndValueFromField = function(otherField) {
+_acceptLookupRowAndValueFromField(otherField) {
   if (this.lookupRow !== otherField.lookupRow) {
     this.setLookupRow(otherField.lookupRow);
   }
-};
+}
 
 /**
  * In ProposalField value and display-text is the same. When a custom text has been entered,
  * the value is set and the lookup-row is null.
  */
-scout.ProposalField.prototype._copyValuesFromField = function(otherField) {
+_copyValuesFromField(otherField) {
   if (this.lookupRow !== otherField.lookupRow) {
     this.setLookupRow(otherField.lookupRow);
   }
   if (this.value !== otherField.value) {
     this.setValue(otherField.value);
   }
-};
+}
 
-scout.ProposalField.prototype._acceptInput = function(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
+_acceptInput(sync, searchText, searchTextEmpty, searchTextChanged, selectedLookupRow) {
   // Do nothing when search text is equals to the text of the current lookup row
   if (!selectedLookupRow && this.lookupRow && this.lookupRow.text === searchText) {
     $.log.isDebugEnabled() && $.log.debug('(ProposalField#_acceptInput) unchanged: text is equals. Close popup');
@@ -189,19 +197,20 @@ scout.ProposalField.prototype._acceptInput = function(sync, searchText, searchTe
   }
 
   return this._acceptInputDeferred.promise();
-};
+}
 
-scout.ProposalField.prototype.setTrimText = function(trimText) {
+setTrimText(trimText) {
   this.setProperty('trimText', trimText);
-};
+}
 
-scout.ProposalField.prototype.setMaxLength = function(maxLength) {
+setMaxLength(maxLength) {
   this.setProperty('maxLength', maxLength);
-};
+}
 
 /**
  * @override ValueField.js
  */
-scout.ProposalField.prototype._updateEmpty = function() {
-  this.empty = scout.strings.empty(this.value);
-};
+_updateEmpty() {
+  this.empty = strings.empty(this.value);
+}
+}
