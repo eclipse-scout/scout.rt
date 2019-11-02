@@ -97,13 +97,13 @@ const RGB_BLACK = {
   red: 0,
   green: 0,
   blue: 0
-}
+};
 
 const RGB_WHITE = {
   red: 255,
   green: 255,
   blue: 255
-}
+};
 
 /**
  * Creates an rgb object based on the given rgb string with the format rgb(0, 0, 0).

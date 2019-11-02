@@ -95,7 +95,7 @@ export function maxFinish(currentState) {
   return currentState;
 }
 
-let maxSymbol = icons.MAX_BOLD
+let maxSymbol = icons.MAX_BOLD;
 
 
 export default {

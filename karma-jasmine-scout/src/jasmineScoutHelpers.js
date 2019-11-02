@@ -46,7 +46,7 @@ window.receiveResponseForAjaxCall = function(request, response) {
   if (request && request.onload) {
     request.respondWith(response);
   }
-}
+};
 
 /**
  * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.start()
